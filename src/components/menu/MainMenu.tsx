@@ -14,7 +14,9 @@ const Menu = () => {
             }}
             spacing={2}>
             <Grid item xs={12}>
-                <Grid container justifyContent="center" spacing={20}>
+                <Grid container justifyContent="center"
+                      spacing={15}  // Space between buttons
+                >
                     <Grid key='menu-grid-item-data' item><StyledButton name={'Data'} items={[{name: 'Item1', handler:()=> {}}]}/></Grid>
                     <Grid key='menu-grid-item-learn' item><StyledButton name={'Learn'} items={[{name: 'Item1', handler:()=> {}}]}/></Grid>
                     <Grid key='menu-grid-item-engage' item><StyledButton name={'Engage'} items={[{name: 'Item1', handler:()=> {}}]}/></Grid>
