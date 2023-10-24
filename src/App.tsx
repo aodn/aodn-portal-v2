@@ -25,7 +25,7 @@ const app = () =>
       backgroundSize: 'cover',
       height: '100%'
   }}>
-      <RouterProvider router={router} fallbackElement={<Fallback />} />;
+      <RouterProvider router={router} fallbackElement={<Fallback />} />
   </div>
 
 export default app;

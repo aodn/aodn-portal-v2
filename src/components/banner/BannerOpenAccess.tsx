@@ -30,7 +30,7 @@ const BannerOpenAccess = (props : BannerProps) => {
                         </Grid>
                     </Grid>
                 </Grid>
-            </Grid>;
+            </Grid>
     }
 
     return(banner);
