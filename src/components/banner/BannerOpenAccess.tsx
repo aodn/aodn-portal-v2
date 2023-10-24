@@ -19,7 +19,15 @@ const BannerOpenAccess = (props : BannerProps) => {
                       }}>
                     <Grid container justifyContent="left">
                         <Grid xs={7} item>&nbsp;</Grid>
-                        <Grid xs={4} sx={{fontSize: '70px'}} item>Open Access to Ocean Data</Grid>
+                        <Grid
+                            item
+                            xs={4} sx={{
+                                fontSize: '70px',
+                                color: 'white',
+                                textShadow: '3px 3px lightgrey'
+                            }}>
+                            Open Access to Ocean Data
+                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>;
