@@ -1,0 +1,28 @@
+
+/*.menu-button {*/
+/*    background-color: rgba(161, 167, 183, 90);*/
+/*}*/
+
+/*.menu-list {*/
+/*    list-style-type: none;*/
+/*    display: flex;*/
+/*    justify-content: space-between;*/
+/*    max-width: 800px; !* Adjust this to your preference *!*/
+/*    margin: 0 auto;*/
+/*    padding: 0;*/
+/*}*/
+
+/*.menu-list li {*/
+/*    margin: 0;*/
+/*}*/
+
+/*.menu-list li a {*/
+/*    color: #333; !* Placeholder color, adjust as needed *!*/
+/*    text-decoration: none;*/
+/*    padding: 5px 15px;*/
+/*    transition: background-color 0.3s ease;*/
+/*}*/
+
+/*.menu-list li a:hover {*/
+/*    background-color: #ddd; !* Placeholder color for hover effect *!*/
+/*}*/

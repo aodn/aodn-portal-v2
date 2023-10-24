@@ -1,16 +1,26 @@
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
-import Menu, { MenuProps } from '@mui/material/Menu';
-import {Button, MenuItem} from "@mui/material";
+import {styled, alpha} from '@mui/material/styles';
+import Menu, {MenuProps} from '@mui/material/Menu';
+import {Button, ButtonProps, MenuItem} from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import './MainMenu.module.css';
+import grey from '../common/colors/grey';
 
 type StyledMenuItem = {
     name: string;
-    items : [{
+    items: [{
         name: string
         handler(event: React.MouseEvent<HTMLElement>): void;
     }]
 };
+
+const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
+    color: theme.palette.getContrastText(grey['menu']),
+    backgroundColor: grey['menu'],
+    '&:hover': {
+        backgroundColor: grey['menu'],
+    },
+}));
 
 const StyledMenu = styled((props: MenuProps) => (
     <Menu
@@ -24,7 +34,7 @@ const StyledMenu = styled((props: MenuProps) => (
             horizontal: 'right',
         }}
         {...props}
-    />))(({ theme }) => ({
+    />))(({theme}) => ({
     '& .MuiPaper-root': {
         borderRadius: 6,
         marginTop: theme.spacing(1),
@@ -67,7 +77,7 @@ const StyledButton = (menuItem: StyledMenuItem) => {
 
     return (
         <>
-            <Button
+            <ColorButton
                 id="styled-menu-button"
                 aria-controls={open ? 'styled-menu-menu' : undefined}
                 aria-haspopup="true"
@@ -75,10 +85,10 @@ const StyledButton = (menuItem: StyledMenuItem) => {
                 variant="contained"
                 disableElevation
                 onClick={handleClick}
-                endIcon={<KeyboardArrowDownIcon />}
+                endIcon={<KeyboardArrowDownIcon/>}
             >
                 {menuItem.name}
-            </Button>
+            </ColorButton>
             <StyledMenu
                 id="styled-menu"
                 MenuListProps={{
@@ -90,7 +100,9 @@ const StyledButton = (menuItem: StyledMenuItem) => {
             >
                 {menuItem.items.map(value => {
                     return (
-                        <MenuItem onClick={(event) => { value.handler(event);}}
+                        <MenuItem onClick={(event) => {
+                            value.handler(event);
+                        }}
                                   disableRipple>
                             {value.name}
                         </MenuItem>
