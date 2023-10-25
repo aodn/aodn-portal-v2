@@ -1,5 +1,5 @@
 
-import {Grid, TextField, InputAdornment, Button, withStyles, TextFieldProps} from '@mui/material';
+import {Grid, TextField, InputAdornment, Button, TextFieldProps} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import grey from '../common/colors/grey';
 import {styled} from "@mui/material/styles";

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Box, Card, CardActionArea, CardContent, CardMedia, Paper, Typography} from '@mui/material';
+import {Box, Card, CardActionArea, CardMedia} from '@mui/material';
 
 enum CardType {
     OneOnOne,
