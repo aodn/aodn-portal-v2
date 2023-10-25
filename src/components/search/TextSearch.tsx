@@ -1,9 +1,10 @@
-import * as React from 'react';
+
 import {Grid, TextField, InputAdornment, Button, withStyles, TextFieldProps} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import grey from '../common/colors/grey';
 import {styled} from "@mui/material/styles";
 import {Tune} from "@mui/icons-material";
+import {margin} from '../common/constants';
 
 const StyledTextField = styled(TextField)<TextFieldProps>(({ theme }) => ({
     minWidth: '100%',
@@ -60,7 +61,7 @@ const searchButton = () =>
             height: '100%',
             borderColor: 'white',
             borderSize: '5px',
-            minWidth: '217px'
+            minWidth: '150px'
         }}
     >
         Search
@@ -69,7 +70,12 @@ const searchButton = () =>
 const TextSearch = () => {
     return(
         <Grid container>
-            <Grid item xs={12}>
+            <Grid item
+                  xs={12}
+                  sx={{
+                      marginTop: margin['top'],
+                      marginBottom: margin['bottom']
+                  }}>
                 <Grid container justifyContent={'left'} spacing={2}>
                     <Grid item xs={2}>&nbsp;</Grid>
                     <Grid item xs={7}>
