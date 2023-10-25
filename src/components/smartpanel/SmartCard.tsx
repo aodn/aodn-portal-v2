@@ -57,9 +57,11 @@ const SmartCardContent = (props: SmartcardProps) => {
                         <div
                           style={{
                               position: "absolute",
-                              top: '40%',
-                              left: '45%',
-                              transform: 'translate(-40%, -45%)',
+                              marginLeft: 'auto',
+                              marginRight: 'auto',
+                              left: 0,
+                              right: 0,
+                              textAlign: 'center',
                               color: 'white',
                               fontSize: 'x-large',
                               fontWeight: 'bold',

@@ -17,11 +17,11 @@ const ComplexSmartPanel = () => {
                     <Grid item xs={8}>
                         <Box
                             display='grid'
-                            marginTop={margin['top']}
-                            marginBottom={margin['bottom']}
+                            marginTop={margin['tripleTop']}
+                            marginBottom={margin['tripleBottom']}
                             gridTemplateColumns="repeat(9, 1fr)"
-                            gridTemplateRows='repeat(2, 90px)'
-                            gap={3}
+                            gridTemplateRows='repeat(2, 95px)'
+                            gap={2}
                             sx ={{
                                 overflowX: 'auto',
                                 overflowY: 'hidden'
