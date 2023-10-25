@@ -13,7 +13,7 @@ interface SmartcardProps {
     card? : CardType
 };
 
-const getImageHeight = (type: CardType | undefined) => {
+const getPreferDimension = (type: CardType | undefined) => {
     switch (type) {
         case CardType.TwoOnTwo:
             return {cardHeight: '200px', imgWidth: '100%', imgHeight: '120px'};
@@ -26,7 +26,7 @@ const getImageHeight = (type: CardType | undefined) => {
 
 const SmartCardContent = (props: SmartcardProps) => {
     const t = props.card;
-    const dimension = getImageHeight(t);
+    const dimension = getPreferDimension(t);
 
     return(
         <Card sx={{
