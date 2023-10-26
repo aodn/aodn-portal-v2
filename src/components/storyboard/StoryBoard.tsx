@@ -12,12 +12,13 @@ interface StoryBoardProps {
     url: string,
     caption: string,
     content: string,
+    isActive?: boolean,
     buttons? : Array<ButtonEvent>
 };
 
 const StoryBoard = (props: StoryBoardProps) => {
     return (
-        <Box sx={{display: 'flex'}}>
+        <Box sx={{display: props?.isActive ? 'flex' : 'none'}}>
             <CardContent>
                 <iframe style= {{
                             border: frameBorder,
