@@ -5,6 +5,10 @@ import grey from '../common/colors/grey';
 import {styled} from "@mui/material/styles";
 import {Tune} from "@mui/icons-material";
 import {margin} from '../common/constants';
+import NoBorderButton from '../common/buttons/NoBorderButton';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import RemovableFilter from '../common/filters/RemovableFilter';
+import React from 'react';
 
 const StyledTextField = styled(TextField)<TextFieldProps>(({ theme }) => ({
     minWidth: '100%',
@@ -39,7 +43,7 @@ const StyledTextField = styled(TextField)<TextFieldProps>(({ theme }) => ({
     // }
 }));
 
-const filterButton = () =>
+const filterButton = (setValue: React.Dispatch<React.SetStateAction<boolean>>) =>
     <InputAdornment position='end'>
         <Button
             variant="outlined"
@@ -48,6 +52,7 @@ const filterButton = () =>
                 borderColor: grey["searchButtonText"]
             }}
             startIcon={<Tune/>}
+            onClick={() => setValue(true)}
         >
             Filters
         </Button>
@@ -68,6 +73,9 @@ const searchButton = () =>
     </Button>
 
 const TextSearch = () => {
+
+    const [showFilters, setShowFilters] = React.useState(false);
+
     return(
         <Grid container>
             <Grid item
@@ -76,8 +84,7 @@ const TextSearch = () => {
                       marginTop: margin['top'],
                       marginBottom: margin['bottom']
                   }}>
-                <Grid container justifyContent={'left'} spacing={2}>
-                    <Grid item xs={2}>&nbsp;</Grid>
+                <Grid container justifyContent={'center'} spacing={2}>
                     <Grid item xs={7}>
                         <StyledTextField
                             id="outlined-search"
@@ -86,11 +93,33 @@ const TextSearch = () => {
                             InputProps={{
                                 style: {color: 'white'},
                                 startAdornment: (<InputAdornment position='start'><SearchIcon/></InputAdornment>),
-                                endAdornment: filterButton()
+                                endAdornment: filterButton(setShowFilters)
                             }}
                         />
                     </Grid>
                     <Grid item>{searchButton()}</Grid>
+                </Grid>
+                <Grid 
+                    container 
+                    gap={2}
+                    justifyContent={'center'} 
+                    sx= {{display: showFilters ? 'flex' : 'none'}}
+                >
+                    <Grid item xs={8} sx={{textAlign:'center'}}>
+                        <NoBorderButton
+                            endIcon={<ArrowDropUpIcon/>}
+                            sx={{
+                                fontWeight: 'bold',
+                            }}
+                            onClick={() => {setShowFilters(false)}}
+                        >
+                            Search Filters 
+                        </NoBorderButton>
+                    </Grid>
+                    <Grid item xs={8}><RemovableFilter title='Parameter' url='/filters/tune.png'/></Grid>
+                    <Grid item xs={8}><RemovableFilter title='Platform' url='/filters/platform.png'/></Grid>
+                    <Grid item xs={8}><RemovableFilter title='Organization' url='/filters/organization.png'/></Grid>
+                    <Grid item xs={8}><RemovableFilter title='Data' url='/filters/data.png'/></Grid>
                 </Grid>
             </Grid>
         </Grid>
