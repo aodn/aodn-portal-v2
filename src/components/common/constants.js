@@ -8,8 +8,10 @@ const margin = {
 };
 
 const frameBorder = '5px solid #fff';
+const borderRadius = '24px';
 
 export {
   margin,
-  frameBorder
+  frameBorder,
+  borderRadius
 }
