@@ -1,24 +1,60 @@
 import * as React from 'react';
-import {Box, CardContent, Typography} from '@mui/material';
+import {Box, CardContent, Typography, Grid} from '@mui/material';
+import RoundButton from '../common/buttons/RoundButton';
+import {frameBorder} from '../common/constants';
 
-const StoryBoard = () => {
+interface ButtonEvent {
+    label: string, 
+    onClick?: (event: React.MouseEvent<HTMLButtonElement> | undefined) => void
+}
+
+interface StoryBoardProps {
+    url: string,
+    caption: string,
+    content: string,
+    buttons? : Array<ButtonEvent>
+};
+
+const StoryBoard = (props: StoryBoardProps) => {
     return (
         <Box sx={{display: 'flex'}}>
             <CardContent>
-                <iframe width="560" height="315"
-                        src="https://www.youtube.com/embed/hOb9oELCp4Q?si=A39K_92ZBmJztncL"
-                        title="YouTube video player" frameBorder="0"
+                <iframe style= {{
+                            border: frameBorder,
+                            minWidth: '290px'
+                        }}
+                        height="100%"
+                        src={props.url}
+                        title={props.caption}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen></iframe>
+                        allowFullScreen>        
+                </iframe>
             </CardContent>
             <Box sx={{display: 'flex', flexDirection: 'column'}}>
                 <CardContent sx={{flex: '1 0 auto'}}>
                     <Typography component="div" variant="h5">
-                        Live From Space
+                        {props.caption}
                     </Typography>
-                    <Typography variant="subtitle1" color="text.secondary" component="div">
-                        Mac Miller
+                    <Typography variant="body1" color="text.secondary" component="div" style={{ lineHeightStep: "30px" }}>
+                        {props.content}
                     </Typography>
+                    <Typography variant="body1" color="text.secondary" component="div" style={{ lineHeightStep: "30px" }}>
+                        &nbsp;
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" component="div" style={{ lineHeightStep: "30px" }}>
+                        &nbsp;
+                    </Typography>
+                    <Grid container spacing={3}>
+                        {props.buttons &&
+                            props.buttons?.map((button) => {
+                                return (
+                                    <Grid item xs='auto'>
+                                        <RoundButton variant="outlined" size="small" onClick={button.onClick}>{button.label}</RoundButton>
+                                    </Grid>
+                                );
+                            }
+                        )}
+                    </Grid>
                 </CardContent>
             </Box>
         </Box>

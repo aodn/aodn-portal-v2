@@ -5,8 +5,11 @@ const margin = {
   doubleBottom: '30px',
   tripleTop: '45px',
   tripleBottom: '45px'
-}
+};
+
+const frameBorder = '5px solid #fff';
 
 export {
-  margin
+  margin,
+  frameBorder
 }
