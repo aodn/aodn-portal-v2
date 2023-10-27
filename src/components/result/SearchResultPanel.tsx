@@ -5,28 +5,25 @@ import Map from '../map/maplibre/Map';
 import Controls from "../map/maplibre/controls/Controls";
 import NavigationControl from "../map/maplibre/controls/NavigationControl";
 import ScaleControl from "../map/maplibre/controls/ScaleControl";
+import ResultCards from "./ResultCards";
 
 const mapPanelId = 'maplibre-panel-id';
 
 const SearchResultPanel = () => {
 
-
     return(
-        <Grid container>
+        <Grid id={'search-result-panel'} container>
             <Grid item
                   xs={12}
                   sx={{
                       marginTop: margin['top'],
                       marginBottom: margin['bottom']
                   }}>
-                <Grid container justifyContent={'center'} spacing={2} columns={4}>
-                    <Grid item>
-                        TODO
+                <Grid container id='search-result-center-panel' justifyContent={'center'} spacing={2}>
+                    <Grid item xs={3}>
+                        <ResultCards/>
                     </Grid>
-                    <Grid item>
-                        TODO
-                    </Grid>
-                    <Grid id={mapPanelId} item xs={2} sx={{
+                    <Grid id={mapPanelId} item xs={5} sx={{
                         border: frameBorder,
                         borderRadius: borderRadius['filter']
                     }}>

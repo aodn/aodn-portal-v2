@@ -1,11 +1,13 @@
 import * as React from 'react';
-import {Grid, Box, Divider} from '@mui/material';
+import {Grid, Box, Divider, SxProps, Theme} from '@mui/material';
 import {margin} from "../common/constants";
 
 interface ComplexSmartPanel {
     columns? :number,
     rows?: number,
-    bottomDivider? : boolean
+    height: string,
+    bottomDivider? : boolean,
+    sx?: SxProps<Theme>
 };
 
 const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanel>) => {
@@ -34,8 +36,9 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanel>) =
                                 marginTop={margin['tripleTop']}
                                 marginBottom={margin['tripleBottom']}
                                 gridTemplateColumns={'repeat(' + props.columns + ', 1fr)'}
-                                gridTemplateRows={'repeat(' + props.rows + ', 95px)'}
+                                gridTemplateRows={'repeat(' + props.rows + ', ' + props.height + ')'}
                                 gap={2}
+                                sx={props.sx}
                             >
                                 {props.children}
                             </Box>
@@ -56,6 +59,7 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanel>) =
 ComplexSmartPanel.defaultProps = {
     columns: 9,
     rows: 2,
+    height: '95px',
     bottomDivider: false
 }
 

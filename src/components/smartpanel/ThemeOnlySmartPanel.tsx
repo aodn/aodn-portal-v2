@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ComplexSmartPanel from "./ComplexSmartPanel";
 import {SmartCard_1_1} from "./SmartCard";
-import {Box, Divider} from "@mui/material";
+import {margin} from "../common/constants";
 
 /**
  * Empty for now, implement it later
@@ -9,7 +9,15 @@ import {Box, Divider} from "@mui/material";
  */
 const ThemeOnlySmartPanel = () => {
     return (
-        <ComplexSmartPanel columns={10} rows={1} bottomDivider={true}>
+        <ComplexSmartPanel
+            sx={{
+                marginTop: margin['top'],
+                marginBottom: margin['bottom']
+            }}
+            columns={10}
+            rows={1}
+            bottomDivider={true}
+        >
             <SmartCard_1_1 imageUrl='/smartcard/all_topics.png' caption='More Topics'/>
             <SmartCard_1_1 imageUrl='/smartcard/environmental.png' caption='Environmental'/>
             <SmartCard_1_1 imageUrl='/smartcard/leave.png' caption='Ocean Biota'/>

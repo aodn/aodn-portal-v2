@@ -32,7 +32,7 @@ const SmartCardContent = (props: SmartcardProps) => {
 
     return(
         <Card sx={{
-                height: dimension.cardHeight
+                maxHeight: dimension.cardHeight
             }}>
             <CardActionArea sx={{
                 border: frameBorder
