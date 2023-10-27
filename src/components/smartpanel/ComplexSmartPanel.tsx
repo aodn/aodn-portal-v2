@@ -1,11 +1,11 @@
 import * as React from 'react';
-import {Grid, Box} from '@mui/material';
-import {SmartCard_1_1, SmartCard_2_1, SmartCard_2_2} from "./SmartCard";
+import {Grid, Box, Divider} from '@mui/material';
 import {margin} from "../common/constants";
 
 interface ComplexSmartPanel {
     columns? :number,
-    rows?: number
+    rows?: number,
+    bottomDivider? : boolean
 };
 
 const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanel>) => {
@@ -17,24 +17,35 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanel>) =
                     // Create a container inside the item which occupy all area, then
                     // set justify content to center, now within the container set a smaller
                     // item so that the item is center in the container
+
+                    // The minWidth may need to calculate instead of hardcode
                 }
                 <Grid container justifyContent='center'>
                     <Grid item xs={8}>
                         <Box
-                            display='grid'
-                            marginTop={margin['tripleTop']}
-                            marginBottom={margin['tripleBottom']}
-                            gridTemplateColumns={'repeat(' + props.columns + ', 1fr)'}
-                            gridTemplateRows={'repeat(' + props.rows + ', 95px)'}
-                            gap={2}
                             sx ={{
-                                overflowX: 'auto',
+                                overflowX: 'scroll',
                                 overflowY: 'hidden'
                             }}
                         >
-                            {props.children}
+                            <Box
+                                display='grid'
+                                minWidth='1200px'
+                                marginTop={margin['tripleTop']}
+                                marginBottom={margin['tripleBottom']}
+                                gridTemplateColumns={'repeat(' + props.columns + ', 1fr)'}
+                                gridTemplateRows={'repeat(' + props.rows + ', 95px)'}
+                                gap={2}
+                            >
+                                {props.children}
+                            </Box>
                         </Box>
                     </Grid>
+                    {props.bottomDivider &&
+                      <Grid item xs={8}>
+                        <Divider sx={{ borderBottomWidth: 5 }}/>
+                      </Grid>
+                    }
                 </Grid>
             </Grid>
         </Grid>
@@ -44,7 +55,8 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanel>) =
 
 ComplexSmartPanel.defaultProps = {
     columns: 9,
-    rows: 2
+    rows: 2,
+    bottomDivider: false
 }
 
 export default ComplexSmartPanel;

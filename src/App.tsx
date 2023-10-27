@@ -1,31 +1,36 @@
 import React from 'react';
 import './App.css';
 import {
-  RouterProvider,
-  createBrowserRouter
+    RouterProvider,
+    createBrowserRouter
 } from 'react-router-dom';
 
 import LandingPage from './pages/LandingPage';
+import SearchPage from './pages/SearchPage';
 import Fallback from './pages/Fallback';
 
 let router = createBrowserRouter([
-  {
-    path: "/",
-    Component: LandingPage,
-    children: [
-    ],
-  },
+    {
+        path: "/",
+        Component: LandingPage,
+        children: [],
+    },
+    {
+        path: "/search",
+        Component: SearchPage,
+        children: [],
+    },
 ]);
 
 const app = () =>
-  <div style={{
-      backgroundImage: 'url(/landing_page_bg.png)',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-      height: '100%'
-  }}>
-      <RouterProvider router={router} fallbackElement={<Fallback />} />
-  </div>
+    <div style={{
+        backgroundImage: 'url(/landing_page_bg.png)',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        height: '100%'
+    }}>
+        <RouterProvider router={router} fallbackElement={<Fallback/>}/>
+    </div>
 
 export default app;

@@ -1,8 +1,7 @@
-
-import {Grid, TextField, InputAdornment, Button, TextFieldProps} from '@mui/material';
+import React from 'react';
+import {Grid, InputAdornment, Button} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import grey from '../common/colors/grey';
-import {styled} from "@mui/material/styles";
 import {Tune} from "@mui/icons-material";
 import {margin} from '../common/constants';
 import NoBorderButton from '../common/buttons/NoBorderButton';
@@ -13,40 +12,7 @@ import SettingsOverscanIcon from '@mui/icons-material/SettingsOverscan';
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import Divider from '@mui/material/Divider';
-import React from 'react';
-
-const StyledTextField = styled(TextField)<TextFieldProps>(({ theme }) => ({
-    minWidth: '100%',
-    marginInline: '2px',
-    backgroundColor: grey['search'],
-    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-        borderColor: "white"
-    },
-    "& .MuiOutlinedInput-input": {
-        color: "black"
-    },
-    // "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-    //     borderColor: "red"
-    // },
-    // "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    //     borderColor: "purple"
-    // },
-    // "&:hover .MuiOutlinedInput-input": {
-    //     color: "red"
-    // },
-    // "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-input": {
-    //     color: "purple"
-    // },
-    // "& .MuiInputLabel-outlined": {
-    //     color: "green"
-    // },
-    // "&:hover .MuiInputLabel-outlined": {
-    //     color: "red"
-    // },
-    // "& .MuiInputLabel-outlined.Mui-focused": {
-    //     color: "purple"
-    // }
-}));
+import StyledTextField from "./StyledTextField";
 
 const filterButton = (setValue: React.Dispatch<React.SetStateAction<boolean>>) =>
     <InputAdornment position='end'>
@@ -117,7 +83,7 @@ const searchButton = () =>
         Search
     </Button>
 
-const TextSearch = () => {
+const ComplexTextSearch = () => {
 
     const [showFilters, setShowFilters] = React.useState(false);
 
@@ -177,4 +143,4 @@ const TextSearch = () => {
     );
 };
 
-export default TextSearch;
+export default ComplexTextSearch;
