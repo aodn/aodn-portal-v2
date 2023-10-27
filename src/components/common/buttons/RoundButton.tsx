@@ -7,7 +7,7 @@ const RoundButton = styled((props: ButtonProps) => (
     <Button 
         {...props}
     />))(({ theme }) => ({
-        borderRadius: borderRadius,
+        borderRadius: borderRadius['button'],
         textTransform: "none",
         backgroundColor: grey['search'],
         color: grey["searchButtonText"]

@@ -8,7 +8,12 @@ const margin = {
 };
 
 const frameBorder = '5px solid #fff';
-const borderRadius = '24px';
+
+const borderRadius = {
+  underline: '24px',
+  button: '24px',
+  filter: '10px'
+}
 
 export {
   margin,

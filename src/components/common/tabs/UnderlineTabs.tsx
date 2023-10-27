@@ -24,7 +24,7 @@ const UnderlineTab = styled((props: TabProps) => (
         />
         <div style={{
                 background: grey['underlineTabUnselected'],
-                borderRadius: borderRadius,
+                borderRadius: borderRadius['underline'],
                 height: "10px"
             }}
         />

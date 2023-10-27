@@ -3,7 +3,12 @@ import {Grid, Box} from '@mui/material';
 import {SmartCard_1_1, SmartCard_2_1, SmartCard_2_2} from "./SmartCard";
 import {margin} from "../common/constants";
 
-const ComplexSmartPanel = () => {
+interface ComplexSmartPanel {
+    columns? :number,
+    rows?: number
+};
+
+const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanel>) => {
 
     return (
         <Grid container>
@@ -19,26 +24,15 @@ const ComplexSmartPanel = () => {
                             display='grid'
                             marginTop={margin['tripleTop']}
                             marginBottom={margin['tripleBottom']}
-                            gridTemplateColumns="repeat(9, 1fr)"
-                            gridTemplateRows='repeat(2, 95px)'
+                            gridTemplateColumns={'repeat(' + props.columns + ', 1fr)'}
+                            gridTemplateRows={'repeat(' + props.rows + ', 95px)'}
                             gap={2}
                             sx ={{
                                 overflowX: 'auto',
                                 overflowY: 'hidden'
                             }}
                         >
-                            <SmartCard_2_1 caption='Get started' imageUrl='/smartcard/getstarted.png'/>
-                            <SmartCard_2_2 caption='Surface Waves' imageUrl='/smartcard/wave.png'/>
-                            <SmartCard_1_1 caption='Satellite' imageUrl='/smartcard/satellite.png'/>
-                            <SmartCard_1_1 caption='Reef' imageUrl='/smartcard/reef.png'/>
-                            <SmartCard_1_1 caption='Location' imageUrl='/smartcard/location.png'/>
-                            <SmartCard_2_1 caption='Advanced Search' imageUrl='/smartcard/advancedSearch.png'/>
-                            <SmartCard_1_1 caption='Tutorials' imageUrl='/smartcard/tutorial.png'/>
-                            <SmartCard_1_1 caption='All Topics' imageUrl='/smartcard/all_topics.png'/>
-                            <SmartCard_1_1 caption='Ocean Biota' imageUrl='/smartcard/leave.png'/>
-                            <SmartCard_2_1 caption='Explore on Map' imageUrl='/smartcard/explorerOnMap.png'/>
-                            <SmartCard_1_1 caption='Fishery' imageUrl='/smartcard/fishery.png'/>
-                            <SmartCard_1_1 caption='Tourism' imageUrl='/smartcard/tour.png'/>
+                            {props.children}
                         </Box>
                     </Grid>
                 </Grid>
@@ -46,6 +40,11 @@ const ComplexSmartPanel = () => {
         </Grid>
     );
 
+}
+
+ComplexSmartPanel.defaultProps = {
+    columns: 9,
+    rows: 2
 }
 
 export default ComplexSmartPanel;

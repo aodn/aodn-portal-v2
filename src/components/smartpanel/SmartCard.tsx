@@ -5,7 +5,8 @@ import {frameBorder} from '../common/constants';
 enum CardType {
     OneOnOne,
     TwoOnOne,
-    TwoOnTwo
+    TwoOnTwo,
+    ThreeOnTwo
 };
 
 interface SmartcardProps {
@@ -149,8 +150,26 @@ const SmartCard_2_2 = (props: SmartcardProps) => {
     );
 };
 
+const SmartCard_3_2 = (props: SmartcardProps) => {
+    // Format string with Start / End column
+    const p = {...props};
+    p.card = CardType.ThreeOnTwo;
+
+    return(
+        <Box
+            sx = {{
+                gridColumn: 'span 3',
+                gridRow: 'span 2'
+            }}
+        >
+            <SmartCardContent {...p}/>
+        </Box>
+    );
+};
+
 export {
     SmartCard_1_1,
     SmartCard_2_1,
-    SmartCard_2_2
+    SmartCard_2_2,
+    SmartCard_3_2
 };
