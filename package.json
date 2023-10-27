@@ -18,6 +18,8 @@
     "@mui/material": "5.14.14",
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.14.14",
+    "maplibre-gl": "3.5.2",
+    "@mapbox/mapbox-gl-draw": "1.4.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
