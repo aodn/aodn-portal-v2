@@ -6,6 +6,7 @@ import Controls from "../map/maplibre/controls/Controls";
 import NavigationControl from "../map/maplibre/controls/NavigationControl";
 import ScaleControl from "../map/maplibre/controls/ScaleControl";
 import {ResultCards} from "./ResultCards";
+import { findResults } from './api';
 
 const mapPanelId = 'maplibre-panel-id';
 
@@ -19,12 +20,13 @@ const SearchResultPanel = () => {
         //TODO: Add bounding box to map
     },[]);
 
+    const [results, setResult] = useState(findResults());
+
     return(
         <Grid id={'search-result-panel'} container>
             <Grid item
                   xs={12}
                   sx={{
-                      marginTop: margin['top'],
                       marginBottom: margin['bottom']
                   }}>
                 <Grid container id='search-result-center-panel' justifyContent='center'>
@@ -34,16 +36,17 @@ const SearchResultPanel = () => {
                             minWidth='1200px'
                             marginTop={margin['tripleTop']}
                             marginBottom={margin['tripleBottom']}
-                            gridTemplateColumns={'repeat(3, 1fr)'}
+                            gridTemplateColumns={'repeat(5, 1fr)'}
                             gridTemplateRows={'repeat(1, 1fr)'}
                             gap={2}
                         >
                             <Box
                                 sx = {{
-                                    gridColumn: 'span 1',
+                                    gridColumn: 'span 2',
                                     gridRow: 'span 1'
                                 }}>
                                 <ResultCards 
+                                    contents={results}
                                     onAddToMap={onAddToMap} 
                                     onDownload={onDownload}
                                     onTags={undefined}
@@ -51,7 +54,7 @@ const SearchResultPanel = () => {
                                 />
                             </Box>
                             <Box id={mapPanelId} sx={{
-                                gridColumn: 'span 2',
+                                gridColumn: 'span 3',
                                 gridRow: 'span 1',
                                 border: frameBorder,
                                 borderRadius: borderRadius['filter']

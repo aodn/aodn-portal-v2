@@ -16,7 +16,6 @@ const ResultPanelSimpleFilter = () => {
                   xs={12}
                   sx={{
                       marginTop: margin['top'],
-                      marginBottom: margin['bottom']
                   }}>
                 <Grid container justifyContent='center' columns={11} gap={1 }>
                     <Grid item xs='auto'>

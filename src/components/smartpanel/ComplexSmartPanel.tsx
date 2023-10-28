@@ -26,7 +26,7 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanel>) =
                     <Grid item xs={8}>
                         <Box
                             sx ={{
-                                overflowX: 'scroll',
+                                overflowX: 'hidden',
                                 overflowY: 'hidden'
                             }}
                         >
