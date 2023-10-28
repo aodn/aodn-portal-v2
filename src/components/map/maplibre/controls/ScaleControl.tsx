@@ -1,8 +1,14 @@
 import React, { useContext, useEffect } from "react";
 import MapContext from "../MapContext";
 import maplibregl from 'maplibre-gl'
+import { Unit } from "maplibre-gl";
 
-const ScaleControl = ({maxWidth = 80, unit = 'metric'}) => {
+interface ScaleControlProps {
+    maxWidth?: number;
+    unit?: Unit;
+}
+
+const ScaleControl = (props: ScaleControlProps) => {
  
     const { map } = useContext(MapContext);  
 
@@ -10,8 +16,8 @@ const ScaleControl = ({maxWidth = 80, unit = 'metric'}) => {
         if(!map) return;
 
         const scale = new maplibregl.ScaleControl({
-            maxWidth: maxWidth,
-            unit: unit
+            maxWidth: props.maxWidth,
+            unit: props.unit
         });
 
         map.addControl(scale);
@@ -20,9 +26,14 @@ const ScaleControl = ({maxWidth = 80, unit = 'metric'}) => {
             map.removeControl(scale);
         }
 
-    }, [map, maxWidth, unit]);
+    }, [map, props.maxWidth, props.unit]);
 
     return (<React.Fragment/>);
+}
+
+ScaleControl.defaultProps = {
+    maxWidth: 80, 
+    unit: 'metric'
 }
 
 export default ScaleControl;
