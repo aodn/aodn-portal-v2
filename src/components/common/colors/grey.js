@@ -5,7 +5,9 @@ const grey = {
     underlineTabSelected: 'grey',
     underlineTabUnselected: 'darkgrey',
     search: '#ECECEC',
-    searchButtonText: '#74797D'
+    searchButtonText: '#74797D',
+    resultCard: '#ECECEC',
+    resultCardNumber: '#74797D'
 }
 
 export default grey;

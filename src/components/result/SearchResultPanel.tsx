@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {borderRadius, frameBorder, margin} from "../common/constants";
-import {Grid} from "@mui/material";
+import {Grid, Box} from "@mui/material";
 import Map from '../map/maplibre/Map';
 import Controls from "../map/maplibre/controls/Controls";
 import NavigationControl from "../map/maplibre/controls/NavigationControl";
@@ -19,20 +19,38 @@ const SearchResultPanel = () => {
                       marginTop: margin['top'],
                       marginBottom: margin['bottom']
                   }}>
-                <Grid container id='search-result-center-panel' justifyContent={'center'} spacing={2}>
-                    <Grid item xs={3}>
-                        <ResultCards/>
-                    </Grid>
-                    <Grid id={mapPanelId} item xs={5} sx={{
-                        border: frameBorder,
-                        borderRadius: borderRadius['filter']
-                    }}>
-                        <Map panelId={mapPanelId}>
-                            <Controls>
-                                <NavigationControl/>
-                                <ScaleControl/>
-                            </Controls>
-                        </Map>
+                <Grid container id='search-result-center-panel' justifyContent='center'>
+                    <Grid item  xs={8}>
+                        <Box
+                            display='grid'
+                            minWidth='1200px'
+                            marginTop={margin['tripleTop']}
+                            marginBottom={margin['tripleBottom']}
+                            gridTemplateColumns={'repeat(3, 1fr)'}
+                            gridTemplateRows={'repeat(1, 1fr)'}
+                            gap={2}
+                        >
+                            <Box
+                                sx = {{
+                                    gridColumn: 'span 1',
+                                    gridRow: 'span 1'
+                                }}>
+                                <ResultCards/>
+                            </Box>
+                            <Box id={mapPanelId} sx={{
+                                gridColumn: 'span 2',
+                                gridRow: 'span 1',
+                                border: frameBorder,
+                                borderRadius: borderRadius['filter']
+                            }}>
+                                <Map panelId={mapPanelId}>
+                                    <Controls>
+                                        <NavigationControl/>
+                                        <ScaleControl/>
+                                    </Controls>
+                                </Map>
+                            </Box>
+                        </Box>
                     </Grid>
                 </Grid>
             </Grid>

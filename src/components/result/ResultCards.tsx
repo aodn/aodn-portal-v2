@@ -8,7 +8,8 @@ const ResultCards = () => {
             <ResultCard
                 title={'IMOS - ANMN South Australia (SA) Deep Slope Mooring (SAM1DS)'}
                 status={'completed'}
-                imageUrl={''}
+                imageUrl={'https://warcontent.com/wp-content/uploads/2021/03/substring-javascript-5-1024x576.png.webp'}
+                item={1}
                 description={'The data available from this mooring was designed to monitor particular oceanographic phenomena in coastal ocean waters. The mooring is located at Latitude:-36.52, Longitude:136.24 and trim the rest'}/>
         </Grid>
     );
