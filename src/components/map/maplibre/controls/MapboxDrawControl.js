@@ -8,7 +8,8 @@ import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 // we use MapboxDraw from Mapbox
 //
 // There is a third party control that can draw rectangle, but right
-// now just stick with the offical control.
+// now just stick with the offical control. Because of that you cannot use typescript
+// as it will fail on map.addControl(draw) as it is not in the type definition
 const MapboxDrawControl = (props) => {
 
     const { map } = useContext(MapContext);  
