@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Grid, Box, Button, MenuItem, OutlinedInput} from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import BorderButton from "../buttons/BorderButton";
+import SlightRoundButton from "../buttons/SlightRoundButton";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import {margin} from "../constants";
 import NoBorderButton from "../buttons/NoBorderButton";
@@ -20,7 +20,7 @@ const ResultPanelSimpleFilter = () => {
                   }}>
                 <Grid container justifyContent='center' columns={11} gap={1 }>
                     <Grid item xs='auto'>
-                        <BorderButton startIcon={<PlayArrowIcon/>} endIcon={<FilterAltIcon/>}>Expand filters</BorderButton>
+                        <SlightRoundButton startIcon={<PlayArrowIcon/>} endIcon={<FilterAltIcon/>}>Expand filters</SlightRoundButton>
                     </Grid>
                     <Grid item xs='auto'><NoBorderButton endIcon={<ArrowBackIosIcon/>}></NoBorderButton></Grid>
                     <Grid item xs={1}>

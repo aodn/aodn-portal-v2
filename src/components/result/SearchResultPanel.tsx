@@ -1,15 +1,23 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {borderRadius, frameBorder, margin} from "../common/constants";
 import {Grid, Box} from "@mui/material";
 import Map from '../map/maplibre/Map';
 import Controls from "../map/maplibre/controls/Controls";
 import NavigationControl from "../map/maplibre/controls/NavigationControl";
 import ScaleControl from "../map/maplibre/controls/ScaleControl";
-import ResultCards from "./ResultCards";
+import {ResultCards} from "./ResultCards";
 
 const mapPanelId = 'maplibre-panel-id';
 
 const SearchResultPanel = () => {
+
+    const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
+        //TODO: Add bounding box to map
+    },[]);
+
+    const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
+        //TODO: Add bounding box to map
+    },[]);
 
     return(
         <Grid id={'search-result-panel'} container>
@@ -35,7 +43,12 @@ const SearchResultPanel = () => {
                                     gridColumn: 'span 1',
                                     gridRow: 'span 1'
                                 }}>
-                                <ResultCards/>
+                                <ResultCards 
+                                    onAddToMap={onAddToMap} 
+                                    onDownload={onDownload}
+                                    onTags={undefined}
+                                    onMore={undefined}
+                                />
                             </Box>
                             <Box id={mapPanelId} sx={{
                                 gridColumn: 'span 2',
