@@ -1,14 +1,16 @@
 import React, {useContext, useEffect, useRef} from "react";
 import MapContext from "../MapContext";
 
-const DisplayCoordinate = (props) => {
+const DisplayCoordinate = () => {
+  
   const { map } = useContext(MapContext);
-  const ref = useRef();
+  const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if(!map) return;
 
-    const handle = (e) => ref.current.innerHTML = JSON.stringify(e.point) + ' ' + JSON.stringify(e.lngLat.wrap());
+    const handle = (e : any) => {if(ref.current) { ref.current.innerHTML = JSON.stringify(e.point) + ' ' + JSON.stringify(e.lngLat.wrap())}};
+
     map.on('mousemove', handle);
 
     return () => {

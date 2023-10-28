@@ -7,6 +7,7 @@ import NavigationControl from "../map/maplibre/controls/NavigationControl";
 import ScaleControl from "../map/maplibre/controls/ScaleControl";
 import {ResultCards} from "./ResultCards";
 import { findResults } from './api';
+import DisplayCoordinate from '../map/maplibre/controls/DisplayCoordinate';
 
 const mapPanelId = 'maplibre-panel-id';
 
@@ -62,6 +63,7 @@ const SearchResultPanel = () => {
                                 <Map panelId={mapPanelId}>
                                     <Controls>
                                         <NavigationControl/>
+                                        <DisplayCoordinate/>
                                         <ScaleControl/>
                                     </Controls>
                                 </Map>
