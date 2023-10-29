@@ -8,10 +8,9 @@ import { createContext } from 'react';
 // we need to use the following to import the type
 // so that the IControl interface for control in mapbox can be add to maplibre
 // as the type definition combined them together
-import { IControl as MapboxIControl, Map as MapboxMap } from 'mapbox-gl';
-import { IControl as MaplibreIControl, Map as MaplibreMap } from 'maplibre-gl';
+import { Map as MapboxMap } from 'mapbox-gl';
+import { Map as MaplibreMap } from 'maplibre-gl';
 
-type IControl = MapboxIControl & MaplibreIControl;
 type Map = MapboxMap & MaplibreMap;
 // ---------------------------------------------------------------
 
