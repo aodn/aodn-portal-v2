@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react'
 
-import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import MapContext from "./MapContext";
-import "./Map.css";
 import {Box} from "@mui/material";
-
-import { Map as MapboxMap } from 'mapbox-gl';
 import { Map as MaplibreMap } from 'maplibre-gl';
-
-type Map = MapboxMap & MaplibreMap;
 
 interface MapProps {
     centerLongitude: number;
@@ -19,9 +13,7 @@ interface MapProps {
     stylejson: string;
 };
 
-const uniqueMapContainerId = 'map-libre-container-id';
-
-const Map = (props: React.PropsWithChildren<MapProps>) => {
+const ReactMap = (props: React.PropsWithChildren<MapProps>) => {
     const [map, setMap] = useState<any | null>(null);
 
     useEffect(() => {
@@ -32,23 +24,30 @@ const Map = (props: React.PropsWithChildren<MapProps>) => {
             zoom: props.zoom,
             localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif"
         });
+
+        // https://github.com/maplibre/maplibre-gl-js/issues/2601
+        m.getCanvas().classList.add('mapboxgl-canvas');
+        m.getContainer().classList.add('mapboxgl-map');
+        m.getCanvasContainer().classList.add('mapboxgl-canvas-container');
+        m.getCanvasContainer().classList.add('mapboxgl-interactive');
+        
         setMap(m);
     }, []);
 
     return (
         <MapContext.Provider value={{ map }}> 
-            <Box className="libre-map">
+            <Box>
                 {props.children}
             </Box>
         </MapContext.Provider>
     )
 }
 
-Map.defaultProps = {
-    centerLongitude : 0,
-    centerLatitude : 0,
+ReactMap.defaultProps = {
+    centerLatitude : -42.88611707886841,
+    centerLongitude : 147.3353554138993,
     zoom : 5,
     stylejson : 'https://demotiles.maplibre.org/style.json'
 };
 
-export default Map
+export default ReactMap
