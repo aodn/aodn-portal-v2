@@ -1,7 +1,9 @@
 import React, { useContext, useEffect } from "react";
+
 import MapContext from "../MapContext";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+
 
 // Maplibre is a foke of Mapbox when it goes to commerical, hence 
 // some of the controls still works with maplibre. In this case
@@ -10,7 +12,14 @@ import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 // There is a third party control that can draw rectangle, but right
 // now just stick with the offical control. Because of that you cannot use typescript
 // as it will fail on map.addControl(draw) as it is not in the type definition
-const MapboxDrawControl = (props) => {
+
+interface MapboxDrawControlProps {
+    onDrawCreate: ((e: any) => void) | undefined;
+    onDrawDelete: ((e: any) => void) | undefined;
+    onDrawUpdate: ((e: any) => void) | undefined;
+};
+
+const MapboxDrawControl = (props: MapboxDrawControlProps) => {
 
     const { map } = useContext(MapContext);  
 
@@ -41,18 +50,18 @@ const MapboxDrawControl = (props) => {
     }, [map]);
 
     // When user completed the polygon by double click, this event first
-    const onDrawCreate = (e) => {
-        props.onDrawCreate(e);
+    const onDrawCreate = (e: any) => {
+        props.onDrawCreate && props.onDrawCreate(e);
     }
 
     // When user hit the delete button, this event fire.
-    const onDrawDelete = (e) => {
-        props.onDrawDelete(e);
+    const onDrawDelete = (e: any) => {
+        props.onDrawDelete && props.onDrawDelete(e);
     }
 
     // When user move the polygon, this event first
-    const onDrawUpdate = (e) => {
-        props.onDrawUpdate(e);
+    const onDrawUpdate = (e: any) => {
+        props.onDrawUpdate && props.onDrawUpdate(e);
     }
 
     return (<React.Fragment/>);

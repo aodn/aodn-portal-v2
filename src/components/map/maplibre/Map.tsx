@@ -6,6 +6,11 @@ import MapContext from "./MapContext";
 import "./Map.css";
 import {Box} from "@mui/material";
 
+import { Map as MapboxMap } from 'mapbox-gl';
+import { Map as MaplibreMap } from 'maplibre-gl';
+
+type Map = MapboxMap & MaplibreMap;
+
 interface MapProps {
     centerLongitude: number;
     centerLatitude: number;
@@ -17,10 +22,10 @@ interface MapProps {
 const uniqueMapContainerId = 'map-libre-container-id';
 
 const Map = (props: React.PropsWithChildren<MapProps>) => {
-    const [map, setMap] = useState<maplibregl.Map | null>(null);
+    const [map, setMap] = useState<any | null>(null);
 
     useEffect(() => {
-        const m = new maplibregl.Map({
+        const m = new MaplibreMap({
             container: props.panelId,
             style: props.stylejson,
             center: [props.centerLongitude, props.centerLatitude],

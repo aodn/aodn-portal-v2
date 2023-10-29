@@ -66,7 +66,7 @@ const SearchResultPanel = () => {
                                         <NavigationControl/>
                                         <DisplayCoordinate/>
                                         <ScaleControl/>
-                                        <MapboxDrawControl/>
+                                        <MapboxDrawControl onDrawCreate={undefined} onDrawDelete={undefined} onDrawUpdate={undefined}/>
                                     </Controls>
                                 </Map>
                             </Box>
