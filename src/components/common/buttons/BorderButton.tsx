@@ -1,12 +1,12 @@
 import {Button, ButtonProps} from '@mui/material';
 import { styled } from '@mui/material/styles';
-import {frameBorder} from "../constants";
+import {border} from "../constants";
 
 const BorderButton = styled((props: ButtonProps) => (
     <Button 
         {...props}
     />))(({ theme }) => ({
-    border: frameBorder,
+    border: border['frameBorder'],
     textTransform: "none",
     backgroundColor: 'none',
     fontSize: '1rem',

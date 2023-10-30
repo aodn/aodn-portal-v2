@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Grid, Box, Button, MenuItem, OutlinedInput} from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
-import { frameBorder, borderRadius} from '../constants';
+import { border, borderRadius} from '../constants';
 import RoundSelect from '../dropdown/RoundSelect';
 import ClearIcon from '@mui/icons-material/Clear';
 
@@ -19,7 +19,7 @@ const RemovableFilter = (props: RemovableFilterProps) => {
                 backgroundImage: 'url(/filters/Background.png)',
                 backgroundRepeat: 'no-repeat',
                 backgroundSize: 'cover',
-                border: frameBorder,
+                border: border['frameBorder'],
                 borderRadius: borderRadius['filter'],
                 justifyContent: 'center',
                 minHeight: '90px'

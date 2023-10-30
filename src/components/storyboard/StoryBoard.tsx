@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Box, CardContent, Typography, Grid} from '@mui/material';
 import RoundButton from '../common/buttons/RoundButton';
-import {frameBorder} from '../common/constants';
+import {border} from '../common/constants';
 
 interface ButtonEvent {
     label: string, 
@@ -21,7 +21,7 @@ const StoryBoard = (props: StoryBoardProps) => {
         <Box sx={{display: props?.isActive ? 'flex' : 'none'}}>
             <CardContent>
                 <iframe style= {{
-                            border: frameBorder,
+                            border: border['frameBorder'],
                             minWidth: '290px'
                         }}
                         height="100%"

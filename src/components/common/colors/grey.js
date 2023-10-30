@@ -7,7 +7,9 @@ const grey = {
     search: '#ECECEC',
     searchButtonText: '#74797D',
     resultCard: '#ECECEC',
-    resultCardNumber: '#74797D'
+    resultCardNumber: '#74797D',
+    filterGroup: '#ECECEC',
+    filterGroupItem: 'white',
 }
 
 export default grey;

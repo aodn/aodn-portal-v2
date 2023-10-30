@@ -1,3 +1,5 @@
+import grey from "./colors/grey";
+
 const margin = {
   top: '15px',
   bottom: '15px',
@@ -7,8 +9,11 @@ const margin = {
   tripleBottom: '45px'
 };
 
-const frameBorder = '5px solid #fff';
-const buttonBorder = '2px solid #fff';
+const border = {
+  frameBorder: '5px solid #fff',
+  buttonBorder: '2px solid #fff',
+  listFilterBorder: '2px solid ' + grey['filterGroup']
+}
 
 const borderRadius = {
   circle: '50%',
@@ -17,9 +22,13 @@ const borderRadius = {
   filter: '10px'
 }
 
+const filterList = {
+  filterListMaxDisplay: 4
+}
+
 export {
   margin,
-  frameBorder,
-  buttonBorder,
-  borderRadius
+  border,
+  borderRadius,
+  filterList
 }

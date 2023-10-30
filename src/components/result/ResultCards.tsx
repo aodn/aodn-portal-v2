@@ -1,7 +1,7 @@
 import React from 'react'
 import grey from "../common/colors/grey";
 import {Card, CardContent, CardMedia, Grid, Typography, CardActionArea, CardActions, List, ListItem} from "@mui/material";
-import {borderRadius, frameBorder} from "../common/constants";
+import {borderRadius, border} from "../common/constants";
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import DownloadIcon from '@mui/icons-material/Download';
 import SellIcon from '@mui/icons-material/Sell';
@@ -29,7 +29,7 @@ interface ResultCardProps {
 const ResultCard = (props: ResultCardProps) => {
     return(
         <Card sx={{
-            border: frameBorder,
+            border: border['frameBorder'],
             borderRadius: borderRadius['filter'],
             backgroundColor: grey['resultCard']
         }}>
@@ -44,7 +44,7 @@ const ResultCard = (props: ResultCardProps) => {
                                         textAlign: 'center',
                                         color: 'white',
                                         backgroundColor: grey['resultCardNumber'],
-                                        border: frameBorder,
+                                        border: border['frameBorder'],
                                         borderRadius: borderRadius['circle'],
                                     }}>
                                     {props.content.item}

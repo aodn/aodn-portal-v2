@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Box, Card, CardActionArea, CardMedia} from '@mui/material';
-import {frameBorder} from '../common/constants';
+import {border} from '../common/constants';
 
 enum CardType {
     OneOnOne,
@@ -35,7 +35,7 @@ const SmartCardContent = (props: SmartcardProps) => {
                 maxHeight: dimension.cardHeight
             }}>
             <CardActionArea sx={{
-                border: frameBorder
+                border: border['frameBorder']
             }}>
                 {props?.imageUrl &&
                   <>
