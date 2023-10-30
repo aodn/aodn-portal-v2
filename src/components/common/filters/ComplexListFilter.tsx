@@ -4,12 +4,8 @@ import AddIcon from '@mui/icons-material/Add';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import {border, borderRadius, filterList} from "../constants";
 import grey from "../colors/grey";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {FilterGroup, Filter, getAllFilters} from "./api";
-
-interface ExpandableControl {
-    showHide: Map<string, boolean>
-}
 
 const createListItem = (item: Filter) =>
     <ListItem
@@ -23,27 +19,34 @@ const createListItem = (item: Filter) =>
         {item.name}
     </ListItem>
 
+const initShowHideListItem = (filterGroup : Array<FilterGroup>) => {
+    const i = new Map<string, boolean>();
 
+    filterGroup.forEach(v => {
+        i.set(v.name, v.filters.length > filterList['filterListMaxDisplay']);
+    });
+
+    return i;
+}
 
 const ComplexListFilter = () => {
-    const [filterGroup, setFilterGroup] = useState<Array<FilterGroup>>(getAllFilters())
-    const [showHideListItem, setShowHideListItem] = useState<ExpandableControl | null>(null);
+    const [filterGroup, setFilterGroup] = useState<Array<FilterGroup>>();
+    const [showHideListItem, setShowHideListItem] = useState<Map<string, boolean>>();
 
-    useEffect(() =>{
-        // Init the show hide iff filterGroup value changed
+    useEffect(() => {
+        const f = getAllFilters();
+        setFilterGroup(f);
+        setShowHideListItem(initShowHideListItem(f));
+    }, []);
+
+    const toggleShowHide = useCallback((name: string) => {
         setShowHideListItem((prevState) => {
-
-            const e: ExpandableControl = {
-                showHide: new Map<string, boolean>()
-            };
-
-            filterGroup.forEach(v => {
-                e.showHide.set(v.name, v.filters.length > filterList['filterListMaxDisplay']);
-            });
-
-            return e;
+            // Must clone a new copy otherwise React update will not trigger
+            const newMap = new Map<string, boolean>(prevState);
+            newMap?.set(name, !newMap.get(name));
+            return newMap;
         });
-    }, [filterGroup])
+    },[setShowHideListItem]);
 
     return(
         <Grid container spacing={2}>
@@ -70,17 +73,14 @@ const ComplexListFilter = () => {
                                     <ListItem
                                         sx={{
                                             backgroundColor: grey['filterGroupItem'],
-                                            display: showHideListItem?.showHide.get(value.name) ? 'flex' : 'none'
+                                            display: showHideListItem?.get(value.name) ? 'flex' : 'none'
                                         }}
                                     >
-                                        <ListItemIcon>
+                                        <ListItemIcon >
                                             <IconButton
                                                 edge={'start'}
                                                 onClick={(event ) => {
-                                                    setShowHideListItem((prevState) => {
-                                                        prevState?.showHide.set(value.name, !prevState?.showHide.get(value.name));
-                                                        return prevState;
-                                                    });
+                                                    toggleShowHide(value.name);
                                                 }}
                                             >
                                                 <UnfoldMoreIcon/>
@@ -88,9 +88,12 @@ const ComplexListFilter = () => {
                                         </ListItemIcon>
                                         all ({value.filters.length - filterList['filterListMaxDisplay']})
                                     </ListItem>
+                                    {
+                                        // TODO: Not working properly
+                                    }
                                     <Collapse
                                         key={value.name + '-collapse-id'}
-                                        in={!showHideListItem?.showHide.get(value.name)}
+                                        in={!showHideListItem?.get(value.name)}
                                         timeout='auto'
                                         unmountOnExit
                                     >
