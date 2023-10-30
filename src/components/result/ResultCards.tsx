@@ -54,7 +54,7 @@ const ResultCard = (props: ResultCardProps) => {
                     </Typography>
                     <Typography variant="body2">
                         <Grid container spacing={1}>
-                            <Grid item xs={3}><CardMedia sx={{display: 'flex', width: '100%', height: '100%'}} component='img' image={props.content.imageUrl} /></Grid>
+                            <Grid item xs={3}><CardMedia sx={{display: 'flex', width: '100%', height: '100px'}} component='img' image={props.content.imageUrl} /></Grid>
                             <Grid item xs={9}>
                                 {props.content.description.substring(0, 180) + '...'}
                             </Grid>

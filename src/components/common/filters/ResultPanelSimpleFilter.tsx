@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Grid, Box, Button, MenuItem, OutlinedInput} from '@mui/material';
+import {Grid, MenuItem} from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SlightRoundButton from "../buttons/SlightRoundButton";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -9,7 +9,11 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import RoundSelect from "../dropdown/RoundSelect";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-const ResultPanelSimpleFilter = () => {
+interface ResultPanelSimpleFilter {
+    filterClicked: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilter) => {
     return(
         <Grid container>
             <Grid item
@@ -19,7 +23,10 @@ const ResultPanelSimpleFilter = () => {
                   }}>
                 <Grid container justifyContent='center' columns={11} gap={1 }>
                     <Grid item xs='auto'>
-                        <SlightRoundButton startIcon={<PlayArrowIcon/>} endIcon={<FilterAltIcon/>}>Expand filters</SlightRoundButton>
+                        <SlightRoundButton
+                            startIcon={<PlayArrowIcon/>}
+                            endIcon={<FilterAltIcon/>}
+                            onClick={props.filterClicked}>Expand filters</SlightRoundButton>
                     </Grid>
                     <Grid item xs='auto'><NoBorderButton endIcon={<ArrowBackIosIcon/>}></NoBorderButton></Grid>
                     <Grid item xs={1}>

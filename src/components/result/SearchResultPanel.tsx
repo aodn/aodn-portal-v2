@@ -10,9 +10,13 @@ import { findResults } from './api';
 import DisplayCoordinate from '../map/maplibre/controls/DisplayCoordinate';
 import MapboxDrawControl from '../map/maplibre/controls/MapboxDrawControl';
 
+interface SearchResultPanel {
+    showMap?: boolean
+}
+
 const mapPanelId = 'maplibre-panel-id';
 
-const SearchResultPanel = () => {
+const SearchResultPanel = (props: SearchResultPanel) => {
 
     const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
         //TODO: Add bounding box to map
@@ -42,9 +46,17 @@ const SearchResultPanel = () => {
                             gridTemplateRows={'repeat(1, 1fr)'}
                             gap={2}
                         >
-                            <Box
+                            {!props.showMap &&
+                              <Box
                                 sx = {{
                                     gridColumn: 'span 2',
+                                    gridRow: 'span 1'
+                                }}>
+                              </Box>
+                            }
+                            <Box
+                                sx = {{
+                                    gridColumn: props.showMap? 'span 2' :'span 3',
                                     gridRow: 'span 1'
                                 }}>
                                 <ResultCards 
@@ -55,21 +67,24 @@ const SearchResultPanel = () => {
                                     onMore={undefined}
                                 />
                             </Box>
-                            <Box id={mapPanelId} sx={{
-                                gridColumn: 'span 3',
-                                gridRow: 'span 1',
-                                border: frameBorder,
-                                borderRadius: borderRadius['filter']
-                            }}>
+                            {props.showMap &&
+                              <Box id={mapPanelId} sx={{
+                                  gridColumn: 'span 3',
+                                  gridRow: 'span 1',
+                                  border: frameBorder,
+                                  borderRadius: borderRadius['filter']
+                              }}>
                                 <Map panelId={mapPanelId}>
-                                    <Controls>
-                                        <NavigationControl/>
-                                        <DisplayCoordinate/>
-                                        <ScaleControl/>
-                                        <MapboxDrawControl onDrawCreate={undefined} onDrawDelete={undefined} onDrawUpdate={undefined}/>
-                                    </Controls>
+                                  <Controls>
+                                    <NavigationControl/>
+                                    <DisplayCoordinate/>
+                                    <ScaleControl/>
+                                    <MapboxDrawControl onDrawCreate={undefined} onDrawDelete={undefined}
+                                                       onDrawUpdate={undefined}/>
+                                  </Controls>
                                 </Map>
-                            </Box>
+                              </Box>
+                            }
                         </Box>
                     </Grid>
                 </Grid>
@@ -78,4 +93,7 @@ const SearchResultPanel = () => {
     );
 };
 
+SearchResultPanel.defaultProps = {
+    showMap: false
+}
 export default SearchResultPanel;
