@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Grid, Tabs, Tab} from "@mui/material";
+import { Grid } from "@mui/material";
 import StoryBoard from "./StoryBoard";
 import grey from '../common/colors/grey';
 import { margin } from '../common/constants';

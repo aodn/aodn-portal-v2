@@ -102,9 +102,7 @@ const ComplexTextSearch = () => {
         parameters.text = 'temperature';
         dispatch(fetchResult(parameters))
             .unwrap()
-            .then((value) =>
-                navigate('/search')
-            );
+            .then((v) => navigate('/search'));
     }
 
     return(

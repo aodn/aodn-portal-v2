@@ -9,7 +9,8 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SlightRoundButton from '../common/buttons/SlightRoundButton';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useSelector } from 'react-redux/es/hooks/useSelector';
-import { collectionsQueryResult, StacCollection, StacCollections } from '../common/store/searchReducer';
+import { StacCollection, StacCollections } from '../common/store/searchReducer';
+import { RootState } from "../common/store/store";
 
 interface ResultCardProps {
     item: number,
@@ -120,7 +121,7 @@ const renderRows = (props: ResultCardsProps, contents: StacCollections, child: L
     return (
         <ListItem style={style}>
             <ResultCard
-                item={index}
+                item={index + 1}
                 content={contents.collections[index]}
                 onAddToMap={props.onAddToMap}
                 onDownload={props.onDownload}
@@ -129,10 +130,10 @@ const renderRows = (props: ResultCardsProps, contents: StacCollections, child: L
             />
         </ListItem>
     );
-}
+} 
 const ResultCards = (props: ResultCardsProps) => {
 
-    const contents = useSelector(collectionsQueryResult);
+    const contents = useSelector<RootState, StacCollections>((state) => state.searcher.collectionsQueryResult);
     console.log(contents);
     return(
         <FixedSizeList
