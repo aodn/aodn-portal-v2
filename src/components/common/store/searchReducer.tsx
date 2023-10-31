@@ -1,7 +1,7 @@
-import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { MediaType } from 'media-typer';
 import { searchUrl } from "../constants";
-import axios, {HttpStatusCode, AxiosError} from 'axios';
+import axios from 'axios';
 
 interface Link {
     href: string,
@@ -14,7 +14,7 @@ interface Spatial {
     crs: string,
 }
 
-interface StacCollection {
+export interface StacCollection {
     id: string,
     title: string,
     description: string,
@@ -23,7 +23,7 @@ interface StacCollection {
     extent: Spatial
 };
 
-interface StacCollections {
+export interface StacCollections {
     collections: Array<StacCollection>,
     links: Array<Link>
 }
@@ -38,18 +38,18 @@ export type SearchParameters = {
 }
 
 interface ObjectValue {
-    collections: StacCollections,
+    collectionsQueryResult: StacCollections,
 }
 
 const initialState : ObjectValue = {
-    collections: {
+    collectionsQueryResult: {
         links: new Array<Link>(),
         collections: new Array<StacCollection>()
     }
 }
 
 // Trunk for async action and update searcher
-export const fetchResult = createAsyncThunk<StacCollections, SearchParameters, {rejectValue: FailedResponse}>(
+const fetchResult = createAsyncThunk<StacCollections, SearchParameters, {rejectValue: FailedResponse}>(
     'search/fetchResult',
     async (param, thunkApi) => {
         try {
@@ -68,6 +68,8 @@ export const fetchResult = createAsyncThunk<StacCollections, SearchParameters, {
         }
     });
 
+const collectionsQueryResult = (state : ObjectValue) => state.collectionsQueryResult;
+
 const searcher = createSlice({
     name: 'search',
     initialState: initialState,
@@ -76,9 +78,14 @@ const searcher = createSlice({
     extraReducers(builder) {
         builder
             .addCase(fetchResult.fulfilled, (state, action) => {
-                state.collections = action.payload
+                state.collectionsQueryResult = action.payload
             })
     }
 });
+
+export {
+    fetchResult,
+    collectionsQueryResult
+}
 
 export default searcher.reducer;

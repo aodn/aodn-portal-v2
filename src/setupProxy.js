@@ -5,7 +5,7 @@ const {createProxyMiddleware} = require("http-proxy-middleware")
  * hence if your browser request something not from localhost:3000 orgin check blocked the call.
  *
  * This proxy allow the call to tunnel to our real target.
- * 
+ *
  * @param app
  */
 module.exports = function(app) {

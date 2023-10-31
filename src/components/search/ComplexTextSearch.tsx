@@ -1,5 +1,6 @@
 import React from 'react';
 import {Grid, InputAdornment, Button} from '@mui/material';
+import  { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import grey from '../common/colors/grey';
 import {Tune} from "@mui/icons-material";
@@ -84,7 +85,7 @@ const searchButton = (handler: any) => {
             minWidth: '150px'
         }}
         onClick={(event) => {
-            handler();
+            return handler();
         }}
     >
         Search
@@ -92,14 +93,18 @@ const searchButton = (handler: any) => {
 }
 
 const ComplexTextSearch = () => {
-
+    const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const [showFilters, setShowFilters] = React.useState(false);
 
     const onSearchClick = () => {
         const parameters : SearchParameters = {}
         parameters.text = 'temperature';
-        dispatch(fetchResult(parameters));
+        dispatch(fetchResult(parameters))
+            .unwrap()
+            .then((value) =>
+                navigate('/search')
+            );
     }
 
     return(

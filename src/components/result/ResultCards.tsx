@@ -8,25 +8,24 @@ import SellIcon from '@mui/icons-material/Sell';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SlightRoundButton from '../common/buttons/SlightRoundButton';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
-
-export interface ResultCardContent {
-    item: number,
-    uuid: string,
-    title: string,
-    status: string,
-    imageUrl: string,
-    description: string
-}
+import { useSelector } from 'react-redux/es/hooks/useSelector';
+import { collectionsQueryResult, StacCollection, StacCollections } from '../common/store/searchReducer';
 
 interface ResultCardProps {
-    content: ResultCardContent,
+    item: number,
+    content : StacCollection,
     onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined,
     onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined,
     onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined,
     onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined,
 }
 
+const findThumbnail = (c : StacCollection) : string => {
+    return 'https://warcontent.com/wp-content/uploads/2021/03/substring-javascript-5.png'
+}
+
 const ResultCard = (props: ResultCardProps) => {
+
     return(
         <Card sx={{
             border: border['frameBorder'],
@@ -47,14 +46,19 @@ const ResultCard = (props: ResultCardProps) => {
                                         border: border['frameBorder'],
                                         borderRadius: borderRadius['circle'],
                                     }}>
-                                    {props.content.item}
+                                    {props.item}
                                 </div>
                             </Grid>
                         </Grid>                    
                     </Typography>
                     <Typography variant="body2">
                         <Grid container spacing={1}>
-                            <Grid item xs={3}><CardMedia sx={{display: 'flex', width: '100%', height: '100px'}} component='img' image={props.content.imageUrl} /></Grid>
+                            <Grid item xs={3}>
+                                <CardMedia
+                                    sx={{display: 'flex', width: '100%', height: '100px'}}
+                                    component='img'
+                                    image={findThumbnail(props.content)} />
+                            </Grid>
                             <Grid item xs={9}>
                                 {props.content.description.substring(0, 180) + '...'}
                             </Grid>
@@ -66,7 +70,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <SlightRoundButton 
                     startIcon={<WhereToVoteIcon/>} 
                     size="small" 
-                    onClick={(event) => props?.onAddToMap && props.onAddToMap(event, props.content.uuid)} 
+                    onClick={(event) => props?.onAddToMap && props.onAddToMap(event, props.content.id)}
                     disabled={props.onAddToMap === undefined}
                 >
                         Add to Map
@@ -74,7 +78,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <SlightRoundButton 
                     startIcon={<DownloadIcon/>} 
                     size="small" 
-                    onClick={(event) => props?.onDownload && props.onDownload(event, props.content.uuid)} 
+                    onClick={(event) => props?.onDownload && props.onDownload(event, props.content.id)}
                     disabled={props.onDownload === undefined}
                 >
                     Download
@@ -82,7 +86,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <SlightRoundButton 
                     startIcon={<SellIcon/>} 
                     size="small"
-                    onClick={(event) => props?.onTags && props.onTags(event, props.content.uuid)} 
+                    onClick={(event) => props?.onTags && props.onTags(event, props.content.id)}
                     disabled={props.onTags === undefined}
                 >
                     Tags
@@ -90,7 +94,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <SlightRoundButton 
                     startIcon={<MoreHorizIcon/>} 
                     size="small"
-                    onClick={(event) => props?.onMore && props.onMore(event, props.content.uuid)} 
+                    onClick={(event) => props?.onMore && props.onMore(event, props.content.id)}
                     disabled={props.onMore === undefined}
                 >
                     More
@@ -101,7 +105,6 @@ const ResultCard = (props: ResultCardProps) => {
 };
 
 interface ResultCardsProps {
-    contents: Array<ResultCardContent>,
     onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined;
     onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined;
     onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined;
@@ -109,7 +112,7 @@ interface ResultCardsProps {
 }
 
 // This function is use to control which item to render in the long list
-const renderRows = (props: ResultCardsProps, child: ListChildComponentProps) => {
+const renderRows = (props: ResultCardsProps, contents: StacCollections, child: ListChildComponentProps) => {
 
     // The style must pass to the listitem else incorrect rendering
     const { index, style } = child;
@@ -117,7 +120,8 @@ const renderRows = (props: ResultCardsProps, child: ListChildComponentProps) => 
     return (
         <ListItem style={style}>
             <ResultCard
-                content={props.contents[index]}
+                item={index}
+                content={contents.collections[index]}
                 onAddToMap={props.onAddToMap}
                 onDownload={props.onDownload}
                 onTags={props.onTags}
@@ -127,15 +131,18 @@ const renderRows = (props: ResultCardsProps, child: ListChildComponentProps) => 
     );
 }
 const ResultCards = (props: ResultCardsProps) => {
+
+    const contents = useSelector(collectionsQueryResult);
+    console.log(contents);
     return(
         <FixedSizeList
             height={700}
             width={"100%"}
             itemSize={270}
-            itemCount={props.contents.length}
+            itemCount={contents.collections.length}
             overscanCount={10}
         >
-            {(child: ListChildComponentProps) => renderRows(props, child)}
+            {(child: ListChildComponentProps) => renderRows(props, contents, child)}
         </FixedSizeList>
     );
 };

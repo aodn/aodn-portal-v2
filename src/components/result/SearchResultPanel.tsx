@@ -7,7 +7,6 @@ import NavigationControl from "../map/maplibre/controls/NavigationControl";
 import ScaleControl from "../map/maplibre/controls/ScaleControl";
 import {ResultCards} from "./ResultCards";
 import ComplexListFilter from '../common/filters/ComplexListFilter';
-import { findResults } from './api';
 import DisplayCoordinate from '../map/maplibre/controls/DisplayCoordinate';
 import MapboxDrawControl from '../map/maplibre/controls/MapboxDrawControl';
 
@@ -26,8 +25,6 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
     const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
         //TODO: Add bounding box to map
     },[]);
-
-    const [results, setResult] = useState(findResults());
 
     return(
         <Grid id={'search-result-panel'} container>
@@ -62,8 +59,7 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                     gridRow: 'span 1'
                                 }}>
                                 <ResultCards 
-                                    contents={results}
-                                    onAddToMap={onAddToMap} 
+                                    onAddToMap={onAddToMap}
                                     onDownload={onDownload}
                                     onTags={undefined}
                                     onMore={undefined}
