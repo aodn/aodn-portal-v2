@@ -1,6 +1,6 @@
 import React from 'react'
 import grey from "../common/colors/grey";
-import {Card, CardContent, CardMedia, Grid, Typography, CardActionArea, CardActions, List, ListItem} from "@mui/material";
+import {Card, CardContent, CardMedia, Grid, Typography, CardActionArea, CardActions, ListItem} from "@mui/material";
 import {borderRadius, border} from "../common/constants";
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -10,7 +10,7 @@ import SlightRoundButton from '../common/buttons/SlightRoundButton';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useSelector } from 'react-redux/es/hooks/useSelector';
 import { StacCollection, StacCollections } from '../common/store/searchReducer';
-import { RootState } from "../common/store/store";
+import { RootState, searchQueryResult } from "../common/store/store";
 
 interface ResultCardProps {
     item: number,
@@ -133,7 +133,7 @@ const renderRows = (props: ResultCardsProps, contents: StacCollections, child: L
 } 
 const ResultCards = (props: ResultCardsProps) => {
 
-    const contents = useSelector<RootState, StacCollections>((state) => state.searcher.collectionsQueryResult);
+    const contents = useSelector<RootState, StacCollections>(searchQueryResult);
     console.log(contents);
     return(
         <FixedSizeList

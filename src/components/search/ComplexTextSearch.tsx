@@ -84,8 +84,8 @@ const searchButton = (handler: any) => {
             borderSize: '5px',
             minWidth: '150px'
         }}
-        onClick={(event) => {
-            return handler();
+        onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            return handler(event);
         }}
     >
         Search
@@ -95,11 +95,15 @@ const searchButton = (handler: any) => {
 const ComplexTextSearch = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
-    const [showFilters, setShowFilters] = React.useState(false);
 
-    const onSearchClick = () => {
-        const parameters : SearchParameters = {}
-        parameters.text = 'temperature';
+    const [showFilters, setShowFilters] = React.useState(false);
+    const [searchText, setSearchText] = React.useState('');
+
+    const onSearchClick = (event : React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const parameters : SearchParameters = {};
+        // OGC api requires comma separated values as list of search terms
+        parameters.text = (searchText || '').replace(' ',',');
+
         dispatch(fetchResult(parameters))
             .unwrap()
             .then((v) => navigate('/search'));
@@ -119,10 +123,14 @@ const ComplexTextSearch = () => {
                             id="outlined-search"
                             label="Search for open data"
                             type="search"
+                            value={searchText}
                             InputProps={{
                                 style: {color: 'white'},
                                 startAdornment: (<InputAdornment position='start'><SearchIcon/></InputAdornment>),
                                 endAdornment: filterButton(setShowFilters)
+                            }}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setSearchText(event.target.value);
                             }}
                         />
                     </Grid>
