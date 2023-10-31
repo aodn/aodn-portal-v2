@@ -13,6 +13,9 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import Divider from '@mui/material/Divider';
 import StyledTextField from "./StyledTextField";
+import { useDispatch } from 'react-redux'
+import { fetchResult, SearchParameters } from '../common/store/searchReducer';
+import { AppDispatch } from "../common/store/store";
 
 const filterButton = (setValue: React.Dispatch<React.SetStateAction<boolean>>) =>
     <InputAdornment position='end'>
@@ -69,8 +72,9 @@ const filterFooter = () =>
         <Divider></Divider>
     </Grid>;
 
-const searchButton = () =>
-    <Button
+const searchButton = (handler: any) => {
+
+    return(<Button
         sx={{
             color: grey["searchButtonText"],
             backgroundColor: grey["search"],
@@ -79,13 +83,24 @@ const searchButton = () =>
             borderSize: '5px',
             minWidth: '150px'
         }}
+        onClick={(event) => {
+            handler();
+        }}
     >
         Search
-    </Button>
+    </Button>);
+}
 
 const ComplexTextSearch = () => {
 
+    const dispatch = useDispatch<AppDispatch>();
     const [showFilters, setShowFilters] = React.useState(false);
+
+    const onSearchClick = () => {
+        const parameters : SearchParameters = {}
+        parameters.text = 'temperature';
+        dispatch(fetchResult(parameters));
+    }
 
     return(
         <Grid container>
@@ -108,7 +123,7 @@ const ComplexTextSearch = () => {
                             }}
                         />
                     </Grid>
-                    <Grid item>{searchButton()}</Grid>
+                    <Grid item>{searchButton(onSearchClick)}</Grid>
                 </Grid>
                 <Collapse orientation="vertical" in={showFilters}>
                     <Grid 

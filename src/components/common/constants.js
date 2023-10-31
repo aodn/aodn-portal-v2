@@ -26,9 +26,12 @@ const filterList = {
   filterListMaxDisplay: 4
 }
 
+const searchUrl = '';
+
 export {
   margin,
   border,
   borderRadius,
-  filterList
+  filterList,
+  searchUrl
 }

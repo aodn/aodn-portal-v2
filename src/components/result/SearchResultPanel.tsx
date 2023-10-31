@@ -81,8 +81,10 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                     <NavigationControl/>
                                     <DisplayCoordinate/>
                                     <ScaleControl/>
-                                    <MapboxDrawControl onDrawCreate={undefined} onDrawDelete={undefined}
-                                                       onDrawUpdate={undefined}/>
+                                    <MapboxDrawControl
+                                        onDrawCreate={undefined}
+                                        onDrawDelete={undefined}
+                                        onDrawUpdate={undefined}/>
                                   </Controls>
                                 </Map>
                               </Box>
