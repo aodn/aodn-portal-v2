@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
 import { searchUrl } from "../../../common/constants";
+import { StacCollection } from "../../../common/store/searchReducer";
 
 interface VectirTileLayersProps {
     // Vector tile layer should added to map
-    uuids: Array<string>;
+    stac: Array<StacCollection>;
 };
 
 const findSetDifference = (setA: Array<string>, setB: Array<string>) => setA.filter(x => !setB.includes(x));
@@ -47,8 +48,10 @@ const VectirTileLayers = (props : VectirTileLayersProps) => {
         if(!mapLoaded) return;
 
         // Things need to add and remove
-        const toAdd = findSetDifference(props.uuids, layers);
-        const toDelete = findSetDifference(layers, props.uuids);
+        const stacIds = props.stac.map(s => s.id);
+
+        const toAdd = findSetDifference(stacIds, layers);
+        const toDelete = findSetDifference(layers, stacIds);
 
         toDelete.forEach(uuid => {
             map.removeLayer(uuid);
@@ -77,7 +80,7 @@ const VectirTileLayers = (props : VectirTileLayersProps) => {
             }
         });
 
-    },[map, props.uuids, layers, mapLoaded]);
+    },[map, props.stac, layers, mapLoaded]);
 
     return(<React.Fragment/>);
 };

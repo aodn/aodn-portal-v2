@@ -11,7 +11,9 @@ import DisplayCoordinate from '../map/maplibre/controls/DisplayCoordinate';
 import MapboxDrawControl from '../map/maplibre/controls/MapboxDrawControl';
 import Layers from '../map/maplibre/layers/Layers';
 import VectorTileLayers from '../map/maplibre/layers/VectorTileLayers';
-import Locate from '../map/maplibre/controls/Locate';
+import LocateControl from '../map/maplibre/controls/LocateControl';
+import ItemsOnMapControl from '../map/maplibre/controls/ItemsOnMapControl';
+import { StacCollection } from '../common/store/searchReducer';
 
 interface SearchResultPanelProps {
     showMap?: boolean
@@ -21,17 +23,17 @@ const mapPanelId = 'maplibre-panel-id';
 
 const SearchResultPanel = (props: SearchResultPanelProps) => {
 
-    const [layersUuid, setLayersUuid] = useState<Array<string>>([]);
+    const [layersUuid, setLayersUuid] = useState<Array<StacCollection>>([]);
 
-    const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
+    const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => {
         // Unique set of layers
-        const s = new Set<string>(layersUuid);
-        s.add(uuid);
+        const s = new Set<StacCollection>(layersUuid);
+        s.add(stac);
         setLayersUuid(Array.from(s));
 
     },[layersUuid]);
 
-    const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
+    const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => {
         //TODO: Add bounding box to map
     },[]);
 
@@ -86,14 +88,15 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                     <NavigationControl/>
                                     <DisplayCoordinate/>
                                     <ScaleControl/>
-                                    <Locate/>
+                                    <LocateControl/>
+                                    <ItemsOnMapControl stac={layersUuid}/>
                                     <MapboxDrawControl
                                         onDrawCreate={undefined}
                                         onDrawDelete={undefined}
                                         onDrawUpdate={undefined}/>
                                   </Controls>
                                   <Layers>
-                                    <VectorTileLayers uuids={layersUuid}/>
+                                    <VectorTileLayers stac={layersUuid}/>
                                   </Layers>
                                 </Map>
                               </Box>
