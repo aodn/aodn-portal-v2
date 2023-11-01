@@ -46,7 +46,7 @@ const ReactMap = (props: React.PropsWithChildren<MapProps>) => {
 ReactMap.defaultProps = {
     centerLatitude : -42.88611707886841,
     centerLongitude : 147.3353554138993,
-    zoom : 5,
+    zoom : 2,
     stylejson : 'https://demotiles.maplibre.org/style.json'
 };
 

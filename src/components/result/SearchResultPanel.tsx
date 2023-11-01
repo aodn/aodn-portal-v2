@@ -11,6 +11,7 @@ import DisplayCoordinate from '../map/maplibre/controls/DisplayCoordinate';
 import MapboxDrawControl from '../map/maplibre/controls/MapboxDrawControl';
 import Layers from '../map/maplibre/layers/Layers';
 import VectorTileLayers from '../map/maplibre/layers/VectorTileLayers';
+import Locate from '../map/maplibre/controls/Locate';
 
 interface SearchResultPanelProps {
     showMap?: boolean
@@ -85,6 +86,7 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                     <NavigationControl/>
                                     <DisplayCoordinate/>
                                     <ScaleControl/>
+                                    <Locate/>
                                     <MapboxDrawControl
                                         onDrawCreate={undefined}
                                         onDrawDelete={undefined}

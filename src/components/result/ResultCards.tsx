@@ -37,7 +37,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <CardContent>
                     <Typography component="div" sx={{ marginBottom: '10px'}}>
                         <Grid container>
-                            <Grid item xs={11}>{props.content.title}</Grid>
+                            <Grid item xs={11}>{props.content.title.substring(0, 90) + '...'}</Grid>
                             <Grid item xs={1}>
                                 <div 
                                     style={{
