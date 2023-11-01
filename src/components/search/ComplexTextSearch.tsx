@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {Grid, InputAdornment, Button} from '@mui/material';
 import  { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
@@ -72,7 +72,11 @@ const filterFooter = () =>
         </Grid>
         <Divider></Divider>
     </Grid>;
-
+/**
+ * Put it here to avoid refresh the function every time the component is rendered
+ * @param handler 
+ * @returns 
+ */
 const searchButton = (handler: any) => {
 
     return(<Button
@@ -99,7 +103,7 @@ const ComplexTextSearch = () => {
     const [showFilters, setShowFilters] = React.useState(false);
     const [searchText, setSearchText] = React.useState('');
 
-    const onSearchClick = (event : React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const onSearchClick = useCallback((event : React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         const parameters : SearchParameters = {};
         // OGC api requires comma separated values as list of search terms
         parameters.text = (searchText || '').replace(' ',',');
@@ -107,7 +111,8 @@ const ComplexTextSearch = () => {
         dispatch(fetchResult(parameters))
             .unwrap()
             .then((v) => navigate('/search'));
-    }
+
+    },[searchText, dispatch, navigate]);
 
     return(
         <Grid container>

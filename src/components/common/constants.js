@@ -26,7 +26,7 @@ const filterList = {
   filterListMaxDisplay: 4
 }
 
-const searchUrl = '';
+const searchUrl = 'http://localhost:3000';
 
 export {
   margin,

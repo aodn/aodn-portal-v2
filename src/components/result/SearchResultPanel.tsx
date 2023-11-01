@@ -9,6 +9,8 @@ import {ResultCards} from "./ResultCards";
 import ComplexListFilter from '../common/filters/ComplexListFilter';
 import DisplayCoordinate from '../map/maplibre/controls/DisplayCoordinate';
 import MapboxDrawControl from '../map/maplibre/controls/MapboxDrawControl';
+import Layers from '../map/maplibre/layers/Layers';
+import VectorTileLayers from '../map/maplibre/layers/VectorTileLayers';
 
 interface SearchResultPanelProps {
     showMap?: boolean
@@ -18,9 +20,15 @@ const mapPanelId = 'maplibre-panel-id';
 
 const SearchResultPanel = (props: SearchResultPanelProps) => {
 
+    const [layersUuid, setLayersUuid] = useState<Array<string>>([]);
+
     const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
-        //TODO: Add bounding box to map
-    },[]);
+        // Unique set of layers
+        const s = new Set<string>(layersUuid);
+        s.add(uuid);
+        setLayersUuid(Array.from(s));
+
+    },[layersUuid]);
 
     const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
         //TODO: Add bounding box to map
@@ -82,6 +90,9 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                         onDrawDelete={undefined}
                                         onDrawUpdate={undefined}/>
                                   </Controls>
+                                  <Layers>
+                                    <VectorTileLayers uuids={layersUuid}/>
+                                  </Layers>
                                 </Map>
                               </Box>
                             }

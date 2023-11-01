@@ -1,6 +1,6 @@
 import React from 'react';
 import {margin} from "../common/constants";
-import {Grid, InputAdornment, Button} from '@mui/material';
+import {Grid, InputAdornment} from '@mui/material';
 import StyledTextField from "./StyledTextField";
 import SearchIcon from "@mui/icons-material/Search";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -17,6 +17,9 @@ const getEndAdornment = () =>
 
 
 const SimpleTextSearch = () => {
+
+    const [searchText, setSearchText] = React.useState('');
+
     return(
         <Grid container>
             <Grid item
@@ -31,9 +34,13 @@ const SimpleTextSearch = () => {
                             id="outlined-search"
                             label="Search for open data"
                             type="search"
+                            value={searchText}
                             InputProps={{
                                 style: {color: 'white'},
                                 endAdornment: getEndAdornment()
+                            }}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setSearchText(event.target.value);
                             }}
                         />
                     </Grid>
