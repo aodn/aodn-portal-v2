@@ -13,7 +13,7 @@ module.exports = function(app) {
       createProxyMiddleware(
         ['/collections','/tiles'],
         {
-          target: 'http://ec2-3-24-110-244.ap-southeast-2.compute.amazonaws.com:8081',
+          target: process.env.REACT_APP_API_HOST,
           changeOrigin: true,
         })
     );

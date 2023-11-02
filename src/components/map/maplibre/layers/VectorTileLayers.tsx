@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
-import { searchUrl } from "../../../common/constants";
 import { StacCollection } from "../../../common/store/searchReducer";
 
 interface VectirTileLayersProps {
@@ -63,7 +62,7 @@ const VectirTileLayers = (props : VectirTileLayersProps) => {
                 map.addSource(uuid, {
                     type: 'vector',
                     tiles: [
-                        `${searchUrl}/tiles/WebMercatorQuad/{z}/{x}/{y}?collections=${uuid}`
+                        `/tiles/WebMercatorQuad/{z}/{x}/{y}?collections=${uuid}`
                     ]
                 });
                 map.addLayer({
