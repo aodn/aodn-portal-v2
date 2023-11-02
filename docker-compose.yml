@@ -6,5 +6,9 @@ services:
     build: .
     image: 615645230945.dkr.ecr.ap-southeast-2.amazonaws.com/raymond/aodn-portal-v2
     network_mode: "host"
+    env_file:
+      - .env
+    environment:
+      REACT_APP_API_HOST: ${API_HOST:-http://localhost}:${API_CONTAINER_PORT:-8081}
     volumes:
       - /tmp:/tmp

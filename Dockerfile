@@ -10,4 +10,6 @@ COPY tsconfig.json /aodn-portal/
 RUN npm install -g npm
 RUN npm install
 
+ENV REACT_APP_API_HOST ${API_HOST}
+
 CMD ["npm", "start"]
