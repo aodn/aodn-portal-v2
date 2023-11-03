@@ -1,15 +1,27 @@
-FROM node:18-alpine
+# Build env
+FROM node:18-alpine as build
 
-WORKDIR /aodn-portal/
+WORKDIR /app/
 
-COPY public/ /aodn-portal/public
-COPY src/ /aodn-portal/src
-COPY package.json /aodn-portal/
-COPY tsconfig.json /aodn-portal/
+COPY public/ /app/public
+COPY src/ /app/src
+COPY nginx /app/nginx
+COPY package.json /app/
+COPY tsconfig.json /app/
+
+# It is not use in prod remove it.
+RUN rm /app/src/setupProxy.js
 
 RUN npm install -g npm
+
 RUN npm install
+RUN npm run build
 
-ENV REACT_APP_API_HOST ${API_HOST}
+# production environment
+FROM nginx:stable-alpine
 
-CMD ["npm", "start"]
+# Mulit-stage build, need copy output from the "as build"
+COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+CMD ["nginx", "-g", "daemon off;"]
