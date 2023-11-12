@@ -7,6 +7,6 @@ services:
     image: 615645230945.dkr.ecr.ap-southeast-2.amazonaws.com/raymond/aodn-portal-v2
     network_mode: "host"
     env_file:
-      - .env
+      - .env.sample
     volumes:
       - /tmp:/tmp
