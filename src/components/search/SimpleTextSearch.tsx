@@ -1,6 +1,10 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {margin} from "../common/constants";
-import {Grid, InputAdornment, Button} from '@mui/material';
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from "../common/store/store";
+import { fetchResult, SearchParameters } from '../common/store/searchReducer';
+import  { useNavigate } from 'react-router-dom';
+import {Grid, InputAdornment} from '@mui/material';
 import StyledTextField from "./StyledTextField";
 import SearchIcon from "@mui/icons-material/Search";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -17,6 +21,24 @@ const getEndAdornment = () =>
 
 
 const SimpleTextSearch = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+
+    const [searchText, setSearchText] = React.useState('');
+
+    const handleEnterPressed = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'Enter') {
+            const parameters : SearchParameters = {};
+            // OGC api requires comma separated values as list of search terms
+            parameters.text = (searchText || '').replace(' ',',');
+    
+            dispatch(fetchResult(parameters))
+                .unwrap()
+                .then((v) => navigate('/search'));
+        }
+
+    },[searchText, dispatch, navigate]);
+
     return(
         <Grid container>
             <Grid item
@@ -31,10 +53,15 @@ const SimpleTextSearch = () => {
                             id="outlined-search"
                             label="Search for open data"
                             type="search"
+                            value={searchText}
                             InputProps={{
                                 style: {color: 'white'},
                                 endAdornment: getEndAdornment()
                             }}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setSearchText(event.target.value);
+                            }}
+                            onKeyDown={handleEnterPressed}
                         />
                     </Grid>
                 </Grid>

@@ -1,0 +1,12 @@
+version: '3.1'
+
+services:
+  aodnportal:
+    container_name: aodn-portal-v2
+    build: .
+    image: 615645230945.dkr.ecr.ap-southeast-2.amazonaws.com/raymond/aodn-portal-v2
+    network_mode: "host"
+    env_file:
+      - .env.sample
+    volumes:
+      - /tmp:/tmp

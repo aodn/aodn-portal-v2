@@ -1,6 +1,5 @@
 import {createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { MediaType } from 'media-typer';
-import { searchUrl } from "../constants";
 import axios from 'axios';
 
 interface Link {
@@ -54,7 +53,7 @@ const fetchResult = createAsyncThunk<StacCollections, SearchParameters, {rejectV
     async (param, thunkApi) => {
         try {
             const response = await axios.get<StacCollections>(
-                searchUrl + '/collections', {
+                '/collections', {
                     params: {
                         q: param.text
                     }

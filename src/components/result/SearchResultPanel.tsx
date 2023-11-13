@@ -9,6 +9,11 @@ import {ResultCards} from "./ResultCards";
 import ComplexListFilter from '../common/filters/ComplexListFilter';
 import DisplayCoordinate from '../map/maplibre/controls/DisplayCoordinate';
 import MapboxDrawControl from '../map/maplibre/controls/MapboxDrawControl';
+import Layers from '../map/maplibre/layers/Layers';
+import VectorTileLayers from '../map/maplibre/layers/VectorTileLayers';
+import LocateControl from '../map/maplibre/controls/LocateControl';
+import ItemsOnMapControl from '../map/maplibre/controls/ItemsOnMapControl';
+import { StacCollection } from '../common/store/searchReducer';
 
 interface SearchResultPanelProps {
     showMap?: boolean
@@ -18,11 +23,17 @@ const mapPanelId = 'maplibre-panel-id';
 
 const SearchResultPanel = (props: SearchResultPanelProps) => {
 
-    const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
-        //TODO: Add bounding box to map
-    },[]);
+    const [layersUuid, setLayersUuid] = useState<Array<StacCollection>>([]);
 
-    const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => {
+    const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => {
+        // Unique set of layers
+        const s = new Set<StacCollection>(layersUuid);
+        s.add(stac);
+        setLayersUuid(Array.from(s));
+
+    },[layersUuid]);
+
+    const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => {
         //TODO: Add bounding box to map
     },[]);
 
@@ -38,6 +49,7 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                         <Box
                             display='grid'
                             minWidth='1200px'
+                            maxHeight='700px'
                             marginTop={margin['tripleTop']}
                             marginBottom={margin['tripleBottom']}
                             gridTemplateColumns={'repeat(5, 1fr)'}
@@ -77,11 +89,16 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                     <NavigationControl/>
                                     <DisplayCoordinate/>
                                     <ScaleControl/>
+                                    <LocateControl/>
+                                    <ItemsOnMapControl stac={layersUuid}/>
                                     <MapboxDrawControl
                                         onDrawCreate={undefined}
                                         onDrawDelete={undefined}
                                         onDrawUpdate={undefined}/>
                                   </Controls>
+                                  <Layers>
+                                    <VectorTileLayers stac={layersUuid}/>
+                                  </Layers>
                                 </Map>
                               </Box>
                             }

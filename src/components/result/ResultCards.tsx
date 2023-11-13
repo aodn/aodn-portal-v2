@@ -15,10 +15,10 @@ import { RootState, searchQueryResult } from "../common/store/store";
 interface ResultCardProps {
     item: number,
     content : StacCollection,
-    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined,
-    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined,
-    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined,
-    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined,
+    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
+    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
+    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
+    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
 }
 
 const findThumbnail = (c : StacCollection) : string => {
@@ -37,7 +37,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <CardContent>
                     <Typography component="div" sx={{ marginBottom: '10px'}}>
                         <Grid container>
-                            <Grid item xs={11}>{props.content.title}</Grid>
+                            <Grid item xs={11}>{props.content.title.substring(0, 90) + '...'}</Grid>
                             <Grid item xs={1}>
                                 <div 
                                     style={{
@@ -71,7 +71,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <SlightRoundButton 
                     startIcon={<WhereToVoteIcon/>} 
                     size="small" 
-                    onClick={(event) => props?.onAddToMap && props.onAddToMap(event, props.content.id)}
+                    onClick={(event) => props?.onAddToMap && props.onAddToMap(event, props.content)}
                     disabled={props.onAddToMap === undefined}
                 >
                         Add to Map
@@ -79,7 +79,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <SlightRoundButton 
                     startIcon={<DownloadIcon/>} 
                     size="small" 
-                    onClick={(event) => props?.onDownload && props.onDownload(event, props.content.id)}
+                    onClick={(event) => props?.onDownload && props.onDownload(event, props.content)}
                     disabled={props.onDownload === undefined}
                 >
                     Download
@@ -87,7 +87,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <SlightRoundButton 
                     startIcon={<SellIcon/>} 
                     size="small"
-                    onClick={(event) => props?.onTags && props.onTags(event, props.content.id)}
+                    onClick={(event) => props?.onTags && props.onTags(event, props.content)}
                     disabled={props.onTags === undefined}
                 >
                     Tags
@@ -95,7 +95,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <SlightRoundButton 
                     startIcon={<MoreHorizIcon/>} 
                     size="small"
-                    onClick={(event) => props?.onMore && props.onMore(event, props.content.id)}
+                    onClick={(event) => props?.onMore && props.onMore(event, props.content)}
                     disabled={props.onMore === undefined}
                 >
                     More
@@ -106,10 +106,10 @@ const ResultCard = (props: ResultCardProps) => {
 };
 
 interface ResultCardsProps {
-    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined;
-    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined;
-    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined;
-    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, uuid: string) => void) | undefined;
+    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
+    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
+    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
+    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
 }
 
 // This function is use to control which item to render in the long list
