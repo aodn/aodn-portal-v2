@@ -1,4 +1,3 @@
-import React from "react";
 import { createContext } from 'react';
 
 // Refer to this https://maplibre.org/news/2023-01-03-aws-maplibre-plugins/

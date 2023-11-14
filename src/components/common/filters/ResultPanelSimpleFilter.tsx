@@ -9,11 +9,11 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import RoundSelect from "../dropdown/RoundSelect";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-interface ResultPanelSimpleFilter {
+interface ResultPanelSimpleFilterProps {
     filterClicked: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilter) => {
+const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilterProps) => {
     return(
         <Grid container>
             <Grid item

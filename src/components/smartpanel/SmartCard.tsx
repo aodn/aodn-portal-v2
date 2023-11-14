@@ -91,7 +91,7 @@ const SmartCardContent = (props: SmartcardProps) => {
  * @param props
  * @constructor
  */
-const SmartCard_2_1 = (props: SmartcardProps) => {
+const SmartCard21 = (props: SmartcardProps) => {
     // Format string with Start / End column
     const p = {...props};
     p.card = CardType.TwoOnOne;
@@ -112,7 +112,7 @@ const SmartCard_2_1 = (props: SmartcardProps) => {
  * @param props
  * @constructor
  */
-const SmartCard_1_1 = (props: SmartcardProps) => {
+const SmartCard11 = (props: SmartcardProps) => {
     // Format string with Start / End column
     const p = {...props};
     p.card = CardType.OneOnOne;
@@ -133,7 +133,7 @@ const SmartCard_1_1 = (props: SmartcardProps) => {
  * @param props
  * @constructor
  */
-const SmartCard_2_2 = (props: SmartcardProps) => {
+const SmartCard22 = (props: SmartcardProps) => {
     // Format string with Start / End column
     const p = {...props};
     p.card = CardType.TwoOnTwo;
@@ -150,7 +150,7 @@ const SmartCard_2_2 = (props: SmartcardProps) => {
     );
 };
 
-const SmartCard_3_2 = (props: SmartcardProps) => {
+const SmartCard32 = (props: SmartcardProps) => {
     // Format string with Start / End column
     const p = {...props};
     p.card = CardType.ThreeOnTwo;
@@ -168,8 +168,8 @@ const SmartCard_3_2 = (props: SmartcardProps) => {
 };
 
 export {
-    SmartCard_1_1,
-    SmartCard_2_1,
-    SmartCard_2_2,
-    SmartCard_3_2
+    SmartCard11,
+    SmartCard21,
+    SmartCard22,
+    SmartCard32
 };

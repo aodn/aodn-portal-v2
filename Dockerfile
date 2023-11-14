@@ -14,8 +14,8 @@ RUN rm /app/src/setupProxy.js
 
 RUN npm install -g npm
 
-RUN npm install
-RUN npm run build
+RUN npm install --production
+RUN npm run build --production
 
 # production environment
 FROM nginx:stable-alpine

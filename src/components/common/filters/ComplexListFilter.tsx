@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Grid, List, ListItem, ListItemIcon, ListSubheader, Box, IconButton, Collapse} from '@mui/material';
+import {Grid, List, ListItem, ListItemIcon, ListSubheader, IconButton, Collapse} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import {border, borderRadius, filterList} from "../constants";

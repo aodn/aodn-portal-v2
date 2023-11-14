@@ -1,7 +1,6 @@
-import React, {useContext, useRef} from "react";
+import React from "react";
 import { List, ListItem, ListItemText, ListItemSecondaryAction, IconButton } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
-import MapContext from "../MapContext";
 import { StacCollection } from "../../../common/store/searchReducer";
 
 interface ItemsOnMapControlProps {
@@ -25,9 +24,6 @@ const createListItem = (uuid: string, description: string) => {
 }
 
 const ItemsOnMapControl = (props: ItemsOnMapControlProps) => {
-    
-    const { map } = useContext(MapContext);
-    const ref = useRef<HTMLDivElement | null>(null);
 
     return (
         <List

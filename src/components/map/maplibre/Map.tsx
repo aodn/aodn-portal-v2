@@ -32,7 +32,7 @@ const ReactMap = (props: React.PropsWithChildren<MapProps>) => {
         m.getCanvasContainer().classList.add('mapboxgl-interactive');
         
         setMap(m);
-    }, []);
+    }, [props.centerLatitude, props.centerLongitude, props.panelId, props.stylejson, props.zoom]);
 
     return (
         <MapContext.Provider value={{ map }}> 
