@@ -18,7 +18,13 @@ import { useDispatch } from 'react-redux'
 import { fetchResult, SearchParameters } from '../common/store/searchReducer';
 import { AppDispatch } from "../common/store/store";
 
-const filterButton = (setValue: React.Dispatch<React.SetStateAction<boolean>>) =>
+export interface ComplexTextSearchProps {
+    onFilterCallback: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, show: boolean) => void | null;
+};
+
+const filterButton = (setValue: React.Dispatch<React.SetStateAction<boolean>>,
+                      onFilterCallback: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, show: boolean) => void | null) =>
+
     <InputAdornment position='end'>
         <Button
             variant="outlined"
@@ -27,7 +33,10 @@ const filterButton = (setValue: React.Dispatch<React.SetStateAction<boolean>>) =
                 borderColor: grey["searchButtonText"]
             }}
             startIcon={<Tune/>}
-            onClick={() => setValue(true)}
+            onClick={(e) => {
+                setValue(true);
+                onFilterCallback && onFilterCallback(e, true);
+            }}
         >
             Filters
         </Button>
@@ -96,7 +105,7 @@ const searchButton = (handler: any) => {
     </Button>);
 }
 
-const ComplexTextSearch = () => {
+const ComplexTextSearch = (props : ComplexTextSearchProps) => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
 
@@ -132,7 +141,7 @@ const ComplexTextSearch = () => {
                             InputProps={{
                                 style: {color: 'white'},
                                 startAdornment: (<InputAdornment position='start'><SearchIcon/></InputAdornment>),
-                                endAdornment: filterButton(setShowFilters)
+                                endAdornment: filterButton(setShowFilters, props.onFilterCallback)
                             }}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setSearchText(event.target.value);
@@ -153,7 +162,7 @@ const ComplexTextSearch = () => {
                                 sx={{
                                     fontWeight: 'bold',
                                 }}
-                                onClick={() => {setShowFilters(false)}}
+                                onClick={(e) => {setShowFilters(false); props.onFilterCallback(e, false)}}
                             >
                                 Search Filters 
                             </NoBorderButton>
@@ -173,5 +182,9 @@ const ComplexTextSearch = () => {
         </Grid>
     );
 };
+
+ComplexTextSearch.defaultProps = {
+    onFilterCallback: null
+}
 
 export default ComplexTextSearch;

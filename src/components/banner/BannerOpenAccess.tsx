@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Grid} from '@mui/material';
+import Collapse from '@mui/material/Collapse';
 
 interface BannerProps {
     isDisplay?: boolean ,
@@ -7,10 +8,8 @@ interface BannerProps {
 
 const BannerOpenAccess = (props : BannerProps) => {
 
-    let banner = <></>; // Empty item;
-
-    if(props.isDisplay === undefined || props.isDisplay) {
-        banner =
+    return (
+        <Collapse in={props.isDisplay}>
             <Grid container>
                 <Grid item xs={11}
                       sx={{
@@ -31,9 +30,12 @@ const BannerOpenAccess = (props : BannerProps) => {
                     </Grid>
                 </Grid>
             </Grid>
-    }
-
-    return(banner);
+        </Collapse>
+    );
 };
+
+BannerOpenAccess.defaultProps = {
+    isDisplay: true
+}
 
 export default BannerOpenAccess;
