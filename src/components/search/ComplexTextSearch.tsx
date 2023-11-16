@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux'
 import { fetchResult, SearchParameters } from '../common/store/searchReducer';
 import { AppDispatch } from "../common/store/store";
 import RemovableFilters from "../common/filters/RemovableFilters";
+import AdvanceFilters from '../common/filters/AdvanceFilters';
 
 export interface ComplexTextSearchProps {
     onFilterCallback: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, show: boolean) => void | null;
@@ -61,8 +62,9 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
 
-    const [showFilters, setShowFilters] = React.useState(false);
-    const [searchText, setSearchText] = React.useState('');
+    const [toggleRemovableFilter, setToggleRemovableFilter] = React.useState<boolean>(true);
+    const [showFilters, setShowFilters] = React.useState<boolean>(false);
+    const [searchText, setSearchText] = React.useState<string>('');
 
     const onSearchClick = useCallback((event : React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         const parameters : SearchParameters = {};
@@ -81,6 +83,25 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
         onFilterCallback && onFilterCallback(events, !showFilters);
 
     },[onFilterCallback, showFilters, setShowFilters]);
+
+    const showFilter = useCallback(() => {
+        if(toggleRemovableFilter) {
+            return(
+                <RemovableFilters
+                    showFilters={showFilters}
+                    onFilterShowHide={onFilterShowHide}
+                    onExpandAllFilters={(e) => setToggleRemovableFilter(false)}
+                />
+            );
+        }
+        else {
+            return(
+                <AdvanceFilters
+                    showFilters={showFilters}
+                />
+            );
+        }
+    },[toggleRemovableFilter, showFilters, onFilterShowHide]);
 
     return(
         <Grid container>
@@ -109,10 +130,9 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
                     </Grid>
                     <Grid item>{searchButton(onSearchClick)}</Grid>
                 </Grid>
-                <RemovableFilters
-                    showFilters={showFilters}
-                    onFilterShowHide={onFilterShowHide}
-                />
+                {
+                    showFilter()
+                }
             </Grid>
         </Grid>
     );

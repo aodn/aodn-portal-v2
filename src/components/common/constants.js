@@ -3,6 +3,8 @@ import grey from "./colors/grey";
 const margin = {
   top: '15px',
   bottom: '15px',
+  left: '15px',
+  right: '15px',
   doubleTop: '30px',
   doubleBottom: '30px',
   tripleTop: '45px',

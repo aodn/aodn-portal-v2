@@ -2,7 +2,7 @@ import Collapse from "@mui/material/Collapse";
 import {Grid} from "@mui/material";
 import NoBorderButton from "../buttons/NoBorderButton";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import RemovableFilter from "./RemovableFilter";
+import RemovableParameterFilter from "./RemovableParameterFilter";
 import React from "react";
 import AddIcon from "@mui/icons-material/Add";
 import grey from "../colors/grey";
@@ -12,10 +12,11 @@ import Divider from "@mui/material/Divider";
 
 export interface RemovableFiltersProps {
     onFilterShowHide: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>) => void | null,
+    onExpandAllFilters: (events : React.MouseEvent<HTMLButtonElement>) => void | null,
     showFilters: boolean
 };
 
-const filterFooter = () =>
+const filterFooter = (onExpandAllFilters: (events :  React.MouseEvent<HTMLButtonElement>) => void | null) =>
     <Grid item xs={8}>
         <Grid
             container
@@ -33,10 +34,11 @@ const filterFooter = () =>
             </Grid>
             <Grid item xs={4} sx={{textAlign: 'center'}}>
                 <NoBorderButton
-                    endIcon={<SettingsOverscanIcon/>}
                     sx={{
                         color: grey['searchButtonText'],
                     }}
+                    endIcon={<SettingsOverscanIcon/>}
+                    onClick={(event) => onExpandAllFilters && onExpandAllFilters(event)}
                 >
                     Expand All Filters
                 </NoBorderButton>
@@ -74,18 +76,24 @@ const RemovableFilters = (props : RemovableFiltersProps) => {
                         Search Filters
                     </NoBorderButton>
                 </Grid>
-                <Grid item xs={8}><RemovableFilter title='Parameter' url='/filters/tune.png'/></Grid>
-                <Grid item xs={8}><RemovableFilter title='Platform' url='/filters/platform.png'/></Grid>
-                <Grid item xs={8}><RemovableFilter title='Organization' url='/filters/organization.png'/></Grid>
-                <Grid item xs={8}><RemovableFilter title='Data' url='/filters/data.png'/></Grid>
+                <Grid item xs={8}><RemovableParameterFilter title='Parameter' url='/filters/tune.png'/></Grid>
+                <Grid item xs={8}><RemovableParameterFilter title='Platform' url='/filters/platform.png'/></Grid>
+                <Grid item xs={8}><RemovableParameterFilter title='Organization' url='/filters/organization.png'/></Grid>
+                <Grid item xs={8}><RemovableParameterFilter title='Data' url='/filters/data.png'/></Grid>
                 {
                     // The bottom section of filter group, contains three button
-                    filterFooter()
+                    filterFooter(props.onExpandAllFilters)
                 }
 
             </Grid>
         </Collapse>
     );
 };
+
+RemovableFilters.defaultProps = {
+    onFilterShowHide: null,
+    onExpandAllFilters: null,
+    showFilters: false
+}
 
 export default RemovableFilters;
