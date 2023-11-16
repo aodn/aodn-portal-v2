@@ -1,10 +1,11 @@
-import React, { useCallback } from 'react';
-import {border, borderRadius, margin} from '../constants';
+import React, {useCallback, useState} from 'react';
+import {border, borderRadius, dateDefault, margin} from '../constants';
 import {Grid, Box, Button, MenuItem, OutlinedInput} from '@mui/material';
 import TuneIcon from "@mui/icons-material/Tune";
 import DatePicker from "../datetime/DatePicker";
 import {DateRangeSlider} from "../slider/RangeSlider";
 import { BarChart } from '@mui/x-charts/BarChart';
+import dayjs from "dayjs";
 
 interface RemovableDateTimeFilterProps {
     title: string,
@@ -12,6 +13,23 @@ interface RemovableDateTimeFilterProps {
 }
 
 const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
+
+    const [startDate, setStartDate] = useState<Date>(dateDefault['min']);
+    const [endDate, setEndDate] = useState<Date>(dateDefault['max']);
+
+    const onSlideChanged = useCallback((start: number, end: number) => {
+        setStartDate(new Date(start));
+        setEndDate(new Date(end));
+    },[setStartDate, setEndDate]);
+
+    const onStartDatePickerChanged = useCallback((value: any) => {
+        setStartDate(new Date(value));
+    },[setStartDate]);
+
+    const onEndDatePickerChanged = useCallback((value: any) => {
+        setEndDate(new Date(value));
+    },[setEndDate]);
+
     return(
         <Grid
             container
@@ -70,6 +88,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                                     itemGap: 10,
                                 }
                             }}
+                            // TODO: read data needed
                             series={[
                                 { data: [3, 4, 1, 6, 5], stack: 'A', label: 'IMOS Data' },
                                 { data: [4, 3, 1, 5, 8], stack: 'A', label: 'Data amount' }
@@ -90,6 +109,8 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                 <Grid container>
                     <Grid item xs={2}>
                         <DatePicker
+                            onChange={onStartDatePickerChanged}
+                            value={dayjs(startDate)}
                             views={['year', 'month', 'day']}
                         />
                     </Grid>
@@ -98,12 +119,14 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                             justifyContent: 'center',
                         }}>
                             <Grid item xs={11}>
-                                <DateRangeSlider title={'temporal'}/>
+                                <DateRangeSlider title={'temporal'} onSlideChanged={onSlideChanged} start={startDate} end={endDate}/>
                             </Grid>
                         </Grid>
                     </Grid>
                     <Grid item xs={2}>
                         <DatePicker
+                            onChange={onEndDatePickerChanged}
+                            value={dayjs(endDate)}
                             views={['year', 'month', 'day']}
                         />
                     </Grid>

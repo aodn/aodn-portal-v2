@@ -1,6 +1,5 @@
 import React from "react";
 import {Grid, Collapse} from '@mui/material';
-import RemovableParameterFilter from "./RemovableParameterFilter";
 import RemovableDateTimeFilter from "./RemovableDateTimeFilter";
 
 export interface NonRemovableFiltersProps {

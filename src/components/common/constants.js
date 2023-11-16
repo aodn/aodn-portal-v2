@@ -28,9 +28,15 @@ const filterList = {
   filterListMaxDisplay: 4
 }
 
+const dateDefault = {
+  min: new Date('01/01/1970'),
+  max: new Date()
+}
+
 export {
   margin,
   border,
   borderRadius,
   filterList,
+  dateDefault
 }
