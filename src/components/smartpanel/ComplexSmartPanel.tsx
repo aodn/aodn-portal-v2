@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Grid, Box, Divider, SxProps, Theme} from '@mui/material';
 import {margin} from "../common/constants";
 
-interface ComplexSmartPanel {
+interface ComplexSmartPanelProps {
     columns? :number,
     rows?: number,
     height: string,
@@ -10,7 +10,7 @@ interface ComplexSmartPanel {
     sx?: SxProps<Theme>
 };
 
-const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanel>) => {
+const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProps>) => {
 
     return (
         <Grid container>

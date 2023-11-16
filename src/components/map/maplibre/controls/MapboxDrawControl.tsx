@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, {useCallback, useContext, useEffect} from "react";
 
 import MapContext from "../MapContext";
 import MapboxDraw, { DrawDeleteEvent, DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
@@ -25,9 +25,24 @@ interface MapboxDrawControlProps {
     onDrawUpdate: ((e: any) => void) | undefined;
 };
 
-const MapboxDrawControl = (props: MapboxDrawControlProps) => {
+const MapboxDrawControl = ({onDrawCreate, onDrawDelete, onDrawUpdate}: MapboxDrawControlProps) => {
 
-    const { map } = useContext(MapContext);  
+    const { map } = useContext(MapContext);
+
+    // When user completed the polygon by double click, this event first
+    const handleDrawCreate = useCallback((e: DrawCreateEvent) => {
+        onDrawCreate && onDrawCreate(e);
+    },[onDrawCreate]);
+
+    // When user hit the delete button, this event fire.
+    const handleDrawDelete = useCallback((e: DrawDeleteEvent) => {
+        onDrawDelete && onDrawDelete(e);
+    },[onDrawDelete]);
+
+    // When user move the polygon, this event first
+    const handleDrawUpdate = useCallback((e: DrawUpdateEvent) => {
+        onDrawUpdate && onDrawUpdate(e);
+    },[onDrawUpdate]);
 
     useEffect(() => {
         if(!map) return;
@@ -44,32 +59,17 @@ const MapboxDrawControl = (props: MapboxDrawControlProps) => {
         });
 
         map.addControl(draw);
-        map.on('draw.create', onDrawCreate);
-        map.on('draw.delete', onDrawDelete);
-        map.on('draw.update', onDrawUpdate);
+        map.on('draw.create', handleDrawCreate);
+        map.on('draw.delete', handleDrawDelete);
+        map.on('draw.update', handleDrawUpdate);
 
         return () => {
             map.removeControl(draw);
-            map.off('draw.create', onDrawCreate);
-            map.off('draw.delete', onDrawDelete);
-            map.off('draw.update', onDrawUpdate);                
+            map.off('draw.create', handleDrawCreate);
+            map.off('draw.delete', handleDrawDelete);
+            map.off('draw.update', handleDrawUpdate);
         }
-    }, [map]);
-
-    // When user completed the polygon by double click, this event first
-    const onDrawCreate = (e: DrawCreateEvent) => {
-        props.onDrawCreate && props.onDrawCreate(e);
-    }
-
-    // When user hit the delete button, this event fire.
-    const onDrawDelete = (e: DrawDeleteEvent) => {
-        props.onDrawDelete && props.onDrawDelete(e);
-    }
-
-    // When user move the polygon, this event first
-    const onDrawUpdate = (e: DrawUpdateEvent) => {
-        props.onDrawUpdate && props.onDrawUpdate(e);
-    }
+    }, [map, handleDrawCreate, handleDrawDelete, handleDrawUpdate]);
 
     return (<React.Fragment/>);
 }

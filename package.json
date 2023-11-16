@@ -17,6 +17,7 @@
     "@types/react-dom": "^18.2.14",
     "@types/react-window": "1.8.5",
     "@types/media-typer": "1.1.2",
+    "@types/mapbox__mapbox-gl-draw": "^1.4.5",
     "@reduxjs/toolkit": "1.9.7",
     "axios": "1.6.0",
     "maplibre-gl": "3.5.2",
@@ -56,6 +57,5 @@
     ]
   },
   "devDependencies": {
-    "@types/mapbox__mapbox-gl-draw": "^1.4.5"
   }
 }
