@@ -9,19 +9,19 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SlightRoundButton from '../common/buttons/SlightRoundButton';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useSelector } from 'react-redux/es/hooks/useSelector';
-import { StacCollection, StacCollections } from '../common/store/searchReducer';
+import { OGCCollection, OGCCollections } from '../common/store/searchReducer';
 import { RootState, searchQueryResult } from "../common/store/store";
 
 interface ResultCardProps {
     item: number,
-    content : StacCollection,
-    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
-    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
-    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
-    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
+    content : OGCCollection,
+    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined,
+    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined,
+    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined,
+    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined,
 }
 
-const findThumbnail = (c : StacCollection) : string => {
+const findThumbnail = (c : OGCCollection) : string => {
     return 'https://warcontent.com/wp-content/uploads/2021/03/substring-javascript-5.png'
 }
 
@@ -37,7 +37,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <CardContent>
                     <Typography component="div" sx={{ marginBottom: '10px'}}>
                         <Grid container>
-                            <Grid item xs={11}>{props.content.title.substring(0, 90) + '...'}</Grid>
+                            <Grid item xs={11}>{props.content.title?.substring(0, 90) + '...'}</Grid>
                             <Grid item xs={1}>
                                 <div 
                                     style={{
@@ -61,7 +61,7 @@ const ResultCard = (props: ResultCardProps) => {
                                     image={findThumbnail(props.content)} />
                             </Grid>
                             <Grid item xs={9}>
-                                {props.content.description.substring(0, 180) + '...'}
+                                {props.content.description?.substring(0, 180) + '...'}
                             </Grid>
                         </Grid>                    
                     </Typography>
@@ -106,14 +106,14 @@ const ResultCard = (props: ResultCardProps) => {
 };
 
 interface ResultCardsProps {
-    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
-    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
-    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
-    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
+    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
+    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
+    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
+    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
 }
 
 // This function is use to control which item to render in the long list
-const renderRows = (props: ResultCardsProps, contents: StacCollections, child: ListChildComponentProps) => {
+const renderRows = (props: ResultCardsProps, contents: OGCCollections, child: ListChildComponentProps) => {
 
     // The style must pass to the listitem else incorrect rendering
     const { index, style } = child;
@@ -133,7 +133,7 @@ const renderRows = (props: ResultCardsProps, contents: StacCollections, child: L
 } 
 const ResultCards = (props: ResultCardsProps) => {
 
-    const contents = useSelector<RootState, StacCollections>(searchQueryResult);
+    const contents = useSelector<RootState, OGCCollections>(searchQueryResult);
     console.log(contents);
     return(
         <FixedSizeList

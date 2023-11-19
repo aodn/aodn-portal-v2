@@ -7,7 +7,7 @@ import {Tune} from "@mui/icons-material";
 import {margin} from '../common/constants';
 import StyledTextField from "./StyledTextField";
 import { useDispatch } from 'react-redux'
-import { fetchResult, SearchParameters } from '../common/store/searchReducer';
+import { fetchResultWithStore, SearchParameters } from '../common/store/searchReducer';
 import { AppDispatch } from "../common/store/store";
 import RemovableFilters from "../common/filters/RemovableFilters";
 import AdvanceFilters from '../common/filters/AdvanceFilters';
@@ -71,7 +71,7 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
         // OGC api requires comma separated values as list of search terms
         parameters.text = (searchText || '').replace(' ',',');
 
-        dispatch(fetchResult(parameters))
+        dispatch(fetchResultWithStore(parameters))
             .unwrap()
             .then((v) => navigate('/search'));
 

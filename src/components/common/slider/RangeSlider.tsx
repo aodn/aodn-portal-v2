@@ -65,7 +65,7 @@ const NumberRangeSlider = ({title, label, min, max, start, end, sx, onSlideChang
         let c = newValue as number[];
         setValue(c);
         onSlideChanged(mapRangeToRealValue(min, max, c[0]), mapRangeToRealValue(min, max, c[1]));
-    },[setValue]);
+    },[setValue, min, max, onSlideChanged]);
 
     return (
         <Box sx={sx}>

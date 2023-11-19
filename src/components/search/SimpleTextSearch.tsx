@@ -2,7 +2,7 @@ import React, {useCallback} from 'react';
 import {margin} from "../common/constants";
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from "../common/store/store";
-import { fetchResult, SearchParameters } from '../common/store/searchReducer';
+import { fetchResultWithStore, SearchParameters } from '../common/store/searchReducer';
 import  { useNavigate } from 'react-router-dom';
 import {Grid, InputAdornment} from '@mui/material';
 import StyledTextField from "./StyledTextField";
@@ -32,7 +32,7 @@ const SimpleTextSearch = () => {
             // OGC api requires comma separated values as list of search terms
             parameters.text = (searchText || '').replace(' ',',');
     
-            dispatch(fetchResult(parameters))
+            dispatch(fetchResultWithStore(parameters))
                 .unwrap()
                 .then((v) => navigate('/search'));
         }

@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
-import { StacCollection } from "../../../common/store/searchReducer";
+import { OGCCollection } from "../../../common/store/searchReducer";
 
 interface VectirTileLayersProps {
     // Vector tile layer should added to map
-    stac: Array<StacCollection>;
+    stac: Array<OGCCollection>;
 };
 
 const findSetDifference = (setA: Array<string>, setB: Array<string>) => setA.filter(x => !setB.includes(x));

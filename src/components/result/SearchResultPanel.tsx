@@ -13,7 +13,7 @@ import Layers from '../map/maplibre/layers/Layers';
 import VectorTileLayers from '../map/maplibre/layers/VectorTileLayers';
 import LocateControl from '../map/maplibre/controls/LocateControl';
 import ItemsOnMapControl from '../map/maplibre/controls/ItemsOnMapControl';
-import { StacCollection } from '../common/store/searchReducer';
+import { OGCCollection } from '../common/store/searchReducer';
 
 interface SearchResultPanelProps {
     showMap?: boolean
@@ -23,17 +23,17 @@ const mapPanelId = 'maplibre-panel-id';
 
 const SearchResultPanel = (props: SearchResultPanelProps) => {
 
-    const [layersUuid, setLayersUuid] = useState<Array<StacCollection>>([]);
+    const [layersUuid, setLayersUuid] = useState<Array<OGCCollection>>([]);
 
-    const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => {
+    const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => {
         // Unique set of layers
-        const s = new Set<StacCollection>(layersUuid);
+        const s = new Set<OGCCollection>(layersUuid);
         s.add(stac);
         setLayersUuid(Array.from(s));
 
     },[layersUuid]);
 
-    const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => {
+    const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => {
         //TODO: Add bounding box to map
     },[]);
 
