@@ -7,7 +7,6 @@ import {DateRangeSlider} from "../slider/RangeSlider";
 import { BarChart } from '@mui/x-charts/BarChart';
 import dayjs from "dayjs";
 import { BarSeriesType } from '@mui/x-charts';
-import { MakeOptional } from '@mui/x-charts/models/helpers';
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../store/store";
 import {fetchResultNoStore, OGCCollections} from "../store/searchReducer";
@@ -20,7 +19,7 @@ interface RemovableDateTimeFilterProps {
 
 interface DataSeries {
     x: Array<Date>,
-    y: MakeOptional<BarSeriesType, "type">[]
+    y: BarSeriesType[]
 };
 /**
  * It is belongs to a bucket if
@@ -39,7 +38,7 @@ const isIncludedInBucket = (targetStart: number, targetEnd: number, bucketStart:
     || (bucketStart <= targetEnd && targetEnd <= bucketEnd)
     || ((targetStart <= bucketStart && bucketEnd <= targetEnd));
 
-const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, MakeOptional<BarSeriesType, "type">[]] => {
+const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, BarSeriesType[]] => {
     /* Need to convert to something like this
     [
         { data: [3, 4, 1, 6, 5], stack: 'A', label: 'IMOS Data' },
@@ -105,17 +104,19 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, Mak
     };
 
     let imos : BarSeriesType = {
+        id: "imos-data-id",
         type: "bar",
         valueFormatter: formatter,
-        stack: 'S',
+        stack: 'total',
         label: 'IMOS Data',
         data: buckets.flatMap(m => m.imosOnlyCount)
     }
 
     let total : BarSeriesType = {
+        id: "total-data-id",
         type: "bar",
         valueFormatter: formatter,
-        stack: 'S',
+        stack: 'total',
         label: 'Total',
         data: buckets.flatMap(m => m.totalCount)
     }
@@ -124,6 +125,19 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, Mak
     series.push(total);
 
     return [smallestDate, xValues, series];
+}
+
+const cloneBarSeriesType = (s : BarSeriesType) : BarSeriesType => {
+    const c : BarSeriesType = {
+      id: s.id,
+      type: s.type,
+      valueFormatter: s.valueFormatter,
+      stack: s.stack,
+      label: s.label,
+      data: s.data && s.data.map(x => x)
+    };
+
+    return c;
 }
 
 const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
@@ -138,6 +152,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
     const [endSliderDate, setSliderEndDate] = useState<Date>(dateDefault['max']);
 
     const [barSeries, setBarSeries] = useState<DataSeries>({x:[], y:[]});
+    const [slicedBarSeries, setSlicedBarSeries] = useState<DataSeries>({x:[], y:[]});
 
     useEffect(() => {
         dispatch(fetchResultNoStore({
@@ -148,6 +163,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
             .then((value => {
                 const [min, xValues, series] = createSeries(value);
                 setBarSeries({x: xValues, y: series});
+                setSlicedBarSeries( {x: xValues, y: series});
 
                 setSliderMinDate(min);
                 setSliderStartDate(min);
@@ -156,18 +172,58 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
             }));
     }, [dispatch]);
 
+    const sliceBarSeries = useCallback((start: Date, end: Date) => {
+        // Slider default min/max value is 0-100
+        let startIndex = 0;
+        let endIndex = 100;
+
+        for(let i : number = 0; i < barSeries.x.length; i++) {
+            if(barSeries.x[i] < start) {
+                startIndex = i;
+            }
+            if(barSeries.x[i] < end) {
+                endIndex = i;
+            }
+        }
+
+        const series : BarSeriesType[] = [];
+
+        series.push(cloneBarSeriesType(barSeries.y[0]));
+        series.push(cloneBarSeriesType(barSeries.y[1]));
+
+        series[0].data = series[0] && series[0].data && series[0].data.slice(startIndex, endIndex);
+        series[1].data = series[1] && series[1].data && series[1].data.slice(startIndex, endIndex);
+
+        setSlicedBarSeries({
+            x: barSeries.x.slice(startIndex ,endIndex),
+            y: series
+        });
+    },[setSlicedBarSeries, barSeries]);
+
     const onSlideChanged = useCallback((start: number, end: number) => {
-        setPickerStartDate(new Date(start));
-        setPickerEndDate(new Date(end));
-    },[setPickerStartDate, setPickerEndDate]);
+        const s = new Date(start);
+        const e = new Date(end);
+        setPickerStartDate(s);
+        setPickerEndDate(e);
+
+        setSliderStartDate(s);
+        setSliderEndDate(e);
+
+        sliceBarSeries(s,e);
+
+    },[setPickerStartDate, setPickerEndDate, sliceBarSeries]);
 
     const onStartDatePickerChanged = useCallback((value: any) => {
-        setSliderStartDate(new Date(value));
-    },[setSliderStartDate]);
+        const e = new Date(value);
+        setPickerStartDate(e);
+        setSliderStartDate(e);
+    },[setSliderStartDate, setPickerStartDate]);
 
     const onEndDatePickerChanged = useCallback((value: any) => {
-        setSliderEndDate(new Date(value));
-    },[setSliderEndDate]);
+        const e = new Date(value);
+        setPickerEndDate(e);
+        setSliderEndDate(e);
+    },[setSliderEndDate, setPickerEndDate]);
 
     return(
         <Grid
@@ -227,13 +283,19 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                                     itemGap: 10,
                                 }
                             }}
-                            series={barSeries.y}
                             xAxis={[{
-                                data: barSeries.x,
+                                data: slicedBarSeries.x,
                                 scaleType: 'band',
                                 valueFormatter: (date: Date) => date.toLocaleDateString(),
-                                tickMinStep: 3600 * 1000 * 24, // min step: 24h
+                                tickMinStep: 3600 * 1000 * 48, // min step: 48h,
+                                // If you want the label rotate
+                                // tickLabelStyle: {
+                                //  angle: 45,
+                                //  dominantBaseline: 'hanging',
+                                //  textAnchor: 'start',
+                                // },
                             }]}
+                            series={slicedBarSeries.y}
                         />
                     </Grid>
                 </Grid>
