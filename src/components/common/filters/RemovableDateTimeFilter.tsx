@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {border, borderRadius, dateDefault, margin} from '../constants';
-import {Grid, Box, Button, MenuItem, OutlinedInput} from '@mui/material';
+import {Grid, Box} from '@mui/material';
 import TuneIcon from "@mui/icons-material/Tune";
 import DatePicker from "../datetime/DatePicker";
 import {DateRangeSlider} from "../slider/RangeSlider";
@@ -10,21 +10,31 @@ import { BarSeriesType } from '@mui/x-charts';
 import { MakeOptional } from '@mui/x-charts/models/helpers';
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../store/store";
-import {fetchResultNoStore, SearchParameters, OGCCollections} from "../store/searchReducer";
+import {fetchResultNoStore, OGCCollections} from "../store/searchReducer";
 import {findSmallestDate} from "./api";
-
-interface Dataset {
-    imos: number,
-    total: number,
-    date: Date
-}
 
 interface RemovableDateTimeFilterProps {
     title: string,
     url: string
 }
+/**
+ * It is belongs to a bucket if
+ * 1. target start is within bucket
+ * 2. target end is within bucket
+ * 3. bucket start is within target && bucket end is within target
+ *    |--------------------|       <-target
+ * |---1---|----2----|----3---|    <-bucket
+ * @param targetStart
+ * @param targetEnd
+ * @param bucketStart
+ * @param bucketEnd
+ */
+const isIncludedInBucket = (targetStart: number, targetEnd: number, bucketStart: number, bucketEnd: number) =>
+    (bucketStart <= targetStart && targetStart <= bucketEnd)
+    || (bucketStart <= targetEnd && targetEnd <= bucketEnd)
+    || ((targetStart <= bucketStart && bucketEnd <= targetEnd));
 
-const createSeries = (ogcCollections : OGCCollections) : [Date, MakeOptional<BarSeriesType, "type">[]] => {
+const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, MakeOptional<BarSeriesType, "type">[]] => {
     /* Need to convert to something like this
     [
         { data: [3, 4, 1, 6, 5], stack: 'A', label: 'IMOS Data' },
@@ -48,7 +58,8 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, MakeOptional<Bar
 
     // Create bucket of time slot so can count how many records is within
     // that time slot
-    const buckets : Array<Bucket> = []
+    const xValues : Array<Date> = [];
+    const buckets : Array<Bucket> = [];
     for(let i: number = 0; i < 100; i++) {
         let b : Bucket = {
             start: smallestDate.getTime() + i * bandWidth,
@@ -57,6 +68,7 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, MakeOptional<Bar
             totalCount: 0
         };
         buckets.push(b);
+        xValues.push(new Date(b.start));
     }
 
     // Scan through stacs collection and add to bucket count iff within range
@@ -68,11 +80,14 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, MakeOptional<Bar
                 // Check individual item is within the time range
                 // if yes then increase bucket count.
                 buckets.forEach(b => {
-                    let start = v[0]? new Date(v[0]) : null;
-                    let end = v[1]? new Date(v[1]) : null;
-                    if(start && b.start >= start.getTime() && b.end <= start.getTime() // Start within range
-                        || !v[1]   // There is no end date, so it spans all bucket
-                        || end && b.start >= end.getTime() && b.end <= end.getTime()) {
+                    let start = v[0]? new Date(v[0]).getTime() : null;
+
+                    // Some big further date if not specified.
+                    let end = v[1]? new Date(v[1]).getTime() : new Date().getTime() * 2;
+
+                    // If you do not have a start, it is invalid date, hence skip
+                    if(start && isIncludedInBucket(start, end, b.start, b.end)) {
+                        b.imosOnlyCount++;  // TODO: need to fix
                         b.totalCount++;
                     }
                 });
@@ -88,6 +103,7 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, MakeOptional<Bar
         type: "bar",
         valueFormatter: formatter,
         stack: 'S',
+        label: 'IMOS Data',
         data: buckets.flatMap(m => m.imosOnlyCount)
     }
 
@@ -95,21 +111,29 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, MakeOptional<Bar
         type: "bar",
         valueFormatter: formatter,
         stack: 'S',
+        label: 'Total',
         data: buckets.flatMap(m => m.totalCount)
     }
 
     series.push(imos);
     series.push(total);
 
-    return [smallestDate, series];
+    return [smallestDate, xValues, series];
 }
 
 const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
     const dispatch = useDispatch<AppDispatch>();
 
-    const [startDate, setStartDate] = useState<Date>(dateDefault['min']);
-    const [endDate, setEndDate] = useState<Date>(dateDefault['max']);
-    const [series, setSeries] = useState<MakeOptional<BarSeriesType, "type">[]>([]);
+    // Must separate picker start and end date with slider to avoid feedback loop
+    const [pickerStartDate, setPickerStartDate] = useState<Date>(dateDefault['min']);
+    const [pickerEndDate, setPickerEndDate] = useState<Date>(dateDefault['max']);
+
+    const [minSliderDate, setSliderMinDate] = useState<Date | undefined>(undefined);
+    const [startSliderDate, setSliderStartDate] = useState<Date>(dateDefault['min']);
+    const [endSliderDate, setSliderEndDate] = useState<Date>(dateDefault['max']);
+
+    const [barSeries, setBarSeries] = useState<MakeOptional<BarSeriesType, "type">[]>([]);
+    const [barX, setBarX] = useState<Array<Date>>([]);
 
     useEffect(() => {
         dispatch(fetchResultNoStore({
@@ -118,23 +142,29 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
             }))
             .unwrap()
             .then((value => {
-                const [min, series] = createSeries(value);
-                setSeries(series);
+                const [min, xValues, series] = createSeries(value);
+                setBarSeries(series);
+                setBarX(xValues);
+
+                setSliderMinDate(min);
+                setSliderStartDate(min);
+
+                setPickerStartDate(min);
             }));
-    }, []);
+    }, [dispatch]);
 
     const onSlideChanged = useCallback((start: number, end: number) => {
-        setStartDate(new Date(start));
-        setEndDate(new Date(end));
-    },[setStartDate, setEndDate]);
+        setPickerStartDate(new Date(start));
+        setPickerEndDate(new Date(end));
+    },[setPickerStartDate, setPickerEndDate]);
 
     const onStartDatePickerChanged = useCallback((value: any) => {
-        setStartDate(new Date(value));
-    },[setStartDate]);
+        setSliderStartDate(new Date(value));
+    },[setSliderStartDate]);
 
     const onEndDatePickerChanged = useCallback((value: any) => {
-        setEndDate(new Date(value));
-    },[setEndDate]);
+        setSliderEndDate(new Date(value));
+    },[setSliderEndDate]);
 
     return(
         <Grid
@@ -194,7 +224,13 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                                     itemGap: 10,
                                 }
                             }}
-                            series={series}
+                            series={barSeries}
+                            xAxis={[{
+                                data: barX,
+                                scaleType: 'band',
+                                valueFormatter: (date: Date) => date.toLocaleDateString(),
+                                tickMinStep: 3600 * 1000 * 24, // min step: 24h
+                            }]}
                         />
                     </Grid>
                 </Grid>
@@ -212,7 +248,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                     <Grid item xs={2}>
                         <DatePicker
                             onChange={onStartDatePickerChanged}
-                            value={dayjs(startDate)}
+                            value={dayjs(pickerStartDate)}
                             views={['year', 'month', 'day']}
                         />
                     </Grid>
@@ -221,14 +257,18 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                             justifyContent: 'center',
                         }}>
                             <Grid item xs={11}>
-                                <DateRangeSlider title={'temporal'} onSlideChanged={onSlideChanged} start={startDate} end={endDate}/>
+                                <DateRangeSlider title={'temporal'}
+                                                 onSlideChanged={onSlideChanged}
+                                                 min={minSliderDate}
+                                                 start={startSliderDate}
+                                                 end={endSliderDate}/>
                             </Grid>
                         </Grid>
                     </Grid>
                     <Grid item xs={2}>
                         <DatePicker
                             onChange={onEndDatePickerChanged}
-                            value={dayjs(endDate)}
+                            value={dayjs(pickerEndDate)}
                             views={['year', 'month', 'day']}
                         />
                     </Grid>

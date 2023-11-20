@@ -97,7 +97,11 @@ const findSmallestDate = (stacs : OGCCollections) : Date | null | undefined => {
         .reduce((a, b) => a && b && a < b ? a : b);
 }
 
+const isDateWithin = (target: number, min: number, max: number) =>
+    min >= target && target <= max;
+
 export {
     findSmallestDate,
     getAllFilters,
+    isDateWithin,
 }
