@@ -17,6 +17,11 @@ interface RemovableDateTimeFilterProps {
     title: string,
     url: string
 }
+
+interface DataSeries {
+    x: Array<Date>,
+    y: MakeOptional<BarSeriesType, "type">[]
+};
 /**
  * It is belongs to a bucket if
  * 1. target start is within bucket
@@ -132,8 +137,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
     const [startSliderDate, setSliderStartDate] = useState<Date>(dateDefault['min']);
     const [endSliderDate, setSliderEndDate] = useState<Date>(dateDefault['max']);
 
-    const [barSeries, setBarSeries] = useState<MakeOptional<BarSeriesType, "type">[]>([]);
-    const [barX, setBarX] = useState<Array<Date>>([]);
+    const [barSeries, setBarSeries] = useState<DataSeries>({x:[], y:[]});
 
     useEffect(() => {
         dispatch(fetchResultNoStore({
@@ -143,8 +147,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
             .unwrap()
             .then((value => {
                 const [min, xValues, series] = createSeries(value);
-                setBarSeries(series);
-                setBarX(xValues);
+                setBarSeries({x: xValues, y: series});
 
                 setSliderMinDate(min);
                 setSliderStartDate(min);
@@ -224,9 +227,9 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                                     itemGap: 10,
                                 }
                             }}
-                            series={barSeries}
+                            series={barSeries.y}
                             xAxis={[{
-                                data: barX,
+                                data: barSeries.x,
                                 scaleType: 'band',
                                 valueFormatter: (date: Date) => date.toLocaleDateString(),
                                 tickMinStep: 3600 * 1000 * 24, // min step: 24h

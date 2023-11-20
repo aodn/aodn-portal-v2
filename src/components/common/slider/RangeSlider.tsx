@@ -36,7 +36,7 @@ const mapRangeToZeroHundred = (min :number, max: number, i : number) : number =>
         return 100;
     }
     else {
-        return i / (max - min) * 100;
+        return (i - min) / (max - min) * 100;
     }
 }
 /**
@@ -65,7 +65,6 @@ const NumberRangeSlider = ({title, label, min, max, start, end, sx, onSlideChang
 
     const handleChange = useCallback((event: Event, newValue: number | number[]) => {
         let c = newValue as number[];
-        console.log(c);
         setValue(c);
         onSlideChanged(mapRangeToRealValue(min, max, c[0]), mapRangeToRealValue(min, max, c[1]));
     },[setValue, min, max, onSlideChanged]);
