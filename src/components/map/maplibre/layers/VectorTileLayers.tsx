@@ -62,7 +62,7 @@ const VectirTileLayers = (props : VectirTileLayersProps) => {
                 map.addSource(uuid, {
                     type: 'vector',
                     tiles: [
-                        `${window.location.protocol}//${window.location.host}/tiles/WebMercatorQuad/{z}/{x}/{y}?collections=${uuid}`
+                        `${window.location.protocol}//${window.location.host}/api/v1/ogc/tiles/WebMercatorQuad/{z}/{x}/{y}?collections=${uuid}`
                     ]
                 });
                 map.addLayer({
