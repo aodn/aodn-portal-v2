@@ -1,8 +1,8 @@
 import React, {useCallback} from 'react';
 import {margin} from "../common/constants";
 import { useDispatch } from 'react-redux'
-import { AppDispatch } from "../common/store/store";
-import { fetchResultWithStore, SearchParameters } from '../common/store/searchReducer';
+import {AppDispatch, getSearchText, RootState, searchQueryResult} from "../common/store/store";
+import {CollectionsQueryType, fetchResultWithStore, SearchParameters} from '../common/store/searchReducer';
 import  { useNavigate } from 'react-router-dom';
 import {Grid, InputAdornment} from '@mui/material';
 import StyledTextField from "./StyledTextField";
@@ -11,6 +11,8 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ClearIcon from '@mui/icons-material/Clear';
 import NoBorderButton from "../common/buttons/NoBorderButton";
 import grey from "../common/colors/grey";
+import {useSelector} from "react-redux/es/hooks/useSelector";
+import {ParameterState, updateSearchText} from "../common/store/componentParamReducer";
 
 const getEndAdornment = () =>
     <InputAdornment position='end'>
@@ -24,14 +26,16 @@ const SimpleTextSearch = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
 
-    const [searchText, setSearchText] = React.useState('');
+    const [searchText, setSearchText] = React.useState(useSelector<RootState, ParameterState>(getSearchText).searchText);
 
     const handleEnterPressed = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter') {
             const parameters : SearchParameters = {};
             // OGC api requires comma separated values as list of search terms
             parameters.text = (searchText || '').replace(' ',',');
-    
+
+            // searchText || '' make sure will never undefined, worst it is empty string
+            dispatch(updateSearchText(searchText || ''));
             dispatch(fetchResultWithStore(parameters))
                 .unwrap()
                 .then((v) => navigate('/search'));

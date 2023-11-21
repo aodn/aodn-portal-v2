@@ -11,6 +11,7 @@ import { fetchResultWithStore, SearchParameters } from '../common/store/searchRe
 import { AppDispatch } from "../common/store/store";
 import RemovableFilters from "../common/filters/RemovableFilters";
 import AdvanceFilters from '../common/filters/AdvanceFilters';
+import {updateSearchText} from "../common/store/componentParamReducer";
 
 export interface ComplexTextSearchProps {
     onFilterCallback: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, show: boolean) => void | null;
@@ -71,6 +72,7 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
         // OGC api requires comma separated values as list of search terms
         parameters.text = (searchText || '').replace(' ',',');
 
+        dispatch(updateSearchText(searchText));
         dispatch(fetchResultWithStore(parameters))
             .unwrap()
             .then((v) => navigate('/search'));

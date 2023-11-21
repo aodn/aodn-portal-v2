@@ -11,6 +11,7 @@ import {useDispatch} from "react-redux";
 import {AppDispatch} from "../store/store";
 import {fetchResultNoStore, OGCCollections} from "../store/searchReducer";
 import {findSmallestDate} from "./api";
+import {updateDateTimeFilterRange} from "../store/componentParamReducer";
 
 interface RemovableDateTimeFilterProps {
     title: string,
@@ -208,6 +209,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
         setSliderStartDate(s);
         setSliderEndDate(e);
+        dispatch(updateDateTimeFilterRange({start: s, end: e}));
 
         sliceBarSeries(s,e);
 
@@ -217,12 +219,16 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         const e = new Date(value);
         setPickerStartDate(e);
         setSliderStartDate(e);
+        dispatch(updateDateTimeFilterRange({start: e, end: pickerEndDate}));
+
     },[setSliderStartDate, setPickerStartDate]);
 
     const onEndDatePickerChanged = useCallback((value: any) => {
         const e = new Date(value);
         setPickerEndDate(e);
         setSliderEndDate(e);
+        dispatch(updateDateTimeFilterRange({start: pickerStartDate, end: e}));
+
     },[setSliderEndDate, setPickerEndDate]);
 
     return(
