@@ -9,7 +9,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SlightRoundButton from '../common/buttons/SlightRoundButton';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useSelector } from 'react-redux/es/hooks/useSelector';
-import { OGCCollection, OGCCollections } from '../common/store/searchReducer';
+import { OGCCollection, OGCCollections, CollectionsQueryType } from '../common/store/searchReducer';
 import { RootState, searchQueryResult } from "../common/store/store";
 
 interface ResultCardProps {
@@ -133,17 +133,17 @@ const renderRows = (props: ResultCardsProps, contents: OGCCollections, child: Li
 } 
 const ResultCards = (props: ResultCardsProps) => {
 
-    const contents = useSelector<RootState, OGCCollections>(searchQueryResult);
-    console.log(contents);
+    const contents = useSelector<RootState, CollectionsQueryType>(searchQueryResult);
+
     return(
         <FixedSizeList
             height={700}
             width={"100%"}
             itemSize={270}
-            itemCount={contents.collections.length}
+            itemCount={contents.result.collections.length}
             overscanCount={10}
         >
-            {(child: ListChildComponentProps) => renderRows(props, contents, child)}
+            {(child: ListChildComponentProps) => renderRows(props, contents.result, child)}
         </FixedSizeList>
     );
 };

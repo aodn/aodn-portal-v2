@@ -40,14 +40,22 @@ export type SearchParameters = {
     property?: string
 }
 
+export interface CollectionsQueryType {
+    result: OGCCollections,
+    query: SearchParameters
+}
+
 interface ObjectValue {
-    collectionsQueryResult: OGCCollections,
+    collectionsQueryResult: CollectionsQueryType,
 }
 
 const initialState : ObjectValue = {
     collectionsQueryResult: {
-        links: new Array<Link>(),
-        collections: new Array<OGCCollection>()
+        result: {
+            links: new Array<Link>(),
+            collections: new Array<OGCCollection>()
+        },
+        query: {}
     }
 }
 
@@ -82,8 +90,6 @@ const fetchResultWithStore = createAsyncThunk<OGCCollections, SearchParameters, 
 const fetchResultNoStore = createAsyncThunk<OGCCollections, SearchParameters, {rejectValue: FailedResponse}>(
     'search/fetchResultNoStore', searchResult);
 
-const collectionsQueryResult = (state : ObjectValue) => state.collectionsQueryResult;
-
 const searcher = createSlice({
     name: 'search',
     initialState: initialState,
@@ -92,15 +98,15 @@ const searcher = createSlice({
     extraReducers(builder) {
         builder
             .addCase(fetchResultWithStore.fulfilled, (state, action) => {
-                state.collectionsQueryResult = action.payload
+                state.collectionsQueryResult.result = action.payload;
+                state.collectionsQueryResult.query = action.meta.arg;
             })
     }
 });
 
 export {
     fetchResultWithStore,
-    fetchResultNoStore,
-    collectionsQueryResult
+    fetchResultNoStore
 }
 
 export default searcher.reducer;
