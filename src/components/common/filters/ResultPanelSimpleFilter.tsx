@@ -10,7 +10,7 @@ import RoundSelect from "../dropdown/RoundSelect";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface ResultPanelSimpleFilterProps {
-    filterClicked: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    filterClicked?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilterProps) => {

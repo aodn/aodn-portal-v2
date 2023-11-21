@@ -11,12 +11,12 @@ const ThemeOnlySmartPanel = () => {
     return (
         <ComplexSmartPanel
             sx={{
-                marginTop: margin['top'],
-                marginBottom: margin['bottom']
+                marginTop: 0,
+                marginBottom: 0
             }}
             columns={10}
+            gridColumns={11}
             rows={1}
-            bottomDivider={true}
         >
             <SmartCard11 imageUrl='/smartcard/all_topics.png' caption='More Topics'/>
             <SmartCard11 imageUrl='/smartcard/environmental.png' caption='Environmental'/>

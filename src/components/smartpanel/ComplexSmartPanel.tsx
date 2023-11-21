@@ -7,6 +7,7 @@ interface ComplexSmartPanelProps {
     rows?: number,
     height: string,
     bottomDivider? : boolean,
+    gridColumns: number,
     sx?: SxProps<Theme>
 };
 
@@ -23,7 +24,7 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProp
                     // The minWidth may need to calculate instead of hardcode
                 }
                 <Grid container justifyContent='center'>
-                    <Grid item xs={8}>
+                    <Grid item xs={props.gridColumns}>
                         <Box
                             sx ={{
                                 overflowX: 'hidden',
@@ -59,6 +60,7 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProp
 ComplexSmartPanel.defaultProps = {
     columns: 9,
     rows: 2,
+    gridColumns: 8,
     height: '95px',
     bottomDivider: false
 }

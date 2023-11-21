@@ -13,6 +13,28 @@ interface MapProps {
     stylejson: string;
 };
 
+const osmStyle = {
+    'version': 8,
+    'sources': {
+        'osm-tiles': {
+            'type': 'raster',
+            'tiles': [
+                'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            ],
+            'tileSize': 256
+        }
+    },
+    'layers': [{
+        'id': 'osm-tiles',
+        'type': 'raster',
+        'source': 'osm-tiles',
+        'minzoom': 0,
+        'maxzoom': 22
+    }]
+};
+
 const ReactMap = (props: React.PropsWithChildren<MapProps>) => {
     const [map, setMap] = useState<any | null>(null);
 
@@ -47,7 +69,8 @@ ReactMap.defaultProps = {
     centerLatitude : -42.88611707886841,
     centerLongitude : 147.3353554138993,
     zoom : 2,
-    stylejson : 'https://demotiles.maplibre.org/style.json'
+    //'https://demotiles.maplibre.org/style.json'
+    stylejson : osmStyle
 };
 
 export default ReactMap
