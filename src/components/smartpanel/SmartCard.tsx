@@ -12,7 +12,8 @@ enum CardType {
 interface SmartcardProps {
     imageUrl: string,
     caption: string,
-    card? : CardType
+    card? : CardType,
+    onCardClicked? : (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLAnchorElement>) => void;
 };
 
 const getPreferDimension = (type: CardType | undefined) => {
@@ -34,9 +35,12 @@ const SmartCardContent = (props: SmartcardProps) => {
         <Card sx={{
                 maxHeight: dimension.cardHeight
             }}>
-            <CardActionArea sx={{
-                border: border['frameBorder']
-            }}>
+            <CardActionArea
+                sx={{
+                    border: border['frameBorder']
+                }}
+                onClick={(event) => props.onCardClicked && props.onCardClicked(event)}
+            >
                 {props?.imageUrl &&
                   <>
                     <CardMedia
