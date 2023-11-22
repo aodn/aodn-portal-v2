@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {border, borderRadius, dateDefault, margin} from '../constants';
+import {border, borderRadius, cqlDefaultFilters, dateDefault, margin} from '../constants';
 import {Grid, Box} from '@mui/material';
 import TuneIcon from "@mui/icons-material/Tune";
 import DatePicker from "../datetime/DatePicker";
@@ -39,7 +39,7 @@ const isIncludedInBucket = (targetStart: number, targetEnd: number, bucketStart:
     || (bucketStart <= targetEnd && targetEnd <= bucketEnd)
     || ((targetStart <= bucketStart && bucketEnd <= targetEnd));
 
-const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, BarSeriesType[]] => {
+const createSeries = (ids: Set<string>, ogcCollections : OGCCollections) : [Date, Array<Date>, BarSeriesType[]] => {
     /* Need to convert to something like this
     [
         { data: [3, 4, 1, 6, 5], stack: 'A', label: 'IMOS Data' },
@@ -58,7 +58,7 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, Bar
         start: number
         end: number
         imosOnlyCount: number,
-        totalCount: number
+        total: number
     };
 
     // Create bucket of time slot so can count how many records is within
@@ -70,7 +70,7 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, Bar
             start: smallestDate.getTime() + i * bandWidth,
             end: smallestDate.getTime() + (i+1) * bandWidth,
             imosOnlyCount: 0,
-            totalCount: 0
+            total: 0
         };
         buckets.push(b);
         xValues.push(new Date(b.start));
@@ -92,8 +92,10 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, Bar
 
                     // If you do not have a start, it is invalid date, hence skip
                     if(start && isIncludedInBucket(start, end, b.start, b.end)) {
-                        b.imosOnlyCount++;  // TODO: need to fix
-                        b.totalCount++;
+                        if(ids.has(i.id)) {
+                            b.imosOnlyCount++;
+                        }
+                        b.total++;
                     }
                 });
             })
@@ -119,7 +121,7 @@ const createSeries = (ogcCollections : OGCCollections) : [Date, Array<Date>, Bar
         valueFormatter: formatter,
         stack: 'total',
         label: 'Total',
-        data: buckets.flatMap(m => m.totalCount)
+        data: buckets.flatMap(m => m.total)
     }
 
     series.push(imos);
@@ -156,20 +158,34 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
     const [slicedBarSeries, setSlicedBarSeries] = useState<DataSeries>({x:[], y:[]});
 
     useEffect(() => {
+
+        const filters : Map<string, string> = cqlDefaultFilters as Map<string, string>;
+        // Find all collection
         dispatch(fetchResultNoStore({
                 property: 'id,temporal',
-                filter: 'temporal after 1970-01-01T00:00:00Z'
+                filter: `${filters.get('ALL_TIME_RANGE')}`
             }))
             .unwrap()
             .then((value => {
-                const [min, xValues, series] = createSeries(value);
-                setBarSeries({x: xValues, y: series});
-                setSlicedBarSeries( {x: xValues, y: series});
+                // Find all id of collection from imosOnly
+                dispatch(fetchResultNoStore({
+                    property: 'id,providers',
+                    filter: `${filters.get('ALL_TIME_RANGE')} AND ${filters.get('IMOS_ONLY')}`
+                }))
+                .unwrap()
+                .then((imosOnlyCollection: OGCCollections) => {
+                    const ids = imosOnlyCollection.collections.map(value => value.id);
 
-                setSliderMinDate(min);
-                setSliderStartDate(min);
+                    const [min, xValues, series] = createSeries(new Set(ids), value);
+                    setBarSeries({x: xValues, y: series});
+                    setSlicedBarSeries( {x: xValues, y: series});
 
-                setPickerStartDate(min);
+                    setSliderMinDate(min);
+                    setSliderStartDate(min);
+
+                    setPickerStartDate(min);
+
+                });
             }));
     }, [dispatch]);
 
