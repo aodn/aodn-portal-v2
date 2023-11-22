@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {border, borderRadius, cqlDefaultFilters, dateDefault, margin} from '../constants';
-import {Grid, Box} from '@mui/material';
+import {Grid, Box, SxProps, Theme} from '@mui/material';
 import TuneIcon from "@mui/icons-material/Tune";
 import DatePicker from "../datetime/DatePicker";
 import {DateRangeSlider} from "../slider/RangeSlider";
@@ -15,7 +15,8 @@ import {updateDateTimeFilterRange} from "../store/componentParamReducer";
 
 interface RemovableDateTimeFilterProps {
     title: string,
-    url: string
+    url: string,
+    sx?: SxProps<Theme>
 }
 
 interface DataSeries {
@@ -255,10 +256,11 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                 backgroundImage: 'url(/filters/Background.png)',
                 backgroundRepeat: 'no-repeat',
                 backgroundSize: 'cover',
-                border: border['frameBorder'],
-                borderRadius: borderRadius['filter'],
+                border: 'none',
+                borderRadius: 0,
                 justifyContent: 'center',
-                minHeight: '90px'
+                minHeight: '90px',
+                ...props.sx,
             }}
         >
             <Grid item xs={1}
