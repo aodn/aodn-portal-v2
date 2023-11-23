@@ -1,7 +1,7 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import searchReducer from "./searchReducer";
 import logger from 'redux-logger';
-import paramReducer, {updateDateTimeFilterRange} from "./componentParamReducer";
+import paramReducer, {ParameterState, updateDateTimeFilterRange} from "./componentParamReducer";
 
 // https://stackoverflow.com/questions/69502147/changing-from-redux-to-redux-toolkit
 // https://redux-toolkit.js.org/api/getDefaultMiddleware
@@ -23,14 +23,11 @@ export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 
 const searchQueryResult = (state: any) => state.searcher.collectionsQueryResult;
-
-const getDateTimeFilterRange = (state: any) => state.paramReducer.dateTimeFilterRange;
-const getSearchText = (state: any) => state.paramReducer.searchText;
+const getComponentState = (state: any) : ParameterState => state.paramReducer;
 
 export {
     searchQueryResult,
-    getDateTimeFilterRange,
-    getSearchText
+    getComponentState
 }
 
 export default store;

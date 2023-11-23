@@ -1,6 +1,7 @@
 import {createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { MediaType } from 'media-typer';
 import axios from 'axios';
+import {ParameterState} from "./componentParamReducer";
 
 interface Link {
     href: string,
@@ -104,7 +105,15 @@ const searcher = createSlice({
     }
 });
 
+const createSearchParamFrom = (i: ParameterState) : SearchParameters => {
+    const p : SearchParameters = {};
+    p.text = (i.searchText + '').replace(' ',',');
+
+    return p;
+}
+
 export {
+    createSearchParamFrom,
     fetchResultWithStore,
     fetchResultNoStore
 }

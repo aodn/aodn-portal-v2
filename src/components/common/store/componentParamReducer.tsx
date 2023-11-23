@@ -54,7 +54,7 @@ const paramReducer = (state: ParameterState = initialState, action: ActionType) 
         case UPDATE_SEARCH_TEXT_FILTER_VARIABLE:
             return {
                 ...state,
-                searchText: action.payload
+                searchText: action.payload.searchText
             };
         default:
             return state;

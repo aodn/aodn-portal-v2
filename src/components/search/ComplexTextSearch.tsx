@@ -7,11 +7,11 @@ import {Tune} from "@mui/icons-material";
 import {margin} from '../common/constants';
 import StyledTextField from "./StyledTextField";
 import { useDispatch } from 'react-redux'
-import { fetchResultWithStore, SearchParameters } from '../common/store/searchReducer';
-import { AppDispatch } from "../common/store/store";
+import {createSearchParamFrom, fetchResultWithStore} from '../common/store/searchReducer';
+import store, {AppDispatch, getComponentState} from "../common/store/store";
 import RemovableFilters from "../common/filters/RemovableFilters";
 import AdvanceFilters from '../common/filters/AdvanceFilters';
-import {updateSearchText} from "../common/store/componentParamReducer";
+import {ParameterState, updateSearchText} from "../common/store/componentParamReducer";
 
 export interface ComplexTextSearchProps {
     onFilterCallback: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, show: boolean) => void | null;
@@ -68,16 +68,14 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
     const [searchText, setSearchText] = React.useState<string>('');
 
     const onSearchClick = useCallback((event : React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const parameters : SearchParameters = {};
-        // OGC api requires comma separated values as list of search terms
-        parameters.text = (searchText || '').replace(' ',',');
+        dispatch(updateSearchText(searchText + ''));
 
-        dispatch(updateSearchText(searchText));
-        dispatch(fetchResultWithStore(parameters))
+        const componentParam : ParameterState = getComponentState(store.getState());
+        dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
             .unwrap()
             .then((v) => navigate('/search'));
 
-    },[searchText, dispatch, navigate]);
+    },[dispatch, navigate, searchText]);
 
     const onFilterShowHide = useCallback((events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>) => {
 

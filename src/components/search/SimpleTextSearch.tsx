@@ -1,8 +1,8 @@
 import React, {useCallback} from 'react';
 import {margin} from "../common/constants";
 import { useDispatch } from 'react-redux'
-import {AppDispatch, getSearchText, RootState, searchQueryResult} from "../common/store/store";
-import {CollectionsQueryType, fetchResultWithStore, SearchParameters} from '../common/store/searchReducer';
+import store, {AppDispatch, getComponentState} from "../common/store/store";
+import {createSearchParamFrom, fetchResultWithStore, SearchParameters} from '../common/store/searchReducer';
 import  { useNavigate } from 'react-router-dom';
 import {Grid, InputAdornment} from '@mui/material';
 import StyledTextField from "./StyledTextField";
@@ -26,17 +26,14 @@ const SimpleTextSearch = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
 
-    const [searchText, setSearchText] = React.useState(useSelector<RootState, ParameterState>(getSearchText).searchText);
+    const [searchText, setSearchText] = React.useState(getComponentState(store.getState()).searchText);
 
     const handleEnterPressed = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter') {
-            const parameters : SearchParameters = {};
-            // OGC api requires comma separated values as list of search terms
-            parameters.text = (searchText || '').replace(' ',',');
+            dispatch(updateSearchText(searchText + ''));
 
-            // searchText || '' make sure will never undefined, worst it is empty string
-            dispatch(updateSearchText(searchText || ''));
-            dispatch(fetchResultWithStore(parameters))
+            const componentParam : ParameterState = getComponentState(store.getState());
+            dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
                 .unwrap()
                 .then((v) => navigate('/search'));
         }
