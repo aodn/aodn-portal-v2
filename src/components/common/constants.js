@@ -33,20 +33,12 @@ const dateDefault = {
   max: new Date()
 };
 
-/**
- * Common filter for cql, avoid cql string repeat everywhere
- * @type {{}}
- */
-const cqlDefaultFilters = new Map();
-cqlDefaultFilters
-  .set('IMOS_ONLY', 'providers like \'%IMOS%\'')
-  .set('ALL_TIME_RANGE','temporal after 1970-01-01T00:00:00Z');
+
 
 export {
   margin,
   border,
   borderRadius,
   filterList,
-  dateDefault,
-  cqlDefaultFilters
+  dateDefault
 }

@@ -17,7 +17,7 @@ export interface ComplexTextSearchProps {
     onFilterCallback: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, show: boolean) => void | null;
 };
 
-const filterButton = (onFilterShowHide: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>) => void | null) =>
+const getEndAdornment = (onFilterShowHide: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>) => void | null) =>
 
     <InputAdornment position='end'>
         <Button
@@ -121,7 +121,7 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
                             InputProps={{
                                 style: {color: 'white'},
                                 startAdornment: (<InputAdornment position='start'><SearchIcon/></InputAdornment>),
-                                endAdornment: filterButton(onFilterShowHide)
+                                endAdornment: getEndAdornment(onFilterShowHide)
                             }}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setSearchText(event.target.value);

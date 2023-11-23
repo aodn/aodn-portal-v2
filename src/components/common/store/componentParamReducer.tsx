@@ -59,7 +59,7 @@ const paramReducer = (state: ParameterState = initialState, action: ActionType) 
         case UPDATE_DATETIME_FILTER_VARIABLE:
             return {
                 ...state,
-                dateTimeFilterRange: action.payload
+                dateTimeFilterRange: action.payload.dateTimeFilterRange
             };
         case UPDATE_SEARCH_TEXT_FILTER_VARIABLE:
             return {

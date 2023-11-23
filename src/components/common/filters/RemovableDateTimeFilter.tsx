@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {cqlDefaultFilters, dateDefault, margin} from '../constants';
+import {dateDefault, margin} from '../constants';
 import {Grid, Box, SxProps, Theme} from '@mui/material';
 import TuneIcon from "@mui/icons-material/Tune";
 import DatePicker from "../datetime/DatePicker";
@@ -8,10 +8,11 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import dayjs from "dayjs";
 import { BarSeriesType } from '@mui/x-charts';
 import {useDispatch} from "react-redux";
-import {AppDispatch} from "../store/store";
+import store, {AppDispatch, getComponentState} from "../store/store";
 import {fetchResultNoStore, OGCCollections} from "../store/searchReducer";
 import {findSmallestDate} from "./api";
-import {updateDateTimeFilterRange} from "../store/componentParamReducer";
+import {ParameterState, updateDateTimeFilterRange} from "../store/componentParamReducer";
+import {cqlDefaultFilters} from "../cqlFilters";
 
 interface RemovableDateTimeFilterProps {
     title: string,
@@ -146,6 +147,7 @@ const cloneBarSeriesType = (s : BarSeriesType) : BarSeriesType => {
 
 const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
     const dispatch = useDispatch<AppDispatch>();
+    const componentParam : ParameterState = getComponentState(store.getState());
 
     // Must separate picker start and end date with slider to avoid feedback loop
     const [pickerStartDate, setPickerStartDate] = useState<Date>(dateDefault['min']);
@@ -160,18 +162,17 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
     useEffect(() => {
 
-        const filters : Map<string, string> = cqlDefaultFilters as Map<string, string>;
         // Find all collection
         dispatch(fetchResultNoStore({
                 property: 'id,temporal',
-                filter: `${filters.get('ALL_TIME_RANGE')}`
+                filter: `${cqlDefaultFilters.get('ALL_TIME_RANGE')}`
             }))
             .unwrap()
             .then((value => {
                 // Find all id of collection from imosOnly
                 dispatch(fetchResultNoStore({
                     property: 'id,providers',
-                    filter: `${filters.get('ALL_TIME_RANGE')} AND ${filters.get('IMOS_ONLY')}`
+                    filter: `${cqlDefaultFilters.get('ALL_TIME_RANGE')} AND ${cqlDefaultFilters.get('IMOS_ONLY')}`
                 }))
                 .unwrap()
                 .then((imosOnlyCollection: OGCCollections) => {
@@ -179,13 +180,16 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
                     const [min, xValues, series] = createSeries(new Set(ids), value);
                     setBarSeries({x: xValues, y: series});
-                    setSlicedBarSeries( {x: xValues, y: series});
+                    setSlicedBarSeries({x: xValues, y: series});
 
                     setSliderMinDate(min);
-                    setSliderStartDate(min);
+                    setSliderStartDate(componentParam.dateTimeFilterRange?.start ? componentParam.dateTimeFilterRange?.start : min);
+                    setPickerStartDate(componentParam.dateTimeFilterRange?.start ? componentParam.dateTimeFilterRange?.start : min);
 
-                    setPickerStartDate(min);
-
+                    if (componentParam.dateTimeFilterRange?.end) {
+                        setSliderEndDate(componentParam.dateTimeFilterRange?.end);
+                        setPickerEndDate(componentParam.dateTimeFilterRange?.end);
+                    }
                 });
             }));
     }, [dispatch]);
@@ -230,7 +234,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
         sliceBarSeries(s,e);
 
-    },[setPickerStartDate, setPickerEndDate, sliceBarSeries]);
+    },[setPickerStartDate, setPickerEndDate, sliceBarSeries,dispatch]);
 
     const onStartDatePickerChanged = useCallback((value: any) => {
         const e = new Date(value);
@@ -238,7 +242,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         setSliderStartDate(e);
         dispatch(updateDateTimeFilterRange({start: e, end: pickerEndDate}));
 
-    },[setSliderStartDate, setPickerStartDate]);
+    },[dispatch,setSliderStartDate, setPickerStartDate, pickerEndDate]);
 
     const onEndDatePickerChanged = useCallback((value: any) => {
         const e = new Date(value);
@@ -246,7 +250,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         setSliderEndDate(e);
         dispatch(updateDateTimeFilterRange({start: pickerStartDate, end: e}));
 
-    },[setSliderEndDate, setPickerEndDate]);
+    },[dispatch,setSliderEndDate, setPickerEndDate, pickerStartDate]);
 
     return(
         <Grid
@@ -337,6 +341,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                     <Grid item xs={2}>
                         <DatePicker
                             onChange={onStartDatePickerChanged}
+                            defaultValue={componentParam.dateTimeFilterRange?.start}
                             value={dayjs(pickerStartDate)}
                             views={['year', 'month', 'day']}
                         />
@@ -357,6 +362,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                     <Grid item xs={2}>
                         <DatePicker
                             onChange={onEndDatePickerChanged}
+                            defaultValue={componentParam.dateTimeFilterRange?.end}
                             value={dayjs(pickerEndDate)}
                             views={['year', 'month', 'day']}
                         />

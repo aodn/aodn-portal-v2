@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { MediaType } from 'media-typer';
 import axios from 'axios';
 import {ParameterState} from "./componentParamReducer";
-import {cqlDefaultFilters} from "../constants";
+import {cqlDefaultFilters, TemporalBetween} from "../cqlFilters";
 
 interface Link {
     href: string,
@@ -106,15 +106,24 @@ const searcher = createSlice({
     }
 });
 
+const appendFilter = (f: string | undefined, a: string | undefined) =>
+    f === undefined ? a : f + ' AND ' + a;
+
 const createSearchParamFrom = (i: ParameterState) : SearchParameters => {
-    const filters : Map<string, string> = cqlDefaultFilters as Map<string, string>;
 
     const p : SearchParameters = {};
     p.text = (i.searchText + '').replace(' ',',');
     p.filter = undefined;
 
     if(i.isImosOnlyDataset) {
-        p.filter = p.filter === undefined ? filters.get('IMOS_ONLY') : p.filter + ' AND ' + filters.get('IMOS_ONLY');
+        p.filter = appendFilter(p.filter, cqlDefaultFilters.get('IMOS_ONLY') as string);
+    }
+
+    if(i.dateTimeFilterRange) {
+        if(i.dateTimeFilterRange.start && i.dateTimeFilterRange.end) {
+            const f = cqlDefaultFilters.get('BETWEEN_TIME_RANGE') as TemporalBetween;
+            p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.start, i.dateTimeFilterRange.end));
+        }
     }
 
     return p;

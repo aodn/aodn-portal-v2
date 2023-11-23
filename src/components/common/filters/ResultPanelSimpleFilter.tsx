@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {FormControlLabel, Grid, MenuItem, Switch, SwitchProps} from '@mui/material';
+import {Grid, MenuItem} from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SlightRoundButton from "../buttons/SlightRoundButton";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -8,24 +8,12 @@ import NoBorderButton from "../buttons/NoBorderButton";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import RoundSelect from "../dropdown/RoundSelect";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import {useDispatch} from "react-redux";
-import store, {AppDispatch, getComponentState} from "../store/store";
-import {ParameterState, updateImosOnly} from "../store/componentParamReducer";
-import {useCallback, useState} from "react";
 
 interface ResultPanelSimpleFilterProps {
     filterClicked?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilterProps) => {
-
-    const dispatch = useDispatch<AppDispatch>();
-    const componentParam : ParameterState = getComponentState(store.getState());
-
-    const onImosOnlySwitch = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-        const p : SwitchProps = event.target as SwitchProps;
-        dispatch(updateImosOnly(p.checked))
-    },[dispatch]);
 
     return(
         <Grid container>
@@ -57,9 +45,6 @@ const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilterProps) => {
                         <RoundSelect>
                             <MenuItem>Sort By</MenuItem>
                         </RoundSelect>
-                    </Grid>
-                    <Grid item xs='auto'>
-                        <FormControlLabel control={<Switch defaultChecked={componentParam.isImosOnlyDataset} onClick={onImosOnlySwitch}/>} label="IMOS Data" />
                     </Grid>
                 </Grid>
             </Grid>
