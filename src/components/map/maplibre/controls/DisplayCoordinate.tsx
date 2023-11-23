@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useRef} from "react";
 import MapContext from "../MapContext";
+import {zIndex} from "../../../common/constants";
 
 const DisplayCoordinate = () => {
   
@@ -25,7 +26,7 @@ const DisplayCoordinate = () => {
          style={{
            display: "inline-block",
            position: "relative",
-           zIndex: 10,
+           zIndex: zIndex['MAP_COORD'],
            backgroundColor: 'rgba(255, 255, 255, 0.6)'
          }}
     />

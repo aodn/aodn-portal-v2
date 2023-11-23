@@ -22,7 +22,7 @@ const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilterProps) => {
                   sx={{
                       marginTop: margin['top'],
                   }}>
-                <Grid container justifyContent='center' columns={11} gap={1 }>
+                <Grid container justifyContent='center' columns={11} gap={1}>
                     <Grid item xs='auto'>
                         <SlightRoundButton
                             startIcon={<PlayArrowIcon/>}

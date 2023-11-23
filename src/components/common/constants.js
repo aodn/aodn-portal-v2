@@ -33,12 +33,16 @@ const dateDefault = {
   max: new Date()
 };
 
-
+const zIndex = {
+  MAP_COORD: 1,
+  FILTER_OVERLAY: 2
+}
 
 export {
   margin,
   border,
   borderRadius,
   filterList,
+  zIndex,
   dateDefault
 }

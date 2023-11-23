@@ -11,6 +11,7 @@ import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useSelector } from 'react-redux/es/hooks/useSelector';
 import { OGCCollection, OGCCollections, CollectionsQueryType } from '../common/store/searchReducer';
 import { RootState, searchQueryResult } from "../common/store/store";
+import {stringToColor} from "../common/colors/colorsUtils";
 
 interface ResultCardProps {
     item: number,
@@ -42,8 +43,8 @@ const ResultCard = (props: ResultCardProps) => {
                                 <div 
                                     style={{
                                         textAlign: 'center',
-                                        color: 'white',
-                                        backgroundColor: grey['resultCardNumber'],
+                                        color: 'black',
+                                        backgroundColor: stringToColor(props.content.id),
                                         border: border['frameBorder'],
                                         borderRadius: borderRadius['circle'],
                                     }}>

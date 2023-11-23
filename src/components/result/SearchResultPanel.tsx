@@ -48,7 +48,6 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                             display='grid'
                             minWidth='1200px'
                             maxHeight='700px'
-                            marginTop={margin['tripleTop']}
                             marginBottom={margin['tripleBottom']}
                             gridTemplateColumns={'repeat(6, 1fr)'}
                             gridTemplateRows={'repeat(1, 1fr)'}
@@ -70,6 +69,7 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                 gridColumn: 'span 4',
                                 gridRow: 'span 1',
                                 border: border['frameBorder'],
+                                marginTop: margin['top'],
                                 borderRadius: borderRadius['filter']
                             }}>
                                 <Map panelId={mapPanelId}>

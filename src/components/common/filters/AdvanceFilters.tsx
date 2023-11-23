@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from "react";
 import {Grid, Collapse, SxProps, Theme, Divider, Switch, FormControlLabel, SwitchProps} from '@mui/material';
 import RemovableDateTimeFilter from "./RemovableDateTimeFilter";
-import {border, margin} from "../constants";
+import {border, margin, zIndex} from "../constants";
 import BorderButton from "../buttons/BorderButton";
 import grey from "../colors/grey";
 import {Tune, Layers, People, DataThresholding} from "@mui/icons-material";
@@ -31,7 +31,7 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
                 container
                 sx={{
                     // Make it overlay instead of push smart card downwards
-                    zIndex:1,
+                    zIndex: zIndex['FILTER_OVERLAY'],
                     position:'absolute',
                 }}
                 justifyContent={'center'}
