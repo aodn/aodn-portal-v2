@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {border, borderRadius, cqlDefaultFilters, dateDefault, margin} from '../constants';
+import {cqlDefaultFilters, dateDefault, margin} from '../constants';
 import {Grid, Box, SxProps, Theme} from '@mui/material';
 import TuneIcon from "@mui/icons-material/Tune";
 import DatePicker from "../datetime/DatePicker";

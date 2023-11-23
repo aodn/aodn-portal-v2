@@ -2,7 +2,7 @@ import React, {useCallback} from 'react';
 import {margin} from "../common/constants";
 import { useDispatch } from 'react-redux'
 import store, {AppDispatch, getComponentState} from "../common/store/store";
-import {createSearchParamFrom, fetchResultWithStore, SearchParameters} from '../common/store/searchReducer';
+import {createSearchParamFrom, fetchResultWithStore} from '../common/store/searchReducer';
 import  { useNavigate } from 'react-router-dom';
 import {Grid, InputAdornment} from '@mui/material';
 import StyledTextField from "./StyledTextField";
@@ -11,7 +11,6 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ClearIcon from '@mui/icons-material/Clear';
 import NoBorderButton from "../common/buttons/NoBorderButton";
 import grey from "../common/colors/grey";
-import {useSelector} from "react-redux/es/hooks/useSelector";
 import {ParameterState, updateSearchText} from "../common/store/componentParamReducer";
 
 const getEndAdornment = () =>

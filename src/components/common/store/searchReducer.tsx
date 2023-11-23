@@ -2,6 +2,7 @@ import {createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { MediaType } from 'media-typer';
 import axios from 'axios';
 import {ParameterState} from "./componentParamReducer";
+import {cqlDefaultFilters} from "../constants";
 
 interface Link {
     href: string,
@@ -106,8 +107,15 @@ const searcher = createSlice({
 });
 
 const createSearchParamFrom = (i: ParameterState) : SearchParameters => {
+    const filters : Map<string, string> = cqlDefaultFilters as Map<string, string>;
+
     const p : SearchParameters = {};
     p.text = (i.searchText + '').replace(' ',',');
+    p.filter = undefined;
+
+    if(i.isImosOnlyDataset) {
+        p.filter = p.filter === undefined ? filters.get('IMOS_ONLY') : p.filter + ' AND ' + filters.get('IMOS_ONLY');
+    }
 
     return p;
 }

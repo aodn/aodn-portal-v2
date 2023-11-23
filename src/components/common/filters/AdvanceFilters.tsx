@@ -1,10 +1,13 @@
-import React from "react";
-import {Grid, Collapse, SxProps, Theme, Divider, Switch, FormControlLabel} from '@mui/material';
+import React, {useCallback, useState} from "react";
+import {Grid, Collapse, SxProps, Theme, Divider, Switch, FormControlLabel, SwitchProps} from '@mui/material';
 import RemovableDateTimeFilter from "./RemovableDateTimeFilter";
 import {border, margin} from "../constants";
 import BorderButton from "../buttons/BorderButton";
 import grey from "../colors/grey";
 import {Tune, Layers, People, DataThresholding} from "@mui/icons-material";
+import {useDispatch} from "react-redux";
+import store, {AppDispatch, getComponentState} from "../store/store";
+import {ParameterState, updateImosOnly, updateSearchText} from "../store/componentParamReducer";
 
 export interface NonRemovableFiltersProps {
     showFilters: boolean,
@@ -13,6 +16,15 @@ export interface NonRemovableFiltersProps {
 };
 
 const AdvanceFilters = (props: NonRemovableFiltersProps) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const componentParam : ParameterState = getComponentState(store.getState());
+
+    const onImosOnlySwitch = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+        const p : SwitchProps = event.target as SwitchProps;
+        dispatch(updateImosOnly(p.checked))
+
+    },[dispatch]);
+
     return(
         <Collapse orientation="vertical" in={props.showFilters}>
             <Grid
@@ -104,7 +116,7 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
                                     </BorderButton>
                                 </Grid>
                                 <Grid item xs={2}>
-                                    <FormControlLabel control={<Switch defaultChecked />} label="IMOS Data" />
+                                    <FormControlLabel control={<Switch defaultChecked={componentParam.isImosOnlyDataset} onClick={onImosOnlySwitch}/>} label="IMOS Data" />
                                 </Grid>
                                 <Grid item xs={12}><Divider sx={{ borderBottomWidth: 2 }}/></Grid>
                                 <Grid item xs={12}><RemovableDateTimeFilter title='Data Settings' url='/filters/datasetting.png'/></Grid>

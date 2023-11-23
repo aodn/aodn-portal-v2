@@ -1,9 +1,10 @@
 /**
  * This reducer is used to allow different component share value between pages, it is useful for filter
- * to preserve value between pages.
+ * to preserve value between pages. The number below must be unique across the whole application
  */
-const UPDATE_DATETIME_FILTER_VARIABLE = 1;
-const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = 2;
+const UPDATE_DATETIME_FILTER_VARIABLE = 1000;
+const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = 1001;
+const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE = 1002;
 
 interface DataTimeFilterRange {
     start?: Date,
@@ -11,6 +12,7 @@ interface DataTimeFilterRange {
 }
 
 export interface ParameterState {
+    isImosOnlyDataset: boolean,
     // Use in RemovableDateTimeFilter
     dateTimeFilterRange?: DataTimeFilterRange
     // Use in search box
@@ -37,8 +39,16 @@ const updateSearchText = (q: string): ActionType => {
     };
 };
 
+const updateImosOnly = (isImosOnly: boolean | undefined): ActionType => {
+    return {
+        type: UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE,
+        payload: { isImosOnlyDataset: isImosOnly === undefined ? false : isImosOnly } as ParameterState
+    };
+};
+
 // Initial State
 const initialState : ParameterState = {
+    isImosOnlyDataset: true,
     dateTimeFilterRange : {},
     searchText: ''
 };
@@ -56,6 +66,11 @@ const paramReducer = (state: ParameterState = initialState, action: ActionType) 
                 ...state,
                 searchText: action.payload.searchText
             };
+        case UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE:
+            return {
+                ...state,
+                isImosOnlyDataset: action.payload.isImosOnlyDataset
+            };
         default:
             return state;
     }
@@ -65,5 +80,6 @@ export default paramReducer;
 
 export {
     updateDateTimeFilterRange,
-    updateSearchText
+    updateSearchText,
+    updateImosOnly
 }
