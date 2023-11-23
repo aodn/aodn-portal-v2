@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { MediaType } from 'media-typer';
 import axios from 'axios';
 import {ParameterState} from "./componentParamReducer";
-import {cqlDefaultFilters, TemporalBetween} from "../cqlFilters";
+import {cqlDefaultFilters, TemporalDuring} from "../cqlFilters";
 
 interface Link {
     href: string,
@@ -121,7 +121,7 @@ const createSearchParamFrom = (i: ParameterState) : SearchParameters => {
 
     if(i.dateTimeFilterRange) {
         if(i.dateTimeFilterRange.start && i.dateTimeFilterRange.end) {
-            const f = cqlDefaultFilters.get('BETWEEN_TIME_RANGE') as TemporalBetween;
+            const f = cqlDefaultFilters.get('BETWEEN_TIME_RANGE') as TemporalDuring;
             p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.start, i.dateTimeFilterRange.end));
         }
     }
