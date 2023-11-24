@@ -36,15 +36,23 @@ const osmStyle = {
     }]
 };
 
-const ReactMap = (props: React.PropsWithChildren<MapProps>) => {
+const ReactMap = ({
+                      panelId,
+                      styleJson,
+                      centerLongitude,
+                      centerLatitude,
+                      zoom,
+                      onZoomEvent,
+                      children
+                  }: React.PropsWithChildren<MapProps>) => {
     const [map, setMap] = useState<any | null>(null);
 
     useEffect(() => {
         const m = new MaplibreMap({
-            container: props.panelId,
-            style: props.styleJson,
-            center: [props.centerLongitude, props.centerLatitude],
-            zoom: props.zoom,
+            container: panelId,
+            style: styleJson,
+            center: [centerLongitude, centerLatitude],
+            zoom: zoom,
             localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif"
         });
 
@@ -53,15 +61,15 @@ const ReactMap = (props: React.PropsWithChildren<MapProps>) => {
         m.getContainer().classList.add('mapboxgl-map');
         m.getCanvasContainer().classList.add('mapboxgl-canvas-container');
         m.getCanvasContainer().classList.add('mapboxgl-interactive');
-        m.on('zoomend', (e) => props.onZoomEvent && props.onZoomEvent(e));
+        m.on('zoomend', (e) => onZoomEvent && onZoomEvent(e));
         
         setMap(m);
-    }, [props.centerLatitude, props.centerLongitude, props.panelId, props.styleJson, props.zoom]);
+    }, [centerLatitude, centerLongitude, panelId, styleJson, zoom]);
 
     return (
         <MapContext.Provider value={{ map }}> 
             <Box>
-                {props.children}
+                {children}
             </Box>
         </MapContext.Provider>
     )
