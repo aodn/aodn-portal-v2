@@ -10,11 +10,11 @@ import DisplayCoordinate from '../map/maplibre/controls/DisplayCoordinate';
 import MapboxDrawControl from '../map/maplibre/controls/MapboxDrawControl';
 import Layers from '../map/maplibre/layers/Layers';
 import VectorTileLayers from '../map/maplibre/layers/VectorTileLayers';
-import LocateControl from '../map/maplibre/controls/LocateControl';
 import ItemsOnMapControl from '../map/maplibre/controls/ItemsOnMapControl';
 import {CollectionsQueryType, OGCCollection} from '../common/store/searchReducer';
 import {useSelector} from "react-redux/es/hooks/useSelector";
 import {RootState, searchQueryResult} from "../common/store/store";
+import {MapLibreEvent} from "maplibre-gl";
 
 interface SearchResultPanelProps {
 }
@@ -25,6 +25,13 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
 
     const [layersUuid, setLayersUuid] = useState<Array<OGCCollection>>([]);
     const contents = useSelector<RootState, CollectionsQueryType>(searchQueryResult);
+
+    const onMapZoom = useCallback((event: MapLibreEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
+        if(event.type === 'zoomend') {
+            const bounds = event.target.getBounds();
+            
+        }
+    }, []);
 
     const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => {
         // Unique set of layers
@@ -76,7 +83,7 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                 marginTop: margin['top'],
                                 borderRadius: borderRadius['filter']
                             }}>
-                                <Map panelId={mapPanelId}>
+                                <Map panelId={mapPanelId} onZoomEvent={onMapZoom}>
                                     <Controls>
                                         <NavigationControl/>
                                         <DisplayCoordinate/>

@@ -3,14 +3,15 @@ import React, { useState, useEffect } from 'react'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import MapContext from "./MapContext";
 import {Box} from "@mui/material";
-import { Map as MaplibreMap } from 'maplibre-gl';
+import {Map as MaplibreMap, MapLibreEvent} from 'maplibre-gl';
 
 interface MapProps {
     centerLongitude: number;
     centerLatitude: number;
     zoom: number;
     panelId: string;
-    stylejson: string;
+    styleJson: string;
+    onZoomEvent?: (event: MapLibreEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => void;
 };
 
 const osmStyle = {
@@ -41,7 +42,7 @@ const ReactMap = (props: React.PropsWithChildren<MapProps>) => {
     useEffect(() => {
         const m = new MaplibreMap({
             container: props.panelId,
-            style: props.stylejson,
+            style: props.styleJson,
             center: [props.centerLongitude, props.centerLatitude],
             zoom: props.zoom,
             localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif"
@@ -52,9 +53,10 @@ const ReactMap = (props: React.PropsWithChildren<MapProps>) => {
         m.getContainer().classList.add('mapboxgl-map');
         m.getCanvasContainer().classList.add('mapboxgl-canvas-container');
         m.getCanvasContainer().classList.add('mapboxgl-interactive');
+        m.on('zoomend', (e) => props.onZoomEvent && props.onZoomEvent(e));
         
         setMap(m);
-    }, [props.centerLatitude, props.centerLongitude, props.panelId, props.stylejson, props.zoom]);
+    }, [props.centerLatitude, props.centerLongitude, props.panelId, props.styleJson, props.zoom]);
 
     return (
         <MapContext.Provider value={{ map }}> 
@@ -70,7 +72,7 @@ ReactMap.defaultProps = {
     centerLongitude : 147.3353554138993,
     zoom : 2,
     //'https://demotiles.maplibre.org/style.json'
-    stylejson : osmStyle
+    styleJson : osmStyle
 };
 
 export default ReactMap
