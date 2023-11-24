@@ -144,7 +144,8 @@ const cloneBarSeriesType = (s : BarSeriesType) : BarSeriesType => {
 
     return c;
 }
-
+// TODO: Bug in end date, it didn't handle correctly, end date = today means ongoing dataset passing today,
+// because some dataset do not have end date.
 const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
     const dispatch = useDispatch<AppDispatch>();
     const componentParam : ParameterState = getComponentState(store.getState());
@@ -183,12 +184,12 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                     setSlicedBarSeries({x: xValues, y: series});
 
                     setSliderMinDate(min);
-                    setSliderStartDate(componentParam.dateTimeFilterRange?.start ? componentParam.dateTimeFilterRange?.start : min);
-                    setPickerStartDate(componentParam.dateTimeFilterRange?.start ? componentParam.dateTimeFilterRange?.start : min);
+                    setSliderStartDate(componentParam.dateTimeFilterRange?.start ? new Date(componentParam.dateTimeFilterRange?.start) : min);
+                    setPickerStartDate(componentParam.dateTimeFilterRange?.start ? new Date(componentParam.dateTimeFilterRange?.start) : min);
 
                     if (componentParam.dateTimeFilterRange?.end) {
-                        setSliderEndDate(componentParam.dateTimeFilterRange?.end);
-                        setPickerEndDate(componentParam.dateTimeFilterRange?.end);
+                        setSliderEndDate(new Date(componentParam.dateTimeFilterRange?.end));
+                        setPickerEndDate(new Date(componentParam.dateTimeFilterRange?.end));
                     }
                 });
             }));
@@ -222,7 +223,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         });
     },[setSlicedBarSeries, barSeries]);
 
-    const onSlideChanged = useCallback((start: number, end: number) => {
+    const onSlideChanged = useCallback((start: number, end: number, startIndex: number, endIndex: number) => {
         const s = new Date(start);
         const e = new Date(end);
         setPickerStartDate(s);
@@ -230,7 +231,11 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
         setSliderStartDate(s);
         setSliderEndDate(e);
-        dispatch(updateDateTimeFilterRange({start: s, end: e}));
+        dispatch(updateDateTimeFilterRange(
+            {
+                start: startIndex === 0? undefined : start,
+                end: endIndex === 100 ? undefined : end
+            }));
 
         sliceBarSeries(s,e);
 
@@ -240,7 +245,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         const e = new Date(value);
         setPickerStartDate(e);
         setSliderStartDate(e);
-        dispatch(updateDateTimeFilterRange({start: e, end: pickerEndDate}));
+        dispatch(updateDateTimeFilterRange({start: value, end: pickerEndDate.getTime()}));
 
     },[dispatch,setSliderStartDate, setPickerStartDate, pickerEndDate]);
 
@@ -248,7 +253,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         const e = new Date(value);
         setPickerEndDate(e);
         setSliderEndDate(e);
-        dispatch(updateDateTimeFilterRange({start: pickerStartDate, end: e}));
+        dispatch(updateDateTimeFilterRange({start: pickerStartDate.getTime(), end: value}));
 
     },[dispatch,setSliderEndDate, setPickerEndDate, pickerStartDate]);
 

@@ -12,7 +12,9 @@ import Layers from '../map/maplibre/layers/Layers';
 import VectorTileLayers from '../map/maplibre/layers/VectorTileLayers';
 import LocateControl from '../map/maplibre/controls/LocateControl';
 import ItemsOnMapControl from '../map/maplibre/controls/ItemsOnMapControl';
-import {OGCCollection} from '../common/store/searchReducer';
+import {CollectionsQueryType, OGCCollection} from '../common/store/searchReducer';
+import {useSelector} from "react-redux/es/hooks/useSelector";
+import {RootState, searchQueryResult} from "../common/store/store";
 
 interface SearchResultPanelProps {
 }
@@ -22,6 +24,7 @@ const mapPanelId = 'maplibre-panel-id';
 const SearchResultPanel = (props: SearchResultPanelProps) => {
 
     const [layersUuid, setLayersUuid] = useState<Array<OGCCollection>>([]);
+    const contents = useSelector<RootState, CollectionsQueryType>(searchQueryResult);
 
     const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => {
         // Unique set of layers
@@ -59,6 +62,7 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                     gridRow: 'span 1'
                                 }}>
                                 <ResultCards
+                                    contents={contents}
                                     onAddToMap={onAddToMap}
                                     onDownload={onDownload}
                                     onTags={undefined}

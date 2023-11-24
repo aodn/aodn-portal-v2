@@ -3,27 +3,25 @@
  * @type {{}}
  */
 import dayjs from "dayjs";
+import {dateDefault} from "./constants";
 
-export type TemporalAfterOrBefore = (t: Date) => string;
-export type TemporalDuring = (s: Date, e: Date) => string;
+export type TemporalAfterOrBefore = (t: number) => string;
+export type TemporalDuring = (s: number, e: number) => string;
 export type FilterTypes = string | TemporalDuring | TemporalAfterOrBefore;
 
-// Must use this format to do search, we do not care about the time
-const DATE_TIME_FORMAT = 'YYYY-MM-DDT00:00:00[Z]';
+const funcTemporalAfter : TemporalAfterOrBefore = (s:number) =>
+    `temporal AFTER ${dayjs(s).format(dateDefault['DATE_TIME_FORMAT'])}`;
 
-const funcTemporalAfter : TemporalAfterOrBefore = (s:Date) =>
-    `temporal AFTER ${dayjs(s).format(DATE_TIME_FORMAT)}`;
-
-const funcTemporalBefore : TemporalAfterOrBefore = (s:Date) =>
-    `temporal BEFORE ${dayjs(s).format(DATE_TIME_FORMAT)}`;
+const funcTemporalBefore : TemporalAfterOrBefore = (s:number) =>
+    `temporal BEFORE ${dayjs(s).format(dateDefault['DATE_TIME_FORMAT'])}`;
 
 /**
  * The CQL filter format for search dataset given start/end date
  * @param s
  * @param e
  */
-const funcTemporalBetween : TemporalDuring = (s: Date, e: Date) =>
-    `temporal DURING ${dayjs(s).format(DATE_TIME_FORMAT)}/${dayjs(e).format(DATE_TIME_FORMAT)}`;
+const funcTemporalBetween : TemporalDuring = (s: number, e: number) =>
+    `temporal DURING ${dayjs(s).format(dateDefault['DATE_TIME_FORMAT'])}/${dayjs(e).format(dateDefault['DATE_TIME_FORMAT'])}`;
 
 
 const cqlDefaultFilters = new Map<string, FilterTypes>();

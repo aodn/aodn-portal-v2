@@ -107,6 +107,7 @@ const ResultCard = (props: ResultCardProps) => {
 };
 
 interface ResultCardsProps {
+    contents: CollectionsQueryType,
     onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
     onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
     onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
@@ -114,7 +115,7 @@ interface ResultCardsProps {
 }
 
 // This function is use to control which item to render in the long list
-const renderRows = (props: ResultCardsProps, contents: OGCCollections, child: ListChildComponentProps) => {
+const renderRows = (props: ResultCardsProps, child: ListChildComponentProps) => {
 
     // The style must pass to the listitem else incorrect rendering
     const { index, style } = child;
@@ -123,7 +124,7 @@ const renderRows = (props: ResultCardsProps, contents: OGCCollections, child: Li
         <ListItem style={style}>
             <ResultCard
                 item={index + 1}
-                content={contents.collections[index]}
+                content={props.contents.result.collections[index]}
                 onAddToMap={props.onAddToMap}
                 onDownload={props.onDownload}
                 onTags={props.onTags}
@@ -134,17 +135,15 @@ const renderRows = (props: ResultCardsProps, contents: OGCCollections, child: Li
 } 
 const ResultCards = (props: ResultCardsProps) => {
 
-    const contents = useSelector<RootState, CollectionsQueryType>(searchQueryResult);
-
     return(
         <FixedSizeList
             height={700}
             width={"100%"}
             itemSize={270}
-            itemCount={contents.result.collections.length}
+            itemCount={props.contents.result.collections.length}
             overscanCount={10}
         >
-            {(child: ListChildComponentProps) => renderRows(props, contents.result, child)}
+            {(child: ListChildComponentProps) => renderRows(props, child)}
         </FixedSizeList>
     );
 };

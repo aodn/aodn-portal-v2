@@ -7,8 +7,9 @@ const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = 1001;
 const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE = 1002;
 
 interface DataTimeFilterRange {
-    start?: Date,
-    end?: Date
+    // Cannot use Date in Redux as it is non-serializable
+    start?: number | undefined,
+    end?: number | undefined
 }
 
 export interface ParameterState {
@@ -59,7 +60,10 @@ const paramReducer = (state: ParameterState = initialState, action: ActionType) 
         case UPDATE_DATETIME_FILTER_VARIABLE:
             return {
                 ...state,
-                dateTimeFilterRange: action.payload.dateTimeFilterRange
+                dateTimeFilterRange: {
+                    start: action.payload.dateTimeFilterRange?.start,
+                    end: action.payload.dateTimeFilterRange?.end
+                }
             };
         case UPDATE_SEARCH_TEXT_FILTER_VARIABLE:
             return {

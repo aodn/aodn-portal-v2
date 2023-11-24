@@ -13,7 +13,7 @@ interface RangeSliderProps<T> {
     start: T,
     end: T,
     sx?: SxProps<Theme>,
-    onSlideChanged: (start: number, end: number) => void
+    onSlideChanged: (start: number, end: number, startIndex: number, endIndex: number) => void
 }
 
 interface NumberRangeSliderProps extends RangeSliderProps<number> {
@@ -66,7 +66,7 @@ const NumberRangeSlider = ({title, label, min, max, start, end, sx, onSlideChang
     const handleChange = useCallback((event: Event, newValue: number | number[]) => {
         let c = newValue as number[];
         setValue(c);
-        onSlideChanged(mapRangeToRealValue(min, max, c[0]), mapRangeToRealValue(min, max, c[1]));
+        onSlideChanged(mapRangeToRealValue(min, max, c[0]), mapRangeToRealValue(min, max, c[1]), c[0], c[1]);
     },[setValue, min, max, onSlideChanged]);
 
     return (
