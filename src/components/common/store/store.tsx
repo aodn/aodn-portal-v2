@@ -1,7 +1,7 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import searchReducer from "./searchReducer";
 import logger from 'redux-logger';
-import paramReducer, {ParameterState, updateDateTimeFilterRange} from "./componentParamReducer";
+import paramReducer, {ParameterState} from "./componentParamReducer";
 
 // https://stackoverflow.com/questions/69502147/changing-from-redux-to-redux-toolkit
 // https://redux-toolkit.js.org/api/getDefaultMiddleware

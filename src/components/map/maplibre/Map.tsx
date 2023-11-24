@@ -56,15 +56,21 @@ const ReactMap = ({
             localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif"
         });
 
+        const z = (e: any) => onZoomEvent && onZoomEvent(e);
+
         // https://github.com/maplibre/maplibre-gl-js/issues/2601
         m.getCanvas().classList.add('mapboxgl-canvas');
         m.getContainer().classList.add('mapboxgl-map');
         m.getCanvasContainer().classList.add('mapboxgl-canvas-container');
         m.getCanvasContainer().classList.add('mapboxgl-interactive');
-        m.on('zoomend', (e) => onZoomEvent && onZoomEvent(e));
+        m.on('zoomend', z);
         
         setMap(m);
-    }, [centerLatitude, centerLongitude, panelId, styleJson, zoom]);
+
+        return () => {
+            m.off('zoomend', z)
+        }
+    }, [centerLatitude, centerLongitude, panelId, styleJson, zoom, onZoomEvent]);
 
     return (
         <MapContext.Provider value={{ map }}> 

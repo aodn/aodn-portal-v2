@@ -50,9 +50,16 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
             const componentParam : ParameterState = getComponentState(store.getState());
             dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
                 .unwrap()
+                .then((collections) => {
+                    const ids = collections.collections.map(c => c.id);
+                    // remove map uuid not exist in the ids
+                    setLayersUuid(v =>
+                        v.filter(i => ids.includes(i.id))
+                    );
+                })
                 .then((v) => navigate('/search'));
         }
-    }, [dispatch]);
+    }, [dispatch, navigate]);
 
     const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => {
         // Unique set of layers
