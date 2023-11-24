@@ -1,7 +1,6 @@
 import * as React from 'react';
 import ComplexSmartPanel from "./ComplexSmartPanel";
 import {SmartCard11} from "./SmartCard";
-import {margin} from "../common/constants";
 
 /**
  * Empty for now, implement it later

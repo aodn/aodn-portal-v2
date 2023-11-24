@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { MediaType } from 'media-typer';
 import axios from 'axios';
 import {ParameterState} from "./componentParamReducer";
-import {cqlDefaultFilters, TemporalAfterOrBefore, TemporalDuring} from "../cqlFilters";
+import {cqlDefaultFilters, IntersectPolygon, TemporalAfterOrBefore, TemporalDuring} from "../cqlFilters";
 
 interface Link {
     href: string,
@@ -132,6 +132,11 @@ const createSearchParamFrom = (i: ParameterState) : SearchParameters => {
             const f = cqlDefaultFilters.get("AFTER_TIME") as TemporalAfterOrBefore;
             p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.start));
         }
+    }
+
+    if(i.polygon) {
+        const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as IntersectPolygon;
+        p.filter = appendFilter(p.filter, f(i.polygon));
     }
 
     return p;

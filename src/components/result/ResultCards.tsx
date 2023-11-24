@@ -8,9 +8,7 @@ import SellIcon from '@mui/icons-material/Sell';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SlightRoundButton from '../common/buttons/SlightRoundButton';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
-import { useSelector } from 'react-redux/es/hooks/useSelector';
-import { OGCCollection, OGCCollections, CollectionsQueryType } from '../common/store/searchReducer';
-import { RootState, searchQueryResult } from "../common/store/store";
+import { OGCCollection, CollectionsQueryType } from '../common/store/searchReducer';
 import {stringToColor} from "../common/colors/colorsUtils";
 
 interface ResultCardProps {

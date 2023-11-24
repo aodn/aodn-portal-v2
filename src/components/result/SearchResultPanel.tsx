@@ -11,10 +11,19 @@ import MapboxDrawControl from '../map/maplibre/controls/MapboxDrawControl';
 import Layers from '../map/maplibre/layers/Layers';
 import VectorTileLayers from '../map/maplibre/layers/VectorTileLayers';
 import ItemsOnMapControl from '../map/maplibre/controls/ItemsOnMapControl';
-import {CollectionsQueryType, OGCCollection} from '../common/store/searchReducer';
+import {
+    CollectionsQueryType,
+    createSearchParamFrom,
+    fetchResultWithStore,
+    OGCCollection
+} from '../common/store/searchReducer';
 import {useSelector} from "react-redux/es/hooks/useSelector";
-import {RootState, searchQueryResult} from "../common/store/store";
+import store, {AppDispatch, getComponentState, RootState, searchQueryResult} from "../common/store/store";
 import {MapLibreEvent} from "maplibre-gl";
+import * as turf from '@turf/turf';
+import {useDispatch} from "react-redux";
+import {ParameterState, updateFilterPolygon} from "../common/store/componentParamReducer";
+import {useNavigate} from "react-router-dom";
 
 interface SearchResultPanelProps {
 }
@@ -22,6 +31,8 @@ interface SearchResultPanelProps {
 const mapPanelId = 'maplibre-panel-id';
 
 const SearchResultPanel = (props: SearchResultPanelProps) => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
 
     const [layersUuid, setLayersUuid] = useState<Array<OGCCollection>>([]);
     const contents = useSelector<RootState, CollectionsQueryType>(searchQueryResult);
@@ -29,9 +40,19 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
     const onMapZoom = useCallback((event: MapLibreEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
         if(event.type === 'zoomend') {
             const bounds = event.target.getBounds();
-            
+            const ne = bounds.getNorthEast(); // NorthEast corner
+            const sw = bounds.getSouthWest(); // SouthWest corner
+
+            // Note order: longitude, latitude.
+            const polygon = turf.bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat])
+            dispatch(updateFilterPolygon(polygon));
+
+            const componentParam : ParameterState = getComponentState(store.getState());
+            dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
+                .unwrap()
+                .then((v) => navigate('/search'));
         }
-    }, []);
+    }, [dispatch]);
 
     const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => {
         // Unique set of layers
