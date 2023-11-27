@@ -85,7 +85,7 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                         <Box
                             display='grid'
                             minWidth='1200px'
-                            maxHeight='700px'
+                            minHeight='700px'
                             marginBottom={margin['tripleBottom']}
                             gridTemplateColumns={'repeat(6, 1fr)'}
                             gridTemplateRows={'repeat(1, 1fr)'}
@@ -127,7 +127,6 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                                     </Layers>
                                 </Map>
                             </Box>
-
                         </Box>
                     </Grid>
                 </Grid>

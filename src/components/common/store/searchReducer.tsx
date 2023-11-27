@@ -92,6 +92,21 @@ const fetchResultWithStore = createAsyncThunk<OGCCollections, SearchParameters, 
 const fetchResultNoStore = createAsyncThunk<OGCCollections, SearchParameters, {rejectValue: FailedResponse}>(
     'search/fetchResultNoStore', searchResult);
 
+const fetchResultByUuidNoStore = createAsyncThunk<OGCCollection, string, {rejectValue: FailedResponse}>(
+    'search/fetchResultNoStore',
+    async (id: string, thunkApi) => {
+        try {
+            const response = await axios.get<OGCCollection>(
+                `/api/v1/ogc/collections/${id}`
+            );
+            return response.data;
+        }
+        catch(error: any){
+            return thunkApi.rejectWithValue(error?.response.data);
+        }
+    }
+);
+
 const searcher = createSlice({
     name: 'search',
     initialState: initialState,
@@ -145,7 +160,8 @@ const createSearchParamFrom = (i: ParameterState) : SearchParameters => {
 export {
     createSearchParamFrom,
     fetchResultWithStore,
-    fetchResultNoStore
+    fetchResultNoStore,
+    fetchResultByUuidNoStore
 }
 
 export default searcher.reducer;

@@ -1,7 +1,7 @@
 import React from 'react'
 import grey from "../common/colors/grey";
 import {Card, CardContent, CardMedia, Grid, Typography, CardActionArea, CardActions, ListItem} from "@mui/material";
-import {borderRadius, border} from "../common/constants";
+import {borderRadius, border, pageDefault} from "../common/constants";
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import DownloadIcon from '@mui/icons-material/Download';
 import SellIcon from '@mui/icons-material/Sell';
@@ -10,6 +10,7 @@ import SlightRoundButton from '../common/buttons/SlightRoundButton';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { OGCCollection, CollectionsQueryType } from '../common/store/searchReducer';
 import {stringToColor} from "../common/colors/colorsUtils";
+import {useNavigate} from "react-router-dom";
 
 interface ResultCardProps {
     item: number,
@@ -25,6 +26,7 @@ const findThumbnail = (c : OGCCollection) : string => {
 }
 
 const ResultCard = (props: ResultCardProps) => {
+    const navigate = useNavigate();
 
     return(
         <Card sx={{
@@ -32,7 +34,10 @@ const ResultCard = (props: ResultCardProps) => {
             borderRadius: borderRadius['filter'],
             backgroundColor: grey['resultCard']
         }}>
-            <CardActionArea>
+            <CardActionArea onClick={
+                (e) =>
+                    navigate(pageDefault.details, {state:{uuid: props.content.id}})}
+            >
                 <CardContent>
                     <Typography component="div" sx={{ marginBottom: '10px'}}>
                         <Grid container>

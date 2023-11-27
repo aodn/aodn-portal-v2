@@ -8,16 +8,23 @@ import {
 import LandingPage from './pages/LandingPage';
 import SearchPage from './pages/SearchPage';
 import Fallback from './pages/Fallback';
+import DetailsPage from "./pages/DetailsPage";
+import {pageDefault} from "./components/common/constants";
 
 let router = createBrowserRouter([
     {
-        path: "/",
+        path: pageDefault.landing,
         Component: LandingPage,
         children: [],
     },
     {
-        path: "/search",
+        path: pageDefault.search,
         Component: SearchPage,
+        children: [],
+    },
+    {
+        path: pageDefault.details,
+        Component: DetailsPage,
         children: [],
     },
 ]);

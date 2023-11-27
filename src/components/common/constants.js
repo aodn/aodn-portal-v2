@@ -35,6 +35,12 @@ const dateDefault = {
   max: new Date()
 };
 
+const pageDefault = {
+  search: '/search',
+  details: '/details',
+  landing: '/'
+}
+
 const zIndex = {
   MAP_COORD: 1,
   FILTER_OVERLAY: 2
@@ -46,5 +52,6 @@ export {
   borderRadius,
   filterList,
   zIndex,
-  dateDefault
+  dateDefault,
+  pageDefault
 }
