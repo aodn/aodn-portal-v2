@@ -14,6 +14,7 @@ const margin = {
 const border = {
   frameBorder: '5px solid #fff',
   buttonBorder: '2px solid #fff',
+  tabPanelBorder: '1px solid darkgrey',
   listFilterBorder: '2px solid ' + grey['filterGroup']
 }
 

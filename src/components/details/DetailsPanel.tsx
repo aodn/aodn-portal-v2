@@ -3,7 +3,7 @@ import {border, borderRadius, margin} from "../common/constants";
 import {Grid, Box, Card} from "@mui/material";
 import { DetailsHeader, DetailsHeaderButton } from "./DetailsHeader";
 import React from "react";
-import {MapCard} from "./DetailsCards";
+import {ContentCard, LinkCard, MapCard} from "./DetailsCards";
 
 export interface DetailsProps {
     collection? : OGCCollection,
@@ -18,7 +18,7 @@ const DetailsPanel = (props : DetailsProps) => {
                       marginTop: margin['top'],
                       marginBottom: margin['bottom']
                   }}>
-                <Grid container id='details-page-center-panel' justifyContent='center' spacing={2} gap={1}>
+                <Grid container id='details-page-center-panel' justifyContent='center' spacing={2} gap={2}>
                     <Grid item xs={8}>
                         <DetailsHeaderButton collection={props.collection}/>
                     </Grid>
@@ -35,9 +35,30 @@ const DetailsPanel = (props : DetailsProps) => {
                                     gridColumn: 'span 5',
                                     gridRow: 'span 1',
                                     border: border['frameBorder'],
-                                    borderRadius: borderRadius['filter']
+                                    borderRadius: borderRadius['filter'],
+                                    marginBottom: margin['bottom']
                                 }}>
                                 <MapCard collection={undefined}/>
+                            </Box>
+                            <Box
+                                sx={{
+                                    gridColumn: 'span 5',
+                                    gridRow: 'span 1',
+                                    border: border['frameBorder'],
+                                    borderRadius: borderRadius['filter'],
+                                    marginBottom: margin['bottom']
+                                }}>
+                                <ContentCard collection={props.collection}/>
+                            </Box>
+                            <Box
+                                sx={{
+                                    gridColumn: 'span 5',
+                                    gridRow: 'span 1',
+                                    border: border['frameBorder'],
+                                    borderRadius: borderRadius['filter'],
+                                    marginBottom: margin['bottom']
+                                }}>
+                                <LinkCard collection={props.collection}/>
                             </Box>
                             <Box
                                 sx={{

@@ -3,17 +3,31 @@ import Map from "../map/maplibre/Map";
 import Controls from "../map/maplibre/controls/Controls";
 import NavigationControl from "../map/maplibre/controls/NavigationControl";
 import DisplayCoordinate from "../map/maplibre/controls/DisplayCoordinate";
-import {Card, CardContent, Box, CardHeader, Stack, Grid, TextField, IconButton} from "@mui/material";
+import {
+    Card,
+    CardContent,
+    Box,
+    CardHeader,
+    Grid,
+    TextField,
+    IconButton,
+    Tab,
+    Tabs,
+    Typography, CardActionArea, List, ListItem, ListItemAvatar, Avatar, ListItemText
+} from "@mui/material";
 import grey from "../common/colors/grey";
 import FullScreen from "../map/maplibre/controls/FullScreenControl";
 import {LineChart} from "@mui/x-charts/LineChart";
-import {useCallback, useState} from "react";
+import {PropsWithChildren, useCallback, useState} from "react";
 import {OGCCollection} from "../common/store/searchReducer";
 import {DateRangeSlider} from "../common/slider/RangeSlider";
-import {dateDefault, margin} from "../common/constants";
+import {border, dateDefault, margin} from "../common/constants";
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
+import SlightRoundButton from "../common/buttons/SlightRoundButton";
+import LinkIcon from '@mui/icons-material/Link';
+import PublicIcon from '@mui/icons-material/Public';
 
 type Point = {
     date: number,
@@ -24,6 +38,11 @@ type DataSeries = Array<Point>;
 
 interface DetailCardProps {
     collection: OGCCollection | undefined
+}
+
+interface TabPanelProps {
+    index: number;
+    value: number;
 }
 
 const mapPanelId = 'maplibre-detail-page-id';
@@ -183,19 +202,160 @@ const MapCard = (props: DetailCardProps) => {
         </Card>
     );
 }
-/**
- * Screen of diff area of bounding box, can we code this?
- * @constructor
- */
-const OverviewCard = () => {
-    return(
-        <Stack direction="row" spacing={2}>
 
-        </Stack>
+const ContentTabPanel = ({value, index, children}: PropsWithChildren<TabPanelProps>) => {
+    return(
+        <>
+        {value === index && (
+            <Box sx={{
+                border: border['tabPanelBorder'],
+                backgroundColor: grey['contentTabPanel']
+            }}>
+                <Typography
+                    sx={{
+                        margin: margin['top'],
+                        minHeight: '220px'
+                    }}
+                >
+                    {children}
+                </Typography>
+                <Typography
+                    sx={{
+                        margin: margin['top'],
+                    }}
+                >
+                    <CardActionArea>
+                        {
+                            // TODO fake here
+                        }
+                        <SlightRoundButton>On going</SlightRoundButton>
+                        <SlightRoundButton>Dataset</SlightRoundButton>
+                        <SlightRoundButton>netCDF</SlightRoundButton>
+                    </CardActionArea>
+                </Typography>
+            </Box>
+        )}
+        </>
+    );
+}
+
+const ContentCard = (props: DetailCardProps) => {
+    const [value, setValue] = React.useState<number>(1);
+
+    const handleChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    },[setValue]);
+
+    return(
+        <Card sx={{
+            backgroundColor: grey['resultCard'],
+        }}>
+            <CardContent>
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor="secondary"
+                    textColor="inherit"
+                    aria-label="secondary tabs example"
+                >
+                    <Tab value={1} label="Description" />
+                    <Tab value={2} label="About this resources" />
+                    <Tab value={3} label="Metadata Information" />
+                </Tabs>
+                <ContentTabPanel value={value} index={1}>
+                    {props.collection?.description}
+                </ContentTabPanel>
+                <ContentTabPanel value={value} index={2}>
+                    TODO
+                </ContentTabPanel>
+                <ContentTabPanel value={value} index={3}>
+                    TODO
+                </ContentTabPanel>
+            </CardContent>
+        </Card>
+    );
+}
+
+const LinkTabPanel = ({value, index, children}: PropsWithChildren<TabPanelProps>) => {
+    return(
+        <>
+            {value === index && (
+                <Box sx={{
+                    border: border['tabPanelBorder'],
+                    backgroundColor: grey['contentTabPanel']
+                }}>
+                    <Typography
+                        sx={{
+                            margin: margin['top'],
+                            minHeight: '220px'
+                        }}
+                    >
+                        {children}
+                    </Typography>
+                </Box>
+            )}
+        </>
+    );
+}
+
+const LinkCard = (props: DetailCardProps) => {
+
+    const [value, setValue] = React.useState<number>(1);
+
+    const handleChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    },[setValue]);
+
+    return(
+        <Card sx={{
+            backgroundColor: grey['resultCard'],
+        }}>
+            <CardContent>
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor="secondary"
+                    textColor="inherit"
+                    aria-label="secondary tabs example"
+                >
+                    <Tab value={1} label="Links" />
+                    <Tab value={2} label="Assoicated resource" />
+                </Tabs>
+                <LinkTabPanel value={value} index={1}>
+                    <List>
+                    {
+                        props.collection?.links?.map(f =>
+                            <ListItem
+                                secondaryAction={
+                                    <IconButton edge="end" onClick={() => window.open(f.href)}>
+                                        <LinkIcon />
+                                    </IconButton>
+                                }
+                            >
+                                <ListItemAvatar>
+                                    <Avatar>
+                                        <PublicIcon />
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText
+                                    primary={f.title}
+                                    secondary={f.href}
+                                />
+                            </ListItem>
+                        )
+                    }
+                    </List>
+                </LinkTabPanel>
+                <LinkTabPanel value={value} index={2}>
+                    TODO
+                </LinkTabPanel>
+            </CardContent>
+        </Card>
     );
 }
 
 export {
     MapCard,
-    OverviewCard,
+    ContentCard,
+    LinkCard
 }

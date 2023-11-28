@@ -7,7 +7,8 @@ import {cqlDefaultFilters, IntersectPolygon, TemporalAfterOrBefore, TemporalDuri
 interface Link {
     href: string,
     rel: string,
-    type: MediaType
+    type: MediaType,
+    title: string
 }
 
 interface Spatial {
