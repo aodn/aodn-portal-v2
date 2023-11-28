@@ -7,14 +7,18 @@ import SlightRoundButton from "../common/buttons/SlightRoundButton";
 import UndoIcon from '@mui/icons-material/Undo';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import {useNavigate} from "react-router-dom";
 
 const DetailsHeaderButton = (props: DetailsProps) => {
+    const navigate = useNavigate();
+    
     return (
       <Grid container>
           <Grid item xs={6}>
               <SlightRoundButton
                   startIcon={<UndoIcon />}
                   sx={{minWidth: 200}}
+                  onClick={() => navigate('/search')}
               >
                   Back to search
               </SlightRoundButton>
