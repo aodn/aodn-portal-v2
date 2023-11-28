@@ -37,16 +37,13 @@ const DetailsPanel = (props : DetailsProps) => {
                                     border: border['frameBorder'],
                                     borderRadius: borderRadius['filter']
                                 }}>
-                                <MapCard/>
+                                <MapCard collection={undefined}/>
                             </Box>
                             <Box
                                 sx={{
                                     gridColumn: 'span 1',
                                     gridRow: 'span 1'
                                 }}>
-                                <Card>
-
-                                </Card>
                             </Box>
                         </Box>
                     </Grid>

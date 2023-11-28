@@ -3,15 +3,57 @@ import Map from "../map/maplibre/Map";
 import Controls from "../map/maplibre/controls/Controls";
 import NavigationControl from "../map/maplibre/controls/NavigationControl";
 import DisplayCoordinate from "../map/maplibre/controls/DisplayCoordinate";
-import {Card, Typography, CardContent, Box, CardHeader, Stack} from "@mui/material";
+import {Card, CardContent, Box, CardHeader, Stack, Grid, TextField, IconButton} from "@mui/material";
 import grey from "../common/colors/grey";
+import FullScreen from "../map/maplibre/controls/FullScreenControl";
+import {LineChart} from "@mui/x-charts/LineChart";
+import {useCallback, useState} from "react";
+import {OGCCollection} from "../common/store/searchReducer";
+import {DateRangeSlider} from "../common/slider/RangeSlider";
+import {dateDefault, margin} from "../common/constants";
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 
-interface MapCardProps {
+type Point = {
+    date: number,
+    y: number
+}
+
+type DataSeries = Array<Point>;
+
+interface DetailCardProps {
+    collection: OGCCollection | undefined
 }
 
 const mapPanelId = 'maplibre-detail-page-id';
 
-const MapCard = (props: MapCardProps) => {
+const MapCard = (props: DetailCardProps) => {
+
+    const [minSliderDate, setSliderMinDate] = useState<Date | undefined>(undefined);
+    const [startSliderDate, setSliderStartDate] = useState<Date>(dateDefault['min']);
+    const [endSliderDate, setSliderEndDate] = useState<Date>(dateDefault['max']);
+
+    // TODO: Need to fix later to get the number of data points across time.
+    const createDataSet = useCallback((collection: OGCCollection | undefined) : DataSeries => {
+        const r : DataSeries = new Array<Point>();
+
+        if(collection === undefined) {
+            // TODO: Create sample info for MVP only
+            for (let i = 0; i < 200; i++) {
+                r.push({date: i, y: Math.floor(Math.random() * 100)})
+            }
+        }
+
+        return r;
+
+    }, [props.collection]);
+
+    const onSlideChanged = useCallback((start: number, end: number, startIndex: number, endIndex: number) => {
+        setSliderStartDate(new Date(start));
+        setSliderEndDate(new Date(end));
+    }, []);
+
     return(
         <Card sx={{
             backgroundColor: grey['resultCard'],
@@ -24,21 +66,127 @@ const MapCard = (props: MapCardProps) => {
                     id={mapPanelId}
                     sx = {{
                         width:'100%',
-                        minHeight: '700px',
+                        minHeight: '460px',
                     }}
                 >
                     <Map panelId={mapPanelId}>
                         <Controls>
+                            <FullScreen/>
                             <NavigationControl/>
                             <DisplayCoordinate/>
                         </Controls>
                     </Map>
                 </Box>
+                <Box
+                    sx = {{
+                        width:'100%',
+                        height: '200px',
+                        minHeight: '200px',
+                    }}
+                >
+                    <LineChart
+                        dataset={createDataSet(props.collection)}
+                        xAxis={[
+                            {
+                                dataKey: 'date',
+                                valueFormatter: (v) => v.toString(),
+                                min: 0,
+                                max: 200,
+                            },
+                        ]}
+                        series={[{
+                            id: 'timeline',
+                            dataKey: 'y',
+                            label: 'Target data',
+                            showMark: false,
+                        }]}
+                        margin={{
+                            // use to control the space on right, so that it will not overlap with the legend
+                            right: 200
+                        }}
+                        slotProps={{
+                            legend: {
+                                direction: 'column',
+                                position: {
+                                    vertical: 'middle',
+                                    horizontal: 'right',
+                                },
+                                itemMarkWidth: 20,
+                                itemMarkHeight: 20,
+                                markGap: 10,
+                                itemGap: 10,
+                            }
+                        }}
+                        // TODO: Fill not working why?
+                        sx={{
+                            '& .MuiAreaElement-series-timeline': {
+                                fill: "url('#fillStyle')",
+                            },
+                            height: '100%'
+                        }}
+                    >
+                        <defs>
+                            <linearGradient id="fillStyle" gradientTransform="rotate(0)">
+                                <stop offset="5%" stopColor="blue" />
+                                <stop offset="95%" stopColor="green" />
+                            </linearGradient>
+                        </defs>
+                    </LineChart>
+                </Box>
+                <Box
+                    sx = {{
+                        width:'100%',
+                        minHeight: '60px',
+                    }}
+                >
+                    <Grid container xs={12} justifyContent={'center'}>
+                        <Grid item xs={2} sx={{
+                            marginRight: margin['right']
+                        }}>
+                            <TextField value={startSliderDate.toLocaleDateString()}
+                                       variant="outlined"
+                                       size="small"
+                                       disabled={true}
+                            />
+                        </Grid>
+                        <Grid item xs={5}>
+                            <DateRangeSlider title={'temporal'}
+                                             onSlideChanged={onSlideChanged}
+                                             min={minSliderDate}
+                                             start={startSliderDate}
+                                             end={endSliderDate}/>
+
+                        </Grid>
+                        <Grid item xs={2} sx={{
+                            marginLeft: margin['left']
+                        }}>
+                            <TextField value={endSliderDate.toLocaleDateString()}
+                                       variant="outlined"
+                                       size="small"
+                                       disabled={true}
+                            />
+                        </Grid>
+                        <Grid item xs={'auto'} sx={{marginLeft: '20px'}}>
+                            <IconButton aria-label="previous">
+                                <SkipPreviousIcon />
+                            </IconButton>
+                            <IconButton aria-label="play/pause">
+                                <PlayArrowIcon sx={{ height: 38, width: 38 }} />
+                            </IconButton>
+                            <IconButton aria-label="next">
+                                <SkipNextIcon />
+                            </IconButton>
+                        </Grid>
+                    </Grid>
+                </Box>
             </CardContent>
         </Card>
     );
 }
-
+/**
+ * Screen of diff area of bounding box, can we code this?
+ * @constructor
+ */
 const OverviewCard = () => {
     return(
         <Stack direction="row" spacing={2}>
@@ -49,5 +197,5 @@ const OverviewCard = () => {
 
 export {
     MapCard,
-    OverviewCard
+    OverviewCard,
 }
