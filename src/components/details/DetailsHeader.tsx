@@ -11,7 +11,7 @@ import {useNavigate} from "react-router-dom";
 
 const DetailsHeaderButton = (props: DetailsProps) => {
     const navigate = useNavigate();
-    
+
     return (
       <Grid container>
           <Grid item xs={6}>
