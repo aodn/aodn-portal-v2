@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { MediaType } from 'media-typer';
 import axios from 'axios';
 import {ParameterState} from "./componentParamReducer";
-import {cqlDefaultFilters, IntersectPolygon, TemporalAfterOrBefore, TemporalDuring} from "../cqlFilters";
+import {cqlDefaultFilters, PolygonOperation, TemporalAfterOrBefore, TemporalDuring} from "../cqlFilters";
 
 interface Link {
     href: string,
@@ -151,18 +151,26 @@ const createSearchParamFrom = (i: ParameterState) : SearchParameters => {
     }
 
     if(i.polygon) {
-        const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as IntersectPolygon;
+        const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
         p.filter = appendFilter(p.filter, f(i.polygon));
     }
 
     return p;
 }
 
+const createSearchParamForImosRealTime = () => {
+    const p: SearchParameters = {};
+    p.filter = cqlDefaultFilters.get('REAL_TIME_ONLY') as string;
+
+    return p;
+}
+
 export {
     createSearchParamFrom,
+    createSearchParamForImosRealTime,
     fetchResultWithStore,
     fetchResultNoStore,
-    fetchResultByUuidNoStore
+    fetchResultByUuidNoStore,
 }
 
 export default searcher.reducer;

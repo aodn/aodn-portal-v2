@@ -14,7 +14,8 @@ export const CARD_ID = {
     OCEAN_BIOTA: 9,
     EXPLORER_ON_MAP: 10,
     FISHERY: 11,
-    TOURISM: 12
+    TOURISM: 12,
+    REAL_TIME: 3
 }
 
 interface ShortCutSmartPanelProps {
@@ -29,7 +30,7 @@ const ShortCutSmartPanel = (props: ShortCutSmartPanelProps) => {
         <ComplexSmartPanel>
             <SmartCard21 caption='Get started' imageUrl='/smartcard/getstarted.png' onCardClicked={(e) => props.onCardClicked && props.onCardClicked(CARD_ID.GET_START, e)}/>
             <SmartCard22 caption='Surface Waves' imageUrl='/smartcard/wave.png' onCardClicked={(e) => props.onCardClicked && props.onCardClicked(CARD_ID.SURFACE_WAVES, e)}/>
-            <SmartCard11 caption='Satellite' imageUrl='/smartcard/satellite.png' onCardClicked={(e) => props.onCardClicked && props.onCardClicked(CARD_ID.SATELLITE, e)}/>
+            <SmartCard11 caption='Real-time' imageUrl='/smartcard/satellite.png' onCardClicked={(e) => props.onCardClicked && props.onCardClicked(CARD_ID.REAL_TIME, e)}/>
             <SmartCard11 caption='Reef' imageUrl='/smartcard/reef.png' onCardClicked={(e) => props.onCardClicked && props.onCardClicked(CARD_ID.REEF, e)}/>
             <SmartCard11 caption='Location' imageUrl='/smartcard/location.png' onCardClicked={(e) => props.onCardClicked && props.onCardClicked(CARD_ID.LOCATION, e)}/>
             <SmartCard21 caption='Advanced Search' imageUrl='/smartcard/advancedSearch.png' onCardClicked={(e) => props.onCardClicked && props.onCardClicked(CARD_ID.ADVANCED_SEARCH, e)}/>

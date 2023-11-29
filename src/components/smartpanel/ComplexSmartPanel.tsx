@@ -1,6 +1,9 @@
 import * as React from 'react';
-import {Grid, Box, Divider, SxProps, Theme} from '@mui/material';
+import {Grid, Box, Divider, SxProps, Theme, IconButton} from '@mui/material';
 import {margin} from "../common/constants";
+import {useCallback, useRef} from "react";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 interface ComplexSmartPanelProps {
     columns? :number,
@@ -12,6 +15,13 @@ interface ComplexSmartPanelProps {
 };
 
 const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProps>) => {
+    const boxRef = useRef<HTMLDivElement>(null);
+
+    const scroll = useCallback((scrollOffset : number) => {
+        if(boxRef && boxRef.current) {
+            boxRef.current.scrollLeft += scrollOffset;
+        }
+    },[boxRef]);
 
     return (
         <Grid container>
@@ -24,12 +34,16 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProp
                     // The minWidth may need to calculate instead of hardcode
                 }
                 <Grid container justifyContent='center'>
+                    <IconButton
+                        onClick={() => scroll(-50)}
+                        sx={{ "&:hover": { background: "none" } }}
+                    >
+                        <ArrowLeftIcon sx={{ height: 38, width: 38 }} />
+                    </IconButton>
                     <Grid item xs={props.gridColumns}>
                         <Box
-                            sx ={{
-                                overflowX: 'hidden',
-                                overflowY: 'hidden'
-                            }}
+                            ref={boxRef}
+                            sx ={{ overflow: 'hidden' }}
                         >
                             <Box
                                 display='grid'
@@ -45,6 +59,12 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProp
                             </Box>
                         </Box>
                     </Grid>
+                    <IconButton
+                        onClick={() => scroll(50)}
+                        sx={{ "&:hover": { background: "none" } }}
+                    >
+                        <ArrowRightIcon sx={{ height: 38, width: 38 }}/>
+                    </IconButton>
                     {props.bottomDivider &&
                       <Grid item xs={8}>
                         <Divider sx={{ borderBottomWidth: 5 }}/>
