@@ -36,7 +36,9 @@ const funcIntersectPolygon : PolygonOperation = (p)=> {
 const funcTemporalBetween : TemporalDuring = (s: number, e: number) =>
     `temporal DURING ${dayjs(s).format(dateDefault['DATE_TIME_FORMAT'])}/${dayjs(e).format(dateDefault['DATE_TIME_FORMAT'])}`;
 
-
+/**
+ * Keep all cql query here, otherwise it will be very hard to manage
+ */
 const cqlDefaultFilters = new Map<string, FilterTypes>();
 cqlDefaultFilters
     .set('IMOS_ONLY', 'dataset_provider=\'IMOS\'')
