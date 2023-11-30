@@ -5,12 +5,12 @@ import { border, borderRadius} from '../constants';
 import RoundSelect from '../dropdown/RoundSelect';
 import ClearIcon from '@mui/icons-material/Clear';
 
-interface RemovableFilterProps {
+interface RemovableParameterFilterProps {
     title: string,
     url: string
 };
 
-const RemovableFilter = (props: RemovableFilterProps) => {
+const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
     return (
         <Grid 
             container 
@@ -35,7 +35,7 @@ const RemovableFilter = (props: RemovableFilterProps) => {
                     component="img"
                     src={props.url}
                 />
-                </Grid>
+            </Grid>
             <Grid item xs={2}
                 sx={{
                     display: 'inline-block',
@@ -111,4 +111,4 @@ const RemovableFilter = (props: RemovableFilterProps) => {
     );
 };
 
-export default RemovableFilter;
+export default RemovableParameterFilter;

@@ -10,10 +10,11 @@ import RoundSelect from "../dropdown/RoundSelect";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface ResultPanelSimpleFilterProps {
-    filterClicked: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    filterClicked?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilterProps) => {
+
     return(
         <Grid container>
             <Grid item
@@ -21,7 +22,7 @@ const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilterProps) => {
                   sx={{
                       marginTop: margin['top'],
                   }}>
-                <Grid container justifyContent='center' columns={11} gap={1 }>
+                <Grid container justifyContent='center' columns={11} gap={1}>
                     <Grid item xs='auto'>
                         <SlightRoundButton
                             startIcon={<PlayArrowIcon/>}

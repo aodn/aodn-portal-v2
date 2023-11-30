@@ -1,11 +1,11 @@
 import React from "react";
 import { List, ListItem, ListItemText, ListItemSecondaryAction, IconButton } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
-import { StacCollection } from "../../../common/store/searchReducer";
+import { OGCCollection } from "../../../common/store/searchReducer";
 
 interface ItemsOnMapControlProps {
     // Contain UUID and its description for each item
-    stac: Array<StacCollection>;
+    stac: Array<OGCCollection>;
 }
 
 const itemId = 'display-items-on-map';
@@ -31,7 +31,7 @@ const ItemsOnMapControl = (props: ItemsOnMapControlProps) => {
             sx={{ width: '100%', bgcolor: 'background.paper' }}>
             {
                 props.stac.map((i) => {
-                    return createListItem(i.id, i.description);
+                    return i.description !== undefined && createListItem(i.id, i.description);
                 })
             }
         </List>

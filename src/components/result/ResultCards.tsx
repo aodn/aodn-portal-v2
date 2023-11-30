@@ -1,31 +1,32 @@
 import React from 'react'
 import grey from "../common/colors/grey";
 import {Card, CardContent, CardMedia, Grid, Typography, CardActionArea, CardActions, ListItem} from "@mui/material";
-import {borderRadius, border} from "../common/constants";
+import {borderRadius, border, pageDefault} from "../common/constants";
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import DownloadIcon from '@mui/icons-material/Download';
 import SellIcon from '@mui/icons-material/Sell';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SlightRoundButton from '../common/buttons/SlightRoundButton';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
-import { useSelector } from 'react-redux/es/hooks/useSelector';
-import { StacCollection, StacCollections } from '../common/store/searchReducer';
-import { RootState, searchQueryResult } from "../common/store/store";
+import { OGCCollection, CollectionsQueryType } from '../common/store/searchReducer';
+import {stringToColor} from "../common/colors/colorsUtils";
+import {useNavigate} from "react-router-dom";
 
 interface ResultCardProps {
     item: number,
-    content : StacCollection,
-    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
-    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
-    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
-    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined,
+    content : OGCCollection,
+    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined,
+    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined,
+    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined,
+    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined,
 }
 
-const findThumbnail = (c : StacCollection) : string => {
+const findThumbnail = (c : OGCCollection) : string => {
     return 'https://warcontent.com/wp-content/uploads/2021/03/substring-javascript-5.png'
 }
 
 const ResultCard = (props: ResultCardProps) => {
+    const navigate = useNavigate();
 
     return(
         <Card sx={{
@@ -33,17 +34,20 @@ const ResultCard = (props: ResultCardProps) => {
             borderRadius: borderRadius['filter'],
             backgroundColor: grey['resultCard']
         }}>
-            <CardActionArea>
+            <CardActionArea onClick={
+                (e) =>
+                    navigate(pageDefault.details, {state:{uuid: props.content.id}})}
+            >
                 <CardContent>
                     <Typography component="div" sx={{ marginBottom: '10px'}}>
                         <Grid container>
-                            <Grid item xs={11}>{props.content.title.substring(0, 90) + '...'}</Grid>
+                            <Grid item xs={11}>{props.content.title?.substring(0, 90) + '...'}</Grid>
                             <Grid item xs={1}>
                                 <div 
                                     style={{
                                         textAlign: 'center',
-                                        color: 'white',
-                                        backgroundColor: grey['resultCardNumber'],
+                                        color: 'black',
+                                        backgroundColor: stringToColor(props.content.id),
                                         border: border['frameBorder'],
                                         borderRadius: borderRadius['circle'],
                                     }}>
@@ -61,7 +65,7 @@ const ResultCard = (props: ResultCardProps) => {
                                     image={findThumbnail(props.content)} />
                             </Grid>
                             <Grid item xs={9}>
-                                {props.content.description.substring(0, 180) + '...'}
+                                {props.content.description?.substring(0, 180) + '...'}
                             </Grid>
                         </Grid>                    
                     </Typography>
@@ -106,14 +110,15 @@ const ResultCard = (props: ResultCardProps) => {
 };
 
 interface ResultCardsProps {
-    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
-    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
-    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
-    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => void) | undefined;
+    contents: CollectionsQueryType,
+    onAddToMap: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
+    onDownload: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
+    onTags: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
+    onMore: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => void) | undefined;
 }
 
 // This function is use to control which item to render in the long list
-const renderRows = (props: ResultCardsProps, contents: StacCollections, child: ListChildComponentProps) => {
+const renderRows = (props: ResultCardsProps, child: ListChildComponentProps) => {
 
     // The style must pass to the listitem else incorrect rendering
     const { index, style } = child;
@@ -122,7 +127,7 @@ const renderRows = (props: ResultCardsProps, contents: StacCollections, child: L
         <ListItem style={style}>
             <ResultCard
                 item={index + 1}
-                content={contents.collections[index]}
+                content={props.contents.result.collections[index]}
                 onAddToMap={props.onAddToMap}
                 onDownload={props.onDownload}
                 onTags={props.onTags}
@@ -133,17 +138,15 @@ const renderRows = (props: ResultCardsProps, contents: StacCollections, child: L
 } 
 const ResultCards = (props: ResultCardsProps) => {
 
-    const contents = useSelector<RootState, StacCollections>(searchQueryResult);
-    console.log(contents);
     return(
         <FixedSizeList
             height={700}
             width={"100%"}
             itemSize={270}
-            itemCount={contents.collections.length}
+            itemCount={props.contents.result.collections.length}
             overscanCount={10}
         >
-            {(child: ListChildComponentProps) => renderRows(props, contents, child)}
+            {(child: ListChildComponentProps) => renderRows(props, child)}
         </FixedSizeList>
     );
 };

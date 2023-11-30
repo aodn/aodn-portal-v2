@@ -8,7 +8,7 @@ interface ScaleControlProps {
     unit?: Unit;
 }
 
-const ScaleControl = (props: ScaleControlProps) => {
+const ScaleControl = ({maxWidth, unit}: ScaleControlProps) => {
  
     const { map } = useContext(MapContext);  
 
@@ -16,8 +16,8 @@ const ScaleControl = (props: ScaleControlProps) => {
         if(!map) return;
 
         const scale = new maplibregl.ScaleControl({
-            maxWidth: props.maxWidth,
-            unit: props.unit
+            maxWidth: maxWidth,
+            unit: unit
         });
 
         map.addControl(scale);
@@ -26,7 +26,7 @@ const ScaleControl = (props: ScaleControlProps) => {
             map.removeControl(scale);
         }
 
-    }, [map, props.maxWidth, props.unit]);
+    }, [map, maxWidth, unit]);
 
     return (<React.Fragment/>);
 }

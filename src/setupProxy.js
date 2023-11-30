@@ -12,7 +12,7 @@ const {createProxyMiddleware} = require("http-proxy-middleware")
 module.exports = function(app) {
     app.use(
       createProxyMiddleware(
-        ['/collections','/tiles'],
+        ['/api/v1/ogc/collections','/api/v1/ogc/tiles'],
         {
           target: process.env.REACT_APP_API_HOST,
           changeOrigin: true,

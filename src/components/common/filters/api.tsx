@@ -1,3 +1,4 @@
+import {OGCCollections} from "../store/searchReducer";
 
 export interface FilterGroup {
     name: string
@@ -73,6 +74,34 @@ const getAllFilters = () : Array<FilterGroup> => {
     ];
 }
 
+/**
+ * Find the smallest day among the stacs record
+ * TODO: Need auto test
+ * @param stacs
+ */
+const findSmallestDate = (stacs : OGCCollections) : Date | null | undefined => {
+    return stacs.collections
+        .map<Date | null | undefined>(value =>
+            // flatten the start date in the array and then get the smallest
+            // start date within the same stac
+            value
+                ?.extent
+                ?.temporal
+                ?.interval
+                ?.flatMap<Date | null>(m => m[0] ? new Date(m[0]) : null)
+                .reduce((a,b) => a !== null && b !== null && a < b ? a : b)
+        )
+        // Remove all null and undefined
+        .filter(f => f !== null && f !== undefined)
+        // find the smallest among all the stacs
+        .reduce((a, b) => a && b && a < b ? a : b);
+}
+
+const isDateWithin = (target: number, min: number, max: number) =>
+    min >= target && target <= max;
+
 export {
+    findSmallestDate,
     getAllFilters,
+    isDateWithin,
 }

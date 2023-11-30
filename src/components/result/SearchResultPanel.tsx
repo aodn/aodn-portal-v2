@@ -6,38 +6,74 @@ import Controls from "../map/maplibre/controls/Controls";
 import NavigationControl from "../map/maplibre/controls/NavigationControl";
 import ScaleControl from "../map/maplibre/controls/ScaleControl";
 import {ResultCards} from "./ResultCards";
-import ComplexListFilter from '../common/filters/ComplexListFilter';
 import DisplayCoordinate from '../map/maplibre/controls/DisplayCoordinate';
 import MapboxDrawControl from '../map/maplibre/controls/MapboxDrawControl';
 import Layers from '../map/maplibre/layers/Layers';
 import VectorTileLayers from '../map/maplibre/layers/VectorTileLayers';
-import LocateControl from '../map/maplibre/controls/LocateControl';
 import ItemsOnMapControl from '../map/maplibre/controls/ItemsOnMapControl';
-import { StacCollection } from '../common/store/searchReducer';
+import {
+    CollectionsQueryType,
+    createSearchParamFrom,
+    fetchResultWithStore,
+    OGCCollection
+} from '../common/store/searchReducer';
+import {useSelector} from "react-redux/es/hooks/useSelector";
+import store, {AppDispatch, getComponentState, RootState, searchQueryResult} from "../common/store/store";
+import {MapLibreEvent} from "maplibre-gl";
+import * as turf from '@turf/turf';
+import {useDispatch} from "react-redux";
+import {ParameterState, updateFilterPolygon} from "../common/store/componentParamReducer";
+import {useNavigate} from "react-router-dom";
 
 interface SearchResultPanelProps {
-    showMap?: boolean
 }
 
 const mapPanelId = 'maplibre-panel-id';
 
 const SearchResultPanel = (props: SearchResultPanelProps) => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
 
-    const [layersUuid, setLayersUuid] = useState<Array<StacCollection>>([]);
+    const [layersUuid, setLayersUuid] = useState<Array<OGCCollection>>([]);
+    const contents = useSelector<RootState, CollectionsQueryType>(searchQueryResult);
 
-    const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => {
+    const onMapZoom = useCallback((event: MapLibreEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
+        if(event.type === 'zoomend') {
+            const bounds = event.target.getBounds();
+            const ne = bounds.getNorthEast(); // NorthEast corner
+            const sw = bounds.getSouthWest(); // SouthWest corner
+
+            // Note order: longitude, latitude.
+            const polygon = turf.bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat])
+            dispatch(updateFilterPolygon(polygon));
+
+            const componentParam : ParameterState = getComponentState(store.getState());
+            dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
+                .unwrap()
+                .then((collections) => {
+                    const ids = collections.collections.map(c => c.id);
+                    // remove map uuid not exist in the ids
+                    setLayersUuid(v =>
+                        v.filter(i => ids.includes(i.id))
+                    );
+                })
+                .then((v) => navigate('/search'));
+        }
+    }, [dispatch, navigate]);
+
+    const onAddToMap = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => {
         // Unique set of layers
-        const s = new Set<StacCollection>(layersUuid);
+        const s = new Set<OGCCollection>(layersUuid);
         s.add(stac);
         setLayersUuid(Array.from(s));
 
-    },[layersUuid]);
+    }, [layersUuid]);
 
-    const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: StacCollection) => {
+    const onDownload = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, stac: OGCCollection) => {
         //TODO: Add bounding box to map
-    },[]);
+    }, []);
 
-    return(
+    return (
         <Grid id={'search-result-panel'} container>
             <Grid item
                   xs={12}
@@ -45,63 +81,52 @@ const SearchResultPanel = (props: SearchResultPanelProps) => {
                       marginBottom: margin['bottom']
                   }}>
                 <Grid container id='search-result-center-panel' justifyContent='center'>
-                    <Grid item  xs={8}>
+                    <Grid item xs={11}>
                         <Box
                             display='grid'
                             minWidth='1200px'
-                            maxHeight='700px'
-                            marginTop={margin['tripleTop']}
+                            minHeight='700px'
                             marginBottom={margin['tripleBottom']}
-                            gridTemplateColumns={'repeat(5, 1fr)'}
+                            gridTemplateColumns={'repeat(6, 1fr)'}
                             gridTemplateRows={'repeat(1, 1fr)'}
                             gap={2}
                         >
-                            {!props.showMap &&
-                              <Box
-                                sx = {{
+                            <Box
+                                sx={{
                                     gridColumn: 'span 2',
                                     gridRow: 'span 1'
                                 }}>
-                                    <ComplexListFilter/>
-                              </Box>
-                            }
-                            <Box
-                                sx = {{
-                                    gridColumn: props.showMap? 'span 2' :'span 3',
-                                    gridRow: 'span 1'
-                                }}>
-                                <ResultCards 
+                                <ResultCards
+                                    contents={contents}
                                     onAddToMap={onAddToMap}
                                     onDownload={onDownload}
                                     onTags={undefined}
                                     onMore={undefined}
                                 />
                             </Box>
-                            {props.showMap &&
-                              <Box id={mapPanelId} sx={{
-                                  gridColumn: 'span 3',
-                                  gridRow: 'span 1',
-                                  border: border['frameBorder'],
-                                  borderRadius: borderRadius['filter']
-                              }}>
-                                <Map panelId={mapPanelId}>
-                                  <Controls>
-                                    <NavigationControl/>
-                                    <DisplayCoordinate/>
-                                    <ScaleControl/>
-                                    <LocateControl/>
-                                    <ItemsOnMapControl stac={layersUuid}/>
-                                    <MapboxDrawControl
-                                        onDrawCreate={undefined}
-                                        onDrawDelete={undefined}
-                                        onDrawUpdate={undefined}/>
-                                  </Controls>
-                                  <Layers>
-                                    <VectorTileLayers stac={layersUuid}/>
-                                  </Layers>
+                            <Box id={mapPanelId} sx={{
+                                gridColumn: 'span 4',
+                                gridRow: 'span 1',
+                                border: border['frameBorder'],
+                                marginTop: margin['top'],
+                                borderRadius: borderRadius['filter']
+                            }}>
+                                <Map panelId={mapPanelId} onZoomEvent={onMapZoom}>
+                                    <Controls>
+                                        <NavigationControl/>
+                                        <DisplayCoordinate/>
+                                        <ScaleControl/>
+                                        <ItemsOnMapControl stac={layersUuid}/>
+                                        <MapboxDrawControl
+                                            onDrawCreate={undefined}
+                                            onDrawDelete={undefined}
+                                            onDrawUpdate={undefined}/>
+                                    </Controls>
+                                    <Layers>
+                                        <VectorTileLayers stac={layersUuid}/>
+                                    </Layers>
                                 </Map>
-                              </Box>
-                            }
+                            </Box>
                         </Box>
                     </Grid>
                 </Grid>
