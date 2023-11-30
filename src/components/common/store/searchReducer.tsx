@@ -40,7 +40,7 @@ export interface FailedResponse {
 export type SearchParameters = {
     text?: string,
     filter?: string,
-    property?: string
+    properties?: string
 }
 
 export interface CollectionsQueryType {
@@ -69,7 +69,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
                 params: {
                     q: param.text !== undefined ? param.text : null,
                     filter: param.filter !== undefined ? param.filter : null,
-                    property: param.property !== undefined ? param.property : 'id,title,description'
+                    properties: param.properties !== undefined ? param.properties : 'id,title,description'
                 }
             }
         );

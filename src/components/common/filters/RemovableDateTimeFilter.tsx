@@ -165,14 +165,14 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
         // Find all collection
         dispatch(fetchResultNoStore({
-                property: 'id,temporal',
+                properties: 'id,temporal',
                 filter: `${cqlDefaultFilters.get('ALL_TIME_RANGE')}`
             }))
             .unwrap()
             .then((value => {
                 // Find all id of collection from imosOnly
                 dispatch(fetchResultNoStore({
-                    property: 'id,providers',
+                    properties: 'id,providers',
                     filter: `${cqlDefaultFilters.get('ALL_TIME_RANGE')} AND ${cqlDefaultFilters.get('IMOS_ONLY')}`
                 }))
                 .unwrap()
