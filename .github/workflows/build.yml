@@ -14,6 +14,7 @@ jobs:
       BUCKET: portal2.aodn.org.au
       DIST: build
       DIST_ID: EUL4XIP4OACLK
+      CI: ""
     permissions:
       contents: read
       id-token: write
