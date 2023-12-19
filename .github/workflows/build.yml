@@ -1,0 +1,47 @@
+name: Push build artifacts to S3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [build,main]
+
+jobs:
+  dev-build:
+    name: Push build artifacts to S3
+    runs-on: ubuntu-latest
+    env:
+      AWS_ROLE_TO_ASSUME: arn:aws:iam::704910415367:role/S3-FullAccess-portal2.aodn.org.au
+      BUCKET: portal2.aodn.org.au
+      DIST: build
+      DIST_ID: EUL4XIP4OACLK
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ap-southeast-2
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+
+      - name: Install Dependencies
+        run: |
+          node --version
+          npm ci --production
+
+      - name: Build Static Website
+        run: npm run build
+
+      - name: Copy files to the production website with the AWS CLI
+        run: |
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ env.BUCKET }} --region ap-southeast-2
+
+      - name: Copy files to the production website with the AWS CLI
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id ${{ env.DIST_ID }} \
+          --paths "/*" \
+          --region us-east-1
