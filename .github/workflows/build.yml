@@ -39,7 +39,7 @@ jobs:
         run: |
           aws s3 sync --delete ${{ env.DIST }} s3://${{ env.BUCKET }} --region ap-southeast-2
 
-      - name: Copy files to the production website with the AWS CLI
+      - name: Clear cloudfront cache
         run: |
           aws cloudfront create-invalidation \
           --distribution-id ${{ env.DIST_ID }} \
