@@ -10,7 +10,7 @@ jobs:
     name: Push build artifacts to S3
     runs-on: ubuntu-latest
     env:
-      AWS_ROLE_TO_ASSUME: arn:aws:iam::704910415367:role/S3-FullAccess-portal2.aodn.org.au
+      AWS_ROLE_TO_ASSUME: arn:aws:iam::704910415367:role/aodn-portal-v2
       BUCKET: portal2.aodn.org.au
       DIST: build
       DIST_ID: EUL4XIP4OACLK
