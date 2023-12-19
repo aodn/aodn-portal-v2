@@ -36,6 +36,7 @@ jobs:
   dev-push:
     name: Publish app
     runs-on: ubuntu-latest
+    needs: dev-build
     env:
       AWS_ROLE_TO_ASSUME: arn:aws:iam::704910415367:role/aodn-portal-v2
       BUCKET: portal2.aodn.org.au
