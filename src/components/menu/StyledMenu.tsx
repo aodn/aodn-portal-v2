@@ -100,7 +100,9 @@ const StyledButton = (menuItem: StyledMenuItem) => {
             >
                 {menuItem.items.map(value => {
                     return (
-                        <MenuItem onClick={(event) => {
+                        <MenuItem 
+                        key={value.name}
+                        onClick={(event) => {
                             value.handler(event);
                         }}
                                   disableRipple>

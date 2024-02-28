@@ -14,7 +14,7 @@ module.exports = function(app) {
       createProxyMiddleware(
         ['/api/v1/ogc/collections','/api/v1/ogc/tiles'],
         {
-          target: process.env.REACT_APP_API_HOST,
+          target: import.meta.env.VITE_API_HOST,
           changeOrigin: true,
         })
     );

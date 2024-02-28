@@ -38,6 +38,7 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
             >
                 <Grid item xs={props.gridColumn}>
                     <Grid container
+                          item
                           xs={12}
                           sx = {{
                               backgroundImage: 'url(/filters/Background.png)',

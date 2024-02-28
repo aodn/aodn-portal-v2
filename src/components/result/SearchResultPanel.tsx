@@ -17,7 +17,7 @@ import {
     fetchResultWithStore,
     OGCCollection
 } from '../common/store/searchReducer';
-import {useSelector} from "react-redux/es/hooks/useSelector";
+import {useSelector} from "react-redux";
 import store, {AppDispatch, getComponentState, RootState, searchQueryResult} from "../common/store/store";
 import {MapLibreEvent} from "maplibre-gl";
 import * as turf from '@turf/turf';
