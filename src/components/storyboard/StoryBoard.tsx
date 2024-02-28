@@ -49,7 +49,7 @@ const StoryBoard = (props: StoryBoardProps) => {
                         {props.buttons &&
                             props.buttons?.map((button) => {
                                 return (
-                                    <Grid item xs='auto'>
+                                    <Grid key={button.label} item xs='auto'>
                                         <RoundButton variant="outlined" size="small" onClick={button.onClick}>{button.label}</RoundButton>
                                     </Grid>
                                 );
