@@ -1,12 +1,11 @@
-import * as React from 'react';
 import {
   Box,
   Container,
-  Typography,
-  Link,
-  List,
   Grid,
   IconButton,
+  Link,
+  List,
+  Typography,
 } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -57,6 +56,7 @@ const Footer = () => {
             <Typography variant="h6" padding="10px 0 0 0">
               Data
             </Typography>
+            {/* This is where the menu items/links for 'Data' will go */}
             <Typography variant="body1">
               <Link color="#F4F5F6" href="#">
                 Link 1
@@ -77,6 +77,7 @@ const Footer = () => {
             <Typography variant="h6" padding="10px 0 0 0">
               Learn
             </Typography>
+            {/* This is where the menu items/links for 'Learn' will go */}
             <Typography variant="body1">
               <Link color="#F4F5F6" href="#">
                 Link 1
