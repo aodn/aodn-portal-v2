@@ -20,17 +20,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Yarn
-        run: npm install -g yarn
-
-      - name: Install Vite
-        run: yarn global add vite
-
       - name: Install Dependencies
-        run: yarn install
+        run: |
+          node --version
+          npm ci --include=dev
 
-      - name: Build Website
-        run: yarn build
+      - name: Build Static Website
+        run: npm run build
 
       - uses: actions/upload-artifact@v4
         with:
