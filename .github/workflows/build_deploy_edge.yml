@@ -23,11 +23,11 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 21
-          cache: 'npm'
+      # - name: Set up Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 21
+      #     cache: 'npm'
 
       - name: Install Dependencies
         run: |
