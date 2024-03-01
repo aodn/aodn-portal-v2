@@ -1,0 +1,81 @@
+name: Build/Deploy Edge
+
+on:
+  push:
+    branches:
+      - 5319-cicd
+    paths-ignore:
+      - '**/*.md'
+      - '.github/environment/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build_push:
+    runs-on: ubuntu-latest
+    environment: central
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: |
+            node --version
+            npm ci --production
+
+      - name: Build Static Website
+        run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+            name: build
+            path: build
+            retention-days: 1
+
+      - name: Configure AWS credentials
+        id: aws_auth
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+  edge_deploy:
+    environment: edge
+    runs-on: ubuntu-latest
+    needs: build_push
+    env:
+      DIST: build
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build
+
+      - name: Retrieve Parameters - ssm parameter store
+        id: getParameters
+        run: |
+          # Replace '--path' with your specific path from Parameter Store
+          bucket=$(aws ssm get-parameter --name "/core/aodn-portal-v2/edge-bucket" --query 'Parameter.Value' --output text)
+          distribution_id=$(aws ssm get-parameter --name "/core/aodn-portal-v2/edge-cloudfront-distribution-id" --query 'Parameter.Value' --output text)
+          echo "BUCKET=$bucket" >> "$GITHUB_ENV"
+          echo "DISTRIBUTION_ID=$distribution_id" >> "$GITHUB_ENV"
+  
+      - name: Copy files to the production website with the AWS CLI
+        run: |
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ env.BUCKET }} --region ${{ vars.AWS_REGION }}
+
+      - name: Clear cloudfront cache
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id ${{ env.DISTRIBUTION_ID }} \
+          --paths "/*" \
+          --region ${{ vars.AWS_REGION }}
