@@ -22,5 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+<<<<<<< HEAD
 *.lock
 *.env
+=======
+*.lock 
+
+.env
+>>>>>>> 5df780312fc64a7dd03fa35e37c19026f31fe66b
