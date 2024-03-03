@@ -9,13 +9,11 @@ import * as proxy from 'http-proxy-middleware';
  *
  * @param app
  */
-module.exports = function(app) {
-    app.use(
-      proxy(
-        ['/api/v1/ogc/collections','/api/v1/ogc/tiles'],
-        {
-          target: import.meta.env.VITE_API_HOST,
-          changeOrigin: true,
-        })
-    );
-}
+module.exports = function (app) {
+  app.use(
+    proxy(['/api/v1/ogc/collections', '/api/v1/ogc/tiles'], {
+      target: import.meta.env.VITE_API_HOST,
+      changeOrigin: true,
+    })
+  );
+};
