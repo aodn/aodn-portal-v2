@@ -1,27 +1,27 @@
 import * as React from 'react';
-import {Box, Card, CardActionArea, CardMedia} from '@mui/material';
-import {border} from '../common/constants';
+import {Box, Card, CardActionArea, CardMedia, Typography} from '@mui/material';
 
 enum CardType {
     OneOnOne,
     TwoOnOne,
     TwoOnTwo,
     ThreeOnTwo
-};
+}
 
 interface SmartcardProps {
     imageUrl: string,
     caption: string,
+    underline?: string,
     card? : CardType,
     onCardClicked? : (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLAnchorElement>) => void;
-};
+}
 
 const getPreferDimension = (type: CardType | undefined) => {
     switch (type) {
         case CardType.TwoOnTwo:
-            return {cardHeight: '200px', imgWidth: '100%', imgHeight: '120px'};
+            return {cardHeight: '240px', imgWidth: '100%', imgHeight: '120px'};
         case CardType.TwoOnOne:
-            return {cardHeight: '90px', imgWidth: '100%', imgHeight: '80px'};
+            return {cardHeight: '100px', imgWidth: '100%', imgHeight: '100px'};
         default:
             return {cardHeight: '90px', imgWidth: '60px', imgHeight: '60px'};
     }
@@ -30,18 +30,19 @@ const getPreferDimension = (type: CardType | undefined) => {
 const SmartCardContent = (props: SmartcardProps) => {
     const t = props.card;
     const dimension = getPreferDimension(t);
+    const isLittleCard = t == CardType.OneOnOne;
 
     return(
-        <Card sx={{
-                maxHeight: dimension.cardHeight
+        <Card elevation={isLittleCard ? 0 : 1} sx={{
+                maxHeight: dimension.cardHeight,
+                backgroundColor: 'transparent',
+                border: !isLittleCard ? "1px solid #FFFFFF" : "none",
+                padding: isLittleCard ? '12px' : '0',
             }}>
             <CardActionArea
-                sx={{
-                    border: border['frameBorder']
-                }}
                 onClick={(event) => props.onCardClicked && props.onCardClicked(event)}
             >
-                {props?.imageUrl &&
+                {props?.imageUrl ?
                   <>
                     <CardMedia
                         component='img'
@@ -71,7 +72,7 @@ const SmartCardContent = (props: SmartcardProps) => {
                               color: 'white',
                               fontSize: 'x-large',
                               fontWeight: 'bold',
-                              bottom: '40%'
+                              bottom: '40%',
                           }}>
                             {props.caption}
                         </div>
@@ -79,7 +80,35 @@ const SmartCardContent = (props: SmartcardProps) => {
                       {props.card === CardType.OneOnOne &&
                           <div style={{
                               justifyContent: 'center',
-                              display: 'flex'
+                              display: 'flex',
+                          }}>
+                              {props.caption}
+                          </div>
+                      }
+                  </>
+                  :
+                  <>
+                  {(props.card === CardType.TwoOnOne || props.card === CardType.TwoOnTwo) &&
+                        <div
+                          style={{
+                              position: "absolute",
+                              marginLeft: 'auto',
+                              marginRight: 'auto',
+                              left: 0,
+                              right: 0,
+                              textAlign: 'center',
+                              color: 'white',
+                              fontSize: 'x-large',
+                              fontWeight: 'bold',
+                              bottom: '40%',
+                          }}>
+                            {props.caption}
+                        </div>
+                      }
+                      {props.card === CardType.OneOnOne &&
+                          <div style={{
+                              justifyContent: 'center',
+                              display: 'flex',
                           }}>
                               {props.caption}
                           </div>
@@ -87,6 +116,11 @@ const SmartCardContent = (props: SmartcardProps) => {
                   </>
                 }
             </CardActionArea>
+            {props.underline && 
+                    <Box sx={{paddingY: 2}}>
+                    <Typography variant="subtitle1">{props.underline}</Typography>
+                    </Box>
+                }
         </Card>
     );
 }
@@ -104,7 +138,7 @@ const SmartCard21 = (props: SmartcardProps) => {
         <Box
             sx = {{
                 gridColumn: 'span 2',
-                gridRow: 'span 1'
+                gridRow: 'span 1',
             }}
         >
             <SmartCardContent {...p}/>

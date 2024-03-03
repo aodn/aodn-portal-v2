@@ -12,7 +12,7 @@ interface ComplexSmartPanelProps {
     bottomDivider? : boolean,
     gridColumns: number,
     sx?: SxProps<Theme>
-};
+}
 
 const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProps>) => {
     const boxRef = useRef<HTMLDivElement>(null);
@@ -24,7 +24,7 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProp
     },[boxRef]);
 
     return (
-        <Grid container>
+        <Grid container sx={{pb: 6}}>
             <Grid item xs={12}>
                 {
                     // Create a container inside the item which occupy all area, then
@@ -52,7 +52,7 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProp
                                 marginBottom={margin['tripleBottom']}
                                 gridTemplateColumns={'repeat(' + props.columns + ', 1fr)'}
                                 gridTemplateRows={'repeat(' + props.rows + ', ' + props.height + ')'}
-                                gap={2}
+                                gap={3}
                                 sx={props.sx}
                             >
                                 {props.children}

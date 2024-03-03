@@ -1,11 +1,9 @@
 import React, { useCallback } from 'react';
-import {Grid, InputAdornment, Button} from '@mui/material';
+import {Grid, Button, Paper, InputBase, IconButton, Divider} from '@mui/material';
 import  { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import grey from '../common/colors/grey';
 import {Tune} from "@mui/icons-material";
-import {margin} from '../common/constants';
-import StyledTextField from "./StyledTextField";
 import { useDispatch } from 'react-redux'
 import {createSearchParamFrom, fetchResultWithStore} from '../common/store/searchReducer';
 import store, {AppDispatch, getComponentState} from "../common/store/store";
@@ -15,44 +13,24 @@ import {ParameterState, updateSearchText} from "../common/store/componentParamRe
 
 export interface ComplexTextSearchProps {
     onFilterCallback: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, show: boolean) => void | null;
-};
-
-const getEndAdornment = (onFilterShowHide: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>) => void | null) =>
-
-    <InputAdornment position='end'>
-        <Button
-            variant="outlined"
-            sx={{
-                color: grey["searchButtonText"],
-                borderColor: grey["searchButtonText"]
-            }}
-            startIcon={<Tune/>}
-            onClick={(e) => {
-                onFilterShowHide(e);
-            }}
-        >
-            Filters
-        </Button>
-    </InputAdornment>
+}
 
 /**
  * Put it here to avoid refresh the function every time the component is rendered
  * @param handler 
  * @returns 
  */
-const searchButton = (handler: any) => {
+const searchButton = (handler: () => void) => {
 
-    return(<Button
+    return(<Button        
         sx={{
             color: grey["searchButtonText"],
-            backgroundColor: grey["search"],
+            backgroundColor: 'white',
             height: '100%',
-            borderColor: 'white',
-            borderSize: '5px',
             minWidth: '150px'
         }}
-        onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-            return handler(event);
+        onClick={() => {
+            return handler();
         }}
     >
         Search
@@ -67,13 +45,13 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
     const [showFilters, setShowFilters] = React.useState<boolean>(false);
     const [searchText, setSearchText] = React.useState<string>('');
 
-    const onSearchClick = useCallback((event : React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const onSearchClick = useCallback(() => {
         dispatch(updateSearchText(searchText + ''));
 
         const componentParam : ParameterState = getComponentState(store.getState());
         dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
             .unwrap()
-            .then((v) => navigate('/search'));
+            .then(() => navigate('/search'));
 
     },[dispatch, navigate, searchText]);
 
@@ -90,7 +68,7 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
                 <RemovableFilters
                     showFilters={showFilters}
                     onFilterShowHide={onFilterShowHide}
-                    onExpandAllFilters={(e) => setToggleRemovableFilter(false)}
+                    onExpandAllFilters={() => setToggleRemovableFilter(false)}
                 />
             );
         }
@@ -108,25 +86,39 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
             <Grid item
                   xs={12}
                   sx={{
-                      marginTop: margin['top'],
-                      marginBottom: margin['bottom']
-                  }}>
+                    marginTop: 8,
+                      marginBottom: 12
+                  }}
+                  >
                 <Grid container justifyContent={'center'} spacing={2}>
                     <Grid item xs={7}>
-                        <StyledTextField
-                            id="outlined-search"
-                            label="Search for open data"
-                            type="search"
-                            value={searchText}
-                            InputProps={{
-                                style: {color: 'white'},
-                                startAdornment: (<InputAdornment position='start'><SearchIcon/></InputAdornment>),
-                                endAdornment: getEndAdornment(onFilterShowHide)
-                            }}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setSearchText(event.target.value);
-                            }}
-                        />
+                        <Paper component="form" sx={{marginInlineStart: 2, p: '2px 4px', display: 'flex', alignItems: 'center'}}>
+                            <IconButton sx={{ p: '10px' }} aria-label="search">
+                                <SearchIcon />
+                            </IconButton>
+                            <InputBase
+                                sx={{ ml: 1, flex: 1 }}
+                                placeholder="Search for open data"
+                                inputProps={{ 'aria-label': 'Search for open data' }}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                    setSearchText(event.target.value);
+                                }}
+                            />
+                            <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                            <Button
+                                variant="text"
+                                sx={{
+                                    color: grey["searchButtonText"],
+                                    pr: 1
+                                }}
+                                startIcon={<Tune/>}
+                                onClick={(e) => {
+                                    onFilterShowHide(e);
+                                }}
+                            >
+                                Filters
+                            </Button>
+                        </Paper>
                     </Grid>
                     <Grid item>{searchButton(onSearchClick)}</Grid>
                 </Grid>

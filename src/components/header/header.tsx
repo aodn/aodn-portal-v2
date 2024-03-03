@@ -40,6 +40,7 @@ const Header = () => {
                 textAlign="left"
                 fontWeight="300"
                 padding="10px"
+                lineHeight="1.2"
               >
                 Australian Ocean <br />
                 Data Network

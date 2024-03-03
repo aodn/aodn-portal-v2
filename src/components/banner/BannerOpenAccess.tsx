@@ -1,5 +1,4 @@
-import * as React from 'react';
-import {Grid} from '@mui/material';
+import {Grid, Typography} from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 
 interface BannerProps {
@@ -20,12 +19,22 @@ const BannerOpenAccess = (props : BannerProps) => {
                         <Grid xs={7} item>&nbsp;</Grid>
                         <Grid
                             item
-                            xs={4} sx={{
+                            xs={4}>
+                            <Typography
+                            sx={{
                                 fontSize: '70px',
                                 color: 'white',
-                                textShadow: '3px 3px lightgrey'
-                            }}>
-                            Open Access to Ocean Data
+                                textAlign: 'left',                      
+                            }}
+                            variant='h1'
+                            >Open Access to Ocean Data</Typography> 
+                            <Typography
+                                 sx={{
+                                     color: 'white',
+                                     textAlign: 'left',                      
+                                 }}>
+                                The gateway to Australian marine and climate science data
+                            </Typography>                               
                         </Grid>
                     </Grid>
                 </Grid>

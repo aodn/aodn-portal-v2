@@ -1,10 +1,10 @@
 import * as React from 'react';
 import {styled, alpha} from '@mui/material/styles';
 import Menu, {MenuProps} from '@mui/material/Menu';
-import {Button, ButtonProps, MenuItem} from "@mui/material";
+import {Button, MenuItem} from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import './MainMenu.module.css';
-import grey from '../common/colors/grey';
+//import grey from '../common/colors/grey';
 
 type StyledMenuItem = {
     name: string;
@@ -14,13 +14,13 @@ type StyledMenuItem = {
     }]
 };
 
-const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
-    color: theme.palette.getContrastText(grey['menu']),
-    backgroundColor: grey['menu'],
-    '&:hover': {
-        backgroundColor: grey['menu'],
-    },
-}));
+// const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
+//     color: theme.palette.getContrastText(grey['menu']),
+//     backgroundColor: grey['menu'],
+//     '&:hover': {
+//         backgroundColor: grey['menu'],
+//     },
+// }));
 
 const StyledMenu = styled((props: MenuProps) => (
     <Menu
@@ -77,18 +77,17 @@ const StyledButton = (menuItem: StyledMenuItem) => {
 
     return (
         <>
-            <ColorButton
+            <Button
                 id="styled-menu-button"
                 aria-controls={open ? 'styled-menu-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
-                variant="contained"
                 disableElevation
                 onClick={handleClick}
                 endIcon={<KeyboardArrowDownIcon/>}
             >
                 {menuItem.name}
-            </ColorButton>
+            </Button>
             <StyledMenu
                 id="styled-menu"
                 MenuListProps={{

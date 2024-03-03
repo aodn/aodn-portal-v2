@@ -1,5 +1,4 @@
 import { StyledButton } from './StyledMenu';
-import grey from '../common/colors/grey';
 import { Grid } from '@mui/material';
 
 const Menu = () => {
@@ -8,7 +7,7 @@ const Menu = () => {
       container
       sx={{
         flexGrow: 1,
-        backgroundColor: grey['menu'],
+        backgroundColor: 'transparent',
         padding: '5px 0',
       }}
       spacing={2}
@@ -17,7 +16,7 @@ const Menu = () => {
         <Grid
           container
           justifyContent="center"
-          spacing={15} // Space between buttons
+          spacing={10} // Space between buttons
         >
           <Grid key="menu-grid-item-data" item>
             <StyledButton
