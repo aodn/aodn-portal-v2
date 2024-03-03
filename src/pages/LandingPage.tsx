@@ -1,4 +1,3 @@
-import * as React from 'react';
 import MainMenu from '../components/menu/MainMenu';
 import BannerOpenAccess from '../components/banner/BannerOpenAccess';
 import ComplexTextSearch from '../components/search/ComplexTextSearch';
@@ -8,25 +7,26 @@ import PromotionSmartPanel from "../components/smartpanel/PromotionSmartPanel";
 import {useState} from "react";
 import {
     createSearchParamForImosRealTime,
-    createSearchParamFrom,
+    //createSearchParamFrom,
     fetchResultWithStore
 } from "../components/common/store/searchReducer";
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../components/common/store/store";
+import { Box } from '@mui/material';
 
 const LandingPage = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const [display, setDisplay] = useState<boolean>(true)
 
-    const onCardClick = (id: number, event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLAnchorElement>) => {
+    const onCardClick = (id: number) => {
         switch(id) {
             case CARD_ID.ADVANCED_SEARCH: break;
             case CARD_ID.REAL_TIME:
                 dispatch(fetchResultWithStore(createSearchParamForImosRealTime()))
                     .unwrap()
-                    .then((v) => navigate('/search'));
+                    .then(() => navigate('/search'));
 
                 break;
             default: break;
@@ -35,10 +35,12 @@ const LandingPage = () => {
 
     return (
         <>
-            <MainMenu/>
-            <BannerOpenAccess isDisplay={display}/>
-            <ComplexTextSearch onFilterCallback={(e, show) => setDisplay(!show)}/>
-            <ShortCutSmartPanel onCardClicked={onCardClick}/>
+            <Box sx={{backgroundImage: 'url(/bg_landing_page.png)',  backgroundSize: 'cover' }}>
+                <MainMenu/>
+                <BannerOpenAccess isDisplay={display}/>
+                <ComplexTextSearch onFilterCallback={(_, show) => setDisplay(!show)}/>
+                <ShortCutSmartPanel onCardClicked={onCardClick}/>
+            </Box>
             <StoryBoardPanel/>
             <PromotionSmartPanel/>
         </>

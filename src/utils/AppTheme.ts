@@ -1,4 +1,4 @@
-import { createTheme, Theme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 
 const AppTheme = createTheme({
   palette: {
@@ -12,7 +12,7 @@ const AppTheme = createTheme({
       light: '#B3E2F7',
       dark: '#1C9FE4',
     },
-    divider: '#4490B6',
+    divider: '#DDDDD',
   },
   typography: {
     fontFamily: ['Helvetica Neue', 'Roboto', 'Ariel', 'sans-serif'].join(','),
