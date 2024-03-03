@@ -12,6 +12,7 @@ const AppTheme = createTheme({
       light: '#B3E2F7',
       dark: '#1C9FE4',
     },
+    divider: '#4490B6',
   },
   typography: {
     fontFamily: ['Helvetica Neue', 'Roboto', 'Ariel', 'sans-serif'].join(','),

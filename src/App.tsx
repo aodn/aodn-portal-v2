@@ -6,7 +6,7 @@ import Fallback from './pages/Fallback';
 import { ThemeProvider } from '@mui/material/styles';
 import AppTheme from './utils/AppTheme';
 import AppRouter from './utils/AppRouter';
-import Footer from './components/footer/footer';
+import Layout from './components/layout/layout';
 
 const app = () => {
   return (
@@ -22,8 +22,9 @@ const app = () => {
       }
     >
       <ThemeProvider theme={AppTheme}>
-        <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
-        <Footer />
+        <Layout>
+          <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
+        </Layout>
       </ThemeProvider>
     </div>
   );
