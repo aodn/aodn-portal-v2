@@ -38,19 +38,6 @@ jobs:
             path: ./dist
             retention-days: 1
 
-      - name: print
-        run: |
-          echo ${{ vars.AWS_REGION }}
-          echo ${{ vars.AWS_ROLE_ARN }}
-
-      - name: Configure AWS credentials
-        id: aws_auth
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          audience: sts.amazonaws.com
-          aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-
   edge_deploy:
     environment: edge
     runs-on: ubuntu-latest
@@ -65,6 +52,14 @@ jobs:
         with:
           name: build
           path: ./dist
+
+      - name: Configure AWS credentials
+        id: aws_auth
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Retrieve Parameters - ssm parameter store
         id: getParameters
