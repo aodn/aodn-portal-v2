@@ -2,8 +2,8 @@ import * as React from 'react';
 import {Grid, Box, Divider, SxProps, Theme, IconButton} from '@mui/material';
 import {margin} from "../common/constants";
 import {useCallback, useRef} from "react";
-import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface ComplexSmartPanelProps {
     columns? :number,
@@ -34,12 +34,14 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProp
                     // The minWidth may need to calculate instead of hardcode
                 }
                 <Grid container justifyContent='center'>
-                    <IconButton
-                        onClick={() => scroll(-50)}
-                        sx={{ "&:hover": { background: "none" } }}
-                    >
-                        <ArrowLeftIcon sx={{ height: 38, width: 38 }} />
-                    </IconButton>
+                    <Box sx={{ pr: 2, display: 'flex', alignItems: 'center' }}>
+                        <IconButton
+                            onClick={() => scroll(-50)}
+                            sx={{ backgroundColor: '#7ba0b6' }}
+                        >
+                            <ArrowBackIosNewIcon sx={{ pr: '4px',height: 38, width: 38, color: 'white' }} />
+                        </IconButton>
+                    </Box>
                     <Grid item xs={props.gridColumns}>
                         <Box
                             ref={boxRef}
@@ -59,12 +61,14 @@ const ComplexSmartPanel = (props : React.PropsWithChildren<ComplexSmartPanelProp
                             </Box>
                         </Box>
                     </Grid>
-                    <IconButton
-                        onClick={() => scroll(50)}
-                        sx={{ "&:hover": { background: "none" } }}
-                    >
-                        <ArrowRightIcon sx={{ height: 38, width: 38 }}/>
-                    </IconButton>
+                    <Box sx={{ pl: 2, display: 'flex', alignItems: 'center' }}>
+                        <IconButton
+                            onClick={() => scroll(50)}
+                            sx={{ backgroundColor: '#7ba0b6' }}
+                        >
+                            <ArrowForwardIosIcon sx={{ pl: '4px', height: 38, width: 38, color: 'white' }}/>
+                        </IconButton>
+                    </Box>
                     {props.bottomDivider &&
                       <Grid item xs={8}>
                         <Divider sx={{ borderBottomWidth: 5 }}/>
