@@ -35,7 +35,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
             name: build
-            path: build
+            path: ./dist
             retention-days: 1
 
       - name: Configure AWS credentials
@@ -59,7 +59,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build
-          path: build
+          path: ./dist
 
       - name: Retrieve Parameters - ssm parameter store
         id: getParameters
