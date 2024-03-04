@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_push
     env:
-      DIST: build
+      DIST: ./dist
     permissions:
       contents: read
       id-token: write
