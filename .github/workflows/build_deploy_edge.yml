@@ -15,7 +15,7 @@ permissions:
 jobs:
   build_push:
     runs-on: ubuntu-latest
-    environment: central
+    environment: edge
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
         run: yarn global add vite
 
       - name: Install Dependencies
-        run: yarn install
+        run: yarn install --force
 
       - name: Build Website
         run: yarn build
