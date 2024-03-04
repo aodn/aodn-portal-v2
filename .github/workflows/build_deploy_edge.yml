@@ -27,7 +27,7 @@ jobs:
           npm ci --production
 
       - name: Build Static Website
-        run: npm run build
+        run: npm run build --if-present
 
       - uses: actions/upload-artifact@v4
         with:
