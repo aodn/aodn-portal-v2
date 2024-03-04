@@ -15,21 +15,35 @@ const AppTheme = createTheme({
     divider: '#DDDDD',
   },
   typography: {
-    fontFamily: ['Helvetica Neue', 'Roboto', 'Ariel', 'sans-serif'].join(','),
+    fontFamily: [
+      'Lexend',
+      'Helvetica Neue',
+      'Roboto',
+      'Ariel',
+      'sans-serif',
+    ].join(','),
 
     body1: {
       padding: '10px 0 0 0',
       lineHeight: '1.5',
+      color: '#747474',
     },
     body2: {
       fontSize: '0.8rem',
+      color: '#BBBBBB',
+    },
+    h1: {
+      fontWeight: '700',
     },
     h5: {
       fontSize: '1.5rem',
       fontWeight: 400,
       padding: '40px 0 0 0',
     },
-    h6: {},
+    h6: {
+      fontSize: '16px',
+      fontWeight: 400,
+    },
   },
   components: {
     MuiButton: {
@@ -43,6 +57,7 @@ const AppTheme = createTheme({
       styleOverrides: {
         root: {
           textDecoration: 'none',
+          color: '#747474',
           '&:hover': {
             textDecoration: 'underline',
             color: '#54BCEB',

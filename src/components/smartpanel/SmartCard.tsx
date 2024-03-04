@@ -1,149 +1,165 @@
 import * as React from 'react';
-import {Box, Card, CardActionArea, CardMedia, Typography} from '@mui/material';
+import {
+  Box,
+  Card,
+  CardActionArea,
+  CardMedia,
+  Typography,
+} from '@mui/material';
 
 enum CardType {
-    OneOnOne,
-    TwoOnOne,
-    TwoOnTwo,
-    ThreeOnTwo
+  OneOnOne,
+  TwoOnOne,
+  TwoOnTwo,
+  ThreeOnTwo,
 }
 
 interface SmartcardProps {
-    imageUrl: string,
-    caption: string,
-    underline?: string,
-    card? : CardType,
-    onCardClicked? : (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLAnchorElement>) => void;
+  imageUrl: string;
+  caption: string;
+  underline?: string;
+  card?: CardType;
+  onCardClicked?: (
+    event:
+      | React.MouseEvent<HTMLButtonElement>
+      | React.MouseEvent<HTMLAnchorElement>
+  ) => void;
 }
 
 const getPreferDimension = (type: CardType | undefined) => {
-    switch (type) {
-        case CardType.TwoOnTwo:
-            return {cardHeight: '240px', imgWidth: '100%', imgHeight: '120px'};
-        case CardType.TwoOnOne:
-            return {cardHeight: '100px', imgWidth: '100%', imgHeight: '100px'};
-        default:
-            return {cardHeight: '90px', imgWidth: '60px', imgHeight: '60px'};
-    }
-}
+  switch (type) {
+    case CardType.TwoOnTwo:
+      return { cardHeight: '240px', imgWidth: '100%', imgHeight: '120px' };
+    case CardType.TwoOnOne:
+      return { cardHeight: '100px', imgWidth: '100%', imgHeight: '100px' };
+    default:
+      return { cardHeight: '90px', imgWidth: '60px', imgHeight: '60px' };
+  }
+};
 
 const SmartCardContent = (props: SmartcardProps) => {
-    const t = props.card;
-    const dimension = getPreferDimension(t);
-    const isLittleCard = t == CardType.OneOnOne;
+  const t = props.card;
+  const dimension = getPreferDimension(t);
+  const isLittleCard = t == CardType.OneOnOne;
 
-    return(
-        <Card elevation={isLittleCard ? 0 : 1} sx={{
-                maxHeight: dimension.cardHeight,
-                backgroundColor: 'transparent',
-                border: !isLittleCard ? "1px solid #FFFFFF" : "none",
-                padding: isLittleCard ? '12px' : '0',
-            }}>
-            <CardActionArea
-                onClick={(event) => props.onCardClicked && props.onCardClicked(event)}
-            >
-                {props?.imageUrl ?
-                  <>
-                    <CardMedia
-                        component='img'
-                        image={props.imageUrl}
-                        sx={{
-                            objectFit: 'cover',
-                            marginLeft: 'auto',
-                            marginRight: 'auto',
-                            left: 0,
-                            right: 0,
-                            width: dimension.imgWidth,
-                            height: dimension.imgHeight
-                        }}
-                    />
-                      {
-                          // Add text and position text in the middle of the image
-                      }
-                      {(props.card === CardType.TwoOnOne || props.card === CardType.TwoOnTwo) &&
-                        <div
-                          style={{
-                              position: "absolute",
-                              marginLeft: 'auto',
-                              marginRight: 'auto',
-                              left: 0,
-                              right: 0,
-                              textAlign: 'center',
-                              color: 'white',
-                              fontSize: 'x-large',
-                              fontWeight: 'bold',
-                              bottom: '40%',
-                          }}>
-                            {props.caption}
-                        </div>
-                      }
-                      {props.card === CardType.OneOnOne &&
-                          <div style={{
-                              justifyContent: 'center',
-                              display: 'flex',
-                          }}>
-                              {props.caption}
-                          </div>
-                      }
-                  </>
-                  :
-                  <>
-                  {(props.card === CardType.TwoOnOne || props.card === CardType.TwoOnTwo) &&
-                        <div
-                          style={{
-                              position: "absolute",
-                              marginLeft: 'auto',
-                              marginRight: 'auto',
-                              left: 0,
-                              right: 0,
-                              textAlign: 'center',
-                              color: 'white',
-                              fontSize: 'x-large',
-                              fontWeight: 'bold',
-                              bottom: '40%',
-                          }}>
-                            {props.caption}
-                        </div>
-                      }
-                      {props.card === CardType.OneOnOne &&
-                          <div style={{
-                              justifyContent: 'center',
-                              display: 'flex',
-                          }}>
-                              {props.caption}
-                          </div>
-                      }
-                  </>
-                }
-            </CardActionArea>
-            {props.underline && 
-                    <Box sx={{paddingY: 2}}>
-                    <Typography variant="subtitle1">{props.underline}</Typography>
-                    </Box>
-                }
-        </Card>
-    );
-}
+  return (
+    <Card
+      elevation={isLittleCard ? 0 : 1}
+      sx={{
+        maxHeight: dimension.cardHeight,
+        backgroundColor: 'transparent',
+        border: !isLittleCard ? '1px solid #FFFFFF' : 'none',
+        padding: isLittleCard ? '12px' : '0',
+      }}
+    >
+      <CardActionArea
+        onClick={(event) => props.onCardClicked && props.onCardClicked(event)}
+      >
+        {props?.imageUrl ? (
+          <>
+            <CardMedia
+              component="img"
+              image={props.imageUrl}
+              sx={{
+                objectFit: 'cover',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                left: 0,
+                right: 0,
+                width: dimension.imgWidth,
+                height: dimension.imgHeight,
+              }}
+            />
+            {
+              // Add text and position text in the middle of the image
+            }
+            {(props.card === CardType.TwoOnOne ||
+              props.card === CardType.TwoOnTwo) && (
+              <div
+                style={{
+                  position: 'absolute',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  left: 0,
+                  right: 0,
+                  textAlign: 'center',
+                  color: 'white',
+                  bottom: '40%',
+                }}
+              >
+                {props.caption}
+              </div>
+            )}
+            {props.card === CardType.OneOnOne && (
+              <div
+                style={{
+                  justifyContent: 'center',
+                  display: 'flex',
+                }}
+              >
+                {props.caption}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {(props.card === CardType.TwoOnOne ||
+              props.card === CardType.TwoOnTwo) && (
+              <div
+                style={{
+                  position: 'absolute',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  left: 0,
+                  right: 0,
+                  textAlign: 'center',
+                  bottom: '40%',
+                }}
+              >
+                {props.caption}
+              </div>
+            )}
+            {props.card === CardType.OneOnOne && (
+              <div
+                style={{
+                  justifyContent: 'center',
+                  display: 'flex',
+                }}
+              >
+                {props.caption}
+              </div>
+            )}
+          </>
+        )}
+      </CardActionArea>
+      {props.underline && (
+        <Box sx={{ paddingY: 2 }}>
+          <Typography variant="subtitle1">{props.underline}</Typography>
+        </Box>
+      )}
+    </Card>
+  );
+};
 /**
  * A Card where is span two column and one row.
  * @param props
  * @constructor
  */
 const SmartCard21 = (props: SmartcardProps) => {
-    // Format string with Start / End column
-    const p = {...props};
-    p.card = CardType.TwoOnOne;
+  // Format string with Start / End column
+  const p = { ...props };
+  p.card = CardType.TwoOnOne;
 
-    return(
-        <Box
-            sx = {{
-                gridColumn: 'span 2',
-                gridRow: 'span 1',
-            }}
-        >
-            <SmartCardContent {...p}/>
-        </Box>
-    );
+  return (
+    <Box
+      sx={{
+        gridColumn: 'span 2',
+        gridRow: 'span 1',
+      }}
+    >
+      <SmartCardContent {...p} />
+    </Box>
+  );
 };
 /**
  * A Card where is span one column and one row.
@@ -151,19 +167,20 @@ const SmartCard21 = (props: SmartcardProps) => {
  * @constructor
  */
 const SmartCard11 = (props: SmartcardProps) => {
-    // Format string with Start / End column
-    const p = {...props};
-    p.card = CardType.OneOnOne;
+  // Format string with Start / End column
+  const p = { ...props };
+  p.card = CardType.OneOnOne;
 
-    return(
-        <Box
-            sx = {{
-            gridColumn: 'span 1',
-            gridRow: 'span 1'
-        }}>
-            <SmartCardContent {...p}/>
-        </Box>
-    );
+  return (
+    <Box
+      sx={{
+        gridColumn: 'span 1',
+        gridRow: 'span 1',
+      }}
+    >
+      <SmartCardContent {...p} />
+    </Box>
+  );
 };
 
 /**
@@ -172,42 +189,37 @@ const SmartCard11 = (props: SmartcardProps) => {
  * @constructor
  */
 const SmartCard22 = (props: SmartcardProps) => {
-    // Format string with Start / End column
-    const p = {...props};
-    p.card = CardType.TwoOnTwo;
+  // Format string with Start / End column
+  const p = { ...props };
+  p.card = CardType.TwoOnTwo;
 
-    return(
-        <Box
-            sx = {{
-                gridColumn: 'span 2',
-                gridRow: 'span 2'
-            }}
-        >
-            <SmartCardContent {...p}/>
-        </Box>
-    );
+  return (
+    <Box
+      sx={{
+        gridColumn: 'span 2',
+        gridRow: 'span 2',
+      }}
+    >
+      <SmartCardContent {...p} />
+    </Box>
+  );
 };
 
 const SmartCard32 = (props: SmartcardProps) => {
-    // Format string with Start / End column
-    const p = {...props};
-    p.card = CardType.ThreeOnTwo;
+  // Format string with Start / End column
+  const p = { ...props };
+  p.card = CardType.ThreeOnTwo;
 
-    return(
-        <Box
-            sx = {{
-                gridColumn: 'span 3',
-                gridRow: 'span 2'
-            }}
-        >
-            <SmartCardContent {...p}/>
-        </Box>
-    );
+  return (
+    <Box
+      sx={{
+        gridColumn: 'span 3',
+        gridRow: 'span 2',
+      }}
+    >
+      <SmartCardContent {...p} />
+    </Box>
+  );
 };
 
-export {
-    SmartCard11,
-    SmartCard21,
-    SmartCard22,
-    SmartCard32
-};
+export { SmartCard11, SmartCard21, SmartCard22, SmartCard32 };

@@ -106,7 +106,7 @@ const Footer = () => {
             </Typography>
             <div>
               <IconButton
-                color="primary"
+                sx={{ color: 'body1.color' }}
                 aria-label="Facebook"
                 onClick={() =>
                   window.open(
@@ -118,7 +118,7 @@ const Footer = () => {
               </IconButton>
 
               <IconButton
-                color="primary"
+                sx={{ color: 'body1.color' }}
                 aria-label="LinkedIn"
                 onClick={() =>
                   window.open('https://www.linkedin.com/company/18409795')
@@ -128,7 +128,7 @@ const Footer = () => {
               </IconButton>
 
               {/* <IconButton
-                color="primary"
+                sx={{ color: 'body1.color' }}
                 aria-label="YouTube"
                 onClick={() =>
                   window.open('https://www.youtube.com/user/IMOS5395')
@@ -138,7 +138,7 @@ const Footer = () => {
               </IconButton> */}
 
               <IconButton
-                color="primary"
+                sx={{ color: 'body1.color' }}
                 aria-label="X"
                 onClick={() => window.open('https://twitter.com/IMOS_AUS')}
               >
@@ -146,7 +146,7 @@ const Footer = () => {
               </IconButton>
 
               <IconButton
-                color="primary"
+                sx={{ color: 'body1.color' }}
                 aria-label="Instagram"
                 onClick={() =>
                   window.open('https://www.instagram.com/imos_australia')
@@ -154,7 +154,11 @@ const Footer = () => {
               >
                 <InstagramIcon />
               </IconButton>
-              <Typography variant="body2" padding="50px 0 20px 0">
+              <Typography
+                sx={{ color: 'body1.color' }}
+                variant="body2"
+                padding="50px 0 20px 0"
+              >
                 Copyright © 2024. All rights reserved.{' '}
               </Typography>
             </div>
