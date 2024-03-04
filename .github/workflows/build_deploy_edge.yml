@@ -36,7 +36,12 @@ jobs:
         with:
             name: build
             path: ./dist
-            retention-days: 2
+            retention-days: 1
+
+      - name: print
+        run: |
+          echo ${{ vars.AWS_REGION }}
+          echo ${{ vars.AWS_ROLE_ARN }}
 
       - name: Configure AWS credentials
         id: aws_auth
