@@ -50,54 +50,21 @@ const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
                     display: 'inline-block',
                     marginTop: '10px',
                 }}>
-                <RoundSelect
-                    sx={{
-                        width: '80%',
-                    }}
-                    input={<OutlinedInput />}
-                    renderValue={(selected) => <em>Biological</em>}
-                >
-                    <MenuItem disabled value="">
-                        <em>Biological</em>
-                    </MenuItem>
-                    <MenuItem>Biologicals</MenuItem>
-                </RoundSelect>
+                
             </Grid>
             <Grid item xs={3}
                 sx={{
                     display: 'inline-block',
                     marginTop: '10px',
                 }}>
-                <RoundSelect
-                    sx={{
-                        width: '80%',
-                    }}
-                    input={<OutlinedInput />}
-                    renderValue={(selected) => <em>Biological</em>}
-                >
-                    <MenuItem disabled value="">
-                        <em>Biological</em>
-                    </MenuItem>
-                    <MenuItem>Biologicals</MenuItem>
-                </RoundSelect>
+                
             </Grid>
             <Grid item xs={3}
                 sx={{
                     display: 'inline-block',
                     marginTop: '10px',
                 }}>
-                <RoundSelect
-                    sx={{
-                        width: '80%',
-                    }}
-                    input={<OutlinedInput />}
-                    renderValue={(selected) => <em>Biological</em>}
-                >
-                    <MenuItem disabled value="">
-                        <em>Biological</em>
-                    </MenuItem>
-                    <MenuItem>Biologicals</MenuItem>
-                </RoundSelect>
+                
             </Grid>
             <Grid item xs={1}
                 sx={{
