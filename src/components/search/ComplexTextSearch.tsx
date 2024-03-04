@@ -27,8 +27,8 @@ const searchButton = (handler: () => void) => {
             color: grey["searchButtonText"],
             backgroundColor: 'white',
             height: '100%',
-            minWidth: '150px'
         }}
+        fullWidth
         onClick={() => {
             return handler();
         }}
@@ -84,47 +84,49 @@ const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
     return(
         <Grid container>
             <Grid item
-                  xs={12}
+                  xs={8}
                   sx={{
                     marginTop: 8,
-                      marginBottom: 12
+                    marginBottom: 12,
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
                   }}
                   >
-                <Grid container justifyContent={'center'} spacing={2}>
-                    <Grid item xs={7}>
-                        <Paper component="form" sx={{marginInlineStart: 2, p: '2px 4px', display: 'flex', alignItems: 'center'}}>
-                            <IconButton sx={{ p: '10px' }} aria-label="search">
-                                <SearchIcon />
-                            </IconButton>
-                            <InputBase
-                                sx={{ ml: 1, flex: 1 }}
-                                placeholder="Search for open data"
-                                inputProps={{ 'aria-label': 'Search for open data' }}
-                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                    setSearchText(event.target.value);
-                                }}
-                            />
-                            <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                            <Button
-                                variant="text"
-                                sx={{
-                                    color: grey["searchButtonText"],
-                                    pr: 1
-                                }}
-                                startIcon={<Tune/>}
-                                onClick={(e) => {
-                                    onFilterShowHide(e);
-                                }}
-                            >
-                                Filters
-                            </Button>
-                        </Paper>
+                    <Grid container spacing={2}>
+                        <Grid item xs={10}>
+                            <Paper component="form" sx={{ p: '2px 4px', display: 'flex', alignItems: 'center'}}>
+                                <IconButton sx={{ p: '10px' }} aria-label="search">
+                                    <SearchIcon />
+                                </IconButton>
+                                <InputBase
+                                    sx={{ ml: 1, flex: 1 }}
+                                    placeholder="Search for open data"
+                                    inputProps={{ 'aria-label': 'Search for open data' }}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                        setSearchText(event.target.value);
+                                    }}
+                                />
+                                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                                <Button
+                                    variant="text"
+                                    sx={{
+                                        color: grey["searchButtonText"],
+                                        pr: 1
+                                    }}
+                                    startIcon={<Tune/>}
+                                    onClick={(e) => {
+                                        onFilterShowHide(e);
+                                    }}
+                                >
+                                    Filters
+                                </Button>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={2}>{searchButton(onSearchClick)}</Grid>
                     </Grid>
-                    <Grid item>{searchButton(onSearchClick)}</Grid>
-                </Grid>
-                {
-                    showFilter()
-                }
+                    {
+                        showFilter()
+                    }
             </Grid>
         </Grid>
     );

@@ -7,7 +7,7 @@ interface BannerProps {
 
 const BannerOpenAccess = (props: BannerProps) => {
   return (
-    <Collapse in={props.isDisplay}>
+    <Collapse in={props.isDisplay}>      
       <Grid container>
         <Grid
           item
@@ -18,17 +18,18 @@ const BannerOpenAccess = (props: BannerProps) => {
           }}
         >
           <Grid container justifyContent="left">
-            <Grid xs={7} item>
+            <Grid xs={6} item>
               &nbsp;
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={6}>              
               <Grid item xs={10}>
-                <Box>
+                <Box sx={{ justifyContent: 'right', display: 'flex'}}>
                   <Typography
                     sx={{
                       fontSize: '70px',
                       color: 'white',
                       textAlign: 'left',
+                      pr: '10px',
                       textShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
                     }}
                     variant="h1"
@@ -37,27 +38,27 @@ const BannerOpenAccess = (props: BannerProps) => {
                   </Typography>
                 </Box>
               </Grid>
-              <Grid item xs={6}>
-                <Box>
+              <Grid item xs={10}>
+                <Box sx={{ justifyContent: 'right', display: 'flex'}}>
                   <Typography
                     sx={{
                       color: 'white',
                       whiteSpace: 'nowrap',
-                      textAlign: 'right',
                       fontSize: '20px',
                       fontWeight: 200,
                       letterSpacing: '0.1em',
+                      pr: '10px',
                       textShadow: '0 0 30px rgba(0, 0, 0, 1.9)',
                     }}
                   >
-                    "The gateway to Australian marine and climate science data."
+                    The gateway to Australian marine and climate science data
                   </Typography>
                 </Box>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      </Grid>      
     </Collapse>
   );
 };

@@ -35,7 +35,6 @@ const ShortCutSmartPanel = (props: ShortCutSmartPanelProps) => {
     <ComplexSmartPanel rows={2} columns={9}>
       <SmartCard21
         caption="Get started"
-        imageUrl="/smartcard/getstarted.png"
         onCardClicked={(e) =>
           props.onCardClicked && props.onCardClicked(CARD_ID.GET_START, e)
         }
@@ -78,8 +77,7 @@ const ShortCutSmartPanel = (props: ShortCutSmartPanelProps) => {
         }
       />
       <SmartCard21
-        caption="Advanced Search"
-        imageUrl="/smartcard/advancedSearch.png"
+        caption="Popular Search"
         onCardClicked={(e) =>
           props.onCardClicked && props.onCardClicked(CARD_ID.ADVANCED_SEARCH, e)
         }
@@ -107,7 +105,6 @@ const ShortCutSmartPanel = (props: ShortCutSmartPanelProps) => {
       />
       <SmartCard21
         caption="Explore on Map"
-        imageUrl="/smartcard/explorerOnMap.png"
         onCardClicked={(e) =>
           props.onCardClicked && props.onCardClicked(CARD_ID.EXPLORER_ON_MAP, e)
         }

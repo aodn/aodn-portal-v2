@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   Box,
+  Button,
   Card,
   CardActionArea,
   CardMedia,
@@ -15,9 +16,9 @@ enum CardType {
 }
 
 interface SmartcardProps {
-  imageUrl: string;
+  imageUrl?: string;
   caption: string;
-  underline?: string;
+  underline?: React.ReactNode;
   card?: CardType;
   onCardClicked?: (
     event:
@@ -29,7 +30,7 @@ interface SmartcardProps {
 const getPreferDimension = (type: CardType | undefined) => {
   switch (type) {
     case CardType.TwoOnTwo:
-      return { cardHeight: '240px', imgWidth: '100%', imgHeight: '120px' };
+      return { cardHeight: '220px', imgWidth: '100%', imgHeight: '120px' };
     case CardType.TwoOnOne:
       return { cardHeight: '100px', imgWidth: '100%', imgHeight: '100px' };
     default:
@@ -49,7 +50,7 @@ const SmartCardContent = (props: SmartcardProps) => {
         maxHeight: dimension.cardHeight,
         backgroundColor: 'transparent',
         border: !isLittleCard ? '1px solid #FFFFFF' : 'none',
-        padding: isLittleCard ? '12px' : '0',
+        paddingTop: isLittleCard ? '12px' : '0',
       }}
     >
       <CardActionArea
@@ -87,7 +88,7 @@ const SmartCardContent = (props: SmartcardProps) => {
                   bottom: '40%',
                 }}
               >
-                {props.caption}
+                <Typography variant='body1' color={'white'} fontWeight={300} fontSize={'22px'}>{props.caption}</Typography>
               </div>
             )}
             {props.card === CardType.OneOnOne && (
@@ -97,7 +98,7 @@ const SmartCardContent = (props: SmartcardProps) => {
                   display: 'flex',
                 }}
               >
-                {props.caption}
+                <Typography variant='body1' color={'white'} fontWeight={300}>{props.caption}</Typography>
               </div>
             )}
           </>
@@ -105,36 +106,14 @@ const SmartCardContent = (props: SmartcardProps) => {
           <>
             {(props.card === CardType.TwoOnOne ||
               props.card === CardType.TwoOnTwo) && (
-              <div
-                style={{
-                  position: 'absolute',
-                  marginLeft: 'auto',
-                  marginRight: 'auto',
-                  left: 0,
-                  right: 0,
-                  textAlign: 'center',
-                  bottom: '40%',
-                }}
-              >
-                {props.caption}
-              </div>
-            )}
-            {props.card === CardType.OneOnOne && (
-              <div
-                style={{
-                  justifyContent: 'center',
-                  display: 'flex',
-                }}
-              >
-                {props.caption}
-              </div>
+                <Button variant="outlined" sx={{fontSize: '22px', fontWeight: '300', color: 'white', padding: '30px'}}>{props.caption}</Button>              
             )}
           </>
         )}
       </CardActionArea>
       {props.underline && (
-        <Box sx={{ paddingY: 2 }}>
-          <Typography variant="subtitle1">{props.underline}</Typography>
+        <Box sx={{ paddingY: 1, paddingX: 2 }}>
+          <Typography variant="subtitle1" color='white' fontWeight={300} textAlign='left'>{props.underline}</Typography>
         </Box>
       )}
     </Card>
