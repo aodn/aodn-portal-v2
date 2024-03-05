@@ -12,27 +12,43 @@ permissions:
 jobs:
   build_push:
     runs-on: ubuntu-latest
-    environment: central
+    environment: edge
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check out the repo
-        uses: actions/checkout@v2
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install Vite
+        run: yarn global add vite
 
       - name: Install Dependencies
-        run: |
-            node --version
-            npm ci --production
+        run: yarn install --production
 
-      - name: Build Static Website
-        run: npm run build
+      - name: Build Website
+        run: yarn build
 
       - uses: actions/upload-artifact@v4
         with:
             name: build
-            path: build
+            path: ./dist
             retention-days: 1
+
+  staging_deploy:
+    environment: staging
+    runs-on: ubuntu-latest
+    needs: build_push
+    env:
+      DIST: ./dist
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./dist
 
       - name: Configure AWS credentials
         id: aws_auth
@@ -42,27 +58,12 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
-  staging_deploy:
-    environment: staging
-    runs-on: ubuntu-latest
-    needs: build_push
-    env:
-      DIST: build
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: build
-          path: build
-
       - name: Retrieve Parameters - ssm parameter store
         id: getParameters
         run: |
           # Replace '--path' with your specific path from Parameter Store
-          bucket=$(aws ssm get-parameter --name "/core/aodn-portal-v2/staging-bucket" --query 'Parameter.Value' --output text)
-          distribution_id=$(aws ssm get-parameter --name "/core/aodn-portal-v2/staging-cloudfront-distribution-id" --query 'Parameter.Value' --output text)
+          bucket=$(aws ssm get-parameter --name "/core/aodn-portal-v2/edge-bucket" --query 'Parameter.Value' --output text)
+          distribution_id=$(aws ssm get-parameter --name "/core/aodn-portal-v2/edge-cloudfront-distribution-id" --query 'Parameter.Value' --output text)
           echo "BUCKET=$bucket" >> "$GITHUB_ENV"
           echo "DISTRIBUTION_ID=$distribution_id" >> "$GITHUB_ENV"
   
@@ -82,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_push
     env:
-      DIST: build
+      DIST: ./dist
     permissions:
       contents: read
       id-token: write
@@ -90,14 +91,22 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build
-          path: build
+          path: ./dist
+
+      - name: Configure AWS credentials
+        id: aws_auth
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Retrieve Parameters - ssm parameter store
         id: getParameters
         run: |
           # Replace '--path' with your specific path from Parameter Store
-          bucket=$(aws ssm get-parameter --name "/core/aodn-portal-v2/production-bucket" --query 'Parameter.Value' --output text)
-          distribution_id=$(aws ssm get-parameter --name "/core/aodn-portal-v2/production-cloudfront-distribution-id" --query 'Parameter.Value' --output text)
+          bucket=$(aws ssm get-parameter --name "/core/aodn-portal-v2/edge-bucket" --query 'Parameter.Value' --output text)
+          distribution_id=$(aws ssm get-parameter --name "/core/aodn-portal-v2/edge-cloudfront-distribution-id" --query 'Parameter.Value' --output text)
           echo "BUCKET=$bucket" >> "$GITHUB_ENV"
           echo "DISTRIBUTION_ID=$distribution_id" >> "$GITHUB_ENV"
   

@@ -27,7 +27,7 @@ jobs:
         run: yarn global add vite
 
       - name: Install Dependencies
-        run: yarn install --force
+        run: yarn install --production
 
       - name: Build Website
         run: yarn build
