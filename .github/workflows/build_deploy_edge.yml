@@ -15,7 +15,6 @@ permissions:
 jobs:
   build_push:
     runs-on: ubuntu-latest
-    environment: edge
     steps:
       - name: Checkout
         uses: actions/checkout@v4
