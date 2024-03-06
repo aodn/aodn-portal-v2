@@ -6,7 +6,7 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "plugins": [{ "name": "typescript-plugin-css-modules" }],
-    "types": ["vite/client"],
+    "typeRoots": ["./node_modules/@types"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",
