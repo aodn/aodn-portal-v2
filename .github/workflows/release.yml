@@ -80,7 +80,7 @@ jobs:
   production_deploy:
     environment: production
     runs-on: ubuntu-latest
-    needs: build_push
+    needs: [build_push, staging_deploy]
     env:
       DIST: ./dist
     permissions:

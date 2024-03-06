@@ -3,6 +3,7 @@ name: Build/Deploy Edge
 on:
   push:
     branches:
+      - main
       - 5319-cicd
     paths-ignore:
       - '**/*.md'
@@ -19,14 +20,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Yarn
-        run: npm install -g yarn
-
-      - name: Install Vite
-        run: yarn global add vite
-
-      - name: Install Dependencies
-        run: yarn install
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '19'
+          cache: 'yarn'
 
       - name: Build Website
         run: yarn build
@@ -59,23 +56,14 @@ jobs:
           audience: sts.amazonaws.com
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-
-      - name: Retrieve Parameters - ssm parameter store
-        id: getParameters
-        run: |
-          # Replace '--path' with your specific path from Parameter Store
-          bucket=$(aws ssm get-parameter --name "/core/aodn-portal-v2/edge-bucket" --query 'Parameter.Value' --output text)
-          distribution_id=$(aws ssm get-parameter --name "/core/aodn-portal-v2/edge-cloudfront-distribution-id" --query 'Parameter.Value' --output text)
-          echo "BUCKET=$bucket" >> "$GITHUB_ENV"
-          echo "DISTRIBUTION_ID=$distribution_id" >> "$GITHUB_ENV"
   
       - name: Copy files to the production website with the AWS CLI
         run: |
-          aws s3 sync --delete ${{ env.DIST }} s3://${{ env.BUCKET }} --region ${{ vars.AWS_REGION }}
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }}
 
       - name: Clear cloudfront cache
         run: |
           aws cloudfront create-invalidation \
-          --distribution-id ${{ env.DISTRIBUTION_ID }} \
+          --distribution-id ${{ vars.DISTRIBUTION_ID }} \
           --paths "/*" \
           --region ${{ vars.AWS_REGION }}
