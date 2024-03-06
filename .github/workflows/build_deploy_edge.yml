@@ -26,6 +26,9 @@ jobs:
           cache: 'yarn'
 
       - name: Build Website
+        run: yarn install
+
+      - name: Build Website
         run: yarn build
 
       - uses: actions/upload-artifact@v4
