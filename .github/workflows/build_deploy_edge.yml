@@ -26,8 +26,8 @@ jobs:
           node-version: '20'
           cache: 'yarn'
 
-      # - name: Install yarn
-      #   run: yarn install
+      - name: Install yarn
+        run: yarn install
 
       - name: Build Website
         run: yarn build
