@@ -28,7 +28,7 @@ const Header = () => {
               <a href="/">
                 <img
                   height="40px"
-                  src="public\logo\imos_logo.png"
+                  src="..\..\src\assets\logos\imos_logo.png"
                   alt="IMOS Logo"
                   style={{ padding: '10px' }}
                 />
