@@ -49,7 +49,7 @@ jobs:
           #json='${{ steps.build_website.outputs }}'
           #echo "$json" > metadata.json
           #gh release upload ${{ github.ref_name }} metadata.json
-          gh release upload ${{ github.ref_name }} metadata.json
+          gh release upload ${{ github.ref_name }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
