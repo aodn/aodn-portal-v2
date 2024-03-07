@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 5319-cicd
     paths-ignore:
       - '**/*.md'
       - '.github/environment/**'
@@ -30,49 +29,44 @@ jobs:
         run: yarn install
 
       - name: Build Website
-        id: build_website
         run: yarn build
 
-      - name: Build data
-        run: |
-          echo "${{ steps.build_website.outputs }}"
+      - uses: actions/upload-artifact@v4
+        with:
+            name: build
+            path: ./dist
+            retention-days: 1
 
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #       name: build
-      #       path: ./dist
-      #       retention-days: 1
+  edge_deploy:
+    environment: edge
+    runs-on: ubuntu-latest
+    needs: build_push
+    env:
+      DIST: ./dist
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./dist
 
-  # edge_deploy:
-  #   environment: edge
-  #   runs-on: ubuntu-latest
-  #   needs: build_push
-  #   env:
-  #     DIST: ./dist
-  #   permissions:
-  #     contents: read
-  #     id-token: write
-  #   steps:
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: build
-  #         path: ./dist
-
-  #     - name: Configure AWS credentials
-  #       id: aws_auth
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         audience: sts.amazonaws.com
-  #         aws-region: ${{ vars.AWS_REGION }}
-  #         role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+      - name: Configure AWS credentials
+        id: aws_auth
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
   
-  #     - name: Copy files to the production website with the AWS CLI
-  #       run: |
-  #         aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }}
+      - name: Copy files to the production website with the AWS CLI
+        run: |
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }}
 
-  #     - name: Clear cloudfront cache
-  #       run: |
-  #         aws cloudfront create-invalidation \
-  #         --distribution-id ${{ vars.DISTRIBUTION_ID }} \
-  #         --paths "/*" \
-  #         --region ${{ vars.AWS_REGION }}
+      - name: Clear cloudfront cache
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id ${{ vars.DISTRIBUTION_ID }} \
+          --paths "/*" \
+          --region ${{ vars.AWS_REGION }}
