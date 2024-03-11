@@ -1,36 +1,40 @@
-import React, {useContext, useEffect, useRef} from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import MapContext from "../MapContext";
-import {zIndex} from "../../../common/constants";
+import { zIndex } from "../../../common/constants";
 
 const DisplayCoordinate = () => {
-  
   const { map } = useContext(MapContext);
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if(!map) return;
+    if (!map) return;
 
-    const handle = (e : any) => {if(ref.current) { ref.current.innerHTML = JSON.stringify(e.point) + ' ' + JSON.stringify(e.lngLat.wrap())}};
+    const handle = (e: any) => {
+      if (ref.current) {
+        ref.current.innerHTML =
+          JSON.stringify(e.point) + " " + JSON.stringify(e.lngLat.wrap());
+      }
+    };
 
-    map.on('mousemove', handle);
+    map.on("mousemove", handle);
 
     return () => {
-      map.off('mousemove', handle);
-    }
-
-  }, [map])
+      map.off("mousemove", handle);
+    };
+  }, [map]);
 
   return (
-    <div id={'display-coor'}
-         ref={ref}
-         style={{
-           display: "inline-block",
-           position: "relative",
-           zIndex: zIndex['MAP_COORD'],
-           backgroundColor: 'rgba(255, 255, 255, 0.6)'
-         }}
+    <div
+      id={"display-coor"}
+      ref={ref}
+      style={{
+        display: "inline-block",
+        position: "relative",
+        zIndex: zIndex["MAP_COORD"],
+        backgroundColor: "rgba(255, 255, 255, 0.6)",
+      }}
     />
   );
-}
+};
 
 export default DisplayCoordinate;

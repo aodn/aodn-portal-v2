@@ -1,51 +1,77 @@
-import * as React from 'react';
-import {Box, CardContent, Typography, Grid} from '@mui/material';
-import RoundButton from '../common/buttons/RoundButton';
-import {border} from '../common/constants';
+import * as React from "react";
+import { Box, CardContent, Typography, Grid, Card } from "@mui/material";
+//import RoundButton from "../common/buttons/RoundButton"; TODO
+import YouTube, { YouTubeProps } from "react-youtube";
 
 interface ButtonEvent {
-    label: string, 
-    onClick?: (event: React.MouseEvent<HTMLButtonElement> | undefined) => void
+  label: string;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement> | undefined) => void;
 }
 
 interface StoryBoardProps {
-    url: string,
-    caption: string,
-    content: string,
-    isActive?: boolean,
-    buttons? : Array<ButtonEvent>
-};
+  url: string;
+  caption: React.ReactNode;
+  content: string;
+  isActive?: boolean;
+  buttons?: Array<ButtonEvent>;
+}
 
 const StoryBoard = (props: StoryBoardProps) => {
-    return (
-        <Box sx={{display: props?.isActive ? 'flex' : 'none'}}>
-            <CardContent>
-                <iframe style= {{
-                            border: border['frameBorder'],
-                            minWidth: '290px'
-                        }}
-                        height="100%"
-                        src={props.url}
-                        title={props.caption}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen>        
-                </iframe>
-            </CardContent>
-            <Box sx={{display: 'flex', flexDirection: 'column'}}>
-                <CardContent sx={{flex: '1 0 auto'}}>
-                    <Typography component="div" variant="h5">
-                        {props.caption}
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" component="div" style={{ lineHeightStep: "30px" }}>
-                        {props.content}
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" component="div" style={{ lineHeightStep: "30px" }}>
-                        &nbsp;
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" component="div" style={{ lineHeightStep: "30px" }}>
-                        &nbsp;
-                    </Typography>
-                    <Grid container spacing={3}>
+  const onPlayerReady: YouTubeProps["onReady"] = (event) => {
+    event.target.pauseVideo();
+  };
+
+  const opts: YouTubeProps["opts"] = {
+    width: "480",
+    height: "270",
+    playerVars: {
+      //autoplay: 1,
+    },
+  };
+  return (
+    <Box sx={{ display: props?.isActive ? "flex" : "none" }}>
+      <Grid container spacing={3} justifyContent="center">
+        <Grid item xs="auto" justifyContent="center">
+          <Card>
+            <YouTube
+              videoId={props.url}
+              opts={opts}
+              style={{
+                height: "270px",
+              }}
+              onReady={onPlayerReady}
+            />
+          </Card>
+        </Grid>
+        <Grid item xs={5}>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <CardContent sx={{ flex: "1 0 auto" }}>
+              {props.caption}
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                component="div"
+                style={{ lineHeightStep: "30px" }}
+              >
+                {props.content}
+              </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                component="div"
+                style={{ lineHeightStep: "30px" }}
+              >
+                &nbsp;
+              </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                component="div"
+                style={{ lineHeightStep: "30px" }}
+              >
+                &nbsp;
+              </Typography>
+              {/* <Grid container spacing={3}>
                         {props.buttons &&
                             props.buttons?.map((button) => {
                                 return (
@@ -55,11 +81,13 @@ const StoryBoard = (props: StoryBoardProps) => {
                                 );
                             }
                         )}
-                    </Grid>
-                </CardContent>
-            </Box>
-        </Box>
-    );
+                    </Grid> */}
+            </CardContent>
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 };
 
 export default StoryBoard;

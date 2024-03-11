@@ -1,5 +1,5 @@
-import { StyledButton } from './StyledMenu';
-import { Grid } from '@mui/material';
+import { StyledButton } from "./StyledMenu";
+import { Grid } from "@mui/material";
 
 const Menu = () => {
   return (
@@ -7,8 +7,8 @@ const Menu = () => {
       container
       sx={{
         flexGrow: 1,
-        backgroundColor: 'transparent',
-        padding: '5px 0',
+        backgroundColor: "transparent",
+        padding: "5px 0",
       }}
       spacing={2}
     >
@@ -20,32 +20,32 @@ const Menu = () => {
         >
           <Grid key="menu-grid-item-data" item>
             <StyledButton
-              name={'Data'}
-              items={[{ name: 'Item1', handler: () => {} }]}
+              name={"Data"}
+              items={[{ name: "Item1", handler: () => {} }]}
             />
           </Grid>
           <Grid key="menu-grid-item-learn" item>
             <StyledButton
-              name={'Learn'}
-              items={[{ name: 'Item1', handler: () => {} }]}
+              name={"Learn"}
+              items={[{ name: "Item1", handler: () => {} }]}
             />
           </Grid>
           <Grid key="menu-grid-item-engage" item>
             <StyledButton
-              name={'Engage'}
-              items={[{ name: 'Item1', handler: () => {} }]}
+              name={"Engage"}
+              items={[{ name: "Item1", handler: () => {} }]}
             />
           </Grid>
           <Grid key="menu-grid-item-contact" item>
             <StyledButton
-              name={'Contact'}
-              items={[{ name: 'Item1', handler: () => {} }]}
+              name={"Contact"}
+              items={[{ name: "Item1", handler: () => {} }]}
             />
           </Grid>
           <Grid key="menu-grid-item-about" item>
             <StyledButton
-              name={'About'}
-              items={[{ name: 'Item1', handler: () => {} }]}
+              name={"About"}
+              items={[{ name: "Item1", handler: () => {} }]}
             />
           </Grid>
         </Grid>

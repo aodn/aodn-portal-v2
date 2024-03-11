@@ -1,15 +1,14 @@
-import {Button, ButtonProps} from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Button, ButtonProps } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-const NoBorderButton = styled((props: ButtonProps) => (
-    <Button 
-        {...props}
-    />))(({ theme }) => ({
-    border: 'none',
+const NoBorderButton = styled((props: ButtonProps) => <Button {...props} />)(
+  ({ theme }) => ({
+    border: "none",
     textTransform: "none",
-    backgroundColor: 'none',
-    fontSize: '1rem',
-    color: 'white'
-}));
+    backgroundColor: "none",
+    fontSize: "1rem",
+    color: "white",
+  })
+);
 
 export default NoBorderButton;

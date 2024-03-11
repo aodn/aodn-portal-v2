@@ -1,16 +1,16 @@
-import {Button, ButtonProps} from '@mui/material';
-import { styled } from '@mui/material/styles';
-import {border} from "../constants";
+import { Button, ButtonProps } from "@mui/material";
+import { styled } from "@mui/material/styles";
+//import { border } from "../constants";
 
-const BorderButton = styled((props: ButtonProps) => (
-    <Button 
-        {...props}
-    />))(({ theme }) => ({
-    border: border['frameBorder'],
+const BorderButton = styled((props: ButtonProps) => <Button {...props} />)(
+  () => ({
+    //border: border["frameBorder"],
     textTransform: "none",
-    backgroundColor: 'none',
-    fontSize: '1rem',
-    color: 'white'
-}));
+    backgroundColor: "none",
+    fontSize: "1rem",
+    color: "white",
+    // eslint-disable-next-line prettier/prettier
+  })
+);
 
 export default BorderButton;

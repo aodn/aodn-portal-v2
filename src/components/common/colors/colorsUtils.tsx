@@ -4,16 +4,19 @@
  * @param str
  * @returns
  */
-const stringToColor = (s : string, saturation: number = 100, lightness: number = 75, alpha: number = 0.4) => {
-    let hash = 0;
+const stringToColor = (
+  s: string,
+  saturation: number = 100,
+  lightness: number = 75,
+  alpha: number = 0.4
+) => {
+  let hash = 0;
 
-    for (let i = 0; i < s.length; i++) {
-        hash = s.charCodeAt(i) + ((hash << 5) - hash);
-        hash = hash & hash;
-    }
-    return `hsla(${(hash % 360)}, ${saturation}%, ${lightness}%, ${alpha})`;
-}
+  for (let i = 0; i < s.length; i++) {
+    hash = s.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
+  }
+  return `hsla(${hash % 360}, ${saturation}%, ${lightness}%, ${alpha})`;
+};
 
-export {
-    stringToColor
-}
+export { stringToColor };

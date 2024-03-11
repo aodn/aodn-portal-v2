@@ -1,4 +1,4 @@
-import Logos from '../common/logos/Logos';
+import Logos from "../common/logos/Logos";
 
 /**
  * Empty for now, implement it later

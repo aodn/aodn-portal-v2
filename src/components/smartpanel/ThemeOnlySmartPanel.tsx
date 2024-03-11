@@ -1,14 +1,13 @@
-import * as React from 'react';
-import { SmartCard11 } from './SmartCard';
-import { Grid, IconButton, Paper, Stack } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { useCallback, useRef } from 'react';
-import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { SmartCard11 } from "./SmartCard";
+import { Grid, IconButton, Paper, Stack } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { useCallback, useRef } from "react";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 const Item = styled(Paper)(({ theme }) => ({
-  textAlign: 'center',
-  minWidth: '100px',
+  textAlign: "center",
+  minWidth: "100px",
   color: theme.palette.text.secondary,
 }));
 
@@ -25,6 +24,7 @@ const ThemeOnlySmartPanel = () => {
         stackRef.current.scrollLeft += scrollOffset;
       }
     },
+    // eslint-disable-next-line prettier/prettier
     [stackRef]
   );
 
@@ -40,7 +40,7 @@ const ThemeOnlySmartPanel = () => {
               ref={stackRef}
               direction="row"
               spacing={2}
-              sx={{ overflow: 'hidden' }}
+              sx={{ overflow: "hidden" }}
             >
               <Item>
                 <SmartCard11

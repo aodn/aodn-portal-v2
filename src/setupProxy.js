@@ -1,4 +1,4 @@
-import * as proxy from 'http-proxy-middleware';
+import * as proxy from "http-proxy-middleware";
 
 /**
  * This is use to proxy call to ogcapi server, the web server is coming from localhost:3000
@@ -11,7 +11,7 @@ import * as proxy from 'http-proxy-middleware';
  */
 module.exports = function (app) {
   app.use(
-    proxy(['/api/v1/ogc/collections', '/api/v1/ogc/tiles'], {
+    proxy(["/api/v1/ogc/collections", "/api/v1/ogc/tiles"], {
       target: import.meta.env.VITE_API_HOST,
       changeOrigin: true,
     })

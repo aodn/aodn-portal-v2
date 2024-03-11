@@ -6,20 +6,20 @@ import {
   Link,
   List,
   Typography,
-} from '@mui/material';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import XIcon from '@mui/icons-material/X';
+} from "@mui/material";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import XIcon from "@mui/icons-material/X";
 //import YouTubeIcon from '@mui/icons-material/YouTube';
 
 const Footer = () => {
   return (
     <Box
       sx={{
-        backgroundColor: '#F4F5F6',
-        color: 'primary.main',
-        padding: '50px 0',
+        backgroundColor: "#F4F5F6",
+        color: "primary.main",
+        padding: "50px 0",
       }}
     >
       <Container>
@@ -106,11 +106,11 @@ const Footer = () => {
             </Typography>
             <div>
               <IconButton
-                sx={{ color: 'body1.color' }}
+                sx={{ color: "body1.color" }}
                 aria-label="Facebook"
                 onClick={() =>
                   window.open(
-                    'https://www.facebook.com/IntegratedMarineObservingSystem'
+                    "https://www.facebook.com/IntegratedMarineObservingSystem"
                   )
                 }
               >
@@ -118,10 +118,10 @@ const Footer = () => {
               </IconButton>
 
               <IconButton
-                sx={{ color: 'body1.color' }}
+                sx={{ color: "body1.color" }}
                 aria-label="LinkedIn"
                 onClick={() =>
-                  window.open('https://www.linkedin.com/company/18409795')
+                  window.open("https://www.linkedin.com/company/18409795")
                 }
               >
                 <LinkedInIcon />
@@ -138,28 +138,28 @@ const Footer = () => {
               </IconButton> */}
 
               <IconButton
-                sx={{ color: 'body1.color' }}
+                sx={{ color: "body1.color" }}
                 aria-label="X"
-                onClick={() => window.open('https://twitter.com/IMOS_AUS')}
+                onClick={() => window.open("https://twitter.com/IMOS_AUS")}
               >
                 <XIcon />
               </IconButton>
 
               <IconButton
-                sx={{ color: 'body1.color' }}
+                sx={{ color: "body1.color" }}
                 aria-label="Instagram"
                 onClick={() =>
-                  window.open('https://www.instagram.com/imos_australia')
+                  window.open("https://www.instagram.com/imos_australia")
                 }
               >
                 <InstagramIcon />
               </IconButton>
               <Typography
-                sx={{ color: 'body1.color' }}
+                sx={{ color: "body1.color" }}
                 variant="body2"
                 padding="50px 0 20px 0"
               >
-                Copyright © 2024. All rights reserved.{' '}
+                Copyright © 2024. All rights reserved.{" "}
               </Typography>
             </div>
           </Grid>

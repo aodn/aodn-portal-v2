@@ -1,139 +1,239 @@
-import React, { useCallback } from 'react';
-import {Grid, Button, Paper, InputBase, IconButton, Divider} from '@mui/material';
-import  { useNavigate } from 'react-router-dom';
-import SearchIcon from '@mui/icons-material/Search';
-import grey from '../common/colors/grey';
-import {Tune} from "@mui/icons-material";
-import { useDispatch } from 'react-redux'
-import {createSearchParamFrom, fetchResultWithStore} from '../common/store/searchReducer';
-import store, {AppDispatch, getComponentState} from "../common/store/store";
+import React, { useCallback } from "react";
+import {
+  Grid,
+  Button,
+  Paper,
+  InputBase,
+  IconButton,
+  Divider,
+  Autocomplete,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import SearchIcon from "@mui/icons-material/Search";
+import grey from "../common/colors/grey";
+import { Tune } from "@mui/icons-material";
+import { useDispatch } from "react-redux";
+import {
+  createSearchParamFrom,
+  fetchResultWithStore,
+} from "../common/store/searchReducer";
+import store, { AppDispatch, getComponentState } from "../common/store/store";
 import RemovableFilters from "../common/filters/RemovableFilters";
-import AdvanceFilters from '../common/filters/AdvanceFilters';
-import {ParameterState, updateSearchText} from "../common/store/componentParamReducer";
+import AdvanceFilters from "../common/filters/AdvanceFilters";
+import {
+  ParameterState,
+  updateSearchText,
+} from "../common/store/componentParamReducer";
+import AutoCompleteSearchField from "./AutoCompleteSearchField";
+import axios from "axios";
+import StyledTextField from "./StyledTextField";
 
 export interface ComplexTextSearchProps {
-    onFilterCallback: (events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, show: boolean) => void | null;
+  onFilterCallback: (
+    events:
+      | React.MouseEvent<HTMLAnchorElement>
+      | React.MouseEvent<HTMLButtonElement>,
+    show: boolean
+  ) => void | null;
 }
 
 /**
  * Put it here to avoid refresh the function every time the component is rendered
- * @param handler 
- * @returns 
+ * @param handler
+ * @returns
  */
 const searchButton = (handler: () => void) => {
-
-    return(<Button        
-        sx={{
-            color: grey["searchButtonText"],
-            backgroundColor: 'white',
-            height: '100%',
-        }}
-        fullWidth
-        onClick={() => {
-            return handler();
-        }}
+  return (
+    <Button
+      sx={{
+        color: grey["searchButtonText"],
+        backgroundColor: "white",
+        height: "100%",
+      }}
+      fullWidth
+      onClick={() => {
+        return handler();
+      }}
     >
-        Search
-    </Button>);
-}
+      Search
+    </Button>
+  );
+};
 
-const ComplexTextSearch = ({onFilterCallback} : ComplexTextSearchProps) => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch<AppDispatch>();
+const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
-    const [toggleRemovableFilter, setToggleRemovableFilter] = React.useState<boolean>(true);
-    const [showFilters, setShowFilters] = React.useState<boolean>(false);
-    const [searchText, setSearchText] = React.useState<string>('');
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState<string | null>(null);
+  const [inputValue, setInputValue] = React.useState("");
+  const [options, setOptions] = React.useState<readonly string[]>([]);
+  const loading = open && options.length === 0;
 
-    const onSearchClick = useCallback(() => {
-        dispatch(updateSearchText(searchText + ''));
+  const [toggleRemovableFilter, setToggleRemovableFilter] =
+    React.useState<boolean>(true);
+  const [showFilters, setShowFilters] = React.useState<boolean>(false);
+  const [searchText, setSearchText] = React.useState<string>("");
 
-        const componentParam : ParameterState = getComponentState(store.getState());
-        dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
-            .unwrap()
-            .then(() => navigate('/search'));
+  const onSearchClick = useCallback(() => {
+    dispatch(updateSearchText(searchText + ""));
 
-    },[dispatch, navigate, searchText]);
+    const componentParam: ParameterState = getComponentState(store.getState());
+    dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
+      .unwrap()
+      .then(() => navigate("/search"));
+  }, [dispatch, navigate, searchText]);
 
-    const onFilterShowHide = useCallback((events : React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const onSearchSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      onSearchClick();
+    },
+    [onSearchClick]
+  );
 
-        setShowFilters(value => !value);
-        onFilterCallback && onFilterCallback(events, !showFilters);
+  const onFilterShowHide = useCallback(
+    (
+      events:
+        | React.MouseEvent<HTMLAnchorElement>
+        | React.MouseEvent<HTMLButtonElement>
+    ) => {
+      setShowFilters((value) => !value);
+      onFilterCallback && onFilterCallback(events, !showFilters);
+    },
+    [onFilterCallback, showFilters, setShowFilters]
+  );
 
-    },[onFilterCallback, showFilters, setShowFilters]);
+  const showFilter = useCallback(() => {
+    if (toggleRemovableFilter) {
+      return (
+        <RemovableFilters
+          showFilters={showFilters}
+          onFilterShowHide={onFilterShowHide}
+          onExpandAllFilters={() => setToggleRemovableFilter(false)}
+        />
+      );
+    } else {
+      return <AdvanceFilters showFilters={showFilters} />;
+    }
+  }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
 
-    const showFilter = useCallback(() => {
-        if(toggleRemovableFilter) {
-            return(
-                <RemovableFilters
-                    showFilters={showFilters}
-                    onFilterShowHide={onFilterShowHide}
-                    onExpandAllFilters={() => setToggleRemovableFilter(false)}
-                />
-            );
-        }
-        else {
-            return(
-                <AdvanceFilters
-                    showFilters={showFilters}
-                />
-            );
-        }
-    },[toggleRemovableFilter, showFilters, onFilterShowHide]);
+  React.useEffect(() => {
+    if (inputValue.trim() === "") {
+      setOptions(value ? [value] : []);
+      return undefined;
+    }
 
-    return(
-        <Grid container>
-            <Grid item
-                  xs={8}
-                  sx={{
-                    marginTop: 8,
-                    marginBottom: 12,
-                    marginLeft: 'auto',
-                    marginRight: 'auto',
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`/api/v1/ogc/ext/autocomplete`, {
+          params: {
+            input: inputValue,
+          },
+        });
+        setOptions(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [inputValue, loading, value]);
+
+  React.useEffect(() => {
+    if (!open) {
+      setOptions([]);
+    }
+  }, [open]);
+
+  return (
+    <Grid container>
+      <Grid
+        item
+        xs={8}
+        sx={{
+          marginTop: 8,
+          marginBottom: 12,
+          marginLeft: "auto",
+          marginRight: "auto",
+        }}
+      >
+        <Grid container spacing={2}>
+          <Grid item xs={10}>
+            <form onSubmit={onSearchSubmit}>
+              <Paper
+                sx={{ p: "2px 4px", display: "flex", alignItems: "center" }}
+              >
+                <IconButton sx={{ p: "10px" }} aria-label="search">
+                  <SearchIcon />
+                </IconButton>
+                <Autocomplete
+                  id="search"
+                  fullWidth
+                  open={open}
+                  onOpen={() => {
+                    setOpen(true);
                   }}
-                  >
-                    <Grid container spacing={2}>
-                        <Grid item xs={10}>
-                            <Paper component="form" sx={{ p: '2px 4px', display: 'flex', alignItems: 'center'}}>
-                                <IconButton sx={{ p: '10px' }} aria-label="search">
-                                    <SearchIcon />
-                                </IconButton>
-                                <InputBase
-                                    sx={{ ml: 1, flex: 1 }}
-                                    placeholder="Search for open data"
-                                    inputProps={{ 'aria-label': 'Search for open data' }}
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        setSearchText(event.target.value);
-                                    }}
-                                />
-                                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                                <Button
-                                    variant="text"
-                                    sx={{
-                                        color: grey["searchButtonText"],
-                                        pr: 1
-                                    }}
-                                    startIcon={<Tune/>}
-                                    onClick={(e) => {
-                                        onFilterShowHide(e);
-                                    }}
-                                >
-                                    Filters
-                                </Button>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={2}>{searchButton(onSearchClick)}</Grid>
-                    </Grid>
-                    {
-                        showFilter()
-                    }
-            </Grid>
+                  onClose={() => {
+                    setOpen(false);
+                  }}
+                  loading={loading}
+                  getOptionLabel={(option) => option}
+                  filterOptions={(x) => x}
+                  options={options}
+                  autoComplete
+                  includeInputInList
+                  filterSelectedOptions
+                  value={value}
+                  noOptionsText="No locations"
+                  onChange={(_, newValue: string | null) => {
+                    setOptions(newValue ? [newValue, ...options] : options);
+                    setValue(newValue);
+                    onSearchClick();
+                  }}
+                  onInputChange={(_, newInputValue) => {
+                    setInputValue(newInputValue);
+                  }}
+                  renderInput={(params) => (
+                    <StyledTextField
+                      {...params}
+                      placeholder="Search for open data"
+                      inputProps={{
+                        "aria-label": "Search for open data",
+                        ...params.inputProps,
+                      }}
+                    />
+                  )}
+                />
+                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                <Button
+                  variant="text"
+                  sx={{
+                    color: grey["searchButtonText"],
+                    pr: 1,
+                  }}
+                  startIcon={<Tune />}
+                  onClick={(e) => {
+                    onFilterShowHide(e);
+                  }}
+                >
+                  Filters
+                </Button>
+              </Paper>
+            </form>
+          </Grid>
+          <Grid item xs={2}>
+            {searchButton(onSearchClick)}
+          </Grid>
         </Grid>
-    );
+        {showFilter()}
+      </Grid>
+    </Grid>
+  );
 };
 
 ComplexTextSearch.defaultProps = {
-    onFilterCallback: null
-}
+  onFilterCallback: null,
+};
 
 export default ComplexTextSearch;
