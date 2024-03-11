@@ -44,12 +44,11 @@ jobs:
           private-key: ${{ secrets.DEPLOY_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-      - name: Upload Metadata to Release
+      - name: Upload Artifacts to Release
         run: |
-          #json='${{ steps.build_website.outputs }}'
-          #echo "$json" > metadata.json
-          #gh release upload ${{ github.ref_name }} metadata.json
-          gh release upload ${{ github.ref_name }}
+          artifacts='${{ steps.build_website.outputs }}'
+          echo "$json" > artifacts.json
+          gh release upload ${{ github.ref_name }} artifacts.json
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
