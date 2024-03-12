@@ -50,6 +50,7 @@ const LogoList = () => {
     <Grid container spacing={2} pb={6}>
       <Grid item xs={12}>
         <Grid
+          item
           xs={6}
           sx={{
             display: "flex",
@@ -94,6 +95,7 @@ const LogoList = () => {
         ))}
       </Grid>
       <Grid
+        item
         sx={{
           display: "flex",
           flexDirection: "row",
@@ -120,6 +122,7 @@ const LogoList = () => {
         <Typography fontWeight={500}>ASSOCIATE PARTICIPANTS</Typography>
       </Grid>
       <Grid
+        item
         sx={{
           display: "flex",
           flexDirection: "row",
