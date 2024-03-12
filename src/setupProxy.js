@@ -11,9 +11,16 @@ import * as proxy from "http-proxy-middleware";
  */
 module.exports = function (app) {
   app.use(
-    proxy(["/api/v1/ogc/collections", "/api/v1/ogc/tiles"], {
-      target: import.meta.env.VITE_API_HOST,
-      changeOrigin: true,
-    })
+    proxy(
+      [
+        "/api/v1/ogc/collections",
+        "/api/v1/ogc/tiles",
+        "/api/v1/ogc/ext/autocomplete",
+      ],
+      {
+        target: import.meta.env.VITE_API_HOST,
+        changeOrigin: true,
+      }
+    )
   );
 };
