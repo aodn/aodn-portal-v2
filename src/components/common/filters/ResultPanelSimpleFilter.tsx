@@ -31,20 +31,20 @@ const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilterProps) => {
                     </Grid>
                     <Grid item xs='auto'><NoBorderButton endIcon={<ArrowBackIosIcon/>}></NoBorderButton></Grid>
                     <Grid item xs={1}>
-                        <RoundSelect>
+                        {/* <RoundSelect>
                             <MenuItem>1-20 on 1258 matching</MenuItem>
-                        </RoundSelect>
+                        </RoundSelect> */}
                     </Grid>
                     <Grid item xs='auto'><NoBorderButton startIcon={<ArrowForwardIosIcon/>}></NoBorderButton></Grid>
                     <Grid item xs={2}>
-                        <RoundSelect>
+                        {/* <RoundSelect>
                             <MenuItem>Sort By</MenuItem>
-                        </RoundSelect>
+                        </RoundSelect> */}
                     </Grid>
                     <Grid item xs={2}>
-                        <RoundSelect>
+                        {/* <RoundSelect>
                             <MenuItem>Sort By</MenuItem>
-                        </RoundSelect>
+                        </RoundSelect> */}
                     </Grid>
                 </Grid>
             </Grid>

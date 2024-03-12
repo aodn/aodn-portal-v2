@@ -1,0 +1,120 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*.*.*
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install yarn
+        run: yarn install
+
+      - name: Build Website
+        id: build_website
+        run: yarn build
+
+      - uses: actions/upload-artifact@v4
+        with:
+            name: build
+            path: ./dist
+            retention-days: 1
+
+      - name: Generate App Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.DEPLOY_APP_ID }}
+          private-key: ${{ secrets.DEPLOY_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Upload Artifacts to Release
+        run: |
+          artifacts='${{ steps.build_website.outputs }}'
+          echo "$json" > artifacts.json
+          gh release upload ${{ github.ref_name }} artifacts.json
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+  staging_deploy:
+    environment: staging
+    runs-on: ubuntu-latest
+    needs: build_push
+    env:
+      DIST: ./dist
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./dist
+
+      - name: Configure AWS credentials
+        id: aws_auth
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Copy files to the production website with the AWS CLI
+        run: |
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }}
+
+      - name: Clear cloudfront cache
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id ${{ vars.DISTRIBUTION_ID }} \
+          --paths "/*" \
+          --region ${{ vars.AWS_REGION }}
+
+  production_deploy:
+    environment: production
+    runs-on: ubuntu-latest
+    needs: [build_push, staging_deploy]
+    env:
+      DIST: ./dist
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./dist
+
+      - name: Configure AWS credentials
+        id: aws_auth
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Copy files to the production website with the AWS CLI
+        run: |
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }}
+
+      - name: Clear cloudfront cache
+        run: |
+          aws cloudfront create-invalidation \
+          --distribution-id ${{ vars.DISTRIBUTION_ID }} \
+          --paths "/*" \
+          --region ${{ vars.AWS_REGION }}

@@ -50,7 +50,7 @@ const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
                     display: 'inline-block',
                     marginTop: '10px',
                 }}>
-                <RoundSelect
+                {/* <RoundSelect
                     sx={{
                         width: '80%',
                     }}
@@ -61,14 +61,14 @@ const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
                         <em>Biological</em>
                     </MenuItem>
                     <MenuItem>Biologicals</MenuItem>
-                </RoundSelect>
+                </RoundSelect> */}
             </Grid>
             <Grid item xs={3}
                 sx={{
                     display: 'inline-block',
                     marginTop: '10px',
                 }}>
-                <RoundSelect
+                {/* <RoundSelect
                     sx={{
                         width: '80%',
                     }}
@@ -79,14 +79,14 @@ const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
                         <em>Biological</em>
                     </MenuItem>
                     <MenuItem>Biologicals</MenuItem>
-                </RoundSelect>
+                </RoundSelect> */}
             </Grid>
             <Grid item xs={3}
                 sx={{
                     display: 'inline-block',
                     marginTop: '10px',
                 }}>
-                <RoundSelect
+                {/* <RoundSelect
                     sx={{
                         width: '80%',
                     }}
@@ -97,7 +97,7 @@ const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
                         <em>Biological</em>
                     </MenuItem>
                     <MenuItem>Biologicals</MenuItem>
-                </RoundSelect>
+                </RoundSelect> */}
             </Grid>
             <Grid item xs={1}
                 sx={{
