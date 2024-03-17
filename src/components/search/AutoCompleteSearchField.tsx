@@ -2,17 +2,11 @@ import { Tune } from "@mui/icons-material";
 import {
   Paper,
   IconButton,
-  InputBase,
   Divider,
   Button,
   Autocomplete,
-  debounce,
-  Typography,
-  Grid,
-  TextField,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { grey } from "@mui/material/colors";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import StyledTextField from "./StyledTextField";
@@ -103,7 +97,7 @@ const AutoCompleteSearchField = () => {
       <Button
         variant="text"
         sx={{
-          color: grey["searchButtonText"],
+          //color: grey["searchButtonText"],
           pr: 1,
         }}
         startIcon={<Tune />}

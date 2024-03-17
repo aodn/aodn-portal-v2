@@ -17,8 +17,8 @@ import {
   fetchResultWithStore,
 } from "../common/store/searchReducer";
 import store, { AppDispatch, getComponentState } from "../common/store/store";
-import RemovableFilters from "../common/filters/RemovableFilters";
-import AdvanceFilters from "../common/filters/AdvanceFilters";
+//import RemovableFilters from "../common/filters/RemovableFilters";
+//import AdvanceFilters from "../common/filters/AdvanceFilters";
 import {
   ParameterState,
   updateSearchText,
@@ -68,8 +68,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
   const [options, setOptions] = useState<readonly string[]>([]);
   const loading = open && options.length === 0;
 
-  const [toggleRemovableFilter, setToggleRemovableFilter] =
-    useState<boolean>(true);
+  //const [toggleRemovableFilter] = useState<boolean>(true);
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [searchText] = useState<string>("");
 
@@ -102,19 +101,20 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
     [onFilterCallback, showFilters, setShowFilters]
   );
 
-  const showFilter = useCallback(() => {
-    if (toggleRemovableFilter) {
-      return (
-        <RemovableFilters
-          showFilters={showFilters}
-          onFilterShowHide={onFilterShowHide}
-          onExpandAllFilters={() => setToggleRemovableFilter(false)}
-        />
-      );
-    } else {
-      return <AdvanceFilters showFilters={showFilters} />;
-    }
-  }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
+  // const showFilter = useCallback(() => {
+  //   if (toggleRemovableFilter) {
+  //     return <AdvanceFilters showFilters={showFilters} />;
+  //     // return (
+  //     //   <RemovableFilters
+  //     //     showFilters={showFilters}
+  //     //     onFilterShowHide={onFilterShowHide}
+  //     //     onExpandAllFilters={() => setToggleRemovableFilter(false)}
+  //     //   />
+  //     // );
+  //   } else {
+  //     return <AdvanceFilters showFilters={showFilters} />;
+  //   }
+  // }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
 
   useEffect(() => {
     if (inputValue.trim() === "") {
@@ -224,7 +224,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
             {searchButton(onSearchClick)}
           </Grid>
         </Grid>
-        {showFilter()}
+        {/* {showFilter()} */}
       </Grid>
     </Grid>
   );

@@ -91,7 +91,10 @@ const ResultPanelSimpleFilter = () => {
             <ArrowBackIosIcon />
           </IconButton>
           <FormControl fullWidth size="small">
-            <Select value={1} input={<SlimSelect />}>
+            <Select
+              value={1}
+              input={<SlimSelect id="select1" name="select1" />}
+            >
               <MenuItem value={1}>1-20 on 1258 matching</MenuItem>
             </Select>
           </FormControl>
