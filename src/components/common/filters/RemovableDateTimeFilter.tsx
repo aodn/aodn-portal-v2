@@ -4,7 +4,7 @@ import { Grid, Box, SxProps, Theme } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import { DateRangeSlider } from "../slider/RangeSlider";
 import { BarChart } from "@mui/x-charts/BarChart";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { BarSeriesType } from "@mui/x-charts";
 import { useDispatch } from "react-redux";
 import store, { AppDispatch, getComponentState } from "../store/store";
@@ -293,14 +293,14 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
   const onStartDatePickerChanged = useCallback(
     (
-      value: string | null,
+      value: Dayjs | null,
       context: FieldChangeHandlerContext<DateTimeValidationError>
     ) => {
       // just log this for now
       if (context.validationError) {
         console.log("Validation error", context.validationError);
       }
-      const e = new Date(value ?? dateDefault["min"]);
+      const e = value ? value.toDate() : new Date(dateDefault["min"]);
       setPickerStartDate(e);
       setSliderStartDate(e);
       dispatch(
@@ -315,14 +315,14 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
   const onEndDatePickerChanged = useCallback(
     (
-      value: string | null,
+      value: Dayjs | null,
       context: FieldChangeHandlerContext<DateTimeValidationError>
     ) => {
       // just log this for now
       if (context.validationError) {
         console.log("Validation error", context.validationError);
       }
-      const e = new Date(value ?? dateDefault["max"]);
+      const e = value ? value.toDate() : new Date(dateDefault["max"]);
       setPickerEndDate(e);
       setSliderEndDate(e);
       dispatch(
@@ -439,8 +439,8 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
           <Grid item xs={2}>
             <DateTimePicker
               onChange={onStartDatePickerChanged}
-              defaultValue={componentParam.dateTimeFilterRange?.start?.toString()}
-              value={dayjs(pickerStartDate).toString()}
+              defaultValue={dayjs(componentParam.dateTimeFilterRange?.start)}
+              value={dayjs(pickerStartDate)}
               views={["year", "month", "day"]}
             />
           </Grid>
@@ -465,8 +465,8 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
           <Grid item xs={2}>
             <DateTimePicker
               onChange={onEndDatePickerChanged}
-              defaultValue={componentParam.dateTimeFilterRange?.end?.toString()}
-              value={dayjs(pickerEndDate).toString()}
+              defaultValue={dayjs(componentParam.dateTimeFilterRange?.end)}
+              value={dayjs(pickerEndDate)}
               views={["year", "month", "day"]}
             />
           </Grid>
