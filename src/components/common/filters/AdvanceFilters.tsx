@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import {
   Grid,
   Collapse,
@@ -16,11 +16,7 @@ import grey from "../colors/grey";
 import { Tune, Layers, People, DataThresholding } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import store, { AppDispatch, getComponentState } from "../store/store";
-import {
-  ParameterState,
-  updateImosOnly,
-  updateSearchText,
-} from "../store/componentParamReducer";
+import { ParameterState, updateImosOnly } from "../store/componentParamReducer";
 
 export interface NonRemovableFiltersProps {
   showFilters: boolean;

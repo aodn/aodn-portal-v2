@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import eslint from "vite-plugin-eslint";
 import path from "path";
 
 // https://vitejs.dev/config/
@@ -28,7 +29,10 @@ export default ({ mode }) => {
         },
       },
     },
-    plugins: [react()],
+    plugins: [
+      react(),
+      eslint({ exclude: ["/virtual:/**", "node_modules/**"] }),
+    ],
     build: {
       outDir: "dist",
     },

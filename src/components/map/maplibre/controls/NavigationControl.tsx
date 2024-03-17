@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import MapContext from "../MapContext";
-import maplibregl from "maplibre-gl";
+import { NavigationControl as LibreNavigationControl } from "maplibre-gl";
 
 interface NavigationControlProps {
   showCompass?: boolean;
@@ -14,7 +14,7 @@ const NavigationControl = (props: NavigationControlProps) => {
   useEffect(() => {
     if (!map) return;
 
-    const n = new maplibregl.NavigationControl({
+    const n = new LibreNavigationControl({
       showCompass: props.showCompass,
       showZoom: props.showZoom,
       visualizePitch: props.visualizePitch,

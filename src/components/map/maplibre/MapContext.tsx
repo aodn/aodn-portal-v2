@@ -10,11 +10,11 @@ import { createContext } from "react";
 import { Map as MapboxMap } from "mapbox-gl";
 import { Map as MaplibreMap } from "maplibre-gl";
 
-type Map = MapboxMap & MaplibreMap;
+export type MapCombined = MapboxMap & MaplibreMap;
 // ---------------------------------------------------------------
 
 type MapContextType = {
-  map: Map | null;
+  map: MapCombined | null;
 };
 
 const MapContext = createContext<Partial<MapContextType>>({});

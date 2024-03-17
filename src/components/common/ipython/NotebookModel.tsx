@@ -1,6 +1,6 @@
 import * as React from "react";
 import { IpynbRenderer, IpynbType } from "react-ipynb-renderer";
-import Dialog, { DialogProps } from "@mui/material/Dialog";
+import Dialog from "@mui/material/Dialog";
 import { getNotebook } from "./api";
 import { useEffect, useState } from "react";
 
@@ -24,11 +24,10 @@ const NotebookModel = (props: NotebookModelProps) => {
 
   useEffect(() => {
     if (props.url != null) {
-      getNotebook(props.url)
-        .then((value: IpynbType) => setNb(value))
-        .catch((reason) => {
-          //TODO: Should print the error reason
-        });
+      getNotebook(props.url).then((value: IpynbType) => setNb(value));
+      // .catch((reason) => {
+      //   //TODO: Should print the error reason
+      // });
     } else {
       setNb(null);
     }
@@ -52,10 +51,10 @@ const NotebookModel = (props: NotebookModelProps) => {
   );
 };
 
-NotebookModel.defaultProps = {
-  url: undefined,
-  callback: (p: NotebookModelCallbackProps) => {},
-  showDialog: false,
-};
+// NotebookModel.defaultProps = {
+//   url: undefined,
+//   callback: (p: NotebookModelCallbackProps) => {},
+//   showDialog: false,
+// };
 
 export default NotebookModel;

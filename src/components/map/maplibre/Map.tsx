@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import MapContext from "./MapContext";
+import MapContext, { MapCombined } from "./MapContext";
 import { Box } from "@mui/material";
 import { Map as MaplibreMap, MapLibreEvent } from "maplibre-gl";
 
@@ -49,7 +49,7 @@ const ReactMap = ({
   onZoomEvent,
   children,
 }: React.PropsWithChildren<MapProps>) => {
-  const [map, setMap] = useState<any | null>(null);
+  const [map, setMap] = useState<MapCombined | null>(null);
 
   useEffect(() => {
     const m = new MaplibreMap({
@@ -58,9 +58,11 @@ const ReactMap = ({
       center: [centerLongitude, centerLatitude],
       zoom: zoom,
       localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
-    });
+    }) as MapCombined;
 
-    const z = (e: any) => onZoomEvent && onZoomEvent(e);
+    const z = (
+      e: MapLibreEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+    ) => onZoomEvent && onZoomEvent(e);
 
     // https://github.com/maplibre/maplibre-gl-js/issues/2601
     m.getCanvas().classList.add("mapboxgl-canvas");
@@ -77,9 +79,11 @@ const ReactMap = ({
   }, [centerLatitude, centerLongitude, panelId, styleJson, zoom, onZoomEvent]);
 
   return (
-    <MapContext.Provider value={{ map }}>
-      <Box>{children}</Box>
-    </MapContext.Provider>
+    map && (
+      <MapContext.Provider value={{ map }}>
+        <Box>{children}</Box>
+      </MapContext.Provider>
+    )
   );
 };
 

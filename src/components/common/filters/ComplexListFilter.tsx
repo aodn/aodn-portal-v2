@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Grid,
   List,
@@ -95,9 +94,9 @@ const ComplexListFilter = () => {
                   <ListItemIcon>
                     <IconButton
                       edge={"start"}
-                      onClick={(event) => {
-                        toggleShowHide(value.name);
-                      }}
+                      // onClick={(event) => {
+                      //   toggleShowHide(value.name);
+                      // }}
                     >
                       <UnfoldMoreIcon />
                     </IconButton>

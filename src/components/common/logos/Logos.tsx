@@ -61,12 +61,13 @@ const LogoList = () => {
             marginRight: "auto",
           }}
         >
-          <Logo src={NCRIS} alt={`logo-NCRIS`} height="200px" />
+          <Logo src={NCRIS} alt={"logo-NCRIS"} height="200px" />
           <Typography textAlign="left" pl={2}>
-            Australia's Integrated Marine Observing System (IMOS) is enabled by
-            the National Collaborative Research Infrastructre Strategy (NCRIS)
-            It is operated by a consortium of institutions as an unincorperated
-            joint venture with the Unviersity of Tasmania as Lead Agent.
+            Australia&apos;s Integrated Marine Observing System (IMOS) is
+            enabled by the National Collaborative Research Infrastructre
+            Strategy (NCRIS) It is operated by a consortium of institutions as
+            an unincorperated joint venture with the Unviersity of Tasmania as
+            Lead Agent.
           </Typography>
         </Grid>
       </Grid>
@@ -85,7 +86,7 @@ const LogoList = () => {
         }}
       >
         <Box>
-          <Logo src={UTAS} alt={`logo-University-of-Tasmania`} height="60px" />
+          <Logo src={UTAS} alt={"logo-University-of-Tasmania"} height="60px" />
           <Typography fontWeight={500}>LEAD AGENT</Typography>
         </Box>
         {principals.map((logo, index) => (

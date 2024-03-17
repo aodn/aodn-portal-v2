@@ -2,7 +2,7 @@ import { Button, ButtonProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const NoBorderButton = styled((props: ButtonProps) => <Button {...props} />)(
-  ({ theme }) => ({
+  () => ({
     border: "none",
     textTransform: "none",
     backgroundColor: "none",

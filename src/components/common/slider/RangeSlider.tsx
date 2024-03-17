@@ -74,7 +74,7 @@ const NumberRangeSlider = ({
 
   const handleChange = useCallback(
     (event: Event, newValue: number | number[]) => {
-      let c = newValue as number[];
+      const c = newValue as number[];
       setValue(c);
       onSlideChanged(
         mapRangeToRealValue(min, max, c[0]),

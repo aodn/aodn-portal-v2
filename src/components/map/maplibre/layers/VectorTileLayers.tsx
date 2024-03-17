@@ -16,7 +16,7 @@ const VectirTileLayers = (props: VectirTileLayersProps) => {
   const [mapLoaded, setMapLoaded] = useState<boolean | null>(null);
 
   // Book keeping of layers added to map
-  const [layers, setLayers] = useState<Array<string>>([]);
+  const [layers] = useState<Array<string>>([]);
 
   useEffect(() => {
     if (!map) return;

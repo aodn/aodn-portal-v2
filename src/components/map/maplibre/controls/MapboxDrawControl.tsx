@@ -16,17 +16,17 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 // now just stick with the offical control.
 
 // Refer to this issue https://github.com/maplibre/maplibre-gl-js/issues/2601
-// @ts-ignore
+// @ts-expect-error see above
 MapboxDraw.constants.classes.CONTROL_BASE = "maplibregl-ctrl";
-// @ts-ignore
+// @ts-expect-error see above
 MapboxDraw.constants.classes.CONTROL_PREFIX = "maplibregl-ctrl-";
-// @ts-ignore
+// @ts-expect-error see above
 MapboxDraw.constants.classes.CONTROL_GROUP = "maplibregl-ctrl-group";
 
 interface MapboxDrawControlProps {
-  onDrawCreate: ((e: any) => void) | undefined;
-  onDrawDelete: ((e: any) => void) | undefined;
-  onDrawUpdate: ((e: any) => void) | undefined;
+  onDrawCreate: ((e: unknown) => void) | undefined;
+  onDrawDelete: ((e: unknown) => void) | undefined;
+  onDrawUpdate: ((e: unknown) => void) | undefined;
 }
 
 const MapboxDrawControl = ({

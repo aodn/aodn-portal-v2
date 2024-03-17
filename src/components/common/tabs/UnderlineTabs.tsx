@@ -15,7 +15,7 @@ const UnderlineTabs = styled((props: TabsProps) => (
     centered={true}
     {...props}
   />
-))(({ theme }) => ({}));
+))(() => ({}));
 
 const UnderlineTab = styled((props: TabProps) => (
   <div>
@@ -28,6 +28,6 @@ const UnderlineTab = styled((props: TabProps) => (
       }}
     />
   </div>
-))(({ theme }) => ({}));
+))(() => ({}));
 
 export { UnderlineTabs, UnderlineTab };

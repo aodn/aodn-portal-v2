@@ -1,5 +1,3 @@
-import React from "react";
-import grey from "../common/colors/grey";
 import {
   Card,
   CardContent,
@@ -12,18 +10,16 @@ import {
   Chip,
   Button,
 } from "@mui/material";
-import { borderRadius, border, pageDefault } from "../common/constants";
+import { pageDefault } from "../common/constants";
 import WhereToVoteIcon from "@mui/icons-material/WhereToVote";
 import DownloadIcon from "@mui/icons-material/Download";
 import SellIcon from "@mui/icons-material/Sell";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-//import SlightRoundButton from "../common/buttons/SlightRoundButton";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import {
   OGCCollection,
   CollectionsQueryType,
 } from "../common/store/searchReducer";
-import { stringToColor } from "../common/colors/colorsUtils";
 import { useNavigate } from "react-router-dom";
 
 interface ResultCardProps {
@@ -55,7 +51,11 @@ interface ResultCardProps {
     | undefined;
 }
 
-const findThumbnail = (c: OGCCollection): string => {
+// const findThumbnail = (c: OGCCollection): string => {
+//   return "https://warcontent.com/wp-content/uploads/2021/03/substring-javascript-5.png";
+// };
+
+const findThumbnail = (): string => {
   return "https://warcontent.com/wp-content/uploads/2021/03/substring-javascript-5.png";
 };
 
@@ -65,7 +65,7 @@ const ResultCard = (props: ResultCardProps) => {
   return (
     <Card variant="outlined">
       <CardActionArea
-        onClick={(e) =>
+        onClick={() =>
           navigate(pageDefault.details, { state: { uuid: props.content.id } })
         }
       >
@@ -86,7 +86,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <CardMedia
                   sx={{ display: "flex", width: "100%", height: "100px" }}
                   component="img"
-                  image={findThumbnail(props.content)}
+                  image={findThumbnail()}
                 />
               </Grid>
               <Grid item xs={9}>

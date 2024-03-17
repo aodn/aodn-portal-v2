@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 module.exports = {
   env: {
     browser: true,
@@ -13,6 +14,10 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "eslint-config-prettier",
     "prettier",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:prettier/recommended",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -32,13 +37,18 @@ module.exports = {
         paths: ["src"],
         extensions: [".js", ".jsx", ".ts", ".tsx"],
       },
+      alias: {
+        map: [["@", "./src"]],
+      },
     },
   },
   rules: {
     "react/react-in-jsx-scope": "off",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["error"],
-    quotes: ["error", "single"],
+    quotes: ["error"],
     "no-undef": "off",
+    "prettier/prettier": "error",
   },
+  plugins: ["prettier"],
 };

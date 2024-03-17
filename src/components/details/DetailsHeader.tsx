@@ -1,4 +1,3 @@
-import * as React from "react";
 import { DetailsProps } from "./DetailsPanel";
 import {
   Card,
@@ -8,7 +7,7 @@ import {
   CardMedia,
   Grid,
 } from "@mui/material";
-import { border, borderRadius, margin } from "../common/constants";
+import { borderRadius, margin } from "../common/constants";
 import grey from "../common/colors/grey";
 import SlightRoundButton from "../common/buttons/SlightRoundButton";
 import UndoIcon from "@mui/icons-material/Undo";
@@ -16,7 +15,7 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useNavigate } from "react-router-dom";
 
-const DetailsHeaderButton = (props: DetailsProps) => {
+const DetailsHeaderButton = () => {
   const navigate = useNavigate();
 
   return (
@@ -49,7 +48,6 @@ const DetailsHeader = (props: DetailsProps) => {
   return (
     <Card
       sx={{
-        border: border["frameBorder"],
         borderRadius: borderRadius["filter"],
         backgroundColor: grey["resultCard"],
         display: "flex",

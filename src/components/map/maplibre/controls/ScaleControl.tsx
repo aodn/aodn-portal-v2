@@ -1,7 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import MapContext from "../MapContext";
-import maplibregl from "maplibre-gl";
-import { Unit } from "maplibre-gl";
+import { Unit, ScaleControl as LibreScaleControl } from "maplibre-gl";
 
 interface ScaleControlProps {
   maxWidth?: number;
@@ -14,7 +13,7 @@ const ScaleControl = ({ maxWidth, unit }: ScaleControlProps) => {
   useEffect(() => {
     if (!map) return;
 
-    const scale = new maplibregl.ScaleControl({
+    const scale = new LibreScaleControl({
       maxWidth: maxWidth,
       unit: unit,
     });

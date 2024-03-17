@@ -36,7 +36,7 @@ const AutoCompleteSearchField = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`/api/v1/ogc/ext/autocomplete`, {
+        const response = await axios.get("/api/v1/ogc/ext/autocomplete", {
           params: {
             input: inputValue,
           },

@@ -1,6 +1,6 @@
 import { OGCCollection } from "../common/store/searchReducer";
 import { border, borderRadius, margin } from "../common/constants";
-import { Grid, Box, Card } from "@mui/material";
+import { Grid, Box } from "@mui/material";
 import { DetailsHeader, DetailsHeaderButton } from "./DetailsHeader";
 import React from "react";
 import { ContentCard, LinkCard, MapCard } from "./DetailsCards";

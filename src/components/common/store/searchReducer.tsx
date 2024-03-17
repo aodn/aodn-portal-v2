@@ -67,6 +67,7 @@ const initialState: ObjectValue = {
   },
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const searchResult = async (param: SearchParameters, thunkApi: any) => {
   try {
     const response = await axios.get<OGCCollections>(
@@ -83,10 +84,18 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
       }
     );
     return response.data;
-  } catch (error: any) {
-    return thunkApi.rejectWithValue(error?.response.data);
+  } catch (error: unknown) {
+    const errorMessage = "Unkown error occurred. Please try again later.";
+    if (axios.isAxiosError(error)) {
+      return thunkApi.rejectWithValue(error?.response?.data);
+    } else {
+      return thunkApi.rejectWithValue({
+        error: errorMessage,
+      } as FailedResponse);
+    }
   }
 };
+
 /**
  * Trunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description
@@ -117,8 +126,15 @@ const fetchResultByUuidNoStore = createAsyncThunk<
       `/api/v1/ogc/collections/${id}`
     );
     return response.data;
-  } catch (error: any) {
-    return thunkApi.rejectWithValue(error?.response.data);
+  } catch (error: unknown) {
+    const errorMessage = "Unkown error occurred. Please try again later.";
+    if (axios.isAxiosError(error)) {
+      return thunkApi.rejectWithValue(error?.response?.data);
+    } else {
+      return thunkApi.rejectWithValue({
+        error: errorMessage,
+      } as FailedResponse);
+    }
   }
 });
 

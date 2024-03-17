@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { dateDefault, margin } from "../constants";
 import { Grid, Box, SxProps, Theme } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
-import DatePicker from "../datetime/DatePicker";
 import { DateRangeSlider } from "../slider/RangeSlider";
 import { BarChart } from "@mui/x-charts/BarChart";
 import dayjs from "dayjs";
@@ -16,6 +15,9 @@ import {
   updateDateTimeFilterRange,
 } from "../store/componentParamReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { FieldChangeHandlerContext } from "@mui/x-date-pickers/internals/hooks/useField";
+import { DateTimeValidationError } from "@mui/x-date-pickers";
 
 interface RemovableDateTimeFilterProps {
   title: string;
@@ -79,7 +81,7 @@ const createSeries = (
   const xValues: Array<Date> = [];
   const buckets: Array<Bucket> = [];
   for (let i: number = 0; i < 100; i++) {
-    let b: Bucket = {
+    const b: Bucket = {
       start: smallestDate.getTime() + i * bandWidth,
       end: smallestDate.getTime() + (i + 1) * bandWidth,
       imosOnlyCount: 0,
@@ -95,10 +97,10 @@ const createSeries = (
       // Check individual item is within the time range
       // if yes then increase bucket count.
       buckets.forEach((b) => {
-        let start = v[0] ? new Date(v[0]).getTime() : null;
+        const start = v[0] ? new Date(v[0]).getTime() : null;
 
         // Some big further date if not specified.
-        let end = v[1] ? new Date(v[1]).getTime() : new Date().getTime() * 2;
+        const end = v[1] ? new Date(v[1]).getTime() : new Date().getTime() * 2;
 
         // If you do not have a start, it is invalid date, hence skip
         if (start && isIncludedInBucket(start, end, b.start, b.end)) {
@@ -116,7 +118,7 @@ const createSeries = (
     return `${value}`;
   };
 
-  let imos: BarSeriesType = {
+  const imos: BarSeriesType = {
     id: "imos-data-id",
     type: "bar",
     valueFormatter: formatter,
@@ -125,7 +127,7 @@ const createSeries = (
     data: buckets.flatMap((m) => m.imosOnlyCount),
   };
 
-  let total: BarSeriesType = {
+  const total: BarSeriesType = {
     id: "total-data-id",
     type: "bar",
     valueFormatter: formatter,
@@ -225,7 +227,11 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
             }
           });
       });
-  }, [dispatch]);
+  }, [
+    componentParam.dateTimeFilterRange?.end,
+    componentParam.dateTimeFilterRange?.start,
+    dispatch,
+  ]);
 
   const sliceBarSeries = useCallback(
     (start: Date, end: Date) => {
@@ -286,13 +292,20 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
   );
 
   const onStartDatePickerChanged = useCallback(
-    (value: any) => {
-      const e = new Date(value);
+    (
+      value: string | null,
+      context: FieldChangeHandlerContext<DateTimeValidationError>
+    ) => {
+      // just log this for now
+      if (context.validationError) {
+        console.log("Validation error", context.validationError);
+      }
+      const e = new Date(value ?? dateDefault["min"]);
       setPickerStartDate(e);
       setSliderStartDate(e);
       dispatch(
         updateDateTimeFilterRange({
-          start: value,
+          start: e.getTime(),
           end: pickerEndDate.getTime(),
         })
       );
@@ -301,14 +314,21 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
   );
 
   const onEndDatePickerChanged = useCallback(
-    (value: any) => {
-      const e = new Date(value);
+    (
+      value: string | null,
+      context: FieldChangeHandlerContext<DateTimeValidationError>
+    ) => {
+      // just log this for now
+      if (context.validationError) {
+        console.log("Validation error", context.validationError);
+      }
+      const e = new Date(value ?? dateDefault["max"]);
       setPickerEndDate(e);
       setSliderEndDate(e);
       dispatch(
         updateDateTimeFilterRange({
           start: pickerStartDate.getTime(),
-          end: value,
+          end: e.getTime(),
         })
       );
     },
@@ -417,10 +437,10 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
       >
         <Grid container>
           <Grid item xs={2}>
-            <DatePicker
+            <DateTimePicker
               onChange={onStartDatePickerChanged}
-              defaultValue={componentParam.dateTimeFilterRange?.start}
-              value={dayjs(pickerStartDate)}
+              defaultValue={componentParam.dateTimeFilterRange?.start?.toString()}
+              value={dayjs(pickerStartDate).toString()}
               views={["year", "month", "day"]}
             />
           </Grid>
@@ -443,10 +463,10 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            <DatePicker
+            <DateTimePicker
               onChange={onEndDatePickerChanged}
-              defaultValue={componentParam.dateTimeFilterRange?.end}
-              value={dayjs(pickerEndDate)}
+              defaultValue={componentParam.dateTimeFilterRange?.end?.toString()}
+              value={dayjs(pickerEndDate).toString()}
               views={["year", "month", "day"]}
             />
           </Grid>

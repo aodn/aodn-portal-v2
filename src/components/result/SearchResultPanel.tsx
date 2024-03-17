@@ -17,7 +17,7 @@ import {
   fetchResultWithStore,
   OGCCollection,
 } from "../common/store/searchReducer";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import store, {
   AppDispatch,
   getComponentState,
@@ -26,7 +26,6 @@ import store, {
 } from "../common/store/store";
 import { MapLibreEvent } from "maplibre-gl";
 import * as turf from "@turf/turf";
-import { useDispatch } from "react-redux";
 import {
   ParameterState,
   updateFilterPolygon,

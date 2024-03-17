@@ -27,7 +27,7 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { PropsWithChildren, useCallback, useState } from "react";
 import { OGCCollection } from "../common/store/searchReducer";
 import { DateRangeSlider } from "../common/slider/RangeSlider";
-import { border, dateDefault, margin } from "../common/constants";
+import { dateDefault, margin } from "../common/constants";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
@@ -54,9 +54,7 @@ interface TabPanelProps {
 const mapPanelId = "maplibre-detail-page-id";
 
 const MapCard = (props: DetailCardProps) => {
-  const [minSliderDate, setSliderMinDate] = useState<Date | undefined>(
-    undefined
-  );
+  const [minSliderDate] = useState<Date | undefined>(undefined);
   const [startSliderDate, setSliderStartDate] = useState<Date>(
     dateDefault["min"]
   );
@@ -76,16 +74,13 @@ const MapCard = (props: DetailCardProps) => {
 
       return r;
     },
-    [props.collection]
-  );
-
-  const onSlideChanged = useCallback(
-    (start: number, end: number, startIndex: number, endIndex: number) => {
-      setSliderStartDate(new Date(start));
-      setSliderEndDate(new Date(end));
-    },
     []
   );
+
+  const onSlideChanged = useCallback((start: number, end: number) => {
+    setSliderStartDate(new Date(start));
+    setSliderEndDate(new Date(end));
+  }, []);
 
   return (
     <Card
@@ -240,7 +235,7 @@ const ContentTabPanel = ({
       {value === index && (
         <Box
           sx={{
-            border: border["tabPanelBorder"],
+            //border: border["tabPanelBorder"],
             backgroundColor: grey["contentTabPanel"],
           }}
         >
@@ -324,7 +319,7 @@ const LinkTabPanel = ({
       {value === index && (
         <Box
           sx={{
-            border: border["tabPanelBorder"],
+            //border: border["tabPanelBorder"],
             backgroundColor: grey["contentTabPanel"],
           }}
         >
@@ -373,6 +368,7 @@ const LinkCard = (props: DetailCardProps) => {
           <List>
             {props.collection?.links?.map((f) => (
               <ListItem
+                key={f.title}
                 secondaryAction={
                   <IconButton edge="end" onClick={() => window.open(f.href)}>
                     <LinkIcon />

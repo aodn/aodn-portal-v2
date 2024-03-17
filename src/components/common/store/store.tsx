@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import searchReducer from "./searchReducer";
-import logger from "redux-logger";
-import paramReducer, { ParameterState } from "./componentParamReducer";
+import { logger } from "redux-logger";
+import paramReducer from "./componentParamReducer";
 
 // https://stackoverflow.com/questions/69502147/changing-from-redux-to-redux-toolkit
 // https://redux-toolkit.js.org/api/getDefaultMiddleware
@@ -20,9 +20,11 @@ export type RootState = ReturnType<typeof store.getState>;
 
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;
+export type AppStore = typeof store;
 
-const searchQueryResult = (state: any) => state.searcher.collectionsQueryResult;
-const getComponentState = (state: any): ParameterState => state.paramReducer;
+const searchQueryResult = (state: RootState) =>
+  state.searcher.collectionsQueryResult;
+const getComponentState = (state: RootState) => state.paramReducer;
 
 export { searchQueryResult, getComponentState };
 

@@ -1,7 +1,6 @@
-import * as React from "react";
 import { Grid, Box, Button, MenuItem, OutlinedInput } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
-import { border, borderRadius } from "../constants";
+import { borderRadius } from "../constants";
 import RoundSelect from "../dropdown/RoundSelect";
 import ClearIcon from "@mui/icons-material/Clear";
 
@@ -19,7 +18,7 @@ const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
         backgroundImage: "url(/filters/Background.png)",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
-        border: border["frameBorder"],
+        //border: border["frameBorder"],
         borderRadius: borderRadius["filter"],
         justifyContent: "center",
         minHeight: "90px",
@@ -61,7 +60,7 @@ const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
             width: "80%",
           }}
           input={<OutlinedInput />}
-          renderValue={(selected) => <em>Biological</em>}
+          renderValue={() => <em>Biological</em>}
         >
           <MenuItem disabled value="">
             <em>Biological</em>
@@ -82,7 +81,7 @@ const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
             width: "80%",
           }}
           input={<OutlinedInput />}
-          renderValue={(selected) => <em>Biological</em>}
+          renderValue={() => <em>Biological</em>}
         >
           <MenuItem disabled value="">
             <em>Biological</em>
@@ -103,7 +102,7 @@ const RemovableParameterFilter = (props: RemovableParameterFilterProps) => {
             width: "80%",
           }}
           input={<OutlinedInput />}
-          renderValue={(selected) => <em>Biological</em>}
+          renderValue={() => <em>Biological</em>}
         >
           <MenuItem disabled value="">
             <em>Biological</em>

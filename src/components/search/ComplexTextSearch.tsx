@@ -1,9 +1,8 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import {
   Grid,
   Button,
   Paper,
-  InputBase,
   IconButton,
   Divider,
   Autocomplete,
@@ -24,7 +23,6 @@ import {
   ParameterState,
   updateSearchText,
 } from "../common/store/componentParamReducer";
-import AutoCompleteSearchField from "./AutoCompleteSearchField";
 import axios from "axios";
 import StyledTextField from "./StyledTextField";
 
@@ -64,16 +62,16 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState<string | null>(null);
-  const [inputValue, setInputValue] = React.useState("");
-  const [options, setOptions] = React.useState<readonly string[]>([]);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState("");
+  const [options, setOptions] = useState<readonly string[]>([]);
   const loading = open && options.length === 0;
 
   const [toggleRemovableFilter, setToggleRemovableFilter] =
-    React.useState<boolean>(true);
-  const [showFilters, setShowFilters] = React.useState<boolean>(false);
-  const [searchText, setSearchText] = React.useState<string>("");
+    useState<boolean>(true);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [searchText] = useState<string>("");
 
   const onSearchClick = useCallback(() => {
     dispatch(updateSearchText(searchText + ""));
@@ -118,7 +116,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
     }
   }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (inputValue.trim() === "") {
       setOptions(value ? [value] : []);
       return undefined;
@@ -126,7 +124,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`/api/v1/ogc/ext/autocomplete`, {
+        const response = await axios.get("/api/v1/ogc/ext/autocomplete", {
           params: {
             input: inputValue,
           },
@@ -140,7 +138,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
     fetchData();
   }, [inputValue, loading, value]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) {
       setOptions([]);
     }

@@ -1,4 +1,4 @@
-import "./App.css";
+// React import is not required in React 17 or later
 import { RouterProvider } from "react-router-dom";
 
 import Fallback from "./pages/Fallback";

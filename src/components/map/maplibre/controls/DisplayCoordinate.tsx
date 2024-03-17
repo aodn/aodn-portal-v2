@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import MapContext from "../MapContext";
 import { zIndex } from "../../../common/constants";
 
@@ -9,7 +9,7 @@ const DisplayCoordinate = () => {
   useEffect(() => {
     if (!map) return;
 
-    const handle = (e: any) => {
+    const handle = (e: unknown) => {
       if (ref.current) {
         ref.current.innerHTML =
           JSON.stringify(e.point) + " " + JSON.stringify(e.lngLat.wrap());
