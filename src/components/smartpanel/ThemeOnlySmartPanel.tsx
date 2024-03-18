@@ -24,7 +24,6 @@ const ThemeOnlySmartPanel = () => {
         stackRef.current.scrollLeft += scrollOffset;
       }
     },
-    // eslint-disable-next-line prettier/prettier
     [stackRef]
   );
 
