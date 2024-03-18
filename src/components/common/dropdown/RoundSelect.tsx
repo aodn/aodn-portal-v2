@@ -1,7 +1,9 @@
 import { Select, SelectProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-const RoundSelect = styled((props: SelectProps) => <Select {...props} />)(
+type RoundSelectProps = Partial<SelectProps>;
+
+const RoundSelect = styled((props: RoundSelectProps) => <Select {...props} />)(
   () => ({
     borderRadius: "10px",
     textTransform: "none",

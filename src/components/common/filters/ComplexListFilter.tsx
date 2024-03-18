@@ -66,6 +66,7 @@ const ComplexListFilter = () => {
         {filterGroup &&
           filterGroup.map((value) => (
             <List
+              key={value.name}
               sx={{
                 backgroundColor: grey["filterGroup"],
                 border: border["listFilterBorder"],

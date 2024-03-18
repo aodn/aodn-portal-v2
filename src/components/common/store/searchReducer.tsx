@@ -67,7 +67,6 @@ const initialState: ObjectValue = {
   },
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const searchResult = async (param: SearchParameters, thunkApi: any) => {
   try {
     const response = await axios.get<OGCCollections>(
