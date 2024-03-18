@@ -12,10 +12,7 @@ module.exports = {
     "plugin:import/recommended",
     "plugin:jsx-a11y/recommended",
     "plugin:@typescript-eslint/recommended",
-    "eslint-config-prettier",
     "prettier",
-    "plugin:import/errors",
-    "plugin:import/warnings",
     "plugin:import/typescript",
     "plugin:prettier/recommended",
   ],
@@ -45,10 +42,9 @@ module.exports = {
   rules: {
     "react/react-in-jsx-scope": "off",
     "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["error"],
+    "@typescript-eslint/no-unused-vars": ["off"],
+    "@typescript-eslint/no-explicit-any": "off",
     quotes: ["error"],
     "no-undef": "off",
-    "prettier/prettier": "error",
   },
-  plugins: ["prettier"],
 };

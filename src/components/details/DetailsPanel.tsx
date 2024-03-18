@@ -28,7 +28,7 @@ const DetailsPanel = (props: DetailsProps) => {
           gap={2}
         >
           <Grid item xs={8}>
-            <DetailsHeaderButton collection={props.collection} />
+            <DetailsHeaderButton />
           </Grid>
           <Grid item xs={8}>
             <DetailsHeader collection={props.collection} />

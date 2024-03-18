@@ -9,7 +9,7 @@ const DisplayCoordinate = () => {
   useEffect(() => {
     if (!map) return;
 
-    const handle = (e: unknown) => {
+    const handle = (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
       if (ref.current) {
         ref.current.innerHTML =
           JSON.stringify(e.point) + " " + JSON.stringify(e.lngLat.wrap());
