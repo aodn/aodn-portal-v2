@@ -9,7 +9,6 @@ const BorderButton = styled((props: ButtonProps) => <Button {...props} />)(
     backgroundColor: "none",
     fontSize: "1rem",
     color: "white",
-    // eslint-disable-next-line prettier/prettier
   })
 );
 
