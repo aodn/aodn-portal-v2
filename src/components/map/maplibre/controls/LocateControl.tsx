@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import MapContext from "../MapContext";
-import maplibregl from "maplibre-gl";
+import { GeolocateControl as LibreGeolocateContol } from "maplibre-gl";
 
 const Locate = () => {
   const { map } = useContext(MapContext);
@@ -8,7 +8,7 @@ const Locate = () => {
   useEffect(() => {
     if (!map) return;
 
-    const n = new maplibregl.GeolocateControl({
+    const n = new LibreGeolocateContol({
       positionOptions: {
         enableHighAccuracy: true,
       },
