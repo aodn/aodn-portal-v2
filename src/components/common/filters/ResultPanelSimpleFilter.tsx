@@ -1,55 +1,110 @@
-import * as React from 'react';
-import {Grid, MenuItem} from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import SlightRoundButton from "../buttons/SlightRoundButton";
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import {margin} from "../constants";
-import NoBorderButton from "../buttons/NoBorderButton";
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import RoundSelect from "../dropdown/RoundSelect";
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import {
+  FormControl,
+  Grid,
+  IconButton,
+  InputBase,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  styled,
+} from "@mui/material";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
-interface ResultPanelSimpleFilterProps {
-    filterClicked?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-}
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import dateTime from "@/assets/logos/time-range.png";
+import depth from "@/assets/logos/depth.png";
+import dataSettings from "@/assets/logos/data-settings.png";
+import waterBody from "@/assets/logos/water-body.png";
 
-const ResultPanelSimpleFilter = (props: ResultPanelSimpleFilterProps) => {
+import { SmartCard11 } from "../../smartpanel/SmartCard";
 
-    return(
-        <Grid container>
-            <Grid item
-                  xs={12}
-                  sx={{
-                      marginTop: margin['top'],
-                  }}>
-                <Grid container justifyContent='center' columns={11} gap={1}>
-                    <Grid item xs='auto'>
-                        <SlightRoundButton
-                            startIcon={<PlayArrowIcon/>}
-                            endIcon={<FilterAltIcon/>}
-                            onClick={props.filterClicked}>Expand filters</SlightRoundButton>
-                    </Grid>
-                    <Grid item xs='auto'><NoBorderButton endIcon={<ArrowBackIosIcon/>}></NoBorderButton></Grid>
-                    <Grid item xs={1}>
-                        {/* <RoundSelect>
-                            <MenuItem>1-20 on 1258 matching</MenuItem>
-                        </RoundSelect> */}
-                    </Grid>
-                    <Grid item xs='auto'><NoBorderButton startIcon={<ArrowForwardIosIcon/>}></NoBorderButton></Grid>
-                    <Grid item xs={2}>
-                        {/* <RoundSelect>
-                            <MenuItem>Sort By</MenuItem>
-                        </RoundSelect> */}
-                    </Grid>
-                    <Grid item xs={2}>
-                        {/* <RoundSelect>
-                            <MenuItem>Sort By</MenuItem>
-                        </RoundSelect> */}
-                    </Grid>
-                </Grid>
-            </Grid>
-        </Grid>
-    );
-}
+// interface ResultPanelSimpleFilterProps {
+//   filterClicked?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+// }
+
+const SlimSelect = styled(InputBase)(() => ({
+  "& .MuiInputBase-input": {
+    border: "none",
+  },
+}));
+
+const Item = styled(Paper)(({ theme }) => ({
+  textAlign: "center",
+  minWidth: "100px",
+  color: theme.palette.text.secondary,
+}));
+
+export const ResultPanelIconFilter = () => {
+  return (
+    <Grid container sx={{ pl: 2 }}>
+      <Grid item xs={12}>
+        <Stack direction="column" spacing={2}>
+          <Item variant="outlined">
+            <SmartCard11
+              imageUrl={dateTime}
+              caption="Date Range"
+              colour="#747474"
+              isOutlined
+            />
+          </Item>
+          <Item variant="outlined">
+            <SmartCard11
+              imageUrl={depth}
+              caption="Depth"
+              colour="#747474"
+              isOutlined
+            />
+          </Item>
+          <Item variant="outlined">
+            <SmartCard11
+              imageUrl={dataSettings}
+              caption="Data Settings"
+              colour="#747474"
+              isOutlined
+            />
+          </Item>
+          <Item variant="outlined">
+            <SmartCard11
+              imageUrl={waterBody}
+              caption="Water Body"
+              colour="#747474"
+              isOutlined
+            />
+          </Item>
+        </Stack>
+      </Grid>
+    </Grid>
+  );
+};
+// props: ResultPanelSimpleFilterProps -- use this later maybe?
+const ResultPanelSimpleFilter = () => {
+  return (
+    <Grid container justifyContent="center">
+      <Grid item xs={12} sx={{ pb: 1 }}>
+        <Paper
+          variant="outlined"
+          component="form"
+          sx={{ p: "2px 4px", display: "flex", alignItems: "center" }}
+        >
+          <IconButton sx={{ p: "10px" }} aria-label="search">
+            <ArrowBackIosIcon />
+          </IconButton>
+          <FormControl fullWidth size="small">
+            <Select
+              value={1}
+              input={<SlimSelect id="select1" name="select1" />}
+            >
+              <MenuItem value={1}>1-20 on 1258 matching</MenuItem>
+            </Select>
+          </FormControl>
+          <IconButton sx={{ p: "10px" }}>
+            <ArrowForwardIosIcon />
+          </IconButton>
+        </Paper>
+      </Grid>
+    </Grid>
+  );
+};
 
 export default ResultPanelSimpleFilter;

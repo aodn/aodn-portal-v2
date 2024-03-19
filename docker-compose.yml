@@ -1,12 +1,12 @@
-version: '3.1'
+version: "3.1"
 
 services:
   aodnportal:
     container_name: aodn-portal-v2
     build: .
-    image: http://ec2-13-239-6-54.ap-southeast-2.compute.amazonaws.com:8081
+    image: https://ogcapi-edge.mvp.aodn.org.au/
     network_mode: "host"
     env_file:
-      - .env
+      - sample.env
     volumes:
       - /tmp:/tmp

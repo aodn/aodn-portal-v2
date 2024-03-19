@@ -7,6 +7,7 @@
     "skipLibCheck": true,
     "plugins": [{ "name": "typescript-plugin-css-modules" }],
     "types": ["vite/client"],
+    "esModuleInterop": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -19,8 +20,8 @@
 
     /* Linting */
     "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    // "noUnusedLocals": false,
+    // "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],

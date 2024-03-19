@@ -1,26 +1,25 @@
-import * as React from 'react';
 import {
   Box,
   Container,
-  Typography,
-  Link,
-  List,
   Grid,
   IconButton,
-} from '@mui/material';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import XIcon from '@mui/icons-material/X';
+  Link,
+  List,
+  Typography,
+} from "@mui/material";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import XIcon from "@mui/icons-material/X";
 //import YouTubeIcon from '@mui/icons-material/YouTube';
 
 const Footer = () => {
   return (
     <Box
       sx={{
-        backgroundColor: '#F4F5F6',
-        color: 'primary.main',
-        padding: '50px 0',
+        backgroundColor: "#F4F5F6",
+        color: "primary.main",
+        padding: "50px 0",
       }}
     >
       <Container>
@@ -57,6 +56,7 @@ const Footer = () => {
             <Typography variant="h6" padding="10px 0 0 0">
               Data
             </Typography>
+            {/* This is where the menu items/links for 'Data' will go */}
             <Typography variant="body1">
               <Link color="#F4F5F6" href="#">
                 Link 1
@@ -77,6 +77,7 @@ const Footer = () => {
             <Typography variant="h6" padding="10px 0 0 0">
               Learn
             </Typography>
+            {/* This is where the menu items/links for 'Learn' will go */}
             <Typography variant="body1">
               <Link color="#F4F5F6" href="#">
                 Link 1
@@ -105,11 +106,11 @@ const Footer = () => {
             </Typography>
             <div>
               <IconButton
-                color="primary"
+                sx={{ color: "body1.color" }}
                 aria-label="Facebook"
                 onClick={() =>
                   window.open(
-                    'https://www.facebook.com/IntegratedMarineObservingSystem'
+                    "https://www.facebook.com/IntegratedMarineObservingSystem"
                   )
                 }
               >
@@ -117,17 +118,17 @@ const Footer = () => {
               </IconButton>
 
               <IconButton
-                color="primary"
+                sx={{ color: "body1.color" }}
                 aria-label="LinkedIn"
                 onClick={() =>
-                  window.open('https://www.linkedin.com/company/18409795')
+                  window.open("https://www.linkedin.com/company/18409795")
                 }
               >
                 <LinkedInIcon />
               </IconButton>
 
               {/* <IconButton
-                color="primary"
+                sx={{ color: 'body1.color' }}
                 aria-label="YouTube"
                 onClick={() =>
                   window.open('https://www.youtube.com/user/IMOS5395')
@@ -137,24 +138,28 @@ const Footer = () => {
               </IconButton> */}
 
               <IconButton
-                color="primary"
+                sx={{ color: "body1.color" }}
                 aria-label="X"
-                onClick={() => window.open('https://twitter.com/IMOS_AUS')}
+                onClick={() => window.open("https://twitter.com/IMOS_AUS")}
               >
                 <XIcon />
               </IconButton>
 
               <IconButton
-                color="primary"
+                sx={{ color: "body1.color" }}
                 aria-label="Instagram"
                 onClick={() =>
-                  window.open('https://www.instagram.com/imos_australia')
+                  window.open("https://www.instagram.com/imos_australia")
                 }
               >
                 <InstagramIcon />
               </IconButton>
-              <Typography variant="body2" padding="50px 0 20px 0">
-                Copyright © 2024. All rights reserved.{' '}
+              <Typography
+                sx={{ color: "body1.color" }}
+                variant="body2"
+                padding="50px 0 20px 0"
+              >
+                Copyright © 2024. All rights reserved.{" "}
               </Typography>
             </div>
           </Grid>

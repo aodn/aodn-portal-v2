@@ -1,7 +1,9 @@
 # AODN Portal RC1
+
 Release Candidate 1 - for limited release to key stakeholders of priority features.
 
 ## Running the app locally
+
 For testing the app locally ensure you have Vite, React, Yarn installed globally.
 
 1. Clone the repositiory to your local machine
