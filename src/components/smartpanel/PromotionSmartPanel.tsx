@@ -1,15 +1,11 @@
-import * as React from 'react';
-import ComplexSmartPanel from "./ComplexSmartPanel";
+import Logos from "../common/logos/Logos";
 
 /**
  * Empty for now, implement it later
  * @constructor
  */
 const PromotionSmartPanel = () => {
-    return (
-        <ComplexSmartPanel columns={7} rows={4}>
-        </ComplexSmartPanel>
-    );
-}
+  return <Logos />;
+};
 
 export default PromotionSmartPanel;

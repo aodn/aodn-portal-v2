@@ -1,15 +1,14 @@
-import { styled } from '@mui/material/styles';
-import { TextField, TextFieldProps } from '@mui/material';
-import grey from '../common/colors/grey';
+import { styled } from "@mui/material/styles";
+import { TextField, TextFieldProps } from "@mui/material";
 
 const StyledTextField = styled((props: TextFieldProps) => (
   <TextField {...props} />
-))(({ theme }) => ({
-  minWidth: '100%',
-  marginInline: '2px',
-  backgroundColor: grey['search'],
-  '& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline': {
-    borderColor: 'white',
+))(() => ({
+  minWidth: "100%",
+  //marginInline: '2px',
+  //backgroundColor: grey['search'],
+  "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+    border: "none",
   },
   // "& .MuiOutlinedInput-input": {
   //     color: "black"

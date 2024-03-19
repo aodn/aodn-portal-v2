@@ -1,28 +1,27 @@
 import React, { useContext, useEffect } from "react";
 import MapContext from "../MapContext";
-import maplibregl from 'maplibre-gl'
+import { GeolocateControl as LibreGeolocateContol } from "maplibre-gl";
 
 const Locate = () => {
+  const { map } = useContext(MapContext);
 
-    const { map } = useContext(MapContext);  
+  useEffect(() => {
+    if (!map) return;
 
-    useEffect(() => {
-        if(!map) return;
+    const n = new LibreGeolocateContol({
+      positionOptions: {
+        enableHighAccuracy: true,
+      },
+      trackUserLocation: true,
+    });
 
-        const n = new maplibregl.GeolocateControl({
-            positionOptions: {
-                enableHighAccuracy: true
-            },
-            trackUserLocation: true
-        });
-    
-        map.addControl(n);
-        return () => {
-            map.removeControl(n)
-        }
-    }, [map]);
+    map.addControl(n);
+    return () => {
+      map.removeControl(n);
+    };
+  }, [map]);
 
-    return (<React.Fragment/>);
-}
+  return <React.Fragment />;
+};
 
 export default Locate;

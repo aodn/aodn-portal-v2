@@ -4,7 +4,7 @@ import DetailsPage from "../pages/DetailsPage";
 import { pageDefault } from "../components/common/constants";
 import { createBrowserRouter } from "react-router-dom";
 
-const AppRouter = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: pageDefault.landing,
     Component: LandingPage,
@@ -22,4 +22,4 @@ const AppRouter = createBrowserRouter([
   },
 ]);
 
-export default AppRouter;
+export default router;

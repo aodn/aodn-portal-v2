@@ -1,4 +1,4 @@
-const {createProxyMiddleware} = require("http-proxy-middleware")
+import * as proxy from "http-proxy-middleware";
 
 /**
  * This is use to proxy call to ogcapi server, the web server is coming from localhost:3000
@@ -9,13 +9,18 @@ const {createProxyMiddleware} = require("http-proxy-middleware")
  *
  * @param app
  */
-module.exports = function(app) {
-    app.use(
-      createProxyMiddleware(
-        ['/api/v1/ogc/collections','/api/v1/ogc/tiles'],
-        {
-          target: import.meta.env.VITE_API_HOST,
-          changeOrigin: true,
-        })
-    );
-}
+module.exports = function (app) {
+  app.use(
+    proxy(
+      [
+        "/api/v1/ogc/collections",
+        "/api/v1/ogc/tiles",
+        "/api/v1/ogc/ext/autocomplete",
+      ],
+      {
+        target: import.meta.env.VITE_API_HOST,
+        changeOrigin: true,
+      }
+    )
+  );
+};

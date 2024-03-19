@@ -1,23 +1,22 @@
-import React, {useContext, useEffect} from "react";
+import React, { useContext, useEffect } from "react";
 import MapContext from "../MapContext";
-import mapLibre from "maplibre-gl";
+import { FullscreenControl as LibreFullScreenControl } from "maplibre-gl";
 
 const FullScreen = () => {
+  const { map } = useContext(MapContext);
 
-    const { map } = useContext(MapContext);
+  useEffect(() => {
+    if (!map) return;
 
-    useEffect(() => {
-        if(!map) return;
+    const n = new LibreFullScreenControl();
+    map.addControl(n);
 
-        const n = new mapLibre.FullscreenControl();
-        map.addControl(n);
+    return () => {
+      map.removeControl(n);
+    };
+  }, [map]);
 
-        return () => {
-            map.removeControl(n)
-        }
-    }, [map]);
-
-    return (<React.Fragment/>);
-}
+  return <React.Fragment />;
+};
 
 export default FullScreen;
