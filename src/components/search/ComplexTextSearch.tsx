@@ -40,7 +40,7 @@ export interface ComplexTextSearchProps {
  * @param handler
  * @returns
  */
-const searchButton = (searchText: string, handler: () => void) => {
+const searchButton = (searchText: string, handler: (t: string) => void) => {
   return (
     <Button
       sx={{
