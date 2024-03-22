@@ -154,7 +154,7 @@ const appendFilter = (f: string | undefined, a: string | undefined) =>
 
 const createSearchParamFrom = (i: ParameterState): SearchParameters => {
   const p: SearchParameters = {};
-  p.text = (i.searchText + "").replace(" ", ",");
+  p.text = i.searchText;
   p.filter = undefined;
 
   if (i.isImosOnlyDataset) {

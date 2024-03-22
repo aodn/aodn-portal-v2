@@ -40,7 +40,7 @@ export interface ComplexTextSearchProps {
  * @param handler
  * @returns
  */
-const searchButton = (handler: () => void) => {
+const searchButton = (searchText: string, handler: () => void) => {
   return (
     <Button
       sx={{
@@ -50,7 +50,7 @@ const searchButton = (handler: () => void) => {
       }}
       fullWidth
       onClick={() => {
-        return handler();
+        return handler(searchText);
       }}
     >
       Search
@@ -63,30 +63,27 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState<string | null>(null);
-  const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState<readonly string[]>([]);
   const loading = open && options.length === 0;
 
+  // This is use store what need to display on the autocomplete text box, we cannot merge the item together
+  const [textValue, setTextValue] = useState("");
   //const [toggleRemovableFilter] = useState<boolean>(true);
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [searchText] = useState<string>("");
 
-  const onSearchClick = useCallback(() => {
-    dispatch(updateSearchText(searchText + ""));
+  const onSearchClick = useCallback(
+    (t: string) => {
+      dispatch(updateSearchText(t + ""));
 
-    const componentParam: ParameterState = getComponentState(store.getState());
-    dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
-      .unwrap()
-      .then(() => navigate("/search"));
-  }, [dispatch, navigate, searchText]);
+      const componentParam: ParameterState = getComponentState(
+        store.getState()
+      );
 
-  const onSearchSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      onSearchClick();
+      dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
+        .unwrap()
+        .then(() => navigate("/search"));
     },
-    [onSearchClick]
+    [dispatch, navigate]
   );
 
   const onFilterShowHide = useCallback(
@@ -117,26 +114,24 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
   // }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
 
   useEffect(() => {
-    if (inputValue.trim() === "") {
-      setOptions(value ? [value] : []);
-      return undefined;
-    }
-
-    const fetchData = async () => {
+    const fetchData = async (value) => {
       try {
         const response = await axios.get("/api/v1/ogc/ext/autocomplete", {
           params: {
-            input: inputValue,
+            input: value,
           },
         });
-        setOptions(response.data);
+
+        const d = response.data;
+        setOptions(d);
+        setOpen(d.length > 0);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    fetchData();
-  }, [inputValue, loading, value]);
+    fetchData(textValue);
+  }, [textValue, loading]);
 
   useEffect(() => {
     if (!open) {
@@ -158,70 +153,67 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
       >
         <Grid container spacing={2}>
           <Grid item xs={10}>
-            <form onSubmit={onSearchSubmit}>
-              <Paper
-                sx={{ p: "2px 4px", display: "flex", alignItems: "center" }}
+            <Paper sx={{ p: "2px 4px", display: "flex", alignItems: "center" }}>
+              <IconButton sx={{ p: "10px" }} aria-label="search">
+                <SearchIcon />
+              </IconButton>
+              <Autocomplete
+                id="search"
+                fullWidth
+                freeSolo
+                open={open}
+                onOpen={() => {
+                  setOpen(options.length > 0);
+                }}
+                onClose={() => {
+                  setOpen(false);
+                }}
+                forcePopupIcon={false}
+                getOptionLabel={(option) => option}
+                options={options}
+                value={textValue}
+                autoComplete
+                includeInputInList
+                onChange={(_, newValue: string | null) => {
+                  if (newValue !== null) {
+                    // String quote with double quote to indicate user want the whole phase during search.
+                    // fire event here before useState update, need to call function in this case
+                    setTextValue(newValue);
+                  }
+                }}
+                onInputChange={(_, newInputValue) => {
+                  // If user type anything, then it is not a title search anymore
+                  setTextValue(newInputValue);
+                }}
+                renderInput={(params) => (
+                  <StyledTextField
+                    {...params}
+                    placeholder="Search for open data"
+                    inputProps={{
+                      "aria-label": "Search for open data",
+                      ...params.inputProps,
+                    }}
+                  />
+                )}
+              />
+              <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+              <Button
+                variant="text"
+                sx={{
+                  color: grey["searchButtonText"],
+                  pr: 1,
+                }}
+                startIcon={<Tune />}
+                onClick={(e) => {
+                  onFilterShowHide(e);
+                }}
               >
-                <IconButton sx={{ p: "10px" }} aria-label="search">
-                  <SearchIcon />
-                </IconButton>
-                <Autocomplete
-                  id="search"
-                  fullWidth
-                  open={open}
-                  onOpen={() => {
-                    setOpen(true);
-                  }}
-                  onClose={() => {
-                    setOpen(false);
-                  }}
-                  loading={loading}
-                  getOptionLabel={(option) => option}
-                  filterOptions={(x) => x}
-                  options={options}
-                  autoComplete
-                  includeInputInList
-                  filterSelectedOptions
-                  value={value}
-                  noOptionsText="No locations"
-                  onChange={(_, newValue: string | null) => {
-                    setOptions(newValue ? [newValue, ...options] : options);
-                    setValue(newValue);
-                    onSearchClick();
-                  }}
-                  onInputChange={(_, newInputValue) => {
-                    setInputValue(newInputValue);
-                  }}
-                  renderInput={(params) => (
-                    <StyledTextField
-                      {...params}
-                      placeholder="Search for open data"
-                      inputProps={{
-                        "aria-label": "Search for open data",
-                        ...params.inputProps,
-                      }}
-                    />
-                  )}
-                />
-                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                <Button
-                  variant="text"
-                  sx={{
-                    color: grey["searchButtonText"],
-                    pr: 1,
-                  }}
-                  startIcon={<Tune />}
-                  onClick={(e) => {
-                    onFilterShowHide(e);
-                  }}
-                >
-                  Filters
-                </Button>
-              </Paper>
-            </form>
+                Filters
+              </Button>
+            </Paper>
           </Grid>
           <Grid item xs={2}>
-            {searchButton(onSearchClick)}
+            {searchButton(textValue, onSearchClick)}
           </Grid>
         </Grid>
         {/* {showFilter()} */}
