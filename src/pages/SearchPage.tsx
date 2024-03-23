@@ -1,5 +1,5 @@
+import { useState, useCallback } from "react";
 import SimpleTextSearch from "../components/search/SimpleTextSearch";
-//import ThemeOnlySmartPanel from "../components/smartpanel/ThemeOnlySmartPanel";
 import ResultPanelSimpleFilter, {
   ResultPanelIconFilter,
 } from "../components/common/filters/ResultPanelSimpleFilter";
@@ -13,21 +13,65 @@ import DisplayCoordinate from "../components/map/maplibre/controls/DisplayCoordi
 import ItemsOnMapControl from "../components/map/maplibre/controls/ItemsOnMapControl";
 import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
 import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
-import { useState } from "react";
 import {
   CollectionsQueryType,
+  createSearchParamFrom,
+  fetchResultWithStore,
   OGCCollection,
 } from "../components/common/store/searchReducer";
 import { ResultCards } from "../components/result/ResultCards";
-import { useSelector } from "react-redux";
-import { RootState, searchQueryResult } from "../components/common/store/store";
 import Layout from "../components/layout/layout";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  ParameterState,
+  updateFilterPolygon,
+} from "../components/common/store/componentParamReducer";
+import store, {
+  AppDispatch,
+  getComponentState,
+  RootState,
+  searchQueryResult,
+} from "../components/common/store/store";
+import * as turf from "@turf/turf";
+import { MapLibreEvent as MapEvent } from "maplibre-gl";
 
 const SearchPage = () => {
-  const [layersUuid] = useState<Array<OGCCollection>>([]);
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [layersUuid, setLayersUuid] = useState<Array<OGCCollection>>([]);
   const contents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
+
+  const onMapZoom = useCallback(
+    (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
+      if (event.type === "zoomend") {
+        const bounds = event.target.getBounds();
+        const ne = bounds.getNorthEast(); // NorthEast corner
+        const sw = bounds.getSouthWest(); // SouthWest corner
+
+        // Note order: longitude, latitude.
+        const polygon = turf.bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
+        dispatch(updateFilterPolygon(polygon));
+
+        const componentParam: ParameterState = getComponentState(
+          store.getState()
+        );
+        dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
+          .unwrap()
+          .then((collections) => {
+            const ids = collections.collections.map((c) => c.id);
+            // remove map uuid not exist in the ids
+            setLayersUuid((v) => v.filter((i) => ids.includes(i.id)));
+          })
+          .then((v) => navigate("/search"));
+      }
+    },
+    [dispatch, navigate]
+  );
+
   return (
     <Layout>
       <Grid container spacing={2}>
@@ -53,7 +97,7 @@ const SearchPage = () => {
             id="maplibre-panel-id"
             sx={{ minHeight: "726px", pr: 2, pb: 2 }}
           >
-            <Map panelId="maplibre-panel-id" onZoomEvent={undefined}>
+            <Map panelId="maplibre-panel-id" onZoomEvent={onMapZoom}>
               <Controls>
                 <NavigationControl />
                 <DisplayCoordinate />
