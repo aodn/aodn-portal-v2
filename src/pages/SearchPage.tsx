@@ -114,17 +114,14 @@ const SearchPage = () => {
           />
         </Grid>
         <Grid item xs={7} sx={{ pr: 2, pb: 2 }}>
-          <Paper
-            elevation={0}
-            id="map-container-id"
-            sx={{ minHeight: "726px" }}
-          />
-          <Map panelId="map-container-id" onZoomEvent={onMapZoom}>
-            <Controls>
-              <NavigationControl />
-              <ScaleControl />
-            </Controls>
-          </Map>
+          <Paper id="map-container-id" sx={{ minHeight: "726px" }}>
+            <Map panelId="map-container-id" onZoomEvent={onMapZoom}>
+              <Controls>
+                <NavigationControl />
+                <ScaleControl />
+              </Controls>
+            </Map>
+          </Paper>
         </Grid>
       </Grid>
     </Layout>
