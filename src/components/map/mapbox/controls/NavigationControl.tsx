@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import MapContext from "../MapContext";
-import mapboxgl from "mapbox-gl";
+import { NavigationControl as MapboxNavigationControl } from "mapbox-gl";
 
 interface NavigationControlProps {
   showCompass?: boolean;
@@ -14,7 +14,7 @@ const NavigationControl = (props: NavigationControlProps) => {
   useEffect(() => {
     if (map === null) return;
 
-    const n = new mapboxgl.NavigationControl({
+    const n = new MapboxNavigationControl({
       showCompass: props.showCompass,
       showZoom: props.showZoom,
       visualizePitch: props.visualizePitch,

@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import mapboxgl, { Map, MapboxEvent } from "mapbox-gl";
+import { Map, MapboxEvent } from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
-
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string;
 
 interface MapProps {
   centerLongitude: number;
@@ -30,8 +28,9 @@ const ReactMap = ({
   useEffect(() => {
     setMap((m) =>
       m === null
-        ? (new mapboxgl.Map({
+        ? (new Map({
             container: panelId,
+            accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
             style: styleJson,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
