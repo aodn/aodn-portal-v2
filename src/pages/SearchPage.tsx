@@ -4,15 +4,6 @@ import ResultPanelSimpleFilter, {
   ResultPanelIconFilter,
 } from "../components/common/filters/ResultPanelSimpleFilter";
 import { Grid, Paper } from "@mui/material";
-import { Layers } from "@mui/icons-material";
-import Map from "../components/map/maplibre/Map";
-import Controls from "../components/map/maplibre/controls/Controls";
-import NavigationControl from "../components/map/maplibre/controls/NavigationControl";
-import ScaleControl from "../components/map/maplibre/controls/ScaleControl";
-import DisplayCoordinate from "../components/map/maplibre/controls/DisplayCoordinate";
-import ItemsOnMapControl from "../components/map/maplibre/controls/ItemsOnMapControl";
-import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
-import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 import {
   CollectionsQueryType,
   createSearchParamFrom,
@@ -34,13 +25,23 @@ import store, {
   searchQueryResult,
 } from "../components/common/store/store";
 import * as turf from "@turf/turf";
+// Map section, you can switch to other map library
 import { MapLibreEvent as MapEvent } from "maplibre-gl";
+import Map from "../components/map/maplibre/Map";
+import Controls from "../components/map/maplibre/controls/Controls";
+import Layers from "../components/map/maplibre/layers/Layers";
+import NavigationControl from "../components/map/maplibre/controls/NavigationControl";
+import ScaleControl from "../components/map/maplibre/controls/ScaleControl";
+import DisplayCoordinate from "../components/map/maplibre/controls/DisplayCoordinate";
+import ItemsOnMapControl from "../components/map/maplibre/controls/ItemsOnMapControl";
+import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
+import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 
 const SearchPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const [layersUuid, setLayersUuid] = useState<Array<OGCCollection>>([]);
+  const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   const contents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
@@ -52,7 +53,7 @@ const SearchPage = () => {
         const ne = bounds.getNorthEast(); // NorthEast corner
         const sw = bounds.getSouthWest(); // SouthWest corner
 
-        // Note order: longitude, latitude.
+        // Note order: longitude, latitude.2
         const polygon = turf.bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
         dispatch(updateFilterPolygon(polygon));
 
@@ -64,12 +65,27 @@ const SearchPage = () => {
           .then((collections) => {
             const ids = collections.collections.map((c) => c.id);
             // remove map uuid not exist in the ids
-            setLayersUuid((v) => v.filter((i) => ids.includes(i.id)));
+            setLayers((v) => v.filter((i) => ids.includes(i.id)));
           })
           .then((v) => navigate("/search"));
       }
     },
-    [dispatch, navigate]
+    [dispatch, navigate, setLayers]
+  );
+
+  const onAddToMap = useCallback(
+    (
+      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      collection: OGCCollection
+    ) => {
+      // Unique set of layers because we use set, duplicate will be removed
+      setLayers((v) => {
+        const l = v.filter((i) => i.id !== collection.id);
+        l.push(collection);
+        return l;
+      });
+    },
+    [setLayers]
   );
 
   return (
@@ -85,7 +101,7 @@ const SearchPage = () => {
           <ResultPanelSimpleFilter />
           <ResultCards
             contents={contents}
-            onAddToMap={undefined}
+            onAddToMap={onAddToMap}
             onDownload={undefined}
             onTags={undefined}
             onMore={undefined}
@@ -102,7 +118,6 @@ const SearchPage = () => {
                 <NavigationControl />
                 <DisplayCoordinate />
                 <ScaleControl />
-                <ItemsOnMapControl stac={layersUuid} />
                 <MapboxDrawControl
                   onDrawCreate={undefined}
                   onDrawDelete={undefined}
@@ -110,7 +125,7 @@ const SearchPage = () => {
                 />
               </Controls>
               <Layers>
-                <VectorTileLayers stac={layersUuid} />
+                <VectorTileLayers collections={layers} />
               </Layers>
             </Map>
           </Paper>
