@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Box } from "@mui/material";
-import mapboxgl, { Map, MapboxEvent } from 'mapbox-gl';
+import mapboxgl, { Map, MapboxEvent } from "mapbox-gl";
 import MapContext from "./MapContext";
- 
-mapboxgl.accessToken = 'myz@dkf-MCR3nkq4twd';
+
+mapboxgl.accessToken =
+  "pk.eyJ1IjoicmF5bW9uZG1mbmciLCJhIjoiY2x1NTNpbXJsMGozcDJxbm9qdmF5ZGVwbiJ9.ZLxq3dxSrxIr0MyWniK62A";
 
 interface MapProps {
   centerLongitude: number;
@@ -28,41 +28,49 @@ const ReactMap = ({
   const [map, setMap] = useState<Map | null>(null);
 
   useEffect(() => {
-    const m = new mapboxgl.Map({
-      container: panelId,
-      style: styleJson,
-      center: [centerLongitude, centerLatitude],
-      zoom: zoom,
-      localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
-    }) as Map;
+    setMap((m) =>
+      m === null
+        ? (new mapboxgl.Map({
+            container: panelId,
+            style: styleJson,
+            center: [centerLongitude, centerLatitude],
+            zoom: zoom,
+            localIdeographFontFamily:
+              "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
+          }) as Map)
+        : m
+    );
 
-    const z = (
-      e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-    ) => onZoomEvent && onZoomEvent(e);
+    if (map !== null) {
+      const z = (
+        e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+      ) => onZoomEvent && onZoomEvent(e);
 
-    m.on('zoomend', z);
-
-    setMap(m);
-
-    return () => {
-      m.off("zoomend", z);
-    };
-  }, [centerLatitude, centerLongitude, panelId, styleJson, zoom, onZoomEvent]);
+      map.on("zoomend", z);
+      return () => {
+        map.off("zoomend", z);
+      };
+    }
+  }, [
+    centerLatitude,
+    centerLongitude,
+    panelId,
+    styleJson,
+    zoom,
+    map,
+    onZoomEvent,
+  ]);
 
   return (
-    map && (
-      <MapContext.Provider value={{ map }}>
-        <Box>{children}</Box>
-      </MapContext.Provider>
-    )
+    map && <MapContext.Provider value={{ map }}>{children}</MapContext.Provider>
   );
 };
 
 ReactMap.defaultProps = {
   centerLatitude: -42.88611707886841,
   centerLongitude: 147.3353554138993,
-  zoom: 2,
-  styleJson: 'mapbox://styles/mapbox/streets-v12',
+  zoom: 4,
+  styleJson: "mapbox://styles/mapbox/outdoors-v12",
 };
 
 export default ReactMap;

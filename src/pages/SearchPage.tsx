@@ -26,16 +26,22 @@ import store, {
 } from "../components/common/store/store";
 import * as turf from "@turf/turf";
 // Map section, you can switch to other map library
-import { MapLibreEvent as MapEvent } from "maplibre-gl";
-import Map from "../components/map/maplibre/Map";
-import Controls from "../components/map/maplibre/controls/Controls";
-import Layers from "../components/map/maplibre/layers/Layers";
-import NavigationControl from "../components/map/maplibre/controls/NavigationControl";
-import ScaleControl from "../components/map/maplibre/controls/ScaleControl";
-import DisplayCoordinate from "../components/map/maplibre/controls/DisplayCoordinate";
-import ItemsOnMapControl from "../components/map/maplibre/controls/ItemsOnMapControl";
-import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
-import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
+// import { MapLibreEvent as MapEvent } from "maplibre-gl";
+// import Map from "../components/map/maplibre/Map";
+// import Controls from "../components/map/maplibre/controls/Controls";
+// import Layers from "../components/map/maplibre/layers/Layers";
+// import NavigationControl from "../components/map/maplibre/controls/NavigationControl";
+// import ScaleControl from "../components/map/maplibre/controls/ScaleControl";
+// import DisplayCoordinate from "../components/map/maplibre/controls/DisplayCoordinate";
+// import ItemsOnMapControl from "../components/map/maplibre/controls/ItemsOnMapControl";
+// import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
+// import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
+
+import Map from "../components/map/mapbox/Map";
+import Controls from "../components/map/mapbox/controls/Controls";
+import NavigationControl from "../components/map/mapbox/controls/NavigationControl";
+import ScaleControl from "../components/map/mapbox/controls/ScaleControl";
+import { MapboxEvent as MapEvent } from "mapbox-gl";
 
 const SearchPage = () => {
   const navigate = useNavigate();
@@ -110,25 +116,15 @@ const SearchPage = () => {
         <Grid item xs={7} sx={{ pr: 2, pb: 2 }}>
           <Paper
             elevation={0}
-            id="maplibre-panel-id"
-            sx={{ minHeight: "726px", pr: 2, pb: 2 }}
-          >
-            <Map panelId="maplibre-panel-id" onZoomEvent={onMapZoom}>
-              <Controls>
-                <NavigationControl />
-                <DisplayCoordinate />
-                <ScaleControl />
-                <MapboxDrawControl
-                  onDrawCreate={undefined}
-                  onDrawDelete={undefined}
-                  onDrawUpdate={undefined}
-                />
-              </Controls>
-              <Layers>
-                <VectorTileLayers collections={layers} />
-              </Layers>
-            </Map>
-          </Paper>
+            id="map-container-id"
+            sx={{ minHeight: "726px" }}
+          />
+          <Map panelId="map-container-id" onZoomEvent={onMapZoom}>
+            <Controls>
+              <NavigationControl />
+              <ScaleControl />
+            </Controls>
+          </Map>
         </Grid>
       </Grid>
     </Layout>
