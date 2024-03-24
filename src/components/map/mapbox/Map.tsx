@@ -3,8 +3,7 @@ import mapboxgl, { Map, MapboxEvent } from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoicmF5bW9uZG1mbmciLCJhIjoiY2x1NTNpbXJsMGozcDJxbm9qdmF5ZGVwbiJ9.ZLxq3dxSrxIr0MyWniK62A";
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string;
 
 interface MapProps {
   centerLongitude: number;
