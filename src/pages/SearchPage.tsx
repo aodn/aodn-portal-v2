@@ -25,7 +25,8 @@ import store, {
   searchQueryResult,
 } from "../components/common/store/store";
 import * as turf from "@turf/turf";
-// Map section, you can switch to other map library
+
+// Map section, you can switch to other map library, this is for maplibre
 // import { MapLibreEvent as MapEvent } from "maplibre-gl";
 // import Map from "../components/map/maplibre/Map";
 // import Controls from "../components/map/maplibre/controls/Controls";
@@ -37,10 +38,14 @@ import * as turf from "@turf/turf";
 // import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
 // import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 
+// Map section, you can switch to other map library, this is for mapbox
 import Map from "../components/map/mapbox/Map";
 import Controls from "../components/map/mapbox/controls/Controls";
 import NavigationControl from "../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../components/map/mapbox/controls/ScaleControl";
+import DisplayCoordinate from "../components/map/mapbox/controls/DisplayCoordinate";
+import Layers from "../components/map/mapbox/layers/Layers";
+import VectorTileLayers from "../components/map/mapbox/layers/VectorTileLayers";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 
 const SearchPage = () => {
@@ -118,8 +123,12 @@ const SearchPage = () => {
             <Map panelId="map-container-id" onZoomEvent={onMapZoom}>
               <Controls>
                 <NavigationControl />
+                <DisplayCoordinate />
                 <ScaleControl />
               </Controls>
+              <Layers>
+                <VectorTileLayers collections={layers} />
+              </Layers>
             </Map>
           </Paper>
         </Grid>
