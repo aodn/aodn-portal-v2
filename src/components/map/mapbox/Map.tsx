@@ -8,6 +8,7 @@ interface MapProps {
   centerLatitude: number;
   zoom: number;
   panelId: string;
+  projection: string;
   styleJson: string;
   onZoomEvent?: (
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
@@ -20,6 +21,7 @@ const ReactMap = ({
   centerLongitude,
   centerLatitude,
   zoom,
+  projection,
   onZoomEvent,
   children,
 }: React.PropsWithChildren<MapProps>) => {
@@ -45,7 +47,9 @@ const ReactMap = ({
         e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
       ) => onZoomEvent && onZoomEvent(e);
 
+      map.setProjection(projection);
       map.on("zoomend", z);
+
       return () => {
         map.off("zoomend", z);
       };
@@ -69,7 +73,8 @@ ReactMap.defaultProps = {
   centerLatitude: -42.88611707886841,
   centerLongitude: 147.3353554138993,
   zoom: 4,
-  styleJson: "mapbox://styles/mapbox/outdoors-v12",
+  styleJson: "mapbox://styles/mapbox/satellite-streets-v12",
+  projection: "equirectangular",
 };
 
 export default ReactMap;

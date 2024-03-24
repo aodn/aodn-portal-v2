@@ -64,9 +64,6 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
 
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<readonly string[]>([]);
-  const loading = open && options.length === 0;
-
-  // This is use store what need to display on the autocomplete text box, we cannot merge the item together
   const [textValue, setTextValue] = useState("");
   //const [toggleRemovableFilter] = useState<boolean>(true);
   const [showFilters, setShowFilters] = useState<boolean>(false);
@@ -131,7 +128,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
     };
 
     fetchData(textValue);
-  }, [textValue, loading]);
+  }, [textValue]);
 
   useEffect(() => {
     if (!open) {
