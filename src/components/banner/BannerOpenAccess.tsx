@@ -34,7 +34,7 @@ const BannerOpenAccess = (props: BannerProps) => {
                     }}
                     variant="h1"
                   >
-                    Open Access <br /> to Ocean Data
+                    Open Access <br /> to AODN
                   </Typography>
                 </Box>
               </Grid>
