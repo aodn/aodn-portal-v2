@@ -8,6 +8,15 @@ interface MapProps {
   centerLatitude: number;
   zoom: number;
   panelId: string;
+  projection:
+    | "mercator"
+    | "globe"
+    | "albers"
+    | "equalEarth"
+    | "equirectangular"
+    | "lambertConformalConic"
+    | "naturalEarth"
+    | "winkelTripel";
   styleJson: string;
   onZoomEvent?: (
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
@@ -20,6 +29,7 @@ const ReactMap = ({
   centerLongitude,
   centerLatitude,
   zoom,
+  projection,
   onZoomEvent,
   children,
 }: React.PropsWithChildren<MapProps>) => {
@@ -34,6 +44,7 @@ const ReactMap = ({
             style: styleJson,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
+            projection: projection,
             localIdeographFontFamily:
               "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
           }) as Map)
@@ -56,6 +67,7 @@ const ReactMap = ({
     panelId,
     styleJson,
     zoom,
+    projection,
     map,
     onZoomEvent,
   ]);
@@ -69,7 +81,8 @@ ReactMap.defaultProps = {
   centerLatitude: -42.88611707886841,
   centerLongitude: 147.3353554138993,
   zoom: 4,
-  styleJson: "mapbox://styles/mapbox/outdoors-v12",
+  projection: "equirectangular",
+  styleJson: "mapbox://styles/mapbox/satellite-streets-v12",
 };
 
 export default ReactMap;
