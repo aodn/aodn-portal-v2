@@ -44,7 +44,6 @@ const ReactMap = ({
             style: styleJson,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
-            projection: projection,
             localIdeographFontFamily:
               "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
           }) as Map)
@@ -55,6 +54,8 @@ const ReactMap = ({
       const z = (
         e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
       ) => onZoomEvent && onZoomEvent(e);
+
+      map.setProjection(projection);
 
       map.on("zoomend", z);
       return () => {
