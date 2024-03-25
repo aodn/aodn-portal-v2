@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
-
+import { useState, useEffect } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import MapContext, { MapCombined } from "./MapContext";
 import { Box } from "@mui/material";
-import { Map as MaplibreMap, MapLibreEvent } from "maplibre-gl";
+import { Map as MaplibreMap, MapLibreEvent as MapEvent } from "maplibre-gl";
 
 interface MapProps {
   centerLongitude: number;
@@ -12,7 +11,7 @@ interface MapProps {
   panelId: string;
   styleJson: string;
   onZoomEvent?: (
-    event: MapLibreEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+    event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
 }
 
@@ -60,9 +59,8 @@ const ReactMap = ({
       localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
     }) as MapCombined;
 
-    const z = (
-      e: MapLibreEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-    ) => onZoomEvent && onZoomEvent(e);
+    const z = (e: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) =>
+      onZoomEvent && onZoomEvent(e);
 
     // https://github.com/maplibre/maplibre-gl-js/issues/2601
     m.getCanvas().classList.add("mapboxgl-canvas");

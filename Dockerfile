@@ -9,14 +9,6 @@ COPY nginx /app/nginx
 COPY package.json /app/
 COPY tsconfig.json /app/
 
-# It is not use in prod remove it.
-# RUN rm /app/src/setupProxy.js
-
-# RUN npm install -g npm
-
-# RUN npm install --production
-# RUN npm run build --production
-
 # production environment
 FROM nginx:stable-alpine
 

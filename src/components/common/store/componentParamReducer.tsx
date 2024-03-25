@@ -65,7 +65,7 @@ const updateImosOnly = (isImosOnly: boolean | undefined): ActionType => {
 
 // Initial State
 const initialState: ParameterState = {
-  isImosOnlyDataset: true,
+  isImosOnlyDataset: false,
   dateTimeFilterRange: {},
   searchText: "",
 };
