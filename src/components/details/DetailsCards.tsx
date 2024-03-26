@@ -1,8 +1,4 @@
 import * as React from "react";
-import Map from "../map/maplibre/Map";
-import Controls from "../map/maplibre/controls/Controls";
-import NavigationControl from "../map/maplibre/controls/NavigationControl";
-import DisplayCoordinate from "../map/maplibre/controls/DisplayCoordinate";
 import {
   Card,
   CardContent,
@@ -22,7 +18,6 @@ import {
   ListItemText,
 } from "@mui/material";
 import grey from "../common/colors/grey";
-import FullScreen from "../map/maplibre/controls/FullScreenControl";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { PropsWithChildren, useCallback, useState } from "react";
 import { OGCCollection } from "../common/store/searchReducer";
@@ -34,6 +29,19 @@ import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SlightRoundButton from "../common/buttons/SlightRoundButton";
 import LinkIcon from "@mui/icons-material/Link";
 import PublicIcon from "@mui/icons-material/Public";
+
+// import Map from "../map/maplibre/Map";
+// import Controls from "../map/maplibre/controls/Controls";
+// import NavigationControl from "../map/maplibre/controls/NavigationControl";
+// import DisplayCoordinate from "../map/maplibre/controls/DisplayCoordinate";
+// import FullScreen from "../map/maplibre/controls/FullScreenControl";
+
+import Map from "../map/mapbox/Map";
+import Controls from "../map/mapbox/controls/Controls";
+import NavigationControl from "../map/mapbox/controls/NavigationControl";
+import ScaleControl from "../map/mapbox/controls/ScaleControl";
+import DisplayCoordinate from "../map/mapbox/controls/DisplayCoordinate";
+import { MapboxEvent as MapEvent } from "mapbox-gl";
 
 type Point = {
   date: number;
@@ -99,7 +107,6 @@ const MapCard = (props: DetailCardProps) => {
         >
           <Map panelId={mapPanelId}>
             <Controls>
-              <FullScreen />
               <NavigationControl />
               <DisplayCoordinate />
             </Controls>
