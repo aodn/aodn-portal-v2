@@ -101,7 +101,14 @@ const SearchPage = () => {
 
   return (
     <Layout>
-      <Grid container spacing={2}>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          backgroundImage: "url(/bg_search_results.png)",
+          backgroundSize: "cover",
+        }}
+      >
         <Grid item xs={12}>
           <SimpleTextSearch />
         </Grid>

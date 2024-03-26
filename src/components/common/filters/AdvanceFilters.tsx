@@ -10,7 +10,9 @@ import {
   SwitchProps,
 } from "@mui/material";
 import RemovableDateTimeFilter from "./RemovableDateTimeFilter";
-import { border, margin, zIndex } from "../constants";
+import DepthFilter from "./DepthFilter";
+import CategoryVocabFilter from "./CategoryVocabFilter";
+import { border, margin, zIndex, borderRadius } from "../constants";
 import BorderButton from "../buttons/BorderButton";
 import grey from "../colors/grey";
 import { Tune, Layers, People, DataThresholding } from "@mui/icons-material";
@@ -53,103 +55,52 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
             item
             xs={12}
             sx={{
-              backgroundImage: "url(/filters/Background.png)",
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "cover",
               marginTop: margin["top"],
+              borderRadius: borderRadius["filter"],
+              backgroundColor: "white",
               ...props.sx,
             }}
           >
             <Grid item xs={12}>
+              <Grid item xs={12}>
+                Filters
+              </Grid>
               <Grid
-                container
+                item
+                xs={12}
                 sx={{
-                  justifyContent: "center",
+                  marginLeft: margin["doubleLeft"],
+                  marginRight: margin["doubleRight"],
                 }}
               >
-                <Grid item xs={12}>
-                  Advanced Filters
-                </Grid>
-                <Grid item xs={2}>
-                  <BorderButton
-                    sx={{
-                      marginBottom: margin["bottom"],
-                      border: border["buttonBorder"],
-                      backgroundColor: grey["search"],
-                      color: "black",
-                    }}
-                    startIcon={<Tune />}
-                  >
-                    Parameter
-                  </BorderButton>
-                </Grid>
-                <Grid item xs={2}>
-                  <BorderButton
-                    sx={{
-                      border: border["buttonBorder"],
-                      backgroundColor: grey["search"],
-                      color: "black",
-                    }}
-                    startIcon={<Layers />}
-                  >
-                    Platform
-                  </BorderButton>
-                </Grid>
-                <Grid item xs={2}>
-                  <BorderButton
-                    sx={{
-                      border: border["buttonBorder"],
-                      backgroundColor: grey["search"],
-                      color: "black",
-                    }}
-                    startIcon={<DataThresholding />}
-                  >
-                    Data Settings
-                  </BorderButton>
-                </Grid>
-                <Grid item xs={2}>
-                  <BorderButton
-                    sx={{
-                      border: border["buttonBorder"],
-                      backgroundColor: grey["search"],
-                      color: "black",
-                    }}
-                    startIcon={<Tune />}
-                  >
-                    Organization
-                  </BorderButton>
-                </Grid>
-                <Grid item xs={2}>
-                  <BorderButton
-                    sx={{
-                      border: border["buttonBorder"],
-                      backgroundColor: grey["search"],
-                      color: "black",
-                    }}
-                    startIcon={<People />}
-                  >
-                    Facilities
-                  </BorderButton>
-                </Grid>
-                <Grid item xs={2}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        defaultChecked={componentParam.isImosOnlyDataset}
-                        onClick={onImosOnlySwitch}
-                      />
-                    }
-                    label="IMOS Data"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider sx={{ borderBottomWidth: 2 }} />
-                </Grid>
-                <Grid item xs={12}>
-                  <RemovableDateTimeFilter
-                    title="Data Settings"
-                    url="/filters/datasetting.png"
-                  />
+                <Grid
+                  container
+                  sx={{
+                    marginTop: margin["top"],
+                    marginBottom: margin["bottom"],
+                    justifyContent: "center",
+                  }}
+                >
+                  <Grid item xs={12}>
+                    <RemovableDateTimeFilter title="Time Range" />
+                  </Grid>
+                  <Grid item xs={6} sx={{ marginTop: margin["top"] }}>
+                    <DepthFilter />
+                  </Grid>
+                  <Grid item xs={6} sx={{ marginTop: margin["top"] }}>
+                    <CategoryVocabFilter />
+                  </Grid>
+                  <Grid item xs={6} sx={{ marginTop: margin["top"] }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          defaultChecked={componentParam.isImosOnlyDataset}
+                          onClick={onImosOnlySwitch}
+                        />
+                      }
+                      label="IMOS Data"
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
@@ -162,7 +113,7 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
 
 AdvanceFilters.defaultProps = {
   showFilters: false,
-  gridColumn: 8,
+  gridColumn: 10,
 };
 
 export default AdvanceFilters;

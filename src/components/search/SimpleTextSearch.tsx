@@ -88,10 +88,15 @@ const SimpleTextSearch = () => {
       <Grid container>
         <Grid item xs={12}>
           <Grid container justifyContent={"center"} spacing={2}>
-            <Grid item xs={10}>
+            <Grid item xs={9}>
               <Paper
                 variant="outlined"
-                sx={{ p: "2px 4px", display: "flex", alignItems: "center" }}
+                sx={{
+                  p: "2px 4px",
+                  display: "flex",
+                  alignItems: "center",
+                  maxHeight: "40px",
+                }}
               >
                 <IconButton sx={{ p: "10px" }} aria-label="search">
                   <SearchIcon />
@@ -141,18 +146,26 @@ const SimpleTextSearch = () => {
                   )}
                 />
                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                <Button
-                  variant="text"
-                  sx={{
-                    color: grey["searchButtonText"],
-                    pr: 1,
-                  }}
-                  startIcon={<Tune />}
-                  onClick={(e) => onAdvancedFilterClicked(e)}
-                >
-                  Filters
-                </Button>
+                <IconButton sx={{ p: "10px" }} aria-label="search">
+                  <SearchIcon />
+                </IconButton>
               </Paper>
+            </Grid>
+            <Grid item xs={3}>
+              <Button
+                variant="text"
+                sx={{
+                  color: grey["searchButtonText"],
+                  backgroundColor: "white",
+                  height: "100%",
+                  minWidth: "200px",
+                }}
+                fullWidth
+                startIcon={<Tune />}
+                onClick={(e) => onAdvancedFilterClicked(e)}
+              >
+                Filters
+              </Button>
             </Grid>
           </Grid>
         </Grid>

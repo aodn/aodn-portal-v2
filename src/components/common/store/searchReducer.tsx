@@ -9,6 +9,13 @@ import {
   TemporalDuring,
 } from "../cqlFilters";
 
+export interface Category {
+  label: string;
+  definition: string;
+  broader: Map<string, string>;
+  narrower: Map<string, string>;
+}
+
 interface Link {
   href: string;
   rel: string;
@@ -55,6 +62,7 @@ export interface CollectionsQueryType {
 
 interface ObjectValue {
   collectionsQueryResult: CollectionsQueryType;
+  categoriesResult: Array<Category>;
 }
 
 const initialState: ObjectValue = {
@@ -65,8 +73,11 @@ const initialState: ObjectValue = {
     },
     query: {},
   },
+  categoriesResult: new Array<Category>(),
 };
-
+/**
+  Define search functions
+ */
 const searchResult = async (param: SearchParameters, thunkApi: any) => {
   try {
     const response = await axios.get<OGCCollections>(
@@ -95,6 +106,26 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
   }
 };
 
+const searchParameterCategories = async (
+  param: Map<string, string>,
+  thunkApi: any
+) => {
+  try {
+    const response = await axios.get<Array<Category>>(
+      "/api/v1/ogc/ext/parameter/categories"
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const errorMessage = "Unkown error occurred. Please try again later.";
+    if (axios.isAxiosError(error)) {
+      return thunkApi.rejectWithValue(error?.response?.data);
+    } else {
+      return thunkApi.rejectWithValue({
+        error: errorMessage,
+      } as FailedResponse);
+    }
+  }
+};
 /**
  * Trunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description
@@ -137,15 +168,25 @@ const fetchResultByUuidNoStore = createAsyncThunk<
   }
 });
 
+const fetchParameterCategoriesWithStore = createAsyncThunk<
+  Array<Category>,
+  Map<string, string>,
+  { rejectValue: FailedResponse }
+>("search/fetchParameterCategoriesWithStore", searchParameterCategories);
+
 const searcher = createSlice({
   name: "search",
   initialState: initialState,
   reducers: {},
   extraReducers(builder) {
-    builder.addCase(fetchResultWithStore.fulfilled, (state, action) => {
-      state.collectionsQueryResult.result = action.payload;
-      state.collectionsQueryResult.query = action.meta.arg;
-    });
+    builder
+      .addCase(fetchResultWithStore.fulfilled, (state, action) => {
+        state.collectionsQueryResult.result = action.payload;
+        state.collectionsQueryResult.query = action.meta.arg;
+      })
+      .addCase(fetchParameterCategoriesWithStore.fulfilled, (state, action) => {
+        state.categoriesResult = action.payload;
+      });
   },
 });
 
@@ -209,6 +250,7 @@ export {
   fetchResultWithStore,
   fetchResultNoStore,
   fetchResultByUuidNoStore,
+  fetchParameterCategoriesWithStore,
 };
 
 export default searcher.reducer;

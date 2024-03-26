@@ -8,7 +8,15 @@ interface MapProps {
   centerLatitude: number;
   zoom: number;
   panelId: string;
-  projection: string;
+  projection:
+    | "mercator"
+    | "globe"
+    | "albers"
+    | "equalEarth"
+    | "equirectangular"
+    | "lambertConformalConic"
+    | "naturalEarth"
+    | "winkelTripel";
   styleJson: string;
   onZoomEvent?: (
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
@@ -48,8 +56,8 @@ const ReactMap = ({
       ) => onZoomEvent && onZoomEvent(e);
 
       map.setProjection(projection);
-      map.on("zoomend", z);
 
+      map.on("zoomend", z);
       return () => {
         map.off("zoomend", z);
       };
@@ -60,6 +68,7 @@ const ReactMap = ({
     panelId,
     styleJson,
     zoom,
+    projection,
     map,
     onZoomEvent,
   ]);
@@ -73,8 +82,8 @@ ReactMap.defaultProps = {
   centerLatitude: -42.88611707886841,
   centerLongitude: 147.3353554138993,
   zoom: 4,
-  styleJson: "mapbox://styles/mapbox/satellite-streets-v12",
   projection: "equirectangular",
+  styleJson: "mapbox://styles/mapbox/satellite-streets-v12",
 };
 
 export default ReactMap;

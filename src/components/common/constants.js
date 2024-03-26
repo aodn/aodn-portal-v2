@@ -5,6 +5,8 @@ const margin = {
   right: "15px",
   doubleTop: "30px",
   doubleBottom: "30px",
+  doubleLeft: "30px",
+  doubleRight: "30px",
   tripleTop: "45px",
   tripleBottom: "45px",
 };

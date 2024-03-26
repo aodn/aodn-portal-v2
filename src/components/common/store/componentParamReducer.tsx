@@ -3,12 +3,14 @@
  * to preserve value between pages. The number below must be unique across the whole application
  */
 import { Feature, Polygon, Properties } from "@turf/turf";
+import axios from "axios";
 
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
 const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = "UPDATE_SEARCH_TEXT_FILTER_VARIABLE";
 const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
   "UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE";
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
+const UPDATE_CATEGORY_FILTER_VARIABLE = "UPDATE_CATEGORY_FILTER_VARIABLE";
 
 interface DataTimeFilterRange {
   // Cannot use Date in Redux as it is non-serializable
@@ -23,6 +25,7 @@ export interface ParameterState {
   dateTimeFilterRange?: DataTimeFilterRange;
   // Use in search box
   searchText?: string;
+  categories?: Array<string>;
 }
 
 interface ActionType {
