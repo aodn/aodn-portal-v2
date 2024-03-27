@@ -57,8 +57,12 @@ const SimpleTextSearch = () => {
 
   const onAdvancedFilterClicked = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      setShowFilters((value) => !value);
-      executeSearch();
+      setShowFilters((value) => {
+        // Only executeSearch when you close the this filter,
+        // aka before change value is true
+        if (value) executeSearch();
+        return !value;
+      });
     },
     [executeSearch]
   );

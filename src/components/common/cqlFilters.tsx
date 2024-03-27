@@ -16,6 +16,7 @@ export type PolygonOperation = SingleArgumentFunction<
 >;
 export type TemporalAfterOrBefore = SingleArgumentFunction<number, string>;
 export type TemporalDuring = DualArgumentFunction<number, number, string>;
+export type CategoriesIn = SingleArgumentFunction<Array<string, string>>;
 
 export type FilterTypes =
   | string
@@ -35,6 +36,14 @@ const funcIntersectPolygon: PolygonOperation = (p) => {
   return `INTERSECTS(geometry,${wkt})`;
 };
 
+const funcCategories: CategoriesIn = (s: Array<string>) => {
+  let q = "";
+  const or = " OR ";
+  s.forEach((i) => (q = q + `category='${i.label}'${or}`));
+
+  // Remove the last OR
+  return `(${q.substring(0, q.length - or.length)})`;
+};
 /**
  * The CQL filter format for search dataset given start/end date
  * @param s
@@ -48,6 +57,7 @@ const funcTemporalBetween: TemporalDuring = (s: number, e: number) =>
  */
 const cqlDefaultFilters = new Map<string, FilterTypes>();
 cqlDefaultFilters
+  .set("CATEGORIES_IN", funcCategories)
   .set("IMOS_ONLY", "dataset_provider='IMOS'")
   .set("ALL_TIME_RANGE", "temporal after 1970-01-01T00:00:00Z")
   .set("BETWEEN_TIME_RANGE", funcTemporalBetween)

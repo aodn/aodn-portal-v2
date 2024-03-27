@@ -1,21 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { MediaType } from "media-typer";
 import axios from "axios";
-import { ParameterState } from "./componentParamReducer";
+import { ParameterState, Category } from "./componentParamReducer";
 import {
   cqlDefaultFilters,
   PolygonOperation,
   TemporalAfterOrBefore,
   TemporalDuring,
+  CategoriesIn,
 } from "../cqlFilters";
-
-export interface Category {
-  label: string;
-  definition?: string;
-  about: string;
-  broader: Array<Category>;
-  narrower: Array<Category>;
-}
 
 interface Link {
   href: string;
@@ -233,6 +226,11 @@ const createSearchParamFrom = (i: ParameterState): SearchParameters => {
   if (i.polygon) {
     const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
     p.filter = appendFilter(p.filter, f(i.polygon));
+  }
+
+  if (i.categories) {
+    const f = cqlDefaultFilters.get("CATEGORIES_IN") as CategoriesIn;
+    p.filter = appendFilter(p.filter, f(i.categories));
   }
 
   return p;

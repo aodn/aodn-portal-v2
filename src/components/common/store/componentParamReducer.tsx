@@ -25,7 +25,15 @@ export interface ParameterState {
   dateTimeFilterRange?: DataTimeFilterRange;
   // Use in search box
   searchText?: string;
-  categories?: Array<string>;
+  categories?: Array<Category>;
+}
+
+export interface Category {
+  label: string;
+  definition?: string;
+  about: string;
+  broader: Array<Category>;
+  narrower: Array<Category>;
 }
 
 interface ActionType {
@@ -66,6 +74,15 @@ const updateImosOnly = (isImosOnly: boolean | undefined): ActionType => {
   };
 };
 
+const updateCategories = (input: Array<Category>): ActionType => {
+  return {
+    type: UPDATE_CATEGORY_FILTER_VARIABLE,
+    payload: {
+      categories: input,
+    } as ParameterState,
+  };
+};
+
 // Initial State
 const initialState: ParameterState = {
   isImosOnlyDataset: false,
@@ -102,6 +119,11 @@ const paramReducer = (
         ...state,
         polygon: action.payload.polygon,
       };
+    case UPDATE_CATEGORY_FILTER_VARIABLE:
+      return {
+        ...state,
+        categories: action.payload.categories,
+      };
     default:
       return state;
   }
@@ -114,4 +136,5 @@ export {
   updateSearchText,
   updateImosOnly,
   updateFilterPolygon,
+  updateCategories,
 };
