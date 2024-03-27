@@ -11,9 +11,10 @@ import {
 
 export interface Category {
   label: string;
-  definition: string;
-  broader: Map<string, string>;
-  narrower: Map<string, string>;
+  definition?: string;
+  about: string;
+  broader: Array<Category>;
+  narrower: Array<Category>;
 }
 
 interface Link {

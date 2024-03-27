@@ -22,10 +22,7 @@ interface CategoryVocabFilterProps {
 
 const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
   const dispatch = useDispatch<AppDispatch>();
-  const [topLevelCategories, setTopLevelCategories] = useState<Array<Category>>(
-    []
-  );
-
+  const [categories, setCategories] = useState<Array<Category>>([]);
   const [values, setValues] = useState<Array<string>>([]);
 
   const handleChange = (event, newAlignment) => {
@@ -36,14 +33,22 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
     dispatch(fetchParameterCategoriesWithStore(null))
       .unwrap()
       .then((categories: Array<Category>) => {
-        // If the item do not have a broader terms, that means it is the top level
-        setTopLevelCategories(
-          categories
-            .filter((i) => Object.keys(i.broader).length === 0)
-            .sort((a, b) =>
-              a.label < b.label ? -1 : a.label > b.label ? 1 : 0
-            )
+        // If the item do not have a broader terms, that means it is the root level
+        const root = categories.filter((i) => i.broader.length === 0);
+
+        // Now we need to go one level lower as this is a requirement to display
+        // second level instead of top level
+        let child = new Array<Category>();
+        root
+          .filter((i) => i.narrower.length !== 0)
+          .forEach((i) => i.narrower.forEach((j) => child.push(j)));
+
+        // Now sort by child
+        child = child.sort((a, b) =>
+          a.label < b.label ? -1 : a.label > b.label ? 1 : 0
         );
+
+        setCategories(child);
       });
   }, [dispatch]);
 
@@ -74,7 +79,7 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
           exclusive={false}
           onChange={handleChange}
         >
-          {topLevelCategories.map((v) => (
+          {categories.map((v) => (
             <ToggleButton
               sx={{
                 boxShadow: "1px 1px 10px 1px #d4d4d4",
