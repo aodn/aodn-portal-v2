@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { dateDefault } from "./constants";
 import { Feature, Polygon, Properties } from "@turf/turf";
 import * as wellknown from "wellknown";
+import { Category } from "./store/componentParamReducer";
 
 type SingleArgumentFunction<T, R> = (p: T) => R;
 type DualArgumentFunction<I, J, R> = (i: I, j: J) => R;
@@ -16,7 +17,7 @@ export type PolygonOperation = SingleArgumentFunction<
 >;
 export type TemporalAfterOrBefore = SingleArgumentFunction<number, string>;
 export type TemporalDuring = DualArgumentFunction<number, number, string>;
-export type CategoriesIn = SingleArgumentFunction<Array<string, string>>;
+export type CategoriesIn = SingleArgumentFunction<Array<Category>, string>;
 
 export type FilterTypes =
   | string
@@ -36,7 +37,7 @@ const funcIntersectPolygon: PolygonOperation = (p) => {
   return `INTERSECTS(geometry,${wkt})`;
 };
 
-const funcCategories: CategoriesIn = (s: Array<string>) => {
+const funcCategories: CategoriesIn = (s: Array<Category>) => {
   let q = "";
   const or = " OR ";
   s.forEach((i) => (q = q + `category='${i.label}'${or}`));
