@@ -15,6 +15,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import dateTime from "@/assets/logos/time-range.png";
 import depth from "@/assets/logos/depth.png";
 import dataSettings from "@/assets/logos/data-settings.png";
+import parameter from "@/assets/logos/parameter.png";
 import waterBody from "@/assets/logos/water-body.png";
 
 import { SmartCard11 } from "../../smartpanel/SmartCard";
@@ -66,8 +67,8 @@ export const ResultPanelIconFilter = () => {
           </Item>
           <Item variant="outlined">
             <SmartCard11
-              imageUrl={waterBody}
-              caption="Water Body"
+              imageUrl={parameter}
+              caption="Parameter"
               colour="#747474"
               isOutlined
             />
