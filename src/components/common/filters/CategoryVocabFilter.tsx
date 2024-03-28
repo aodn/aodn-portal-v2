@@ -72,19 +72,21 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
         border: "none",
         borderRadius: borderRadius["filter"],
         justifyContent: "center",
-        minHeight: "90px",
+        minHeight: "70px",
         ...props.sx,
       }}
     >
       <Grid item xs={12}>
-        Category Vocabulary
+        <Box display="flex" justifyContent="center" alignItems="center">
+          Category Vocabulary
+        </Box>
       </Grid>
       <Grid item xs={12}>
         <ToggleButtonGroup
           sx={{
             display: "grid",
             gridTemplateColumns: "auto auto auto auto",
-            gridGap: "50px",
+            gridGap: "10px",
             padding: "10px",
           }}
           value={values}

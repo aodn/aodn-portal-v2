@@ -371,7 +371,9 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
       >
         <Grid container>
           <Grid item xs={1}>
-            <div>{props.title}</div>
+            <Box display="flex" justifyContent="center" alignItems="center">
+              {props.title}
+            </Box>
           </Grid>
           <Grid
             item

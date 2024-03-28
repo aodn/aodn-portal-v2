@@ -21,7 +21,12 @@ const DepthFilter = (props: DepthFiltersProps) => {
       }}
     >
       <Grid item xs={12}>
-        Depth
+        <Box display="flex" justifyContent="center" alignItems="center">
+          Depth
+        </Box>
+      </Grid>
+      <Grid item xs={12}>
+        TODO
       </Grid>
     </Grid>
   );

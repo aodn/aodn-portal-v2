@@ -7,10 +7,12 @@ import {
   Divider,
   Switch,
   FormControlLabel,
+  Box,
   SwitchProps,
 } from "@mui/material";
 import RemovableDateTimeFilter from "./RemovableDateTimeFilter";
 import DepthFilter from "./DepthFilter";
+import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
 import CategoryVocabFilter from "./CategoryVocabFilter";
 import { border, margin, zIndex, borderRadius } from "../constants";
 import BorderButton from "../buttons/BorderButton";
@@ -19,6 +21,7 @@ import { Tune, Layers, People, DataThresholding } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import store, { AppDispatch, getComponentState } from "../store/store";
 import { ParameterState, updateImosOnly } from "../store/componentParamReducer";
+import imos_logo from "@/assets/logos/imos-logo.png";
 
 export interface NonRemovableFiltersProps {
   showFilters: boolean;
@@ -63,7 +66,9 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
           >
             <Grid item xs={12}>
               <Grid item xs={12}>
-                Filters
+                <Box display="flex" justifyContent="center" alignItems="center">
+                  Filters
+                </Box>
               </Grid>
               <Grid
                 item
@@ -75,6 +80,7 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
               >
                 <Grid
                   container
+                  spacing={2}
                   sx={{
                     marginTop: margin["top"],
                     marginBottom: margin["bottom"],
@@ -84,13 +90,16 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
                   <Grid item xs={12}>
                     <RemovableDateTimeFilter title="Time Range" />
                   </Grid>
-                  <Grid item xs={6} sx={{ marginTop: margin["top"] }}>
+                  <Grid item xs={6}>
                     <DepthFilter />
                   </Grid>
-                  <Grid item xs={6} sx={{ marginTop: margin["top"] }}>
+                  <Grid item xs={6}>
                     <CategoryVocabFilter />
                   </Grid>
-                  <Grid item xs={6} sx={{ marginTop: margin["top"] }}>
+                  <Grid item xs={6}>
+                    <DataDeliveryModeFilter />
+                  </Grid>
+                  <Grid item xs={6}>
                     <FormControlLabel
                       control={
                         <Switch
@@ -98,7 +107,17 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
                           onClick={onImosOnlySwitch}
                         />
                       }
-                      label="IMOS Data"
+                      label={
+                        <React.Fragment>
+                          <img
+                            src={imos_logo}
+                            alt=""
+                            width="40px"
+                            height="10px"
+                          />
+                          IMOS Only
+                        </React.Fragment>
+                      }
                     />
                   </Grid>
                 </Grid>
