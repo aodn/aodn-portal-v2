@@ -74,17 +74,25 @@ const initialState: ObjectValue = {
  */
 const searchResult = async (param: SearchParameters, thunkApi: any) => {
   try {
+    const p = {
+      properties:
+        param.properties !== undefined
+          ? param.properties
+          : "id,title,description",
+    };
+
+    if (param.text !== undefined && param.text.length !== 0) {
+      p.q = param.text;
+    }
+
+    if (param.filter !== undefined && param.filter.length !== 0) {
+      p.filter = param.filter;
+    }
+
     const response = await axios.get<OGCCollections>(
       "/api/v1/ogc/collections",
       {
-        params: {
-          q: param.text !== undefined ? param.text : null,
-          filter: param.filter !== undefined ? param.filter : null,
-          properties:
-            param.properties !== undefined
-              ? param.properties
-              : "id,title,description",
-        },
+        params: p,
       }
     );
     return response.data;

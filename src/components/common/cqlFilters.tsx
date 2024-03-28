@@ -43,7 +43,8 @@ const funcCategories: CategoriesIn = (s: Array<Category>) => {
   s.forEach((i) => (q = q + `category='${i.label}'${or}`));
 
   // Remove the last OR
-  return `(${q.substring(0, q.length - or.length)})`;
+  const query = `(${q.substring(0, q.length - or.length)})`;
+  return query !== "()" ? query : undefined;
 };
 /**
  * The CQL filter format for search dataset given start/end date
