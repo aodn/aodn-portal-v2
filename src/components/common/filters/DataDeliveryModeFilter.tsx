@@ -16,7 +16,7 @@ interface DataDeliveryModeFilterProps {
 
 const DataDeliveryModeFilter = (props: DataDeliveryModeFilterProps) => {
   const [values, setValues] = useState<Array<string>>([]);
-  const [modes, setModes] = useState<Array<Category>>([
+  const [modes, setModes] = useState<Array<string>>([
     "Real-time",
     "Delayed",
     "One-off",
