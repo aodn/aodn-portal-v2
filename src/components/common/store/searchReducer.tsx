@@ -49,6 +49,12 @@ export type SearchParameters = {
   properties?: string;
 };
 
+type OGCSearchParameters = {
+  q?: string;
+  filter?: string;
+  properties?: string;
+};
+
 export interface CollectionsQueryType {
   result: OGCCollections;
   query: SearchParameters;
@@ -74,7 +80,7 @@ const initialState: ObjectValue = {
  */
 const searchResult = async (param: SearchParameters, thunkApi: any) => {
   try {
-    const p = {
+    const p: OGCSearchParameters = {
       properties:
         param.properties !== undefined
           ? param.properties
