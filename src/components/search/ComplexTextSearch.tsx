@@ -17,8 +17,8 @@ import {
   fetchResultWithStore,
 } from "../common/store/searchReducer";
 import store, { AppDispatch, getComponentState } from "../common/store/store";
-//import RemovableFilters from "../common/filters/RemovableFilters";
-//import AdvanceFilters from "../common/filters/AdvanceFilters";
+import RemovableFilters from "../common/filters/RemovableFilters";
+import AdvanceFilters from "../common/filters/AdvanceFilters";
 import {
   ParameterState,
   updateSearchText,
@@ -64,11 +64,9 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
 
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<readonly string[]>([]);
-  const loading = open && options.length === 0;
-
-  // This is use store what need to display on the autocomplete text box, we cannot merge the item together
   const [textValue, setTextValue] = useState("");
-  //const [toggleRemovableFilter] = useState<boolean>(true);
+  const [toggleRemovableFilter, setToggleRemovableFilter] =
+    useState<boolean>(true);
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
   const onSearchClick = useCallback(
@@ -98,20 +96,19 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
     [onFilterCallback, showFilters, setShowFilters]
   );
 
-  // const showFilter = useCallback(() => {
-  //   if (toggleRemovableFilter) {
-  //     return <AdvanceFilters showFilters={showFilters} />;
-  //     // return (
-  //     //   <RemovableFilters
-  //     //     showFilters={showFilters}
-  //     //     onFilterShowHide={onFilterShowHide}
-  //     //     onExpandAllFilters={() => setToggleRemovableFilter(false)}
-  //     //   />
-  //     // );
-  //   } else {
-  //     return <AdvanceFilters showFilters={showFilters} />;
-  //   }
-  // }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
+  const showFilter = useCallback(() => {
+    if (toggleRemovableFilter) {
+      return (
+        <RemovableFilters
+          showFilters={showFilters}
+          onFilterShowHide={onFilterShowHide}
+          onExpandAllFilters={() => setToggleRemovableFilter(false)}
+        />
+      );
+    } else {
+      return <AdvanceFilters showFilters={showFilters} />;
+    }
+  }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
 
   useEffect(() => {
     const fetchData = async (value) => {
@@ -131,7 +128,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
     };
 
     fetchData(textValue);
-  }, [textValue, loading]);
+  }, [textValue]);
 
   useEffect(() => {
     if (!open) {
@@ -216,7 +213,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
             {searchButton(textValue, onSearchClick)}
           </Grid>
         </Grid>
-        {/* {showFilter()} */}
+        {showFilter()}
       </Grid>
     </Grid>
   );

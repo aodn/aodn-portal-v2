@@ -27,6 +27,10 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
+        "/api/v1/ogc/ext/parameter/categories": {
+          target: apiPath,
+          changeOrigin: true,
+        },
       },
     },
     plugins: [

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { dateDefault, margin } from "../constants";
+import { dateDefault, margin, borderRadius } from "../constants";
 import { Grid, Box, SxProps, Theme } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import { DateRangeSlider } from "../slider/RangeSlider";
@@ -18,10 +18,11 @@ import { cqlDefaultFilters } from "../cqlFilters";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { FieldChangeHandlerContext } from "@mui/x-date-pickers/internals/hooks/useField";
 import { DateTimeValidationError } from "@mui/x-date-pickers";
+import blue from "../colors/blue.js";
 
 interface RemovableDateTimeFilterProps {
   title: string;
-  url: string;
+  url?: string;
   sx?: SxProps<Theme>;
 }
 
@@ -340,26 +341,26 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
       container
       columns={13}
       sx={{
-        backgroundImage: "url(/filters/Background.png)",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
+        backgroundColor: blue["bgParam"],
         border: "none",
-        borderRadius: 0,
+        borderRadius: borderRadius["filter"],
         justifyContent: "center",
         minHeight: "90px",
         ...props.sx,
       }}
     >
-      <Grid
-        item
-        xs={1}
-        sx={{
-          marginTop: margin["top"],
-          textAlign: "center",
-        }}
-      >
-        <Box component="img" src={props.url} />
-      </Grid>
+      {props.url && (
+        <Grid
+          item
+          xs={1}
+          sx={{
+            marginTop: margin["top"],
+            textAlign: "center",
+          }}
+        >
+          <Box component="img" src={props.url} />
+        </Grid>
+      )}
       <Grid
         item
         xs={12}
@@ -370,8 +371,9 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
       >
         <Grid container>
           <Grid item xs={1}>
-            <div>{props.title}</div>
-            <TuneIcon />
+            <Box display="flex" justifyContent="center" alignItems="center">
+              {props.title}
+            </Box>
           </Grid>
           <Grid
             item

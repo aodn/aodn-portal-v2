@@ -3,12 +3,14 @@
  * to preserve value between pages. The number below must be unique across the whole application
  */
 import { Feature, Polygon, Properties } from "@turf/turf";
+import axios from "axios";
 
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
 const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = "UPDATE_SEARCH_TEXT_FILTER_VARIABLE";
 const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
   "UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE";
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
+const UPDATE_CATEGORY_FILTER_VARIABLE = "UPDATE_CATEGORY_FILTER_VARIABLE";
 
 interface DataTimeFilterRange {
   // Cannot use Date in Redux as it is non-serializable
@@ -23,6 +25,15 @@ export interface ParameterState {
   dateTimeFilterRange?: DataTimeFilterRange;
   // Use in search box
   searchText?: string;
+  categories?: Array<Category>;
+}
+
+export interface Category {
+  label: string;
+  definition?: string;
+  about: string;
+  broader: Array<Category>;
+  narrower: Array<Category>;
 }
 
 interface ActionType {
@@ -63,6 +74,15 @@ const updateImosOnly = (isImosOnly: boolean | undefined): ActionType => {
   };
 };
 
+const updateCategories = (input: Array<Category>): ActionType => {
+  return {
+    type: UPDATE_CATEGORY_FILTER_VARIABLE,
+    payload: {
+      categories: input,
+    } as ParameterState,
+  };
+};
+
 // Initial State
 const initialState: ParameterState = {
   isImosOnlyDataset: false,
@@ -99,6 +119,11 @@ const paramReducer = (
         ...state,
         polygon: action.payload.polygon,
       };
+    case UPDATE_CATEGORY_FILTER_VARIABLE:
+      return {
+        ...state,
+        categories: action.payload.categories,
+      };
     default:
       return state;
   }
@@ -111,4 +136,5 @@ export {
   updateSearchText,
   updateImosOnly,
   updateFilterPolygon,
+  updateCategories,
 };

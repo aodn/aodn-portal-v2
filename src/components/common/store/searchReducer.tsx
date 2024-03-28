@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { MediaType } from "media-typer";
 import axios from "axios";
-import { ParameterState } from "./componentParamReducer";
+import { ParameterState, Category } from "./componentParamReducer";
 import {
   cqlDefaultFilters,
   PolygonOperation,
   TemporalAfterOrBefore,
   TemporalDuring,
+  CategoriesIn,
 } from "../cqlFilters";
 
 interface Link {
@@ -48,6 +49,12 @@ export type SearchParameters = {
   properties?: string;
 };
 
+type OGCSearchParameters = {
+  q?: string;
+  filter?: string;
+  properties?: string;
+};
+
 export interface CollectionsQueryType {
   result: OGCCollections;
   query: SearchParameters;
@@ -55,6 +62,7 @@ export interface CollectionsQueryType {
 
 interface ObjectValue {
   collectionsQueryResult: CollectionsQueryType;
+  categoriesResult: Array<Category>;
 }
 
 const initialState: ObjectValue = {
@@ -65,21 +73,32 @@ const initialState: ObjectValue = {
     },
     query: {},
   },
+  categoriesResult: new Array<Category>(),
 };
-
+/**
+  Define search functions
+ */
 const searchResult = async (param: SearchParameters, thunkApi: any) => {
   try {
+    const p: OGCSearchParameters = {
+      properties:
+        param.properties !== undefined
+          ? param.properties
+          : "id,title,description",
+    };
+
+    if (param.text !== undefined && param.text.length !== 0) {
+      p.q = param.text;
+    }
+
+    if (param.filter !== undefined && param.filter.length !== 0) {
+      p.filter = param.filter;
+    }
+
     const response = await axios.get<OGCCollections>(
       "/api/v1/ogc/collections",
       {
-        params: {
-          q: param.text !== undefined ? param.text : null,
-          filter: param.filter !== undefined ? param.filter : null,
-          properties:
-            param.properties !== undefined
-              ? param.properties
-              : "id,title,description",
-        },
+        params: p,
       }
     );
     return response.data;
@@ -95,6 +114,26 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
   }
 };
 
+const searchParameterCategories = async (
+  param: Map<string, string>,
+  thunkApi: any
+) => {
+  try {
+    const response = await axios.get<Array<Category>>(
+      "/api/v1/ogc/ext/parameter/categories"
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const errorMessage = "Unkown error occurred. Please try again later.";
+    if (axios.isAxiosError(error)) {
+      return thunkApi.rejectWithValue(error?.response?.data);
+    } else {
+      return thunkApi.rejectWithValue({
+        error: errorMessage,
+      } as FailedResponse);
+    }
+  }
+};
 /**
  * Trunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description
@@ -137,15 +176,25 @@ const fetchResultByUuidNoStore = createAsyncThunk<
   }
 });
 
+const fetchParameterCategoriesWithStore = createAsyncThunk<
+  Array<Category>,
+  Map<string, string>,
+  { rejectValue: FailedResponse }
+>("search/fetchParameterCategoriesWithStore", searchParameterCategories);
+
 const searcher = createSlice({
   name: "search",
   initialState: initialState,
   reducers: {},
   extraReducers(builder) {
-    builder.addCase(fetchResultWithStore.fulfilled, (state, action) => {
-      state.collectionsQueryResult.result = action.payload;
-      state.collectionsQueryResult.query = action.meta.arg;
-    });
+    builder
+      .addCase(fetchResultWithStore.fulfilled, (state, action) => {
+        state.collectionsQueryResult.result = action.payload;
+        state.collectionsQueryResult.query = action.meta.arg;
+      })
+      .addCase(fetchParameterCategoriesWithStore.fulfilled, (state, action) => {
+        state.categoriesResult = action.payload;
+      });
   },
 });
 
@@ -193,6 +242,11 @@ const createSearchParamFrom = (i: ParameterState): SearchParameters => {
     p.filter = appendFilter(p.filter, f(i.polygon));
   }
 
+  if (i.categories) {
+    const f = cqlDefaultFilters.get("CATEGORIES_IN") as CategoriesIn;
+    p.filter = appendFilter(p.filter, f(i.categories));
+  }
+
   return p;
 };
 
@@ -209,6 +263,7 @@ export {
   fetchResultWithStore,
   fetchResultNoStore,
   fetchResultByUuidNoStore,
+  fetchParameterCategoriesWithStore,
 };
 
 export default searcher.reducer;
