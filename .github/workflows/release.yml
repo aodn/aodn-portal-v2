@@ -27,7 +27,7 @@ jobs:
 
       - name: Build Website
         id: build_website
-        run: yarn build
+        run: yarn staging
 
       - uses: actions/upload-artifact@v4
         with:
