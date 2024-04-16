@@ -42,16 +42,16 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
   );
 
   return (
-    <Collapse orientation="vertical" in={props.showFilters}>
-      <Grid
-        container
-        sx={{
-          // Make it overlay instead of push smart card downwards
-          zIndex: zIndex["FILTER_OVERLAY"],
-          position: "absolute",
-        }}
-        justifyContent={"center"}
-      >
+    <Collapse
+      orientation="vertical"
+      in={props.showFilters}
+      sx={{
+        // Make it overlay instead of push smart card downwards
+        zIndex: zIndex["FILTER_OVERLAY"],
+        position: "absolute",
+      }}
+    >
+      <Grid container justifyContent={"center"}>
         <Grid item xs={props.gridColumn}>
           <Grid
             container
