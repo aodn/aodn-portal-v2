@@ -33,8 +33,12 @@ const PlainDropdownMenu: React.FC<PlainDropdownMenuProps> = ({
         sx={{
           height: "44px",
           borderRadius: "4px",
+          backgroundColor: "#fff",
+          "& fieldset": {
+            border: "none",
+          },
           boxShadow: "2px 2px 4px 0px rgba(0, 0, 0, 0.15)",
-          fontSize: "14px",
+          fontSize: "18px",
         }}
       >
         {items.map((item) => (

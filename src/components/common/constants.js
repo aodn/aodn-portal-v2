@@ -41,7 +41,7 @@ const pageDefault = {
 
 const zIndex = {
   MAP_COORD: 1,
-  FILTER_OVERLAY: 2,
+  FILTER_OVERLAY: 3,
 };
 
 export {
