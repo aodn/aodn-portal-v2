@@ -116,7 +116,7 @@ const DepthSlider = () => {
         <Box
           sx={{
             position: "relative",
-            top: `calc(${((3000 - sliderValues[0]) / 3000) * 100}% - 8px)`,
+            top: `calc(${((3000 - sliderValues[0]) / 3000) * 100}%)`,
             left: 0,
             right: 0,
             height: "1px",
@@ -126,7 +126,7 @@ const DepthSlider = () => {
         <Box
           sx={{
             position: "relative",
-            top: `calc(${((3000 - sliderValues[1]) / 3000) * 100}% - 8px)`,
+            top: `calc(${((3000 - sliderValues[1]) / 3000) * 100}%)`,
             left: 0,
             right: 0,
             height: "1px",

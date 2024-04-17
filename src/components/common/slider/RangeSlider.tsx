@@ -73,9 +73,15 @@ const NumberRangeSlider = ({
   }, [start, end, min, max, setValue]);
 
   const handleChange = useCallback(
+    (_: Event, newValue: number | number[]) => {
+      setValue(newValue as number[]);
+    },
+    [setValue]
+  );
+
+  const handleChangeCommitted = useCallback(
     (event: Event, newValue: number | number[]) => {
       const c = newValue as number[];
-      setValue(c);
       onSlideChanged(
         mapRangeToRealValue(min, max, c[0]),
         mapRangeToRealValue(min, max, c[1]),
@@ -83,7 +89,7 @@ const NumberRangeSlider = ({
         c[1]
       );
     },
-    [setValue, min, max, onSlideChanged]
+    [min, max, onSlideChanged]
   );
 
   return (
@@ -92,6 +98,7 @@ const NumberRangeSlider = ({
         getAriaLabel={() => title}
         value={value}
         onChange={handleChange}
+        onChangeCommitted={handleChangeCommitted}
         valueLabelDisplay="auto"
         getAriaValueText={(v) => label(v, min, max)}
         valueLabelFormat={(v) => label(v, min, max)}

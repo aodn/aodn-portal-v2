@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { dateDefault, margin, borderRadius } from "../constants";
 import { Grid, Box, SxProps, Theme } from "@mui/material";
-import TuneIcon from "@mui/icons-material/Tune";
 import { DateRangeSlider } from "../slider/RangeSlider";
 import { BarChart } from "@mui/x-charts/BarChart";
 import dayjs, { Dayjs } from "dayjs";
@@ -228,11 +227,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
             }
           });
       });
-  }, [
-    componentParam.dateTimeFilterRange?.end,
-    componentParam.dateTimeFilterRange?.start,
-    dispatch,
-  ]);
+  }, [dispatch]);
 
   const sliceBarSeries = useCallback(
     (start: Date, end: Date) => {
