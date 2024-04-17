@@ -50,11 +50,11 @@ const DepthSlider = () => {
   const [sliderValues, setSliderValues] =
     React.useState<number[]>(defaultValues);
 
-  const handleSliderChange = (_, newValue) => {
+  const handleSliderChange = (_: any, newValue: number[]) => {
     setSliderValues(newValue);
     console.log("Slider values: ", newValue);
   };
-  const formatLabel = (value) => {
+  const formatLabel = (value: number) => {
     if (value === -1) {
       return <Box>{">3000m"}</Box>;
     }
@@ -94,10 +94,11 @@ const DepthSlider = () => {
 
   return (
     <Grid container direction={"row"}>
-      <Grid xs={1} />
-      <Grid xs={1}>
+      <Grid item xs={1} />
+      <Grid item xs={1}>
         {depthMarks.map((mark, index) => (
           <Grid
+            item
             xs={12}
             key={index}
             sx={{
@@ -111,7 +112,7 @@ const DepthSlider = () => {
           </Grid>
         ))}
       </Grid>
-      <Grid xs={8} sx={{ height: 400, paddingLeft: 2, paddingRight: 2 }}>
+      <Grid item xs={8} sx={{ height: 400, paddingLeft: 2, paddingRight: 2 }}>
         <Box
           sx={{
             position: "relative",
@@ -138,7 +139,7 @@ const DepthSlider = () => {
           style={{ width: "100%", height: "100%" }}
         />
       </Grid>
-      <Grid container xs={2} sx={{ height: 400 }} spacing={1}>
+      <Grid item xs={2} sx={{ height: 400 }}>
         <StyledSlider
           getAriaLabel={() => "depth"}
           orientation="vertical"
