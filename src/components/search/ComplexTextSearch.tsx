@@ -1,12 +1,5 @@
-import React, { useCallback, useState, useEffect } from "react";
-import {
-  Grid,
-  Button,
-  Paper,
-  IconButton,
-  Divider,
-  Autocomplete,
-} from "@mui/material";
+import React, { useCallback, useState } from "react";
+import { Button, Divider, Grid, IconButton, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import grey from "../common/colors/grey";
@@ -23,8 +16,7 @@ import {
   ParameterState,
   updateSearchText,
 } from "../common/store/componentParamReducer";
-import axios from "axios";
-import StyledTextField from "./StyledTextField";
+import InputWithSuggester from "./InputWithSuggester.tsx";
 
 export interface ComplexTextSearchProps {
   onFilterCallback: (
@@ -37,6 +29,7 @@ export interface ComplexTextSearchProps {
 
 /**
  * Put it here to avoid refresh the function every time the component is rendered
+ * @param searchText
  * @param handler
  * @returns
  */
@@ -62,8 +55,6 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState<readonly string[]>([]);
   const [textValue, setTextValue] = useState("");
   const [toggleRemovableFilter, setToggleRemovableFilter] =
     useState<boolean>(true);
@@ -110,32 +101,6 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
     }
   }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
 
-  useEffect(() => {
-    const fetchData = async (value) => {
-      try {
-        const response = await axios.get("/api/v1/ogc/ext/autocomplete", {
-          params: {
-            input: value,
-          },
-        });
-
-        const d = response.data;
-        setOptions(d);
-        setOpen(d.length > 0);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData(textValue);
-  }, [textValue]);
-
-  useEffect(() => {
-    if (!open) {
-      setOptions([]);
-    }
-  }, [open]);
-
   return (
     <Grid container>
       <Grid
@@ -154,44 +119,9 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
               <IconButton sx={{ p: "10px" }} aria-label="search">
                 <SearchIcon />
               </IconButton>
-              <Autocomplete
-                id="search"
-                fullWidth
-                freeSolo
-                open={open}
-                onOpen={() => {
-                  setOpen(options.length > 0);
-                }}
-                onClose={() => {
-                  setOpen(false);
-                }}
-                forcePopupIcon={false}
-                getOptionLabel={(option) => option}
-                options={options}
-                value={textValue}
-                autoComplete
-                includeInputInList
-                onChange={(_, newValue: string | null) => {
-                  if (newValue !== null) {
-                    // String quote with double quote to indicate user want the whole phase during search.
-                    // fire event here before useState update, need to call function in this case
-                    setTextValue(newValue);
-                  }
-                }}
-                onInputChange={(_, newInputValue) => {
-                  // If user type anything, then it is not a title search anymore
-                  setTextValue(newInputValue);
-                }}
-                renderInput={(params) => (
-                  <StyledTextField
-                    {...params}
-                    placeholder="Search for open data"
-                    inputProps={{
-                      "aria-label": "Search for open data",
-                      ...params.inputProps,
-                    }}
-                  />
-                )}
+              <InputWithSuggester
+                textValue={textValue}
+                onInputChangeCallback={setTextValue}
               />
               <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
               <Button

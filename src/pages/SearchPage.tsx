@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import SimpleTextSearch from "../components/search/SimpleTextSearch";
 import ResultPanelSimpleFilter, {
   ResultPanelIconFilter,
@@ -37,7 +37,6 @@ import * as turf from "@turf/turf";
 // import ItemsOnMapControl from "../components/map/maplibre/controls/ItemsOnMapControl";
 // import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
 // import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
-
 // Map section, you can switch to other map library, this is for mapbox
 import Map from "../components/map/mapbox/Map";
 import Controls from "../components/map/mapbox/controls/Controls";
@@ -109,8 +108,12 @@ const SearchPage = () => {
           backgroundSize: "cover",
         }}
       >
-        <Grid item xs={12}>
-          <SimpleTextSearch />
+        <Grid container item xs={12}>
+          <Grid item xs={1} />
+          <Grid item xs={10}>
+            <SimpleTextSearch />
+          </Grid>
+          <Grid item xs={1} />
         </Grid>
         <Grid item xs={1}>
           <ResultPanelIconFilter />
