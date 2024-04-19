@@ -11,7 +11,8 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
-//import YouTubeIcon from '@mui/icons-material/YouTube';
+
+const version = import.meta.env.VITE_APP_VERSION;
 
 const Footer = () => {
   return (
@@ -127,16 +128,6 @@ const Footer = () => {
                 <LinkedInIcon />
               </IconButton>
 
-              {/* <IconButton
-                sx={{ color: 'body1.color' }}
-                aria-label="YouTube"
-                onClick={() =>
-                  window.open('https://www.youtube.com/user/IMOS5395')
-                }
-              >
-                <YouTubeIcon />
-              </IconButton> */}
-
               <IconButton
                 sx={{ color: "body1.color" }}
                 aria-label="X"
@@ -159,7 +150,7 @@ const Footer = () => {
                 variant="body2"
                 padding="50px 0 20px 0"
               >
-                Copyright © 2024. All rights reserved.{" "}
+                Copyright © 2024. All rights reserved. Version : {version}
               </Typography>
             </div>
           </Grid>
