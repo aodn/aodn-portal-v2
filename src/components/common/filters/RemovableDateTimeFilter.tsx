@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { borderRadius, dateDefault, margin } from "../constants";
 import { Box, Grid, SxProps, Theme } from "@mui/material";
 import { DateRangeSlider } from "../slider/RangeSlider";
@@ -141,7 +141,7 @@ const createSeries = (
 };
 
 const cloneBarSeriesType = (s: BarSeriesType): BarSeriesType => {
-  const c: BarSeriesType = {
+  return {
     id: s.id,
     type: s.type,
     valueFormatter: s.valueFormatter,
@@ -149,8 +149,6 @@ const cloneBarSeriesType = (s: BarSeriesType): BarSeriesType => {
     label: s.label,
     data: s.data && s.data.map((x) => x),
   };
-
-  return c;
 };
 // TODO: Bug in end date, it didn't handle correctly, end date = today means ongoing dataset passing today,
 // because some dataset do not have end date.
@@ -162,14 +160,28 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
   // Temporarily logic: this filter only have one pair of date. bar chart, date slider, and date picker are sharing
   // the same date range states.
 
-  const overallDateRange = {
-    min: new Date(dateDefault["min"]),
-    max: new Date(dateDefault["max"]),
-  };
-  Object.freeze(overallDateRange);
+  // Disable the keyboard input for the date picker. May be changed in the future,
+  // according to the customers' feedback.
+  const endDateInputRef = useRef(null);
+  useEffect(() => {
+    if (endDateInputRef.current) {
+      endDateInputRef.current.disabled = true;
+    }
+  }, []);
+  const startDateInputRef = useRef(null);
+  useEffect(() => {
+    if (startDateInputRef.current) {
+      startDateInputRef.current.disabled = true;
+    }
+  }, []);
 
-  const [startDate, setStartDate] = useState<Date>(overallDateRange.min);
-  const [endDate, setEndDate] = useState<Date>(overallDateRange.max);
+  // This state is the minimun date range. Shouldn't be changed after initializing
+  const [minimumDate, setMinimumDate] = useState<Date>(dateDefault.min);
+
+  //The below two states are the date range states. They are shared by datePickers, dateSlider, and barChart.
+  const [startDate, setStartDate] = useState<Date>(dateDefault.min);
+  const [endDate, setEndDate] = useState<Date>(dateDefault.max);
+
   const [barSeries, setBarSeries] = useState<DataSeries>({ x: [], y: [] });
   const [slicedBarSeries, setSlicedBarSeries] = useState<DataSeries>({
     x: [],
@@ -204,6 +216,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
             if (min > new Date(dateDefault["min"])) {
               setStartDate(min);
+              setMinimumDate(min);
             }
           });
       }); // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -262,7 +275,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
   );
 
   // Second function as mentioned above
-  const onStartDatePickerChanged = useCallback(
+  const onStartDatePickerAccepted = useCallback(
     (value: Dayjs | null) => {
       const e = value ? value.toDate() : new Date(dateDefault["min"]);
       setStartDate(e);
@@ -278,7 +291,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
   );
 
   // Third function as mentioned above
-  const onEndDatePickerChanged = useCallback(
+  const onEndDatePickerAccepted = useCallback(
     (value: Dayjs | null) => {
       const e = value ? value.toDate() : new Date(dateDefault["max"]);
       setEndDate(e);
@@ -396,10 +409,13 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         <Grid container>
           <Grid item xs={2}>
             <DateTimePicker
-              onAccept={onStartDatePickerChanged}
+              onAccept={onStartDatePickerAccepted}
               defaultValue={dayjs(componentParam.dateTimeFilterRange?.start)}
               value={dayjs(startDate)}
               views={["year", "month", "day"]}
+              minDate={dayjs(minimumDate)}
+              disableFuture
+              inputRef={startDateInputRef}
             />
           </Grid>
           <Grid item xs={8}>
@@ -413,7 +429,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                 <DateRangeSlider
                   title={"temporal"}
                   onSlideChanged={onSlideChanged}
-                  min={overallDateRange.min}
+                  min={minimumDate}
                   start={startDate}
                   end={endDate}
                 />
@@ -422,10 +438,13 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
           </Grid>
           <Grid item xs={2}>
             <DateTimePicker
-              onAccept={onEndDatePickerChanged}
+              onAccept={onEndDatePickerAccepted}
               defaultValue={dayjs(componentParam.dateTimeFilterRange?.end)}
               value={dayjs(endDate)}
               views={["year", "month", "day"]}
+              minDate={dayjs(minimumDate)}
+              disableFuture
+              inputRef={endDateInputRef}
             />
           </Grid>
         </Grid>
