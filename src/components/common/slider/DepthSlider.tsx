@@ -52,7 +52,6 @@ const DepthSlider = () => {
 
   const handleSliderChange = (_: any, newValue: number[]) => {
     setSliderValues(newValue);
-    console.log("Slider values: ", newValue);
   };
   const formatLabel = (value: number) => {
     if (value === -1) {
