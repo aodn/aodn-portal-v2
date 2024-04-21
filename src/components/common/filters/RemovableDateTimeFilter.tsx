@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import { dateDefault, margin, borderRadius } from "../constants";
-import { Grid, Box, SxProps, Theme } from "@mui/material";
-import TuneIcon from "@mui/icons-material/Tune";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { borderRadius, dateDefault, margin } from "../constants";
+import { Box, Grid, SxProps, Theme } from "@mui/material";
 import { DateRangeSlider } from "../slider/RangeSlider";
 import { BarChart } from "@mui/x-charts/BarChart";
 import dayjs, { Dayjs } from "dayjs";
@@ -16,8 +15,6 @@ import {
 } from "../store/componentParamReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { FieldChangeHandlerContext } from "@mui/x-date-pickers/internals/hooks/useField";
-import { DateTimeValidationError } from "@mui/x-date-pickers";
 import blue from "../colors/blue.js";
 
 interface RemovableDateTimeFilterProps {
@@ -31,7 +28,7 @@ interface DataSeries {
   y: BarSeriesType[];
 }
 /**
- * It is belongs to a bucket if
+ * It belongs to a bucket if
  * 1. target start is within bucket
  * 2. target end is within bucket
  * 3. bucket start is within target && bucket end is within target
@@ -144,7 +141,7 @@ const createSeries = (
 };
 
 const cloneBarSeriesType = (s: BarSeriesType): BarSeriesType => {
-  const c: BarSeriesType = {
+  return {
     id: s.id,
     type: s.type,
     valueFormatter: s.valueFormatter,
@@ -152,8 +149,6 @@ const cloneBarSeriesType = (s: BarSeriesType): BarSeriesType => {
     label: s.label,
     data: s.data && s.data.map((x) => x),
   };
-
-  return c;
 };
 // TODO: Bug in end date, it didn't handle correctly, end date = today means ongoing dataset passing today,
 // because some dataset do not have end date.
@@ -161,19 +156,31 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const componentParam: ParameterState = getComponentState(store.getState());
 
-  // Must separate picker start and end date with slider to avoid feedback loop
-  const [pickerStartDate, setPickerStartDate] = useState<Date>(
-    dateDefault["min"]
-  );
-  const [pickerEndDate, setPickerEndDate] = useState<Date>(dateDefault["max"]);
+  // Below is the note, will remove later:
+  // Temporarily logic: this filter only have one pair of date. bar chart, date slider, and date picker are sharing
+  // the same date range states.
 
-  const [minSliderDate, setSliderMinDate] = useState<Date | undefined>(
-    undefined
-  );
-  const [startSliderDate, setSliderStartDate] = useState<Date>(
-    dateDefault["min"]
-  );
-  const [endSliderDate, setSliderEndDate] = useState<Date>(dateDefault["max"]);
+  // Disable the keyboard input for the date picker. May be changed in the future,
+  // according to the customers' feedback.
+  const endDateInputRef = useRef(null);
+  useEffect(() => {
+    if (endDateInputRef.current) {
+      endDateInputRef.current.disabled = true;
+    }
+  }, []);
+  const startDateInputRef = useRef(null);
+  useEffect(() => {
+    if (startDateInputRef.current) {
+      startDateInputRef.current.disabled = true;
+    }
+  }, []);
+
+  // This state is the minimun date range. Shouldn't be changed after initializing
+  const [minimumDate, setMinimumDate] = useState<Date>(dateDefault.min);
+
+  //The below two states are the date range states. They are shared by datePickers, dateSlider, and barChart.
+  const [startDate, setStartDate] = useState<Date>(dateDefault.min);
+  const [endDate, setEndDate] = useState<Date>(dateDefault.max);
 
   const [barSeries, setBarSeries] = useState<DataSeries>({ x: [], y: [] });
   const [slicedBarSeries, setSlicedBarSeries] = useState<DataSeries>({
@@ -181,6 +188,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
     y: [],
   });
 
+  // Initialize the component
   useEffect(() => {
     // Find all collection
     dispatch(
@@ -206,134 +214,95 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
             setBarSeries({ x: xValues, y: series });
             setSlicedBarSeries({ x: xValues, y: series });
 
-            setSliderMinDate(min);
-            setSliderStartDate(
-              componentParam.dateTimeFilterRange?.start
-                ? new Date(componentParam.dateTimeFilterRange?.start)
-                : min
-            );
-            setPickerStartDate(
-              componentParam.dateTimeFilterRange?.start
-                ? new Date(componentParam.dateTimeFilterRange?.start)
-                : min
-            );
-
-            if (componentParam.dateTimeFilterRange?.end) {
-              setSliderEndDate(
-                new Date(componentParam.dateTimeFilterRange?.end)
-              );
-              setPickerEndDate(
-                new Date(componentParam.dateTimeFilterRange?.end)
-              );
+            if (min > new Date(dateDefault["min"])) {
+              setStartDate(min);
+              setMinimumDate(min);
             }
           });
-      });
-  }, [
-    componentParam.dateTimeFilterRange?.end,
-    componentParam.dateTimeFilterRange?.start,
-    dispatch,
-  ]);
+      }); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const sliceBarSeries = useCallback(
-    (start: Date, end: Date) => {
-      // Slider default min/max value is 0-100
-      let startIndex = 0;
-      let endIndex = 100;
+  // When date range is changed, the bar chart should be updated
+  useEffect(() => {
+    // Omit this useEffect if the barSeries is not populated yet
+    if (barSeries.x.length === 0 && barSeries.y.length === 0) {
+      return;
+    }
+    // Slider default min/max value is 0-100
+    let startIndex = 0;
+    let endIndex = 100;
 
-      for (let i: number = 0; i < barSeries.x.length; i++) {
-        if (barSeries.x[i] < start) {
-          startIndex = i;
-        }
-        if (barSeries.x[i] < end) {
-          endIndex = i;
-        }
+    for (let i: number = 0; i < barSeries.x.length; i++) {
+      if (barSeries.x[i] < startDate) {
+        startIndex = i;
       }
+      if (barSeries.x[i] < endDate) {
+        endIndex = i;
+      }
+    }
 
-      const series: BarSeriesType[] = [];
+    const series: BarSeriesType[] = [];
 
-      series.push(cloneBarSeriesType(barSeries.y[0]));
-      series.push(cloneBarSeriesType(barSeries.y[1]));
+    series.push(cloneBarSeriesType(barSeries.y[0]));
+    series.push(cloneBarSeriesType(barSeries.y[1]));
 
-      series[0].data =
-        series[0] &&
-        series[0].data &&
-        series[0].data.slice(startIndex, endIndex);
-      series[1].data =
-        series[1] &&
-        series[1].data &&
-        series[1].data.slice(startIndex, endIndex);
+    series[0].data =
+      series[0] && series[0].data && series[0].data.slice(startIndex, endIndex);
+    series[1].data =
+      series[1] && series[1].data && series[1].data.slice(startIndex, endIndex);
 
-      setSlicedBarSeries({
-        x: barSeries.x.slice(startIndex, endIndex),
-        y: series,
-      });
-    },
-    [setSlicedBarSeries, barSeries]
-  );
+    setSlicedBarSeries({
+      x: barSeries.x.slice(startIndex, endIndex),
+      y: series,
+    });
+  }, [startDate, endDate, barSeries.y, barSeries.x]);
 
+  // These 3 functions handle the change of the date slider, and two date pickers.
+  // they only update the date range state locally and globally.
   const onSlideChanged = useCallback(
     (start: number, end: number, startIndex: number, endIndex: number) => {
-      const s = new Date(start);
-      const e = new Date(end);
-      setPickerStartDate(s);
-      setPickerEndDate(e);
+      setStartDate(new Date(start));
+      setEndDate(new Date(end));
 
-      setSliderStartDate(s);
-      setSliderEndDate(e);
       dispatch(
         updateDateTimeFilterRange({
           start: startIndex === 0 ? undefined : start,
           end: endIndex === 100 ? undefined : end,
         })
       );
-
-      sliceBarSeries(s, e);
     },
-    [setPickerStartDate, setPickerEndDate, sliceBarSeries, dispatch]
+    [dispatch]
   );
 
-  const onStartDatePickerChanged = useCallback(
-    (
-      value: Dayjs | null,
-      context: FieldChangeHandlerContext<DateTimeValidationError>
-    ) => {
-      // just log this for now
-      if (context.validationError) {
-        console.log("Validation error", context.validationError);
-      }
+  // Second function as mentioned above
+  const onStartDatePickerAccepted = useCallback(
+    (value: Dayjs | null) => {
       const e = value ? value.toDate() : new Date(dateDefault["min"]);
-      setPickerStartDate(e);
-      setSliderStartDate(e);
+      setStartDate(e);
+
       dispatch(
         updateDateTimeFilterRange({
           start: e.getTime(),
-          end: pickerEndDate.getTime(),
+          end: endDate.getTime(),
         })
       );
     },
-    [dispatch, setSliderStartDate, setPickerStartDate, pickerEndDate]
+    [dispatch, endDate]
   );
 
-  const onEndDatePickerChanged = useCallback(
-    (
-      value: Dayjs | null,
-      context: FieldChangeHandlerContext<DateTimeValidationError>
-    ) => {
-      // just log this for now
-      if (context.validationError) {
-        console.log("Validation error", context.validationError);
-      }
+  // Third function as mentioned above
+  const onEndDatePickerAccepted = useCallback(
+    (value: Dayjs | null) => {
       const e = value ? value.toDate() : new Date(dateDefault["max"]);
-      setPickerEndDate(e);
-      setSliderEndDate(e);
+      setEndDate(e);
       dispatch(
         updateDateTimeFilterRange({
-          start: pickerStartDate.getTime(),
+          start: startDate.getTime(),
           end: e.getTime(),
         })
       );
     },
-    [dispatch, setSliderEndDate, setPickerEndDate, pickerStartDate]
+    [dispatch, startDate]
   );
 
   return (
@@ -440,10 +409,13 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         <Grid container>
           <Grid item xs={2}>
             <DateTimePicker
-              onChange={onStartDatePickerChanged}
+              onAccept={onStartDatePickerAccepted}
               defaultValue={dayjs(componentParam.dateTimeFilterRange?.start)}
-              value={dayjs(pickerStartDate)}
+              value={dayjs(startDate)}
               views={["year", "month", "day"]}
+              minDate={dayjs(minimumDate)}
+              disableFuture
+              inputRef={startDateInputRef}
             />
           </Grid>
           <Grid item xs={8}>
@@ -457,19 +429,22 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
                 <DateRangeSlider
                   title={"temporal"}
                   onSlideChanged={onSlideChanged}
-                  min={minSliderDate}
-                  start={startSliderDate}
-                  end={endSliderDate}
+                  min={minimumDate}
+                  start={startDate}
+                  end={endDate}
                 />
               </Grid>
             </Grid>
           </Grid>
           <Grid item xs={2}>
             <DateTimePicker
-              onChange={onEndDatePickerChanged}
+              onAccept={onEndDatePickerAccepted}
               defaultValue={dayjs(componentParam.dateTimeFilterRange?.end)}
-              value={dayjs(pickerEndDate)}
+              value={dayjs(endDate)}
               views={["year", "month", "day"]}
+              minDate={dayjs(minimumDate)}
+              disableFuture
+              inputRef={endDateInputRef}
             />
           </Grid>
         </Grid>
