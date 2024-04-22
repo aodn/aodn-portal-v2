@@ -96,4 +96,4 @@ Example of use:
 
 ## Feature tips
 
-- On advanced filter, the unit of the barchart will change (year / month / day) according to the selected date range.
+- On advanced filter, the unit of the barchart(TimeRangeBarChart) will change (year / month / day) according to the selected date range.
