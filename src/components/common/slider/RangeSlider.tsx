@@ -102,6 +102,7 @@ const NumberRangeSlider = ({
         valueLabelDisplay="auto"
         getAriaValueText={(v) => label(v, min, max)}
         valueLabelFormat={(v) => label(v, min, max)}
+        step={0.01}
       />
     </Box>
   );

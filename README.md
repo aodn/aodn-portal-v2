@@ -93,3 +93,7 @@ And add the issue id after an `/` followed with an explanation of the task.
 
 Example of use:
 `feature/5348-create-react-app`
+
+## Feature tips
+
+- On advanced filter, the unit of the barchart will change (year / month / day) according to the selected date range.
