@@ -14,7 +14,7 @@ import {
 import { cqlDefaultFilters } from "../cqlFilters";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import blue from "../colors/blue.js";
-import TimeRangeBarChart from "../charts/timeRangeBarChart.tsx";
+import TimeRangeBarChart from "../charts/TimeRangeBarChart.tsx";
 
 interface RemovableDateTimeFilterProps {
   title: string;
