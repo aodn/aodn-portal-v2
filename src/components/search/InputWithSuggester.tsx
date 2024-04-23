@@ -2,6 +2,8 @@ import StyledTextField from "./StyledTextField.tsx";
 import { Autocomplete } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { ParameterState } from "../common/store/componentParamReducer.tsx";
+import store, { getComponentState } from "../common/store/store.tsx";
 
 interface InputWithSuggesterProps {
   // may have filter values here
@@ -50,9 +52,18 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   useEffect(() => {
     const refreshOptions = async (value: string) => {
       try {
-        const response = await axios.get("/api/v1/ogc/ext/autocomplete", {
+        const params: ParameterState = getComponentState(store.getState());
+        const categoryStrings: string[] = [];
+        params.categories?.forEach((c) => {
+          categoryStrings.push(
+            `discovery_categories='${c.label?.toLowerCase()}'`
+          );
+        });
+        const filterString = categoryStrings.join(" or ");
+        const response = await axios.get<any>("/api/v1/ogc/ext/autocomplete", {
           params: {
             input: value,
+            filter: filterString === "" ? undefined : filterString,
           },
         });
 
