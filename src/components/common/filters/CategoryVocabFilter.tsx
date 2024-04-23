@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  Grid,
   Box,
+  Grid,
   SxProps,
   Theme,
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
-import store, { AppDispatch } from "../store/store";
+import { AppDispatch } from "../store/store";
 import { borderRadius } from "../constants";
 import blue from "../colors/blue";
 import { fetchParameterCategoriesWithStore } from "../store/searchReducer";
@@ -23,8 +23,12 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
   const [categories, setCategories] = useState<Array<Category>>([]);
   const [values, setValues] = useState<Array<string>>([]);
 
+  // Because the categories using in this component have duplicate labels. They should be combined so need this state
+  // to store the labels of the buttons
+  const [buttonLabels, setButtonLabels] = useState<string[]>([]);
+
   const handleChange = useCallback(
-    (event, newAlignment) => {
+    (_: any, newAlignment: any) => {
       // Now given the newAlignment value, we need to find the categories object
       // from there we can get the leaf node of what values to set for categories search
       const selected: Array<Category> = categories.filter((c) =>
@@ -32,8 +36,10 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
       );
       const childSelected = new Array<Category>();
 
-      selected.forEach((s) => {
-        s.narrower?.forEach((l) => childSelected.push(l));
+      selected.forEach((selectedCategory) => {
+        if (selectedCategory.label) {
+          childSelected.push(selectedCategory);
+        }
       });
 
       dispatch(updateCategories(childSelected));
@@ -41,6 +47,18 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
     },
     [dispatch, categories]
   );
+
+  useEffect(() => {
+    const labels = [];
+
+    // remove all items whose label is already in the labels array
+    categories.map((category) => {
+      if (!labels.includes(category.label)) {
+        labels.push(category.label);
+      }
+    });
+    setButtonLabels(labels);
+  }, [categories]);
 
   useEffect(() => {
     dispatch(fetchParameterCategoriesWithStore(null))
@@ -93,15 +111,15 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
           exclusive={false}
           onChange={handleChange}
         >
-          {categories.map((v) => (
+          {buttonLabels.map((label) => (
             <ToggleButton
               sx={{
                 boxShadow: "1px 1px 10px 1px #d4d4d4",
               }}
-              value={v.label}
-              key={v.label}
+              value={label}
+              key={label}
             >
-              {v.label}
+              {label}
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
