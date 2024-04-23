@@ -14,13 +14,14 @@ import store, { AppDispatch, getComponentState } from "../common/store/store";
 import {
   ParameterState,
   updateSearchText,
+  formatToUrlParam,
 } from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester.tsx";
+import { pageDefault } from "../common/constants";
 
 const SimpleTextSearch = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
   const [searchText] = useState(getComponentState(store.getState()).searchText);
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
@@ -28,9 +29,17 @@ const SimpleTextSearch = () => {
 
   const executeSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
-    dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
+    const searchParameters: SearchParameters =
+      createSearchParamFrom(componentParam);
+
+    dispatch(fetchResultWithStore(searchParameters))
       .unwrap()
-      .then(() => navigate("/search"));
+      .then(() => {
+        navigate(
+          pageDefault.searchWithQuery + formatToUrlParam(componentParam),
+          { state: { fromNavigate: true } }
+        );
+      });
   }, [dispatch, navigate]);
 
   const handleEnterPressed = useCallback(

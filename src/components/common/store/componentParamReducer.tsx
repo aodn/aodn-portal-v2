@@ -27,8 +27,12 @@ export interface ParameterState {
   searchText?: string;
   categories?: Array<Category>;
 }
+// Function use to test an input value is of type Category
+const isTypeCategory = (value: any): value is Category =>
+  value && (value as Category).label !== undefined;
 
 export interface Category {
+  // The label is never undefined
   label: string;
   definition?: string;
   about: string;
@@ -129,9 +133,91 @@ const paramReducer = (
   }
 };
 
+const flattenToProperties = (
+  param: ParameterState,
+  parentKey = "",
+  result = {}
+) => {
+  for (const key in param) {
+    if (Object.prototype.hasOwnProperty.call(param, key)) {
+      const propName = parentKey ? `${parentKey}.${key}` : key;
+      if (typeof param[key] === "object" && param[key] !== null) {
+        flattenToProperties(param[key], propName, result);
+      } else {
+        // Special handle for category type
+        if (isTypeCategory(param)) {
+          if (key === "label") {
+            result[propName] = param[key];
+          }
+        } else {
+          result[propName] = param[key];
+        }
+      }
+    }
+  }
+  return result;
+};
+
+const formatToUrlParam = (param: ParameterState) => {
+  const result = flattenToProperties(param);
+  const parts = [];
+  for (const key in result) {
+    if (Object.prototype.hasOwnProperty.call(result, key)) {
+      parts.push(
+        `${encodeURIComponent(key)}=${encodeURIComponent(result[key])}`
+      );
+    }
+  }
+  return parts.join("&");
+};
+
+const parseQueryString = (queryString: string) => {
+  const obj = {};
+  const pairs = queryString.split("&"); // Split the query string into key-value pairs
+
+  pairs.forEach((pair) => {
+    const [key, value] = pair.split("="); // Split each pair into a key and a value
+    // Ensure the key and value are present
+    if (key && value) {
+      obj[decodeURIComponent(key)] = decodeURIComponent(value); // Decode and store them in the object
+    }
+  });
+
+  return obj;
+};
+
+const unFlattenToParameterState = (input: string) => {
+  const result = {};
+  const flatObject = parseQueryString(input);
+
+  for (const key in flatObject) {
+    if (Object.prototype.hasOwnProperty.call(flatObject, key)) {
+      const parts = key.split("."); // Split the key into parts based on '.'
+      let current = result;
+
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (i === parts.length - 1) {
+          // If it's the last part, set the value
+          current[part] = flatObject[key];
+        } else {
+          // If not the last part, update or create the nested object
+          if (!current[part]) {
+            current[part] = {};
+          }
+          current = current[part];
+        }
+      }
+    }
+  }
+
+  return result;
+};
+
 export default paramReducer;
 
 export {
+  formatToUrlParam,
   updateDateTimeFilterRange,
   updateSearchText,
   updateImosOnly,

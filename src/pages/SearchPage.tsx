@@ -12,7 +12,7 @@ import {
 } from "../components/common/store/searchReducer";
 import { ResultCards } from "../components/result/ResultCards";
 import Layout from "../components/layout/layout";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ParameterState,
@@ -48,10 +48,20 @@ import VectorTileLayers from "../components/map/mapbox/layers/VectorTileLayers";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 
 const SearchPage = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
+
+  // If this flag is set, that means it is call from within react
+  // and the search status already refresh and useSelector contains
+  // the correct values, else it is user paste the url directly
+  // and content may not refreshed
+  if (!location.state?.fromNavigate) {
+    console.log("User paste url");
+  }
+
   const contents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
