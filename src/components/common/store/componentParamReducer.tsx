@@ -41,9 +41,9 @@ export interface Category {
   // The label is never undefined
   label: string;
   definition?: string;
-  about: string;
-  broader: Array<Category>;
-  narrower: Array<Category>;
+  about?: string;
+  broader?: Array<Category>;
+  narrower?: Array<Category>;
 }
 
 interface ActionType {

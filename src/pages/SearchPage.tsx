@@ -15,10 +15,12 @@ import Layout from "../components/layout/layout";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  SearchParameters,
   ParameterState,
   updateFilterPolygon,
   updateParameterStates,
   unFlattenToParameterState,
+  formatToUrlParam,
 } from "../components/common/store/componentParamReducer";
 import store, {
   AppDispatch,
