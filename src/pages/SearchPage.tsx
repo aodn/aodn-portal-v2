@@ -9,13 +9,13 @@ import {
   createSearchParamFrom,
   fetchResultWithStore,
   OGCCollection,
+  SearchParameters,
 } from "../components/common/store/searchReducer";
 import { ResultCards } from "../components/result/ResultCards";
 import Layout from "../components/layout/layout";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  SearchParameters,
   ParameterState,
   updateFilterPolygon,
   updateParameterStates,

@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import {
   createSearchParamFrom,
   fetchResultWithStore,
+  SearchParameters,
 } from "../common/store/searchReducer";
 import { useNavigate } from "react-router-dom";
 import { Button, Divider, Grid, IconButton, Paper } from "@mui/material";
