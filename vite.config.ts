@@ -42,7 +42,7 @@ export default ({ mode }) => {
     },
     test: {
       // 👋 add the line below to add jsdom to vite
-      environment: 'jsdom',
+      environment: "jsdom",
     },
     publicDir: "public",
     resolve: {
