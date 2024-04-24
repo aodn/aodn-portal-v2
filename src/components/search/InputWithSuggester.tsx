@@ -66,6 +66,9 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
 
   // Whenever user type something, refresh the options
   useEffect(() => {
+    if (textValue === "") {
+      return;
+    }
     const refreshOptions = async () => {
       try {
         const currentState: ParameterState = getComponentState(
@@ -74,7 +77,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
           .unwrap()
           .then((data) => {
-            setOptions(data);
+            setOptions(data.record_suggestions.titles);
           });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -82,7 +85,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     };
 
     refreshOptions().then();
-  }, [dispatch]);
+  }, [dispatch, textValue]);
 
   return (
     <Autocomplete

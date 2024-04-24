@@ -141,7 +141,7 @@ const searchParameterCategories = async (
 };
 
 const fetchSuggesterOptions = createAsyncThunk<
-  string[],
+  any,
   SuggesterParameters,
   { rejectValue: FailedResponse }
 >(
