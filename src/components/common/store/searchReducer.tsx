@@ -43,6 +43,11 @@ export interface FailedResponse {
   error: string;
 }
 
+export type SuggesterParameters = {
+  input?: string;
+  filter?: string;
+};
+
 export type SearchParameters = {
   text?: string;
   filter?: string;
@@ -134,6 +139,32 @@ const searchParameterCategories = async (
     }
   }
 };
+
+const fetchSuggesterOptions = createAsyncThunk<
+  any,
+  SuggesterParameters,
+  { rejectValue: FailedResponse }
+>(
+  "search/fetchSuggesterOptions",
+  async (params: SuggesterParameters, thunkApi: any) => {
+    try {
+      const response = await axios.get<any>("/api/v1/ogc/ext/autocomplete", {
+        params: params,
+      });
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage = "Unkown error occurred. Please try again later.";
+      if (axios.isAxiosError(error)) {
+        return thunkApi.rejectWithValue(error?.response?.data);
+      } else {
+        return thunkApi.rejectWithValue({
+          error: errorMessage,
+        } as FailedResponse);
+      }
+    }
+  }
+);
+
 /**
  * Trunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description
@@ -201,6 +232,22 @@ const searcher = createSlice({
 const appendFilter = (f: string | undefined, a: string | undefined) =>
   f === undefined ? a : f + " AND " + a;
 
+const createSuggesterParamFrom = (
+  paramState: ParameterState
+): SuggesterParameters => {
+  const suggesterParam: SuggesterParameters = {};
+  if (paramState.searchText) {
+    suggesterParam.input = paramState.searchText;
+  }
+  if (paramState.categories) {
+    const filterGenerator = cqlDefaultFilters.get(
+      "CATEGORIES_IN"
+    ) as CategoriesIn;
+    suggesterParam.filter = filterGenerator(paramState.categories);
+  }
+  return suggesterParam;
+};
+
 const createSearchParamFrom = (i: ParameterState): SearchParameters => {
   const p: SearchParameters = {};
   p.text = i.searchText;
@@ -258,8 +305,10 @@ const createSearchParamForImosRealTime = () => {
 };
 
 export {
+  createSuggesterParamFrom,
   createSearchParamFrom,
   createSearchParamForImosRealTime,
+  fetchSuggesterOptions,
   fetchResultWithStore,
   fetchResultNoStore,
   fetchResultByUuidNoStore,

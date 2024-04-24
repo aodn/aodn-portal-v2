@@ -1,7 +1,19 @@
 import StyledTextField from "./StyledTextField.tsx";
 import { Autocomplete } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import {
+  ParameterState,
+  updateSearchText,
+} from "../common/store/componentParamReducer.tsx";
+import store, {
+  AppDispatch,
+  getComponentState,
+} from "../common/store/store.tsx";
+import { useDispatch } from "react-redux";
+import {
+  createSuggesterParamFrom,
+  fetchSuggesterOptions,
+} from "../common/store/searchReducer.tsx";
 
 interface InputWithSuggesterProps {
   // may have filter values here
@@ -26,19 +38,25 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   onInputChangeCallback,
   handleEnterPressed = () => {},
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<readonly string[]>([]);
   const onChange = (_: any, newValue: string | null) => {
     if (newValue !== null) {
       // String quote with double quote to indicate user want the whole phase during search.
       // fire event here before useState update, need to call function in this case
-      onInputChangeCallback(newValue);
+      onTextChange(newValue);
     }
   };
   const onInputChange = (_: any, newInputValue: string) => {
     // If user type anything, then it is not a title search anymore
-    onInputChangeCallback(newInputValue);
+    onTextChange(newInputValue);
   };
+  const onTextChange = (text: string) => {
+    dispatch(updateSearchText(text));
+    onInputChangeCallback(text);
+  };
+
   // Whenever suggestion is closed, clear the options
   useEffect(() => {
     if (!open) {
@@ -46,26 +64,28 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     }
   }, [open]);
 
-  // Whenever user type, refresh options from server
+  // Whenever user type something, refresh the options
   useEffect(() => {
-    const refreshOptions = async (value: string) => {
+    if (textValue === "") {
+      return;
+    }
+    const refreshOptions = async () => {
       try {
-        const response = await axios.get("/api/v1/ogc/ext/autocomplete", {
-          params: {
-            input: value,
-          },
-        });
-
-        const d = response.data;
-        setOptions(d);
-        setOpen(d.length > 0);
+        const currentState: ParameterState = getComponentState(
+          store.getState()
+        );
+        dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
+          .unwrap()
+          .then((data) => {
+            setOptions(data.record_suggestions.titles);
+          });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    refreshOptions(textValue);
-  }, [textValue]);
+    refreshOptions().then();
+  }, [dispatch, textValue]);
 
   return (
     <Autocomplete
