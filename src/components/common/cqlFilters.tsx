@@ -37,14 +37,19 @@ const funcIntersectPolygon: PolygonOperation = (p) => {
   return `INTERSECTS(geometry,${wkt})`;
 };
 
-const funcCategories: CategoriesIn = (s: Array<Category>) => {
-  let q = "";
-  const or = " OR ";
-  s.forEach((i) => (q = q + `category='${i.label}'${or}`));
-
-  // Remove the last OR
-  const query = `(${q.substring(0, q.length - or.length)})`;
-  return query !== "()" ? query : undefined;
+const funcCategories: CategoriesIn = (categories: Array<Category>) => {
+  const categoryLabels: string[] = [];
+  // grab labels only
+  categories.forEach((category) => {
+    categoryLabels.push(
+      `discovery_categories='${category.label?.toLowerCase()}'`
+    );
+  });
+  // if no category, return undefined
+  if (categoryLabels.length === 0) {
+    return undefined;
+  }
+  return `(${categoryLabels.join(" or ")})`;
 };
 /**
  * The CQL filter format for search dataset given start/end date

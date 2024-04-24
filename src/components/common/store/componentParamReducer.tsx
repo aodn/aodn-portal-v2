@@ -20,7 +20,7 @@ interface DataTimeFilterRange {
 
 export interface ParameterState {
   polygon?: Feature<Polygon, Properties>;
-  isImosOnlyDataset: boolean;
+  isImosOnlyDataset?: boolean;
   // Use in RemovableDateTimeFilter
   dateTimeFilterRange?: DataTimeFilterRange;
   // Use in search box
