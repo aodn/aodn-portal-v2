@@ -2,7 +2,12 @@
  * This reducer is used to allow different component share value between pages, it is useful for filter
  * to preserve value between pages. The number below must be unique across the whole application
  */
-import { Feature, Polygon, Properties } from "@turf/turf";
+import {
+  Feature,
+  Polygon,
+  Properties,
+  bboxPolygon as turfBboxPolygon,
+} from "@turf/turf";
 import axios from "axios";
 
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -88,15 +93,17 @@ const updateCategories = (input: Array<Category>): ActionType => {
 };
 
 // Initial State
-const initialState: ParameterState = {
-  isImosOnlyDataset: false,
-  dateTimeFilterRange: {},
-  searchText: "",
+const createInitialParameterState = (): ParameterState => {
+  return {
+    isImosOnlyDataset: false,
+    dateTimeFilterRange: {},
+    searchText: "",
+  };
 };
 
 // Reducer
 const paramReducer = (
-  state: ParameterState = initialState,
+  state: ParameterState = createInitialParameterState(),
   action: ActionType
 ) => {
   switch (action.type) {
@@ -132,7 +139,8 @@ const paramReducer = (
       return state;
   }
 };
-
+// Flatten the ParameterState json to a properties like array, where key is
+// the name.name.name... that describe multiple level json.
 const flattenToProperties = (
   param: ParameterState,
   parentKey = "",
@@ -144,8 +152,10 @@ const flattenToProperties = (
       if (typeof param[key] === "object" && param[key] !== null) {
         flattenToProperties(param[key], propName, result);
       } else {
-        // Special handle for category type
         if (isTypeCategory(param)) {
+          // Special handle for category type, we only serializable
+          // the label value, because other is of no use to search
+          // and just waste space
           if (key === "label") {
             result[propName] = param[key];
           }
@@ -157,7 +167,7 @@ const flattenToProperties = (
   }
   return result;
 };
-
+// Change the flatten json to xxx=yyy?xxxx=yyyy which can be use in url.
 const formatToUrlParam = (param: ParameterState) => {
   const result = flattenToProperties(param);
   const parts = [];
@@ -185,9 +195,9 @@ const parseQueryString = (queryString: string) => {
 
   return obj;
 };
-
-const unFlattenToParameterState = (input: string) => {
-  const result = {};
+// Convert the url parameter back to ParameterState, check test case for more details
+const unFlattenToParameterState = (input: string): ParameterState => {
+  const result = createInitialParameterState();
   const flatObject = parseQueryString(input);
 
   for (const key in flatObject) {
@@ -197,20 +207,39 @@ const unFlattenToParameterState = (input: string) => {
 
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
+
         if (i === parts.length - 1) {
           // If it's the last part, set the value
-          current[part] = flatObject[key];
+          if (typeof current[part] === "boolean") {
+            current[part] = flatObject[key] === "true";
+          } else if (!isNaN(Number(flatObject[key]))) {
+            current[part] = parseFloat(flatObject[key]);
+          } else {
+            current[part] = flatObject[key];
+          }
         } else {
           // If not the last part, update or create the nested object
           if (!current[part]) {
-            current[part] = {};
+            // Check if this key is array or not by forward looking the next key
+            // if it is a number then create as array, else an object
+            const isTypeArray = !isNaN(Number(parts[i + 1]));
+            current[part] = isTypeArray ? [] : {};
           }
           current = current[part];
         }
       }
     }
   }
-
+  // Special handle for polygon
+  if (Object.prototype.hasOwnProperty.call(result, "polygon")) {
+    // By default empty object will not be serialized, so when deserialize, we may miss some default empty value
+    // in this case the polygon "properties" fields is missing, so we add it back by create an empty default object
+    // then update all attributes with the same
+    result.polygon = {
+      ...turfBboxPolygon([0, 0, 0, 0]),
+      ...result.polygon,
+    };
+  }
   return result;
 };
 
@@ -218,6 +247,7 @@ export default paramReducer;
 
 export {
   formatToUrlParam,
+  unFlattenToParameterState,
   updateDateTimeFilterRange,
   updateSearchText,
   updateImosOnly,
