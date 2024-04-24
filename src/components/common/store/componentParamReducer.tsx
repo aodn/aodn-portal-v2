@@ -10,6 +10,7 @@ import {
 } from "@turf/turf";
 import axios from "axios";
 
+const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
 const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = "UPDATE_SEARCH_TEXT_FILTER_VARIABLE";
 const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
@@ -51,6 +52,13 @@ interface ActionType {
 }
 
 // Action Creator
+const updateParameterStates = (param: ParameterState): ActionType => {
+  return {
+    type: UPDATE_PARAMETER_STATES,
+    payload: param,
+  };
+};
+
 const updateDateTimeFilterRange = (range: DataTimeFilterRange): ActionType => {
   return {
     type: UPDATE_DATETIME_FILTER_VARIABLE,
@@ -134,6 +142,11 @@ const paramReducer = (
       return {
         ...state,
         categories: action.payload.categories,
+      };
+    case UPDATE_PARAMETER_STATES:
+      return {
+        ...state,
+        ...action.payload,
       };
     default:
       return state;
@@ -253,4 +266,5 @@ export {
   updateImosOnly,
   updateFilterPolygon,
   updateCategories,
+  updateParameterStates,
 };

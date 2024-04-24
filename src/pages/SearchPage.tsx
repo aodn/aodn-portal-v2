@@ -12,11 +12,13 @@ import {
 } from "../components/common/store/searchReducer";
 import { ResultCards } from "../components/result/ResultCards";
 import Layout from "../components/layout/layout";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ParameterState,
   updateFilterPolygon,
+  updateParameterStates,
+  unFlattenToParameterState,
 } from "../components/common/store/componentParamReducer";
 import store, {
   AppDispatch,
@@ -24,6 +26,7 @@ import store, {
   RootState,
   searchQueryResult,
 } from "../components/common/store/store";
+import { pageDefault } from "../components/common/constants";
 import * as turf from "@turf/turf";
 
 // Map section, you can switch to other map library, this is for maplibre
@@ -51,20 +54,28 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
+  const [searchParams, setSearchParams] = useSearchParams();
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
-
-  // If this flag is set, that means it is call from within react
-  // and the search status already refresh and useSelector contains
-  // the correct values, else it is user paste the url directly
-  // and content may not refreshed
-  if (!location.state?.fromNavigate) {
-    console.log("User paste url");
-  }
 
   const contents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
+
+  const doSearch = useCallback(() => {
+    const componentParam: ParameterState = getComponentState(store.getState());
+    dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
+      .unwrap()
+      .then((collections) => {
+        const ids = collections.collections.map((c) => c.id);
+        //Remove map uuid not exist in the ids
+        setLayers((v) => v.filter((i) => ids.includes(i.id)));
+      })
+      .then((v) =>
+        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+          state: { fromNavigate: true },
+        })
+      );
+  }, [dispatch, navigate, setLayers]);
 
   const onMapZoom = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
@@ -76,21 +87,10 @@ const SearchPage = () => {
         // Note order: longitude, latitude.2
         const polygon = turf.bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
         dispatch(updateFilterPolygon(polygon));
-
-        const componentParam: ParameterState = getComponentState(
-          store.getState()
-        );
-        dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
-          .unwrap()
-          .then((collections) => {
-            const ids = collections.collections.map((c) => c.id);
-            // remove map uuid not exist in the ids
-            setLayers((v) => v.filter((i) => ids.includes(i.id)));
-          })
-          .then((v) => navigate("/search"));
+        doSearch();
       }
     },
-    [dispatch, navigate, setLayers]
+    [dispatch, doSearch]
   );
 
   const onAddToMap = useCallback(
@@ -107,6 +107,19 @@ const SearchPage = () => {
     },
     [setLayers]
   );
+  // If this flag is set, that means it is call from within react
+  // and the search status already refresh and useSelector contains
+  // the correct values, else it is user paste the url directly
+  // and content may not refreshed
+  if (!location.state?.fromNavigate) {
+    // The first char is ? in the search string, so we need to remove it.
+    const param = location?.search.substring(1);
+    if (param !== null) {
+      const paramState: ParameterState = unFlattenToParameterState(param);
+      dispatch(updateParameterStates(paramState));
+      doSearch();
+    }
+  }
 
   return (
     <Layout>

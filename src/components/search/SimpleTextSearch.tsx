@@ -35,10 +35,9 @@ const SimpleTextSearch = () => {
     dispatch(fetchResultWithStore(searchParameters))
       .unwrap()
       .then(() => {
-        navigate(
-          pageDefault.searchWithQuery + formatToUrlParam(componentParam),
-          { state: { fromNavigate: true } }
-        );
+        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+          state: { fromNavigate: true },
+        });
       });
   }, [dispatch, navigate]);
 

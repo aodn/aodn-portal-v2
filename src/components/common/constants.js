@@ -35,7 +35,6 @@ const dateDefault = {
 
 const pageDefault = {
   search: "/search",
-  searchWithQuery: "/search?f=",
   details: "/details",
   landing: "/",
 };
