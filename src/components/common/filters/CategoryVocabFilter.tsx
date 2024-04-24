@@ -49,14 +49,9 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
   );
 
   useEffect(() => {
-    const labels = [];
-
     // remove all items whose label is already in the labels array
-    categories.map((category) => {
-      if (!labels.includes(category.label)) {
-        labels.push(category.label);
-      }
-    });
+
+    const labels = [...new Set(categories.map((c) => c.label))];
     setButtonLabels(labels);
   }, [categories]);
 
