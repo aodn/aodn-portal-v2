@@ -14,33 +14,35 @@ import {
   createSuggesterParamFrom,
   fetchSuggesterOptions,
 } from "../common/store/searchReducer.tsx";
-
 interface InputWithSuggesterProps {
-  // may have filter values here
-  textValue: string;
-  onInputChangeCallback: (chosenOption: string) => void;
   handleEnterPressed?: (
     event: React.KeyboardEvent<HTMLTextAreaElement>
   ) => void;
 }
 
+interface OptionType {
+  text: string;
+  group: string;
+}
+
+enum OptionGroup {
+  CATEGORY = "category",
+  TITLE = "title",
+}
+
 /**
  * Customized input box with suggester. If more customization is needed, please
  * do as the below nullable props.
- * @param inputValue value of the input box.
- * @param onInputChangeCallback used to pass changed input value to parent.
  * @param handleEnterPressed handle the event when users press the ENTER on keyboard.
  * have default empty implementation. Can be overridden.
  * @constructor
  */
 const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
-  textValue,
-  onInputChangeCallback,
   handleEnterPressed = () => {},
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState<readonly string[]>([]);
+  const [options, setOptions] = useState<OptionType[]>([]);
   const onChange = (_: any, newValue: string | null) => {
     if (newValue !== null) {
       // String quote with double quote to indicate user want the whole phase during search.
@@ -54,7 +56,34 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   };
   const onTextChange = (text: string) => {
     dispatch(updateSearchText(text));
-    onInputChangeCallback(text);
+    if (text !== "") {
+      refreshOptions().then();
+    }
+  };
+
+  const refreshOptions = async () => {
+    try {
+      const currentState: ParameterState = getComponentState(store.getState());
+      dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
+        .unwrap()
+        .then((data) => {
+          const options: OptionType[] = [];
+
+          const categorySuggestions = new Set(data.category_suggestions);
+          const titleSuggestions = new Set(data.record_suggestions.titles);
+
+          categorySuggestions.forEach((category: string) => {
+            options.push({ text: category, group: OptionGroup.CATEGORY });
+          });
+          titleSuggestions.forEach((title: string) => {
+            options.push({ text: title, group: OptionGroup.TITLE });
+          });
+
+          setOptions(options);
+        });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   // Whenever suggestion is closed, clear the options
@@ -63,29 +92,6 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
       setOptions([]);
     }
   }, [open]);
-
-  // Whenever user type something, refresh the options
-  useEffect(() => {
-    if (textValue === "") {
-      return;
-    }
-    const refreshOptions = async () => {
-      try {
-        const currentState: ParameterState = getComponentState(
-          store.getState()
-        );
-        dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
-          .unwrap()
-          .then((data) => {
-            setOptions(data.record_suggestions.titles);
-          });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    refreshOptions().then();
-  }, [dispatch, textValue]);
 
   return (
     <Autocomplete
@@ -99,9 +105,8 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         setOpen(false);
       }}
       forcePopupIcon={false}
-      getOptionLabel={(option) => option}
-      options={options}
-      value={textValue}
+      options={options.flatMap((option) => option.text)}
+      groupBy={(option) => options.find((o) => o.text === option)?.group}
       autoComplete
       includeInputInList
       onChange={onChange}
