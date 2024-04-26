@@ -40,6 +40,10 @@ export default ({ mode }) => {
     build: {
       outDir: "dist",
     },
+    test: {
+      // 👋 add the line below to add jsdom to vite
+      environment: "jsdom",
+    },
     publicDir: "public",
     resolve: {
       alias: [{ find: "@", replacement: path.resolve(__dirname, "src") }],
