@@ -11,21 +11,21 @@ import DetailsPanel from "../components/details/DetailsPanel";
 import Layout from "../components/layout/layout";
 
 const DetailsPage = () => {
-  const { state } = useLocation();
+  const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
 
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
-  const uuid = state?.uuid;
 
   useEffect(() => {
+    const uuid = new URLSearchParams(location.search).get("uuid");
     dispatch(fetchResultByUuidNoStore(uuid))
       .unwrap()
       .then((collection) => {
         setCollection(collection);
       });
-  }, [dispatch, uuid]);
+  }, [dispatch, location.search]);
 
   return (
     <Layout>

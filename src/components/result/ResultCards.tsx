@@ -65,9 +65,11 @@ const ResultCard = (props: ResultCardProps) => {
   return (
     <Card variant="outlined">
       <CardActionArea
-        onClick={() =>
-          navigate(pageDefault.details, { state: { uuid: props.content.id } })
-        }
+        onClick={() => {
+          const searchParams = new URLSearchParams();
+          searchParams.append("uuid", props.content.id);
+          navigate(pageDefault.details + "?" + searchParams.toString());
+        }}
       >
         <CardContent>
           <Typography component="div" sx={{ marginBottom: "10px" }}>
