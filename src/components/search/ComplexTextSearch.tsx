@@ -12,8 +12,12 @@ import {
 import store, { AppDispatch, getComponentState } from "../common/store/store";
 import RemovableFilters from "../common/filters/RemovableFilters";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
-import { ParameterState } from "../common/store/componentParamReducer";
+import {
+  ParameterState,
+  formatToUrlParam,
+} from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester.tsx";
+import { pageDefault } from "../common/constants";
 
 export interface ComplexTextSearchProps {
   onFilterCallback: (
@@ -59,9 +63,17 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
 
     dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
       .unwrap()
-      .then(() => navigate("/search"));
-  }, [dispatch, navigate]);
-
+      .then(() =>
+        navigate(
+          pageDefault.search + "?" + formatToUrlParam(componentParam),
+          {
+            state: { fromNavigate: true },
+          }
+        )
+      );
+  },
+  [dispatch, navigate]
+  );
   const onFilterShowHide = useCallback(
     (
       events:
