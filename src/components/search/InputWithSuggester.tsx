@@ -75,7 +75,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     }
   };
 
-  const debounceRefreshOptions = _.debounce(refreshOptions, 3000);
+  const debounceRefreshOptions = _.debounce(refreshOptions, 300);
 
   const onChange = (_: any, newValue: string | null) => {
     if (newValue !== null) {
