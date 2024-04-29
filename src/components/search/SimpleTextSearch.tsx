@@ -14,7 +14,6 @@ import AdvanceFilters from "../common/filters/AdvanceFilters";
 import store, { AppDispatch, getComponentState } from "../common/store/store";
 import {
   ParameterState,
-  updateSearchText,
   formatToUrlParam,
 } from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester.tsx";
@@ -23,11 +22,7 @@ import { pageDefault } from "../common/constants";
 const SimpleTextSearch = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [searchText] = useState(getComponentState(store.getState()).searchText);
   const [showFilters, setShowFilters] = useState<boolean>(false);
-
-  const [textValue, setTextValue] = useState(searchText);
-
   const executeSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
     const searchParameters: SearchParameters =
@@ -45,11 +40,10 @@ const SimpleTextSearch = () => {
   const handleEnterPressed = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === "Enter") {
-        dispatch(updateSearchText(textValue + ""));
         executeSearch();
       }
     },
-    [textValue, dispatch, executeSearch]
+    [executeSearch]
   );
 
   const onAdvancedFilterClicked = useCallback(
@@ -82,11 +76,7 @@ const SimpleTextSearch = () => {
                 <IconButton sx={{ p: "10px" }} aria-label="search">
                   <SearchIcon />
                 </IconButton>
-                <InputWithSuggester
-                  textValue={textValue}
-                  onInputChangeCallback={setTextValue}
-                  handleEnterPressed={handleEnterPressed}
-                />
+                <InputWithSuggester handleEnterPressed={handleEnterPressed} />
                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
                 <IconButton sx={{ p: "10px" }} aria-label="search">
                   <SearchIcon />

@@ -14,7 +14,6 @@ import RemovableFilters from "../common/filters/RemovableFilters";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
 import {
   ParameterState,
-  updateSearchText,
   formatToUrlParam,
 } from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester.tsx";
@@ -31,11 +30,10 @@ export interface ComplexTextSearchProps {
 
 /**
  * Put it here to avoid refresh the function every time the component is rendered
- * @param searchText
  * @param handler
  * @returns
  */
-const searchButton = (searchText: string, handler: (t: string) => void) => {
+const searchButton = (handler: () => void) => {
   return (
     <Button
       sx={{
@@ -45,7 +43,7 @@ const searchButton = (searchText: string, handler: (t: string) => void) => {
       }}
       fullWidth
       onClick={() => {
-        return handler(searchText);
+        return handler();
       }}
     >
       Search
@@ -56,34 +54,21 @@ const searchButton = (searchText: string, handler: (t: string) => void) => {
 const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
-  const [textValue, setTextValue] = useState("");
   const [toggleRemovableFilter, setToggleRemovableFilter] =
     useState<boolean>(true);
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
-  const onSearchClick = useCallback(
-    (t: string) => {
-      dispatch(updateSearchText(t + ""));
+  const onSearchClick = useCallback(() => {
+    const componentParam: ParameterState = getComponentState(store.getState());
 
-      const componentParam: ParameterState = getComponentState(
-        store.getState()
+    dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
+      .unwrap()
+      .then(() =>
+        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+          state: { fromNavigate: true },
+        })
       );
-
-      dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
-        .unwrap()
-        .then(() =>
-          navigate(
-            pageDefault.search + "?" + formatToUrlParam(componentParam),
-            {
-              state: { fromNavigate: true },
-            }
-          )
-        );
-    },
-    [dispatch, navigate]
-  );
-
+  }, [dispatch, navigate]);
   const onFilterShowHide = useCallback(
     (
       events:
@@ -128,10 +113,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
               <IconButton sx={{ p: "10px" }} aria-label="search">
                 <SearchIcon />
               </IconButton>
-              <InputWithSuggester
-                textValue={textValue}
-                onInputChangeCallback={setTextValue}
-              />
+              <InputWithSuggester />
               <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
               <Button
                 variant="text"
@@ -149,7 +131,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
             </Paper>
           </Grid>
           <Grid item xs={2}>
-            {searchButton(textValue, onSearchClick)}
+            {searchButton(onSearchClick)}
           </Grid>
         </Grid>
         {showFilter()}

@@ -8,7 +8,6 @@ import {
   Properties,
   bboxPolygon as turfBboxPolygon,
 } from "@turf/turf";
-import axios from "axios";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -66,6 +65,7 @@ const updateDateTimeFilterRange = (range: DataTimeFilterRange): ActionType => {
   };
 };
 
+// This const should only be used in InputWithSuggester.tsx component.
 const updateSearchText = (q: string): ActionType => {
   return {
     type: UPDATE_SEARCH_TEXT_FILTER_VARIABLE,
