@@ -15,8 +15,10 @@ import AdvanceFilters from "../common/filters/AdvanceFilters";
 import {
   ParameterState,
   updateSearchText,
+  formatToUrlParam,
 } from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester.tsx";
+import { pageDefault } from "../common/constants";
 
 export interface ComplexTextSearchProps {
   onFilterCallback: (
@@ -70,7 +72,14 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
 
       dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
         .unwrap()
-        .then(() => navigate("/search"));
+        .then(() =>
+          navigate(
+            pageDefault.search + "?" + formatToUrlParam(componentParam),
+            {
+              state: { fromNavigate: true },
+            }
+          )
+        );
     },
     [dispatch, navigate]
   );
