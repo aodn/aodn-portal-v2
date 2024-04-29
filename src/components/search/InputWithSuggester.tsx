@@ -14,12 +14,15 @@ import {
   createSuggesterParamFrom,
   fetchSuggesterOptions,
 } from "../common/store/searchReducer.tsx";
+import { debounce } from "../../utils/Debounce.ts";
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
     event: React.KeyboardEvent<HTMLTextAreaElement>
   ) => void;
 }
 
+// TODO: Try to only use these two classes inside this file to maintain high cohesion.
+//  But if they must be used outside, refactor these two to a common place.
 interface OptionType {
   text: string;
   group: string;
@@ -57,7 +60,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   const onTextChange = (text: string) => {
     dispatch(updateSearchText(text));
     if (text !== "") {
-      refreshOptions().then();
+      debounce(refreshOptions, 1000)();
     }
   };
 
@@ -82,6 +85,9 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
           setOptions(options);
         });
     } catch (error) {
+      // TODO: Add error handling in the future.(toast, alert, etc)
+      //  Also need to apply error handing
+      //  in some other places if needed.
       console.error("Error fetching data:", error);
     }
   };
