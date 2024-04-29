@@ -14,7 +14,7 @@ import {
   createSuggesterParamFrom,
   fetchSuggesterOptions,
 } from "../common/store/searchReducer.tsx";
-import { debounce } from "../../utils/Debounce.ts";
+import _ from "lodash";
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
     event: React.KeyboardEvent<HTMLTextAreaElement>
@@ -46,23 +46,6 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
-  const onChange = (_: any, newValue: string | null) => {
-    if (newValue !== null) {
-      // String quote with double quote to indicate user want the whole phase during search.
-      // fire event here before useState update, need to call function in this case
-      onTextChange(newValue);
-    }
-  };
-  const onInputChange = (_: any, newInputValue: string) => {
-    // If user type anything, then it is not a title search anymore
-    onTextChange(newInputValue);
-  };
-  const onTextChange = (text: string) => {
-    dispatch(updateSearchText(text));
-    if (text !== "") {
-      debounce(refreshOptions, 1000)();
-    }
-  };
 
   const refreshOptions = async () => {
     try {
@@ -89,6 +72,27 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
       //  Also need to apply error handing
       //  in some other places if needed.
       console.error("Error fetching data:", error);
+    }
+  };
+
+  const debounceRefreshOptions = _.debounce(refreshOptions, 3000);
+
+  const onChange = (_: any, newValue: string | null) => {
+    if (newValue !== null) {
+      // String quote with double quote to indicate user want the whole phase during search.
+      // fire event here before useState update, need to call function in this case
+      onTextChange(newValue);
+    }
+  };
+
+  const onInputChange = (_: any, newInputValue: string) => {
+    // If user type anything, then it is not a title search anymore
+    onTextChange(newInputValue);
+  };
+  const onTextChange = (text: string) => {
+    dispatch(updateSearchText(text));
+    if (text?.length > 2) {
+      debounceRefreshOptions().then();
     }
   };
 

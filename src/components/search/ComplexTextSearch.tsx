@@ -64,16 +64,11 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
     dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
       .unwrap()
       .then(() =>
-        navigate(
-          pageDefault.search + "?" + formatToUrlParam(componentParam),
-          {
-            state: { fromNavigate: true },
-          }
-        )
+        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+          state: { fromNavigate: true },
+        })
       );
-  },
-  [dispatch, navigate]
-  );
+  }, [dispatch, navigate]);
   const onFilterShowHide = useCallback(
     (
       events:
