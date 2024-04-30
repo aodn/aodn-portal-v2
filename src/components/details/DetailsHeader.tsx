@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { DetailsProps } from "./DetailsPanel";
 import {
   Card,
@@ -7,16 +8,33 @@ import {
   CardMedia,
   Grid,
 } from "@mui/material";
-import { borderRadius, margin } from "../common/constants";
+import { borderRadius, margin, pageDefault } from "../common/constants";
 import grey from "../common/colors/grey";
 import SlightRoundButton from "../common/buttons/SlightRoundButton";
 import UndoIcon from "@mui/icons-material/Undo";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useNavigate } from "react-router-dom";
+import {
+  ParameterState,
+  updateFilterPolygon,
+  updateParameterStates,
+  formatToUrlParam,
+} from "../common/store/componentParamReducer";
+import store, { AppDispatch, getComponentState } from "../common/store/store";
+import { useDispatch } from "react-redux";
 
 const DetailsHeaderButton = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  // Make sure the url is append with param before route, with fromNavigate we do not
+  // alter the parameter state.
+  const onGoBack = useCallback(() => {
+    const componentParam: ParameterState = getComponentState(store.getState());
+    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+      state: { fromNavigate: true },
+    });
+  }, [navigate]);
 
   return (
     <Grid container>
@@ -24,7 +42,7 @@ const DetailsHeaderButton = () => {
         <SlightRoundButton
           startIcon={<UndoIcon />}
           sx={{ minWidth: 200 }}
-          onClick={() => navigate("/search")}
+          onClick={onGoBack}
         >
           Back to search
         </SlightRoundButton>
