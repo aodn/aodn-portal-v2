@@ -1,20 +1,25 @@
 import StyledTextField from "./StyledTextField.tsx";
-import { Autocomplete } from "@mui/material";
+import { Autocomplete, Box, Chip, Grid } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import {
+  Category,
   ParameterState,
+  updateCategories,
   updateSearchText,
 } from "../common/store/componentParamReducer.tsx";
 import store, {
   AppDispatch,
   getComponentState,
+  RootState,
 } from "../common/store/store.tsx";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   createSuggesterParamFrom,
+  fetchParameterCategoriesWithStore,
   fetchSuggesterOptions,
 } from "../common/store/searchReducer.tsx";
 import _ from "lodash";
+
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
     event: React.KeyboardEvent<HTMLTextAreaElement>
@@ -46,6 +51,54 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
+
+  const [inputValue, setInputValue] = useState<string | null>(null);
+  const [categorySet, setCategorySet] = useState<Category[]>([]);
+
+  const selectedCategories: Category[] = useSelector(
+    (state: RootState) => state.paramReducer.categories
+  );
+
+  const selectedCategoryStrs = selectedCategories
+    ? [...new Set(selectedCategories.map((c) => c.label))]
+    : [];
+  const addCategory = (category: string) => {
+    const currentCategories = selectedCategories
+      ? new Array(...selectedCategories)
+      : [];
+    // if categorySet contains a category whose label is category, then add it to the currentCategories
+    const categoryToAdd = categorySet.find((c) => c.label === category);
+    if (!categoryToAdd) {
+      //may need warning / alert in the future
+      console.error("no category found: ", category);
+      return;
+    }
+    if (currentCategories.find((c) => c.label === category)) {
+      //may need warning / alert in the future
+      console.error("already have category: ", category);
+      return;
+    }
+    currentCategories.push(categoryToAdd);
+    dispatch(updateCategories(currentCategories));
+  };
+
+  const removeCategory = (category: string) => {
+    const currentCategories = new Array(...selectedCategories);
+    const categoryToRemove = categorySet.find((c) => c.label === category);
+    if (!categoryToRemove) {
+      //may need warning / alert in the future
+      console.error("no category found: ", category);
+      return;
+    }
+    if (!currentCategories.find((c) => c.label === category)) {
+      //may need warning / alert in the future
+      console.error("no category found in current category state: ", category);
+      return;
+    }
+    // remove this category from currentCategories
+    _.remove(currentCategories, (c) => c.label === category);
+    dispatch(updateCategories(currentCategories));
+  };
 
   const refreshOptions = async () => {
     try {
@@ -81,21 +134,21 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     if (newValue !== null) {
       // String quote with double quote to indicate user want the whole phase during search.
       // fire event here before useState update, need to call function in this case
-      onTextChange(newValue);
+      if (getGroup(newValue) === OptionGroup.CATEGORY) {
+        addCategory(newValue);
+        setInputValue("");
+      }
     }
   };
 
   const onInputChange = (_: any, newInputValue: string) => {
+    setInputValue(newInputValue);
     // If user type anything, then it is not a title search anymore
-    onTextChange(newInputValue);
-  };
-  const onTextChange = (text: string) => {
-    dispatch(updateSearchText(text));
-    if (text?.length > 2) {
-      debounceRefreshOptions().then();
+    dispatch(updateSearchText(newInputValue));
+    if (newInputValue?.length > 2) {
+      debounceRefreshOptions()?.then();
     }
   };
-
   // Whenever suggestion is closed, clear the options
   useEffect(() => {
     if (!open) {
@@ -103,36 +156,90 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     }
   }, [open]);
 
+  useEffect(() => {
+    dispatch(fetchParameterCategoriesWithStore(null))
+      .unwrap()
+      .then((categories: Array<Category>) => {
+        const root = categories.filter((i) => i.broader.length === 0);
+        let child = new Array<Category>();
+        root
+          .filter((i) => i.narrower.length !== 0)
+          .forEach((i) => i.narrower.forEach((j) => child.push(j)));
+
+        child = child.sort((a, b) =>
+          a.label < b.label ? -1 : a.label > b.label ? 1 : 0
+        );
+        setCategorySet(child);
+      });
+  }, [dispatch]);
+
+  const getGroup = (option: string) => {
+    return options.find((o) => o.text.toLowerCase() === option.toLowerCase())
+      ?.group;
+  };
+
   return (
-    <Autocomplete
-      id="search"
-      fullWidth
-      freeSolo
-      onOpen={() => {
-        setOpen(options.length > 0);
-      }}
-      onClose={() => {
-        setOpen(false);
-      }}
-      forcePopupIcon={false}
-      options={options.flatMap((option) => option.text)}
-      groupBy={(option) => options.find((o) => o.text === option)?.group}
-      autoComplete
-      includeInputInList
-      onChange={onChange}
-      onInputChange={onInputChange}
-      renderInput={(params) => (
-        <StyledTextField
-          {...params}
-          placeholder="Search for open data"
-          inputProps={{
-            "aria-label": "Search for open data",
-            ...params.inputProps,
-            onKeyDown: handleEnterPressed,
+    <>
+      <Box display="flex" flexDirection="row">
+        <Box
+          display={selectedCategories?.length > 0 ? "flex" : "none"}
+          flexDirection="row"
+          alignItems="center"
+        >
+          Categories:{" "}
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "nowrap",
+            width: "50%",
+            gap: "0px",
           }}
-        />
-      )}
-    />
+        >
+          {selectedCategoryStrs?.map((c, i) => (
+            <Grid item key={i}>
+              <Chip
+                sx={{ fontSize: "12px" }}
+                label={c}
+                onDelete={() => {
+                  removeCategory(c);
+                }}
+              />
+            </Grid>
+          ))}
+        </Box>
+      </Box>
+      <Autocomplete
+        id="search"
+        fullWidth
+        freeSolo
+        onOpen={() => {
+          setOpen(options.length > 0);
+        }}
+        onClose={() => {
+          setOpen(false);
+        }}
+        value={inputValue}
+        forcePopupIcon={false}
+        options={options.flatMap((option) => option.text)}
+        groupBy={(option) => options.find((o) => o.text === option)?.group}
+        autoComplete
+        includeInputInList
+        onChange={onChange}
+        onInputChange={onInputChange}
+        renderInput={(params) => (
+          <StyledTextField
+            {...params}
+            placeholder="Search for open data"
+            inputProps={{
+              "aria-label": "Search for open data",
+              ...params.inputProps,
+              onKeyDown: handleEnterPressed,
+            }}
+          />
+        )}
+      />
+    </>
   );
 };
 
