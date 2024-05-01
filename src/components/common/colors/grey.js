@@ -1,5 +1,6 @@
 const grey = {
   menu: "rgba(161, 167, 183, 0.9)",
+  mapMenuText: "#828282",
   storyBoard: "rgba(119, 119, 119, 0.3)",
   underlineTabSelected: "grey",
   underlineTabUnselected: "darkgrey",
