@@ -46,6 +46,9 @@ import * as turf from "@turf/turf";
 import Map from "../components/map/mapbox/Map";
 import Controls from "../components/map/mapbox/controls/Controls";
 import NavigationControl from "../components/map/mapbox/controls/NavigationControl";
+import MenuControl, {
+  BaseMapSwitcher,
+} from "../components/map/mapbox/controls/MenuControl";
 import ScaleControl from "../components/map/mapbox/controls/ScaleControl";
 import DisplayCoordinate from "../components/map/mapbox/controls/DisplayCoordinate";
 import Layers from "../components/map/mapbox/layers/Layers";
@@ -157,6 +160,7 @@ const SearchPage = () => {
           <Paper id="map-container-id" sx={{ minHeight: "726px" }}>
             <Map panelId="map-container-id" onZoomEvent={onMapZoom}>
               <Controls>
+                <MenuControl menu={<BaseMapSwitcher />} />
                 <NavigationControl />
                 <DisplayCoordinate />
                 <ScaleControl />
