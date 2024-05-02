@@ -229,8 +229,12 @@ class MapMenuControl implements IControl {
   onRemove() {
     if (this.container.parentNode) {
       // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
-      setTimeout(() => this.root.unmount());
-      this.container.parentNode.removeChild(this.container);
+      // Keep the old pointer
+      console.debug("onRemove called");
+      setTimeout(() => {
+        this.container.parentNode.removeChild(this.container);
+        this.root.unmount();
+      });
     }
   }
 }

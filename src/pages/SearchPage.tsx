@@ -55,6 +55,8 @@ import Layers from "../components/map/mapbox/layers/Layers";
 import VectorTileLayers from "../components/map/mapbox/layers/VectorTileLayers";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 
+const mapContainerId = "map-container-id";
+
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -157,13 +159,12 @@ const SearchPage = () => {
           />
         </Grid>
         <Grid item xs={7} sx={{ pr: 2, pb: 2 }}>
-          <Paper id="map-container-id" sx={{ minHeight: "726px" }}>
-            <Map panelId="map-container-id" onZoomEvent={onMapZoom}>
+          <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
+            <Map panelId={mapContainerId} onZoomEvent={onMapZoom}>
               <Controls>
-                <MenuControl menu={<BaseMapSwitcher />} />
                 <NavigationControl />
-                <DisplayCoordinate />
                 <ScaleControl />
+                <MenuControl menu={<BaseMapSwitcher />} />
               </Controls>
               <Layers>
                 <VectorTileLayers collections={layers} />

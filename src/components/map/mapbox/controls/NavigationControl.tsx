@@ -20,7 +20,7 @@ const NavigationControl = (props: NavigationControlProps) => {
       visualizePitch: props.visualizePitch,
     });
 
-    map.addControl(n);
+    map.addControl(n, "top-left");
     return () => {
       map.removeControl(n);
     };
