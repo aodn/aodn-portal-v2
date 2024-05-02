@@ -26,11 +26,32 @@ import LayersIcon from "@mui/icons-material/Layers";
 import grey from "../../../common/colors/grey";
 import blue from "../../../common/colors/blue";
 import { fontSize, borderRadius } from "../../../common/constants";
+import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
+import WorldTopographic from "./styles/WorldTopographic.json";
 
+// Styles can be found here https://developers.arcgis.com/rest/basemap-styles/
+// but require feeds.
 const styles = [
-  { name: "Street map", styleUrl: "mapbox://styles/mapbox/streets-v11" },
-  { name: "Topo map", styleUrl: "mapbox://styles/mapbox/outdoors-v11" },
-  { name: "Satellite map", styleUrl: "mapbox://styles/mapbox/satellite-v9" },
+  {
+    id: "1",
+    name: "Street map (MapBox)",
+    style: "mapbox://styles/mapbox/streets-v11",
+  },
+  {
+    id: "2",
+    name: "Topographic map (MapBox)",
+    style: "mapbox://styles/mapbox/outdoors-v11",
+  },
+  {
+    id: "3",
+    name: "Satellite map (MapBox)",
+    style: "mapbox://styles/mapbox/satellite-v9",
+  },
+  {
+    id: "4",
+    name: "ESRI World Imagery (ArcGIS)",
+    style: ERSIWorldImagery,
+  },
   // Add more styles as needed
 ];
 
@@ -48,7 +69,7 @@ const leftPadding = "15px";
 const rightPadding = "15px";
 
 const BaseMapSwitcher: React.FC<{ map: MapBox }> = ({ map }) => {
-  const [currentStyle, setCurrentStyle] = useState<string>(styles[0].styleUrl);
+  const [currentStyle, setCurrentStyle] = useState<number>(styles[0].id);
   const [overlaysChecked, setOverlaysChecked] = useState(new Map());
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -58,9 +79,10 @@ const BaseMapSwitcher: React.FC<{ map: MapBox }> = ({ map }) => {
   };
 
   const updateCurrentStyle = useCallback(
-    (styleUrl) => {
-      map.setStyle(styleUrl);
-      setCurrentStyle(styleUrl);
+    (id) => {
+      const target = styles.find((e) => e.id === id);
+      map.setStyle(target.style);
+      setCurrentStyle(id);
     },
     [map]
   );
@@ -142,7 +164,7 @@ const BaseMapSwitcher: React.FC<{ map: MapBox }> = ({ map }) => {
                 {styles.map((style) => (
                   <FormControlLabel
                     key={style.name}
-                    value={style.styleUrl}
+                    value={style.id}
                     control={
                       <Radio
                         sx={{
