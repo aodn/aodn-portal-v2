@@ -42,6 +42,9 @@ import NavigationControl from "../map/mapbox/controls/NavigationControl";
 import ScaleControl from "../map/mapbox/controls/ScaleControl";
 import DisplayCoordinate from "../map/mapbox/controls/DisplayCoordinate";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
+import MenuControl, {
+  BaseMapSwitcher,
+} from "../map/mapbox/controls/MenuControl";
 
 type Point = {
   date: number;
@@ -107,6 +110,7 @@ const MapCard = (props: DetailCardProps) => {
         >
           <Map panelId={mapPanelId}>
             <Controls>
+              <MenuControl menu={<BaseMapSwitcher />} />
               <NavigationControl />
               <DisplayCoordinate />
             </Controls>
