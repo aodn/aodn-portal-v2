@@ -64,6 +64,8 @@ const ReactMap = ({
       ) => onMoveEvent && onMoveEvent(e);
 
       map.setProjection(projection);
+      // Stop drag cause map to rotate.
+      map.dragRotate.disable();
 
       map.on("zoomend", zoomEvent);
       map.on("moveend", moveEvent);
