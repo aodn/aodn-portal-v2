@@ -27,7 +27,6 @@ import grey from "../../../common/colors/grey";
 import blue from "../../../common/colors/blue";
 import { fontSize, borderRadius } from "../../../common/constants";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
-import WorldTopographic from "./styles/WorldTopographic.json";
 
 // Styles can be found here https://developers.arcgis.com/rest/basemap-styles/
 // but require feeds.
