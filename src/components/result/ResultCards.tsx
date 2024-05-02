@@ -25,12 +25,6 @@ import { useNavigate } from "react-router-dom";
 interface ResultCardProps {
   item: number;
   content: OGCCollection;
-  onAddToMap:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
   onDownload:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -101,17 +95,6 @@ const ResultCard = (props: ResultCardProps) => {
       <CardActions sx={{ justifyContent: "space-between" }}>
         <Button
           variant="outlined"
-          startIcon={<WhereToVoteIcon />}
-          size="small"
-          onClick={(event) =>
-            props?.onAddToMap && props.onAddToMap(event, props.content)
-          }
-          disabled={props.onAddToMap === undefined}
-        >
-          Add to Map
-        </Button>
-        <Button
-          variant="outlined"
           startIcon={<DownloadIcon />}
           size="small"
           onClick={(event) =>
@@ -150,12 +133,6 @@ const ResultCard = (props: ResultCardProps) => {
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
-  onAddToMap:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
   onDownload:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -189,7 +166,6 @@ const renderRows = (
       <ResultCard
         item={index + 1}
         content={props.contents.result.collections[index]}
-        onAddToMap={props.onAddToMap}
         onDownload={props.onDownload}
         onTags={props.onTags}
         onMore={props.onMore}

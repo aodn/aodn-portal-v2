@@ -21,6 +21,9 @@ interface MapProps {
   onZoomEvent?: (
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
+  onMoveEvent?: (
+    event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+  ) => void;
 }
 
 const ReactMap = ({
@@ -31,6 +34,7 @@ const ReactMap = ({
   zoom,
   projection,
   onZoomEvent,
+  onMoveEvent,
   children,
 }: React.PropsWithChildren<MapProps>) => {
   const [map, setMap] = useState<Map | null>(null);
@@ -51,15 +55,21 @@ const ReactMap = ({
     );
 
     if (map !== null) {
-      const z = (
+      const zoomEvent = (
         e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
       ) => onZoomEvent && onZoomEvent(e);
 
+      const moveEvent = (
+        e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+      ) => onMoveEvent && onMoveEvent(e);
+
       map.setProjection(projection);
 
-      map.on("zoomend", z);
+      map.on("zoomend", zoomEvent);
+      map.on("moveend", moveEvent);
       return () => {
-        map.off("zoomend", z);
+        map.off("zoomend", zoomEvent);
+        map.off("moveend", moveEvent);
       };
     }
   }, [
@@ -71,6 +81,7 @@ const ReactMap = ({
     projection,
     map,
     onZoomEvent,
+    onMoveEvent,
   ]);
 
   return (
