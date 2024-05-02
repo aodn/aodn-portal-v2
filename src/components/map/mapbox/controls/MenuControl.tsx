@@ -5,10 +5,12 @@ import React, {
   useCallback,
   useRef,
   cloneElement,
+  ReactNode,
+  PropsWithChildren,
 } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, Root } from "react-dom/client";
 import MapContext from "../MapContext";
-import { MapBox, IControl } from "mapbox-gl";
+import { Map as MapBox, IControl, Style } from "mapbox-gl";
 import {
   Box,
   Typography,
@@ -49,7 +51,7 @@ const styles = [
   {
     id: "4",
     name: "ESRI World Imagery (ArcGIS)",
-    style: ERSIWorldImagery,
+    style: ERSIWorldImagery as Style,
   },
   // Add more styles as needed
 ];
@@ -67,8 +69,8 @@ const overlays = [
 const leftPadding = "15px";
 const rightPadding = "15px";
 
-const BaseMapSwitcher: React.FC<{ map: MapBox }> = ({ map }) => {
-  const [currentStyle, setCurrentStyle] = useState<number>(styles[0].id);
+const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
+  const [currentStyle, setCurrentStyle] = useState<string>(styles[0].id);
   const [overlaysChecked, setOverlaysChecked] = useState(new Map());
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -224,11 +226,14 @@ const BaseMapSwitcher: React.FC<{ map: MapBox }> = ({ map }) => {
   );
 };
 
-type Menus = BaseMapSwitcher;
+type Menus = React.ReactElement<
+  { map: MapBox },
+  string | React.JSXElementConstructor<any>
+>;
 
 class MapMenuControl implements IControl {
   private container: HTMLDivElement;
-  private root: ReactNode | null;
+  private root: Root;
   private component: Menus;
 
   constructor(component: Menus) {
