@@ -46,11 +46,16 @@ import * as turf from "@turf/turf";
 import Map from "../components/map/mapbox/Map";
 import Controls from "../components/map/mapbox/controls/Controls";
 import NavigationControl from "../components/map/mapbox/controls/NavigationControl";
+import MenuControl, {
+  BaseMapSwitcher,
+} from "../components/map/mapbox/controls/MenuControl";
 import ScaleControl from "../components/map/mapbox/controls/ScaleControl";
 import DisplayCoordinate from "../components/map/mapbox/controls/DisplayCoordinate";
 import Layers from "../components/map/mapbox/layers/Layers";
 import VectorTileLayers from "../components/map/mapbox/layers/VectorTileLayers";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
+
+const mapContainerId = "map-container-id";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -154,12 +159,12 @@ const SearchPage = () => {
           />
         </Grid>
         <Grid item xs={7} sx={{ pr: 2, pb: 2 }}>
-          <Paper id="map-container-id" sx={{ minHeight: "726px" }}>
-            <Map panelId="map-container-id" onZoomEvent={onMapZoom}>
+          <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
+            <Map panelId={mapContainerId} onZoomEvent={onMapZoom}>
               <Controls>
                 <NavigationControl />
-                <DisplayCoordinate />
                 <ScaleControl />
+                <MenuControl menu={<BaseMapSwitcher />} />
               </Controls>
               <Layers>
                 <VectorTileLayers collections={layers} />

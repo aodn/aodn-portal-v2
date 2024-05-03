@@ -42,6 +42,9 @@ import NavigationControl from "../map/mapbox/controls/NavigationControl";
 import ScaleControl from "../map/mapbox/controls/ScaleControl";
 import DisplayCoordinate from "../map/mapbox/controls/DisplayCoordinate";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
+import MenuControl, {
+  BaseMapSwitcher,
+} from "../map/mapbox/controls/MenuControl";
 
 type Point = {
   date: number;
@@ -59,7 +62,7 @@ interface TabPanelProps {
   value: number;
 }
 
-const mapPanelId = "maplibre-detail-page-id";
+const mapPanelId = "map-detail-container-id";
 
 const MapCard = (props: DetailCardProps) => {
   const [minSliderDate] = useState<Date | undefined>(undefined);
@@ -108,7 +111,8 @@ const MapCard = (props: DetailCardProps) => {
           <Map panelId={mapPanelId}>
             <Controls>
               <NavigationControl />
-              <DisplayCoordinate />
+              <ScaleControl />
+              <MenuControl menu={<BaseMapSwitcher />} />
             </Controls>
           </Map>
         </Box>

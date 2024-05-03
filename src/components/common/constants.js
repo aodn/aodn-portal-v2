@@ -11,6 +11,11 @@ const margin = {
   tripleBottom: "45px",
 };
 
+const fontSize = {
+  mapMenuItem: 14,
+  mapMenuSubItem: 13,
+};
+
 const border = {
   buttonBorder: "2px solid #fff",
 };
@@ -20,6 +25,8 @@ const borderRadius = {
   underline: "24px",
   button: "24px",
   filter: "10px",
+  menu: "5px",
+  menuTop: "5px 5px 0 0",
 };
 
 const filterList = {
@@ -52,4 +59,5 @@ export {
   zIndex,
   dateDefault,
   pageDefault,
+  fontSize,
 };

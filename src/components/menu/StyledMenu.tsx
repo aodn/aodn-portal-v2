@@ -4,7 +4,7 @@ import Menu, { MenuProps } from "@mui/material/Menu";
 import { Button, MenuItem } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import "./MainMenu.module.css";
-//import grey from '../common/colors/grey';
+import { fontSize } from "../common/constants";
 
 type StyledMenuItem = {
   name: string;
@@ -53,7 +53,7 @@ const StyledMenu = styled((props: MenuProps) => (
     },
     "& .MuiMenuItem-root": {
       "& .MuiSvgIcon-root": {
-        fontSize: 18,
+        fontSize: fontSize["menuItem"],
         color: theme.palette.text.secondary,
         marginRight: theme.spacing(1.5),
       },
