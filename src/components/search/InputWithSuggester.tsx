@@ -1,6 +1,6 @@
 import StyledTextField from "./StyledTextField.tsx";
 import { Autocomplete, Box, Chip, Grid } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Category,
   ParameterState,
@@ -102,7 +102,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     dispatch(updateCategories(currentCategories));
   };
 
-  const refreshOptions = async () => {
+  const refreshOptions = useCallback(async () => {
     try {
       const currentState: ParameterState = getComponentState(store.getState());
       dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
@@ -128,12 +128,18 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
       //  in some other places if needed.
       console.error("Error fetching data:", error);
     }
-  };
+  }, [dispatch]);
 
-  const debounceRefreshOptions = useCallback(
-    _.debounce(refreshOptions, 300),
-    []
-  );
+  const debounceRefreshOptions = useRef(
+    _.debounce(refreshOptions, 300)
+  ).current;
+
+  // cancel all debounce things when component is unmounted
+  useEffect(() => {
+    return () => {
+      debounceRefreshOptions.cancel();
+    };
+  }, [debounceRefreshOptions]);
 
   const onChange = (_: any, newValue: string | null) => {
     if (newValue !== null) {
