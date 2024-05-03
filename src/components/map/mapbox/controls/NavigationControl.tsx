@@ -24,9 +24,6 @@ const NavigationControl = (props: NavigationControlProps) => {
         });
 
         map.addControl(n, "top-left");
-
-        // Remove the control when the map is removed
-        map.on("remove", () => map.removeControl(n));
       }
       return true;
     });

@@ -69,9 +69,15 @@ const ReactMap = ({
 
       map.on("zoomend", zoomEvent);
       map.on("moveend", moveEvent);
+
       return () => {
         map.off("zoomend", zoomEvent);
         map.off("moveend", moveEvent);
+
+        // This cleanup all associated resources include controls, so no need to
+        // call removeControl()
+        map.remove();
+        setMap(null);
       };
     }
   }, [

@@ -21,7 +21,6 @@ const DisplayCoordinate = () => {
         };
 
         map.on("mousemove", handle);
-        map.on("remove", () => map.off("mousemove", handle));
       }
       return true;
     });

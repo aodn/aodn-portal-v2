@@ -242,7 +242,6 @@ class MapMenuControl implements IControl {
   }
 
   onAdd(map: MapBox) {
-    console.log("onAdd");
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
 
@@ -281,15 +280,10 @@ const MenuControl = (props: PropsWithChildren<MenuControlProps>) => {
 
     // Make it atomic update
     setInit((prev) => {
-      if (prev === false) {
+      if (!prev) {
         // If prev state is false
         const n = new MapMenuControl(cloneElement(props.menu, { map: map }));
-
-        console.debug("onAddControl called");
         map.addControl(n, "top-right");
-
-        // Remove the control when the map is removed
-        map.on("remove", () => map.removeControl(n));
       }
       // Only update once.
       return true;

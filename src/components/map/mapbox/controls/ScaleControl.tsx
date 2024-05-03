@@ -24,7 +24,6 @@ const ScaleControl = ({ maxWidth, unit }: ScaleControlProps) => {
         });
 
         map.addControl(scale);
-        map.on("remove", () => map.removeControl(scale));
       }
       return true;
     });
