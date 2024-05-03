@@ -235,6 +235,7 @@ class MapMenuControl implements IControl {
   private container: HTMLDivElement;
   private root: Root;
   private component: Menus;
+  private map: MapBox;
 
   constructor(component: Menus) {
     this.component = component;
@@ -253,12 +254,13 @@ class MapMenuControl implements IControl {
   }
 
   onRemove() {
+    console.log("onRemove");
     if (this.container.parentNode) {
       // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
       // Keep the old pointer
-      console.debug("onRemove called");
       setTimeout(() => {
         this.container.parentNode.removeChild(this.container);
+        this.container = null;
         this.root.unmount();
       });
     }
@@ -271,16 +273,21 @@ interface MenuControlProps {
 
 const MenuControl = (props: PropsWithChildren<MenuControlProps>) => {
   const { map } = useContext(MapContext);
+  const [init, setInit] = useState<boolean>(false);
 
   useEffect(() => {
     if (map === null) return;
 
-    const n = new MapMenuControl(cloneElement(props.menu, { map: map }));
-
-    map.addControl(n, "top-right");
-    return () => {
-      map.removeControl(n);
-    };
+    // Make it atomic update
+    setInit((prev) => {
+      if (!prev) {
+        // If prev state is false
+        const n = new MapMenuControl(cloneElement(props.menu, { map: map }));
+        map.addControl(n, "top-right");
+      }
+      // Only update once.
+      return true;
+    });
   }, [map, props.menu]);
 
   return <React.Fragment />;

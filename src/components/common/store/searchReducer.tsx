@@ -236,9 +236,7 @@ const createSuggesterParamFrom = (
   paramState: ParameterState
 ): SuggesterParameters => {
   const suggesterParam: SuggesterParameters = {};
-  if (paramState.searchText) {
-    suggesterParam.input = paramState.searchText;
-  }
+  suggesterParam.input = paramState.searchText ? paramState.searchText : "";
   if (paramState.categories) {
     const filterGenerator = cqlDefaultFilters.get(
       "CATEGORIES_IN"
