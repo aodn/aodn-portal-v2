@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import SimpleTextSearch from "../components/search/SimpleTextSearch";
 import ResultPanelSimpleFilter, {
   ResultPanelIconFilter,
@@ -62,11 +62,9 @@ const SearchPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [layers, setLayers] = useState<Array<OGCCollection>>([]);
 
-  const contents = useSelector<RootState, CollectionsQueryType>(
-    searchQueryResult
-  );
+  // Layers inside this array will be add to map
+  const [layers, setLayers] = useState<Array<OGCCollection>>([]);
 
   const doSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -84,9 +82,11 @@ const SearchPage = () => {
       );
   }, [dispatch, navigate, setLayers]);
 
-  const onMapZoom = useCallback(
+  // The result will be changed based on the zoomed area, that is only
+  // dataset where spatial extends fall into the zoomed area will be selected.
+  const onMapZoomOrMove = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
-      if (event.type === "zoomend") {
+      if (event.type === "zoomend" || event.type === "moveend") {
         const bounds = event.target.getBounds();
         const ne = bounds.getNorthEast(); // NorthEast corner
         const sw = bounds.getSouthWest(); // SouthWest corner
@@ -100,20 +100,6 @@ const SearchPage = () => {
     [dispatch, doSearch]
   );
 
-  const onAddToMap = useCallback(
-    (
-      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-      collection: OGCCollection
-    ) => {
-      // Unique set of layers because we use set, duplicate will be removed
-      setLayers((v) => {
-        const l = v.filter((i) => i.id !== collection.id);
-        l.push(collection);
-        return l;
-      });
-    },
-    [setLayers]
-  );
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
@@ -127,6 +113,18 @@ const SearchPage = () => {
       doSearch();
     }
   }
+
+  // Get contents when no more navigate needed.
+  const contents = useSelector<RootState, CollectionsQueryType>(
+    searchQueryResult
+  );
+
+  // Now set the first 10 layers on map, will cause map big issue but
+  // we want to see how things go.
+  useEffect(
+    () => setLayers(contents.result.collections.slice(0, 10)),
+    [contents]
+  );
 
   return (
     <Layout>
@@ -152,7 +150,6 @@ const SearchPage = () => {
           <ResultPanelSimpleFilter />
           <ResultCards
             contents={contents}
-            onAddToMap={onAddToMap}
             onDownload={undefined}
             onTags={undefined}
             onMore={undefined}
@@ -160,7 +157,11 @@ const SearchPage = () => {
         </Grid>
         <Grid item xs={7} sx={{ pr: 2, pb: 2 }}>
           <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
-            <Map panelId={mapContainerId} onZoomEvent={onMapZoom}>
+            <Map
+              panelId={mapContainerId}
+              onZoomEvent={onMapZoomOrMove}
+              onMoveEvent={onMapZoomOrMove}
+            >
               <Controls>
                 <NavigationControl />
                 <ScaleControl />
