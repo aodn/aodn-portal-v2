@@ -25,6 +25,12 @@ import { useNavigate } from "react-router-dom";
 interface ResultCardProps {
   item: number;
   content: OGCCollection;
+  onRemoveLayer:
+    | ((
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        stac: OGCCollection
+      ) => void)
+    | undefined;
   onDownload:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -95,6 +101,17 @@ const ResultCard = (props: ResultCardProps) => {
       <CardActions sx={{ justifyContent: "space-between" }}>
         <Button
           variant="outlined"
+          startIcon={<WhereToVoteIcon />}
+          size="small"
+          onClick={(event) =>
+            props?.onRemoveLayer && props.onRemoveLayer(event, props.content)
+          }
+          disabled={props.onRemoveLayer === undefined}
+        >
+          Remove Layer
+        </Button>
+        <Button
+          variant="outlined"
           startIcon={<DownloadIcon />}
           size="small"
           onClick={(event) =>
@@ -133,6 +150,12 @@ const ResultCard = (props: ResultCardProps) => {
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
+  onRemoveLayer:
+    | ((
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        stac: OGCCollection
+      ) => void)
+    | undefined;
   onDownload:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -164,8 +187,9 @@ const renderRows = (
   return (
     <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
       <ResultCard
-        item={index + 1}
+        item={props.contents.result.collections[index].index}
         content={props.contents.result.collections[index]}
+        onRemoveLayer={props.onRemoveLayer}
         onDownload={props.onDownload}
         onTags={props.onTags}
         onMore={props.onMore}

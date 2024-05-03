@@ -90,7 +90,7 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
           source: uuid,
           "source-layer": "hits",
           layout: {
-            "text-field": "" + (index + 1),
+            "text-field": "" + collections?.find((e) => e.id === uuid).index,
             "text-size": 12,
           },
           paint: {
