@@ -23,7 +23,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 interface ResultCardProps {
-  item: number;
+  item: string;
   content: OGCCollection;
   onRemoveLayer:
     | ((
