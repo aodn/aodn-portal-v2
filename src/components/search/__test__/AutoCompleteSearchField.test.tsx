@@ -1,8 +1,8 @@
 import { fireEvent, render } from "@testing-library/react";
 import { test, expect } from "vitest";
 import { Provider } from "react-redux";
-import store from "../../common/store/store.tsx"; // adjust the import path as needed
-import InputWithSuggester from "../InputWithSuggester.tsx"; // adjust the import path as needed
+import store from "../../common/store/store.tsx";
+import InputWithSuggester from "../InputWithSuggester.tsx";
 
 test("renders InputWithSuggester component", () => {
   const { getByTestId } = render(
@@ -16,5 +16,5 @@ test("renders InputWithSuggester component", () => {
   expect(inputElement).to.exist;
 
   fireEvent.change(inputElement, { target: { value: "wave" } });
-  expect(inputElement).toHaveValue("wave");
+  expect(inputElement).to.have.property("value", "wave");
 });
