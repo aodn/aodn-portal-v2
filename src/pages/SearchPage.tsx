@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import SimpleTextSearch from "../components/search/SimpleTextSearch";
 import ResultPanelSimpleFilter, {
   ResultPanelIconFilter,
@@ -66,10 +66,6 @@ const SearchPage = () => {
   // Layers inside this array will be add to map
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
 
-  const contents = useSelector<RootState, CollectionsQueryType>(
-    searchQueryResult
-  );
-
   const doSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
     dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
@@ -117,6 +113,18 @@ const SearchPage = () => {
       doSearch();
     }
   }
+
+  // Get contents when no more navigate needed.
+  const contents = useSelector<RootState, CollectionsQueryType>(
+    searchQueryResult
+  );
+
+  // Now set the first 10 layers on map, will cause map big issue but
+  // we want to see how things go.
+  useEffect(
+    () => setLayers(contents.result.collections.slice(0, 10)),
+    [contents]
+  );
 
   return (
     <Layout>

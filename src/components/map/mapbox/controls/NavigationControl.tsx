@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
 import { NavigationControl as MapboxNavigationControl } from "mapbox-gl";
 
@@ -10,20 +10,26 @@ interface NavigationControlProps {
 
 const NavigationControl = (props: NavigationControlProps) => {
   const { map } = useContext(MapContext);
+  const [init, setInit] = useState<boolean>(false);
 
   useEffect(() => {
     if (map === null) return;
 
-    const n = new MapboxNavigationControl({
-      showCompass: props.showCompass,
-      showZoom: props.showZoom,
-      visualizePitch: props.visualizePitch,
-    });
+    setInit((prev) => {
+      if (prev === false) {
+        const n = new MapboxNavigationControl({
+          showCompass: props.showCompass,
+          showZoom: props.showZoom,
+          visualizePitch: props.visualizePitch,
+        });
 
-    map.addControl(n, "top-left");
-    return () => {
-      map.removeControl(n);
-    };
+        map.addControl(n, "top-left");
+
+        // Remove the control when the map is removed
+        map.on("remove", () => map.removeControl(n));
+      }
+      return true;
+    });
   }, [map, props.showCompass, props.showZoom, props.visualizePitch]);
 
   return <React.Fragment />;

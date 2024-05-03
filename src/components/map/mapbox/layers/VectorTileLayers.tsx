@@ -34,7 +34,6 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
 
     // Things need to add and remove given map is fully loaded
     const stacIds = collections.map((collection) => collection.id);
-
     const toAdd = findSetDifference(stacIds, layers);
     const toDelete = findSetDifference(layers, stacIds);
 
@@ -44,8 +43,10 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
       map.removeSource(uuid);
     });
 
-    // Add items to layer
-    toAdd.forEach((uuid) => {
+    // If map style changed, then the layer will be gone, we need
+    // to try add it again, but before add we need to check if the
+    // layer exist
+    stacIds.forEach((uuid) => {
       if (!map.getSource(uuid)) {
         const source: mapboxgl.AnySourceData = {
           type: "vector",
@@ -54,7 +55,6 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
           ],
         };
         map.addSource(uuid, source);
-        console.log(source);
         map.addLayer({
           id: uuid,
           type: "fill",
@@ -68,14 +68,11 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
       }
     });
 
-    // Update the layers if there are changes, else you will have
-    // infinite loop
+    // Bookmark the layers, however we do not need to update if nothing changed
+    // that is nothing need to add or delete.
     if (toAdd.length > 0 || toDelete.length > 0) {
-      setLayers((l) => {
-        const newLayers = l.filter((l) => !toDelete.includes(l));
-        newLayers.push(...toAdd);
-        return newLayers;
-      });
+      // This avoid infinity loop due to layers update.
+      setLayers(stacIds);
     }
   }, [map, collections, layers, mapLoaded]);
 

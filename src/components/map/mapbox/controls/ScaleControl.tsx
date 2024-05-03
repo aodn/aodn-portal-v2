@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
 import { ScaleControl as MapboxScaleControl } from "mapbox-gl";
 
@@ -11,20 +11,23 @@ interface ScaleControlProps {
 
 const ScaleControl = ({ maxWidth, unit }: ScaleControlProps) => {
   const { map } = useContext(MapContext);
+  const [init, setInit] = useState<boolean>(false);
 
   useEffect(() => {
     if (!map) return;
 
-    const scale = new MapboxScaleControl({
-      maxWidth: maxWidth,
-      unit: unit,
+    setInit((prev) => {
+      if (prev === false) {
+        const scale = new MapboxScaleControl({
+          maxWidth: maxWidth,
+          unit: unit,
+        });
+
+        map.addControl(scale);
+        map.on("remove", () => map.removeControl(scale));
+      }
+      return true;
     });
-
-    map.addControl(scale);
-
-    return () => {
-      map.removeControl(scale);
-    };
   }, [map, maxWidth, unit]);
 
   return <React.Fragment />;
