@@ -1,6 +1,6 @@
 import StyledTextField from "./StyledTextField.tsx";
 import { Autocomplete, Box, Chip, Grid } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Category,
   ParameterState,
@@ -51,12 +51,14 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
-
-  const [inputValue, setInputValue] = useState<string | null>(null);
   const [categorySet, setCategorySet] = useState<Category[]>([]);
 
   const selectedCategories: Category[] = useSelector(
     (state: RootState) => state.paramReducer.categories
+  );
+
+  const searchInput = useSelector(
+    (state: RootState) => state.paramReducer.searchText
   );
 
   const selectedCategoryStrs = selectedCategories
@@ -128,7 +130,10 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     }
   };
 
-  const debounceRefreshOptions = _.debounce(refreshOptions, 300);
+  const debounceRefreshOptions = useCallback(
+    _.debounce(refreshOptions, 300),
+    []
+  );
 
   const onChange = (_: any, newValue: string | null) => {
     if (newValue !== null) {
@@ -136,16 +141,15 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
       // fire event here before useState update, need to call function in this case
       if (getGroup(newValue) === OptionGroup.CATEGORY) {
         addCategory(newValue);
-        setInputValue("");
+        dispatch(updateSearchText(""));
       }
     }
   };
 
   const onInputChange = (_: any, newInputValue: string) => {
-    setInputValue(newInputValue);
     // If user type anything, then it is not a title search anymore
     dispatch(updateSearchText(newInputValue));
-    if (newInputValue?.length > 2) {
+    if (newInputValue?.length > 1) {
       debounceRefreshOptions()?.then();
     }
   };
@@ -219,7 +223,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         onClose={() => {
           setOpen(false);
         }}
-        value={inputValue}
+        value={searchInput}
         forcePopupIcon={false}
         options={options.flatMap((option) => option.text)}
         groupBy={(option) => options.find((o) => o.text === option)?.group}
