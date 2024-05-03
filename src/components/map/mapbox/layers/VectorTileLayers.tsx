@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { OGCCollection } from "../../../common/store/searchReducer";
@@ -26,7 +26,22 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
       // This situation is map object created, hence not null, but not completely loaded
       // and therefore you will have problem setting source and layer. Set-up a listener
       // to update the state and then this effect can be call again when map loaded.
-      map.on("load", () => setMapLoaded(true));
+      map.on("load", () =>
+        setMapLoaded((prev) => {
+          // If style changed, we may need to add the layer again, hence listen to this event.
+          // https://github.com/mapbox/mapbox-gl-js/issues/8660
+          //
+          // We take the maploaded event and setup the listener and return value at once.
+          map.on("styledata", () => {
+            if (map.isStyleLoaded()) {
+              // Since the style change reset all layers, so it make sense
+              // to set it back to empty and trigger a redraw of layers
+              setLayers([]);
+            }
+          });
+          return true;
+        })
+      );
       return;
     }
     // If map still not fire load even, aka not ready then we just return
@@ -39,8 +54,10 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
 
     // Remove items in map layer
     toDelete.forEach((uuid) => {
-      map.removeLayer(uuid);
-      map.removeSource(uuid);
+      if (map.getSource(uuid)) {
+        map.removeLayer(uuid);
+        map.removeSource(uuid);
+      }
     });
 
     // If map style changed, then the layer will be gone, we need
