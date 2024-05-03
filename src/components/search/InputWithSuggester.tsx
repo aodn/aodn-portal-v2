@@ -64,43 +64,53 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   const selectedCategoryStrs = selectedCategories
     ? [...new Set(selectedCategories.map((c) => c.label))]
     : [];
-  const addCategory = (category: string) => {
-    const currentCategories = selectedCategories
-      ? new Array(...selectedCategories)
-      : [];
-    // if categorySet contains a category whose label is category, then add it to the currentCategories
-    const categoryToAdd = categorySet.find((c) => c.label === category);
-    if (!categoryToAdd) {
-      //may need warning / alert in the future
-      console.error("no category found: ", category);
-      return;
-    }
-    if (currentCategories.find((c) => c.label === category)) {
-      //may need warning / alert in the future
-      console.error("already have category: ", category);
-      return;
-    }
-    currentCategories.push(categoryToAdd);
-    dispatch(updateCategories(currentCategories));
-  };
 
-  const removeCategory = (category: string) => {
-    const currentCategories = new Array(...selectedCategories);
-    const categoryToRemove = categorySet.find((c) => c.label === category);
-    if (!categoryToRemove) {
-      //may need warning / alert in the future
-      console.error("no category found: ", category);
-      return;
-    }
-    if (!currentCategories.find((c) => c.label === category)) {
-      //may need warning / alert in the future
-      console.error("no category found in current category state: ", category);
-      return;
-    }
-    // remove this category from currentCategories
-    _.remove(currentCategories, (c) => c.label === category);
-    dispatch(updateCategories(currentCategories));
-  };
+  const addCategory = useCallback(
+    (category: string) => {
+      const currentCategories = selectedCategories
+        ? new Array(...selectedCategories)
+        : [];
+      // if categorySet contains a category whose label is category, then add it to the currentCategories
+      const categoryToAdd = categorySet.find((c) => c.label === category);
+      if (!categoryToAdd) {
+        //may need warning / alert in the future
+        console.error("no category found: ", category);
+        return;
+      }
+      if (currentCategories.find((c) => c.label === category)) {
+        //may need warning / alert in the future
+        console.error("already have category: ", category);
+        return;
+      }
+      currentCategories.push(categoryToAdd);
+      dispatch(updateCategories(currentCategories));
+    },
+    [categorySet, dispatch, selectedCategories]
+  );
+
+  const removeCategory = useCallback(
+    (category: string) => {
+      const currentCategories = new Array(...selectedCategories);
+      const categoryToRemove = categorySet.find((c) => c.label === category);
+      if (!categoryToRemove) {
+        //may need warning / alert in the future
+        console.error("no category found: ", category);
+        return;
+      }
+      if (!currentCategories.find((c) => c.label === category)) {
+        //may need warning / alert in the future
+        console.error(
+          "no category found in current category state: ",
+          category
+        );
+        return;
+      }
+      // remove this category from currentCategories
+      _.remove(currentCategories, (c) => c.label === category);
+      dispatch(updateCategories(currentCategories));
+    },
+    [categorySet, dispatch, selectedCategories]
+  );
 
   const refreshOptions = useCallback(async () => {
     try {
@@ -141,24 +151,37 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     };
   }, [debounceRefreshOptions]);
 
-  const onChange = (_: any, newValue: string | null) => {
-    if (newValue !== null) {
-      // String quote with double quote to indicate user want the whole phase during search.
-      // fire event here before useState update, need to call function in this case
-      if (getGroup(newValue) === OptionGroup.CATEGORY) {
-        addCategory(newValue);
-        dispatch(updateSearchText(""));
+  const getGroup = useCallback(
+    (option: string) => {
+      return options.find((o) => o.text.toLowerCase() === option.toLowerCase())
+        ?.group;
+    },
+    [options]
+  );
+  const onChange = useCallback(
+    (_: any, newValue: string | null) => {
+      if (newValue !== null) {
+        // String quote with double quote to indicate user want the whole phase during search.
+        // fire event here before useState update, need to call function in this case
+        if (getGroup(newValue) === OptionGroup.CATEGORY) {
+          addCategory(newValue);
+          dispatch(updateSearchText(""));
+        }
       }
-    }
-  };
+    },
+    [addCategory, dispatch, getGroup]
+  );
 
-  const onInputChange = (_: any, newInputValue: string) => {
-    // If user type anything, then it is not a title search anymore
-    dispatch(updateSearchText(newInputValue));
-    if (newInputValue?.length > 1) {
-      debounceRefreshOptions()?.then();
-    }
-  };
+  const onInputChange = useCallback(
+    (_: any, newInputValue: string) => {
+      // If user type anything, then it is not a title search anymore
+      dispatch(updateSearchText(newInputValue));
+      if (newInputValue?.length > 1) {
+        debounceRefreshOptions()?.then();
+      }
+    },
+    [debounceRefreshOptions, dispatch]
+  );
   // Whenever suggestion is closed, clear the options
   useEffect(() => {
     if (!open) {
@@ -182,11 +205,6 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         setCategorySet(child);
       });
   }, [dispatch]);
-
-  const getGroup = (option: string) => {
-    return options.find((o) => o.text.toLowerCase() === option.toLowerCase())
-      ?.group;
-  };
 
   return (
     <>
