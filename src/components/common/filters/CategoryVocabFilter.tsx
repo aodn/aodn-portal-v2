@@ -7,8 +7,8 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store/store";
 import { borderRadius } from "../constants";
 import blue from "../colors/blue";
 import { fetchParameterCategoriesWithStore } from "../store/searchReducer";
@@ -21,11 +21,18 @@ interface CategoryVocabFilterProps {
 const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const [categories, setCategories] = useState<Array<Category>>([]);
-  const [values, setValues] = useState<Array<string>>([]);
 
   // Because the categories using in this component have duplicate labels. They should be combined so need this state
   // to store the labels of the buttons
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
+
+  const selectedCategories: Category[] = useSelector(
+    (state: RootState) => state.paramReducer.categories
+  );
+
+  const selectedCategoryStrs = selectedCategories
+    ? [...new Set(selectedCategories.map((c) => c.label))]
+    : [];
 
   const handleChange = useCallback(
     (_: any, newAlignment: any) => {
@@ -43,7 +50,6 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
       });
 
       dispatch(updateCategories(childSelected));
-      setValues(newAlignment);
     },
     [dispatch, categories]
   );
@@ -102,7 +108,7 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
             gridGap: "10px",
             padding: "10px",
           }}
-          value={values}
+          value={selectedCategoryStrs}
           exclusive={false}
           onChange={handleChange}
         >
