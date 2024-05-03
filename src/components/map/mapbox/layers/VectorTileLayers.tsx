@@ -55,7 +55,8 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
     // Remove items in map layer
     toDelete.forEach((uuid) => {
       if (map.getSource(uuid)) {
-        map.removeLayer(uuid);
+        map.removeLayer("symbol-" + uuid);
+        map.removeLayer("fill-" + uuid);
         map.removeSource(uuid);
       }
     });
@@ -63,7 +64,7 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
     // If map style changed, then the layer will be gone, we need
     // to try add it again, but before add we need to check if the
     // layer exist
-    stacIds.forEach((uuid) => {
+    stacIds.forEach((uuid, index) => {
       if (!map.getSource(uuid)) {
         const source: mapboxgl.AnySourceData = {
           type: "vector",
@@ -73,13 +74,27 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
         };
         map.addSource(uuid, source);
         map.addLayer({
-          id: uuid,
+          id: "fill-" + uuid,
           type: "fill",
           source: uuid,
           "source-layer": "hits",
           paint: {
             "fill-color": stringToColor(uuid),
             "fill-outline-color": "black",
+          },
+        });
+        // This will add the number to the layer
+        map.addLayer({
+          id: "symbol-" + uuid,
+          type: "symbol",
+          source: uuid,
+          "source-layer": "hits",
+          layout: {
+            "text-field": "" + (index + 1),
+            "text-size": 12,
+          },
+          paint: {
+            "text-color": "white",
           },
         });
       }

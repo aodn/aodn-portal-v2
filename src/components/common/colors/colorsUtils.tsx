@@ -8,7 +8,7 @@ const stringToColor = (
   s: string,
   saturation: number = 100,
   lightness: number = 75,
-  alpha: number = 0.4
+  alpha: number = 0.2
 ) => {
   let hash = 0;
 
