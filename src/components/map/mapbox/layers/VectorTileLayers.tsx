@@ -55,9 +55,9 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
     // Remove items in map layer
     toDelete.forEach((uuid) => {
       if (map.getSource(uuid)) {
-        map.removeLayer("symbol-" + uuid);
-        map.removeLayer("fill-" + uuid);
         map.removeSource(uuid);
+        map.removeLayer("fill-" + uuid);
+        map.removeLayer("symbol-" + uuid);
       }
     });
 

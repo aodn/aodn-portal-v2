@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Map, MapboxEvent } from "mapbox-gl";
+import { Map, MapboxEvent, Style } from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
+import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 
 interface MapProps {
   centerLongitude: number;
@@ -17,7 +18,6 @@ interface MapProps {
     | "lambertConformalConic"
     | "naturalEarth"
     | "winkelTripel";
-  styleJson: string;
   onZoomEvent?: (
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
@@ -26,9 +26,36 @@ interface MapProps {
   ) => void;
 }
 
+// Styles can be found here https://developers.arcgis.com/rest/basemap-styles/
+// but require feeds.
+const styles = [
+  {
+    id: "1",
+    name: "Street map (MapBox)",
+    style: "mapbox://styles/mapbox/streets-v11",
+  },
+  {
+    id: "2",
+    name: "Topographic map (MapBox)",
+    style: "mapbox://styles/mapbox/outdoors-v11",
+  },
+  {
+    id: "3",
+    name: "Satellite map (MapBox)",
+    style: "mapbox://styles/mapbox/satellite-v9",
+  },
+  {
+    id: "4",
+    name: "ESRI World Imagery (ArcGIS)",
+    style: ERSIWorldImagery as Style,
+  },
+  // Add more styles as needed
+];
+
+const defaultStyle = 3;
+
 const ReactMap = ({
   panelId,
-  styleJson,
   centerLongitude,
   centerLatitude,
   zoom,
@@ -45,7 +72,7 @@ const ReactMap = ({
         ? (new Map({
             container: panelId,
             accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
-            style: styleJson,
+            style: styles[defaultStyle].style,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
             localIdeographFontFamily:
@@ -84,7 +111,6 @@ const ReactMap = ({
     centerLatitude,
     centerLongitude,
     panelId,
-    styleJson,
     zoom,
     projection,
     map,
@@ -102,7 +128,8 @@ ReactMap.defaultProps = {
   centerLongitude: 147.3353554138993,
   zoom: 4,
   projection: "equirectangular",
-  styleJson: "mapbox://styles/mapbox/satellite-streets-v12",
 };
 
 export default ReactMap;
+
+export { styles, defaultStyle };
