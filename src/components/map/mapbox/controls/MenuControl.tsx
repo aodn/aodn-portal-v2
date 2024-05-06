@@ -28,33 +28,7 @@ import LayersIcon from "@mui/icons-material/Layers";
 import grey from "../../../common/colors/grey";
 import blue from "../../../common/colors/blue";
 import { fontSize, borderRadius } from "../../../common/constants";
-import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
-
-// Styles can be found here https://developers.arcgis.com/rest/basemap-styles/
-// but require feeds.
-const styles = [
-  {
-    id: "1",
-    name: "Street map (MapBox)",
-    style: "mapbox://styles/mapbox/streets-v11",
-  },
-  {
-    id: "2",
-    name: "Topographic map (MapBox)",
-    style: "mapbox://styles/mapbox/outdoors-v11",
-  },
-  {
-    id: "3",
-    name: "Satellite map (MapBox)",
-    style: "mapbox://styles/mapbox/satellite-v9",
-  },
-  {
-    id: "4",
-    name: "ESRI World Imagery (ArcGIS)",
-    style: ERSIWorldImagery as Style,
-  },
-  // Add more styles as needed
-];
+import { styles as mapStyles, defaultStyle } from "../Map";
 
 const overlays = [
   { name: "Australian Marine Parks", id: "marine-parks-layer", visible: false },
@@ -70,7 +44,9 @@ const leftPadding = "15px";
 const rightPadding = "15px";
 
 const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
-  const [currentStyle, setCurrentStyle] = useState<string>(styles[0].id);
+  const [currentStyle, setCurrentStyle] = useState<string>(
+    mapStyles[defaultStyle].id
+  );
   const [overlaysChecked, setOverlaysChecked] = useState(new Map());
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -81,7 +57,7 @@ const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
 
   const updateCurrentStyle = useCallback(
     (id) => {
-      const target = styles.find((e) => e.id === id);
+      const target = mapStyles.find((e) => e.id === id);
       map.setStyle(target.style);
       setCurrentStyle(id);
     },
@@ -162,7 +138,7 @@ const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
                 value={currentStyle}
                 onChange={(e) => updateCurrentStyle(e.target.value)}
               >
-                {styles.map((style) => (
+                {mapStyles.map((style) => (
                   <FormControlLabel
                     key={style.name}
                     value={style.id}
