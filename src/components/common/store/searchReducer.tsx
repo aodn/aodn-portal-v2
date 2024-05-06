@@ -27,6 +27,8 @@ interface Spatial {
 
 export interface OGCCollection {
   id: string;
+  // This index is use to show the ordering 1, 2, 3...
+  index?: string;
   title?: string;
   description?: string;
   itemType?: string;
@@ -106,7 +108,15 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
         params: p,
       }
     );
-    return response.data;
+
+    // We need to fill in the index value here before return,
+    // TODO: The index value may not start from 1 if it is paged
+    const collections: OGCCollections = response.data;
+    collections?.collections?.forEach(
+      (o, index) => (o.index = "" + (index + 1))
+    );
+
+    return collections;
   } catch (error: unknown) {
     const errorMessage = "Unkown error occurred. Please try again later.";
     if (axios.isAxiosError(error)) {

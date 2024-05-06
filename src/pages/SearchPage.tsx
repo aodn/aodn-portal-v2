@@ -100,6 +100,16 @@ const SearchPage = () => {
     [dispatch, doSearch]
   );
 
+  const onRemoveLayer = useCallback(
+    (
+      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      collection: OGCCollection
+    ) => {
+      // Remove the layer if found
+      setLayers((v) => v.filter((i) => i.id !== collection.id));
+    },
+    [setLayers]
+  );
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
@@ -150,6 +160,7 @@ const SearchPage = () => {
           <ResultPanelSimpleFilter />
           <ResultCards
             contents={contents}
+            onRemoveLayer={onRemoveLayer}
             onDownload={undefined}
             onTags={undefined}
             onMore={undefined}
