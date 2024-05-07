@@ -12,7 +12,7 @@ import { Provider } from "react-redux";
 import store from "../../common/store/store.tsx";
 import InputWithSuggester from "../InputWithSuggester.tsx";
 import { server } from "../../../__mocks__/server.ts";
-import userEvent from "@testing-library/user-event";
+import { userEvent } from "@testing-library/user-event";
 import { sleep } from "../../../__mocks__/utils.ts";
 
 beforeAll(() => {
