@@ -1,4 +1,4 @@
-export const parameterCategories: any[] = [
+export const PARAMETER_CATEGORIES: any[] = [
   {
     label: "Air pressure",
     definition:

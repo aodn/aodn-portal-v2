@@ -1,4 +1,4 @@
-export const suggesterOptions = {
+export const SUGGESTER_OPTIONS = {
   category_suggestions: ["Wave", "Temperature", "Air temperature"],
   record_suggestions: {
     titles: [
@@ -34,4 +34,3 @@ export const suggesterOptions = {
     ],
   },
 };
-[];

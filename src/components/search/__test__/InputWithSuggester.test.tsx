@@ -19,8 +19,8 @@ beforeAll(() => {
   server.listen();
 });
 afterEach(() => {
-  server.resetHandlers();
   cleanup();
+  server.resetHandlers();
 });
 afterAll(() => {
   server.close();
@@ -35,9 +35,6 @@ describe("inputwithsuggester", async () => {
         <InputWithSuggester />
       </Provider>
     );
-  });
-  afterEach(() => {
-    cleanup();
   });
 
   test("Suggestion options should disappear after choosing one of them", async () => {
