@@ -263,6 +263,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
               "aria-label": "Search for open data",
               ...params.inputProps,
               onKeyDown: handleEnterPressed,
+              "data-testid": "input-with-suggester",
             }}
           />
         )}
