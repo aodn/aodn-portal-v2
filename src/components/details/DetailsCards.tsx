@@ -22,7 +22,7 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { PropsWithChildren, useCallback, useState } from "react";
 import { OGCCollection } from "../common/store/searchReducer";
 import { DateRangeSlider } from "../common/slider/RangeSlider";
-import { dateDefault, margin } from "../common/constants";
+import { dateDefault } from "../common/constants";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
@@ -45,6 +45,7 @@ import { MapboxEvent as MapEvent } from "mapbox-gl";
 import MenuControl, {
   BaseMapSwitcher,
 } from "../map/mapbox/controls/MenuControl";
+import { margin } from "../../styles/constants";
 
 type Point = {
   date: number;

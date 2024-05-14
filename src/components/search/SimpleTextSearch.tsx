@@ -13,8 +13,8 @@ import { Tune } from "@mui/icons-material";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
 import store, { AppDispatch, getComponentState } from "../common/store/store";
 import {
-  ParameterState,
   formatToUrlParam,
+  ParameterState,
 } from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester.tsx";
 import { pageDefault } from "../common/constants";
@@ -59,52 +59,51 @@ const SimpleTextSearch = () => {
   );
 
   return (
-    <>
-      <Grid container>
-        <Grid item xs={12}>
-          <Grid container justifyContent={"center"} spacing={2}>
-            <Grid item xs={10}>
-              <Paper
-                variant="outlined"
-                sx={{
-                  p: "2px 4px",
-                  display: "flex",
-                  alignItems: "center",
-                  maxHeight: "40px",
-                }}
-              >
-                <IconButton sx={{ p: "10px" }} aria-label="search">
-                  <SearchIcon />
-                </IconButton>
-                <InputWithSuggester handleEnterPressed={handleEnterPressed} />
-                <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                <IconButton sx={{ p: "10px" }} aria-label="search">
-                  <SearchIcon />
-                </IconButton>
-              </Paper>
-            </Grid>
-            <Grid item xs={2}>
-              <Button
-                variant="text"
-                sx={{
-                  color: grey["searchButtonText"],
-                  backgroundColor: "white",
-                  height: "100%",
-                  width: "100%",
-                  minWidth: "200px",
-                }}
-                fullWidth
-                startIcon={<Tune />}
-                onClick={(e) => onAdvancedFilterClicked(e)}
-              >
-                Filters
-              </Button>
-            </Grid>
-          </Grid>
+    <Grid sx={{ position: "relative" }}>
+      <Grid container justifyContent={"center"} spacing={2}>
+        <Grid item xs={10}>
+          <Paper
+            variant="outlined"
+            sx={{
+              p: "2px 4px",
+              display: "flex",
+              alignItems: "center",
+              maxHeight: "40px",
+            }}
+          >
+            <IconButton sx={{ p: "10px" }} aria-label="search">
+              <SearchIcon />
+            </IconButton>
+            <InputWithSuggester handleEnterPressed={handleEnterPressed} />
+            <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+            <IconButton sx={{ p: "10px" }} aria-label="search">
+              <SearchIcon />
+            </IconButton>
+          </Paper>
+        </Grid>
+        <Grid item xs={2}>
+          <Button
+            variant="text"
+            sx={{
+              color: grey["searchButtonText"],
+              backgroundColor: "white",
+              height: "100%",
+              width: "100%",
+              minWidth: "200px",
+            }}
+            fullWidth
+            startIcon={<Tune />}
+            onClick={(e) => onAdvancedFilterClicked(e)}
+          >
+            Filters
+          </Button>
         </Grid>
       </Grid>
-      <AdvanceFilters showFilters={showFilters} />
-    </>
+      <AdvanceFilters
+        showFilters={showFilters}
+        setShowFilters={setShowFilters}
+      />
+    </Grid>
   );
 };
 

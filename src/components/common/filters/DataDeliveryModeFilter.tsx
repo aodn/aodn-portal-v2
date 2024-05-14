@@ -1,14 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Grid,
-  Box,
   SxProps,
   Theme,
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
-import { borderRadius } from "../constants";
-import blue from "../colors/blue";
+import { StyledToggleButton } from "../../../styles/StyledToggleButton.tsx";
+import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup.tsx";
 
 interface DataDeliveryModeFilterProps {
   sx?: SxProps<Theme>;
@@ -22,50 +21,24 @@ const DataDeliveryModeFilter = (props: DataDeliveryModeFilterProps) => {
     "One-off",
   ]);
 
-  const handleChange = useCallback((event, newAlignment) => {
-    // TODO
+  const handleChange = useCallback((_: any, newAlignment: any) => {
+    setValues(newAlignment);
   }, []);
 
   return (
-    <Grid
-      container
-      sx={{
-        backgroundColor: blue["bgParam"],
-        border: "none",
-        borderRadius: borderRadius["filter"],
-        justifyContent: "center",
-        ...props.sx,
-      }}
-    >
+    <Grid container sx={{ ...props.sx }}>
       <Grid item xs={12}>
-        <Box display="flex" justifyContent="center" alignItems="center">
-          Data Delivery Mode
-        </Box>
-      </Grid>
-      <Grid item xs={12}>
-        <ToggleButtonGroup
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "auto auto auto auto",
-            gridGap: "10px",
-            padding: "10px",
-          }}
+        <StyledToggleButtonGroup
           value={values}
-          exclusive={false}
+          exclusive
           onChange={handleChange}
         >
           {modes.map((v) => (
-            <ToggleButton
-              sx={{
-                boxShadow: "1px 1px 10px 1px #d4d4d4",
-              }}
-              value={v}
-              key={v}
-            >
+            <StyledToggleButton value={v} key={v}>
               {v}
-            </ToggleButton>
+            </StyledToggleButton>
           ))}
-        </ToggleButtonGroup>
+        </StyledToggleButtonGroup>
       </Grid>
     </Grid>
   );

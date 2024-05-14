@@ -1,18 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  Box,
-  Grid,
-  SxProps,
-  Theme,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "@mui/material";
+import { Grid, SxProps, Theme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import { borderRadius } from "../constants";
-import blue from "../colors/blue";
 import { fetchParameterCategoriesWithStore } from "../store/searchReducer";
 import { Category, updateCategories } from "../store/componentParamReducer";
+import { StyledToggleButton } from "../../../styles/StyledToggleButton.tsx";
+import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup.tsx";
 
 interface CategoryVocabFilterProps {
   sx?: SxProps<Theme>;
@@ -84,46 +77,19 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
   }, [dispatch]);
 
   return (
-    <Grid
-      container
-      sx={{
-        backgroundColor: blue["bgParam"],
-        border: "none",
-        borderRadius: borderRadius["filter"],
-        justifyContent: "center",
-        minHeight: "70px",
-        ...props.sx,
-      }}
-    >
+    <Grid container sx={{ ...props.sx }}>
       <Grid item xs={12}>
-        <Box display="flex" justifyContent="center" alignItems="center">
-          Category Vocabulary
-        </Box>
-      </Grid>
-      <Grid item xs={12}>
-        <ToggleButtonGroup
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "auto auto auto auto",
-            gridGap: "10px",
-            padding: "10px",
-          }}
+        <StyledToggleButtonGroup
           value={selectedCategoryStrs}
           exclusive={false}
           onChange={handleChange}
         >
           {buttonLabels.map((label) => (
-            <ToggleButton
-              sx={{
-                boxShadow: "1px 1px 10px 1px #d4d4d4",
-              }}
-              value={label}
-              key={label}
-            >
+            <StyledToggleButton value={label} key={label}>
               {label}
-            </ToggleButton>
+            </StyledToggleButton>
           ))}
-        </ToggleButtonGroup>
+        </StyledToggleButtonGroup>
       </Grid>
     </Grid>
   );

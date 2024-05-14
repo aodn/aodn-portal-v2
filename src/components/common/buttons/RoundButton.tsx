@@ -1,7 +1,8 @@
 import { Button, ButtonProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import grey from "../colors/grey";
-import { borderRadius } from "../constants";
+
+import { borderRadius } from "../../../styles/constants";
 
 const RoundButton = styled((props: ButtonProps) => <Button {...props} />)(
   () => ({

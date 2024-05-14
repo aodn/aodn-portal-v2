@@ -4,6 +4,7 @@ import Slider from "@mui/material/Slider";
 import { SxProps, Theme } from "@mui/material";
 import { useCallback, useEffect } from "react";
 import { dateDefault } from "../constants";
+import StyledSlider from "../../../styles/StyledSlider.tsx";
 
 interface RangeSliderProps<T> {
   title: string;
@@ -94,12 +95,12 @@ const NumberRangeSlider = ({
 
   return (
     <Box sx={sx}>
-      <Slider
+      <StyledSlider
         getAriaLabel={() => title}
         value={value}
         onChange={handleChange}
         onChangeCommitted={handleChangeCommitted}
-        valueLabelDisplay="auto"
+        valueLabelDisplay="on"
         getAriaValueText={(v) => label(v, min, max)}
         valueLabelFormat={(v) => label(v, min, max)}
         step={0.01}

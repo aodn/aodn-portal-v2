@@ -8,7 +8,7 @@ import {
   CardMedia,
   Grid,
 } from "@mui/material";
-import { borderRadius, margin, pageDefault } from "../common/constants";
+import { pageDefault } from "../common/constants";
 import grey from "../common/colors/grey";
 import SlightRoundButton from "../common/buttons/SlightRoundButton";
 import UndoIcon from "@mui/icons-material/Undo";
@@ -23,6 +23,7 @@ import {
 } from "../common/store/componentParamReducer";
 import store, { AppDispatch, getComponentState } from "../common/store/store";
 import { useDispatch } from "react-redux";
+import { borderRadius, margin } from "../../styles/constants";
 
 const DetailsHeaderButton = () => {
   const navigate = useNavigate();

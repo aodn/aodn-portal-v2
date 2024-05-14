@@ -1,8 +1,8 @@
 import { Grid, Box, Button, MenuItem, OutlinedInput } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
-import { borderRadius } from "../constants";
 import RoundSelect from "../dropdown/RoundSelect";
 import ClearIcon from "@mui/icons-material/Clear";
+import { borderRadius } from "../../../styles/constants";
 
 interface RemovableParameterFilterProps {
   title: string;

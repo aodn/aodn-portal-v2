@@ -1,8 +1,7 @@
-import { Box, Grid, SxProps, Theme } from "@mui/material";
-import { borderRadius, margin } from "../constants";
-import blue from "../colors/blue";
+import { Grid, SxProps, Theme } from "@mui/material";
 import DepthSlider from "../slider/DepthSlider.tsx";
 import PlainDropdownMenu from "../dropdown/PlainDropdownMenu.tsx";
+import { margin } from "../../../styles/constants";
 
 interface DepthFiltersProps {
   sx?: SxProps<Theme>;
@@ -18,27 +17,15 @@ const DepthFilter = (props: DepthFiltersProps) => {
     "millimeters",
   ];
   return (
-    <Grid
-      container
-      sx={{
-        backgroundColor: blue["bgParam"],
-        border: "none",
-        borderRadius: borderRadius["filter"],
-        justifyContent: "center",
-        minHeight: "90px",
-        ...props.sx,
-      }}
-    >
+    <Grid container sx={{ ...props.sx }}>
       <Grid
         container
-        sx={{ marginTop: margin["top"], marginBottom: margin["bottom"] }}
+        sx={{
+          marginTop: margin["top"],
+          marginBottom: margin["bottom"],
+        }}
       >
-        <Grid item xs={2}>
-          <Box display="flex" justifyContent="center" alignItems="center">
-            Depth
-          </Box>
-        </Grid>
-        <Grid item xs={6}></Grid>
+        <Grid item xs={8}></Grid>
         <Grid item xs={3}>
           <PlainDropdownMenu items={depthUnits} onSelectCallback={() => {}} />
         </Grid>
