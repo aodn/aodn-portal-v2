@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import MapContext from "../MapContext";
-import { zIndex } from "../../../common/constants";
+
+import { zIndex } from "../../../../styles/constants";
 
 const DisplayCoordinate = () => {
   const { map } = useContext(MapContext);

@@ -9,10 +9,10 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import { border, borderRadius, filterList } from "../constants";
 import grey from "../colors/grey";
 import { useCallback, useEffect, useState } from "react";
 import { FilterGroup, Filter, getAllFilters } from "./api";
+import { border, borderRadius, filterList } from "../../../styles/constants";
 
 const createListItem = (item: Filter) => (
   <ListItem

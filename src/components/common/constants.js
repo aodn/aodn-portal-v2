@@ -1,38 +1,3 @@
-const margin = {
-  top: "15px",
-  bottom: "15px",
-  left: "15px",
-  right: "15px",
-  doubleTop: "30px",
-  doubleBottom: "30px",
-  doubleLeft: "30px",
-  doubleRight: "30px",
-  tripleTop: "45px",
-  tripleBottom: "45px",
-};
-
-const fontSize = {
-  mapMenuItem: 14,
-  mapMenuSubItem: 13,
-};
-
-const border = {
-  buttonBorder: "2px solid #fff",
-};
-
-const borderRadius = {
-  circle: "50%",
-  underline: "24px",
-  button: "24px",
-  filter: "10px",
-  menu: "5px",
-  menuTop: "5px 5px 0 0",
-};
-
-const filterList = {
-  filterListMaxDisplay: 4,
-};
-
 const dateDefault = {
   // Must use this format to do search, we do not care about the time
   DATE_TIME_FORMAT: "YYYY-MM-DDT00:00:00[Z]",
@@ -46,18 +11,4 @@ const pageDefault = {
   landing: "/",
 };
 
-const zIndex = {
-  MAP_COORD: 1,
-  FILTER_OVERLAY: 3,
-};
-
-export {
-  margin,
-  border,
-  borderRadius,
-  filterList,
-  zIndex,
-  dateDefault,
-  pageDefault,
-  fontSize,
-};
+export { dateDefault, pageDefault };

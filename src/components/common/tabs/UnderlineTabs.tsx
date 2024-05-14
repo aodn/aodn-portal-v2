@@ -1,7 +1,7 @@
 import { Tab, Tabs, TabProps, TabsProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { borderRadius } from "../constants";
 import grey from "../colors/grey";
+import { borderRadius } from "../../../styles/constants";
 
 const UnderlineTabs = styled((props: TabsProps) => (
   <Tabs

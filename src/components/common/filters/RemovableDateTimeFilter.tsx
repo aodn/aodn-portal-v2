@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { borderRadius, dateDefault, margin } from "../constants";
+import { dateDefault } from "../constants";
 import { Box, Grid, SxProps, Theme } from "@mui/material";
 import { DateRangeSlider } from "../slider/RangeSlider";
 import dayjs, { Dayjs } from "dayjs";
@@ -12,12 +12,11 @@ import {
   updateDateTimeFilterRange,
 } from "../store/componentParamReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import blue from "../colors/blue.js";
 import TimeRangeBarChart from "../charts/TimeRangeBarChart.tsx";
+import StyledDateTimePicker from "../../../styles/StyledDateTimePicker.tsx";
+import { margin } from "../../../styles/constants";
 
 interface RemovableDateTimeFilterProps {
-  title: string;
   url?: string;
   sx?: SxProps<Theme>;
 }
@@ -156,18 +155,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
   );
 
   return (
-    <Grid
-      container
-      columns={13}
-      sx={{
-        backgroundColor: blue["bgParam"],
-        border: "none",
-        borderRadius: borderRadius["filter"],
-        justifyContent: "center",
-        minHeight: "90px",
-        ...props.sx,
-      }}
-    >
+    <Grid container sx={{ ...props.sx }}>
       {props.url && (
         <Grid
           item
@@ -189,14 +177,10 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         }}
       >
         <Grid container>
-          <Grid item xs={1}>
-            <Box display="flex" justifyContent="center" alignItems="center">
-              {props.title}
-            </Box>
-          </Grid>
+          <Grid item xs={2} />
           <Grid
             item
-            xs={11}
+            xs={9}
             sx={{
               minHeight: "200px",
             }}
@@ -215,13 +199,6 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
       </Grid>
       <Grid
         item
-        xs={1}
-        sx={{
-          marginBottom: margin["bottom"],
-        }}
-      />
-      <Grid
-        item
         xs={12}
         sx={{
           marginBottom: margin["bottom"],
@@ -230,7 +207,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
       >
         <Grid container>
           <Grid item xs={2}>
-            <DateTimePicker
+            <StyledDateTimePicker
               onAccept={onStartDatePickerAccepted}
               defaultValue={dayjs(componentParam.dateTimeFilterRange?.start)}
               value={dayjs(startDate)}
@@ -259,7 +236,7 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
             </Grid>
           </Grid>
           <Grid item xs={2}>
-            <DateTimePicker
+            <StyledDateTimePicker
               onAccept={onEndDatePickerAccepted}
               defaultValue={dayjs(componentParam.dateTimeFilterRange?.end)}
               value={dayjs(endDate)}

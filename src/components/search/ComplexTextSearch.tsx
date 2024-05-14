@@ -91,7 +91,12 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
         />
       );
     } else {
-      return <AdvanceFilters showFilters={showFilters} />;
+      return (
+        <AdvanceFilters
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+        />
+      );
     }
   }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
 

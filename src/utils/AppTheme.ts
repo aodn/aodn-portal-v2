@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, PaletteOptions } from "@mui/material/styles";
 
 const AppTheme = createTheme({
   palette: {
@@ -13,7 +13,17 @@ const AppTheme = createTheme({
       dark: "#1C9FE4",
     },
     divider: "#DDDDDD",
+    info: {
+      main: "#51BCEB",
+      light: "#B3C8D4",
+      dark: "#3A6F8F",
+    },
+    common: {
+      white: "#FFF",
+      black: "#000",
+    },
   },
+
   typography: {
     fontFamily: [
       "Lexend",
@@ -41,6 +51,15 @@ const AppTheme = createTheme({
     },
     h1: {
       fontWeight: "700",
+    },
+    // h3 is now used for the title on the filter. Any other can use it but please
+    // only modify it just for the filter title
+    h3: {
+      fontSize: "1rem",
+      fontWeight: 800,
+      padding: "10px 0 0 0",
+      fontFamily: "Noto Sans",
+      color: "#3A6F8F",
     },
     h4: {
       fontSize: "1.5rem",

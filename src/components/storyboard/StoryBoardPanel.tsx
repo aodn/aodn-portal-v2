@@ -1,11 +1,11 @@
 import * as React from "react";
 import { Grid, Typography } from "@mui/material";
 import StoryBoard from "./StoryBoard";
-import { margin } from "../common/constants";
 import NotebookModel, {
   //NotebookModelCallbackProps,
   NotebookModelProps,
 } from "../common/ipython/NotebookModel";
+import { margin } from "../../styles/constants";
 
 const StoryBoardPanel = () => {
   const [value] = React.useState(0);

@@ -2,6 +2,7 @@ import React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { OGCCollections } from "../store/searchReducer.tsx";
 import { BarSeriesType } from "@mui/x-charts";
+import { useTheme } from "@mui/material";
 
 interface TimeRangeBarChartProps {
   imosDataIds: string[];
@@ -29,6 +30,8 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
   selectedStartDate,
   selectedEndDate,
 }) => {
+  const theme = useTheme();
+
   // below consts are private functions
   const determineChartUnit = () => {
     if (calculateDaysBetween(selectedStartDate, selectedEndDate) <= 100) {
@@ -175,14 +178,16 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
       stack: "total",
       label: "IMOS Data",
       data: buckets.flatMap((m) => m.imosOnlyCount),
+      color: theme.palette.info.dark,
     };
     const others: BarSeriesType = {
       id: "others-data-id",
       type: "bar",
       valueFormatter: seriesFormatter,
       stack: "total",
-      label: "Others",
+      label: "All Data",
       data: buckets.flatMap((m) => m.total - m.imosOnlyCount),
+      color: theme.palette.info.light,
     };
 
     series.push(imos);

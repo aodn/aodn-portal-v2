@@ -27,8 +27,8 @@ import {
 import LayersIcon from "@mui/icons-material/Layers";
 import grey from "../../../common/colors/grey";
 import blue from "../../../common/colors/blue";
-import { fontSize, borderRadius } from "../../../common/constants";
 import { styles as mapStyles, defaultStyle } from "../Map";
+import { borderRadius, fontSize } from "../../../../styles/constants";
 
 const overlays = [
   { name: "Australian Marine Parks", id: "marine-parks-layer", visible: false },

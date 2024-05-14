@@ -4,7 +4,8 @@ import Menu, { MenuProps } from "@mui/material/Menu";
 import { Button, MenuItem } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import "./MainMenu.module.css";
-import { fontSize } from "../common/constants";
+
+import { fontSize } from "../../styles/constants";
 
 type StyledMenuItem = {
   name: string;

@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Grid, Box, Divider, SxProps, Theme, IconButton } from "@mui/material";
-import { margin } from "../common/constants";
 import { useCallback, useRef } from "react";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { margin } from "../../styles/constants";
 
 interface ComplexSmartPanelProps {
   columns?: number;

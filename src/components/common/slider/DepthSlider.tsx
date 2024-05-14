@@ -2,41 +2,8 @@ import * as React from "react";
 import Slider from "@mui/material/Slider";
 import { Box, Grid } from "@mui/material";
 import { styled } from "@mui/system";
-
-const StyledSlider = styled(Slider)(({ theme }) => ({
-  "& .MuiSlider-valueLabel": {
-    // Override the default styles here
-    background: "none",
-    color: "black",
-    borderRadius: 0,
-    padding: 0,
-    left: "calc(100% + 25px)",
-  },
-
-  "& .MuiSlider-markLabel": {
-    left: "calc(-2200%)",
-  },
-
-  "& .MuiSlider-mark": {
-    display: "none",
-  },
-
-  "& .MuiSlider-track": {
-    backgroundColor: "#51BCEB",
-    border: "none",
-    width: "7px",
-  },
-  "& .MuiSlider-rail": {
-    backgroundColor: "#BDC7D6",
-    width: "5px",
-  },
-  "& .MuiSlider-thumb": {
-    backgroundColor: "#FFF",
-    width: "22px",
-    height: "22px",
-    boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.50)",
-  },
-}));
+import StyledSlider from "../../../styles/StyledSlider.tsx";
+import SliderLine from "./SliderLine.tsx";
 
 /**
  * TODO: may need to be refactored to use theme. Currently, all colors are
@@ -112,26 +79,8 @@ const DepthSlider = () => {
         ))}
       </Grid>
       <Grid item xs={8} sx={{ height: 400, paddingLeft: 2, paddingRight: 2 }}>
-        <Box
-          sx={{
-            position: "relative",
-            top: `calc(${((3000 - sliderValues[0]) / 3000) * 100}%)`,
-            left: 0,
-            right: 0,
-            height: "1px",
-            backgroundColor: "#FFF",
-          }}
-        />
-        <Box
-          sx={{
-            position: "relative",
-            top: `calc(${((3000 - sliderValues[1]) / 3000) * 100}%)`,
-            left: 0,
-            right: 0,
-            height: "1px",
-            backgroundColor: "#FFF",
-          }}
-        />
+        <SliderLine sliderValue={sliderValues[0]} />
+        <SliderLine sliderValue={sliderValues[1]} />
         <img
           src={"src/assets/images/depth-selector.png"}
           alt={"Depth"}
@@ -140,6 +89,7 @@ const DepthSlider = () => {
       </Grid>
       <Grid item xs={2} sx={{ height: 400 }}>
         <StyledSlider
+          isvertical="true"
           getAriaLabel={() => "depth"}
           orientation="vertical"
           // getAriaValueText={valuetext}
