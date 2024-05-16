@@ -1,4 +1,4 @@
-import { createTheme, PaletteOptions } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 
 const AppTheme = createTheme({
   palette: {
@@ -31,6 +31,7 @@ const AppTheme = createTheme({
       "Noto Sans",
       "Ariel",
       "sans-serif",
+      "Roboto",
     ].join(","),
 
     body1: {
