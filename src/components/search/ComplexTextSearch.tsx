@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button, Divider, Grid, IconButton, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
@@ -10,7 +10,6 @@ import {
   fetchResultWithStore,
 } from "../common/store/searchReducer";
 import store, { AppDispatch, getComponentState } from "../common/store/store";
-import RemovableFilters from "../common/filters/RemovableFilters";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
 import {
   ParameterState,
@@ -20,12 +19,7 @@ import InputWithSuggester from "./InputWithSuggester.tsx";
 import { pageDefault } from "../common/constants";
 
 export interface ComplexTextSearchProps {
-  onFilterCallback: (
-    events:
-      | React.MouseEvent<HTMLAnchorElement>
-      | React.MouseEvent<HTMLButtonElement>,
-    show: boolean
-  ) => void | null;
+  onFilterCallback?: (value: any) => void | null;
 }
 
 /**
@@ -54,8 +48,6 @@ const searchButton = (handler: () => void) => {
 const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [toggleRemovableFilter, setToggleRemovableFilter] =
-    useState<boolean>(true);
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
   const onSearchClick = useCallback(() => {
@@ -69,36 +61,14 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
         })
       );
   }, [dispatch, navigate]);
-  const onFilterShowHide = useCallback(
-    (
-      events:
-        | React.MouseEvent<HTMLAnchorElement>
-        | React.MouseEvent<HTMLButtonElement>
-    ) => {
-      setShowFilters((value) => !value);
-      onFilterCallback && onFilterCallback(events, !showFilters);
-    },
-    [onFilterCallback, showFilters, setShowFilters]
-  );
 
-  const showFilter = useCallback(() => {
-    if (toggleRemovableFilter) {
-      return (
-        <RemovableFilters
-          showFilters={showFilters}
-          onFilterShowHide={onFilterShowHide}
-          onExpandAllFilters={() => setToggleRemovableFilter(false)}
-        />
-      );
-    } else {
-      return (
-        <AdvanceFilters
-          showFilters={showFilters}
-          setShowFilters={setShowFilters}
-        />
-      );
-    }
-  }, [toggleRemovableFilter, showFilters, onFilterShowHide]);
+  const onFilterClick = useCallback(() => {
+    setShowFilters(true);
+  }, [setShowFilters]);
+
+  useEffect(() => {
+    onFilterCallback && onFilterCallback(showFilters);
+  }, [onFilterCallback, showFilters]);
 
   return (
     <Grid container>
@@ -127,9 +97,7 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
                   pr: 1,
                 }}
                 startIcon={<Tune />}
-                onClick={(e) => {
-                  onFilterShowHide(e);
-                }}
+                onClick={onFilterClick}
               >
                 Filters
               </Button>
@@ -139,7 +107,10 @@ const ComplexTextSearch = ({ onFilterCallback }: ComplexTextSearchProps) => {
             {searchButton(onSearchClick)}
           </Grid>
         </Grid>
-        {showFilter()}
+        <AdvanceFilters
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+        />
       </Grid>
     </Grid>
   );
