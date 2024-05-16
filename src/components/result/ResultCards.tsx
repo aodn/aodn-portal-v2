@@ -1,26 +1,27 @@
 import {
   Card,
-  CardContent,
-  CardMedia,
-  Grid,
-  Typography,
   CardActionArea,
   CardActions,
-  ListItem,
+  CardContent,
+  CardMedia,
   Chip,
-  Button,
+  Grid,
+  ListItem,
+  Typography,
 } from "@mui/material";
 import { pageDefault } from "../common/constants";
 import WhereToVoteIcon from "@mui/icons-material/WhereToVote";
 import DownloadIcon from "@mui/icons-material/Download";
-import SellIcon from "@mui/icons-material/Sell";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import InfoIcon from "@mui/icons-material/Info";
+import TaskAltSharpIcon from "@mui/icons-material/TaskAltSharp";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import {
-  OGCCollection,
   CollectionsQueryType,
+  OGCCollection,
 } from "../common/store/searchReducer";
 import { useNavigate } from "react-router-dom";
+import LinkIcon from "@mui/icons-material/Link";
+import ResultCardButton from "../common/buttons/ResultCardButton.tsx";
 
 interface ResultCardProps {
   item: string;
@@ -62,6 +63,7 @@ const findThumbnail = (): string => {
 const ResultCard = (props: ResultCardProps) => {
   const navigate = useNavigate();
 
+  // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card variant="outlined">
       <CardActionArea
@@ -99,50 +101,41 @@ const ResultCard = (props: ResultCardProps) => {
         </CardContent>
       </CardActionArea>
       <CardActions sx={{ justifyContent: "space-between" }}>
-        <Button
-          variant="outlined"
+        <ResultCardButton
+          text={"Remove Layer"}
           startIcon={<WhereToVoteIcon />}
-          size="small"
           onClick={(event) =>
             props?.onRemoveLayer && props.onRemoveLayer(event, props.content)
           }
-          disabled={props.onRemoveLayer === undefined}
-        >
-          Remove Layer
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<DownloadIcon />}
-          size="small"
-          onClick={(event) =>
-            props?.onDownload && props.onDownload(event, props.content)
-          }
-          disabled={props.onDownload === undefined}
-        >
-          Download
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<SellIcon />}
-          size="small"
+        />
+        <ResultCardButton
+          // TODO: Below two lines are fake. the status need to be from the metadata
+          text={"Completed"}
+          startIcon={<TaskAltSharpIcon />}
+          onClick={() => {}}
+        />
+        <ResultCardButton
+          text={"Briefs"}
+          startIcon={<InfoIcon />}
           onClick={(event) =>
             props?.onTags && props.onTags(event, props.content)
           }
-          disabled={props.onTags === undefined}
-        >
-          Tags
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<MoreHorizIcon />}
-          size="small"
+        />
+        <ResultCardButton
+          // TODO: The number of links here should be from database
+          text={"3 Links"}
+          startIcon={<LinkIcon />}
           onClick={(event) =>
             props?.onMore && props.onMore(event, props.content)
           }
-          disabled={props.onMore === undefined}
-        >
-          More
-        </Button>
+        />
+        <ResultCardButton
+          text={"Download"}
+          startIcon={<DownloadIcon />}
+          onClick={(event) =>
+            props?.onDownload && props.onDownload(event, props.content)
+          }
+        />
       </CardActions>
     </Card>
   );
