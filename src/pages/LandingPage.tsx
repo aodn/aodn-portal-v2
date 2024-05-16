@@ -47,7 +47,7 @@ const LandingPage = () => {
       >
         <MainMenu />
         <BannerOpenAccess isDisplay={display} />
-        <ComplexTextSearch onFilterCallback={(_, show) => setDisplay(!show)} />
+        <ComplexTextSearch onFilterCallback={(value) => setDisplay(!value)} />
         <ShortCutSmartPanel onCardClicked={onCardClick} />
       </Box>
       <StoryBoardPanel />

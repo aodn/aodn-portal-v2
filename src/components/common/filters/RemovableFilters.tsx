@@ -10,6 +10,8 @@ import SettingsOverscanIcon from "@mui/icons-material/SettingsOverscan";
 import CheckIcon from "@mui/icons-material/Check";
 import Divider from "@mui/material/Divider";
 
+// TODO: this component is not used in any other components,
+// can be deleted if not needed anymore
 export interface RemovableFiltersProps {
   onFilterShowHide: (
     events:
