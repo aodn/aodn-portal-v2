@@ -19,10 +19,12 @@ import {
 import InputWithSuggester from "./InputWithSuggester.tsx";
 import { pageDefault } from "../common/constants";
 
+// this component is not used in any other components, can be deleted if not needed any more
 const SimpleTextSearch = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [showFilters, setShowFilters] = useState<boolean>(false);
+
   const executeSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
     const searchParameters: SearchParameters =

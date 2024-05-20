@@ -1,9 +1,8 @@
-import React from "react";
 import {
-  Backdrop,
   Box,
-  Collapse,
+  Fade,
   Grid,
+  Modal,
   SxProps,
   Theme,
   Typography,
@@ -28,80 +27,84 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
   const theme = useTheme();
   return (
     <>
-      <Backdrop
+      <Modal
         open={props.showFilters}
-        sx={{ zIndex: zIndex["FILTER_MODAL"] }}
-        onClick={() => {
+        onClose={() => {
           props.setShowFilters(false);
         }}
-      />
-      <Collapse
-        orientation="vertical"
-        in={props.showFilters}
-        sx={{
-          // Make it overlay instead of push smart card downwards
-          zIndex: zIndex["FILTER_OVERLAY"],
-          position: "absolute",
-          width: "80%",
-        }}
       >
-        <Grid
-          container
-          xs={12}
-          justifyContent={"center"}
-          sx={{
-            marginTop: margin["top"],
-            borderRadius: borderRadius["filter"],
-            backgroundColor: theme.palette.common.white,
-            ...props.sx,
-          }}
-        >
-          <Grid
-            item
-            xs={12}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Typography variant="h3">Filters</Typography>
-          </Grid>
-          <Grid
-            container
-            spacing={2}
+        <Fade in={props.showFilters} timeout={{ enter: 500, exit: 300 }}>
+          <Box
             sx={{
-              margin: `${margin["top"]} ${margin["doubleLeft"]}`,
-              justifyContent: "center",
+              zIndex: zIndex["FILTER_OVERLAY"],
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "50%",
+              minWidth: "1090px",
+              maxWidth: "2000px",
             }}
           >
-            <Grid item xs={12}>
-              <FilterSection title={"Time Range"}>
-                <RemovableDateTimeFilter />
-              </FilterSection>
+            <Grid
+              container
+              xs={12}
+              justifyContent={"center"}
+              sx={{
+                marginTop: margin["top"],
+                borderRadius: borderRadius["filter"],
+                backgroundColor: theme.palette.common.white,
+                ...props.sx,
+              }}
+            >
+              <Grid
+                item
+                xs={12}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Typography variant="h3">Filters</Typography>
+              </Grid>
+              <Grid
+                container
+                spacing={2}
+                sx={{
+                  margin: `${margin["top"]} ${margin["doubleLeft"]}`,
+                  justifyContent: "center",
+                }}
+              >
+                <Grid item xs={12}>
+                  <FilterSection title={"Time Range"}>
+                    <RemovableDateTimeFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={6}>
+                  <FilterSection title={"Depth"}>
+                    <DepthFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={6}>
+                  <FilterSection isTitleOnlyHeader title={"Parameter"}>
+                    <CategoryVocabFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={6}>
+                  <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
+                    <DataDeliveryModeFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={1}>
+                  <FilterSection title={""}>
+                    <ImosOnlySwitch />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={5} />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <FilterSection title={"Depth"}>
-                <DepthFilter />
-              </FilterSection>
-            </Grid>
-            <Grid item xs={6}>
-              <FilterSection isTitleOnlyHeader title={"Parameter"}>
-                <CategoryVocabFilter />
-              </FilterSection>
-            </Grid>
-            <Grid item xs={6}>
-              <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
-                <DataDeliveryModeFilter />
-              </FilterSection>
-            </Grid>
-            <Grid item xs={1}>
-              <FilterSection title={""}>
-                <ImosOnlySwitch />
-              </FilterSection>
-            </Grid>
-            <Grid item xs={5} />
-          </Grid>
-        </Grid>
-      </Collapse>
+          </Box>
+        </Fade>
+      </Modal>
     </>
   );
 };

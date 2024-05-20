@@ -16,7 +16,7 @@ const StyledFilterSectionGrid = styled(Grid)<StyledFilterSectionGridProps>(
     borderRadius: borderRadius["filter"],
     justifyContent: "center",
     height: "100%",
-    padding: isSmall ? "0px" : "20px",
+    padding: isSmall === "true" ? "0px" : "20px",
   })
 );
 

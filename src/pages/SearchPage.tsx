@@ -54,6 +54,7 @@ import DisplayCoordinate from "../components/map/mapbox/controls/DisplayCoordina
 import Layers from "../components/map/mapbox/layers/Layers";
 import VectorTileLayers from "../components/map/mapbox/layers/VectorTileLayers";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
+import ComplexTextSearch from "../components/search/ComplexTextSearch";
 
 const mapContainerId = "map-container-id";
 
@@ -146,43 +147,49 @@ const SearchPage = () => {
           backgroundSize: "cover",
         }}
       >
-        <Grid container item xs={12}>
-          <Grid item xs={1} />
-          <Grid item xs={10}>
-            <SimpleTextSearch />
+        <Grid item xs={12}>
+          <Grid container>
+            <Grid item xs={1} />
+            <Grid item xs={10}>
+              <ComplexTextSearch />
+            </Grid>
+            <Grid item xs={1} />
           </Grid>
-          <Grid item xs={1} />
         </Grid>
-        <Grid item xs={1}>
-          <ResultPanelIconFilter />
-        </Grid>
-        <Grid item xs={4}>
-          <ResultPanelSimpleFilter />
-          <ResultCards
-            contents={contents}
-            onRemoveLayer={onRemoveLayer}
-            onDownload={undefined}
-            onTags={undefined}
-            onMore={undefined}
-          />
-        </Grid>
-        <Grid item xs={7} sx={{ pr: 2, pb: 2 }}>
-          <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
-            <Map
-              panelId={mapContainerId}
-              onZoomEvent={onMapZoomOrMove}
-              onMoveEvent={onMapZoomOrMove}
-            >
-              <Controls>
-                <NavigationControl />
-                <ScaleControl />
-                <MenuControl menu={<BaseMapSwitcher />} />
-              </Controls>
-              <Layers>
-                <VectorTileLayers collections={layers} />
-              </Layers>
-            </Map>
-          </Paper>
+        <Grid item xs={12}>
+          <Grid container spacing={2}>
+            <Grid item xs={1}>
+              <ResultPanelIconFilter />
+            </Grid>
+            <Grid item xs={4}>
+              <ResultPanelSimpleFilter />
+              <ResultCards
+                contents={contents}
+                onRemoveLayer={onRemoveLayer}
+                onDownload={undefined}
+                onTags={undefined}
+                onMore={undefined}
+              />
+            </Grid>
+            <Grid item xs={7} sx={{ pr: 2, pb: 2 }}>
+              <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
+                <Map
+                  panelId={mapContainerId}
+                  onZoomEvent={onMapZoomOrMove}
+                  onMoveEvent={onMapZoomOrMove}
+                >
+                  <Controls>
+                    <NavigationControl />
+                    <ScaleControl />
+                    <MenuControl menu={<BaseMapSwitcher />} />
+                  </Controls>
+                  <Layers>
+                    <VectorTileLayers collections={layers} />
+                  </Layers>
+                </Map>
+              </Paper>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </Layout>

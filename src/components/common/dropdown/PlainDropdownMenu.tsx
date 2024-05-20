@@ -31,6 +31,8 @@ const PlainDropdownMenu: React.FC<PlainDropdownMenuProps> = ({
         value={selectedItem}
         onChange={handleOnChange}
         sx={{
+          padding: "0",
+          textAlign: "center",
           height: "44px",
           borderRadius: "4px",
           backgroundColor: "#fff",

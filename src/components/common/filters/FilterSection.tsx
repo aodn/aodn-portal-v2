@@ -21,12 +21,15 @@ const FilterSection: React.FC<FilterSectionContainerProps> = ({
         paddingTop: isTitleOnlyHeader ? "3rem" : undefined,
       }}
     >
-      <Typography
-        variant="h3"
-        sx={{ position: "absolute", left: "2rem", top: "0.7rem" }}
-      >
-        {title}
-      </Typography>
+      {title && (
+        <Typography
+          variant="h3"
+          sx={{ position: "absolute", left: "2rem", top: "0.7rem" }}
+        >
+          {title}
+        </Typography>
+      )}
+
       {children}
     </StyledFilterSectionGrid>
   );
