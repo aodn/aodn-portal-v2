@@ -13,7 +13,6 @@ import { pageDefault } from "../common/constants";
 import WhereToVoteIcon from "@mui/icons-material/WhereToVote";
 import DownloadIcon from "@mui/icons-material/Download";
 import InfoIcon from "@mui/icons-material/Info";
-import TaskAltSharpIcon from "@mui/icons-material/TaskAltSharp";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import {
   CollectionsQueryType,
@@ -21,7 +20,9 @@ import {
 } from "../common/store/searchReducer";
 import { useNavigate } from "react-router-dom";
 import LinkIcon from "@mui/icons-material/Link";
-import ResultCardButton from "../common/buttons/ResultCardButton.tsx";
+import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton.tsx";
+import StaticResultCardButton from "../common/buttons/StaticResultCardButton.tsx";
+import { useCallback } from "react";
 
 interface ResultCardProps {
   item: string;
@@ -63,6 +64,16 @@ const findThumbnail = (): string => {
 const ResultCard = (props: ResultCardProps) => {
   const navigate = useNavigate();
 
+  const generateLinkText = useCallback((linkLength: number) => {
+    if (linkLength === 0) {
+      return "No link";
+    }
+    if (linkLength === 1) {
+      return "1 link";
+    }
+    return `${linkLength} links`;
+  }, []);
+
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card variant="outlined">
@@ -100,36 +111,31 @@ const ResultCard = (props: ResultCardProps) => {
           </Typography>
         </CardContent>
       </CardActionArea>
+
       <CardActions sx={{ justifyContent: "space-between" }}>
-        <ResultCardButton
+        {/*This button will be gone in the future*/}
+        <StaticResultCardButton
           text={"Remove Layer"}
           startIcon={<WhereToVoteIcon />}
           onClick={(event) =>
             props?.onRemoveLayer && props.onRemoveLayer(event, props.content)
           }
         />
-        <ResultCardButton
-          // TODO: Below two lines are fake. the status need to be from the metadata
-          text={"Completed"}
-          startIcon={<TaskAltSharpIcon />}
+        <DynamicResultCardButton
+          status={props.content.summaries.status}
           onClick={() => {}}
         />
-        <ResultCardButton
+        <StaticResultCardButton
           text={"Briefs"}
           startIcon={<InfoIcon />}
-          onClick={(event) =>
-            props?.onTags && props.onTags(event, props.content)
-          }
+          onClick={() => {}}
         />
-        <ResultCardButton
-          // TODO: The number of links here should be from database
-          text={"3 Links"}
+        <StaticResultCardButton
+          text={generateLinkText(props.content.links.length)}
           startIcon={<LinkIcon />}
-          onClick={(event) =>
-            props?.onMore && props.onMore(event, props.content)
-          }
+          onClick={() => {}}
         />
-        <ResultCardButton
+        <StaticResultCardButton
           text={"Download"}
           startIcon={<DownloadIcon />}
           onClick={(event) =>

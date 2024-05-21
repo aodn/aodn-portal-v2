@@ -25,15 +25,22 @@ interface Spatial {
   crs: string;
 }
 
+// may need more fields in the future
+interface Summaries {
+  score: number;
+  status: string;
+}
+
 export interface OGCCollection {
   id: string;
-  // This index is use to show the ordering 1, 2, 3...
+  // This index is used to show the ordering 1, 2, 3...
   index?: string;
   title?: string;
   description?: string;
   itemType?: string;
   links?: Array<Link>;
   extent?: Spatial;
+  summaries?: Summaries;
 }
 
 export interface OGCCollections {
@@ -91,7 +98,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
       properties:
         param.properties !== undefined
           ? param.properties
-          : "id,title,description",
+          : "id,title,description,status,links",
     };
 
     if (param.text !== undefined && param.text.length !== 0) {
