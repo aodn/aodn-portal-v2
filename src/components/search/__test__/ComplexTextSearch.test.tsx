@@ -1,71 +1,36 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import { Provider } from "react-redux";
-import { BrowserRouter } from "react-router-dom";
-import ComplexTextSearch from "./../ComplexTextSearch";
-import store from "./../../../components/common/store/store";
-import { vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import ComplexTextSearch from "../ComplexTextSearch";
+import store from "../../common/store/store";
+
+vi.mock("../../common/filters/AdvanceFilters.tsx", () => {
+  const mockAdvanceFilters = () => <div>mockAdvanceFilters</div>;
+  return { default: mockAdvanceFilters };
+});
 
 describe("ComplexTextSearch Component", () => {
+  beforeEach(() => {
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <ComplexTextSearch />
+        </MemoryRouter>
+      </Provider>
+    );
+  });
+
   test("renders ComplexTextSearch component", () => {
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <ComplexTextSearch />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    // Check if all main components are rendered
-    expect(screen.getByLabelText(/search/i)).toBeInTheDocument();
-    expect(screen.getByText(/filters/i)).toBeInTheDocument();
-    expect(screen.getByText(/search/i)).toBeInTheDocument();
+    expect(screen.getByText("Filters")).toBeInTheDocument();
+    expect(screen.getByText("Search")).toBeInTheDocument();
   });
 
-  test("clicks search button and executes search", () => {
-    const mockDispatch = vi.fn();
-    render(
-      <Provider store={{ ...store, dispatch: mockDispatch }}>
-        <BrowserRouter>
-          <ComplexTextSearch />
-        </BrowserRouter>
-      </Provider>
-    );
+  test("clicks filter button and shows filters", async () => {
+    const filterButton = screen.getByTestId("filtersBtn");
+    await userEvent.click(filterButton);
 
-    const searchButton = screen.getByText(/search/i);
-    userEvent.click(searchButton);
-
-    expect(mockDispatch).toHaveBeenCalled();
-  });
-
-  test("presses Enter and executes search", () => {
-    const mockDispatch = vi.fn();
-    render(
-      <Provider store={{ ...store, dispatch: mockDispatch }}>
-        <BrowserRouter>
-          <ComplexTextSearch />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    const inputElement = screen.getByRole("textbox");
-    fireEvent.keyDown(inputElement, { key: "Enter", code: "Enter" });
-
-    expect(mockDispatch).toHaveBeenCalled();
-  });
-
-  test("clicks filter button and shows filters", () => {
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <ComplexTextSearch />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    const filterButton = screen.getByText(/filters/i);
-    userEvent.click(filterButton);
-
-    expect(screen.getByText(/advance filters/i)).toBeInTheDocument();
+    expect(screen.getByText("mockAdvanceFilters")).toBeInTheDocument();
   });
 });

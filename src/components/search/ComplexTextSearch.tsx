@@ -94,6 +94,7 @@ const ComplexTextSearch = () => {
             }}
             startIcon={<Tune />}
             onClick={onFilterClick}
+            data-testid={"filtersBtn"}
           >
             Filters
           </Button>
