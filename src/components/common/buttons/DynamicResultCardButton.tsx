@@ -11,7 +11,7 @@ interface DynamicResultCardButtonProps {
   onClick: () => void;
 }
 
-interface toolKit {
+interface ToolKit {
   text: string;
   color: string;
   icon: React.ReactNode;
@@ -23,7 +23,7 @@ const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
 }) => {
   const theme = useTheme();
 
-  const onGoingKit: toolKit = useMemo(
+  const onGoingKit: ToolKit = useMemo(
     () => ({
       text: "On Going",
       color: theme.palette.success.main,
@@ -32,7 +32,7 @@ const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
     [theme]
   );
 
-  const completedKit: toolKit = useMemo(
+  const completedKit: ToolKit = useMemo(
     () => ({
       text: "Completed",
       color: theme.palette.primary.light,
@@ -41,7 +41,7 @@ const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
     [theme]
   );
 
-  const unknownKit: toolKit = useMemo(
+  const unknownKit: ToolKit = useMemo(
     () => ({
       text: "no status",
       color: alpha(theme.palette.info.dark, 0.8),
@@ -50,7 +50,7 @@ const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
     [theme]
   );
 
-  let toolKit: toolKit = unknownKit;
+  let toolKit: ToolKit = unknownKit;
   if (status?.toLowerCase().trim() === "ongoing") {
     toolKit = onGoingKit;
   } else if (status?.toLowerCase().trim() === "completed") {
