@@ -20,8 +20,8 @@ import {
 } from "../common/store/searchReducer";
 import { useNavigate } from "react-router-dom";
 import LinkIcon from "@mui/icons-material/Link";
-import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton.tsx";
-import StaticResultCardButton from "../common/buttons/StaticResultCardButton.tsx";
+import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
+import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
 import { useCallback } from "react";
 
 interface ResultCardProps {

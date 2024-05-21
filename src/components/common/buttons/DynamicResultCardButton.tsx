@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import StyledResultCardButton from "../../../styles/StyledResultCardButton.tsx";
+import StyledResultCardButton from "../../../styles/StyledResultCardButton";
 import TaskAltSharpIcon from "@mui/icons-material/TaskAltSharp";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
