@@ -64,6 +64,7 @@ const findThumbnail = (): string => {
 const ResultCard = (props: ResultCardProps) => {
   const navigate = useNavigate();
 
+  // links here may need to be changed, because only html links are wanted
   const generateLinkText = useCallback((linkLength: number) => {
     if (linkLength === 0) {
       return "No link";
