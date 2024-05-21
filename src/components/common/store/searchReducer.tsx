@@ -25,12 +25,6 @@ interface Spatial {
   crs: string;
 }
 
-// may need more fields in the future
-interface Summaries {
-  score: number;
-  status: string;
-}
-
 export interface OGCCollection {
   id: string;
   // This index is used to show the ordering 1, 2, 3...
@@ -40,7 +34,7 @@ export interface OGCCollection {
   itemType?: string;
   links?: Array<Link>;
   extent?: Spatial;
-  summaries?: Summaries;
+  status?: string;
 }
 
 export interface OGCCollections {
