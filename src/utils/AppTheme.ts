@@ -4,7 +4,7 @@ const AppTheme = createTheme({
   palette: {
     primary: {
       main: "#3B6E8F",
-      light: "#4490B6",
+      light: "#52BDEC",
       dark: "#2F4F6C",
     },
     secondary: {
@@ -21,6 +21,11 @@ const AppTheme = createTheme({
     common: {
       white: "#FFF",
       black: "#000",
+    },
+    success: {
+      main: "#4CAF50",
+      light: "",
+      dark: "",
     },
   },
 
@@ -84,6 +89,38 @@ const AppTheme = createTheme({
   shape: {
     borderRadius: 10,
   },
+  /** when using shadows, please use existing shadows if they are the same with
+   * your requirement. If not, please replace one placeholder with your shadow values.
+   * Please be very careful when trying to modify existing shadows because they
+   * are in use.
+   */
+  shadows: [
+    "none",
+    "1.5px 1.5px 3px 0px rgba(0, 0, 0, 0.20)",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+  ],
   components: {
     MuiButton: {
       styleOverrides: {

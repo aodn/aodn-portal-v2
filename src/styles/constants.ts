@@ -38,6 +38,7 @@ const borderRadius = {
   filter: "10px",
   menu: "5px",
   menuTop: "5px 5px 0 0",
+  small: "5px",
 };
 const filterList = {
   filterListMaxDisplay: 4,

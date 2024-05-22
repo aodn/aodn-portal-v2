@@ -27,13 +27,14 @@ interface Spatial {
 
 export interface OGCCollection {
   id: string;
-  // This index is use to show the ordering 1, 2, 3...
+  // This index is used to show the ordering 1, 2, 3...
   index?: string;
   title?: string;
   description?: string;
   itemType?: string;
   links?: Array<Link>;
   extent?: Spatial;
+  properties?: Map<string, any>;
 }
 
 export interface OGCCollections {
@@ -91,7 +92,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
       properties:
         param.properties !== undefined
           ? param.properties
-          : "id,title,description",
+          : "id,title,description,status,links",
     };
 
     if (param.text !== undefined && param.text.length !== 0) {
@@ -112,9 +113,12 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     // We need to fill in the index value here before return,
     // TODO: The index value may not start from 1 if it is paged
     const collections: OGCCollections = response.data;
-    collections?.collections?.forEach(
-      (o, index) => (o.index = "" + (index + 1))
-    );
+    collections?.collections?.forEach((o, index) => {
+      o.index = "" + (index + 1);
+      if (o.properties && typeof o.properties === "object") {
+        o.properties = new Map(Object.entries(o.properties));
+      }
+    });
 
     return collections;
   } catch (error: unknown) {
