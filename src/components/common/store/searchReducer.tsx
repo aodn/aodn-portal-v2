@@ -34,7 +34,7 @@ export interface OGCCollection {
   itemType?: string;
   links?: Array<Link>;
   extent?: Spatial;
-  properties?: Map<string, any>;
+  properties?: { [key: string]: any };
 }
 
 export interface OGCCollections {
@@ -115,9 +115,6 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     const collections: OGCCollections = response.data;
     collections?.collections?.forEach((o, index) => {
       o.index = "" + (index + 1);
-      if (o.properties && typeof o.properties === "object") {
-        o.properties = new Map(Object.entries(o.properties));
-      }
     });
 
     return collections;
