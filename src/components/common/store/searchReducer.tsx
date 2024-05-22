@@ -34,7 +34,7 @@ export interface OGCCollection {
   itemType?: string;
   links?: Array<Link>;
   extent?: Spatial;
-  status?: string;
+  properties?: Map<string, any>;
 }
 
 export interface OGCCollections {
@@ -113,9 +113,12 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     // We need to fill in the index value here before return,
     // TODO: The index value may not start from 1 if it is paged
     const collections: OGCCollections = response.data;
-    collections?.collections?.forEach(
-      (o, index) => (o.index = "" + (index + 1))
-    );
+    collections?.collections?.forEach((o, index) => {
+      o.index = "" + (index + 1);
+      if (o.properties && typeof o.properties === "object") {
+        o.properties = new Map(Object.entries(o.properties));
+      }
+    });
 
     return collections;
   } catch (error: unknown) {

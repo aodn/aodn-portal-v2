@@ -67,12 +67,12 @@ const ResultCard = (props: ResultCardProps) => {
   // links here may need to be changed, because only html links are wanted
   const generateLinkText = useCallback((linkLength: number) => {
     if (linkLength === 0) {
-      return "No link";
+      return "No Link";
     }
     if (linkLength === 1) {
-      return "1 link";
+      return "1 Link";
     }
-    return `${linkLength} links`;
+    return `${linkLength} Links`;
   }, []);
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
@@ -123,7 +123,7 @@ const ResultCard = (props: ResultCardProps) => {
           }
         />
         <DynamicResultCardButton
-          status={props.content.status}
+          status={props.content.properties.get("STATUS")}
           onClick={() => {}}
         />
         <StaticResultCardButton

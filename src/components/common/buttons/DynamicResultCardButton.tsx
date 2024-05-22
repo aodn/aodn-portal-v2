@@ -18,7 +18,7 @@ interface ToolKit {
 }
 // currently only the data status button is dynamic. Please refactor if other buttons are dynamic
 const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
-  status,
+  status = "un known",
   onClick,
 }) => {
   const theme = useTheme();
@@ -43,7 +43,7 @@ const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
 
   const unknownKit: ToolKit = useMemo(
     () => ({
-      text: "no status",
+      text: "No Status",
       color: alpha(theme.palette.info.dark, 0.8),
       icon: <QuestionMarkIcon />,
     }),
