@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Backdrop,
-  Box,
   Collapse,
   Grid,
   SxProps,
@@ -13,8 +12,8 @@ import RemovableDateTimeFilter from "./RemovableDateTimeFilter";
 import DepthFilter from "./DepthFilter";
 import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
 import CategoryVocabFilter from "./CategoryVocabFilter";
-import ImosOnlySwitch from "./ImosOnlySwitch.tsx";
-import FilterSection from "./FilterSection.tsx";
+import ImosOnlySwitch from "./ImosOnlySwitch";
+import FilterSection from "./FilterSection";
 import { borderRadius, margin, zIndex } from "../../../styles/constants";
 
 export interface NonRemovableFiltersProps {

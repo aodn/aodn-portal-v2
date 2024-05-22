@@ -9,11 +9,11 @@ import {
   test,
 } from "vitest";
 import { Provider } from "react-redux";
-import store from "../../common/store/store.tsx";
-import InputWithSuggester from "../InputWithSuggester.tsx";
-import { server } from "../../../__mocks__/server.ts";
+import store from "../../common/store/store";
+import InputWithSuggester from "../InputWithSuggester";
+import { server } from "../../../__mocks__/server";
 import { userEvent } from "@testing-library/user-event";
-import { sleep } from "../../../__mocks__/utils.ts";
+import { sleep } from "../../../__mocks__/utils";
 
 beforeAll(() => {
   server.listen();
