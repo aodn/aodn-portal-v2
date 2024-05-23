@@ -37,10 +37,17 @@ export class OGCCollection {
   links?: Array<Link>;
   extent?: Spatial;
   properties?: Map<string, any>;
-
+  // Locate the thumbnail from the links array
   findThumbnail = (): string => {
     const target = this.links?.find(
       (l) => l.type === "image" && l.rel === "thumbnail"
+    );
+    return target !== undefined ? target.href : default_thumbnail;
+  };
+  // Locate the logo from the links array
+  findIcon = (): string => {
+    const target = this.links?.find(
+      (l) => l.type === "image/png" && l.rel === "icon"
     );
     return target !== undefined ? target.href : default_thumbnail;
   };

@@ -87,13 +87,12 @@ const DetailsHeader = (props: DetailsProps) => {
       <CardMedia
         component="img"
         sx={{
-          width: 200,
+          width: 50,
           marginTop: margin["top"],
           marginBottom: margin["bottom"],
           marginLeft: margin["left"],
         }}
-        // TODO: should get link from collection
-        image="/logo/imos_logo.png"
+        image={props.collection?.findIcon()}
       />
     </Card>
   );
