@@ -1,14 +1,28 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import ComplexTextSearch from "../ComplexTextSearch";
 import store from "../../common/store/store";
+import { server } from "../../../__mocks__/server.ts";
 
 vi.mock("../../common/filters/AdvanceFilters.tsx", () => {
-  const mockAdvanceFilters = () => <div>mockAdvanceFilters</div>;
+  const mockAdvanceFilters = () => (
+    <div data-testid="mockAdvanceFilters">mockAdvanceFilters</div>
+  );
   return { default: mockAdvanceFilters };
+});
+
+beforeAll(() => {
+  server.listen();
+});
+afterEach(() => {
+  cleanup();
+  server.resetHandlers();
+});
+afterAll(() => {
+  server.close();
 });
 
 describe("ComplexTextSearch Component", () => {
@@ -22,15 +36,14 @@ describe("ComplexTextSearch Component", () => {
     );
   });
 
-  test("renders ComplexTextSearch component", () => {
+  it("renders ComplexTextSearch", () => {
     expect(screen.getByText("Filters")).toBeInTheDocument();
     expect(screen.getByText("Search")).toBeInTheDocument();
   });
 
-  test("clicks filter button and shows filters", async () => {
-    const filterButton = screen.getByTestId("filtersBtn");
-    await userEvent.click(filterButton);
-
-    expect(screen.getByText("mockAdvanceFilters")).toBeInTheDocument();
+  // The visibility of Filter is tested in AdvanceFilters unit test
+  it("renders Filters when it exists", () => {
+    const advanceFilters = screen.getByTestId("mockAdvanceFilters");
+    expect(advanceFilters).toBeInTheDocument();
   });
 });

@@ -19,29 +19,6 @@ import InputWithSuggester from "./InputWithSuggester.tsx";
 import { pageDefault } from "../common/constants";
 import { padding } from "../../styles/constants.js";
 
-/**
- * Put it here to avoid refresh the function every time the component is rendered
- * @param handler
- * @returns
- */
-const searchButton = (handler: () => void) => {
-  return (
-    <Button
-      sx={{
-        color: grey["searchButtonText"],
-        backgroundColor: "white",
-        height: "100%",
-      }}
-      fullWidth
-      onClick={() => {
-        return handler();
-      }}
-    >
-      Search
-    </Button>
-  );
-};
-
 const ComplexTextSearch = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
@@ -101,7 +78,17 @@ const ComplexTextSearch = () => {
         </Paper>
       </Grid>
       <Grid item xs={2}>
-        {searchButton(executeSearch)}
+        <Button
+          sx={{
+            color: grey["searchButtonText"],
+            backgroundColor: "white",
+            height: "100%",
+          }}
+          fullWidth
+          onClick={() => executeSearch()}
+        >
+          Search
+        </Button>
       </Grid>
       <AdvanceFilters
         showFilters={showFilters}
@@ -109,10 +96,6 @@ const ComplexTextSearch = () => {
       />
     </Grid>
   );
-};
-
-ComplexTextSearch.defaultProps = {
-  onFilterCallback: null,
 };
 
 export default ComplexTextSearch;

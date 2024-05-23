@@ -57,8 +57,4 @@ const BannerOpenAccess = () => {
   );
 };
 
-BannerOpenAccess.defaultProps = {
-  isDisplay: true,
-};
-
 export default BannerOpenAccess;
