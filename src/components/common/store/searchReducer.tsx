@@ -37,7 +37,7 @@ export class OGCCollection {
   links?: Array<Link>;
   extent?: Spatial;
   properties?: { [key: string]: any };
-  
+
   // Locate the thumbnail from the links array
   findThumbnail = (): string => {
     const target = this.links?.find(
