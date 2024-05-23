@@ -27,6 +27,8 @@ interface Spatial {
 }
 
 export class OGCCollection {
+
+  private propValue: Map<string, any>;
   id: string;
   // This index is used to show the ordering 1, 2, 3...
   index?: string;
