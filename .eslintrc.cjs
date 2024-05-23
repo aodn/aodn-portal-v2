@@ -46,5 +46,6 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "off",
     quotes: ["error"],
     "no-undef": "off",
+    "import/extensions": ["error", "never", { "js": "never", "jsx": "never", "ts": "never", "tsx": "never", "json": "always" }],
   },
 };

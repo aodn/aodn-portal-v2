@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Box, Grid } from "@mui/material";
-import StyledSlider from "../../../styles/StyledSlider.tsx";
-import SliderLine from "./SliderLine.tsx";
+import StyledSlider from "../../../styles/StyledSlider";
+import SliderLine from "./SliderLine";
 import depth_image from "@/assets/images/depth-selector.png";
 
 /**

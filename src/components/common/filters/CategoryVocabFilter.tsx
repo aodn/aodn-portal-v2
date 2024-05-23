@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { fetchParameterCategoriesWithStore } from "../store/searchReducer";
 import { Category, updateCategories } from "../store/componentParamReducer";
-import { StyledToggleButton } from "../../../styles/StyledToggleButton.tsx";
-import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup.tsx";
+import { StyledToggleButton } from "../../../styles/StyledToggleButton";
+import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup";
 
 interface CategoryVocabFilterProps {
   sx?: SxProps<Theme>;
