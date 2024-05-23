@@ -1,5 +1,5 @@
-import StyledFilterSectionGrid from "../../../styles/StyledFilterSectionGrid.tsx";
-import { Box, Typography } from "@mui/material";
+import StyledFilterSectionGrid from "../../../styles/StyledFilterSectionGrid";
+import { Typography } from "@mui/material";
 import React from "react";
 
 interface FilterSectionContainerProps {

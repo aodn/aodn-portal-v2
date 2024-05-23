@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
-import { PARAMETER_CATEGORIES } from "./data/PARAMETER_CATEGORIES.ts";
-import { SUGGESTER_OPTIONS } from "./data/SUGGESTER_OPTIONS.ts";
+import { PARAMETER_CATEGORIES } from "./data/PARAMETER_CATEGORIES";
+import { SUGGESTER_OPTIONS } from "./data/SUGGESTER_OPTIONS";
 
 export const handlers = [
   http.get("/api/v1/ogc/ext/parameter/categories", () => {

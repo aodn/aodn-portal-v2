@@ -36,7 +36,8 @@ export class OGCCollection {
   itemType?: string;
   links?: Array<Link>;
   extent?: Spatial;
-  properties?: Map<string, any>;
+  properties?: { [key: string]: any };
+  
   // Locate the thumbnail from the links array
   findThumbnail = (): string => {
     const target = this.links?.find(
@@ -140,9 +141,6 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     const collections: OGCCollections = jsonToOGCCollections(response.data);
     collections?.collections?.forEach((o, index) => {
       o.index = "" + (index + 1);
-      if (o.properties && typeof o.properties === "object") {
-        o.properties = new Map(Object.entries(o.properties));
-      }
     });
 
     return collections;

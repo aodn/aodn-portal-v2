@@ -16,7 +16,7 @@ import {
   formatToUrlParam,
   ParameterState,
 } from "../common/store/componentParamReducer";
-import InputWithSuggester from "./InputWithSuggester.tsx";
+import InputWithSuggester from "./InputWithSuggester";
 import { pageDefault } from "../common/constants";
 
 const SimpleTextSearch = () => {

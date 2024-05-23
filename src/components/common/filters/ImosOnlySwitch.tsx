@@ -2,11 +2,8 @@ import { Grid, Switch, SwitchProps } from "@mui/material";
 import React, { useCallback } from "react";
 import imos_logo from "@/assets/logos/imos-logo-transparent.png";
 import { useDispatch } from "react-redux";
-import store, { AppDispatch, getComponentState } from "../store/store.tsx";
-import {
-  ParameterState,
-  updateImosOnly,
-} from "../store/componentParamReducer.tsx";
+import store, { AppDispatch, getComponentState } from "../store/store";
+import { ParameterState, updateImosOnly } from "../store/componentParamReducer";
 
 const ImosOnlySwitch = () => {
   const dispatch = useDispatch<AppDispatch>();

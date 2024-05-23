@@ -1,4 +1,4 @@
-import StyledResultCardButton from "../../../styles/StyledResultCardButton.tsx";
+import StyledResultCardButton from "../../../styles/StyledResultCardButton";
 import React from "react";
 
 interface StaticResultCardButtonProps {
