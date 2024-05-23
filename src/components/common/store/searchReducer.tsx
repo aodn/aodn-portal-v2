@@ -35,7 +35,10 @@ export class OGCCollection {
   itemType?: string;
   links?: Array<Link>;
   extent?: Spatial;
-  properties?: Map<string, any>;
+
+  set properties(props: object) {
+    this.propValue = new Map(Object.entries(props));
+  }
 
   // Locate the thumbnail from the links array
   findThumbnail = (): string => {
@@ -51,6 +54,8 @@ export class OGCCollection {
     );
     return target !== undefined ? target.href : undefined;
   };
+  // get status
+  getStatus = (): string => this.propValue?.get("STATUS");
 }
 
 export interface OGCCollections {

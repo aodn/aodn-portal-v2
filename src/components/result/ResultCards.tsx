@@ -115,7 +115,7 @@ const ResultCard = (props: ResultCardProps) => {
           }
         />
         <DynamicResultCardButton
-          status={props.content.properties?.STATUS}
+          status={props.content.getStatus()}
           onClick={() => {}}
         />
         <StaticResultCardButton
