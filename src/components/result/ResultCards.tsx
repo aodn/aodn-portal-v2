@@ -23,7 +23,6 @@ import LinkIcon from "@mui/icons-material/Link";
 import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
 import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
 import { useCallback } from "react";
-import default_thumbnail from "@/assets/images/default-thumbnail.png";
 
 interface ResultCardProps {
   item: string;
@@ -53,11 +52,6 @@ interface ResultCardProps {
       ) => void)
     | undefined;
 }
-
-const findThumbnail = (links: Array<Link>): string => {
-  const target = links.find((l) => l.type === "image" && l.rel === "thumbnail");
-  return target !== undefined ? target.href : default_thumbnail;
-};
 
 const ResultCard = (props: ResultCardProps) => {
   const navigate = useNavigate();
@@ -100,7 +94,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <CardMedia
                   sx={{ display: "flex", width: "100%", height: "100px" }}
                   component="img"
-                  image={findThumbnail(props.content.links)}
+                  image={props.content.findThumbnail()}
                 />
               </Grid>
               <Grid item xs={9}>
