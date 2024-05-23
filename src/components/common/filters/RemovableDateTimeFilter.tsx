@@ -12,8 +12,8 @@ import {
   updateDateTimeFilterRange,
 } from "../store/componentParamReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
-import TimeRangeBarChart from "../charts/TimeRangeBarChart.tsx";
-import StyledDateTimePicker from "../../../styles/StyledDateTimePicker.tsx";
+import TimeRangeBarChart from "../charts/TimeRangeBarChart";
+import StyledDateTimePicker from "../../../styles/StyledDateTimePicker";
 import { margin } from "../../../styles/constants";
 
 interface RemovableDateTimeFilterProps {

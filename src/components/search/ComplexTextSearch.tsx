@@ -15,7 +15,7 @@ import {
   ParameterState,
   formatToUrlParam,
 } from "../common/store/componentParamReducer";
-import InputWithSuggester from "./InputWithSuggester.tsx";
+import InputWithSuggester from "./InputWithSuggester";
 import { pageDefault } from "../common/constants";
 import { padding } from "../../styles/constants.js";
 

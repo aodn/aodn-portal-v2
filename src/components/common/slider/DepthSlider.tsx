@@ -1,9 +1,8 @@
 import * as React from "react";
-import Slider from "@mui/material/Slider";
 import { Box, Grid } from "@mui/material";
-import { styled } from "@mui/system";
-import StyledSlider from "../../../styles/StyledSlider.tsx";
-import SliderLine from "./SliderLine.tsx";
+import StyledSlider from "../../../styles/StyledSlider";
+import SliderLine from "./SliderLine";
+import depth_image from "@/assets/images/depth-selector.png";
 
 /**
  * TODO: may need to be refactored to use theme. Currently, all colors are
@@ -82,7 +81,7 @@ const DepthSlider = () => {
         <SliderLine sliderValue={sliderValues[0]} />
         <SliderLine sliderValue={sliderValues[1]} />
         <img
-          src={"src/assets/images/depth-selector.png"}
+          src={depth_image}
           alt={"Depth"}
           style={{ width: "100%", height: "100%" }}
         />

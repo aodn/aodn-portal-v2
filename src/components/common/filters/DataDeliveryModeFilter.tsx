@@ -1,13 +1,7 @@
 import { useCallback, useState } from "react";
-import {
-  Grid,
-  SxProps,
-  Theme,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "@mui/material";
-import { StyledToggleButton } from "../../../styles/StyledToggleButton.tsx";
-import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup.tsx";
+import { Grid, SxProps, Theme } from "@mui/material";
+import { StyledToggleButton } from "../../../styles/StyledToggleButton";
+import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup";
 
 interface DataDeliveryModeFilterProps {
   sx?: SxProps<Theme>;

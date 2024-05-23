@@ -1,6 +1,6 @@
 import { Grid, SxProps, Theme } from "@mui/material";
-import DepthSlider from "../slider/DepthSlider.tsx";
-import PlainDropdownMenu from "../dropdown/PlainDropdownMenu.tsx";
+import DepthSlider from "../slider/DepthSlider";
+import PlainDropdownMenu from "../dropdown/PlainDropdownMenu";
 import { margin } from "../../../styles/constants";
 
 interface DepthFiltersProps {

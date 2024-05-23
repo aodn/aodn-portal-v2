@@ -1,4 +1,4 @@
-import StyledTextField from "./StyledTextField.tsx";
+import StyledTextField from "./StyledTextField";
 import { Autocomplete, Box, Chip, Grid } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -6,18 +6,18 @@ import {
   ParameterState,
   updateCategories,
   updateSearchText,
-} from "../common/store/componentParamReducer.tsx";
+} from "../common/store/componentParamReducer";
 import store, {
   AppDispatch,
   getComponentState,
   RootState,
-} from "../common/store/store.tsx";
+} from "../common/store/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createSuggesterParamFrom,
   fetchParameterCategoriesWithStore,
   fetchSuggesterOptions,
-} from "../common/store/searchReducer.tsx";
+} from "../common/store/searchReducer";
 import _ from "lodash";
 
 interface InputWithSuggesterProps {

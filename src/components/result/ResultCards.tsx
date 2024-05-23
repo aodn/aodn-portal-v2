@@ -1,26 +1,28 @@
 import {
   Card,
-  CardContent,
-  CardMedia,
-  Grid,
-  Typography,
   CardActionArea,
   CardActions,
-  ListItem,
+  CardContent,
+  CardMedia,
   Chip,
-  Button,
+  Grid,
+  ListItem,
+  Typography,
 } from "@mui/material";
 import { pageDefault } from "../common/constants";
 import WhereToVoteIcon from "@mui/icons-material/WhereToVote";
 import DownloadIcon from "@mui/icons-material/Download";
-import SellIcon from "@mui/icons-material/Sell";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import InfoIcon from "@mui/icons-material/Info";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import {
-  OGCCollection,
   CollectionsQueryType,
+  OGCCollection,
 } from "../common/store/searchReducer";
 import { useNavigate } from "react-router-dom";
+import LinkIcon from "@mui/icons-material/Link";
+import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
+import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
+import { useCallback } from "react";
 
 interface ResultCardProps {
   item: string;
@@ -62,6 +64,18 @@ const findThumbnail = (): string => {
 const ResultCard = (props: ResultCardProps) => {
   const navigate = useNavigate();
 
+  // links here may need to be changed, because only html links are wanted
+  const generateLinkText = useCallback((linkLength: number) => {
+    if (linkLength === 0) {
+      return "No Link";
+    }
+    if (linkLength === 1) {
+      return "1 Link";
+    }
+    return `${linkLength} Links`;
+  }, []);
+
+  // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card variant="outlined">
       <CardActionArea
@@ -98,51 +112,37 @@ const ResultCard = (props: ResultCardProps) => {
           </Typography>
         </CardContent>
       </CardActionArea>
+
       <CardActions sx={{ justifyContent: "space-between" }}>
-        <Button
-          variant="outlined"
+        {/*This button will be gone in the future*/}
+        <StaticResultCardButton
+          text={"Remove Layer"}
           startIcon={<WhereToVoteIcon />}
-          size="small"
           onClick={(event) =>
             props?.onRemoveLayer && props.onRemoveLayer(event, props.content)
           }
-          disabled={props.onRemoveLayer === undefined}
-        >
-          Remove Layer
-        </Button>
-        <Button
-          variant="outlined"
+        />
+        <DynamicResultCardButton
+          status={props.content.properties?.STATUS}
+          onClick={() => {}}
+        />
+        <StaticResultCardButton
+          text={"Briefs"}
+          startIcon={<InfoIcon />}
+          onClick={() => {}}
+        />
+        <StaticResultCardButton
+          text={generateLinkText(props.content.links.length)}
+          startIcon={<LinkIcon />}
+          onClick={() => {}}
+        />
+        <StaticResultCardButton
+          text={"Download"}
           startIcon={<DownloadIcon />}
-          size="small"
           onClick={(event) =>
             props?.onDownload && props.onDownload(event, props.content)
           }
-          disabled={props.onDownload === undefined}
-        >
-          Download
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<SellIcon />}
-          size="small"
-          onClick={(event) =>
-            props?.onTags && props.onTags(event, props.content)
-          }
-          disabled={props.onTags === undefined}
-        >
-          Tags
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<MoreHorizIcon />}
-          size="small"
-          onClick={(event) =>
-            props?.onMore && props.onMore(event, props.content)
-          }
-          disabled={props.onMore === undefined}
-        >
-          More
-        </Button>
+        />
       </CardActions>
     </Card>
   );

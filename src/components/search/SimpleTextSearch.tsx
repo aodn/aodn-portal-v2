@@ -16,7 +16,7 @@ import {
   formatToUrlParam,
   ParameterState,
 } from "../common/store/componentParamReducer";
-import InputWithSuggester from "./InputWithSuggester.tsx";
+import InputWithSuggester from "./InputWithSuggester";
 import { pageDefault } from "../common/constants";
 
 // TODO: this component is not used in any other components, can be deleted if not needed any more

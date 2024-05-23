@@ -1,4 +1,4 @@
-import StyledFilterSectionGrid from "../../../styles/StyledFilterSectionGrid.tsx";
+import StyledFilterSectionGrid from "../../../styles/StyledFilterSectionGrid";
 import { Typography } from "@mui/material";
 import React from "react";
 
