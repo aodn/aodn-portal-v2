@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { MediaType } from "media-typer";
 import axios from "axios";
 import { ParameterState, Category } from "./componentParamReducer";
+import default_thumbnail from "@/assets/images/default-thumbnail.png";
+
 import {
   cqlDefaultFilters,
   PolygonOperation,
@@ -13,7 +14,7 @@ import {
 interface Link {
   href: string;
   rel: string;
-  type: MediaType;
+  type: string;
   title: string;
 }
 
@@ -25,7 +26,8 @@ interface Spatial {
   crs: string;
 }
 
-export interface OGCCollection {
+export class OGCCollection {
+  private propValue: Map<string, any>;
   id: string;
   // This index is used to show the ordering 1, 2, 3...
   index?: string;
@@ -34,7 +36,27 @@ export interface OGCCollection {
   itemType?: string;
   links?: Array<Link>;
   extent?: Spatial;
-  properties?: { [key: string]: any };
+
+  set properties(props: object) {
+    this.propValue = new Map(Object.entries(props));
+  }
+
+  // Locate the thumbnail from the links array
+  findThumbnail = (): string => {
+    const target = this.links?.find(
+      (l) => l.type === "image" && l.rel === "thumbnail"
+    );
+    return target !== undefined ? target.href : default_thumbnail;
+  };
+  // Locate the logo from the links array
+  findIcon = (): string => {
+    const target = this.links?.find(
+      (l) => l.type === "image/png" && l.rel === "icon"
+    );
+    return target !== undefined ? target.href : undefined;
+  };
+  // get status
+  getStatus = (): string => this.propValue?.get("STATUS");
 }
 
 export interface OGCCollections {
@@ -72,6 +94,15 @@ interface ObjectValue {
   collectionsQueryResult: CollectionsQueryType;
   categoriesResult: Array<Category>;
 }
+
+const jsonToOGCCollections = (json: any): OGCCollections => {
+  return {
+    collections: json.collections.map((collection) =>
+      Object.assign(new OGCCollection(), collection)
+    ),
+    links: json.links,
+  };
+};
 
 const initialState: ObjectValue = {
   collectionsQueryResult: {
@@ -112,7 +143,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
 
     // We need to fill in the index value here before return,
     // TODO: The index value may not start from 1 if it is paged
-    const collections: OGCCollections = response.data;
+    const collections: OGCCollections = jsonToOGCCollections(response.data);
     collections?.collections?.forEach((o, index) => {
       o.index = "" + (index + 1);
     });
@@ -205,7 +236,7 @@ const fetchResultByUuidNoStore = createAsyncThunk<
     const response = await axios.get<OGCCollection>(
       `/api/v1/ogc/collections/${id}`
     );
-    return response.data;
+    return Object.assign(new OGCCollection(), response.data);
   } catch (error: unknown) {
     const errorMessage = "Unkown error occurred. Please try again later.";
     if (axios.isAxiosError(error)) {

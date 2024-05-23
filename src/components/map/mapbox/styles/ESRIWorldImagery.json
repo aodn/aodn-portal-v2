@@ -9,6 +9,7 @@
       "tileSize": 256
     }
   },
+  "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "worldImagery",
