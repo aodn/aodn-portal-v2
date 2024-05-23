@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { MediaType } from "media-typer";
 import axios from "axios";
 import { ParameterState, Category } from "./componentParamReducer";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
@@ -15,7 +14,7 @@ import {
 interface Link {
   href: string;
   rel: string;
-  type: MediaType;
+  type: string;
   title: string;
 }
 
@@ -50,7 +49,7 @@ export class OGCCollection {
     const target = this.links?.find(
       (l) => l.type === "image/png" && l.rel === "icon"
     );
-    return target !== undefined ? target.href : default_thumbnail;
+    return target !== undefined ? target.href : undefined;
   };
 }
 

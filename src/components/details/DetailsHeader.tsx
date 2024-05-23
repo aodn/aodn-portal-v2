@@ -84,16 +84,19 @@ const DetailsHeader = (props: DetailsProps) => {
           </Typography>
         </CardContent>
       </Box>
-      <CardMedia
-        component="img"
-        sx={{
-          width: 50,
-          marginTop: margin["top"],
-          marginBottom: margin["bottom"],
-          marginLeft: margin["left"],
-        }}
-        image={props.collection?.findIcon()}
-      />
+      {props.collection?.findIcon() !== undefined && (
+        <CardMedia
+          component="img"
+          sx={{
+            width: 100,
+            marginTop: margin["top"],
+            marginBottom: margin["bottom"],
+            marginLeft: margin["left"],
+            marginRight: margin["right"],
+          }}
+          image={props.collection?.findIcon()}
+        />
+      )}
     </Card>
   );
 };
