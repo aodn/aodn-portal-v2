@@ -26,7 +26,6 @@ describe("Search Reducer Function Test", () => {
     };
 
     const collection: OGCCollection = Object.assign(new OGCCollection(), item);
-    console.debug(collection);
     expect(collection.getStatus()).toEqual("completed");
   });
 });
