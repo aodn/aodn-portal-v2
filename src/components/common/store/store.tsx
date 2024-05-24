@@ -7,7 +7,11 @@ import paramReducer from "./componentParamReducer";
 // https://redux-toolkit.js.org/api/getDefaultMiddleware
 const store = configureStore({
   // Add additional middleware to the default one.
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  middleware: (getDefaultMiddleware) =>
+    // https://stackoverflow.com/questions/61704805/getting-an-error-a-non-serializable-value-was-detected-in-the-state-when-using
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }).concat(logger),
   reducer: combineReducers({
     // Add your reducers here
     searcher: searchReducer,
