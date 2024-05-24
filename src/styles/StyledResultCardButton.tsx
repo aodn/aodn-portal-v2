@@ -4,15 +4,20 @@ import { alpha } from "@mui/material/styles";
 import { borderRadius } from "./constants";
 
 interface StyledResultCardButtonProps {
-  determinedColor?: string;
+  determinedcolor?: string;
+  isbordered?: string;
 }
 
 const StyledResultCardButton = styled(Button)<StyledResultCardButtonProps>(
-  ({ theme, determinedColor = alpha(theme.palette.info.dark, 0.8) }) => ({
-    color: determinedColor,
+  ({
+    theme,
+    determinedcolor = alpha(theme.palette.info.dark, 0.8),
+    isbordered,
+  }) => ({
+    color: determinedcolor,
     height: theme.spacing(4),
     borderRadius: borderRadius.small,
-    boxShadow: theme.shadows[1],
+    boxShadow: isbordered === "true" ? theme.shadows[1] : "none",
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
     whiteSpace: "nowrap",

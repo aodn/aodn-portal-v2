@@ -1,26 +1,21 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SimpleTextSearch from "../components/search/SimpleTextSearch";
-import ResultPanelSimpleFilter, {
-  ResultPanelIconFilter,
-} from "../components/common/filters/ResultPanelSimpleFilter";
-import { Grid, Paper } from "@mui/material";
+import { Grid } from "@mui/material";
 import {
   CollectionsQueryType,
   createSearchParamFrom,
   fetchResultWithStore,
   OGCCollection,
-  SearchParameters,
 } from "../components/common/store/searchReducer";
-import { ResultCards } from "../components/result/ResultCards";
 import Layout from "../components/layout/layout";
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  formatToUrlParam,
   ParameterState,
+  unFlattenToParameterState,
   updateFilterPolygon,
   updateParameterStates,
-  unFlattenToParameterState,
-  formatToUrlParam,
 } from "../components/common/store/componentParamReducer";
 import store, {
   AppDispatch,
@@ -43,17 +38,12 @@ import * as turf from "@turf/turf";
 // import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
 // import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 // Map section, you can switch to other map library, this is for mapbox
-import Map from "../components/map/mapbox/Map";
-import Controls from "../components/map/mapbox/controls/Controls";
-import NavigationControl from "../components/map/mapbox/controls/NavigationControl";
-import MenuControl, {
-  BaseMapSwitcher,
-} from "../components/map/mapbox/controls/MenuControl";
-import ScaleControl from "../components/map/mapbox/controls/ScaleControl";
-import DisplayCoordinate from "../components/map/mapbox/controls/DisplayCoordinate";
-import Layers from "../components/map/mapbox/layers/Layers";
-import VectorTileLayers from "../components/map/mapbox/layers/VectorTileLayers";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
+import SearchPageResultList, {
+  SearchResultLayoutEnum,
+} from "../components/subPage/SearchPageResultList";
+import ResultPanelIconFilter from "../components/common/filters/ResultPanelIconFilter";
+import SearchPageMap from "../components/subPage/SearchPageMap";
 
 const mapContainerId = "map-container-id";
 
@@ -62,6 +52,10 @@ const SearchPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [resultLayout, setResultLayout] = useState<SearchResultLayoutEnum>(
+    SearchResultLayoutEnum.LIST
+  );
+  const [isShowingResult, setIsShowingResult] = useState<boolean>(true);
 
   // Layers inside this array will be add to map
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -156,34 +150,28 @@ const SearchPage = () => {
         <Grid item xs={1}>
           <ResultPanelIconFilter />
         </Grid>
-        <Grid item xs={4}>
-          <ResultPanelSimpleFilter />
-          <ResultCards
-            contents={contents}
-            onRemoveLayer={onRemoveLayer}
-            onDownload={undefined}
-            onTags={undefined}
-            onMore={undefined}
+        {isShowingResult ? (
+          <>
+            <SearchPageResultList
+              contents={contents}
+              onRemoveLayer={onRemoveLayer}
+              layout={resultLayout}
+              setLayout={setResultLayout}
+              setIsShowingResult={setIsShowingResult}
+            />
+            <SearchPageMap
+              onMapZoomOrMove={onMapZoomOrMove}
+              isShowingResult={isShowingResult}
+              setIsShowingResult={setIsShowingResult}
+            />
+          </>
+        ) : (
+          <SearchPageMap
+            onMapZoomOrMove={onMapZoomOrMove}
+            isShowingResult={isShowingResult}
+            setIsShowingResult={setIsShowingResult}
           />
-        </Grid>
-        <Grid item xs={7} sx={{ pr: 2, pb: 2 }}>
-          <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
-            <Map
-              panelId={mapContainerId}
-              onZoomEvent={onMapZoomOrMove}
-              onMoveEvent={onMapZoomOrMove}
-            >
-              <Controls>
-                <NavigationControl />
-                <ScaleControl />
-                <MenuControl menu={<BaseMapSwitcher />} />
-              </Controls>
-              <Layers>
-                <VectorTileLayers collections={layers} />
-              </Layers>
-            </Map>
-          </Paper>
-        </Grid>
+        )}
       </Grid>
     </Layout>
   );

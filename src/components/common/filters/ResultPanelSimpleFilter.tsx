@@ -6,19 +6,16 @@ import {
   MenuItem,
   Paper,
   Select,
-  Stack,
   styled,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import dateTime from "@/assets/logos/time-range.png";
-import depth from "@/assets/logos/depth.png";
-import dataSettings from "@/assets/logos/data-settings.png";
-import parameter from "@/assets/logos/parameter.png";
-import waterBody from "@/assets/logos/water-body.png";
-
-import { SmartCard11 } from "../../smartpanel/SmartCard";
+import MapListToggleButton from "../buttons/MapListToggleButton";
+import { margin } from "../../../styles/constants";
+import SortButton from "../buttons/SortButton";
+import { SearchResultLayoutEnum } from "../../subPage/SearchPageResultList";
+import React from "react";
 
 // interface ResultPanelSimpleFilterProps {
 //   filterClicked?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -30,63 +27,28 @@ const SlimSelect = styled(InputBase)(() => ({
   },
 }));
 
-const Item = styled(Paper)(({ theme }) => ({
-  textAlign: "center",
-  minWidth: "100px",
-  color: theme.palette.text.secondary,
-}));
+interface ResultPanelSimpleFilterProps {
+  setLayout: (layout: SearchResultLayoutEnum) => void;
 
-export const ResultPanelIconFilter = () => {
-  return (
-    <Grid container sx={{ pl: 2 }}>
-      <Grid item xs={12}>
-        <Stack direction="column" spacing={2}>
-          <Item variant="outlined">
-            <SmartCard11
-              imageUrl={dateTime}
-              caption="Date Range"
-              colour="#747474"
-              isOutlined
-            />
-          </Item>
-          <Item variant="outlined">
-            <SmartCard11
-              imageUrl={depth}
-              caption="Depth"
-              colour="#747474"
-              isOutlined
-            />
-          </Item>
-          <Item variant="outlined">
-            <SmartCard11
-              imageUrl={dataSettings}
-              caption="Data Settings"
-              colour="#747474"
-              isOutlined
-            />
-          </Item>
-          <Item variant="outlined">
-            <SmartCard11
-              imageUrl={parameter}
-              caption="Parameter"
-              colour="#747474"
-              isOutlined
-            />
-          </Item>
-        </Stack>
-      </Grid>
-    </Grid>
-  );
-};
-// props: ResultPanelSimpleFilterProps -- use this later maybe?
-const ResultPanelSimpleFilter = () => {
+  setIsShowingResult: (value: boolean) => void;
+}
+
+const ResultPanelSimpleFilter: React.FC<ResultPanelSimpleFilterProps> = ({
+  setLayout,
+  setIsShowingResult,
+}) => {
   return (
     <Grid container justifyContent="center">
-      <Grid item xs={12} sx={{ pb: 1 }}>
+      <Grid container item xs={12} sx={{ pb: 1 }}>
         <Paper
           variant="outlined"
           component="form"
-          sx={{ p: "2px 4px", display: "flex", alignItems: "center" }}
+          sx={{
+            p: "2px 4px",
+            display: "flex",
+            alignItems: "center",
+            width: { md: "500px" },
+          }}
         >
           <IconButton sx={{ p: "10px" }} aria-label="search">
             <ArrowBackIosIcon />
@@ -102,6 +64,24 @@ const ResultPanelSimpleFilter = () => {
           <IconButton sx={{ p: "10px" }}>
             <ArrowForwardIosIcon />
           </IconButton>
+        </Paper>
+        <MapListToggleButton
+          setLayout={setLayout}
+          setIsShowingResult={setIsShowingResult}
+        />
+        <Paper
+          variant="outlined"
+          component="form"
+          sx={{
+            p: "2px 14px",
+            marginLeft: margin.small,
+            display: "flex",
+            alignItems: "center",
+
+            width: { md: "50px" },
+          }}
+        >
+          <SortButton />
         </Paper>
       </Grid>
     </Grid>

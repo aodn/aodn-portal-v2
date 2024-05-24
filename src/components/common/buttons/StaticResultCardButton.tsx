@@ -5,12 +5,14 @@ interface StaticResultCardButtonProps {
   text: string;
   startIcon?: React.ReactNode;
   onClick: (event: any) => void;
+  isbordered?: string;
 }
 
 const StaticResultCardButton: React.FC<StaticResultCardButtonProps> = ({
   text,
   startIcon,
   onClick,
+  isbordered = "true",
 }) => {
   return (
     <StyledResultCardButton
@@ -18,6 +20,7 @@ const StaticResultCardButton: React.FC<StaticResultCardButtonProps> = ({
       startIcon={startIcon}
       onClick={onClick}
       disabled={onClick === undefined}
+      isbordered={isbordered}
     >
       {text}
     </StyledResultCardButton>
