@@ -53,14 +53,6 @@ interface ResultCardProps {
     | undefined;
 }
 
-// const findThumbnail = (c: OGCCollection): string => {
-//   return "https://warcontent.com/wp-content/uploads/2021/03/substring-javascript-5.png";
-// };
-
-const findThumbnail = (): string => {
-  return "https://warcontent.com/wp-content/uploads/2021/03/substring-javascript-5.png";
-};
-
 const ResultCard = (props: ResultCardProps) => {
   const navigate = useNavigate();
 
@@ -102,7 +94,7 @@ const ResultCard = (props: ResultCardProps) => {
                 <CardMedia
                   sx={{ display: "flex", width: "100%", height: "100px" }}
                   component="img"
-                  image={findThumbnail()}
+                  image={props.content.findThumbnail()}
                 />
               </Grid>
               <Grid item xs={9}>
@@ -123,7 +115,7 @@ const ResultCard = (props: ResultCardProps) => {
           }
         />
         <DynamicResultCardButton
-          status={props.content.properties?.STATUS}
+          status={props.content.getStatus()}
           onClick={() => {}}
         />
         <StaticResultCardButton
