@@ -43,6 +43,11 @@ export default ({ mode }) => {
     test: {
       // 👋 add the line below to add jsdom to vite
       environment: "jsdom",
+      exclude: [
+        "**/tests/**", // Make sure vitest not running Playwright tests
+        "**/node_modules/**",
+        "**/dist/**",
+      ],
     },
     publicDir: "public",
     resolve: {
