@@ -1,19 +1,17 @@
 import { IconButton } from "@mui/material";
 import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
-import SouthSharpIcon from "@mui/icons-material/SouthSharp";
-import SortSharpIcon from "@mui/icons-material/SortSharp";
+import React from "react";
+import ActionButtonPaper from "./ActionButtonPaper";
+import RelevancyIcon from "../../icon/RelevancyIcon";
 
 const SortButton = () => {
   return (
-    <>
+    <ActionButtonPaper>
       <IconButton>
-        <SouthSharpIcon
-          sx={{ width: "16px", marginLeft: "-10px", marginRight: "-3px" }}
-        />
-        <SortSharpIcon sx={{ marginRight: "-3px" }} />
+        <RelevancyIcon />
         <ArrowDropDownSharpIcon />
       </IconButton>
-    </>
+    </ActionButtonPaper>
   );
 };
 

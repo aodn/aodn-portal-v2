@@ -3,7 +3,8 @@
  */
 const margin = {
   nil: "0",
-  small: "5px",
+  xSmall: "5px",
+  small: "10px",
   top: "15px",
   bottom: "15px",
   left: "15px",

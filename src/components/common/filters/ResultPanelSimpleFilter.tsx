@@ -12,9 +12,8 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import MapListToggleButton from "../buttons/MapListToggleButton";
-import { margin } from "../../../styles/constants";
 import SortButton from "../buttons/SortButton";
-import { SearchResultLayoutEnum } from "../../subPage/SearchPageResultList";
+import { SearchResultLayoutEnum } from "../../subpage/SearchPageResultList";
 import React from "react";
 
 // interface ResultPanelSimpleFilterProps {
@@ -28,12 +27,13 @@ const SlimSelect = styled(InputBase)(() => ({
 }));
 
 interface ResultPanelSimpleFilterProps {
+  layout: SearchResultLayoutEnum;
   setLayout: (layout: SearchResultLayoutEnum) => void;
-
   setIsShowingResult: (value: boolean) => void;
 }
 
 const ResultPanelSimpleFilter: React.FC<ResultPanelSimpleFilterProps> = ({
+  layout,
   setLayout,
   setIsShowingResult,
 }) => {
@@ -66,23 +66,11 @@ const ResultPanelSimpleFilter: React.FC<ResultPanelSimpleFilterProps> = ({
           </IconButton>
         </Paper>
         <MapListToggleButton
+          layout={layout}
           setLayout={setLayout}
           setIsShowingResult={setIsShowingResult}
         />
-        <Paper
-          variant="outlined"
-          component="form"
-          sx={{
-            p: "2px 14px",
-            marginLeft: margin.small,
-            display: "flex",
-            alignItems: "center",
-
-            width: { md: "50px" },
-          }}
-        >
-          <SortButton />
-        </Paper>
+        <SortButton />
       </Grid>
     </Grid>
   );

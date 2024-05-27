@@ -5,7 +5,7 @@ import {
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Grid, ListItem } from "@mui/material";
 import GridResultCard from "./GridResultCard";
-import { SearchResultLayoutEnum } from "../subPage/SearchPageResultList";
+import { SearchResultLayoutEnum } from "../subpage/SearchPageResultList";
 import ListResultCard from "./ListResultCard";
 
 interface ResultCardsProps {
@@ -50,7 +50,6 @@ const renderGrid = (
       <Grid container spacing={1}>
         <Grid item xs={6}>
           <GridResultCard
-            item={props.contents.result.collections[leftIndex].index}
             content={props.contents.result.collections[leftIndex]}
             onRemoveLayer={props.onRemoveLayer}
             onDownload={props.onDownload}
@@ -58,7 +57,6 @@ const renderGrid = (
         </Grid>
         <Grid item xs={6}>
           <GridResultCard
-            item={props.contents.result.collections[rightIndex].index}
             content={props.contents.result.collections[rightIndex]}
             onRemoveLayer={props.onRemoveLayer}
             onDownload={props.onDownload}

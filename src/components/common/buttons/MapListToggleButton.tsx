@@ -1,18 +1,21 @@
-import { IconButton, MenuItem, Paper } from "@mui/material";
-import VerticalSplitSharpIcon from "@mui/icons-material/VerticalSplitSharp";
+import { IconButton, ListItemIcon, MenuItem } from "@mui/material";
 import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
-import { margin } from "../../../styles/constants";
 import React, { useState } from "react";
 import Menu from "@mui/material/Menu";
-import { SearchResultLayoutEnum } from "../../subPage/SearchPageResultList";
+import { SearchResultLayoutEnum } from "../../subpage/SearchPageResultList";
+import ActionButtonPaper from "./ActionButtonPaper";
+import GridAndMapIcon from "../../icon/GridAndMapIcon";
+import ListAndMapIcon from "../../icon/ListAndMapIcon";
+import FullMapViewIcon from "../../icon/FullMapViewIcon";
 
-// type ToolKit = {};
 interface MapListToggleButtonProps {
+  layout: SearchResultLayoutEnum;
   setLayout: (layout: SearchResultLayoutEnum) => void;
   setIsShowingResult: (value: boolean) => void;
 }
 
 const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
+  layout,
   setLayout,
   setIsShowingResult,
 }) => {
@@ -27,19 +30,23 @@ const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
     setAnchorEl(null);
   };
 
-  return (
-    <Paper
-      variant="outlined"
-      component="form"
-      sx={{
-        p: "2px 14px",
-        marginLeft: margin.small,
-        display: "flex",
-        alignItems: "center",
+  const determineShowingIcon = () => {
+    if (layout === SearchResultLayoutEnum.LIST) {
+      return (
+        <>
+          <ListAndMapIcon />
+        </>
+      );
+    }
+    if (layout === SearchResultLayoutEnum.GRID) {
+      return <GridAndMapIcon />;
+    }
+    // TODO: need to handle error in the future
+    return undefined;
+  };
 
-        width: { md: "50px" },
-      }}
-    >
+  return (
+    <ActionButtonPaper>
       <IconButton
         id="map-list-toggle-button"
         onClick={handleClick}
@@ -47,7 +54,7 @@ const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
       >
-        <VerticalSplitSharpIcon />
+        {determineShowingIcon()}
         <ArrowDropDownSharpIcon />
       </IconButton>
       <Menu
@@ -65,6 +72,9 @@ const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
             handleClose();
           }}
         >
+          <ListItemIcon>
+            <FullMapViewIcon />
+          </ListItemIcon>
           Full Map View
         </MenuItem>
         <MenuItem
@@ -73,6 +83,9 @@ const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
             handleClose();
           }}
         >
+          <ListItemIcon>
+            <ListAndMapIcon />
+          </ListItemIcon>
           List and Map
         </MenuItem>
         <MenuItem
@@ -81,10 +94,13 @@ const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
             handleClose();
           }}
         >
+          <ListItemIcon>
+            <GridAndMapIcon />
+          </ListItemIcon>
           Grid and Map
         </MenuItem>
       </Menu>
-    </Paper>
+    </ActionButtonPaper>
   );
 };
 

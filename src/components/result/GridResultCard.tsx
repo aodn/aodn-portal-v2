@@ -18,15 +18,14 @@ import LinkIcon from "@mui/icons-material/Link";
 import DownloadIcon from "@mui/icons-material/Download";
 
 interface GridResultCardProps {
-  item: string;
-  content: OGCCollection;
-  onRemoveLayer:
+  content?: OGCCollection;
+  onRemoveLayer?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
       ) => void)
     | undefined;
-  onDownload:
+  onDownload?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
@@ -47,78 +46,80 @@ const GridResultCard: React.FC<GridResultCardProps> = (props) => {
     return `${linkLength} Links`;
   }, []);
 
-  return (
-    <Card variant="outlined" sx={{ height: "100%" }}>
-      <CardActionArea
-        onClick={() => {
-          const searchParams = new URLSearchParams();
-          searchParams.append("uuid", props.content.id);
-          navigate(pageDefault.details + "?" + searchParams.toString());
-        }}
-      >
-        <CardContent>
-          <Grid container>
-            <Grid item xs={12}>
-              <CardMedia
-                sx={{ display: "flex", width: "100%", height: "100px" }}
-                component="img"
-                image={props.content?.findThumbnail()}
+  if (props.content) {
+    return (
+      <Card variant="outlined" sx={{ height: "100%" }}>
+        <CardActionArea
+          onClick={() => {
+            const searchParams = new URLSearchParams();
+            searchParams.append("uuid", props.content.id);
+            navigate(pageDefault.details + "?" + searchParams.toString());
+          }}
+        >
+          <CardContent>
+            <Grid container>
+              <Grid item xs={12}>
+                <CardMedia
+                  sx={{ display: "flex", width: "100%", height: "100px" }}
+                  component="img"
+                  image={props.content?.findThumbnail()}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography
+                  component="div"
+                  sx={{
+                    marginBottom: "10px",
+                    height: "64px",
+                  }}
+                >
+                  {`${props.content?.title?.slice(0, 90)}${props.content?.title?.length > 90 ? "..." : ""}`}
+                </Typography>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </CardActionArea>
+        <CardActions sx={{ justifyContent: "space-between" }}>
+          <Grid container item xs={12}>
+            <Grid item xs={6}>
+              <DynamicResultCardButton
+                status={props.content?.getStatus()}
+                onClick={() => {}}
+                isbordered="false"
               />
             </Grid>
-            <Grid item xs={12}>
-              <Typography
-                component="div"
-                sx={{
-                  marginBottom: "10px",
-                  height: "64px",
-                }}
-              >
-                {`${props.content?.title?.slice(0, 90)}${props.content?.title?.length > 90 ? "..." : ""}`}
-              </Typography>
+            <Grid item xs={6}>
+              <StaticResultCardButton
+                text={"Briefs"}
+                startIcon={<InfoIcon />}
+                onClick={() => {}}
+                isbordered="false"
+              />
             </Grid>
-            <CardActions sx={{ justifyContent: "space-between" }}>
-              <Grid container item xs={12}>
-                <Grid item xs={6}>
-                  <DynamicResultCardButton
-                    status={props.content?.getStatus()}
-                    onClick={() => {}}
-                    isbordered="false"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <StaticResultCardButton
-                    text={"Briefs"}
-                    startIcon={<InfoIcon />}
-                    onClick={() => {}}
-                    isbordered="false"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <StaticResultCardButton
-                    text={generateLinkText(props.content.links.length)}
-                    startIcon={<LinkIcon />}
-                    onClick={() => {}}
-                    isbordered="false"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <StaticResultCardButton
-                    text={"Download"}
-                    startIcon={<DownloadIcon />}
-                    onClick={(event) =>
-                      props?.onDownload &&
-                      props.onDownload(event, props.content)
-                    }
-                    isbordered="false"
-                  />
-                </Grid>
-              </Grid>
-            </CardActions>
+            <Grid item xs={6}>
+              <StaticResultCardButton
+                text={generateLinkText(props.content.links.length)}
+                startIcon={<LinkIcon />}
+                onClick={() => {}}
+                isbordered="false"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <StaticResultCardButton
+                text={"Download"}
+                startIcon={<DownloadIcon />}
+                onClick={(event) =>
+                  props?.onDownload && props.onDownload(event, props.content)
+                }
+                isbordered="false"
+              />
+            </Grid>
           </Grid>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
+        </CardActions>
+      </Card>
+    );
+  }
+  return undefined;
 };
 
 export default GridResultCard;

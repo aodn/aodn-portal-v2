@@ -11,7 +11,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export const ResultPanelIconFilter = () => {
+const ResultPanelIconFilter = () => {
   return (
     <Grid container sx={{ pl: 2 }}>
       <Grid item xs={12}>

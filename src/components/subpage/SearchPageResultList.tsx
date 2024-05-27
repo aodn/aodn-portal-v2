@@ -33,6 +33,7 @@ const SearchPageResultList: React.FC<SearchResultListProps> = ({
   return (
     <Grid item sx={{ width: "700px" }}>
       <ResultPanelSimpleFilter
+        layout={layout}
         setLayout={setLayout}
         setIsShowingResult={setIsShowingResult}
       />

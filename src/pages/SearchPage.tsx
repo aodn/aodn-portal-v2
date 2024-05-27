@@ -41,9 +41,9 @@ import * as turf from "@turf/turf";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import SearchPageResultList, {
   SearchResultLayoutEnum,
-} from "../components/subPage/SearchPageResultList";
+} from "../components/subpage/SearchPageResultList";
 import ResultPanelIconFilter from "../components/common/filters/ResultPanelIconFilter";
-import SearchPageMap from "../components/subPage/SearchPageMap";
+import SearchPageMap from "../components/subpage/SearchPageMap";
 
 const mapContainerId = "map-container-id";
 
