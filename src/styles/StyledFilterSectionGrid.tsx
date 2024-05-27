@@ -6,17 +6,17 @@ import { borderRadius } from "./constants";
 
 interface StyledFilterSectionGridProps {
   theme?: any;
-  isSmall?: string;
+  issmall?: string;
 }
 
 const StyledFilterSectionGrid = styled(Grid)<StyledFilterSectionGridProps>(
-  ({ isSmall = undefined }) => ({
+  ({ issmall = undefined }) => ({
     backgroundColor: blue["bgParam"],
     border: "none",
     borderRadius: borderRadius["filter"],
     justifyContent: "center",
     height: "100%",
-    padding: isSmall ? "0px" : "20px",
+    padding: issmall ? "0px" : "20px",
   })
 );
 

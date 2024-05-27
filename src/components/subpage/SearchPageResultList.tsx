@@ -31,7 +31,7 @@ const SearchPageResultList: React.FC<SearchResultListProps> = ({
   onRemoveLayer,
 }) => {
   return (
-    <Grid item sx={{ width: "700px" }}>
+    <Grid item sx={{ width: "700px" }} data-testid="search-page-result-list">
       <ResultPanelSimpleFilter
         layout={layout}
         setLayout={setLayout}

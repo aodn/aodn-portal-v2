@@ -8,7 +8,7 @@ import {
   OGCCollection,
 } from "../components/common/store/searchReducer";
 import Layout from "../components/layout/layout";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   formatToUrlParam,
@@ -51,7 +51,6 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [resultLayout, setResultLayout] = useState<SearchResultLayoutEnum>(
     SearchResultLayoutEnum.LIST
   );

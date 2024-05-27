@@ -53,6 +53,7 @@ const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
         aria-controls={open ? "map-list-toggle-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
+        data-testid="map-list-toggle-button"
       >
         {determineShowingIcon()}
         <ArrowDropDownSharpIcon />

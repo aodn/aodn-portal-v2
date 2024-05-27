@@ -46,7 +46,6 @@ const AdvanceFilters = (props: NonRemovableFiltersProps) => {
       >
         <Grid
           container
-          xs={12}
           justifyContent={"center"}
           sx={{
             marginTop: margin["top"],
