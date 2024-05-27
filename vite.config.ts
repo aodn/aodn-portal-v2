@@ -8,7 +8,7 @@ export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
   const apiPath = process.env.VITE_API_HOST;
-
+  console.log("api path", apiPath);
   return defineConfig({
     server: {
       watch: {
