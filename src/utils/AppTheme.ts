@@ -97,9 +97,9 @@ const AppTheme = createTheme({
   shadows: [
     "none",
     "1.5px 1.5px 3px 0px rgba(0, 0, 0, 0.20)",
-    "placeholder",
-    "placeholder",
-    "placeholder",
+    "1px 1px 10px 1px #d4d4d4", // filter toggle button
+    "0 0 10px rgba(0, 0, 0, 0.1)", // banner heading
+    "0 0 30px rgba(0, 0, 0, 1.9)", // banner subtitle
     "placeholder",
     "placeholder",
     "placeholder",

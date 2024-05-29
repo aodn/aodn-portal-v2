@@ -27,7 +27,7 @@ const FilterSection: React.FC<FilterSectionContainerProps> = ({
       >
         {title}
       </Typography>
-      ){children}
+      {children}
     </StyledFilterSectionGrid>
   );
 };

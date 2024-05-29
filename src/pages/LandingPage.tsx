@@ -48,13 +48,20 @@ const LandingPage = () => {
           alignItems: "center",
         }}
       >
-        <MainMenu />
-        <BannerOpenAccess />
-        <Box sx={{ width: "66.5%" }}>
+        <Box
+          sx={{
+            width: "70%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <MainMenu />
+          <BannerOpenAccess />
           <ComplexTextSearch />
+          <ShortCutSmartPanel onCardClicked={onCardClick} />
         </Box>
-
-        <ShortCutSmartPanel onCardClicked={onCardClick} />
       </Box>
       <StoryBoardPanel />
       <PromotionSmartPanel />

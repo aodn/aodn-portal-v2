@@ -15,7 +15,7 @@ import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
 import CategoryVocabFilter from "./CategoryVocabFilter";
 import ImosOnlySwitch from "./ImosOnlySwitch";
 import FilterSection from "./FilterSection";
-import { borderRadius, margin, zIndex } from "../../../styles/constants";
+import { borderRadius, padding, zIndex } from "../../../styles/constants";
 
 export interface NonRemovableFiltersProps {
   showFilters: boolean;
@@ -38,6 +38,7 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
         }}
         TransitionComponent={Fade}
         transitionDuration={{ enter: 500, exit: 300 }}
+        fullWidth
       >
         <Box
           sx={{
@@ -46,66 +47,68 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "50%",
-            minWidth: "1090px",
-            maxWidth: "2000px",
+            maxWidth: "90%",
+            maxHeight: "90%",
+            overflow: "auto",
             ...sx,
           }}
         >
-          <Grid
-            container
-            justifyContent={"center"}
-            sx={{
-              marginTop: margin["top"],
-              borderRadius: borderRadius["filter"],
-              backgroundColor: theme.palette.common.white,
-            }}
-          >
-            <Grid
-              item
-              xs={12}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Typography variant="h3">Filters</Typography>
-            </Grid>
+          <Box sx={{ minWidth: "1300px" }}>
             <Grid
               container
-              spacing={2}
+              justifyContent={"center"}
               sx={{
-                margin: `${margin["top"]} ${margin["doubleLeft"]}`,
-                justifyContent: "center",
+                borderRadius: borderRadius["filter"],
+                backgroundColor: theme.palette.common.white,
               }}
             >
-              <Grid item xs={12}>
-                <FilterSection title={"Time Range"}>
-                  <RemovableDateTimeFilter />
-                </FilterSection>
+              <Grid
+                item
+                xs={12}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Typography variant="h3">Filters</Typography>
               </Grid>
-              <Grid item xs={6}>
-                <FilterSection title={"Depth"}>
-                  <DepthFilter />
-                </FilterSection>
+              <Grid
+                container
+                spacing={2}
+                sx={{
+                  padding: padding.double,
+                  paddingTop: padding.small,
+                  justifyContent: "center",
+                }}
+              >
+                <Grid item xs={12}>
+                  <FilterSection title={"Time Range"}>
+                    <RemovableDateTimeFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={6}>
+                  <FilterSection title={"Depth"}>
+                    <DepthFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={6}>
+                  <FilterSection isTitleOnlyHeader title={"Parameter"}>
+                    <CategoryVocabFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={6}>
+                  <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
+                    <DataDeliveryModeFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={1}>
+                  <FilterSection title={""}>
+                    <ImosOnlySwitch />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={5} />
               </Grid>
-              <Grid item xs={6}>
-                <FilterSection isTitleOnlyHeader title={"Parameter"}>
-                  <CategoryVocabFilter />
-                </FilterSection>
-              </Grid>
-              <Grid item xs={6}>
-                <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
-                  <DataDeliveryModeFilter />
-                </FilterSection>
-              </Grid>
-              <Grid item xs={1}>
-                <FilterSection title={""}>
-                  <ImosOnlySwitch />
-                </FilterSection>
-              </Grid>
-              <Grid item xs={5} />
             </Grid>
-          </Grid>
+          </Box>
         </Box>
       </Dialog>
     </>
