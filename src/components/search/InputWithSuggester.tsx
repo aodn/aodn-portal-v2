@@ -22,7 +22,8 @@ import _ from "lodash";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
-    event: React.KeyboardEvent<HTMLTextAreaElement>
+    event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
+    isSuggesterOpen: boolean
   ) => void;
 }
 
@@ -182,12 +183,6 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     },
     [debounceRefreshOptions, dispatch]
   );
-  // Whenever suggestion is closed, clear the options
-  useEffect(() => {
-    if (!open) {
-      setOptions([]);
-    }
-  }, [open]);
 
   useEffect(() => {
     dispatch(fetchParameterCategoriesWithStore(null))
@@ -205,6 +200,22 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         setCategorySet(child);
       });
   }, [dispatch]);
+
+  const handleSuggesterOpen = () => {
+    setOpen(true);
+  };
+
+  const handleSuggesterClose = () => {
+    setOpen(false);
+    setOptions([]);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      setOpen(false);
+    }
+    handleEnterPressed(event, open);
+  };
 
   return (
     <>
@@ -241,12 +252,9 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         id="search"
         fullWidth
         freeSolo
-        onOpen={() => {
-          setOpen(options.length > 0);
-        }}
-        onClose={() => {
-          setOpen(false);
-        }}
+        open={open}
+        onOpen={handleSuggesterOpen}
+        onClose={handleSuggesterClose}
         value={searchInput}
         forcePopupIcon={false}
         options={options.flatMap((option) => option.text)}
@@ -262,7 +270,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
             inputProps={{
               "aria-label": "Search for open data",
               ...params.inputProps,
-              onKeyDown: handleEnterPressed,
+              onKeyDown: handleKeyDown,
               "data-testid": "input-with-suggester",
             }}
           />

@@ -41,8 +41,10 @@ export default ({ mode }) => {
       outDir: "dist",
     },
     test: {
+      globals: true,
       // 👋 add the line below to add jsdom to vite
       environment: "jsdom",
+      setupFiles: "./src/setupTests.ts",
     },
     publicDir: "public",
     resolve: {

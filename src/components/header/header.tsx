@@ -16,7 +16,7 @@ const Header = ({ isLandingPage }: HeaderProps) => {
       }}
     >
       <Container>
-        <Grid container spacing={2}>
+        <Grid container>
           <Grid item alignContent="left" xs={12} sm={4}>
             <Box
               sx={{

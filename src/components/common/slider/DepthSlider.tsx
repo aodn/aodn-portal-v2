@@ -77,7 +77,7 @@ const DepthSlider = () => {
           </Grid>
         ))}
       </Grid>
-      <Grid item xs={8} sx={{ height: 400, paddingLeft: 2, paddingRight: 2 }}>
+      <Grid item xs={8} sx={{ height: 300, paddingLeft: 2, paddingRight: 2 }}>
         <SliderLine sliderValue={sliderValues[0]} />
         <SliderLine sliderValue={sliderValues[1]} />
         <img
@@ -86,7 +86,7 @@ const DepthSlider = () => {
           style={{ width: "100%", height: "100%" }}
         />
       </Grid>
-      <Grid item xs={2} sx={{ height: 400 }}>
+      <Grid item xs={2} sx={{ height: 300 }}>
         <StyledSlider
           isvertical="true"
           getAriaLabel={() => "depth"}

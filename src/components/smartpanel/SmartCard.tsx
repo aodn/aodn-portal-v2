@@ -51,7 +51,8 @@ const SmartCardContent = (props: SmartcardProps) => {
         paddingTop: isLittleCard ? "12px" : "0",
       }}
     >
-      <CardActionArea
+      <Box
+        sx={{ position: "relative" }}
         onClick={() => props.onCardClicked && props.onCardClicked()}
       >
         {props?.imageUrl ? (
@@ -134,7 +135,7 @@ const SmartCardContent = (props: SmartcardProps) => {
             )}
           </>
         )}
-      </CardActionArea>
+      </Box>
       {props.underline && (
         <Box sx={{ paddingY: 1, paddingX: 2 }}>
           <Typography

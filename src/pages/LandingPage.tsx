@@ -20,7 +20,6 @@ import Layout from "../components/layout/layout";
 const LandingPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [display, setDisplay] = useState<boolean>(true);
 
   const onCardClick = (id: number) => {
     switch (id) {
@@ -43,12 +42,26 @@ const LandingPage = () => {
         sx={{
           backgroundImage: "url(/bg_landing_page.png)",
           backgroundSize: "cover",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <MainMenu />
-        <BannerOpenAccess isDisplay={display} />
-        <ComplexTextSearch onFilterCallback={(value) => setDisplay(!value)} />
-        <ShortCutSmartPanel onCardClicked={onCardClick} />
+        <Box
+          sx={{
+            width: "70%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <MainMenu />
+          <BannerOpenAccess />
+          <ComplexTextSearch />
+          <ShortCutSmartPanel onCardClicked={onCardClick} />
+        </Box>
       </Box>
       <StoryBoardPanel />
       <PromotionSmartPanel />

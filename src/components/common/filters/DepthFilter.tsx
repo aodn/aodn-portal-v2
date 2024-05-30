@@ -18,13 +18,7 @@ const DepthFilter = (props: DepthFiltersProps) => {
   ];
   return (
     <Grid container sx={{ ...props.sx }}>
-      <Grid
-        container
-        sx={{
-          marginTop: margin["top"],
-          marginBottom: margin["bottom"],
-        }}
-      >
+      <Grid container>
         <Grid item xs={8}></Grid>
         <Grid item xs={3}>
           <PlainDropdownMenu items={depthUnits} onSelectCallback={() => {}} />

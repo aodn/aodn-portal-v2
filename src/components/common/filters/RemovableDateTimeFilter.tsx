@@ -172,7 +172,6 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         item
         xs={12}
         sx={{
-          marginTop: margin["top"],
           textAlign: "left",
         }}
       >

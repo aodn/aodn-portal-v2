@@ -4,6 +4,7 @@ import imos_logo from "@/assets/logos/imos-logo-transparent.png";
 import { useDispatch } from "react-redux";
 import store, { AppDispatch, getComponentState } from "../store/store";
 import { ParameterState, updateImosOnly } from "../store/componentParamReducer";
+import { padding } from "../../../styles/constants.js";
 
 const ImosOnlySwitch = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -18,34 +19,37 @@ const ImosOnlySwitch = () => {
   );
 
   return (
-    <Grid>
+    <Grid
+      container
+      sx={{
+        paddingTop: padding["large"],
+        paddingBottom: padding["small"],
+        paddingX: padding["small"],
+        height: "100%",
+      }}
+    >
+      <Grid item xs={12}>
+        <img
+          src={imos_logo}
+          alt="imos_logo"
+          style={{
+            objectFit: "contain",
+            width: "100%",
+            height: "100%",
+          }}
+        />
+      </Grid>
       <Grid
-        container
+        item
+        xs={12}
+        display="flex"
         alignItems="center"
         justifyContent="center"
-        sx={{
-          padding: "20px 0px",
-        }}
       >
-        <Grid item xs={10}>
-          <img
-            src={imos_logo}
-            alt=""
-            style={{
-              width: "100%",
-              height: "100%",
-              //   width: "calc(100% + 40px)",
-              //   height: "calc(100% + 40px)",
-              //   margin: "-20px 0px 0px -20px",
-            }}
-          />
-        </Grid>
-        <Grid item>
-          <Switch
-            defaultChecked={componentParam.isImosOnlyDataset}
-            onClick={onImosOnlySwitch}
-          />
-        </Grid>
+        <Switch
+          defaultChecked={componentParam.isImosOnlyDataset}
+          onClick={onImosOnlySwitch}
+        />
       </Grid>
     </Grid>
   );

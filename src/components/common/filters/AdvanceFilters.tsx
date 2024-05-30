@@ -1,7 +1,8 @@
-import React from "react";
+import { FC } from "react";
 import {
-  Backdrop,
-  Collapse,
+  Box,
+  Dialog,
+  Fade,
   Grid,
   SxProps,
   Theme,
@@ -14,99 +15,104 @@ import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
 import CategoryVocabFilter from "./CategoryVocabFilter";
 import ImosOnlySwitch from "./ImosOnlySwitch";
 import FilterSection from "./FilterSection";
-import { borderRadius, margin, zIndex } from "../../../styles/constants";
+import { borderRadius, padding, zIndex } from "../../../styles/constants";
 
 export interface NonRemovableFiltersProps {
   showFilters: boolean;
-  setShowFilters?: (value: boolean) => void;
-  gridColumn: number;
+  setShowFilters: (value: boolean) => void;
   sx?: SxProps<Theme>;
 }
 
-const AdvanceFilters = (props: NonRemovableFiltersProps) => {
+const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
+  showFilters = false,
+  setShowFilters = () => {},
+  sx = {},
+}) => {
   const theme = useTheme();
   return (
     <>
-      <Backdrop
-        open={props.showFilters}
-        sx={{ zIndex: zIndex["FILTER_MODAL"] }}
-        onClick={() => {
-          props.setShowFilters(false);
+      <Dialog
+        open={showFilters}
+        onClose={() => {
+          setShowFilters(false);
         }}
-      />
-      <Collapse
-        orientation="vertical"
-        in={props.showFilters}
-        sx={{
-          // Make it overlay instead of push smart card downwards
-          zIndex: zIndex["FILTER_OVERLAY"],
-          position: "absolute",
-          width: "80%",
-        }}
+        TransitionComponent={Fade}
+        transitionDuration={{ enter: 500, exit: 300 }}
+        fullWidth
       >
-        <Grid
-          container
-          justifyContent={"center"}
+        <Box
           sx={{
-            marginTop: margin["top"],
-            borderRadius: borderRadius["filter"],
-            backgroundColor: theme.palette.common.white,
-            ...props.sx,
+            zIndex: zIndex["FILTER_OVERLAY"],
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            maxWidth: "90%",
+            maxHeight: "90%",
+            overflow: "auto",
+            ...sx,
           }}
         >
-          <Grid
-            item
-            xs={12}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Typography variant="h3">Filters</Typography>
-          </Grid>
-          <Grid
-            container
-            spacing={2}
-            sx={{
-              margin: `${margin["top"]} ${margin["doubleLeft"]}`,
-              justifyContent: "center",
-            }}
-          >
-            <Grid item xs={12}>
-              <FilterSection title={"Time Range"}>
-                <RemovableDateTimeFilter />
-              </FilterSection>
+          <Box sx={{ minWidth: "1300px" }}>
+            <Grid
+              container
+              justifyContent={"center"}
+              sx={{
+                borderRadius: borderRadius["filter"],
+                backgroundColor: theme.palette.common.white,
+              }}
+            >
+              <Grid
+                item
+                xs={12}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Typography variant="h3">Filters</Typography>
+              </Grid>
+              <Grid
+                container
+                spacing={2}
+                sx={{
+                  padding: padding.double,
+                  paddingTop: padding.small,
+                  justifyContent: "center",
+                }}
+              >
+                <Grid item xs={12}>
+                  <FilterSection title={"Time Range"}>
+                    <RemovableDateTimeFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={6}>
+                  <FilterSection title={"Depth"}>
+                    <DepthFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={6}>
+                  <FilterSection isTitleOnlyHeader title={"Parameter"}>
+                    <CategoryVocabFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={6}>
+                  <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
+                    <DataDeliveryModeFilter />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={1}>
+                  <FilterSection title={""}>
+                    <ImosOnlySwitch />
+                  </FilterSection>
+                </Grid>
+                <Grid item xs={5} />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <FilterSection title={"Depth"}>
-                <DepthFilter />
-              </FilterSection>
-            </Grid>
-            <Grid item xs={6}>
-              <FilterSection isTitleOnlyHeader title={"Parameter"}>
-                <CategoryVocabFilter />
-              </FilterSection>
-            </Grid>
-            <Grid item xs={6}>
-              <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
-                <DataDeliveryModeFilter />
-              </FilterSection>
-            </Grid>
-            <Grid item xs={1}>
-              <FilterSection title={""}>
-                <ImosOnlySwitch />
-              </FilterSection>
-            </Grid>
-            <Grid item xs={5} />
-          </Grid>
-        </Grid>
-      </Collapse>
+          </Box>
+        </Box>
+      </Dialog>
     </>
   );
-};
-
-AdvanceFilters.defaultProps = {
-  showFilters: false,
-  gridColumn: 12,
 };
 
 export default AdvanceFilters;

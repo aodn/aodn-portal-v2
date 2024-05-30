@@ -1,21 +1,26 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import SimpleTextSearch from "../components/search/SimpleTextSearch";
-import { Grid } from "@mui/material";
+import ResultPanelSimpleFilter, {
+  ResultPanelIconFilter,
+} from "../components/common/filters/ResultPanelSimpleFilter";
+import { Grid, Paper } from "@mui/material";
 import {
   CollectionsQueryType,
   createSearchParamFrom,
   fetchResultWithStore,
   OGCCollection,
+  SearchParameters,
 } from "../components/common/store/searchReducer";
+import { ResultCards } from "../components/result/ResultCards";
 import Layout from "../components/layout/layout";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  formatToUrlParam,
   ParameterState,
-  unFlattenToParameterState,
   updateFilterPolygon,
   updateParameterStates,
+  unFlattenToParameterState,
+  formatToUrlParam,
 } from "../components/common/store/componentParamReducer";
 import store, {
   AppDispatch,
@@ -38,12 +43,19 @@ import * as turf from "@turf/turf";
 // import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
 // import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 // Map section, you can switch to other map library, this is for mapbox
+import Map from "../components/map/mapbox/Map";
+import Controls from "../components/map/mapbox/controls/Controls";
+import NavigationControl from "../components/map/mapbox/controls/NavigationControl";
+import MenuControl, {
+  BaseMapSwitcher,
+} from "../components/map/mapbox/controls/MenuControl";
+import ScaleControl from "../components/map/mapbox/controls/ScaleControl";
+import DisplayCoordinate from "../components/map/mapbox/controls/DisplayCoordinate";
+import Layers from "../components/map/mapbox/layers/Layers";
+import VectorTileLayers from "../components/map/mapbox/layers/VectorTileLayers";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
-import SearchPageResultList, {
-  SearchResultLayoutEnum,
-} from "../components/subpage/SearchPageResultList";
-import ResultPanelIconFilter from "../components/common/filters/ResultPanelIconFilter";
-import SearchPageMap from "../components/subpage/SearchPageMap";
+import ComplexTextSearch from "../components/search/ComplexTextSearch";
+import { margin } from "../styles/constants";
 
 const mapContainerId = "map-container-id";
 
@@ -51,10 +63,7 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [resultLayout, setResultLayout] = useState<SearchResultLayoutEnum>(
-    SearchResultLayoutEnum.LIST
-  );
-  const [isShowingResult, setIsShowingResult] = useState<boolean>(true);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Layers inside this array will be add to map
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -137,40 +146,53 @@ const SearchPage = () => {
         sx={{
           backgroundImage: "url(/bg_search_results.png)",
           backgroundSize: "cover",
+          marginTop: margin.sm,
         }}
       >
-        <Grid container item xs={12}>
-          <Grid item xs={1} />
-          <Grid item xs={10}>
-            <SimpleTextSearch />
+        <Grid item xs={12}>
+          <Grid container>
+            <Grid item xs={1} />
+            <Grid item xs={10}>
+              <ComplexTextSearch />
+            </Grid>
+            <Grid item xs={1} />
           </Grid>
-          <Grid item xs={1} />
         </Grid>
-        <Grid item xs={1}>
-          <ResultPanelIconFilter />
+        <Grid item xs={12}>
+          <Grid container spacing={2}>
+            <Grid item xs={1}>
+              <ResultPanelIconFilter />
+            </Grid>
+            <Grid item xs={4}>
+              <ResultPanelSimpleFilter />
+              <ResultCards
+                contents={contents}
+                onRemoveLayer={onRemoveLayer}
+                onDownload={undefined}
+                onTags={undefined}
+                onMore={undefined}
+              />
+            </Grid>
+            <Grid item xs={7} sx={{ pr: 2, pb: 2 }}>
+              <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
+                <Map
+                  panelId={mapContainerId}
+                  onZoomEvent={onMapZoomOrMove}
+                  onMoveEvent={onMapZoomOrMove}
+                >
+                  <Controls>
+                    <NavigationControl />
+                    <ScaleControl />
+                    <MenuControl menu={<BaseMapSwitcher />} />
+                  </Controls>
+                  <Layers>
+                    <VectorTileLayers collections={layers} />
+                  </Layers>
+                </Map>
+              </Paper>
+            </Grid>
+          </Grid>
         </Grid>
-        {isShowingResult ? (
-          <>
-            <SearchPageResultList
-              contents={contents}
-              onRemoveLayer={onRemoveLayer}
-              layout={resultLayout}
-              setLayout={setResultLayout}
-              setIsShowingResult={setIsShowingResult}
-            />
-            <SearchPageMap
-              onMapZoomOrMove={onMapZoomOrMove}
-              isShowingResult={isShowingResult}
-              setIsShowingResult={setIsShowingResult}
-            />
-          </>
-        ) : (
-          <SearchPageMap
-            onMapZoomOrMove={onMapZoomOrMove}
-            isShowingResult={isShowingResult}
-            setIsShowingResult={setIsShowingResult}
-          />
-        )}
       </Grid>
     </Layout>
   );
