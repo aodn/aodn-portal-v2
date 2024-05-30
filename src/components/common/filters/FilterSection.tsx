@@ -15,7 +15,7 @@ const FilterSection: React.FC<FilterSectionContainerProps> = ({
 }) => {
   return (
     <StyledFilterSectionGrid
-      isSmall={title ? undefined : "true"}
+      padding={!title ? "0px" : "10px"}
       sx={{
         position: "relative",
         paddingTop: isTitleOnlyHeader ? "3rem" : undefined,

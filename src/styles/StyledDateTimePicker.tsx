@@ -11,7 +11,7 @@ const StyledDateTimePicker = styled(DateTimePicker)(({ theme }) => ({
     border: "none",
   },
   boxShadow: "2px 2px 4px 0px rgba(0, 0, 0, 0.15)",
-  fontSize: "18px",
+  fontSize: "14px",
   display: "flex",
 
   "& input": {

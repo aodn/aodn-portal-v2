@@ -29,7 +29,7 @@ const ComplexSmartPanel = (
   );
 
   return (
-    <Grid container sx={{ pb: 6 }}>
+    <Grid container>
       <Grid item xs={12}>
         {
           // Create a container inside the item which occupy all area, then
@@ -37,18 +37,28 @@ const ComplexSmartPanel = (
           // item so that the item is center in the container
           // The minWidth may need to calculate instead of hardcode
         }
-        <Grid container justifyContent="center">
-          <Box sx={{ pr: 2, display: "flex", alignItems: "center" }}>
-            <IconButton
-              onClick={() => scroll(-50)}
-              sx={{ backgroundColor: "#7ba0b6" }}
-            >
-              <ArrowBackIosNewIcon
-                sx={{ pr: "4px", height: 38, width: 38, color: "white" }}
-              />
-            </IconButton>
-          </Box>
-          <Grid item xs={props.gridColumns}>
+        <Grid container>
+          <Grid
+            item
+            xs={1}
+            sx={{
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "center",
+            }}
+          >
+            <Box>
+              <IconButton
+                onClick={() => scroll(-50)}
+                sx={{ backgroundColor: "#7ba0b6" }}
+              >
+                <ArrowBackIosNewIcon
+                  sx={{ pr: "4px", height: 38, width: 38, color: "white" }}
+                />
+              </IconButton>
+            </Box>
+          </Grid>
+          <Grid item xs={10}>
             <Box ref={boxRef} sx={{ overflow: "hidden" }}>
               <Box
                 display="grid"
@@ -66,21 +76,31 @@ const ComplexSmartPanel = (
               </Box>
             </Box>
           </Grid>
-          <Box sx={{ pl: 2, display: "flex", alignItems: "center" }}>
-            <IconButton
-              onClick={() => scroll(50)}
-              sx={{ backgroundColor: "#7ba0b6" }}
-            >
-              <ArrowForwardIosIcon
-                sx={{ pl: "4px", height: 38, width: 38, color: "white" }}
-              />
-            </IconButton>
-          </Box>
-          {props.bottomDivider && (
-            <Grid item xs={8}>
-              <Divider sx={{ borderBottomWidth: 5 }} />
-            </Grid>
-          )}
+          <Grid
+            item
+            xs={1}
+            sx={{
+              display: "flex",
+              justifyContent: "end",
+              alignItems: "center",
+            }}
+          >
+            <Box>
+              <IconButton
+                onClick={() => scroll(50)}
+                sx={{ backgroundColor: "#7ba0b6" }}
+              >
+                <ArrowForwardIosIcon
+                  sx={{ pl: "4px", height: 38, width: 38, color: "white" }}
+                />
+              </IconButton>
+            </Box>
+            {props.bottomDivider && (
+              <Grid item xs={8}>
+                <Divider sx={{ borderBottomWidth: 5 }} />
+              </Grid>
+            )}
+          </Grid>
         </Grid>
       </Grid>
     </Grid>

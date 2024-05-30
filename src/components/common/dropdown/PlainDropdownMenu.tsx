@@ -31,6 +31,8 @@ const PlainDropdownMenu: React.FC<PlainDropdownMenuProps> = ({
         value={selectedItem}
         onChange={handleOnChange}
         sx={{
+          padding: "0",
+          textAlign: "center",
           height: "44px",
           borderRadius: "4px",
           backgroundColor: "#fff",
@@ -38,7 +40,7 @@ const PlainDropdownMenu: React.FC<PlainDropdownMenuProps> = ({
             border: "none",
           },
           boxShadow: "2px 2px 4px 0px rgba(0, 0, 0, 0.15)",
-          fontSize: "18px",
+          fontSize: "14px",
         }}
       >
         {items.map((item) => (

@@ -1,12 +1,13 @@
 import { ToggleButton } from "@mui/material";
 import { styled } from "@mui/system";
+import { fontSize, fontWeight } from "./constants";
 
 export const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
-  boxShadow: "1px 1px 10px 1px #d4d4d4",
-  borderRadius: "0px",
+  boxShadow: theme.shadows[2],
+  borderRadius: 0,
   backgroundColor: theme.palette.common.white,
-  fontSize: "14px",
-  fontWeight: "600",
+  fontSize: fontSize.mapMenuItem,
+  fontWeight: fontWeight.bold,
   fontFamily: "Noto Sans",
   textTransform: "capitalize",
   "&.Mui-selected": {
