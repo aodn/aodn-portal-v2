@@ -1,4 +1,10 @@
-import { cleanup, render, RenderResult } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  RenderResult,
+  act,
+  waitFor,
+} from "@testing-library/react";
 import {
   afterAll,
   afterEach,
@@ -13,7 +19,6 @@ import store from "../../common/store/store";
 import InputWithSuggester from "../InputWithSuggester";
 import { server } from "../../../__mocks__/server";
 import { userEvent } from "@testing-library/user-event";
-import { sleep } from "../../../__mocks__/utils";
 
 beforeAll(() => {
   server.listen();
@@ -38,84 +43,96 @@ describe("inputwithsuggester", async () => {
   });
 
   test("Suggestion options should disappear after choosing one of them", async () => {
-    const { getByRole, findByTestId, queryByRole, getAllByRole } = rendered;
+    await act(async () => {
+      let input: HTMLInputElement;
+      const { getByRole, findByTestId, findByRole, queryByRole, getAllByRole } =
+        rendered;
+      waitFor(
+        () => findByTestId("input-with-suggester") && findByRole("combobox")
+      )
+        .then(() => {
+          input = getByRole("combobox") as HTMLInputElement;
+          userEvent.type(input, "wave");
+          waitFor(() =>
+            expect((input as HTMLInputElement).value).to.equal("wave")
+          );
+        })
+        .then(() => {
+          waitFor(() => expect(expect(queryByRole("listbox")).to.exist)).then(
+            () => {
+              const options = getAllByRole("option");
+              const textToMatch =
+                "MOCK API IMOS - ACORN - Coffs Harbour HF ocean radar site (New South Wales, Australia) - Delayed mode wave";
+              const optionToClick = options.find(
+                (o) => o.textContent === textToMatch
+              );
+              expect(optionToClick).to.exist;
 
-    await findByTestId("input-with-suggester");
-    const input = getByRole("combobox");
-    await userEvent.type(input, "wave");
-    expect((input as HTMLInputElement).value).to.equal("wave");
+              userEvent.click(optionToClick);
+              expect(input.value).to.equal(textToMatch);
 
-    // await debouncing
-    await sleep(1000);
+              // suggestion list should disappear after clicking on an option
+              const listboxAfterClick = queryByRole("listbox");
+              expect(listboxAfterClick).to.not.exist;
 
-    const listbox = queryByRole("listbox");
-    expect(listbox).to.exist;
-
-    const options = getAllByRole("option");
-    const textToMatch =
-      "MOCK API IMOS - ACORN - Coffs Harbour HF ocean radar site (New South Wales, Australia) - Delayed mode wave";
-    const optionToClick = options.find((o) => o.textContent === textToMatch);
-    expect(optionToClick).to.exist;
-
-    await userEvent.click(optionToClick);
-    expect((input as HTMLInputElement).value).to.equal(textToMatch);
-
-    // suggestion list should disappear after clicking on an option
-    const listboxAfterClick = queryByRole("listbox");
-    expect(listboxAfterClick).to.not.exist;
-
-    // cleanup the input state
-    await userEvent.clear(input);
+              // cleanup the input state
+              userEvent.clear(input);
+            }
+          );
+        });
+    });
   });
 
   test("Categories section should work properly", async () => {
-    const {
-      getByRole,
-      findAllByText,
-      findByTestId,
-      queryByText,
-      queryByRole,
-      getAllByRole,
-    } = rendered;
-    const input = getByRole("combobox");
-    const categoryToMatch = "Wave";
-    await userEvent.type(input, categoryToMatch.toLowerCase());
-    expect((input as HTMLInputElement).value).to.equal(
-      categoryToMatch.toLowerCase()
-    );
+    await act(async () => {
+      const categoryToMatch = "Wave";
+      const {
+        getByRole,
+        findAllByText,
+        findByTestId,
+        queryByText,
+        queryByRole,
+        getAllByRole,
+      } = rendered;
 
-    // await debouncing
-    await sleep(1000);
+      waitFor(() => {
+        const input = getByRole("combobox");
 
-    const listbox = queryByRole("listbox");
-    expect(listbox).to.exist;
+        userEvent.type(input, categoryToMatch.toLowerCase());
+        expect((input as HTMLInputElement).value).to.equal(
+          categoryToMatch.toLowerCase()
+        );
+      }).then(() => {
+        waitFor(() => expect(queryByRole("listbox")).to.exist).then(() => {
+          const options = getAllByRole("option");
+          const optionToClick = options.find(
+            (o) => o.textContent.toLowerCase() === categoryToMatch.toLowerCase()
+          );
+          expect(optionToClick).to.exist;
 
-    const options = getAllByRole("option");
-    const optionToClick = options.find(
-      (o) => o.textContent.toLowerCase() === categoryToMatch.toLowerCase()
-    );
-    expect(optionToClick).to.exist;
+          userEvent.click(optionToClick);
+          waitFor(async () => {
+            const categorySection = await findAllByText("Categories:");
+            // after clicking on a category, the category section should appear
+            expect(categorySection.length).to.equal(1);
 
-    await userEvent.click(optionToClick);
-    const categorySection = await findAllByText("Categories:");
+            // A chip showing wave should appear
+            const chip = await findAllByText(categoryToMatch);
+            expect(chip.length).to.equal(1);
+            // Try to remove this category
+            const removeButton = await findByTestId("CancelIcon");
+            userEvent.click(removeButton);
 
-    // after clicking on a category, the category section should appear
-    expect(categorySection.length).to.equal(1);
+            // now the wave chip should disappear
+            const chipAfterRemove = queryByText(categoryToMatch);
+            expect(chipAfterRemove).to.not.exist;
+          });
 
-    // A chip showing wave should appear
-    const chip = await findAllByText(categoryToMatch);
-    expect(chip.length).to.equal(1);
-
-    // Try to remove this category
-    const removeButton = await findByTestId("CancelIcon");
-    await userEvent.click(removeButton);
-
-    // now the wave chip should disappear
-    const chipAfterRemove = queryByText(categoryToMatch);
-    expect(chipAfterRemove).to.not.exist;
-
-    // check suggesters
-    const listboxAfterClick = queryByRole("listbox");
-    expect(listboxAfterClick).to.not.exist;
+          // check suggesters
+          const listboxAfterClick = queryByRole("listbox");
+          expect(listboxAfterClick).to.not.exist;
+        });
+      });
+    });
   });
 });
