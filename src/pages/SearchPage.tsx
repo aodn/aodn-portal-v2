@@ -55,6 +55,7 @@ import Layers from "../components/map/mapbox/layers/Layers";
 import VectorTileLayers from "../components/map/mapbox/layers/VectorTileLayers";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import ComplexTextSearch from "../components/search/ComplexTextSearch";
+import { margin } from "../styles/constants";
 
 const mapContainerId = "map-container-id";
 
@@ -145,6 +146,7 @@ const SearchPage = () => {
         sx={{
           backgroundImage: "url(/bg_search_results.png)",
           backgroundSize: "cover",
+          marginTop: margin.sm,
         }}
       >
         <Grid item xs={12}>

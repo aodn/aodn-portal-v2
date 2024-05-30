@@ -36,8 +36,11 @@ const ComplexTextSearch = () => {
   }, [dispatch, navigate]);
 
   const handleEnterPressed = useCallback(
-    (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (event.key === "Enter") {
+    (
+      event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
+      isSuggesterOpen: boolean
+    ) => {
+      if (event.key === "Enter" && !isSuggesterOpen) {
         executeSearch();
       }
     },
@@ -85,7 +88,7 @@ const ComplexTextSearch = () => {
             height: "100%",
           }}
           fullWidth
-          onClick={() => executeSearch()}
+          onClick={executeSearch}
         >
           Search
         </Button>
