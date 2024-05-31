@@ -5,7 +5,7 @@ import {
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Grid, ListItem } from "@mui/material";
 import GridResultCard from "./GridResultCard";
-import { SearchResultLayoutEnum } from "../subpage/SearchPageResultList";
+import { SearchResultLayoutEnum } from "../../pages/SearchPage/subpages/ResultBlock";
 import ListResultCard from "./ListResultCard";
 
 interface ResultCardsProps {

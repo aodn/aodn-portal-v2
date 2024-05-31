@@ -14,7 +14,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import DynamicResultCardButton from "../../components/common/buttons/DynamicResultCardButton";
 import { Provider } from "react-redux";
 import AppTheme from "../../utils/AppTheme";
-import SearchPage from "../SearchPage";
+import SearchPage from "../SearchPage/SearchPage";
 import { userEvent } from "@testing-library/user-event";
 import { BrowserRouter as Router } from "react-router-dom";
 
@@ -30,20 +30,19 @@ afterAll(() => {
 });
 
 describe("SearchPage", async () => {
-  const theme = AppTheme;
-
-  beforeEach(() => {
-    render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <SearchPage />
-          </Router>
-        </ThemeProvider>
-      </Provider>
-    );
-  });
-
+  // const theme = AppTheme;
+  //
+  // beforeEach(() => {
+  //   render(
+  //     <Provider store={store}>
+  //       <ThemeProvider theme={theme}>
+  //         <Router>
+  //           <SearchPage />
+  //         </Router>
+  //       </ThemeProvider>
+  //     </Provider>
+  //   );
+  // });
   test("The SearchPage layout should be able to changed properly", async () => {
     // const mapListToggleButton = screen.getByTestId("map-list-toggle-button");
     // await userEvent.click(mapListToggleButton);

@@ -15,7 +15,7 @@ const ActionButtonPaper: React.FC<StyledActionButtonPaperProps> = ({
       variant="outlined"
       sx={{
         p: "2px 14px",
-        marginLeft: margin.xSmall,
+        marginLeft: margin.md,
         display: "flex",
         alignItems: "center",
         width: { md: "50px" },

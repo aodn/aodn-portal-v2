@@ -13,7 +13,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import MapListToggleButton from "../buttons/MapListToggleButton";
 import SortButton from "../buttons/SortButton";
-import { SearchResultLayoutEnum } from "../../subpage/SearchPageResultList";
+import { SearchResultLayoutEnum } from "../../../pages/SearchPage/subpages/ResultBlock";
 import React from "react";
 
 // interface ResultPanelSimpleFilterProps {

@@ -1,11 +1,11 @@
-import ResultPanelSimpleFilter from "../common/filters/ResultPanelSimpleFilter";
+import ResultPanelSimpleFilter from "../../../components/common/filters/ResultPanelSimpleFilter";
 import { Grid } from "@mui/material";
 import {
   CollectionsQueryType,
   OGCCollection,
-} from "../common/store/searchReducer";
+} from "../../../components/common/store/searchReducer";
 import React from "react";
-import ResultCards from "../result/ResultCards";
+import ResultCards from "../../../components/result/ResultCards";
 
 enum SearchResultLayoutEnum {
   GRID = "GRID",
@@ -23,7 +23,7 @@ interface SearchResultListProps {
   ) => void;
 }
 
-const SearchPageResultList: React.FC<SearchResultListProps> = ({
+const ResultBlock: React.FC<SearchResultListProps> = ({
   layout,
   setLayout,
   setIsShowingResult,
@@ -50,4 +50,4 @@ const SearchPageResultList: React.FC<SearchResultListProps> = ({
 };
 
 export { SearchResultLayoutEnum };
-export default SearchPageResultList;
+export default ResultBlock;
