@@ -44,6 +44,7 @@ const fontSize = {
   bannerSubtitle: "20px",
   mapMenuItem: 14,
   mapMenuSubItem: 13,
+  detailPageHeading: "20px",
 };
 
 const fontWeight = {
@@ -53,6 +54,22 @@ const fontWeight = {
   medium: "500",
   bold: "600",
   extraBold: "800",
+};
+
+const fontColor = {
+  gray: {
+    dark: "#575757",
+    medium: "#787878",
+    light: "#979797",
+  },
+};
+
+const color = {
+  tabPanel: {
+    background: "#E8EDF7",
+    tabOnFocused: "#618CA5",
+    tabOnHover: "",
+  },
 };
 
 const border = {
@@ -67,6 +84,8 @@ const borderRadius = {
   menu: "5px",
   menuTop: "5px 5px 0 0",
   small: "5px",
+  medium: "8px",
+  large: "10px",
 };
 
 const filterList = {
@@ -89,6 +108,8 @@ export {
   padding,
   fontSize,
   fontWeight,
+  fontColor,
+  color,
   border,
   borderRadius,
   filterList,
