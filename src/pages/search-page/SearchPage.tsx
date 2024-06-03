@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Grid } from "@mui/material";
 import {
   CollectionsQueryType,
@@ -46,6 +52,8 @@ import { margin } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 
 const mapContainerId = "map-container-id";
+
+const SearchResultLayoutContext = createContext(null);
 
 const SearchPage = () => {
   const location = useLocation();
@@ -124,53 +132,56 @@ const SearchPage = () => {
     () => setLayers(contents.result.collections.slice(0, 10)),
     [contents]
   );
+
+  const SearchResultLayoutContextFields = useMemo(
+    () => ({
+      resultLayout,
+      setResultLayout,
+      isShowingResult,
+      setIsShowingResult,
+    }),
+    [isShowingResult, resultLayout]
+  );
+
   return (
-    <Layout>
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          backgroundImage: "url(/bg_search_results.png)",
-          backgroundSize: "cover",
-          marginTop: margin.sm,
-        }}
-      >
-        <Grid item xs={12}>
-          <Grid container>
-            <Grid item xs={1} />
-            <Grid item xs={10}>
-              <ComplexTextSearch />
+    <SearchResultLayoutContext.Provider value={SearchResultLayoutContextFields}>
+      <Layout>
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            backgroundImage: "url(/bg_search_results.png)",
+            backgroundSize: "cover",
+            marginTop: margin.sm,
+          }}
+        >
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={1} />
+              <Grid item xs={10}>
+                <ComplexTextSearch />
+              </Grid>
+              <Grid item xs={1} />
             </Grid>
-            <Grid item xs={1} />
           </Grid>
+          <Grid item xs={1}>
+            <ResultPanelIconFilter />
+          </Grid>
+          {isShowingResult ? (
+            <>
+              <ResultSection
+                contents={contents}
+                onRemoveLayer={onRemoveLayer}
+              />
+              <MapSection onMapZoomOrMove={onMapZoomOrMove} />
+            </>
+          ) : (
+            <MapSection onMapZoomOrMove={onMapZoomOrMove} />
+          )}
         </Grid>
-        <Grid item xs={1}>
-          <ResultPanelIconFilter />
-        </Grid>
-        {isShowingResult ? (
-          <>
-            <ResultSection
-              contents={contents}
-              onRemoveLayer={onRemoveLayer}
-              layout={resultLayout}
-              setLayout={setResultLayout}
-              setIsShowingResult={setIsShowingResult}
-            />
-            <MapSection
-              onMapZoomOrMove={onMapZoomOrMove}
-              isShowingResult={isShowingResult}
-              setIsShowingResult={setIsShowingResult}
-            />
-          </>
-        ) : (
-          <MapSection
-            onMapZoomOrMove={onMapZoomOrMove}
-            isShowingResult={isShowingResult}
-            setIsShowingResult={setIsShowingResult}
-          />
-        )}
-      </Grid>
-    </Layout>
+      </Layout>
+    </SearchResultLayoutContext.Provider>
   );
 };
+export { SearchResultLayoutContext };
 export default SearchPage;

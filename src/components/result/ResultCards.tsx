@@ -7,11 +7,11 @@ import { Grid, ListItem } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import { SearchResultLayoutEnum } from "../../pages/search-page/subpages/ResultSection";
 import ListResultCard from "./ListResultCard";
-import React from "react";
+import React, { useContext } from "react";
+import { SearchResultLayoutContext } from "../../pages/search-page/SearchPage";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
-  layout: SearchResultLayoutEnum;
   onRemoveLayer:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -91,12 +91,14 @@ const renderRows = (
   );
 };
 const ResultCards = (props: ResultCardsProps) => {
-  if (props.layout === SearchResultLayoutEnum.LIST) {
+  const { resultLayout } = useContext(SearchResultLayoutContext);
+
+  if (resultLayout === SearchResultLayoutEnum.LIST) {
     return (
       <FixedSizeList
         height={700}
         width={"100%"}
-        itemSize={270}
+        itemSize={240}
         itemCount={props.contents.result.collections.length}
         overscanCount={10}
       >
@@ -105,7 +107,7 @@ const ResultCards = (props: ResultCardsProps) => {
     );
   }
 
-  // or else render grid
+  // or else render grid view
   return (
     <FixedSizeList
       height={700}

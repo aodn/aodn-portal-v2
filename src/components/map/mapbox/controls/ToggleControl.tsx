@@ -6,6 +6,7 @@ import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import { SearchResultLayoutContext } from "../../../../pages/search-page/SearchPage";
 
 interface ToggleButtonProps {
   isShowingResult: boolean;
@@ -67,17 +68,12 @@ class ToggleControlClass implements IControl {
   }
 }
 
-interface ToggleControlProps {
-  setIsShowingResult: (value: boolean) => void;
-  isShowingResult: boolean;
-}
-
-const ToggleControl: React.FC<ToggleControlProps> = ({
-  setIsShowingResult,
-  isShowingResult,
-}) => {
+const ToggleControl = () => {
   const { map } = useContext(MapContext);
   const [_, setInit] = useState<boolean>(false);
+  const { isShowingResult, setIsShowingResult } = useContext(
+    SearchResultLayoutContext
+  );
 
   useEffect(() => {
     if (map === null) return;

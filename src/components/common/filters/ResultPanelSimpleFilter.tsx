@@ -13,7 +13,6 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import MapListToggleButton from "../buttons/MapListToggleButton";
 import SortButton from "../buttons/SortButton";
-import { SearchResultLayoutEnum } from "../../../pages/search-page/subpages/ResultSection";
 import React from "react";
 
 // interface ResultPanelSimpleFilterProps {
@@ -26,17 +25,7 @@ const SlimSelect = styled(InputBase)(() => ({
   },
 }));
 
-interface ResultPanelSimpleFilterProps {
-  layout: SearchResultLayoutEnum;
-  setLayout: (layout: SearchResultLayoutEnum) => void;
-  setIsShowingResult: (value: boolean) => void;
-}
-
-const ResultPanelSimpleFilter: React.FC<ResultPanelSimpleFilterProps> = ({
-  layout,
-  setLayout,
-  setIsShowingResult,
-}) => {
+const ResultPanelSimpleFilter = () => {
   return (
     <Grid container justifyContent="center">
       <Grid container item xs={12} sx={{ pb: 1 }}>
@@ -65,11 +54,7 @@ const ResultPanelSimpleFilter: React.FC<ResultPanelSimpleFilterProps> = ({
             <ArrowForwardIosIcon />
           </IconButton>
         </Paper>
-        <MapListToggleButton
-          layout={layout}
-          setLayout={setLayout}
-          setIsShowingResult={setIsShowingResult}
-        />
+        <MapListToggleButton />
         <SortButton />
       </Grid>
     </Grid>

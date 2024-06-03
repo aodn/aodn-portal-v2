@@ -15,18 +15,12 @@ import { MapboxEvent as MapEvent } from "mapbox-gl";
 const mapContainerId = "map-container-id";
 
 interface SearchPageProps {
-  isShowingResult: boolean;
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
-  setIsShowingResult: (value: boolean) => void;
 }
 
-const MapSection: React.FC<SearchPageProps> = ({
-  isShowingResult,
-  onMapZoomOrMove,
-  setIsShowingResult,
-}) => {
+const MapSection: React.FC<SearchPageProps> = ({ onMapZoomOrMove }) => {
   return (
     <Grid
       item
@@ -45,10 +39,7 @@ const MapSection: React.FC<SearchPageProps> = ({
           onMoveEvent={onMapZoomOrMove}
         >
           <Controls>
-            <ToggleControl
-              isShowingResult={isShowingResult}
-              setIsShowingResult={setIsShowingResult}
-            />
+            <ToggleControl />
             <NavigationControl />
             <ScaleControl />
             <MenuControl menu={<BaseMapSwitcher />} />

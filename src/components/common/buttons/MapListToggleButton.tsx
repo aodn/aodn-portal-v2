@@ -1,26 +1,21 @@
 import { IconButton, ListItemIcon, MenuItem } from "@mui/material";
 import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Menu from "@mui/material/Menu";
 import { SearchResultLayoutEnum } from "../../../pages/search-page/subpages/ResultSection";
 import ActionButtonPaper from "./ActionButtonPaper";
 import GridAndMapIcon from "../../icon/GridAndMapIcon";
 import ListAndMapIcon from "../../icon/ListAndMapIcon";
 import FullMapViewIcon from "../../icon/FullMapViewIcon";
+import { SearchResultLayoutContext } from "../../../pages/search-page/SearchPage";
 
-interface MapListToggleButtonProps {
-  layout: SearchResultLayoutEnum;
-  setLayout: (layout: SearchResultLayoutEnum) => void;
-  setIsShowingResult: (value: boolean) => void;
-}
-
-const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
-  layout,
-  setLayout,
-  setIsShowingResult,
-}) => {
+const MapListToggleButton = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
+  const { resultLayout, setResultLayout, setIsShowingResult } = useContext(
+    SearchResultLayoutContext
+  );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -31,17 +26,17 @@ const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
   };
 
   const determineShowingIcon = () => {
-    if (layout === SearchResultLayoutEnum.LIST) {
+    if (resultLayout === SearchResultLayoutEnum.LIST) {
       return (
         <>
           <ListAndMapIcon />
         </>
       );
     }
-    if (layout === SearchResultLayoutEnum.GRID) {
+    if (resultLayout === SearchResultLayoutEnum.GRID) {
       return <GridAndMapIcon />;
     }
-    // TODO: need to handle error in the future
+    // TODO: May need to handle error in the future
     return undefined;
   };
 
@@ -80,7 +75,7 @@ const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            setLayout(SearchResultLayoutEnum.LIST);
+            setResultLayout(SearchResultLayoutEnum.LIST);
             handleClose();
           }}
         >
@@ -91,7 +86,7 @@ const MapListToggleButton: React.FC<MapListToggleButtonProps> = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            setLayout(SearchResultLayoutEnum.GRID);
+            setResultLayout(SearchResultLayoutEnum.GRID);
             handleClose();
           }}
         >

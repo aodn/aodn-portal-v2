@@ -76,28 +76,27 @@ const ListResultCard = (props: ResultCardProps) => {
           <Typography component="div" sx={{ marginBottom: "10px" }}>
             <Grid container>
               <Grid item xs={11}>
-                {props.content.title?.substring(0, 90) + "..."}
+                {`${props.content?.title?.slice(0, 90)}${props.content?.title?.length > 90 ? "..." : ""}`}
               </Grid>
               <Grid item xs={1}>
                 <Chip label={props.item} />
               </Grid>
             </Grid>
           </Typography>
-          {/*TODO: over here, will render a div inside a <p>. should fix*/}
-          <Typography variant="body2">
-            <Grid container spacing={1}>
-              <Grid item xs={3}>
-                <CardMedia
-                  sx={{ display: "flex", width: "100%", height: "100px" }}
-                  component="img"
-                  image={props.content.findThumbnail()}
-                />
-              </Grid>
-              <Grid item xs={9}>
-                {props.content.description?.substring(0, 180) + "..."}
-              </Grid>
+          <Grid container spacing={1}>
+            <Grid item xs={3}>
+              <CardMedia
+                sx={{ display: "flex", width: "100%", height: "100px" }}
+                component="img"
+                image={props.content.findThumbnail()}
+              />
             </Grid>
-          </Typography>
+            <Grid item xs={9}>
+              <Typography variant="body2">
+                {`${props.content.description?.slice(0, 180)}${props.content?.description?.length > 180 ? "..." : ""}`}
+              </Typography>
+            </Grid>
+          </Grid>
         </CardContent>
       </CardActionArea>
 
