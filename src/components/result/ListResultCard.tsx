@@ -64,7 +64,7 @@ const ListResultCard = (props: ResultCardProps) => {
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
-    <Card variant="outlined">
+    <Card variant="outlined" data-testid="result-card-list">
       <CardActionArea
         onClick={() => {
           const searchParams = new URLSearchParams();
@@ -83,6 +83,7 @@ const ListResultCard = (props: ResultCardProps) => {
               </Grid>
             </Grid>
           </Typography>
+          {/*TODO: over here, will render a div inside a <p>. should fix*/}
           <Typography variant="body2">
             <Grid container spacing={1}>
               <Grid item xs={3}>

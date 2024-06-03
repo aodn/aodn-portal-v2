@@ -48,7 +48,11 @@ const GridResultCard: React.FC<GridResultCardProps> = (props) => {
 
   if (props.content) {
     return (
-      <Card variant="outlined" sx={{ height: "100%" }}>
+      <Card
+        variant="outlined"
+        sx={{ height: "100%" }}
+        data-testid="result-card-grid"
+      >
         <CardActionArea
           onClick={() => {
             const searchParams = new URLSearchParams();

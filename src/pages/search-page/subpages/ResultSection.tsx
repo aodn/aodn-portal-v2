@@ -23,7 +23,7 @@ interface SearchResultListProps {
   ) => void;
 }
 
-const ResultBlock: React.FC<SearchResultListProps> = ({
+const ResultSection: React.FC<SearchResultListProps> = ({
   layout,
   setLayout,
   setIsShowingResult,
@@ -50,4 +50,4 @@ const ResultBlock: React.FC<SearchResultListProps> = ({
 };
 
 export { SearchResultLayoutEnum };
-export default ResultBlock;
+export default ResultSection;

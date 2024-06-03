@@ -37,9 +37,11 @@ import * as turf from "@turf/turf";
 // import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 // Map section, you can switch to other map library, this is for mapbox
 import { MapboxEvent as MapEvent } from "mapbox-gl";
-import ResultBlock, { SearchResultLayoutEnum } from "./subpages/ResultBlock";
+import ResultSection, {
+  SearchResultLayoutEnum,
+} from "./subpages/ResultSection";
 import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
-import MapBlock from "./subpages/MapBlock";
+import MapSection from "./subpages/MapSection";
 import { margin } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 
@@ -54,7 +56,7 @@ const SearchPage = () => {
   );
   const [isShowingResult, setIsShowingResult] = useState<boolean>(true);
 
-  // Layers inside this array will be add to map
+  // Layers inside this array will be added to map
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   const doSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -101,15 +103,17 @@ const SearchPage = () => {
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
   // and content may not refreshed
-  if (!location.state?.fromNavigate) {
-    // The first char is ? in the search string, so we need to remove it.
-    const param = location?.search.substring(1);
-    if (param !== null) {
-      const paramState: ParameterState = unFlattenToParameterState(param);
-      dispatch(updateParameterStates(paramState));
-      doSearch();
+  useEffect(() => {
+    if (!location.state?.fromNavigate) {
+      // The first char is ? in the search string, so we need to remove it.
+      const param = location?.search.substring(1);
+      if (param !== null) {
+        const paramState: ParameterState = unFlattenToParameterState(param);
+        dispatch(updateParameterStates(paramState));
+        doSearch();
+      }
     }
-  }
+  }, [location, dispatch, doSearch]);
   // Get contents when no more navigate needed.
   const contents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
@@ -145,21 +149,21 @@ const SearchPage = () => {
         </Grid>
         {isShowingResult ? (
           <>
-            <ResultBlock
+            <ResultSection
               contents={contents}
               onRemoveLayer={onRemoveLayer}
               layout={resultLayout}
               setLayout={setResultLayout}
               setIsShowingResult={setIsShowingResult}
             />
-            <MapBlock
+            <MapSection
               onMapZoomOrMove={onMapZoomOrMove}
               isShowingResult={isShowingResult}
               setIsShowingResult={setIsShowingResult}
             />
           </>
         ) : (
-          <MapBlock
+          <MapSection
             onMapZoomOrMove={onMapZoomOrMove}
             isShowingResult={isShowingResult}
             setIsShowingResult={setIsShowingResult}

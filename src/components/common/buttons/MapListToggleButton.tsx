@@ -2,7 +2,7 @@ import { IconButton, ListItemIcon, MenuItem } from "@mui/material";
 import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
 import React, { useState } from "react";
 import Menu from "@mui/material/Menu";
-import { SearchResultLayoutEnum } from "../../../pages/SearchPage/subpages/ResultBlock";
+import { SearchResultLayoutEnum } from "../../../pages/search-page/subpages/ResultSection";
 import ActionButtonPaper from "./ActionButtonPaper";
 import GridAndMapIcon from "../../icon/GridAndMapIcon";
 import ListAndMapIcon from "../../icon/ListAndMapIcon";

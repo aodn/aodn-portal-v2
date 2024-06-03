@@ -5,8 +5,9 @@ import {
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Grid, ListItem } from "@mui/material";
 import GridResultCard from "./GridResultCard";
-import { SearchResultLayoutEnum } from "../../pages/SearchPage/subpages/ResultBlock";
+import { SearchResultLayoutEnum } from "../../pages/search-page/subpages/ResultSection";
 import ListResultCard from "./ListResultCard";
+import React from "react";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
@@ -37,7 +38,7 @@ interface ResultCardsProps {
     | undefined;
 }
 
-const renderGrid = (
+const renderCells = (
   props: ResultCardsProps,
   child: ListChildComponentProps
 ) => {
@@ -45,6 +46,7 @@ const renderGrid = (
 
   const leftIndex = index * 2;
   const rightIndex = leftIndex + 1;
+
   return (
     <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
       <Grid container spacing={1}>
@@ -53,6 +55,7 @@ const renderGrid = (
             content={props.contents.result.collections[leftIndex]}
             onRemoveLayer={props.onRemoveLayer}
             onDownload={props.onDownload}
+            data-testid="result-cards-grid"
           />
         </Grid>
         <Grid item xs={6}>
@@ -67,7 +70,6 @@ const renderGrid = (
   );
 };
 
-// This function is use to control which item to render in the long list
 const renderRows = (
   props: ResultCardsProps,
   child: ListChildComponentProps
@@ -112,7 +114,7 @@ const ResultCards = (props: ResultCardsProps) => {
       itemCount={Math.ceil(props.contents.result.collections.length / 2)}
       overscanCount={10}
     >
-      {(child: ListChildComponentProps) => renderGrid(props, child)}
+      {(child: ListChildComponentProps) => renderCells(props, child)}
     </FixedSizeList>
   );
 };

@@ -22,7 +22,7 @@ interface SearchPageProps {
   setIsShowingResult: (value: boolean) => void;
 }
 
-const MapBlock: React.FC<SearchPageProps> = ({
+const MapSection: React.FC<SearchPageProps> = ({
   isShowingResult,
   onMapZoomOrMove,
   setIsShowingResult,
@@ -60,4 +60,4 @@ const MapBlock: React.FC<SearchPageProps> = ({
   );
 };
 
-export default MapBlock;
+export default MapSection;
