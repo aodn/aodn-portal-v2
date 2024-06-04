@@ -54,8 +54,8 @@ const ResultPanelSimpleFilter = () => {
             <ArrowForwardIosIcon />
           </IconButton>
         </Paper>
-        <MapListToggleButton />
         <SortButton />
+        <MapListToggleButton />
       </Grid>
     </Grid>
   );
