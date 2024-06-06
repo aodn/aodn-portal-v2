@@ -32,7 +32,7 @@ jobs:
         run: yarn install
 
       - name: Build Website
-        id: build_website_stage
+        id: build_website_staging
         run: yarn staging
 
       - uses: actions/upload-artifact@v4
@@ -88,7 +88,7 @@ jobs:
         run: yarn install
 
       - name: Build Website
-        id: build_website_prod
+        id: build_website_production
         run: yarn prod
 
       - uses: actions/upload-artifact@v4
@@ -112,7 +112,7 @@ jobs:
 
       - name: Upload Artifacts to Release
         run: |
-          artifacts='${{ steps.build_website_prod.outputs }}'
+          artifacts='${{ steps.build_website_production.outputs }}'
           echo "$json" > artifacts.json
           gh release upload ${{ github.ref_name }} artifacts.json
         env:
