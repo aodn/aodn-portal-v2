@@ -32,7 +32,7 @@ jobs:
         run: yarn install
 
       - name: Build Website
-        id: build_website_stage
+        id: build_website_staging
         run: yarn staging
 
       - uses: actions/upload-artifact@v4
