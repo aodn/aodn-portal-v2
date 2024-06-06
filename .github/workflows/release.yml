@@ -32,7 +32,7 @@ jobs:
         run: yarn install
 
       - name: Build Website
-        id: build_website_staging
+        id: build_website_stage
         run: yarn staging
 
       - uses: actions/upload-artifact@v4
@@ -136,3 +136,4 @@ jobs:
           --distribution-id ${{ vars.DISTRIBUTION_ID }} \
           --paths "/*" \
           --region ${{ vars.AWS_REGION }}
+          
