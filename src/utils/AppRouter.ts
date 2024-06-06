@@ -1,5 +1,5 @@
 import LandingPage from "../pages/LandingPage";
-import SearchPage from "../pages/SearchPage";
+import SearchPage from "../pages/search-page/SearchPage";
 import DetailsPage from "../pages/DetailsPage";
 import { pageDefault } from "../components/common/constants";
 import { createBrowserRouter } from "react-router-dom";

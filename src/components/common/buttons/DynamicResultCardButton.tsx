@@ -9,6 +9,7 @@ import { alpha } from "@mui/material/styles";
 interface DynamicResultCardButtonProps {
   status: string;
   onClick: () => void;
+  isbordered?: string;
 }
 
 interface ToolKit {
@@ -20,6 +21,7 @@ interface ToolKit {
 const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
   status = "un known",
   onClick,
+  isbordered = "true",
 }) => {
   const theme = useTheme();
 
@@ -63,7 +65,8 @@ const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
       startIcon={toolKit.icon}
       onClick={onClick}
       disabled={onClick === undefined}
-      determinedColor={toolKit.color}
+      determinedcolor={toolKit.color}
+      isbordered={isbordered}
     >
       {toolKit.text}
     </StyledResultCardButton>

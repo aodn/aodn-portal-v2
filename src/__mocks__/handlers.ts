@@ -1,13 +1,16 @@
 import { http, HttpResponse } from "msw";
 import { PARAMETER_CATEGORIES } from "./data/PARAMETER_CATEGORIES";
 import { SUGGESTER_OPTIONS } from "./data/SUGGESTER_OPTIONS";
+import { COLLECTIONS_WAVE } from "./data/COLLECTIONS_WAVE";
+
+const PREFIX = "/api/v1/ogc";
 
 export const handlers = [
-  http.get("/api/v1/ogc/ext/parameter/categories", () => {
+  http.get(PREFIX + "/ext/parameter/categories", () => {
     return HttpResponse.json(PARAMETER_CATEGORIES);
   }),
 
-  http.get("/api/v1/ogc/ext/autocomplete", ({ request }) => {
+  http.get(PREFIX + "/ext/autocomplete", ({ request }) => {
     const url = new URL(request.url);
     const input = url.searchParams.getAll("input");
     const filters = url.searchParams.getAll("filter");
@@ -19,6 +22,15 @@ export const handlers = [
     }
 
     return HttpResponse.json(getSuggesterOptionsBy(input[0], filters));
+  }),
+
+  http.get(PREFIX + "/collections", ({ request }) => {
+    const url = new URL(request.url);
+    const properties = url.searchParams.get("properties");
+    if (properties === "id,title,description,status,links") {
+      // For simplify current test usage, return wave result only for now. May need to update in the future
+      return HttpResponse.json(COLLECTIONS_WAVE);
+    }
   }),
 ];
 
