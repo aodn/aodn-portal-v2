@@ -98,7 +98,7 @@ const ResultCards = (props: ResultCardsProps) => {
       <FixedSizeList
         height={700}
         width={"100%"}
-        itemSize={240}
+        itemSize={260}
         itemCount={props.contents.result.collections.length}
         overscanCount={10}
       >

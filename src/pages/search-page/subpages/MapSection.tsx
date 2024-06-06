@@ -8,9 +8,11 @@ import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MenuControl, {
   BaseMapSwitcher,
 } from "../../../components/map/mapbox/controls/MenuControl";
-import Layers from "../../../components/map/mapbox/layers/Layers";
 import React from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
+import VectorTileLayers from "../../../components/map/mapbox/layers/VectorTileLayers";
+import { OGCCollection } from "../../../components/common/store/searchReducer";
+import Layers from "../../../components/map/mapbox/layers/Layers";
 
 const mapContainerId = "map-container-id";
 
@@ -18,9 +20,10 @@ interface SearchPageProps {
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
+  layers: OGCCollection[];
 }
 
-const MapSection: React.FC<SearchPageProps> = ({ onMapZoomOrMove }) => {
+const MapSection: React.FC<SearchPageProps> = ({ onMapZoomOrMove, layers }) => {
   return (
     <Grid
       item
@@ -29,7 +32,6 @@ const MapSection: React.FC<SearchPageProps> = ({ onMapZoomOrMove }) => {
         pr: 2,
         pb: 2,
         flex: 1,
-        width: "100%",
       }}
     >
       <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
@@ -44,7 +46,9 @@ const MapSection: React.FC<SearchPageProps> = ({ onMapZoomOrMove }) => {
             <ScaleControl />
             <MenuControl menu={<BaseMapSwitcher />} />
           </Controls>
-          <Layers>{/*<VectorTileLayers collections={layers} />*/}</Layers>
+          <Layers>
+            <VectorTileLayers collections={layers} />
+          </Layers>
         </Map>
       </Paper>
     </Grid>

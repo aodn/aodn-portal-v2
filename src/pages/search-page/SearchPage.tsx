@@ -167,17 +167,9 @@ const SearchPage = () => {
           <Grid item xs={1}>
             <ResultPanelIconFilter />
           </Grid>
-          {isShowingResult ? (
-            <>
-              <ResultSection
-                contents={contents}
-                onRemoveLayer={onRemoveLayer}
-              />
-              <MapSection onMapZoomOrMove={onMapZoomOrMove} />
-            </>
-          ) : (
-            <MapSection onMapZoomOrMove={onMapZoomOrMove} />
-          )}
+          <ResultSection contents={contents} onRemoveLayer={onRemoveLayer} />
+          <MapSection onMapZoomOrMove={onMapZoomOrMove} layers={layers} />
+          <Grid></Grid>
         </Grid>
       </Layout>
     </SearchResultLayoutContext.Provider>

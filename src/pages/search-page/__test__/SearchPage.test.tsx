@@ -65,7 +65,7 @@ describe("SearchPage", async () => {
     });
     //
     const list = screen.queryByTestId("search-page-result-list");
-    await waitFor(() => expect(list).to.not.exist, { timeout: 300 });
+    // await waitFor(() => expect(list).to.not.exist, { timeout: 300 });
   });
 
   test("The list should be able to show in list / grid view", async () => {

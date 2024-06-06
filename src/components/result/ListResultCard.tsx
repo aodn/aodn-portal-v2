@@ -73,7 +73,10 @@ const ListResultCard = (props: ResultCardProps) => {
         }}
       >
         <CardContent>
-          <Typography component="div" sx={{ marginBottom: "10px" }}>
+          <Typography
+            component="div"
+            sx={{ marginBottom: "10px", height: "48px" }}
+          >
             <Grid container>
               <Grid item xs={11}>
                 {`${props.content?.title?.slice(0, 90)}${props.content?.title?.length > 90 ? "..." : ""}`}
