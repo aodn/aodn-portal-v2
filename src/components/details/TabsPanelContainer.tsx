@@ -1,5 +1,5 @@
 import { FC, Fragment, SyntheticEvent, useCallback, useState } from "react";
-import { Card, CardContent, Divider, Paper } from "@mui/material";
+import { Card, CardContent, Divider, Paper, useTheme } from "@mui/material";
 import { TabsList as BaseTabsList } from "@mui/base/TabsList";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { Tabs } from "@mui/base/Tabs";
@@ -32,6 +32,7 @@ const CardWithTabsPanel: FC<TabsPanelProps> = ({ tabs }) => {
     []
   );
 
+  const theme = useTheme();
   return (
     <Card
       arial-label="container with tabs-panel"
@@ -58,7 +59,9 @@ const CardWithTabsPanel: FC<TabsPanelProps> = ({ tabs }) => {
       <Paper
         arial-label="container for tab content"
         elevation={3}
-        sx={{ borderRadius: `0 0 ${borderRadius.small} ${borderRadius.small}` }}
+        sx={{
+          borderRadius: `0 0 ${borderRadius.small} ${borderRadius.small}`,
+        }}
       >
         <CardContent>{tabs[currentTabIndex].component}</CardContent>
       </Paper>

@@ -17,7 +17,6 @@ import ContentUpperSection from "./subpages/ContentUpperSection";
 import ContentLowerSection from "./subpages/ContentLowerSection";
 import Fallback from "../Fallback";
 import { DetailPageProvider } from "./context/detail-page-provider";
-import { createContext } from "vm";
 
 export interface DetailsProps {
   collection?: OGCCollection;

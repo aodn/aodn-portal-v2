@@ -139,7 +139,7 @@ const HeaderPanel = () => {
         >
           <img
             aria-label="collection image"
-            src="public/logo/imos_logo_with_title.png"
+            src="logo/imos_logo_with_title.png"
             alt="imos_logo_with_title"
             style={{
               objectFit: "contain",

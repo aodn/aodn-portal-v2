@@ -52,8 +52,22 @@ import { margin } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 
 const mapContainerId = "map-container-id";
+interface SearchResultLayoutContextType {
+  resultLayout: SearchResultLayoutEnum;
+  setResultLayout: React.Dispatch<React.SetStateAction<SearchResultLayoutEnum>>;
+  isShowingResult: boolean;
+  setIsShowingResult: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const SearchResultLayoutContext = createContext(null);
+const SearchResultLayoutContextDefault = {
+  resultLayout: SearchResultLayoutEnum.LIST,
+  setResultLayout: () => {},
+  isShowingResult: true,
+  setIsShowingResult: () => {},
+};
+const SearchResultLayoutContext = createContext<SearchResultLayoutContextType>(
+  SearchResultLayoutContextDefault
+);
 
 const SearchPage = () => {
   const location = useLocation();

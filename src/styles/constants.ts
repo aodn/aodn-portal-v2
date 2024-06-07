@@ -45,6 +45,8 @@ const fontSize = {
   mapMenuItem: 14,
   mapMenuSubItem: 13,
   detailPageHeading: "20px",
+  icon: "10px",
+  info: "14px",
 };
 
 const fontWeight = {
@@ -69,6 +71,10 @@ const color = {
     background: "#E8EDF7",
     tabOnFocused: "#618CA5",
     tabOnHover: "",
+  },
+  blue: {
+    light: "rgba(231, 242, 255, 0.5)",
+    medium: "#E7F2FF",
   },
 };
 

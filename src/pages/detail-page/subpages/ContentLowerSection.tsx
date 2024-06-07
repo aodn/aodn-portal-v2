@@ -1,6 +1,6 @@
 import AbstractCard from "./tab-panels/AbstractPanel";
 import CardWithTabsPanel from "../../../components/details/TabsPanelContainer";
-import LInksAndDownloadsCard from "./tab-panels/LInksAndDownloadsPanel";
+import LinksAndDownloadsCard from "./tab-panels/LinksAndDownloadsPanel";
 import LineageCard from "./tab-panels/LineagePanel";
 import AssociatedRecordsCard from "./tab-panels/AssociatedRecordsPanel";
 import GlobalAttributeCard from "./tab-panels/GlobalAttributePanel";
@@ -9,7 +9,7 @@ const tabs = [
   {
     label: "Links and Downloads",
     value: "links and downloads",
-    component: <LInksAndDownloadsCard />,
+    component: <LinksAndDownloadsCard />,
   },
   { label: "Lineage", value: "lineage", component: <LineageCard /> },
   {
