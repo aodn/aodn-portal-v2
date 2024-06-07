@@ -20,10 +20,15 @@ interface SearchPageProps {
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
+  onToggleClicked: (v: boolean) => void;
   layers: OGCCollection[];
 }
 
-const MapSection: React.FC<SearchPageProps> = ({ onMapZoomOrMove, layers }) => {
+const MapSection: React.FC<SearchPageProps> = ({
+  onMapZoomOrMove,
+  onToggleClicked,
+  layers,
+}) => {
   return (
     <Grid
       item
@@ -41,7 +46,7 @@ const MapSection: React.FC<SearchPageProps> = ({ onMapZoomOrMove, layers }) => {
           onMoveEvent={onMapZoomOrMove}
         >
           <Controls>
-            <ToggleControl />
+            <ToggleControl onToggleClicked={onToggleClicked} />
             <NavigationControl />
             <ScaleControl />
             <MenuControl menu={<BaseMapSwitcher />} />

@@ -53,8 +53,6 @@ import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 
 const mapContainerId = "map-container-id";
 
-const SearchResultLayoutContext = createContext(null);
-
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -62,7 +60,15 @@ const SearchPage = () => {
   const [resultLayout, setResultLayout] = useState<SearchResultLayoutEnum>(
     SearchResultLayoutEnum.LIST
   );
-  const [isShowingResult, setIsShowingResult] = useState<boolean>(true);
+
+  // value true meaning full map, so we set emum, else keep it as is.
+  const onToggleDisplay = useCallback(
+    (value) =>
+      setResultLayout((current) =>
+        value ? SearchResultLayoutEnum.MAP : current
+      ),
+    [setResultLayout]
+  );
 
   // Layers inside this array will be added to map
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -133,47 +139,42 @@ const SearchPage = () => {
     [contents]
   );
 
-  const SearchResultLayoutContextFields = useMemo(
-    () => ({
-      resultLayout,
-      setResultLayout,
-      isShowingResult,
-      setIsShowingResult,
-    }),
-    [isShowingResult, resultLayout]
-  );
-
   return (
-    <SearchResultLayoutContext.Provider value={SearchResultLayoutContextFields}>
-      <Layout>
-        <Grid
-          container
-          spacing={2}
-          sx={{
-            backgroundImage: "url(/bg_search_results.png)",
-            backgroundSize: "cover",
-            marginTop: margin.sm,
-          }}
-        >
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={1} />
-              <Grid item xs={10}>
-                <ComplexTextSearch />
-              </Grid>
-              <Grid item xs={1} />
+    <Layout>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          backgroundImage: "url(/bg_search_results.png)",
+          backgroundSize: "cover",
+          marginTop: margin.sm,
+        }}
+      >
+        <Grid item xs={12}>
+          <Grid container>
+            <Grid item xs={1} />
+            <Grid item xs={10}>
+              <ComplexTextSearch />
             </Grid>
+            <Grid item xs={1} />
           </Grid>
-          <Grid item xs={1}>
-            <ResultPanelIconFilter />
-          </Grid>
-          <ResultSection contents={contents} onRemoveLayer={onRemoveLayer} />
-          <MapSection onMapZoomOrMove={onMapZoomOrMove} layers={layers} />
-          <Grid></Grid>
         </Grid>
-      </Layout>
-    </SearchResultLayoutContext.Provider>
+        <Grid item xs={1}>
+          <ResultPanelIconFilter />
+        </Grid>
+        <ResultSection
+          contents={contents}
+          onRemoveLayer={onRemoveLayer}
+          resultLayout={resultLayout}
+        />
+        <MapSection
+          onMapZoomOrMove={onMapZoomOrMove}
+          layers={layers}
+          onToggleClicked={onToggleDisplay}
+        />
+        <Grid></Grid>
+      </Grid>
+    </Layout>
   );
 };
-export { SearchResultLayoutContext };
 export default SearchPage;

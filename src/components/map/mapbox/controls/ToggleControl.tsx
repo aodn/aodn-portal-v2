@@ -8,15 +8,16 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import { SearchResultLayoutContext } from "../../../../pages/search-page/SearchPage";
 
-interface ToggleButtonProps {
-  isShowingResult: boolean;
-  setIsShowingResult: (isShowingResult: boolean) => void;
+interface ToggleControlProps {
+  showFullMap: boolean;
+  onToggleClicked?: (state: boolean) => void;
 }
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({
-  isShowingResult,
-  setIsShowingResult,
+const ToggleButton: React.FC<ToggleControlProps> = ({
+  showFullMap,
+  onToggleClicked,
 }) => {
+  const [toggle, setToggle] = useState<boolean>(showFullMap);
   return (
     <IconButton
       title="hint of the button"
@@ -29,13 +30,18 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
         alignItems: "center",
       }}
       onClick={() => {
-        setIsShowingResult(!isShowingResult);
+        const v = !toggle;
+        setToggle(v);
+
+        if (onToggleClicked) {
+          onToggleClicked(v);
+        }
       }}
     >
-      {isShowingResult ? (
-        <ArrowBackIosNewIcon fontSize="small" />
-      ) : (
+      {toggle ? (
         <ArrowForwardIosSharpIcon fontSize="small" />
+      ) : (
+        <ArrowBackIosNewIcon fontSize="small" />
       )}
     </IconButton>
   );
@@ -44,76 +50,63 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
 class ToggleControlClass implements IControl {
   private container: HTMLDivElement;
   private root: Root;
-  private readonly setIsShowingResult: (value: boolean) => void;
-  private readonly isShowingResult: boolean;
+  private props: ToggleControlProps;
 
-  constructor(
-    setIsShowingResult: (value: boolean) => void,
-    isShowingResult: boolean
-  ) {
-    this.isShowingResult = isShowingResult;
-    this.setIsShowingResult = setIsShowingResult;
+  constructor(props: ToggleControlProps) {
+    this.props = props;
   }
 
-  // It will generate warnings. React doesn't allow operating the real DOM directly. Should fix later
-  onChange(isShowingResult: boolean) {
-    this.root.render(
-      <React.Fragment>
-        <ToggleButton
-          isShowingResult={isShowingResult}
-          setIsShowingResult={this.setIsShowingResult}
-        />
-      </React.Fragment>
-    );
-  }
-
-  onAdd(_: Map): HTMLElement {
+  onAdd(map: Map): HTMLElement {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
     this.root = createRoot(this.container!);
     this.root.render(
       <ToggleButton
-        isShowingResult={this.isShowingResult}
-        setIsShowingResult={this.setIsShowingResult}
+        onToggleClicked={this.props.onToggleClicked}
+        showFullMap={this.props.showFullMap}
       />
     );
     return this.container;
   }
 
   onRemove(_: Map): void {
-    this.container.parentNode?.removeChild(this.container);
-    this.container = null;
+    console.log("onRemove toggle button");
+    if (this.container.parentNode) {
+      // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
+      // Keep the old pointer
+      setTimeout(() => {
+        this.container.parentNode.removeChild(this.container);
+        this.container = null;
+        this.root.unmount();
+      });
+    }
   }
 }
 
-const ToggleControl = () => {
+const ToggleControl = (props: ToggleControlProps) => {
   const { map } = useContext(MapContext);
-  const [_, setInit] = useState<boolean>(false);
-  const { isShowingResult, setIsShowingResult } = useContext(
-    SearchResultLayoutContext
-  );
-
-  const controlRef = useRef<ToggleControlClass | null>(null);
+  const [init, setInit] = useState<boolean>(false);
 
   useEffect(() => {
     if (map === null) return;
-    if (!controlRef.current) {
-      controlRef.current = new ToggleControlClass(
-        setIsShowingResult,
-        isShowingResult
-      );
-    }
     setInit((prev) => {
       if (!prev) {
-        map.addControl(controlRef.current, "top-left");
-      } else {
-        controlRef.current.onChange(isShowingResult);
+        const n = new ToggleControlClass({
+          showFullMap: props.showFullMap,
+          onToggleClicked: props?.onToggleClicked,
+        });
+        map.addControl(n, "top-left");
       }
       return true;
     });
-  }, [isShowingResult, map, setIsShowingResult]);
+  }, [map, props]);
 
   return <React.Fragment />;
+};
+
+ToggleControl.defaultProps = {
+  showFullMap: false,
+  onToggleClicked: (v: boolean) => {},
 };
 
 export default ToggleControl;

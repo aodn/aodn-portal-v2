@@ -8,9 +8,9 @@ import GridResultCard from "./GridResultCard";
 import { SearchResultLayoutEnum } from "../../pages/search-page/subpages/ResultSection";
 import ListResultCard from "./ListResultCard";
 import React, { useContext } from "react";
-import { SearchResultLayoutContext } from "../../pages/search-page/SearchPage";
 
 interface ResultCardsProps {
+  resultLayout: SearchResultLayoutEnum;
   contents: CollectionsQueryType;
   onRemoveLayer:
     | ((
@@ -91,9 +91,7 @@ const renderRows = (
   );
 };
 const ResultCards = (props: ResultCardsProps) => {
-  const { resultLayout } = useContext(SearchResultLayoutContext);
-
-  if (resultLayout === SearchResultLayoutEnum.LIST) {
+  if (props.resultLayout === SearchResultLayoutEnum.LIST) {
     return (
       <FixedSizeList
         height={700}

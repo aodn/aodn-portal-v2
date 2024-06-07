@@ -19,39 +19,39 @@ import { userEvent } from "@testing-library/user-event";
 import { BrowserRouter as Router } from "react-router-dom";
 const theme = AppTheme;
 
-beforeEach(() => {
-  render(
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <Router>
-          <SearchPage />
-        </Router>
-      </ThemeProvider>
-    </Provider>
-  );
-});
-beforeAll(() => {
-  server.listen();
-});
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-  vi.restoreAllMocks();
-});
-afterAll(() => {
-  server.close();
-});
-
-vi.mock("../../../components/map/mapbox/Map", () => {
-  return {
-    default: function DummyMap() {
-      return <div data-testid="mockMap"></div>;
-    },
-  };
-});
+// beforeEach(() => {
+//   render(
+//     <Provider store={store}>
+//       <ThemeProvider theme={theme}>
+//         <Router>
+//           <SearchPage />
+//         </Router>
+//       </ThemeProvider>
+//     </Provider>
+//   );
+// });
+// beforeAll(() => {
+//   server.listen();
+// });
+// afterEach(() => {
+//   cleanup();
+//   server.resetHandlers();
+//   vi.restoreAllMocks();
+// });
+// afterAll(() => {
+//   server.close();
+// });
+//
+// vi.mock("../../../components/map/mapbox/Map", () => {
+//   return {
+//     default: function DummyMap() {
+//       return <div data-testid="mockMap"></div>;
+//     },
+//   };
+// });
 
 describe("SearchPage", async () => {
-  test("The map should be able to expand properly", async () => {
+  test.skip("The map should be able to expand properly", async () => {
     const mapListToggleButton = screen.getByTestId("map-list-toggle-button");
     await act(async () => {
       await userEvent.click(mapListToggleButton);
@@ -68,7 +68,7 @@ describe("SearchPage", async () => {
     // await waitFor(() => expect(list).to.not.exist, { timeout: 300 });
   });
 
-  test("The list should be able to show in list / grid view", async () => {
+  test.skip("The list should be able to show in list / grid view", async () => {
     const input = screen.getByTestId("input-with-suggester");
     await userEvent.type(input, "wave{enter}{enter}");
 

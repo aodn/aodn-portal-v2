@@ -25,7 +25,13 @@ const SlimSelect = styled(InputBase)(() => ({
   },
 }));
 
-const ResultPanelSimpleFilter = () => {
+interface ResultPanelSimpleFilterProps {
+  onChangeLayout: (layout: SearchResultLayoutEnum) => void;
+}
+
+const ResultPanelSimpleFilter = ({
+  onChangeLayout,
+}: ResultPanelSimpleFilterProps) => {
   return (
     <Grid container justifyContent="center">
       <Grid container item xs={12} sx={{ pb: 1 }}>
@@ -55,7 +61,7 @@ const ResultPanelSimpleFilter = () => {
           </IconButton>
         </Paper>
         <SortButton />
-        <MapListToggleButton />
+        <MapListToggleButton onChangeLayout={onChangeLayout} />
       </Grid>
     </Grid>
   );

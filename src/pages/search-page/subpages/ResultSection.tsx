@@ -6,14 +6,15 @@ import {
 } from "../../../components/common/store/searchReducer";
 import React, { useContext } from "react";
 import ResultCards from "../../../components/result/ResultCards";
-import { SearchResultLayoutContext } from "../SearchPage";
 
 enum SearchResultLayoutEnum {
   GRID = "GRID",
   LIST = "LIST",
+  MAP = "MAP",
 }
 
 interface SearchResultListProps {
+  resultLayout: SearchResultLayoutEnum;
   contents: CollectionsQueryType;
   onRemoveLayer: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -22,19 +23,22 @@ interface SearchResultListProps {
 }
 
 const ResultSection: React.FC<SearchResultListProps> = ({
+  resultLayout,
   contents,
   onRemoveLayer,
 }) => {
-  const { isShowingResult } = useContext(SearchResultLayoutContext);
-
   return (
     <Grid
       item
-      sx={{ width: "700px", display: isShowingResult ? "block" : "none" }}
+      sx={{
+        width: "700px",
+        display: resultLayout !== SearchResultLayoutEnum.MAP ? "block" : "none",
+      }}
       data-testid="search-page-result-list"
     >
       <ResultPanelSimpleFilter />
       <ResultCards
+        resultLayout={resultLayout}
         contents={contents}
         onRemoveLayer={onRemoveLayer}
         onDownload={undefined}

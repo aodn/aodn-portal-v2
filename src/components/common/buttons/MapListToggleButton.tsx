@@ -9,13 +9,16 @@ import ListAndMapIcon from "../../icon/ListAndMapIcon";
 import FullMapViewIcon from "../../icon/FullMapViewIcon";
 import { SearchResultLayoutContext } from "../../../pages/search-page/SearchPage";
 
-const MapListToggleButton = () => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+interface MapListToggleButtonProps {
+  onChangeLayout: (layout: SearchResultLayoutEnum) => void;
+}
 
-  const { resultLayout, setResultLayout, setIsShowingResult } = useContext(
-    SearchResultLayoutContext
+const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [resultLayout, setResultLayout] = useState<SearchResultLayoutEnum>(
+    SearchResultLayoutEnum.Grid
   );
+  const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -26,18 +29,16 @@ const MapListToggleButton = () => {
   };
 
   const determineShowingIcon = () => {
-    if (resultLayout === SearchResultLayoutEnum.LIST) {
-      return (
-        <>
-          <ListAndMapIcon />
-        </>
-      );
+    switch (resultLayout) {
+      case SearchResultLayoutEnum.LIST:
+        return <ListAndMapIcon />;
+
+      case SearchResultLayoutEnum.GRID:
+        return <GridAndMapIcon />;
+
+      default:
+        return <FullMapViewIcon />;
     }
-    if (resultLayout === SearchResultLayoutEnum.GRID) {
-      return <GridAndMapIcon />;
-    }
-    // TODO: May need to handle error in the future
-    return undefined;
   };
 
   return (
@@ -64,8 +65,9 @@ const MapListToggleButton = () => {
       >
         <MenuItem
           onClick={() => {
-            setIsShowingResult(false);
+            setResultLayout(SearchResultLayoutEnum.MAP);
             handleClose();
+            onChangeLayout(SearchResultLayoutEnum.MAP);
           }}
         >
           <ListItemIcon>
@@ -77,6 +79,7 @@ const MapListToggleButton = () => {
           onClick={() => {
             setResultLayout(SearchResultLayoutEnum.LIST);
             handleClose();
+            onChangeLayout(SearchResultLayoutEnum.LIST);
           }}
         >
           <ListItemIcon>
@@ -88,6 +91,7 @@ const MapListToggleButton = () => {
           onClick={() => {
             setResultLayout(SearchResultLayoutEnum.GRID);
             handleClose();
+            onChangeLayout(SearchResultLayoutEnum.GRID);
           }}
         >
           <ListItemIcon>
