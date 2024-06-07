@@ -29,9 +29,6 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
         alignItems: "center",
       }}
       onClick={() => {
-        //const v = !toggle;
-        //setToggle(v);
-
         if (onToggleClicked) {
           onToggleClicked(!showFullMap);
         }
