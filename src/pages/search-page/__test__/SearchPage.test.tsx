@@ -53,19 +53,25 @@ vi.mock("../../../components/map/mapbox/Map", () => {
 describe("SearchPage", async () => {
   test("The map should be able to expand properly", async () => {
     const mapListToggleButton = screen.getByTestId("map-list-toggle-button");
-    await act(async () => {
-      await userEvent.click(mapListToggleButton);
-    });
+    await userEvent.click(mapListToggleButton);
 
     const fullMapViewOption = screen.queryByText("Full Map View");
     expect(fullMapViewOption).to.exist;
 
-    await act(async () => {
-      await userEvent.click(fullMapViewOption);
+    const listStyle1 = window.getComputedStyle(
+      screen.queryByTestId("search-page-result-list")
+    );
+    await waitFor(() => expect(listStyle1.display).to.equal("block"), {
+      timeout: 300,
     });
-    //
-    const list = screen.queryByTestId("search-page-result-list");
-    // await waitFor(() => expect(list).to.not.exist, { timeout: 300 });
+
+    await userEvent.click(fullMapViewOption);
+    const listStyle2 = window.getComputedStyle(
+      screen.queryByTestId("search-page-result-list")
+    );
+    await waitFor(() => expect(listStyle2.display).to.equal("none"), {
+      timeout: 300,
+    });
   });
 
   test("The list should be able to show in list / grid view", async () => {
