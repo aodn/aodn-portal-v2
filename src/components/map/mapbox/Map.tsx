@@ -99,11 +99,12 @@ const ReactMap = ({
 
       // Create a resize observer to the canvas so we know if its size have changed
       // and we need to redraw the map
+      const canvas = document.getElementById(panelId);
       const resizeObserver = new ResizeObserver((entries) => map.resize());
-      resizeObserver.observe(document.getElementById(panelId));
+      resizeObserver.observe(canvas);
 
       return () => {
-        resizeObserver.unobserve(document.getElementById(panelId));
+        resizeObserver.unobserve(canvas);
         map.off("zoomend", zoomEvent);
         map.off("moveend", moveEvent);
 

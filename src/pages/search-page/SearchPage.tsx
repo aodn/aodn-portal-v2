@@ -43,13 +43,12 @@ import * as turf from "@turf/turf";
 // import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 // Map section, you can switch to other map library, this is for mapbox
 import { MapboxEvent as MapEvent } from "mapbox-gl";
-import ResultSection, {
-  SearchResultLayoutEnum,
-} from "./subpages/ResultSection";
+import ResultSection from "./subpages/ResultSection";
 import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
 import MapSection from "./subpages/MapSection";
 import { margin } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
+import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 
 const mapContainerId = "map-container-id";
 
@@ -57,17 +56,24 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [resultLayout, setResultLayout] = useState<SearchResultLayoutEnum>(
-    SearchResultLayoutEnum.LIST
+  const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
+    SearchResultLayoutEnum.VISIBLE
   );
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
     (value) =>
-      setResultLayout((current) =>
-        value ? SearchResultLayoutEnum.MAP : current
+      setVisibility(
+        value
+          ? SearchResultLayoutEnum.INVISIBLE
+          : SearchResultLayoutEnum.VISIBLE
       ),
-    [setResultLayout]
+    [setVisibility]
+  );
+
+  const onVisibilityChanged = useCallback(
+    (value) => setVisibility(value),
+    [setVisibility]
   );
 
   // Layers inside this array will be added to map
@@ -163,9 +169,10 @@ const SearchPage = () => {
           <ResultPanelIconFilter />
         </Grid>
         <ResultSection
+          visibility={visibility}
           contents={contents}
           onRemoveLayer={onRemoveLayer}
-          resultLayout={resultLayout}
+          onVisibilityChanged={onVisibilityChanged}
         />
         <MapSection
           onMapZoomOrMove={onMapZoomOrMove}

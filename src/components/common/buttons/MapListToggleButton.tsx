@@ -2,12 +2,18 @@ import { IconButton, ListItemIcon, MenuItem } from "@mui/material";
 import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
 import React, { useContext, useState } from "react";
 import Menu from "@mui/material/Menu";
-import { SearchResultLayoutEnum } from "../../../pages/search-page/subpages/ResultSection";
 import ActionButtonPaper from "./ActionButtonPaper";
 import GridAndMapIcon from "../../icon/GridAndMapIcon";
 import ListAndMapIcon from "../../icon/ListAndMapIcon";
 import FullMapViewIcon from "../../icon/FullMapViewIcon";
 import { SearchResultLayoutContext } from "../../../pages/search-page/SearchPage";
+
+enum SearchResultLayoutEnum {
+  GRID = "GRID",
+  LIST = "LIST",
+  INVISIBLE = "INVISIBLE",
+  VISIBLE = "VISIBLE",
+}
 
 interface MapListToggleButtonProps {
   onChangeLayout: (layout: SearchResultLayoutEnum) => void;
@@ -65,9 +71,10 @@ const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
       >
         <MenuItem
           onClick={() => {
-            setResultLayout(SearchResultLayoutEnum.MAP);
+            // No need to set layout because we want to
+            // remember the last layout
             handleClose();
-            onChangeLayout(SearchResultLayoutEnum.MAP);
+            onChangeLayout(SearchResultLayoutEnum.INVISIBLE);
           }}
         >
           <ListItemIcon>
@@ -104,4 +111,5 @@ const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
   );
 };
 
+export { SearchResultLayoutEnum };
 export default MapListToggleButton;

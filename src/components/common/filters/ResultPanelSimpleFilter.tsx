@@ -11,7 +11,9 @@ import {
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import MapListToggleButton from "../buttons/MapListToggleButton";
+import MapListToggleButton, {
+  SearchResultLayoutEnum,
+} from "../buttons/MapListToggleButton";
 import SortButton from "../buttons/SortButton";
 import React from "react";
 
