@@ -175,8 +175,9 @@ const SearchPage = () => {
           onVisibilityChanged={onVisibilityChanged}
         />
         <MapSection
-          onMapZoomOrMove={onMapZoomOrMove}
           layers={layers}
+          showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
+          onMapZoomOrMove={onMapZoomOrMove}
           onToggleClicked={onToggleDisplay}
         />
         <Grid></Grid>
