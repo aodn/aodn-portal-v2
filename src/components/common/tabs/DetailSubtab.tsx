@@ -4,9 +4,14 @@ import { Box, Button } from "@mui/material";
 interface DetailSubtabProps {
   title: string;
   selectedTab: string;
+  setSelectedTab: (tab: string) => void;
 }
 
-const DetailSubtab: React.FC<DetailSubtabProps> = ({ title, selectedTab }) => {
+const DetailSubtab: React.FC<DetailSubtabProps> = ({
+  title,
+  selectedTab,
+  setSelectedTab,
+}) => {
   const isSelected = selectedTab === title;
   return (
     <Box
@@ -20,7 +25,9 @@ const DetailSubtab: React.FC<DetailSubtabProps> = ({ title, selectedTab }) => {
         borderRadius: "5px",
       }}
     >
-      <Button sx={{ minWidth: 0 }}>{title}</Button>
+      <Button sx={{ minWidth: 0 }} onClick={() => setSelectedTab(title)}>
+        {title}
+      </Button>
     </Box>
   );
 };
