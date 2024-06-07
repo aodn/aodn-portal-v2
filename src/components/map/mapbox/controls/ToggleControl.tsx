@@ -6,7 +6,6 @@ import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
-import { SearchResultLayoutContext } from "../../../../pages/search-page/SearchPage";
 
 interface ToggleControlProps {
   showFullMap: boolean;
@@ -19,6 +18,7 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
 }) => {
   return (
     <IconButton
+      id="map-toggle-control-button"
       title="hint of the button"
       style={{
         width: "29px",
@@ -55,7 +55,6 @@ class ToggleControlClass implements IControl {
   redraw(showFullMap: boolean) {
     this.root.render(
       <ToggleButton
-        id="map-toggle-control-button"
         onToggleClicked={this.props.onToggleClicked}
         showFullMap={showFullMap}
       />
@@ -104,7 +103,10 @@ const ToggleControl = (props: ToggleControlProps) => {
     });
   }, [map, props]);
 
-  useEffect(() => control?.redraw(props.showFullMap), [props.showFullMap]);
+  useEffect(
+    () => control?.redraw(props.showFullMap),
+    [props.showFullMap, control]
+  );
 
   return <React.Fragment />;
 };

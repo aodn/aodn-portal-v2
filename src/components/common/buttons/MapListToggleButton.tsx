@@ -6,7 +6,6 @@ import ActionButtonPaper from "./ActionButtonPaper";
 import GridAndMapIcon from "../../icon/GridAndMapIcon";
 import ListAndMapIcon from "../../icon/ListAndMapIcon";
 import FullMapViewIcon from "../../icon/FullMapViewIcon";
-import { SearchResultLayoutContext } from "../../../pages/search-page/SearchPage";
 
 enum SearchResultLayoutEnum {
   GRID = "GRID",
@@ -22,7 +21,7 @@ interface MapListToggleButtonProps {
 const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [resultLayout, setResultLayout] = useState<SearchResultLayoutEnum>(
-    SearchResultLayoutEnum.Grid
+    SearchResultLayoutEnum.GRID
   );
   const open = Boolean(anchorEl);
 
