@@ -29,7 +29,10 @@ jobs:
           cache: 'yarn'
 
       - name: Install yarn
-        run: yarn install
+        run: |
+          : # set-version will always download the latest version of yarn
+          yarn policies set-version
+          yarn install --frozen-lockfile
 
       - name: Build Website
         id: build_website_staging
@@ -85,7 +88,10 @@ jobs:
           cache: 'yarn'
 
       - name: Install yarn
-        run: yarn install
+        run: |
+          : # set-version will always download the latest version of yarn
+          yarn policies set-version
+          yarn install --frozen-lockfile
 
       - name: Build Website
         id: build_website_production

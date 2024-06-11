@@ -26,7 +26,10 @@ jobs:
           cache: 'yarn'
 
       - name: Install yarn
-        run: yarn install
+        run: |
+          : # set-version will always download the latest version of yarn
+          yarn policies set-version
+          yarn install --frozen-lockfile
 
       - name: Build Website
         run: yarn edge
