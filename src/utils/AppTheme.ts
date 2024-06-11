@@ -1,5 +1,29 @@
 import { createTheme } from "@mui/material/styles";
 
+declare module "@mui/material/styles" {
+  interface Palette {
+    ochre: Palette["primary"];
+  }
+
+  interface PaletteOptions {
+    ochre?: PaletteOptions["primary"];
+  }
+
+  interface TypographyVariants {
+    detail: TypographyVariants["body1"];
+  }
+
+  interface TypographyVariantsOptions {
+    detail?: TypographyVariantsOptions["body1"];
+  }
+}
+
+declare module "@mui/material/Typography/Typography" {
+  interface TypographyPropsVariantOverrides {
+    detail: true;
+  }
+}
+
 const AppTheme = createTheme({
   palette: {
     primary: {
@@ -48,6 +72,13 @@ const AppTheme = createTheme({
       "sans-serif",
       "Roboto",
     ].join(","),
+
+    detail: {
+      padding: "10px 0 0 0",
+      lineHeight: "1.5",
+      color: "#747474",
+      fontFamily: "Noto Sans",
+    },
 
     body1: {
       padding: "10px 0 0 0",
