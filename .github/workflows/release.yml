@@ -32,7 +32,7 @@ jobs:
         run: |
           : # set-version will always download the latest version of yarn
           yarn policies set-version 4.3.0
-          yarn install
+          yarn install --immutable
 
       - name: Build Website
         id: build_website_staging
@@ -91,7 +91,7 @@ jobs:
         run: |
           : # set-version will always download the latest version of yarn
           yarn policies set-version 4.3.0
-          yarn install
+          yarn install --immutable
 
       - name: Build Website
         id: build_website_production
