@@ -13,7 +13,7 @@ const DownloadIcon = () => {
         alignItems: "center",
         width: "84px",
         height: "84px",
-        backgroundColor: color.blue.light,
+        backgroundColor: color.blue.lightSemiTransparent,
       }}
     >
       <FileDownloadIcon />

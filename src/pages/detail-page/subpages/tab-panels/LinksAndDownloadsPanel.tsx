@@ -30,16 +30,16 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../components/common/store/store";
 import { updateDateTimeFilterRange } from "../../../../components/common/store/componentParamReducer";
 import DateRangeSlider from "../../../../components/details/DateRangeSlider";
+import TimeRangeIcon from "../../../../components/details/icons/TimeRangeIcon";
 
 // TODO: replace with real select options
 const selects = {
   download: {
-    label: "",
     selectOptions: ["NetCDFs"],
   },
   selectionMode: {
     label: "Selection mode",
-    selectOptions: ["Polygon, Point, Line"],
+    selectOptions: ["Polygon", "Point", "Line"],
   },
   selectedArea: {
     label: "Selected area",
@@ -64,27 +64,8 @@ const selects = {
 };
 
 const LinksAndDownloadsCard = () => {
-  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const theme = useTheme();
-
-  const dispatch = useDispatch<AppDispatch>();
-  const [startDate, setStartDate] = useState<Date>(dateDefault.min);
-  const [endDate, setEndDate] = useState<Date>(dateDefault.max);
-  const [minimumDate, setMinimumDate] = useState<Date>(dateDefault.min);
-  const onSlideChanged = useCallback(
-    (start: number, end: number, startIndex: number, endIndex: number) => {
-      setStartDate(new Date(start));
-      setEndDate(new Date(end));
-
-      dispatch(
-        updateDateTimeFilterRange({
-          start: startIndex === 0 ? undefined : start,
-          end: endIndex === 100 ? undefined : end,
-        })
-      );
-    },
-    [dispatch]
-  );
+  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
 
   const selectSxProps = {
     height: "30px",
@@ -110,6 +91,7 @@ const LinksAndDownloadsCard = () => {
       <CommonSelect items={select.selectOptions} sxProps={selectSxProps} />
     </Stack>
   );
+
   return (
     <>
       <Grid container>
@@ -194,7 +176,7 @@ const LinksAndDownloadsCard = () => {
                   <Grid container spacing={4}>
                     <Grid container item spacing={4} arial-babel="time range">
                       <Grid item xs={2}>
-                        time range
+                        <TimeRangeIcon />
                       </Grid>
                       <Grid item xs={10}>
                         <DateRangeSlider />

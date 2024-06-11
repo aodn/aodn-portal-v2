@@ -1,12 +1,20 @@
 import React, { useState } from "react";
-import { Slider, Box, Grid } from "@mui/material";
+import { Slider, Box, Grid, useTheme, styled } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
-import { padding } from "../../styles/constants";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import {
+  color,
+  fontColor,
+  fontSize,
+  fontWeight,
+  padding,
+} from "../../styles/constants";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { dateDefault } from "../common/constants";
 
-const initialMinDate: Dayjs = dayjs("2000-01-01");
-const initialMaxDate: Dayjs = dayjs("2024-01-01");
+const initialMinDate: Dayjs = dayjs(dateDefault.min);
+const initialMaxDate: Dayjs = dayjs(dateDefault.max);
 
 // Utility function to convert a date to a numeric value
 const dateToValue = (date: Dayjs): number => date.valueOf();
@@ -15,6 +23,7 @@ const dateToValue = (date: Dayjs): number => date.valueOf();
 const valueToDate = (value: number): Dayjs => dayjs(value);
 
 const DateRangeSlider: React.FC = () => {
+  const theme = useTheme();
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
   const [maxDate, setMaxDate] = useState<Dayjs>(initialMaxDate);
   const [value, setValue] = useState<number[]>([
@@ -27,6 +36,9 @@ const DateRangeSlider: React.FC = () => {
     newValue: number | number[]
   ): void => {
     setValue(newValue as number[]);
+    if (!Array.isArray(newValue)) return;
+    setMinDate(valueToDate(newValue[0]));
+    setMaxDate(valueToDate(newValue[1]));
   };
 
   const handleMinDateChange = (newMinDate: Dayjs | null) => {
@@ -43,6 +55,33 @@ const DateRangeSlider: React.FC = () => {
     }
   };
 
+  const datePikerSlotProps = {
+    desktopPaper: {
+      sx: {
+        backgroundColor: color.blue.light,
+        width: "350px",
+
+        ".MuiPickersYear-yearButton": {
+          color: fontColor.gray.dark,
+          padding: 0,
+        },
+        ".MuiPickersYear-yearButton.Mui-selected": {
+          color: "#fff",
+          backgroundColor: theme.palette.primary,
+        },
+        ".MuiPickersMonth-monthButton": {
+          color: fontColor.gray.dark,
+          padding: 0,
+        },
+
+        ".MuiPickersMonth-monthButton.Mui-selected": {
+          color: "#fff",
+          backgroundColor: theme.palette.primary,
+        },
+      },
+    },
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Grid container>
@@ -57,30 +96,55 @@ const DateRangeSlider: React.FC = () => {
           }}
         >
           <Box sx={{ width: "90%", paddingTop: padding.extraLarge }}>
-            <Slider
+            <PlainSlider
               value={value}
-              min={dateToValue(minDate)}
-              max={dateToValue(maxDate)}
+              min={dateToValue(initialMinDate)}
+              max={dateToValue(initialMaxDate)}
               onChange={handleSliderChange}
               valueLabelDisplay="on"
               valueLabelFormat={(value: number) =>
-                valueToDate(value).format("MM/DD/YYYY")
+                valueToDate(value).format("MM/YYYY")
               }
             />
           </Box>
         </Grid>
-        <Grid item xs={6}>
-          <DatePicker
-            label="Start Date"
+        <Grid
+          item
+          xs={6}
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+          }}
+        >
+          <PlainDatePicker
+            views={["month", "year"]}
+            format="MM/YYYY"
             value={minDate}
-            onChange={handleMinDateChange}
+            minDate={initialMinDate}
+            maxDate={valueToDate(value[1])}
+            onChange={(date) => handleMinDateChange(date as Dayjs)}
+            slotProps={{
+              inputAdornment: {
+                position: "start",
+              },
+              ...datePikerSlotProps,
+            }}
           />
         </Grid>
-        <Grid item xs={6}>
-          <DatePicker
-            label="End Date"
+        <Grid
+          item
+          xs={6}
+          sx={{ display: "flex", justifyContent: "end", alignItems: "center" }}
+        >
+          <PlainDatePicker
+            views={["month", "year"]}
+            format="MM/YYYY"
             value={maxDate}
-            onChange={handleMaxDateChange}
+            minDate={valueToDate(value[0])}
+            maxDate={initialMaxDate}
+            onChange={(date) => handleMaxDateChange(date as Dayjs)}
+            slotProps={datePikerSlotProps}
           />
         </Grid>
       </Grid>
@@ -89,3 +153,32 @@ const DateRangeSlider: React.FC = () => {
 };
 
 export default DateRangeSlider;
+
+const PlainDatePicker = styled(DatePicker)(({ theme }) => ({
+  backgroundColor: "transparent",
+  width: "100px",
+
+  "& fieldset": {
+    border: "none",
+  },
+  "& input": {
+    fontSize: "14px",
+    color: `${fontColor.gray.dark}`,
+    fontWeight: `${fontWeight.regular}`,
+    padding: 0,
+    textAlign: "center",
+  },
+  "& .MuiInputBase-root": {
+    padding: 0,
+  },
+}));
+
+const PlainSlider = styled(Slider)(() => ({
+  "& .MuiSlider-valueLabel": {
+    fontSize: `${fontSize.info}`,
+    fontWeight: `${fontWeight.regular}`,
+    color: `${fontColor.gray.medium}`,
+    top: -6,
+    backgroundColor: "transparent",
+  },
+}));

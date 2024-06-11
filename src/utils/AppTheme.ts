@@ -24,8 +24,8 @@ const AppTheme = createTheme({
     },
     success: {
       main: "#4CAF50",
-      light: "",
-      dark: "",
+      // light: "",
+      // dark: "",
     },
   },
 

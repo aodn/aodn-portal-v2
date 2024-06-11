@@ -73,7 +73,8 @@ const color = {
     tabOnHover: "",
   },
   blue: {
-    light: "rgba(231, 242, 255, 0.5)",
+    light: "#E7F2FF",
+    lightSemiTransparent: "rgba(231, 242, 255, 0.5)",
     medium: "#E7F2FF",
   },
 };
