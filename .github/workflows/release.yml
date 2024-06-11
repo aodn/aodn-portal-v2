@@ -31,8 +31,8 @@ jobs:
       - name: Install yarn
         run: |
           : # set-version will always download the latest version of yarn
-          yarn policies set-version
-          yarn install --frozen-lockfile
+          yarn policies set-version 4.3.0
+          yarn install --immutable
 
       - name: Build Website
         id: build_website_staging
@@ -90,8 +90,8 @@ jobs:
       - name: Install yarn
         run: |
           : # set-version will always download the latest version of yarn
-          yarn policies set-version
-          yarn install --frozen-lockfile
+          yarn policies set-version 4.3.0
+          yarn install --immutable
 
       - name: Build Website
         id: build_website_production
