@@ -43,40 +43,38 @@ import * as turf from "@turf/turf";
 // import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 // Map section, you can switch to other map library, this is for mapbox
 import { MapboxEvent as MapEvent } from "mapbox-gl";
-import ResultSection, {
-  SearchResultLayoutEnum,
-} from "./subpages/ResultSection";
+import ResultSection from "./subpages/ResultSection";
 import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
 import MapSection from "./subpages/MapSection";
 import { margin } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
+import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 
 const mapContainerId = "map-container-id";
-interface SearchResultLayoutContextType {
-  resultLayout: SearchResultLayoutEnum;
-  setResultLayout: React.Dispatch<React.SetStateAction<SearchResultLayoutEnum>>;
-  isShowingResult: boolean;
-  setIsShowingResult: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const SearchResultLayoutContextDefault = {
-  resultLayout: SearchResultLayoutEnum.LIST,
-  setResultLayout: () => {},
-  isShowingResult: true,
-  setIsShowingResult: () => {},
-};
-const SearchResultLayoutContext = createContext<SearchResultLayoutContextType>(
-  SearchResultLayoutContextDefault
-);
 
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [resultLayout, setResultLayout] = useState<SearchResultLayoutEnum>(
-    SearchResultLayoutEnum.LIST
+  const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
+    SearchResultLayoutEnum.VISIBLE
   );
-  const [isShowingResult, setIsShowingResult] = useState<boolean>(true);
+
+  // value true meaning full map, so we set emum, else keep it as is.
+  const onToggleDisplay = useCallback(
+    (value) =>
+      setVisibility(
+        value
+          ? SearchResultLayoutEnum.INVISIBLE
+          : SearchResultLayoutEnum.VISIBLE
+      ),
+    [setVisibility]
+  );
+
+  const onVisibilityChanged = useCallback(
+    (value) => setVisibility(value),
+    [setVisibility]
+  );
 
   // Layers inside this array will be added to map
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -147,47 +145,44 @@ const SearchPage = () => {
     [contents]
   );
 
-  const SearchResultLayoutContextFields = useMemo(
-    () => ({
-      resultLayout,
-      setResultLayout,
-      isShowingResult,
-      setIsShowingResult,
-    }),
-    [isShowingResult, resultLayout]
-  );
-
   return (
-    <SearchResultLayoutContext.Provider value={SearchResultLayoutContextFields}>
-      <Layout>
-        <Grid
-          container
-          spacing={2}
-          sx={{
-            backgroundImage: "url(/bg_search_results.png)",
-            backgroundSize: "cover",
-            marginTop: margin.sm,
-          }}
-        >
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={1} />
-              <Grid item xs={10}>
-                <ComplexTextSearch />
-              </Grid>
-              <Grid item xs={1} />
+    <Layout>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          backgroundImage: "url(/bg_search_results.png)",
+          backgroundSize: "cover",
+          marginTop: margin.sm,
+        }}
+      >
+        <Grid item xs={12}>
+          <Grid container>
+            <Grid item xs={1} />
+            <Grid item xs={10}>
+              <ComplexTextSearch />
             </Grid>
+            <Grid item xs={1} />
           </Grid>
-          <Grid item xs={1}>
-            <ResultPanelIconFilter />
-          </Grid>
-          <ResultSection contents={contents} onRemoveLayer={onRemoveLayer} />
-          <MapSection onMapZoomOrMove={onMapZoomOrMove} layers={layers} />
-          <Grid></Grid>
         </Grid>
-      </Layout>
-    </SearchResultLayoutContext.Provider>
+        <Grid item xs={1}>
+          <ResultPanelIconFilter />
+        </Grid>
+        <ResultSection
+          visibility={visibility}
+          contents={contents}
+          onRemoveLayer={onRemoveLayer}
+          onVisibilityChanged={onVisibilityChanged}
+        />
+        <MapSection
+          layers={layers}
+          showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
+          onMapZoomOrMove={onMapZoomOrMove}
+          onToggleClicked={onToggleDisplay}
+        />
+        <Grid></Grid>
+      </Grid>
+    </Layout>
   );
 };
-export { SearchResultLayoutContext };
 export default SearchPage;

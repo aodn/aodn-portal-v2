@@ -17,13 +17,20 @@ import Layers from "../../../components/map/mapbox/layers/Layers";
 const mapContainerId = "map-container-id";
 
 interface SearchPageProps {
+  layers: OGCCollection[];
+  showFullMap: boolean;
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
-  layers: OGCCollection[];
+  onToggleClicked: (v: boolean) => void;
 }
 
-const MapSection: React.FC<SearchPageProps> = ({ onMapZoomOrMove, layers }) => {
+const MapSection: React.FC<SearchPageProps> = ({
+  onMapZoomOrMove,
+  onToggleClicked,
+  layers,
+  showFullMap,
+}) => {
   return (
     <Grid
       item
@@ -41,7 +48,10 @@ const MapSection: React.FC<SearchPageProps> = ({ onMapZoomOrMove, layers }) => {
           onMoveEvent={onMapZoomOrMove}
         >
           <Controls>
-            <ToggleControl />
+            <ToggleControl
+              onToggleClicked={onToggleClicked}
+              showFullMap={showFullMap}
+            />
             <NavigationControl />
             <ScaleControl />
             <MenuControl menu={<BaseMapSwitcher />} />
