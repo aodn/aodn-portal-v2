@@ -18,14 +18,20 @@ const DetailSubtab: React.FC<DetailSubtabProps> = ({
       display="flex"
       justifyContent="flex-start"
       sx={{
+        height: "45px",
         marginX: "20px",
-        border: isSelected
-          ? " 1px solid var(--brand_dark-blue_80, #618CA5)"
-          : "none",
-        borderRadius: "5px",
       }}
     >
-      <Button sx={{ minWidth: 0 }} onClick={() => setSelectedTab(title)}>
+      <Button
+        sx={{
+          minWidth: 0,
+          border: isSelected
+            ? " 1px solid var(--brand_dark-blue_80, #618CA5)"
+            : "none",
+          borderRadius: "5px",
+        }}
+        onClick={() => setSelectedTab(title)}
+      >
         {title}
       </Button>
     </Box>
