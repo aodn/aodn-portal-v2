@@ -28,7 +28,7 @@ jobs:
       - name: Install yarn
         run: |
           : # set-version will always download the latest version of yarn
-          yarn policies set-version
+          yarn policies set-version 4.3.0
           yarn install --frozen-lockfile
 
       - name: Build Website
