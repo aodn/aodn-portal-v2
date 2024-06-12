@@ -19,8 +19,10 @@ const DetailsPage = () => {
   );
 
   useEffect(() => {
-    const uuid: string | undefined = new URLSearchParams(location.search).get("uuid")?.toString();
-    if(uuid) {
+    const uuid: string | undefined = new URLSearchParams(location.search)
+      .get("uuid")
+      ?.toString();
+    if (uuid) {
       dispatch(fetchResultByUuidNoStore(uuid))
         .unwrap()
         .then((collection) => {

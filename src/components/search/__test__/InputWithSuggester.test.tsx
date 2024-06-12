@@ -43,48 +43,48 @@ describe("inputwithsuggester", async () => {
   });
 
   test("Suggestion options should disappear after choosing one of them", async () => {
-    await act(async () => {
-      let input: HTMLInputElement;
-      const { getByRole, findByTestId, findByRole, queryByRole, getAllByRole } =
-        rendered;
-      waitFor(
-        () => findByTestId("input-with-suggester") && findByRole("combobox")
-      )
-        .then(() => {
-          input = getByRole("combobox") as HTMLInputElement;
-          userEvent.type(input, "wave");
-          waitFor(() =>
-            expect((input as HTMLInputElement).value).to.equal("wave")
-          );
-        })
-        .then(() => {
-          waitFor(() => expect(expect(queryByRole("listbox")).to.exist)).then(
-            () => {
-              const options = getAllByRole("option");
-              const textToMatch =
-                "MOCK API IMOS - ACORN - Coffs Harbour HF ocean radar site (New South Wales, Australia) - Delayed mode wave";
-              const optionToClick = options.find(
-                (o) => o.textContent === textToMatch
-              );
-              expect(optionToClick).to.exist;
+    let input: HTMLInputElement;
+    const { getByRole, findByTestId, findByRole, queryByRole, getAllByRole } =
+      rendered;
+    waitFor(
+      () =>
+        expect(getByRole("input-with-suggester")) &&
+        expect(getByRole("combobox"))
+    )
+      .then(() => {
+        input = getByRole("combobox") as HTMLInputElement;
+        userEvent.type(input, "wave");
+        waitFor(() =>
+          expect((input as HTMLInputElement).value).to.equal("wave")
+        );
+      })
+      .then(() => {
+        waitFor(() => expect(expect(queryByRole("listbox")).to.exist)).then(
+          () => {
+            const options = getAllByRole("option");
+            const textToMatch =
+              "MOCK API IMOS - ACORN - Coffs Harbour HF ocean radar site (New South Wales, Australia) - Delayed mode wave";
+            const optionToClick = options.find(
+              (o) => o.textContent === textToMatch
+            );
+            expect(optionToClick).to.exist;
 
-              userEvent.click(optionToClick);
-              expect(input.value).to.equal(textToMatch);
+            userEvent.click(optionToClick);
+            expect(input.value).to.equal(textToMatch);
 
-              // suggestion list should disappear after clicking on an option
-              const listboxAfterClick = queryByRole("listbox");
-              expect(listboxAfterClick).to.not.exist;
+            // suggestion list should disappear after clicking on an option
+            const listboxAfterClick = queryByRole("listbox");
+            expect(listboxAfterClick).to.not.exist;
 
-              // cleanup the input state
-              userEvent.clear(input);
-            }
-          );
-        });
-    });
+            // cleanup the input state
+            userEvent.clear(input);
+          }
+        );
+      });
   });
 
   test("Categories section should work properly", async () => {
-    await act(async () => {
+    async () => {
       const categoryToMatch = "Wave";
       const {
         getByRole,
@@ -133,6 +133,6 @@ describe("inputwithsuggester", async () => {
           expect(listboxAfterClick).to.not.exist;
         });
       });
-    });
+    };
   });
 });
