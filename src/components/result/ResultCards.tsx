@@ -5,13 +5,13 @@ import {
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Grid, ListItem } from "@mui/material";
 import GridResultCard from "./GridResultCard";
-import { SearchResultLayoutEnum } from "../../pages/search-page/subpages/ResultSection";
 import ListResultCard from "./ListResultCard";
-import React, { useContext } from "react";
-import { SearchResultLayoutContext } from "../../pages/search-page/SearchPage";
+import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
+import React, { useState } from "react";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
+  layout?: SearchResultLayoutEnum;
   onRemoveLayer:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -90,10 +90,9 @@ const renderRows = (
     </ListItem>
   );
 };
-const ResultCards = (props: ResultCardsProps) => {
-  const { resultLayout } = useContext(SearchResultLayoutContext);
 
-  if (resultLayout === SearchResultLayoutEnum.LIST) {
+const ResultCards = (props: ResultCardsProps) => {
+  if (props.layout === SearchResultLayoutEnum.LIST) {
     return (
       <FixedSizeList
         height={700}
@@ -105,20 +104,20 @@ const ResultCards = (props: ResultCardsProps) => {
         {(child: ListChildComponentProps) => renderRows(props, child)}
       </FixedSizeList>
     );
+  } else {
+    // or else render grid view
+    return (
+      <FixedSizeList
+        height={700}
+        width={"100%"}
+        itemSize={310}
+        itemCount={Math.ceil(props.contents.result.collections.length / 2)}
+        overscanCount={10}
+      >
+        {(child: ListChildComponentProps) => renderCells(props, child)}
+      </FixedSizeList>
+    );
   }
-
-  // or else render grid view
-  return (
-    <FixedSizeList
-      height={700}
-      width={"100%"}
-      itemSize={310}
-      itemCount={Math.ceil(props.contents.result.collections.length / 2)}
-      overscanCount={10}
-    >
-      {(child: ListChildComponentProps) => renderCells(props, child)}
-    </FixedSizeList>
-  );
 };
 
 export default ResultCards;
