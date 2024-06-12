@@ -4,7 +4,7 @@
  */
 import dayjs from "dayjs";
 import { dateDefault } from "./constants";
-import { Feature, Polygon, Properties } from "@turf/turf";
+import { Feature, Polygon, Properties } from "@turf/helpers";
 import * as wellknown from "wellknown";
 import { Category } from "./store/componentParamReducer";
 
@@ -17,10 +17,14 @@ export type PolygonOperation = SingleArgumentFunction<
 >;
 export type TemporalAfterOrBefore = SingleArgumentFunction<number, string>;
 export type TemporalDuring = DualArgumentFunction<number, number, string>;
-export type CategoriesIn = SingleArgumentFunction<Array<Category>, string>;
+export type CategoriesIn = SingleArgumentFunction<
+  Array<Category>,
+  string | undefined
+>;
 
 export type FilterTypes =
   | string
+  | CategoriesIn
   | TemporalDuring
   | TemporalAfterOrBefore
   | PolygonOperation;

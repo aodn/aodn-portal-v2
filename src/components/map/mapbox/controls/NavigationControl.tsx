@@ -23,7 +23,7 @@ const NavigationControl = (props: NavigationControlProps) => {
           visualizePitch: props.visualizePitch,
         });
 
-        map.addControl(n, "top-left");
+        map?.addControl(n, "top-left");
       }
       return true;
     });

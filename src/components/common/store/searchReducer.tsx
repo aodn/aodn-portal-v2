@@ -27,8 +27,8 @@ interface Spatial {
 }
 
 export class OGCCollection {
-  private propValue: Map<string, any>;
-  id: string;
+  private propValue: Map<string, any> = new Map<string, any>();
+  id: string = "undefined";
   // This index is used to show the ordering 1, 2, 3...
   index?: string;
   title?: string;
@@ -49,7 +49,7 @@ export class OGCCollection {
     return target !== undefined ? target.href : default_thumbnail;
   };
   // Locate the logo from the links array
-  findIcon = (): string => {
+  findIcon = (): string | undefined => {
     const target = this.links?.find(
       (l) => l.type === "image/png" && l.rel === "icon"
     );
@@ -97,7 +97,7 @@ interface ObjectValue {
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
   return {
-    collections: json.collections.map((collection) =>
+    collections: json.collections.map((collection: any) =>
       Object.assign(new OGCCollection(), collection)
     ),
     links: json.links,
@@ -160,9 +160,9 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     }
   }
 };
-
+// TODO: Why no param needed?
 const searchParameterCategories = async (
-  param: Map<string, string>,
+  param: Map<string, string> | null,
   thunkApi: any
 ) => {
   try {
@@ -251,7 +251,7 @@ const fetchResultByUuidNoStore = createAsyncThunk<
 
 const fetchParameterCategoriesWithStore = createAsyncThunk<
   Array<Category>,
-  Map<string, string>,
+  Map<string, string> | null,
   { rejectValue: FailedResponse }
 >("search/fetchParameterCategoriesWithStore", searchParameterCategories);
 

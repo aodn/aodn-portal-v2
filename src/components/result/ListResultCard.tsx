@@ -14,13 +14,13 @@ import DownloadIcon from "@mui/icons-material/Download";
 import InfoIcon from "@mui/icons-material/Info";
 import { OGCCollection } from "../common/store/searchReducer";
 import { useNavigate } from "react-router-dom";
+import { trimContent } from "./CardUtils";
 import LinkIcon from "@mui/icons-material/Link";
 import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
 import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
 import { useCallback } from "react";
 
 interface ResultCardProps {
-  item: string;
   content: OGCCollection;
   onRemoveLayer:
     | ((
@@ -79,10 +79,7 @@ const ListResultCard = (props: ResultCardProps) => {
           >
             <Grid container>
               <Grid item xs={11}>
-                {`${props.content?.title?.slice(0, 90)}${props.content?.title?.length > 90 ? "..." : ""}`}
-              </Grid>
-              <Grid item xs={1}>
-                <Chip label={props.item} />
+                {trimContent(props.content.title)}
               </Grid>
             </Grid>
           </Typography>
@@ -96,7 +93,7 @@ const ListResultCard = (props: ResultCardProps) => {
             </Grid>
             <Grid item xs={9}>
               <Typography variant="body2">
-                {`${props.content.description?.slice(0, 180)}${props.content?.description?.length > 180 ? "..." : ""}`}
+                {trimContent(props.content.description, 180)}
               </Typography>
             </Grid>
           </Grid>
@@ -121,11 +118,13 @@ const ListResultCard = (props: ResultCardProps) => {
           startIcon={<InfoIcon />}
           onClick={() => {}}
         />
-        <StaticResultCardButton
-          text={generateLinkText(props.content.links?.length)}
-          startIcon={<LinkIcon />}
-          onClick={() => {}}
-        />
+        {props.content.links && (
+          <StaticResultCardButton
+            text={generateLinkText(props.content.links?.length)}
+            startIcon={<LinkIcon />}
+            onClick={() => {}}
+          />
+        )}
         <StaticResultCardButton
           text={"Download"}
           startIcon={<DownloadIcon />}

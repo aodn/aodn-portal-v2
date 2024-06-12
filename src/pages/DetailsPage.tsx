@@ -19,12 +19,16 @@ const DetailsPage = () => {
   );
 
   useEffect(() => {
-    const uuid = new URLSearchParams(location.search).get("uuid");
-    dispatch(fetchResultByUuidNoStore(uuid))
-      .unwrap()
-      .then((collection) => {
-        setCollection(collection);
-      });
+    const uuid: string | undefined = new URLSearchParams(location.search).get("uuid")?.toString();
+    if(uuid) {
+      dispatch(fetchResultByUuidNoStore(uuid))
+        .unwrap()
+        .then((collection) => {
+          setCollection(collection);
+        });
+    } else {
+      //TODO: Show error
+    }
   }, [dispatch, location.search]);
 
   return (

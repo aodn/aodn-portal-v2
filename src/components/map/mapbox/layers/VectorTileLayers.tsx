@@ -26,7 +26,7 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
       // This situation is map object created, hence not null, but not completely loaded
       // and therefore you will have problem setting source and layer. Set-up a listener
       // to update the state and then this effect can be call again when map loaded.
-      map.on("load", () =>
+      map?.on("load", () =>
         setMapLoaded((prev) => {
           // If style changed, we may need to add the layer again, hence listen to this event.
           // https://github.com/mapbox/mapbox-gl-js/issues/8660
@@ -54,7 +54,7 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
 
     // Remove items in map layer
     toDelete.forEach((uuid) => {
-      if (map.getSource(uuid)) {
+      if (map?.getSource(uuid)) {
         map.removeSource(uuid);
         map.removeLayer("fill-" + uuid);
         map.removeLayer("symbol-" + uuid);
@@ -65,15 +65,15 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
     // to try add it again, but before add we need to check if the
     // layer exist
     stacIds.forEach((uuid, index) => {
-      if (!map.getSource(uuid)) {
+      if (!map?.getSource(uuid)) {
         const source: mapboxgl.AnySourceData = {
           type: "vector",
           tiles: [
             `${window.location.protocol}//${window.location.host}/api/v1/ogc/tiles/WebMercatorQuad/{z}/{x}/{y}?collections=${uuid}`,
           ],
         };
-        map.addSource(uuid, source);
-        map.addLayer({
+        map?.addSource(uuid, source);
+        map?.addLayer({
           id: "fill-" + uuid,
           type: "fill",
           source: uuid,
@@ -84,13 +84,13 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
           },
         });
         // This will add the number to the layer
-        map.addLayer({
+        map?.addLayer({
           id: "symbol-" + uuid,
           type: "symbol",
           source: uuid,
           "source-layer": "hits",
           layout: {
-            "text-field": "" + collections?.find((e) => e.id === uuid).index,
+            "text-field": "" + collections?.find((e) => e.id === uuid)?.index,
             "text-size": 12,
           },
           paint: {

@@ -40,7 +40,7 @@ const SimpleTextSearch = () => {
   }, [dispatch, navigate]);
 
   const handleEnterPressed = useCallback(
-    (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>, isSuggesterOpen: boolean) => {
       if (event.key === "Enter") {
         executeSearch();
       }

@@ -157,23 +157,30 @@ const paramReducer = (
 const flattenToProperties = (
   param: ParameterState,
   parentKey = "",
-  result = {}
+  result: Record<string, any> = {}
 ) => {
   for (const key in param) {
     if (Object.prototype.hasOwnProperty.call(param, key)) {
       const propName = parentKey ? `${parentKey}.${key}` : key;
-      if (typeof param[key] === "object" && param[key] !== null) {
-        flattenToProperties(param[key], propName, result);
+      if (
+        typeof param[key as keyof ParameterState] === "object" &&
+        param[key as keyof ParameterState] !== null
+      ) {
+        flattenToProperties(
+          param[key as keyof ParameterState],
+          propName,
+          result
+        );
       } else {
         if (isTypeCategory(param)) {
           // Special handle for category type, we only serializable
           // the label value, because other is of no use to search
           // and just waste space
           if (key === "label") {
-            result[propName] = param[key];
+            result[propName] = param[key as keyof ParameterState];
           }
         } else {
-          result[propName] = param[key];
+          result[propName] = param[key as keyof ParameterState];
         }
       }
     }
@@ -195,7 +202,7 @@ const formatToUrlParam = (param: ParameterState) => {
 };
 
 const parseQueryString = (queryString: string) => {
-  const obj = {};
+  const obj: Record<string, any> = {};
   const pairs = queryString.split("&"); // Split the query string into key-value pairs
 
   pairs.forEach((pair) => {
@@ -223,22 +230,22 @@ const unFlattenToParameterState = (input: string): ParameterState => {
 
         if (i === parts.length - 1) {
           // If it's the last part, set the value
-          if (typeof current[part] === "boolean") {
-            current[part] = flatObject[key] === "true";
+          if (typeof current[part as keyof ParameterState] === "boolean") {
+            current[part as keyof ParameterState] = flatObject[key] === "true";
           } else if (!isNaN(Number(flatObject[key]))) {
-            current[part] = parseFloat(flatObject[key]);
+            current[part as keyof ParameterState] = parseFloat(flatObject[key]);
           } else {
-            current[part] = flatObject[key];
+            current[part as keyof ParameterState] = flatObject[key];
           }
         } else {
           // If not the last part, update or create the nested object
-          if (!current[part]) {
+          if (!current[part as keyof ParameterState]) {
             // Check if this key is array or not by forward looking the next key
             // if it is a number then create as array, else an object
             const isTypeArray = !isNaN(Number(parts[i + 1]));
-            current[part] = isTypeArray ? [] : {};
+            current[part as keyof ParameterState] = isTypeArray ? [] : {};
           }
-          current = current[part];
+          current = current[part as keyof ParameterState];
         }
       }
     }

@@ -62,7 +62,7 @@ const SearchPage = () => {
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
-    (value) =>
+    (value: boolean) =>
       setVisibility(
         value
           ? SearchResultLayoutEnum.INVISIBLE
@@ -72,7 +72,7 @@ const SearchPage = () => {
   );
 
   const onVisibilityChanged = useCallback(
-    (value) => setVisibility(value),
+    (value: SearchResultLayoutEnum) => setVisibility(value),
     [setVisibility]
   );
 

@@ -69,6 +69,7 @@ const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
         }}
       >
         <MenuItem
+          data-testid="maplist-toggle-menu-mapview"
           onClick={() => {
             // No need to set layout because we want to
             // remember the last layout
@@ -82,6 +83,7 @@ const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
           Full Map View
         </MenuItem>
         <MenuItem
+          data-testid="maplist-toggle-menu-listandmap"
           onClick={() => {
             setResultLayout(SearchResultLayoutEnum.LIST);
             handleClose();
@@ -94,6 +96,7 @@ const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
           List and Map
         </MenuItem>
         <MenuItem
+          data-testid="maplist-toggle-menu-gridandmap"
           onClick={() => {
             setResultLayout(SearchResultLayoutEnum.GRID);
             handleClose();
