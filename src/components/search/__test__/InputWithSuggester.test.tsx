@@ -69,15 +69,17 @@ describe("inputwithsuggester", async () => {
             );
             expect(optionToClick).to.exist;
 
-            userEvent.click(optionToClick);
-            expect(input.value).to.equal(textToMatch);
+            if (optionToClick) {
+              userEvent.click(optionToClick);
+              expect(input.value).to.equal(textToMatch);
 
-            // suggestion list should disappear after clicking on an option
-            const listboxAfterClick = queryByRole("listbox");
-            expect(listboxAfterClick).to.not.exist;
+              // suggestion list should disappear after clicking on an option
+              const listboxAfterClick = queryByRole("listbox");
+              expect(listboxAfterClick).to.not.exist;
 
-            // cleanup the input state
-            userEvent.clear(input);
+              // cleanup the input state
+              userEvent.clear(input);
+            }
           }
         );
       });
@@ -106,27 +108,30 @@ describe("inputwithsuggester", async () => {
         waitFor(() => expect(queryByRole("listbox")).to.exist).then(() => {
           const options = getAllByRole("option");
           const optionToClick = options.find(
-            (o) => o.textContent.toLowerCase() === categoryToMatch.toLowerCase()
+            (o) =>
+              o.textContent?.toLowerCase() === categoryToMatch.toLowerCase()
           );
           expect(optionToClick).to.exist;
 
-          userEvent.click(optionToClick);
-          waitFor(async () => {
-            const categorySection = await findAllByText("Categories:");
-            // after clicking on a category, the category section should appear
-            expect(categorySection.length).to.equal(1);
+          if (optionToClick) {
+            userEvent.click(optionToClick);
+            waitFor(async () => {
+              const categorySection = await findAllByText("Categories:");
+              // after clicking on a category, the category section should appear
+              expect(categorySection.length).to.equal(1);
 
-            // A chip showing wave should appear
-            const chip = await findAllByText(categoryToMatch);
-            expect(chip.length).to.equal(1);
-            // Try to remove this category
-            const removeButton = await findByTestId("CancelIcon");
-            userEvent.click(removeButton);
+              // A chip showing wave should appear
+              const chip = await findAllByText(categoryToMatch);
+              expect(chip.length).to.equal(1);
+              // Try to remove this category
+              const removeButton = await findByTestId("CancelIcon");
+              userEvent.click(removeButton);
 
-            // now the wave chip should disappear
-            const chipAfterRemove = queryByText(categoryToMatch);
-            expect(chipAfterRemove).to.not.exist;
-          });
+              // now the wave chip should disappear
+              const chipAfterRemove = queryByText(categoryToMatch);
+              expect(chipAfterRemove).to.not.exist;
+            });
+          }
 
           // check suggesters
           const listboxAfterClick = queryByRole("listbox");

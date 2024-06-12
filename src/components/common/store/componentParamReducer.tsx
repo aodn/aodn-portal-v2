@@ -2,12 +2,8 @@
  * This reducer is used to allow different component share value between pages, it is useful for filter
  * to preserve value between pages. The number below must be unique across the whole application
  */
-import {
-  Feature,
-  Polygon,
-  Properties,
-  bboxPolygon as turfBboxPolygon,
-} from "@turf/turf";
+import { bboxPolygon } from "@turf/turf";
+import { Feature, Polygon, GeoJsonProperties } from "geojson";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -24,7 +20,7 @@ interface DataTimeFilterRange {
 }
 
 export interface ParameterState {
-  polygon?: Feature<Polygon, Properties>;
+  polygon?: Feature<Polygon, GeoJsonProperties>;
   isImosOnlyDataset?: boolean;
   // Use in RemovableDateTimeFilter
   dateTimeFilterRange?: DataTimeFilterRange;
@@ -74,7 +70,7 @@ const updateSearchText = (q: string): ActionType => {
 };
 
 const updateFilterPolygon = (
-  polygon: Feature<Polygon, Properties> | undefined
+  polygon: Feature<Polygon, GeoJsonProperties> | undefined
 ): ActionType => {
   return {
     type: UPDATE_POLYGON_FILTER_VARIABLE,
@@ -154,33 +150,27 @@ const paramReducer = (
 };
 // Flatten the ParameterState json to a properties like array, where key is
 // the name.name.name... that describe multiple level json.
+// Must use any due to multiple type complicated type casting
 const flattenToProperties = (
-  param: ParameterState,
+  param: any,
   parentKey = "",
   result: Record<string, any> = {}
 ) => {
   for (const key in param) {
     if (Object.prototype.hasOwnProperty.call(param, key)) {
       const propName = parentKey ? `${parentKey}.${key}` : key;
-      if (
-        typeof param[key as keyof ParameterState] === "object" &&
-        param[key as keyof ParameterState] !== null
-      ) {
-        flattenToProperties(
-          param[key as keyof ParameterState],
-          propName,
-          result
-        );
+      if (typeof param[key] === "object" && param[key] !== null) {
+        flattenToProperties(param[key], propName, result);
       } else {
         if (isTypeCategory(param)) {
           // Special handle for category type, we only serializable
           // the label value, because other is of no use to search
           // and just waste space
           if (key === "label") {
-            result[propName] = param[key as keyof ParameterState];
+            result[propName] = param[key];
           }
         } else {
-          result[propName] = param[key as keyof ParameterState];
+          result[propName] = param[key];
         }
       }
     }
@@ -223,29 +213,29 @@ const unFlattenToParameterState = (input: string): ParameterState => {
   for (const key in flatObject) {
     if (Object.prototype.hasOwnProperty.call(flatObject, key)) {
       const parts = key.split("."); // Split the key into parts based on '.'
-      let current = result;
+      let current: any = result; // Must use any, as it can be multiple type during unflattern
 
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
 
         if (i === parts.length - 1) {
           // If it's the last part, set the value
-          if (typeof current[part as keyof ParameterState] === "boolean") {
-            current[part as keyof ParameterState] = flatObject[key] === "true";
+          if (typeof current[part] === "boolean") {
+            current[part] = flatObject[key] === "true";
           } else if (!isNaN(Number(flatObject[key]))) {
-            current[part as keyof ParameterState] = parseFloat(flatObject[key]);
+            current[part] = parseFloat(flatObject[key]);
           } else {
-            current[part as keyof ParameterState] = flatObject[key];
+            current[part] = flatObject[key];
           }
         } else {
           // If not the last part, update or create the nested object
-          if (!current[part as keyof ParameterState]) {
+          if (!current[part]) {
             // Check if this key is array or not by forward looking the next key
             // if it is a number then create as array, else an object
             const isTypeArray = !isNaN(Number(parts[i + 1]));
-            current[part as keyof ParameterState] = isTypeArray ? [] : {};
+            current[part] = isTypeArray ? [] : {};
           }
-          current = current[part as keyof ParameterState];
+          current = current[part];
         }
       }
     }
@@ -256,7 +246,7 @@ const unFlattenToParameterState = (input: string): ParameterState => {
     // in this case the polygon "properties" fields is missing, so we add it back by create an empty default object
     // then update all attributes with the same
     result.polygon = {
-      ...turfBboxPolygon([0, 0, 0, 0]),
+      ...bboxPolygon([0, 0, 0, 0]),
       ...result.polygon,
     };
   }
