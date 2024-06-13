@@ -16,8 +16,12 @@ const DepthSlider = () => {
   const [sliderValues, setSliderValues] =
     React.useState<number[]>(defaultValues);
 
-  const handleSliderChange = (_: any, newValue: number[]) => {
-    setSliderValues(newValue);
+  const handleSliderChange = (
+    _: Event,
+    newValue: number | number[],
+    activeThumb: number
+  ) => {
+    setSliderValues(Array.isArray(newValue) ? newValue : [newValue]);
   };
   const formatLabel = (value: number) => {
     if (value === -1) {

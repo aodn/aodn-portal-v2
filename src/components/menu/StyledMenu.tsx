@@ -54,7 +54,7 @@ const StyledMenu = styled((props: MenuProps) => (
     },
     "& .MuiMenuItem-root": {
       "& .MuiSvgIcon-root": {
-        fontSize: fontSize["menuItem"],
+        fontSize: fontSize["mapMenuItem"],
         color: theme.palette.text.secondary,
         marginRight: theme.spacing(1.5),
       },

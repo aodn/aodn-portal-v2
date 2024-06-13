@@ -17,7 +17,7 @@ const StyledResultCardButton = styled(Button)<StyledResultCardButtonProps>(
     color: determinedcolor,
     height: theme.spacing(4),
     borderRadius: borderRadius.small,
-    boxShadow: isbordered === "true" ? theme.shadows[1] : "none",
+    boxShadow: isbordered === "true" ? (theme as any).shadows[1] : "none",
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
     whiteSpace: "nowrap",

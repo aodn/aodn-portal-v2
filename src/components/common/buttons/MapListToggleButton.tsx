@@ -1,6 +1,6 @@
 import { IconButton, ListItemIcon, MenuItem } from "@mui/material";
 import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import Menu from "@mui/material/Menu";
 import ActionButtonPaper from "./ActionButtonPaper";
 import GridAndMapIcon from "../../icon/GridAndMapIcon";
@@ -69,6 +69,7 @@ const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
         }}
       >
         <MenuItem
+          data-testid="maplist-toggle-menu-mapview"
           onClick={() => {
             // No need to set layout because we want to
             // remember the last layout
@@ -82,6 +83,7 @@ const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
           Full Map View
         </MenuItem>
         <MenuItem
+          data-testid="maplist-toggle-menu-listandmap"
           onClick={() => {
             setResultLayout(SearchResultLayoutEnum.LIST);
             handleClose();
@@ -94,6 +96,7 @@ const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
           List and Map
         </MenuItem>
         <MenuItem
+          data-testid="maplist-toggle-menu-gridandmap"
           onClick={() => {
             setResultLayout(SearchResultLayoutEnum.GRID);
             handleClose();

@@ -80,8 +80,11 @@ const NumberRangeSlider = ({
   );
 
   const handleChangeCommitted = useCallback(
-    (event: Event, newValue: number | number[]) => {
-      const c = newValue as number[];
+    (
+      event: Event | React.SyntheticEvent<Element, Event>,
+      value: number | number[]
+    ) => {
+      const c: number[] = Array.isArray(value) ? value : [value];
       onSlideChanged(
         mapRangeToRealValue(min, max, c[0]),
         mapRangeToRealValue(min, max, c[1]),
