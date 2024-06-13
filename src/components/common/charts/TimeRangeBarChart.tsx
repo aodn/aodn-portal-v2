@@ -18,7 +18,7 @@ interface Bucket {
   total: number;
 }
 
-enum DevidedBy {
+enum DividedBy {
   day,
   month,
   year,
@@ -35,12 +35,12 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
   // below consts are private functions
   const determineChartUnit = () => {
     if (calculateDaysBetween(selectedStartDate, selectedEndDate) <= 100) {
-      return DevidedBy.day;
+      return DividedBy.day;
     }
     if (calculateMonthBetween(selectedStartDate, selectedEndDate) <= 100) {
-      return DevidedBy.month;
+      return DividedBy.month;
     }
-    return DevidedBy.year;
+    return DividedBy.year;
   };
 
   // start date and end date are inclusive. So the result should be added by 1
@@ -86,10 +86,10 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
     (bucketStart <= targetEnd && targetEnd <= bucketEnd) ||
     (targetStart <= bucketStart && bucketEnd <= targetEnd);
 
-  const determineXWithBucketsBy = (unit: DevidedBy) => {
+  const determineXWithBucketsBy = (unit: DividedBy) => {
     const xValues: Array<Date> = [];
     const buckets: Array<Bucket> = [];
-    if (unit === DevidedBy.day) {
+    if (unit === DividedBy.day) {
       const days = calculateDaysBetween(selectedStartDate, selectedEndDate);
       for (let i = 0; i < days; i++) {
         const date = new Date(selectedStartDate);
@@ -102,7 +102,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
           total: 0,
         });
       }
-    } else if (unit === DevidedBy.month) {
+    } else if (unit === DividedBy.month) {
       const months = calculateMonthBetween(selectedStartDate, selectedEndDate);
       for (let i = 0; i < months; i++) {
         const date = new Date(selectedStartDate);
@@ -115,7 +115,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
           total: 0,
         });
       }
-    } else if (unit === DevidedBy.year) {
+    } else if (unit === DividedBy.year) {
       const years = calculateYearBetween(selectedStartDate, selectedEndDate);
       for (let i = 0; i < years; i++) {
         const date = new Date(selectedStartDate);
@@ -157,14 +157,14 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
   };
 
   const xAxisLabelFormatter = (date: Date): string => {
-    if (unit === DevidedBy.day) {
+    if (unit === DividedBy.day) {
       return date.toLocaleDateString();
-    }
-    if (unit === DevidedBy.month) {
+    } else if (unit === DividedBy.month) {
       // return mm/yyyy
       return `${date.getMonth() + 1}/${date.getFullYear()}`;
-    }
-    if (unit === DevidedBy.year) {
+    } else if (unit === DividedBy.year) {
+      return date.getFullYear().toString();
+    } else {
       return date.getFullYear().toString();
     }
   };

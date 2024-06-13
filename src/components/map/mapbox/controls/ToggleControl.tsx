@@ -44,8 +44,8 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
 };
 
 class ToggleControlClass implements IControl {
-  private container: HTMLDivElement;
-  private root: Root;
+  private container: HTMLDivElement | null = null;
+  private root: Root | null = null;
   private props: ToggleControlProps;
 
   constructor(props: ToggleControlProps) {
@@ -53,7 +53,7 @@ class ToggleControlClass implements IControl {
   }
 
   redraw(showFullMap: boolean) {
-    this.root.render(
+    this.root?.render(
       <ToggleButton
         onToggleClicked={this.props.onToggleClicked}
         showFullMap={showFullMap}
@@ -71,13 +71,13 @@ class ToggleControlClass implements IControl {
 
   onRemove(_: Map): void {
     console.log("onRemove toggle button");
-    if (this.container.parentNode) {
+    if (this.container?.parentNode) {
       // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
       // Keep the old pointer
       setTimeout(() => {
-        this.container.parentNode.removeChild(this.container);
+        this.container?.parentNode?.removeChild(this.container);
         this.container = null;
-        this.root.unmount();
+        this.root?.unmount();
       });
     }
   }
@@ -85,7 +85,7 @@ class ToggleControlClass implements IControl {
 
 const ToggleControl = (props: ToggleControlProps) => {
   const { map } = useContext(MapContext);
-  const [control, setControl] = useState<ToggleControlClass>(null);
+  const [control, setControl] = useState<ToggleControlClass | null>(null);
 
   useEffect(() => {
     if (map === null) return;
@@ -96,7 +96,7 @@ const ToggleControl = (props: ToggleControlProps) => {
           showFullMap: props.showFullMap,
           onToggleClicked: props?.onToggleClicked,
         });
-        map.addControl(n, "top-left");
+        map?.addControl(n, "top-left");
         return n;
       }
       return prev;

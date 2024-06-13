@@ -39,7 +39,7 @@ const DetailsPanel = (props: DetailsProps) => {
                 sx={{
                   gridColumn: "span 5",
                   gridRow: "span 1",
-                  border: border["frameBorder"],
+                  border: border["buttonBorder"],
                   borderRadius: borderRadius["filter"],
                   marginBottom: margin["bottom"],
                 }}
@@ -50,7 +50,7 @@ const DetailsPanel = (props: DetailsProps) => {
                 sx={{
                   gridColumn: "span 5",
                   gridRow: "span 1",
-                  border: border["frameBorder"],
+                  border: border["buttonBorder"],
                   borderRadius: borderRadius["filter"],
                   marginBottom: margin["bottom"],
                 }}
@@ -61,7 +61,7 @@ const DetailsPanel = (props: DetailsProps) => {
                 sx={{
                   gridColumn: "span 5",
                   gridRow: "span 1",
-                  border: border["frameBorder"],
+                  border: border["buttonBorder"],
                   borderRadius: borderRadius["filter"],
                   marginBottom: margin["bottom"],
                 }}

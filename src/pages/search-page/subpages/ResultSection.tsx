@@ -13,7 +13,7 @@ interface SearchResultListProps {
   contents: CollectionsQueryType;
   onRemoveLayer: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    collection: OGCCollection
+    collection: OGCCollection | undefined
   ) => void;
   onVisibilityChanged?: (v: SearchResultLayoutEnum) => void;
 }

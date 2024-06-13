@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
-import * as turf from "@turf/turf";
 import {
   formatToUrlParam,
   unFlattenToParameterState,
   ParameterState,
 } from "../componentParamReducer";
+
+import { bboxPolygon } from "@turf/turf";
 
 describe("Component Reducer Function Test", () => {
   it("Verify formatToUrlParam", () => {
@@ -82,7 +83,7 @@ describe("Component Reducer Function Test", () => {
           about: "about2",
         },
       ],
-      polygon: turf.bboxPolygon([10, 20, -10.1, -20.0]),
+      polygon: bboxPolygon([10, 20, -10.1, -20.0]),
     };
 
     const answer5: string = formatToUrlParam(sample5);
@@ -139,7 +140,7 @@ describe("Component Reducer Function Test", () => {
           label: "cat2",
         },
       ],
-      polygon: turf.bboxPolygon([10, 20, -10.1, -20.0]),
+      polygon: bboxPolygon([10, 20, -10.1, -20.0]),
     };
 
     console.debug(JSON.stringify(sample5, null, 2));

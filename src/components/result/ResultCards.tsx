@@ -15,13 +15,13 @@ interface ResultCardsProps {
   onRemoveLayer:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
+        stac: OGCCollection | undefined
       ) => void)
     | undefined;
   onDownload:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
+        stac: OGCCollection | undefined
       ) => void)
     | undefined;
   onTags:
@@ -80,7 +80,6 @@ const renderRows = (
   return (
     <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
       <ListResultCard
-        item={props.contents.result.collections[index].index}
         content={props.contents.result.collections[index]}
         onRemoveLayer={props.onRemoveLayer}
         onDownload={props.onDownload}

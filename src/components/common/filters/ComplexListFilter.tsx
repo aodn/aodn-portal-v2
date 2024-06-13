@@ -69,7 +69,7 @@ const ComplexListFilter = () => {
               key={value.name}
               sx={{
                 backgroundColor: grey["filterGroup"],
-                border: border["listFilterBorder"],
+                border: border["buttonBorder"],
                 borderRadius: borderRadius["filter"],
                 marginBottom: "10px",
               }}

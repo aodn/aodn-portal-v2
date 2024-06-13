@@ -19,6 +19,7 @@ import {
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
 import _ from "lodash";
+//import { CategoryIcon } from "@mui/icons-material";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -54,8 +55,10 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   const [options, setOptions] = useState<OptionType[]>([]);
   const [categorySet, setCategorySet] = useState<Category[]>([]);
 
-  const selectedCategories: Category[] = useSelector(
-    (state: RootState) => state.paramReducer.categories
+  const selectedCategories: Category[] = useSelector((state: RootState) =>
+    state.paramReducer.categories
+      ? state.paramReducer.categories
+      : new Array<Category>()
   );
 
   const searchInput = useSelector(
@@ -120,9 +123,12 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         .unwrap()
         .then((data) => {
           const options: OptionType[] = [];
-
-          const categorySuggestions = new Set(data.category_suggestions);
-          const titleSuggestions = new Set(data.record_suggestions.titles);
+          const categorySuggestions = new Set<string>(
+            data.category_suggestions
+          );
+          const titleSuggestions = new Set<string>(
+            data.record_suggestions.titles
+          );
 
           categorySuggestions.forEach((category: string) => {
             options.push({ text: category, group: OptionGroup.CATEGORY });
@@ -188,11 +194,11 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     dispatch(fetchParameterCategoriesWithStore(null))
       .unwrap()
       .then((categories: Array<Category>) => {
-        const root = categories.filter((i) => i.broader.length === 0);
+        const root = categories.filter((i) => i.broader?.length === 0);
         let child = new Array<Category>();
         root
-          .filter((i) => i.narrower.length !== 0)
-          .forEach((i) => i.narrower.forEach((j) => child.push(j)));
+          .filter((i) => i.narrower?.length !== 0)
+          .forEach((i) => i.narrower?.forEach((j) => child.push(j)));
 
         child = child.sort((a, b) =>
           a.label < b.label ? -1 : a.label > b.label ? 1 : 0
@@ -210,7 +216,9 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     setOptions([]);
   };
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (
+    event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
     if (event.key === "Enter") {
       setOpen(false);
     }
@@ -258,7 +266,10 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         value={searchInput}
         forcePopupIcon={false}
         options={options.flatMap((option) => option.text)}
-        groupBy={(option) => options.find((o) => o.text === option)?.group}
+        groupBy={(option: string): string => {
+          const v = options.find((o) => o.text === option);
+          return v ? v.group : "";
+        }}
         autoComplete
         includeInputInList
         onChange={onChange}

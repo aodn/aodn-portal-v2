@@ -29,7 +29,7 @@ import store, {
   searchQueryResult,
 } from "../../components/common/store/store";
 import { pageDefault } from "../../components/common/constants";
-import * as turf from "@turf/turf";
+
 // Map section, you can switch to other map library, this is for maplibre
 // import { MapLibreEvent as MapEvent } from "maplibre-gl";
 // import Map from "../components/map/maplibre/Map";
@@ -49,6 +49,7 @@ import MapSection from "./subpages/MapSection";
 import { margin } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
+import { bboxPolygon } from "@turf/turf";
 
 const mapContainerId = "map-container-id";
 
@@ -62,7 +63,7 @@ const SearchPage = () => {
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
-    (value) =>
+    (value: boolean) =>
       setVisibility(
         value
           ? SearchResultLayoutEnum.INVISIBLE
@@ -72,7 +73,7 @@ const SearchPage = () => {
   );
 
   const onVisibilityChanged = useCallback(
-    (value) => setVisibility(value),
+    (value: SearchResultLayoutEnum) => setVisibility(value),
     [setVisibility]
   );
 
@@ -102,7 +103,7 @@ const SearchPage = () => {
         const ne = bounds.getNorthEast(); // NorthEast corner
         const sw = bounds.getSouthWest(); // SouthWest corner
         // Note order: longitude, latitude.2
-        const polygon = turf.bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
+        const polygon = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
         dispatch(updateFilterPolygon(polygon));
         doSearch();
       }
@@ -112,10 +113,10 @@ const SearchPage = () => {
   const onRemoveLayer = useCallback(
     (
       event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-      collection: OGCCollection
+      collection: OGCCollection | undefined
     ) => {
       // Remove the layer if found
-      setLayers((v) => v.filter((i) => i.id !== collection.id));
+      setLayers((v) => v.filter((i) => i.id !== collection?.id));
     },
     [setLayers]
   );

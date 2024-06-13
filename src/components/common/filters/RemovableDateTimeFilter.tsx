@@ -29,14 +29,18 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
 
   // Disable the keyboard input for the date picker. May be changed in the future,
   // according to the customers' feedback.
-  const endDateInputRef = useRef(null);
-  const startDateInputRef = useRef(null);
+  const endDateInputRef = useRef<HTMLInputElement>(null);
+  const startDateInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    if (endDateInputRef.current) {
-      endDateInputRef.current.disabled = true;
+    const eRef: HTMLInputElement | null = endDateInputRef.current;
+    if (eRef) {
+      eRef.disabled = true;
     }
-    if (startDateInputRef.current) {
-      startDateInputRef.current.disabled = true;
+
+    const sRef: HTMLInputElement | null = startDateInputRef.current;
+    if (sRef) {
+      sRef.disabled = true;
     }
   }, []);
 

@@ -19,7 +19,7 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
   // to store the labels of the buttons
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
 
-  const selectedCategories: Category[] = useSelector(
+  const selectedCategories: Category[] | undefined = useSelector(
     (state: RootState) => state.paramReducer.categories
   );
 
@@ -59,13 +59,13 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
       .unwrap()
       .then((categories: Array<Category>) => {
         // If the item do not have a broader terms, that means it is the root level
-        const root = categories.filter((i) => i.broader.length === 0);
+        const root = categories.filter((i) => i.broader?.length === 0);
 
         // Now we need to go one level lower as this is a requirement to display second level instead of top level
         let child = new Array<Category>();
         root
-          .filter((i) => i.narrower.length !== 0)
-          .forEach((i) => i.narrower.forEach((j) => child.push(j)));
+          .filter((i) => i?.narrower?.length !== 0)
+          .forEach((i) => i?.narrower?.forEach((j) => child.push(j)));
 
         // Now sort by child
         child = child.sort((a, b) =>
