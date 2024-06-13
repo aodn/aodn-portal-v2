@@ -1,27 +1,8 @@
-import { Card, Typography } from "@mui/material";
-import { color, fontSize } from "../../../styles/constants";
+import IconContainer from "./IconContainer";
 import { FileDownloadIcon } from "../../icon/download";
 
 const DownloadIcon = () => {
-  return (
-    <Card
-      elevation={3}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "84px",
-        height: "84px",
-        backgroundColor: color.blue.lightSemiTransparent,
-      }}
-    >
-      <FileDownloadIcon />
-      <Typography fontSize={fontSize.icon} sx={{ paddingTop: 1 }}>
-        Download
-      </Typography>
-    </Card>
-  );
+  return <IconContainer icon={FileDownloadIcon} label="Download" />;
 };
 
 export default DownloadIcon;

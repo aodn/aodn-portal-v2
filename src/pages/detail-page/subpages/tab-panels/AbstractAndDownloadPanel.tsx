@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
   AccordionDetails,
   AccordionProps,
@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MuiAccordion from "@mui/material/Accordion";
-import DownloadIcon from "../../../../components/details/icons/DownloadIcon";
 import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
 import InfoIcon from "@mui/icons-material/Info";
 import {
@@ -23,14 +22,22 @@ import {
   fontColor,
   fontSize,
   fontWeight,
+  margin,
   padding,
 } from "../../../../styles/constants";
-import { dateDefault } from "../../../../components/common/constants";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../../components/common/store/store";
-import { updateDateTimeFilterRange } from "../../../../components/common/store/componentParamReducer";
 import DateRangeSlider from "../../../../components/details/DateRangeSlider";
 import TimeRangeIcon from "../../../../components/details/icons/TimeRangeIcon";
+import DownloadIcon from "../../../../components/details/icons/DownloadIcon";
+import SpatialIcon from "../../../../components/details/icons/SpatialIcon";
+import DimensionsIcon from "../../../../components/details/icons/Dimensions";
+import { useDetailPageContext } from "../../context/detail-page-context";
+import Controls from "../../../../components/map/mapbox/controls/Controls";
+import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
+import MenuControl, {
+  BaseMapSwitcher,
+} from "../../../../components/map/mapbox/controls/MenuControl";
+import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
+import Map from "../../../../components/map/mapbox/Map";
 
 // TODO: replace with real select options
 const selects = {
@@ -63,14 +70,17 @@ const selects = {
   },
 };
 
-const LinksAndDownloadsCard = () => {
+const AbstractAndDownloadPanel = () => {
+  const { collection } = useDetailPageContext();
+  const abstract = collection?.description ? collection.description : "";
+  const mapPanelId = "map-detail-container-id";
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
 
   const selectSxProps = {
     height: "30px",
     textAlign: "start",
-    backgroundColor: color.blue.medium,
+    backgroundColor: color.blue.lightSemiTransparent,
     boxShadow: theme.shadows[5],
   };
 
@@ -96,7 +106,30 @@ const LinksAndDownloadsCard = () => {
     <>
       <Grid container>
         <Grid item xs={12}>
-          <Grid container aria-label="download as section" spacing={2}>
+          <Stack direction="column">
+            <Typography sx={{ padding: 0 }}>{abstract}</Typography>
+            <Box
+              arial-label="map"
+              id={mapPanelId}
+              sx={{
+                width: "100%",
+                minHeight: "500px",
+
+                marginY: padding.large,
+              }}
+            >
+              <Map panelId={mapPanelId}>
+                <Controls>
+                  <NavigationControl />
+                  <ScaleControl />
+                  <MenuControl menu={<BaseMapSwitcher />} />
+                </Controls>
+              </Map>
+            </Box>
+          </Stack>
+        </Grid>
+        <Grid item xs={12} aria-label="download section">
+          <Grid container spacing={2} aria-label="download as section">
             <Grid item xs={12}>
               <Typography
                 fontWeight={fontWeight.bold}
@@ -107,49 +140,48 @@ const LinksAndDownloadsCard = () => {
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <Box>
-                <Grid container spacing={2}>
-                  <Grid item xs={2}>
-                    <IconButton
-                      sx={{
-                        padding: 0,
-                        "&:hover": {
-                          backgroundColor: "transparent",
-                        },
-                      }}
-                    >
-                      <DownloadIcon />
-                    </IconButton>
-                  </Grid>
-                  <Grid item xs={5}>
-                    {renderSelect(selects.download)}
-                  </Grid>
-                  <Grid item xs={5}>
-                    <Stack
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "start",
-                      }}
-                    >
-                      <Icon
-                        color="disabled"
-                        sx={{
-                          paddingLeft: padding.large,
-                          paddingRight: padding.small,
-                        }}
-                      >
-                        <InfoIcon />
-                      </Icon>
-                      <Typography fontSize={fontSize.info} sx={{ padding: 0 }}>
-                        The full data collection will be downloaded. Please
-                        consider filtering the collection. Citation file is
-                        automatically included as part of the download.
-                      </Typography>
-                    </Stack>
-                  </Grid>
+              <Grid container spacing={4}>
+                <Grid item xs={2}>
+                  <IconButton
+                    sx={{
+                      padding: 0,
+                      paddingLeft: padding.medium,
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                      },
+                    }}
+                  >
+                    <DownloadIcon />
+                  </IconButton>
                 </Grid>
-              </Box>
+                <Grid item xs={5}>
+                  {renderSelect(selects.download)}
+                </Grid>
+                <Grid item xs={5}>
+                  <Stack
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "start",
+                    }}
+                  >
+                    <Icon
+                      color="disabled"
+                      sx={{
+                        paddingLeft: padding.large,
+                        paddingRight: padding.small,
+                      }}
+                    >
+                      <InfoIcon />
+                    </Icon>
+                    <Typography fontSize={fontSize.info} sx={{ padding: 0 }}>
+                      The full data collection will be downloaded. Please
+                      consider filtering the collection. Citation file is
+                      automatically included as part of the download.
+                    </Typography>
+                  </Stack>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
           <Grid container aria-label="download subset section">
@@ -184,7 +216,7 @@ const LinksAndDownloadsCard = () => {
                     </Grid>
                     <Grid container item spacing={4} arial-babel="spatial">
                       <Grid item xs={2}>
-                        1
+                        <SpatialIcon />
                       </Grid>
                       <Grid item xs={5}>
                         {renderSelect(selects.selectionMode)}
@@ -195,7 +227,7 @@ const LinksAndDownloadsCard = () => {
                     </Grid>
                     <Grid container item spacing={4} arial-babel="dimensions">
                       <Grid item xs={2}>
-                        1
+                        <DimensionsIcon />
                       </Grid>
                       <Grid item xs={10}>
                         <Grid container spacing={4}>
@@ -205,10 +237,18 @@ const LinksAndDownloadsCard = () => {
                           <Grid item xs={6}>
                             {renderSelect(selects.instrument)}
                           </Grid>
-                          <Grid item xs={6}>
+                          <Grid
+                            item
+                            xs={6}
+                            sx={{ marginTop: `-${margin.top}` }}
+                          >
                             {renderSelect(selects.siteName)}
                           </Grid>
-                          <Grid item xs={6}>
+                          <Grid
+                            item
+                            xs={6}
+                            sx={{ marginTop: `-${margin.top}` }}
+                          >
                             {renderSelect(selects.institution)}
                           </Grid>
                         </Grid>
@@ -220,20 +260,12 @@ const LinksAndDownloadsCard = () => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <Divider />
-        </Grid>
-        <Grid item xs={12}>
-          <Grid container arial-babel="links section">
-            links
-          </Grid>
-        </Grid>
       </Grid>
     </>
   );
 };
 
-export default LinksAndDownloadsCard;
+export default AbstractAndDownloadPanel;
 
 const PlainAccordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} {...props} />

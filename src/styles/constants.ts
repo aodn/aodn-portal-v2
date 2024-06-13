@@ -64,6 +64,9 @@ const fontColor = {
     medium: "#787878",
     light: "#979797",
   },
+  blue: {
+    medium: "#468CB6",
+  },
 };
 
 const color = {
@@ -76,11 +79,16 @@ const color = {
     light: "#E7F2FF",
     lightSemiTransparent: "rgba(231, 242, 255, 0.5)",
     medium: "#E7F2FF",
+    dark: "#618CA5",
+    darkSemiTransparent: "rgba(97,140,165,0.5)",
+    extraDark: "#182C3A",
   },
 };
 
 const border = {
   buttonBorder: "2px solid #fff",
+  xs: "1px solid",
+  sm: "2px solid",
 };
 
 const borderRadius = {

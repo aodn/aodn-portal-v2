@@ -11,14 +11,14 @@ import {
   CategoriesIn,
 } from "../cqlFilters";
 
-interface Link {
+export interface Link {
   href: string;
   rel: string;
   type: string;
   title: string;
 }
 
-interface Spatial {
+export interface Spatial {
   bbox: Array<Array<number>>;
   temporal: {
     interval: Array<Array<string | null>>;
