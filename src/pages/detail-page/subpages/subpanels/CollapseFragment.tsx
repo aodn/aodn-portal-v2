@@ -3,24 +3,25 @@ import React, { ReactNode, useEffect, useState } from "react";
 
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { alpha } from "@mui/material/styles";
 
 interface CollapseFragmentProps {
   title: string;
   children: ReactNode;
-  isAutoExpanded?: boolean;
+  isOnTop?: boolean;
 }
 
 const CollapseFragment: React.FC<CollapseFragmentProps> = ({
-  isAutoExpanded = false,
+  isOnTop = false,
   title,
   children,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(isAutoExpanded);
+  const [isExpanded, setIsExpanded] = useState(isOnTop);
   useEffect(() => {
-    setIsExpanded(isAutoExpanded);
-  }, [isAutoExpanded]);
+    if (isOnTop) setIsExpanded(true);
+  }, [isOnTop]);
   return (
-    <Grid container sx={{ backgroundColor: "#D2E1EA" }}>
+    <Grid container sx={{ backgroundColor: alpha("#D2E1EA", 0.3) }}>
       <ButtonBase
         onClick={() => {
           setIsExpanded(!isExpanded);

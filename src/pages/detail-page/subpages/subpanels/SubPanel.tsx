@@ -5,13 +5,18 @@ import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArro
 interface SubPanelProps {
   title: string;
   children: ReactNode;
+  isOnTop?: boolean;
 }
 
-const SubPanel: React.FC<SubPanelProps> = ({ title, children }) => {
+const SubPanel: React.FC<SubPanelProps> = ({
+  title,
+  children,
+  isOnTop = false,
+}) => {
   return (
     <Grid container spacing={2}>
       <Grid item md={12} display="flex" alignItems="center">
-        <KeyboardDoubleArrowRightIcon />
+        <KeyboardDoubleArrowRightIcon sx={{ opacity: isOnTop ? 1 : 0.2 }} />
         <Typography display="inline" variant="h3" sx={{ paddingTop: "0px" }}>
           {title}
         </Typography>

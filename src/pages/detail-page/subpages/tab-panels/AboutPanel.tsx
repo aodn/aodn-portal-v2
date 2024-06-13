@@ -6,8 +6,13 @@ import CollapseFragment from "../subpanels/CollapseFragment";
 import BulletedText from "../../../../components/common/texts/BulletedText";
 
 const AboutPanel = () => {
-  const subtabTitles = Object.freeze(["Keywords", "Contact", "Credit"]);
-  const [selectedTab, setSelectedTab] = useState<string>(subtabTitles[0]);
+  const readOnlySubtabTitles = Object.freeze(["Keywords", "Contact", "Credit"]);
+  const [selectedTab, setSelectedTab] = useState<string>(
+    readOnlySubtabTitles[0]
+  );
+  const sortedSubtabTitles = [...readOnlySubtabTitles].sort((a, b) =>
+    a === selectedTab ? -1 : b === selectedTab ? 1 : 0
+  );
 
   return (
     <Grid container>
@@ -15,36 +20,19 @@ const AboutPanel = () => {
         <Grid item md={1} />
         <Grid item container md={11}>
           <DetailSubtabGroup
-            titles={subtabTitles}
+            titles={readOnlySubtabTitles}
             selectedTab={selectedTab}
             setSelectedTab={setSelectedTab}
           />
         </Grid>
       </Grid>
-      {/*selected subpanel should be on the top*/}
       <Grid item container md={8}>
-        <SubPanel title={selectedTab}>
-          <CollapseFragment
-            title={selectedTab + "collapse"}
-            isAutoExpanded={true}
-          >
-            <BulletedText>
-              item 1, eerewsfjs oicxvjxf moodsfsdj iorrm js oif
-            </BulletedText>
-          </CollapseFragment>
-          {/*  TODO: other collapse fragment should be rendered here*/}
-        </SubPanel>
-        {/*render other subpanels*/}
-
-        {subtabTitles.map((title) => {
-          if (title === selectedTab) {
-            return null;
-          }
+        {sortedSubtabTitles.map((title) => {
           return (
-            <SubPanel key={title} title={title}>
+            <SubPanel key={title} title={title} isOnTop={title === selectedTab}>
               <CollapseFragment
                 title={title + "collapse"}
-                isAutoExpanded={title === selectedTab}
+                isOnTop={title === selectedTab}
               >
                 <BulletedText>
                   item 1, eerewsfjs oicxvjxf moodsfsdj iorrm js oif
