@@ -57,7 +57,9 @@ describe("SearchPage", async () => {
       await userEvent.click(mapListToggleButton);
     });
 
-    const fullMapViewOption = screen.queryByText("Full Map View");
+    const fullMapViewOption: HTMLElement = screen.getByTestId(
+      "maplist-toggle-menu-mapview"
+    );
     expect(fullMapViewOption).to.exist;
 
     await act(async () => {
@@ -65,7 +67,6 @@ describe("SearchPage", async () => {
     });
     //
     const list = screen.queryByTestId("search-page-result-list");
-    // await waitFor(() => expect(list).to.not.exist, { timeout: 300 });
   });
 
   test("The list should be able to show in list / grid view", async () => {
@@ -83,7 +84,9 @@ describe("SearchPage", async () => {
     const mapListToggleButton = screen.getByTestId("map-list-toggle-button");
     await userEvent.click(mapListToggleButton);
 
-    const gridAndMapOption = screen.queryByText("Grid and Map");
+    const gridAndMapOption: HTMLElement = screen.getByTestId(
+      "maplist-toggle-menu-gridandmap"
+    );
     expect(gridAndMapOption).to.exist;
 
     await userEvent.click(gridAndMapOption);
@@ -98,10 +101,14 @@ describe("SearchPage", async () => {
 
     await userEvent.click(mapListToggleButton);
 
-    const listAndMapOption = screen.queryByText("List and Map");
-    expect(listAndMapOption).to.exist;
-
-    await userEvent.click(listAndMapOption);
+    let listAndMapOption: HTMLElement;
+    await waitFor(
+      () => {
+        listAndMapOption = screen.getByTestId("maplist-toggle-menu-listandmap");
+        expect(listAndMapOption).to.exist;
+      },
+      { timeout: 300 }
+    ).then(() => userEvent.click(listAndMapOption));
 
     await waitFor(
       () => {

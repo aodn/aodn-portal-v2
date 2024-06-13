@@ -56,10 +56,12 @@ const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
   };
 
   const updateCurrentStyle = useCallback(
-    (id) => {
+    (id: string) => {
       const target = mapStyles.find((e) => e.id === id);
-      map.setStyle(target.style);
-      setCurrentStyle(id);
+      if (target) {
+        map?.setStyle(target.style);
+        setCurrentStyle(id);
+      }
     },
     [map]
   );
@@ -136,7 +138,9 @@ const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
             <FormControl component="fieldset">
               <RadioGroup
                 value={currentStyle}
-                onChange={(e) => updateCurrentStyle(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  updateCurrentStyle(e.target.value)
+                }
               >
                 {mapStyles.map((style) => (
                   <FormControlLabel
@@ -208,10 +212,10 @@ type Menus = React.ReactElement<
 >;
 
 class MapMenuControl implements IControl {
-  private container: HTMLDivElement;
-  private root: Root;
+  private container: HTMLDivElement | null = null;
+  private root: Root | null = null;
+  private map: MapBox | null = null;
   private component: Menus;
-  private map: MapBox;
 
   constructor(component: Menus) {
     this.component = component;
@@ -231,13 +235,13 @@ class MapMenuControl implements IControl {
 
   onRemove() {
     console.log("onRemove");
-    if (this.container.parentNode) {
+    if (this.container?.parentNode) {
       // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
       // Keep the old pointer
       setTimeout(() => {
-        this.container.parentNode.removeChild(this.container);
+        this.container?.parentNode?.removeChild(this.container);
         this.container = null;
-        this.root.unmount();
+        this.root?.unmount();
       });
     }
   }
@@ -259,7 +263,7 @@ const MenuControl = (props: PropsWithChildren<MenuControlProps>) => {
       if (!prev) {
         // If prev state is false
         const n = new MapMenuControl(cloneElement(props.menu, { map: map }));
-        map.addControl(n, "top-right");
+        map?.addControl(n, "top-right");
       }
       // Only update once.
       return true;

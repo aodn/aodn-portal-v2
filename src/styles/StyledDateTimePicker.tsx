@@ -1,9 +1,9 @@
 import { styled } from "@mui/system";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-
+import { Dayjs } from "dayjs";
 import { margin } from "./constants";
 
-const StyledDateTimePicker = styled(DateTimePicker)(({ theme }) => ({
+const StyledDateTimePicker = styled(DateTimePicker<Dayjs>)(({ theme }) => ({
   borderRadius: "4px",
   backgroundColor: "#fff",
   margin: `${margin["nil"]} ${margin["doubleLeft"]}`,

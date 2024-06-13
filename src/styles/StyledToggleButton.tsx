@@ -3,7 +3,7 @@ import { styled } from "@mui/system";
 import { fontSize, fontWeight } from "./constants";
 
 export const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
-  boxShadow: theme.shadows[2],
+  boxShadow: (theme as any).shadows[2],
   borderRadius: 0,
   backgroundColor: theme.palette.common.white,
   fontSize: fontSize.mapMenuItem,

@@ -1,6 +1,6 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, ThemeOptions } from "@mui/material/styles";
 
-const AppTheme = createTheme({
+const theme: ThemeOptions = {
   palette: {
     primary: {
       main: "#3B6E8F",
@@ -66,7 +66,7 @@ const AppTheme = createTheme({
       fontFamily: "Lexend",
     },
     h1: {
-      fontWeight: "700",
+      fontWeight: 700,
     },
     // h3 is now used for the title on the filter. Any other can use it but please
     // only modify it just for the filter title
@@ -156,6 +156,8 @@ const AppTheme = createTheme({
       },
     },
   },
-});
+};
+
+const AppTheme = createTheme(theme);
 
 export default AppTheme;

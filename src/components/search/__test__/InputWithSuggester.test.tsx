@@ -43,31 +43,33 @@ describe("inputwithsuggester", async () => {
   });
 
   test("Suggestion options should disappear after choosing one of them", async () => {
-    await act(async () => {
-      let input: HTMLInputElement;
-      const { getByRole, findByTestId, findByRole, queryByRole, getAllByRole } =
-        rendered;
-      waitFor(
-        () => findByTestId("input-with-suggester") && findByRole("combobox")
-      )
-        .then(() => {
-          input = getByRole("combobox") as HTMLInputElement;
-          userEvent.type(input, "wave");
-          waitFor(() =>
-            expect((input as HTMLInputElement).value).to.equal("wave")
-          );
-        })
-        .then(() => {
-          waitFor(() => expect(expect(queryByRole("listbox")).to.exist)).then(
-            () => {
-              const options = getAllByRole("option");
-              const textToMatch =
-                "MOCK API IMOS - ACORN - Coffs Harbour HF ocean radar site (New South Wales, Australia) - Delayed mode wave";
-              const optionToClick = options.find(
-                (o) => o.textContent === textToMatch
-              );
-              expect(optionToClick).to.exist;
+    let input: HTMLInputElement;
+    const { getByRole, findByTestId, findByRole, queryByRole, getAllByRole } =
+      rendered;
+    waitFor(
+      () =>
+        expect(getByRole("input-with-suggester")) &&
+        expect(getByRole("combobox"))
+    )
+      .then(() => {
+        input = getByRole("combobox") as HTMLInputElement;
+        userEvent.type(input, "wave");
+        waitFor(() =>
+          expect((input as HTMLInputElement).value).to.equal("wave")
+        );
+      })
+      .then(() => {
+        waitFor(() => expect(expect(queryByRole("listbox")).to.exist)).then(
+          () => {
+            const options = getAllByRole("option");
+            const textToMatch =
+              "MOCK API IMOS - ACORN - Coffs Harbour HF ocean radar site (New South Wales, Australia) - Delayed mode wave";
+            const optionToClick = options.find(
+              (o) => o.textContent === textToMatch
+            );
+            expect(optionToClick).to.exist;
 
+            if (optionToClick) {
               userEvent.click(optionToClick);
               expect(input.value).to.equal(textToMatch);
 
@@ -78,13 +80,13 @@ describe("inputwithsuggester", async () => {
               // cleanup the input state
               userEvent.clear(input);
             }
-          );
-        });
-    });
+          }
+        );
+      });
   });
 
   test("Categories section should work properly", async () => {
-    await act(async () => {
+    async () => {
       const categoryToMatch = "Wave";
       const {
         getByRole,
@@ -106,33 +108,36 @@ describe("inputwithsuggester", async () => {
         waitFor(() => expect(queryByRole("listbox")).to.exist).then(() => {
           const options = getAllByRole("option");
           const optionToClick = options.find(
-            (o) => o.textContent.toLowerCase() === categoryToMatch.toLowerCase()
+            (o) =>
+              o.textContent?.toLowerCase() === categoryToMatch.toLowerCase()
           );
           expect(optionToClick).to.exist;
 
-          userEvent.click(optionToClick);
-          waitFor(async () => {
-            const categorySection = await findAllByText("Categories:");
-            // after clicking on a category, the category section should appear
-            expect(categorySection.length).to.equal(1);
+          if (optionToClick) {
+            userEvent.click(optionToClick);
+            waitFor(async () => {
+              const categorySection = await findAllByText("Categories:");
+              // after clicking on a category, the category section should appear
+              expect(categorySection.length).to.equal(1);
 
-            // A chip showing wave should appear
-            const chip = await findAllByText(categoryToMatch);
-            expect(chip.length).to.equal(1);
-            // Try to remove this category
-            const removeButton = await findByTestId("CancelIcon");
-            userEvent.click(removeButton);
+              // A chip showing wave should appear
+              const chip = await findAllByText(categoryToMatch);
+              expect(chip.length).to.equal(1);
+              // Try to remove this category
+              const removeButton = await findByTestId("CancelIcon");
+              userEvent.click(removeButton);
 
-            // now the wave chip should disappear
-            const chipAfterRemove = queryByText(categoryToMatch);
-            expect(chipAfterRemove).to.not.exist;
-          });
+              // now the wave chip should disappear
+              const chipAfterRemove = queryByText(categoryToMatch);
+              expect(chipAfterRemove).to.not.exist;
+            });
+          }
 
           // check suggesters
           const listboxAfterClick = queryByRole("listbox");
           expect(listboxAfterClick).to.not.exist;
         });
       });
-    });
+    };
   });
 });

@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useCallback } from "react";
 import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
 import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
+import { trimContent } from "./CardUtils";
 import InfoIcon from "@mui/icons-material/Info";
 import LinkIcon from "@mui/icons-material/Link";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -22,13 +23,13 @@ interface GridResultCardProps {
   onRemoveLayer?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
+        stac: OGCCollection | undefined
       ) => void)
     | undefined;
   onDownload?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
+        stac: OGCCollection | undefined
       ) => void)
     | undefined;
 }
@@ -55,9 +56,11 @@ const GridResultCard: React.FC<GridResultCardProps> = (props) => {
       >
         <CardActionArea
           onClick={() => {
-            const searchParams = new URLSearchParams();
-            searchParams.append("uuid", props.content.id);
-            navigate(pageDefault.details + "?" + searchParams.toString());
+            if (props.content) {
+              const searchParams = new URLSearchParams();
+              searchParams.append("uuid", props.content.id);
+              navigate(pageDefault.details + "?" + searchParams.toString());
+            }
           }}
         >
           <CardContent>
@@ -77,7 +80,7 @@ const GridResultCard: React.FC<GridResultCardProps> = (props) => {
                     height: "64px",
                   }}
                 >
-                  {`${props.content?.title?.slice(0, 90)}${props.content?.title?.length > 90 ? "..." : ""}`}
+                  {trimContent(props.content?.title)}
                 </Typography>
               </Grid>
             </Grid>
@@ -100,14 +103,16 @@ const GridResultCard: React.FC<GridResultCardProps> = (props) => {
                 isbordered="false"
               />
             </Grid>
-            <Grid item xs={6}>
-              <StaticResultCardButton
-                text={generateLinkText(props.content.links.length)}
-                startIcon={<LinkIcon />}
-                onClick={() => {}}
-                isbordered="false"
-              />
-            </Grid>
+            {props.content.links && (
+              <Grid item xs={6}>
+                <StaticResultCardButton
+                  text={generateLinkText(props.content.links.length)}
+                  startIcon={<LinkIcon />}
+                  onClick={() => {}}
+                  isbordered="false"
+                />
+              </Grid>
+            )}
             <Grid item xs={6}>
               <StaticResultCardButton
                 text={"Download"}

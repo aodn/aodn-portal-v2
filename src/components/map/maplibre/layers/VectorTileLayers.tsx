@@ -26,7 +26,7 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
       // This situation is map object created, hence not null, but not completely loaded
       // and therefore you will have problem setting source and layer. Set-up a listener
       // to update the state and then this effect can be call again when map loaded.
-      map.on("load", () => setMapLoaded(true));
+      map?.on("load", () => setMapLoaded(true));
       return;
     }
     // If map still not fire load even, aka not ready then we just return
@@ -40,22 +40,21 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
 
     // Remove items in map layer
     toDelete.forEach((uuid) => {
-      map.removeLayer(uuid);
-      map.removeSource(uuid);
+      map?.removeLayer(uuid);
+      map?.removeSource(uuid);
     });
 
     // Add items to layer
     toAdd.forEach((uuid) => {
-      if (!map.getSource(uuid)) {
+      if (!map?.getSource(uuid)) {
         const source: mapboxgl.AnySourceData = {
           type: "vector",
           tiles: [
             `${window.location.protocol}//${window.location.host}/api/v1/ogc/tiles/WebMercatorQuad/{z}/{x}/{y}?collections=${uuid}`,
           ],
         };
-        map.addSource(uuid, source);
-        console.log(source);
-        map.addLayer({
+        map?.addSource(uuid, source);
+        map?.addLayer({
           id: uuid,
           type: "fill",
           source: uuid,
