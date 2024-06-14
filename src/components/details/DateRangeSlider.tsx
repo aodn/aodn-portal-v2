@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Slider, Box, Grid, useTheme, styled } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import {
-  color,
+  border,
+  borderRadius,
   fontColor,
   fontSize,
   fontWeight,
@@ -58,9 +59,9 @@ const DateRangeSlider: React.FC = () => {
   const datePikerSlotProps = {
     desktopPaper: {
       sx: {
-        backgroundColor: color.blue.light,
+        border: border.xs,
+        borderRadius: borderRadius.small,
         width: "350px",
-
         ".MuiPickersYear-yearButton": {
           color: fontColor.gray.dark,
           padding: 0,

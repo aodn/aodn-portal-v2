@@ -1,7 +1,7 @@
 import React from "react";
 
-const AssociatedRecordsCard = () => {
+const AssociatedRecordsPanel = () => {
   return <div>AssociatedRecordsCard</div>;
 };
 
-export default AssociatedRecordsCard;
+export default AssociatedRecordsPanel;

@@ -14,6 +14,8 @@ const margin = {
   sm: "2px",
   md: "5px",
   lg: "10px",
+  xlg: "15px",
+  xxlg: "25px",
   top: "15px",
   bottom: "15px",
   left: "15px",
@@ -71,13 +73,14 @@ const fontColor = {
 
 const color = {
   tabPanel: {
-    background: "#E8EDF7",
-    tabOnFocused: "#618CA5",
-    tabOnHover: "",
+    background: "#fff",
+    tabOnFocused: "#182C3A",
+    tabOnHover: "#182C3A",
+    divider: "#8B959C",
   },
   blue: {
-    light: "#E7F2FF",
-    lightSemiTransparent: "rgba(231, 242, 255, 0.5)",
+    extraLight: "rgba(231,242,255,0.5)",
+    light: "#E2ECF3",
     medium: "#E7F2FF",
     dark: "#618CA5",
     darkSemiTransparent: "rgba(97,140,165,0.5)",
@@ -101,6 +104,8 @@ const borderRadius = {
   small: "5px",
   medium: "8px",
   large: "10px",
+  xlg: "15px",
+  xxlg: "34px",
 };
 
 const filterList = {

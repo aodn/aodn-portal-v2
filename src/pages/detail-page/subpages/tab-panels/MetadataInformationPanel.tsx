@@ -1,7 +1,7 @@
 import React from "react";
 
-const MetadataInformationCard = () => {
+const MetadataInformationPanel = () => {
   return <div>MetadataInformationCard</div>;
 };
 
-export default MetadataInformationCard;
+export default MetadataInformationPanel;

@@ -1,7 +1,7 @@
 import React from "react";
 
-const LineageCard = () => {
+const LineagePanel = () => {
   return <div>LineageCard</div>;
 };
 
-export default LineageCard;
+export default LineagePanel;

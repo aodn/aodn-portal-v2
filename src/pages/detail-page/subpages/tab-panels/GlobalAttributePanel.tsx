@@ -1,7 +1,7 @@
 import React from "react";
 
-const GlobalAttributeCard = () => {
+const GlobalAttributePanel = () => {
   return <div>GlobalAttributeCard</div>;
 };
 
-export default GlobalAttributeCard;
+export default GlobalAttributePanel;

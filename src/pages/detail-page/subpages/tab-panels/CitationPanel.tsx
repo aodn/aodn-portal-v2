@@ -1,7 +1,7 @@
 import React from "react";
 
-const CitationCard = () => {
+const CitationPanel = () => {
   return <div>CitationCard</div>;
 };
 
-export default CitationCard;
+export default CitationPanel;

@@ -42,7 +42,7 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
   },
 };
 
-const HeaderPanel = () => {
+const HeaderSection = () => {
   const { collection } = useDetailPageContext();
   const title = collection?.title;
   const renderButton = useCallback((children: JSX.Element) => {
@@ -152,4 +152,4 @@ const HeaderPanel = () => {
   );
 };
 
-export default HeaderPanel;
+export default HeaderSection;

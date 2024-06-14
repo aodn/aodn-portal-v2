@@ -11,7 +11,6 @@ import {
   Icon,
   Stack,
   IconButton,
-  Divider,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MuiAccordion from "@mui/material/Accordion";
@@ -80,7 +79,7 @@ const AbstractAndDownloadPanel = () => {
   const selectSxProps = {
     height: "30px",
     textAlign: "start",
-    backgroundColor: color.blue.lightSemiTransparent,
+    backgroundColor: color.blue.extraLight,
     boxShadow: theme.shadows[5],
   };
 

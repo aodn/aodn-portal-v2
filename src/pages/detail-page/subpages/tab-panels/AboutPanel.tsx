@@ -1,7 +1,7 @@
 import React from "react";
 
-const AboutCard = () => {
+const AboutPanel = () => {
   return <div>AboutCard</div>;
 };
 
-export default AboutCard;
+export default AboutPanel;

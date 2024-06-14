@@ -1,113 +1,150 @@
-import { FC, Fragment, SyntheticEvent, useCallback, useState } from "react";
-import { Card, CardContent, Divider, Paper, useTheme } from "@mui/material";
-import { TabsList as BaseTabsList } from "@mui/base/TabsList";
-import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
-import { Tabs } from "@mui/base/Tabs";
-import { styled } from "@mui/system";
+import * as React from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 import {
+  border,
   borderRadius,
   color,
+  fontColor,
   fontWeight,
+  margin,
   padding,
 } from "../../styles/constants";
+import { styled } from "@mui/material";
+import { BorderBottom, Translate } from "@mui/icons-material";
 
 interface Tab {
   label: string;
   value: string;
   component: JSX.Element;
 }
+
 interface TabsPanelProps {
   tabs: Tab[];
 }
-const CardWithTabsPanel: FC<TabsPanelProps> = ({ tabs }) => {
-  const [currentTabIndex, setCurrentTabIndex] = useState<number>(0);
-  const handleTabsChange = useCallback(
-    (
-      _: SyntheticEvent<Element, Event> | null,
-      value: string | number | null
-    ): void => {
-      if (value === null || typeof value === "string") return;
-      setCurrentTabIndex(value);
-    },
-    []
-  );
 
-  const theme = useTheme();
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
   return (
-    <Card
-      arial-label="container with tabs-panel"
-      elevation={0}
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: padding.large }}>{children}</Box>}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `tab-${index}`,
+    "aria-controls": `tabpanel-${index}`,
+  };
+}
+
+const TabsPanelContainer: React.FC<TabsPanelProps> = ({ tabs }) => {
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  return (
+    <Box
       sx={{
-        backgroundColor: "white",
-        borderRadius: borderRadius.medium,
+        bgcolor: "#fff",
       }}
     >
-      <Tabs onChange={handleTabsChange} value={currentTabIndex}>
-        <TabsList arial-label="tabs-panel">
-          {tabs.map((tab, idx) => (
-            <Fragment key={idx}>
-              <Tab key={idx} value={idx} sx={{ textTransform: "none" }}>
-                {tab.label}
-              </Tab>
-              {idx !== tabs.length - 1 && (
-                <Divider orientation="vertical" variant="middle" flexItem />
-              )}
-            </Fragment>
-          ))}
-        </TabsList>
-      </Tabs>
-      <Paper
-        arial-label="container for tab content"
-        elevation={3}
-        sx={{
-          borderRadius: `0 0 ${borderRadius.small} ${borderRadius.small}`,
-        }}
+      <StyledTabs
+        value={value}
+        onChange={handleChange}
+        aria-label="tabsPanelContainer"
       >
-        <CardContent>{tabs[currentTabIndex].component}</CardContent>
-      </Paper>
-    </Card>
+        {tabs.map((tab, index) => (
+          <StyledTab
+            key={index}
+            label={tab.label}
+            {...a11yProps(index)}
+            sx={{ textTransform: "none" }}
+          />
+        ))}
+      </StyledTabs>
+      {tabs.map((tab, index) => (
+        <TabPanel key={index} value={value} index={index}>
+          {tab.component}
+        </TabPanel>
+      ))}
+    </Box>
   );
 };
 
-export default CardWithTabsPanel;
+export default TabsPanelContainer;
 
-const Tab = styled(BaseTab)(
-  ({ theme }) => `
-  font-family: ${theme.typography};
-  color: #000;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: ${fontWeight.medium};
-  letter-spacing: 1px;
-  background-color: transparent;
-  width: 100%;
-  padding: 10px 12px;
-  border: none;
-  border-radius: ${borderRadius.small} ${borderRadius.small} 0 0;
-  display: flex;
-  justify-content: center;
+interface StyledTabsProps {
+  children?: React.ReactNode;
+  value: number;
+  onChange: (event: React.SyntheticEvent, newValue: number) => void;
+}
 
-  &:hover {
-    background-color: ${theme.palette.secondary.light};
-  }
+const StyledTabs = styled((props: StyledTabsProps) => (
+  <Tabs
+    {...props}
+    orientation="horizontal"
+    variant="scrollable"
+    TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
+  />
+))({
+  borderBottom: `${border.xs} ${color.tabPanel.tabOnFocused}`,
+  "& .MuiTabs-indicator": {
+    display: "flex",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+    height: "5px",
+    paddingTop: padding.medium,
+  },
+  "& .MuiTabs-indicatorSpan": {
+    width: 0,
+    height: 0,
+    borderLeft: "5px solid transparent",
+    borderRight: "5px solid transparent",
+    borderBottom: `5px solid  ${color.tabPanel.tabOnFocused}`,
+  },
+});
 
-  &.${tabClasses.selected} {
-    background-color:${color.tabPanel.tabOnFocused};
-    color: #fff;
-  }
-`
-);
+interface StyledTabProps {
+  label: string;
+}
 
-const TabsList = styled(BaseTabsList)(
-  () => `
-  background-color: ${color.tabPanel.background};
-  border-radius:${borderRadius.small} ${borderRadius.small} 0 0 ;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-content: space-between;
-  padding:${padding.extraSmall};
-  padding-bottom: 0;
-;
-  `
-);
+const StyledTab = styled((props: StyledTabProps) => (
+  <Tab
+    disableRipple
+    {...props}
+    sx={{ margin: `${margin.xxlg} ${margin.lg}` }}
+  />
+))(({ theme }) => ({
+  textTransform: "none",
+  fontWeight: fontWeight.regular,
+  color: fontColor.gray.dark,
+  border: `${border.xs}  ${color.tabPanel.tabOnFocused}`,
+  borderRadius: borderRadius.xxlg,
+  "&.Mui-selected": {
+    color: "#fff",
+    backgroundColor: color.tabPanel.tabOnFocused,
+  },
+  " &:hover": {
+    backgroundColor: color.tabPanel.tabOnHover,
+    color: "#fff",
+  },
+}));

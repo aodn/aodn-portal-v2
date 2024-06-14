@@ -12,14 +12,16 @@ import DoneIcon from "@mui/icons-material/Done";
 const CopyLinkButton = ({
   index,
   setClickedCopyLinkButtonIndex,
+  copyUrl,
 }: {
   index: number;
   setClickedCopyLinkButtonIndex: Dispatch<SetStateAction<number[]>>;
+  copyUrl: string;
 }) => {
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const handleCopy = () => {
     navigator.clipboard
-      .writeText("abc")
+      .writeText(copyUrl)
       .then(() => {
         setIsCopied(true);
         setClickedCopyLinkButtonIndex((prev) => [...prev, index]);

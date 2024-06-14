@@ -37,6 +37,7 @@ const LinkCard = ({
             <CopyLinkButton
               index={index}
               setClickedCopyLinkButtonIndex={setClickedCopyLinkButtonIndex}
+              copyUrl={link.href}
             />
           )}
         </Grid>
