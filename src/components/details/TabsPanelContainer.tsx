@@ -106,7 +106,7 @@ const StyledTabs = styled((props: StyledTabsProps) => (
     TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
   />
 ))({
-  borderBottom: `${border.xs} ${color.tabPanel.tabOnFocused}`,
+  borderBottom: `${border.xs} ${color.tabPanel.divider}`,
   "& .MuiTabs-indicator": {
     display: "flex",
     justifyContent: "center",
@@ -119,7 +119,7 @@ const StyledTabs = styled((props: StyledTabsProps) => (
     height: 0,
     borderLeft: "5px solid transparent",
     borderRight: "5px solid transparent",
-    borderBottom: `5px solid  ${color.tabPanel.tabOnFocused}`,
+    borderBottom: `5px solid  ${color.tabPanel.divider}`,
   },
 });
 

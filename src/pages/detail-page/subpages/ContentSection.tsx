@@ -8,6 +8,8 @@ import LineagePanel from "./tab-panels/LineagePanel";
 import AssociatedRecordsPanel from "./tab-panels/AssociatedRecordsPanel";
 import GlobalAttributePanel from "./tab-panels/GlobalAttributePanel";
 import TabsPanelContainer from "../../../components/details/TabsPanelContainer";
+import { Card } from "@mui/material";
+import { borderRadius } from "../../../styles/constants";
 
 const tabs = [
   {
@@ -42,9 +44,14 @@ const tabs = [
 
 const ContentSection: FC = () => {
   return (
-    <>
+    <Card
+      sx={{
+        backgroundColor: "white",
+        borderRadius: borderRadius.small,
+      }}
+    >
       <TabsPanelContainer tabs={tabs} />
-    </>
+    </Card>
   );
 };
 

@@ -1,11 +1,9 @@
 import { useState } from "react";
 import {
   AccordionDetails,
-  AccordionProps,
   AccordionSummary,
   Box,
   Grid,
-  styled,
   Typography,
   useTheme,
   Icon,
@@ -13,7 +11,6 @@ import {
   IconButton,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MuiAccordion from "@mui/material/Accordion";
 import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
 import InfoIcon from "@mui/icons-material/Info";
 import {
@@ -37,9 +34,10 @@ import MenuControl, {
 } from "../../../../components/map/mapbox/controls/MenuControl";
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
 import Map from "../../../../components/map/mapbox/Map";
+import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
 
 // TODO: replace with real select options
-const selects = {
+export const selects = {
   download: {
     selectOptions: ["NetCDFs"],
   },
@@ -265,14 +263,3 @@ const AbstractAndDownloadPanel = () => {
 };
 
 export default AbstractAndDownloadPanel;
-
-const PlainAccordion = styled((props: AccordionProps) => (
-  <MuiAccordion disableGutters elevation={0} {...props} />
-))(({ theme }) => ({
-  "&:not(:last-child)": {
-    borderBottom: 0,
-  },
-  "&::before": {
-    display: "none",
-  },
-}));
