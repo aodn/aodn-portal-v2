@@ -86,6 +86,12 @@ const color = {
     darkSemiTransparent: "rgba(97,140,165,0.5)",
     extraDark: "#182C3A",
   },
+  gray: {
+    dark: "#575757",
+    medium: "#787878",
+    light: "#979797",
+    extraLight: "#DFDFDF",
+  },
 };
 
 const border = {

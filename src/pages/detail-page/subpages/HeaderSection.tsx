@@ -20,6 +20,8 @@ import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import { useDetailPageContext } from "../context/detail-page-context";
 
+import { useNavigate } from "react-router-dom";
+
 interface ButtonWithIcon {
   label: string;
   icon: JSX.Element;
@@ -43,9 +45,15 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
 };
 
 const HeaderSection = () => {
+  const navigate = useNavigate();
   const { collection } = useDetailPageContext();
   const title = collection?.title;
-  const renderButton = useCallback((children: JSX.Element) => {
+
+  const onGoBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const renderButton = useCallback((icon: JSX.Element) => {
     return (
       <Paper
         elevation={3}
@@ -56,7 +64,7 @@ const HeaderSection = () => {
           borderRadius: borderRadius.small,
         }}
       >
-        <IconButton>{children}</IconButton>
+        <IconButton>{icon}</IconButton>
       </Paper>
     );
   }, []);
@@ -81,6 +89,7 @@ const HeaderSection = () => {
           left: "-50px",
           top: "5%",
         }}
+        onClick={onGoBack}
       >
         {renderButton(buttons.goBack.icon)}
       </Box>
