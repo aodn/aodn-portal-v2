@@ -35,6 +35,8 @@ import MenuControl, {
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
 import Map from "../../../../components/map/mapbox/Map";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
+import Layers from "../../../../components/map/mapbox/layers/Layers";
+import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 
 // TODO: replace with real select options
 export const selects = {
@@ -70,7 +72,7 @@ export const selects = {
 const AbstractAndDownloadPanel = () => {
   const { collection } = useDetailPageContext();
   const abstract = collection?.description ? collection.description : "";
-  const mapPanelId = "map-detail-container-id";
+  const mapContainerId = "map-detail-container-id";
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
 
@@ -98,7 +100,7 @@ const AbstractAndDownloadPanel = () => {
       <CommonSelect items={select.selectOptions} sxProps={selectSxProps} />
     </Stack>
   );
-
+  if (!collection) return;
   return (
     <>
       <Grid container>
@@ -107,20 +109,22 @@ const AbstractAndDownloadPanel = () => {
             <Typography sx={{ padding: 0 }}>{abstract}</Typography>
             <Box
               arial-label="map"
-              id={mapPanelId}
+              id={mapContainerId}
               sx={{
                 width: "100%",
                 minHeight: "500px",
-
                 marginY: padding.large,
               }}
             >
-              <Map panelId={mapPanelId}>
+              <Map panelId={mapContainerId}>
                 <Controls>
                   <NavigationControl />
                   <ScaleControl />
                   <MenuControl menu={<BaseMapSwitcher />} />
                 </Controls>
+                <Layers>
+                  <GeojsonLayer collection={collection} />
+                </Layers>
               </Map>
             </Box>
           </Stack>

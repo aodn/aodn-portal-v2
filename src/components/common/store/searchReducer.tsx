@@ -10,6 +10,14 @@ import {
   TemporalDuring,
   CategoriesIn,
 } from "../cqlFilters";
+import {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+  Position,
+} from "geojson";
+import { bboxPolygon } from "@turf/turf";
 
 export interface Link {
   href: string;
@@ -18,16 +26,72 @@ export interface Link {
   title: string;
 }
 
-export interface Spatial {
-  bbox: Array<Array<number>>;
+export class Spatial {
+  private parent: OGCCollection;
+
+  bbox: Array<Position> = [];
   temporal: {
     interval: Array<Array<string | null>>;
+    trs?: string;
+  } = { interval: [[]] };
+  crs: string = "";
+
+  constructor(ogcCollection: OGCCollection) {
+    this.parent = ogcCollection;
+  }
+
+  getGeojsonExtents = (): FeatureCollection => {
+    const featureCollections: FeatureCollection = {
+      type: "FeatureCollection",
+      // crs: {
+      //   type: "name",
+      //   properties: {
+      //     name: "urn:ogc:def:crs:OGC:1.3:CRS84",
+      //   },
+      // },
+      features: [],
+    };
+
+    featureCollections.features = this.bbox
+      .filter((box) => box.length === 4 || box.length === 2)
+      .map((box) => {
+        if (box.length === 4) {
+          // const feature: Feature = {
+          //   type: "Feature",
+          //   properties: {
+          //     id: this.parent.id,
+          //   },
+          //   geometry: {
+          //     type: "Polygon",
+          //     coordinates: bboxPolygon(box),
+          //   },
+          // };
+
+          // TODO: fix this
+          return bboxPolygon([box[0], box[1], box[2], box[3]]);
+        } else {
+          // TODO: fix bbox points to point
+          const feature: Feature = {
+            type: "Feature",
+            properties: {
+              id: this.parent.id,
+            },
+            geometry: {
+              type: "Point",
+              coordinates: box,
+            },
+          };
+          return feature;
+        }
+      });
+    console.log({ featureCollections });
+    return featureCollections;
   };
-  crs: string;
 }
 
 export class OGCCollection {
   private propValue: Map<string, any> = new Map<string, any>();
+  private propExtent?: Spatial;
   id: string = "undefined";
   // This index is used to show the ordering 1, 2, 3...
   index?: string;
@@ -35,7 +99,18 @@ export class OGCCollection {
   description?: string;
   itemType?: string;
   links?: Array<Link>;
-  extent?: Spatial;
+  set extent(extents: any) {
+    console.log("extent in reducer========", extents);
+    this.propExtent = new Spatial(this);
+    this.propExtent.bbox = extents.spatial.bbox;
+    this.propExtent.crs = extents.spatial.crs;
+    this.propExtent.temporal = extents.temporal;
+    console.log("in reducer", this.propExtent);
+  }
+
+  get extent(): Spatial | undefined {
+    return this.propExtent;
+  }
 
   set properties(props: object) {
     this.propValue = new Map(Object.entries(props));
