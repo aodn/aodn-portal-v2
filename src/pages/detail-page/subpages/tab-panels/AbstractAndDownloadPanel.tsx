@@ -39,31 +39,31 @@ import PlainAccordion from "../../../../components/common/accordion/PlainAccordi
 // TODO: replace with real select options
 export const selects = {
   download: {
-    selectOptions: ["NetCDFs"],
+    selectOptions: ["NetCDFs", "1", "2"],
   },
   selectionMode: {
     label: "Selection mode",
-    selectOptions: ["Polygon", "Point", "Line"],
+    selectOptions: ["All", "Polygon", "Point", "Line"],
   },
   selectedArea: {
     label: "Selected area",
-    selectOptions: ["-124.248... 145.2895"],
+    selectOptions: ["All", "-124.248... 145.2895", "1", "2"],
   },
   depth: {
     label: "Depth",
-    selectOptions: ["All"],
+    selectOptions: ["All", "1", "2"],
   },
   instrument: {
     label: "Instrument",
-    selectOptions: ["All"],
+    selectOptions: ["All", "1", "2"],
   },
   siteName: {
     label: "Site name",
-    selectOptions: ["All"],
+    selectOptions: ["All", "1", "2"],
   },
   institution: {
     label: "Institution",
-    selectOptions: ["All"],
+    selectOptions: ["All", "1", "2"],
   },
 };
 

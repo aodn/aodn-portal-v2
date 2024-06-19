@@ -49,9 +49,14 @@ const HeaderSection = () => {
   const { collection } = useDetailPageContext();
   const title = collection?.title;
 
+  // TODO: on click user goes back to search page where has results based on previous search params
   const onGoBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
+
+  // TODO: implement the goNext and goPrevious function
+  // This will require the entire search results (their ids and indexes) based on search params
+  // and current-collection-index
 
   const renderButton = useCallback((icon: JSX.Element) => {
     return (
@@ -146,6 +151,7 @@ const HeaderSection = () => {
             alignItems: "center",
           }}
         >
+          {/* TODO: replace with real org logo */}
           <img
             aria-label="collection image"
             src="logo/imos_logo_with_title.png"

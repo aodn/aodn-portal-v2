@@ -2,7 +2,7 @@ import { Box, Paper, Stack, Typography } from "@mui/material";
 import SideCardContainer from "./SideCardContainer";
 import { borderRadius, color, padding } from "../../../../styles/constants";
 
-// TODO: replace with real categories
+// TODO: replace with real categories from real data
 const categories = [
   "Ocean",
   "IMOS content",

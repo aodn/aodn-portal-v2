@@ -2,6 +2,7 @@ import React from "react";
 import SideCardContainer from "./SideCardContainer";
 import { Box } from "@mui/material";
 
+// TODO: replace with real picture url
 const OverviewCard = () => {
   return (
     <SideCardContainer title="Overview">

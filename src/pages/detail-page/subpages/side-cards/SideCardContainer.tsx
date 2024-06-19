@@ -1,30 +1,42 @@
-import { Box, Divider, Stack, Typography } from "@mui/material";
+import { Box, Card, Divider, Stack, Typography } from "@mui/material";
 import { FC, ReactNode } from "react";
-import { fontWeight, padding } from "../../../../styles/constants";
+import {
+  borderRadius,
+  fontWeight,
+  padding,
+} from "../../../../styles/constants";
 interface SideCardContainerProps {
   children: ReactNode;
   title: string;
 }
 const SideCardContainer: FC<SideCardContainerProps> = ({ children, title }) => {
   return (
-    <Stack
+    <Card
+      elevation={2}
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
+        backgroundColor: "#fff",
+        borderRadius: borderRadius.small,
       }}
     >
-      <Typography
-        paddingY={padding.medium}
-        fontSize="16px"
-        fontWeight={fontWeight.bold}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
-        {title}
-      </Typography>
-      <Divider sx={{ width: "100%" }} />
-      {children}
-    </Stack>
+        <Typography
+          paddingY={padding.medium}
+          fontSize="16px"
+          fontWeight={fontWeight.bold}
+        >
+          {title}
+        </Typography>
+        <Divider sx={{ width: "100%" }} />
+        {children}
+      </Box>
+    </Card>
   );
 };
 

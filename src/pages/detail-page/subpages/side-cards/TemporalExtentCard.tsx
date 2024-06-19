@@ -20,12 +20,14 @@ enum Status {
 const TemporalExtentCard = () => {
   const theme = useTheme();
   const { collection } = useDetailPageContext();
+
   if (!collection) return;
   const period: (string | null)[][] | undefined = collection.extent?.temporal
     .interval ?? [
     ["", ""],
     ["", ""],
   ];
+
   const startDate = dayjs(period[0][0]).format("DD/MM/YYYY");
 
   const status = collection.getStatus();

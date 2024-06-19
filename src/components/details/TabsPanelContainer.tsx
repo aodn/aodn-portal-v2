@@ -1,7 +1,6 @@
 import * as React from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import {
   border,
@@ -13,7 +12,6 @@ import {
   padding,
 } from "../../styles/constants";
 import { styled } from "@mui/material";
-import { BorderBottom, Translate } from "@mui/icons-material";
 
 interface Tab {
   label: string;
