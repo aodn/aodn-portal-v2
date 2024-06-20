@@ -37,6 +37,7 @@ import Map from "../../../../components/map/mapbox/Map";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
 import Layers from "../../../../components/map/mapbox/layers/Layers";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
+import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 
 // TODO: replace with real select options
 export const selects = {
@@ -70,7 +71,7 @@ export const selects = {
 };
 
 const AbstractAndDownloadPanel = () => {
-  const { collection } = useDetailPageContext();
+  const { collection, setPhotos } = useDetailPageContext();
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
   const theme = useTheme();
@@ -121,9 +122,10 @@ const AbstractAndDownloadPanel = () => {
                   <NavigationControl />
                   <ScaleControl />
                   <MenuControl menu={<BaseMapSwitcher />} />
+                  <DisplayCoordinate />
                 </Controls>
                 <Layers>
-                  <GeojsonLayer collection={collection} />
+                  <GeojsonLayer collection={collection} setPhotos={setPhotos} />
                 </Layers>
               </Map>
             </Box>

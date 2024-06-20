@@ -1,7 +1,10 @@
 import { Box, Stack } from "@mui/material";
 import Carousel from "../../../../components/details/Carousel";
 import SideCardContainer from "./SideCardContainer";
-import { useDetailPageContext } from "../../context/detail-page-context";
+import {
+  SpatialExtentPhoto,
+  useDetailPageContext,
+} from "../../context/detail-page-context";
 import { useEffect, useState } from "react";
 
 // TODO: use real bboxes to generate map shots,
@@ -28,17 +31,10 @@ const mockSpatialExtentUrls = [
   "public/bg_search_results.png",
 ];
 
-export interface SpatialExtent {
-  bbox: number[];
-  url: string;
-}
-
 const SpatialExtendCard = () => {
   const { collection } = useDetailPageContext();
-  const [extents, setExtents] = useState<SpatialExtent[]>([]);
-  const [mainMap, setMainMap] = useState<SpatialExtent>();
-  console.log({ extents });
-  console.log({ mainMap });
+  const [extents, setExtents] = useState<SpatialExtentPhoto[]>([]);
+  const [mainMap, setMainMap] = useState<SpatialExtentPhoto>();
 
   // TODO: need to define a default bbox
   // const spatialExtent: number[] | number[][] = collection.extent?.bbox ?? [
@@ -104,7 +100,7 @@ const SpatialExtendCard = () => {
           </Box>
         )}
 
-        <Carousel extents={extents} />
+        <Carousel />
       </Stack>
     </SideCardContainer>
   );

@@ -4,36 +4,21 @@ import { borderRadius, padding } from "../../styles/constants";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { FC, useEffect, useState } from "react";
-import { SpatialExtent } from "../../pages/detail-page/subpages/side-cards/SpatialExtendCard";
 
-interface CarouselProps {
-  extents: SpatialExtent[];
-}
-
-const Carousel: FC<CarouselProps> = ({ extents }) => {
+const Carousel: FC = () => {
+  const { photos } = useDetailPageContext();
   // cards will be the cards that are displayed
   const [cards, setCards] = useState<React.ReactElement[]>([]);
   // currentPage is the current page of the cards that is currently displayed
   const [currentPage, setCurrentPage] = useState(0);
-  // slideDirection is the direction that the cards will slide in
+
   const [slideDirection, setSlideDirection] = useState<
     "right" | "left" | undefined
   >("left");
 
-  // you can modify for your needs
-  const cardsPerPage = 3;
-  // this is just a dummy array of cards it uses the MUI card demo and repeats it 10 times
-  // const duplicateCards: React.ReactElement[] = Array.from(
-  //   { length: 10 },
-  //   (_, i) => <Card key={i} />
-  // );
-  const renderCards = () => (
-    <>
-      {extents.map((extent, index) => (
-        <div key={index}>{extent.url}</div>
-      ))}
-    </>
-  );
+  const cardsPerPage: number = 3;
+  const cardSize: number = 45;
+  const containerWidth = cardsPerPage * cardSize;
 
   // these two functions handle changing the pages
   const handleNextPage = () => {
@@ -46,19 +31,14 @@ const Carousel: FC<CarouselProps> = ({ extents }) => {
     setCurrentPage((prevPage) => prevPage - 1);
   };
 
-  // This useEffect is really just for demonstration purposes
-  // it sets the cards to the duplicateCards array
-  // you can remove this and replace it with your own useEffect
-  // or if your page is static you can just set the cards to the array
-  // at the top of the file
   useEffect(() => {
     setCards(
-      extents.map((extent, index) => (
+      photos.map((photo, index) => (
         <Card
           key={index}
           sx={{
-            width: "65px",
-            height: "65px",
+            width: `${cardSize}px`,
+            height: `${cardSize}px`,
             borderRadius: borderRadius.small,
             cursor: "pointer",
             ":hover": {
@@ -67,7 +47,7 @@ const Carousel: FC<CarouselProps> = ({ extents }) => {
           }}
         >
           <img
-            src={extent.url}
+            src={photo.url}
             alt=""
             style={{
               objectFit: "cover",
@@ -78,11 +58,7 @@ const Carousel: FC<CarouselProps> = ({ extents }) => {
         </Card>
       ))
     );
-    // eslint-disable-next-line
-  }, []);
-  // this sets the container width to the number of cards per page * 250px
-  // which we know because it is defined in the card component
-  const containerWidth = cardsPerPage * 65; // 250px per card
+  }, [photos]);
 
   return (
     <Grid

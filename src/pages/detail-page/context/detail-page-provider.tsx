@@ -6,7 +6,7 @@ import {
   fetchResultByUuidNoStore,
   OGCCollection,
 } from "../../../components/common/store/searchReducer";
-import { DetailPageContext } from "./detail-page-context";
+import { DetailPageContext, SpatialExtentPhoto } from "./detail-page-context";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -20,6 +20,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
+  const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
+  console.log("photos", photos);
 
   useEffect(() => {
     const uuid = new URLSearchParams(location.search).get("uuid");
@@ -37,6 +39,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       value={{
         collection,
         setCollection,
+        photos,
+        setPhotos,
       }}
     >
       {children}

@@ -53,7 +53,7 @@ export class Spatial {
     };
 
     featureCollections.features = this.bbox
-      .filter((box) => box.length === 4 || box.length === 2)
+      ?.filter((box) => box.length === 4 || box.length === 2)
       .map((box) => {
         if (box.length === 4) {
           // const feature: Feature = {
@@ -68,6 +68,7 @@ export class Spatial {
           // };
 
           // TODO: fix this
+
           return bboxPolygon([box[0], box[1], box[2], box[3]]);
         } else {
           // TODO: fix bbox points to point
