@@ -46,8 +46,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       });
   }, [dispatch, location.search]);
 
-  console.log("collection", collection);
-
   return (
     <DetailPageContext.Provider
       value={{

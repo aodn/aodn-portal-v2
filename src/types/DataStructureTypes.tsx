@@ -27,7 +27,7 @@ interface IInfo {
 interface IContact {
   name: string;
   organization: string;
-  identifer: string;
+  identifier: string;
   position: string;
   emails: string[];
   addresses: IAddress[];
