@@ -9,17 +9,17 @@ NREUM.init = {
 NREUM.loader_config = {
   accountID: "4390506",
   trustKey: "4390506",
-  agentID: "1386174428",
+  agentID: "1386181300",
   licenseKey: "NRJS-0775545a426749aedf1",
-  applicationID: "1386174428",
+  applicationID: "1386181300",
 };
 NREUM.info = {
   beacon: "bam.nr-data.net",
   errorBeacon: "bam.nr-data.net",
   licenseKey: "NRJS-0775545a426749aedf1",
-  applicationID: "1386174428",
+  applicationID: "1386181300",
   sa: 1,
-}; /*! For license information please see nr-loader-spa-1.260.0.min.js.LICENSE.txt */
+}; /*! For license information please see nr-loader-spa-1.260.1.min.js.LICENSE.txt */
 (() => {
   var e,
     t,
@@ -130,11 +130,7 @@ NREUM.info = {
               session: { expiresMs: d.oD, inactiveMs: d.Hb },
               ssl: void 0,
               obfuscate: void 0,
-              jserrors: {
-                enabled: !0,
-                harvestTimeSeconds: 10,
-                autoStart: !0,
-              },
+              jserrors: { enabled: !0, harvestTimeSeconds: 10, autoStart: !0 },
               metrics: { enabled: !0, autoStart: !0 },
               page_action: {
                 enabled: !0,
@@ -367,7 +363,7 @@ NREUM.info = {
       6818: (e, t, r) => {
         "use strict";
         r.d(t, { Re: () => i, gF: () => o, lF: () => a, q4: () => n });
-        const n = "1.260.0",
+        const n = "1.260.1",
           i = "PROD",
           o = "CDN",
           a = "2.0.0-alpha.12";
@@ -375,21 +371,22 @@ NREUM.info = {
       385: (e, t, r) => {
         "use strict";
         r.d(t, {
-          FN: () => c,
-          IF: () => l,
-          LW: () => a,
-          Nk: () => h,
-          Tt: () => u,
-          _A: () => o,
-          iS: () => s,
-          il: () => n,
-          sK: () => p,
-          ux: () => d,
-          v6: () => i,
-          w1: () => f,
+          FN: () => u,
+          IF: () => f,
+          LW: () => s,
+          Nk: () => p,
+          Tt: () => d,
+          _A: () => a,
+          iS: () => c,
+          il: () => i,
+          sK: () => g,
+          ux: () => l,
+          v6: () => o,
+          w1: () => h,
         });
-        const n = "undefined" != typeof window && !!window.document,
-          i =
+        var n = r(7894);
+        const i = "undefined" != typeof window && !!window.document,
+          o =
             "undefined" != typeof WorkerGlobalScope &&
             (("undefined" != typeof self &&
               self instanceof WorkerGlobalScope &&
@@ -397,7 +394,7 @@ NREUM.info = {
               ("undefined" != typeof globalThis &&
                 globalThis instanceof WorkerGlobalScope &&
                 globalThis.navigator instanceof WorkerNavigator)),
-          o = n
+          a = i
             ? window
             : "undefined" != typeof WorkerGlobalScope &&
               (("undefined" != typeof self &&
@@ -406,18 +403,18 @@ NREUM.info = {
                 ("undefined" != typeof globalThis &&
                   globalThis instanceof WorkerGlobalScope &&
                   globalThis)),
-          a = "complete" === o?.document?.readyState,
-          s = Boolean("hidden" === o?.document?.visibilityState),
-          c = "" + o?.location,
-          u = /iPad|iPhone|iPod/.test(o.navigator?.userAgent),
-          d = u && "undefined" == typeof SharedWorker,
-          l = (() => {
-            const e = o.navigator?.userAgent?.match(/Firefox[/\s](\d+\.\d+)/);
+          s = "complete" === a?.document?.readyState,
+          c = Boolean("hidden" === a?.document?.visibilityState),
+          u = "" + a?.location,
+          d = /iPad|iPhone|iPod/.test(a.navigator?.userAgent),
+          l = d && "undefined" == typeof SharedWorker,
+          f = (() => {
+            const e = a.navigator?.userAgent?.match(/Firefox[/\s](\d+\.\d+)/);
             return Array.isArray(e) && e.length >= 2 ? +e[1] : 0;
           })(),
-          f = Boolean(n && window.document.documentMode),
-          h = !!o.navigator?.sendBeacon,
-          p = Math.floor(Date.now() - performance.now());
+          h = Boolean(i && window.document.documentMode),
+          p = !!a.navigator?.sendBeacon,
+          g = Date.now() - (0, n.z)();
       },
       1117: (e, t, r) => {
         "use strict";
@@ -1004,10 +1001,7 @@ NREUM.info = {
         });
         var n = r(385),
           i = r(7894);
-        const o = {
-          beacon: "bam.nr-data.net",
-          errorBeacon: "bam.nr-data.net",
-        };
+        const o = { beacon: "bam.nr-data.net", errorBeacon: "bam.nr-data.net" };
         function a() {
           return (
             n._A.NREUM || (n._A.NREUM = {}),
@@ -1051,11 +1045,7 @@ NREUM.info = {
             (function () {
               let e = a();
               const t = e.info || {};
-              e.info = {
-                beacon: o.beacon,
-                errorBeacon: o.errorBeacon,
-                ...t,
-              };
+              e.info = { beacon: o.beacon, errorBeacon: o.errorBeacon, ...t };
             })(),
             (function () {
               let e = a();
@@ -1697,14 +1687,8 @@ NREUM.info = {
           d = { [n.IK.ERROR]: 15e3, [n.IK.FULL]: 3e5, [n.IK.OFF]: 0 },
           l = {
             RESET: { message: "Session was reset", sm: "Reset" },
-            IMPORT: {
-              message: "Recorder failed to import",
-              sm: "Import",
-            },
-            TOO_MANY: {
-              message: "429: Too Many Requests",
-              sm: "Too-Many",
-            },
+            IMPORT: { message: "Recorder failed to import", sm: "Import" },
+            TOO_MANY: { message: "429: Too Many Requests", sm: "Too-Many" },
             TOO_BIG: { message: "Payload was too large", sm: "Too-Big" },
             CROSS_TAB: {
               message: "Session Entity was set to OFF on another tab",
@@ -1787,12 +1771,7 @@ NREUM.info = {
           o = "api",
           a = n.D.softNav,
           s = { INITIAL_PAGE_LOAD: "", ROUTE_CHANGE: 1, UNSPECIFIED: 2 },
-          c = {
-            INTERACTION: 1,
-            AJAX: 2,
-            CUSTOM_END: 3,
-            CUSTOM_TRACER: 4,
-          },
+          c = { INTERACTION: 1, AJAX: 2, CUSTOM_END: 3, CUSTOM_TRACER: 4 },
           u = { IP: "in progress", FIN: "finished", CAN: "cancelled" };
       },
       7836: (e, t, r) => {
@@ -2278,14 +2257,11 @@ NREUM.info = {
     (i.e = (e) =>
       Promise.all(Object.keys(i.f).reduce((t, r) => (i.f[r](e, t), t), []))),
     (i.u = (e) =>
-      ({
-        111: "nr-spa",
-        164: "nr-spa-compressor",
-        433: "nr-spa-recorder",
-      })[e] + "-1.260.0.min.js"),
+      ({ 111: "nr-spa", 164: "nr-spa-compressor", 433: "nr-spa-recorder" })[e] +
+      "-1.260.1.min.js"),
     (i.o = (e, t) => Object.prototype.hasOwnProperty.call(e, t)),
     (e = {}),
-    (t = "NRBA-1.260.0.PROD:"),
+    (t = "NRBA-1.260.1.PROD:"),
     (i.l = (r, n, o, a) => {
       if (e[r]) e[r].push(n);
       else {
@@ -2308,9 +2284,9 @@ NREUM.info = {
         if (!s) {
           c = !0;
           var f = {
-            111: "sha512-yg/3G4Xi/nUUSGUZ5sZ5laGfxYiBl4A4z1KiCDtOZnnyZ1yRz/gldBGvnLQkCt9iHEG+xaLgGYJXknmRQ1RRBg==",
-            433: "sha512-+r3Wkk8iuDgwHGMXW/4TexrEk4BUtJDwoydKiVtCg/OhRaVQjDykRQ5pq++NLNYgn6VmvYTyFNtJOzAGjbQYxQ==",
-            164: "sha512-B0foyUJVqgCiRQ77L/MyMwRicWPhe+NqE2lxw/3pl055wE8eTQpuvUp+2B2d8y2J7zEgKz6qDFwcVFoxG46BKw==",
+            111: "sha512-1vbJLadsUx7r3ct9dcZ8xWYWRwjt1ZgNM7ZGewgLIexOrwwEwfm93GALuGB8Z5SoqqsLLjmx45VxQ6hbq5d4tA==",
+            433: "sha512-GiLzIBj56lJ8WJ2NzkmQbbP5bDfqc0PbS30+FFrYgYBhzMOWg3PDNb2OYCaGiWyvQagVT9CeRMBrrFe45RBNVA==",
+            164: "sha512-89TYqrPxRo9GwsbxmRSsCdyC5BH41uIPaW0FFv5w92e97EnshpUozEOnd12Dqnl7LGF+GS5XJY3LfGAh5DzLyA==",
           };
           ((s = document.createElement("script")).charset = "utf-8"),
             (s.timeout = 120),
@@ -2391,8 +2367,8 @@ NREUM.info = {
           for (t && t(r); u < a.length; u++)
             (o = a[u]), i.o(e, o) && e[o] && e[o][0](), (e[o] = 0);
         },
-        r = (self["webpackChunk:NRBA-1.260.0.PROD"] =
-          self["webpackChunk:NRBA-1.260.0.PROD"] || []);
+        r = (self["webpackChunk:NRBA-1.260.1.PROD"] =
+          self["webpackChunk:NRBA-1.260.1.PROD"] || []);
       r.forEach(t.bind(null, 0)), (r.push = t.bind(null, r.push.bind(r)));
     })(),
     (() => {
