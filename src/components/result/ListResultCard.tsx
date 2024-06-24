@@ -4,7 +4,6 @@ import {
   CardActions,
   CardContent,
   CardMedia,
-  Chip,
   Grid,
   Typography,
 } from "@mui/material";
@@ -64,7 +63,11 @@ const ListResultCard = (props: ResultCardProps) => {
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
-    <Card variant="outlined" data-testid="result-card-list">
+    <Card
+      variant="outlined"
+      data-testid="result-card-list"
+      sx={{ width: "99%" }}
+    >
       <CardActionArea
         onClick={() => {
           const searchParams = new URLSearchParams();

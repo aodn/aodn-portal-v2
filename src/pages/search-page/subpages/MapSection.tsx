@@ -10,9 +10,7 @@ import MenuControl, {
 } from "../../../components/map/mapbox/controls/MenuControl";
 import React from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
-import VectorTileLayers from "../../../components/map/mapbox/layers/VectorTileLayers";
 import { OGCCollection } from "../../../components/common/store/searchReducer";
-import Layers from "../../../components/map/mapbox/layers/Layers";
 
 const mapContainerId = "map-container-id";
 
@@ -56,9 +54,9 @@ const MapSection: React.FC<SearchPageProps> = ({
             <ScaleControl />
             <MenuControl menu={<BaseMapSwitcher />} />
           </Controls>
-          <Layers>
-            <VectorTileLayers collections={layers} />
-          </Layers>
+          {/*<Layers>*/}
+          {/*  <VectorTileLayers collections={layers} />*/}
+          {/*</Layers>*/}
         </Map>
       </Paper>
     </Grid>
