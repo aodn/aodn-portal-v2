@@ -19,8 +19,8 @@ import ReplyIcon from "@mui/icons-material/Reply";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import { useDetailPageContext } from "../context/detail-page-context";
-
 import { useNavigate } from "react-router-dom";
+import imosLogoWithTitle from "../../../../public/logo/imos_logo_with_title.png";
 
 interface ButtonWithIcon {
   label: string;
@@ -154,7 +154,7 @@ const HeaderSection = () => {
           {/* TODO: replace with real org logo */}
           <img
             aria-label="collection image"
-            src="logo/imos_logo_with_title.png"
+            src={imosLogoWithTitle}
             alt="imos_logo_with_title"
             style={{
               objectFit: "contain",

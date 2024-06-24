@@ -8,6 +8,14 @@ import {
   Typography,
 } from "@mui/material";
 import { borderRadius, color, padding } from "../../../../styles/constants";
+import twitterIcon from "../../../../assets/icons/twitter.png";
+import facebookIcon from "../../../../assets/icons/facebook.png";
+import instagramIcon from "../../../../assets/icons/instagram.png";
+import emailIcon from "../../../../assets/icons/email.png";
+import linkIcon from "../../../../assets/icons/link.png";
+import commentsIcon from "../../../../assets/icons/comments.png";
+import feedbackIcon from "../../../../assets/icons/feedback.png";
+
 interface SocialIcon {
   name: string;
   icon?: JSX.Element;
@@ -17,11 +25,11 @@ interface SocialIcon {
 
 // TODO: add real social sites links
 const socialIcons: SocialIcon[] = [
-  { name: "twitter", imgUrl: "src/assets/icons/twitter.png", url: "#" },
-  { name: "facebook", imgUrl: "src/assets/icons/facebook.png", url: "#" },
-  { name: "facebook", imgUrl: "src/assets/icons/instagram.png", url: "#" },
-  { name: "facebook", imgUrl: "src/assets/icons/email.png", url: "#" },
-  { name: "facebook", imgUrl: "src/assets/icons/link.png", url: "#" },
+  { name: "twitter", imgUrl: twitterIcon, url: "#" },
+  { name: "facebook", imgUrl: facebookIcon, url: "#" },
+  { name: "instagram", imgUrl: instagramIcon, url: "#" },
+  { name: "email", imgUrl: emailIcon, url: "#" },
+  { name: "link", imgUrl: linkIcon, url: "#" },
 ];
 
 const RatingsAndCommentsCard = () => {
@@ -88,7 +96,7 @@ const RatingsAndCommentsCard = () => {
               }}
             >
               <img
-                src="src/assets/icons/comments.png"
+                src={commentsIcon}
                 alt="all_comments"
                 style={{
                   objectFit: "contain",
@@ -123,7 +131,7 @@ const RatingsAndCommentsCard = () => {
               }}
             >
               <img
-                src="src/assets/icons/feedback.png"
+                src={feedbackIcon}
                 alt="add_your_feedback"
                 style={{
                   objectFit: "contain",

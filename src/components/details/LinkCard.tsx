@@ -3,6 +3,7 @@ import { Link as LinkType } from "../common/store/searchReducer";
 import { Box, Grid, Link, Typography } from "@mui/material";
 import { color, fontColor, padding } from "../../styles/constants";
 import CopyLinkButton from "../common/buttons/CopyLinkButton";
+import linkIcon from "../../assets/icons/link.png";
 
 const LinkCard = ({
   link,
@@ -59,7 +60,7 @@ const LinkCard = ({
                 }}
               >
                 <img
-                  src="src/assets/icons/link.png"
+                  src={linkIcon}
                   alt=""
                   style={{
                     objectFit: "scale-down",

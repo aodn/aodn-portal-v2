@@ -1,12 +1,8 @@
 import IconContainer from "./IconContainer";
+import dimensions from "../../../assets/icons/dimensions.png";
 
 const DimensionsIcon = () => {
-  return (
-    <IconContainer
-      imgUrl="src/assets/icons/dimensions.png"
-      label="Dimensions"
-    />
-  );
+  return <IconContainer imgUrl={dimensions} label="Dimensions" />;
 };
 
 export default DimensionsIcon;
