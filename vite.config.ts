@@ -26,7 +26,7 @@ export default ({ mode }) => {
           `<script type='text/javascript'>${inlineJs}</script>`
         );
       },
-    }
+    };
   };
 
   return defineConfig({
