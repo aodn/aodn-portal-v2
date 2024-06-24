@@ -14,7 +14,7 @@ export default ({ mode }) => {
     // We need to inline the relic_script in the index.html, you can dynamic include based on env here
     // https://docs.newrelic.com/docs/browser/new-relic-browser/page-load-timing-resources/instrumentation-browser-monitoring/#javascript-placement
     return {
-      name: 'inline-javascript',
+      name: "inline-javascript",
       transformIndexHtml(html) {
         const inlineJs = fs.readFileSync(
           path.resolve(__dirname, "public/relic_script.js"),
@@ -22,11 +22,11 @@ export default ({ mode }) => {
         );
 
         return html.replace(
-          '<!-- new-relic-js -->',
-          `<script type="text/javascript">${inlineJs}</script>`
+          "<!-- new-relic-js -->",
+          "<script type='text/javascript'>${inlineJs}</script>"
         );
-      }
-    }    
+      },
+    }
   };
 
   return defineConfig({
