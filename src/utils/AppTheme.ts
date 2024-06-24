@@ -24,8 +24,8 @@ const theme: ThemeOptions = {
     },
     success: {
       main: "#4CAF50",
-      light: "",
-      dark: "",
+      // light: "",
+      // dark: "",
     },
   },
 
@@ -110,7 +110,7 @@ const theme: ThemeOptions = {
     "1px 1px 10px 1px #d4d4d4", // filter toggle button
     "0 0 10px rgba(0, 0, 0, 0.1)", // banner heading
     "0 0 30px rgba(0, 0, 0, 1.9)", // banner subtitle
-    "placeholder",
+    "inset 1px 1px rgba(0, 0, 0, 0.1)", // detail page select
     "placeholder",
     "placeholder",
     "placeholder",

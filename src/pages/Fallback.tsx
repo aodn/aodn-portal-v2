@@ -1,7 +1,7 @@
 import * as React from "react";
 
 const Fallback = () => {
-  return <div></div>;
+  return <div>something went wrong</div>;
 };
 
 export default Fallback;

@@ -14,6 +14,8 @@ const margin = {
   sm: "2px",
   md: "5px",
   lg: "10px",
+  xlg: "15px",
+  xxlg: "25px",
   top: "15px",
   bottom: "15px",
   left: "15px",
@@ -44,6 +46,9 @@ const fontSize = {
   bannerSubtitle: "20px",
   mapMenuItem: 14,
   mapMenuSubItem: 13,
+  detailPageHeading: "20px",
+  icon: "10px",
+  info: "14px",
 };
 
 const fontWeight = {
@@ -55,8 +60,44 @@ const fontWeight = {
   extraBold: "800",
 };
 
+const fontColor = {
+  gray: {
+    dark: "#575757",
+    medium: "#787878",
+    light: "#979797",
+  },
+  blue: {
+    medium: "#468CB6",
+  },
+};
+
+const color = {
+  tabPanel: {
+    background: "#fff",
+    tabOnFocused: "#182C3A",
+    tabOnHover: "#182C3A",
+    divider: "#8B959C",
+  },
+  blue: {
+    extraLight: "rgba(231,242,255,0.5)",
+    light: "#E2ECF3",
+    medium: "#E7F2FF",
+    dark: "#618CA5",
+    darkSemiTransparent: "rgba(97,140,165,0.5)",
+    extraDark: "#182C3A",
+  },
+  gray: {
+    dark: "#575757",
+    medium: "#787878",
+    light: "#979797",
+    extraLight: "#DFDFDF",
+  },
+};
+
 const border = {
   buttonBorder: "2px solid #fff",
+  xs: "1px solid",
+  sm: "2px solid",
 };
 
 const borderRadius = {
@@ -67,6 +108,10 @@ const borderRadius = {
   menu: "5px",
   menuTop: "5px 5px 0 0",
   small: "5px",
+  medium: "8px",
+  large: "10px",
+  xlg: "15px",
+  xxlg: "34px",
 };
 
 const filterList = {
@@ -89,6 +134,8 @@ export {
   padding,
   fontSize,
   fontWeight,
+  fontColor,
+  color,
   border,
   borderRadius,
   filterList,
