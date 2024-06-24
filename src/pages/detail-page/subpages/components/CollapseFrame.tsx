@@ -56,38 +56,40 @@ const CollapseFrame: React.FC<CollapseFrameProps> = ({
         overflowY: "auto",
       }}
     >
-      <ButtonBase
-        onClick={() => {
-          if (isContactFragment && isExpanded) {
-            return null;
-          }
-          setIsExpanded(!isExpanded);
-        }}
-        sx={{ width: "100%" }}
-      >
-        <Grid item container md={12}>
-          <Grid item md={1}>
-            {isContactFragment && isExpanded && <MailOutlineIcon />}
+      <Grid item md={11}>
+        <ButtonBase
+          onClick={() => {
+            if (isContactFragment && isExpanded) {
+              return null;
+            }
+            setIsExpanded(!isExpanded);
+          }}
+          sx={{ width: "100%" }}
+        >
+          <Grid item container md={12}>
+            <Grid item md={1}>
+              {isContactFragment && isExpanded && <MailOutlineIcon />}
+            </Grid>
+            <Grid item md={11}>
+              {isExpanded && isContactFragment ? (
+                <Link href={`mailto:${email}`}>{titleComponent()}</Link>
+              ) : (
+                titleComponent()
+              )}
+            </Grid>
           </Grid>
-          <Grid item md={10}>
-            {isExpanded && isContactFragment ? (
-              <Link href={`mailto:${email}`}>{titleComponent()}</Link>
-            ) : (
-              titleComponent()
-            )}
-          </Grid>
-          <Grid item md={1}>
-            <IconButton
-              aria-label="expand or collapse"
-              onClick={() => {
-                setIsExpanded(!isExpanded);
-              }}
-            >
-              {isExpanded ? <ExpandLess /> : <ExpandMore />}
-            </IconButton>
-          </Grid>
-        </Grid>
-      </ButtonBase>
+        </ButtonBase>
+      </Grid>
+      <Grid item md={1}>
+        <IconButton
+          aria-label="expand or collapse"
+          onClick={() => {
+            setIsExpanded(!isExpanded);
+          }}
+        >
+          {isExpanded ? <ExpandLess /> : <ExpandMore />}
+        </IconButton>
+      </Grid>
 
       <Grid item md={12}>
         <Collapse in={isExpanded}>

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import KeywordSection from "../components/KeywordSection";
-import CreditSection from "../components/CreditSection";
-import ContactSection from "../components/ContactSection";
+import KeywordBlock from "../components/KeywordBlock";
+import CreditBlock from "../components/CreditBlock";
+import ContactBlock from "../components/ContactBlock";
 import NavigatablePanel from "../components/NavigatablePanel";
 
 const AboutPanel = () => {
@@ -24,15 +24,15 @@ const AboutPanel = () => {
     () => [
       {
         title: "Keywords",
-        component: <KeywordSection themes={themes ? themes : []} />,
+        component: <KeywordBlock themes={themes ? themes : []} />,
       },
       {
         title: "Contacts",
-        component: <ContactSection contacts={contacts ? contacts : []} />,
+        component: <ContactBlock contacts={contacts ? contacts : []} />,
       },
       {
         title: "Credits",
-        component: <CreditSection credits={credits ? credits : []} />,
+        component: <CreditBlock credits={credits ? credits : []} />,
       },
     ],
     [contacts, credits, themes]

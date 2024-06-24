@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { ITheme } from "../../../../types/DataStructureTypes";
-import ListSection from "./ListSection";
+import BlockList from "./BlockList";
 import CollapseFrame from "./CollapseFrame";
 import BulletedText from "../../../../components/common/texts/BulletedText";
 
@@ -8,13 +8,13 @@ interface KeywordSectionProps {
   themes: ITheme[];
 }
 
-const KeywordSection: React.FC<KeywordSectionProps> = ({ themes }) => {
+const KeywordBlock: React.FC<KeywordSectionProps> = ({ themes }) => {
   // children list
   const collapseComponents: ReactNode[] = useMemo(() => {
     const returnedList: ReactNode[] = [];
-    themes?.map((theme) => {
+    themes?.map((theme, index) => {
       returnedList.push(
-        <CollapseFrame title={theme.title} key={theme.title}>
+        <CollapseFrame title={theme.title} key={index}>
           {theme.concepts?.map((concept, index) => {
             return <BulletedText key={index}>{concept.id}</BulletedText>;
           })}
@@ -24,7 +24,7 @@ const KeywordSection: React.FC<KeywordSectionProps> = ({ themes }) => {
     return returnedList;
   }, [themes]);
 
-  return <ListSection title="Keywords" childrenList={collapseComponents} />;
+  return <BlockList title="Keywords" childrenList={collapseComponents} />;
 };
 
-export default KeywordSection;
+export default KeywordBlock;

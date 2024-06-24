@@ -134,7 +134,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       <Grid
         item
         container
-        md={8}
+        md={9}
         ref={scrollableSectionRef}
         sx={{ height: "500px", overflowY: "auto" }}
         onScroll={(event) => {

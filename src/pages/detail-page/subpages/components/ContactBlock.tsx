@@ -1,14 +1,14 @@
 import { IContact } from "../../../../types/DataStructureTypes";
 import React, { ReactNode, useMemo } from "react";
-import ListSection from "./ListSection";
+import BlockList from "./BlockList";
 import ContactCard from "./ContactCard";
 import CollapseFrame from "./CollapseFrame";
 
-interface ContactSectionProps {
+interface ContactBlockProps {
   contacts: IContact[];
 }
 
-const ContactSection: React.FC<ContactSectionProps> = ({ contacts }) => {
+const ContactBlock: React.FC<ContactBlockProps> = ({ contacts }) => {
   const collapseComponents: ReactNode[] = useMemo(() => {
     const returnedList: ReactNode[] = [];
     contacts?.map((contact, index) => {
@@ -28,11 +28,8 @@ const ContactSection: React.FC<ContactSectionProps> = ({ contacts }) => {
   }, [contacts]);
 
   return (
-    <ListSection
-      title="Contacts"
-      childrenList={collapseComponents}
-    ></ListSection>
+    <BlockList title="Contacts" childrenList={collapseComponents}></BlockList>
   );
 };
 
-export default ContactSection;
+export default ContactBlock;

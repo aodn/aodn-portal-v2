@@ -1,11 +1,11 @@
-import ListSection from "./ListSection";
+import BlockList from "./BlockList";
 import React, { ReactNode, useMemo } from "react";
 import PlainTextFragment from "./PlainTextFragment";
 
-interface CreditSectionProps {
+interface CreditBlockProps {
   credits: string[];
 }
-const CreditSection: React.FC<CreditSectionProps> = ({ credits }) => {
+const CreditBlock: React.FC<CreditBlockProps> = ({ credits }) => {
   const creditList: ReactNode[] = useMemo(() => {
     const returnedList: ReactNode[] = [];
     credits?.map((credit) => {
@@ -15,6 +15,6 @@ const CreditSection: React.FC<CreditSectionProps> = ({ credits }) => {
     });
     return returnedList;
   }, [credits]);
-  return <ListSection title="Credit" childrenList={creditList} />;
+  return <BlockList title="Credit" childrenList={creditList} />;
 };
-export default CreditSection;
+export default CreditBlock;
