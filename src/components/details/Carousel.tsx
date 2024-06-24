@@ -1,39 +1,60 @@
 import { Box, Card, Grid, IconButton, Slide, Stack } from "@mui/material";
-import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
+import {
+  SpatialExtentPhoto,
+  useDetailPageContext,
+} from "../../pages/detail-page/context/detail-page-context";
 import { borderRadius, padding } from "../../styles/constants";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 
 const Carousel: FC = () => {
-  const { photos } = useDetailPageContext();
-  // cards will be the cards that are displayed
+  const { extentsPhotos, setPhotoSelected } = useDetailPageContext();
+  // State to store the cards to be displayed in the carousel
   const [cards, setCards] = useState<React.ReactElement[]>([]);
-  // currentPage is the current page of the cards that is currently displayed
+  // State to track the current page of cards being displayed
   const [currentPage, setCurrentPage] = useState(0);
-
+  // State to track the direction of the slide animation
   const [slideDirection, setSlideDirection] = useState<
     "right" | "left" | undefined
   >("left");
 
   const cardsPerPage: number = 3;
-  const cardSize: number = 45;
+  const cardSize: number = 70;
   const containerWidth = cardsPerPage * cardSize;
 
-  // these two functions handle changing the pages
+  // Function to handle moving to the next page of cards
   const handleNextPage = () => {
     setSlideDirection("left");
-    setCurrentPage((prevPage) => prevPage + 1);
+    setCurrentPage((prevPage) => {
+      // if it is the last page, user cannot go further next page
+      const totalPages = Math.ceil(cards.length / cardsPerPage);
+      if (prevPage + 1 === totalPages) return prevPage;
+      return prevPage + 1;
+    });
   };
 
+  // Function to handle moving to the previous page of cards
   const handlePrevPage = () => {
     setSlideDirection("right");
-    setCurrentPage((prevPage) => prevPage - 1);
+    setCurrentPage((prevPage) => {
+      if (prevPage === 0) return prevPage;
+      return prevPage - 1;
+    });
   };
 
+  const handleClick = useCallback(
+    (photo: SpatialExtentPhoto) => {
+      setPhotoSelected(photo);
+    },
+    [setPhotoSelected]
+  );
+
+  // Update and map cards when extentsPhotos changes
   useEffect(() => {
+    if (!extentsPhotos) return;
     setCards(
-      photos.map((photo, index) => (
+      extentsPhotos.map((photo, index) => (
         <Card
           key={index}
           sx={{
@@ -45,6 +66,7 @@ const Carousel: FC = () => {
               scale: "110%",
             },
           }}
+          onClick={() => handleClick(photo)}
         >
           <img
             src={photo.url}
@@ -58,7 +80,9 @@ const Carousel: FC = () => {
         </Card>
       ))
     );
-  }, [photos]);
+  }, [extentsPhotos, extentsPhotos?.length, handleClick]);
+
+  if (!extentsPhotos || extentsPhotos.length === 0) return;
 
   return (
     <Grid
@@ -83,11 +107,9 @@ const Carousel: FC = () => {
       <Grid item xs={10}>
         <Box arial-label="cards container">
           <Box sx={{ width: `${containerWidth}px`, height: "100%" }}>
-            {/* this is the box that holds the cards and the slide animation,
-        in this implementation the card is already constructed but in later versions you will see how the
-        items you wish to use will be dynamically created with the map method*/}
+            {/* Container for the cards and the slide animation */}
             {cards.map((card, index) => (
-              <Box
+              <Box // State to track the direction of the slide animation
                 key={`card-${index}`}
                 sx={{
                   width: "100%",
@@ -95,7 +117,7 @@ const Carousel: FC = () => {
                   display: currentPage === index ? "block" : "none",
                 }}
               >
-                {/* this is the slide animation that will be used to slide the cards in and out*/}
+                {/* Slide animation for the cards */}
                 <Slide direction={slideDirection} in={currentPage === index}>
                   <Stack
                     spacing={2}
@@ -104,7 +126,7 @@ const Carousel: FC = () => {
                     justifyContent="center"
                     sx={{ width: "100%", height: "100%" }}
                   >
-                    {/* this slices the cards array to only display the amount you have previously determined per page*/}
+                    {/* Slicing the cards array to display the cards for the current page */}
                     {cards.slice(
                       index * cardsPerPage,
                       index * cardsPerPage + cardsPerPage

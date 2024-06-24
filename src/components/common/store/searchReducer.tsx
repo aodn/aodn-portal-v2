@@ -10,15 +10,9 @@ import {
   TemporalDuring,
   CategoriesIn,
 } from "../cqlFilters";
-import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-  Position,
-} from "geojson";
+import { FeatureCollection, Position } from "geojson";
 import { bboxPolygon } from "@turf/turf";
-
+import * as turf from "@turf/turf";
 export interface Link {
   href: string;
   rel: string;
@@ -40,52 +34,26 @@ export class Spatial {
     this.parent = ogcCollection;
   }
 
-  getGeojsonExtents = (): FeatureCollection => {
+  getGeojsonExtents = (start: number): FeatureCollection => {
     const featureCollections: FeatureCollection = {
       type: "FeatureCollection",
-      // crs: {
-      //   type: "name",
-      //   properties: {
-      //     name: "urn:ogc:def:crs:OGC:1.3:CRS84",
-      //   },
-      // },
       features: [],
     };
 
-    featureCollections.features = this.bbox
-      ?.filter((box) => box.length === 4 || box.length === 2)
-      .map((box) => {
-        if (box.length === 4) {
-          // const feature: Feature = {
-          //   type: "Feature",
-          //   properties: {
-          //     id: this.parent.id,
-          //   },
-          //   geometry: {
-          //     type: "Polygon",
-          //     coordinates: bboxPolygon(box),
-          //   },
-          // };
+    // Filter valid bounding boxes and points
+    const validBoxesAndPoints = this.bbox.filter(
+      (box) => box.length === 4 || box.length === 2
+    );
 
-          // TODO: fix this
+    // Create features from valid boxes and points starting from the given index
+    const features = validBoxesAndPoints.slice(start).map((pos) => {
+      return pos.length === 4
+        ? bboxPolygon([pos[0], pos[1], pos[2], pos[3]])
+        : turf.point(pos);
+    });
 
-          return bboxPolygon([box[0], box[1], box[2], box[3]]);
-        } else {
-          // TODO: fix bbox points to point
-          const feature: Feature = {
-            type: "Feature",
-            properties: {
-              id: this.parent.id,
-            },
-            geometry: {
-              type: "Point",
-              coordinates: box,
-            },
-          };
-          return feature;
-        }
-      });
-    console.log({ featureCollections });
+    // Add individual bounding boxes and points
+    featureCollections.features.push(...features);
     return featureCollections;
   };
 }
@@ -101,14 +69,11 @@ export class OGCCollection {
   itemType?: string;
   links?: Array<Link>;
   set extent(extents: any) {
-    console.log("extent in reducer========", extents);
     this.propExtent = new Spatial(this);
     this.propExtent.bbox = extents.spatial.bbox;
     this.propExtent.crs = extents.spatial.crs;
     this.propExtent.temporal = extents.temporal;
-    console.log("in reducer", this.propExtent);
   }
-
   get extent(): Spatial | undefined {
     return this.propExtent;
   }

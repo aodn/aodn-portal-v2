@@ -9,6 +9,7 @@ import {
   Icon,
   Stack,
   IconButton,
+  LinearProgress,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
@@ -37,7 +38,6 @@ import Map from "../../../../components/map/mapbox/Map";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
 import Layers from "../../../../components/map/mapbox/layers/Layers";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
-import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 
 // TODO: replace with real select options
 export const selects = {
@@ -71,7 +71,14 @@ export const selects = {
 };
 
 const AbstractAndDownloadPanel = () => {
-  const { collection, setPhotos } = useDetailPageContext();
+  const {
+    collection,
+    setPhotos,
+    hasSnapshotsFinished,
+    photoHovered,
+    photoSelected,
+  } = useDetailPageContext();
+
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
   const theme = useTheme();
@@ -108,26 +115,47 @@ const AbstractAndDownloadPanel = () => {
         <Grid item xs={12}>
           <Stack direction="column">
             <Typography sx={{ padding: 0 }}>{abstract}</Typography>
+            {!hasSnapshotsFinished && (
+              <Stack sx={{ width: "100%", height: "100px" }}>
+                <LinearProgress />
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                >
+                  <Typography>Map Loading ...</Typography>
+                </Box>
+              </Stack>
+            )}
             <Box
-              arial-label="map"
-              id={mapContainerId}
-              sx={{
-                width: "100%",
-                minHeight: "500px",
-                marginY: padding.large,
-              }}
+              sx={{ visibility: hasSnapshotsFinished ? "visible" : "hidden" }}
             >
-              <Map panelId={mapContainerId}>
-                <Controls>
-                  <NavigationControl />
-                  <ScaleControl />
-                  <MenuControl menu={<BaseMapSwitcher />} />
-                  <DisplayCoordinate />
-                </Controls>
-                <Layers>
-                  <GeojsonLayer collection={collection} setPhotos={setPhotos} />
-                </Layers>
-              </Map>
+              <Box
+                arial-label="map"
+                id={mapContainerId}
+                sx={{
+                  width: "100%",
+                  minHeight: "500px",
+                  marginY: padding.large,
+                }}
+              >
+                <Map panelId={mapContainerId}>
+                  <Controls>
+                    <NavigationControl />
+                    <ScaleControl />
+                    <MenuControl menu={<BaseMapSwitcher />} />
+                  </Controls>
+                  <Layers>
+                    <GeojsonLayer
+                      collection={collection}
+                      setPhotos={setPhotos}
+                    />
+                  </Layers>
+                </Map>
+              </Box>
             </Box>
           </Stack>
         </Grid>

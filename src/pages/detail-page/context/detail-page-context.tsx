@@ -10,6 +10,14 @@ interface DetailPageContextType {
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
   photos: SpatialExtentPhoto[];
   setPhotos: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
+  extentsPhotos: SpatialExtentPhoto[] | undefined;
+  setExtentsPhotos: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
+  photoHovered: SpatialExtentPhoto | undefined;
+  setPhotoHovered: Dispatch<SetStateAction<SpatialExtentPhoto | undefined>>;
+  photoSelected: SpatialExtentPhoto | undefined;
+  setPhotoSelected: Dispatch<SetStateAction<SpatialExtentPhoto | undefined>>;
+  hasSnapshotsFinished: boolean;
+  setHasSnapshotsFinished: Dispatch<SetStateAction<boolean>>;
 }
 
 const DetailPageContextDefault = {
@@ -17,6 +25,14 @@ const DetailPageContextDefault = {
   setCollection: () => {},
   photos: [] as SpatialExtentPhoto[],
   setPhotos: () => {},
+  extentsPhotos: [] as SpatialExtentPhoto[],
+  setExtentsPhotos: () => {},
+  photoHovered: {} as SpatialExtentPhoto,
+  setPhotoHovered: () => {},
+  photoSelected: {} as SpatialExtentPhoto,
+  setPhotoSelected: () => {},
+  hasSnapshotsFinished: false,
+  setHasSnapshotsFinished: () => {},
 };
 
 export const DetailPageContext = createContext<DetailPageContextType>(

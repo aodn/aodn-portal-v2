@@ -21,7 +21,20 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     undefined
   );
   const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
-  console.log("photos", photos);
+  const [extentsPhotos, setExtentsPhotos] = useState<SpatialExtentPhoto[]>([]);
+  const [photoHovered, setPhotoHovered] = useState<SpatialExtentPhoto>();
+  const [photoSelected, setPhotoSelected] = useState<SpatialExtentPhoto>();
+  const [hasSnapshotsFinished, setHasSnapshotsFinished] =
+    useState<boolean>(false);
+
+  const extentsLength = collection?.extent?.bbox.length;
+  useEffect(() => {
+    if (photos.length === extentsLength) {
+      setHasSnapshotsFinished(true);
+      if (photos.length === 1) return;
+      setExtentsPhotos(photos.slice(1, extentsLength));
+    }
+  }, [extentsLength, hasSnapshotsFinished, photos, photos.length]);
 
   useEffect(() => {
     const uuid = new URLSearchParams(location.search).get("uuid");
@@ -34,6 +47,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   }, [dispatch, location.search]);
 
   console.log("collection", collection);
+
   return (
     <DetailPageContext.Provider
       value={{
@@ -41,6 +55,14 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setCollection,
         photos,
         setPhotos,
+        extentsPhotos,
+        setExtentsPhotos,
+        photoHovered,
+        setPhotoHovered,
+        photoSelected,
+        setPhotoSelected,
+        hasSnapshotsFinished,
+        setHasSnapshotsFinished,
       }}
     >
       {children}
