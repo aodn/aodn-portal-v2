@@ -43,7 +43,9 @@ export default ({ mode }) => {
       createHtmlPlugin({
         inject: {
           data: {
-            inlineNewRelic: fs.readFileSync(path.resolve(__dirname, 'public/relic_script.js'), 'utf-8'),
+            inlineNewRelic: fs.readFileSync(
+              path.resolve(__dirname, "public/relic_script.js"), "utf-8"
+            ),
           },
         },
       }),
