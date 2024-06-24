@@ -3,16 +3,15 @@ import { Box, Button } from "@mui/material";
 
 interface DetailSubtabProps {
   title: string;
-  selectedTab: string;
-  setSelectedTab: (tab: string) => void;
+  navigate: () => void;
+  isBordered: boolean;
 }
 
-const DetailSubtab: React.FC<DetailSubtabProps> = ({
+const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
   title,
-  selectedTab,
-  setSelectedTab,
+  navigate,
+  isBordered,
 }) => {
-  const isSelected = selectedTab === title;
   return (
     <Box
       display="flex"
@@ -25,12 +24,12 @@ const DetailSubtab: React.FC<DetailSubtabProps> = ({
       <Button
         sx={{
           minWidth: 0,
-          border: isSelected
+          border: isBordered
             ? " 1px solid var(--brand_dark-blue_80, #618CA5)"
             : "none",
           borderRadius: "5px",
         }}
-        onClick={() => setSelectedTab(title)}
+        onClick={navigate}
       >
         {title}
       </Button>
@@ -38,4 +37,4 @@ const DetailSubtab: React.FC<DetailSubtabProps> = ({
   );
 };
 
-export default DetailSubtab;
+export default DetailSubtabBtn;

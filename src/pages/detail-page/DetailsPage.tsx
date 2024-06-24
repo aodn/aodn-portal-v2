@@ -1,11 +1,4 @@
-import { useLocation } from "react-router-dom";
-import {
-  fetchResultByUuidNoStore,
-  OGCCollection,
-} from "../../components/common/store/searchReducer";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../components/common/store/store";
+import { OGCCollection } from "../../components/common/store/searchReducer";
 
 import Layout from "../../components/layout/layout";
 import { Box, Grid } from "@mui/material";
@@ -15,7 +8,6 @@ import HeaderPanel from "./subpages/HeaderPanel";
 import SidePanel from "./subpages/SidePanel";
 import ContentUpperSection from "./subpages/ContentUpperSection";
 import ContentLowerSection from "./subpages/ContentLowerSection";
-import Fallback from "../Fallback";
 import { DetailPageProvider } from "./context/detail-page-provider";
 
 export interface DetailsProps {

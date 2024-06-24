@@ -1,15 +1,16 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { ParameterState, Category } from "./componentParamReducer";
+import { Category, ParameterState } from "./componentParamReducer";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 
 import {
+  CategoriesIn,
   cqlDefaultFilters,
   PolygonOperation,
   TemporalAfterOrBefore,
   TemporalDuring,
-  CategoriesIn,
 } from "../cqlFilters";
+import { IContact, ITheme } from "../../../types/DataStructureTypes";
 
 interface Link {
   href: string;
@@ -55,8 +56,11 @@ export class OGCCollection {
     );
     return target !== undefined ? target.href : undefined;
   };
-  // get status
+  // get properties
   getStatus = (): string => this.propValue?.get("STATUS");
+  getCredits = (): string[] => this.propValue?.get("CREDITS");
+  getContacts = (): IContact[] => this.propValue?.get("CONTACTS");
+  getThemes = (): ITheme[] => this.propValue?.get("THEMES");
 }
 
 export interface OGCCollections {

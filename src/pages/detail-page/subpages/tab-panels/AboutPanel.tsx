@@ -1,49 +1,44 @@
-import React, { useState } from "react";
-import { Grid } from "@mui/material";
-import DetailSubtabGroup from "../../../../components/common/tabs/DetailSubtabGroup";
-import SubPanel from "../subpanels/SubPanel";
-import CollapseFragment from "../subpanels/CollapseFragment";
-import BulletedText from "../../../../components/common/texts/BulletedText";
+import React, { useEffect, useMemo, useState } from "react";
+import { useDetailPageContext } from "../../context/detail-page-context";
+import KeywordSection from "../components/KeywordSection";
+import CreditSection from "../components/CreditSection";
+import ContactSection from "../components/ContactSection";
+import NavigatablePanel from "../components/NavigatablePanel";
 
 const AboutPanel = () => {
-  const readOnlySubtabTitles = Object.freeze(["Keywords", "Contact", "Credit"]);
-  const [selectedTab, setSelectedTab] = useState<string>(
-    readOnlySubtabTitles[0]
-  );
-  const sortedSubtabTitles = [...readOnlySubtabTitles].sort((a, b) =>
-    a === selectedTab ? -1 : b === selectedTab ? 1 : 0
+  const context = useDetailPageContext();
+  const credits = context.collection?.getCredits();
+  const contacts = context.collection?.getContacts();
+  const themes = context.collection?.getThemes();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!credits || !contacts || !themes) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [credits, contacts, themes]);
+
+  const sections = useMemo(
+    () => [
+      {
+        title: "Keywords",
+        component: <KeywordSection themes={themes ? themes : []} />,
+      },
+      {
+        title: "Contacts",
+        component: <ContactSection contacts={contacts ? contacts : []} />,
+      },
+      {
+        title: "Credits",
+        component: <CreditSection credits={credits ? credits : []} />,
+      },
+    ],
+    [contacts, credits, themes]
   );
 
-  return (
-    <Grid container>
-      <Grid item container md={3}>
-        <Grid item md={1} />
-        <Grid item container md={11}>
-          <DetailSubtabGroup
-            titles={readOnlySubtabTitles}
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-          />
-        </Grid>
-      </Grid>
-      <Grid item container md={8}>
-        {sortedSubtabTitles.map((title) => {
-          return (
-            <SubPanel key={title} title={title} isOnTop={title === selectedTab}>
-              <CollapseFragment
-                title={title + "collapse"}
-                isOnTop={title === selectedTab}
-              >
-                <BulletedText>
-                  item 1, eerewsfjs oicxvjxf moodsfsdj iorrm js oif
-                </BulletedText>
-              </CollapseFragment>
-            </SubPanel>
-          );
-        })}
-      </Grid>
-    </Grid>
-  );
+  return <NavigatablePanel childrenList={sections} isLoading={isLoading} />;
 };
 
 export default AboutPanel;
