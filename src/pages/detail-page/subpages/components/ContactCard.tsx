@@ -2,7 +2,7 @@ import { Grid, Link, Typography } from "@mui/material";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
 import React from "react";
-import { IContact } from "../../../../types/DataStructureTypes";
+import { IAddress, IContact } from "../../../../types/DataStructureTypes";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 
@@ -11,8 +11,14 @@ interface ContactCardProps {
 }
 
 const ContactCard: React.FC<ContactCardProps> = ({ contact }) => {
+  let addresses: IAddress;
+  if (contact && Array.isArray(contact.addresses) && contact.addresses[0]) {
+    addresses = contact.addresses[0];
+  } else {
+    addresses = {} as IAddress;
+  }
   const { delivery_point, city, country, postal_code, administrative_area } =
-    contact.addresses[0];
+    addresses;
   const phones = contact.phones;
   const links = contact.links;
 
