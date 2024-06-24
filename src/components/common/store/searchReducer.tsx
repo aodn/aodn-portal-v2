@@ -1,33 +1,67 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { ParameterState, Category } from "./componentParamReducer";
+import { Category, ParameterState } from "./componentParamReducer";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 
 import {
+  CategoriesIn,
   cqlDefaultFilters,
   PolygonOperation,
   TemporalAfterOrBefore,
   TemporalDuring,
-  CategoriesIn,
 } from "../cqlFilters";
-
-interface Link {
+import { IContact, ITheme } from "../../../types/DataStructureTypes";
+import { FeatureCollection, Position } from "geojson";
+import { bboxPolygon } from "@turf/turf";
+import * as turf from "@turf/turf";
+export interface Link {
   href: string;
   rel: string;
   type: string;
   title: string;
 }
 
-interface Spatial {
-  bbox: Array<Array<number>>;
+export class Spatial {
+  private parent: OGCCollection;
+
+  bbox: Array<Position> = [];
   temporal: {
     interval: Array<Array<string | null>>;
+    trs?: string;
+  } = { interval: [[]] };
+  crs: string = "";
+
+  constructor(ogcCollection: OGCCollection) {
+    this.parent = ogcCollection;
+  }
+
+  getGeojsonExtents = (start: number): FeatureCollection => {
+    const featureCollections: FeatureCollection = {
+      type: "FeatureCollection",
+      features: [],
+    };
+
+    // Filter valid bounding boxes and points
+    const validBoxesAndPoints = this.bbox.filter(
+      (box) => box.length === 4 || box.length === 2
+    );
+
+    // Create features from valid boxes and points starting from the given index
+    const features = validBoxesAndPoints.slice(start).map((pos) => {
+      return pos.length === 4
+        ? bboxPolygon([pos[0], pos[1], pos[2], pos[3]])
+        : turf.point(pos);
+    });
+
+    // Add individual bounding boxes and points
+    featureCollections.features.push(...features);
+    return featureCollections;
   };
-  crs: string;
 }
 
 export class OGCCollection {
   private propValue: Map<string, any> = new Map<string, any>();
+  private propExtent?: Spatial;
   id: string = "undefined";
   // This index is used to show the ordering 1, 2, 3...
   index?: string;
@@ -35,7 +69,15 @@ export class OGCCollection {
   description?: string;
   itemType?: string;
   links?: Array<Link>;
-  extent?: Spatial;
+  set extent(extents: any) {
+    this.propExtent = new Spatial(this);
+    this.propExtent.bbox = extents.spatial.bbox;
+    this.propExtent.crs = extents.spatial.crs;
+    this.propExtent.temporal = extents.temporal;
+  }
+  get extent(): Spatial | undefined {
+    return this.propExtent;
+  }
 
   set properties(props: object) {
     this.propValue = new Map(Object.entries(props));
@@ -55,8 +97,11 @@ export class OGCCollection {
     );
     return target !== undefined ? target.href : undefined;
   };
-  // get status
+  // get properties
   getStatus = (): string => this.propValue?.get("STATUS");
+  getCredits = (): string[] => this.propValue?.get("CREDITS");
+  getContacts = (): IContact[] => this.propValue?.get("CONTACTS");
+  getThemes = (): ITheme[] => this.propValue?.get("THEMES");
 }
 
 export interface OGCCollections {
