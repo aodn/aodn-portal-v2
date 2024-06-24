@@ -44,7 +44,8 @@ export default ({ mode }) => {
         inject: {
           data: {
             inlineNewRelic: fs.readFileSync(
-              path.resolve(__dirname, "public/relic_script.js"), "utf-8"
+              path.resolve(__dirname, "public/relic_script.js"),
+              "utf-8"
             ),
           },
         },
