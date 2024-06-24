@@ -23,7 +23,7 @@ export default ({ mode }) => {
 
         return html.replace(
           "<!-- new-relic-js -->",
-          "<script type='text/javascript'>${inlineJs}</script>"
+          `<script type='text/javascript'>${inlineJs}</script>`
         );
       },
     }
