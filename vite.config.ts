@@ -3,13 +3,31 @@ import react from "@vitejs/plugin-react-swc";
 import eslint from "vite-plugin-eslint";
 import path from "path";
 import fs from "fs";
-import { createHtmlPlugin } from "vite-plugin-html";
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
   const apiPath = process.env.VITE_API_HOST;
+
+  const inlineNewRelicPlugin = () => {
+    // We need to inline the relic_script in the index.html, you can dynamic include based on env here
+    // https://docs.newrelic.com/docs/browser/new-relic-browser/page-load-timing-resources/instrumentation-browser-monitoring/#javascript-placement
+    return {
+      name: "inline-javascript",
+      transformIndexHtml(html) {
+        const inlineJs = fs.readFileSync(
+          path.resolve(__dirname, "public/relic_script.js"),
+          "utf8"
+        );
+
+        return html.replace(
+          "<!-- new-relic-js -->",
+          `<script type='text/javascript'>${inlineJs}</script>`
+        );
+      },
+    };
+  };
 
   return defineConfig({
     server: {
@@ -38,18 +56,7 @@ export default ({ mode }) => {
     plugins: [
       react(),
       eslint({ exclude: ["/virtual:/**", "node_modules/**"] }),
-      // We need to inline the relic_script in the index.html, you can dynamic include based on env here
-      // https://docs.newrelic.com/docs/browser/new-relic-browser/page-load-timing-resources/instrumentation-browser-monitoring/#javascript-placement
-      createHtmlPlugin({
-        inject: {
-          data: {
-            inlineNewRelic: fs.readFileSync(
-              path.resolve(__dirname, "public/relic_script.js"),
-              "utf-8"
-            ),
-          },
-        },
-      }),
+      inlineNewRelicPlugin(),
     ],
     build: {
       outDir: "dist",
