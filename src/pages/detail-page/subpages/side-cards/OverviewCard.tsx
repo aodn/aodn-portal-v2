@@ -1,7 +1,7 @@
 import React from "react";
 import SideCardContainer from "./SideCardContainer";
 import { Box } from "@mui/material";
-import bgLandingPage from "../../../../../public/bg_landing_page.png";
+import bgLandingPage from "@/assets/images/bg_landing_page.png";
 
 // TODO: replace with real picture url
 const OverviewCard = () => {

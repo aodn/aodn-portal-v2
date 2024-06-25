@@ -4,7 +4,6 @@ import ComplexTextSearch from "../components/search/ComplexTextSearch";
 import StoryBoardPanel from "../components/storyboard/StoryBoardPanel";
 import ShortCutSmartPanel from "../components/smartpanel/ShortCutSmartPanel";
 import PromotionSmartPanel from "../components/smartpanel/PromotionSmartPanel";
-import { useState } from "react";
 import {
   createSearchParamForImosRealTime,
   //createSearchParamFrom,
@@ -16,6 +15,7 @@ import { AppDispatch } from "../components/common/store/store";
 import { Box } from "@mui/material";
 import { CARD_ID } from "../components/smartpanel/utils";
 import Layout from "../components/layout/layout";
+import landingImageUrl from "@/assets/images/bg_landing_page.png";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const LandingPage = () => {
     <Layout>
       <Box
         sx={{
-          backgroundImage: "url(/bg_landing_page.png)",
+          backgroundImage: `url(${landingImageUrl})`,
           backgroundSize: "cover",
           display: "flex",
           flexDirection: "column",

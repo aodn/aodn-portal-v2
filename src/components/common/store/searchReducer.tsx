@@ -11,7 +11,13 @@ import {
   TemporalDuring,
 } from "../cqlFilters";
 import { IContact, ITheme } from "../../../types/DataStructureTypes";
-import { FeatureCollection, Position } from "geojson";
+import {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+  Position,
+} from "geojson";
 import { bboxPolygon } from "@turf/turf";
 import * as turf from "@turf/turf";
 export interface Link {
@@ -38,7 +44,7 @@ export class Spatial {
   getGeojsonExtents = (start: number): FeatureCollection => {
     const featureCollections: FeatureCollection = {
       type: "FeatureCollection",
-      features: [],
+      features: new Array<Feature<Geometry, GeoJsonProperties>>(),
     };
 
     // Filter valid bounding boxes and points
