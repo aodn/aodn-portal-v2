@@ -71,13 +71,7 @@ export const selects = {
 };
 
 const AbstractAndDownloadPanel = () => {
-  const {
-    collection,
-    setPhotos,
-    hasSnapshotsFinished,
-    photoHovered,
-    photoSelected,
-  } = useDetailPageContext();
+  const { collection } = useDetailPageContext();
 
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
@@ -115,24 +109,7 @@ const AbstractAndDownloadPanel = () => {
         <Grid item xs={12}>
           <Stack direction="column">
             <Typography sx={{ padding: 0 }}>{abstract}</Typography>
-            {!hasSnapshotsFinished && (
-              <Stack sx={{ width: "100%", height: "100px" }}>
-                <LinearProgress />
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                >
-                  <Typography>Map Loading ...</Typography>
-                </Box>
-              </Stack>
-            )}
-            <Box
-              sx={{ visibility: hasSnapshotsFinished ? "visible" : "hidden" }}
-            >
+            <Box sx={{ visibility: "visible" }}>
               <Box
                 arial-label="map"
                 id={mapContainerId}
@@ -149,10 +126,7 @@ const AbstractAndDownloadPanel = () => {
                     <MenuControl menu={<BaseMapSwitcher />} />
                   </Controls>
                   <Layers>
-                    <GeojsonLayer
-                      collection={collection}
-                      setPhotos={setPhotos}
-                    />
+                    <GeojsonLayer collection={collection} />
                   </Layers>
                 </Map>
               </Box>

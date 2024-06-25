@@ -26,23 +26,32 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
   const [mapLoaded, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
 
+  // Function to fit map to the overall bbox(bboxes[0])
+  const fitToOverallBbox = useCallback(
+    (bboxes: Array<Position>) => {
+      const bound = bboxes[0] as LngLatBoundsLike;
+      map?.fitBounds(bound, { maxZoom: 3, padding: 10 });
+    },
+    [map]
+  );
+
   // Function to take photo of the map for given bounding boxes
   const takePhoto = useCallback(
     (bboxes: Array<Position> | undefined, index: number) => {
       if (!Array.isArray(bboxes) || !setPhotos) return;
 
-      // after the last bbox snapshot was taken, map fitBound to the first bbox (the overall bbox)
+      // when it comes to the last index, map fitBound to the first bbox (the overall bbox)
       if (bboxes.length === index) {
-        const bound = bboxes[0] as LngLatBoundsLike;
-        map?.fitBounds(bound, { maxZoom: 3, padding: 10 });
+        fitToOverallBbox(bboxes);
         return;
       }
 
-      // before the last bbox snapshot has been taken, map will fitBound to current bounding box (bboxes[index]) to get a snapshot once idle
+      // before the last bbox snapshot has been taken (i.e. index < bboxes.length), map will fitBound to current bounding box (bboxes[index]) to get a snapshot once idle
       const bound = bboxes[index] as LngLatBoundsLike;
       const bbox = bboxes[index];
       const m = map?.fitBounds(bound, {
-        maxZoom: index === 0 ? 3 : 5,
+        maxZoom: index === 0 ? 2 : 5,
+        padding: 10,
         animate: false,
       });
       m?.once("idle", () => {
@@ -62,27 +71,34 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
             console.error("Error creating blob from canvas");
           }
         }, "image/png");
+        // increase the index to loop
         takePhoto(bboxes, index + 1);
       });
     },
-    [map, setPhotos]
+    [fitToOverallBbox, map, setPhotos]
   );
 
-  //  Resets the photos state and initiates the photo-taking process for the provided bounding boxes.
-  const takeSnapshot = useCallback(
+  const handleIdle = useCallback(
     (bboxes: Array<Position> | undefined) => {
-      if (!setPhotos || bboxes === undefined) return;
-      // clears the existing photos in the setPhotos state by revoking the URLs of the previous photos and setting the state to an empty array.
+      if (bboxes === undefined) return;
+
+      // If Layer didn't receive the setPhoto as a prop, it means no need to take photos for every bbox, therefore just call fitToOverallBbox
+      if (!setPhotos) {
+        fitToOverallBbox(bboxes);
+        return;
+      }
+
+      //  Resets the photos state and initiates the photo-taking process for the provided bounding boxes.
       setPhotos((prevPhotos) => {
         prevPhotos.forEach((prevPhoto) => {
           URL.revokeObjectURL(prevPhoto.url); // Cleanup the URL
         });
         return [];
       });
-      //calls takePhoto with the bounding boxes and starts with the first bounding box (index set to 0)
+      // Call takePhoto with the bounding boxes and starts with the first bounding box (index set to 0)
       takePhoto(bboxes, 0);
     },
-    [setPhotos, takePhoto]
+    [fitToOverallBbox, setPhotos, takePhoto]
   );
 
   useEffect(() => {
@@ -124,9 +140,9 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
       );
     }
 
-    // Take a snapshot when the map is idle
-    const handleIdle = () => takeSnapshot(extent?.bbox);
-    map?.once("idle", handleIdle);
+    // Call handleIdle when the map is idle
+    const onceIdle = () => handleIdle(extent?.bbox);
+    map?.once("idle", onceIdle);
 
     // Clean up map sources and layers when the component unmounts or map unloads
     map?.on("unload", () => {
@@ -137,10 +153,10 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
     });
 
     return () => {
-      map?.off("idle", handleIdle);
+      map?.off("idle", onceIdle);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collection.id, map, mapLoaded, setPhotos, takeSnapshot]);
+  }, [collection.id, map, mapLoaded, setPhotos, handleIdle]);
 
   return <React.Fragment />;
 };
