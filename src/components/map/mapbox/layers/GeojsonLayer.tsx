@@ -29,20 +29,23 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
   // Function to take photo of the map for given bounding boxes
   const takePhoto = useCallback(
     (bboxes: Array<Position> | undefined, index: number) => {
-      if (!Array.isArray(bboxes) || !setPhotos) return;
+      if (!Array.isArray(bboxes)) return;
 
-      // after the last bbox snapshot was taken, map fitBound to the first bbox (the overall bbox)
+      // when it comes to the last index, map fitBound to the first bbox (the overall bbox)
       if (bboxes.length === index) {
         const bound = bboxes[0] as LngLatBoundsLike;
         map?.fitBounds(bound, { maxZoom: 3, padding: 10 });
         return;
       }
+      // if no setPhotos prop passed in, it means no need to take photo for each bbox
+      if (!setPhotos) return;
 
-      // before the last bbox snapshot has been taken, map will fitBound to current bounding box (bboxes[index]) to get a snapshot once idle
+      // before the last bbox snapshot has been taken (i.e. index < bboxes.length), map will fitBound to current bounding box (bboxes[index]) to get a snapshot once idle
       const bound = bboxes[index] as LngLatBoundsLike;
       const bbox = bboxes[index];
       const m = map?.fitBounds(bound, {
-        maxZoom: index === 0 ? 3 : 5,
+        maxZoom: index === 0 ? 2 : 5,
+        padding: 10,
         animate: false,
       });
       m?.once("idle", () => {
@@ -62,6 +65,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
             console.error("Error creating blob from canvas");
           }
         }, "image/png");
+        // increase the index to loop
         takePhoto(bboxes, index + 1);
       });
     },
@@ -71,7 +75,15 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
   //  Resets the photos state and initiates the photo-taking process for the provided bounding boxes.
   const takeSnapshot = useCallback(
     (bboxes: Array<Position> | undefined) => {
-      if (!setPhotos || bboxes === undefined) return;
+      if (bboxes === undefined) return;
+
+      // if no need to take photos for every bbox, just go to the final step of takePhoto (by set the index to the max) where the map fitBound to overall bbox without taking any photos
+      // this exists in a Map which not receiving the setPhoto prop,
+      if (!setPhotos) {
+        takePhoto(bboxes, bboxes.length);
+        return;
+      }
+
       // clears the existing photos in the setPhotos state by revoking the URLs of the previous photos and setting the state to an empty array.
       setPhotos((prevPhotos) => {
         prevPhotos.forEach((prevPhoto) => {
