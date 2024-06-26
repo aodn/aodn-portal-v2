@@ -55,7 +55,8 @@ export default ({ mode }) => {
     },
     plugins: [
       react(),
-      mode !== "test" && eslint({ exclude: ["/virtual:/**", "node_modules/**"] }),
+      mode !== "test" &&
+        eslint({ exclude: ["/virtual:/**", "node_modules/**"] }),
       inlineNewRelicPlugin(),
     ],
     build: {
