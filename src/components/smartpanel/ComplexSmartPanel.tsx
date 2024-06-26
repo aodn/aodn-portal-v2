@@ -22,7 +22,10 @@ const ComplexSmartPanel = (
   const scroll = useCallback(
     (scrollOffset: number) => {
       if (boxRef && boxRef.current) {
-        boxRef.current.scrollLeft += scrollOffset;
+        boxRef.current.scrollTo({
+          left: boxRef.current.scrollLeft + scrollOffset,
+          behavior: "smooth",
+        });
       }
     },
     [boxRef]
@@ -49,7 +52,7 @@ const ComplexSmartPanel = (
           >
             <Box>
               <IconButton
-                onClick={() => scroll(-50)}
+                onClick={() => scroll(-500)}
                 sx={{ backgroundColor: "#7ba0b6" }}
               >
                 <ArrowBackIosNewIcon
@@ -87,7 +90,7 @@ const ComplexSmartPanel = (
           >
             <Box>
               <IconButton
-                onClick={() => scroll(50)}
+                onClick={() => scroll(500)}
                 sx={{ backgroundColor: "#7ba0b6" }}
               >
                 <ArrowForwardIosIcon

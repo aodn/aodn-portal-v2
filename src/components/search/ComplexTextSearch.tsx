@@ -84,8 +84,11 @@ const ComplexTextSearch = () => {
         <Button
           sx={{
             color: grey["searchButtonText"],
-            backgroundColor: "white",
+            backgroundColor: "#fff",
             height: "100%",
+            ":hover": {
+              backgroundColor: "#fff",
+            },
           }}
           fullWidth
           onClick={executeSearch}

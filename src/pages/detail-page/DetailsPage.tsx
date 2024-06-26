@@ -1,5 +1,4 @@
 import { OGCCollection } from "../../components/common/store/searchReducer";
-
 import Layout from "../../components/layout/layout";
 import { Box, Grid } from "@mui/material";
 import { color, padding } from "../../styles/constants";
@@ -25,7 +24,7 @@ const DetailsPage = () => {
             backgroundColor: color.blue.light,
           }}
         >
-          <Box sx={{ width: "1200px" }}>
+          <Box sx={{ minWidth: "1020px", width: "70%", maxWidth: "1228px" }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <HeaderSection />

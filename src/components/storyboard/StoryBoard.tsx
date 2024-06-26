@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, CardContent, Typography, Grid, Card } from "@mui/material";
+import { Box, CardContent, Typography, Grid, Card, Stack } from "@mui/material";
 //import RoundButton from "../common/buttons/RoundButton"; TODO
 import YouTube, { YouTubeProps } from "react-youtube";
 
@@ -30,8 +30,13 @@ const StoryBoard = (props: StoryBoardProps) => {
   };
   return (
     <Box sx={{ display: props?.isActive ? "flex" : "none" }}>
-      <Grid container spacing={3} justifyContent="center">
-        <Grid item xs="auto" justifyContent="center">
+      <Stack
+        direction="row"
+        spacing={2}
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Box>
           <Card>
             <YouTube
               videoId={props.url}
@@ -42,36 +47,26 @@ const StoryBoard = (props: StoryBoardProps) => {
               onReady={onPlayerReady}
             />
           </Card>
-        </Grid>
-        <Grid item xs={5}>
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <CardContent sx={{ flex: "1 0 auto" }}>
-              {props.caption}
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                component="div"
-                style={{ lineHeightStep: "30px" }}
-              >
-                {props.content}
-              </Typography>
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                component="div"
-                style={{ lineHeightStep: "30px" }}
-              >
-                &nbsp;
-              </Typography>
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                component="div"
-                style={{ lineHeightStep: "30px" }}
-              >
-                &nbsp;
-              </Typography>
-              {/* <Grid container spacing={3}>
+        </Box>
+
+        <Stack
+          direction="column"
+          display="flex"
+          justifyContent="start"
+          alignItems="start"
+        >
+          <CardContent sx={{ flex: "1 0 auto" }}>
+            {props.caption}
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              component="div"
+              style={{ lineHeightStep: "30px" }}
+            >
+              {props.content}
+            </Typography>
+
+            {/* <Grid container spacing={3}>
                         {props.buttons &&
                             props.buttons?.map((button) => {
                                 return (
@@ -82,10 +77,9 @@ const StoryBoard = (props: StoryBoardProps) => {
                             }
                         )}
                     </Grid> */}
-            </CardContent>
-          </Box>
-        </Grid>
-      </Grid>
+          </CardContent>
+        </Stack>
+      </Stack>
     </Box>
   );
 };
