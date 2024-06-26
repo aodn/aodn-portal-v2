@@ -20,7 +20,7 @@ import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import { useDetailPageContext } from "../context/detail-page-context";
 import { useNavigate } from "react-router-dom";
-import imosLogoWithTitle from "../../../../public/logo/imos_logo_with_title.png";
+import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
 
 interface ButtonWithIcon {
   label: string;

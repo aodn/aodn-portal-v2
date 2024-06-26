@@ -3,6 +3,8 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { OGCCollection } from "../../../common/store/searchReducer";
 
+// This vector tile layer call the function of Elastic Search to generate the tile and display on map,
+// it will be much slower than generate the polygon locally use the GeojsonLayer, hence we stop using this layer
 interface VectorTileLayersProps {
   // Vector tile layer should added to map
   collections: Array<OGCCollection>;

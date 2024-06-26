@@ -4,5 +4,6 @@ import { handlers } from "./handlers";
 export const server = setupServer(...handlers);
 
 server.listen({
-  onUnhandledRequest: "warn",
+  onUnhandledRequest: (request) =>
+    console.log("Unhandled %s %s", request.method, request.url),
 });

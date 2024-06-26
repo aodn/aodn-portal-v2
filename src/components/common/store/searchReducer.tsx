@@ -11,7 +11,13 @@ import {
   TemporalDuring,
 } from "../cqlFilters";
 import { IContact, ITheme } from "../../../types/DataStructureTypes";
-import { FeatureCollection, Position } from "geojson";
+import {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+  Position,
+} from "geojson";
 import { bboxPolygon } from "@turf/turf";
 import * as turf from "@turf/turf";
 export interface Link {
@@ -38,11 +44,11 @@ export class Spatial {
   getGeojsonExtents = (start: number): FeatureCollection => {
     const featureCollections: FeatureCollection = {
       type: "FeatureCollection",
-      features: [],
+      features: new Array<Feature<Geometry, GeoJsonProperties>>(),
     };
 
     // Filter valid bounding boxes and points
-    const validBoxesAndPoints = this.bbox.filter(
+    const validBoxesAndPoints = this.bbox?.filter(
       (box) => box.length === 4 || box.length === 2
     );
 
@@ -168,7 +174,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
       properties:
         param.properties !== undefined
           ? param.properties
-          : "id,title,description,status,links",
+          : "id,title,description,status,links,geometry",
     };
 
     if (param.text !== undefined && param.text.length !== 0) {
