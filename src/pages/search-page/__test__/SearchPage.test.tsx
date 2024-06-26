@@ -52,9 +52,7 @@ describe("SearchPage", async () => {
         </ThemeProvider>
       </Provider>
     );
-    const mapListToggleButton = await findByTestId(
-      "map-list-toggle-button"
-    );
+    const mapListToggleButton = await findByTestId("map-list-toggle-button");
     await userEvent.click(mapListToggleButton);
 
     const fullMapViewOption: HTMLElement = await findByTestId(
