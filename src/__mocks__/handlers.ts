@@ -7,10 +7,12 @@ const PREFIX = "/api/v1/ogc";
 
 export const handlers = [
   http.get(PREFIX + "/ext/parameter/categories", () => {
+    console.log("Called /ext/parameter/categories");
     return HttpResponse.json(PARAMETER_CATEGORIES);
   }),
 
   http.get(PREFIX + "/ext/autocomplete", ({ request }) => {
+    console.log("Called /ext/autocomplete");
     const url = new URL(request.url);
     const input = url.searchParams.getAll("input");
     const filters = url.searchParams.getAll("filter");
@@ -25,6 +27,7 @@ export const handlers = [
   }),
 
   http.get(PREFIX + "/collections", ({ request }) => {
+    console.log("Called /collections/??");
     const url = new URL(request.url);
     const properties = url.searchParams.get("properties");
     if (properties === "id,title,description,status,links") {

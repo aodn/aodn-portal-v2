@@ -48,7 +48,7 @@ export class Spatial {
     };
 
     // Filter valid bounding boxes and points
-    const validBoxesAndPoints = this.bbox.filter(
+    const validBoxesAndPoints = this.bbox?.filter(
       (box) => box.length === 4 || box.length === 2
     );
 
@@ -174,7 +174,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
       properties:
         param.properties !== undefined
           ? param.properties
-          : "id,title,description,status,links",
+          : "id,title,description,status,links,geometry",
     };
 
     if (param.text !== undefined && param.text.length !== 0) {

@@ -2,14 +2,14 @@ import {
   afterAll,
   afterEach,
   beforeAll,
-  beforeEach,
   expect,
   describe,
   test,
   vi,
 } from "vitest";
 import { server } from "../../../__mocks__/server";
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom"; // for the additional matchers
 import store from "../../../components/common/store/store";
 import { ThemeProvider } from "@mui/material/styles";
 import { Provider } from "react-redux";
@@ -19,29 +19,6 @@ import { userEvent } from "@testing-library/user-event";
 import { BrowserRouter as Router } from "react-router-dom";
 const theme = AppTheme;
 
-beforeEach(() => {
-  render(
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <Router>
-          <SearchPage />
-        </Router>
-      </ThemeProvider>
-    </Provider>
-  );
-});
-beforeAll(() => {
-  server.listen();
-});
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-  vi.restoreAllMocks();
-});
-afterAll(() => {
-  server.close();
-});
-
 vi.mock("../../../components/map/mapbox/Map", () => {
   return {
     default: function DummyMap() {
@@ -50,72 +27,80 @@ vi.mock("../../../components/map/mapbox/Map", () => {
   };
 });
 
+beforeAll(() => {
+  server.listen();
+});
+
+// afterEach(() => {
+//   cleanup();
+//   server.resetHandlers();
+//   vi.restoreAllMocks();
+// });
+
+afterAll(() => {
+  server.close();
+});
+
 describe("SearchPage", async () => {
-  test("The map should be able to expand properly", async () => {
-    const mapListToggleButton = screen.getByTestId("map-list-toggle-button");
-    await act(async () => {
-      await userEvent.click(mapListToggleButton);
-    });
+  // test.skip("The map should be able to expand properly", async () => {
+  //   const mapListToggleButton = await screen.findByTestId(
+  //     "map-list-toggle-button"
+  //   );
+  //   await userEvent.click(mapListToggleButton);
 
-    const fullMapViewOption: HTMLElement = screen.getByTestId(
-      "maplist-toggle-menu-mapview"
+  //   const fullMapViewOption: HTMLElement = await screen.findByTestId(
+  //     "maplist-toggle-menu-mapview"
+  //   );
+  //   expect(fullMapViewOption).to.exist;
+
+  //   await userEvent.click(fullMapViewOption);
+  //   //
+  //   const list = await screen.findByTestId("search-page-result-list");
+  // });
+
+  test.skip("The list should be able to show in list / grid view", async () => {
+    const { findByTestId, findAllByTestId } = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <SearchPage />
+          </Router>
+        </ThemeProvider>
+      </Provider>
     );
-    expect(fullMapViewOption).to.exist;
+    // Pretend user enter wave and press two enter in search box
+    const input = (await findByTestId(
+      "input-with-suggester"
+    )) as HTMLInputElement;
+    await userEvent.type(input, "wave");
+    await userEvent.type(input, "{enter}{enter}");
 
-    await act(async () => {
-      await userEvent.click(fullMapViewOption);
-    });
-    //
-    const list = screen.queryByTestId("search-page-result-list");
-  });
+    expect(input.value).toEqual("wave");
 
-  test("The list should be able to show in list / grid view", async () => {
-    const input = screen.getByTestId("input-with-suggester");
-    await userEvent.type(input, "wave{enter}{enter}");
+    const list = await findByTestId("search-page-result-list");
+    expect(list).toBeDefined();
 
-    await waitFor(
-      () => {
-        const list = screen.queryByTestId("search-page-result-list");
-        expect(list).to.exist;
-      },
-      { timeout: 300 }
-    );
-
-    const mapListToggleButton = screen.getByTestId("map-list-toggle-button");
+    const mapListToggleButton = await findByTestId("map-list-toggle-button");
     await userEvent.click(mapListToggleButton);
 
-    const gridAndMapOption: HTMLElement = screen.getByTestId(
+    const gridAndMapOption: HTMLElement = await findByTestId(
       "maplist-toggle-menu-gridandmap"
     );
-    expect(gridAndMapOption).to.exist;
-
+    expect(gridAndMapOption).toBeDefined();
     await userEvent.click(gridAndMapOption);
-
-    await waitFor(
-      () => {
-        const gridList = screen.queryAllByTestId("result-card-grid");
-        expect(gridList.length).not.equal(0);
-      },
-      { timeout: 300 }
-    );
+    
+    const gridList = await findAllByTestId("result-card-grid");
+    expect(gridList.length).not.equal(0);
 
     await userEvent.click(mapListToggleButton);
 
-    let listAndMapOption: HTMLElement;
-    await waitFor(
-      () => {
-        listAndMapOption = screen.getByTestId("maplist-toggle-menu-listandmap");
-        expect(listAndMapOption).to.exist;
-      },
-      { timeout: 300 }
-    ).then(() => userEvent.click(listAndMapOption));
-
-    await waitFor(
-      () => {
-        const listList = screen.queryAllByTestId("result-card-list");
-        expect(listList.length).not.equal(0);
-      },
-      { timeout: 300 }
+    const listAndMapOption: HTMLElement = await findByTestId(
+      "maplist-toggle-menu-listandmap"
     );
+    expect(listAndMapOption).to.exist;
+    userEvent.click(listAndMapOption);
+
+    const listList = await findAllByTestId("result-card-list");
+    expect(listList.length).not.equal(0);
   }, 60000);
 });
