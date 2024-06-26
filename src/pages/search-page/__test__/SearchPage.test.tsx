@@ -88,7 +88,7 @@ describe("SearchPage", async () => {
     );
     expect(gridAndMapOption).toBeDefined();
     await userEvent.click(gridAndMapOption);
-    
+
     const gridList = await findAllByTestId("result-card-grid");
     expect(gridList.length).not.equal(0);
 
