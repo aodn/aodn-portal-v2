@@ -81,8 +81,6 @@ export class OGCCollection {
   private propExtent?: Spatial;
 
   readonly id: string = "undefined";
-  // This index is used to show the ordering 1, 2, 3...
-  readonly index?: string;
   readonly title?: string;
   readonly description?: string;
   readonly itemType?: string;
@@ -211,9 +209,6 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     // We need to fill in the index value here before return,
     // TODO: The index value may not start from 1 if it is paged
     const collections: OGCCollections = jsonToOGCCollections(response.data);
-    collections?.collections?.forEach((o, index) => {
-      o.index = "" + (index + 1);
-    });
 
     return collections;
   } catch (error: unknown) {
