@@ -4212,6 +4212,7 @@ __metadata:
     react-window: "npm:^1.8.10"
     react-youtube: "npm:^10.1.0"
     redux-logger: "npm:^3.0.6"
+    resize-observer-polyfill: "npm:^1.5.1"
     svgo: "npm:^3.2.0"
     typescript: "npm:^5.4.2"
     typescript-eslint: "npm:^7.2.0"
@@ -10649,6 +10650,13 @@ __metadata:
   version: 5.1.0
   resolution: "reselect@npm:5.1.0"
   checksum: 10c0/b0ed789f4f6f10dfbd23741823726793384932969aa7ce8f584c882ad87620a02b09b5d1146cd2ea6eaa0953b3fd9f7df22f113893af73f35f28432a8a4294de
+  languageName: node
+  linkType: hard
+
+"resize-observer-polyfill@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "resize-observer-polyfill@npm:1.5.1"
+  checksum: 10c0/5e882475067f0b97dc07e0f37c3e335ac5bc3520d463f777cec7e894bb273eddbfecb857ae668e6fb6881fd6f6bb7148246967172139302da50fa12ea3a15d95
   languageName: node
   linkType: hard
 

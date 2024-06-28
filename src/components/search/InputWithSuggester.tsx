@@ -1,6 +1,23 @@
-import StyledTextField from "./StyledTextField";
-import { Autocomplete, Box, Chip, Grid } from "@mui/material";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import ResizeObserver from "resize-observer-polyfill";
+import {
+  Autocomplete,
+  Box,
+  Chip,
+  Paper,
+  Popper,
+  Stack,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import React, {
+  FC,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Category,
   ParameterState,
@@ -19,7 +36,8 @@ import {
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
 import _ from "lodash";
-//import { CategoryIcon } from "@mui/icons-material";
+import { borderRadius, color, padding } from "../../styles/constants";
+import { filterButtonWidth, searchIconWidth } from "./ComplexTextSearch";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -40,6 +58,8 @@ enum OptionGroup {
   TITLE = "title",
 }
 
+const textfieldMinWidth = 200;
+
 /**
  * Customized input box with suggester. If more customization is needed, please
  * do as the below nullable props.
@@ -50,6 +70,7 @@ enum OptionGroup {
 const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
 }) => {
+  const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
@@ -165,6 +186,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     },
     [options]
   );
+
   const onChange = useCallback(
     (_: any, newValue: string | null) => {
       if (newValue !== null) {
@@ -225,41 +247,98 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     handleEnterPressed(event, open);
   };
 
+  const [searchFieldWidth, setSearchFieldWidth] = useState<number>(0);
+  const [categoryWidth, setCategoryWidth] = useState<number>(0);
+  const searchFieldDiv = useRef(null);
+  const categoryDiv = useRef(null);
+
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === searchFieldDiv.current) {
+          setSearchFieldWidth(entry.contentRect.width);
+        } else if (entry.target === categoryDiv.current) {
+          setCategoryWidth(entry.contentRect.width);
+        }
+      }
+    });
+
+    const searchFieldElement = searchFieldDiv.current;
+    const categoryElement = categoryDiv.current;
+
+    if (searchFieldElement) {
+      observer.observe(searchFieldElement);
+    }
+
+    if (categoryElement) {
+      observer.observe(categoryElement);
+    }
+
+    return () => {
+      if (searchFieldElement) {
+        observer.unobserve(searchFieldElement);
+      }
+      if (categoryElement) {
+        observer.unobserve(categoryElement);
+      }
+    };
+  }, []);
+
+  const CustomPopper = (props: any): ReactNode => {
+    const calculateOffset = () => {
+      return searchFieldWidth - categoryWidth < textfieldMinWidth
+        ? [-searchIconWidth, 0]
+        : [-(categoryWidth + searchIconWidth), 0];
+    };
+    return (
+      <Popper
+        {...props}
+        placement="bottom-start"
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: calculateOffset, // Skid horizontally by categoryWidth, no vertical offset
+            },
+          },
+          {
+            name: "flip",
+            enabled: false, // Disable the flip modifier
+          },
+        ]}
+        style={{
+          width: `${searchFieldWidth + searchIconWidth + filterButtonWidth}px`,
+        }}
+      />
+    );
+  };
+
+  const CustomPaper = (props: any): ReactNode => {
+    return (
+      <Paper
+        sx={{
+          backgroundColor: color.blue.light,
+          "& .MuiAutocomplete-listbox": {
+            borderRadius: borderRadius.medium,
+            bgcolor: color.blue.light,
+          },
+          "& .MuiListSubheader-root": {
+            bgcolor: color.blue.light,
+          },
+        }}
+        {...props}
+      />
+    );
+  };
+
   return (
     <>
-      <Box display="flex" flexDirection="row">
-        <Box
-          display={selectedCategories?.length > 0 ? "flex" : "none"}
-          flexDirection="row"
-          alignItems="center"
-        >
-          Categories:{" "}
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "nowrap",
-            width: "50%",
-            gap: "0px",
-          }}
-        >
-          {selectedCategoryStrs?.map((c, i) => (
-            <Grid item key={i}>
-              <Chip
-                sx={{ fontSize: "12px" }}
-                label={c}
-                onDelete={() => {
-                  removeCategory(c);
-                }}
-              />
-            </Grid>
-          ))}
-        </Box>
-      </Box>
       <Autocomplete
         id="search"
         fullWidth
         freeSolo
+        PopperComponent={CustomPopper}
+        PaperComponent={CustomPaper}
         open={open}
         onOpen={handleSuggesterOpen}
         onClose={handleSuggesterClose}
@@ -275,16 +354,55 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         onChange={onChange}
         onInputChange={onInputChange}
         renderInput={(params) => (
-          <StyledTextField
-            {...params}
-            placeholder="Search for open data"
-            inputProps={{
-              "aria-label": "Search for open data",
-              ...params.inputProps,
-              onKeyDown: handleKeyDown,
-              "data-testid": "input-with-suggester",
-            }}
-          />
+          <Box display="flex" flexWrap="wrap" ref={searchFieldDiv}>
+            <Stack
+              display={selectedCategories?.length > 0 ? "flex" : "none"}
+              spacing={1}
+              direction="row"
+              useFlexGap
+              flexWrap="wrap"
+              paddingY={padding.small}
+              ref={categoryDiv}
+            >
+              <Typography
+                fontFamily={theme.typography.fontFamily}
+                fontSize="small"
+                paddingTop={padding.extraSmall}
+              >
+                Categories&nbsp;:&nbsp;
+              </Typography>
+
+              {selectedCategoryStrs?.map((c, i) => (
+                <Box key={i}>
+                  <Chip
+                    sx={{ fontSize: "12px" }}
+                    label={c}
+                    onDelete={() => {
+                      removeCategory(c);
+                    }}
+                  />
+                </Box>
+              ))}
+            </Stack>
+            <Box flexGrow={1}>
+              <TextField
+                sx={{
+                  minWidth: textfieldMinWidth,
+                  "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+                    border: "none",
+                  },
+                }}
+                {...params}
+                placeholder="Search for open data"
+                inputProps={{
+                  "aria-label": "Search for open data",
+                  ...params.inputProps,
+                  onKeyDown: handleKeyDown,
+                  "data-testid": "input-with-suggester",
+                }}
+              />
+            </Box>
+          </Box>
         )}
       />
     </>
