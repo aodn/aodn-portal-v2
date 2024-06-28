@@ -27,10 +27,10 @@ export const handlers = [
   }),
 
   http.get(PREFIX + "/collections", ({ request }) => {
-    console.log("Called /collections/??");
+    console.log(`Called ${request.url}`);
     const url = new URL(request.url);
-    const properties = url.searchParams.get("properties");
-    if (properties === "id,title,description,status,links") {
+    const q = url.searchParams.get("q");
+    if (q === "wave" || q === null) {
       // For simplify current test usage, return wave result only for now. May need to update in the future
       return HttpResponse.json(COLLECTIONS_WAVE);
     }

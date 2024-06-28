@@ -42,23 +42,31 @@ afterAll(() => {
 });
 
 describe("SearchPage", async () => {
-  // test.skip("The map should be able to expand properly", async () => {
-  //   const mapListToggleButton = await screen.findByTestId(
-  //     "map-list-toggle-button"
-  //   );
-  //   await userEvent.click(mapListToggleButton);
+  test("The map should be able to expand properly", async () => {
+    const { findByTestId, findAllByTestId } = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <SearchPage />
+          </Router>
+        </ThemeProvider>
+      </Provider>
+    );
+    const mapListToggleButton = await findByTestId("map-list-toggle-button");
+    await userEvent.click(mapListToggleButton);
 
-  //   const fullMapViewOption: HTMLElement = await screen.findByTestId(
-  //     "maplist-toggle-menu-mapview"
-  //   );
-  //   expect(fullMapViewOption).to.exist;
+    const fullMapViewOption: HTMLElement = await findByTestId(
+      "maplist-toggle-menu-mapview"
+    );
+    expect(fullMapViewOption).to.exist;
 
-  //   await userEvent.click(fullMapViewOption);
-  //   //
-  //   const list = await screen.findByTestId("search-page-result-list");
-  // });
+    await userEvent.click(fullMapViewOption);
 
-  test.skip("The list should be able to show in list / grid view", async () => {
+    const list = await findByTestId("search-page-result-list");
+    expect(list).to.exist;
+  });
+
+  test("The list should be able to show in list / grid view", async () => {
     const { findByTestId, findAllByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>

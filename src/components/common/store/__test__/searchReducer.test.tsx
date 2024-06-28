@@ -22,7 +22,7 @@ describe("Search Reducer Function Test", () => {
       index: "1",
       itemType: "Collection",
       links: [],
-      properties: { STATUS: "completed" },
+      properties: { status: "completed" },
     };
 
     const collection: OGCCollection = Object.assign(new OGCCollection(), item);

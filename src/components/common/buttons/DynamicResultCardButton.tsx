@@ -7,7 +7,7 @@ import { useTheme } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 
 interface DynamicResultCardButtonProps {
-  status: string;
+  status?: string;
   onClick: () => void;
   isbordered?: string;
 }
@@ -19,7 +19,7 @@ interface ToolKit {
 }
 // currently only the data status button is dynamic. Please refactor if other buttons are dynamic
 const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
-  status = "un known",
+  status = "unknown",
   onClick,
   isbordered = "true",
 }) => {

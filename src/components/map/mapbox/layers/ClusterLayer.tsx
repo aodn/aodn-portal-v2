@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useState } from "react";
+import React, { FC, useCallback, useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
 import {
   Feature,
@@ -6,14 +6,24 @@ import {
   GeoJsonProperties,
   Geometry,
 } from "geojson";
-import { OGCCollection } from "../../../common/store/searchReducer";
+import {
+  OGCCollection,
+  OGCCollections,
+  SearchParameters,
+  fetchResultNoStore,
+} from "../../../common/store/searchReducer";
 import { centroid } from "@turf/turf";
-import { GeoJSONSource } from "mapbox-gl";
+import { GeoJSONSource, MapLayerMouseEvent } from "mapbox-gl";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../common/store/store";
 
 interface ClusterLayerProps {
   // Vector tile layer should added to map
   collections: Array<OGCCollection>;
 }
+
+const OPACITY = 0.6;
+const STROKE_WIDTH = 1;
 
 // Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
 // in a collection to the FeatureCollection
@@ -27,46 +37,165 @@ const createClusterDatSource = (
 
   collections.forEach((collection) => {
     // We skip the first one which is the overall bounding box, then add the remaining
-    collection.extent
-      ?.getGeojsonExtents(1)
-      .features.forEach((i) =>
-        featureCollections.features.push(centroid(i.geometry))
-      );
+    collection.extent?.getGeojsonExtents(1).features.forEach((i) =>
+      featureCollections.features.push({
+        ...centroid(i.geometry),
+        // Add the id so we can reference it easily
+        properties: { uuid: collection.id },
+      })
+    );
   });
 
   return featureCollections;
+};
+
+const unclusterPointLayerMouseEnterEventHandler = (
+  ev: MapLayerMouseEvent
+): void => {
+  ev.target.getCanvas().style.cursor = "pointer";
+};
+
+const unclusterPointLayerMouseLeaveEventHandler = (
+  ev: MapLayerMouseEvent
+): void => {
+  ev.target.getCanvas().style.cursor = "";
 };
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
+  const dispatch = useDispatch<AppDispatch>();
+  const [spatialExtentsUUid, setSpatialExtentsUUid] = useState<Array<string>>();
+
   const layerId = `cluster-layer-${map?.getContainer().id}`;
+  const clusterSourceId = `${layerId}-source`;
+  const clusterLayer = `${layerId}-clusters`;
+
+  const unclusterPointLayerMouseClickEventHandler = useCallback(
+    (ev: MapLayerMouseEvent): void => {
+      // Since it is a uncluster point, so there will only be 1 features
+      // and [0] make sense;
+      if (ev.features) {
+        setSpatialExtentsUUid([
+          ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
+        ]);
+      }
+    },
+    [setSpatialExtentsUUid]
+  );
 
   useEffect(() => {
+    const sourceIds = new Array<string>();
+
+    spatialExtentsUUid?.forEach((uuid: string) => {
+      const sourceId = `${layerId}-${uuid}-source`;
+      sourceIds.push(sourceId);
+
+      const param: SearchParameters = {
+        filter: `id='${uuid}'`,
+        properties: "id,geometry",
+      };
+
+      dispatch(fetchResultNoStore(param))
+        .unwrap()
+        .then((collections: OGCCollections) => {
+          // Give we use uuid, there will be one record only
+          const collection = collections.collections[0];
+
+          map?.addSource(sourceId, {
+            type: "geojson",
+            data: collection.getGeometry(),
+          });
+
+          // Add layers for each geometry type within the GeometryCollection
+          map?.addLayer(
+            {
+              id: `${sourceId}-points`,
+              type: "circle",
+              source: sourceId,
+              filter: ["==", "$type", "Point"],
+              paint: {
+                "circle-radius": 8,
+                "circle-color": "#007cbf",
+              },
+            },
+            clusterLayer
+          );
+
+          map?.addLayer(
+            {
+              id: `${sourceId}-lines`,
+              type: "line",
+              source: sourceId,
+              filter: ["==", "$type", "LineString"],
+              paint: {
+                "line-color": "#ff0000",
+                "line-width": 2,
+              },
+            },
+            clusterLayer
+          );
+
+          map?.addLayer(
+            {
+              id: `${sourceId}-polygons`,
+              type: "fill",
+              source: sourceId,
+              filter: ["==", "$type", "Polygon"],
+              paint: {
+                "fill-color": "#00ff00",
+                "fill-opacity": 0.5,
+              },
+            },
+            clusterLayer
+          );
+        });
+    });
+
+    return () => {
+      sourceIds.forEach((id) => {
+        map?.removeLayer(`${id}-points`);
+        map?.removeLayer(`${id}-lines`);
+        map?.removeLayer(`${id}-polygons`);
+        map?.removeSource(id);
+      });
+    };
+  }, [map, layerId, clusterLayer, dispatch, spatialExtentsUUid]);
+
+  // This is use to render the cluster circle and add event handle to circles
+  useEffect(() => {
     if (map === null) return;
+
+    const unclusterPointLayer = `${layerId}-unclustered-point`;
 
     // This situation is map object created, hence not null, but not completely loaded
     // and therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
-    map?.once("idle", () => {
-      if (map?.getSource(layerId)) return;
+    map?.once("load", () => {
+      if (map?.getSource(clusterSourceId)) return;
 
-      map?.addSource(layerId, {
+      map?.addSource(clusterSourceId, {
         type: "geojson",
-        data: undefined,
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
         cluster: true,
         clusterMaxZoom: 14,
-        clusterRadius: 50,
+        clusterRadius: 10,
       });
 
-      // Add layers for dataset1
+      // Add layers for multiple items, that is cluster
       map?.addLayer({
-        id: `${layerId}-clusters`,
+        id: clusterLayer,
         type: "circle",
-        source: layerId,
+        source: clusterSourceId,
         filter: ["has", "point_count"],
         paint: {
+          "circle-stroke-width": STROKE_WIDTH,
+          "circle-stroke-color": "#fff",
+          "circle-opacity": OPACITY,
           "circle-color": [
             "step",
             ["get", "point_count"],
@@ -91,7 +220,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       map?.addLayer({
         id: `${layerId}-cluster-count`,
         type: "symbol",
-        source: layerId,
+        source: clusterSourceId,
         filter: ["has", "point_count"],
         layout: {
           "text-field": "{point_count_abbreviated}",
@@ -99,41 +228,93 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           "text-size": 12,
         },
       });
-
+      // Layer for only 1 item in the circle
       map?.addLayer({
-        id: `${layerId}-unclustered-point`,
+        id: unclusterPointLayer,
         type: "circle",
-        source: layerId,
+        source: clusterSourceId,
         filter: ["!", ["has", "point_count"]],
         paint: {
+          "circle-opacity": OPACITY,
           "circle-color": "#11b4da",
-          "circle-radius": 4,
-          "circle-stroke-width": 1,
+          "circle-radius": 10,
+          "circle-stroke-width": STROKE_WIDTH,
           "circle-stroke-color": "#fff",
         },
       });
 
+      // Change the cursor to a pointer for uncluster point
+      map?.on(
+        "mouseenter",
+        unclusterPointLayer,
+        unclusterPointLayerMouseEnterEventHandler
+      );
+
+      // Change the cursor back to default when it leaves the unclustered points
+      map?.on(
+        "mouseleave",
+        unclusterPointLayer,
+        unclusterPointLayerMouseLeaveEventHandler
+      );
+
+      map?.on(
+        "click",
+        unclusterPointLayer,
+        unclusterPointLayerMouseClickEventHandler
+      );
+
+      // Handle events when user click on the cirle with only 1 item
       map?.once("unload", () => {
-        if (map?.getLayer(`${layerId}-clusters`))
-          map.removeLayer(`${layerId}-clusters`);
+        map?.off(
+          "mouseenter",
+          unclusterPointLayer,
+          unclusterPointLayerMouseEnterEventHandler
+        );
+        map?.off(
+          "mouseleave",
+          unclusterPointLayer,
+          unclusterPointLayerMouseLeaveEventHandler
+        );
+        map?.off(
+          "click",
+          unclusterPointLayer,
+          unclusterPointLayerMouseClickEventHandler
+        );
+
+        if (map?.getLayer(clusterLayer)) map.removeLayer(clusterLayer);
+
         if (map?.getLayer(`${layerId}-cluster-count`))
           map.removeLayer(`${layerId}-cluster-count`);
-        if (map?.getLayer(`${layerId}-unclustered-point`))
-          map.removeLayer(`${layerId}-unclustered-point`);
-        if (map?.getSource(layerId)) map.removeSource(layerId);
+
+        if (map?.getLayer(unclusterPointLayer))
+          map.removeLayer(unclusterPointLayer);
+
+        if (map?.getLayer(`${layerId}-unclustered-count`))
+          map.removeLayer(`${layerId}-unclustered-count`);
+
+        if (map?.getSource(clusterSourceId)) map.removeSource(clusterSourceId);
       });
     });
-  }, [map, layerId]);
+  }, [
+    map,
+    layerId,
+    clusterSourceId,
+    clusterLayer,
+    unclusterPointLayerMouseClickEventHandler,
+  ]);
 
   useEffect(() => {
-    if (map?.getSource(layerId)) {
-      (map?.getSource(layerId) as GeoJSONSource).setData(
+    if (map?.getSource(clusterSourceId)) {
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
         createClusterDatSource(collections)
       );
     }
-  }, [map, collections, layerId]);
+  }, [map, collections, clusterSourceId]);
 
   return <React.Fragment />;
 };
 
 export default ClusterLayer;
+function dispatch(arg0: any) {
+  throw new Error("Function not implemented.");
+}
