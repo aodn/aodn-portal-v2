@@ -9,6 +9,7 @@ import { Grid } from "@mui/material";
 import {
   CollectionsQueryType,
   createSearchParamFrom,
+  fetchResultNoStore,
   fetchResultWithStore,
   OGCCollection,
 } from "../../components/common/store/searchReducer";
@@ -77,23 +78,32 @@ const SearchPage = () => {
     [setVisibility]
   );
 
-  // Layers inside this array will be added to map
+  // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
+
   const doSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
-    dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
-      .unwrap()
-      .then((collections) => {
-        const ids = collections.collections.map((c) => c.id);
-        //Remove map uuid not exist in the ids
-        setLayers((v) => v.filter((i) => ids.includes(i.id)));
-      })
-      .then((v) =>
-        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-          state: { fromNavigate: true },
+    const param = createSearchParamFrom(componentParam);
+
+    // Use standard param to get fields you need, record is stored in redux
+    dispatch(fetchResultWithStore(param)).then(() => {
+      // Use a different parameter so that it return id and bbox only and do not store the values
+      dispatch(fetchResultNoStore({ ...param, properties: "id,bbox" }))
+        .unwrap()
+        .then((collections) => {
+          setLayers(collections.collections);
         })
-      );
+        .then(() =>
+          navigate(
+            pageDefault.search + "?" + formatToUrlParam(componentParam),
+            {
+              state: { fromNavigate: true },
+            }
+          )
+        );
+    });
   }, [dispatch, navigate, setLayers]);
+
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(

@@ -16,6 +16,7 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 !.vscode/launch.json
+playwright-report/*
 .idea
 .DS_Store
 *.suo
@@ -30,5 +31,7 @@ dist-ssr
 *.env.staging
 *.env.edge
 package-lock.json
+tsconfig.node.tsbuildinfo
 
 .yarn/install-state.gz
+.last-run.json

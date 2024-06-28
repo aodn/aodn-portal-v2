@@ -16,10 +16,12 @@ import {
   FeatureCollection,
   GeoJsonProperties,
   Geometry,
+  GeometryCollection,
   Position,
 } from "geojson";
 import { bboxPolygon } from "@turf/turf";
 import * as turf from "@turf/turf";
+
 export interface Link {
   href: string;
   rel: string;
@@ -65,28 +67,40 @@ export class Spatial {
   };
 }
 
+export class SummariesProperties {
+  readonly score?: number;
+  readonly status?: string;
+  readonly credits?: Array<string>;
+  readonly contacts?: IContact[];
+  readonly themes?: ITheme[];
+  readonly geometry?: GeometryCollection;
+}
+
 export class OGCCollection {
-  private propValue: Map<string, any> = new Map<string, any>();
+  private propValue?: SummariesProperties;
   private propExtent?: Spatial;
-  id: string = "undefined";
+
+  readonly id: string = "undefined";
   // This index is used to show the ordering 1, 2, 3...
-  index?: string;
-  title?: string;
-  description?: string;
-  itemType?: string;
-  links?: Array<Link>;
+  readonly index?: string;
+  readonly title?: string;
+  readonly description?: string;
+  readonly itemType?: string;
+  readonly links?: Array<Link>;
+
   set extent(extents: any) {
     this.propExtent = new Spatial(this);
     this.propExtent.bbox = extents.spatial.bbox;
     this.propExtent.crs = extents.spatial.crs;
     this.propExtent.temporal = extents.temporal;
   }
+
   get extent(): Spatial | undefined {
     return this.propExtent;
   }
 
-  set properties(props: object) {
-    this.propValue = new Map(Object.entries(props));
+  set properties(props: SummariesProperties) {
+    this.propValue = Object.assign(new SummariesProperties(), props);
   }
 
   // Locate the thumbnail from the links array
@@ -103,11 +117,13 @@ export class OGCCollection {
     );
     return target !== undefined ? target.href : undefined;
   };
+
   // get properties
-  getStatus = (): string => this.propValue?.get("STATUS");
-  getCredits = (): string[] => this.propValue?.get("CREDITS");
-  getContacts = (): IContact[] => this.propValue?.get("CONTACTS");
-  getThemes = (): ITheme[] => this.propValue?.get("THEMES");
+  getStatus = (): string | undefined => this.propValue?.status;
+  getCredits = (): string[] | undefined => this.propValue?.credits;
+  getContacts = (): IContact[] | undefined => this.propValue?.contacts;
+  getThemes = (): ITheme[] | undefined => this.propValue?.themes;
+  getGeometry = (): GeometryCollection | undefined => this.propValue?.geometry;
 }
 
 export interface OGCCollections {
@@ -174,7 +190,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
       properties:
         param.properties !== undefined
           ? param.properties
-          : "id,title,description,status,links,geometry",
+          : "id,title,description,status,links",
     };
 
     if (param.text !== undefined && param.text.length !== 0) {
