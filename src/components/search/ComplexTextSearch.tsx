@@ -4,12 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import grey from "../common/colors/grey";
 import { Tune } from "@mui/icons-material";
-import { useDispatch } from "react-redux";
-import {
-  createSearchParamFrom,
-  fetchResultWithStore,
-} from "../common/store/searchReducer";
-import store, { AppDispatch, getComponentState } from "../common/store/store";
+import store, { getComponentState } from "../common/store/store";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
 import {
   ParameterState,
@@ -21,7 +16,6 @@ import { padding } from "../../styles/constants.js";
 
 const ComplexTextSearch = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
   const redirectSearch = useCallback(() => {
