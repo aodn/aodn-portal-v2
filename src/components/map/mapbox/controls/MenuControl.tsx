@@ -5,7 +5,6 @@ import React, {
   useCallback,
   useRef,
   cloneElement,
-  ReactNode,
   PropsWithChildren,
 } from "react";
 import { createRoot, Root } from "react-dom/client";
@@ -272,8 +271,6 @@ const MenuControl = (props: PropsWithChildren<MenuControlProps>) => {
 
   return <React.Fragment />;
 };
-
-MenuControl.defaultProps = {};
 
 export default MenuControl;
 

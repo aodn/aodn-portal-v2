@@ -81,28 +81,35 @@ const SearchPage = () => {
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
 
-  const doSearch = useCallback(() => {
-    const componentParam: ParameterState = getComponentState(store.getState());
-    const param = createSearchParamFrom(componentParam);
+  const doSearch = useCallback(
+    (needNavigate: boolean = true) => {
+      const componentParam: ParameterState = getComponentState(
+        store.getState()
+      );
+      const param = createSearchParamFrom(componentParam);
 
-    // Use standard param to get fields you need, record is stored in redux
-    dispatch(fetchResultWithStore(param)).then(() => {
-      // Use a different parameter so that it return id and bbox only and do not store the values
-      dispatch(fetchResultNoStore({ ...param, properties: "id,bbox" }))
-        .unwrap()
-        .then((collections) => {
-          setLayers(collections.collections);
-        })
-        .then(() =>
-          navigate(
-            pageDefault.search + "?" + formatToUrlParam(componentParam),
-            {
-              state: { fromNavigate: true },
+      // Use standard param to get fields you need, record is stored in redux
+      dispatch(fetchResultWithStore(param)).then(() => {
+        // Use a different parameter so that it return id and bbox only and do not store the values
+        dispatch(fetchResultNoStore({ ...param, properties: "id,bbox" }))
+          .unwrap()
+          .then((collections) => {
+            setLayers(collections.collections);
+          })
+          .then(() => {
+            if (needNavigate) {
+              navigate(
+                pageDefault.search + "?" + formatToUrlParam(componentParam),
+                {
+                  state: { fromNavigate: true },
+                }
+              );
             }
-          )
-        );
-    });
-  }, [dispatch, navigate, setLayers]);
+          });
+      });
+    },
+    [dispatch, navigate, setLayers]
+  );
 
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
@@ -142,6 +149,12 @@ const SearchPage = () => {
         const paramState: ParameterState = unFlattenToParameterState(param);
         dispatch(updateParameterStates(paramState));
         doSearch();
+      }
+    } else {
+      if (location.state?.requireSearch) {
+        // Explicitly call search from navigation, so you just need search
+        // but do not navigate again.
+        doSearch(false);
       }
     }
   }, [location, dispatch, doSearch]);

@@ -24,16 +24,12 @@ const ComplexTextSearch = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
-  const executeSearch = useCallback(() => {
+  const redirectSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
-    dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
-      .unwrap()
-      .then(() =>
-        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-          state: { fromNavigate: true },
-        })
-      );
-  }, [dispatch, navigate]);
+    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+      state: { fromNavigate: true, requireSearch: true },
+    });
+  }, [navigate]);
 
   const handleEnterPressed = useCallback(
     (
@@ -41,10 +37,10 @@ const ComplexTextSearch = () => {
       isSuggesterOpen: boolean
     ) => {
       if (event.key === "Enter" && !isSuggesterOpen) {
-        executeSearch();
+        redirectSearch();
       }
     },
-    [executeSearch]
+    [redirectSearch]
   );
 
   const onFilterClick = useCallback(() => {
@@ -88,7 +84,7 @@ const ComplexTextSearch = () => {
             height: "100%",
           }}
           fullWidth
-          onClick={executeSearch}
+          onClick={redirectSearch}
         >
           Search
         </Button>

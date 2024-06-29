@@ -8,7 +8,11 @@ interface NavigationControlProps {
   visualizePitch?: boolean;
 }
 
-const NavigationControl = (props: NavigationControlProps) => {
+const NavigationControl = ({
+  showCompass = true,
+  showZoom = true,
+  visualizePitch = true,
+}: NavigationControlProps) => {
   const { map } = useContext(MapContext);
   const [init, setInit] = useState<boolean>(false);
 
@@ -18,24 +22,18 @@ const NavigationControl = (props: NavigationControlProps) => {
     setInit((prev) => {
       if (prev === false) {
         const n = new MapboxNavigationControl({
-          showCompass: props.showCompass,
-          showZoom: props.showZoom,
-          visualizePitch: props.visualizePitch,
+          showCompass: showCompass,
+          showZoom: showZoom,
+          visualizePitch: visualizePitch,
         });
 
         map?.addControl(n, "top-left");
       }
       return true;
     });
-  }, [map, props.showCompass, props.showZoom, props.visualizePitch]);
+  }, [map, showCompass, showZoom, visualizePitch]);
 
   return <React.Fragment />;
-};
-
-NavigationControl.defaultProps = {
-  showCompass: true,
-  showZoom: true,
-  visualizePitch: true,
 };
 
 export default NavigationControl;

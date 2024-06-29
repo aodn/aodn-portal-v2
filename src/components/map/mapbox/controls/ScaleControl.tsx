@@ -9,7 +9,10 @@ interface ScaleControlProps {
   unit?: Unit;
 }
 
-const ScaleControl = ({ maxWidth, unit }: ScaleControlProps) => {
+const ScaleControl = ({
+  maxWidth = 80,
+  unit = "metric",
+}: ScaleControlProps) => {
   const { map } = useContext(MapContext);
   const [init, setInit] = useState<boolean>(false);
 
@@ -30,11 +33,6 @@ const ScaleControl = ({ maxWidth, unit }: ScaleControlProps) => {
   }, [map, maxWidth, unit]);
 
   return <React.Fragment />;
-};
-
-ScaleControl.defaultProps = {
-  maxWidth: 80,
-  unit: "metric",
 };
 
 export default ScaleControl;
