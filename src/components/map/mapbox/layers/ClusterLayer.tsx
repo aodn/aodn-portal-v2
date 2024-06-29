@@ -20,7 +20,8 @@ import { AppDispatch } from "../../../common/store/store";
 interface ClusterLayerProps {
   // Vector tile layer should added to map
   collections: Array<OGCCollection>;
-  onDataSelected?: (uuid: Array<string>) => void;
+  // Event fired when user click on the point layer
+  onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
 const OPACITY = 0.6;
@@ -64,7 +65,7 @@ const unclusterPointLayerMouseLeaveEventHandler = (
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
-  onDataSelected,
+  onDatasetSelected,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
   const dispatch = useDispatch<AppDispatch>();
@@ -83,10 +84,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         ];
         setSpatialExtentsUUid(uuids);
         // Give time for the state to be updated
-        if (onDataSelected) setTimeout(() => onDataSelected(uuids), 100);
+        if (onDatasetSelected) setTimeout(() => onDatasetSelected(uuids), 100);
       }
     },
-    [setSpatialExtentsUUid, onDataSelected]
+    [setSpatialExtentsUUid, onDatasetSelected]
   );
 
   useEffect(() => {

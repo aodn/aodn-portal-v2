@@ -46,8 +46,6 @@ import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 import { bboxPolygon } from "@turf/turf";
 
-const mapContainerId = "map-container-id";
-
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -71,6 +69,10 @@ const SearchPage = () => {
     (value: SearchResultLayoutEnum) => setVisibility(value),
     [setVisibility]
   );
+
+  const onDatasetSelected = useCallback((uuid: Array<string>) => {
+    // Do something when dataset selected
+  }, []);
 
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -121,16 +123,16 @@ const SearchPage = () => {
     },
     [dispatch, doSearch]
   );
-  const onRemoveLayer = useCallback(
-    (
-      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-      collection: OGCCollection | undefined
-    ) => {
-      // Remove the layer if found
-      setLayers((v) => v.filter((i) => i.id !== collection?.id));
-    },
-    [setLayers]
-  );
+  // const onRemoveLayer = useCallback(
+  //   (
+  //     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  //     collection: OGCCollection | undefined
+  //   ) => {
+  //     // Remove the layer if found
+  //     setLayers((v) => v.filter((i) => i.id !== collection?.id));
+  //   },
+  //   [setLayers]
+  // );
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
@@ -155,12 +157,6 @@ const SearchPage = () => {
   // Get contents when no more navigate needed.
   const contents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
-  );
-  // Now set the first 10 layers on map, will cause map big issue but
-  // we want to see how things go.
-  useEffect(
-    () => setLayers(contents.result.collections.slice(0, 10)),
-    [contents]
   );
 
   return (
@@ -189,7 +185,7 @@ const SearchPage = () => {
         <ResultSection
           visibility={visibility}
           contents={contents}
-          onRemoveLayer={onRemoveLayer}
+          onRemoveLayer={undefined}
           onVisibilityChanged={onVisibilityChanged}
         />
         <MapSection
@@ -197,6 +193,7 @@ const SearchPage = () => {
           showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
           onMapZoomOrMove={onMapZoomOrMove}
           onToggleClicked={onToggleDisplay}
+          onDatasetSelected={onDatasetSelected}
         />
         <Grid></Grid>
       </Grid>

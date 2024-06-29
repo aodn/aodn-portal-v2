@@ -11,7 +11,7 @@ import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapLi
 interface SearchResultListProps {
   visibility: SearchResultLayoutEnum;
   contents: CollectionsQueryType;
-  onRemoveLayer: (
+  onRemoveLayer?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     collection: OGCCollection | undefined
   ) => void;
@@ -61,7 +61,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
       <ResultCards
         layout={currentLayout}
         contents={contents}
-        onRemoveLayer={onRemoveLayer}
+        onRemoveLayer={undefined}
         onDownload={undefined}
         onTags={undefined}
         onMore={undefined}
