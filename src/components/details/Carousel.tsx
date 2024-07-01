@@ -109,7 +109,7 @@ const Carousel: FC = () => {
           <Box sx={{ width: `${containerWidth}px`, height: "100%" }}>
             {/* Container for the cards and the slide animation */}
             {cards.map((card, index) => (
-              <Box // State to track the direction of the slide animation
+              <Box
                 key={`card-${index}`}
                 sx={{
                   width: "100%",

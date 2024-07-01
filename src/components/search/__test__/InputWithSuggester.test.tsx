@@ -13,6 +13,7 @@ import {
   describe,
   expect,
   test,
+  vi,
 } from "vitest";
 import { Provider } from "react-redux";
 import store from "../../common/store/store";

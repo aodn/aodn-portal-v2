@@ -12,7 +12,10 @@ import {
 } from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester";
 import { pageDefault } from "../common/constants";
-import { padding } from "../../styles/constants.js";
+import { color, fontColor, padding } from "../../styles/constants.js";
+
+export const filterButtonWidth = 100;
+export const searchIconWidth = 44;
 
 const ComplexTextSearch = () => {
   const navigate = useNavigate();
@@ -46,21 +49,26 @@ const ComplexTextSearch = () => {
       <Grid item xs={10}>
         <Paper
           sx={{
-            p: "2px 4px",
             display: "flex",
             alignItems: "center",
+            height: "100%",
           }}
         >
-          <IconButton sx={{ p: "10px" }} aria-label="search">
+          <IconButton
+            sx={{ width: `${searchIconWidth}px`, p: padding.small }}
+            aria-label="search"
+          >
             <SearchIcon />
           </IconButton>
           <InputWithSuggester handleEnterPressed={handleEnterPressed} />
-          <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
           <Button
             variant="text"
             sx={{
-              color: grey["searchButtonText"],
-              paddingX: padding["large"],
+              height: "100%",
+              minWidth: `${filterButtonWidth}px`,
+              color: fontColor.blue.medium,
+              paddingX: padding.large,
+              backgroundColor: color.gray.xxLight,
             }}
             startIcon={<Tune />}
             onClick={onFilterClick}
@@ -70,12 +78,22 @@ const ComplexTextSearch = () => {
           </Button>
         </Paper>
       </Grid>
-      <Grid item xs={2}>
+      <Grid
+        item
+        xs={2}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
         <Button
           sx={{
             color: grey["searchButtonText"],
-            backgroundColor: "white",
+            backgroundColor: "#fff",
             height: "100%",
+
+            ":hover": {
+              backgroundColor: "#fff",
+            },
           }}
           fullWidth
           onClick={redirectSearch}

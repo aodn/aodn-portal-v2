@@ -12,7 +12,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../components/common/store/store";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { CARD_ID } from "../components/smartpanel/utils";
 import Layout from "../components/layout/layout";
 import landingImageUrl from "@/assets/images/bg_landing_page.png";
@@ -43,28 +43,46 @@ const LandingPage = () => {
           backgroundImage: `url(${landingImageUrl})`,
           backgroundSize: "cover",
           display: "flex",
-          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
-        <Box
+        <Stack
+          direction="column"
+          justifyContent="center"
+          alignItems="center"
           sx={{
+            minWidth: "1020px",
             width: "70%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
+            maxWidth: "1228px",
           }}
         >
           <MainMenu />
           <BannerOpenAccess />
           <ComplexTextSearch />
           <ShortCutSmartPanel onCardClicked={onCardClick} />
-        </Box>
+        </Stack>
       </Box>
-      <StoryBoardPanel />
-      <PromotionSmartPanel />
+      <Box
+        sx={{
+          backgroundColor: "#fff",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Stack
+          direction="column"
+          sx={{
+            minWidth: "1020px",
+            width: "70%",
+            maxWidth: "1228px",
+          }}
+        >
+          <StoryBoardPanel />
+          <PromotionSmartPanel />
+        </Stack>
+      </Box>
     </Layout>
   );
 };
