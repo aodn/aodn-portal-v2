@@ -21,14 +21,6 @@ import InputWithSuggester from "../InputWithSuggester";
 import { server } from "../../../__mocks__/server";
 import { userEvent } from "@testing-library/user-event";
 
-const ResizeObserverMock = vi.fn(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
-
-vi.stubGlobal("ResizeObserver", ResizeObserverMock);
-
 beforeAll(() => {
   server.listen();
 });

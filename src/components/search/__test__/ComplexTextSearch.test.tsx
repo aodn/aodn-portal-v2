@@ -13,14 +13,6 @@ vi.mock("../../common/filters/AdvanceFilters.tsx", () => {
   return { default: mockAdvanceFilters };
 });
 
-const ResizeObserverMock = vi.fn(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
-
-vi.stubGlobal("ResizeObserver", ResizeObserverMock);
-
 beforeAll(() => {
   server.listen();
 });
