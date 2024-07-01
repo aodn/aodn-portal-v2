@@ -322,13 +322,13 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
     return (
       <Paper
         sx={{
-          backgroundColor: color.blue.light,
+          backgroundColor: color.blue.xLight,
           "& .MuiAutocomplete-listbox": {
             borderRadius: borderRadius.medium,
-            bgcolor: color.blue.light,
+            bgcolor: color.blue.xLight,
           },
           "& .MuiListSubheader-root": {
-            bgcolor: color.blue.light,
+            bgcolor: color.blue.xLight,
           },
         }}
         {...props}

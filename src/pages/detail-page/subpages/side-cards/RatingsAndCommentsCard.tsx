@@ -81,7 +81,7 @@ const RatingsAndCommentsCard = () => {
             sx={{
               border: "none",
               borderRadius: borderRadius.small,
-              backgroundColor: color.blue.extraLight,
+              backgroundColor: color.blue.extraLightSemiTransparent,
               padding: padding.small,
               cursor: "pointer",
             }}
@@ -116,7 +116,7 @@ const RatingsAndCommentsCard = () => {
             sx={{
               border: "none",
               borderRadius: borderRadius.small,
-              backgroundColor: color.blue.extraLight,
+              backgroundColor: color.blue.extraLightSemiTransparent,
               padding: padding.small,
               cursor: "pointer",
             }}
@@ -154,7 +154,7 @@ const RatingsAndCommentsCard = () => {
                   key={index}
                   sx={{
                     borderRadius: borderRadius.small,
-                    backgroundColor: color.blue.extraLight,
+                    backgroundColor: color.blue.extraLightSemiTransparent,
                     cursor: "pointer",
                   }}
                 >

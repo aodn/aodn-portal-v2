@@ -63,7 +63,7 @@ const TemporalExtentCard = () => {
         alignItems: "center",
         border: `${border.xs} ${color.gray.extraLight}`,
         borderRadius: borderRadius.medium,
-        backgroundColor: color.blue.extraLight,
+        backgroundColor: color.blue.extraLightSemiTransparent,
         padding: padding.small,
       }}
     >
@@ -112,7 +112,7 @@ const TemporalExtentCard = () => {
               alignItems: "center",
               border: `${border.xs} ${color.gray.extraLight}`,
               borderRadius: borderRadius.medium,
-              backgroundColor: color.blue.extraLight,
+              backgroundColor: color.blue.extraLightSemiTransparent,
               padding: padding.small,
             }}
           >

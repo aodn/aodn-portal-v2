@@ -79,7 +79,8 @@ const color = {
     divider: "#8B959C",
   },
   blue: {
-    extraLight: "rgba(231,242,255,0.5)",
+    extraLightSemiTransparent: "rgba(231,242,255,0.5)",
+    xLight: "#eaf1f6",
     light: "#E2ECF3",
     medium: "#E7F2FF",
     dark: "#618CA5",
@@ -90,7 +91,8 @@ const color = {
     dark: "#575757",
     medium: "#787878",
     light: "#979797",
-    extraLight: "#DFDFDF",
+    extraLight: "#dfdfdf",
+    xxLight: "#f8f8f8",
   },
 };
 

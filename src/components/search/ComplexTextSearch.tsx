@@ -68,7 +68,7 @@ const ComplexTextSearch = () => {
               minWidth: `${filterButtonWidth}px`,
               color: fontColor.blue.medium,
               paddingX: padding.large,
-              backgroundColor: color.blue.extraLight,
+              backgroundColor: color.gray.xxLight,
             }}
             startIcon={<Tune />}
             onClick={onFilterClick}

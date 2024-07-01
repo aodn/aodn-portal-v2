@@ -18,7 +18,7 @@ const AssociatedCategoriesCard = () => {
       sx={{
         border: "none",
         borderRadius: borderRadius.small,
-        backgroundColor: color.blue.extraLight,
+        backgroundColor: color.blue.extraLightSemiTransparent,
         padding: padding.extraSmall,
       }}
     >

@@ -81,7 +81,7 @@ const AbstractAndDownloadPanel = () => {
   const selectSxProps = {
     height: "30px",
     textAlign: "start",
-    backgroundColor: color.blue.extraLight,
+    backgroundColor: color.blue.extraLightSemiTransparent,
     boxShadow: theme.shadows[5],
   };
 
