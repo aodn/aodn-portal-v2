@@ -63,7 +63,7 @@ const unclusterPointLayerMouseLeaveEventHandler = (
   ev.target.getCanvas().style.cursor = "";
 };
 
-// These function help to get the correct id and reduce the need to set those id in the 
+// These function help to get the correct id and reduce the need to set those id in the
 // useEffect list
 const getLayerId = (id: string | undefined) => `cluster-layer-${id}`;
 
@@ -301,12 +301,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer,
         unclusterPointLayerMouseLeaveEventHandler
       );
-
-      map?.on(
-        "click",
-        unclusterPointLayer,
-        unclusterPointLayerMouseClickEventHandler
-      );
     };
 
     map?.once("load", createLayers);
@@ -321,11 +315,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         "mouseleave",
         unclusterPointLayer,
         unclusterPointLayerMouseLeaveEventHandler
-      );
-      map?.off(
-        "click",
-        unclusterPointLayer,
-        unclusterPointLayerMouseClickEventHandler
       );
 
       try {
@@ -345,7 +334,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         // If source not found and throw exception then layer will not exist
       }
     };
-  }, [map, unclusterPointLayerMouseClickEventHandler]);
+    // Make sure map is the only dependency so that it will not trigger twice run
+    // where you will add source and remove layer accidentally.
+  }, [map]);
 
   useEffect(() => {
     const clusterSourceId = getClusterSourceId(
@@ -357,6 +348,25 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       );
     }
   }, [map, collections]);
+
+  useEffect(() => {
+    const layerId = getLayerId(map?.getContainer().id);
+    const unclusterPointLayer = getUnclusterPointId(layerId);
+
+    map?.on(
+      "click",
+      unclusterPointLayer,
+      unclusterPointLayerMouseClickEventHandler
+    );
+
+    return () => {
+      map?.off(
+        "click",
+        unclusterPointLayer,
+        unclusterPointLayerMouseClickEventHandler
+      );
+    };
+  }, [map, unclusterPointLayerMouseClickEventHandler]);
 
   return <React.Fragment />;
 };
