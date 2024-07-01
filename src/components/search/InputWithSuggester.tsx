@@ -1,4 +1,3 @@
-import ResizeObserver from "resize-observer-polyfill";
 import {
   Autocomplete,
   Box,
@@ -38,6 +37,7 @@ import {
 import _ from "lodash";
 import { borderRadius, color, padding } from "../../styles/constants";
 import { filterButtonWidth, searchIconWidth } from "./ComplexTextSearch";
+import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -253,6 +253,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   const categoryDiv = useRef(null);
 
   useEffect(() => {
+    // Create a ResizeObserver to monitor changes in element sizes
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         if (entry.target === searchFieldDiv.current) {
@@ -263,9 +264,11 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
       }
     });
 
+    // Get the elements from refs
     const searchFieldElement = searchFieldDiv.current;
     const categoryElement = categoryDiv.current;
 
+    // Observe the elements
     if (searchFieldElement) {
       observer.observe(searchFieldElement);
     }
@@ -274,6 +277,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
       observer.observe(categoryElement);
     }
 
+    // Cleanup observer on component unmount
     return () => {
       if (searchFieldElement) {
         observer.unobserve(searchFieldElement);
@@ -285,6 +289,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   }, []);
 
   const CustomPopper = (props: any): ReactNode => {
+    // Util function for calculating the suggester offset
     const calculateOffset = () => {
       return searchFieldWidth - categoryWidth < textfieldMinWidth
         ? [-searchIconWidth, 0]
@@ -347,7 +352,7 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
         options={options.flatMap((option) => option.text)}
         groupBy={(option: string): string => {
           const v = options.find((o) => o.text === option);
-          return v ? v.group : "";
+          return v ? capitalizeFirstLetter(v.group) : "";
         }}
         autoComplete
         includeInputInList
