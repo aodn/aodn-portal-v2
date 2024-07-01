@@ -76,10 +76,9 @@ const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
   const [options, setOptions] = useState<OptionType[]>([]);
   const [categorySet, setCategorySet] = useState<Category[]>([]);
 
-  const selectedCategories: Category[] = useSelector((state: RootState) =>
-    state.paramReducer.categories
-      ? state.paramReducer.categories
-      : new Array<Category>()
+  const emptyArray: Category[] = [];
+  const selectedCategories: Category[] = useSelector(
+    (state: RootState) => state.paramReducer.categories || emptyArray
   );
 
   const searchInput = useSelector(

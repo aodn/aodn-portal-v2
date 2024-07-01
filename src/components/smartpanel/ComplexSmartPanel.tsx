@@ -8,14 +8,21 @@ import { margin } from "../../styles/constants";
 interface ComplexSmartPanelProps {
   columns?: number;
   rows?: number;
-  height: string;
+  height?: string;
   bottomDivider?: boolean;
-  gridColumns: number;
+  gridColumns?: number;
   sx?: SxProps<Theme>;
 }
+const defaultProps = {
+  columns: 9,
+  rows: 2,
+  gridColumns: 8,
+  height: "95px",
+  bottomDivider: false,
+};
 
 const ComplexSmartPanel = (
-  props: React.PropsWithChildren<ComplexSmartPanelProps>
+  props: React.PropsWithChildren<ComplexSmartPanelProps> = defaultProps
 ) => {
   const boxRef = useRef<HTMLDivElement>(null);
 
@@ -108,14 +115,6 @@ const ComplexSmartPanel = (
       </Grid>
     </Grid>
   );
-};
-
-ComplexSmartPanel.defaultProps = {
-  columns: 9,
-  rows: 2,
-  gridColumns: 8,
-  height: "95px",
-  bottomDivider: false,
 };
 
 export default ComplexSmartPanel;
