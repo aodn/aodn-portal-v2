@@ -8,7 +8,7 @@ import {
   vi,
 } from "vitest";
 import { server } from "../../../__mocks__/server";
-import { cleanup, render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import "@testing-library/jest-dom"; // for the additional matchers
 import store from "../../../components/common/store/store";
 import { ThemeProvider } from "@mui/material/styles";

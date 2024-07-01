@@ -23,11 +23,13 @@ interface SearchPageProps {
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
   onToggleClicked: (v: boolean) => void;
+  onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
 const MapSection: React.FC<SearchPageProps> = ({
   onMapZoomOrMove,
   onToggleClicked,
+  onDatasetSelected,
   layers,
   showFullMap,
 }) => {
@@ -57,7 +59,10 @@ const MapSection: React.FC<SearchPageProps> = ({
             <MenuControl menu={<BaseMapSwitcher />} />
           </Controls>
           <Layers>
-            <ClusterLayer collections={layers} />
+            <ClusterLayer
+              collections={layers}
+              onDatasetSelected={onDatasetSelected}
+            />
           </Layers>
         </Map>
       </Paper>

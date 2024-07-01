@@ -42,7 +42,11 @@ export class Spatial {
   constructor(ogcCollection: OGCCollection) {
     this.parent = ogcCollection;
   }
-
+  /**
+   * Create a GeoJSON FeatureCollection from the bounding boxes and points
+   * @param start - The index to start from, from spec, the first is the overall bounding box
+   * @returns - The geojson feature collection
+   */
   getGeojsonExtents = (start: number): FeatureCollection => {
     const featureCollections: FeatureCollection = {
       type: "FeatureCollection",
@@ -54,15 +58,17 @@ export class Spatial {
       (box) => box.length === 4 || box.length === 2
     );
 
-    // Create features from valid boxes and points starting from the given index
-    const features = validBoxesAndPoints.slice(start).map((pos) => {
-      return pos.length === 4
-        ? bboxPolygon([pos[0], pos[1], pos[2], pos[3]])
-        : turf.point(pos);
-    });
+    if (validBoxesAndPoints && validBoxesAndPoints.length > 1) {
+      // Create features from valid boxes and points starting from the given index
+      const features = validBoxesAndPoints.slice(start).map((pos) => {
+        return pos.length === 4
+          ? bboxPolygon([pos[0], pos[1], pos[2], pos[3]])
+          : turf.point(pos);
+      });
 
-    // Add individual bounding boxes and points
-    featureCollections.features.push(...features);
+      // Add individual bounding boxes and points
+      featureCollections.features.push(...features);
+    }
     return featureCollections;
   };
 }
@@ -121,6 +127,7 @@ export class OGCCollection {
   getCredits = (): string[] | undefined => this.propValue?.credits;
   getContacts = (): IContact[] | undefined => this.propValue?.contacts;
   getThemes = (): ITheme[] | undefined => this.propValue?.themes;
+  // It is a well form geometry collection of detail spatial extents
   getGeometry = (): GeometryCollection | undefined => this.propValue?.geometry;
 }
 

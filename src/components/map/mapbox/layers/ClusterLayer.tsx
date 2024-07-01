@@ -20,6 +20,8 @@ import { AppDispatch } from "../../../common/store/store";
 interface ClusterLayerProps {
   // Vector tile layer should added to map
   collections: Array<OGCCollection>;
+  // Event fired when user click on the point layer
+  onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
 const OPACITY = 0.6;
@@ -63,6 +65,7 @@ const unclusterPointLayerMouseLeaveEventHandler = (
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
+  onDatasetSelected,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
   const dispatch = useDispatch<AppDispatch>();
@@ -74,15 +77,17 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   const unclusterPointLayerMouseClickEventHandler = useCallback(
     (ev: MapLayerMouseEvent): void => {
-      // Since it is a uncluster point, so there will only be 1 features
-      // and [0] make sense;
+      // Make sure even same id under same area will be set once.
       if (ev.features) {
-        setSpatialExtentsUUid([
+        const uuids = [
           ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
-        ]);
+        ];
+        setSpatialExtentsUUid(uuids);
+        // Give time for the state to be updated
+        if (onDatasetSelected) setTimeout(() => onDatasetSelected(uuids), 100);
       }
     },
-    [setSpatialExtentsUUid]
+    [setSpatialExtentsUUid, onDatasetSelected]
   );
 
   useEffect(() => {
@@ -112,12 +117,16 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           map?.addLayer(
             {
               id: `${sourceId}-points`,
-              type: "circle",
+              type: "symbol",
               source: sourceId,
               filter: ["==", "$type", "Point"],
-              paint: {
-                "circle-radius": 8,
-                "circle-color": "#007cbf",
+              layout: {
+                "icon-image": "marker-15", // Built-in icon provided by Mapbox
+                "icon-size": 1.5,
+                "text-field": ["get", "title"],
+                "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                "text-offset": [0, 1.25],
+                "text-anchor": "top",
               },
             },
             clusterLayer
@@ -145,7 +154,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
               filter: ["==", "$type", "Polygon"],
               paint: {
                 "fill-color": "#00ff00",
-                "fill-opacity": 0.5,
+                "fill-opacity": 0.4,
               },
             },
             clusterLayer
@@ -208,7 +217,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           "circle-radius": [
             "step",
             ["get", "point_count"],
-            20,
+            15,
             100,
             30,
             750,
@@ -237,7 +246,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         paint: {
           "circle-opacity": OPACITY,
           "circle-color": "#11b4da",
-          "circle-radius": 10,
+          "circle-radius": 8,
           "circle-stroke-width": STROKE_WIDTH,
           "circle-stroke-color": "#fff",
         },
@@ -315,6 +324,3 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 };
 
 export default ClusterLayer;
-function dispatch(arg0: any) {
-  throw new Error("Function not implemented.");
-}
