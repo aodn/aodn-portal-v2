@@ -1,14 +1,9 @@
-import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Grid } from "@mui/material";
 import {
   CollectionsQueryType,
   createSearchParamFrom,
+  fetchResultNoStore,
   fetchResultWithStore,
   OGCCollection,
 } from "../../components/common/store/searchReducer";
@@ -51,8 +46,6 @@ import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 import { bboxPolygon } from "@turf/turf";
 
-const mapContainerId = "map-container-id";
-
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -77,23 +70,43 @@ const SearchPage = () => {
     [setVisibility]
   );
 
-  // Layers inside this array will be added to map
+  const onDatasetSelected = useCallback((uuid: Array<string>) => {
+    // Do something when dataset selected
+  }, []);
+
+  // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
-  const doSearch = useCallback(() => {
-    const componentParam: ParameterState = getComponentState(store.getState());
-    dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
-      .unwrap()
-      .then((collections) => {
-        const ids = collections.collections.map((c) => c.id);
-        //Remove map uuid not exist in the ids
-        setLayers((v) => v.filter((i) => ids.includes(i.id)));
-      })
-      .then((v) =>
-        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-          state: { fromNavigate: true },
-        })
+
+  const doSearch = useCallback(
+    (needNavigate: boolean = true) => {
+      const componentParam: ParameterState = getComponentState(
+        store.getState()
       );
-  }, [dispatch, navigate, setLayers]);
+      const param = createSearchParamFrom(componentParam);
+
+      // Use standard param to get fields you need, record is stored in redux
+      dispatch(fetchResultWithStore(param)).then(() => {
+        // Use a different parameter so that it return id and bbox only and do not store the values
+        dispatch(fetchResultNoStore({ ...param, properties: "id,bbox" }))
+          .unwrap()
+          .then((collections) => {
+            setLayers(collections.collections);
+          })
+          .then(() => {
+            if (needNavigate) {
+              navigate(
+                pageDefault.search + "?" + formatToUrlParam(componentParam),
+                {
+                  state: { fromNavigate: true },
+                }
+              );
+            }
+          });
+      });
+    },
+    [dispatch, navigate, setLayers]
+  );
+
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
@@ -110,16 +123,16 @@ const SearchPage = () => {
     },
     [dispatch, doSearch]
   );
-  const onRemoveLayer = useCallback(
-    (
-      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-      collection: OGCCollection | undefined
-    ) => {
-      // Remove the layer if found
-      setLayers((v) => v.filter((i) => i.id !== collection?.id));
-    },
-    [setLayers]
-  );
+  // const onRemoveLayer = useCallback(
+  //   (
+  //     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  //     collection: OGCCollection | undefined
+  //   ) => {
+  //     // Remove the layer if found
+  //     setLayers((v) => v.filter((i) => i.id !== collection?.id));
+  //   },
+  //   [setLayers]
+  // );
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
@@ -133,17 +146,17 @@ const SearchPage = () => {
         dispatch(updateParameterStates(paramState));
         doSearch();
       }
+    } else {
+      if (location.state?.requireSearch) {
+        // Explicitly call search from navigation, so you just need search
+        // but do not navigate again.
+        doSearch(false);
+      }
     }
   }, [location, dispatch, doSearch]);
   // Get contents when no more navigate needed.
   const contents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
-  );
-  // Now set the first 10 layers on map, will cause map big issue but
-  // we want to see how things go.
-  useEffect(
-    () => setLayers(contents.result.collections.slice(0, 10)),
-    [contents]
   );
 
   return (
@@ -172,7 +185,7 @@ const SearchPage = () => {
         <ResultSection
           visibility={visibility}
           contents={contents}
-          onRemoveLayer={onRemoveLayer}
+          onRemoveLayer={undefined}
           onVisibilityChanged={onVisibilityChanged}
         />
         <MapSection
@@ -180,6 +193,7 @@ const SearchPage = () => {
           showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
           onMapZoomOrMove={onMapZoomOrMove}
           onToggleClicked={onToggleDisplay}
+          onDatasetSelected={onDatasetSelected}
         />
         <Grid></Grid>
       </Grid>

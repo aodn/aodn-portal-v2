@@ -4,12 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import grey from "../common/colors/grey";
 import { Tune } from "@mui/icons-material";
-import { useDispatch } from "react-redux";
-import {
-  createSearchParamFrom,
-  fetchResultWithStore,
-} from "../common/store/searchReducer";
-import store, { AppDispatch, getComponentState } from "../common/store/store";
+import store, { getComponentState } from "../common/store/store";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
 import {
   ParameterState,
@@ -24,19 +19,14 @@ export const searchIconWidth = 44;
 
 const ComplexTextSearch = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
-  const executeSearch = useCallback(() => {
+  const redirectSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
-    dispatch(fetchResultWithStore(createSearchParamFrom(componentParam)))
-      .unwrap()
-      .then(() =>
-        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-          state: { fromNavigate: true },
-        })
-      );
-  }, [dispatch, navigate]);
+    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+      state: { fromNavigate: true, requireSearch: true },
+    });
+  }, [navigate]);
 
   const handleEnterPressed = useCallback(
     (
@@ -44,10 +34,10 @@ const ComplexTextSearch = () => {
       isSuggesterOpen: boolean
     ) => {
       if (event.key === "Enter" && !isSuggesterOpen) {
-        executeSearch();
+        redirectSearch();
       }
     },
-    [executeSearch]
+    [redirectSearch]
   );
 
   const onFilterClick = useCallback(() => {
@@ -106,7 +96,7 @@ const ComplexTextSearch = () => {
             },
           }}
           fullWidth
-          onClick={executeSearch}
+          onClick={redirectSearch}
         >
           Search
         </Button>

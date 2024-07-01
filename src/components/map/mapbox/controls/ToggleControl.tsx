@@ -83,7 +83,10 @@ class ToggleControlClass implements IControl {
   }
 }
 
-const ToggleControl = (props: ToggleControlProps) => {
+const ToggleControl = ({
+  showFullMap = false,
+  onToggleClicked = (v: boolean) => {},
+}: ToggleControlProps) => {
   const { map } = useContext(MapContext);
   const [control, setControl] = useState<ToggleControlClass | null>(null);
 
@@ -93,27 +96,19 @@ const ToggleControl = (props: ToggleControlProps) => {
     setControl((prev) => {
       if (!prev) {
         const n = new ToggleControlClass({
-          showFullMap: props.showFullMap,
-          onToggleClicked: props?.onToggleClicked,
+          showFullMap: showFullMap,
+          onToggleClicked: onToggleClicked,
         });
         map?.addControl(n, "top-left");
         return n;
       }
       return prev;
     });
-  }, [map, props]);
+  }, [map, showFullMap, onToggleClicked]);
 
-  useEffect(
-    () => control?.redraw(props.showFullMap),
-    [props.showFullMap, control]
-  );
+  useEffect(() => control?.redraw(showFullMap), [showFullMap, control]);
 
   return <React.Fragment />;
-};
-
-ToggleControl.defaultProps = {
-  showFullMap: false,
-  onToggleClicked: (v: boolean) => {},
 };
 
 export default ToggleControl;
