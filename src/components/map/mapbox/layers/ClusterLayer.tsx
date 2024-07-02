@@ -29,7 +29,7 @@ const STROKE_WIDTH = 1;
 
 // Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
 // in a collection to the FeatureCollection
-const createClusterDatSource = (
+const createClusterDataSource = (
   collections: Array<OGCCollection> | undefined
 ): FeatureCollection => {
   const featureCollections: FeatureCollection = {
@@ -225,7 +225,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       map?.addSource(clusterSourceId, {
         type: "geojson",
-        data: createClusterDatSource(undefined),
+        data: createClusterDataSource(undefined),
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 10,
@@ -245,19 +245,23 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
             "step",
             ["get", "point_count"],
             "#51bbd6",
-            100,
+            5,
             "#f1f075",
-            750,
+            30,
             "#f28cb1",
+            50,
+            "#fe8cf1",
           ],
           "circle-radius": [
             "step",
             ["get", "point_count"],
-            15,
-            100,
+            10,
+            20,
+            20,
             30,
-            750,
-            40,
+            30,
+            50,
+            50,
           ],
         },
       });
@@ -344,7 +348,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     );
     if (map?.getSource(clusterSourceId)) {
       (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createClusterDatSource(collections)
+        createClusterDataSource(collections)
       );
     }
   }, [map, collections]);

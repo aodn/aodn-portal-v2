@@ -16,7 +16,7 @@ import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 
 const mapContainerId = "map-container-id";
 
-interface SearchPageProps {
+interface MapSectionProps {
   layers: OGCCollection[];
   showFullMap: boolean;
   onMapZoomOrMove: (
@@ -26,7 +26,7 @@ interface SearchPageProps {
   onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
-const MapSection: React.FC<SearchPageProps> = ({
+const MapSection: React.FC<MapSectionProps> = ({
   onMapZoomOrMove,
   onToggleClicked,
   onDatasetSelected,

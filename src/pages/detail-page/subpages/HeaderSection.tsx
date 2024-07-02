@@ -21,6 +21,14 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import { useDetailPageContext } from "../context/detail-page-context";
 import { useNavigate } from "react-router-dom";
 import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
+import store, {
+  getComponentState,
+} from "../../../components/common/store/store";
+import {
+  ParameterState,
+  formatToUrlParam,
+} from "../../../components/common/store/componentParamReducer";
+import { pageDefault } from "../../../components/common/constants";
 
 interface ButtonWithIcon {
   label: string;
@@ -51,7 +59,14 @@ const HeaderSection = () => {
 
   // TODO: on click user goes back to search page where has results based on previous search params
   const onGoBack = useCallback(() => {
-    navigate(-1);
+    const componentParam: ParameterState = getComponentState(store.getState());
+    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+      state: {
+        fromNavigate: true,
+        requireSearch: true,
+        referer: "HeaderSection",
+      },
+    });
   }, [navigate]);
 
   // TODO: implement the goNext and goPrevious function

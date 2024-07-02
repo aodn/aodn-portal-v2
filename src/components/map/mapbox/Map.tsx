@@ -56,10 +56,10 @@ const defaultStyle = 3;
 
 const ReactMap = ({
   panelId,
-  centerLongitude,
-  centerLatitude,
-  zoom,
-  projection,
+  centerLongitude = 147.3353554138993,
+  centerLatitude = -42.88611707886841,
+  zoom = 4,
+  projection = "equirectangular",
   onZoomEvent,
   onMoveEvent,
   children,
@@ -130,13 +130,6 @@ const ReactMap = ({
   return (
     map && <MapContext.Provider value={{ map }}>{children}</MapContext.Provider>
   );
-};
-
-ReactMap.defaultProps = {
-  centerLatitude: -42.88611707886841,
-  centerLongitude: 147.3353554138993,
-  zoom: 4,
-  projection: "equirectangular",
 };
 
 export default ReactMap;

@@ -21,7 +21,11 @@ const ComplexTextSearch = () => {
   const redirectSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
     navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-      state: { fromNavigate: true, requireSearch: true },
+      state: {
+        fromNavigate: true,
+        requireSearch: true,
+        referer: "ComplexTextSearch",
+      },
     });
   }, [navigate]);
 
