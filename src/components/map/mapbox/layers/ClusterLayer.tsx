@@ -310,7 +310,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     map?.once("load", createLayers);
 
     return () => {
-      // In theory it is not necessary to clean up as by default the map will invoke remove() on exit
       map?.off(
         "mouseenter",
         unclusterPointLayer,
@@ -321,6 +320,25 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer,
         unclusterPointLayerMouseLeaveEventHandler
       );
+
+      // Clean up resource when you click on the next spatial extents, map is
+      // still working in this page.
+      try {
+        if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
+
+        if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
+
+        if (map?.getLayer(`${layerId}-cluster-count`))
+          map?.removeLayer(`${layerId}-cluster-count`);
+
+        if (map?.getLayer(unclusterPointLayer))
+          map?.removeLayer(unclusterPointLayer);
+
+        if (map?.getLayer(`${layerId}-unclustered-count`))
+          map?.removeLayer(`${layerId}-unclustered-count`);
+      } catch (error) {
+        // If source not found and throw exception then layer will not exist
+      }
     };
     // Make sure map is the only dependency so that it will not trigger twice run
     // where you will add source and remove layer accidentally.
@@ -348,6 +366,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     );
 
     return () => {
+      // Map will be destroy by default, so in theory there is no need
+      // to clean up resource in this level
       map?.off(
         "click",
         unclusterPointLayer,

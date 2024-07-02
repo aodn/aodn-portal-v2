@@ -158,7 +158,7 @@ const SearchPage = () => {
         doSearch(false);
       }
     }
-  }, [location.state, location.search, dispatch, doSearch]);
+  }, [location, dispatch, doSearch]);
 
   // Get contents when no more navigate needed.
   const contents = useSelector<RootState, CollectionsQueryType>(
@@ -169,7 +169,7 @@ const SearchPage = () => {
   // which is ok.
   // TODO: Optimize call if possible, this happens when navigate from page
   // to this page.
-  useEffect(() => handleNavigation(), []);
+  useEffect(() => handleNavigation(), [handleNavigation]);
 
   return (
     <Layout>
