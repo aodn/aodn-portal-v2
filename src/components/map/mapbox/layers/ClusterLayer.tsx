@@ -81,6 +81,17 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [spatialExtentsUUid, setSpatialExtentsUUid] = useState<Array<string>>();
 
+  const updateSource = useCallback(() => {
+    const clusterSourceId = getClusterSourceId(
+      getLayerId(map?.getContainer().id)
+    );
+    if (map?.getSource(clusterSourceId)) {
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
+        createClusterDataSource(collections)
+      );
+    }
+  }, [map, collections]);
+
   const unclusterPointLayerMouseClickEventHandler = useCallback(
     (ev: MapLayerMouseEvent): void => {
       // Make sure even same id under same area will be set once.
@@ -96,7 +107,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [setSpatialExtentsUUid, onDatasetSelected]
   );
 
-  useEffect(() => {
+  const addSpatialExtentsLayer = useCallback(() => {
     const sourceIds = new Array<string>();
     const layerIds = new Array<string>();
 
@@ -309,6 +320,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
     map?.once("load", createLayers);
 
+    // When user change the map style, for example change base map, all layer will be removed
+    // as per mapbox design, we need to listen to that even and add back the layer
+    map?.on("styledata", createLayers);
+
     return () => {
       map?.off(
         "mouseenter",
@@ -345,15 +360,28 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   }, [map]);
 
   useEffect(() => {
-    const clusterSourceId = getClusterSourceId(
-      getLayerId(map?.getContainer().id)
-    );
-    if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createClusterDataSource(collections)
-      );
-    }
-  }, [map, collections]);
+    addSpatialExtentsLayer();
+
+    // When user change the map style, for example change base map, all layer will be removed
+    // as per mapbox design, we need to listen to that even and add data
+    map?.on("styledata", addSpatialExtentsLayer);
+
+    return () => {
+      map?.off("styledata", addSpatialExtentsLayer);
+    };
+  }, [addSpatialExtentsLayer]);
+
+  useEffect(() => {
+    updateSource();
+
+    // When user change the map style, for example change base map, all layer will be removed
+    // as per mapbox design, we need to listen to that even and add data
+    map?.on("styledata", updateSource);
+
+    return () => {
+      map?.off("styledata", updateSource);
+    };
+  }, [updateSource]);
 
   useEffect(() => {
     const layerId = getLayerId(map?.getContainer().id);

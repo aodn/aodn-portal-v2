@@ -142,7 +142,6 @@ const SearchPage = () => {
   // the correct values, else it is user paste the url directly
   // and content may not refreshed
   const handleNavigation = useCallback(() => {
-    console.log(location);
     if (!location.state?.fromNavigate) {
       // The first char is ? in the search string, so we need to remove it.
       const param = location?.search.substring(1);

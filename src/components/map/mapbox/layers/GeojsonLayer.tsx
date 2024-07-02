@@ -13,7 +13,7 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
-import { LngLatBoundsLike } from "mapbox-gl";
+import mapboxgl, { LngLatBoundsLike } from "mapbox-gl";
 
 interface GeojsonLayerProps {
   // Vector tile layer should added to map
@@ -102,11 +102,43 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
     [fitToOverallBbox, setPhotos, takePhoto]
   );
 
-  useEffect(() => {
-    if (map === null) return;
-
+  const createLayer = useCallback(() => {
     const sourceId = `geojson-${map?.getContainer().id}-source-${collectionId}`;
     const layerId = `geojson-${map?.getContainer().id}-layer-${collectionId}`;
+
+    // If style changed, we may need to add the layer again, hence listen to this event.
+    // https://github.com/mapbox/mapbox-gl-js/issues/8660
+    //
+    if (map?.getSource(sourceId)) return true;
+
+    map?.addSource(sourceId, {
+      type: "geojson",
+      // Use a URL for the value for the `data` property.
+      data: extent?.getGeojsonExtents(1),
+    });
+
+    map?.addLayer({
+      id: layerId,
+      type: "fill",
+      source: sourceId,
+      paint: {
+        "fill-color": stringToColor(collectionId),
+        "fill-outline-color": "black",
+      },
+    });
+  }, [map, stringToColor, extent]);
+
+  // This is use to handle base map change that set style will default remove all layer, which is
+  // the behavior of mapbox, this useEffect, add the layer back based on user event
+  useEffect(() => {
+    map?.on("styledata", createLayer);
+    return () => {
+      map?.off("styledata", createLayer);
+    };
+  }, [map, createLayer]);
+
+  useEffect(() => {
+    if (map === null) return;
 
     // This situation is map object created, hence not null, but not completely loaded
     // and therefore you will have problem setting source and layer. Set-up a listener
@@ -114,26 +146,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
     map?.once("load", () =>
       setMapLoaded((prev) => {
         if (!prev) {
-          // If style changed, we may need to add the layer again, hence listen to this event.
-          // https://github.com/mapbox/mapbox-gl-js/issues/8660
-          //
-          if (map.getSource(sourceId)) return true;
-
-          map.addSource(sourceId, {
-            type: "geojson",
-            // Use a URL for the value for the `data` property.
-            data: extent?.getGeojsonExtents(1),
-          });
-
-          map.addLayer({
-            id: layerId,
-            type: "fill",
-            source: sourceId,
-            paint: {
-              "fill-color": stringToColor(collectionId),
-              "fill-outline-color": "black",
-            },
-          });
+          createLayer();
           // Call handleIdle when the map is idle
           const onceIdle = () => handleIdle(extent?.bbox);
           map?.once("idle", onceIdle);
