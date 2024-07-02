@@ -63,6 +63,14 @@ const unclusterPointLayerMouseLeaveEventHandler = (
   ev.target.getCanvas().style.cursor = "";
 };
 
+const clusterLayerMouseEnterEventHandler = (ev: MapLayerMouseEvent): void => {
+  ev.target.getCanvas().style.cursor = "pointer";
+};
+
+const clusterLayerMouseLeaveEventHandler = (ev: MapLayerMouseEvent): void => {
+  ev.target.getCanvas().style.cursor = "";
+};
+
 // These function help to get the correct id and reduce the need to set those id in the
 // useEffect list
 const getLayerId = (id: string | undefined) => `cluster-layer-${id}`;
@@ -105,6 +113,19 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       }
     },
     [setSpatialExtentsUUid, onDatasetSelected]
+  );
+
+  const clusterLayerMouseClickEventHandler = useCallback(
+    (ev: MapLayerMouseEvent): void => {
+      if (ev.lngLat) {
+        map?.easeTo({
+          center: ev.lngLat,
+          zoom: map?.getZoom() + 1,
+          duration: 500,
+        });
+      }
+    },
+    [map]
   );
 
   const addSpatialExtentsLayer = useCallback(() => {
@@ -309,6 +330,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer,
         unclusterPointLayerMouseEnterEventHandler
       );
+      map?.on("mouseenter", clusterLayer, clusterLayerMouseEnterEventHandler);
 
       // Change the cursor back to default when it leaves the unclustered points
       map?.on(
@@ -316,6 +338,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer,
         unclusterPointLayerMouseLeaveEventHandler
       );
+      map?.on("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
+
+      // If user click a cluster layer, zoom into it a bit
+      map?.on("click", clusterLayer, clusterLayerMouseClickEventHandler);
     };
 
     map?.once("load", createLayers);
@@ -330,11 +356,14 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer,
         unclusterPointLayerMouseEnterEventHandler
       );
+      map?.off("mouseenter", clusterLayer, clusterLayerMouseEnterEventHandler);
       map?.off(
         "mouseleave",
         unclusterPointLayer,
         unclusterPointLayerMouseLeaveEventHandler
       );
+      map?.off("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
+      map?.off("click", clusterLayer, clusterLayerMouseClickEventHandler);
 
       // Clean up resource when you click on the next spatial extents, map is
       // still working in this page.
@@ -369,7 +398,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     return () => {
       map?.off("styledata", addSpatialExtentsLayer);
     };
-  }, [addSpatialExtentsLayer]);
+  }, [map, addSpatialExtentsLayer]);
 
   useEffect(() => {
     updateSource();
@@ -383,6 +412,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     };
   }, [updateSource]);
 
+  // Setup the event handler
   useEffect(() => {
     const layerId = getLayerId(map?.getContainer().id);
     const unclusterPointLayer = getUnclusterPointId(layerId);
