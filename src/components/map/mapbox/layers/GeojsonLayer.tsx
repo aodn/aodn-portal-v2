@@ -142,15 +142,6 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
         } else return prev;
       })
     );
-
-    return () => {
-      try {
-        if (map?.getSource(sourceId)) map?.removeSource(sourceId);
-        if (map?.getLayer(layerId)) map?.removeLayer(layerId);
-      } catch (error) {
-        // If source not found then layer will not found too
-      }
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, handleIdle]);
 
