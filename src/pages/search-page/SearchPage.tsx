@@ -97,7 +97,11 @@ const SearchPage = () => {
               navigate(
                 pageDefault.search + "?" + formatToUrlParam(componentParam),
                 {
-                  state: { fromNavigate: true },
+                  state: {
+                    fromNavigate: true,
+                    requireSearch: false,
+                    referer: "SearchPage",
+                  },
                 }
               );
             }
@@ -137,7 +141,7 @@ const SearchPage = () => {
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
   // and content may not refreshed
-  useEffect(() => {
+  const handleNavigation = useCallback(() => {
     if (!location.state?.fromNavigate) {
       // The first char is ? in the search string, so we need to remove it.
       const param = location?.search.substring(1);
@@ -154,10 +158,17 @@ const SearchPage = () => {
       }
     }
   }, [location, dispatch, doSearch]);
+
   // Get contents when no more navigate needed.
   const contents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
+
+  // You will see this trigger twice, this is due to use of strict-mode
+  // which is ok.
+  // TODO: Optimize call if possible, this happens when navigate from page
+  // to this page.
+  useEffect(() => handleNavigation(), [handleNavigation]);
 
   return (
     <Layout>

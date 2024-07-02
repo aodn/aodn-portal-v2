@@ -29,15 +29,15 @@ const STROKE_WIDTH = 1;
 
 // Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
 // in a collection to the FeatureCollection
-const createClusterDatSource = (
-  collections: Array<OGCCollection>
+const createClusterDataSource = (
+  collections: Array<OGCCollection> | undefined
 ): FeatureCollection => {
   const featureCollections: FeatureCollection = {
     type: "FeatureCollection",
     features: new Array<Feature<Geometry, GeoJsonProperties>>(),
   };
 
-  collections.forEach((collection) => {
+  collections?.forEach((collection) => {
     // We skip the first one which is the overall bounding box, then add the remaining
     collection.extent?.getGeojsonExtents(1).features.forEach((i) =>
       featureCollections.features.push({
@@ -63,6 +63,24 @@ const unclusterPointLayerMouseLeaveEventHandler = (
   ev.target.getCanvas().style.cursor = "";
 };
 
+const clusterLayerMouseEnterEventHandler = (ev: MapLayerMouseEvent): void => {
+  ev.target.getCanvas().style.cursor = "pointer";
+};
+
+const clusterLayerMouseLeaveEventHandler = (ev: MapLayerMouseEvent): void => {
+  ev.target.getCanvas().style.cursor = "";
+};
+
+// These function help to get the correct id and reduce the need to set those id in the
+// useEffect list
+const getLayerId = (id: string | undefined) => `cluster-layer-${id}`;
+
+const getClusterSourceId = (layerId: string) => `${layerId}-source`;
+
+const getclusterLayerId = (layerId: string) => `${layerId}-clusters`;
+
+const getUnclusterPointId = (layerId: string) => `${layerId}-unclustered-point`;
+
 const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
   onDatasetSelected,
@@ -71,9 +89,16 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [spatialExtentsUUid, setSpatialExtentsUUid] = useState<Array<string>>();
 
-  const layerId = `cluster-layer-${map?.getContainer().id}`;
-  const clusterSourceId = `${layerId}-source`;
-  const clusterLayer = `${layerId}-clusters`;
+  const updateSource = useCallback(() => {
+    const clusterSourceId = getClusterSourceId(
+      getLayerId(map?.getContainer().id)
+    );
+    if (map?.getSource(clusterSourceId)) {
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
+        createClusterDataSource(collections)
+      );
+    }
+  }, [map, collections]);
 
   const unclusterPointLayerMouseClickEventHandler = useCallback(
     (ev: MapLayerMouseEvent): void => {
@@ -90,12 +115,44 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [setSpatialExtentsUUid, onDatasetSelected]
   );
 
-  useEffect(() => {
+  const clusterLayerMouseClickEventHandler = useCallback(
+    (ev: MapLayerMouseEvent): void => {
+      if (ev.lngLat) {
+        map?.easeTo({
+          center: ev.lngLat,
+          zoom: map?.getZoom() + 1,
+          duration: 500,
+        });
+      }
+    },
+    [map]
+  );
+
+  const addSpatialExtentsLayer = useCallback(() => {
     const sourceIds = new Array<string>();
+    const layerIds = new Array<string>();
+
+    const createPointsLayerId = (id: string) => `${id}-points`;
+    const createLinesLayerId = (id: string) => `${id}-lines`;
+    const createPolygonLayerId = (id: string) => `${id}-polygons`;
+    const createSourceId = (layerId: string, uuid: string) =>
+      `${layerId}-${uuid}-source`;
 
     spatialExtentsUUid?.forEach((uuid: string) => {
-      const sourceId = `${layerId}-${uuid}-source`;
+      const layerId = getLayerId(map?.getContainer().id);
+      const sourceId = createSourceId(layerId, uuid);
+      const clusterLayer = getclusterLayerId(layerId);
+
       sourceIds.push(sourceId);
+
+      const pointLayerId = createPointsLayerId(sourceId);
+      layerIds.push(pointLayerId);
+
+      const lineLayerId = createLinesLayerId(sourceId);
+      layerIds.push(lineLayerId);
+
+      const polygonLayerId = createPolygonLayerId(sourceId);
+      layerIds.push(polygonLayerId);
 
       const param: SearchParameters = {
         filter: `id='${uuid}'`,
@@ -116,7 +173,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           // Add layers for each geometry type within the GeometryCollection
           map?.addLayer(
             {
-              id: `${sourceId}-points`,
+              id: pointLayerId,
               type: "symbol",
               source: sourceId,
               filter: ["==", "$type", "Point"],
@@ -134,7 +191,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
           map?.addLayer(
             {
-              id: `${sourceId}-lines`,
+              id: lineLayerId,
               type: "line",
               source: sourceId,
               filter: ["==", "$type", "LineString"],
@@ -148,7 +205,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
           map?.addLayer(
             {
-              id: `${sourceId}-polygons`,
+              id: polygonLayerId,
               type: "fill",
               source: sourceId,
               filter: ["==", "$type", "Polygon"],
@@ -163,33 +220,44 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     });
 
     return () => {
+      layerIds.forEach((id) => {
+        try {
+          if (map?.getLayer(id)) map?.removeLayer(id);
+        } catch (error) {
+          // Ok to ignore as map gone if we hit this error
+        }
+      });
+
       sourceIds.forEach((id) => {
-        map?.removeLayer(`${id}-points`);
-        map?.removeLayer(`${id}-lines`);
-        map?.removeLayer(`${id}-polygons`);
-        map?.removeSource(id);
+        try {
+          if (map?.getSource(id)) map?.removeSource(id);
+        } catch (error) {
+          // Ok to ignore as map gone if we hit this error
+        }
       });
     };
-  }, [map, layerId, clusterLayer, dispatch, spatialExtentsUUid]);
+  }, [map, dispatch, spatialExtentsUUid]);
 
   // This is use to render the cluster circle and add event handle to circles
   useEffect(() => {
     if (map === null) return;
 
-    const unclusterPointLayer = `${layerId}-unclustered-point`;
+    const layerId = getLayerId(map?.getContainer().id);
+    const clusterSourceId = getClusterSourceId(layerId);
+    const clusterLayer = getclusterLayerId(layerId);
+    const unclusterPointLayer = getUnclusterPointId(layerId);
 
     // This situation is map object created, hence not null, but not completely loaded
     // and therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
-    map?.once("load", () => {
+    const createLayers = () => {
+      // Function may call multiple times due to useEffect, it is not possible to avoid
+      // these changes so use this check to avoid duplicate add
       if (map?.getSource(clusterSourceId)) return;
 
       map?.addSource(clusterSourceId, {
         type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: [],
-        },
+        data: createClusterDataSource(undefined),
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 10,
@@ -209,19 +277,23 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
             "step",
             ["get", "point_count"],
             "#51bbd6",
-            100,
+            5,
             "#f1f075",
-            750,
+            30,
             "#f28cb1",
+            50,
+            "#fe8cf1",
           ],
           "circle-radius": [
             "step",
             ["get", "point_count"],
-            15,
-            100,
+            10,
+            20,
+            20,
             30,
-            750,
-            40,
+            30,
+            50,
+            50,
           ],
         },
       });
@@ -258,6 +330,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer,
         unclusterPointLayerMouseEnterEventHandler
       );
+      map?.on("mouseenter", clusterLayer, clusterLayerMouseEnterEventHandler);
 
       // Change the cursor back to default when it leaves the unclustered points
       map?.on(
@@ -265,60 +338,108 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer,
         unclusterPointLayerMouseLeaveEventHandler
       );
+      map?.on("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
+    };
 
-      map?.on(
+    map?.once("load", createLayers);
+
+    // When user change the map style, for example change base map, all layer will be removed
+    // as per mapbox design, we need to listen to that even and add back the layer
+    map?.on("styledata", createLayers);
+
+    return () => {
+      map?.off(
+        "mouseenter",
+        unclusterPointLayer,
+        unclusterPointLayerMouseEnterEventHandler
+      );
+      map?.off("mouseenter", clusterLayer, clusterLayerMouseEnterEventHandler);
+      map?.off(
+        "mouseleave",
+        unclusterPointLayer,
+        unclusterPointLayerMouseLeaveEventHandler
+      );
+      map?.off("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
+
+      // Clean up resource when you click on the next spatial extents, map is
+      // still working in this page.
+      try {
+        if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
+
+        if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
+
+        if (map?.getLayer(`${layerId}-cluster-count`))
+          map?.removeLayer(`${layerId}-cluster-count`);
+
+        if (map?.getLayer(unclusterPointLayer))
+          map?.removeLayer(unclusterPointLayer);
+
+        if (map?.getLayer(`${layerId}-unclustered-count`))
+          map?.removeLayer(`${layerId}-unclustered-count`);
+      } catch (error) {
+        // If source not found and throw exception then layer will not exist
+      }
+    };
+    // Make sure map is the only dependency so that it will not trigger twice run
+    // where you will add source and remove layer accidentally.
+  }, [map]);
+
+  useEffect(() => {
+    const layerId = getLayerId(map?.getContainer().id);
+    const clusterLayer = getclusterLayerId(layerId);
+
+    // If user click a cluster layer, zoom into it a bit
+    map?.on("click", clusterLayer, clusterLayerMouseClickEventHandler);
+    return () => {
+      map?.off("click", clusterLayer, clusterLayerMouseClickEventHandler);
+    };
+  }, [map, clusterLayerMouseClickEventHandler]);
+
+  useEffect(() => {
+    addSpatialExtentsLayer();
+
+    // When user change the map style, for example change base map, all layer will be removed
+    // as per mapbox design, we need to listen to that even and add data
+    map?.on("styledata", addSpatialExtentsLayer);
+
+    return () => {
+      map?.off("styledata", addSpatialExtentsLayer);
+    };
+  }, [map, addSpatialExtentsLayer]);
+
+  useEffect(() => {
+    updateSource();
+
+    // When user change the map style, for example change base map, all layer will be removed
+    // as per mapbox design, we need to listen to that even and add data
+    map?.on("styledata", updateSource);
+
+    return () => {
+      map?.off("styledata", updateSource);
+    };
+  }, [map, updateSource]);
+
+  // Setup the event handler
+  useEffect(() => {
+    const layerId = getLayerId(map?.getContainer().id);
+    const unclusterPointLayer = getUnclusterPointId(layerId);
+
+    map?.on(
+      "click",
+      unclusterPointLayer,
+      unclusterPointLayerMouseClickEventHandler
+    );
+
+    return () => {
+      // Map will be destroy by default, so in theory there is no need
+      // to clean up resource in this level
+      map?.off(
         "click",
         unclusterPointLayer,
         unclusterPointLayerMouseClickEventHandler
       );
-
-      // Handle events when user click on the cirle with only 1 item
-      map?.once("unload", () => {
-        map?.off(
-          "mouseenter",
-          unclusterPointLayer,
-          unclusterPointLayerMouseEnterEventHandler
-        );
-        map?.off(
-          "mouseleave",
-          unclusterPointLayer,
-          unclusterPointLayerMouseLeaveEventHandler
-        );
-        map?.off(
-          "click",
-          unclusterPointLayer,
-          unclusterPointLayerMouseClickEventHandler
-        );
-
-        if (map?.getLayer(clusterLayer)) map.removeLayer(clusterLayer);
-
-        if (map?.getLayer(`${layerId}-cluster-count`))
-          map.removeLayer(`${layerId}-cluster-count`);
-
-        if (map?.getLayer(unclusterPointLayer))
-          map.removeLayer(unclusterPointLayer);
-
-        if (map?.getLayer(`${layerId}-unclustered-count`))
-          map.removeLayer(`${layerId}-unclustered-count`);
-
-        if (map?.getSource(clusterSourceId)) map.removeSource(clusterSourceId);
-      });
-    });
-  }, [
-    map,
-    layerId,
-    clusterSourceId,
-    clusterLayer,
-    unclusterPointLayerMouseClickEventHandler,
-  ]);
-
-  useEffect(() => {
-    if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createClusterDatSource(collections)
-      );
-    }
-  }, [map, collections, clusterSourceId]);
+    };
+  }, [map, unclusterPointLayerMouseClickEventHandler]);
 
   return <React.Fragment />;
 };

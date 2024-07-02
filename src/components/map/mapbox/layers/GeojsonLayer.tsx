@@ -13,7 +13,7 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
-import { LngLatBoundsLike } from "mapbox-gl";
+import mapboxgl, { LngLatBoundsLike } from "mapbox-gl";
 
 interface GeojsonLayerProps {
   // Vector tile layer should added to map
@@ -25,6 +25,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
   const { map } = useContext(MapContext);
   const [mapLoaded, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
+  const collectionId = useMemo(() => collection.id, [collection.id]);
 
   // Function to fit map to the overall bbox(bboxes[0])
   const fitToOverallBbox = useCallback(
@@ -101,62 +102,61 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
     [fitToOverallBbox, setPhotos, takePhoto]
   );
 
+  const createLayer = useCallback(() => {
+    const sourceId = `geojson-${map?.getContainer().id}-source-${collectionId}`;
+    const layerId = `geojson-${map?.getContainer().id}-layer-${collectionId}`;
+
+    // If style changed, we may need to add the layer again, hence listen to this event.
+    // https://github.com/mapbox/mapbox-gl-js/issues/8660
+    //
+    if (map?.getSource(sourceId)) return true;
+
+    map?.addSource(sourceId, {
+      type: "geojson",
+      // Use a URL for the value for the `data` property.
+      data: extent?.getGeojsonExtents(1),
+    });
+
+    map?.addLayer({
+      id: layerId,
+      type: "fill",
+      source: sourceId,
+      paint: {
+        "fill-color": stringToColor(collectionId),
+        "fill-outline-color": "black",
+      },
+    });
+  }, [map, extent, collectionId]);
+
+  // This is use to handle base map change that set style will default remove all layer, which is
+  // the behavior of mapbox, this useEffect, add the layer back based on user event
+  useEffect(() => {
+    map?.on("styledata", createLayer);
+    return () => {
+      map?.off("styledata", createLayer);
+    };
+  }, [map, createLayer]);
+
   useEffect(() => {
     if (map === null) return;
 
-    const sourceId = `geojson-source-layer-${collection.id}`;
-    const layerId = `geojson-layer-${collection.id}`;
+    // This situation is map object created, hence not null, but not completely loaded
+    // and therefore you will have problem setting source and layer. Set-up a listener
+    // to update the state and then this effect can be call again when map loaded.
+    map?.once("load", () =>
+      setMapLoaded((prev) => {
+        if (!prev) {
+          createLayer();
+          // Call handleIdle when the map is idle
+          const onceIdle = () => handleIdle(extent?.bbox);
+          map?.once("idle", onceIdle);
 
-    if (mapLoaded === null) {
-      // This situation is map object created, hence not null, but not completely loaded
-      // and therefore you will have problem setting source and layer. Set-up a listener
-      // to update the state and then this effect can be call again when map loaded.
-      map?.on("load", () =>
-        setMapLoaded((prev) => {
-          if (!prev) {
-            // If style changed, we may need to add the layer again, hence listen to this event.
-            // https://github.com/mapbox/mapbox-gl-js/issues/8660
-            //
-            // We take the maploaded event and setup the listener and return value at once.
-
-            map.addSource(sourceId, {
-              type: "geojson",
-              // Use a URL for the value for the `data` property.
-              data: extent?.getGeojsonExtents(1),
-            });
-
-            map.addLayer({
-              id: layerId,
-              type: "fill",
-              source: sourceId,
-              paint: {
-                "fill-color": stringToColor(collection.id),
-                "fill-outline-color": "black",
-              },
-            });
-            return true;
-          } else return prev;
-        })
-      );
-    }
-
-    // Call handleIdle when the map is idle
-    const onceIdle = () => handleIdle(extent?.bbox);
-    map?.once("idle", onceIdle);
-
-    // Clean up map sources and layers when the component unmounts or map unloads
-    map?.on("unload", () => {
-      if (map?.getSource(sourceId)) {
-        map?.removeSource(sourceId);
-        map?.removeLayer(layerId);
-      }
-    });
-
-    return () => {
-      map?.off("idle", onceIdle);
-    };
+          return true;
+        } else return prev;
+      })
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collection.id, map, mapLoaded, setPhotos, handleIdle]);
+  }, [map, handleIdle]);
 
   return <React.Fragment />;
 };
