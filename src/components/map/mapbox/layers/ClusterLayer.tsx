@@ -339,9 +339,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayerMouseLeaveEventHandler
       );
       map?.on("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
-
-      // If user click a cluster layer, zoom into it a bit
-      map?.on("click", clusterLayer, clusterLayerMouseClickEventHandler);
     };
 
     map?.once("load", createLayers);
@@ -363,7 +360,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayerMouseLeaveEventHandler
       );
       map?.off("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
-      map?.off("click", clusterLayer, clusterLayerMouseClickEventHandler);
 
       // Clean up resource when you click on the next spatial extents, map is
       // still working in this page.
@@ -389,6 +385,17 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   }, [map]);
 
   useEffect(() => {
+    const layerId = getLayerId(map?.getContainer().id);
+    const clusterLayer = getclusterLayerId(layerId);
+
+    // If user click a cluster layer, zoom into it a bit
+    map?.on("click", clusterLayer, clusterLayerMouseClickEventHandler);
+    return () => {
+      map?.off("click", clusterLayer, clusterLayerMouseClickEventHandler);
+    };
+  }, [map, clusterLayerMouseClickEventHandler]);
+
+  useEffect(() => {
     addSpatialExtentsLayer();
 
     // When user change the map style, for example change base map, all layer will be removed
@@ -410,7 +417,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     return () => {
       map?.off("styledata", updateSource);
     };
-  }, [updateSource]);
+  }, [map, updateSource]);
 
   // Setup the event handler
   useEffect(() => {

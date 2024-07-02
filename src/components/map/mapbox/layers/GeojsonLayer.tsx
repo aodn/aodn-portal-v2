@@ -126,7 +126,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
         "fill-outline-color": "black",
       },
     });
-  }, [map, stringToColor, extent, collectionId]);
+  }, [map, extent, collectionId]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
   // the behavior of mapbox, this useEffect, add the layer back based on user event
