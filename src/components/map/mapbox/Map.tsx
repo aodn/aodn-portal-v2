@@ -5,11 +5,11 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 
 interface MapProps {
-  centerLongitude: number;
-  centerLatitude: number;
-  zoom: number;
+  centerLongitude?: number;
+  centerLatitude?: number;
+  zoom?: number;
   panelId: string;
-  projection:
+  projection?:
     | "mercator"
     | "globe"
     | "albers"
