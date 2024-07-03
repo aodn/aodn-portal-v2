@@ -48,7 +48,7 @@ const StoryBoardPanel = () => {
                 </Typography>
               </>
             }
-            content="This tutorial demostrates several ways data can be accessed remotely and loaded into a Python environment , direct access to files on cloud storage (AWS S3), cloud-optimised formats Zarr & Parquet"
+            content="This tutorial demostrates several ways data can be accessed remotely and loaded into a Python environment, direct access to files on cloud storage (AWS S3), cloud-optimised formats Zarr & Parquet"
             buttons={[
               {
                 label: "iPython",
