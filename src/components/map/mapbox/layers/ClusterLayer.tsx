@@ -5,6 +5,7 @@ import {
   FeatureCollection,
   GeoJsonProperties,
   Geometry,
+  Point,
 } from "geojson";
 import {
   OGCCollection,
@@ -13,7 +14,7 @@ import {
   fetchResultNoStore,
 } from "../../../common/store/searchReducer";
 import { centroid } from "@turf/turf";
-import { GeoJSONSource, MapLayerMouseEvent } from "mapbox-gl";
+import { GeoJSONSource, MapLayerMouseEvent, Popup } from "mapbox-gl";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
 
@@ -51,18 +52,6 @@ const createClusterDataSource = (
   return featureCollections;
 };
 
-const unclusterPointLayerMouseEnterEventHandler = (
-  ev: MapLayerMouseEvent
-): void => {
-  ev.target.getCanvas().style.cursor = "pointer";
-};
-
-const unclusterPointLayerMouseLeaveEventHandler = (
-  ev: MapLayerMouseEvent
-): void => {
-  ev.target.getCanvas().style.cursor = "";
-};
-
 const clusterLayerMouseEnterEventHandler = (ev: MapLayerMouseEvent): void => {
   ev.target.getCanvas().style.cursor = "pointer";
 };
@@ -88,6 +77,51 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const { map } = useContext(MapContext);
   const dispatch = useDispatch<AppDispatch>();
   const [spatialExtentsUUid, setSpatialExtentsUUid] = useState<Array<string>>();
+  console.log("spatialExtentsUUid", spatialExtentsUUid);
+
+  const popup = new Popup({
+    closeButton: false,
+    closeOnClick: false,
+  });
+
+  const unclusterPointLayerMouseEnterEventHandler = (
+    ev: MapLayerMouseEvent
+  ): void => {
+    if (!ev.target || !map) return;
+
+    ev.target.getCanvas().style.cursor = "pointer";
+
+    // Copy coordinates array.
+    if (ev.features && ev.features.length > 0) {
+      const feature = ev.features[0] as Feature<Point>;
+      const geometry = feature.geometry;
+      const coordinates = geometry.coordinates.slice();
+      const description = feature.properties?.uuid as string;
+
+      if (
+        map &&
+        ["mercator", "equirectangular"].includes(map.getProjection().name)
+      ) {
+        while (Math.abs(ev.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += ev.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+      }
+
+      // Populate the popup and set its coordinates
+      // based on the feature found.
+      popup
+        .setLngLat(coordinates as [number, number])
+        .setHTML(description)
+        .addTo(map);
+    }
+  };
+
+  const unclusterPointLayerMouseLeaveEventHandler = (
+    ev: MapLayerMouseEvent
+  ): void => {
+    ev.target.getCanvas().style.cursor = "";
+    popup.remove();
+  };
 
   const updateSource = useCallback(() => {
     const clusterSourceId = getClusterSourceId(
@@ -102,6 +136,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   const unclusterPointLayerMouseClickEventHandler = useCallback(
     (ev: MapLayerMouseEvent): void => {
+      console.log("un-clusterLayerMouseClick!!");
       // Make sure even same id under same area will be set once.
       if (ev.features) {
         const uuids = [
@@ -117,6 +152,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   const clusterLayerMouseClickEventHandler = useCallback(
     (ev: MapLayerMouseEvent): void => {
+      console.log("clusterLayerMouseClick!!");
       if (ev.lngLat) {
         map?.easeTo({
           center: ev.lngLat,
@@ -218,7 +254,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           );
         });
     });
-
+    //????
     return () => {
       layerIds.forEach((id) => {
         try {
