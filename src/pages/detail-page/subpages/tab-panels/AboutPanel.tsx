@@ -8,17 +8,19 @@ import NavigatablePanel from "../components/NavigatablePanel";
 const AboutPanel = () => {
   const context = useDetailPageContext();
   const credits = context.collection?.getCredits();
-  const contacts = context.collection?.getContacts();
+  const aboutContacts = context.collection?.getContacts()?.filter((contact) => {
+    contact.roles.includes("about");
+  });
   const themes = context.collection?.getThemes();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!credits || !contacts || !themes) {
+    if (!credits || !aboutContacts || !themes) {
       setIsLoading(true);
     } else {
       setIsLoading(false);
     }
-  }, [credits, contacts, themes]);
+  }, [credits, aboutContacts, themes]);
 
   const sections = useMemo(
     () => [
@@ -28,14 +30,16 @@ const AboutPanel = () => {
       },
       {
         title: "Contacts",
-        component: <ContactBlock contacts={contacts ? contacts : []} />,
+        component: (
+          <ContactBlock contacts={aboutContacts ? aboutContacts : []} />
+        ),
       },
       {
         title: "Credits",
         component: <CreditBlock credits={credits ? credits : []} />,
       },
     ],
-    [contacts, credits, themes]
+    [aboutContacts, credits, themes]
   );
 
   return <NavigatablePanel childrenList={sections} isLoading={isLoading} />;
