@@ -170,6 +170,12 @@ const SearchPage = () => {
   // to this page.
   useEffect(() => handleNavigation(), [handleNavigation]);
 
+  const onClickNavigateToDetailPage = (uuid: string) => {
+    const searchParams = new URLSearchParams();
+    searchParams.append("uuid", uuid);
+    navigate(pageDefault.details + "?" + searchParams.toString());
+  };
+
   return (
     <Layout>
       <Grid
@@ -198,6 +204,7 @@ const SearchPage = () => {
           contents={contents}
           onRemoveLayer={undefined}
           onVisibilityChanged={onVisibilityChanged}
+          onClickCard={onClickNavigateToDetailPage}
         />
         <MapSection
           layers={layers}
@@ -205,6 +212,7 @@ const SearchPage = () => {
           onMapZoomOrMove={onMapZoomOrMove}
           onToggleClicked={onToggleDisplay}
           onDatasetSelected={onDatasetSelected}
+          onClickPopup={onClickNavigateToDetailPage}
         />
         <Grid></Grid>
       </Grid>

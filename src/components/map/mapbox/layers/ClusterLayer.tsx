@@ -1,4 +1,4 @@
-import React, {
+import {
   FC,
   useCallback,
   useContext,
@@ -24,12 +24,16 @@ import { centroid } from "@turf/turf";
 import { GeoJSONSource, MapLayerMouseEvent, Popup } from "mapbox-gl";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
+import { createRoot } from "react-dom/client";
+import { CircularProgress } from "@mui/material";
+import MapPopup from "../popup/MapPopup";
 
 interface ClusterLayerProps {
   // Vector tile layer should added to map
   collections: Array<OGCCollection>;
   // Event fired when user click on the point layer
   onDatasetSelected?: (uuid: Array<string>) => void;
+  onClickPopup?: (uuid: string) => void;
 }
 
 const OPACITY = 0.6;
@@ -65,7 +69,7 @@ const getLayerId = (id: string | undefined) => `cluster-layer-${id}`;
 
 const getClusterSourceId = (layerId: string) => `${layerId}-source`;
 
-const getclusterLayerId = (layerId: string) => `${layerId}-clusters`;
+const getClusterLayerId = (layerId: string) => `${layerId}-clusters`;
 
 const getUnclusterPointId = (layerId: string) => `${layerId}-unclustered-point`;
 
@@ -81,11 +85,40 @@ const createSourceId = (layerId: string, uuid: string) =>
 const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
   onDatasetSelected,
+  onClickPopup,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
   const dispatch = useDispatch<AppDispatch>();
   const [spatialExtentsUUid, setSpatialExtentsUUid] = useState<Array<string>>();
-  console.log("spatialExtentsUUid", spatialExtentsUUid);
+
+  const getCollectionData = useCallback(
+    async ({
+      uuid,
+      forGeometryOnly,
+    }: {
+      uuid: string;
+      forGeometryOnly: boolean;
+    }) => {
+      const param: SearchParameters = {
+        filter: `id='${uuid}'`,
+        properties: forGeometryOnly ? "id,geometry" : undefined,
+      };
+
+      try {
+        const collections: OGCCollections = await dispatch(
+          fetchResultNoStore(param)
+        ).unwrap();
+        // Given we use uuid, there will be one record only
+        const collection = collections.collections[0];
+        return collection;
+      } catch (error) {
+        // Handle any errors here
+        console.error("Error fetching collection data:", error);
+        throw error;
+      }
+    },
+    [dispatch]
+  );
 
   const popup = useMemo(
     () =>
@@ -96,11 +129,23 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     []
   );
 
+  const renderPopupContent = useCallback(
+    async (uuid: string) => {
+      const collection = await getCollectionData({
+        uuid,
+        forGeometryOnly: false,
+      });
+
+      return <MapPopup collection={collection} onClickPopup={onClickPopup} />;
+    },
+    [getCollectionData, onClickPopup]
+  );
+
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
   const clusterSourceId = useMemo(() => getClusterSourceId(layerId), [layerId]);
 
-  const clusterLayer = useMemo(() => getclusterLayerId(layerId), [layerId]);
+  const clusterLayer = useMemo(() => getClusterLayerId(layerId), [layerId]);
 
   const unclusterPointLayer = useMemo(
     () => getUnclusterPointId(layerId),
@@ -116,7 +161,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   }, [map, clusterSourceId, collections]);
 
   const unclusterPointLayerMouseEnterEventHandler = useCallback(
-    (ev: MapLayerMouseEvent): void => {
+    async (ev: MapLayerMouseEvent): Promise<void> => {
       if (!ev.target || !map) return;
 
       ev.target.getCanvas().style.cursor = "pointer";
@@ -126,25 +171,35 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         const feature = ev.features[0] as Feature<Point>;
         const geometry = feature.geometry;
         const coordinates = geometry.coordinates.slice();
-        const description = feature.properties?.uuid as string;
+        const uuid = feature.properties?.uuid as string;
 
-        if (
-          ["mercator", "equirectangular"].includes(map.getProjection().name)
-        ) {
-          while (Math.abs(ev.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += ev.lngLat.lng > coordinates[0] ? 360 : -360;
-          }
+        try {
+          // Create a temporary div to render our React component
+          const popupNode = document.createElement("div");
+          const root = createRoot(popupNode);
+
+          // Show loading state
+          root.render(<CircularProgress />);
+
+          // Set the popup on the map immediately with loading state
+          popup
+            .setLngLat(coordinates as [number, number])
+            .setDOMContent(popupNode)
+            .addTo(map);
+
+          // Fetch and render the content asynchronously
+          const popupContent = await renderPopupContent(uuid);
+          root.render(popupContent);
+
+          // Update the popup content
+          popup.setDOMContent(popupNode);
+        } catch (error) {
+          console.error("Error rendering popup:", error);
+          popup.remove();
         }
-
-        // Populate the popup and set its coordinates
-        // based on the feature found.
-        popup
-          .setLngLat(coordinates as [number, number])
-          .setHTML(description)
-          .addTo(map);
       }
     },
-    [map, popup]
+    [map, popup, renderPopupContent]
   );
 
   const unclusterPointLayerMouseLeaveEventHandler = useCallback(
@@ -172,23 +227,21 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const unclusterPointLayerMouseClickEventHandler = useCallback(
     (ev: MapLayerMouseEvent): void => {
       // Make sure even same id under same area will be set once.
-      console.log("uncluster clicked");
       if (ev.features) {
         const uuids = [
           ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
         ];
         setSpatialExtentsUUid(uuids);
-        console.log({ uuids });
+
         // Give time for the state to be updated
         if (onDatasetSelected) setTimeout(() => onDatasetSelected(uuids), 100);
       }
     },
     [setSpatialExtentsUUid, onDatasetSelected]
   );
-  console.log({ spatialExtentsUUid });
+
   const clusterLayerMouseClickEventHandler = useCallback(
     (ev: MapLayerMouseEvent): void => {
-      console.log("clusterLayerMouseClick!!");
       if (ev.lngLat) {
         map?.easeTo({
           center: ev.lngLat,
@@ -204,7 +257,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     const sourceIds = new Array<string>();
     const layerIds = new Array<string>();
 
-    spatialExtentsUUid?.forEach((uuid: string) => {
+    spatialExtentsUUid?.forEach(async (uuid: string) => {
       const sourceId = createSourceId(layerId, uuid);
       sourceIds.push(sourceId);
 
@@ -217,76 +270,62 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       const polygonLayerId = createPolygonLayerId(sourceId);
       layerIds.push(polygonLayerId);
 
-      const param: SearchParameters = {
-        filter: `id='${uuid}'`,
-        properties: "id,geometry",
+      const collection = await getCollectionData({
+        uuid,
+        forGeometryOnly: true,
+      });
+
+      if (!map?.getSource(sourceId)) {
+        map?.addSource(sourceId, {
+          type: "geojson",
+          data: collection.getGeometry(),
+        });
+      }
+
+      // util function to check if layer exists or not and add a before layer Id
+      const addLayerIfNotExists = (id: string, layer: any) => {
+        if (!map?.getLayer(id)) {
+          map?.addLayer(layer, clusterLayer);
+        }
       };
 
-      dispatch(fetchResultNoStore(param))
-        .unwrap()
-        .then((collections: OGCCollections) => {
-          // Give we use uuid, there will be one record only
-          const collection = collections.collections[0];
+      // Add layers for each geometry type within the GeometryCollection if not exists
+      addLayerIfNotExists(pointLayerId, {
+        id: pointLayerId,
+        type: "symbol",
+        source: sourceId,
+        filter: ["==", "$type", "Point"],
+        layout: {
+          "icon-image": "marker-15",
+          "icon-size": 1.5,
+          "text-field": ["get", "title"],
+          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+          "text-offset": [0, 1.25],
+          "text-anchor": "top",
+        },
+      });
 
-          console.log("extent collection", collection);
-          console.log(
-            "extent spatial extents",
-            collection.extent?.getGeojsonExtents(1)
-          );
-          console.log("extent Geometry", collection.getGeometry());
+      addLayerIfNotExists(lineLayerId, {
+        id: lineLayerId,
+        type: "line",
+        source: sourceId,
+        filter: ["==", "$type", "LineString"],
+        paint: {
+          "line-color": "#ff0000",
+          "line-width": 2,
+        },
+      });
 
-          if (!map?.getSource(sourceId)) {
-            map?.addSource(sourceId, {
-              type: "geojson",
-              // data: collection.extent?.getGeojsonExtents(1),
-              data: collection.getGeometry(),
-            });
-          }
-
-          const addLayerIfNotExists = (id: string, layer: any) => {
-            if (!map?.getLayer(id)) {
-              map?.addLayer(layer, clusterLayer);
-            }
-          };
-          // Add layers for each geometry type within the GeometryCollection
-          // if not exists
-          addLayerIfNotExists(pointLayerId, {
-            id: pointLayerId,
-            type: "symbol",
-            source: sourceId,
-            filter: ["==", "$type", "Point"],
-            layout: {
-              "icon-image": "marker-15",
-              "icon-size": 1.5,
-              "text-field": ["get", "title"],
-              "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-              "text-offset": [0, 1.25],
-              "text-anchor": "top",
-            },
-          });
-
-          addLayerIfNotExists(lineLayerId, {
-            id: lineLayerId,
-            type: "line",
-            source: sourceId,
-            filter: ["==", "$type", "LineString"],
-            paint: {
-              "line-color": "#ff0000",
-              "line-width": 2,
-            },
-          });
-
-          addLayerIfNotExists(polygonLayerId, {
-            id: polygonLayerId,
-            type: "fill",
-            source: sourceId,
-            filter: ["==", "$type", "Polygon"],
-            paint: {
-              "fill-color": "#00ff00",
-              "fill-opacity": 0.4,
-            },
-          });
-        });
+      addLayerIfNotExists(polygonLayerId, {
+        id: polygonLayerId,
+        type: "fill",
+        source: sourceId,
+        filter: ["==", "$type", "Polygon"],
+        paint: {
+          "fill-color": "#00ff00",
+          "fill-opacity": 0.4,
+        },
+      });
     });
 
     return () => {
@@ -306,7 +345,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         }
       });
     };
-  }, [spatialExtentsUUid, layerId, dispatch, map, clusterLayer]);
+  }, [spatialExtentsUUid, layerId, getCollectionData, map, clusterLayer]);
 
   // This is use to render the cluster circle and add event handle to circles
   useEffect(() => {
@@ -457,19 +496,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     };
     // Make sure map is the only dependency so that it will not trigger twice run
     // where you will add source and remove layer accidentally.
-  }, [
-    clusterLayer,
-    clusterLayerMouseClickEventHandler,
-    clusterLayerMouseEnterEventHandler,
-    clusterLayerMouseLeaveEventHandler,
-    clusterSourceId,
-    layerId,
-    map,
-    unclusterPointLayer,
-    unclusterPointLayerMouseClickEventHandler,
-    unclusterPointLayerMouseEnterEventHandler,
-    unclusterPointLayerMouseLeaveEventHandler,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map]);
 
   useEffect(() => {
     updateSource();

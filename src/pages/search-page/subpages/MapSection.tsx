@@ -24,6 +24,7 @@ interface MapSectionProps {
   ) => void;
   onToggleClicked: (v: boolean) => void;
   onDatasetSelected?: (uuid: Array<string>) => void;
+  onClickPopup: (uuid: string) => void;
 }
 
 const MapSection: React.FC<MapSectionProps> = ({
@@ -32,6 +33,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   onDatasetSelected,
   layers,
   showFullMap,
+  onClickPopup,
 }) => {
   return (
     <Grid
@@ -62,6 +64,7 @@ const MapSection: React.FC<MapSectionProps> = ({
             <ClusterLayer
               collections={layers}
               onDatasetSelected={onDatasetSelected}
+              onClickPopup={onClickPopup}
             />
           </Layers>
         </Map>

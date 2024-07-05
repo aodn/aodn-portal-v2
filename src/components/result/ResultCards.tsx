@@ -36,6 +36,7 @@ interface ResultCardsProps {
         stac: OGCCollection
       ) => void)
     | undefined;
+  onClickCard: ((uuid: string) => void) | undefined;
 }
 
 const renderCells = (
@@ -55,6 +56,7 @@ const renderCells = (
             content={props.contents.result.collections[leftIndex]}
             onRemoveLayer={props.onRemoveLayer}
             onDownload={props.onDownload}
+            onClickCard={props.onClickCard}
             data-testid="result-cards-grid"
           />
         </Grid>
@@ -63,6 +65,7 @@ const renderCells = (
             content={props.contents.result.collections[rightIndex]}
             onRemoveLayer={props.onRemoveLayer}
             onDownload={props.onDownload}
+            onClickCard={props.onClickCard}
           />
         </Grid>
       </Grid>
@@ -85,6 +88,7 @@ const renderRows = (
         onDownload={props.onDownload}
         onTags={props.onTags}
         onMore={props.onMore}
+        onClickCard={props.onClickCard}
       />
     </ListItem>
   );
