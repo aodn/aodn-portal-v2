@@ -1,5 +1,11 @@
 import { Box, CircularProgress, Grid } from "@mui/material";
-import React, { ReactNode, useCallback, useRef, useState } from "react";
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import DetailSubtabBtn from "../../../../components/common/tabs/DetailSubtabBtn";
 import _ from "lodash";
 
@@ -13,12 +19,28 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   isLoading,
 }) => {
   const bigPosition = 99999;
+  const panelVisibleHeight = 1480;
+  const [toScroll, setToScroll] = useState<number | null>(null);
   const scrollableSectionRef = useRef<HTMLDivElement>(null);
   const firstRef = useRef<HTMLDivElement>(null);
   const secondRef = useRef<HTMLDivElement>(null);
   const thirdRef = useRef<HTMLDivElement>(null);
   const fourthRef = useRef<HTMLDivElement>(null);
+  const basePointRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState(0);
+
+  const [supplimentaryHeight, setSupplimentaryHeight] = useState(0);
+
+  useEffect(() => {
+    if (!toScroll) {
+      return;
+    }
+    scrollableSectionRef.current?.scroll({
+      top: toScroll,
+      behavior: "smooth",
+    });
+    setToScroll(null);
+  }, [toScroll]);
 
   const getRefBy = useCallback((index: number) => {
     switch (index) {
@@ -120,10 +142,19 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
                     const ref = getRefBy(index);
                     if (!scrollableSectionRef.current || !ref?.current) return;
                     const targetPosition = ref.current.offsetTop;
-                    scrollableSectionRef.current.scroll({
-                      top: targetPosition,
-                      behavior: "smooth",
-                    });
+
+                    // Calculate the needed height to scroll to the target position
+                    const currentScrollHeight = basePointRef.current
+                      ? basePointRef.current.offsetTop
+                      : 0;
+                    const visibleHeight =
+                      scrollableSectionRef.current.clientHeight;
+                    const neededHeight =
+                      targetPosition - (currentScrollHeight - visibleHeight);
+                    setSupplimentaryHeight(
+                      (prevHeight) => prevHeight + neededHeight
+                    );
+                    setToScroll(targetPosition);
                   }}
                 />
               );
@@ -133,10 +164,9 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       </Grid>
       <Grid
         item
-        container
         md={9}
         ref={scrollableSectionRef}
-        sx={{ height: "500px", overflowY: "auto" }}
+        sx={{ height: panelVisibleHeight + "px", overflowY: "auto" }}
         onScroll={(event) => {
           const scrollPosition = event.currentTarget.scrollTop;
           debouncee(scrollPosition);
@@ -151,6 +181,8 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
             </Box>
           );
         })}
+        <Box sx={{ height: `${supplimentaryHeight}px` }} />
+        <Box ref={basePointRef} />
       </Grid>
     </Grid>
   );

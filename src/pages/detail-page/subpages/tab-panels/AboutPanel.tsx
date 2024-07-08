@@ -8,9 +8,9 @@ import NavigatablePanel from "../components/NavigatablePanel";
 const AboutPanel = () => {
   const context = useDetailPageContext();
   const credits = context.collection?.getCredits();
-  const aboutContacts = context.collection?.getContacts()?.filter((contact) => {
-    contact.roles.includes("about");
-  });
+  const aboutContacts = context.collection
+    ?.getContacts()
+    ?.filter((contact) => contact.roles.includes("about"));
   const themes = context.collection?.getThemes();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,7 +22,7 @@ const AboutPanel = () => {
     }
   }, [credits, aboutContacts, themes]);
 
-  const sections = useMemo(
+  const blocks = useMemo(
     () => [
       {
         title: "Keywords",
@@ -42,7 +42,7 @@ const AboutPanel = () => {
     [aboutContacts, credits, themes]
   );
 
-  return <NavigatablePanel childrenList={sections} isLoading={isLoading} />;
+  return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
 };
 
 export default AboutPanel;
