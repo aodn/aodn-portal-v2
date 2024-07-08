@@ -114,6 +114,24 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     []
   );
 
+  const onNavigate = (index: number) => {
+    return () => {
+      const ref = getRefBy(index);
+      if (!scrollableSectionRef.current || !ref?.current) return;
+      const targetPosition = ref.current.offsetTop;
+
+      // Calculate the needed height to scroll to the target position
+      const currentScrollHeight = basePointRef.current
+        ? basePointRef.current.offsetTop
+        : 0;
+      const visibleHeight = scrollableSectionRef.current.clientHeight;
+      const neededHeight =
+        targetPosition - (currentScrollHeight - visibleHeight);
+      setSupplimentaryHeight((prevHeight) => prevHeight + neededHeight);
+      setToScroll(targetPosition);
+    };
+  };
+
   return isLoading ? (
     <Grid
       container
@@ -138,24 +156,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
                   key={index}
                   title={child.title}
                   isBordered={isPositionInsideBlock(position, index)}
-                  navigate={() => {
-                    const ref = getRefBy(index);
-                    if (!scrollableSectionRef.current || !ref?.current) return;
-                    const targetPosition = ref.current.offsetTop;
-
-                    // Calculate the needed height to scroll to the target position
-                    const currentScrollHeight = basePointRef.current
-                      ? basePointRef.current.offsetTop
-                      : 0;
-                    const visibleHeight =
-                      scrollableSectionRef.current.clientHeight;
-                    const neededHeight =
-                      targetPosition - (currentScrollHeight - visibleHeight);
-                    setSupplimentaryHeight(
-                      (prevHeight) => prevHeight + neededHeight
-                    );
-                    setToScroll(targetPosition);
-                  }}
+                  navigate={onNavigate(index)}
                 />
               );
             })}
