@@ -20,7 +20,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
 }) => {
   const bigPosition = 99999;
   const panelVisibleHeight = 1480;
-  const [toScroll, setToScroll] = useState<number | null>(null);
+  const [scrollDistance, setScrollDistance] = useState<number | null>(null);
   const scrollableSectionRef = useRef<HTMLDivElement>(null);
   const firstRef = useRef<HTMLDivElement>(null);
   const secondRef = useRef<HTMLDivElement>(null);
@@ -32,15 +32,15 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const [supplimentaryHeight, setSupplimentaryHeight] = useState(0);
 
   useEffect(() => {
-    if (!toScroll) {
+    if (!scrollDistance) {
       return;
     }
     scrollableSectionRef.current?.scroll({
-      top: toScroll,
+      top: scrollDistance,
       behavior: "smooth",
     });
-    setToScroll(null);
-  }, [toScroll]);
+    setScrollDistance(null);
+  }, [scrollDistance]);
 
   const getRefBy = useCallback((index: number) => {
     switch (index) {
@@ -128,7 +128,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       const neededHeight =
         targetPosition - (currentScrollHeight - visibleHeight);
       setSupplimentaryHeight((prevHeight) => prevHeight + neededHeight);
-      setToScroll(targetPosition);
+      setScrollDistance(targetPosition);
     };
   };
 
