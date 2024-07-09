@@ -39,6 +39,26 @@ interface ClusterLayerProps {
 const OPACITY = 0.6;
 const STROKE_WIDTH = 1;
 
+// Constants for cluster circle sizes
+//These define the radius(px) of the circles used to represent clusters on the map.
+const DEFAULT_CIRCLE_SIZE = 20;
+const MEDIUM_CIRCLE_SIZE = 30;
+const LARGE_CIRCLE_SIZE = 40;
+const EXTRA_LARGE_CIRCLE_SIZE = 60;
+
+// Constants for cluster circle colors
+// These define the colors used for the circles representing clusters of different sizes.
+const DEFAULT_COLOR = "#51bbd6";
+const MEDIUM_COLOR = "#f1f075";
+const LARGE_COLOR = "#f28cb1";
+const EXTRA_LARGE_COLOR = "#fe8cf1";
+
+// Constants for point count thresholds
+// These define the boundaries between different cluster sizes.
+const MEDIUM_POINT_COUNT = 20;
+const LARGE_POINT_COUNT = 30;
+const EXTRA_LARGE_POINT_COUNT = 50;
+
 // Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
 // in a collection to the FeatureCollection
 const createClusterDataSource = (
@@ -357,7 +377,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         data: createClusterDataSource(undefined),
         cluster: true,
         clusterMaxZoom: 14,
-        clusterRadius: 10,
+        clusterRadius: 50,
       });
 
       // Add layers for multiple items, that is cluster
@@ -373,24 +393,24 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           "circle-color": [
             "step",
             ["get", "point_count"],
-            "#51bbd6",
-            5,
-            "#f1f075",
-            30,
-            "#f28cb1",
-            50,
-            "#fe8cf1",
+            DEFAULT_COLOR,
+            MEDIUM_POINT_COUNT,
+            MEDIUM_COLOR,
+            LARGE_POINT_COUNT,
+            LARGE_COLOR,
+            EXTRA_LARGE_POINT_COUNT,
+            EXTRA_LARGE_COLOR,
           ],
           "circle-radius": [
             "step",
             ["get", "point_count"],
-            10,
-            20,
-            20,
-            30,
-            30,
-            50,
-            50,
+            DEFAULT_CIRCLE_SIZE,
+            MEDIUM_POINT_COUNT,
+            MEDIUM_CIRCLE_SIZE,
+            LARGE_POINT_COUNT,
+            LARGE_CIRCLE_SIZE,
+            EXTRA_LARGE_POINT_COUNT,
+            EXTRA_LARGE_CIRCLE_SIZE,
           ],
         },
       });
