@@ -45,7 +45,7 @@ const MapSection: React.FC<MapSectionProps> = ({
         flex: 1,
       }}
     >
-      <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
+      <Paper id={mapContainerId} sx={{ minHeight: "80vh" }}>
         <Map
           panelId={mapContainerId}
           onZoomEvent={onMapZoomOrMove}

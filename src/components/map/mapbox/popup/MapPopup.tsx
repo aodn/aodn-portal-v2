@@ -4,26 +4,51 @@ import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "../../../../utils/AppTheme";
 import ListResultCard from "../../../result/ListResultCard";
 import {
+  Box,
   Card,
   CardActionArea,
   CardContent,
+  CircularProgress,
   Stack,
   Typography,
 } from "@mui/material";
-
 import { fontWeight } from "../../../../styles/constants";
 
 interface MapPopupProps {
   collection: OGCCollection;
   onClickPopup?: ((uuid: string) => void) | undefined;
+  isLoading?: boolean;
 }
 
-const MapPopup: FC<MapPopupProps> = ({ collection, onClickPopup }) => {
+const POPUP_WIDTH = "250px";
+const POPUP_HEIGHT = "180px";
+
+const MapPopup: FC<MapPopupProps> = ({
+  collection,
+  onClickPopup,
+  isLoading = false,
+}) => {
   const handleClick = () => {
     if (onClickPopup) {
       onClickPopup(collection.id);
     }
   };
+
+  if (isLoading)
+    return (
+      <Box
+        sx={{
+          transition: "opacity 0.2s ease-in-out",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: POPUP_HEIGHT,
+          width: POPUP_WIDTH,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   return (
     <ThemeProvider theme={AppTheme}>
       {/* <ListResultCard
@@ -32,7 +57,7 @@ const MapPopup: FC<MapPopupProps> = ({ collection, onClickPopup }) => {
       /> */}
       <Card
         elevation={0}
-        sx={{ height: "100%", minWidth: "200px" }}
+        sx={{ height: POPUP_HEIGHT, width: POPUP_WIDTH }}
         data-testid="result-card-grid"
       >
         <CardActionArea onClick={handleClick}>
@@ -59,6 +84,7 @@ const MapPopup: FC<MapPopupProps> = ({ collection, onClickPopup }) => {
                   display: "-webkit-box",
                   WebkitLineClamp: "4",
                   WebkitBoxOrient: "vertical",
+                  maxWidth: "100%",
                 }}
               >
                 {collection.description}

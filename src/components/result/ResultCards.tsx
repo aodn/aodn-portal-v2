@@ -98,7 +98,7 @@ const ResultCards = (props: ResultCardsProps) => {
   if (props.layout === SearchResultLayoutEnum.LIST) {
     return (
       <FixedSizeList
-        height={700}
+        height={1500}
         width={"100%"}
         itemSize={260}
         itemCount={props.contents.result.collections.length}
@@ -111,7 +111,7 @@ const ResultCards = (props: ResultCardsProps) => {
     // or else render grid view
     return (
       <FixedSizeList
-        height={700}
+        height={1500}
         width={"100%"}
         itemSize={310}
         itemCount={Math.ceil(props.contents.result.collections.length / 2)}

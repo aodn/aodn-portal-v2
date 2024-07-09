@@ -54,6 +54,8 @@ const ResultSection: React.FC<SearchResultListProps> = ({
       item
       sx={{
         width: "700px",
+        height: "81vh",
+        overflow: "hidden",
         display:
           visibility === SearchResultLayoutEnum.VISIBLE ? "block" : "none",
       }}

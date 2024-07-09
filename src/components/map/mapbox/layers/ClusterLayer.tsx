@@ -25,8 +25,8 @@ import { GeoJSONSource, MapLayerMouseEvent, Popup } from "mapbox-gl";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
 import { createRoot } from "react-dom/client";
-import { CircularProgress } from "@mui/material";
 import MapPopup from "../popup/MapPopup";
+import { CircularProgress } from "@mui/material";
 
 interface ClusterLayerProps {
   // Vector tile layer should added to map
@@ -91,17 +91,13 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [spatialExtentsUUid, setSpatialExtentsUUid] = useState<Array<string>>();
 
+  // util function to get collection data given uuid
+  // and based on boolean indicating whether to fetch only geometry-related properties
   const getCollectionData = useCallback(
-    async ({
-      uuid,
-      forGeometryOnly,
-    }: {
-      uuid: string;
-      forGeometryOnly: boolean;
-    }) => {
+    async ({ uuid, geometryOnly }: { uuid: string; geometryOnly: boolean }) => {
       const param: SearchParameters = {
         filter: `id='${uuid}'`,
-        properties: forGeometryOnly ? "id,geometry" : undefined,
+        properties: geometryOnly ? "id,geometry" : undefined,
       };
 
       try {
@@ -125,6 +121,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       new Popup({
         closeButton: false,
         closeOnClick: false,
+        maxWidth: "none",
       }),
     []
   );
@@ -133,12 +130,16 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     async (uuid: string) => {
       const collection = await getCollectionData({
         uuid,
-        forGeometryOnly: false,
+        geometryOnly: false,
       });
-
       return <MapPopup collection={collection} onClickPopup={onClickPopup} />;
     },
     [getCollectionData, onClickPopup]
+  );
+
+  const renderLoadingPopup = useCallback(
+    () => <MapPopup collection={{} as OGCCollection} isLoading />,
+    []
   );
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
@@ -173,33 +174,25 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         const coordinates = geometry.coordinates.slice();
         const uuid = feature.properties?.uuid as string;
 
-        try {
-          // Create a temporary div to render our React component
-          const popupNode = document.createElement("div");
-          const root = createRoot(popupNode);
+        // Create a new div container for the popup
+        const popupNode = document.createElement("div");
+        const root = createRoot(popupNode);
 
-          // Show loading state
-          root.render(<CircularProgress />);
+        // Render a loading state in the popup
+        root.render(renderLoadingPopup());
 
-          // Set the popup on the map immediately with loading state
-          popup
-            .setLngLat(coordinates as [number, number])
-            .setDOMContent(popupNode)
-            .addTo(map);
+        // Set the popup's position and content, then add it to the map
+        popup
+          .setLngLat(coordinates as [number, number])
+          .setDOMContent(popupNode)
+          .addTo(map);
 
-          // Fetch and render the content asynchronously
-          const popupContent = await renderPopupContent(uuid);
-          root.render(popupContent);
-
-          // Update the popup content
-          popup.setDOMContent(popupNode);
-        } catch (error) {
-          console.error("Error rendering popup:", error);
-          popup.remove();
-        }
+        // Fetch and render the actual content for the popup
+        const content = await renderPopupContent(uuid);
+        root.render(content);
       }
     },
-    [map, popup, renderPopupContent]
+    [map, popup, renderLoadingPopup, renderPopupContent]
   );
 
   const unclusterPointLayerMouseLeaveEventHandler = useCallback(
@@ -272,7 +265,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       const collection = await getCollectionData({
         uuid,
-        forGeometryOnly: true,
+        geometryOnly: true,
       });
 
       if (!map?.getSource(sourceId)) {
@@ -322,7 +315,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         source: sourceId,
         filter: ["==", "$type", "Polygon"],
         paint: {
-          "fill-color": "#00ff00",
+          "fill-color": "#fff",
           "fill-opacity": 0.4,
         },
       });
@@ -507,22 +500,11 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     };
   }, [map, updateSource]);
 
+  // Remove all layers and sources created by addSpatialExtentsLayer
   useEffect(() => {
     const cleanup = addSpatialExtentsLayer();
     return () => {
       cleanup();
-      // Remove all layers and sources created by addSpatialExtentsLayer
-      spatialExtentsUUid?.forEach((uuid: string) => {
-        const sourceId = createSourceId(layerId, uuid);
-        const pointLayerId = createPointsLayerId(sourceId);
-        const lineLayerId = createLinesLayerId(sourceId);
-        const polygonLayerId = createPolygonLayerId(sourceId);
-
-        if (map?.getLayer(pointLayerId)) map.removeLayer(pointLayerId);
-        if (map?.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
-        if (map?.getLayer(polygonLayerId)) map.removeLayer(polygonLayerId);
-        if (map?.getSource(sourceId)) map.removeSource(sourceId);
-      });
     };
   }, [addSpatialExtentsLayer, map, layerId, spatialExtentsUUid]);
 
