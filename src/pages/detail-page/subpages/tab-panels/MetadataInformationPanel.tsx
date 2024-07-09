@@ -5,19 +5,23 @@ import ContactBlock from "../components/ContactBlock";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
-  const metadataContact = context.collection
-    ?.getContacts()
-    ?.filter((contact) => contact.roles.includes("metadata"));
+  const metadataContact = useMemo(
+    () =>
+      context.collection
+        ?.getContacts()
+        ?.filter((contact) => contact.roles.includes("metadata")),
+    [context.collection]
+  );
 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!metadataContact) {
+    if (!context.collection) {
       setIsLoading(true);
     } else {
       setIsLoading(false);
     }
-  }, [metadataContact]);
+  }, [context.collection]);
 
   const blocks = useMemo(
     () => [
