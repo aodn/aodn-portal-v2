@@ -24,6 +24,7 @@ interface MapSectionProps {
   ) => void;
   onToggleClicked: (v: boolean) => void;
   onDatasetSelected?: (uuid: Array<string>) => void;
+  onClickPopup: (uuid: string) => void;
 }
 
 const MapSection: React.FC<MapSectionProps> = ({
@@ -32,6 +33,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   onDatasetSelected,
   layers,
   showFullMap,
+  onClickPopup,
 }) => {
   return (
     <Grid
@@ -43,7 +45,7 @@ const MapSection: React.FC<MapSectionProps> = ({
         flex: 1,
       }}
     >
-      <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
+      <Paper id={mapContainerId} sx={{ minHeight: "80vh" }}>
         <Map
           panelId={mapContainerId}
           onZoomEvent={onMapZoomOrMove}
@@ -62,6 +64,7 @@ const MapSection: React.FC<MapSectionProps> = ({
             <ClusterLayer
               collections={layers}
               onDatasetSelected={onDatasetSelected}
+              onClickPopup={onClickPopup}
             />
           </Layers>
         </Map>
