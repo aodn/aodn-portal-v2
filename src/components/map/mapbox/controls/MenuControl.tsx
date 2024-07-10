@@ -24,6 +24,7 @@ import {
   Divider,
 } from "@mui/material";
 import LayersIcon from "@mui/icons-material/Layers";
+import PublicIcon from "@mui/icons-material/Public";
 import grey from "../../../common/colors/grey";
 import blue from "../../../common/colors/blue";
 import { styles as mapStyles, defaultStyle } from "../Map";
@@ -42,7 +43,11 @@ const overlays = [
 const leftPadding = "15px";
 const rightPadding = "15px";
 
-const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
+interface BaseMapSwitcherProps {
+  map?: MapBox;
+}
+
+const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
   const [currentStyle, setCurrentStyle] = useState<string>(
     mapStyles[defaultStyle].id
   );
@@ -50,9 +55,9 @@ const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
 
-  const handleToggle = () => {
+  const handleToggle = useCallback(() => {
     setOpen((prevOpen) => !prevOpen);
-  };
+  }, [setOpen]);
 
   const updateCurrentStyle = useCallback(
     (id: string) => {
@@ -89,7 +94,7 @@ const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
         ref={anchorRef}
         onClick={handleToggle}
       >
-        <LayersIcon />
+        <PublicIcon />
       </IconButton>
       <Popper
         open={open}
@@ -205,6 +210,118 @@ const BaseMapSwitcher: React.FC<{ map?: MapBox }> = ({ map }) => {
   );
 };
 
+interface LayerSwitcherProps {
+  map?: MapBox;
+  layers: Array<{ id: string; name: string }>;
+  onLayerChanged: (id: string) => void;
+}
+
+const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
+  map,
+  layers,
+  onLayerChanged,
+}) => {
+  const anchorRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [currentLayer, setCurrentLayer] = useState(null);
+
+  const handleToggle = useCallback(() => {
+    setOpen((prevOpen) => !prevOpen);
+  }, [setOpen]);
+
+  return (
+    <>
+      <IconButton
+        aria-label="show-hide-menu"
+        ref={anchorRef}
+        onClick={handleToggle}
+      >
+        <LayersIcon />
+        <Popper
+          open={open}
+          anchorEl={anchorRef.current}
+          role={undefined}
+          placement="left-start"
+          disablePortal
+          modifiers={[
+            {
+              name: "offset",
+              options: {
+                offset: [0, 10], // This applies an offset of 10px downward
+              },
+            },
+          ]}
+        >
+          {
+            // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
+          }
+          <Box
+            sx={{
+              color: grey["mapMenuText"],
+              display: "inline-block",
+              whiteSpace: "nowrap",
+              borderRadius: borderRadius["menu"],
+              backgroundColor: grey["resultCard"],
+              zIndex: 1,
+            }}
+          >
+            <Typography
+              sx={{
+                backgroundColor: "white",
+                borderRadius: borderRadius["menuTop"],
+                fontSize: fontSize["mapMenuItem"],
+                paddingTop: "7px",
+                paddingBottom: "7px",
+                paddingLeft: leftPadding,
+                fontWeight: "bold",
+              }}
+            >
+              Layers
+            </Typography>
+            <Divider />
+            <Box sx={{ paddingLeft: leftPadding, paddingRight: rightPadding }}>
+              <FormControl component="fieldset">
+                <RadioGroup
+                  value={currentLayer}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onLayerChanged(e.target.value)
+                  }
+                >
+                  {layers.map((l) => (
+                    <FormControlLabel
+                      key={l.name}
+                      value={l.id}
+                      control={
+                        <Radio
+                          sx={{
+                            "& .MuiSvgIcon-root": {
+                              fontSize: fontSize["mapMenuSubItem"],
+                            },
+                            "&.Mui-checked": {
+                              color: blue["imosLightBlue"],
+                            },
+                          }}
+                        />
+                      }
+                      label={
+                        <Typography
+                          sx={{ fontSize: fontSize["mapMenuSubItem"] }}
+                        >
+                          {l.name}
+                        </Typography>
+                      }
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
+            </Box>
+          </Box>
+        </Popper>
+      </IconButton>
+    </>
+  );
+};
+
 type Menus = React.ReactElement<
   { map: MapBox },
   string | React.JSXElementConstructor<any>
@@ -274,4 +391,4 @@ const MenuControl = (props: PropsWithChildren<MenuControlProps>) => {
 
 export default MenuControl;
 
-export { BaseMapSwitcher };
+export { BaseMapSwitcher, MapLayerSwitcher };

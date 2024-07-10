@@ -7,6 +7,7 @@ import NavigationControl from "../../../components/map/mapbox/controls/Navigatio
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MenuControl, {
   BaseMapSwitcher,
+  MapLayerSwitcher,
 } from "../../../components/map/mapbox/controls/MenuControl";
 import React from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
@@ -33,6 +34,8 @@ const MapSection: React.FC<MapSectionProps> = ({
   layers,
   showFullMap,
 }) => {
+  const onLayerChanged = (id: string) => {};
+
   return (
     <Grid
       item
@@ -57,6 +60,17 @@ const MapSection: React.FC<MapSectionProps> = ({
             <NavigationControl />
             <ScaleControl />
             <MenuControl menu={<BaseMapSwitcher />} />
+            <MenuControl
+              menu={
+                <MapLayerSwitcher
+                  layers={[
+                    { id: "Cluster", name: "Cluster" },
+                    { id: "Heatmap", name: "Heatmap" },
+                  ]}
+                  onLayerChanged={onLayerChanged}
+                />
+              }
+            />
           </Controls>
           <Layers>
             <ClusterLayer
