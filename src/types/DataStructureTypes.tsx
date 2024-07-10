@@ -33,6 +33,7 @@ interface IContact {
   addresses: IAddress[];
   phones: IInfo[];
   links: ILink[];
+  roles: string[];
 }
 
 interface IConcept {

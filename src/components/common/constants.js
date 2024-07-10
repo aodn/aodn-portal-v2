@@ -6,6 +6,7 @@ const dateDefault = {
 };
 
 const pageDefault = {
+  error: "/error",
   search: "/search",
   details: "/details",
   landing: "/",
