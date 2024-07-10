@@ -51,8 +51,6 @@ interface ClusterLayerConfig {
   unclusterPointRadius?: number;
 }
 
-interface SpatialExtentsLayerConfig {}
-
 interface ClusterLayerProps {
   // Vector tile layer should added to map
   collections: Array<OGCCollection>;
@@ -60,7 +58,6 @@ interface ClusterLayerProps {
   onDatasetSelected?: (uuid: Array<string>) => void;
   onClickPopup?: (uuid: string) => void;
   clusterLayerConfig?: ClusterLayerConfig;
-  spatialExtentsLayerConfig?: SpatialExtentsLayerConfig;
 }
 
 const defaultClusterLayerConfig: ClusterLayerConfig = {
@@ -192,8 +189,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           fetchResultNoStore(param)
         ).unwrap();
         // Given we use uuid, there will be one record only
-        const collection = collections.collections[0];
-        return collection;
+        return collections.collections[0];
       } catch (error) {
         console.error("Error fetching collection data:", error);
         // TODO: handle error in ErrorBoundary
