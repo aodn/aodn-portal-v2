@@ -1,16 +1,17 @@
 ---
 name: AS A <type of user> I WANT <some goal> SO THAT <some reason>
 about: Template for a new backlog item
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 ## Acceptance Criteria
+
 1.
 
 ## Notes
+
 1.
 
 ```[tasklist]
@@ -21,11 +22,13 @@ assignees: ''
 ```
 
 ## PRs
+
 1.
 
-
 ## Dependencies
+
 1.
 
 ## Demo
+
 1.

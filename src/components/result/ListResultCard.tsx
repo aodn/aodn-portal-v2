@@ -21,35 +21,34 @@ import { useCallback } from "react";
 
 interface ResultCardProps {
   content: OGCCollection;
-  onRemoveLayer:
+  onRemoveLayer?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
       ) => void)
     | undefined;
-  onDownload:
+  onDownload?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
       ) => void)
     | undefined;
-  onTags:
+  onTags?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
       ) => void)
     | undefined;
-  onMore:
+  onMore?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
       ) => void)
     | undefined;
+  onClickCard?: ((uuid: string) => void) | undefined;
 }
 
 const ListResultCard = (props: ResultCardProps) => {
-  const navigate = useNavigate();
-
   // links here may need to be changed, because only html links are wanted
   const generateLinkText = useCallback((linkLength: number) => {
     if (linkLength === 0) {
@@ -61,6 +60,12 @@ const ListResultCard = (props: ResultCardProps) => {
     return `${linkLength} Links`;
   }, []);
 
+  const handleClick = () => {
+    if (props.onClickCard && props.content && props.content.id) {
+      props.onClickCard(props.content.id);
+    }
+  };
+
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card
@@ -68,13 +73,7 @@ const ListResultCard = (props: ResultCardProps) => {
       data-testid="result-card-list"
       sx={{ width: "99%" }}
     >
-      <CardActionArea
-        onClick={() => {
-          const searchParams = new URLSearchParams();
-          searchParams.append("uuid", props.content.id);
-          navigate(pageDefault.details + "?" + searchParams.toString());
-        }}
-      >
+      <CardActionArea onClick={handleClick}>
         <CardContent>
           <Typography
             component="div"
