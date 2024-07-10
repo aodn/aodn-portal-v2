@@ -26,7 +26,32 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
 import { createRoot } from "react-dom/client";
 import MapPopup from "../popup/MapPopup";
-import { CircularProgress } from "@mui/material";
+
+interface ClusterSize {
+  default?: number | string;
+  medium?: number | string;
+  large?: number | string;
+  extra_large?: number | string;
+}
+
+interface ClusterLayerConfig {
+  pointCountThresholds?: ClusterSize;
+  clusterMaxZoom?: number;
+  clusterRadius?: number;
+  clusterCircleSize?: ClusterSize;
+  clusterCircleColor?: ClusterSize;
+  clusterCircleOpacity?: number;
+  clusterCircleStrokeWidth?: number;
+  clusterCircleStrokeColor?: string;
+  clusterCircleTextSize?: number;
+  unclusterPointColor?: string;
+  unclusterPointOpacity?: number;
+  unclusterPointStrokeWidth?: number;
+  unclusterPointStrokeColor?: string;
+  unclusterPointRadius?: number;
+}
+
+interface SpatialExtentsLayerConfig {}
 
 interface ClusterLayerProps {
   // Vector tile layer should added to map
@@ -34,30 +59,43 @@ interface ClusterLayerProps {
   // Event fired when user click on the point layer
   onDatasetSelected?: (uuid: Array<string>) => void;
   onClickPopup?: (uuid: string) => void;
+  clusterLayerConfig?: ClusterLayerConfig;
+  spatialExtentsLayerConfig?: SpatialExtentsLayerConfig;
 }
 
-const OPACITY = 0.6;
-const STROKE_WIDTH = 1;
-
-// Constants for cluster circle sizes
-//These define the radius(px) of the circles used to represent clusters on the map.
-const DEFAULT_CIRCLE_SIZE = 20;
-const MEDIUM_CIRCLE_SIZE = 30;
-const LARGE_CIRCLE_SIZE = 40;
-const EXTRA_LARGE_CIRCLE_SIZE = 60;
-
-// Constants for cluster circle colors
-// These define the colors used for the circles representing clusters of different sizes.
-const DEFAULT_COLOR = "#51bbd6";
-const MEDIUM_COLOR = "#f1f075";
-const LARGE_COLOR = "#f28cb1";
-const EXTRA_LARGE_COLOR = "#fe8cf1";
-
-// Constants for point count thresholds
-// These define the boundaries between different cluster sizes.
-const MEDIUM_POINT_COUNT = 20;
-const LARGE_POINT_COUNT = 30;
-const EXTRA_LARGE_POINT_COUNT = 50;
+const defaultClusterLayerConfig: ClusterLayerConfig = {
+  // point count thresholds define the boundaries between different cluster sizes.
+  pointCountThresholds: {
+    medium: 20,
+    large: 30,
+    extra_large: 50,
+  },
+  clusterMaxZoom: 14,
+  clusterRadius: 50,
+  // circle sizes define the radius(px) of the circles used to represent clusters on the map.
+  clusterCircleSize: {
+    default: 20,
+    medium: 30,
+    large: 40,
+    extra_large: 60,
+  },
+  //cluster circle colors define the colors used for the circles representing clusters of different sizes.
+  clusterCircleColor: {
+    default: "#51bbd6",
+    medium: "#f1f075",
+    large: "#f28cb1",
+    extra_large: "#fe8cf1",
+  },
+  clusterCircleOpacity: 0.6,
+  clusterCircleStrokeWidth: 1,
+  clusterCircleStrokeColor: "#fff",
+  clusterCircleTextSize: 12,
+  unclusterPointColor: "#51bbd6",
+  unclusterPointOpacity: 0.6,
+  unclusterPointStrokeWidth: 1,
+  unclusterPointStrokeColor: "#fff",
+  unclusterPointRadius: 8,
+};
 
 // Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
 // in a collection to the FeatureCollection
@@ -83,6 +121,34 @@ const createClusterDataSource = (
   return featureCollections;
 };
 
+// util function for get cluster layer config
+// the default cluster layer config will be replaced by given custom cluster layer config
+const getClusterLayerConfig = ({
+  clusterLayerConfig,
+  defaultClusterLayerConfig,
+}: {
+  clusterLayerConfig?: ClusterLayerConfig;
+  defaultClusterLayerConfig: ClusterLayerConfig;
+}): ClusterLayerConfig => {
+  if (!clusterLayerConfig) return defaultClusterLayerConfig;
+  return {
+    ...defaultClusterLayerConfig,
+    ...clusterLayerConfig,
+    pointCountThresholds: {
+      ...defaultClusterLayerConfig.pointCountThresholds,
+      ...clusterLayerConfig.pointCountThresholds,
+    },
+    clusterCircleSize: {
+      ...defaultClusterLayerConfig.clusterCircleSize,
+      ...clusterLayerConfig.clusterCircleSize,
+    },
+    clusterCircleColor: {
+      ...defaultClusterLayerConfig.clusterCircleColor,
+      ...clusterLayerConfig.clusterCircleColor,
+    },
+  };
+};
+
 // These function help to get the correct id and reduce the need to set those id in the
 // useEffect list
 const getLayerId = (id: string | undefined) => `cluster-layer-${id}`;
@@ -106,6 +172,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
   onDatasetSelected,
   onClickPopup,
+  clusterLayerConfig,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
   const dispatch = useDispatch<AppDispatch>();
@@ -128,9 +195,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         const collection = collections.collections[0];
         return collection;
       } catch (error) {
-        // Handle any errors here
         console.error("Error fetching collection data:", error);
-        throw error;
+        // TODO: handle error in ErrorBoundary
       }
     },
     [dispatch]
@@ -152,6 +218,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         uuid,
         geometryOnly: false,
       });
+      if (!collection) return;
       return <MapPopup collection={collection} onClickPopup={onClickPopup} />;
     },
     [getCollectionData, onClickPopup]
@@ -181,7 +248,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     }
   }, [map, clusterSourceId, collections]);
 
-  const unclusterPointLayerMouseEnterEventHandler = useCallback(
+  const onUnclusterPointMouseEnter = useCallback(
     async (ev: MapLayerMouseEvent): Promise<void> => {
       if (!ev.target || !map) return;
 
@@ -215,7 +282,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [map, popup, renderLoadingPopup, renderPopupContent]
   );
 
-  const unclusterPointLayerMouseLeaveEventHandler = useCallback(
+  const onUnclusterPointMouseLeave = useCallback(
     (ev: MapLayerMouseEvent) => {
       ev.target.getCanvas().style.cursor = "";
       popup.remove();
@@ -223,21 +290,15 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [popup]
   );
 
-  const clusterLayerMouseEnterEventHandler = useCallback(
-    (ev: MapLayerMouseEvent) => {
-      ev.target.getCanvas().style.cursor = "pointer";
-    },
-    []
-  );
+  const onClusterCircleMouseEnter = useCallback((ev: MapLayerMouseEvent) => {
+    ev.target.getCanvas().style.cursor = "pointer";
+  }, []);
 
-  const clusterLayerMouseLeaveEventHandler = useCallback(
-    (ev: MapLayerMouseEvent) => {
-      ev.target.getCanvas().style.cursor = "";
-    },
-    []
-  );
+  const onClusterCircleMouseLeave = useCallback((ev: MapLayerMouseEvent) => {
+    ev.target.getCanvas().style.cursor = "";
+  }, []);
 
-  const unclusterPointLayerMouseClickEventHandler = useCallback(
+  const onUnclusterPointMouseClick = useCallback(
     (ev: MapLayerMouseEvent): void => {
       // Make sure even same id under same area will be set once.
       if (ev.features) {
@@ -253,7 +314,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [setSpatialExtentsUUid, onDatasetSelected]
   );
 
-  const clusterLayerMouseClickEventHandler = useCallback(
+  const onClusterCircleMouseClick = useCallback(
     (ev: MapLayerMouseEvent): void => {
       if (ev.lngLat) {
         map?.easeTo({
@@ -291,7 +352,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       if (!map?.getSource(sourceId)) {
         map?.addSource(sourceId, {
           type: "geojson",
-          data: collection.getGeometry(),
+          data: collection?.getGeometry(),
         });
       }
 
@@ -347,6 +408,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           if (map?.getLayer(id)) map?.removeLayer(id);
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
+          console.log("Ok to ignore remove layer error", error);
+          // TODO: handle error in ErrorBoundary
         }
       });
 
@@ -355,6 +418,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           if (map?.getSource(id)) map?.removeSource(id);
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
+          console.log("Ok to ignore remove source error", error);
+          // TODO: handle error in ErrorBoundary
         }
       });
     };
@@ -372,6 +437,11 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       // these changes so use this check to avoid duplicate add
       if (map?.getSource(clusterSourceId)) return;
 
+      const config = getClusterLayerConfig({
+        clusterLayerConfig,
+        defaultClusterLayerConfig,
+      });
+
       map?.addSource(clusterSourceId, {
         type: "geojson",
         data: createClusterDataSource(undefined),
@@ -387,30 +457,30 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         source: clusterSourceId,
         filter: ["has", "point_count"],
         paint: {
-          "circle-stroke-width": STROKE_WIDTH,
-          "circle-stroke-color": "#fff",
-          "circle-opacity": OPACITY,
+          "circle-stroke-width": config.clusterCircleStrokeWidth,
+          "circle-stroke-color": config.clusterCircleStrokeColor,
+          "circle-opacity": config.clusterCircleOpacity,
           "circle-color": [
             "step",
             ["get", "point_count"],
-            DEFAULT_COLOR,
-            MEDIUM_POINT_COUNT,
-            MEDIUM_COLOR,
-            LARGE_POINT_COUNT,
-            LARGE_COLOR,
-            EXTRA_LARGE_POINT_COUNT,
-            EXTRA_LARGE_COLOR,
+            config.clusterCircleColor?.default,
+            config.pointCountThresholds?.medium,
+            config.clusterCircleColor?.medium,
+            config.pointCountThresholds?.large,
+            config.clusterCircleColor?.large,
+            config.pointCountThresholds?.extra_large,
+            config.clusterCircleColor?.extra_large,
           ],
           "circle-radius": [
             "step",
             ["get", "point_count"],
-            DEFAULT_CIRCLE_SIZE,
-            MEDIUM_POINT_COUNT,
-            MEDIUM_CIRCLE_SIZE,
-            LARGE_POINT_COUNT,
-            LARGE_CIRCLE_SIZE,
-            EXTRA_LARGE_POINT_COUNT,
-            EXTRA_LARGE_CIRCLE_SIZE,
+            config.clusterCircleSize?.default,
+            config.pointCountThresholds?.medium,
+            config.clusterCircleSize?.medium,
+            config.pointCountThresholds?.large,
+            config.clusterCircleSize?.large,
+            config.pointCountThresholds?.extra_large,
+            config.clusterCircleSize?.extra_large,
           ],
         },
       });
@@ -423,7 +493,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         layout: {
           "text-field": "{point_count_abbreviated}",
           "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-          "text-size": 12,
+          "text-size": config.clusterCircleTextSize,
         },
       });
       // Layer for only 1 item in the circle
@@ -433,37 +503,25 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         source: clusterSourceId,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-opacity": OPACITY,
-          "circle-color": "#11b4da",
-          "circle-radius": 8,
-          "circle-stroke-width": STROKE_WIDTH,
-          "circle-stroke-color": "#fff",
+          "circle-opacity": config.unclusterPointOpacity,
+          "circle-color": config.unclusterPointColor,
+          "circle-radius": config.unclusterPointRadius,
+          "circle-stroke-width": config.unclusterPointStrokeWidth,
+          "circle-stroke-color": config.unclusterPointStrokeColor,
         },
       });
 
       // Change the cursor to a pointer for uncluster point
-      map?.on(
-        "mouseenter",
-        unclusterPointLayer,
-        unclusterPointLayerMouseEnterEventHandler
-      );
-      map?.on("mouseenter", clusterLayer, clusterLayerMouseEnterEventHandler);
+      map?.on("mouseenter", unclusterPointLayer, onUnclusterPointMouseEnter);
+      map?.on("mouseenter", clusterLayer, onClusterCircleMouseEnter);
 
       // Change the cursor back to default when it leaves the unclustered points
-      map?.on(
-        "mouseleave",
-        unclusterPointLayer,
-        unclusterPointLayerMouseLeaveEventHandler
-      );
-      map?.on("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
+      map?.on("mouseleave", unclusterPointLayer, onUnclusterPointMouseLeave);
+      map?.on("mouseleave", clusterLayer, onClusterCircleMouseLeave);
 
-      map?.on("click", clusterLayer, clusterLayerMouseClickEventHandler);
+      map?.on("click", clusterLayer, onClusterCircleMouseClick);
 
-      map?.on(
-        "click",
-        unclusterPointLayer,
-        unclusterPointLayerMouseClickEventHandler
-      );
+      map?.on("click", unclusterPointLayer, onUnclusterPointMouseClick);
     };
 
     map?.once("load", createLayers);
@@ -473,18 +531,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     map?.on("styledata", createLayers);
 
     return () => {
-      map?.off(
-        "mouseenter",
-        unclusterPointLayer,
-        unclusterPointLayerMouseEnterEventHandler
-      );
-      map?.off("mouseenter", clusterLayer, clusterLayerMouseEnterEventHandler);
-      map?.off(
-        "mouseleave",
-        unclusterPointLayer,
-        unclusterPointLayerMouseLeaveEventHandler
-      );
-      map?.off("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
+      map?.off("mouseenter", unclusterPointLayer, onUnclusterPointMouseEnter);
+      map?.off("mouseenter", clusterLayer, onClusterCircleMouseEnter);
+      map?.off("mouseleave", unclusterPointLayer, onUnclusterPointMouseLeave);
+      map?.off("mouseleave", clusterLayer, onClusterCircleMouseLeave);
 
       // Clean up resource when you click on the next spatial extents, map is
       // still working in this page.
@@ -505,6 +555,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
       } catch (error) {
         // If source not found and throw exception then layer will not exist
+        // TODO: handle error in ErrorBoundary
       }
     };
     // Make sure map is the only dependency so that it will not trigger twice run

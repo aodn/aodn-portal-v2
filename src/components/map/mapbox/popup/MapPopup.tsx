@@ -51,15 +51,7 @@ const MapPopup: FC<MapPopupProps> = ({
     );
   return (
     <ThemeProvider theme={AppTheme}>
-      {/* <ListResultCard
-        content={collection}
-        onClickCard={handleClick}
-      /> */}
-      <Card
-        elevation={0}
-        sx={{ height: POPUP_HEIGHT, width: POPUP_WIDTH }}
-        data-testid="result-card-grid"
-      >
+      <Card elevation={0} sx={{ height: POPUP_HEIGHT, width: POPUP_WIDTH }}>
         <CardActionArea onClick={handleClick}>
           <CardContent>
             <Stack direction="column" justifyContent="left" alignItems="center">
