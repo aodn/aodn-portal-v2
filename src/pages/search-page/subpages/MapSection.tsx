@@ -36,8 +36,6 @@ const MapSection: React.FC<MapSectionProps> = ({
   showFullMap,
   onClickPopup,
 }) => {
-  const onLayerChanged = (id: string) => {};
-
   return (
     <Grid
       item
@@ -66,10 +64,9 @@ const MapSection: React.FC<MapSectionProps> = ({
               menu={
                 <MapLayerSwitcher
                   layers={[
-                    { id: "Cluster", name: "Cluster" },
-                    { id: "Heatmap", name: "Heatmap" },
+                    { id: "cluster", name: "Cluster" },
+                    { id: "heatmap", name: "Heatmap" },
                   ]}
-                  onLayerChanged={onLayerChanged}
                 />
               }
             />

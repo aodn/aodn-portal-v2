@@ -7,25 +7,24 @@ import {
   useState,
 } from "react";
 import MapContext from "../MapContext";
-import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-  Point,
-} from "geojson";
+import { Feature, Point } from "geojson";
 import {
   OGCCollection,
   OGCCollections,
   SearchParameters,
   fetchResultNoStore,
 } from "../../../common/store/searchReducer";
-import { centroid } from "@turf/turf";
 import { GeoJSONSource, MapLayerMouseEvent, Popup } from "mapbox-gl";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
 import { createRoot } from "react-dom/client";
 import MapPopup from "../popup/MapPopup";
+import {
+  LayersProps,
+  createCentroidDataSource,
+  defaultMouseEnterEventHandler,
+  defaultMouseLeaveEventHandler,
+} from "./Layers";
 
 interface ClusterSize {
   default?: number | string;
@@ -51,11 +50,7 @@ interface ClusterLayerConfig {
   unclusterPointRadius?: number;
 }
 
-interface ClusterLayerProps {
-  // Vector tile layer should added to map
-  collections: Array<OGCCollection>;
-  // Event fired when user click on the point layer
-  onDatasetSelected?: (uuid: Array<string>) => void;
+interface ClusterLayerProps extends LayersProps {
   onClickPopup?: (uuid: string) => void;
   clusterLayerConfig?: ClusterLayerConfig;
 }
@@ -92,30 +87,6 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   unclusterPointStrokeWidth: 1,
   unclusterPointStrokeColor: "#fff",
   unclusterPointRadius: 8,
-};
-
-// Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
-// in a collection to the FeatureCollection
-const createClusterDataSource = (
-  collections: Array<OGCCollection> | undefined
-): FeatureCollection => {
-  const featureCollections: FeatureCollection = {
-    type: "FeatureCollection",
-    features: new Array<Feature<Geometry, GeoJsonProperties>>(),
-  };
-
-  collections?.forEach((collection) => {
-    // We skip the first one which is the overall bounding box, then add the remaining
-    collection.extent?.getGeojsonExtents(1).features.forEach((i) =>
-      featureCollections.features.push({
-        ...centroid(i.geometry),
-        // Add the id so we can reference it easily
-        properties: { uuid: collection.id },
-      })
-    );
-  });
-
-  return featureCollections;
 };
 
 // util function for get cluster layer config
@@ -239,7 +210,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
       (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createClusterDataSource(collections)
+        createCentroidDataSource(collections)
       );
     }
   }, [map, clusterSourceId, collections]);
@@ -285,14 +256,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     },
     [popup]
   );
-
-  const onClusterCircleMouseEnter = useCallback((ev: MapLayerMouseEvent) => {
-    ev.target.getCanvas().style.cursor = "pointer";
-  }, []);
-
-  const onClusterCircleMouseLeave = useCallback((ev: MapLayerMouseEvent) => {
-    ev.target.getCanvas().style.cursor = "";
-  }, []);
 
   const onUnclusterPointMouseClick = useCallback(
     (ev: MapLayerMouseEvent): void => {
@@ -440,7 +403,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       map?.addSource(clusterSourceId, {
         type: "geojson",
-        data: createClusterDataSource(undefined),
+        data: createCentroidDataSource(undefined),
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 50,
@@ -509,11 +472,11 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       // Change the cursor to a pointer for uncluster point
       map?.on("mouseenter", unclusterPointLayer, onUnclusterPointMouseEnter);
-      map?.on("mouseenter", clusterLayer, onClusterCircleMouseEnter);
+      map?.on("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
 
       // Change the cursor back to default when it leaves the unclustered points
       map?.on("mouseleave", unclusterPointLayer, onUnclusterPointMouseLeave);
-      map?.on("mouseleave", clusterLayer, onClusterCircleMouseLeave);
+      map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
       map?.on("click", clusterLayer, onClusterCircleMouseClick);
 
@@ -528,9 +491,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
     return () => {
       map?.off("mouseenter", unclusterPointLayer, onUnclusterPointMouseEnter);
-      map?.off("mouseenter", clusterLayer, onClusterCircleMouseEnter);
+      map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
       map?.off("mouseleave", unclusterPointLayer, onUnclusterPointMouseLeave);
-      map?.off("mouseleave", clusterLayer, onClusterCircleMouseLeave);
+      map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
       // Clean up resource when you click on the next spatial extents, map is
       // still working in this page.
