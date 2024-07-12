@@ -266,7 +266,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       map?.addSource(sourceId, {
         type: "geojson",
         data: createCentroidDataSource(undefined),
-        cluster: true,
+        cluster: false,
         clusterMaxZoom: config.heatmapSourceMaxZoom,
         clusterRadius: config.heatmapSourceRadius,
       });
