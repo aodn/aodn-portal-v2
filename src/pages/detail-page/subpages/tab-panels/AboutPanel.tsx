@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import KeywordBlock from "../components/KeywordBlock";
-import CreditBlock from "../components/CreditBlock";
+import PlainTextBlock from "../components/PlainTextBlock";
 import ContactBlock from "../components/ContactBlock";
 import NavigatablePanel from "../components/NavigatablePanel";
 
@@ -31,12 +31,17 @@ const AboutPanel = () => {
       {
         title: "Contacts",
         component: (
-          <ContactBlock contacts={aboutContacts ? aboutContacts : []} />
+          <ContactBlock
+            title="Contacts"
+            contacts={aboutContacts ? aboutContacts : []}
+          />
         ),
       },
       {
         title: "Credits",
-        component: <CreditBlock credits={credits ? credits : []} />,
+        component: (
+          <PlainTextBlock title="Credits" texts={credits ? credits : []} />
+        ),
       },
     ],
     [aboutContacts, credits, themes]
