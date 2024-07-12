@@ -67,7 +67,7 @@ const textfieldMinWidth = 200;
  * have default empty implementation. Can be overridden.
  * @constructor
  */
-const InputWithSuggester: React.FC<InputWithSuggesterProps> = ({
+const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
 }) => {
   const theme = useTheme();

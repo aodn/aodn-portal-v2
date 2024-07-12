@@ -1,74 +1,92 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from "react";
-import MapContext from "../MapContext";
 import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-} from "geojson";
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import MapContext from "../MapContext";
+import { Feature, Point } from "geojson";
 import {
   OGCCollection,
-  OGCCollections,
   SearchParameters,
   fetchResultNoStore,
 } from "../../../common/store/searchReducer";
-import { centroid } from "@turf/turf";
-import { GeoJSONSource, MapLayerMouseEvent } from "mapbox-gl";
+import { GeoJSONSource, MapLayerMouseEvent, Popup } from "mapbox-gl";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
+import { createRoot } from "react-dom/client";
+import MapPopup from "../popup/MapPopup";
+import {
+  LayersProps,
+  createCentroidDataSource,
+  defaultMouseEnterEventHandler,
+  defaultMouseLeaveEventHandler,
+} from "./Layers";
+import { mergeWithDefaults } from "../../../common/utils";
 
-interface ClusterLayerProps {
-  // Vector tile layer should added to map
-  collections: Array<OGCCollection>;
-  // Event fired when user click on the point layer
-  onDatasetSelected?: (uuid: Array<string>) => void;
+interface ClusterSize {
+  default?: number | string;
+  medium: number | string;
+  large: number | string;
+  extra_large: number | string;
 }
 
-const OPACITY = 0.6;
-const STROKE_WIDTH = 1;
+interface ClusterLayerConfig {
+  pointCountThresholds: ClusterSize;
+  clusterMaxZoom: number;
+  clusterRadius: number;
+  clusterCircleSize: ClusterSize;
+  clusterCircleColor: ClusterSize;
+  clusterCircleOpacity: number;
+  clusterCircleStrokeWidth: number;
+  clusterCircleStrokeColor: string;
+  clusterCircleTextSize: number;
+  unclusterPointColor: string;
+  unclusterPointOpacity: number;
+  unclusterPointStrokeWidth: number;
+  unclusterPointStrokeColor: string;
+  unclusterPointRadius: number;
+}
 
-// Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
-// in a collection to the FeatureCollection
-const createClusterDataSource = (
-  collections: Array<OGCCollection> | undefined
-): FeatureCollection => {
-  const featureCollections: FeatureCollection = {
-    type: "FeatureCollection",
-    features: new Array<Feature<Geometry, GeoJsonProperties>>(),
-  };
+interface ClusterLayerProps extends LayersProps {
+  onClickPopup?: (uuid: string) => void;
+  clusterLayerConfig?: Partial<ClusterLayerConfig>;
+}
 
-  collections?.forEach((collection) => {
-    // We skip the first one which is the overall bounding box, then add the remaining
-    collection.extent?.getGeojsonExtents(1).features.forEach((i) =>
-      featureCollections.features.push({
-        ...centroid(i.geometry),
-        // Add the id so we can reference it easily
-        properties: { uuid: collection.id },
-      })
-    );
-  });
-
-  return featureCollections;
-};
-
-const unclusterPointLayerMouseEnterEventHandler = (
-  ev: MapLayerMouseEvent
-): void => {
-  ev.target.getCanvas().style.cursor = "pointer";
-};
-
-const unclusterPointLayerMouseLeaveEventHandler = (
-  ev: MapLayerMouseEvent
-): void => {
-  ev.target.getCanvas().style.cursor = "";
-};
-
-const clusterLayerMouseEnterEventHandler = (ev: MapLayerMouseEvent): void => {
-  ev.target.getCanvas().style.cursor = "pointer";
-};
-
-const clusterLayerMouseLeaveEventHandler = (ev: MapLayerMouseEvent): void => {
-  ev.target.getCanvas().style.cursor = "";
+const defaultClusterLayerConfig: ClusterLayerConfig = {
+  // point count thresholds define the boundaries between different cluster sizes.
+  pointCountThresholds: {
+    medium: 20,
+    large: 30,
+    extra_large: 50,
+  },
+  clusterMaxZoom: 14,
+  clusterRadius: 50,
+  // circle sizes define the radius(px) of the circles used to represent clusters on the map.
+  clusterCircleSize: {
+    default: 20,
+    medium: 30,
+    large: 40,
+    extra_large: 60,
+  },
+  //cluster circle colors define the colors used for the circles representing clusters of different sizes.
+  clusterCircleColor: {
+    default: "#51bbd6",
+    medium: "#f1f075",
+    large: "#f28cb1",
+    extra_large: "#fe8cf1",
+  },
+  clusterCircleOpacity: 0.6,
+  clusterCircleStrokeWidth: 1,
+  clusterCircleStrokeColor: "#fff",
+  clusterCircleTextSize: 12,
+  unclusterPointColor: "#51bbd6",
+  unclusterPointOpacity: 0.6,
+  unclusterPointStrokeWidth: 1,
+  unclusterPointStrokeColor: "#fff",
+  unclusterPointRadius: 8,
 };
 
 // These function help to get the correct id and reduce the need to set those id in the
@@ -77,30 +95,138 @@ const getLayerId = (id: string | undefined) => `cluster-layer-${id}`;
 
 const getClusterSourceId = (layerId: string) => `${layerId}-source`;
 
-const getclusterLayerId = (layerId: string) => `${layerId}-clusters`;
+const getClusterLayerId = (layerId: string) => `${layerId}-clusters`;
 
 const getUnclusterPointId = (layerId: string) => `${layerId}-unclustered-point`;
+
+const createPointsLayerId = (id: string) => `${id}-points`;
+
+const createLinesLayerId = (id: string) => `${id}-lines`;
+
+const createPolygonLayerId = (id: string) => `${id}-polygons`;
+
+const createSourceId = (layerId: string, uuid: string) =>
+  `${layerId}-${uuid}-source`;
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
   onDatasetSelected,
+  onClickPopup,
+  clusterLayerConfig,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
   const dispatch = useDispatch<AppDispatch>();
   const [spatialExtentsUUid, setSpatialExtentsUUid] = useState<Array<string>>();
 
+  // util function to get collection data given uuid
+  // and based on boolean indicating whether to fetch only geometry-related properties
+  const getCollectionData = useCallback(
+    async ({ uuid, geometryOnly }: { uuid: string; geometryOnly: boolean }) => {
+      const param: SearchParameters = {
+        filter: `id='${uuid}'`,
+        properties: geometryOnly ? "id,geometry" : undefined,
+      };
+
+      return dispatch(fetchResultNoStore(param))
+        .unwrap()
+        .then((value) => value.collections[0])
+        .catch((error) => {
+          console.error("Error fetching collection data:", error);
+          // TODO: handle error in ErrorBoundary
+        });
+    },
+    [dispatch]
+  );
+
+  const popup = useMemo(
+    () =>
+      new Popup({
+        closeButton: false,
+        closeOnClick: false,
+        maxWidth: "none",
+      }),
+    []
+  );
+
+  const renderPopupContent = useCallback(
+    async (uuid: string) => {
+      const collection = await getCollectionData({
+        uuid,
+        geometryOnly: false,
+      });
+      if (!collection) return;
+      return <MapPopup collection={collection} onClickPopup={onClickPopup} />;
+    },
+    [getCollectionData, onClickPopup]
+  );
+
+  const renderLoadingPopup = useCallback(
+    () => <MapPopup collection={{} as OGCCollection} isLoading />,
+    []
+  );
+
+  const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
+
+  const clusterSourceId = useMemo(() => getClusterSourceId(layerId), [layerId]);
+
+  const clusterLayer = useMemo(() => getClusterLayerId(layerId), [layerId]);
+
+  const unclusterPointLayer = useMemo(
+    () => getUnclusterPointId(layerId),
+    [layerId]
+  );
+
   const updateSource = useCallback(() => {
-    const clusterSourceId = getClusterSourceId(
-      getLayerId(map?.getContainer().id)
-    );
     if (map?.getSource(clusterSourceId)) {
       (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createClusterDataSource(collections)
+        createCentroidDataSource(collections)
       );
     }
-  }, [map, collections]);
+  }, [map, clusterSourceId, collections]);
 
-  const unclusterPointLayerMouseClickEventHandler = useCallback(
+  const onUnclusterPointMouseEnter = useCallback(
+    async (ev: MapLayerMouseEvent): Promise<void> => {
+      if (!ev.target || !map) return;
+
+      ev.target.getCanvas().style.cursor = "pointer";
+
+      // Copy coordinates array.
+      if (ev.features && ev.features.length > 0) {
+        const feature = ev.features[0] as Feature<Point>;
+        const geometry = feature.geometry;
+        const coordinates = geometry.coordinates.slice();
+        const uuid = feature.properties?.uuid as string;
+
+        // Create a new div container for the popup
+        const popupNode = document.createElement("div");
+        const root = createRoot(popupNode);
+
+        // Render a loading state in the popup
+        root.render(renderLoadingPopup());
+
+        // Set the popup's position and content, then add it to the map
+        popup
+          .setLngLat(coordinates as [number, number])
+          .setDOMContent(popupNode)
+          .addTo(map);
+
+        // Fetch and render the actual content for the popup
+        const content = await renderPopupContent(uuid);
+        root.render(content);
+      }
+    },
+    [map, popup, renderLoadingPopup, renderPopupContent]
+  );
+
+  const onUnclusterPointMouseLeave = useCallback(
+    (ev: MapLayerMouseEvent) => {
+      ev.target.getCanvas().style.cursor = "";
+      popup.remove();
+    },
+    [popup]
+  );
+
+  const onUnclusterPointMouseClick = useCallback(
     (ev: MapLayerMouseEvent): void => {
       // Make sure even same id under same area will be set once.
       if (ev.features) {
@@ -108,6 +234,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
         ];
         setSpatialExtentsUUid(uuids);
+
         // Give time for the state to be updated
         if (onDatasetSelected) setTimeout(() => onDatasetSelected(uuids), 100);
       }
@@ -115,7 +242,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [setSpatialExtentsUUid, onDatasetSelected]
   );
 
-  const clusterLayerMouseClickEventHandler = useCallback(
+  const onClusterCircleMouseClick = useCallback(
     (ev: MapLayerMouseEvent): void => {
       if (ev.lngLat) {
         map?.easeTo({
@@ -132,17 +259,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     const sourceIds = new Array<string>();
     const layerIds = new Array<string>();
 
-    const createPointsLayerId = (id: string) => `${id}-points`;
-    const createLinesLayerId = (id: string) => `${id}-lines`;
-    const createPolygonLayerId = (id: string) => `${id}-polygons`;
-    const createSourceId = (layerId: string, uuid: string) =>
-      `${layerId}-${uuid}-source`;
-
-    spatialExtentsUUid?.forEach((uuid: string) => {
-      const layerId = getLayerId(map?.getContainer().id);
+    spatialExtentsUUid?.forEach(async (uuid: string) => {
       const sourceId = createSourceId(layerId, uuid);
-      const clusterLayer = getclusterLayerId(layerId);
-
       sourceIds.push(sourceId);
 
       const pointLayerId = createPointsLayerId(sourceId);
@@ -154,69 +272,62 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       const polygonLayerId = createPolygonLayerId(sourceId);
       layerIds.push(polygonLayerId);
 
-      const param: SearchParameters = {
-        filter: `id='${uuid}'`,
-        properties: "id,geometry",
+      const collection = await getCollectionData({
+        uuid,
+        geometryOnly: true,
+      });
+
+      if (!map?.getSource(sourceId)) {
+        map?.addSource(sourceId, {
+          type: "geojson",
+          data: collection?.getGeometry(),
+        });
+      }
+
+      // util function to check if layer exists or not and add a before layer Id
+      const addLayerIfNotExists = (id: string, layer: any) => {
+        if (!map?.getLayer(id)) {
+          map?.addLayer(layer, clusterLayer);
+        }
       };
 
-      dispatch(fetchResultNoStore(param))
-        .unwrap()
-        .then((collections: OGCCollections) => {
-          // Give we use uuid, there will be one record only
-          const collection = collections.collections[0];
+      // Add layers for each geometry type within the GeometryCollection if not exists
+      addLayerIfNotExists(pointLayerId, {
+        id: pointLayerId,
+        type: "symbol",
+        source: sourceId,
+        filter: ["==", "$type", "Point"],
+        layout: {
+          "icon-image": "marker-15",
+          "icon-size": 1.5,
+          "text-field": ["get", "title"],
+          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+          "text-offset": [0, 1.25],
+          "text-anchor": "top",
+        },
+      });
 
-          map?.addSource(sourceId, {
-            type: "geojson",
-            data: collection.getGeometry(),
-          });
+      addLayerIfNotExists(lineLayerId, {
+        id: lineLayerId,
+        type: "line",
+        source: sourceId,
+        filter: ["==", "$type", "LineString"],
+        paint: {
+          "line-color": "#ff0000",
+          "line-width": 2,
+        },
+      });
 
-          // Add layers for each geometry type within the GeometryCollection
-          map?.addLayer(
-            {
-              id: pointLayerId,
-              type: "symbol",
-              source: sourceId,
-              filter: ["==", "$type", "Point"],
-              layout: {
-                "icon-image": "marker-15", // Built-in icon provided by Mapbox
-                "icon-size": 1.5,
-                "text-field": ["get", "title"],
-                "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-                "text-offset": [0, 1.25],
-                "text-anchor": "top",
-              },
-            },
-            clusterLayer
-          );
-
-          map?.addLayer(
-            {
-              id: lineLayerId,
-              type: "line",
-              source: sourceId,
-              filter: ["==", "$type", "LineString"],
-              paint: {
-                "line-color": "#ff0000",
-                "line-width": 2,
-              },
-            },
-            clusterLayer
-          );
-
-          map?.addLayer(
-            {
-              id: polygonLayerId,
-              type: "fill",
-              source: sourceId,
-              filter: ["==", "$type", "Polygon"],
-              paint: {
-                "fill-color": "#00ff00",
-                "fill-opacity": 0.4,
-              },
-            },
-            clusterLayer
-          );
-        });
+      addLayerIfNotExists(polygonLayerId, {
+        id: polygonLayerId,
+        type: "fill",
+        source: sourceId,
+        filter: ["==", "$type", "Polygon"],
+        paint: {
+          "fill-color": "#fff",
+          "fill-opacity": 0.4,
+        },
+      });
     });
 
     return () => {
@@ -225,6 +336,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           if (map?.getLayer(id)) map?.removeLayer(id);
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
+          console.log("Ok to ignore remove layer error", error);
+          // TODO: handle error in ErrorBoundary
         }
       });
 
@@ -233,19 +346,16 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           if (map?.getSource(id)) map?.removeSource(id);
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
+          console.log("Ok to ignore remove source error", error);
+          // TODO: handle error in ErrorBoundary
         }
       });
     };
-  }, [map, dispatch, spatialExtentsUUid]);
+  }, [spatialExtentsUUid, layerId, getCollectionData, map, clusterLayer]);
 
   // This is use to render the cluster circle and add event handle to circles
   useEffect(() => {
     if (map === null) return;
-
-    const layerId = getLayerId(map?.getContainer().id);
-    const clusterSourceId = getClusterSourceId(layerId);
-    const clusterLayer = getclusterLayerId(layerId);
-    const unclusterPointLayer = getUnclusterPointId(layerId);
 
     // This situation is map object created, hence not null, but not completely loaded
     // and therefore you will have problem setting source and layer. Set-up a listener
@@ -255,12 +365,17 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       // these changes so use this check to avoid duplicate add
       if (map?.getSource(clusterSourceId)) return;
 
+      const config = mergeWithDefaults(
+        defaultClusterLayerConfig,
+        clusterLayerConfig
+      );
+
       map?.addSource(clusterSourceId, {
         type: "geojson",
-        data: createClusterDataSource(undefined),
+        data: createCentroidDataSource(undefined),
         cluster: true,
         clusterMaxZoom: 14,
-        clusterRadius: 10,
+        clusterRadius: 50,
       });
 
       // Add layers for multiple items, that is cluster
@@ -270,30 +385,30 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         source: clusterSourceId,
         filter: ["has", "point_count"],
         paint: {
-          "circle-stroke-width": STROKE_WIDTH,
-          "circle-stroke-color": "#fff",
-          "circle-opacity": OPACITY,
+          "circle-stroke-width": config.clusterCircleStrokeWidth,
+          "circle-stroke-color": config.clusterCircleStrokeColor,
+          "circle-opacity": config.clusterCircleOpacity,
           "circle-color": [
             "step",
             ["get", "point_count"],
-            "#51bbd6",
-            5,
-            "#f1f075",
-            30,
-            "#f28cb1",
-            50,
-            "#fe8cf1",
+            config.clusterCircleColor?.default,
+            config.pointCountThresholds?.medium,
+            config.clusterCircleColor?.medium,
+            config.pointCountThresholds?.large,
+            config.clusterCircleColor?.large,
+            config.pointCountThresholds?.extra_large,
+            config.clusterCircleColor?.extra_large,
           ],
           "circle-radius": [
             "step",
             ["get", "point_count"],
-            10,
-            20,
-            20,
-            30,
-            30,
-            50,
-            50,
+            config.clusterCircleSize?.default,
+            config.pointCountThresholds?.medium,
+            config.clusterCircleSize?.medium,
+            config.pointCountThresholds?.large,
+            config.clusterCircleSize?.large,
+            config.pointCountThresholds?.extra_large,
+            config.clusterCircleSize?.extra_large,
           ],
         },
       });
@@ -306,7 +421,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         layout: {
           "text-field": "{point_count_abbreviated}",
           "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-          "text-size": 12,
+          "text-size": config.clusterCircleTextSize,
         },
       });
       // Layer for only 1 item in the circle
@@ -316,29 +431,25 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         source: clusterSourceId,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-opacity": OPACITY,
-          "circle-color": "#11b4da",
-          "circle-radius": 8,
-          "circle-stroke-width": STROKE_WIDTH,
-          "circle-stroke-color": "#fff",
+          "circle-opacity": config.unclusterPointOpacity,
+          "circle-color": config.unclusterPointColor,
+          "circle-radius": config.unclusterPointRadius,
+          "circle-stroke-width": config.unclusterPointStrokeWidth,
+          "circle-stroke-color": config.unclusterPointStrokeColor,
         },
       });
 
       // Change the cursor to a pointer for uncluster point
-      map?.on(
-        "mouseenter",
-        unclusterPointLayer,
-        unclusterPointLayerMouseEnterEventHandler
-      );
-      map?.on("mouseenter", clusterLayer, clusterLayerMouseEnterEventHandler);
+      map?.on("mouseenter", unclusterPointLayer, onUnclusterPointMouseEnter);
+      map?.on("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
 
       // Change the cursor back to default when it leaves the unclustered points
-      map?.on(
-        "mouseleave",
-        unclusterPointLayer,
-        unclusterPointLayerMouseLeaveEventHandler
-      );
-      map?.on("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
+      map?.on("mouseleave", unclusterPointLayer, onUnclusterPointMouseLeave);
+      map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
+
+      map?.on("click", clusterLayer, onClusterCircleMouseClick);
+
+      map?.on("click", unclusterPointLayer, onUnclusterPointMouseClick);
     };
 
     map?.once("load", createLayers);
@@ -348,24 +459,15 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     map?.on("styledata", createLayers);
 
     return () => {
-      map?.off(
-        "mouseenter",
-        unclusterPointLayer,
-        unclusterPointLayerMouseEnterEventHandler
-      );
-      map?.off("mouseenter", clusterLayer, clusterLayerMouseEnterEventHandler);
-      map?.off(
-        "mouseleave",
-        unclusterPointLayer,
-        unclusterPointLayerMouseLeaveEventHandler
-      );
-      map?.off("mouseleave", clusterLayer, clusterLayerMouseLeaveEventHandler);
+      map?.off("mouseenter", unclusterPointLayer, onUnclusterPointMouseEnter);
+      map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
+      map?.off("mouseleave", unclusterPointLayer, onUnclusterPointMouseLeave);
+      map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
       // Clean up resource when you click on the next spatial extents, map is
       // still working in this page.
       try {
-        if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
-
+        // Remove layers first
         if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
 
         if (map?.getLayer(`${layerId}-cluster-count`))
@@ -376,72 +478,36 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
         if (map?.getLayer(`${layerId}-unclustered-count`))
           map?.removeLayer(`${layerId}-unclustered-count`);
+
+        // Then remove the source
+        if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
       } catch (error) {
         // If source not found and throw exception then layer will not exist
+        // TODO: handle error in ErrorBoundary
       }
     };
     // Make sure map is the only dependency so that it will not trigger twice run
     // where you will add source and remove layer accidentally.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
   useEffect(() => {
-    const layerId = getLayerId(map?.getContainer().id);
-    const clusterLayer = getclusterLayerId(layerId);
-
-    // If user click a cluster layer, zoom into it a bit
-    map?.on("click", clusterLayer, clusterLayerMouseClickEventHandler);
-    return () => {
-      map?.off("click", clusterLayer, clusterLayerMouseClickEventHandler);
-    };
-  }, [map, clusterLayerMouseClickEventHandler]);
-
-  useEffect(() => {
-    addSpatialExtentsLayer();
-
-    // When user change the map style, for example change base map, all layer will be removed
-    // as per mapbox design, we need to listen to that even and add data
-    map?.on("styledata", addSpatialExtentsLayer);
-
-    return () => {
-      map?.off("styledata", addSpatialExtentsLayer);
-    };
-  }, [map, addSpatialExtentsLayer]);
-
-  useEffect(() => {
     updateSource();
-
-    // When user change the map style, for example change base map, all layer will be removed
-    // as per mapbox design, we need to listen to that even and add data
     map?.on("styledata", updateSource);
-
     return () => {
       map?.off("styledata", updateSource);
     };
   }, [map, updateSource]);
 
-  // Setup the event handler
+  // Remove all layers and sources created by addSpatialExtentsLayer
   useEffect(() => {
-    const layerId = getLayerId(map?.getContainer().id);
-    const unclusterPointLayer = getUnclusterPointId(layerId);
-
-    map?.on(
-      "click",
-      unclusterPointLayer,
-      unclusterPointLayerMouseClickEventHandler
-    );
-
+    const cleanup = addSpatialExtentsLayer();
     return () => {
-      // Map will be destroy by default, so in theory there is no need
-      // to clean up resource in this level
-      map?.off(
-        "click",
-        unclusterPointLayer,
-        unclusterPointLayerMouseClickEventHandler
-      );
+      cleanup();
     };
-  }, [map, unclusterPointLayerMouseClickEventHandler]);
+  }, [addSpatialExtentsLayer, map, layerId, spatialExtentsUUid]);
 
-  return <React.Fragment />;
+  return null;
 };
 
 export default ClusterLayer;

@@ -7,32 +7,62 @@ import NavigationControl from "../../../components/map/mapbox/controls/Navigatio
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MenuControl, {
   BaseMapSwitcher,
+  MapLayerSwitcher,
 } from "../../../components/map/mapbox/controls/MenuControl";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../components/common/store/searchReducer";
 import Layers from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
+import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 
 const mapContainerId = "map-container-id";
 
 interface MapSectionProps {
-  layers: OGCCollection[];
+  collections: OGCCollection[];
   showFullMap: boolean;
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
   onToggleClicked: (v: boolean) => void;
   onDatasetSelected?: (uuid: Array<string>) => void;
+  onClickPopup: (uuid: string) => void;
 }
 
 const MapSection: React.FC<MapSectionProps> = ({
   onMapZoomOrMove,
   onToggleClicked,
   onDatasetSelected,
-  layers,
+  collections,
   showFullMap,
+  onClickPopup,
 }) => {
+  const [selectedLayer, setSelectedLayer] = useState<string | null>("heatmap");
+
+  const createPresentationLayers = useCallback(
+    (id: string | null) => {
+      switch (id) {
+        case "heatmap":
+          return (
+            <HeatmapLayer
+              collections={collections}
+              onDatasetSelected={onDatasetSelected}
+            />
+          );
+
+        default:
+          return (
+            <ClusterLayer
+              collections={collections}
+              onDatasetSelected={onDatasetSelected}
+              onClickPopup={onClickPopup}
+            />
+          );
+      }
+    },
+    [collections, onDatasetSelected, onClickPopup]
+  );
+
   return (
     <Grid
       item
@@ -43,7 +73,7 @@ const MapSection: React.FC<MapSectionProps> = ({
         flex: 1,
       }}
     >
-      <Paper id={mapContainerId} sx={{ minHeight: "726px" }}>
+      <Paper id={mapContainerId} sx={{ minHeight: "80vh" }}>
         <Map
           panelId={mapContainerId}
           onZoomEvent={onMapZoomOrMove}
@@ -57,13 +87,27 @@ const MapSection: React.FC<MapSectionProps> = ({
             <NavigationControl />
             <ScaleControl />
             <MenuControl menu={<BaseMapSwitcher />} />
-          </Controls>
-          <Layers>
-            <ClusterLayer
-              collections={layers}
-              onDatasetSelected={onDatasetSelected}
+            <MenuControl
+              menu={
+                <MapLayerSwitcher
+                  layers={[
+                    {
+                      id: "cluster",
+                      name: "Cluster",
+                      default: selectedLayer === "cluster",
+                    },
+                    {
+                      id: "heatmap",
+                      name: "Heatmap",
+                      default: selectedLayer === "heatmap",
+                    },
+                  ]}
+                  onEvent={(id: string) => setSelectedLayer(id)}
+                />
+              }
             />
-          </Layers>
+          </Controls>
+          <Layers>{createPresentationLayers(selectedLayer)}</Layers>
         </Map>
       </Paper>
     </Grid>

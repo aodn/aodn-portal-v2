@@ -27,7 +27,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [hasSnapshotsFinished, setHasSnapshotsFinished] =
     useState<boolean>(false);
 
-  const extentsLength = collection?.extent?.bbox.length;
+  const extentsLength = collection?.extent?.bbox?.length;
   useEffect(() => {
     if (photos.length === extentsLength) {
       setHasSnapshotsFinished(true);
