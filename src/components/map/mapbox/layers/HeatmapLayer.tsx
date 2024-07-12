@@ -52,7 +52,7 @@ interface HeatmapConfig {
 
 interface HeatmapLayerProps extends LayersProps {
   onClickPopup?: (uuid: string) => void;
-  heatmapLayerConfig: Partial<HeatmapConfig>;
+  heatmapLayerConfig?: Partial<HeatmapConfig>;
 }
 
 const defaultHeatmapConfig: HeatmapConfig = {

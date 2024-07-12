@@ -52,7 +52,7 @@ interface ClusterLayerConfig {
 
 interface ClusterLayerProps extends LayersProps {
   onClickPopup?: (uuid: string) => void;
-  clusterLayerConfig: Partial<ClusterLayerConfig>;
+  clusterLayerConfig?: Partial<ClusterLayerConfig>;
 }
 
 const defaultClusterLayerConfig: ClusterLayerConfig = {
