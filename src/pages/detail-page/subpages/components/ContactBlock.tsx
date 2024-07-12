@@ -5,10 +5,11 @@ import ContactCard from "./ContactCard";
 import CollapseFrame from "./CollapseFrame";
 
 interface ContactBlockProps {
+  title: string;
   contacts: IContact[];
 }
 
-const ContactBlock: React.FC<ContactBlockProps> = ({ contacts }) => {
+const ContactBlock: React.FC<ContactBlockProps> = ({ title, contacts }) => {
   const collapseComponents: ReactNode[] = useMemo(() => {
     const returnedList: ReactNode[] = [];
     contacts?.map((contact, index) => {
@@ -28,7 +29,7 @@ const ContactBlock: React.FC<ContactBlockProps> = ({ contacts }) => {
   }, [contacts]);
 
   return (
-    <BlockList title="Contacts" childrenList={collapseComponents}></BlockList>
+    <BlockList title={title} childrenList={collapseComponents}></BlockList>
   );
 };
 

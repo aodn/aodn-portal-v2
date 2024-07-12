@@ -28,7 +28,10 @@ const MetadataInformationPanel = () => {
       {
         title: "Metadata Contact",
         component: (
-          <ContactBlock contacts={metadataContact ? metadataContact : []} />
+          <ContactBlock
+            title="Metadata Contact"
+            contacts={metadataContact ? metadataContact : []}
+          />
         ),
       },
       {
