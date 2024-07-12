@@ -10,7 +10,6 @@ import MapContext from "../MapContext";
 import { Feature, Point } from "geojson";
 import {
   OGCCollection,
-  OGCCollections,
   SearchParameters,
   fetchResultNoStore,
 } from "../../../common/store/searchReducer";
@@ -128,16 +127,13 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         properties: geometryOnly ? "id,geometry" : undefined,
       };
 
-      try {
-        const collections: OGCCollections = await dispatch(
-          fetchResultNoStore(param)
-        ).unwrap();
-        // Given we use uuid, there will be one record only
-        return collections.collections[0];
-      } catch (error) {
-        console.error("Error fetching collection data:", error);
-        // TODO: handle error in ErrorBoundary
-      }
+      return dispatch(fetchResultNoStore(param))
+        .unwrap()
+        .then((value) => value.collections[0])
+        .catch((error) => {
+          console.error("Error fetching collection data:", error);
+          // TODO: handle error in ErrorBoundary
+        });
     },
     [dispatch]
   );
