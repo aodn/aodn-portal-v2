@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import KeywordBlock from "../components/KeywordBlock";
-import PlainTextBlock from "../components/PlainTextBlock";
 import ContactBlock from "../components/ContactBlock";
 import NavigatablePanel from "../components/NavigatablePanel";
+import CreditBlock from "../components/CreditBlock";
 
 const AboutPanel = () => {
   const context = useDetailPageContext();
@@ -39,9 +39,7 @@ const AboutPanel = () => {
       },
       {
         title: "Credits",
-        component: (
-          <PlainTextBlock title="Credits" texts={credits ? credits : []} />
-        ),
+        component: <CreditBlock credits={credits ? credits : []} />,
       },
     ],
     [aboutContacts, credits, themes]
