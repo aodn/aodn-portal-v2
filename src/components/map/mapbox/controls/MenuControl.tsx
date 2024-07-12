@@ -49,6 +49,7 @@ const EVENT_MENU_CLICKED = "event-menu-clicked";
 
 interface ControlProps {
   map?: MapBox;
+  onEvent?: (...args: any[]) => void;
 }
 
 type Menus = React.ReactElement<
@@ -64,7 +65,7 @@ interface MenuClickedEvent {
 interface BaseMapSwitcherProps extends ControlProps {}
 
 interface LayerSwitcherProps extends ControlProps {
-  layers: Array<{ id: string; name: string }>;
+  layers: Array<{ id: string; name: string; default?: boolean }>;
 }
 
 interface MenuControlProps {
@@ -112,6 +113,8 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
   );
 
   useEffect(() => {
+    // Handle event when other control clicked, this component should close
+    // the menu
     const handleEvent = (evt: MenuClickedEvent) => {
       if (evt.component.type !== BaseMapSwitcher) {
         setOpen(false);
@@ -250,16 +253,24 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
   );
 };
 
-const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({ map, layers }) => {
+const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
+  map,
+  layers,
+  onEvent,
+}) => {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [currentLayer, setCurrentLayer] = useState(null);
+  const [currentLayer, setCurrentLayer] = useState<string | undefined>(
+    layers.find((i) => i.default)?.id
+  );
 
   const handleToggle = useCallback(() => {
     setOpen((prevOpen) => !prevOpen);
   }, [setOpen]);
 
   useEffect(() => {
+    // Handle event when other control clicked, this component should close
+    // the menu
     const handleEvent = (evt: MenuClickedEvent) => {
       if (evt.component.type !== MapLayerSwitcher) {
         setOpen(false);
@@ -332,9 +343,10 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({ map, layers }) => {
             <FormControl component="fieldset">
               <RadioGroup
                 value={currentLayer}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  updateLayerStyle(e.target.value)
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setCurrentLayer(e.target.value);
+                  if (onEvent) onEvent(e.target.value);
+                }}
               >
                 {layers.map((l) => (
                   <FormControlLabel
@@ -342,6 +354,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({ map, layers }) => {
                     value={l.id}
                     control={
                       <Radio
+                        checked={currentLayer === l.id}
                         sx={{
                           "& .MuiSvgIcon-root": {
                             fontSize: fontSize["mapMenuSubItem"],

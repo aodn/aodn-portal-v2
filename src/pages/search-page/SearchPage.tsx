@@ -207,7 +207,7 @@ const SearchPage = () => {
           onClickCard={handleNavigateToDetailPage}
         />
         <MapSection
-          layers={layers}
+          collections={layers}
           showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
           onMapZoomOrMove={onMapZoomOrMove}
           onToggleClicked={onToggleDisplay}

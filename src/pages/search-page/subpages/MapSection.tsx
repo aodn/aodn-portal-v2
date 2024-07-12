@@ -9,16 +9,17 @@ import MenuControl, {
   BaseMapSwitcher,
   MapLayerSwitcher,
 } from "../../../components/map/mapbox/controls/MenuControl";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../components/common/store/searchReducer";
 import Layers from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
+import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 
 const mapContainerId = "map-container-id";
 
 interface MapSectionProps {
-  layers: OGCCollection[];
+  collections: OGCCollection[];
   showFullMap: boolean;
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
@@ -32,10 +33,36 @@ const MapSection: React.FC<MapSectionProps> = ({
   onMapZoomOrMove,
   onToggleClicked,
   onDatasetSelected,
-  layers,
+  collections,
   showFullMap,
   onClickPopup,
 }) => {
+  const [selectedLayer, setSelectedLayer] = useState<string | null>("heatmap");
+
+  const createPresentationLayers = useCallback(
+    (id: string | null) => {
+      switch (id) {
+        case "heatmap":
+          return (
+            <HeatmapLayer
+              collections={collections}
+              onDatasetSelected={onDatasetSelected}
+            />
+          );
+
+        default:
+          return (
+            <ClusterLayer
+              collections={collections}
+              onDatasetSelected={onDatasetSelected}
+              onClickPopup={onClickPopup}
+            />
+          );
+      }
+    },
+    [collections, onDatasetSelected]
+  );
+
   return (
     <Grid
       item
@@ -64,20 +91,23 @@ const MapSection: React.FC<MapSectionProps> = ({
               menu={
                 <MapLayerSwitcher
                   layers={[
-                    { id: "cluster", name: "Cluster" },
-                    { id: "heatmap", name: "Heatmap" },
+                    {
+                      id: "cluster",
+                      name: "Cluster",
+                      default: selectedLayer === "cluster",
+                    },
+                    {
+                      id: "heatmap",
+                      name: "Heatmap",
+                      default: selectedLayer === "heatmap",
+                    },
                   ]}
+                  onEvent={(id: string) => setSelectedLayer(id)}
                 />
               }
             />
           </Controls>
-          <Layers>
-            <ClusterLayer
-              collections={layers}
-              onDatasetSelected={onDatasetSelected}
-              onClickPopup={onClickPopup}
-            />
-          </Layers>
+          <Layers>{createPresentationLayers(selectedLayer)}</Layers>
         </Map>
       </Paper>
     </Grid>
