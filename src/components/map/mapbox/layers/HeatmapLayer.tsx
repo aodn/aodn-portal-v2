@@ -325,9 +325,13 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       map?.off("mouseenter", circleLayer, onPointMouseEnter);
       map?.off("mouseleave", circleLayer, onPointMouseLeave);
 
-      if (map?.getLayer(heatmapLayer)) map?.removeLayer(heatmapLayer);
-      if (map?.getLayer(circleLayer)) map?.removeLayer(circleLayer);
-      if (map?.getSource(sourceId)) map?.removeSource(sourceId);
+      try {
+        if (map?.getLayer(heatmapLayer)) map?.removeLayer(heatmapLayer);
+        if (map?.getLayer(circleLayer)) map?.removeLayer(circleLayer);
+        if (map?.getSource(sourceId)) map?.removeSource(sourceId);
+      } catch (e) {
+        // OK to ignore if no layer then no source as well
+      }
     };
   }, [
     map,
