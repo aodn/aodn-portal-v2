@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useCallback,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Map, MapboxEvent, Style } from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -60,7 +54,9 @@ const styles = [
 ];
 
 const defaultStyle = 3;
-const DEBOUNCE_BEFORE_EVENT_FIRE = 2500;
+
+// Magic number, try and error by experience
+const DEBOUNCE_BEFORE_EVENT_FIRE = 1250;
 
 const ReactMap = ({
   panelId,

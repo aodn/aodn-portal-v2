@@ -25,34 +25,35 @@ import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
 } from "./Layers";
+import { mergeWithDefaults } from "../../../common/utils";
 
 interface ClusterSize {
   default?: number | string;
-  medium?: number | string;
-  large?: number | string;
-  extra_large?: number | string;
+  medium: number | string;
+  large: number | string;
+  extra_large: number | string;
 }
 
 interface ClusterLayerConfig {
-  pointCountThresholds?: ClusterSize;
-  clusterMaxZoom?: number;
-  clusterRadius?: number;
-  clusterCircleSize?: ClusterSize;
-  clusterCircleColor?: ClusterSize;
-  clusterCircleOpacity?: number;
-  clusterCircleStrokeWidth?: number;
-  clusterCircleStrokeColor?: string;
-  clusterCircleTextSize?: number;
-  unclusterPointColor?: string;
-  unclusterPointOpacity?: number;
-  unclusterPointStrokeWidth?: number;
-  unclusterPointStrokeColor?: string;
-  unclusterPointRadius?: number;
+  pointCountThresholds: ClusterSize;
+  clusterMaxZoom: number;
+  clusterRadius: number;
+  clusterCircleSize: ClusterSize;
+  clusterCircleColor: ClusterSize;
+  clusterCircleOpacity: number;
+  clusterCircleStrokeWidth: number;
+  clusterCircleStrokeColor: string;
+  clusterCircleTextSize: number;
+  unclusterPointColor: string;
+  unclusterPointOpacity: number;
+  unclusterPointStrokeWidth: number;
+  unclusterPointStrokeColor: string;
+  unclusterPointRadius: number;
 }
 
 interface ClusterLayerProps extends LayersProps {
   onClickPopup?: (uuid: string) => void;
-  clusterLayerConfig?: ClusterLayerConfig;
+  clusterLayerConfig: Partial<ClusterLayerConfig>;
 }
 
 const defaultClusterLayerConfig: ClusterLayerConfig = {
@@ -87,34 +88,6 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   unclusterPointStrokeWidth: 1,
   unclusterPointStrokeColor: "#fff",
   unclusterPointRadius: 8,
-};
-
-// util function for get cluster layer config
-// the default cluster layer config will be replaced by given custom cluster layer config
-const getClusterLayerConfig = ({
-  clusterLayerConfig,
-  defaultClusterLayerConfig,
-}: {
-  clusterLayerConfig?: ClusterLayerConfig;
-  defaultClusterLayerConfig: ClusterLayerConfig;
-}): ClusterLayerConfig => {
-  if (!clusterLayerConfig) return defaultClusterLayerConfig;
-  return {
-    ...defaultClusterLayerConfig,
-    ...clusterLayerConfig,
-    pointCountThresholds: {
-      ...defaultClusterLayerConfig.pointCountThresholds,
-      ...clusterLayerConfig.pointCountThresholds,
-    },
-    clusterCircleSize: {
-      ...defaultClusterLayerConfig.clusterCircleSize,
-      ...clusterLayerConfig.clusterCircleSize,
-    },
-    clusterCircleColor: {
-      ...defaultClusterLayerConfig.clusterCircleColor,
-      ...clusterLayerConfig.clusterCircleColor,
-    },
-  };
 };
 
 // These function help to get the correct id and reduce the need to set those id in the
@@ -396,10 +369,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       // these changes so use this check to avoid duplicate add
       if (map?.getSource(clusterSourceId)) return;
 
-      const config = getClusterLayerConfig({
-        clusterLayerConfig,
+      const config = mergeWithDefaults(
         defaultClusterLayerConfig,
-      });
+        clusterLayerConfig
+      );
 
       map?.addSource(clusterSourceId, {
         type: "geojson",
