@@ -60,7 +60,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           );
       }
     },
-    [collections, onDatasetSelected]
+    [collections, onDatasetSelected, onClickPopup]
   );
 
   return (

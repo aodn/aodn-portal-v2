@@ -1,8 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useRef,
+} from "react";
 import { Map, MapboxEvent, Style } from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
+import loadash from "lodash";
 
 interface MapProps {
   centerLongitude?: number;
@@ -53,6 +60,7 @@ const styles = [
 ];
 
 const defaultStyle = 3;
+const DEBOUNCE_BEFORE_EVENT_FIRE = 2500;
 
 const ReactMap = ({
   panelId,
@@ -65,6 +73,31 @@ const ReactMap = ({
   children,
 }: React.PropsWithChildren<MapProps>) => {
   const [map, setMap] = useState<Map | null>(null);
+
+  // Debouce to make the map transit smoother
+  const debounceOnZoomEvent = useRef(
+    loadash.debounce(
+      useCallback(
+        async (
+          event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+        ) => onZoomEvent && onZoomEvent(event),
+        [onZoomEvent]
+      ),
+      DEBOUNCE_BEFORE_EVENT_FIRE
+    )
+  ).current;
+
+  const debounceOnMoveEvent = useRef(
+    loadash.debounce(
+      useCallback(
+        async (
+          event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+        ) => onMoveEvent && onMoveEvent(event),
+        [onMoveEvent]
+      ),
+      DEBOUNCE_BEFORE_EVENT_FIRE
+    )
+  ).current;
 
   useEffect(() => {
     setMap((m) =>
@@ -82,20 +115,23 @@ const ReactMap = ({
     );
 
     if (map !== null) {
-      const zoomEvent = (
-        e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-      ) => onZoomEvent && onZoomEvent(e);
+      // const zoomEvent = (
+      //   e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+      // ) => onZoomEvent && onZoomEvent(e);
 
-      const moveEvent = (
-        e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-      ) => onMoveEvent && onMoveEvent(e);
+      // const moveEvent = (
+      //   e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+      // ) => onMoveEvent && onMoveEvent(e);
 
       map.setProjection(projection);
       // Stop drag cause map to rotate.
       map.dragRotate.disable();
 
-      map.on("zoomend", zoomEvent);
-      map.on("moveend", moveEvent);
+      map.on("movestart", () => debounceOnZoomEvent.cancel());
+      map.on("zoomestart", () => debounceOnZoomEvent.cancel());
+
+      map.on("zoomend", debounceOnZoomEvent);
+      map.on("moveend", debounceOnMoveEvent);
 
       // Create a resize observer to the canvas so we know if its size have changed
       // and we need to redraw the map
@@ -107,8 +143,8 @@ const ReactMap = ({
 
       return () => {
         resizeObserver.unobserve(map.getContainer());
-        map.off("zoomend", zoomEvent);
-        map.off("moveend", moveEvent);
+        map.off("zoomend", debounceOnZoomEvent);
+        map.off("moveend", debounceOnMoveEvent);
 
         // This cleanup all associated resources include controls, so no need to
         // call removeControl()
@@ -125,6 +161,8 @@ const ReactMap = ({
     map,
     onZoomEvent,
     onMoveEvent,
+    debounceOnZoomEvent,
+    debounceOnMoveEvent,
   ]);
 
   return (
