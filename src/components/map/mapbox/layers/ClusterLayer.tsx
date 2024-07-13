@@ -13,7 +13,7 @@ import {
   SearchParameters,
   fetchResultNoStore,
 } from "../../../common/store/searchReducer";
-import { GeoJSONSource, MapLayerMouseEvent, Popup } from "mapbox-gl";
+import { GeoJSONSource, MapMouseEvent, Popup } from "mapbox-gl";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
 import { createRoot } from "react-dom/client";
@@ -185,7 +185,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   }, [map, clusterSourceId, collections]);
 
   const onUnclusterPointMouseEnter = useCallback(
-    async (ev: MapLayerMouseEvent): Promise<void> => {
+    async (ev: MapMouseEvent): Promise<void> => {
       if (!ev.target || !map) return;
 
       ev.target.getCanvas().style.cursor = "pointer";
@@ -219,7 +219,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   );
 
   const onUnclusterPointMouseLeave = useCallback(
-    (ev: MapLayerMouseEvent) => {
+    (ev: MapMouseEvent) => {
       ev.target.getCanvas().style.cursor = "";
       popup.remove();
     },
@@ -227,7 +227,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   );
 
   const onUnclusterPointMouseClick = useCallback(
-    (ev: MapLayerMouseEvent): void => {
+    (ev: MapMouseEvent): void => {
       // Make sure even same id under same area will be set once.
       if (ev.features) {
         const uuids = [
@@ -243,7 +243,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   );
 
   const onClusterCircleMouseClick = useCallback(
-    (ev: MapLayerMouseEvent): void => {
+    (ev: MapMouseEvent): void => {
       if (ev.lngLat) {
         map?.easeTo({
           center: ev.lngLat,

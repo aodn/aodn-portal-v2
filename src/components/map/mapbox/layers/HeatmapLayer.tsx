@@ -2,20 +2,15 @@ import React, { FC, useCallback, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
 
 import {
-  Expression,
+  ExpressionSpecification,
   GeoJSONSource,
-  MapLayerMouseEvent,
+  MapMouseEvent,
   Popup,
   StyleFunction,
 } from "mapbox-gl";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
-import {
-  LayersProps,
-  createCentroidDataSource,
-  defaultMouseEnterEventHandler,
-  defaultMouseLeaveEventHandler,
-} from "./Layers";
+import { LayersProps, createCentroidDataSource } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../popup/MapPopup";
 import {
@@ -28,14 +23,14 @@ import { Feature, Point } from "geojson";
 
 interface HeatmapLayer {
   maxZoom: number;
-  weight: StyleFunction | Expression;
-  color: StyleFunction | Expression;
-  radius: number | StyleFunction | Expression;
+  weight: StyleFunction | ExpressionSpecification;
+  color: StyleFunction | ExpressionSpecification;
+  radius: number | StyleFunction | ExpressionSpecification;
 }
 
 interface HeatmapCircle {
-  radius: StyleFunction | Expression;
-  color: StyleFunction | Expression;
+  radius: StyleFunction | ExpressionSpecification;
+  color: StyleFunction | ExpressionSpecification;
   strokeColor: string;
   strokeWidth: number;
 }
@@ -152,7 +147,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   const sourceId = useMemo(() => getHeatmapSourceId(layerId), [layerId]);
 
   const onPointMouseEnter = useCallback(
-    async (ev: MapLayerMouseEvent): Promise<void> => {
+    async (ev: MapMouseEvent): Promise<void> => {
       if (!ev.target || !map) return;
 
       ev.target.getCanvas().style.cursor = "pointer";
@@ -186,7 +181,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   );
 
   const onPointMouseLeave = useCallback(
-    (ev: MapLayerMouseEvent) => {
+    (ev: MapMouseEvent) => {
       ev.target.getCanvas().style.cursor = "";
       popup.remove();
     },
