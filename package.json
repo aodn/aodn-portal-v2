@@ -101,6 +101,5 @@
   "engines": {
     "node": "18.x || >=20.x",
     "npm": ">=8.0.0"
-  },
-  "packageManager": "yarn@4.3.0"
+  }
 }
