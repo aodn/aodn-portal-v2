@@ -233,7 +233,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
               [config.layer.maxZoom - 4, 1],
               [config.layer.maxZoom, 3],
             ],
-          },
+          } as StyleFunction,
           // assign color values be applied to points depending on their density
           "heatmap-color": config.layer.color,
           // increase radius as zoom increases
@@ -245,7 +245,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
               [config.layer.maxZoom - 1, 1],
               [config.layer.maxZoom, 0],
             ],
-          },
+          } as StyleFunction,
         },
       });
 
