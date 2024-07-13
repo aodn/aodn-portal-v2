@@ -4,9 +4,10 @@ import { AppDispatch } from "../../../common/store/store";
 import { useDispatch } from "react-redux";
 import {
   fetchResultNoStore,
+  OGCCollections,
   SearchParameters,
 } from "../../../common/store/searchReducer";
-import { MapMouseEvent } from "mapbox-gl";
+import { MapLayerMouseEvent } from "mapbox-gl";
 
 interface SpatialExtentsProps {
   layerId: string;
@@ -41,8 +42,8 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
 
       return dispatch(fetchResultNoStore(param))
         .unwrap()
-        .then((value) => value.collections[0])
-        .catch((error) => {
+        .then((value: OGCCollections) => value.collections[0])
+        .catch((error: any) => {
           console.error("Error fetching collection data:", error);
           // TODO: handle error in ErrorBoundary
         });
@@ -147,7 +148,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   }, [spatialExtentsUUid, layerId, getCollectionData, map]);
 
   const onPointMouseClick = useCallback(
-    (ev: MapMouseEvent): void => {
+    (ev: MapLayerMouseEvent): void => {
       // Make sure even same id under same area will be set once.
       if (ev.features) {
         const uuids = [

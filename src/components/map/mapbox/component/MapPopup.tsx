@@ -2,6 +2,7 @@ import React, { FC, useCallback, useContext, useEffect } from "react";
 import {
   fetchResultNoStore,
   OGCCollection,
+  OGCCollections,
   SearchParameters,
 } from "../../../common/store/searchReducer";
 import { ThemeProvider } from "@mui/material/styles";
@@ -18,7 +19,7 @@ import {
 import { fontWeight } from "../../../../styles/constants";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
-import { MapMouseEvent, Popup } from "mapbox-gl";
+import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Point, Feature } from "geojson";
 import { createRoot, Root } from "react-dom/client";
@@ -65,8 +66,8 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, onDatasetSelected }) => {
 
       return dispatch(fetchResultNoStore(param))
         .unwrap()
-        .then((value) => value.collections[0])
-        .catch((error) => {
+        .then((value: OGCCollections) => value.collections[0])
+        .catch((error: any) => {
           console.error("Error fetching collection data:", error);
           // TODO: handle error in ErrorBoundary
         });
@@ -126,14 +127,14 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, onDatasetSelected }) => {
     [onDatasetSelected]
   );
 
-  const onPointMouseLeave = useCallback((ev: MapMouseEvent) => {
+  const onPointMouseLeave = useCallback((ev: MapLayerMouseEvent) => {
     ev.target.getCanvas().style.cursor = "";
     popup.remove();
   }, []);
 
   const onPointMouseEnter = useCallback(
     async (
-      ev: MapMouseEvent,
+      ev: MapLayerMouseEvent,
       container: HTMLDivElement,
       root: Root
     ): Promise<void> => {
@@ -171,7 +172,8 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, onDatasetSelected }) => {
     const container = document.createElement("div");
     const root = createRoot(container);
 
-    const mev = (ev: MapMouseEvent) => onPointMouseEnter(ev, container, root);
+    const mev = (ev: MapLayerMouseEvent) =>
+      onPointMouseEnter(ev, container, root);
 
     map?.on("mouseleave", layerId, onPointMouseLeave);
     map?.on("mouseenter", layerId, mev);

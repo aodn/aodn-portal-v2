@@ -1,11 +1,7 @@
 import { FC, useCallback, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
 
-import {
-  ExpressionSpecification,
-  GeoJSONSource,
-  StyleFunction,
-} from "mapbox-gl";
+import { Expression, GeoJSONSource, StyleFunction } from "mapbox-gl";
 import { LayersProps, createCentroidDataSource } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../component/MapPopup";
@@ -13,14 +9,14 @@ import SpatialExtents from "../component/SpatialExtents";
 
 interface HeatmapLayer {
   maxZoom: number;
-  weight: StyleFunction | ExpressionSpecification;
-  color: StyleFunction | ExpressionSpecification;
-  radius: number | StyleFunction | ExpressionSpecification;
+  weight: number | StyleFunction | Expression;
+  color: string | StyleFunction | Expression;
+  radius: number | StyleFunction | Expression;
 }
 
 interface HeatmapCircle {
-  radius: StyleFunction | ExpressionSpecification;
-  color: StyleFunction | ExpressionSpecification;
+  radius: number | StyleFunction | Expression;
+  color: string | StyleFunction | Expression;
   strokeColor: string;
   strokeWidth: number;
 }
