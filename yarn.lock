@@ -4351,7 +4351,7 @@ __metadata:
     husky: "npm:^9.0.11"
     lint-staged: "npm:^15.2.2"
     lodash: "npm:^4.17.21"
-    mapbox-gl: "npm:^3.2.0"
+    mapbox-gl: "npm:3.4.0"
     maplibre-gl: "npm:^4.0.0"
     media-typer: "npm:^1.1.0"
     msw: "npm:^2.2.14"
@@ -8619,7 +8619,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mapbox-gl@npm:^3.2.0":
+"mapbox-gl@npm:3.4.0":
   version: 3.4.0
   resolution: "mapbox-gl@npm:3.4.0"
   dependencies:
