@@ -1,11 +1,4 @@
-import React, {
-  FC,
-  MouseEventHandler,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { FC, useCallback, useContext, useEffect, useRef } from "react";
 import {
   fetchResultNoStore,
   OGCCollection,
@@ -32,7 +25,7 @@ import { createRoot, Root } from "react-dom/client";
 
 interface MapPopupProps {
   layerId: string;
-  handleClick?: MouseEventHandler<HTMLButtonElement> | undefined;
+  onClickPopup?: (uuid: string) => void;
 }
 
 const POPUP_WIDTH = "250px";
@@ -59,7 +52,7 @@ const loadingBox = (
   </Box>
 );
 
-const MapPopup: FC<MapPopupProps> = ({ layerId, handleClick }) => {
+const MapPopup: FC<MapPopupProps> = ({ layerId, onClickPopup }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { map } = useContext(MapContext);
 
@@ -85,7 +78,11 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, handleClick }) => {
     (collection: void | OGCCollection) => (
       <ThemeProvider theme={AppTheme}>
         <Card elevation={0} sx={{ height: POPUP_HEIGHT, width: POPUP_WIDTH }}>
-          <CardActionArea onClick={handleClick}>
+          <CardActionArea
+            onClick={(event) =>
+              collection && onClickPopup && onClickPopup(collection.id)
+            }
+          >
             <CardContent>
               <Stack
                 direction="column"
@@ -124,7 +121,7 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, handleClick }) => {
         </Card>
       </ThemeProvider>
     ),
-    [handleClick]
+    [onClickPopup]
   );
 
   const onPointMouseLeave = useCallback((ev: MapMouseEvent) => {
@@ -133,7 +130,11 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, handleClick }) => {
   }, []);
 
   const onPointMouseEnter = useCallback(
-    async (ev: MapMouseEvent): Promise<void> => {
+    async (
+      ev: MapMouseEvent,
+      container: HTMLDivElement,
+      root: Root
+    ): Promise<void> => {
       if (!ev.target || !map) return;
 
       ev.target.getCanvas().style.cursor = "pointer";
@@ -145,10 +146,6 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, handleClick }) => {
         const coordinates = geometry.coordinates.slice();
         const uuid = feature.properties?.uuid as string;
 
-        // Create a new div container for the popup
-        const popupNode = document.createElement("div");
-        const root = createRoot(popupNode);
-
         // Render a loading state in the popup
         root.render(loadingBox);
 
@@ -156,9 +153,8 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, handleClick }) => {
         // subscribe to close event to clean up resource.
         popup
           .setLngLat(coordinates as [number, number])
-          .setDOMContent(popupNode)
-          .addTo(map)
-          .once("close", () => root.unmount());
+          .setDOMContent(container)
+          .addTo(map);
 
         // Fetch and render the actual content for the popup
         getCollectionData(uuid).then((collection) =>
@@ -170,12 +166,20 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, handleClick }) => {
   );
 
   useEffect(() => {
+    const container = document.createElement("div");
+    const root = createRoot(container);
+
+    const mev = (ev: MapMouseEvent) => onPointMouseEnter(ev, container, root);
+
     map?.on("mouseleave", layerId, onPointMouseLeave);
-    map?.on("mouseenter", layerId, onPointMouseEnter);
+    map?.on("mouseenter", layerId, mev);
 
     return () => {
+      // Important to free up resources, and must timeout to avoid race condition
+      setTimeout(() => root.unmount(), 500);
+
       map?.off("mouseleave", layerId, onPointMouseLeave);
-      map?.off("mouseenter", layerId, onPointMouseEnter);
+      map?.off("mouseenter", layerId, mev);
     };
   }, [map, layerId, onPointMouseEnter, onPointMouseLeave]);
 

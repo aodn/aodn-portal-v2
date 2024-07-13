@@ -7,16 +7,13 @@ import {
   useState,
 } from "react";
 import MapContext from "../MapContext";
-import { Feature, Point } from "geojson";
 import {
-  OGCCollection,
   SearchParameters,
   fetchResultNoStore,
 } from "../../../common/store/searchReducer";
-import { GeoJSONSource, MapMouseEvent, Popup } from "mapbox-gl";
+import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../common/store/store";
-import { createRoot } from "react-dom/client";
 import MapPopup from "../popup/MapPopup";
 import {
   LayersProps,
@@ -51,7 +48,6 @@ interface ClusterLayerConfig {
 }
 
 interface ClusterLayerProps extends LayersProps {
-  onClickPopup?: (uuid: string) => void;
   clusterLayerConfig?: Partial<ClusterLayerConfig>;
 }
 
@@ -138,33 +134,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [dispatch]
   );
 
-  const popup = useMemo(
-    () =>
-      new Popup({
-        closeButton: false,
-        closeOnClick: false,
-        maxWidth: "none",
-      }),
-    []
-  );
-
-  const renderPopupContent = useCallback(
-    async (uuid: string) => {
-      const collection = await getCollectionData({
-        uuid,
-        geometryOnly: false,
-      });
-      if (!collection) return;
-      return <MapPopup collection={collection} onClickPopup={onClickPopup} />;
-    },
-    [getCollectionData, onClickPopup]
-  );
-
-  const renderLoadingPopup = useCallback(
-    () => <MapPopup collection={{} as OGCCollection} isLoading />,
-    []
-  );
-
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
   const clusterSourceId = useMemo(() => getClusterSourceId(layerId), [layerId]);
@@ -183,48 +152,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       );
     }
   }, [map, clusterSourceId, collections]);
-
-  const onUnclusterPointMouseEnter = useCallback(
-    async (ev: MapMouseEvent): Promise<void> => {
-      if (!ev.target || !map) return;
-
-      ev.target.getCanvas().style.cursor = "pointer";
-
-      // Copy coordinates array.
-      if (ev.features && ev.features.length > 0) {
-        const feature = ev.features[0] as Feature<Point>;
-        const geometry = feature.geometry;
-        const coordinates = geometry.coordinates.slice();
-        const uuid = feature.properties?.uuid as string;
-
-        // Create a new div container for the popup
-        const popupNode = document.createElement("div");
-        const root = createRoot(popupNode);
-
-        // Render a loading state in the popup
-        root.render(renderLoadingPopup());
-
-        // Set the popup's position and content, then add it to the map
-        popup
-          .setLngLat(coordinates as [number, number])
-          .setDOMContent(popupNode)
-          .addTo(map);
-
-        // Fetch and render the actual content for the popup
-        const content = await renderPopupContent(uuid);
-        root.render(content);
-      }
-    },
-    [map, popup, renderLoadingPopup, renderPopupContent]
-  );
-
-  const onUnclusterPointMouseLeave = useCallback(
-    (ev: MapMouseEvent) => {
-      ev.target.getCanvas().style.cursor = "";
-      popup.remove();
-    },
-    [popup]
-  );
 
   const onUnclusterPointMouseClick = useCallback(
     (ev: MapMouseEvent): void => {
@@ -440,15 +367,12 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       });
 
       // Change the cursor to a pointer for uncluster point
-      map?.on("mouseenter", unclusterPointLayer, onUnclusterPointMouseEnter);
       map?.on("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
 
       // Change the cursor back to default when it leaves the unclustered points
-      map?.on("mouseleave", unclusterPointLayer, onUnclusterPointMouseLeave);
       map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
       map?.on("click", clusterLayer, onClusterCircleMouseClick);
-
       map?.on("click", unclusterPointLayer, onUnclusterPointMouseClick);
     };
 
@@ -459,9 +383,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     map?.on("styledata", createLayers);
 
     return () => {
-      map?.off("mouseenter", unclusterPointLayer, onUnclusterPointMouseEnter);
       map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
-      map?.off("mouseleave", unclusterPointLayer, onUnclusterPointMouseLeave);
       map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
       // Clean up resource when you click on the next spatial extents, map is
@@ -507,7 +429,11 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     };
   }, [addSpatialExtentsLayer, map, layerId, spatialExtentsUUid]);
 
-  return null;
+  return (
+    <>
+      <MapPopup layerId={unclusterPointLayer} />
+    </>
+  );
 };
 
 export default ClusterLayer;

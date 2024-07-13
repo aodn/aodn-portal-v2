@@ -202,7 +202,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   return (
     <>
-      <MapPopup layerId={getCircleLayerId(layerId)} />
+      <MapPopup
+        layerId={getCircleLayerId(layerId)}
+        onClickPopup={onClickPopup}
+      />
     </>
   );
 };
