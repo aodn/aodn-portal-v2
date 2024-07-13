@@ -31,20 +31,17 @@ interface HeatmapLayer {
   weight: StyleFunction | Expression;
   intensity: StyleFunction | Expression;
   color: StyleFunction | Expression;
-  radius: StyleFunction | Expression;
-  opacity: StyleFunction | Expression;
+  radius: number | StyleFunction | Expression;
 }
 
 interface HeatmapCircle {
   radius: StyleFunction | Expression;
   color: StyleFunction | Expression;
-  opacity: StyleFunction | Expression;
   strokeColor: string;
   strokeWidth: number;
 }
 
 interface HeatmapConfig {
-  heatmapSourceMaxZoom: number;
   heatmapSourceRadius: number;
   layer: HeatmapLayer;
   circle: HeatmapCircle;
@@ -56,51 +53,16 @@ interface HeatmapLayerProps extends LayersProps {
 }
 
 const defaultHeatmapConfig: HeatmapConfig = {
-  heatmapSourceMaxZoom: 14,
   heatmapSourceRadius: 10,
   circle: {
     strokeColor: "white",
     strokeWidth: 1,
-    radius: {
-      property: "dbh",
-      type: "exponential",
-      stops: [
-        [{ zoom: 15, value: 1 }, 5],
-        [{ zoom: 15, value: 62 }, 10],
-        [{ zoom: 22, value: 1 }, 20],
-        [{ zoom: 22, value: 62 }, 50],
-      ],
-    },
-    color: {
-      property: "dbh",
-      type: "exponential",
-      stops: [
-        [0, "rgba(236,222,239,0)"],
-        [10, "rgb(236,222,239)"],
-        [20, "rgb(208,209,230)"],
-        [30, "rgb(166,189,219)"],
-        [40, "rgb(103,169,207)"],
-        [50, "rgb(28,144,153)"],
-        [60, "rgb(1,108,89)"],
-      ],
-    },
-    opacity: {
-      stops: [
-        [14, 0],
-        [15, 1],
-      ],
-    },
+    radius: 8,
+    color: "#51bbd6",
   },
   layer: {
-    maxZoom: 14,
-    weight: {
-      property: "dbh",
-      type: "exponential",
-      stops: [
-        [1, 0],
-        [62, 1],
-      ],
-    },
+    maxZoom: 7,
+    weight: 1,
     intensity: {
       stops: [
         [11, 1],
@@ -126,13 +88,6 @@ const defaultHeatmapConfig: HeatmapConfig = {
       stops: [
         [11, 15],
         [15, 20],
-      ],
-    },
-    opacity: {
-      default: 1,
-      stops: [
-        [14, 1],
-        [15, 0],
       ],
     },
   },
@@ -267,46 +222,60 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         type: "geojson",
         data: createCentroidDataSource(undefined),
         cluster: false,
-        clusterMaxZoom: config.heatmapSourceMaxZoom,
+        clusterMaxZoom: config.layer.maxZoom - 1,
         clusterRadius: config.heatmapSourceRadius,
+      });
+
+      map?.addLayer({
+        id: heatmapLayer,
+        type: "heatmap",
+        source: sourceId,
+        maxzoom: config.layer.maxZoom,
+        paint: {
+          // increase weight as diameter breast height increases
+          "heatmap-weight": config.layer.weight,
+          // increase intensity as zoom level increases
+          "heatmap-intensity": config.layer.intensity,
+          // assign color values be applied to points depending on their density
+          "heatmap-color": config.layer.color,
+          // increase radius as zoom increases
+          "heatmap-radius": config.layer.radius,
+          // decrease opacity to transition into the circle layer
+          "heatmap-opacity": {
+            default: 1,
+            stops: [
+              [config.layer.maxZoom - 1, 1],
+              [config.layer.maxZoom, 0],
+            ],
+          },
+        },
       });
 
       map?.addLayer({
         id: circleLayer,
         type: "circle",
+        minzoom: config.layer.maxZoom - 1,
         source: sourceId,
-        minzoom: 14,
         paint: {
           // increase the radius of the circle as the zoom level and dbh value increases
           "circle-radius": config.circle.radius,
           "circle-color": config.circle.color,
           "circle-stroke-color": config.circle.strokeColor,
           "circle-stroke-width": config.circle.strokeWidth,
-          "circle-opacity": config.circle.opacity,
+          "circle-opacity": {
+            stops: [
+              // You want to make the heatmap totally transparent
+              // aka looks disapear when the zoom level is hit max
+              // zoom. Reappear if greater than max zoom
+              [config.layer.maxZoom - 1, 0],
+              [config.layer.maxZoom, 1],
+            ],
+          },
         },
       });
 
-      map?.addLayer(
-        {
-          id: heatmapLayer,
-          type: "heatmap",
-          source: sourceId,
-          maxzoom: config.layer.maxZoom,
-          paint: {
-            // increase weight as diameter breast height increases
-            "heatmap-weight": config.layer.weight,
-            // increase intensity as zoom level increases
-            "heatmap-intensity": config.layer.intensity,
-            // assign color values be applied to points depending on their density
-            "heatmap-color": config.layer.color,
-            // increase radius as zoom increases
-            "heatmap-radius": config.layer.radius,
-            // decrease opacity to transition into the circle layer
-            "heatmap-opacity": config.layer.opacity,
-          },
-        },
-        circleLayer
-      );
+      map?.on("mouseenter", circleLayer, onPointMouseEnter);
+      map?.on("mouseleave", circleLayer, onPointMouseLeave);
     };
 
     map?.once("load", createLayers);
@@ -314,12 +283,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     // When user change the map style, for example change base map, all layer will be removed
     // as per mapbox design, we need to listen to that even and add back the layer
     map?.on("styledata", createLayers);
-
-    map?.on("mouseenter", circleLayer, onPointMouseEnter);
-    map?.on("mouseenter", circleLayer, defaultMouseEnterEventHandler);
-
-    map?.on("mouseleave", circleLayer, onPointMouseLeave);
-    map?.on("mouseleave", circleLayer, defaultMouseLeaveEventHandler);
 
     return () => {
       map?.off("mouseenter", circleLayer, onPointMouseEnter);
