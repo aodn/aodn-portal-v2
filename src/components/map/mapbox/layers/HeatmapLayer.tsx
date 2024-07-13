@@ -29,7 +29,6 @@ import { Feature, Point } from "geojson";
 interface HeatmapLayer {
   maxZoom: number;
   weight: StyleFunction | Expression;
-  intensity: StyleFunction | Expression;
   color: StyleFunction | Expression;
   radius: number | StyleFunction | Expression;
 }
@@ -63,12 +62,6 @@ const defaultHeatmapConfig: HeatmapConfig = {
   layer: {
     maxZoom: 7,
     weight: 1,
-    intensity: {
-      stops: [
-        [11, 1],
-        [15, 3],
-      ],
-    },
     color: [
       "interpolate",
       ["linear"],
@@ -235,7 +228,12 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
           // increase weight as diameter breast height increases
           "heatmap-weight": config.layer.weight,
           // increase intensity as zoom level increases
-          "heatmap-intensity": config.layer.intensity,
+          "heatmap-intensity": {
+            stops: [
+              [config.layer.maxZoom - 4, 1],
+              [config.layer.maxZoom, 3],
+            ],
+          },
           // assign color values be applied to points depending on their density
           "heatmap-color": config.layer.color,
           // increase radius as zoom increases
