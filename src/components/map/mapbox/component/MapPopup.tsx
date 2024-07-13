@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useEffect, useRef } from "react";
+import React, { FC, useCallback, useContext, useEffect } from "react";
 import {
   fetchResultNoStore,
   OGCCollection,
@@ -25,7 +25,7 @@ import { createRoot, Root } from "react-dom/client";
 
 interface MapPopupProps {
   layerId: string;
-  onClickPopup?: (uuid: string) => void;
+  onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
 const POPUP_WIDTH = "250px";
@@ -52,7 +52,7 @@ const loadingBox = (
   </Box>
 );
 
-const MapPopup: FC<MapPopupProps> = ({ layerId, onClickPopup }) => {
+const MapPopup: FC<MapPopupProps> = ({ layerId, onDatasetSelected }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { map } = useContext(MapContext);
 
@@ -80,7 +80,9 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, onClickPopup }) => {
         <Card elevation={0} sx={{ height: POPUP_HEIGHT, width: POPUP_WIDTH }}>
           <CardActionArea
             onClick={(event) =>
-              collection && onClickPopup && onClickPopup(collection.id)
+              collection &&
+              onDatasetSelected &&
+              onDatasetSelected([collection.id])
             }
           >
             <CardContent>
@@ -121,7 +123,7 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, onClickPopup }) => {
         </Card>
       </ThemeProvider>
     ),
-    [onClickPopup]
+    [onDatasetSelected]
   );
 
   const onPointMouseLeave = useCallback((ev: MapMouseEvent) => {

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useEffect, useMemo } from "react";
+import { FC, useCallback, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
 
 import {
@@ -8,7 +8,8 @@ import {
 } from "mapbox-gl";
 import { LayersProps, createCentroidDataSource } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
-import MapPopup from "../popup/MapPopup";
+import MapPopup from "../component/MapPopup";
+import SpatialExtents from "../component/SpatialExtents";
 
 interface HeatmapLayer {
   maxZoom: number;
@@ -31,7 +32,6 @@ interface HeatmapConfig {
 }
 
 interface HeatmapLayerProps extends LayersProps {
-  onClickPopup?: (uuid: string) => void;
   heatmapLayerConfig?: Partial<HeatmapConfig>;
 }
 
@@ -80,7 +80,6 @@ const getCircleLayerId = (layerId: string) => `${layerId}-circle`;
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
   collections,
   onDatasetSelected,
-  onClickPopup,
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
@@ -204,8 +203,9 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     <>
       <MapPopup
         layerId={getCircleLayerId(layerId)}
-        onClickPopup={onClickPopup}
+        onDatasetSelected={onDatasetSelected}
       />
+      <SpatialExtents layerId={getCircleLayerId(layerId)} />
     </>
   );
 };
