@@ -4,22 +4,11 @@ import MapContext from "../MapContext";
 import {
   ExpressionSpecification,
   GeoJSONSource,
-  MapMouseEvent,
-  Popup,
   StyleFunction,
 } from "mapbox-gl";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../common/store/store";
 import { LayersProps, createCentroidDataSource } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../popup/MapPopup";
-import {
-  OGCCollection,
-  SearchParameters,
-  fetchResultNoStore,
-} from "../../../common/store/searchReducer";
-import { createRoot } from "react-dom/client";
-import { Feature, Point } from "geojson";
 
 interface HeatmapLayer {
   maxZoom: number;
@@ -95,98 +84,8 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
-  const dispatch = useDispatch<AppDispatch>();
-
-  // TODO: Duplicate code but due to use of dispatch cannot import it.
-  const getCollectionData = useCallback(
-    async ({ uuid, geometryOnly }: { uuid: string; geometryOnly: boolean }) => {
-      const param: SearchParameters = {
-        filter: `id='${uuid}'`,
-        properties: geometryOnly ? "id,geometry" : undefined,
-      };
-
-      return dispatch(fetchResultNoStore(param))
-        .unwrap()
-        .then((value) => value.collections[0])
-        .catch((error) => {
-          console.error("Error fetching collection data:", error);
-          // TODO: handle error in ErrorBoundary
-        });
-    },
-    [dispatch]
-  );
-
-  const popup = useMemo(
-    () =>
-      new Popup({
-        closeButton: false,
-        closeOnClick: false,
-        maxWidth: "none",
-      }),
-    []
-  );
-
-  const renderPopupContent = useCallback(
-    async (uuid: string) => {
-      const collection = await getCollectionData({
-        uuid,
-        geometryOnly: false,
-      });
-      if (!collection) return;
-      return <MapPopup collection={collection} onClickPopup={onClickPopup} />;
-    },
-    [getCollectionData, onClickPopup]
-  );
-
-  const renderLoadingPopup = useCallback(
-    () => <MapPopup collection={{} as OGCCollection} isLoading />,
-    []
-  );
-
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
   const sourceId = useMemo(() => getHeatmapSourceId(layerId), [layerId]);
-
-  const onPointMouseEnter = useCallback(
-    async (ev: MapMouseEvent): Promise<void> => {
-      if (!ev.target || !map) return;
-
-      ev.target.getCanvas().style.cursor = "pointer";
-
-      // Copy coordinates array.
-      if (ev.features && ev.features.length > 0) {
-        const feature = ev.features[0] as Feature<Point>;
-        const geometry = feature.geometry;
-        const coordinates = geometry.coordinates.slice();
-        const uuid = feature.properties?.uuid as string;
-
-        // Create a new div container for the popup
-        const popupNode = document.createElement("div");
-        const root = createRoot(popupNode);
-
-        // Render a loading state in the popup
-        root.render(renderLoadingPopup());
-
-        // Set the popup's position and content, then add it to the map
-        popup
-          .setLngLat(coordinates as [number, number])
-          .setDOMContent(popupNode)
-          .addTo(map);
-
-        // Fetch and render the actual content for the popup
-        const content = await renderPopupContent(uuid);
-        root.render(content);
-      }
-    },
-    [map, popup, renderLoadingPopup, renderPopupContent]
-  );
-
-  const onPointMouseLeave = useCallback(
-    (ev: MapMouseEvent) => {
-      ev.target.getCanvas().style.cursor = "";
-      popup.remove();
-    },
-    [popup]
-  );
 
   // This is use to render the heatmap and add event handle to circles
   useEffect(() => {
@@ -266,9 +165,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
           },
         },
       });
-
-      map?.on("mouseenter", circleLayer, onPointMouseEnter);
-      map?.on("mouseleave", circleLayer, onPointMouseLeave);
     };
 
     map?.once("load", createLayers);
@@ -278,9 +174,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     map?.on("styledata", createLayers);
 
     return () => {
-      map?.off("mouseenter", circleLayer, onPointMouseEnter);
-      map?.off("mouseleave", circleLayer, onPointMouseLeave);
-
       try {
         if (map?.getLayer(heatmapLayer)) map?.removeLayer(heatmapLayer);
         if (map?.getLayer(circleLayer)) map?.removeLayer(circleLayer);
@@ -289,14 +182,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         // OK to ignore if no layer then no source as well
       }
     };
-  }, [
-    map,
-    layerId,
-    sourceId,
-    heatmapLayerConfig,
-    onPointMouseEnter,
-    onPointMouseLeave,
-  ]);
+  }, [map, layerId, sourceId, heatmapLayerConfig]);
 
   const updateSource = useCallback(() => {
     if (map?.getSource(sourceId)) {
@@ -314,7 +200,11 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     };
   }, [map, updateSource]);
 
-  return <React.Fragment />;
+  return (
+    <>
+      <MapPopup layerId={getCircleLayerId(layerId)} />
+    </>
+  );
 };
 
 export default HeatmapLayer;
