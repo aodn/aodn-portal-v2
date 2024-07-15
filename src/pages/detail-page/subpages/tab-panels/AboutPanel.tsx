@@ -3,8 +3,7 @@ import { useDetailPageContext } from "../../context/detail-page-context";
 import KeywordBlock from "../components/KeywordBlock";
 import ContactBlock from "../components/ContactBlock";
 import NavigatablePanel from "../components/NavigatablePanel";
-import CreditBlock from "../components/CreditBlock";
-
+import PlainTextBlock from "../components/PlainTextBlock";
 const AboutPanel = () => {
   const context = useDetailPageContext();
   const credits = context.collection?.getCredits();
@@ -39,7 +38,9 @@ const AboutPanel = () => {
       },
       {
         title: "Credits",
-        component: <CreditBlock credits={credits ? credits : []} />,
+        component: (
+          <PlainTextBlock title="Credits" texts={credits ? credits : []} />
+        ),
       },
     ],
     [aboutContacts, credits, themes]
