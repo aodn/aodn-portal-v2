@@ -47,6 +47,7 @@ const MapSection: React.FC<MapSectionProps> = ({
             <HeatmapLayer
               collections={collections}
               onDatasetSelected={onDatasetSelected}
+              onClickPopup={onClickPopup}
             />
           );
 

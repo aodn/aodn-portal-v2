@@ -7,13 +7,14 @@ import {
 } from "geojson";
 import { OGCCollection } from "../../../common/store/searchReducer";
 import { centroid } from "@turf/turf";
-import { MapLayerMouseEvent } from "mapbox-gl";
+import { MapMouseEvent } from "mapbox-gl";
 
 export interface LayersProps {
   // Tile layer should added to map
   collections?: Array<OGCCollection>;
   // Event fired when user click on the point layer
   onDatasetSelected?: (uuid: Array<string>) => void;
+  onClickPopup?: (uuid: string) => void;
 }
 
 // Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
@@ -40,11 +41,11 @@ const createCentroidDataSource = (
   return featureCollections;
 };
 
-const defaultMouseEnterEventHandler = (ev: MapLayerMouseEvent): void => {
+const defaultMouseEnterEventHandler = (ev: MapMouseEvent): void => {
   ev.target.getCanvas().style.cursor = "pointer";
 };
 
-const defaultMouseLeaveEventHandler = (ev: MapLayerMouseEvent): void => {
+const defaultMouseLeaveEventHandler = (ev: MapMouseEvent): void => {
   ev.target.getCanvas().style.cursor = "";
 };
 
