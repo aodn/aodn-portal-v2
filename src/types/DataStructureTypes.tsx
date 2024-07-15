@@ -24,6 +24,13 @@ interface IInfo {
   roles: string[];
 }
 
+interface ITemporal {
+  start?: string;
+  end?: string;
+  creation?: string;
+  revision?: string;
+}
+
 interface IContact {
   name: string;
   organization: string;
@@ -48,4 +55,12 @@ interface ITheme {
   concepts: IConcept[];
 }
 
-export type { IKeyword, ILink, IAddress, IContact, IConcept, ITheme };
+export type {
+  IKeyword,
+  ILink,
+  IAddress,
+  IContact,
+  IConcept,
+  ITheme,
+  ITemporal,
+};
