@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "../components/NavigatablePanel";
 import ContactBlock from "../components/ContactBlock";
+import PlainTextBlock from "../components/PlainTextBlock";
+import { convertDateFormat } from "../../../../utils/DateFormatUtils";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
@@ -12,6 +14,27 @@ const MetadataInformationPanel = () => {
         ?.filter((contact) => contact.roles.includes("metadata")),
     [context.collection]
   );
+  const generateMedatataDateText = () => {
+    let dateText = "";
+    const temporals = context.collection?.getTemporal();
+    if (!temporals) {
+      return "";
+    }
+    const temporal = temporals[0];
+
+    if (temporal.creation) {
+      dateText = dateText + `Creation: ${convertDateFormat(temporal.creation)}`;
+    }
+    if (temporal.revision) {
+      if (dateText) {
+        dateText += "\n";
+      }
+      dateText = dateText + `Revision: ${convertDateFormat(temporal.revision)}`;
+    }
+    return dateText;
+  };
+
+  const dates = useMemo(generateMedatataDateText, [context.collection]);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -44,10 +67,15 @@ const MetadataInformationPanel = () => {
       },
       {
         title: "Metadata Dates",
-        component: <div>metadata dates</div>,
+        component: (
+          <PlainTextBlock
+            title="Metadata Dates"
+            texts={dates ? [dates] : [""]}
+          />
+        ),
       },
     ],
-    [metadataContact]
+    [dates, metadataContact]
   );
   return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
 };
