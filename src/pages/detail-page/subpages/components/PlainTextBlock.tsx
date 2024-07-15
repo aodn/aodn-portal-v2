@@ -11,6 +11,8 @@ const PlainTextBlock: React.FC<PlainTextBlockProps> = ({ title, texts }) => {
     const returnedList: ReactNode[] = [];
     texts?.map((text) => {
       const showedText = [];
+
+      // implement new line if contains \n
       if (text.includes("\n")) {
         const splitText = text.split("\n");
         splitText.forEach((textPart, index) => {
