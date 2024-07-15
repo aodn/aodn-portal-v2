@@ -201,7 +201,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         layerId={getCircleLayerId(layerId)}
         onDatasetSelected={onDatasetSelected}
       />
-      <SpatialExtents layerId={getCircleLayerId(layerId)} />
+      <SpatialExtents
+        layerId={getCircleLayerId(layerId)}
+        addedLayerIds={[getHeatmapLayerId(layerId), getCircleLayerId(layerId)]}
+      />
     </>
   );
 };
