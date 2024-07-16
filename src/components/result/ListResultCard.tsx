@@ -1,4 +1,5 @@
 import {
+  Box,
   Card,
   CardActionArea,
   CardActions,
@@ -7,17 +8,16 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { pageDefault } from "../common/constants";
 import WhereToVoteIcon from "@mui/icons-material/WhereToVote";
 import DownloadIcon from "@mui/icons-material/Download";
 import InfoIcon from "@mui/icons-material/Info";
 import { OGCCollection } from "../common/store/searchReducer";
-import { useNavigate } from "react-router-dom";
-import { trimContent } from "./CardUtils";
 import LinkIcon from "@mui/icons-material/Link";
 import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
 import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
 import { useCallback } from "react";
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import { margin } from "../../styles/constants";
 
 interface ResultCardProps {
   content: OGCCollection;
@@ -46,6 +46,7 @@ interface ResultCardProps {
       ) => void)
     | undefined;
   onClickCard?: ((uuid: string) => void) | undefined;
+  isSelectedDataset?: boolean;
 }
 
 const ListResultCard = (props: ResultCardProps) => {
@@ -70,21 +71,40 @@ const ListResultCard = (props: ResultCardProps) => {
   return (
     <Card
       variant="outlined"
+      sx={{
+        width: "99%",
+        minHeight: "250px",
+        border: props.isSelectedDataset ? "2px solid #618CA5" : "none",
+      }}
       data-testid="result-card-list"
-      sx={{ width: "99%" }}
     >
       <CardActionArea onClick={handleClick}>
         <CardContent>
-          <Typography
-            component="div"
-            sx={{ marginBottom: "10px", height: "48px" }}
+          <Box
+            sx={{
+              marginBottom: "10px",
+              height: "48px",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
           >
-            <Grid container>
-              <Grid item xs={11}>
-                {trimContent(props.content.title)}
-              </Grid>
-            </Grid>
-          </Typography>
+            <Typography
+              sx={{
+                padding: 0,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: "2",
+                WebkitBoxOrient: "vertical",
+              }}
+            >
+              {props.content.title}
+            </Typography>
+            {props.isSelectedDataset && (
+              <TaskAltIcon color="primary" sx={{ mt: margin.sm }} />
+            )}
+          </Box>
+
           <Grid container spacing={1}>
             <Grid item xs={3}>
               <CardMedia
@@ -94,8 +114,18 @@ const ListResultCard = (props: ResultCardProps) => {
               />
             </Grid>
             <Grid item xs={9}>
-              <Typography variant="body2">
-                {trimContent(props.content.description, 180)}
+              <Typography
+                variant="body2"
+                sx={{
+                  padding: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: "5",
+                  WebkitBoxOrient: "vertical",
+                }}
+              >
+                {props.content.description}
               </Typography>
             </Grid>
           </Grid>

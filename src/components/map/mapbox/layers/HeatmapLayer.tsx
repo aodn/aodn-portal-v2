@@ -6,6 +6,7 @@ import { LayersProps, createCentroidDataSource } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
+import { OGCCollection } from "../../../common/store/searchReducer";
 
 interface HeatmapLayer {
   maxZoom: number;
@@ -28,7 +29,9 @@ interface HeatmapConfig {
 }
 
 interface HeatmapLayerProps extends LayersProps {
+  collections?: OGCCollection[] | undefined;
   heatmapLayerConfig?: Partial<HeatmapConfig>;
+  onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
 const defaultHeatmapConfig: HeatmapConfig = {
@@ -204,6 +207,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       <SpatialExtents
         layerId={getCircleLayerId(layerId)}
         addedLayerIds={[getHeatmapLayerId(layerId), getCircleLayerId(layerId)]}
+        onDatasetSelected={onDatasetSelected}
       />
     </>
   );

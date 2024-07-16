@@ -37,6 +37,7 @@ interface ClusterLayerConfig {
 
 interface ClusterLayerProps extends LayersProps {
   clusterLayerConfig?: Partial<ClusterLayerConfig>;
+  onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
 const defaultClusterLayerConfig: ClusterLayerConfig = {
@@ -272,6 +273,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       <SpatialExtents
         layerId={unclusterPointLayer}
         addedLayerIds={[clusterLayer, unclusterPointLayer]}
+        onDatasetSelected={onDatasetSelected}
       />
     </>
   );

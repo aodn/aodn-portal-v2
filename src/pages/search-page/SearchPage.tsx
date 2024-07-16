@@ -6,6 +6,8 @@ import {
   fetchResultNoStore,
   fetchResultWithStore,
   OGCCollection,
+  OGCCollections,
+  SearchParameters,
 } from "../../components/common/store/searchReducer";
 import Layout from "../../components/layout/layout";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -41,7 +43,7 @@ import { MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
 import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
 import MapSection from "./subpages/MapSection";
-import { margin } from "../../styles/constants";
+import { color, margin } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 import { bboxPolygon } from "@turf/turf";
@@ -53,6 +55,7 @@ const SearchPage = () => {
   const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
     SearchResultLayoutEnum.VISIBLE
   );
+  const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -70,9 +73,46 @@ const SearchPage = () => {
     [setVisibility]
   );
 
-  const onDatasetSelected = useCallback((uuid: Array<string>) => {
-    // Do something when dataset selected
-  }, []);
+  //util function for join uuids in a specific pattern for fetching data
+  const createFilterString = (uuids: Array<string>): string => {
+    if (!Array.isArray(uuids) || uuids.length === 0) {
+      return "";
+    }
+    const filterConditions = uuids.map((uuid) => `id='${uuid}'`).join(" or ");
+    return filterConditions;
+  };
+
+  const getCollectionsData = useCallback(
+    async (uuids: Array<string>): Promise<void | OGCCollection[]> => {
+      const uuidsString = createFilterString(uuids);
+      // if uuids array is an empty array, no need fetch collection data
+      if (uuidsString.length === 0) return;
+      const param: SearchParameters = {
+        filter: uuidsString,
+        properties: "id,title,description",
+      };
+      return dispatch(fetchResultNoStore(param))
+        .unwrap()
+        .then((res: OGCCollections) => res.collections)
+        .catch((error: any) => {
+          console.error("Error fetching collection data:", error);
+          // TODO: handle error in ErrorBoundary
+        });
+    },
+    [dispatch]
+  );
+
+  const onDatasetSelected = useCallback(
+    async (uuids: Array<string>) => {
+      if (Array.isArray(uuids) && uuids.length === 0) {
+        setDatasetsSelected([]);
+        return;
+      }
+      const collections = await getCollectionsData(uuids);
+      if (collections) setDatasetsSelected(collections);
+    },
+    [getCollectionsData]
+  );
 
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -182,8 +222,9 @@ const SearchPage = () => {
         container
         spacing={2}
         sx={{
-          backgroundImage: "url(/bg_search_results.png)",
-          backgroundSize: "cover",
+          // backgroundImage: "url(/bg_search_results.png)",
+          // backgroundSize: "cover",
+          bgcolor: color.blue.light,
           marginTop: margin.sm,
         }}
       >
@@ -205,6 +246,7 @@ const SearchPage = () => {
           onRemoveLayer={undefined}
           onVisibilityChanged={onVisibilityChanged}
           onClickCard={handleNavigateToDetailPage}
+          datasetSelected={datasetsSelected}
         />
         <MapSection
           collections={layers}

@@ -160,8 +160,9 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
         ];
         setSpatialExtentsUUid(uuids);
 
-        // Give time for the state to be updated
-        if (onDatasetSelected) setTimeout(() => onDatasetSelected(uuids), 100);
+        if (onDatasetSelected) {
+          onDatasetSelected(uuids);
+        }
       }
     },
     [setSpatialExtentsUUid, onDatasetSelected]
@@ -182,6 +183,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
       if (features && features.length === 0) {
         // Clear the spatial extents uuid array
         setSpatialExtentsUUid([]);
+        // TODO: if we need to clear selected datasets when click on empty space
         if (onDatasetSelected) onDatasetSelected([]);
       }
     },
