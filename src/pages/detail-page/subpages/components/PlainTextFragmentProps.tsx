@@ -3,11 +3,11 @@ import { Grid } from "@mui/material";
 import React from "react";
 import { margin } from "../../../../styles/constants";
 
-interface CollapseFragmentProps {
+interface PlainTextFragmentProps {
   children: React.ReactNode;
 }
 
-const PlainTextFragment: React.FC<CollapseFragmentProps> = ({ children }) => {
+const PlainTextFragment: React.FC<PlainTextFragmentProps> = ({ children }) => {
   return (
     <Grid
       container
