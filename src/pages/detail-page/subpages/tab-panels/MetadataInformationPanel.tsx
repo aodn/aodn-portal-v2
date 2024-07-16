@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "../components/NavigatablePanel";
 import ContactBlock from "../components/ContactBlock";
@@ -7,6 +7,10 @@ import { convertDateFormat } from "../../../../utils/DateFormatUtils";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
+  const metadataId = useMemo(
+    () => context.collection?.id,
+    [context.collection?.id]
+  );
   const metadataContact = useMemo(
     () =>
       context.collection
@@ -14,7 +18,7 @@ const MetadataInformationPanel = () => {
         ?.filter((contact) => contact.roles.includes("metadata")),
     [context.collection]
   );
-  const generateMedatataDateText = () => {
+  const generateMedatataDateText = useCallback(() => {
     let dateText = "";
     const temporals = context.collection?.getTemporal();
     if (!temporals) {
@@ -32,9 +36,9 @@ const MetadataInformationPanel = () => {
       dateText = dateText + `Revision: ${convertDateFormat(temporal.revision)}`;
     }
     return dateText;
-  };
+  }, [context.collection]);
 
-  const dates = useMemo(generateMedatataDateText, [context.collection]);
+  const dates = useMemo(generateMedatataDateText, [generateMedatataDateText]);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -59,7 +63,12 @@ const MetadataInformationPanel = () => {
       },
       {
         title: "Metadata Identifier",
-        component: <div>metadata identifier</div>,
+        component: (
+          <PlainTextBlock
+            title="Metadata Identifier"
+            texts={metadataId ? [metadataId] : []}
+          />
+        ),
       },
       {
         title: "Full Metadata Link",
@@ -75,7 +84,7 @@ const MetadataInformationPanel = () => {
         ),
       },
     ],
-    [dates, metadataContact]
+    [dates, metadataContact, metadataId]
   );
   return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
 };
