@@ -17,6 +17,7 @@ interface SearchResultListProps {
   ) => void;
   onVisibilityChanged?: (v: SearchResultLayoutEnum) => void;
   onClickCard?: (uuid: string) => void;
+  datasetSelected?: OGCCollection[];
 }
 
 const ResultSection: React.FC<SearchResultListProps> = ({
@@ -25,6 +26,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   onRemoveLayer,
   onVisibilityChanged,
   onClickCard,
+  datasetSelected,
 }) => {
   // Use to remember last layout, it is either LIST or GRID at the moment
   const [currentLayout, setCurrentLayout] = useState<
@@ -70,6 +72,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
         onTags={undefined}
         onMore={undefined}
         onClickCard={onClickCard}
+        datasetsSelected={datasetSelected}
       />
     </Grid>
   );

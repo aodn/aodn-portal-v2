@@ -1,13 +1,13 @@
+import React, { useCallback } from "react";
 import {
   CollectionsQueryType,
   OGCCollection,
 } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
-import { Grid, ListItem } from "@mui/material";
+import { Box, Grid, ListItem, Stack } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
-import React, { useState } from "react";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
@@ -37,6 +37,7 @@ interface ResultCardsProps {
       ) => void)
     | undefined;
   onClickCard: ((uuid: string) => void) | undefined;
+  datasetsSelected?: OGCCollection[];
 }
 
 const renderCells = (
@@ -95,30 +96,97 @@ const renderRows = (
 };
 
 const ResultCards = (props: ResultCardsProps) => {
+  const hasSelectedDatasets =
+    props.datasetsSelected && props.datasetsSelected.length > 0;
+
+  const renderDatasetSelectedGridCards = useCallback(() => {
+    if (!hasSelectedDatasets) return;
+    return (
+      <Stack
+        direction="row"
+        flexWrap="wrap"
+        gap={1}
+        sx={{ height: "305px", overflowY: "auto" }}
+      >
+        {props.datasetsSelected?.map((dataset, index) => (
+          <Box key={index} width="327px" height="300px">
+            <GridResultCard
+              content={dataset}
+              onRemoveLayer={props.onRemoveLayer}
+              onDownload={props.onDownload}
+              onClickCard={props.onClickCard}
+              isSelectedDataset
+            />
+          </Box>
+        ))}
+      </Stack>
+    );
+  }, [
+    hasSelectedDatasets,
+    props.datasetsSelected,
+    props.onClickCard,
+    props.onDownload,
+    props.onRemoveLayer,
+  ]);
+
+  const renderDatasetSelectedListCards = useCallback(() => {
+    if (!hasSelectedDatasets) return;
+    return (
+      <Stack
+        direction="column"
+        gap={1}
+        sx={{ maxHeight: "260px", overflowY: "auto" }}
+      >
+        {props.datasetsSelected?.map((dataset, index) => (
+          <ListResultCard
+            key={index}
+            content={dataset}
+            onRemoveLayer={props.onRemoveLayer}
+            onDownload={props.onDownload}
+            onClickCard={props.onClickCard}
+            isSelectedDataset
+          />
+        ))}
+      </Stack>
+    );
+  }, [
+    hasSelectedDatasets,
+    props.datasetsSelected,
+    props.onClickCard,
+    props.onDownload,
+    props.onRemoveLayer,
+  ]);
+
   if (props.layout === SearchResultLayoutEnum.LIST) {
     return (
-      <FixedSizeList
-        height={1500}
-        width={"100%"}
-        itemSize={260}
-        itemCount={props.contents.result.collections.length}
-        overscanCount={10}
-      >
-        {(child: ListChildComponentProps) => renderRows(props, child)}
-      </FixedSizeList>
+      <>
+        {hasSelectedDatasets && renderDatasetSelectedListCards()}
+        <FixedSizeList
+          height={1500}
+          width={"100%"}
+          itemSize={260}
+          itemCount={props.contents.result.collections.length}
+          overscanCount={10}
+        >
+          {(child: ListChildComponentProps) => renderRows(props, child)}
+        </FixedSizeList>
+      </>
     );
   } else {
     // or else render grid view
     return (
-      <FixedSizeList
-        height={1500}
-        width={"100%"}
-        itemSize={310}
-        itemCount={Math.ceil(props.contents.result.collections.length / 2)}
-        overscanCount={10}
-      >
-        {(child: ListChildComponentProps) => renderCells(props, child)}
-      </FixedSizeList>
+      <>
+        {hasSelectedDatasets && renderDatasetSelectedGridCards()}
+        <FixedSizeList
+          height={1500}
+          width={"100%"}
+          itemSize={310}
+          itemCount={Math.ceil(props.contents.result.collections.length / 2)}
+          overscanCount={10}
+        >
+          {(child: ListChildComponentProps) => renderCells(props, child)}
+        </FixedSizeList>
+      </>
     );
   }
 };

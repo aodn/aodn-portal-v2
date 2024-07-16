@@ -37,6 +37,7 @@ interface ClusterLayerConfig {
 
 interface ClusterLayerProps extends LayersProps {
   clusterLayerConfig?: Partial<ClusterLayerConfig>;
+  onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
 const defaultClusterLayerConfig: ClusterLayerConfig = {
@@ -75,13 +76,14 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
 
 // These function help to get the correct id and reduce the need to set those id in the
 // useEffect list
-const getLayerId = (id: string | undefined) => `cluster-layer-${id}`;
+export const getLayerId = (id: string | undefined) => `cluster-layer-${id}`;
 
-const getClusterSourceId = (layerId: string) => `${layerId}-source`;
+export const getClusterSourceId = (layerId: string) => `${layerId}-source`;
 
-const getClusterLayerId = (layerId: string) => `${layerId}-clusters`;
+export const getClusterLayerId = (layerId: string) => `${layerId}-clusters`;
 
-const getUnclusterPointId = (layerId: string) => `${layerId}-unclustered-point`;
+export const getUnclusterPointId = (layerId: string) =>
+  `${layerId}-unclustered-point`;
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
@@ -160,24 +162,24 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           "circle-color": [
             "step",
             ["get", "point_count"],
-            config.clusterCircleColor?.default,
-            config.pointCountThresholds?.medium,
-            config.clusterCircleColor?.medium,
-            config.pointCountThresholds?.large,
-            config.clusterCircleColor?.large,
-            config.pointCountThresholds?.extra_large,
-            config.clusterCircleColor?.extra_large,
+            config.clusterCircleColor.default,
+            config.pointCountThresholds.medium,
+            config.clusterCircleColor.medium,
+            config.pointCountThresholds.large,
+            config.clusterCircleColor.large,
+            config.pointCountThresholds.extra_large,
+            config.clusterCircleColor.extra_large,
           ],
           "circle-radius": [
             "step",
             ["get", "point_count"],
-            config.clusterCircleSize?.default,
-            config.pointCountThresholds?.medium,
-            config.clusterCircleSize?.medium,
-            config.pointCountThresholds?.large,
-            config.clusterCircleSize?.large,
-            config.pointCountThresholds?.extra_large,
-            config.clusterCircleSize?.extra_large,
+            config.clusterCircleSize.default,
+            config.pointCountThresholds.medium,
+            config.clusterCircleSize.medium,
+            config.pointCountThresholds.large,
+            config.clusterCircleSize.large,
+            config.pointCountThresholds.extra_large,
+            config.clusterCircleSize.extra_large,
           ],
         },
       });
@@ -268,7 +270,11 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         layerId={unclusterPointLayer}
         onDatasetSelected={onDatasetSelected}
       />
-      <SpatialExtents layerId={unclusterPointLayer} />
+      <SpatialExtents
+        layerId={unclusterPointLayer}
+        addedLayerIds={[clusterLayer, unclusterPointLayer]}
+        onDatasetSelected={onDatasetSelected}
+      />
     </>
   );
 };

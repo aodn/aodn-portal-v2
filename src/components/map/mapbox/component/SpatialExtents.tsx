@@ -12,6 +12,9 @@ import { MapLayerMouseEvent } from "mapbox-gl";
 interface SpatialExtentsProps {
   layerId: string;
   onDatasetSelected?: (uuid: Array<string>) => void;
+  // added layer ids are layers added on current map other than spatial extents layer
+  // they are used in onEmptySpaceClick to identify if the click falls in empty space or in any layers
+  addedLayerIds?: Array<string>;
 }
 
 const createPointsLayerId = (id: string) => `${id}-points`;
@@ -26,13 +29,13 @@ const createSourceId = (layerId: string, uuid: string) =>
 const SpatialExtents: FC<SpatialExtentsProps> = ({
   layerId,
   onDatasetSelected,
+  addedLayerIds = [],
 }) => {
   const { map } = useContext(MapContext);
   const dispatch = useDispatch<AppDispatch>();
   const [spatialExtentsUUid, setSpatialExtentsUUid] = useState<Array<string>>();
 
   // util function to get collection data given uuid
-  // and based on boolean indicating whether to fetch only geometry-related properties
   const getCollectionData = useCallback(
     async (uuid: string) => {
       const param: SearchParameters = {
@@ -147,8 +150,9 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
     };
   }, [spatialExtentsUUid, layerId, getCollectionData, map]);
 
-  const onPointMouseClick = useCallback(
+  const onPointClick = useCallback(
     (ev: MapLayerMouseEvent): void => {
+      ev.preventDefault();
       // Make sure even same id under same area will be set once.
       if (ev.features) {
         const uuids = [
@@ -156,20 +160,45 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
         ];
         setSpatialExtentsUUid(uuids);
 
-        // Give time for the state to be updated
-        if (onDatasetSelected) setTimeout(() => onDatasetSelected(uuids), 100);
+        if (onDatasetSelected) {
+          onDatasetSelected(uuids);
+        }
       }
     },
     [setSpatialExtentsUUid, onDatasetSelected]
   );
 
+  const onEmptySpaceClick = useCallback(
+    (ev: MapLayerMouseEvent) => {
+      const point = map?.project(ev.lngLat);
+
+      // Query for features at the clicked point, but only in the cluster and unclustered point layers
+      const features = point
+        ? map?.queryRenderedFeatures(point, {
+            layers: addedLayerIds,
+          })
+        : [];
+
+      // If no features are found at the click point (i.e., clicked on empty space)
+      if (features && features.length === 0) {
+        // Clear the spatial extents uuid array
+        setSpatialExtentsUUid([]);
+        // TODO: if we need to clear selected datasets when click on empty space
+        if (onDatasetSelected) onDatasetSelected([]);
+      }
+    },
+    [map, addedLayerIds, onDatasetSelected]
+  );
+
   useEffect(() => {
-    map?.on("click", layerId, onPointMouseClick);
+    map?.on("click", layerId, onPointClick);
+    map?.on("click", onEmptySpaceClick);
 
     return () => {
-      map?.off("click", layerId, onPointMouseClick);
+      map?.off("click", layerId, onPointClick);
+      map?.off("click", onEmptySpaceClick);
     };
-  }, [map, layerId, onPointMouseClick]);
+  }, [map, layerId, onPointClick, onEmptySpaceClick]);
 
   // Remove all layers and sources created by addSpatialExtentsLayer
   useEffect(() => {
