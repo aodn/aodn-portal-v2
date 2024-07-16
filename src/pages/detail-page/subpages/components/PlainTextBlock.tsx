@@ -7,30 +7,30 @@ interface PlainTextBlockProps {
   texts: string[];
 }
 const PlainTextBlock: React.FC<PlainTextBlockProps> = ({ title, texts }) => {
-  const textList: ReactNode[] = useMemo(() => {
-    const returnedList: ReactNode[] = [];
+  const plainTextFragments: ReactNode[] = useMemo(() => {
+    const textFragmentList: ReactNode[] = [];
     texts?.map((text) => {
-      const showedText = [];
+      const displayingText = [];
 
       // implement new line if contains \n
       if (text.includes("\n")) {
-        const splitText = text.split("\n");
-        splitText.forEach((textPart, index) => {
+        const splitedText = text.split("\n");
+        splitedText.forEach((textPart, index) => {
           if (index > 0) {
-            showedText.push(<br />);
+            displayingText.push(<br />);
           }
-          showedText.push(textPart);
+          displayingText.push(textPart);
         });
       } else {
-        showedText.push(text);
+        displayingText.push(text);
       }
 
-      returnedList.push(
-        <PlainTextFragment key={text}>{showedText}</PlainTextFragment>
+      textFragmentList.push(
+        <PlainTextFragment key={text}>{displayingText}</PlainTextFragment>
       );
     });
-    return returnedList;
+    return textFragmentList;
   }, [texts]);
-  return <BlockList title={title} childrenList={textList} />;
+  return <BlockList title={title} childrenList={plainTextFragments} />;
 };
 export default PlainTextBlock;
