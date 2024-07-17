@@ -31,6 +31,12 @@ interface ITemporal {
   revision?: string;
 }
 
+interface ICitation {
+  suggestedCitation?: string;
+  otherConstraints?: string[];
+  useLimitations?: string[];
+}
+
 interface IContact {
   name: string;
   organization: string;
@@ -63,4 +69,5 @@ export type {
   IConcept,
   ITheme,
   ITemporal,
+  ICitation,
 };

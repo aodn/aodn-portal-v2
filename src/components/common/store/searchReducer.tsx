@@ -10,7 +10,12 @@ import {
   TemporalAfterOrBefore,
   TemporalDuring,
 } from "../cqlFilters";
-import { IContact, ITemporal, ITheme } from "../../../types/DataStructureTypes";
+import {
+  ICitation,
+  IContact,
+  ITemporal,
+  ITheme,
+} from "../../../types/DataStructureTypes";
 import {
   Feature,
   FeatureCollection,
@@ -81,6 +86,7 @@ export class SummariesProperties {
   readonly themes?: ITheme[];
   readonly geometry?: GeometryCollection;
   readonly temporal?: ITemporal[];
+  readonly citation?: ICitation;
 }
 
 export class OGCCollection {
@@ -131,6 +137,7 @@ export class OGCCollection {
   // It is a well form geometry collection of detail spatial extents
   getGeometry = (): GeometryCollection | undefined => this.propValue?.geometry;
   getTemporal = (): ITemporal[] | undefined => this.propValue?.temporal;
+  getCitation = (): ICitation | undefined => this.propValue?.citation;
 }
 
 export interface OGCCollections {
