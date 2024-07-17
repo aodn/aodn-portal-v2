@@ -7,7 +7,7 @@ import {
   IconButton,
 } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
-import { OGCCollection } from "../../../common/store/searchReducer";
+import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 interface ItemsOnMapControlProps {
   // Contain UUID and its description for each item

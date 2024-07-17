@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
-import { OGCCollection } from "../../../common/store/searchReducer";
+import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 interface VectorTileLayersProps {
   // Vector tile layer should added to map

@@ -1,8 +1,6 @@
 import React, { FC, useCallback, useContext, useEffect } from "react";
 import {
   fetchResultNoStore,
-  OGCCollection,
-  OGCCollections,
   SearchParameters,
 } from "../../../common/store/searchReducer";
 import { ThemeProvider } from "@mui/material/styles";
@@ -23,6 +21,10 @@ import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Point, Feature } from "geojson";
 import { createRoot, Root } from "react-dom/client";
+import {
+  OGCCollection,
+  OGCCollections,
+} from "../../../common/store/OGCCollectionDefinitions";
 
 interface MapPopupProps {
   layerId: string;

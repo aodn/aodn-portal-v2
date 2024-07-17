@@ -1,4 +1,4 @@
-import { OGCCollections } from "../store/searchReducer";
+import { OGCCollections } from "../store/OGCCollectionDefinitions";
 
 export interface FilterGroup {
   name: string;

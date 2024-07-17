@@ -1,4 +1,3 @@
-import { OGCCollection } from "../../components/common/store/searchReducer";
 import Layout from "../../components/layout/layout";
 import { Box, Grid } from "@mui/material";
 import { color, padding } from "../../styles/constants";
@@ -6,6 +5,7 @@ import HeaderSection from "./subpages/HeaderSection";
 import SideSection from "./subpages/SideSection";
 import { DetailPageProvider } from "./context/detail-page-provider";
 import ContentSection from "./subpages/ContentSection";
+import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
 
 export interface DetailsProps {
   collection?: OGCCollection;

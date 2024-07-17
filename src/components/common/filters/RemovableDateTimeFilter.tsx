@@ -5,7 +5,7 @@ import { DateRangeSlider } from "../slider/RangeSlider";
 import dayjs, { Dayjs } from "dayjs";
 import { useDispatch } from "react-redux";
 import store, { AppDispatch, getComponentState } from "../store/store";
-import { fetchResultNoStore, OGCCollections } from "../store/searchReducer";
+import { fetchResultNoStore } from "../store/searchReducer";
 import { findSmallestDate } from "./api";
 import {
   ParameterState,
@@ -15,6 +15,7 @@ import { cqlDefaultFilters } from "../cqlFilters";
 import TimeRangeBarChart from "../charts/TimeRangeBarChart";
 import StyledDateTimePicker from "../../../styles/StyledDateTimePicker";
 import { margin } from "../../../styles/constants";
+import { OGCCollections } from "../store/OGCCollectionDefinitions";
 
 interface RemovableDateTimeFilterProps {
   url?: string;

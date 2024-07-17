@@ -8,12 +8,12 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { OGCCollection } from "../../../common/store/searchReducer";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
 import mapboxgl, { LngLatBoundsLike } from "mapbox-gl";
+import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 interface GeojsonLayerProps {
   // Vector tile layer should added to map

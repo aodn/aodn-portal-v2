@@ -1,8 +1,8 @@
 import React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { OGCCollections } from "../store/searchReducer";
 import { BarSeriesType } from "@mui/x-charts";
 import { useTheme } from "@mui/material";
+import { OGCCollections } from "../store/OGCCollectionDefinitions";
 
 interface TimeRangeBarChartProps {
   imosDataIds: string[];

@@ -6,7 +6,7 @@ import { LayersProps, createCentroidDataSource } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
-import { OGCCollection } from "../../../common/store/searchReducer";
+import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 interface HeatmapLayer {
   maxZoom: number;
