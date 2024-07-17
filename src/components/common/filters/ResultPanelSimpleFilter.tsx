@@ -12,14 +12,10 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import MapListToggleButton, {
-  SearchResultLayoutEnum,
+  MapListToggleButtonProps,
 } from "../buttons/MapListToggleButton";
-import SortButton from "../buttons/SortButton";
-import React from "react";
-
-// interface ResultPanelSimpleFilterProps {
-//   filterClicked?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-// }
+import SortButton, { SortButtonProps } from "../buttons/SortButton";
+import { FC } from "react";
 
 const SlimSelect = styled(InputBase)(() => ({
   "& .MuiInputBase-input": {
@@ -27,13 +23,14 @@ const SlimSelect = styled(InputBase)(() => ({
   },
 }));
 
-interface ResultPanelSimpleFilterProps {
-  onChangeLayout: (layout: SearchResultLayoutEnum) => void;
-}
+interface ResultPanelSimpleFilterProps
+  extends MapListToggleButtonProps,
+    SortButtonProps {}
 
-const ResultPanelSimpleFilter = ({
+const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   onChangeLayout,
-}: ResultPanelSimpleFilterProps) => {
+  onChangeSorting,
+}) => {
   return (
     <Grid container justifyContent="center">
       <Grid container item xs={12} sx={{ pb: 1 }}>
@@ -62,7 +59,7 @@ const ResultPanelSimpleFilter = ({
             <ArrowForwardIosIcon />
           </IconButton>
         </Paper>
-        <SortButton />
+        <SortButton onChangeSorting={onChangeSorting} />
         <MapListToggleButton onChangeLayout={onChangeLayout} />
       </Grid>
     </Grid>

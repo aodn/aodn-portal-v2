@@ -4,6 +4,7 @@
  */
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
+import { sortBy } from "lodash";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -12,6 +13,7 @@ const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
   "UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE";
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
 const UPDATE_CATEGORY_FILTER_VARIABLE = "UPDATE_CATEGORY_FILTER_VARIABLE";
+const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
 
 interface DataTimeFilterRange {
   // Cannot use Date in Redux as it is non-serializable
@@ -27,6 +29,7 @@ export interface ParameterState {
   // Use in search box
   searchText?: string;
   categories?: Array<Category>;
+  sortby?: string;
 }
 // Function use to test an input value is of type Category
 const isTypeCategory = (value: any): value is Category =>
@@ -96,6 +99,21 @@ const updateCategories = (input: Array<Category>): ActionType => {
   };
 };
 
+const updateSortBy = (
+  input: Array<{ field: string; order: "ASC" | "DESC" }>
+): ActionType => {
+  return {
+    type: UPDATE_SORT_BY_VARIABLE,
+    payload: {
+      sortby: input
+        .map((item) =>
+          item.order === "ASC" ? `+${item.field}` : `-${item.field}`
+        )
+        .join(","),
+    },
+  };
+};
+
 // Initial State
 const createInitialParameterState = (): ParameterState => {
   return {
@@ -138,6 +156,11 @@ const paramReducer = (
       return {
         ...state,
         categories: action.payload.categories,
+      };
+    case UPDATE_SORT_BY_VARIABLE:
+      return {
+        ...state,
+        sortby: action.payload.sortby,
       };
     case UPDATE_PARAMETER_STATES:
       return {
@@ -264,4 +287,5 @@ export {
   updateFilterPolygon,
   updateCategories,
   updateParameterStates,
+  updateSortBy,
 };

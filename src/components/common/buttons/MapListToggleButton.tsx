@@ -1,6 +1,6 @@
 import { IconButton, ListItemIcon, MenuItem } from "@mui/material";
 import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
-import React, { useState } from "react";
+import React, { FC, useCallback, useState } from "react";
 import Menu from "@mui/material/Menu";
 import ActionButtonPaper from "./ActionButtonPaper";
 import GridAndMapIcon from "../../icon/GridAndMapIcon";
@@ -14,53 +14,57 @@ enum SearchResultLayoutEnum {
   VISIBLE = "VISIBLE",
 }
 
-interface MapListToggleButtonProps {
+export interface MapListToggleButtonProps {
   onChangeLayout: (layout: SearchResultLayoutEnum) => void;
 }
 
-const MapListToggleButton = ({ onChangeLayout }: MapListToggleButtonProps) => {
+const determineShowingIcon = (resultLayout: SearchResultLayoutEnum) => {
+  switch (resultLayout) {
+    case SearchResultLayoutEnum.LIST:
+      return <ListAndMapIcon />;
+
+    case SearchResultLayoutEnum.GRID:
+      return <GridAndMapIcon />;
+
+    default:
+      return <FullMapViewIcon />;
+  }
+};
+
+const MapListToggleButton: FC<MapListToggleButtonProps> = ({
+  onChangeLayout,
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [resultLayout, setResultLayout] = useState<SearchResultLayoutEnum>(
     SearchResultLayoutEnum.GRID
   );
-  const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      setAnchorEl(event.currentTarget);
+    },
+    [setAnchorEl]
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
-
-  const determineShowingIcon = () => {
-    switch (resultLayout) {
-      case SearchResultLayoutEnum.LIST:
-        return <ListAndMapIcon />;
-
-      case SearchResultLayoutEnum.GRID:
-        return <GridAndMapIcon />;
-
-      default:
-        return <FullMapViewIcon />;
-    }
-  };
+  }, [setAnchorEl]);
 
   return (
     <ActionButtonPaper>
       <IconButton
         id="map-list-toggle-button"
         onClick={handleClick}
-        aria-controls={open ? "map-list-toggle-menu" : undefined}
+        aria-controls={anchorEl != null ? "map-list-toggle-menu" : undefined}
         aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
+        aria-expanded={anchorEl != null ? "true" : undefined}
         data-testid="map-list-toggle-button"
       >
-        {determineShowingIcon()}
+        {determineShowingIcon(resultLayout)}
         <ArrowDropDownSharpIcon />
       </IconButton>
       <Menu
-        open={open}
+        open={anchorEl != null}
         onClose={handleClose}
         id="map-list-toggle-menu"
         anchorEl={anchorEl}

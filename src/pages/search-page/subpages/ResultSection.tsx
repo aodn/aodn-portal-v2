@@ -7,6 +7,7 @@ import {
 import React, { useCallback, useState } from "react";
 import ResultCards from "../../../components/result/ResultCards";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapListToggleButton";
+import { SortResultEnum } from "../../../components/common/buttons/SortButton";
 
 interface SearchResultListProps {
   visibility: SearchResultLayoutEnum;
@@ -16,6 +17,7 @@ interface SearchResultListProps {
     collection: OGCCollection | undefined
   ) => void;
   onVisibilityChanged?: (v: SearchResultLayoutEnum) => void;
+  onChangeSorting: (v: SortResultEnum) => void;
   onClickCard?: (uuid: string) => void;
   datasetSelected?: OGCCollection[];
 }
@@ -25,6 +27,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   contents,
   onRemoveLayer,
   onVisibilityChanged,
+  onChangeSorting,
   onClickCard,
   datasetSelected,
 }) => {
@@ -63,7 +66,10 @@ const ResultSection: React.FC<SearchResultListProps> = ({
       }}
       data-testid="search-page-result-list"
     >
-      <ResultPanelSimpleFilter onChangeLayout={onChangeLayout} />
+      <ResultPanelSimpleFilter
+        onChangeLayout={onChangeLayout}
+        onChangeSorting={onChangeSorting}
+      />
       <ResultCards
         layout={currentLayout}
         contents={contents}

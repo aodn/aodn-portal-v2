@@ -18,6 +18,7 @@ import {
   unFlattenToParameterState,
   updateFilterPolygon,
   updateParameterStates,
+  updateSortBy,
 } from "../../components/common/store/componentParamReducer";
 import store, {
   AppDispatch,
@@ -47,6 +48,7 @@ import { color, margin } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 import { bboxPolygon } from "@turf/turf";
+import { SortResultEnum } from "../../components/common/buttons/SortButton";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -167,16 +169,6 @@ const SearchPage = () => {
     },
     [dispatch, doSearch]
   );
-  // const onRemoveLayer = useCallback(
-  //   (
-  //     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  //     collection: OGCCollection | undefined
-  //   ) => {
-  //     // Remove the layer if found
-  //     setLayers((v) => v.filter((i) => i.id !== collection?.id));
-  //   },
-  //   [setLayers]
-  // );
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
@@ -210,11 +202,39 @@ const SearchPage = () => {
   // to this page.
   useEffect(() => handleNavigation(), [handleNavigation]);
 
-  const handleNavigateToDetailPage = (uuid: string) => {
-    const searchParams = new URLSearchParams();
-    searchParams.append("uuid", uuid);
-    navigate(pageDefault.details + "?" + searchParams.toString());
-  };
+  const handleNavigateToDetailPage = useCallback(
+    (uuid: string) => {
+      const searchParams = new URLSearchParams();
+      searchParams.append("uuid", uuid);
+      navigate(pageDefault.details + "?" + searchParams.toString());
+    },
+    [navigate]
+  );
+
+  const onChangeSorting = useCallback(
+    (v: SortResultEnum) => {
+      switch (v) {
+        case SortResultEnum.RELEVANT:
+          dispatch(updateSortBy([{ field: "score", order: "DESC" }]));
+          break;
+
+        case SortResultEnum.TITLE:
+          dispatch(updateSortBy([{ field: "title", order: "ASC" }]));
+          break;
+
+        case SortResultEnum.POPULARITY:
+          //TODO: need ogcapi change
+          break;
+
+        case SortResultEnum.MODIFIED:
+          //TODO: need ogcapi change
+          break;
+      }
+
+      doSearch();
+    },
+    [dispatch, doSearch]
+  );
 
   return (
     <Layout>
@@ -246,6 +266,7 @@ const SearchPage = () => {
           onRemoveLayer={undefined}
           onVisibilityChanged={onVisibilityChanged}
           onClickCard={handleNavigateToDetailPage}
+          onChangeSorting={onChangeSorting}
           datasetSelected={datasetsSelected}
         />
         <MapSection

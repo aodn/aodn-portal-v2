@@ -151,12 +151,14 @@ export type SearchParameters = {
   text?: string;
   filter?: string;
   properties?: string;
+  sortby?: string;
 };
 
 type OGCSearchParameters = {
   q?: string;
   filter?: string;
   properties?: string;
+  sortby?: string;
 };
 
 export interface CollectionsQueryType {
@@ -206,6 +208,10 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
 
     if (param.filter !== undefined && param.filter.length !== 0) {
       p.filter = param.filter;
+    }
+
+    if (param.sortby !== undefined && param.sortby.length !== 0) {
+      p.sortby = param.sortby;
     }
 
     const response = await axios.get<OGCCollections>(
@@ -363,6 +369,7 @@ const createSearchParamFrom = (i: ParameterState): SearchParameters => {
   const p: SearchParameters = {};
   p.text = i.searchText;
   p.filter = undefined;
+  p.sortby = i.sortby;
 
   if (i.isImosOnlyDataset) {
     p.filter = appendFilter(
