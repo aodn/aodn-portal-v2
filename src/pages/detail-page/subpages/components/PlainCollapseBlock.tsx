@@ -1,7 +1,7 @@
 import React, { ReactNode, useMemo } from "react";
 import BlockList from "./BlockList";
 import CollapseFrame from "./CollapseFrame";
-import { Typography } from "@mui/material";
+import PlainTextFragment from "./PlainTextFragment";
 
 interface KeywordSectionProps {
   items: { title: string; content: string[] }[];
@@ -15,11 +15,7 @@ const PlainCollapseBlock: React.FC<KeywordSectionProps> = ({ items }) => {
       returnedList.push(
         <CollapseFrame title={item.title} key={index}>
           {item.content?.map((content, index) => {
-            return (
-              <Typography variant="body1" key={index}>
-                {content}
-              </Typography>
-            );
+            return <PlainTextFragment key={index}>{content}</PlainTextFragment>;
           })}
         </CollapseFrame>
       );

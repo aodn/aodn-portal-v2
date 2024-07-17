@@ -1,4 +1,3 @@
-import { alpha } from "@mui/material/styles";
 import { Grid } from "@mui/material";
 import React from "react";
 import { margin } from "../../../../styles/constants";
@@ -12,7 +11,7 @@ const PlainTextFragment: React.FC<PlainTextFragmentProps> = ({ children }) => {
     <Grid
       container
       sx={{
-        backgroundColor: alpha("#D2E1EA", 0.3),
+        backgroundColor: "#F2F6F9",
         margin: margin.lg,
         borderRadius: "var(----s, 4px)",
         color: "#676767",

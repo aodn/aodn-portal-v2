@@ -1,6 +1,6 @@
 import BlockList from "./BlockList";
 import React, { ReactNode, useMemo } from "react";
-import PlainTextFragment from "./PlainTextFragmentProps";
+import PlainTextFragment from "./PlainTextFragment";
 
 interface PlainTextBlockProps {
   title: string;
