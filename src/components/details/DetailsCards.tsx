@@ -20,7 +20,6 @@ import {
 import grey from "../common/colors/grey";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { PropsWithChildren, useCallback, useState } from "react";
-import { OGCCollection } from "../common/store/searchReducer";
 import { DateRangeSlider } from "../common/slider/RangeSlider";
 import { dateDefault } from "../common/constants";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
@@ -46,6 +45,7 @@ import MenuControl, {
   BaseMapSwitcher,
 } from "../map/mapbox/controls/MenuControl";
 import { margin } from "../../styles/constants";
+import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 
 type Point = {
   date: number;

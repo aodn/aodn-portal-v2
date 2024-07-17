@@ -5,9 +5,9 @@ import {
   GeoJsonProperties,
   Geometry,
 } from "geojson";
-import { OGCCollection } from "../../../common/store/searchReducer";
 import { centroid } from "@turf/turf";
 import { MapMouseEvent } from "mapbox-gl";
+import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 export interface LayersProps {
   // Tile layer should added to map

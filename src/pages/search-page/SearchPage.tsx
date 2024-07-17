@@ -5,8 +5,6 @@ import {
   createSearchParamFrom,
   fetchResultNoStore,
   fetchResultWithStore,
-  OGCCollection,
-  OGCCollections,
   SearchParameters,
 } from "../../components/common/store/searchReducer";
 import Layout from "../../components/layout/layout";
@@ -48,6 +46,10 @@ import { color, margin } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 import { bboxPolygon } from "@turf/turf";
+import {
+  OGCCollection,
+  OGCCollections,
+} from "../../components/common/store/OGCCollectionDefinitions";
 import { SortResultEnum } from "../../components/common/buttons/SortButton";
 
 const SearchPage = () => {

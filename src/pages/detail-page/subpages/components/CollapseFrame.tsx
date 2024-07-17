@@ -7,7 +7,6 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
@@ -50,7 +49,7 @@ const CollapseFrame: React.FC<CollapseFrameProps> = ({
     <Grid
       container
       sx={{
-        backgroundColor: alpha("#D2E1EA", 0.3),
+        backgroundColor: "#F2F6F9",
         marginY: "10px",
         maxHeight: "700px",
         overflowY: "auto",

@@ -4,10 +4,10 @@ import { AppDispatch } from "../../../common/store/store";
 import { useDispatch } from "react-redux";
 import {
   fetchResultNoStore,
-  OGCCollections,
   SearchParameters,
 } from "../../../common/store/searchReducer";
 import { MapLayerMouseEvent } from "mapbox-gl";
+import { OGCCollections } from "../../../common/store/OGCCollectionDefinitions";
 
 interface SpatialExtentsProps {
   layerId: string;

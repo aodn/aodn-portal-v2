@@ -8,7 +8,6 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { OGCCollection } from "../common/store/searchReducer";
 import React, { useCallback } from "react";
 import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
 import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
@@ -17,6 +16,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import DownloadIcon from "@mui/icons-material/Download";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import { margin, padding } from "../../styles/constants";
+import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 
 interface GridResultCardProps {
   content?: OGCCollection;

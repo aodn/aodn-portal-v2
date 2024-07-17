@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { Link as LinkType } from "../common/store/searchReducer";
+import { ILink as LinkType } from "../common/store/OGCCollectionDefinitions";
 import { Box, Grid, Link, Typography } from "@mui/material";
 import { color, fontColor, padding } from "../../styles/constants";
 import CopyLinkButton from "../common/buttons/CopyLinkButton";
