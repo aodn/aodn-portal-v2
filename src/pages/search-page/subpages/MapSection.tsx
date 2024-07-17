@@ -11,10 +11,10 @@ import MenuControl, {
 } from "../../../components/map/mapbox/controls/MenuControl";
 import React, { useCallback, useState } from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
-import { OGCCollection } from "../../../components/common/store/searchReducer";
 import Layers from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
+import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 
 const mapContainerId = "map-container-id";
 

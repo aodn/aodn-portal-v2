@@ -1,4 +1,4 @@
-import { IContact } from "../../../../types/DataStructureTypes";
+import { IContact } from "../../../../components/common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
 import BlockList from "./BlockList";
 import ContactCard from "./ContactCard";

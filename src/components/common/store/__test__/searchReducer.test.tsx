@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { OGCCollection } from "../../../common/store/searchReducer";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
+import { OGCCollection } from "../OGCCollectionDefinitions";
 
 describe("Search Reducer Function Test", () => {
   it("Empty links return default thumbnail", () => {

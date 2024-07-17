@@ -1,13 +1,11 @@
 import React, { useCallback } from "react";
-import {
-  CollectionsQueryType,
-  OGCCollection,
-} from "../common/store/searchReducer";
+import { CollectionsQueryType } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Box, Grid, ListItem, Stack } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
+import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;

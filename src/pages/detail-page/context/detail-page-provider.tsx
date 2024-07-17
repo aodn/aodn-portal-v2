@@ -2,11 +2,9 @@ import { useLocation } from "react-router-dom";
 import { AppDispatch } from "../../../components/common/store/store";
 import { useDispatch } from "react-redux";
 import { FC, ReactNode, useEffect, useState } from "react";
-import {
-  fetchResultByUuidNoStore,
-  OGCCollection,
-} from "../../../components/common/store/searchReducer";
+import { fetchResultByUuidNoStore } from "../../../components/common/store/searchReducer";
 import { DetailPageContext, SpatialExtentPhoto } from "./detail-page-context";
+import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 
 interface DetailPageProviderProps {
   children: ReactNode;

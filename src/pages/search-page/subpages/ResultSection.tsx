@@ -1,12 +1,10 @@
 import ResultPanelSimpleFilter from "../../../components/common/filters/ResultPanelSimpleFilter";
 import { Grid } from "@mui/material";
-import {
-  CollectionsQueryType,
-  OGCCollection,
-} from "../../../components/common/store/searchReducer";
+import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
 import React, { useCallback, useState } from "react";
 import ResultCards from "../../../components/result/ResultCards";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapListToggleButton";
+import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 
 interface SearchResultListProps {
   visibility: SearchResultLayoutEnum;

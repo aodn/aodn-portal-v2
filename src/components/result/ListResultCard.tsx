@@ -11,13 +11,13 @@ import {
 import WhereToVoteIcon from "@mui/icons-material/WhereToVote";
 import DownloadIcon from "@mui/icons-material/Download";
 import InfoIcon from "@mui/icons-material/Info";
-import { OGCCollection } from "../common/store/searchReducer";
 import LinkIcon from "@mui/icons-material/Link";
 import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
 import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
 import { useCallback } from "react";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import { margin } from "../../styles/constants";
+import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 
 interface ResultCardProps {
   content: OGCCollection;

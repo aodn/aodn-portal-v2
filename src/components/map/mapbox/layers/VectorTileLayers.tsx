@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState, useCallback } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
-import { OGCCollection } from "../../../common/store/searchReducer";
+import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 // This vector tile layer call the function of Elastic Search to generate the tile and display on map,
 // it will be much slower than generate the polygon locally use the GeojsonLayer, hence we stop using this layer
