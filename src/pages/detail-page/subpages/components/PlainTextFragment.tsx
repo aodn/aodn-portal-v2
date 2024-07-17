@@ -11,6 +11,7 @@ const PlainTextFragment: React.FC<PlainTextFragmentProps> = ({ children }) => {
     <Grid
       container
       sx={{
+        width: "98%",
         backgroundColor: "#F2F6F9",
         margin: margin.lg,
         borderRadius: "var(----s, 4px)",

@@ -4,10 +4,14 @@ import CollapseFrame from "./CollapseFrame";
 import PlainTextFragment from "./PlainTextFragment";
 
 interface KeywordSectionProps {
+  title: string;
   items: { title: string; content: string[] }[];
 }
 
-const PlainCollapseBlock: React.FC<KeywordSectionProps> = ({ items }) => {
+const PlainCollapseBlock: React.FC<KeywordSectionProps> = ({
+  title,
+  items,
+}) => {
   // children list
   const collapseComponents: ReactNode[] = useMemo(() => {
     const returnedList: ReactNode[] = [];
@@ -23,7 +27,7 @@ const PlainCollapseBlock: React.FC<KeywordSectionProps> = ({ items }) => {
     return returnedList;
   }, [items]);
 
-  return <BlockList title="Keywords" childrenList={collapseComponents} />;
+  return <BlockList title={title} childrenList={collapseComponents} />;
 };
 
 export default PlainCollapseBlock;
