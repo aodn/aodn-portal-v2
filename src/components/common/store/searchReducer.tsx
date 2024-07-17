@@ -169,6 +169,8 @@ interface ObjectValue {
   categoriesResult: Array<Category>;
 }
 
+const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
+
 const jsonToOGCCollections = (json: any): OGCCollections => {
   return {
     collections: json.collections.map((collection: any) =>
@@ -203,9 +205,12 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     if (param.text !== undefined && param.text.length !== 0) {
       p.q = param.text;
     }
-
+    // DO NOT EXPOSE score externally, you should not allow share
+    // url with score, alter UI behavior which is hard to control
     if (param.filter !== undefined && param.filter.length !== 0) {
-      p.filter = param.filter;
+      p.filter = param.filter + ` AND score>=${DEFAULT_SEARCH_SCORE}`;
+    } else {
+      p.filter = `score>=${DEFAULT_SEARCH_SCORE}`;
     }
 
     const response = await axios.get<OGCCollections>(
