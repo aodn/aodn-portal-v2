@@ -4,6 +4,10 @@ import PlainCollapseBlock from "../components/PlainCollapseBlock";
 import ContactBlock from "../components/ContactBlock";
 import NavigatablePanel from "../components/NavigatablePanel";
 import PlainTextBlock from "../components/PlainTextBlock";
+import {
+  IContact,
+  ITheme,
+} from "../../../../components/common/store/OGCCollectionDefinitions";
 const AboutPanel = () => {
   const context = useDetailPageContext();
   const credits = useMemo(
@@ -14,7 +18,7 @@ const AboutPanel = () => {
     () =>
       context.collection
         ?.getContacts()
-        ?.filter((contact) => contact.roles.includes("about")),
+        ?.filter((contact: IContact) => contact.roles.includes("about")),
     [context.collection]
   );
   const themes = useMemo(
@@ -24,7 +28,7 @@ const AboutPanel = () => {
 
   const keywords: { title: string; content: string[] }[] = useMemo(() => {
     const keywordItems: { title: string; content: string[] }[] = [];
-    themes?.forEach((theme) => {
+    themes?.forEach((theme: ITheme) => {
       keywordItems.push({
         title: theme.title,
         content: theme.concepts.map((concept) => ` \u2022 ${concept.id}`),

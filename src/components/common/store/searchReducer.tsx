@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { Category, ParameterState } from "./componentParamReducer";
-import default_thumbnail from "@/assets/images/default-thumbnail.png";
 
 import {
   CategoriesIn,
@@ -11,139 +10,10 @@ import {
   TemporalDuring,
 } from "../cqlFilters";
 import {
-  ICitation,
-  IContact,
-  ITemporal,
-  ITheme,
-} from "../../../types/DataStructureTypes";
-import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-  GeometryCollection,
-  Position,
-} from "geojson";
-import { bboxPolygon } from "@turf/turf";
-import * as turf from "@turf/turf";
-
-export interface Link {
-  href: string;
-  rel: string;
-  type: string;
-  title: string;
-}
-
-export class Spatial {
-  private parent: OGCCollection;
-
-  bbox: Array<Position> = [];
-  temporal: {
-    interval: Array<Array<string | null>>;
-    trs?: string;
-  } = { interval: [[]] };
-  crs: string = "";
-
-  constructor(ogcCollection: OGCCollection) {
-    this.parent = ogcCollection;
-  }
-  /**
-   * Create a GeoJSON FeatureCollection from the bounding boxes and points
-   * @param start - The index to start from, from spec, the first is the overall bounding box
-   * @returns - The geojson feature collection
-   */
-  getGeojsonExtents = (start: number): FeatureCollection => {
-    const featureCollections: FeatureCollection = {
-      type: "FeatureCollection",
-      features: new Array<Feature<Geometry, GeoJsonProperties>>(),
-    };
-
-    // Filter valid bounding boxes and points
-    const validBoxesAndPoints = this.bbox?.filter(
-      (box) => box.length === 4 || box.length === 2
-    );
-
-    if (validBoxesAndPoints && validBoxesAndPoints.length > 1) {
-      // Create features from valid boxes and points starting from the given index
-      const features = validBoxesAndPoints.slice(start).map((pos) => {
-        return pos.length === 4
-          ? bboxPolygon([pos[0], pos[1], pos[2], pos[3]])
-          : turf.point(pos);
-      });
-
-      // Add individual bounding boxes and points
-      featureCollections.features.push(...features);
-    }
-    return featureCollections;
-  };
-}
-
-export class SummariesProperties {
-  readonly score?: number;
-  readonly status?: string;
-  readonly credits?: Array<string>;
-  readonly contacts?: IContact[];
-  readonly themes?: ITheme[];
-  readonly geometry?: GeometryCollection;
-  readonly temporal?: ITemporal[];
-  readonly citation?: ICitation;
-}
-
-export class OGCCollection {
-  private propValue?: SummariesProperties;
-  private propExtent?: Spatial;
-
-  readonly id: string = "undefined";
-  readonly title?: string;
-  readonly description?: string;
-  readonly itemType?: string;
-  readonly links?: Array<Link>;
-
-  set extent(extents: any) {
-    this.propExtent = new Spatial(this);
-    this.propExtent.bbox = extents.spatial.bbox;
-    this.propExtent.crs = extents.spatial.crs;
-    this.propExtent.temporal = extents.temporal;
-  }
-
-  get extent(): Spatial | undefined {
-    return this.propExtent;
-  }
-
-  set properties(props: SummariesProperties) {
-    this.propValue = Object.assign(new SummariesProperties(), props);
-  }
-
-  // Locate the thumbnail from the links array
-  findThumbnail = (): string => {
-    const target = this.links?.find(
-      (l) => l.type === "image" && l.rel === "thumbnail"
-    );
-    return target !== undefined ? target.href : default_thumbnail;
-  };
-  // Locate the logo from the links array
-  findIcon = (): string | undefined => {
-    const target = this.links?.find(
-      (l) => l.type === "image/png" && l.rel === "icon"
-    );
-    return target !== undefined ? target.href : undefined;
-  };
-
-  // get properties
-  getStatus = (): string | undefined => this.propValue?.status;
-  getCredits = (): string[] | undefined => this.propValue?.credits;
-  getContacts = (): IContact[] | undefined => this.propValue?.contacts;
-  getThemes = (): ITheme[] | undefined => this.propValue?.themes;
-  // It is a well form geometry collection of detail spatial extents
-  getGeometry = (): GeometryCollection | undefined => this.propValue?.geometry;
-  getTemporal = (): ITemporal[] | undefined => this.propValue?.temporal;
-  getCitation = (): ICitation | undefined => this.propValue?.citation;
-}
-
-export interface OGCCollections {
-  collections: Array<OGCCollection>;
-  links: Array<Link>;
-}
+  ILink,
+  OGCCollection,
+  OGCCollections,
+} from "./OGCCollectionDefinitions";
 
 export interface FailedResponse {
   error: string;
@@ -188,7 +58,7 @@ const jsonToOGCCollections = (json: any): OGCCollections => {
 const initialState: ObjectValue = {
   collectionsQueryResult: {
     result: {
-      links: new Array<Link>(),
+      links: new Array<ILink>(),
       collections: new Array<OGCCollection>(),
     },
     query: {},
@@ -224,9 +94,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
 
     // We need to fill in the index value here before return,
     // TODO: The index value may not start from 1 if it is paged
-    const collections: OGCCollections = jsonToOGCCollections(response.data);
-
-    return collections;
+    return jsonToOGCCollections(response.data);
   } catch (error: unknown) {
     const errorMessage = "Unkown error occurred. Please try again later.";
     if (axios.isAxiosError(error)) {

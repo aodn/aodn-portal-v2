@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
-import { OGCCollection } from "../../../components/common/store/searchReducer";
+import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 
 export interface SpatialExtentPhoto {
   bbox: number[];

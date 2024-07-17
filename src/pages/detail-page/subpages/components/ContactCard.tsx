@@ -2,7 +2,10 @@ import { Grid, Link, Typography } from "@mui/material";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
 import React from "react";
-import { IAddress, IContact } from "../../../../types/DataStructureTypes";
+import {
+  IAddress,
+  IContact,
+} from "../../../../components/common/store/OGCCollectionDefinitions";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 
