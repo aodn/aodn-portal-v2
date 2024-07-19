@@ -62,6 +62,7 @@ export class OGCCollection {
   getGeometry = (): GeometryCollection | undefined => this.propValue?.geometry;
   getTemporal = (): ITemporal[] | undefined => this.propValue?.temporal;
   getCitation = (): ICitation | undefined => this.propValue?.citation;
+  getStatement = (): string | undefined => this.propValue?.statement;
 }
 
 export class SummariesProperties {
@@ -73,6 +74,7 @@ export class SummariesProperties {
   readonly geometry?: GeometryCollection;
   readonly temporal?: ITemporal[];
   readonly citation?: ICitation;
+  readonly statement?: string;
 }
 
 export class Spatial {
