@@ -51,7 +51,6 @@ const CollapseFrame: React.FC<CollapseFrameProps> = ({
       sx={{
         backgroundColor: "#F2F6F9",
         marginY: "10px",
-        maxHeight: "700px",
         overflowY: "auto",
       }}
     >
