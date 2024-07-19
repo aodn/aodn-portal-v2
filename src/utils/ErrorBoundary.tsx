@@ -2,27 +2,64 @@
 import { ErrorInfo, ReactNode, Component } from "react";
 import { Navigate } from "react-router-dom";
 
+class ErrorResponse extends Error {
+  statusCode: number;
+  timestamp: Date;
+  details?: string;
+  parameters?: string;
+
+  constructor(
+    statusCode: number,
+    timestamp: Date,
+    message: string,
+    details: string | undefined,
+    parameters: string | undefined
+  ) {
+    super(message);
+
+    Object.setPrototypeOf(this, ErrorResponse.prototype);
+    this.statusCode = statusCode;
+    this.timestamp = timestamp;
+    this.details = details;
+    this.parameters = parameters;
+  }
+}
+
 interface ErrorBoundaryProps {
   children: ReactNode;
 }
 
 interface ErrorBoundaryState {
   hasError: boolean;
+  error: Error | null;
 }
 
+const createErrorResponse = (
+  statusCode: number,
+  message: string = "Unknown server reply",
+  details?: string,
+  timestamp: Date = new Date(),
+  parameters?: string
+): ErrorResponse => {
+  return new ErrorResponse(statusCode, timestamp, message, details, parameters);
+};
 /*
  * This is use to handle error where exception throw, it will redirect to an error page
  * which needs to upgrade later
+ *
+ * The ErrorBoundary component is set up to catch rendering errors, lifecycle method errors,
+ * and constructor errors within its child component tree. Some error throw cannot handle by
+ * this class
  */
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     // Update state so the next render will show the fallback UI
-    return { hasError: true };
+    return { hasError: true, error: error };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -39,5 +76,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     return this.props.children;
   }
 }
+
+export { createErrorResponse, ErrorResponse };
 
 export default ErrorBoundary;

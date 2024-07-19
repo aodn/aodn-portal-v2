@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Category, ParameterState } from "./componentParamReducer";
 
 import {
@@ -14,10 +14,10 @@ import {
   OGCCollection,
   OGCCollections,
 } from "./OGCCollectionDefinitions";
-
-export interface FailedResponse {
-  error: string;
-}
+import {
+  createErrorResponse,
+  ErrorResponse,
+} from "../../../utils/ErrorBoundary";
 
 export type SuggesterParameters = {
   input?: string;
@@ -73,95 +73,106 @@ const initialState: ObjectValue = {
   Define search functions
  */
 const searchResult = async (param: SearchParameters, thunkApi: any) => {
-  try {
-    const p: OGCSearchParameters = {
-      properties:
-        param.properties !== undefined
-          ? param.properties
-          : "id,title,description,status,links",
-    };
+  const p: OGCSearchParameters = {
+    properties:
+      param.properties !== undefined
+        ? param.properties
+        : "id,title,description,status,links",
+  };
 
-    if (param.text !== undefined && param.text.length !== 0) {
-      p.q = param.text;
-    }
-    // DO NOT EXPOSE score externally, you should not allow share
-    // url with score, alter UI behavior which is hard to control
-    if (param.filter !== undefined && param.filter.length !== 0) {
-      p.filter = param.filter + ` AND score>=${DEFAULT_SEARCH_SCORE}`;
-    } else {
-      p.filter = `score>=${DEFAULT_SEARCH_SCORE}`;
-    }
-
-    if (param.sortby !== undefined && param.sortby.length !== 0) {
-      p.sortby = param.sortby;
-    }
-
-    const response = await axios.get<OGCCollections>(
-      "/api/v1/ogc/collections",
-      {
-        params: p,
-      }
-    );
-
-    // We need to fill in the index value here before return,
-    // TODO: The index value may not start from 1 if it is paged
-    return jsonToOGCCollections(response.data);
-  } catch (error: unknown) {
-    const errorMessage = "Unkown error occurred. Please try again later.";
-    if (axios.isAxiosError(error)) {
-      return thunkApi.rejectWithValue(error?.response?.data);
-    } else {
-      return thunkApi.rejectWithValue({
-        error: errorMessage,
-      } as FailedResponse);
-    }
+  if (param.text !== undefined && param.text.length !== 0) {
+    p.q = param.text;
   }
+  // DO NOT EXPOSE score externally, you should not allow share
+  // url with score, alter UI behavior which is hard to control
+  if (param.filter !== undefined && param.filter.length !== 0) {
+    p.filter = param.filter + ` AND score>=${DEFAULT_SEARCH_SCORE}`;
+  } else {
+    p.filter = `score>=${DEFAULT_SEARCH_SCORE}`;
+  }
+
+  if (param.sortby !== undefined && param.sortby.length !== 0) {
+    p.sortby = param.sortby;
+  }
+
+  return axios
+    .get<OGCCollections>("/api/v1/ogc/collections", {
+      params: p,
+    })
+    .then((response) => jsonToOGCCollections(response.data))
+    .catch((error: Error | AxiosError | ErrorResponse) => {
+      if (axios.isAxiosError(error) && error.response) {
+        return thunkApi.rejectWithValue(
+          createErrorResponse(
+            error?.response?.status,
+            error?.response?.data.details
+              ? error?.response?.data.details
+              : error?.response?.statusText,
+            error?.response?.data.message,
+            error?.response?.data.timestamp,
+            error?.response?.data.parameters
+          )
+        );
+      } else {
+        return thunkApi.rejectWithValue(error);
+      }
+    });
 };
 // TODO: Why no param needed?
 const searchParameterCategories = async (
   param: Map<string, string> | null,
   thunkApi: any
-) => {
-  try {
-    const response = await axios.get<Array<Category>>(
-      "/api/v1/ogc/ext/parameter/categories"
-    );
-    return response.data;
-  } catch (error: unknown) {
-    const errorMessage = "Unkown error occurred. Please try again later.";
-    if (axios.isAxiosError(error)) {
-      return thunkApi.rejectWithValue(error?.response?.data);
-    } else {
-      return thunkApi.rejectWithValue({
-        error: errorMessage,
-      } as FailedResponse);
-    }
-  }
-};
+) =>
+  axios
+    .get<Array<Category>>("/api/v1/ogc/ext/parameter/categories")
+    .then((response) => response.data)
+    .catch((error: Error | AxiosError | ErrorResponse) => {
+      if (axios.isAxiosError(error) && error.response) {
+        return thunkApi.rejectWithValue(
+          createErrorResponse(
+            error?.response?.status,
+            error?.response?.data.details
+              ? error?.response?.data.details
+              : error?.response?.statusText,
+            error?.response?.data.message,
+            error?.response?.data.timestamp,
+            error?.response?.data.parameters
+          )
+        );
+      } else {
+        return thunkApi.rejectWithValue(error);
+      }
+    });
 
 const fetchSuggesterOptions = createAsyncThunk<
   any,
   SuggesterParameters,
-  { rejectValue: FailedResponse }
+  { rejectValue: ErrorResponse }
 >(
   "search/fetchSuggesterOptions",
-  async (params: SuggesterParameters, thunkApi: any) => {
-    try {
-      const response = await axios.get<any>("/api/v1/ogc/ext/autocomplete", {
+  async (params: SuggesterParameters, thunkApi: any) =>
+    axios
+      .get<any>("/api/v1/ogc/ext/autocomplete", {
         params: params,
-      });
-      return response.data;
-    } catch (error: unknown) {
-      const errorMessage = "Unkown error occurred. Please try again later.";
-      if (axios.isAxiosError(error)) {
-        return thunkApi.rejectWithValue(error?.response?.data);
-      } else {
-        return thunkApi.rejectWithValue({
-          error: errorMessage,
-        } as FailedResponse);
-      }
-    }
-  }
+      })
+      .then((response) => response.data)
+      .catch((error: Error | AxiosError | ErrorResponse) => {
+        if (axios.isAxiosError(error) && error.response) {
+          return thunkApi.rejectWithValue(
+            createErrorResponse(
+              error?.response?.status,
+              error?.response?.data.details
+                ? error?.response?.data.details
+                : error?.response?.statusText,
+              error?.response?.data.message,
+              error?.response?.data.timestamp,
+              error?.response?.data.parameters
+            )
+          );
+        } else {
+          return thunkApi.rejectWithValue(error);
+        }
+      })
 );
 
 /**
@@ -171,7 +182,7 @@ const fetchSuggesterOptions = createAsyncThunk<
 const fetchResultWithStore = createAsyncThunk<
   OGCCollections,
   SearchParameters,
-  { rejectValue: FailedResponse }
+  { rejectValue: ErrorResponse }
 >("search/fetchResultWithStore", searchResult);
 
 /**
@@ -181,35 +192,40 @@ const fetchResultWithStore = createAsyncThunk<
 const fetchResultNoStore = createAsyncThunk<
   OGCCollections,
   SearchParameters,
-  { rejectValue: FailedResponse }
+  { rejectValue: ErrorResponse }
 >("search/fetchResultNoStore", searchResult);
 
 const fetchResultByUuidNoStore = createAsyncThunk<
   OGCCollection,
   string,
-  { rejectValue: FailedResponse }
->("search/fetchResultNoStore", async (id: string, thunkApi) => {
-  try {
-    const response = await axios.get<OGCCollection>(
-      `/api/v1/ogc/collections/${id}`
-    );
-    return Object.assign(new OGCCollection(), response.data);
-  } catch (error: unknown) {
-    const errorMessage = "Unkown error occurred. Please try again later.";
-    if (axios.isAxiosError(error)) {
-      return thunkApi.rejectWithValue(error?.response?.data);
-    } else {
-      return thunkApi.rejectWithValue({
-        error: errorMessage,
-      } as FailedResponse);
-    }
-  }
-});
+  { rejectValue: ErrorResponse }
+>("search/fetchResultNoStore", async (id: string, thunkApi: any) =>
+  axios
+    .get<OGCCollection>(`/api/v1/ogc/collections/${id}`)
+    .then((response) => Object.assign(new OGCCollection(), response.data))
+    .catch((error: Error | AxiosError | ErrorResponse) => {
+      if (axios.isAxiosError(error) && error.response) {
+        return thunkApi.rejectWithValue(
+          createErrorResponse(
+            error?.response?.status,
+            error?.response?.data.details
+              ? error?.response?.data.details
+              : error?.response?.statusText,
+            error?.response?.data.message,
+            error?.response?.data.timestamp,
+            error?.response?.data.parameters
+          )
+        );
+      } else {
+        return thunkApi.rejectWithValue(error);
+      }
+    })
+);
 
 const fetchParameterCategoriesWithStore = createAsyncThunk<
   Array<Category>,
   Map<string, string> | null,
-  { rejectValue: FailedResponse }
+  { rejectValue: ErrorResponse }
 >("search/fetchParameterCategoriesWithStore", searchParameterCategories);
 
 const searcher = createSlice({
@@ -314,3 +330,6 @@ export {
 };
 
 export default searcher.reducer;
+function createErrorRespons(): any {
+  throw new Error("Function not implemented.");
+}

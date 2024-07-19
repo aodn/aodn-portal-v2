@@ -198,12 +198,6 @@ const SearchPage = () => {
     searchQueryResult
   );
 
-  // You will see this trigger twice, this is due to use of strict-mode
-  // which is ok.
-  // TODO: Optimize call if possible, this happens when navigate from page
-  // to this page.
-  useEffect(() => handleNavigation(), [handleNavigation]);
-
   const handleNavigateToDetailPage = useCallback(
     (uuid: string) => {
       const searchParams = new URLSearchParams();
@@ -237,6 +231,12 @@ const SearchPage = () => {
     },
     [dispatch, doSearch]
   );
+
+  // You will see this trigger twice, this is due to use of strict-mode
+  // which is ok.
+  // TODO: Optimize call if possible, this happens when navigate from page
+  // to this page.
+  useEffect(() => handleNavigation(), [handleNavigation]);
 
   return (
     <Layout>
