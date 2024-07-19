@@ -6,10 +6,10 @@ import { dateDefault } from "../constants";
 import StyledSlider from "../../../styles/StyledSlider";
 
 interface RangeSliderProps<T> {
-  title: string;
-  label: (value: number, min: number, max: number) => string;
-  min: T;
-  max: T;
+  title?: string;
+  label?: (value: number, min: number, max: number) => string;
+  min?: T;
+  max?: T;
   start: T;
   end: T;
   sx?: SxProps<Theme>;
@@ -50,16 +50,17 @@ const mapRangeToRealValue = (min: number, max: number, i: number): number => {
   return min + ((max - min) * i) / 100;
 };
 
-const NumberRangeSlider = ({
-  title,
-  label,
-  min,
-  max,
-  start,
-  end,
+const NumberRangeSlider: React.FC<NumberRangeSliderProps> = ({
+  title = "TODO",
+  label = (value: number, min: number, max: number) =>
+    "" + mapRangeToRealValue(min, max, value),
+  min = Number.MIN_SAFE_INTEGER,
+  max = Number.MAX_SAFE_INTEGER,
+  start = undefined,
+  end = undefined,
   sx,
   onSlideChanged,
-}: NumberRangeSliderProps) => {
+}) => {
   const [value, setValue] = React.useState<number[]>([
     mapRangeToZeroHundred(min, max, min),
     mapRangeToZeroHundred(min, max, max),
@@ -111,35 +112,24 @@ const NumberRangeSlider = ({
   );
 };
 
-const DateRangeSlider = (props: DateRangeSliderProps) =>
-  NumberRangeSlider({
-    title: props.title,
-    label: props.label,
-    min: props.min.getTime(),
-    max: props.max.getTime(),
-    start: props.start?.getTime(),
-    end: props.end?.getTime(),
-    onSlideChanged: props.onSlideChanged,
-  });
-
-NumberRangeSlider.defaultProps = {
-  title: "TODO",
-  label: (value: number, min: number, max: number) =>
-    mapRangeToRealValue(min, max, value),
-  min: Number.MIN_SAFE_INTEGER,
-  max: Number.MAX_SAFE_INTEGER,
-  start: undefined,
-  end: undefined,
-};
-
-DateRangeSlider.defaultProps = {
-  title: "TODO",
-  label: (value: number, min: number, max: number) =>
+const DateRangeSlider: React.FC<DateRangeSliderProps> = ({
+  title = "TODO",
+  label = (value: number, min: number, max: number) =>
     new Date(mapRangeToRealValue(min, max, value)).toLocaleDateString(),
-  min: dateDefault["min"],
-  max: dateDefault["max"],
-  start: undefined,
-  end: undefined,
-};
+  min = dateDefault["min"],
+  max = dateDefault["max"],
+  start = dateDefault["min"],
+  end = dateDefault["max"],
+  onSlideChanged,
+}) =>
+  NumberRangeSlider({
+    title: title,
+    label: label,
+    min: min.getTime(),
+    max: max.getTime(),
+    start: start?.getTime(),
+    end: end?.getTime(),
+    onSlideChanged: onSlideChanged,
+  });
 
 export { NumberRangeSlider, DateRangeSlider };
