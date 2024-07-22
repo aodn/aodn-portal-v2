@@ -226,6 +226,14 @@ const ResultCards = (props: ResultCardsProps) => {
     props.onRemoveLayer,
   ]);
 
+  const datasetsCount = props.contents.result.collections.length;
+  const itemCountInGridView =
+    props.datasetsSelected && props.datasetsSelected.length === 1
+      ? datasetsCount % 2 === 0
+        ? datasetsCount / 2 + 1
+        : Math.ceil(datasetsCount / 2)
+      : Math.ceil(datasetsCount / 2);
+
   if (props.layout === SearchResultLayoutEnum.LIST) {
     return (
       <>
@@ -234,7 +242,7 @@ const ResultCards = (props: ResultCardsProps) => {
           height={1500}
           width={"100%"}
           itemSize={260}
-          itemCount={props.contents.result.collections.length}
+          itemCount={datasetsCount}
           overscanCount={10}
         >
           {(child: ListChildComponentProps) => renderRows(props, child)}
@@ -250,7 +258,7 @@ const ResultCards = (props: ResultCardsProps) => {
           height={1500}
           width={"100%"}
           itemSize={310}
-          itemCount={Math.ceil(props.contents.result.collections.length / 2)}
+          itemCount={itemCountInGridView}
           overscanCount={10}
         >
           {(child: ListChildComponentProps) => renderCells(props, child)}
