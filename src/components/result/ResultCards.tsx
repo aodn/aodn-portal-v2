@@ -50,7 +50,8 @@ const renderCells = (
   /**
    *if only one dataset is selected:
    * the first row contains a invisible card related to the selected dataset, and also the first one of result datasets
-   * the following rows are the rest of result datasets, but need to switch the leftIndex and rightIndex
+   * the following rows are the rest of result datasets
+   * but leftIndex and rightIndex need to minus 1 because one place is taken by the selected dataset card
    *
    * if more than one datasets are selected:
    * then use the leftIndex and rightIndex as normal
@@ -82,7 +83,7 @@ const renderCells = (
           <Grid container spacing={1}>
             <Grid item xs={6}>
               <GridResultCard
-                content={props.contents.result.collections[rightIndex]}
+                content={props.contents.result.collections[leftIndex - 1]}
                 onRemoveLayer={props.onRemoveLayer}
                 onDownload={props.onDownload}
                 onClickCard={props.onClickCard}
@@ -91,7 +92,7 @@ const renderCells = (
             </Grid>
             <Grid item xs={6}>
               <GridResultCard
-                content={props.contents.result.collections[leftIndex]}
+                content={props.contents.result.collections[rightIndex - 1]}
                 onRemoveLayer={props.onRemoveLayer}
                 onDownload={props.onDownload}
                 onClickCard={props.onClickCard}
