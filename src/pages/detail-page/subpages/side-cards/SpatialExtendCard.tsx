@@ -19,7 +19,8 @@ const SpatialExtendCard = () => {
   const { photos } = useDetailPageContext();
   const mainMap = photos[0];
   const mapContainerId = "map-spatial-extent-container-id";
-  if (!collection) return;
+
+  if (!collection || !collection.extent || !collection.extent.bbox) return;
   return (
     <SideCardContainer title="Spatial Extend">
       <Stack direction="column" sx={{ position: "relative" }}>
