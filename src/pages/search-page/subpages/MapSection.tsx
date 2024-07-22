@@ -26,7 +26,6 @@ interface MapSectionProps {
   ) => void;
   onToggleClicked: (v: boolean) => void;
   onDatasetSelected?: (uuid: Array<string>) => void;
-  onClickPopup: (uuid: string) => void;
 }
 
 const MapSection: React.FC<MapSectionProps> = ({
@@ -35,7 +34,6 @@ const MapSection: React.FC<MapSectionProps> = ({
   onDatasetSelected,
   collections,
   showFullMap,
-  onClickPopup,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>("heatmap");
 
@@ -47,7 +45,6 @@ const MapSection: React.FC<MapSectionProps> = ({
             <HeatmapLayer
               collections={collections}
               onDatasetSelected={onDatasetSelected}
-              onClickPopup={onClickPopup}
             />
           );
 
@@ -56,12 +53,11 @@ const MapSection: React.FC<MapSectionProps> = ({
             <ClusterLayer
               collections={collections}
               onDatasetSelected={onDatasetSelected}
-              onClickPopup={onClickPopup}
             />
           );
       }
     },
-    [collections, onDatasetSelected, onClickPopup]
+    [collections, onDatasetSelected]
   );
 
   return (

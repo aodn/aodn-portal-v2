@@ -12,7 +12,7 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
-import mapboxgl, { LngLatBoundsLike } from "mapbox-gl";
+import { LngLatBoundsLike } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 interface GeojsonLayerProps {

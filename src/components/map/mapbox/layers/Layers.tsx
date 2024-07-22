@@ -14,7 +14,6 @@ export interface LayersProps {
   collections?: Array<OGCCollection>;
   // Event fired when user click on the point layer
   onDatasetSelected?: (uuid: Array<string>) => void;
-  onClickPopup?: (uuid: string) => void;
 }
 
 // Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items

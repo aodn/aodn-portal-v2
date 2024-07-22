@@ -6,7 +6,6 @@ import { LayersProps, createCentroidDataSource } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
-import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 interface HeatmapLayer {
   maxZoom: number;
@@ -29,9 +28,8 @@ interface HeatmapConfig {
 }
 
 interface HeatmapLayerProps extends LayersProps {
-  collections?: OGCCollection[] | undefined;
+  // Some method inherit from LayersProps
   heatmapLayerConfig?: Partial<HeatmapConfig>;
-  onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
 const defaultHeatmapConfig: HeatmapConfig = {
