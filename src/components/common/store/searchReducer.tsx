@@ -303,9 +303,12 @@ const createSearchParamFrom = (i: ParameterState): SearchParameters => {
     p.filter = appendFilter(p.filter, f(i.polygon));
   }
 
-  if (i.categories) {
+  if (i.categories && i.categories.length > 0) {
     const f = cqlDefaultFilters.get("CATEGORIES_IN") as CategoriesIn;
-    p.filter = appendFilter(p.filter, f(i.categories));
+    const categoryFilter = f(i.categories);
+    if (categoryFilter) {
+      p.filter = appendFilter(p.filter, categoryFilter);
+    }
   }
 
   return p;

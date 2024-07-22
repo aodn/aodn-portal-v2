@@ -240,10 +240,13 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && open === true) {
       setOpen(false);
+      handleEnterPressed(event, false);
     }
-    handleEnterPressed(event, open);
+    if (event.key === "Enter" && open === false) {
+      handleEnterPressed(event, false);
+    }
   };
 
   const [searchFieldWidth, setSearchFieldWidth] = useState<number>(0);
