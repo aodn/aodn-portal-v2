@@ -32,16 +32,6 @@ import EventEmitter from "events";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
-const overlays = [
-  { name: "Australian Marine Parks", id: "marine-parks-layer", visible: false },
-  {
-    name: "World Boundaries and Places",
-    id: "world-boundaries-layer",
-    visible: false,
-  },
-  // Add more overlays as needed
-];
-
 const leftPadding = "15px";
 const rightPadding = "15px";
 
@@ -65,7 +55,8 @@ interface MenuClickedEvent {
 }
 
 interface BaseMapSwitcherProps extends ControlProps {
-  // Add property if needed
+  // Static layer to be added to the switch
+  layers: Array<{ id: string; name: string; default?: boolean }>;
 }
 
 interface LayerSwitcherProps extends ControlProps {
@@ -76,11 +67,17 @@ interface MenuControlProps {
   menu: Menus;
 }
 
-const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
+const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
+  map,
+  layers,
+  onEvent,
+}) => {
   const [currentStyle, setCurrentStyle] = useState<string>(
     mapStyles[defaultStyle].id
   );
-  const [overlaysChecked, setOverlaysChecked] = useState(new Map());
+  const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(
+    new Map()
+  );
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
 
@@ -99,22 +96,12 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
     [map]
   );
 
-  const toggleOverlay = useCallback(
-    (layerId: string, visible: boolean) => {
-      if (map) {
-        // if (visible) {
-        //  map.setLayoutProperty(layerId, "visibility", "visible");
-        //} else {
-        //  map.setLayoutProperty(layerId, "visibility", "none");
-        // }
-        setOverlaysChecked((map) => {
-          map.set(layerId, visible);
-          return map;
-        });
-      }
-    },
-    [map]
-  );
+  const toggleOverlay = useCallback((layerId: string, visible: boolean) => {
+    setOverlaysChecked((values) => {
+      values.set(layerId, visible);
+      return new Map(values);
+    });
+  }, []);
 
   useEffect(() => {
     // Handle event when other control clicked, this component should close
@@ -227,9 +214,9 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
             <Divider />
             <FormControl component="fieldset">
               <FormGroup>
-                {overlays.map((ol) => (
+                {layers.map((ol) => (
                   <FormControlLabel
-                    key={ol.name}
+                    key={"fc-" + ol.id}
                     control={
                       <Checkbox
                         id={"cb-" + ol.id}
@@ -244,7 +231,9 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
                         checked={overlaysChecked.get(ol.id)}
                         onChange={(e) => {
                           toggleOverlay(ol.id, e.target.checked);
+                          if (onEvent) onEvent(e.target);
                         }}
+                        value={ol.id}
                       />
                     }
                     label={
