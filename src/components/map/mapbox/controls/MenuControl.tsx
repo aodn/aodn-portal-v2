@@ -77,7 +77,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
   );
   // Must init the map so that it will not throw error indicate uncontrol to control component
   const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(
-    new Map(layers.map((i) => [i.id, i.default ? true : false]))
+    new Map(layers?.map((i) => [i.id, i.default ? true : false]))
   );
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -215,7 +215,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
             <Divider />
             <FormControl component="fieldset">
               <FormGroup>
-                {layers.map((ol) => (
+                {layers?.map((ol) => (
                   <FormControlLabel
                     key={"fc-" + ol.id}
                     control={

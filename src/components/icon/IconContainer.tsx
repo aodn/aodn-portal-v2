@@ -1,5 +1,5 @@
 import { Paper, SxProps, Theme, Typography } from "@mui/material";
-import { border, color, fontSize } from "../../../styles/constants";
+import { border, color, fontSize } from "../../styles/constants";
 import { FC } from "react";
 
 interface IconContainerProps {

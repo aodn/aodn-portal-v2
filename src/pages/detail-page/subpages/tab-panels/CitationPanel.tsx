@@ -4,9 +4,16 @@ import ContactBlock from "../components/ContactBlock";
 import NavigatablePanel from "../components/NavigatablePanel";
 import PlainTextBlock from "../components/PlainTextBlock";
 import PlainCollapseBlock from "../components/PlainCollapseBlock";
+import LicenseBlock from "../components/LicenseBlock";
 
 const CitationPanel = () => {
   const context = useDetailPageContext();
+
+  const license = useMemo(
+    () => context.collection?.getLicense(),
+    [context.collection]
+  );
+
   const citationContacts = useMemo(
     () =>
       context.collection
@@ -70,7 +77,11 @@ const CitationPanel = () => {
       },
       {
         title: "License",
-        component: <div>License</div>,
+        component: license ? (
+          <LicenseBlock license={license} />
+        ) : (
+          <div>no license</div>
+        ),
       },
       {
         title: "Suggested Citation",
@@ -88,7 +99,7 @@ const CitationPanel = () => {
         ),
       },
     ],
-    [citationContacts, constraints, suggestedCitation]
+    [citationContacts, constraints, license, suggestedCitation]
   );
 
   return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;

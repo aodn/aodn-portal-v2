@@ -17,7 +17,7 @@ const PlainTextBlock: React.FC<PlainTextBlockProps> = ({ title, texts }) => {
         const splitedText = text.split("\n");
         splitedText.forEach((textPart, index) => {
           if (index > 0) {
-            displayingText.push(<br />);
+            displayingText.push(<br key={index} />);
           }
           displayingText.push(textPart);
         });

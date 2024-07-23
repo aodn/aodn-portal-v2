@@ -39,13 +39,12 @@ import Map from "../map/mapbox/Map";
 import Controls from "../map/mapbox/controls/Controls";
 import NavigationControl from "../map/mapbox/controls/NavigationControl";
 import ScaleControl from "../map/mapbox/controls/ScaleControl";
-import DisplayCoordinate from "../map/mapbox/controls/DisplayCoordinate";
-import { MapboxEvent as MapEvent } from "mapbox-gl";
 import MenuControl, {
   BaseMapSwitcher,
 } from "../map/mapbox/controls/MenuControl";
 import { margin } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { StaticLayersDef } from "../map/mapbox/layers/StaticLayer";
 
 type Point = {
   date: number;
@@ -64,9 +63,11 @@ interface TabPanelProps {
 }
 
 const mapPanelId = "map-detail-container-id";
+const mapboxWorldLayerId = "mapbox-world-layer-id";
 
 const MapCard = (props: DetailCardProps) => {
   const [minSliderDate] = useState<Date | undefined>(undefined);
+  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [startSliderDate, setSliderStartDate] = useState<Date>(
     dateDefault["min"]
   );
@@ -113,7 +114,34 @@ const MapCard = (props: DetailCardProps) => {
             <Controls>
               <NavigationControl />
               <ScaleControl />
-              <MenuControl menu={<BaseMapSwitcher />} />
+              <MenuControl
+                menu={
+                  <BaseMapSwitcher
+                    layers={[
+                      {
+                        id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
+                        name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+                        default: false,
+                      },
+                      {
+                        id: mapboxWorldLayerId,
+                        name: "World Boundaries and Places",
+                        default: false,
+                      },
+                    ]}
+                    onEvent={(target: EventTarget & HTMLInputElement) =>
+                      setStaticLayer((values) => {
+                        // Remove the item and add it back if selected
+                        const e = values?.filter((i) => i !== target.value);
+                        if (target.checked) {
+                          e.push(target.value);
+                        }
+                        return [...e];
+                      })
+                    }
+                  />
+                }
+              />
             </Controls>
           </Map>
         </Box>

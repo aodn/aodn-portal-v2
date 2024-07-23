@@ -240,11 +240,10 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
-    if (event.key === "Enter" && open === true) {
-      setOpen(false);
-      handleEnterPressed(event, false);
-    }
-    if (event.key === "Enter" && open === false) {
+    if (event.key === "Enter") {
+      if (open) {
+        setOpen(false);
+      }
       handleEnterPressed(event, false);
     }
   };

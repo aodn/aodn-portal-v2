@@ -63,6 +63,7 @@ export class OGCCollection {
   getTemporal = (): ITemporal[] | undefined => this.propValue?.temporal;
   getCitation = (): ICitation | undefined => this.propValue?.citation;
   getStatement = (): string | undefined => this.propValue?.statement;
+  getLicense = (): ILicense | undefined => this.propValue?.license;
 }
 
 export class SummariesProperties {
@@ -75,6 +76,7 @@ export class SummariesProperties {
   readonly temporal?: ITemporal[];
   readonly citation?: ICitation;
   readonly statement?: string;
+  readonly license?: ILicense;
 }
 
 export class Spatial {
@@ -163,6 +165,12 @@ export interface ICitation {
   suggestedCitation?: string;
   otherConstraints?: string[];
   useLimitations?: string[];
+}
+
+export interface ILicense {
+  title: string;
+  url: string;
+  licenseGraphic: string;
 }
 
 export interface IContact {
