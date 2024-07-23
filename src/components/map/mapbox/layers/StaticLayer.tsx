@@ -74,7 +74,9 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, features }) => {
         "text-anchor": "top",
       },
       paint: {
-        "text-color": "#000000",
+        "text-color": "#ffffff",
+        "text-halo-color": "#000000",
+        "text-halo-width": 2,
       },
     });
   }, [map, layerId, sourceId, layerLabelId, features, id]);
