@@ -1,5 +1,5 @@
 import IconContainer from "./IconContainer";
-import { FileDownloadIcon } from "../../icon/download";
+import { FileDownloadIcon } from "./download";
 
 const DownloadIcon = () => {
   return <IconContainer icon={FileDownloadIcon} label="Download" />;

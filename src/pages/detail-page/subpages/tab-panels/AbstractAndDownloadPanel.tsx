@@ -4,12 +4,11 @@ import {
   AccordionSummary,
   Box,
   Grid,
+  Icon,
+  IconButton,
+  Stack,
   Typography,
   useTheme,
-  Icon,
-  Stack,
-  IconButton,
-  LinearProgress,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
@@ -23,10 +22,10 @@ import {
   padding,
 } from "../../../../styles/constants";
 import DateRangeSlider from "../../../../components/details/DateRangeSlider";
-import TimeRangeIcon from "../../../../components/details/icons/TimeRangeIcon";
-import DownloadIcon from "../../../../components/details/icons/DownloadIcon";
-import SpatialIcon from "../../../../components/details/icons/SpatialIcon";
-import DimensionsIcon from "../../../../components/details/icons/Dimensions";
+import TimeRangeIcon from "../../../../components/icon/TimeRangeIcon";
+import DownloadIcon from "../../../../components/icon/DownloadIcon";
+import SpatialIcon from "../../../../components/icon/SpatialIcon";
+import DimensionsIcon from "../../../../components/icon/Dimensions";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import Controls from "../../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
