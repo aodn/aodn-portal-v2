@@ -1,0 +1,21 @@
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "^8.0.0"
+pytest-playwright = "^0.4.4"
+playwright = "1.43.0"
+pytest-xdist = "^3.5.0"
+python-dotenv = "^1.0.1"
+dynaconf = "^3.2.4"
+pytest-html = "^4.1.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.6.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
