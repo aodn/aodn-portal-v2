@@ -75,8 +75,9 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
   const [currentStyle, setCurrentStyle] = useState<string>(
     mapStyles[defaultStyle].id
   );
+  // Must init the map so that it will not throw error indicate uncontrol to control component
   const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(
-    new Map()
+    new Map(layers.map((i) => [i.id, i.default ? true : false]))
   );
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);

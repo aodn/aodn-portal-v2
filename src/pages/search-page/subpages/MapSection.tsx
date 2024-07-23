@@ -19,8 +19,10 @@ import {
   AustraliaMarineParkLayer,
   StaticLayersDef,
 } from "../../../components/map/mapbox/layers/StaticLayer";
+import MapboxWorldLayer from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 
 const mapContainerId = "map-container-id";
+const mapboxWorldLayerId = "mapbox-world-layer-id";
 
 interface MapSectionProps {
   collections: OGCCollection[];
@@ -71,6 +73,8 @@ const MapSection: React.FC<MapSectionProps> = ({
         {ids.map((id) => {
           if (id === StaticLayersDef.AUSTRALIA_MARINE_PARKS.id) {
             return <AustraliaMarineParkLayer key={"s" + id} />;
+          } else if (id === mapboxWorldLayerId) {
+            return <MapboxWorldLayer key={"mb" + mapboxWorldLayerId} />;
           }
         })}
       </>
@@ -108,6 +112,11 @@ const MapSection: React.FC<MapSectionProps> = ({
                     {
                       id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
                       name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+                      default: false,
+                    },
+                    {
+                      id: mapboxWorldLayerId,
+                      name: "World Boundaries and Places",
                       default: false,
                     },
                   ]}
