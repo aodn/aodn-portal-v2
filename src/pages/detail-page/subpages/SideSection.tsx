@@ -2,9 +2,9 @@ import { Card, Stack } from "@mui/material";
 import { borderRadius } from "../../../styles/constants";
 import DownloadCard from "./side-cards/DownloadCard";
 import OverviewCard from "./side-cards/OverviewCard";
-import SpatialExtendCard from "./side-cards/SpatialExtendCard";
-import TemporalExtentCard from "./side-cards/TemporalExtentCard";
-import AssociatedCategoriesCard from "./side-cards/AssociatedCategoriesCard";
+import SpatialCoverageCard from "./side-cards/SpatialCoverageCard";
+import TimePeriodCard from "./side-cards/TimePeriodCard";
+import ThemesCard from "./side-cards/ThemesCard";
 import RatingsAndCommentsCard from "./side-cards/RatingsAndCommentsCard";
 
 const SideSection = () => {
@@ -19,9 +19,9 @@ const SideSection = () => {
         <DownloadCard />
       </Card>
       <OverviewCard />
-      <SpatialExtendCard />
-      <TemporalExtentCard />
-      <AssociatedCategoriesCard />
+      <SpatialCoverageCard />
+      <TimePeriodCard />
+      <ThemesCard />
       <RatingsAndCommentsCard />
     </Stack>
   );

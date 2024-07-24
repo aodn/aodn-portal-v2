@@ -3,7 +3,7 @@ import SideCardContainer from "./SideCardContainer";
 import { borderRadius, color, padding } from "../../../../styles/constants";
 
 // TODO: replace with real categories from real data
-const categories = [
+const themes = [
   "Ocean",
   "IMOS content",
   "Moorings",
@@ -11,7 +11,7 @@ const categories = [
   "Time series",
 ];
 
-const AssociatedCategoriesCard = () => {
+const ThemesCard = () => {
   const renderCategoryCard = (content: string) => (
     <Paper
       elevation={0}
@@ -26,7 +26,7 @@ const AssociatedCategoriesCard = () => {
     </Paper>
   );
   return (
-    <SideCardContainer title="Associated Categories">
+    <SideCardContainer title="Themes">
       <Stack
         spacing={1}
         direction="row"
@@ -34,7 +34,7 @@ const AssociatedCategoriesCard = () => {
         flexWrap="wrap"
         padding={padding.medium}
       >
-        {categories.map((content, index) => (
+        {themes.map((content, index) => (
           <Box key={index}>{renderCategoryCard(content)}</Box>
         ))}
       </Stack>
@@ -42,4 +42,4 @@ const AssociatedCategoriesCard = () => {
   );
 };
 
-export default AssociatedCategoriesCard;
+export default ThemesCard;
