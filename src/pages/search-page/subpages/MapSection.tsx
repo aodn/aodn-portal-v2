@@ -11,7 +11,9 @@ import MenuControl, {
 } from "../../../components/map/mapbox/controls/MenuControl";
 import React, { useCallback, useState } from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
-import Layers from "../../../components/map/mapbox/layers/Layers";
+import Layers, {
+  createStaticLayers,
+} from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
@@ -19,10 +21,11 @@ import {
   AustraliaMarineParkLayer,
   StaticLayersDef,
 } from "../../../components/map/mapbox/layers/StaticLayer";
-import MapboxWorldLayer from "../../../components/map/mapbox/layers/MapboxWorldLayer";
+import MapboxWorldLayer, {
+  MapboxWorldLayersDef,
+} from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 
 const mapContainerId = "map-container-id";
-const mapboxWorldLayerId = "mapbox-world-layer-id";
 
 interface MapSectionProps {
   collections: OGCCollection[];
@@ -67,21 +70,6 @@ const MapSection: React.FC<MapSectionProps> = ({
     [collections, onDatasetSelected]
   );
 
-  const createStaticLayers = useCallback(
-    (ids: Array<string>) => (
-      <>
-        {ids.map((id) => {
-          if (id === StaticLayersDef.AUSTRALIA_MARINE_PARKS.id) {
-            return <AustraliaMarineParkLayer key={"s" + id} />;
-          } else if (id === mapboxWorldLayerId) {
-            return <MapboxWorldLayer key={"mb" + mapboxWorldLayerId} />;
-          }
-        })}
-      </>
-    ),
-    []
-  );
-
   return (
     <Grid
       item
@@ -115,8 +103,8 @@ const MapSection: React.FC<MapSectionProps> = ({
                       default: false,
                     },
                     {
-                      id: mapboxWorldLayerId,
-                      name: "World Boundaries and Places",
+                      id: MapboxWorldLayersDef.WORLD.id,
+                      name: MapboxWorldLayersDef.WORLD.name,
                       default: false,
                     },
                   ]}

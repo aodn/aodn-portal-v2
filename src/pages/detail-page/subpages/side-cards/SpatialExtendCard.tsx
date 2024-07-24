@@ -35,11 +35,6 @@ const SpatialExtendCard = () => {
             }}
           >
             <Map panelId={mapContainerId}>
-              <Controls>
-                <NavigationControl />
-                <ScaleControl />
-                <MenuControl menu={<BaseMapSwitcher />} />
-              </Controls>
               <Layers>
                 <GeojsonLayer collection={collection} setPhotos={setPhotos} />
               </Layers>

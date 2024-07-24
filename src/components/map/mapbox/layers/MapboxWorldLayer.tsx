@@ -5,6 +5,13 @@ const sourceId = "mapbox-world-country-boundaries";
 const layerId = "mapbox-world-country-boundaries-layer";
 const undisputedLabelId = "mapbox-world-country-undisputed-country-label";
 
+const MapboxWorldLayersDef = {
+  WORLD: {
+    id: "static-mapbox-world-layer",
+    name: "World Boundaries and Places",
+  },
+};
+
 const MapboxWorldLayer: FC = () => {
   const { map } = useContext(MapContext);
   const [created, setCreated] = useState<boolean>(false);
@@ -36,15 +43,18 @@ const MapboxWorldLayer: FC = () => {
       type: "symbol",
       filter: ["==", ["get", "disputed"], "false"],
       layout: {
-        "text-field": ["step", ["zoom"], ["to-string", ["get", "name"]], 8, ""],
+        "text-field": ["step", ["zoom"], ["to-string", ["get", "name"]], 9, ""],
         "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
         "text-padding": 5,
-        "text-size": 12,
+        "text-size": 13,
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "symbol-placement": "line",
       },
       paint: {
         "text-color": "#ffffff",
         "text-halo-color": "#000000",
-        "text-halo-width": 2,
+        "text-halo-width": 1,
       },
     });
   }, [map]);
@@ -83,5 +93,7 @@ const MapboxWorldLayer: FC = () => {
 
   return <React.Fragment />;
 };
+
+export { MapboxWorldLayersDef };
 
 export default MapboxWorldLayer;

@@ -67,11 +67,13 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, features }) => {
       id: layerLabelId,
       type: "symbol",
       source: sourceId,
-      minzoom: 5, // Minimum zoom level to display the labels
       layout: {
         "text-field": ["get", "NATLEGEND"],
         "text-offset": [0, 1.25],
         "text-anchor": "top",
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "symbol-placement": "point",
       },
       paint: {
         "text-color": "#ffffff",
