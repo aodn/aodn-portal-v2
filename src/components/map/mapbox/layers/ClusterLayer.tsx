@@ -36,8 +36,8 @@ interface ClusterLayerConfig {
 }
 
 interface ClusterLayerProps extends LayersProps {
+  // Some method inherit from LayersProps
   clusterLayerConfig?: Partial<ClusterLayerConfig>;
-  onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
 const defaultClusterLayerConfig: ClusterLayerConfig = {

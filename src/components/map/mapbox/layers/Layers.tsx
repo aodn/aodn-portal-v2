@@ -8,14 +8,28 @@ import {
 import { centroid } from "@turf/turf";
 import { MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
+import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
+import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 
 export interface LayersProps {
   // Tile layer should added to map
   collections?: Array<OGCCollection>;
   // Event fired when user click on the point layer
   onDatasetSelected?: (uuid: Array<string>) => void;
-  onClickPopup?: (uuid: string) => void;
 }
+// Use to create static layer on map, you need to add menu item to select those layers,
+// refer to map section
+const createStaticLayers = (ids: Array<string>) => (
+  <>
+    {ids.map((id) => {
+      if (id === StaticLayersDef.AUSTRALIA_MARINE_PARKS.id) {
+        return <AustraliaMarineParkLayer key={"s" + id} />;
+      } else if (id === MapboxWorldLayersDef.WORLD.id) {
+        return <MapboxWorldLayer key={"mb" + MapboxWorldLayersDef.WORLD.id} />;
+      }
+    })}
+  </>
+);
 
 // Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
 // in a collection to the FeatureCollection
@@ -56,6 +70,7 @@ const Layers = (props: PropsWithChildren<LayersProps>) => {
 export default Layers;
 
 export {
+  createStaticLayers,
   createCentroidDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
