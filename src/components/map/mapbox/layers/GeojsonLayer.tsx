@@ -12,7 +12,7 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
-import mapboxgl, { LngLatBoundsLike } from "mapbox-gl";
+import { LngLatBoundsLike } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 interface GeojsonLayerProps {
@@ -26,6 +26,14 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
   const [mapLoaded, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
   const collectionId = useMemo(() => collection.id, [collection.id]);
+  const sourceId = useMemo(
+    () => `geojson-${map?.getContainer().id}-source-${collectionId}`,
+    [collectionId, map]
+  );
+  const layerId = useMemo(
+    () => `geojson-${map?.getContainer().id}-layer-${collectionId}`,
+    [collectionId, map]
+  );
 
   // Function to fit map to the overall bbox(bboxes[0])
   const fitToOverallBbox = useCallback(
@@ -103,9 +111,6 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
   );
 
   const createLayer = useCallback(() => {
-    const sourceId = `geojson-${map?.getContainer().id}-source-${collectionId}`;
-    const layerId = `geojson-${map?.getContainer().id}-layer-${collectionId}`;
-
     // If style changed, we may need to add the layer again, hence listen to this event.
     // https://github.com/mapbox/mapbox-gl-js/issues/8660
     //
@@ -123,10 +128,10 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
       source: sourceId,
       paint: {
         "fill-color": stringToColor(collectionId),
-        "fill-outline-color": "black",
+        "fill-outline-color": "yellow",
       },
     });
-  }, [map, extent, collectionId]);
+  }, [map, extent, collectionId, sourceId, layerId]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
   // the behavior of mapbox, this useEffect, add the layer back based on user event
@@ -155,8 +160,19 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
         } else return prev;
       })
     );
+    return () => {
+      // Always remember to clean up resources
+      try {
+        if (map?.getSource(sourceId)) {
+          map?.removeLayer(layerId);
+          map?.removeSource(sourceId);
+        }
+      } catch (error) {
+        // OK to ignore error here
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, handleIdle]);
+  }, [map, handleIdle, layerId, sourceId]);
 
   return <React.Fragment />;
 };

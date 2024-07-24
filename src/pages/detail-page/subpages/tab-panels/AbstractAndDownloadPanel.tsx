@@ -35,8 +35,12 @@ import MenuControl, {
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
 import Map from "../../../../components/map/mapbox/Map";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
-import Layers from "../../../../components/map/mapbox/layers/Layers";
+import Layers, {
+  createStaticLayers,
+} from "../../../../components/map/mapbox/layers/Layers";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
+import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
+import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 
 // TODO: replace with real select options
 export const selects = {
@@ -76,6 +80,7 @@ const AbstractAndDownloadPanel = () => {
   const mapContainerId = "map-detail-container-id";
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
+  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const selectSxProps = {
     height: "30px",
@@ -122,10 +127,40 @@ const AbstractAndDownloadPanel = () => {
                   <Controls>
                     <NavigationControl />
                     <ScaleControl />
-                    <MenuControl menu={<BaseMapSwitcher />} />
+                    <MenuControl
+                      menu={
+                        <BaseMapSwitcher
+                          layers={[
+                            {
+                              id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
+                              name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+                              default: false,
+                            },
+                            {
+                              id: MapboxWorldLayersDef.WORLD.id,
+                              name: MapboxWorldLayersDef.WORLD.name,
+                              default: false,
+                            },
+                          ]}
+                          onEvent={(target: EventTarget & HTMLInputElement) =>
+                            setStaticLayer((values) => {
+                              // Remove the item and add it back if selected
+                              const e = values?.filter(
+                                (i) => i !== target.value
+                              );
+                              if (target.checked) {
+                                e.push(target.value);
+                              }
+                              return [...e];
+                            })
+                          }
+                        />
+                      }
+                    />
                   </Controls>
                   <Layers>
                     <GeojsonLayer collection={collection} />
+                    {createStaticLayers(staticLayer)}
                   </Layers>
                 </Map>
               </Box>
