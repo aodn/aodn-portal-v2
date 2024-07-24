@@ -142,7 +142,7 @@ const RatingsAndCommentsCard = () => {
             </Grid>
             <Grid item xs={9}>
               <Typography padding={0} textAlign="center">
-                Add you feedback
+                Add your feedback
               </Typography>
             </Grid>
           </Grid>
