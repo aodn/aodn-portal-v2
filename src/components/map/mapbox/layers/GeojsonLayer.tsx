@@ -123,7 +123,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
       source: sourceId,
       paint: {
         "fill-color": stringToColor(collectionId),
-        "fill-outline-color": "black",
+        "fill-outline-color": "yellow",
       },
     });
   }, [map, extent, collectionId]);
