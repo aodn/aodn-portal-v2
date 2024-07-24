@@ -122,24 +122,22 @@ const TimePeriodCard: FC = () => {
         </RoundCard>
 
         {endDate && (
-          <>
-            <RoundCard
-              sxProps={{
-                marginTop: margin.md,
-                border: `${border.xs} ${color.gray.extraLight}`,
-                backgroundColor: color.blue.extraLightSemiTransparent,
+          <RoundCard
+            sxProps={{
+              marginTop: margin.md,
+              border: `${border.xs} ${color.gray.extraLight}`,
+              backgroundColor: color.blue.extraLightSemiTransparent,
+            }}
+          >
+            <KeyboardDoubleArrowRightIcon
+              sx={{
+                fontSize: "18px",
+                paddingRight: padding.small,
+                color: color.gray.light,
               }}
-            >
-              <KeyboardDoubleArrowRightIcon
-                sx={{
-                  fontSize: "18px",
-                  paddingRight: padding.small,
-                  color: color.gray.light,
-                }}
-              />
-              <Typography padding={0}>{endDate}</Typography>
-            </RoundCard>
-          </>
+            />
+            <Typography padding={0}>{endDate}</Typography>
+          </RoundCard>
         )}
       </Stack>
     );
