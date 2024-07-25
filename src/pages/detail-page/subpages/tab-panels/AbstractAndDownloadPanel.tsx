@@ -134,6 +134,8 @@ const AbstractAndDownloadPanel = () => {
                             {
                               id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
                               name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+                              label:
+                                StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
                               default: false,
                             },
                             {
