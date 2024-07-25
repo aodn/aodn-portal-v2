@@ -20,20 +20,18 @@ const MetadataInformationPanel = () => {
   );
   const generateMedatataDateText = useCallback(() => {
     let dateText = "";
-    const temporals = context.collection?.getTemporal();
-    if (!temporals) {
-      return "";
-    }
-    const temporal = temporals[0];
 
-    if (temporal.creation) {
-      dateText = dateText + `Creation: ${convertDateFormat(temporal.creation)}`;
+    const creation = context.collection?.getCreation();
+    const revision = context.collection?.getRevision();
+
+    if (creation) {
+      dateText = dateText + `Creation: ${convertDateFormat(creation)}`;
     }
-    if (temporal.revision) {
+    if (revision) {
       if (dateText) {
         dateText += "\n";
       }
-      dateText = dateText + `Revision: ${convertDateFormat(temporal.revision)}`;
+      dateText = dateText + `Revision: ${convertDateFormat(revision)}`;
     }
     return dateText;
   }, [context.collection]);
