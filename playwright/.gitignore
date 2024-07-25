@@ -165,5 +165,8 @@ cython_debug/
 # Test reports
 reports
 
+# Playwright traces
+test-results
+
 # File to check if docker build is necessary
 .docker_build_time
