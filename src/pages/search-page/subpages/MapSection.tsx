@@ -100,6 +100,7 @@ const MapSection: React.FC<MapSectionProps> = ({
                     {
                       id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
                       name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+                      label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
                       default: false,
                     },
                     {
