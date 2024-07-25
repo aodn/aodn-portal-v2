@@ -68,7 +68,7 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, features }) => {
       type: "symbol",
       source: sourceId,
       layout: {
-        "text-field": ["get", "NATLEGEND"],
+        "text-field": ["get", "RESNAME"],
         "text-offset": [0, 1.25],
         "text-anchor": "top",
         "text-allow-overlap": false,
