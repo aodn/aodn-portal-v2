@@ -11,10 +11,19 @@ import MenuControl, {
 } from "../../../components/map/mapbox/controls/MenuControl";
 import React, { useCallback, useState } from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
-import Layers from "../../../components/map/mapbox/layers/Layers";
+import Layers, {
+  createStaticLayers,
+} from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import {
+  AustraliaMarineParkLayer,
+  StaticLayersDef,
+} from "../../../components/map/mapbox/layers/StaticLayer";
+import MapboxWorldLayer, {
+  MapboxWorldLayersDef,
+} from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 
 const mapContainerId = "map-container-id";
 
@@ -26,7 +35,6 @@ interface MapSectionProps {
   ) => void;
   onToggleClicked: (v: boolean) => void;
   onDatasetSelected?: (uuid: Array<string>) => void;
-  onClickPopup: (uuid: string) => void;
 }
 
 const MapSection: React.FC<MapSectionProps> = ({
@@ -35,9 +43,9 @@ const MapSection: React.FC<MapSectionProps> = ({
   onDatasetSelected,
   collections,
   showFullMap,
-  onClickPopup,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>("heatmap");
+  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const createPresentationLayers = useCallback(
     (id: string | null) => {
@@ -47,7 +55,6 @@ const MapSection: React.FC<MapSectionProps> = ({
             <HeatmapLayer
               collections={collections}
               onDatasetSelected={onDatasetSelected}
-              onClickPopup={onClickPopup}
             />
           );
 
@@ -56,12 +63,11 @@ const MapSection: React.FC<MapSectionProps> = ({
             <ClusterLayer
               collections={collections}
               onDatasetSelected={onDatasetSelected}
-              onClickPopup={onClickPopup}
             />
           );
       }
     },
-    [collections, onDatasetSelected, onClickPopup]
+    [collections, onDatasetSelected]
   );
 
   return (
@@ -87,7 +93,34 @@ const MapSection: React.FC<MapSectionProps> = ({
             />
             <NavigationControl />
             <ScaleControl />
-            <MenuControl menu={<BaseMapSwitcher />} />
+            <MenuControl
+              menu={
+                <BaseMapSwitcher
+                  layers={[
+                    {
+                      id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
+                      name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+                      default: false,
+                    },
+                    {
+                      id: MapboxWorldLayersDef.WORLD.id,
+                      name: MapboxWorldLayersDef.WORLD.name,
+                      default: false,
+                    },
+                  ]}
+                  onEvent={(target: EventTarget & HTMLInputElement) =>
+                    setStaticLayer((values) => {
+                      // Remove the item and add it back if selected
+                      const e = values?.filter((i) => i !== target.value);
+                      if (target.checked) {
+                        e.push(target.value);
+                      }
+                      return [...e];
+                    })
+                  }
+                />
+              }
+            />
             <MenuControl
               menu={
                 <MapLayerSwitcher
@@ -108,7 +141,10 @@ const MapSection: React.FC<MapSectionProps> = ({
               }
             />
           </Controls>
-          <Layers>{createPresentationLayers(selectedLayer)}</Layers>
+          <Layers>
+            {createPresentationLayers(selectedLayer)}
+            {createStaticLayers(staticLayer)}
+          </Layers>
         </Map>
       </Paper>
     </Grid>
