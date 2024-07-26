@@ -63,7 +63,7 @@ export class OGCCollection {
   getTemporal = (): ITemporal[] | undefined => this.propValue?.temporal;
   getCitation = (): ICitation | undefined => this.propValue?.citation;
   getStatement = (): string | undefined => this.propValue?.statement;
-  getLicense = (): ILicense | undefined => this.propValue?.license;
+  getLicense = (): string | undefined => this.propValue?.license;
   getCreation = (): string | undefined => this.propValue?.creation;
   getRevision = (): string | undefined => this.propValue?.revision;
 }
@@ -78,7 +78,7 @@ export class SummariesProperties {
   readonly temporal?: ITemporal[];
   readonly citation?: ICitation;
   readonly statement?: string;
-  readonly license?: ILicense;
+  readonly license?: string;
   readonly creation?: string;
   readonly revision?: string;
 }
@@ -128,7 +128,6 @@ export class Spatial {
 }
 
 // interfaces:
-
 export interface OGCCollections {
   collections: Array<OGCCollection>;
   links: Array<ILink>;
@@ -169,12 +168,6 @@ export interface ICitation {
   useLimitations?: string[];
 }
 
-export interface ILicense {
-  title: string;
-  url: string;
-  licenseGraphic: string;
-}
-
 export interface IContact {
   name: string;
   organization: string;
@@ -197,4 +190,15 @@ export interface ITheme {
   description: string;
   title: string;
   concepts: IConcept[];
+}
+
+// Enums
+export enum RelationType {
+  SELF = "self",
+  LICENSE = "license",
+}
+
+export enum MediaType {
+  TEXT_HTML = "text/html",
+  IMAGE_PNG = "image/png",
 }
