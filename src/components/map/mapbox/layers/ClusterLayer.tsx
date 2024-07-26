@@ -1,4 +1,5 @@
 import { FC, useCallback, useContext, useEffect, useMemo } from "react";
+import MapboxglSpiderifier from "mapboxgl-spiderifier";
 import MapContext from "../MapContext";
 import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
 import MapPopup from "../component/MapPopup";
@@ -97,6 +98,15 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const clusterSourceId = useMemo(() => getClusterSourceId(layerId), [layerId]);
 
   const clusterLayer = useMemo(() => getClusterLayerId(layerId), [layerId]);
+
+  const spiderifier = useMemo(() => {
+    if (map) {
+      return new MapboxglSpiderifier(map, {
+        customPin: true,
+      });
+    }
+    return null;
+  }, [map]);
 
   const unclusterPointLayer = useMemo(
     () => getUnclusterPointId(layerId),
