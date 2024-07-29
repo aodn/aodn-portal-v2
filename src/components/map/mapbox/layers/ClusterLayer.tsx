@@ -1,7 +1,10 @@
 import { FC, useCallback, useContext, useEffect, useMemo } from "react";
-import MapboxglSpiderifier from "mapboxgl-spiderifier";
+import MapboxglSpiderifier, {
+  popupOffsetForSpiderLeg,
+  SpiderLeg,
+} from "mapboxgl-spiderifier";
 import MapContext from "../MapContext";
-import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
+import { GeoJSONSource, MapLayerMouseEvent, MapMouseEvent } from "mapbox-gl";
 import MapPopup from "../component/MapPopup";
 import {
   LayersProps,
@@ -11,6 +14,7 @@ import {
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
+import { Feature, Point } from "geojson";
 
 interface ClusterSize {
   default?: number | string;
@@ -68,11 +72,24 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   clusterCircleStrokeWidth: 1,
   clusterCircleStrokeColor: "#fff",
   clusterCircleTextSize: 12,
-  unclusterPointColor: "#51bbd6",
+  unclusterPointColor: "green",
   unclusterPointOpacity: 0.6,
   unclusterPointStrokeWidth: 1,
   unclusterPointStrokeColor: "#fff",
   unclusterPointRadius: 8,
+};
+
+const spiderPinsConfig = {
+  position: "absolute",
+  width: "16px",
+  height: "16px",
+  marginLeft: "-8px",
+  marginTop: "-8px",
+  backgroundColor: "green",
+  border: "1px solid #fff",
+  borderRadius: "50%",
+  zIndex: "2",
+  transform: "translate(0, -75%)",
 };
 
 // These function help to get the correct id and reduce the need to set those id in the
@@ -99,18 +116,53 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   const clusterLayer = useMemo(() => getClusterLayerId(layerId), [layerId]);
 
-  const spiderifier = useMemo(() => {
-    if (map) {
-      return new MapboxglSpiderifier(map, {
-        customPin: true,
-      });
-    }
-    return null;
-  }, [map]);
-
   const unclusterPointLayer = useMemo(
     () => getUnclusterPointId(layerId),
     [layerId]
+  );
+
+  const initializeSpiderLeg = useCallback((spiderLeg: SpiderLeg) => {
+    const pinElem = spiderLeg.elements.pin;
+    const feature = spiderLeg.feature;
+
+    // Apply CSS styles directly to the pin element
+    if (pinElem) {
+      Object.assign(pinElem.style, spiderPinsConfig);
+
+      // Add hover effect
+      pinElem.addEventListener("mouseenter", () => {
+        pinElem.style.backgroundColor = "yellow";
+      });
+      pinElem.addEventListener("mouseleave", () => {
+        pinElem.style.backgroundColor = "green";
+      });
+    }
+  }, []);
+
+  const spiderifier = useMemo(() => {
+    if (map) {
+      return new MapboxglSpiderifier(map, {
+        animate: false,
+        animationSpeed: 0,
+        customPin: false,
+        onClick: function (e, spiderLeg) {
+          console.log("click on spiderLeg", spiderLeg);
+        },
+        initializeLeg: initializeSpiderLeg,
+      });
+    }
+    return null;
+  }, [initializeSpiderLeg, map]);
+
+  const shouldCreateSpiderDiagram = useCallback(
+    (features: any[]): boolean => {
+      const zoom = map?.getZoom() || 0;
+      const clusterCount = features[0].properties.point_count;
+      console.log("current zoom", zoom);
+      console.log("cluster count", clusterCount);
+      return (!clusterCount && features.length > 1) || zoom > 7;
+    },
+    [map]
   );
 
   const updateSource = useCallback(() => {
@@ -123,15 +175,71 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   const onClusterCircleMouseClick = useCallback(
     (ev: MapMouseEvent): void => {
-      if (ev.lngLat) {
-        map?.easeTo({
-          center: ev.lngLat,
-          zoom: map?.getZoom() + 1,
-          duration: 500,
+      const features = map?.queryRenderedFeatures(ev.point, {
+        layers: [clusterLayer],
+      });
+
+      if (!features || features.length === 0) return;
+
+      const feature = features[0] as Feature<Point>;
+      const clusterId = feature.properties?.cluster_id;
+      console.log("clusterId===", clusterId);
+      const coordinate = [
+        feature.geometry.coordinates[0],
+        feature.geometry.coordinates[1],
+      ] as [number, number];
+      const source = map?.getSource(clusterSourceId) as GeoJSONSource;
+      console.log(
+        "shouldCreateSpiderDiagram(features)",
+        shouldCreateSpiderDiagram(features)
+      );
+      if (shouldCreateSpiderDiagram(features)) {
+        source.getClusterLeaves(clusterId, 100, 0, (err, leaves) => {
+          if (err) {
+            console.error("Error getting cluster leaves:", err);
+            return;
+          }
+          const datasets = leaves as Feature<Point>[];
+          const spiderLegs = datasets.map((dataset) => ({
+            ...dataset.geometry.coordinates,
+            properties: dataset.properties,
+          }));
+
+          spiderifier?.spiderfy(coordinate, spiderLegs);
+        });
+      } else {
+        const maxZoomLevel = 4;
+        source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+          if (err) return;
+
+          map?.easeTo({
+            center: (feature.geometry as any).coordinates,
+            zoom: zoom <= maxZoomLevel ? maxZoomLevel : zoom,
+            duration: 500,
+          });
         });
       }
     },
-    [map]
+    [map, clusterLayer, clusterSourceId, shouldCreateSpiderDiagram, spiderifier]
+  );
+
+  const onEmptySpaceClick = useCallback(
+    (ev: MapLayerMouseEvent) => {
+      const point = map?.project(ev.lngLat);
+
+      // Query for features at the clicked point, but only in the cluster and unclustered point layers
+      const features = point
+        ? map?.queryRenderedFeatures(point, {
+            layers: [clusterLayer, unclusterPointLayer],
+          })
+        : [];
+
+      // If no features are found at the click point (i.e., clicked on empty space)
+      if (spiderifier && features && features.length === 0) {
+        spiderifier.unspiderfy();
+      }
+    },
+    [map, clusterLayer, unclusterPointLayer, spiderifier]
   );
 
   // This is use to render the cluster circle and add event handle to circles
@@ -227,6 +335,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
       map?.on("click", clusterLayer, onClusterCircleMouseClick);
+      map?.on("click", onEmptySpaceClick);
     };
 
     map?.once("load", createLayers);
@@ -238,7 +347,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     return () => {
       map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
       map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
-
+      map?.off("click", clusterLayer, onClusterCircleMouseClick);
+      map?.off("click", onEmptySpaceClick);
       // Clean up resource when you click on the next spatial extents, map is
       // still working in this page.
       try {
@@ -282,6 +392,11 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       />
       <SpatialExtents
         layerId={unclusterPointLayer}
+        addedLayerIds={[clusterLayer, unclusterPointLayer]}
+        onDatasetSelected={onDatasetSelected}
+      />
+      <SpatialExtents
+        layerId={unclusterPointLayer} //TODO: spiderPinsLayers
         addedLayerIds={[clusterLayer, unclusterPointLayer]}
         onDatasetSelected={onDatasetSelected}
       />
