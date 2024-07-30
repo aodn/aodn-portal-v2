@@ -1,8 +1,11 @@
-import { FC, useCallback, useContext, useEffect, useMemo } from "react";
-// import MapboxglSpiderifier, {
-//   popupOffsetForSpiderLeg,
-//   SpiderLeg,
-// } from "mapboxgl-spiderifier";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 import { GeoJSONSource, MapLayerMouseEvent, MapMouseEvent } from "mapbox-gl";
 import MapPopup from "../component/MapPopup";
@@ -14,7 +17,8 @@ import {
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
-import { Feature, Point } from "geojson";
+import { Feature, FeatureCollection, LineString, Point } from "geojson";
+import { Layers } from "@mui/icons-material";
 
 interface ClusterSize {
   default?: number | string;
@@ -105,12 +109,37 @@ export const getClusterLayerId = (layerId: string) => `${layerId}-clusters`;
 export const getUnclusterPointId = (layerId: string) =>
   `${layerId}-unclustered-point`;
 
+const getClusterCircleId = (coordinate: [number, number]) =>
+  `${coordinate[0]},${coordinate[1]}`;
+
+const getSpiderPinsSourceId = (clusterCircleId: string) =>
+  `spider-pins-source-${clusterCircleId}`;
+
+const getSpiderLinesSourceId = (clusterCircleId: string) =>
+  `spider-lines-source-${clusterCircleId}`;
+
+const getSpiderPinsLayerId = (clusterCircleId: string) =>
+  `spider-lines-layer-${clusterCircleId}`;
+
+const getSpiderLinesLayerId = (clusterCircleId: string) =>
+  `spider-lines-line-${clusterCircleId}`;
+
+const getSpiderPinId = (clusterId: string, index: number) =>
+  `spider-pin-${clusterId}-${index}`;
+
+const getSpiderLineId = (spiderPinId: string) => `${spiderPinId}-line`;
+
 const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
   onDatasetSelected,
   clusterLayerConfig,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
+
+  const [currentSpiderifiedCluster, setCurrentSpiderifiedCluster] = useState<
+    string | null
+  >(null);
+  console.log("currentSpiderifiedCluster", currentSpiderifiedCluster);
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
@@ -131,39 +160,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     }
   }, [map, clusterSourceId, collections]);
 
-  // const initializeSpiderLeg = useCallback((spiderLeg: SpiderLeg) => {
-  //   const pinElem = spiderLeg.elements.pin;
-  //   const feature = spiderLeg.feature;
-
-  //   // Apply CSS styles directly to the pin element
-  //   if (pinElem) {
-  //     Object.assign(pinElem.style, spiderPinsConfig);
-
-  //     // Add hover effect
-  //     pinElem.addEventListener("mouseenter", () => {
-  //       pinElem.style.backgroundColor = "yellow";
-  //     });
-  //     pinElem.addEventListener("mouseleave", () => {
-  //       pinElem.style.backgroundColor = "green";
-  //     });
-  //   }
-  // }, []);
-
-  // const spiderifier = useMemo(() => {
-  //   if (map) {
-  //     return new MapboxglSpiderifier(map, {
-  //       animate: false,
-  //       animationSpeed: 0,
-  //       customPin: false,
-  //       onClick: function (e, spiderLeg) {
-  //         console.log("click on spiderLeg", spiderLeg);
-  //       },
-  //       initializeLeg: initializeSpiderLeg,
-  //     });
-  //   }
-  //   return null;
-  // }, [initializeSpiderLeg, map]);
-
   // util function to check if a cluster can spiderify or not
   const shouldCreateSpiderDiagram = useCallback(
     (features: any[]): boolean => {
@@ -177,6 +173,158 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       );
     },
     [map]
+  );
+
+  const unspiderify = useCallback(
+    (clusterCircleId: string) => {
+      console.log("Un-spiderifying cluster:", clusterCircleId);
+      const spiderPinsSourceId = getSpiderPinsSourceId(clusterCircleId);
+      const spiderLinesSourceId = getSpiderLinesSourceId(clusterCircleId);
+      const spiderPinsLayerId = getSpiderPinsLayerId(clusterCircleId);
+      const spiderLinesLayerId = getSpiderLinesLayerId(clusterCircleId);
+
+      // Remove layers
+      if (map?.getLayer(spiderPinsLayerId)) {
+        map.removeLayer(spiderPinsLayerId);
+      }
+      if (map?.getLayer(spiderLinesLayerId)) {
+        map.removeLayer(spiderLinesLayerId);
+      }
+
+      // Remove sources
+      if (map?.getSource(spiderPinsSourceId)) {
+        map.removeSource(spiderPinsSourceId);
+      }
+      if (map?.getSource(spiderLinesSourceId)) {
+        map.removeSource(spiderLinesSourceId);
+      }
+
+      setCurrentSpiderifiedCluster(null);
+    },
+    [map]
+  );
+
+  const spiderify = useCallback(
+    (coordinate: [number, number], datasets: Feature<Point>[]) => {
+      const clusterCircleId = getClusterCircleId(coordinate);
+      const spiderPinsSourceId = getSpiderPinsSourceId(clusterCircleId);
+      const spiderLinesSourceId = getSpiderLinesSourceId(clusterCircleId);
+      const spiderPinsLayerId = getSpiderPinsLayerId(clusterCircleId);
+      const spiderLinesLayerId = getSpiderLinesLayerId(clusterCircleId);
+
+      console.log(
+        "Attempting to spiderify cluster:clusterId==",
+        clusterCircleId
+      );
+      console.log(
+        "Attempting to spiderify cluster:currentSpiderifiedCluster==",
+        currentSpiderifiedCluster
+      );
+
+      // Clear existing spider diagram if there is one
+      if (currentSpiderifiedCluster) {
+        unspiderify(currentSpiderifiedCluster);
+      }
+
+      // If clicking on the same cluster, just clear it and return
+      if (currentSpiderifiedCluster === clusterCircleId) {
+        // setCurrentSpiderifiedCluster(null);
+        return;
+      }
+
+      const circleRadius = 50; // Adjust this value to change the size of the spider diagram
+      const angleStep = (2 * Math.PI) / datasets.length;
+
+      const spiderPinsFeatures: Feature<Point>[] = [];
+      const spiderLinesFeatures: Feature<LineString>[] = [];
+
+      datasets.forEach((dataset, index) => {
+        const spiderPinId = getSpiderPinId(clusterCircleId, index);
+        const spiderLineId = getSpiderLineId(spiderPinId);
+        const angle = index * angleStep;
+        const x = Math.cos(angle) * circleRadius;
+        const y = Math.sin(angle) * circleRadius;
+
+        const spiderLegCoordinate: [number, number] = [
+          coordinate[0] + x / 5000,
+          coordinate[1] + y / 5000,
+        ];
+
+        // Create spider pin feature
+        spiderPinsFeatures.push({
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: spiderLegCoordinate,
+          },
+          properties: {
+            ...dataset.properties,
+            spiderPinId: spiderPinId,
+          },
+        });
+
+        // Create spider line feature
+        spiderLinesFeatures.push({
+          type: "Feature",
+          geometry: {
+            type: "LineString",
+            coordinates: [coordinate, spiderLegCoordinate],
+          },
+          properties: {
+            spiderLineId: spiderLineId,
+          },
+        });
+      });
+
+      // Create FeatureCollections
+      const spiderPinsFeatureCollection: FeatureCollection = {
+        type: "FeatureCollection",
+        features: spiderPinsFeatures,
+      };
+
+      const spiderLinesFeatureCollection: FeatureCollection = {
+        type: "FeatureCollection",
+        features: spiderLinesFeatures,
+      };
+
+      // Add sources
+      map?.addSource(spiderPinsSourceId, {
+        type: "geojson",
+        data: spiderPinsFeatureCollection,
+      });
+
+      map?.addSource(spiderLinesSourceId, {
+        type: "geojson",
+        data: spiderLinesFeatureCollection,
+      });
+
+      // Add layers
+      map?.addLayer({
+        id: spiderPinsLayerId,
+        type: "circle",
+        source: spiderPinsSourceId,
+        paint: {
+          "circle-radius": 8,
+          "circle-color": "green",
+          "circle-opacity": 0.6,
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
+        },
+      });
+
+      map?.addLayer({
+        id: spiderLinesLayerId,
+        type: "line",
+        source: spiderLinesSourceId,
+        paint: {
+          "line-color": "#888",
+          "line-width": 1,
+        },
+      });
+
+      setCurrentSpiderifiedCluster(clusterCircleId);
+    },
+    [map, currentSpiderifiedCluster, unspiderify]
   );
 
   const onClusterCircleMouseClick = useCallback(
@@ -197,7 +345,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       // get cluster_id from feature for later query
       const clusterId = feature.properties?.cluster_id;
 
-      // get clicked cluster cluster source
+      // get clicked cluster source
       const source = map?.getSource(clusterSourceId) as GeoJSONSource;
 
       console.log(
@@ -212,14 +360,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
             return;
           }
           const datasets = leaves as Feature<Point>[];
-
-          // create spider-legs for spiderifying
-          const spiderLegs = datasets.map((dataset) => ({
-            ...dataset.geometry.coordinates,
-            properties: dataset.properties,
-          }));
-
-          // TODO: spiderifying function
+          spiderify(coordinate, datasets);
         });
       } else {
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
@@ -236,27 +377,48 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         });
       }
     },
-    [map, clusterLayer, clusterSourceId, shouldCreateSpiderDiagram]
+    [map, clusterLayer, clusterSourceId, shouldCreateSpiderDiagram, spiderify]
   );
 
   // for clear spider diagram when click on empty space
   const onEmptySpaceClick = useCallback(
-    (ev: MapLayerMouseEvent) => {
-      const point = map?.project(ev.lngLat);
+    (ev: MapMouseEvent) => {
+      const point = ev.point;
+      let spiderPinsLayerId;
+      if (currentSpiderifiedCluster) {
+        spiderPinsLayerId = getSpiderPinsLayerId(currentSpiderifiedCluster);
+      }
+      console.log(
+        "on empty spaces clicked, find spiderPinsLayerId=",
+        spiderPinsLayerId
+      );
+      const features = map?.queryRenderedFeatures(point, {
+        layers: spiderPinsLayerId
+          ? [clusterLayer, unclusterPointLayer, spiderPinsLayerId]
+          : [clusterLayer, unclusterPointLayer],
+      });
 
-      // Query for features at the clicked point, but only in the cluster and unclustered point layers
-      const features = point
-        ? map?.queryRenderedFeatures(point, {
-            layers: [clusterLayer, unclusterPointLayer],
-          })
-        : [];
-
-      // If no features are found at the click point (i.e., clicked on empty space)
-      // if (spiderifier && features && features.length === 0) {
-      //   spiderifier.unspiderfy();
-      // }
+      if (!features || features.length === 0) {
+        console.log("Clicked on empty space, clearing spider diagram");
+        setCurrentSpiderifiedCluster((currentCluster) => {
+          console.log(
+            "unspiderify currentSpiderifiedCluster==",
+            currentCluster
+          );
+          if (currentCluster) {
+            unspiderify(currentCluster);
+          }
+          return null;
+        });
+      }
     },
-    [map, clusterLayer, unclusterPointLayer]
+    [
+      currentSpiderifiedCluster,
+      map,
+      clusterLayer,
+      unclusterPointLayer,
+      unspiderify,
+    ]
   );
 
   // This is use to render the cluster circle and add event handle to circles
@@ -412,11 +574,25 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         addedLayerIds={[clusterLayer, unclusterPointLayer]}
         onDatasetSelected={onDatasetSelected}
       />
-      <SpatialExtents
-        layerId={unclusterPointLayer} //TODO: spiderPinsLayers
-        addedLayerIds={[clusterLayer, unclusterPointLayer]}
-        onDatasetSelected={onDatasetSelected}
-      />
+
+      {currentSpiderifiedCluster && (
+        <MapPopup
+          layerId={getSpiderPinsLayerId(currentSpiderifiedCluster)}
+          onDatasetSelected={onDatasetSelected}
+        />
+      )}
+
+      {currentSpiderifiedCluster && (
+        <SpatialExtents
+          layerId={getSpiderPinsLayerId(currentSpiderifiedCluster)}
+          addedLayerIds={[
+            clusterLayer,
+            unclusterPointLayer,
+            getSpiderPinsLayerId(currentSpiderifiedCluster),
+          ]}
+          onDatasetSelected={onDatasetSelected}
+        />
+      )}
     </>
   );
 };
