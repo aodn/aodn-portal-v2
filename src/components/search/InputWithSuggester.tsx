@@ -1,14 +1,4 @@
-import {
-  Autocomplete,
-  Box,
-  Chip,
-  Paper,
-  Popper,
-  Stack,
-  TextField,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Autocomplete, Box, Paper, Popper, TextField } from "@mui/material";
 import React, {
   FC,
   ReactNode,
@@ -20,7 +10,6 @@ import React, {
 import {
   Category,
   ParameterState,
-  updateCategories,
   updateSearchText,
 } from "../common/store/componentParamReducer";
 import store, {
@@ -35,9 +24,8 @@ import {
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
 import _ from "lodash";
-import { borderRadius, color, padding } from "../../styles/constants";
+import { borderRadius, color } from "../../styles/constants";
 import { filterButtonWidth, searchIconWidth } from "./ComplexTextSearch";
-import { capitalizeFirstLetter } from "../../utils/capitalizeFirstLetter";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
