@@ -83,7 +83,7 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   unclusterPointRadius: 8,
 };
 
-const spiderifyFromZoomLevel = 10;
+const spiderifyFromZoomLevel = 14;
 
 // const spiderPinsConfig = {
 //   position: "absolute",
@@ -232,7 +232,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         return;
       }
 
-      const circleRadius = 50; // Adjust this value to change the size of the spider diagram
+      const circleRadius = 20; // Adjust this value to change the size of the spider diagram
       const angleStep = (2 * Math.PI) / datasets.length;
 
       const spiderPinsFeatures: Feature<Point>[] = [];
@@ -368,10 +368,16 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
           // if expansionZoom level hasn't reach the spiderify-zoomLevel, keep zoom into
           // else go to the spiderify-zoomLevel
+          console.log("getClusterExpansionZoom==", zoom);
+          const currentZoom = map?.getZoom();
           map?.easeTo({
             center: (feature.geometry as any).coordinates,
             zoom:
-              zoom >= spiderifyFromZoomLevel ? spiderifyFromZoomLevel : zoom,
+              zoom >= spiderifyFromZoomLevel
+                ? spiderifyFromZoomLevel
+                : zoom === currentZoom
+                  ? zoom + 1
+                  : zoom,
             duration: 500,
           });
         });
@@ -388,37 +394,31 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       if (currentSpiderifiedCluster) {
         spiderPinsLayerId = getSpiderPinsLayerId(currentSpiderifiedCluster);
       }
-      console.log(
-        "on empty spaces clicked, find spiderPinsLayerId=",
-        spiderPinsLayerId
-      );
-      const features = map?.queryRenderedFeatures(point, {
-        layers: spiderPinsLayerId
-          ? [clusterLayer, unclusterPointLayer, spiderPinsLayerId]
-          : [clusterLayer, unclusterPointLayer],
-      });
+      console.log("on map clicked, find spiderPinsLayerId=", spiderPinsLayerId);
 
-      if (!features || features.length === 0) {
-        console.log("Clicked on empty space, clearing spider diagram");
-        setCurrentSpiderifiedCluster((currentCluster) => {
-          console.log(
-            "unspiderify currentSpiderifiedCluster==",
-            currentCluster
-          );
-          if (currentCluster) {
-            unspiderify(currentCluster);
-          }
-          return null;
+      if (spiderPinsLayerId) {
+        const features = map?.queryRenderedFeatures(point, {
+          layers: [spiderPinsLayerId],
         });
+
+        if (!features || features.length === 0) {
+          console.log("Clicked outside spider pins, clearing spider diagram");
+          setCurrentSpiderifiedCluster((currentCluster) => {
+            console.log(
+              "unspiderify currentSpiderifiedCluster==",
+              currentCluster
+            );
+            if (currentCluster) {
+              unspiderify(currentCluster);
+            }
+            return null;
+          });
+        } else {
+          console.log("Clicked on a spider pin, keeping spider diagram");
+        }
       }
     },
-    [
-      currentSpiderifiedCluster,
-      map,
-      clusterLayer,
-      unclusterPointLayer,
-      unspiderify,
-    ]
+    [currentSpiderifiedCluster, map, unspiderify]
   );
 
   // This is use to render the cluster circle and add event handle to circles
