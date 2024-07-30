@@ -55,7 +55,8 @@ interface OptionType {
 
 enum OptionGroup {
   CATEGORY = "category",
-  TITLE = "title",
+  PHRASE = "phrase",
+  COMMON = "common",
 }
 
 const textfieldMinWidth = 200;
@@ -70,70 +71,12 @@ const textfieldMinWidth = 200;
 const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
 }) => {
-  const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
-  const [categorySet, setCategorySet] = useState<Category[]>([]);
-
-  const emptyArray: Category[] = [];
-  const selectedCategories: Category[] = useSelector(
-    (state: RootState) => state.paramReducer.categories || emptyArray
-  );
 
   const searchInput = useSelector(
     (state: RootState) => state.paramReducer.searchText
-  );
-
-  const selectedCategoryStrs = selectedCategories
-    ? [...new Set(selectedCategories.map((c) => c.label))]
-    : [];
-
-  const addCategory = useCallback(
-    (category: string) => {
-      const currentCategories = selectedCategories
-        ? new Array(...selectedCategories)
-        : [];
-      // if categorySet contains a category whose label is category, then add it to the currentCategories
-      const categoryToAdd = categorySet.find((c) => c.label === category);
-      if (!categoryToAdd) {
-        //may need warning / alert in the future
-        console.error("no category found: ", category);
-        return;
-      }
-      if (currentCategories.find((c) => c.label === category)) {
-        //may need warning / alert in the future
-        console.error("already have category: ", category);
-        return;
-      }
-      currentCategories.push(categoryToAdd);
-      dispatch(updateCategories(currentCategories));
-    },
-    [categorySet, dispatch, selectedCategories]
-  );
-
-  const removeCategory = useCallback(
-    (category: string) => {
-      const currentCategories = new Array(...selectedCategories);
-      const categoryToRemove = categorySet.find((c) => c.label === category);
-      if (!categoryToRemove) {
-        //may need warning / alert in the future
-        console.error("no category found: ", category);
-        return;
-      }
-      if (!currentCategories.find((c) => c.label === category)) {
-        //may need warning / alert in the future
-        console.error(
-          "no category found in current category state: ",
-          category
-        );
-        return;
-      }
-      // remove this category from currentCategories
-      _.remove(currentCategories, (c) => c.label === category);
-      dispatch(updateCategories(currentCategories));
-    },
-    [categorySet, dispatch, selectedCategories]
   );
 
   const refreshOptions = useCallback(async () => {
@@ -143,18 +86,34 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         .unwrap()
         .then((data) => {
           const options: OptionType[] = [];
+
           const categorySuggestions = new Set<string>(
-            data.category_suggestions
+            data.category_suggestions.map((category: string) =>
+              category.toLowerCase()
+            )
           );
-          const titleSuggestions = new Set<string>(
-            data.record_suggestions.titles
+          const phrasesSuggestions = new Set<string>(
+            data.record_suggestions.suggest_phrases
           );
+
+          // Get the intersection of categorySuggestions and phrasesSuggestions
+          const commonSuggestions = [...categorySuggestions].filter((item) => {
+            return phrasesSuggestions.has(item);
+          });
+
+          commonSuggestions.forEach((common: string) => {
+            // Remove the commonSuggestions from categorySuggestions and phrasesSuggestions
+            categorySuggestions.delete(common);
+            phrasesSuggestions.delete(common);
+
+            options.push({ text: common, group: OptionGroup.COMMON });
+          });
 
           categorySuggestions.forEach((category: string) => {
             options.push({ text: category, group: OptionGroup.CATEGORY });
           });
-          titleSuggestions.forEach((title: string) => {
-            options.push({ text: title, group: OptionGroup.TITLE });
+          phrasesSuggestions.forEach((phrase: string) => {
+            options.push({ text: phrase, group: OptionGroup.PHRASE });
           });
 
           setOptions(options);
@@ -186,20 +145,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [options]
   );
 
-  const onChange = useCallback(
-    (_: any, newValue: string | null) => {
-      if (newValue !== null) {
-        // String quote with double quote to indicate user want the whole phase during search.
-        // fire event here before useState update, need to call function in this case
-        if (getGroup(newValue) === OptionGroup.CATEGORY) {
-          addCategory(newValue);
-          dispatch(updateSearchText(""));
-        }
-      }
-    },
-    [addCategory, dispatch, getGroup]
-  );
-
   const onInputChange = useCallback(
     (_: any, newInputValue: string) => {
       // If user type anything, then it is not a title search anymore
@@ -224,7 +169,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         child = child.sort((a, b) =>
           a.label < b.label ? -1 : a.label > b.label ? 1 : 0
         );
-        setCategorySet(child);
       });
   }, [dispatch]);
 
@@ -351,45 +295,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         value={searchInput}
         forcePopupIcon={false}
         options={options.flatMap((option) => option.text)}
-        groupBy={(option: string): string => {
-          const v = options.find((o) => o.text === option);
-          return v ? capitalizeFirstLetter(v.group) : "";
-        }}
         autoComplete
         includeInputInList
-        onChange={onChange}
         onInputChange={onInputChange}
         renderInput={(params) => (
           <Box display="flex" flexWrap="wrap" ref={searchFieldDiv}>
-            <Stack
-              display={selectedCategories?.length > 0 ? "flex" : "none"}
-              spacing={1}
-              direction="row"
-              useFlexGap
-              flexWrap="wrap"
-              paddingY={padding.small}
-              ref={categoryDiv}
-            >
-              <Typography
-                fontFamily={theme.typography.fontFamily}
-                fontSize="small"
-                paddingTop={padding.extraSmall}
-              >
-                Categories&nbsp;:&nbsp;
-              </Typography>
-
-              {selectedCategoryStrs?.map((c, i) => (
-                <Box key={i}>
-                  <Chip
-                    sx={{ fontSize: "12px" }}
-                    label={c}
-                    onDelete={() => {
-                      removeCategory(c);
-                    }}
-                  />
-                </Box>
-              ))}
-            </Stack>
             <Box flexGrow={1}>
               <TextField
                 sx={{
