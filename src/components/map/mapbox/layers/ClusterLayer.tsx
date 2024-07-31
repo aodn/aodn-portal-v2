@@ -176,7 +176,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   const unspiderify = useCallback(
     (clusterCircleId: string) => {
-      console.log("Un-spiderifying cluster:", clusterCircleId);
       const spiderPinsSourceId = getSpiderPinsSourceId(clusterCircleId);
       const spiderLinesSourceId = getSpiderLinesSourceId(clusterCircleId);
       const spiderPinsLayerId = getSpiderPinsLayerId(clusterCircleId);
@@ -198,7 +197,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         map.removeSource(spiderLinesSourceId);
       }
 
-      setCurrentSpiderifiedCluster(null);
+      // setCurrentSpiderifiedCluster(null);
     },
     [map]
   );
@@ -344,7 +343,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         if (currentCluster && currentZoom < spiderifyFromZoomLevel) {
           console.log("Zoom level below spiderify threshold, unspiderfying");
           unspiderify(currentCluster);
-          return null;
+          return currentCluster;
         }
 
         return currentCluster;
