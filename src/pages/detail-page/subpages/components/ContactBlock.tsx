@@ -19,7 +19,7 @@ const ContactBlock: React.FC<ContactBlockProps> = ({ title, contacts }) => {
           key={index}
           title={contact.organization + suffix}
           isContactFragment
-          email={contact.emails[0]}
+          email={contact.emails ? contact.emails[0] : undefined}
         >
           <ContactCard contact={contact} />
         </CollapseFrame>
