@@ -18,7 +18,6 @@ import {
 import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
 import { Feature, FeatureCollection, LineString, Point } from "geojson";
-import { Layers } from "@mui/icons-material";
 
 interface ClusterSize {
   default?: number | string;
@@ -287,6 +286,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         features: spiderLinesFeatures,
       };
 
+      // TODO: check if source/layer already exists
       // Add sources
       map?.addSource(spiderPinsSourceId, {
         type: "geojson",
@@ -390,35 +390,43 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const onEmptySpaceClick = useCallback(
     (ev: MapMouseEvent) => {
       const point = ev.point;
-      let spiderPinsLayerId;
-      if (currentSpiderifiedCluster) {
-        spiderPinsLayerId = getSpiderPinsLayerId(currentSpiderifiedCluster);
-      }
-      console.log("on map clicked, find spiderPinsLayerId=", spiderPinsLayerId);
 
-      if (spiderPinsLayerId) {
-        const features = map?.queryRenderedFeatures(point, {
-          layers: [spiderPinsLayerId],
-        });
+      setCurrentSpiderifiedCluster((currentCluster) => {
+        console.log(
+          "call onEmptySpaceClick, and check currentSpiderifiedCluster ",
+          currentCluster
+        );
 
-        if (!features || features.length === 0) {
-          console.log("Clicked outside spider pins, clearing spider diagram");
-          setCurrentSpiderifiedCluster((currentCluster) => {
+        if (currentCluster) {
+          const spiderPinsLayerId = getSpiderPinsLayerId(currentCluster);
+          console.log(
+            "on map clicked, find spiderPinsLayerId=",
+            spiderPinsLayerId
+          );
+
+          if (!map?.getLayer(spiderPinsLayerId)) return null;
+          const features = map?.queryRenderedFeatures(point, {
+            layers: [spiderPinsLayerId],
+          });
+
+          if (!features || features.length === 0) {
+            console.log("Clicked outside spider pins, clearing spider diagram");
             console.log(
               "unspiderify currentSpiderifiedCluster==",
               currentCluster
             );
-            if (currentCluster) {
-              unspiderify(currentCluster);
-            }
+            unspiderify(currentCluster);
             return null;
-          });
-        } else {
-          console.log("Clicked on a spider pin, keeping spider diagram");
+          } else {
+            console.log("Clicked on a spider pin, keeping spider diagram");
+            return currentCluster;
+          }
         }
-      }
+
+        return currentCluster; // This line ensures we always return string | null
+      });
     },
-    [currentSpiderifiedCluster, map, unspiderify]
+    [map, unspiderify]
   );
 
   // This is use to render the cluster circle and add event handle to circles
