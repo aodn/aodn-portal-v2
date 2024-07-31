@@ -327,6 +327,31 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [map, currentSpiderifiedCluster, unspiderify]
   );
 
+  const checkZoomAndUnspiderify = useCallback(() => {
+    console.log("called when zoom end");
+
+    if (map) {
+      const currentZoom = map.getZoom();
+      console.log("when zoom end, check current zoom", currentZoom);
+
+      setCurrentSpiderifiedCluster((currentCluster) => {
+        console.log(
+          "when zoom end, check currentSpiderifiedCluster=",
+          currentCluster,
+          map
+        );
+
+        if (currentCluster && currentZoom < spiderifyFromZoomLevel) {
+          console.log("Zoom level below spiderify threshold, unspiderfying");
+          unspiderify(currentCluster);
+          return null;
+        }
+
+        return currentCluster;
+      });
+    }
+  }, [map, unspiderify]);
+
   const onClusterCircleMouseClick = useCallback(
     (ev: MapMouseEvent): void => {
       const features = map?.queryRenderedFeatures(ev.point, {
@@ -523,6 +548,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       map?.on("click", clusterLayer, onClusterCircleMouseClick);
       map?.on("click", onEmptySpaceClick);
+      map?.on("zoomend", checkZoomAndUnspiderify);
     };
 
     map?.once("load", createLayers);
@@ -536,6 +562,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
       map?.off("click", clusterLayer, onClusterCircleMouseClick);
       map?.off("click", onEmptySpaceClick);
+      map?.off("zoomend", checkZoomAndUnspiderify);
+
       // Clean up resource when you click on the next spatial extents, map is
       // still working in this page.
       try {
