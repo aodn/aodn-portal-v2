@@ -3734,15 +3734,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mapboxgl-spiderifier@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "@types/mapboxgl-spiderifier@npm:1.0.2"
-  dependencies:
-    "@types/mapbox-gl": "npm:*"
-  checksum: 10c0/c00cbbd72147b874d2f0651bbf7008d4f278ec9ba67db2152cba82e802944827a8b413b991465f125ca0aeb8478b2fc21bee6482f9f6f77af72c419cea7801c3
-  languageName: node
-  linkType: hard
-
 "@types/mathjax@npm:^0.0.40":
   version: 0.0.40
   resolution: "@types/mathjax@npm:0.0.40"
@@ -4457,7 +4448,6 @@ __metadata:
     "@types/lodash": "npm:^4.17.0"
     "@types/mapbox__geo-viewport": "npm:^0.5.3"
     "@types/mapbox__mapbox-gl-draw": "npm:^1.4.6"
-    "@types/mapboxgl-spiderifier": "npm:^1.0.2"
     "@types/media-typer": "npm:^1.1.3"
     "@types/node": "npm:^20.11.16"
     "@types/react": "npm:^18.2.55"
@@ -4489,7 +4479,6 @@ __metadata:
     lint-staged: "npm:^15.2.2"
     lodash: "npm:^4.17.21"
     mapbox-gl: "npm:3.4.0"
-    mapboxgl-spiderifier: "npm:^1.0.10"
     maplibre-gl: "npm:^4.0.0"
     media-typer: "npm:^1.1.0"
     msw: "npm:^2.2.14"
@@ -8777,13 +8766,6 @@ __metadata:
     tweakpane: "npm:^4.0.3"
     vt-pbf: "npm:^3.1.3"
   checksum: 10c0/43de1e981496e5f64e2077462684716aa40e72339f18311dbbba96b18509ff1eb31d3d6d168c06184b4376890dfce74de30e4f41d4b912c67f35b222c3c828a0
-  languageName: node
-  linkType: hard
-
-"mapboxgl-spiderifier@npm:^1.0.10":
-  version: 1.0.10
-  resolution: "mapboxgl-spiderifier@npm:1.0.10"
-  checksum: 10c0/29b60f9c2ecc60a30c1efd3422ed1226d6d87e57096c312b6b7e289953d5381283f1f6cda0131d6b3d7f84fd3e599bc62d97c7c3283b30908096a11b0157b59a
   languageName: node
   linkType: hard
 
