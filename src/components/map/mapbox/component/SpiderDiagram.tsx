@@ -20,7 +20,7 @@ interface SpiderDiagramProps extends LayersProps {
 }
 
 const defaultSpiderDiagramConfig: SpiderDiagramConfig = {
-  spiderifyFromZoomLevel: 8,
+  spiderifyFromZoomLevel: 11,
 };
 
 const getClusterCircleId = (coordinate: [number, number]) =>
@@ -120,23 +120,63 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         return;
       }
 
-      //TODO: need to adjust according to zoom level and data.length
-      const circleRadius = 20;
-      const angleStep = (2 * Math.PI) / datasets.length;
-
       const spiderPinsFeatures: Feature<Point>[] = [];
       const spiderLinesFeatures: Feature<LineString>[] = [];
 
-      datasets.forEach((dataset, index) => {
-        const spiderPinId = getSpiderPinId(clusterCircleId, index);
-        const spiderLineId = getSpiderLineId(spiderPinId);
-        const angle = index * angleStep;
-        const x = Math.cos(angle) * circleRadius;
-        const y = Math.sin(angle) * circleRadius;
+      const currentZoom = map?.getZoom() || 0;
+      const numPins = datasets.length;
 
-        const spiderLegCoordinate: [number, number] = [
-          coordinate[0] + x / 5000,
-          coordinate[1] + y / 5000,
+      // Spider configuration
+      const circleSpiralSwitchover = 9;
+      const circleFootSeparation = 25;
+      const spiralFootSeparation = 28;
+      const spiralLengthStart = 15;
+      const spiralLengthFactor = 4;
+
+      const generateSpiderLegParams = (count: number) => {
+        if (count >= circleSpiralSwitchover) {
+          // Generate spiral
+          let legLength = spiralLengthStart;
+          let angle = 0;
+          return Array.from({ length: count }, (_, index) => {
+            angle += spiralFootSeparation / legLength + index * 0.0005;
+            const x = legLength * Math.cos(angle);
+            const y = legLength * Math.sin(angle);
+            legLength += (2 * Math.PI * spiralLengthFactor) / angle;
+            return { x, y, angle, legLength, index };
+          });
+        } else {
+          // Generate circle
+          const circumference = circleFootSeparation * (2 + count);
+          const legLength = circumference / (2 * Math.PI);
+          const angleStep = (2 * Math.PI) / count;
+          return Array.from({ length: count }, (_, index) => {
+            const angle = index * angleStep;
+            return {
+              x: legLength * Math.cos(angle),
+              y: legLength * Math.sin(angle),
+              angle,
+              legLength,
+              index,
+            };
+          });
+        }
+      };
+
+      const spiderLegParams = generateSpiderLegParams(numPins);
+
+      datasets.forEach((dataset, i) => {
+        const spiderLegParam = spiderLegParams[i];
+        const spiderPinId = getSpiderPinId(clusterCircleId, i);
+        const spiderLineId = getSpiderLineId(spiderPinId);
+
+        // Adjust the divisor based on zoom level for finer control
+        const zoomFactor = Math.pow(2, currentZoom - spiderifyFromZoomLevel);
+        const coordDivisor = 5000 / zoomFactor;
+
+        const spiderLegCoordinate = [
+          coordinate[0] + spiderLegParam.x / coordDivisor,
+          coordinate[1] + spiderLegParam.y / coordDivisor,
         ];
 
         // Create spider pin feature
@@ -213,13 +253,13 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
 
       setCurrentSpiderifiedCluster(clusterCircleId);
     },
-    [map, currentSpiderifiedCluster, unspiderify]
+    [currentSpiderifiedCluster, map, unspiderify, spiderifyFromZoomLevel]
   );
 
   const checkZoomAndUnspiderify = useCallback(() => {
     if (map) {
       const currentZoom = map.getZoom();
-
+      console.log("currentZoom", currentZoom);
       setCurrentSpiderifiedCluster((currentCluster) => {
         if (currentCluster && currentZoom < spiderifyFromZoomLevel) {
           unspiderify(currentCluster);

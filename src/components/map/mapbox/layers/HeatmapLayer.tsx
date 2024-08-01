@@ -266,7 +266,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   const updateSource = useCallback(() => {
     const newData = createCentroidDataSource(collections);
-    console.log({ newData });
     if (map?.getSource(heatmapSourceId)) {
       (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
     }
