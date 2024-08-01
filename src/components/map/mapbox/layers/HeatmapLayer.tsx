@@ -11,6 +11,7 @@ import {
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
+import SpiderDiagram from "../component/SpiderDiagram";
 
 interface HeatmapLayer {
   maxZoom: number;
@@ -291,6 +292,12 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       <SpatialExtents
         layerId={unClusterPointLayer}
         addedLayerIds={[clusterLayer, unClusterPointLayer]}
+        onDatasetSelected={onDatasetSelected}
+      />
+      <SpiderDiagram
+        clusterLayer={clusterLayer}
+        clusterSourceId={clusterSourceId}
+        unclusterPointLayer={unClusterPointLayer}
         onDatasetSelected={onDatasetSelected}
       />
     </>
