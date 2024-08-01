@@ -145,9 +145,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           const options: OptionType[] = [];
 
           const categorySuggestions = new Set<string>(
-            data.category_suggestions.map((category: string) =>
-              category.toLowerCase()
-            )
+            data.category_suggestions
           );
           const phrasesSuggestions = new Set<string>(
             data.record_suggestions.suggest_phrases
@@ -194,7 +192,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     };
   }, [debounceRefreshOptions]);
 
-  const getGroup = useCallback(
+  const getGroup: (option: string) => string | undefined = useCallback(
     (option: string) => {
       return options.find((o) => o.text.toLowerCase() === option.toLowerCase())
         ?.group;
@@ -202,29 +200,15 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [options]
   );
 
-  const onChange = useCallback(
-    (_: any, newValue: string | null) => {
-      if (newValue !== null) {
-        // String quote with double quote to indicate user want the whole phase during search.
-        // fire event here before useState update, need to call function in this case
-        if (getGroup(newValue) === OptionGroup.CATEGORY) {
-          addCategory(newValue);
-          dispatch(updateSearchText(""));
-        }
-      }
-    },
-    [addCategory, dispatch, getGroup]
-  );
-
   const onInputChange = useCallback(
     (_: any, newInputValue: string) => {
       // If user type anything, then it is not a title search anymore
-      dispatch(updateSearchText(newInputValue));
+      dispatch(updateSearchText(newInputValue, getGroup(newInputValue)));
       if (newInputValue?.length > 1) {
         debounceRefreshOptions()?.then();
       }
     },
-    [debounceRefreshOptions, dispatch]
+    [debounceRefreshOptions, dispatch, getGroup]
   );
 
   useEffect(() => {
@@ -369,7 +353,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         options={options.flatMap((option) => option.text)}
         autoComplete
         includeInputInList
-        onChange={onChange}
         onInputChange={onInputChange}
         renderInput={(params) => (
           <Box display="flex" flexWrap="wrap" ref={searchFieldDiv}>

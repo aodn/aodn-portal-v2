@@ -28,6 +28,7 @@ export interface ParameterState {
   dateTimeFilterRange?: DataTimeFilterRange;
   // Use in search box
   searchText?: string;
+  searchTextGroup?: string;
   categories?: Array<Category>;
   sortby?: string;
 }
@@ -65,10 +66,10 @@ const updateDateTimeFilterRange = (range: DataTimeFilterRange): ActionType => {
 };
 
 // This const should only be used in InputWithSuggester.tsx component.
-const updateSearchText = (q: string): ActionType => {
+const updateSearchText = (q: string, group: string | undefined): ActionType => {
   return {
     type: UPDATE_SEARCH_TEXT_FILTER_VARIABLE,
-    payload: { searchText: q } as ParameterState,
+    payload: { searchText: q, searchTextGroup: group } as ParameterState,
   };
 };
 
@@ -141,6 +142,7 @@ const paramReducer = (
       return {
         ...state,
         searchText: action.payload.searchText,
+        searchTextGroup: action.payload.searchTextGroup,
       };
     case UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE:
       return {
