@@ -2,7 +2,12 @@ import { FC, useCallback, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
 
 import { Expression, GeoJSONSource, StyleFunction } from "mapbox-gl";
-import { LayersProps, createCentroidDataSource } from "./Layers";
+import {
+  LayersProps,
+  createCentroidDataSource,
+  defaultMouseEnterEventHandler,
+  defaultMouseLeaveEventHandler,
+} from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
@@ -72,8 +77,9 @@ const defaultHeatmapConfig: HeatmapConfig = {
 const getLayerId = (id: string | undefined) => `heatmap-layer-${id}`;
 const getHeatmapSourceId = (layerId: string) => `${layerId}-heatmap-source`;
 const getHeatmapLayerId = (layerId: string) => `${layerId}-heatmap-layer`;
-const getCircleSourceId = (layerId: string) => `${layerId}-circle-source`;
-const getCircleLayerId = (layerId: string) => `${layerId}-circle-layer`;
+const getClusterSourceId = (layerId: string) => `${layerId}-cluster-source`;
+const getClusterCircleLayerId = (layerId: string) =>
+  `${layerId}-cluster-circle-layer`;
 const getUnclusterPointLayerId = (layerId: string) =>
   `${layerId}-uncluster-point-layer`;
 
@@ -86,11 +92,14 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
-  const sourceId = useMemo(() => getHeatmapSourceId(layerId), [layerId]);
-  const circleSourceId = useMemo(() => getCircleSourceId(layerId), [layerId]);
+  const heatmapSourceId = useMemo(() => getHeatmapSourceId(layerId), [layerId]);
+  const clusterSourceId = useMemo(() => getClusterSourceId(layerId), [layerId]);
 
   const heatmapLayer = useMemo(() => getHeatmapLayerId(layerId), [layerId]);
-  const circleLayer = useMemo(() => getCircleLayerId(layerId), [layerId]);
+  const clusterLayer = useMemo(
+    () => getClusterCircleLayerId(layerId),
+    [layerId]
+  );
   const unClusterPointLayer = useMemo(
     () => getUnclusterPointLayerId(layerId),
     [layerId]
@@ -104,7 +113,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     // and therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
-      if (map?.getSource(sourceId)) return;
       const dataSource = createCentroidDataSource(undefined);
 
       const config = mergeWithDefaults(
@@ -112,103 +120,120 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         heatmapLayerConfig
       );
 
-      map?.addSource(sourceId, {
-        type: "geojson",
-        data: dataSource,
-        cluster: false,
-      });
+      if (!map?.getSource(heatmapSourceId)) {
+        map?.addSource(heatmapSourceId, {
+          type: "geojson",
+          data: dataSource,
+          cluster: false,
+        });
+      }
 
-      map?.addSource(circleSourceId, {
-        type: "geojson",
-        data: dataSource,
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: config.heatmapSourceRadius,
-      });
+      if (!map?.getSource(clusterSourceId)) {
+        map?.addSource(clusterSourceId, {
+          type: "geojson",
+          data: dataSource,
+          cluster: true,
+          clusterMaxZoom: 14,
+          clusterRadius: config.heatmapSourceRadius,
+        });
+      }
 
-      map?.addLayer({
-        id: heatmapLayer,
-        type: "heatmap",
-        source: sourceId,
-        maxzoom: config.layer.maxZoom,
-        paint: {
-          // increase weight as diameter breast height increases
-          "heatmap-weight": config.layer.weight,
-          // increase intensity as zoom level increases
-          "heatmap-intensity": {
-            stops: [
-              [config.layer.maxZoom - 4, 1],
-              [config.layer.maxZoom, 3],
-            ],
-          } as StyleFunction,
-          // assign color values be applied to points depending on their density
-          "heatmap-color": config.layer.color,
-          // increase radius as zoom increases
-          "heatmap-radius": config.layer.radius,
-          // decrease opacity to transition into the circle layer
-          "heatmap-opacity": {
-            default: 1,
-            stops: [
-              [config.layer.maxZoom - 1, 1],
-              [config.layer.maxZoom, 0],
-            ],
-          } as StyleFunction,
-        },
-      });
-
-      map?.addLayer({
-        id: circleLayer,
-        type: "circle",
-        minzoom: config.layer.maxZoom - 1,
-        source: circleSourceId,
-        filter: ["has", "point_count"],
-        paint: {
-          // increase the radius of the circle as the zoom level and dbh value increases
-          "circle-radius": config.circle.radius,
-          "circle-color": config.circle.color,
-          "circle-stroke-color": config.circle.strokeColor,
-          "circle-stroke-width": config.circle.strokeWidth,
-          "circle-opacity": {
-            stops: [
-              // You want to make the heatmap totally transparent
-              // aka looks disapear when the zoom level is hit max
-              // zoom. Reappear if greater than max zoom
-              [config.layer.maxZoom - 1, 0],
-              [config.layer.maxZoom, 1],
-            ],
+      if (!map?.getLayer(heatmapLayer)) {
+        map?.addLayer({
+          id: heatmapLayer,
+          type: "heatmap",
+          source: heatmapSourceId,
+          maxzoom: config.layer.maxZoom,
+          paint: {
+            // increase weight as diameter breast height increases
+            "heatmap-weight": config.layer.weight,
+            // increase intensity as zoom level increases
+            "heatmap-intensity": {
+              stops: [
+                [config.layer.maxZoom - 4, 1],
+                [config.layer.maxZoom, 3],
+              ],
+            } as StyleFunction,
+            // assign color values be applied to points depending on their density
+            "heatmap-color": config.layer.color,
+            // increase radius as zoom increases
+            "heatmap-radius": config.layer.radius,
+            // decrease opacity to transition into the circle layer
+            "heatmap-opacity": {
+              default: 1,
+              stops: [
+                [config.layer.maxZoom - 1, 1],
+                [config.layer.maxZoom, 0],
+              ],
+            } as StyleFunction,
           },
-        },
-      });
+        });
+      }
 
-      // Add cluster count layer
-      map?.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: circleSourceId,
-        filter: ["has", "point_count"],
-        minzoom: config.layer.maxZoom - 1,
-        layout: {
-          "text-field": "{point_count_abbreviated}",
-          "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-          "text-size": 12,
-        },
-      });
+      if (!map?.getLayer(clusterLayer)) {
+        console.log("heatmap creating cluster layer");
+        map?.addLayer({
+          id: clusterLayer,
+          type: "circle",
+          minzoom: config.layer.maxZoom - 1,
+          source: clusterSourceId,
+          filter: ["has", "point_count"],
+          paint: {
+            // increase the radius of the circle as the zoom level and dbh value increases
+            "circle-radius": config.circle.radius,
+            "circle-color": config.circle.color,
+            "circle-stroke-color": config.circle.strokeColor,
+            "circle-stroke-width": config.circle.strokeWidth,
+            "circle-opacity": {
+              stops: [
+                // You want to make the heatmap totally transparent
+                // aka looks disapear when the zoom level is hit max
+                // zoom. Reappear if greater than max zoom
+                [config.layer.maxZoom - 1, 0],
+                [config.layer.maxZoom, 1],
+              ],
+            },
+          },
+        });
+      }
 
-      // Add unclustered point layer
-      map?.addLayer({
-        id: unClusterPointLayer,
-        type: "circle",
-        source: circleSourceId,
-        filter: ["!", ["has", "point_count"]],
-        // Individual points appear at max cluster zoom
-        minzoom: config.layer.maxZoom - 1,
-        paint: {
-          "circle-color": "#11b4da",
-          "circle-radius": 4,
-          "circle-stroke-width": 1,
-          "circle-stroke-color": "#fff",
-        },
-      });
+      if (!map?.getLayer("cluster-count")) {
+        map?.addLayer({
+          id: "cluster-count",
+          type: "symbol",
+          source: clusterSourceId,
+          filter: ["has", "point_count"],
+          minzoom: config.layer.maxZoom - 1,
+          layout: {
+            "text-field": "{point_count_abbreviated}",
+            "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+            "text-size": 12,
+          },
+        });
+      }
+
+      if (!map?.getLayer(unClusterPointLayer)) {
+        map?.addLayer({
+          id: unClusterPointLayer,
+          type: "circle",
+          source: clusterSourceId,
+          filter: ["!", ["has", "point_count"]],
+          // Individual points appear at max cluster zoom
+          minzoom: config.layer.maxZoom - 1,
+          paint: {
+            "circle-color": "#11b4da",
+            "circle-radius": 6,
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "#fff",
+          },
+        });
+      }
+
+      // Change the cursor to a pointer for uncluster point
+      map?.on("mouseenter", unClusterPointLayer, defaultMouseEnterEventHandler);
+
+      // Change the cursor back to default when it leaves the unclustered points
+      map?.on("mouseleave", unClusterPointLayer, defaultMouseLeaveEventHandler);
     };
 
     map?.once("load", createLayers);
@@ -218,34 +243,36 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     map?.on("styledata", createLayers);
 
     return () => {
+      map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
+      map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
+
       try {
         if (map?.getLayer(heatmapLayer)) map?.removeLayer(heatmapLayer);
-        if (map?.getLayer(circleLayer)) map?.removeLayer(circleLayer);
-        if (map?.getSource(sourceId)) map?.removeSource(sourceId);
+        if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
+        if (map?.getLayer(unClusterPointLayer))
+          map?.removeLayer(unClusterPointLayer);
+        if (map?.getLayer("cluster-count")) map?.removeLayer("cluster-count");
+        if (map?.getSource(heatmapSourceId)) map?.removeSource(heatmapSourceId);
+        if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
       } catch (e) {
         // OK to ignore if no layer then no source as well
       }
     };
-  }, [
-    map,
-    layerId,
-    sourceId,
-    heatmapLayerConfig,
-    circleSourceId,
-    heatmapLayer,
-    circleLayer,
-    unClusterPointLayer,
-  ]);
+    // Make sure map is the only dependency so that it will not trigger twice run
+    // where you will add source and remove layer accidentally.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map]);
 
   const updateSource = useCallback(() => {
     const newData = createCentroidDataSource(collections);
-    if (map?.getSource(sourceId)) {
-      (map?.getSource(sourceId) as GeoJSONSource).setData(newData);
+    console.log({ newData });
+    if (map?.getSource(heatmapSourceId)) {
+      (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
     }
-    if (map?.getSource(circleSourceId)) {
-      (map?.getSource(circleSourceId) as GeoJSONSource).setData(newData);
+    if (map?.getSource(clusterSourceId)) {
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
     }
-  }, [map, sourceId, circleSourceId, collections]);
+  }, [map, heatmapSourceId, clusterSourceId, collections]);
 
   useEffect(() => {
     updateSource();
@@ -263,7 +290,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       />
       <SpatialExtents
         layerId={unClusterPointLayer}
-        addedLayerIds={[heatmapLayer]}
+        addedLayerIds={[clusterLayer, unClusterPointLayer]}
         onDatasetSelected={onDatasetSelected}
       />
     </>

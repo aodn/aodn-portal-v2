@@ -151,14 +151,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [layerId]
   );
 
-  const updateSource = useCallback(() => {
-    if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createCentroidDataSource(collections)
-      );
-    }
-  }, [map, clusterSourceId, collections]);
-
   // util function to check if a cluster can spiderify or not
   const shouldCreateSpiderDiagram = useCallback(
     (features: any[]): boolean => {
@@ -465,6 +457,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       // these changes so use this check to avoid duplicate add
       if (map?.getSource(clusterSourceId)) return;
 
+      console.log("creating layers cluster layer");
       const config = mergeWithDefaults(
         defaultClusterLayerConfig,
         clusterLayerConfig
@@ -589,6 +582,14 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     // where you will add source and remove layer accidentally.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
+
+  const updateSource = useCallback(() => {
+    if (map?.getSource(clusterSourceId)) {
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
+        createCentroidDataSource(collections)
+      );
+    }
+  }, [map, clusterSourceId, collections]);
 
   useEffect(() => {
     updateSource();
