@@ -88,7 +88,7 @@ const SortButton: FC<SortButtonProps> = ({ onChangeSorting }) => {
           <ListItemIcon>
             <RelevancyIcon />
           </ListItemIcon>
-          Relevancy
+          Relevance
         </MenuItem>
         <MenuItem
           data-testid="sortlist-toggle-menu-title"
@@ -101,7 +101,7 @@ const SortButton: FC<SortButtonProps> = ({ onChangeSorting }) => {
           <ListItemIcon>
             <SubtitlesIcon />
           </ListItemIcon>
-          Title
+          Title (A-Z)
         </MenuItem>
         <MenuItem
           data-testid="sortlist-toggle-menu-popularity"
