@@ -104,6 +104,7 @@ const ReactMap = ({
             style: styles[defaultStyle].style,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
+            maxZoom: 14,
             localIdeographFontFamily:
               "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
           }) as Map)
