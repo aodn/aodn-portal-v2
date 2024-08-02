@@ -21,6 +21,7 @@ import {
   Category,
   ParameterState,
   updateCategories,
+  updateCommonKey,
   updateSearchText,
 } from "../common/store/componentParamReducer";
 import store, {
@@ -88,8 +89,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const selectedCategoryStrs = selectedCategories
     ? [...new Set(selectedCategories.map((c) => c.label))]
     : [];
-
-  const addCategory = useCallback(
+  useCallback(
     (category: string) => {
       const currentCategories = selectedCategories
         ? new Array(...selectedCategories)
@@ -111,7 +111,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     },
     [categorySet, dispatch, selectedCategories]
   );
-
   const removeCategory = useCallback(
     (category: string) => {
       const currentCategories = new Array(...selectedCategories);
@@ -203,7 +202,10 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const onInputChange = useCallback(
     (_: any, newInputValue: string) => {
       // If user type anything, then it is not a title search anymore
-      dispatch(updateSearchText(newInputValue, getGroup(newInputValue)));
+      dispatch(updateSearchText(newInputValue));
+      if (getGroup(newInputValue) === "common") {
+        dispatch(updateCommonKey(newInputValue));
+      }
       if (newInputValue?.length > 1) {
         debounceRefreshOptions()?.then();
       }

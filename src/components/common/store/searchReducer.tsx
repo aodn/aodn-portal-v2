@@ -4,6 +4,7 @@ import { Category, ParameterState } from "./componentParamReducer";
 
 import {
   CategoriesIn,
+  CommonKey,
   cqlDefaultFilters,
   PolygonOperation,
   TemporalAfterOrBefore,
@@ -309,6 +310,13 @@ const createSearchParamFrom = (i: ParameterState): SearchParameters => {
     if (categoryFilter) {
       p.filter = appendFilter(p.filter, categoryFilter);
     }
+  }
+
+  if (i.commonKey) {
+    const f = cqlDefaultFilters.get("COMMON_KEY") as CommonKey;
+    p.filter = appendFilter(p.filter, f(i.commonKey));
+    // clear search text because the value is handled by the filter section instead
+    p.text = "";
   }
 
   return p;
