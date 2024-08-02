@@ -277,7 +277,6 @@ const SearchPage = () => {
           onMapZoomOrMove={onMapZoomOrMove}
           onToggleClicked={onToggleDisplay}
           onDatasetSelected={onDatasetSelected}
-          onClickPopup={handleNavigateToDetailPage}
         />
         <Grid></Grid>
       </Grid>

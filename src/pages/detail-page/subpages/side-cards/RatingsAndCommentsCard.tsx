@@ -142,12 +142,12 @@ const RatingsAndCommentsCard = () => {
             </Grid>
             <Grid item xs={9}>
               <Typography padding={0} textAlign="center">
-                Add you feedback
+                Add Your Feedback
               </Typography>
             </Grid>
           </Grid>
           <Stack direction="column">
-            <Typography>Share on social sites:</Typography>
+            <Typography>Share on Social Sites:</Typography>
             <Stack direction="row" spacing={1}>
               {socialIcons.map((icon, index) => (
                 <Box
