@@ -1,6 +1,6 @@
 import { FC, useCallback, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
-import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
+import { GeoJSONSource } from "mapbox-gl";
 import MapPopup from "../component/MapPopup";
 import {
   LayersProps,
@@ -10,6 +10,7 @@ import {
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
+import SpiderDiagram from "../component/SpiderDiagram";
 
 interface ClusterSize {
   default?: number | string;
@@ -67,12 +68,14 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   clusterCircleStrokeWidth: 1,
   clusterCircleStrokeColor: "#fff",
   clusterCircleTextSize: 12,
-  unclusterPointColor: "#51bbd6",
+  unclusterPointColor: "green",
   unclusterPointOpacity: 0.6,
   unclusterPointStrokeWidth: 1,
   unclusterPointStrokeColor: "#fff",
   unclusterPointRadius: 8,
 };
+
+const spiderifyFromZoomLevel = 14;
 
 // These function help to get the correct id and reduce the need to set those id in the
 // useEffect list
@@ -101,27 +104,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const unclusterPointLayer = useMemo(
     () => getUnclusterPointId(layerId),
     [layerId]
-  );
-
-  const updateSource = useCallback(() => {
-    if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createCentroidDataSource(collections)
-      );
-    }
-  }, [map, clusterSourceId, collections]);
-
-  const onClusterCircleMouseClick = useCallback(
-    (ev: MapMouseEvent): void => {
-      if (ev.lngLat) {
-        map?.easeTo({
-          center: ev.lngLat,
-          zoom: map?.getZoom() + 1,
-          duration: 500,
-        });
-      }
-    },
-    [map]
   );
 
   // This is use to render the cluster circle and add event handle to circles
@@ -215,8 +197,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       // Change the cursor back to default when it leaves the unclustered points
       map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
-
-      map?.on("click", clusterLayer, onClusterCircleMouseClick);
     };
 
     map?.once("load", createLayers);
@@ -256,6 +236,14 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
+  const updateSource = useCallback(() => {
+    if (map?.getSource(clusterSourceId)) {
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
+        createCentroidDataSource(collections)
+      );
+    }
+  }, [map, clusterSourceId, collections]);
+
   useEffect(() => {
     updateSource();
     map?.on("styledata", updateSource);
@@ -273,6 +261,12 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       <SpatialExtents
         layerId={unclusterPointLayer}
         addedLayerIds={[clusterLayer, unclusterPointLayer]}
+        onDatasetSelected={onDatasetSelected}
+      />
+      <SpiderDiagram
+        clusterLayer={clusterLayer}
+        clusterSourceId={clusterSourceId}
+        unclusterPointLayer={unclusterPointLayer}
         onDatasetSelected={onDatasetSelected}
       />
     </>

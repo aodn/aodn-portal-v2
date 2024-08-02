@@ -1,2 +1,2 @@
 
-npx --no-install commitlint --edit
+yarn commitlint --edit
