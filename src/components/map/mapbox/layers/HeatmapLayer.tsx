@@ -57,12 +57,20 @@ const defaultHeatmapConfig: HeatmapConfig = {
       "rgba(236,222,239,0)",
       0.2,
       "rgb(208,209,230)",
-      0.4,
+      0.3,
       "rgb(166,189,219)",
-      0.6,
+      0.4,
       "rgb(103,169,207)",
+      0.6,
+      "#ffe69e",
+      0.7,
+      "#ffd991",
       0.8,
-      "rgb(28,144,153)",
+      "#ffcc84",
+      0.9,
+      "#ffba78",
+      1,
+      "#ffa86b",
     ],
     radius: {
       stops: [
@@ -172,7 +180,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       }
 
       if (!map?.getLayer(clusterLayer)) {
-        console.log("heatmap creating cluster layer");
         map?.addLayer({
           id: clusterLayer,
           type: "circle",
@@ -222,19 +229,21 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
           // Individual points appear at max cluster zoom
           minzoom: config.layer.maxZoom - 1,
           paint: {
-            "circle-color": "#11b4da",
-            "circle-radius": 6,
-            "circle-stroke-width": 1,
-            "circle-stroke-color": "#fff",
+            "circle-radius": config.circle.radius,
+            "circle-color": config.circle.color,
+            "circle-stroke-color": config.circle.strokeColor,
+            "circle-stroke-width": config.circle.strokeWidth,
           },
         });
       }
 
       // Change the cursor to a pointer for uncluster point
       map?.on("mouseenter", unClusterPointLayer, defaultMouseEnterEventHandler);
+      map?.on("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
 
       // Change the cursor back to default when it leaves the unclustered points
       map?.on("mouseleave", unClusterPointLayer, defaultMouseLeaveEventHandler);
+      map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
     };
 
     map?.once("load", createLayers);
@@ -244,7 +253,17 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     map?.on("styledata", createLayers);
 
     return () => {
+      map?.off(
+        "mouseenter",
+        unClusterPointLayer,
+        defaultMouseEnterEventHandler
+      );
       map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
+      map?.off(
+        "mouseleave",
+        unClusterPointLayer,
+        defaultMouseLeaveEventHandler
+      );
       map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
       try {

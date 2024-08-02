@@ -10,6 +10,18 @@ import { LayersProps } from "../layers/Layers";
 
 interface SpiderDiagramConfig {
   spiderifyFromZoomLevel: number;
+  circleSpiralSwitchover: number;
+  circleFootSeparation: number;
+  spiralFootSeparation: number;
+  spiralLengthStart: number;
+  spiralLengthFactor: number;
+  lineColor: string;
+  lineWidth: number;
+  circleRadius: number;
+  circleColor: string;
+  circleOpacity: number;
+  circleStrokeWidth: number;
+  circleStrokeColor: string;
 }
 
 interface SpiderDiagramProps extends LayersProps {
@@ -21,6 +33,18 @@ interface SpiderDiagramProps extends LayersProps {
 
 const defaultSpiderDiagramConfig: SpiderDiagramConfig = {
   spiderifyFromZoomLevel: 11,
+  circleSpiralSwitchover: 9,
+  circleFootSeparation: 25,
+  spiralFootSeparation: 28,
+  spiralLengthStart: 15,
+  spiralLengthFactor: 4,
+  lineColor: "#888",
+  lineWidth: 1,
+  circleRadius: 8,
+  circleColor: "green",
+  circleOpacity: 1,
+  circleStrokeWidth: 1,
+  circleStrokeColor: "#fff",
 };
 
 const getClusterCircleId = (coordinate: [number, number]) =>
@@ -127,11 +151,13 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       const numPins = datasets.length;
 
       // Spider configuration
-      const circleSpiralSwitchover = 9;
-      const circleFootSeparation = 25;
-      const spiralFootSeparation = 28;
-      const spiralLengthStart = 15;
-      const spiralLengthFactor = 4;
+      const {
+        circleSpiralSwitchover,
+        circleFootSeparation,
+        spiralFootSeparation,
+        spiralLengthStart,
+        spiralLengthFactor,
+      } = config;
 
       const generateSpiderLegParams = (count: number) => {
         if (count >= circleSpiralSwitchover) {
@@ -229,37 +255,42 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
 
       // Add layers
       map?.addLayer({
-        id: spiderPinsLayerId,
-        type: "circle",
-        source: spiderPinsSourceId,
-        paint: {
-          "circle-radius": 8,
-          "circle-color": "green",
-          "circle-opacity": 0.6,
-          "circle-stroke-width": 1,
-          "circle-stroke-color": "#fff",
-        },
-      });
-
-      map?.addLayer({
         id: spiderLinesLayerId,
         type: "line",
         source: spiderLinesSourceId,
         paint: {
-          "line-color": "#888",
-          "line-width": 1,
+          "line-color": config.lineColor,
+          "line-width": config.lineWidth,
+        },
+      });
+
+      map?.addLayer({
+        id: spiderPinsLayerId,
+        type: "circle",
+        source: spiderPinsSourceId,
+        paint: {
+          "circle-radius": config.circleRadius,
+          "circle-color": config.circleColor,
+          "circle-opacity": config.circleOpacity,
+          "circle-stroke-width": config.circleStrokeWidth,
+          "circle-stroke-color": config.circleStrokeColor,
         },
       });
 
       setCurrentSpiderifiedCluster(clusterCircleId);
     },
-    [currentSpiderifiedCluster, map, unspiderify, spiderifyFromZoomLevel]
+    [
+      currentSpiderifiedCluster,
+      map,
+      config,
+      unspiderify,
+      spiderifyFromZoomLevel,
+    ]
   );
 
   const checkZoomAndUnspiderify = useCallback(() => {
     if (map) {
       const currentZoom = map.getZoom();
-      console.log("currentZoom", currentZoom);
       setCurrentSpiderifiedCluster((currentCluster) => {
         if (currentCluster && currentZoom < spiderifyFromZoomLevel) {
           unspiderify(currentCluster);
