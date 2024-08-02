@@ -1,12 +1,12 @@
-import BlockList from "./BlockList";
+import ExpandableList from "./ExpandableList";
 import React, { ReactNode, useMemo } from "react";
-import PlainTextFragment from "./PlainTextFragment";
+import PlainTextItem from "./listItem/PlainTextItem";
 
-interface PlainTextBlockProps {
+interface PlainTextListProps {
   title: string;
   texts: string[];
 }
-const PlainTextBlock: React.FC<PlainTextBlockProps> = ({ title, texts }) => {
+const PlainTextList: React.FC<PlainTextListProps> = ({ title, texts }) => {
   const plainTextFragments: ReactNode[] = useMemo(() => {
     const textFragmentList: ReactNode[] = [];
     texts?.map((text) => {
@@ -26,11 +26,11 @@ const PlainTextBlock: React.FC<PlainTextBlockProps> = ({ title, texts }) => {
       }
 
       textFragmentList.push(
-        <PlainTextFragment key={text}>{displayingText}</PlainTextFragment>
+        <PlainTextItem key={text}>{displayingText}</PlainTextItem>
       );
     });
     return textFragmentList;
   }, [texts]);
-  return <BlockList title={title} childrenList={plainTextFragments} />;
+  return <ExpandableList title={title} childrenList={plainTextFragments} />;
 };
-export default PlainTextBlock;
+export default PlainTextList;

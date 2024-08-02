@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
 import React from "react";
-import { margin } from "../../../../styles/constants";
+import { margin } from "../../../styles/constants";
 
 interface PlainTextItemProps {
   children: React.ReactNode;

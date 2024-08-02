@@ -1,8 +1,8 @@
-import { IContact } from "../../../../components/common/store/OGCCollectionDefinitions";
+import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
-import ContactCard from "./ContactCard";
-import CollapseFrame from "./CollapseFrame";
+import ContactItem from "./listItem/ContactItem";
+import CollapseItem from "./listItem/CollapseItem";
 
 interface ContactListProps {
   title: string;
@@ -15,14 +15,14 @@ const ContactList: React.FC<ContactListProps> = ({ title, contacts }) => {
     contacts?.map((contact, index) => {
       const suffix = contact.name ? ` - ${contact.name}` : "";
       returnedList.push(
-        <CollapseFrame
+        <CollapseItem
           key={index}
           title={contact.organization + suffix}
           isContactFragment
           email={contact.emails[0]}
         >
-          <ContactCard contact={contact} />
-        </CollapseFrame>
+          <ContactItem contact={contact} />
+        </CollapseItem>
       );
     });
     return returnedList;

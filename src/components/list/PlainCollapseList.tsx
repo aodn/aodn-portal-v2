@@ -1,7 +1,7 @@
 import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
-import CollapseFrame from "./CollapseFrame";
-import PlainTextItem from "./PlainTextItem";
+import CollapseItem from "./listItem/CollapseItem";
+import PlainTextItem from "./listItem/PlainTextItem";
 
 interface PlainCollapseListProps {
   title: string;
@@ -17,11 +17,11 @@ const PlainCollapseList: React.FC<PlainCollapseListProps> = ({
     const returnedList: ReactNode[] = [];
     items?.map((item, index) => {
       returnedList.push(
-        <CollapseFrame title={item.title} key={index}>
+        <CollapseItem title={item.title} key={index}>
           {item.content?.map((content, index) => {
             return <PlainTextItem key={index}>{content}</PlainTextItem>;
           })}
-        </CollapseFrame>
+        </CollapseItem>
       );
     });
     return returnedList;
