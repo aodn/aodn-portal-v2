@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import ContactBlock from "../components/ContactBlock";
-import NavigatablePanel from "../components/NavigatablePanel";
-import PlainTextBlock from "../components/PlainTextBlock";
-import PlainCollapseBlock from "../components/PlainCollapseBlock";
-import LicenseBlock from "../components/LicenseBlock";
+import ContactList from "../../../../components/list/ContactList";
+import NavigatablePanel from "./NavigatablePanel";
+import PlainTextList from "../../../../components/list/PlainTextList";
+import PlainCollapseList from "../../../../components/list/PlainCollapseList";
+import LicenseList from "../../../../components/list/LicenseList";
 import {
   MediaType,
   RelationType,
@@ -89,7 +89,7 @@ const CitationPanel = () => {
       {
         title: "Cited Responsible Parties",
         component: (
-          <ContactBlock
+          <ContactList
             title="Cited Responsible Parties"
             contacts={citationContacts ? citationContacts : []}
           />
@@ -98,7 +98,7 @@ const CitationPanel = () => {
       {
         title: "License",
         component: license ? (
-          <LicenseBlock
+          <LicenseList
             license={license}
             url={licenseUrl ? licenseUrl : ""}
             graphic={licenseGraphic ? licenseGraphic : ""}
@@ -110,7 +110,7 @@ const CitationPanel = () => {
       {
         title: "Suggested Citation",
         component: (
-          <PlainTextBlock
+          <PlainTextList
             title="Suggested Citation"
             texts={suggestedCitation ? [suggestedCitation] : []}
           />
@@ -119,7 +119,7 @@ const CitationPanel = () => {
       {
         title: "Constraints",
         component: (
-          <PlainCollapseBlock title="Constraints" items={constraints} />
+          <PlainCollapseList title="Constraints" items={constraints} />
         ),
       },
     ],
