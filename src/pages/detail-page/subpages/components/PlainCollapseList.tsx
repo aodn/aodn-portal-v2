@@ -1,14 +1,14 @@
 import React, { ReactNode, useMemo } from "react";
-import BlockList from "./BlockList";
+import ExpandableList from "./ExpandableList";
 import CollapseFrame from "./CollapseFrame";
-import PlainTextFragment from "./PlainTextFragment";
+import PlainTextItem from "./PlainTextItem";
 
-interface KeywordSectionProps {
+interface PlainCollapseListProps {
   title: string;
   items: { title: string; content: string[] }[];
 }
 
-const PlainCollapseBlock: React.FC<KeywordSectionProps> = ({
+const PlainCollapseList: React.FC<PlainCollapseListProps> = ({
   title,
   items,
 }) => {
@@ -19,7 +19,7 @@ const PlainCollapseBlock: React.FC<KeywordSectionProps> = ({
       returnedList.push(
         <CollapseFrame title={item.title} key={index}>
           {item.content?.map((content, index) => {
-            return <PlainTextFragment key={index}>{content}</PlainTextFragment>;
+            return <PlainTextItem key={index}>{content}</PlainTextItem>;
           })}
         </CollapseFrame>
       );
@@ -27,7 +27,7 @@ const PlainCollapseBlock: React.FC<KeywordSectionProps> = ({
     return returnedList;
   }, [items]);
 
-  return <BlockList title={title} childrenList={collapseComponents} />;
+  return <ExpandableList title={title} childrenList={collapseComponents} />;
 };
 
-export default PlainCollapseBlock;
+export default PlainCollapseList;

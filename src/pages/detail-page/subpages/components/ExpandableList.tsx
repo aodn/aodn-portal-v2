@@ -2,12 +2,15 @@ import { Button, Grid, Typography } from "@mui/material";
 import React, { ReactNode, useState } from "react";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 
-interface BlockListProps {
+interface ExpandableListProps {
   title: string;
   childrenList: ReactNode[];
 }
 
-const BlockList: React.FC<BlockListProps> = ({ title, childrenList = [] }) => {
+const ExpandableList: React.FC<ExpandableListProps> = ({
+  title,
+  childrenList = [],
+}) => {
   let showingCollapseCount = 0;
   const [isShowingMore, setIsShowingMore] = useState(false);
   return (
@@ -37,4 +40,4 @@ const BlockList: React.FC<BlockListProps> = ({ title, childrenList = [] }) => {
   );
 };
 
-export default BlockList;
+export default ExpandableList;

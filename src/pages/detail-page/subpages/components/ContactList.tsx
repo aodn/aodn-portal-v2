@@ -1,15 +1,15 @@
 import { IContact } from "../../../../components/common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
-import BlockList from "./BlockList";
+import ExpandableList from "./ExpandableList";
 import ContactCard from "./ContactCard";
 import CollapseFrame from "./CollapseFrame";
 
-interface ContactBlockProps {
+interface ContactListProps {
   title: string;
   contacts: IContact[];
 }
 
-const ContactBlock: React.FC<ContactBlockProps> = ({ title, contacts }) => {
+const ContactList: React.FC<ContactListProps> = ({ title, contacts }) => {
   const collapseComponents: ReactNode[] = useMemo(() => {
     const returnedList: ReactNode[] = [];
     contacts?.map((contact, index) => {
@@ -29,8 +29,11 @@ const ContactBlock: React.FC<ContactBlockProps> = ({ title, contacts }) => {
   }, [contacts]);
 
   return (
-    <BlockList title={title} childrenList={collapseComponents}></BlockList>
+    <ExpandableList
+      title={title}
+      childrenList={collapseComponents}
+    ></ExpandableList>
   );
 };
 
-export default ContactBlock;
+export default ContactList;

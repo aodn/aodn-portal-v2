@@ -2,11 +2,11 @@ import { Grid } from "@mui/material";
 import React from "react";
 import { margin } from "../../../../styles/constants";
 
-interface PlainTextFragmentProps {
+interface PlainTextItemProps {
   children: React.ReactNode;
 }
 
-const PlainTextFragment: React.FC<PlainTextFragmentProps> = ({ children }) => {
+const PlainTextItem: React.FC<PlainTextItemProps> = ({ children }) => {
   return (
     <Grid
       container
@@ -30,4 +30,4 @@ const PlainTextFragment: React.FC<PlainTextFragmentProps> = ({ children }) => {
     </Grid>
   );
 };
-export default PlainTextFragment;
+export default PlainTextItem;
