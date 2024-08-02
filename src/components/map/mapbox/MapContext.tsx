@@ -17,7 +17,12 @@ type MapContextType = {
 const MapContext = createContext<Partial<MapContextType>>({});
 
 if (import.meta.env.MODE === "dev") {
-  (window as Window & typeof globalThis & { __MAP_CONTEXT__: React.Context<Partial<MapContextType>> }).__MAP_CONTEXT__ = MapContext;
+  (
+    window as Window &
+      typeof globalThis & {
+        __MAP_CONTEXT__: React.Context<Partial<MapContextType>>;
+      }
+  ).__MAP_CONTEXT__ = MapContext;
 }
 
 export default MapContext;
