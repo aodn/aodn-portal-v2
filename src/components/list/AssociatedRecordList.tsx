@@ -19,7 +19,7 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
     const searchParams = new URLSearchParams();
     searchParams.append("uuid", uuid);
     const url = pageDefault.details + "?" + searchParams.toString();
-    window.open(url, "_blank");
+    window.open(url, "_blank", "noopener,noreferrer");
   }, []);
 
   const collapseComponents: ReactNode[] = useMemo(() => {
