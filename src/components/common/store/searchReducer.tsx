@@ -245,8 +245,21 @@ const searcher = createSlice({
   },
 });
 
-const appendFilter = (f: string | undefined, a: string | undefined) =>
-  f === undefined ? a : f + " AND " + a;
+/**
+ * Appends a filter condition using AND operation.
+ */
+const appendFilter = (
+  f: string | undefined,
+  a: string | undefined
+): string | undefined => (f === undefined ? a : f + " AND " + a);
+
+/**
+ * Includes a filter condition using OR operation.
+ */
+const includeFilter = (
+  f: string | undefined,
+  a: string | undefined
+): string | undefined => (f === undefined ? a : f + " OR " + a);
 
 const createSuggesterParamFrom = (
   paramState: ParameterState
@@ -314,7 +327,7 @@ const createSearchParamFrom = (i: ParameterState): SearchParameters => {
 
   if (i.commonKey) {
     const f = cqlDefaultFilters.get("COMMON_KEY") as CommonKey;
-    p.filter = appendFilter(p.filter, f(i.commonKey));
+    p.filter = includeFilter(p.filter, f(i.commonKey));
     // clear search text because the value is handled by the filter section instead
     p.text = "";
   }

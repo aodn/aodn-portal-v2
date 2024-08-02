@@ -28,7 +28,7 @@ export type CategoriesIn = SingleArgumentFunction<
  * the OGC API needs to query this type of search text input differently;
  * therefore, the constructed URI by the frontend app needs to distinguish type of particular search text input
  **/
-export type CommonKey = SingleArgumentFunction<string, string>;
+export type CommonKey = SingleArgumentFunction<string, string | undefined>;
 
 export type FilterTypes =
   | string
@@ -65,8 +65,19 @@ const funcCategories: CategoriesIn = (categories: Array<Category>) => {
   return `(${categoryLabels.join(" or ")})`;
 };
 
-const funcCommonTypeSearchText: CommonKey = (searchText: string) =>
-  `common='${searchText.toLowerCase()}'`;
+const funcCommonTypeSearchText: (searchText: string) => undefined | string = (
+  searchText: string
+) => {
+  const results: string[] = [];
+  results.push(`discovery_categories='${searchText?.toLowerCase()}'`);
+  results.push(`fuzzy_title='${searchText?.toLowerCase()}'`);
+  results.push(`fuzzy_description='${searchText?.toLowerCase()}'`);
+  // if no category, return undefined
+  if (results.length === 0) {
+    return undefined;
+  }
+  return `(${results.join(" or ")})`;
+};
 
 /**
  * The CQL filter format for search dataset given start/end date
