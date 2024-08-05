@@ -223,7 +223,7 @@ const SearchPage = () => {
           break;
 
         case SortResultEnum.MODIFIED:
-          //TODO: need ogcapi change
+          dispatch(updateSortBy([{ field: "temporal", order: "DESC" }]));
           break;
       }
 
