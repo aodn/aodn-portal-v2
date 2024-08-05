@@ -200,14 +200,17 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   );
 
   const onInputChange = useCallback(
-    (_: any, newInputValue: string) => {
+    async (_: any, newInputValue: string) => {
       // If user type anything, then it is not a title search anymore
       dispatch(updateSearchText(newInputValue));
-      if (getGroup(newInputValue) === "common") {
-        dispatch(updateCommonKey(newInputValue));
-      }
       if (newInputValue?.length > 1) {
-        debounceRefreshOptions()?.then();
+        await debounceRefreshOptions(); // wait for the debounced refresh to complete
+        // TODO: getGroup has delay, needs to instantly return group value or await until getGroup returns,
+        //  otherwise, commonKey will be falsely ignored in the store (e.g. you type 'salinity' and quickly select it from the list, but it is not recognised as common key)
+        const group = getGroup(newInputValue);
+        if (group === "common") {
+          dispatch(updateCommonKey(newInputValue));
+        }
       }
     },
     [debounceRefreshOptions, dispatch, getGroup]
