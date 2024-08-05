@@ -4,6 +4,8 @@ import { Category, ParameterState } from "./componentParamReducer";
 
 import {
   CategoriesIn,
+  CategoriesWithCommonKey,
+  CommonKey,
   cqlDefaultFilters,
   PolygonOperation,
   TemporalAfterOrBefore,
@@ -244,8 +246,13 @@ const searcher = createSlice({
   },
 });
 
-const appendFilter = (f: string | undefined, a: string | undefined) =>
-  f === undefined ? a : f + " AND " + a;
+/**
+ * Appends a filter condition using AND operation.
+ */
+const appendFilter = (
+  f: string | undefined,
+  a: string | undefined
+): string | undefined => (f === undefined ? a : f + " AND " + a);
 
 const createSuggesterParamFrom = (
   paramState: ParameterState
@@ -303,12 +310,26 @@ const createSearchParamFrom = (i: ParameterState): SearchParameters => {
     p.filter = appendFilter(p.filter, f(i.polygon));
   }
 
-  if (i.categories && i.categories.length > 0) {
+  if (i.categories && i.categories.length > 0 && !i.commonKey) {
     const f = cqlDefaultFilters.get("CATEGORIES_IN") as CategoriesIn;
     const categoryFilter = f(i.categories);
     if (categoryFilter) {
       p.filter = appendFilter(p.filter, categoryFilter);
     }
+  }
+
+  if (i.commonKey) {
+    if (i.categories && i.categories.length > 0) {
+      const f = cqlDefaultFilters.get(
+        "CATEGORIES_WITH_COMMON_KEY"
+      ) as CategoriesWithCommonKey;
+      p.filter = appendFilter(p.filter, f(i.categories, i.commonKey));
+    } else {
+      const f = cqlDefaultFilters.get("COMMON_KEY") as CommonKey;
+      p.filter = appendFilter(p.filter, f(i.commonKey));
+    }
+    // clear search text because the value is handled by the filter section instead
+    p.text = "";
   }
 
   return p;

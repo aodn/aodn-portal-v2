@@ -9,6 +9,7 @@ import { sortBy } from "lodash";
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
 const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = "UPDATE_SEARCH_TEXT_FILTER_VARIABLE";
+const UPDATE_COMMON_KEY_VARIABLE = "UPDATE_COMMON_KEY_VARIABLE";
 const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
   "UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE";
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
@@ -28,6 +29,7 @@ export interface ParameterState {
   dateTimeFilterRange?: DataTimeFilterRange;
   // Use in search box
   searchText?: string;
+  commonKey?: string;
   categories?: Array<Category>;
   sortby?: string;
 }
@@ -69,6 +71,13 @@ const updateSearchText = (q: string): ActionType => {
   return {
     type: UPDATE_SEARCH_TEXT_FILTER_VARIABLE,
     payload: { searchText: q } as ParameterState,
+  };
+};
+
+const updateCommonKey = (q: string): ActionType => {
+  return {
+    type: UPDATE_COMMON_KEY_VARIABLE,
+    payload: { commonKey: q } as ParameterState,
   };
 };
 
@@ -141,6 +150,11 @@ const paramReducer = (
       return {
         ...state,
         searchText: action.payload.searchText,
+      };
+    case UPDATE_COMMON_KEY_VARIABLE:
+      return {
+        ...state,
+        commonKey: action.payload.commonKey,
       };
     case UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE:
       return {
@@ -288,4 +302,5 @@ export {
   updateCategories,
   updateParameterStates,
   updateSortBy,
+  updateCommonKey,
 };
