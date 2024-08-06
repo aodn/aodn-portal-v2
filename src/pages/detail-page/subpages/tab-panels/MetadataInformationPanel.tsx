@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import NavigatablePanel from "../components/NavigatablePanel";
-import ContactBlock from "../components/ContactBlock";
-import PlainTextBlock from "../components/PlainTextBlock";
+import NavigatablePanel from "./NavigatablePanel";
+import ContactList from "../../../../components/list/ContactList";
+import TextList from "../../../../components/list/TextList";
 import { convertDateFormat } from "../../../../utils/DateFormatUtils";
-import PlainLinkBlock from "../components/PlainLinkBlock";
+import PlainLinkBlock from "../../../../components/list/PlainLinkBlock";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
@@ -72,7 +72,7 @@ const MetadataInformationPanel = () => {
       {
         title: "Metadata Contact",
         component: (
-          <ContactBlock
+          <ContactList
             title="Metadata Contact"
             contacts={metadataContact ? metadataContact : []}
           />
@@ -81,7 +81,7 @@ const MetadataInformationPanel = () => {
       {
         title: "Metadata Identifier",
         component: (
-          <PlainTextBlock
+          <TextList
             title="Metadata Identifier"
             texts={metadataId ? [metadataId] : []}
           />
@@ -94,10 +94,7 @@ const MetadataInformationPanel = () => {
       {
         title: "Metadata Dates",
         component: (
-          <PlainTextBlock
-            title="Metadata Dates"
-            texts={dates ? [dates] : [""]}
-          />
+          <TextList title="Metadata Dates" texts={dates ? [dates] : [""]} />
         ),
       },
     ],

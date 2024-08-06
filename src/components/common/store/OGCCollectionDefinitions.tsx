@@ -192,6 +192,18 @@ export interface ITheme {
   concepts: IConcept[];
 }
 
+export interface IAssociatedRecordGroup {
+  parent?: IAssociatedRecord;
+  children: IAssociatedRecord[];
+  siblings: IAssociatedRecord[];
+}
+
+export interface IAssociatedRecord {
+  uuid: string;
+  title: string;
+  abstract: string;
+}
+
 // Enums
 export enum RelationType {
   SELF = "self",

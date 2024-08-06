@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
-import PlainTextFragment from "./PlainTextFragment";
-import BlockList from "./BlockList";
 import { Link } from "@mui/material";
+import TextItem from "./listItem/TextItem";
+import ExpandableList from "./ExpandableList";
 
 interface PlainLinkBlockProps {
   url: string;
@@ -10,14 +10,14 @@ interface PlainLinkBlockProps {
 const PlainLinkBlock: React.FC<PlainLinkBlockProps> = ({ url }) => {
   const link: ReactNode[] = [];
   link.push(
-    <PlainTextFragment>
+    <TextItem>
       <Link href={url} target="_blank" rel="noopener noreferrer">
         {url}
       </Link>
-    </PlainTextFragment>
+    </TextItem>
   );
 
-  return <BlockList title={"Full Metadata Link"} childrenList={link} />;
+  return <ExpandableList title={"Full Metadata Link"} childrenList={link} />;
 };
 
 export default PlainLinkBlock;
