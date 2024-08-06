@@ -74,6 +74,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
+  console.log("suggester open?", open);
   const [options, setOptions] = useState<OptionType[]>([]);
   const [categorySet, setCategorySet] = useState<Category[]>([]);
 
@@ -248,8 +249,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     if (event.key === "Enter") {
       if (open) {
         setOpen(false);
+      } else {
+        handleEnterPressed(event, false);
       }
-      handleEnterPressed(event, false);
     }
   };
 
