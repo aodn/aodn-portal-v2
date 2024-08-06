@@ -3,11 +3,11 @@ import { Link } from "@mui/material";
 import TextItem from "./listItem/TextItem";
 import ExpandableList from "./ExpandableList";
 
-interface LinkListProps {
+interface MetadataUrlListProps {
   url: string;
 }
 
-const LinkList: React.FC<LinkListProps> = ({ url }) => {
+const MetadataUrlList: React.FC<MetadataUrlListProps> = ({ url }) => {
   const link: ReactNode[] = [];
   link.push(
     <TextItem>
@@ -17,7 +17,7 @@ const LinkList: React.FC<LinkListProps> = ({ url }) => {
     </TextItem>
   );
 
-  return <ExpandableList title={"Full Metadata Link"} childrenList={link} />;
+  return <ExpandableList title="Full Metadata Link" childrenList={link} />;
 };
 
-export default LinkList;
+export default MetadataUrlList;
