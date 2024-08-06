@@ -131,7 +131,9 @@ const SearchPage = () => {
       // Use standard param to get fields you need, record is stored in redux
       dispatch(fetchResultWithStore(param)).then(() => {
         // Use a different parameter so that it return id and bbox only and do not store the values
-        dispatch(fetchResultNoStore({ ...param, properties: "id,bbox" }))
+        dispatch(
+          fetchResultNoStore({ ...param, properties: "id,bbox", sortby: "id" })
+        )
           .unwrap()
           .then((collections) => {
             setLayers(collections.collections);
