@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import NavigatablePanel from "../components/NavigatablePanel";
-import PlainTextBlock from "../components/PlainTextBlock";
+import NavigatablePanel from "./NavigatablePanel";
+import TextList from "../../../../components/list/TextList";
 
 const LineagePanel = () => {
   const context = useDetailPageContext();
@@ -14,10 +14,7 @@ const LineagePanel = () => {
       {
         title: "Statement",
         component: (
-          <PlainTextBlock
-            title="Statement"
-            texts={statement ? [statement] : []}
-          />
+          <TextList title="Statement" texts={statement ? [statement] : []} />
         ),
       },
     ],

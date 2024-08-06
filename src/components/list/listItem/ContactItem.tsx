@@ -5,15 +5,15 @@ import React from "react";
 import {
   IAddress,
   IContact,
-} from "../../../../components/common/store/OGCCollectionDefinitions";
+} from "../../common/store/OGCCollectionDefinitions";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 
-interface ContactCardProps {
+interface ContactItemProps {
   contact: IContact;
 }
 
-const ContactCard: React.FC<ContactCardProps> = ({ contact }) => {
+const ContactItem: React.FC<ContactItemProps> = ({ contact }) => {
   let addresses: IAddress;
   if (contact && Array.isArray(contact.addresses) && contact.addresses[0]) {
     addresses = contact.addresses[0];
@@ -110,4 +110,4 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact }) => {
   );
 };
 
-export default ContactCard;
+export default ContactItem;

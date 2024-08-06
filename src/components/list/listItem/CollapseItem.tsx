@@ -18,7 +18,7 @@ interface CollapseFrameProps {
   email?: string;
 }
 
-const CollapseFrame: React.FC<CollapseFrameProps> = ({
+const CollapseItem: React.FC<CollapseFrameProps> = ({
   title,
   children,
   isContactFragment = false,
@@ -102,4 +102,4 @@ const CollapseFrame: React.FC<CollapseFrameProps> = ({
   );
 };
 
-export default CollapseFrame;
+export default CollapseItem;

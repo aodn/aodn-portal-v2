@@ -1,19 +1,15 @@
 import { Grid, Link } from "@mui/material";
-import { margin } from "../../../../styles/constants";
+import { margin } from "../../styles/constants";
 import React from "react";
-import BlockList from "./BlockList";
+import ExpandableList from "./ExpandableList";
 
-interface LicenseBlockProps {
+interface LicenseListProps {
   license: string;
   url: string;
   graphic: string;
 }
 
-const LicenseBlock: React.FC<LicenseBlockProps> = ({
-  license,
-  url,
-  graphic,
-}) => {
+const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
   const licenseComponent = () => {
     return (
       <Grid
@@ -55,7 +51,9 @@ const LicenseBlock: React.FC<LicenseBlockProps> = ({
       </Grid>
     );
   };
-  return <BlockList title={"License"} childrenList={[licenseComponent()]} />;
+  return (
+    <ExpandableList title={"License"} childrenList={[licenseComponent()]} />
+  );
 };
 
-export default LicenseBlock;
+export default LicenseList;
