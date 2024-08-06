@@ -1,0 +1,20 @@
+# Use the official Playwright image
+FROM mcr.microsoft.com/playwright/python:v1.43.0-jammy
+
+WORKDIR /app
+
+COPY pyproject.toml poetry.lock /app/
+COPY scripts/entrypoint.sh /app/
+
+RUN \
+    apt-get update -y \
+    && apt-get upgrade -y \
+    # Install dependencies
+    && python3 -m pip install poetry \
+    && python3 -m poetry install --no-root --no-interaction --no-ansi \
+    # Set entrypoint for Docker Image
+    && cp /app/entrypoint.sh /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/entrypoint.sh"]

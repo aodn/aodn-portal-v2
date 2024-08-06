@@ -1,0 +1,30 @@
+# General exclusions
+# Exclude version control
+.git
+*.gitignore
+
+# Exclude IDE and editor files
+.vscode
+
+# Exclude logs and caches
+logs
+*.log
+cache
+*.cache
+
+# Exclude build artifacts
+build
+dist
+*.zip
+*.tar.gz
+*.rar
+
+# Node.js specific
+node_modules
+
+# Python specific
+__pycache__/
+.pytest_cache
+
+# Mypy
+.mypy_cache

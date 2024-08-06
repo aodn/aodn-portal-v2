@@ -1,0 +1,7 @@
+name: aodn-portal-v2
+channels:
+  - microsoft
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10.12

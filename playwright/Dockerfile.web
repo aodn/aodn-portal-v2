@@ -1,0 +1,20 @@
+# Use the official Node.js image
+FROM node:20
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+COPY .yarnrc.yml ./
+
+# Install dependencies
+RUN \
+    apt-get update -y \
+    && apt-get upgrade -y \
+    && yarn set version 4.3.0 \
+    && yarn install
+
+# Expose the port the app runs on
+EXPOSE 5173
+
+# Command to run the application
+CMD ["yarn", "dev", "--host", "0.0.0.0"]

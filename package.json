@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "postinstall": "husky",
     "test": "vitest",
-    "test:debug": "vitest --run --reporter=verbose --watch=false"
+    "test:debug": "vitest --run --reporter=verbose --watch=false",
+    "playwright": "bash ./playwright/scripts/run-playwright-tests.sh"
   },
   "dependencies": {
     "@emotion/styled": "^11.11.0",
