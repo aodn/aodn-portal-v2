@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button } from "@mui/material";
+import { Box, Button, useTheme } from "@mui/material";
 
 interface DetailSubtabProps {
   title: string;
@@ -12,22 +12,27 @@ const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
   navigate,
   isBordered,
 }) => {
+  const theme = useTheme();
+
+  const border = isBordered ? theme.border.detailSubtabBtn : theme.border.nil;
   return (
     <Box
       display="flex"
       justifyContent="flex-start"
       sx={{
         height: "45px",
-        marginX: "20px",
+        marginX: theme.margin.lg,
       }}
     >
       <Button
         sx={{
-          minWidth: 0,
-          border: isBordered
-            ? " 1px solid var(--brand_dark-blue_80, #618CA5)"
-            : "none",
-          borderRadius: "5px",
+          width: "100%",
+          border: border,
+          "&:hover": {
+            border: border,
+          },
+          borderRadius: theme.borderRadius.sm,
+          justifyContent: "flex-start",
         }}
         onClick={navigate}
       >

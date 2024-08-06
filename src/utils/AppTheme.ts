@@ -1,7 +1,82 @@
 import { createTheme, ThemeOptions } from "@mui/material/styles";
 
+declare module "@mui/material/styles" {
+  interface Theme {
+    border: {
+      nil: string;
+      detailSubtabBtn: string;
+    };
+    margin: {
+      nil: string;
+      xs: string;
+      sm: string;
+      md: string;
+      lg: string;
+      xlg: string;
+      xxlg: string;
+    };
+    borderRadius: {
+      sm: string;
+      md: string;
+      lg: string;
+      xlg: string;
+      xxlg: string;
+    };
+  }
+
+  interface ThemeOptions {
+    border?: {
+      none?: string;
+      detailSubtabBtn?: string;
+    };
+    margin?: {
+      nil?: string;
+      xs?: string;
+      sm?: string;
+      md?: string;
+      lg?: string;
+      xlg?: string;
+      xxlg?: string;
+    };
+    borderRadius?: {
+      sm?: string;
+      md?: string;
+      lg?: string;
+      xlg?: string;
+      xxlg?: string;
+    };
+  }
+
+  interface Palette {
+    ochre: Palette["primary"];
+  }
+
+  interface PaletteOptions {
+    ochre?: PaletteOptions["primary"];
+  }
+
+  interface TypographyVariants {
+    detail: TypographyVariants["body1"];
+  }
+
+  interface TypographyVariantsOptions {
+    detail?: TypographyVariantsOptions["body1"];
+  }
+}
+
+declare module "@mui/material/Typography/Typography" {
+  interface TypographyPropsVariantOverrides {
+    detail: true;
+  }
+}
+
 const theme: ThemeOptions = {
   palette: {
+    ochre: {
+      main: "#F2C94C",
+      light: "#F8E3A5",
+      dark: "#D9A03E",
+    },
     primary: {
       main: "#3B6E8F",
       light: "#52BDEC",
@@ -29,6 +104,29 @@ const theme: ThemeOptions = {
     },
   },
 
+  border: {
+    none: "none",
+    detailSubtabBtn: " 1px solid var(--brand_dark-blue_80, #618CA5)",
+  },
+
+  margin: {
+    nil: "0",
+    xs: "2px",
+    sm: "5px",
+    md: "10px",
+    lg: "15px",
+    xlg: "25px",
+    xxlg: "30px",
+  },
+
+  borderRadius: {
+    sm: "5px",
+    md: "8px",
+    lg: "10px",
+    xlg: "15px",
+    xxlg: "20px",
+  },
+
   breakpoints: {
     values: {
       xs: 0,
@@ -48,6 +146,13 @@ const theme: ThemeOptions = {
       "sans-serif",
       "Roboto",
     ].join(","),
+
+    detail: {
+      padding: "10px 0 0 0",
+      lineHeight: "1.5",
+      color: "#747474",
+      fontFamily: "Noto Sans",
+    },
 
     body1: {
       padding: "10px 0 0 0",
