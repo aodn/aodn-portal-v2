@@ -1,36 +1,39 @@
-import { IContact } from "../../../../components/common/store/OGCCollectionDefinitions";
+import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
-import BlockList from "./BlockList";
-import ContactCard from "./ContactCard";
-import CollapseFrame from "./CollapseFrame";
+import ExpandableList from "./ExpandableList";
+import ContactItem from "./listItem/ContactItem";
+import CollapseItem from "./listItem/CollapseItem";
 
-interface ContactBlockProps {
+interface ContactListProps {
   title: string;
   contacts: IContact[];
 }
 
-const ContactBlock: React.FC<ContactBlockProps> = ({ title, contacts }) => {
+const ContactList: React.FC<ContactListProps> = ({ title, contacts }) => {
   const collapseComponents: ReactNode[] = useMemo(() => {
     const returnedList: ReactNode[] = [];
     contacts?.map((contact, index) => {
       const suffix = contact.name ? ` - ${contact.name}` : "";
       returnedList.push(
-        <CollapseFrame
+        <CollapseItem
           key={index}
           title={contact.organization + suffix}
           isContactFragment
           email={contact.emails[0]}
         >
-          <ContactCard contact={contact} />
-        </CollapseFrame>
+          <ContactItem contact={contact} />
+        </CollapseItem>
       );
     });
     return returnedList;
   }, [contacts]);
 
   return (
-    <BlockList title={title} childrenList={collapseComponents}></BlockList>
+    <ExpandableList
+      title={title}
+      childrenList={collapseComponents}
+    ></ExpandableList>
   );
 };
 
-export default ContactBlock;
+export default ContactList;
