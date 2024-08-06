@@ -19,7 +19,7 @@ const ContactList: React.FC<ContactListProps> = ({ title, contacts }) => {
           key={index}
           title={contact.organization + suffix}
           isContactFragment
-          email={contact.emails[0]}
+          email={contact.emails ? contact.emails[0] : undefined}
         >
           <ContactItem contact={contact} />
         </CollapseItem>

@@ -72,7 +72,7 @@ const initialState: ObjectValue = {
   categoriesResult: new Array<Category>(),
 };
 /**
-  Define search functions
+ Define search functions
  */
 const searchResult = async (param: SearchParameters, thunkApi: any) => {
   const p: OGCSearchParameters = {

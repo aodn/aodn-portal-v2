@@ -4,6 +4,7 @@ import NavigatablePanel from "./NavigatablePanel";
 import ContactList from "../../../../components/list/ContactList";
 import TextList from "../../../../components/list/TextList";
 import { convertDateFormat } from "../../../../utils/DateFormatUtils";
+import MetadataUrlList from "../../../../components/list/MetadataUrlList";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
@@ -38,6 +39,24 @@ const MetadataInformationPanel = () => {
 
   const dates = useMemo(generateMedatataDateText, [generateMedatataDateText]);
 
+  const metadataLink = useMemo(() => {
+    if (context.collection) {
+      const links = context.collection.links;
+      if (links) {
+        const metadataLink = links.find(
+          (link) =>
+            link.title.trim().toLowerCase() === "full metadata link" &&
+            link.type === "text/html" &&
+            link.rel === "self"
+        );
+        if (metadataLink) {
+          return metadataLink.href;
+        }
+      }
+    }
+    return "";
+  }, [context.collection]);
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -70,7 +89,7 @@ const MetadataInformationPanel = () => {
       },
       {
         title: "Full Metadata Link",
-        component: <div>full metadata link</div>,
+        component: <MetadataUrlList url={metadataLink} />,
       },
       {
         title: "Metadata Dates",
@@ -79,7 +98,7 @@ const MetadataInformationPanel = () => {
         ),
       },
     ],
-    [dates, metadataContact, metadataId]
+    [dates, metadataContact, metadataId, metadataLink]
   );
   return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
 };
