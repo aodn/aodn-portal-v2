@@ -111,6 +111,7 @@ const ReactMap = ({
     );
 
     if (map !== null) {
+      document.MAP_OBJECT = map;
       // const zoomEvent = (
       //   e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
       // ) => onZoomEvent && onZoomEvent(e);

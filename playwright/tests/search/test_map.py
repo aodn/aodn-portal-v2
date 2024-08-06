@@ -81,6 +81,7 @@ def test_updating_search_reflects_in_map(
     )
     search_page.search.fill_search_text(updated_search_text)
     search_page.search.click_search_button()
+    page_mock.wait_for_timeout(500)
     updated_map_layers = search_page.map.get_map_layers()
 
     assert map_layers != updated_map_layers

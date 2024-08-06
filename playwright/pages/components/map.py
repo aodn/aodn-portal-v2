@@ -26,7 +26,7 @@ class Map(BasePage):
     def center_map(self, lng: str, lat: str) -> None:
         # Inject JavaScript to center map to a data point
         script = f"""
-            const map = document.testMap;
+            const map = document.MAP_OBJECT;
             map.setZoom(6);
             map.setCenter([{lng}, {lat}]);
         """
@@ -39,7 +39,7 @@ class Map(BasePage):
         self.page.wait_for_function(
             """
             () => {
-                const map = document.testMap;
+                const map = document.MAP_OBJECT;
                 return map.loaded();
             }
         """,
@@ -55,7 +55,7 @@ class Map(BasePage):
         layers = self.page.evaluate(
             """() => {
                 const layer = 'heatmap-layer-map-container-id-heatmap';
-                return document.testMap.queryRenderedFeatures({layers: [layer]}).length;
+                return document.MAP_OBJECT.queryRenderedFeatures({layers: [layer]}).length;
             }"""
         )
         return str(layers)
