@@ -64,7 +64,7 @@ We are using [material ui](https://mui.com/material-ui/) and our configuration t
 
 ## Commit
 
-We are using [gitmoji](https://gitmoji.dev/) with husky and commitlint. Here you have an example of the most used ones:
+We are using [gitmoji](https://gitmoji.dev/)(OPTIONAL) with husky and commitlint. Here you have an example of the most used ones:
 
 - :art: - Improving structure/format of the code.
 - :zap: - Improving performance.
