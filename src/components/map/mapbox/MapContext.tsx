@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 
 // Refer to this https://maplibre.org/news/2023-01-03-aws-maplibre-plugins/
 //
@@ -15,5 +15,14 @@ type MapContextType = {
 };
 
 const MapContext = createContext<Partial<MapContextType>>({});
+
+if (import.meta.env.MODE === "dev") {
+  (
+    window as Window &
+      typeof globalThis & {
+        __MAP_CONTEXT__: React.Context<Partial<MapContextType>>;
+      }
+  ).__MAP_CONTEXT__ = MapContext;
+}
 
 export default MapContext;

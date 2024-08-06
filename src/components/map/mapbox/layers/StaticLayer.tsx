@@ -17,6 +17,7 @@ import ampJson from "./data/Australian_Marine_Parks.json";
 export interface StaticLayersProps {
   id: string;
   name: string;
+  label: string;
   features: FeatureCollection;
 }
 
@@ -24,10 +25,11 @@ const StaticLayersDef = {
   AUSTRALIA_MARINE_PARKS: {
     id: "static-australia-marine-parks",
     name: "Australia Marine Parks",
+    label: "RESNAME",
   },
 };
 
-const StaticLayer: FC<StaticLayersProps> = ({ id, name, features }) => {
+const StaticLayer: FC<StaticLayersProps> = ({ id, name, label, features }) => {
   const { map } = useContext(MapContext);
   const [created, setCreated] = useState<boolean>(false);
   const sourceId = useMemo(
@@ -68,7 +70,7 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, features }) => {
       type: "symbol",
       source: sourceId,
       layout: {
-        "text-field": ["get", "NATLEGEND"],
+        "text-field": ["get", label],
         "text-offset": [0, 1.25],
         "text-anchor": "top",
         "text-allow-overlap": false,
@@ -81,7 +83,7 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, features }) => {
         "text-halo-width": 2,
       },
     });
-  }, [map, layerId, sourceId, layerLabelId, features, id]);
+  }, [map, layerId, sourceId, layerLabelId, features, id, label]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
   // the behavior of mapbox, this useEffect, add the layer back based on user event
@@ -121,8 +123,10 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, features }) => {
 const AustraliaMarineParkLayer: FC<Partial<StaticLayersProps>> = ({
   id = StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
   name = StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+  label = StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
   features = ampJson as FeatureCollection,
-}) => <StaticLayer id={id} name={name} features={features} />;
+}) => <StaticLayer id={id} name={name} label={label} features={features} />;
+// Export needed layers
 export { AustraliaMarineParkLayer, StaticLayersDef };
 
 export default StaticLayer;

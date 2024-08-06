@@ -56,7 +56,12 @@ interface MenuClickedEvent {
 
 interface BaseMapSwitcherProps extends ControlProps {
   // Static layer to be added to the switch
-  layers: Array<{ id: string; name: string; default?: boolean }>;
+  layers: Array<{
+    id: string;
+    name: string;
+    label?: string;
+    default?: boolean;
+  }>;
 }
 
 interface LayerSwitcherProps extends ControlProps {

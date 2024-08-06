@@ -1,14 +1,19 @@
 import { Grid, Link } from "@mui/material";
 import { margin } from "../../../../styles/constants";
-import { ILicense } from "../../../../components/common/store/OGCCollectionDefinitions";
 import React from "react";
 import BlockList from "./BlockList";
 
 interface LicenseBlockProps {
-  license: ILicense;
+  license: string;
+  url: string;
+  graphic: string;
 }
 
-const LicenseBlock: React.FC<LicenseBlockProps> = ({ license }) => {
+const LicenseBlock: React.FC<LicenseBlockProps> = ({
+  license,
+  url,
+  graphic,
+}) => {
   const licenseComponent = () => {
     return (
       <Grid
@@ -27,22 +32,22 @@ const LicenseBlock: React.FC<LicenseBlockProps> = ({ license }) => {
             <Grid item md={1} />
             <Grid container item md={11}>
               <Grid item md={12}>
-                {license.title}
+                {license}
               </Grid>
               <Grid item md={12}>
                 <Link
-                  href={license.url}
+                  href={url}
                   target="_blank"
                   rel="noreferrer"
                   sx={{
                     color: "#468CB6",
                   }}
                 >
-                  {license.url}
+                  {url}
                 </Link>
               </Grid>
               <Grid item md={12}>
-                <img src={license.licenseGraphic} alt="license graphic" />
+                <img src={graphic} alt="license graphic" />
               </Grid>
             </Grid>
           </Grid>
