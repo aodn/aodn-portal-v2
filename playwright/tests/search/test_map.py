@@ -74,6 +74,7 @@ def test_updating_search_reflects_in_map(
     landing_page.load()
     landing_page.search.fill_search_text(search_text)
     landing_page.search.click_search_button()
+    expect(search_page.first_result_title).to_be_visible()
     map_layers = search_page.map.get_map_layers()
 
     api_router.route_collection(

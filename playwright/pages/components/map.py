@@ -54,7 +54,7 @@ class Map(BasePage):
         self.wait_for_map_loading()
         layers = self.page.evaluate(
             """() => {
-                const layer = 'heatmap-layer-map-container-id-heatmap';
+                const layer = 'heatmap-layer-map-container-id-heatmap-layer';
                 return document.MAP_OBJECT.queryRenderedFeatures({layers: [layer]}).length;
             }"""
         )
