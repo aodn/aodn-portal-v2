@@ -1,9 +1,10 @@
-import json
 from http import HTTPStatus
 from typing import Dict, List, Union
 from urllib.parse import parse_qs, urlparse
 
 from playwright.sync_api import Route
+
+from utils.json_utils import load_json_data
 
 
 class SuggesterOptions:
@@ -29,8 +30,7 @@ class SuggesterOptions:
 
 
 def load_suggester_options(filename: str) -> SuggesterOptions:
-    with open(f'mocks/mock_data/{filename}', 'r') as file:
-        data = json.load(file)
+    data = load_json_data(filename)
     return SuggesterOptions(
         category_suggestions=data['category_suggestions'],
         record_titles=data['record_suggestions']['titles'],

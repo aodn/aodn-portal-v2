@@ -1,0 +1,271 @@
+{
+  "links": [],
+  "collections": [
+    {
+      "properties": {
+        "status": ""
+      },
+      "id": "1fba3a57-35f4-461b-8a0e-551af229714e",
+      "title": "Integrated Marine Observing System (IMOS) - Location of assets",
+      "description": "IMOS is designed to be a fully-integrated, national system, observing at ocean-basin and regional scales, and covering physical, chemical and biological variables. IMOS observations are carried out by 10 national Facilities, each deploying a particular type of observing platform: Argo Floats, Ships of opportunity, Deep-water moorings, Ocean Gliders, Autonomous underwater vehicles, Coastal moorings, Coastal ocean radars, Animal tracking and monitoring, Wireless sensor networks, and Satellite remote sensing. IMOS Facilities, operated by partner institutions around the country, are funded to deploy equipment and deliver data streams for use by the entire Australian marine and climate science community and its international collaborators.\n\nThe IMOS Ocean Portal (http://imos.aodn.org.au) allows marine and climate scientists and other users to discover and explore data streams coming from all of the Facilities – some in near-real time, and all as delayed-mode, quality-controlled data. \n\nIMOS is supported by the Australian Government and is led by the University of Tasmania on behalf of the Australian marine and climate science community.\n\nThis record provides a visualisation of all IMOS assets, from its ten facilities.",
+      "links": [
+        {
+          "href": "http://imos.org.au",
+          "rel": "self",
+          "type": "text/html",
+          "title": "IMOS website"
+        },
+        {
+          "href": "https://portal.aodn.org.au",
+          "rel": "self",
+          "type": "text/html",
+          "title": "AODN Portal"
+        },
+        {
+          "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
+          "rel": "self",
+          "type": "",
+          "title": "imos:asset_map"
+        },
+        {
+          "href": "https://portal.aodn.org.au/search?uuid=1fba3a57-35f4-461b-8a0e-551af229714e",
+          "rel": "self",
+          "type": "text/html",
+          "title": "View though the AODN Portal"
+        },
+        {
+          "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+          "rel": "self",
+          "type": "",
+          "title": "imos:asset_map"
+        },
+        {
+          "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
+          "rel": "self",
+          "type": "text/html",
+          "title": "OGC WFS help documentation"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/dbee258b-8730-4072-96d4-2818a69a4afd.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/1fba3a57-35f4-461b-8a0e-551af229714e",
+          "rel": "self",
+          "type": "text/html",
+          "title": "Full metadata link"
+        },
+        {
+          "href": "https://licensebuttons.net/l/by/4.0/88x31.png",
+          "rel": "license",
+          "type": "image/png"
+        },
+        {
+          "href": "http://creativecommons.org/licenses/by/4.0/",
+          "rel": "license",
+          "type": "text/html"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": ""
+      },
+      "id": "c78801d0-bffe-11dc-a463-00188b4c0af8",
+      "title": "Integrated Marine Observing System (IMOS)",
+      "description": "IMOS is designed to be a fully-integrated, national system, observing at ocean-basin and regional scales, and covering physical, chemical and biological variables. IMOS Facilities, operated by ten different institutions within the National Innovation System, are funded to deploy equipment and deliver data streams for use by the entire Australian marine and climate science community and its international collaborators.\nThe IMOS Ocean Portal (http://imos.aodn.org.au) allows marine and climate scientists and other users to discover and explore data streams coming from all of the Facilities – some in near-real time, and all as delayed-mode, quality-controlled data. These data streams, long time-series that are ‘under construction’, represent the actual research infrastructure being created and developed by IMOS.\nIMOS observations are guided by science planning undertaken collaboratively across the Australian marine and climate science community. IMOS now has a National Science and Implementation Plan that draws on the intellectual strength of its six science Nodes – a ‘Bluewater and Climate’ Node focused on the open ocean, and five ‘Regional Nodes’ covering the continental shelf and coastal seas of Western Australia, Queensland, New South Wales, Southern Australia and Tasmania. Leaders of the Nodes come together to form a national steering committee that oversees the whole process, and IMOS science plans are subjected to international peer review on a rolling basis to ensure the planned science is world-class. \n\nThere are five major research themes that unify IMOS science plans and related observations:\n1. Multi-decadal ocean change,\n2. Climate variability and weather extremes\n3. Major boundary currents and interbasin flows\n4. Continental shelf processes, and\n5. Ecosystem responses (productivity, abundance and distribution).\n\nIMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy and the Super Science Initiative. It is led by the University of Tasmania on behalf of the Australian marine and climate science community.",
+      "links": [
+        {
+          "href": "http://imos.org.au",
+          "rel": "self",
+          "type": "text/html",
+          "title": "IMOS website"
+        },
+        {
+          "href": "https://catalogue-imos.aodn.org.au/",
+          "rel": "self",
+          "type": "text/html",
+          "title": "IMOS metadata catalogue"
+        },
+        {
+          "href": "https://portal.aodn.org.au/",
+          "rel": "self",
+          "type": "text/html",
+          "title": "AODN Portal"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/dbee258b-8730-4072-96d4-2818a69a4afd.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/c78801d0-bffe-11dc-a463-00188b4c0af8/attachments/IMOS_logo_s.png",
+          "rel": "thumbnail",
+          "type": "image"
+        },
+        {
+          "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/c78801d0-bffe-11dc-a463-00188b4c0af8",
+          "rel": "self",
+          "type": "text/html",
+          "title": "Full metadata link"
+        },
+        {
+          "href": "https://licensebuttons.net/l/by/4.0/88x31.png",
+          "rel": "license",
+          "type": "image/png"
+        },
+        {
+          "href": "http://creativecommons.org/licenses/by/4.0/",
+          "rel": "license",
+          "type": "text/html"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "onGoing"
+      },
+      "id": "2807f3aa-4db0-4924-b64b-354ae8c10b58",
+      "title": "Wave buoys Observations - Australia - delayed (National Wave Archive)",
+      "description": "Buoys provide integral wave parameters. Buoy data from the following organisations contribute to the National Wave Archive: Manly Hydraulics Laboratory (part of the NSW Department of Planning and Environment (DPE), which has assumed function of the former NSW Office of Environment and Heritage (OEH)); Bureau of Meteorology; Western Australia Department of Transport (DOT); the Queensland Department of Environment and Science (DES); the Defence Technology Agency (DTA), New Zealand Defence Force (NZDF); the Integrated Marine Observing System (IMOS), the University of Western Australia (UWA), Deakin University; and the NSW Nearshore Wave Data Program from the NSW Department of Planning and Environment (DPE). \n\nThe data (aside from IMOS, the NSW Nearshore Wave Data Program, Deakin University and some of the buoys from UWA) is gathered by the Waverider system developed by the Dutch company, Datawell. Some older wave data were collected using non-directional Waverider buoys. As technology advanced and directional measuring capabilities were developed in wave buoys, wave buoy networks were gradually upgraded to directional Waverider buoys. Therefore, some older datasets do not have directional information whereas newer datasets have directional information. \n\nThe data from IMOS, the NSW Nearshore Wave Data Program, Deakin University and some of the buoys from UWA, comes from Spotter Wave Buoys, developed by Sofar Ocean Technologies, which collect data similarly to the Waverider system.\n\nThe buoy data from the Manly Hydraulics Laboratory replaces data (has been re-formatted) from the following specific collection - https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/bb7e9d82-3b9c-44c6-8e93-1ee9fd30bf21.",
+      "links": [
+        {
+          "href": "http://data.aodn.org.au/?prefix=NSW-OEH/Manly_Hydraulics_Laboratory/",
+          "rel": "self",
+          "type": "",
+          "title": "MHL Buoy deployment summaries"
+        },
+        {
+          "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/2807f3aa-4db0-4924-b64b-354ae8c10b58/attachments/BOM_WAVE_DM_RevAOceanSenseQualityManual.pdf",
+          "rel": "self",
+          "type": "",
+          "title": "BOM_WAVE_DM_RevAOceanSenseQualityManual.pdf"
+        },
+        {
+          "href": "http://content.aodn.org.au/?prefix=Documents/AODN/Waves/Instruments_manuals/",
+          "rel": "self",
+          "type": "text/html",
+          "title": "Instrument manuals"
+        },
+        {
+          "href": "https://content.aodn.org.au/Documents/IMOS/Conventions/Wave_standards/AODN_wave_buoy_operations_and_data_management_guidelines_v1.0.pdf",
+          "rel": "self",
+          "type": "text/html",
+          "title": "Wave Buoy Operations and Data Management Guidelines Manual"
+        },
+        {
+          "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Planning_and_Environment-New_South_Wales/Manly_Hydraulics_Laboratory/WAVE-BUOYS/DELAYED/catalog.html",
+          "rel": "self",
+          "type": "text/html",
+          "title": "NetCDF files via THREDDS catalog (MHL)"
+        },
+        {
+          "href": "https://thredds.aodn.org.au/thredds/catalog/Bureau_of_Meteorology/WAVE-BUOYS/DELAYED/catalog.html",
+          "rel": "self",
+          "type": "text/html",
+          "title": "NetCDF files via THREDDS catalog (BOM)"
+        },
+        {
+          "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Transport-Western_Australia/WAVE-BUOYS/DELAYED/catalog.html",
+          "rel": "self",
+          "type": "text/html",
+          "title": "NetCDF files via THREDDS catalog (DoT)"
+        },
+        {
+          "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Environment_and_Science-Queensland/WAVE-BUOYS/DELAYED/catalog.html",
+          "rel": "self",
+          "type": "text/html",
+          "title": "NetCDF files via THREDDS catalog (DES)"
+        },
+        {
+          "href": "http://thredds.aodn.org.au/thredds/catalog/IMOS/NTP/Low_Cost_Wave_Buoy_Technology/Waverider_Buoys/DELAYED/catalog.html",
+          "rel": "self",
+          "type": "text/html",
+          "title": "NetCDF files via THREDDS catalog (IMOS)"
+        },
+        {
+          "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Planning_and_Environment-New_South_Wales/WAVE-BUOYS/DELAYED/catalog.html",
+          "rel": "self",
+          "type": "text/html",
+          "title": "NetCDF files via THREDDS catalog (NSW-DPE)"
+        },
+        {
+          "href": "https://thredds.aodn.org.au/thredds/catalog/UWA/WAVE-BUOYS/DELAYED/catalog.html",
+          "rel": "self",
+          "type": "text/html",
+          "title": "NetCDF files via THREDDS catalog (UWA)"
+        },
+        {
+          "href": "https://thredds.aodn.org.au/thredds/catalog/Deakin_University/WAVE-BUOYS/DELAYED/catalog.html",
+          "rel": "self",
+          "type": "text/html",
+          "title": "NetCDF files via THREDDS catalog (Deakin)"
+        },
+        {
+          "href": "https://portal.aodn.org.au/search?uuid=2807f3aa-4db0-4924-b64b-354ae8c10b58",
+          "rel": "self",
+          "type": "text/html",
+          "title": "View and download data though the AODN Portal"
+        },
+        {
+          "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
+          "rel": "self",
+          "type": "",
+          "title": "aodn:aodn_wave_dm_v2_timeseries_map"
+        },
+        {
+          "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+          "rel": "self",
+          "type": "",
+          "title": "aodn:aodn_wave_dm_v2_timeseries_data"
+        },
+        {
+          "href": "http://help.aodn.org.au/help/?q=node/53",
+          "rel": "self",
+          "type": "text/html",
+          "title": "OGC WFS help documentation"
+        },
+        {
+          "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+          "rel": "self",
+          "type": "",
+          "title": "aodn_wave_dm_v2_timeseries_map#url"
+        },
+        {
+          "href": "https://help.aodn.org.au/web-services/ncurllist-service/",
+          "rel": "self",
+          "type": "text/html",
+          "title": "ncUrlList help documentation"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/dbee258b-8730-4072-96d4-2818a69a4afd.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/2807f3aa-4db0-4924-b64b-354ae8c10b58",
+          "rel": "self",
+          "type": "text/html",
+          "title": "Full metadata link"
+        },
+        {
+          "href": "http://i.creativecommons.org/l/by/4.0/88x31.png",
+          "rel": "license",
+          "type": "image/png"
+        },
+        {
+          "href": "http://creativecommons.org/licenses/by/4.0/",
+          "rel": "license",
+          "type": "text/html"
+        }
+      ],
+      "itemType": "Collection"
+    }
+  ]
+}

@@ -24,18 +24,3 @@ def test_basic_search(
     landing_page.click_option(category_name)
     landing_page.search.click_search_button()
     expect(search_page.get_button(category_name)).to_be_visible()
-
-
-# def test_map(page: Page) -> None:
-#     landing_page = LandingPage(page)
-#     search_page = SearchPage(page)
-
-#     landing_page.load()
-#     landing_page.search.fill_search_text('imos')
-#     landing_page.search.click_search_button()
-#     page.wait_for_timeout(1000)
-#     # page.pause()
-#     page.get_by_label('Map', exact=True).hover()
-#     page.mouse.down()
-#     page.mouse.move(90, 90)
-#     page.mouse.up()
