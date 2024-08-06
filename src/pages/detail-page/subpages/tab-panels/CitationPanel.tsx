@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import ContactList from "../../../../components/list/ContactList";
 import NavigatablePanel from "./NavigatablePanel";
-import PlainTextList from "../../../../components/list/PlainTextList";
-import PlainCollapseList from "../../../../components/list/PlainCollapseList";
+import TextList from "../../../../components/list/TextList";
+import CollapseList from "../../../../components/list/CollapseList";
 import LicenseList from "../../../../components/list/LicenseList";
 import {
   MediaType,
@@ -110,7 +110,7 @@ const CitationPanel = () => {
       {
         title: "Suggested Citation",
         component: (
-          <PlainTextList
+          <TextList
             title="Suggested Citation"
             texts={suggestedCitation ? [suggestedCitation] : []}
           />
@@ -118,9 +118,7 @@ const CitationPanel = () => {
       },
       {
         title: "Constraints",
-        component: (
-          <PlainCollapseList title="Constraints" items={constraints} />
-        ),
+        component: <CollapseList title="Constraints" items={constraints} />,
       },
     ],
     [

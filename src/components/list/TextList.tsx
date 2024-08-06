@@ -1,12 +1,12 @@
 import ExpandableList from "./ExpandableList";
 import React, { ReactNode, useMemo } from "react";
-import PlainTextItem from "./listItem/PlainTextItem";
+import TextItem from "./listItem/TextItem";
 
-interface PlainTextListProps {
+interface TextListProps {
   title: string;
   texts: string[];
 }
-const PlainTextList: React.FC<PlainTextListProps> = ({ title, texts }) => {
+const TextList: React.FC<TextListProps> = ({ title, texts }) => {
   const plainTextFragments: ReactNode[] = useMemo(() => {
     const textFragmentList: ReactNode[] = [];
     texts?.map((text) => {
@@ -25,12 +25,10 @@ const PlainTextList: React.FC<PlainTextListProps> = ({ title, texts }) => {
         displayingText.push(text);
       }
 
-      textFragmentList.push(
-        <PlainTextItem key={text}>{displayingText}</PlainTextItem>
-      );
+      textFragmentList.push(<TextItem key={text}>{displayingText}</TextItem>);
     });
     return textFragmentList;
   }, [texts]);
   return <ExpandableList title={title} childrenList={plainTextFragments} />;
 };
-export default PlainTextList;
+export default TextList;

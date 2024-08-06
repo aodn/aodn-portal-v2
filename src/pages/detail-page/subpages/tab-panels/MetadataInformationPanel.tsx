@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "./NavigatablePanel";
 import ContactList from "../../../../components/list/ContactList";
-import PlainTextList from "../../../../components/list/PlainTextList";
+import TextList from "../../../../components/list/TextList";
 import { convertDateFormat } from "../../../../utils/DateFormatUtils";
 
 const MetadataInformationPanel = () => {
@@ -62,7 +62,7 @@ const MetadataInformationPanel = () => {
       {
         title: "Metadata Identifier",
         component: (
-          <PlainTextList
+          <TextList
             title="Metadata Identifier"
             texts={metadataId ? [metadataId] : []}
           />
@@ -75,10 +75,7 @@ const MetadataInformationPanel = () => {
       {
         title: "Metadata Dates",
         component: (
-          <PlainTextList
-            title="Metadata Dates"
-            texts={dates ? [dates] : [""]}
-          />
+          <TextList title="Metadata Dates" texts={dates ? [dates] : [""]} />
         ),
       },
     ],

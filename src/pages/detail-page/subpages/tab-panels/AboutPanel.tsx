@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import PlainCollapseList from "../../../../components/list/PlainCollapseList";
+import CollapseList from "../../../../components/list/CollapseList";
 import ContactList from "../../../../components/list/ContactList";
 import NavigatablePanel from "./NavigatablePanel";
-import PlainTextList from "../../../../components/list/PlainTextList";
+import TextList from "../../../../components/list/TextList";
 import {
   IContact,
   ITheme,
@@ -51,7 +51,7 @@ const AboutPanel = () => {
     () => [
       {
         title: "Keywords",
-        component: <PlainCollapseList items={keywords} title="Keywords" />,
+        component: <CollapseList items={keywords} title="Keywords" />,
       },
       {
         title: "Contacts",
@@ -64,9 +64,7 @@ const AboutPanel = () => {
       },
       {
         title: "Credits",
-        component: (
-          <PlainTextList title="Credits" texts={credits ? credits : []} />
-        ),
+        component: <TextList title="Credits" texts={credits ? credits : []} />,
       },
     ],
     [aboutContacts, credits, keywords]
