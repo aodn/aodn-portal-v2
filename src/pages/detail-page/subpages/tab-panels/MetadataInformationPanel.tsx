@@ -4,7 +4,7 @@ import NavigatablePanel from "./NavigatablePanel";
 import ContactList from "../../../../components/list/ContactList";
 import TextList from "../../../../components/list/TextList";
 import { convertDateFormat } from "../../../../utils/DateFormatUtils";
-import PlainLinkBlock from "../../../../components/list/PlainLinkBlock";
+import LinkList from "../../../../components/list/LinkList";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
@@ -89,7 +89,7 @@ const MetadataInformationPanel = () => {
       },
       {
         title: "Full Metadata Link",
-        component: <PlainLinkBlock url={metadataLink} />,
+        component: <LinkList url={metadataLink} />,
       },
       {
         title: "Metadata Dates",

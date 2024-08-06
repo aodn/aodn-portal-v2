@@ -3,11 +3,11 @@ import { Link } from "@mui/material";
 import TextItem from "./listItem/TextItem";
 import ExpandableList from "./ExpandableList";
 
-interface PlainLinkBlockProps {
+interface LinkListProps {
   url: string;
 }
 
-const PlainLinkBlock: React.FC<PlainLinkBlockProps> = ({ url }) => {
+const LinkList: React.FC<LinkListProps> = ({ url }) => {
   const link: ReactNode[] = [];
   link.push(
     <TextItem>
@@ -20,4 +20,4 @@ const PlainLinkBlock: React.FC<PlainLinkBlockProps> = ({ url }) => {
   return <ExpandableList title={"Full Metadata Link"} childrenList={link} />;
 };
 
-export default PlainLinkBlock;
+export default LinkList;
