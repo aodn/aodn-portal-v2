@@ -20,8 +20,10 @@ export const searchIconWidth = 44;
 const ComplexTextSearch = () => {
   const navigate = useNavigate();
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [isRefreshingOptions, setIsRefreshOptions] = useState<boolean>(false);
 
   const redirectSearch = useCallback(() => {
+    console.log("search and navigate");
     const componentParam: ParameterState = getComponentState(store.getState());
     navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
       state: {
@@ -37,14 +39,19 @@ const ComplexTextSearch = () => {
       event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
       isSuggesterOpen: boolean
     ) => {
-      if (event.key === "Enter" && !isSuggesterOpen) {
+      if (event.key === "Enter" && !isSuggesterOpen && !isRefreshingOptions) {
         redirectSearch();
       }
     },
-    [redirectSearch]
+    [isRefreshingOptions, redirectSearch]
   );
 
-  const onFilterClick = useCallback(() => {
+  const handleSearchClick = useCallback(() => {
+    console.log("click");
+    if (!isRefreshingOptions) redirectSearch();
+  }, [isRefreshingOptions, redirectSearch]);
+
+  const handleFilterClick = useCallback(() => {
     setShowFilters(true);
   }, [setShowFilters]);
 
@@ -64,7 +71,10 @@ const ComplexTextSearch = () => {
           >
             <SearchIcon />
           </IconButton>
-          <InputWithSuggester handleEnterPressed={handleEnterPressed} />
+          <InputWithSuggester
+            handleEnterPressed={handleEnterPressed}
+            setIsRefreshOptions={setIsRefreshOptions}
+          />
           <Button
             variant="text"
             sx={{
@@ -75,7 +85,7 @@ const ComplexTextSearch = () => {
               backgroundColor: color.gray.xxLight,
             }}
             startIcon={<Tune />}
-            onClick={onFilterClick}
+            onClick={handleFilterClick}
             data-testid={"filtersBtn"}
           >
             Filters
@@ -100,7 +110,7 @@ const ComplexTextSearch = () => {
             },
           }}
           fullWidth
-          onClick={redirectSearch}
+          onClick={handleSearchClick}
         >
           Search
         </Button>
