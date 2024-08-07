@@ -219,9 +219,12 @@ const formatToUrlParam = (param: ParameterState) => {
   const parts = [];
   for (const key in result) {
     if (Object.prototype.hasOwnProperty.call(result, key)) {
-      parts.push(
-        `${encodeURIComponent(key)}=${encodeURIComponent(result[key])}`
-      );
+      // Check if the value is not an empty string before adding to parts
+      if (result[key] !== "") {
+        parts.push(
+          `${encodeURIComponent(key)}=${encodeURIComponent(result[key])}`
+        );
+      }
     }
   }
   return parts.join("&");
