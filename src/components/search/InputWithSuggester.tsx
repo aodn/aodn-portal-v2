@@ -274,7 +274,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   const handleSuggesterClose = () => {
     setOpen(false);
-    // setOptions([]);
+    setOptions([]);
   };
 
   const handleKeyDown = (
