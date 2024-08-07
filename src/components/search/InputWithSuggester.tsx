@@ -35,9 +35,10 @@ import {
   fetchParameterCategoriesWithStore,
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
-import _, { sortBy } from "lodash";
 import { borderRadius, color, padding } from "../../styles/constants";
 import { filterButtonWidth, searchIconWidth } from "./ComplexTextSearch";
+import { sortByRelevance } from "../../utils/sortByRelevance";
+import _ from "lodash";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -184,16 +185,10 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             ];
 
             // Sort suggestions by relevance
-            const sortedSuggestions = sortBy(allSuggestions, [
-              // Exact match first
-              (s) => s.toLowerCase() !== inputValue.toLowerCase(),
-              // Then by whether it starts with the input
-              (s) => !s.toLowerCase().startsWith(inputValue.toLowerCase()),
-              // Then by the index where the input appears in the suggestion
-              (s) => s.toLowerCase().indexOf(inputValue.toLowerCase()),
-              // Finally by length (shorter suggestions first)
-              (s) => s.length,
-            ]);
+            const sortedSuggestions = sortByRelevance(
+              allSuggestions,
+              inputValue
+            );
 
             // Create sorted options array
             const options: OptionType[] = sortedSuggestions.map(
