@@ -48,7 +48,6 @@ declare module "@mui/material/styles" {
   }
 
   interface Palette {
-    ochre: Palette["primary"];
     detail: {
       text: string;
       listItemBG: string;
@@ -56,7 +55,6 @@ declare module "@mui/material/styles" {
   }
 
   interface PaletteOptions {
-    ochre?: PaletteOptions["primary"];
     detail?: {
       text: string;
       listItemBG?: string;
@@ -83,11 +81,6 @@ declare module "@mui/material/Typography/Typography" {
 
 const theme: ThemeOptions = {
   palette: {
-    ochre: {
-      main: "#F2C94C",
-      light: "#F8E3A5",
-      dark: "#D9A03E",
-    },
     detail: {
       text: "#5B5B5B",
       listItemBG: "#F2F6F9",
@@ -97,15 +90,9 @@ const theme: ThemeOptions = {
       light: "#52BDEC",
       dark: "#2F4F6C",
     },
-    secondary: {
-      main: "#54BCEB",
-      light: "#B3E2F7",
-      dark: "#1C9FE4",
-    },
-    divider: "#DDDDDD",
     info: {
-      main: "#51BCEB",
-      light: "#B3C8D4",
+      main: "",
+      light: "",
       dark: "#3A6F8F",
     },
     common: {
