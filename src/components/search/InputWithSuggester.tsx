@@ -176,13 +176,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             }
 
             // Create array of all unique suggestions
-            const allSuggestions = [
-              ...new Set([
-                ...commonSuggestions,
-                ...categorySuggestions,
-                ...phrasesSuggestions,
-              ]),
-            ];
+            const allSuggestions = new Set([
+              ...commonSuggestions,
+              ...categorySuggestions,
+              ...phrasesSuggestions,
+            ]);
 
             // Sort suggestions by relevance
             const sortedSuggestions = sortByRelevance(

@@ -7,8 +7,12 @@ import { sortBy } from "lodash";
  * @param target The target string to compare against
  * @returns A new array of sorted strings
  */
-export function sortByRelevance(items: string[], target: string): string[] {
-  return sortBy(items, [
+export function sortByRelevance(
+  items: string[] | Set<string>,
+  target: string
+): string[] {
+  const itemsArray = Array.from(items);
+  return sortBy(itemsArray, [
     // Exact match first
     (item) => item.toLowerCase() !== target.toLowerCase(),
     // Then by whether it starts with the target
