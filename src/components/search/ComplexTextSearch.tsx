@@ -20,10 +20,11 @@ export const searchIconWidth = 44;
 const ComplexTextSearch = () => {
   const navigate = useNavigate();
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [isRefreshingOptions, setIsRefreshOptions] = useState<boolean>(false);
+
+  // set the default value to false to allow user do search without typing anything
+  const [pendingSearch, setPendingSearch] = useState<boolean>(false);
 
   const redirectSearch = useCallback(() => {
-    console.log("search and navigate");
     const componentParam: ParameterState = getComponentState(store.getState());
     navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
       state: {
@@ -39,17 +40,20 @@ const ComplexTextSearch = () => {
       event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
       isSuggesterOpen: boolean
     ) => {
-      if (event.key === "Enter" && !isSuggesterOpen && !isRefreshingOptions) {
+      // TODO: a more user-friendly way to execute 'enter' press function is to delay the search to wait for pendingSearch turn to true
+      // instead of prevent user doing search if pendingSearch is false
+      // considering the debounce (300ms) and fetchSuggesterOptions(quite fast according to experience with edge) is not very long
+      // we may implement this later if gap is too big
+      if (event.key === "Enter" && !isSuggesterOpen && !pendingSearch) {
         redirectSearch();
       }
     },
-    [isRefreshingOptions, redirectSearch]
+    [pendingSearch, redirectSearch]
   );
 
   const handleSearchClick = useCallback(() => {
-    console.log("click");
-    if (!isRefreshingOptions) redirectSearch();
-  }, [isRefreshingOptions, redirectSearch]);
+    if (!pendingSearch) redirectSearch();
+  }, [pendingSearch, redirectSearch]);
 
   const handleFilterClick = useCallback(() => {
     setShowFilters(true);
@@ -73,7 +77,7 @@ const ComplexTextSearch = () => {
           </IconButton>
           <InputWithSuggester
             handleEnterPressed={handleEnterPressed}
-            setIsRefreshOptions={setIsRefreshOptions}
+            setPendingSearch={setPendingSearch}
           />
           <Button
             variant="text"
