@@ -6,7 +6,7 @@ declare module "@mui/material/styles" {
       nil: string;
       detailSubtabBtn: string;
     };
-    margin: {
+    mp: {
       nil: string;
       xs: string;
       sm: string;
@@ -29,7 +29,7 @@ declare module "@mui/material/styles" {
       none?: string;
       detailSubtabBtn?: string;
     };
-    margin?: {
+    mp?: {
       nil?: string;
       xs?: string;
       sm?: string;
@@ -49,24 +49,35 @@ declare module "@mui/material/styles" {
 
   interface Palette {
     ochre: Palette["primary"];
+    detail: {
+      text: string;
+      listItemBG: string;
+    };
   }
 
   interface PaletteOptions {
     ochre?: PaletteOptions["primary"];
+    detail?: {
+      text: string;
+      listItemBG?: string;
+    };
   }
 
   interface TypographyVariants {
-    detail: TypographyVariants["body1"];
+    detailTitle: TypographyVariants["body1"];
+    detailContent: TypographyVariants["body1"];
   }
 
   interface TypographyVariantsOptions {
-    detail?: TypographyVariantsOptions["body1"];
+    detailTitle?: TypographyVariantsOptions["body1"];
+    detailContent?: TypographyVariantsOptions["body1"];
   }
 }
 
 declare module "@mui/material/Typography/Typography" {
   interface TypographyPropsVariantOverrides {
-    detail: true;
+    detailTitle: true;
+    detailContent: true;
   }
 }
 
@@ -76,6 +87,10 @@ const theme: ThemeOptions = {
       main: "#F2C94C",
       light: "#F8E3A5",
       dark: "#D9A03E",
+    },
+    detail: {
+      text: "#5B5B5B",
+      listItemBG: "#F2F6F9",
     },
     primary: {
       main: "#3B6E8F",
@@ -109,7 +124,7 @@ const theme: ThemeOptions = {
     detailSubtabBtn: " 1px solid var(--brand_dark-blue_80, #618CA5)",
   },
 
-  margin: {
+  mp: {
     nil: "0",
     xs: "2px",
     sm: "5px",
@@ -147,10 +162,20 @@ const theme: ThemeOptions = {
       "Roboto",
     ].join(","),
 
-    detail: {
-      padding: "10px 0 0 0",
-      lineHeight: "1.5",
-      color: "#747474",
+    detailTitle: {
+      // lineHeight: "26px",
+      fontSize: "16px",
+      fontStyle: "normal",
+      fontWeight: 600,
+      color: "#5B5B5B",
+      fontFamily: "Noto Sans",
+    },
+    detailContent: {
+      lineHeight: "22.5px",
+      fontSize: "14px",
+      fontStyle: "normal",
+      fontWeight: 400,
+      color: "#5B5B5B",
       fontFamily: "Noto Sans",
     },
 
@@ -252,7 +277,11 @@ const theme: ThemeOptions = {
       styleOverrides: {
         root: {
           textDecoration: "none",
-          color: "#747474",
+          fontSize: "14px",
+          fontStyle: "normal",
+          fontWeight: 400,
+          lineHeight: "22px",
+          color: "#468CB6",
           "&:hover": {
             textDecoration: "underline",
             color: "#54BCEB",
