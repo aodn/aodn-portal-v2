@@ -35,15 +35,18 @@ import {
   fetchParameterCategoriesWithStore,
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
-import _ from "lodash";
 import { borderRadius, color, padding } from "../../styles/constants";
 import { filterButtonWidth, searchIconWidth } from "./ComplexTextSearch";
+
+import _ from "lodash";
+import { sortByRelevance } from "../../utils/Helpers";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
     event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
     isSuggesterOpen: boolean
   ) => void;
+  setPendingSearch?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // TODO: Try to only use these two classes inside this file to maintain high cohesion.
@@ -70,6 +73,7 @@ const textfieldMinWidth = 200;
  */
 const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
+  setPendingSearch = () => {},
 }) => {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
@@ -111,6 +115,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     },
     [categorySet, dispatch, selectedCategories]
   );
+
   const removeCategory = useCallback(
     (category: string) => {
       const currentCategories = new Array(...selectedCategories);
@@ -135,50 +140,82 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [categorySet, dispatch, selectedCategories]
   );
 
-  const refreshOptions = useCallback(async () => {
-    try {
-      const currentState: ParameterState = getComponentState(store.getState());
-      dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
-        .unwrap()
-        .then((data) => {
-          const options: OptionType[] = [];
+  const refreshOptions = useCallback(
+    async (inputValue: string) => {
+      // setPendingSearch to true to prevent doing search before refreshing options is finished
+      setPendingSearch(true);
+      try {
+        const currentState: ParameterState = getComponentState(
+          store.getState()
+        );
+        dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
+          .unwrap()
+          .then((data) => {
+            const categorySuggestions = new Set<string>(
+              data.category_suggestions
+            );
+            const phrasesSuggestions = new Set<string>(
+              data.record_suggestions.suggest_phrases
+            );
 
-          const categorySuggestions = new Set<string>(
-            data.category_suggestions
-          );
-          const phrasesSuggestions = new Set<string>(
-            data.record_suggestions.suggest_phrases
-          );
+            // Get the intersection of categorySuggestions and phrasesSuggestions
+            const commonSuggestions = [...categorySuggestions].filter(
+              (item) => {
+                return phrasesSuggestions.has(item);
+              }
+            );
 
-          // Get the intersection of categorySuggestions and phrasesSuggestions
-          const commonSuggestions = [...categorySuggestions].filter((item) => {
-            return phrasesSuggestions.has(item);
+            // check if the current inputValue is a common key or not, then dispatch updateCommonKey
+            if (
+              commonSuggestions.some(
+                (item) => item.toLowerCase() === inputValue.toLowerCase()
+              )
+            ) {
+              dispatch(updateCommonKey(inputValue));
+            } else {
+              dispatch(updateCommonKey(""));
+            }
+
+            // Create array of all unique suggestions
+            const allSuggestions = new Set([
+              ...commonSuggestions,
+              ...categorySuggestions,
+              ...phrasesSuggestions,
+            ]);
+
+            // Sort suggestions by relevance
+            const sortedSuggestions = sortByRelevance(
+              allSuggestions,
+              inputValue
+            );
+
+            // Create sorted options array
+            const options: OptionType[] = sortedSuggestions.map(
+              (suggestion) => {
+                if (commonSuggestions.includes(suggestion)) {
+                  return { text: suggestion, group: OptionGroup.COMMON };
+                } else if (categorySuggestions.has(suggestion)) {
+                  return { text: suggestion, group: OptionGroup.CATEGORY };
+                } else {
+                  return { text: suggestion, group: OptionGroup.PHRASE };
+                }
+              }
+            );
+
+            setOptions(options);
           });
-
-          commonSuggestions.forEach((common: string) => {
-            // Remove the commonSuggestions from categorySuggestions and phrasesSuggestions
-            categorySuggestions.delete(common);
-            phrasesSuggestions.delete(common);
-
-            options.push({ text: common, group: OptionGroup.COMMON });
-          });
-
-          categorySuggestions.forEach((category: string) => {
-            options.push({ text: category, group: OptionGroup.CATEGORY });
-          });
-          phrasesSuggestions.forEach((phrase: string) => {
-            options.push({ text: phrase, group: OptionGroup.PHRASE });
-          });
-
-          setOptions(options);
-        });
-    } catch (error) {
-      // TODO: Add error handling in the future.(toast, alert, etc)
-      //  Also need to apply error handing
-      //  in some other places if needed.
-      console.error("Error fetching data:", error);
-    }
-  }, [dispatch]);
+      } catch (error) {
+        // TODO: Add error handling in the future.(toast, alert, etc)
+        //  Also need to apply error handing
+        //  in some other places if needed.
+        console.error("Error fetching data:", error);
+      } finally {
+        // when refreshing options is done, allow to search
+        setPendingSearch(false);
+      }
+    },
+    [dispatch, setPendingSearch]
+  );
 
   const debounceRefreshOptions = useRef(
     _.debounce(refreshOptions, 300)
@@ -191,29 +228,21 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     };
   }, [debounceRefreshOptions]);
 
-  const getGroup: (option: string) => string | undefined = useCallback(
-    (option: string) => {
-      return options.find((o) => o.text.toLowerCase() === option.toLowerCase())
-        ?.group;
-    },
-    [options]
-  );
-
   const onInputChange = useCallback(
     async (_: any, newInputValue: string) => {
       // If user type anything, then it is not a title search anymore
       dispatch(updateSearchText(newInputValue));
-      if (newInputValue?.length > 1) {
-        await debounceRefreshOptions(); // wait for the debounced refresh to complete
-        // TODO: getGroup has delay, needs to instantly return group value or await until getGroup returns,
-        //  otherwise, commonKey will be falsely ignored in the store (e.g. you type 'salinity' and quickly select it from the list, but it is not recognised as common key)
-        const group = getGroup(newInputValue);
-        if (group === "common") {
-          dispatch(updateCommonKey(newInputValue));
-        }
+      if (newInputValue?.length > 0) {
+        // wait for the debounced refresh to complete
+        // dispatch updateCommonKey if there is any during the refreshing-options to ensure the commonKey comes from the latest options given any inputValue changed
+        await debounceRefreshOptions(newInputValue);
+      } else {
+        // update to clear the commonKey
+        // this happens when user clear input text with button "X"
+        dispatch(updateCommonKey(""));
       }
     },
-    [debounceRefreshOptions, dispatch, getGroup]
+    [debounceRefreshOptions, dispatch]
   );
 
   useEffect(() => {
@@ -248,8 +277,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     if (event.key === "Enter") {
       if (open) {
         setOpen(false);
+      } else {
+        handleEnterPressed(event, false);
       }
-      handleEnterPressed(event, false);
     }
   };
 

@@ -80,3 +80,4 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 export { createErrorResponse, ErrorResponse };
 
 export default ErrorBoundary;
+// TODO: move this to different place that is more related

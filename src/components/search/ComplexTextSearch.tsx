@@ -21,6 +21,9 @@ const ComplexTextSearch = () => {
   const navigate = useNavigate();
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
+  // set the default value to false to allow user do search without typing anything
+  const [pendingSearch, setPendingSearch] = useState<boolean>(false);
+
   const redirectSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
     navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
@@ -37,14 +40,22 @@ const ComplexTextSearch = () => {
       event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
       isSuggesterOpen: boolean
     ) => {
-      if (event.key === "Enter" && !isSuggesterOpen) {
+      // TODO: a more user-friendly way to execute 'enter' press function is to delay the search to wait for pendingSearch turn to true
+      // instead of prevent user doing search if pendingSearch is false
+      // considering the debounce (300ms) and fetchSuggesterOptions(quite fast according to experience with edge) is not very long
+      // we may implement this later if gap is too big
+      if (event.key === "Enter" && !isSuggesterOpen && !pendingSearch) {
         redirectSearch();
       }
     },
-    [redirectSearch]
+    [pendingSearch, redirectSearch]
   );
 
-  const onFilterClick = useCallback(() => {
+  const handleSearchClick = useCallback(() => {
+    if (!pendingSearch) redirectSearch();
+  }, [pendingSearch, redirectSearch]);
+
+  const handleFilterClick = useCallback(() => {
     setShowFilters(true);
   }, [setShowFilters]);
 
@@ -64,7 +75,10 @@ const ComplexTextSearch = () => {
           >
             <SearchIcon />
           </IconButton>
-          <InputWithSuggester handleEnterPressed={handleEnterPressed} />
+          <InputWithSuggester
+            handleEnterPressed={handleEnterPressed}
+            setPendingSearch={setPendingSearch}
+          />
           <Button
             variant="text"
             sx={{
@@ -75,7 +89,7 @@ const ComplexTextSearch = () => {
               backgroundColor: color.gray.xxLight,
             }}
             startIcon={<Tune />}
-            onClick={onFilterClick}
+            onClick={handleFilterClick}
             data-testid={"filtersBtn"}
           >
             Filters
@@ -100,7 +114,7 @@ const ComplexTextSearch = () => {
             },
           }}
           fullWidth
-          onClick={redirectSearch}
+          onClick={handleSearchClick}
         >
           Search
         </Button>
