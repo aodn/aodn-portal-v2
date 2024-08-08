@@ -47,29 +47,86 @@ const renderCells = (
   const leftIndex = index * 2;
   const rightIndex = leftIndex + 1;
 
-  return (
-    <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
-      <Grid container spacing={1}>
-        <Grid item xs={6}>
-          <GridResultCard
-            content={props.contents.result.collections[leftIndex]}
-            onRemoveLayer={props.onRemoveLayer}
-            onDownload={props.onDownload}
-            onClickCard={props.onClickCard}
-            data-testid="result-cards-grid"
-          />
+  /**
+   *if only one dataset is selected:
+   * the first row contains a invisible card related to the selected dataset, and also the first one of result datasets
+   * the following rows are the rest of result datasets
+   * but leftIndex and rightIndex need to minus 1 because one place is taken by the selected dataset card
+   *
+   * if more than one datasets are selected:
+   * then use the leftIndex and rightIndex as normal
+   */
+  if (props.datasetsSelected && props.datasetsSelected?.length === 1) {
+    return (
+      <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
+        {index === 0 ? (
+          <Grid container spacing={1}>
+            <Grid item xs={6} sx={{ visibility: "hidden" }}>
+              <GridResultCard
+                content={props.datasetsSelected[0]}
+                onRemoveLayer={props.onRemoveLayer}
+                onDownload={props.onDownload}
+                onClickCard={props.onClickCard}
+                isSelectedDataset
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <GridResultCard
+                content={props.contents.result.collections[0]}
+                onRemoveLayer={props.onRemoveLayer}
+                onDownload={props.onDownload}
+                onClickCard={props.onClickCard}
+              />
+            </Grid>
+          </Grid>
+        ) : (
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              <GridResultCard
+                content={props.contents.result.collections[leftIndex - 1]}
+                onRemoveLayer={props.onRemoveLayer}
+                onDownload={props.onDownload}
+                onClickCard={props.onClickCard}
+                data-testid="result-cards-grid"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <GridResultCard
+                content={props.contents.result.collections[rightIndex - 1]}
+                onRemoveLayer={props.onRemoveLayer}
+                onDownload={props.onDownload}
+                onClickCard={props.onClickCard}
+              />
+            </Grid>
+          </Grid>
+        )}
+      </ListItem>
+    );
+  } else {
+    return (
+      <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
+        <Grid container spacing={1}>
+          <Grid item xs={6}>
+            <GridResultCard
+              content={props.contents.result.collections[leftIndex]}
+              onRemoveLayer={props.onRemoveLayer}
+              onDownload={props.onDownload}
+              onClickCard={props.onClickCard}
+              data-testid="result-cards-grid"
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <GridResultCard
+              content={props.contents.result.collections[rightIndex]}
+              onRemoveLayer={props.onRemoveLayer}
+              onDownload={props.onDownload}
+              onClickCard={props.onClickCard}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <GridResultCard
-            content={props.contents.result.collections[rightIndex]}
-            onRemoveLayer={props.onRemoveLayer}
-            onDownload={props.onDownload}
-            onClickCard={props.onClickCard}
-          />
-        </Grid>
-      </Grid>
-    </ListItem>
-  );
+      </ListItem>
+    );
+  }
 };
 
 const renderRows = (
@@ -99,6 +156,20 @@ const ResultCards = (props: ResultCardsProps) => {
 
   const renderDatasetSelectedGridCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
+    // if only one dataset is selected, return one box with a high z-index, ensuring it is on the top of other scrollable result cards
+    if (props.datasetsSelected && props.datasetsSelected.length === 1) {
+      return (
+        <Box width="329px" height="300px" position="absolute" zIndex={999}>
+          <GridResultCard
+            content={props.datasetsSelected[0]}
+            onRemoveLayer={props.onRemoveLayer}
+            onDownload={props.onDownload}
+            onClickCard={props.onClickCard}
+            isSelectedDataset
+          />
+        </Box>
+      );
+    }
     return (
       <Stack
         direction="row"
@@ -107,7 +178,7 @@ const ResultCards = (props: ResultCardsProps) => {
         sx={{ height: "305px", overflowY: "auto" }}
       >
         {props.datasetsSelected?.map((dataset, index) => (
-          <Box key={index} width="327px" height="300px">
+          <Box key={index} width="329px" height="300px">
             <GridResultCard
               content={dataset}
               onRemoveLayer={props.onRemoveLayer}
@@ -155,6 +226,14 @@ const ResultCards = (props: ResultCardsProps) => {
     props.onRemoveLayer,
   ]);
 
+  const datasetsCount = props.contents.result.collections.length;
+  const itemCountInGridView =
+    props.datasetsSelected && props.datasetsSelected.length === 1
+      ? datasetsCount % 2 === 0
+        ? datasetsCount / 2 + 1
+        : Math.ceil(datasetsCount / 2)
+      : Math.ceil(datasetsCount / 2);
+
   if (props.layout === SearchResultLayoutEnum.LIST) {
     return (
       <>
@@ -163,7 +242,7 @@ const ResultCards = (props: ResultCardsProps) => {
           height={1500}
           width={"100%"}
           itemSize={260}
-          itemCount={props.contents.result.collections.length}
+          itemCount={datasetsCount}
           overscanCount={10}
         >
           {(child: ListChildComponentProps) => renderRows(props, child)}
@@ -179,7 +258,7 @@ const ResultCards = (props: ResultCardsProps) => {
           height={1500}
           width={"100%"}
           itemSize={310}
-          itemCount={Math.ceil(props.contents.result.collections.length / 2)}
+          itemCount={itemCountInGridView}
           overscanCount={10}
         >
           {(child: ListChildComponentProps) => renderCells(props, child)}
