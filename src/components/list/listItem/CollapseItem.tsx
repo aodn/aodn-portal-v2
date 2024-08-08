@@ -1,84 +1,62 @@
 import React, { ReactNode, useState } from "react";
-import {
-  ButtonBase,
-  Collapse,
-  Grid,
-  IconButton,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Collapse, Grid, IconButton, Typography } from "@mui/material";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import StyledItemGrid from "./StyledItemGrid";
+import CollapseItemBtn from "../../common/buttons/CollapseItemBtn";
 
 interface CollapseFrameProps {
   title: string;
   children: ReactNode;
-  isContactFragment?: boolean;
+  isContact?: boolean;
+  isAssociatedRecord?: boolean;
   email?: string;
 }
 
 const CollapseItem: React.FC<CollapseFrameProps> = ({
   title,
   children,
-  isContactFragment = false,
+  isContact = false,
+  isAssociatedRecord = false,
   email,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const titleComponent = () => {
-    return (
-      <Typography
-        align="left"
-        variant="h3"
-        sx={{
-          paddingTop: "0px",
-          color: "#5b5B5B",
-          lineHeight: "24px",
-          fontWeight: "600",
-          fontStyle: "normal",
-          fontSize: "15px",
-        }}
-      >
-        {title}
-      </Typography>
-    );
+    return <Typography variant="detailTitle">{title}</Typography>;
   };
 
   return (
-    <Grid
-      container
-      sx={{
-        backgroundColor: "#F2F6F9",
-        marginY: "10px",
-        overflowY: "auto",
-      }}
-    >
-      <Grid item md={11}>
-        <ButtonBase
+    <StyledItemGrid container>
+      <Grid
+        item
+        md={11}
+        sx={{
+          alignSelf: "center",
+        }}
+      >
+        <CollapseItemBtn
           onClick={() => {
-            if (isContactFragment && isExpanded) {
+            if (isContact && isExpanded) {
               return null;
             }
             setIsExpanded(!isExpanded);
           }}
-          sx={{ width: "100%" }}
-        >
-          <Grid item container md={12}>
-            <Grid item md={1}>
-              {isContactFragment && isExpanded && <MailOutlineIcon />}
-            </Grid>
-            <Grid item md={11}>
-              {isExpanded && isContactFragment ? (
-                <Link href={`mailto:${email}`}>{titleComponent()}</Link>
-              ) : (
-                titleComponent()
-              )}
-            </Grid>
-          </Grid>
-        </ButtonBase>
+          isContact={isContact}
+          isAssociatedRecord={isAssociatedRecord}
+          expanded={isExpanded}
+          email={email}
+          element={titleComponent()}
+        />
       </Grid>
-      <Grid item md={1}>
+      <Grid
+        item
+        md={1}
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
         <IconButton
           aria-label="expand or collapse"
           onClick={() => {
@@ -98,7 +76,7 @@ const CollapseItem: React.FC<CollapseFrameProps> = ({
           </Grid>
         </Collapse>
       </Grid>
-    </Grid>
+    </StyledItemGrid>
   );
 };
 

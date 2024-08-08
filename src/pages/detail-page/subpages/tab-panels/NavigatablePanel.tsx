@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import DetailSubtabBtn from "../../../../components/common/tabs/DetailSubtabBtn";
+import DetailSubtabBtn from "../../../../components/common/buttons/DetailSubtabBtn";
 import _ from "lodash";
 
 // a big number which is obviously bigger than all possible positions
@@ -18,6 +18,8 @@ const PANEL_VISIBLE_HEIGHT = 1480;
 // the delay milliseconds for resizing the panel after scrolling. May change in
 // the future if users feel it is too slow / too fast.
 const RESIZE_DELAY = 400;
+
+const DEBOUNCE_DELAY = 100;
 
 interface NavigatablePanelProps {
   childrenList: { title: string; component: ReactNode }[];
@@ -77,7 +79,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   useEffect(() => {
     debounceScrollHandler.current = _.debounce((scrollPosition: number) => {
       setPosition(scrollPosition);
-    }, 300);
+    }, DEBOUNCE_DELAY);
 
     return () => debounceScrollHandler.current?.cancel();
   }, []);
@@ -177,21 +179,19 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   ) : (
     <Grid container>
       <Grid item container md={3}>
-        <Grid item md={1} />
-        <Grid item container md={11}>
-          <Grid item>
-            {childrenList.map((child, index) => {
-              return (
-                <DetailSubtabBtn
-                  key={index}
-                  title={child.title}
-                  isBordered={isPositionInsideBlock(position, index)}
-                  navigate={onNavigate(index)}
-                />
-              );
-            })}
-          </Grid>
+        <Grid item md={11}>
+          {childrenList.map((child, index) => {
+            return (
+              <DetailSubtabBtn
+                key={index}
+                title={child.title}
+                isBordered={isPositionInsideBlock(position, index)}
+                navigate={onNavigate(index)}
+              />
+            );
+          })}
         </Grid>
+        <Grid item md={1} />
       </Grid>
       <Grid
         item

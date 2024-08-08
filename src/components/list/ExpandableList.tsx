@@ -1,9 +1,10 @@
-import { Button, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import React, { ReactNode, useState } from "react";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import ShowMoreDetailBtn from "../common/buttons/ShowMoreDetailBtn";
 
 interface ExpandableListProps {
-  title: string;
+  title?: string;
   childrenList: ReactNode[];
 }
 
@@ -11,16 +12,29 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
   title,
   childrenList = [],
 }) => {
+  const theme = useTheme();
   let showingCollapseCount = 0;
   const [isShowingMore, setIsShowingMore] = useState(false);
   return (
-    <Grid container spacing={2}>
-      <Grid item md={12} display="flex" alignItems="center">
-        <KeyboardDoubleArrowRightIcon />
-        <Typography display="inline" variant="h3" sx={{ paddingTop: "0px" }}>
-          {title}
-        </Typography>
-      </Grid>
+    <Grid container sx={{ marginTop: theme.mp.md }}>
+      {title && (
+        <Grid item md={12} display="flex" alignItems="center">
+          <Box display="flex" justifyContent="center" alignItems="center">
+            {/*<CircleRightArrowIcon />*/}
+            <KeyboardDoubleArrowRightIcon />
+          </Box>
+          <Typography
+            display="inline"
+            variant="detailTitle"
+            sx={{
+              marginLeft: theme.mp.sm,
+            }}
+          >
+            {title}
+          </Typography>
+        </Grid>
+      )}
+
       <Grid item container md={12}>
         {childrenList.map((child) => {
           showingCollapseCount++;
@@ -29,11 +43,12 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
           }
           return child;
         })}
-
         {childrenList.length > 5 && (
-          <Button onClick={() => setIsShowingMore(!isShowingMore)}>
-            {isShowingMore ? `Show less ${title}` : `Show more ${title}`}
-          </Button>
+          <ShowMoreDetailBtn
+            isShowingMore={isShowingMore}
+            setIsShowingMore={setIsShowingMore}
+            title={title ? title : ""}
+          />
         )}
       </Grid>
     </Grid>

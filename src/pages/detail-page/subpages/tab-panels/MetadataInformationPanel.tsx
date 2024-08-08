@@ -45,7 +45,7 @@ const MetadataInformationPanel = () => {
       if (links) {
         const metadataLink = links.find(
           (link) =>
-            link.title.trim().toLowerCase() === "full metadata link" &&
+            link.title?.trim().toLowerCase() === "full metadata link" &&
             link.type === "text/html" &&
             link.rel === "self"
         );

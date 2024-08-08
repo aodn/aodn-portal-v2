@@ -31,7 +31,9 @@ const AboutPanel = () => {
     themes?.forEach((theme: ITheme) => {
       keywordItems.push({
         title: theme.title,
-        content: theme.concepts.map((concept) => ` \u2022 ${concept.id}`),
+        content: theme.concepts.map(
+          (concept) => ` \u00A0 \u2022 ${concept.id}`
+        ),
       });
     });
     return keywordItems;

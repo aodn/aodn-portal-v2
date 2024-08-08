@@ -5,15 +5,15 @@ import React from "react";
 import {
   IAddress,
   IContact,
-} from "../../common/store/OGCCollectionDefinitions";
+} from "../../../common/store/OGCCollectionDefinitions";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 
-interface ContactItemProps {
+interface ContactAreaProps {
   contact: IContact;
 }
 
-const ContactItem: React.FC<ContactItemProps> = ({ contact }) => {
+const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
   let addresses: IAddress;
   if (contact && Array.isArray(contact.addresses) && contact.addresses[0]) {
     addresses = contact.addresses[0];
@@ -32,42 +32,43 @@ const ContactItem: React.FC<ContactItemProps> = ({ contact }) => {
       case "facsimile":
         return <PrintOutlinedIcon />;
       default:
-        // debug usage. Should be existing for long term
-        <Typography>UNKNOWN PHONE ROLE. PLEASE IMPLEMENT</Typography>;
+      // TODO: toast warning
     }
   };
   return (
     <Grid container>
       <Grid item container md={12}>
-        <Grid item container md={1}>
+        <Grid item container md={1} display="flex" justifyContent="center">
           <LocationOnOutlinedIcon />
         </Grid>
         <Grid item container md={5}>
           {delivery_point?.map((line) => {
             return (
               <Grid item md={12} key={line}>
-                <Typography>{line}</Typography>
+                <Typography variant="detailContent">{line}</Typography>
               </Grid>
             );
           })}
           {city && (
             <Grid item md={12}>
-              <Typography>{city}</Typography>
+              <Typography variant="detailContent">{city}</Typography>
             </Grid>
           )}
           {administrative_area && (
             <Grid item md={12}>
-              <Typography>{administrative_area}</Typography>
+              <Typography variant="detailContent">
+                {administrative_area}
+              </Typography>
             </Grid>
           )}
           {postal_code && (
             <Grid item md={12}>
-              <Typography>{postal_code}</Typography>
+              <Typography variant="detailContent">{postal_code}</Typography>
             </Grid>
           )}
           {country && (
             <Grid item md={12}>
-              <Typography>{country}</Typography>
+              <Typography variant="detailContent">{country}</Typography>
             </Grid>
           )}
         </Grid>
@@ -83,7 +84,9 @@ const ContactItem: React.FC<ContactItemProps> = ({ contact }) => {
                     {getIconByRole(phone.roles[0])}
                   </Grid>
                   <Grid item md={11}>
-                    {`${phone.value} (${phone.roles[0]})`}
+                    <Typography variant="detailContent">
+                      {`\u00A0 ${phone.value} (${phone.roles[0]})`}
+                    </Typography>
                   </Grid>
                 </Grid>
               );
@@ -95,7 +98,7 @@ const ContactItem: React.FC<ContactItemProps> = ({ contact }) => {
           links.map((link) => {
             return (
               <Grid item container md={12} key={link.href}>
-                <Grid item md={1}>
+                <Grid item md={1} display="flex" justifyContent="center">
                   <LanguageOutlinedIcon />
                 </Grid>
                 <Grid item md={11}>
@@ -110,4 +113,4 @@ const ContactItem: React.FC<ContactItemProps> = ({ contact }) => {
   );
 };
 
-export default ContactItem;
+export default ContactArea;
