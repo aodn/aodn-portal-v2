@@ -37,8 +37,9 @@ import {
 } from "../common/store/searchReducer";
 import { borderRadius, color, padding } from "../../styles/constants";
 import { filterButtonWidth, searchIconWidth } from "./ComplexTextSearch";
-import { sortByRelevance } from "../../utils/sortByRelevance";
+
 import _ from "lodash";
+import { sortByRelevance } from "../../utils/Helpers";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (

@@ -161,3 +161,4 @@ const theme: ThemeOptions = {
 const AppTheme = createTheme(theme);
 
 export default AppTheme;
+// TODO: move this to different place that is more related
