@@ -19,6 +19,8 @@ const PANEL_VISIBLE_HEIGHT = 1480;
 // the future if users feel it is too slow / too fast.
 const RESIZE_DELAY = 400;
 
+const DEBOUNCE_DELAY = 100;
+
 interface NavigatablePanelProps {
   childrenList: { title: string; component: ReactNode }[];
   isLoading: boolean;
@@ -77,7 +79,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   useEffect(() => {
     debounceScrollHandler.current = _.debounce((scrollPosition: number) => {
       setPosition(scrollPosition);
-    }, 300);
+    }, DEBOUNCE_DELAY);
 
     return () => debounceScrollHandler.current?.cancel();
   }, []);

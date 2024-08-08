@@ -21,7 +21,7 @@ const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
       justifyContent="flex-start"
       sx={{
         height: "45px",
-        marginX: theme.margin.lg,
+        marginX: theme.mp.lg,
       }}
     >
       <Button
@@ -33,6 +33,7 @@ const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
           },
           borderRadius: theme.borderRadius.sm,
           justifyContent: "flex-start",
+          textAlign: "left",
         }}
         onClick={navigate}
       >

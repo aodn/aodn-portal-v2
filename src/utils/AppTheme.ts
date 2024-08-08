@@ -91,8 +91,8 @@ const theme: ThemeOptions = {
       dark: "#2F4F6C",
     },
     info: {
-      main: "",
-      light: "",
+      main: "#000000",
+      light: "#000000",
       dark: "#3A6F8F",
     },
     common: {
