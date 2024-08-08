@@ -150,7 +150,6 @@ const theme: ThemeOptions = {
     ].join(","),
 
     detailTitle: {
-      // lineHeight: "26px",
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: 600,
