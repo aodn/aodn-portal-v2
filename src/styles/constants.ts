@@ -48,7 +48,12 @@ const fontSize = {
   mapMenuSubItem: 13,
   detailPageHeading: "20px",
   icon: "10px",
+  label: "12px",
   info: "14px",
+};
+
+const fontFamily = {
+  general: "Noto Sans",
 };
 
 const fontWeight = {
@@ -135,6 +140,7 @@ export {
   margin,
   padding,
   fontSize,
+  fontFamily,
   fontWeight,
   fontColor,
   color,

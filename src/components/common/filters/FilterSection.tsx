@@ -23,7 +23,7 @@ const FilterSection: React.FC<FilterSectionContainerProps> = ({
     >
       <Typography
         variant="h3"
-        sx={{ position: "absolute", left: "2rem", top: "0.7rem" }}
+        sx={{ position: "absolute", left: "2rem", top: "0.7rem", padding: 0 }}
       >
         {title}
       </Typography>

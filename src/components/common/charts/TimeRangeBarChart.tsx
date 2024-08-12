@@ -202,7 +202,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
 
   return (
     <BarChart
-      height={200}
+      height={180}
       margin={{
         // use to control the space on right, so that it will not overlap with the legend
         right: 150,

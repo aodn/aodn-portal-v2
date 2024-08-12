@@ -176,30 +176,21 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
       <Grid
         item
         xs={12}
-        sx={{
-          textAlign: "left",
-        }}
+        display="flex"
+        justifyContent="center"
+        alignContent="center"
       >
-        <Grid container>
-          <Grid item xs={2} />
-          <Grid
-            item
-            xs={9}
-            sx={{
-              minHeight: "200px",
-            }}
-          >
-            {
-              // https://mui.com/x/react-charts/legend/
-            }
-            <TimeRangeBarChart
-              imosDataIds={imosDataIds}
-              totalDataset={totalDataset}
-              selectedStartDate={startDate}
-              selectedEndDate={endDate}
-            />
-          </Grid>
-        </Grid>
+        {
+          // https://mui.com/x/react-charts/legend/
+        }
+        <Box sx={{ width: "90%" }}>
+          <TimeRangeBarChart
+            imosDataIds={imosDataIds}
+            totalDataset={totalDataset}
+            selectedStartDate={startDate}
+            selectedEndDate={endDate}
+          />
+        </Box>
       </Grid>
       <Grid
         item
@@ -210,16 +201,24 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
         }}
       >
         <Grid container>
-          <Grid item xs={2}>
-            <StyledDateTimePicker
-              onAccept={onStartDatePickerAccepted}
-              defaultValue={dayjs(componentParam.dateTimeFilterRange?.start)}
-              value={dayjs(startDate)}
-              views={["year", "month", "day"]}
-              minDate={dayjs(minimumDate)}
-              maxDate={dayjs().add(1, "day")}
-              inputRef={startDateInputRef}
-            />
+          <Grid
+            item
+            xs={2}
+            display="flex"
+            justifyContent="center"
+            alignContent="center"
+          >
+            <Box sx={{ width: "80%" }}>
+              <StyledDateTimePicker
+                onAccept={onStartDatePickerAccepted}
+                defaultValue={dayjs(componentParam.dateTimeFilterRange?.start)}
+                value={dayjs(startDate)}
+                views={["year", "month", "day"]}
+                minDate={dayjs(minimumDate)}
+                maxDate={dayjs().add(1, "day")}
+                inputRef={startDateInputRef}
+              />
+            </Box>
           </Grid>
           <Grid item xs={8}>
             <Grid
@@ -239,16 +238,24 @@ const RemovableDateTimeFilter = (props: RemovableDateTimeFilterProps) => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={2}>
-            <StyledDateTimePicker
-              onAccept={onEndDatePickerAccepted}
-              defaultValue={dayjs(componentParam.dateTimeFilterRange?.end)}
-              value={dayjs(endDate)}
-              views={["year", "month", "day"]}
-              minDate={dayjs(minimumDate)}
-              maxDate={dayjs().add(1, "day")}
-              inputRef={endDateInputRef}
-            />
+          <Grid
+            item
+            xs={2}
+            display="flex"
+            justifyContent="center"
+            alignContent="center"
+          >
+            <Box sx={{ width: "80%" }}>
+              <StyledDateTimePicker
+                onAccept={onEndDatePickerAccepted}
+                defaultValue={dayjs(componentParam.dateTimeFilterRange?.end)}
+                value={dayjs(endDate)}
+                views={["year", "month", "day"]}
+                minDate={dayjs(minimumDate)}
+                maxDate={dayjs().add(1, "day")}
+                inputRef={endDateInputRef}
+              />
+            </Box>
           </Grid>
         </Grid>
       </Grid>

@@ -1,5 +1,6 @@
 import { styled } from "@mui/system";
 import Slider from "@mui/material/Slider";
+import { fontColor, fontSize, fontWeight } from "./constants";
 
 interface StyledSliderProps {
   theme?: any;
@@ -9,7 +10,9 @@ const StyledSlider = styled(Slider)<StyledSliderProps>(
   ({ theme, isvertical = undefined }) => ({
     "& .MuiSlider-valueLabel": {
       background: "none",
-      color: "black",
+      fontSize: `${fontSize.label}`,
+      fontWeight: `${fontWeight.regular}`,
+      color: `${fontColor.gray.medium}`,
       borderRadius: 0,
       padding: 0,
       left: isvertical ? "calc(100% + 25px)" : undefined,
@@ -37,8 +40,8 @@ const StyledSlider = styled(Slider)<StyledSliderProps>(
     },
     "& .MuiSlider-thumb": {
       backgroundColor: "#FFF",
-      width: "22px",
-      height: "22px",
+      width: "18px",
+      height: "18px",
       boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.50)",
     },
   })

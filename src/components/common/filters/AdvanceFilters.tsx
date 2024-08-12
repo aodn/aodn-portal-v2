@@ -1,9 +1,11 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import {
   Box,
+  Button,
   Dialog,
   Fade,
   Grid,
+  IconButton,
   SxProps,
   Theme,
   Typography,
@@ -15,7 +17,15 @@ import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
 import CategoryVocabFilter from "./CategoryVocabFilter";
 import ImosOnlySwitch from "./ImosOnlySwitch";
 import FilterSection from "./FilterSection";
-import { borderRadius, padding, zIndex } from "../../../styles/constants";
+import {
+  border,
+  borderRadius,
+  color,
+  margin,
+  padding,
+  zIndex,
+} from "../../../styles/constants";
+import CloseIcon from "@mui/icons-material/Close";
 
 export interface NonRemovableFiltersProps {
   showFilters: boolean;
@@ -29,6 +39,15 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
   sx = {},
 }) => {
   const theme = useTheme();
+
+  const onCloseFilter = useCallback(() => {
+    setShowFilters(false);
+  }, [setShowFilters]);
+
+  const onClearAll = useCallback(() => {}, []);
+
+  const onApplyFilter = useCallback(() => {}, []);
+
   return (
     <>
       <Dialog
@@ -42,7 +61,7 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
       >
         <Box
           sx={{
-            zIndex: zIndex["FILTER_OVERLAY"],
+            zIndex: zIndex.FILTER_OVERLAY,
             position: "fixed",
             top: "50%",
             left: "50%",
@@ -53,15 +72,30 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
             ...sx,
           }}
         >
-          <Box sx={{ minWidth: "1300px" }}>
+          <Box sx={{ minWidth: "1000px" }}>
             <Grid
               container
-              justifyContent={"center"}
+              justifyContent="center"
               sx={{
-                borderRadius: borderRadius["filter"],
+                borderRadius: borderRadius.filter,
                 backgroundColor: theme.palette.common.white,
               }}
             >
+              <Box
+                position="absolute"
+                top={margin.sm}
+                right={0}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Button onClick={onClearAll} sx={{ paddingX: padding.medium }}>
+                  Clear All
+                </Button>
+                <IconButton onClick={onCloseFilter}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
               <Grid
                 item
                 xs={12}
@@ -85,27 +119,44 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
                     <RemovableDateTimeFilter />
                   </FilterSection>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <FilterSection title={"Depth"}>
                     <DepthFilter />
                   </FilterSection>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={7}>
                   <FilterSection isTitleOnlyHeader title={"Parameter"}>
                     <CategoryVocabFilter />
                   </FilterSection>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
                     <DataDeliveryModeFilter />
                   </FilterSection>
                 </Grid>
-                <Grid item xs={1}>
-                  <FilterSection title={""}>
-                    <ImosOnlySwitch />
-                  </FilterSection>
+                <Grid item xs={2}>
+                  <Box width="70%" height="100%">
+                    <FilterSection title={""}>
+                      <ImosOnlySwitch />
+                    </FilterSection>
+                  </Box>
                 </Grid>
-                <Grid item xs={5} />
+                <Grid item xs={5} display="flex" justifyContent="end">
+                  <Box alignContent="end">
+                    <Button
+                      sx={{
+                        width: "100px",
+                        border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+                        "&:hover": {
+                          backgroundColor: color.blue.darkSemiTransparent,
+                        },
+                      }}
+                      onClick={onApplyFilter}
+                    >
+                      Apply
+                    </Button>
+                  </Box>
+                </Grid>
               </Grid>
             </Grid>
           </Box>
