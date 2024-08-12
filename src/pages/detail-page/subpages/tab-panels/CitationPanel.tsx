@@ -46,8 +46,14 @@ const CitationPanel = () => {
     [context.collection]
   );
   const otherConstraints = useMemo(
-    () => context.collection?.getCitation()?.otherConstraints,
-    [context.collection]
+    () =>
+      context.collection?.getCitation()?.otherConstraints?.filter(
+        // Some organizations put license in "other constraints".
+        // So if a constraint is considered as license by es-indexer,
+        // we should not show it in "other constraints".
+        (cons) => cons.toLowerCase().trim() !== license?.toLowerCase().trim()
+      ),
+    [context.collection, license]
   );
   const useLimitations = useMemo(
     () => context.collection?.getCitation()?.useLimitations,
