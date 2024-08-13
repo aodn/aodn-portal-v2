@@ -92,6 +92,9 @@ const color = {
     darkSemiTransparent: "rgba(97,140,165,0.5)",
     extraDark: "#182C3A",
   },
+  brightBlue: {
+    dark: "#51BCEB",
+  },
   gray: {
     dark: "#575757",
     medium: "#787878",

@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -26,6 +26,9 @@ import {
   zIndex,
 } from "../../../styles/constants";
 import CloseIcon from "@mui/icons-material/Close";
+import { ParameterState } from "../store/componentParamReducer";
+import store, { getComponentState } from "../store/store";
+import DateRangeSlider from "./DateRangeFilter";
 
 export interface NonRemovableFiltersProps {
   showFilters: boolean;
@@ -39,6 +42,20 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
   sx = {},
 }) => {
   const theme = useTheme();
+
+  const componentParam: ParameterState = getComponentState(store.getState());
+
+  // state used to store the provisional filter options selected
+  // only dispatch when 'apply' button is hit
+  const [filter, setFilter] = useState<ParameterState>({});
+  console.log("filter=====", filter);
+
+  // initialize filter
+  useEffect(() => {
+    if (componentParam) {
+      setFilter(componentParam);
+    }
+  }, [componentParam]);
 
   const onCloseFilter = useCallback(() => {
     setShowFilters(false);
@@ -116,7 +133,7 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
               >
                 <Grid item xs={12}>
                   <FilterSection title={"Time Range"}>
-                    <RemovableDateTimeFilter />
+                    <DateRangeSlider filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>
