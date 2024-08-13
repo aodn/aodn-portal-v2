@@ -13,6 +13,14 @@ class BasePage:
         """Return option element by text"""
         return self.page.get_by_role('option', name=text, exact=True)
 
+    def click_label(self, text: str) -> None:
+        """Click on the given label"""
+        self.page.get_by_label(text).click()
+
+    def click_text(self, text: str) -> None:
+        """Click on the given text"""
+        self.page.get_by_text(text).click()
+
     def click_option(self, text: str) -> None:
         """Click on the given option"""
         self.get_option(text).click()

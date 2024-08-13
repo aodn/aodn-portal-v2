@@ -86,3 +86,75 @@ def test_updating_search_reflects_in_map(
     updated_map_layers = search_page.map.get_map_layers()
 
     assert map_layers != updated_map_layers
+
+
+@pytest.mark.parametrize(
+    'layer_text, layer_id',
+    [
+        (
+            'Australia Marine Parks',
+            'static-geojson-map-container-id-layer-static-australia-marine-parks',
+        ),
+        (
+            'World Boundaries and Places',
+            'mapbox-world-country-boundaries-layer',
+        ),
+    ],
+)
+def test_map_base_layer(
+    page_mock: Page, layer_text: str, layer_id: str
+) -> None:
+    landing_page = LandingPage(page_mock)
+    search_page = SearchPage(page_mock)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    expect(search_page.first_result_title).to_be_visible()
+    assert search_page.map.is_layer_visible(layer_id) is False
+
+    search_page.map.basemap_show_hide_menu.click()
+    search_page.click_text(layer_text)
+
+    assert search_page.map.is_layer_visible(layer_id) is True
+
+
+@pytest.mark.parametrize(
+    'head_lng, head_lat, title, lng, lat',
+    [
+        (
+            '148.50000858306885',
+            '-42.499994242361204',
+            'IMOS - Combined Biogeochemical parameters (reference stations)',
+            '148.48955941132638',
+            '-42.497357343209494',
+        ),
+    ],
+)
+def test_spider(
+    page_mock: Page,
+    head_lng: str,
+    head_lat: str,
+    title: str,
+    lng: str,
+    lat: str,
+) -> None:
+    landing_page = LandingPage(page_mock)
+    search_page = SearchPage(page_mock)
+
+    landing_page.load()
+    landing_page.search.fill_search_text('imos')
+    landing_page.search.click_search_button()
+
+    search_page.map.center_map(head_lng, head_lat)
+    search_page.map.hover_map()
+    search_page.map.click_map_data_point()
+
+    layer_id = f'spider-lines-line-{head_lng},{head_lat}'
+    assert search_page.map.is_layer_visible(layer_id) is True
+
+    search_page.map.center_map(lng, lat)
+    search_page.map.hover_map()
+    expect(search_page.popup_title).to_have_text(title)
+
+    search_page.map.click_map_data_point()
+    expect(search_page.first_result_title).to_have_text(title)

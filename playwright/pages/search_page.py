@@ -20,4 +20,4 @@ class SearchPage(BasePage):
     def wait_for_updated_search_result(self) -> None:
         selector = 'div[data-testid="result-card-list"]'
         first_result = self.page.locator(selector).all()[1]
-        first_result.wait_for(state='detached')
+        first_result.wait_for(state='detached', timeout=5000)

@@ -7,6 +7,10 @@ class Map(BasePage):
     def __init__(self, page: Page):
         self.page = page
 
+        self.basemap_show_hide_menu = page.get_by_label(
+            'basemap-show-hide-menu'
+        )
+
     def hover_map(self) -> None:
         self.page.get_by_label('Map', exact=True).hover()
 
@@ -27,7 +31,7 @@ class Map(BasePage):
         # Inject JavaScript to center map to a data point
         script = f"""
             const map = document.MAP_OBJECT;
-            map.setZoom(6);
+            map.setZoom(12);
             map.setCenter([{lng}, {lat}]);
         """
         self.page.evaluate(script)
@@ -59,3 +63,12 @@ class Map(BasePage):
             }"""
         )
         return str(layers)
+
+    def is_layer_visible(self, layer_id: str) -> bool:
+        self.wait_for_map_loading()
+        is_visible = self.page.evaluate(
+            f"""() => {{
+                return undefined != document.MAP_OBJECT.getLayer('{layer_id}');
+            }}"""
+        )
+        return is_visible
