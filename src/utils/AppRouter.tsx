@@ -48,3 +48,4 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
+// TODO: move this to different place that is more related

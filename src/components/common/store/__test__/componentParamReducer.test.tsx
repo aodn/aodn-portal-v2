@@ -16,7 +16,7 @@ describe("Component Reducer Function Test", () => {
     };
 
     const answer1: string = formatToUrlParam(sample1);
-    expect(answer1).toEqual("isImosOnlyDataset=false&searchText=");
+    expect(answer1).toEqual("isImosOnlyDataset=false");
 
     const sample2: ParameterState = {
       isImosOnlyDataset: false,

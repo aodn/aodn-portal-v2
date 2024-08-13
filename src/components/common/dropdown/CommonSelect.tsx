@@ -8,7 +8,7 @@ import {
   Theme,
 } from "@mui/material";
 import { FC, useState } from "react";
-import { capitalizeFirstLetter } from "../../../utils/capitalizeFirstLetter";
+import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 
 interface CommonSelectProps {
   items: string[];

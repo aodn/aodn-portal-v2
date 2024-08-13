@@ -3,7 +3,7 @@ import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "./NavigatablePanel";
 import ContactList from "../../../../components/list/ContactList";
 import TextList from "../../../../components/list/TextList";
-import { convertDateFormat } from "../../../../utils/DateFormatUtils";
+import { convertDateFormat } from "../../../../utils/DateUtils";
 import MetadataUrlList from "../../../../components/list/MetadataUrlList";
 
 const MetadataInformationPanel = () => {
