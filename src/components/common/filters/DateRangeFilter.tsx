@@ -25,7 +25,7 @@ import { ParameterState } from "../store/componentParamReducer";
 import TimeRangeBarChart from "../charts/TimeRangeBarChart";
 import { OGCCollections } from "../store/OGCCollectionDefinitions";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store/store";
+import store, { AppDispatch, getComponentState } from "../store/store";
 import { fetchResultNoStore } from "../store/searchReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
 
@@ -72,7 +72,9 @@ interface DateRangeSliderProps {
 
 const DateRangeSlider: FC<DateRangeSliderProps> = ({ filter, setFilter }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { dateTimeFilterRange } = filter;
+  // const { dateTimeFilterRange } = filter;
+  const componentParam: ParameterState = getComponentState(store.getState());
+  const { dateTimeFilterRange } = componentParam;
 
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
   const [maxDate, setMaxDate] = useState<Dayjs>(initialMaxDate);

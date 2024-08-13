@@ -11,7 +11,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import RemovableDateTimeFilter from "./RemovableDateTimeFilter";
 import DepthFilter from "./DepthFilter";
 import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
 import CategoryVocabFilter from "./CategoryVocabFilter";
@@ -26,9 +25,14 @@ import {
   zIndex,
 } from "../../../styles/constants";
 import CloseIcon from "@mui/icons-material/Close";
-import { ParameterState } from "../store/componentParamReducer";
-import store, { getComponentState } from "../store/store";
+import {
+  ParameterState,
+  updateCategories,
+  updateDateTimeFilterRange,
+} from "../store/componentParamReducer";
+import store, { AppDispatch, getComponentState } from "../store/store";
 import DateRangeSlider from "./DateRangeFilter";
+import { useDispatch } from "react-redux";
 
 export interface NonRemovableFiltersProps {
   showFilters: boolean;
@@ -42,7 +46,7 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
   sx = {},
 }) => {
   const theme = useTheme();
-
+  const dispatch = useDispatch<AppDispatch>();
   const componentParam: ParameterState = getComponentState(store.getState());
 
   // state used to store the provisional filter options selected
@@ -57,13 +61,26 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
     }
   }, [componentParam]);
 
-  const onCloseFilter = useCallback(() => {
+  const handleCloseFilter = useCallback(() => {
     setShowFilters(false);
   }, [setShowFilters]);
 
-  const onClearAll = useCallback(() => {}, []);
+  const onClearAll = useCallback(() => {
+    setFilter({});
+  }, []);
 
-  const onApplyFilter = useCallback(() => {}, []);
+  const handleApplyFilter = useCallback(() => {
+    if (filter.dateTimeFilterRange) {
+      dispatch(updateDateTimeFilterRange(filter.dateTimeFilterRange));
+    } else {
+      dispatch(updateDateTimeFilterRange({ start: undefined, end: undefined }));
+    }
+    if (filter.categories) {
+      dispatch(updateCategories(filter.categories));
+    }
+
+    setShowFilters(false);
+  }, [dispatch, filter.categories, filter.dateTimeFilterRange, setShowFilters]);
 
   return (
     <>
@@ -109,7 +126,7 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
                 <Button onClick={onClearAll} sx={{ paddingX: padding.medium }}>
                   Clear All
                 </Button>
-                <IconButton onClick={onCloseFilter}>
+                <IconButton onClick={handleCloseFilter}>
                   <CloseIcon />
                 </IconButton>
               </Box>
@@ -143,7 +160,10 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
                 </Grid>
                 <Grid item xs={7}>
                   <FilterSection isTitleOnlyHeader title={"Parameter"}>
-                    <CategoryVocabFilter />
+                    <CategoryVocabFilter
+                      filter={filter}
+                      setFilter={setFilter}
+                    />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>
@@ -168,7 +188,7 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
                           backgroundColor: color.blue.darkSemiTransparent,
                         },
                       }}
-                      onClick={onApplyFilter}
+                      onClick={handleApplyFilter}
                     >
                       Apply
                     </Button>
@@ -184,3 +204,6 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
 };
 
 export default AdvanceFilters;
+function dispatch(arg0: any) {
+  throw new Error("Function not implemented.");
+}

@@ -1,13 +1,25 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { Grid, SxProps, Theme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { fetchParameterCategoriesWithStore } from "../store/searchReducer";
-import { Category, updateCategories } from "../store/componentParamReducer";
+import {
+  Category,
+  ParameterState,
+  updateCategories,
+} from "../store/componentParamReducer";
 import { StyledToggleButton } from "../../../styles/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup";
 
 interface CategoryVocabFilterProps {
+  filter: ParameterState;
+  setFilter: Dispatch<SetStateAction<ParameterState>>;
   sx?: SxProps<Theme>;
 }
 
