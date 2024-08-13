@@ -8,8 +8,8 @@ from pages.search_page import SearchPage
 @pytest.mark.parametrize(
     'search_text, category_name',
     [
-        ('air', 'Air temperature'),
-        ('temp', 'Temperature'),
+        ('air', 'air temperature'),
+        ('temp', 'temperature'),
     ],
 )
 def test_basic_search(

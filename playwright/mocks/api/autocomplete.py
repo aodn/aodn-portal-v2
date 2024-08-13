@@ -9,10 +9,10 @@ from utils.json_utils import load_json_data
 
 class SuggesterOptions:
     def __init__(
-        self, category_suggestions: List[str], record_titles: List[str]
+        self, category_suggestions: List[str], suggest_phrases: List[str]
     ):
         self.category_suggestions = category_suggestions
-        self.record_titles = record_titles
+        self.suggest_phrases = suggest_phrases
 
     def filter_items(self, items: List[str], keyword: str) -> List[str]:
         keyword_lower = keyword.lower()
@@ -21,11 +21,10 @@ class SuggesterOptions:
     def get_suggestions(
         self, input: str
     ) -> Dict[str, Union[List[str], Dict[str, List[str]]]]:
-        categories = self.filter_items(self.category_suggestions, input)
-        titles = self.filter_items(self.record_titles, input)
+        phrases = self.filter_items(self.suggest_phrases, input)
         return {
-            'category_suggestions': categories,
-            'record_suggestions': {'titles': titles},
+            'category_suggestions': [input],
+            'record_suggestions': {'suggest_phrases': phrases},
         }
 
 
@@ -33,7 +32,7 @@ def load_suggester_options(filename: str) -> SuggesterOptions:
     data = load_json_data(filename)
     return SuggesterOptions(
         category_suggestions=data['category_suggestions'],
-        record_titles=data['record_suggestions']['titles'],
+        suggest_phrases=data['record_suggestions']['suggest_phrases'],
     )
 
 
@@ -51,7 +50,6 @@ def handle_search_autocomplete_api(route: Route) -> None:
         )
     else:
         input_value = inputs[0]
-        # filters_value = search_params.get('filter')
         suggestions = suggester_options.get_suggestions(input_value)
 
         route.fulfill(json=suggestions)
