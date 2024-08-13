@@ -4,6 +4,7 @@ import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import loadash from "lodash";
+import { TestHelper } from "../../common/utils";
 
 interface MapProps {
   centerLongitude?: number;
@@ -112,7 +113,6 @@ const ReactMap = ({
     );
 
     if (map !== null) {
-      document.MAP_OBJECT = map;
       // const zoomEvent = (
       //   e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
       // ) => onZoomEvent && onZoomEvent(e);
@@ -164,7 +164,12 @@ const ReactMap = ({
   ]);
 
   return (
-    map && <MapContext.Provider value={{ map }}>{children}</MapContext.Provider>
+    map && (
+      <MapContext.Provider value={{ map }}>
+        <TestHelper getMap={() => map} />
+        {children}
+      </MapContext.Provider>
+    )
   );
 };
 
