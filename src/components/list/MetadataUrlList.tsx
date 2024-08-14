@@ -10,7 +10,7 @@ interface MetadataUrlListProps {
 const MetadataUrlList: React.FC<MetadataUrlListProps> = ({ url }) => {
   const link: ReactNode[] = [];
   link.push(
-    <TextItem>
+    <TextItem key={"url"}>
       <Link href={url} target="_blank" rel="noopener noreferrer">
         {url}
       </Link>
