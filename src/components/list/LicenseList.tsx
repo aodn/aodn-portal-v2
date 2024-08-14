@@ -24,7 +24,7 @@ const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
             </Link>
           </Grid>
           <Grid item md={12} sx={{ marginTop: theme.mp.md }}>
-            <img src={graphic} alt="license graphic" />
+            {graphic && <img src={graphic} alt="license graphic" />}
           </Grid>
         </Grid>
       </StyledItemGrid>

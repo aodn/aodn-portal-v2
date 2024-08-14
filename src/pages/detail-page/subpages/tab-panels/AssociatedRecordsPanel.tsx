@@ -7,7 +7,7 @@ import {
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import AssociatedRecordList from "../../../../components/list/AssociatedRecordList";
 import NavigatablePanel from "./NavigatablePanel";
-import { parseJson } from "../../../../utils/JsonUtils";
+import { parseJson } from "../../../../utils/Helpers";
 
 const AssociatedRecordsPanel = () => {
   const context = useDetailPageContext();

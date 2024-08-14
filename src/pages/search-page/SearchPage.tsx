@@ -132,6 +132,7 @@ const SearchPage = () => {
       dispatch(fetchResultWithStore(param)).then(() => {
         // Use a different parameter so that it return id and bbox only and do not store the values
         dispatch(
+          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted and ordered by uuid to avoid affecting cluster calculation
           fetchResultNoStore({ ...param, properties: "id,bbox", sortby: "id" })
         )
           .unwrap()
