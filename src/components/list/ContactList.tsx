@@ -1,7 +1,7 @@
 import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
-import ContactItem from "./listItem/ContactItem";
+import ContactArea from "./listItem/subitem/ContactArea";
 import CollapseItem from "./listItem/CollapseItem";
 
 interface ContactListProps {
@@ -18,10 +18,10 @@ const ContactList: React.FC<ContactListProps> = ({ title, contacts }) => {
         <CollapseItem
           key={index}
           title={contact.organization + suffix}
-          isContactFragment
+          isContact
           email={contact.emails ? contact.emails[0] : undefined}
         >
-          <ContactItem contact={contact} />
+          <ContactArea contact={contact} />
         </CollapseItem>
       );
     });

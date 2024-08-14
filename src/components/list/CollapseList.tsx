@@ -1,7 +1,7 @@
 import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import CollapseItem from "./listItem/CollapseItem";
-import TextItem from "./listItem/TextItem";
+import TextArea from "./listItem/subitem/TextArea";
 
 interface CollapseListProps {
   title: string;
@@ -16,7 +16,7 @@ const CollapseList: React.FC<CollapseListProps> = ({ title, items }) => {
       returnedList.push(
         <CollapseItem title={item.title} key={index}>
           {item.content?.map((content, index) => {
-            return <TextItem key={index}>{content}</TextItem>;
+            return <TextArea key={index}>{content}</TextArea>;
           })}
         </CollapseItem>
       );

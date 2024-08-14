@@ -1,21 +1,98 @@
 import { createTheme, ThemeOptions } from "@mui/material/styles";
 
+declare module "@mui/material/styles" {
+  interface Theme {
+    border: {
+      nil: string;
+      detailSubtabBtn: string;
+    };
+    mp: {
+      nil: string;
+      xs: string;
+      sm: string;
+      md: string;
+      lg: string;
+      xlg: string;
+      xxlg: string;
+    };
+    borderRadius: {
+      sm: string;
+      md: string;
+      lg: string;
+      xlg: string;
+      xxlg: string;
+    };
+  }
+
+  interface ThemeOptions {
+    border?: {
+      none?: string;
+      detailSubtabBtn?: string;
+    };
+    mp?: {
+      nil?: string;
+      xs?: string;
+      sm?: string;
+      md?: string;
+      lg?: string;
+      xlg?: string;
+      xxlg?: string;
+    };
+    borderRadius?: {
+      sm?: string;
+      md?: string;
+      lg?: string;
+      xlg?: string;
+      xxlg?: string;
+    };
+  }
+
+  interface Palette {
+    detail: {
+      text: string;
+      listItemBG: string;
+    };
+  }
+
+  interface PaletteOptions {
+    detail?: {
+      text: string;
+      listItemBG?: string;
+    };
+  }
+
+  interface TypographyVariants {
+    detailTitle: TypographyVariants["body1"];
+    detailContent: TypographyVariants["body1"];
+  }
+
+  interface TypographyVariantsOptions {
+    detailTitle?: TypographyVariantsOptions["body1"];
+    detailContent?: TypographyVariantsOptions["body1"];
+  }
+}
+
+declare module "@mui/material/Typography/Typography" {
+  interface TypographyPropsVariantOverrides {
+    detailTitle: true;
+    detailContent: true;
+  }
+}
+
 const theme: ThemeOptions = {
   palette: {
+    detail: {
+      text: "#5B5B5B",
+      listItemBG: "#F2F6F9",
+    },
     primary: {
       main: "#3B6E8F",
       light: "#52BDEC",
       dark: "#2F4F6C",
     },
-    secondary: {
-      main: "#54BCEB",
-      light: "#B3E2F7",
-      dark: "#1C9FE4",
-    },
-    divider: "#DDDDDD",
     info: {
-      main: "#51BCEB",
-      light: "#B3C8D4",
+      main: "#000000",
+      light: "#000000",
       dark: "#3A6F8F",
     },
     common: {
@@ -27,6 +104,29 @@ const theme: ThemeOptions = {
       // light: "",
       // dark: "",
     },
+  },
+
+  border: {
+    none: "none",
+    detailSubtabBtn: " 1px solid var(--brand_dark-blue_80, #618CA5)",
+  },
+
+  mp: {
+    nil: "0",
+    xs: "2px",
+    sm: "5px",
+    md: "10px",
+    lg: "15px",
+    xlg: "25px",
+    xxlg: "30px",
+  },
+
+  borderRadius: {
+    sm: "5px",
+    md: "8px",
+    lg: "10px",
+    xlg: "15px",
+    xxlg: "20px",
   },
 
   breakpoints: {
@@ -48,6 +148,22 @@ const theme: ThemeOptions = {
       "sans-serif",
       "Roboto",
     ].join(","),
+
+    detailTitle: {
+      fontSize: "16px",
+      fontStyle: "normal",
+      fontWeight: 600,
+      color: "#5B5B5B",
+      fontFamily: "Noto Sans",
+    },
+    detailContent: {
+      lineHeight: "22.5px",
+      fontSize: "14px",
+      fontStyle: "normal",
+      fontWeight: 400,
+      color: "#5B5B5B",
+      fontFamily: "Noto Sans",
+    },
 
     body1: {
       padding: "10px 0 0 0",
@@ -147,7 +263,11 @@ const theme: ThemeOptions = {
       styleOverrides: {
         root: {
           textDecoration: "none",
-          color: "#747474",
+          fontSize: "14px",
+          fontStyle: "normal",
+          fontWeight: 400,
+          lineHeight: "22px",
+          color: "#468CB6",
           "&:hover": {
             textDecoration: "underline",
             color: "#54BCEB",
