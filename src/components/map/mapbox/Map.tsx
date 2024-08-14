@@ -4,21 +4,24 @@ import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import loadash from "lodash";
+import { mapDefault } from "../../common/constants";
+
+type PROJECTION =
+  | "mercator"
+  | "globe"
+  | "albers"
+  | "equalEarth"
+  | "equirectangular"
+  | "lambertConformalConic"
+  | "naturalEarth"
+  | "winkelTripel";
 
 interface MapProps {
   centerLongitude?: number;
   centerLatitude?: number;
   zoom?: number;
   panelId: string;
-  projection?:
-    | "mercator"
-    | "globe"
-    | "albers"
-    | "equalEarth"
-    | "equirectangular"
-    | "lambertConformalConic"
-    | "naturalEarth"
-    | "winkelTripel";
+  projection?: PROJECTION;
   onZoomEvent?: (
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
@@ -60,10 +63,10 @@ const DEBOUNCE_BEFORE_EVENT_FIRE = 1250;
 
 const ReactMap = ({
   panelId,
-  centerLongitude = 147.3353554138993,
-  centerLatitude = -42.88611707886841,
-  zoom = 4,
-  projection = "equirectangular",
+  centerLongitude = mapDefault.centerLongitude,
+  centerLatitude = mapDefault.centerLatitude,
+  zoom = mapDefault.zoom,
+  projection = mapDefault.projection as PROJECTION,
   onZoomEvent,
   onMoveEvent,
   children,
@@ -112,14 +115,6 @@ const ReactMap = ({
     );
 
     if (map !== null) {
-      // const zoomEvent = (
-      //   e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-      // ) => onZoomEvent && onZoomEvent(e);
-
-      // const moveEvent = (
-      //   e: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-      // ) => onMoveEvent && onMoveEvent(e);
-
       map.setProjection(projection);
       // Stop drag cause map to rotate.
       map.dragRotate.disable();
