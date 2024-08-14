@@ -72,9 +72,7 @@ interface DateRangeSliderProps {
 
 const DateRangeSlider: FC<DateRangeSliderProps> = ({ filter, setFilter }) => {
   const dispatch = useDispatch<AppDispatch>();
-  // const { dateTimeFilterRange } = filter;
-  const componentParam: ParameterState = getComponentState(store.getState());
-  const { dateTimeFilterRange } = componentParam;
+  const { dateTimeFilterRange } = filter;
 
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
   const [maxDate, setMaxDate] = useState<Dayjs>(initialMaxDate);
@@ -95,6 +93,11 @@ const DateRangeSlider: FC<DateRangeSliderProps> = ({ filter, setFilter }) => {
         dateTimeFilterRange.start ?? dateToValue(initialMinDate),
         dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
       ]);
+    } else {
+      // Reset to initial state when dateTimeFilterRange is null or undefined
+      setMinDate(initialMinDate);
+      setMaxDate(initialMaxDate);
+      setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
     }
   }, [dateTimeFilterRange]);
 
