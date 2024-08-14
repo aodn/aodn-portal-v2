@@ -1,21 +1,26 @@
 import { Grid, Switch, SwitchProps } from "@mui/material";
-import React, { useCallback } from "react";
+import React, { FC, useCallback } from "react";
 import imos_logo from "@/assets/logos/imos-logo-transparent.png";
-import { useDispatch } from "react-redux";
-import store, { AppDispatch, getComponentState } from "../store/store";
-import { ParameterState, updateImosOnly } from "../store/componentParamReducer";
+import { ParameterState } from "../store/componentParamReducer";
 import { padding } from "../../../styles/constants.js";
 
-const ImosOnlySwitch = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const componentParam: ParameterState = getComponentState(store.getState());
+interface imosOnlySwitchProps {
+  filter: ParameterState;
+  setFilter: React.Dispatch<React.SetStateAction<ParameterState>>;
+}
+
+const ImosOnlySwitch: FC<imosOnlySwitchProps> = ({ filter, setFilter }) => {
+  const { isImosOnlyDataset } = filter;
 
   const onImosOnlySwitch = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const p: SwitchProps = event.target as SwitchProps;
-      dispatch(updateImosOnly(p.checked));
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        isImosOnlyDataset: p.checked,
+      }));
     },
-    [dispatch]
+    [setFilter]
   );
 
   return (
@@ -47,7 +52,8 @@ const ImosOnlySwitch = () => {
         justifyContent="center"
       >
         <Switch
-          defaultChecked={componentParam.isImosOnlyDataset}
+          defaultChecked={isImosOnlyDataset ?? false}
+          checked={isImosOnlyDataset ?? false}
           onClick={onImosOnlySwitch}
         />
       </Grid>

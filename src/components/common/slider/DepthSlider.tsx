@@ -1,4 +1,4 @@
-import * as React from "react";
+import { FC, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import StyledSlider from "../../../styles/StyledSlider";
 import SliderLine from "./SliderLine";
@@ -10,6 +10,12 @@ import {
   fontWeight,
   padding,
 } from "../../../styles/constants";
+import { ParameterState } from "../store/componentParamReducer";
+
+interface DepthSliderProps {
+  filter: ParameterState;
+  setFilter: React.Dispatch<React.SetStateAction<ParameterState>>;
+}
 
 const DEPTH_MARKS = [
   {
@@ -52,9 +58,9 @@ const CONTAINER_HEIGHT = 250;
  * Parameters including width, height etc. are all hard-coded. Will change in the future.
  * @constructor
  */
-const DepthSlider = () => {
-  const [sliderValues, setSliderValues] =
-    React.useState<number[]>(DEFAULT_VALUES);
+const DepthSlider: FC<DepthSliderProps> = ({ filter, setFilter }) => {
+  // TODO: implement DepthFilter when backend supports this query
+  const [sliderValues, setSliderValues] = useState<number[]>(DEFAULT_VALUES);
 
   const handleSliderChange = (
     _: Event,

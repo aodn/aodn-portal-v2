@@ -2,25 +2,31 @@ import { Box, Grid, SxProps, Theme } from "@mui/material";
 import DepthSlider from "../slider/DepthSlider";
 import PlainDropdownMenu from "../dropdown/PlainDropdownMenu";
 import { margin } from "../../../styles/constants";
+import { ParameterState } from "../store/componentParamReducer";
+import { FC } from "react";
 
 interface DepthFiltersProps {
+  filter: ParameterState;
+  setFilter: React.Dispatch<React.SetStateAction<ParameterState>>;
   sx?: SxProps<Theme>;
 }
 
-const DepthFilter = (props: DepthFiltersProps) => {
-  const depthUnits = [
-    "meters",
-    "feet",
-    "fathoms",
-    "centimeters",
-    "inches",
-    "millimeters",
-  ];
+const DEPTH_UNITS = [
+  "meters",
+  "feet",
+  "fathoms",
+  "centimeters",
+  "inches",
+  "millimeters",
+];
+
+const DepthFilter: FC<DepthFiltersProps> = ({ filter, setFilter, sx }) => {
+  // TODO: implement DepthFilter when backend supports this query
   return (
-    <Grid container sx={{ ...props.sx }}>
+    <Grid container sx={{ ...sx }}>
       <Grid item xs={12} display="flex" justifyContent="end">
         <Box sx={{ width: "40%" }}>
-          <PlainDropdownMenu items={depthUnits} onSelectCallback={() => {}} />
+          <PlainDropdownMenu items={DEPTH_UNITS} onSelectCallback={() => {}} />
         </Box>
       </Grid>
       <Grid
@@ -28,7 +34,7 @@ const DepthFilter = (props: DepthFiltersProps) => {
         xs={12}
         sx={{ marginTop: margin.top, marginBottom: margin.bottom }}
       >
-        <DepthSlider />
+        <DepthSlider filter={filter} setFilter={setFilter} />
       </Grid>
     </Grid>
   );

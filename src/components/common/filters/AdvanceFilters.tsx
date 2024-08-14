@@ -4,6 +4,7 @@ import {
   ParameterState,
   updateCategories,
   updateDateTimeFilterRange,
+  updateImosOnly,
 } from "../store/componentParamReducer";
 import store, { AppDispatch, getComponentState } from "../store/store";
 import {
@@ -34,13 +35,13 @@ import {
   zIndex,
 } from "../../../styles/constants";
 
-export interface NonRemovableFiltersProps {
+interface FiltersProps {
   showFilters: boolean;
   setShowFilters: (value: boolean) => void;
   sx?: SxProps<Theme>;
 }
 
-const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
+const AdvanceFilters: FC<FiltersProps> = ({
   showFilters = false,
   setShowFilters = () => {},
   sx = {},
@@ -49,10 +50,9 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const componentParam: ParameterState = getComponentState(store.getState());
 
-  // state used to store the provisional filter options selected
+  // State used to store the provisional filter options selected,
   // only dispatch to redux when 'apply' button is hit
   const [filter, setFilter] = useState<ParameterState>({});
-  console.log("filter=====", filter);
 
   // initialize filter
   useEffect(() => {
@@ -70,29 +70,38 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
     setFilter({});
   }, []);
 
-  // TODO: refactor: default-empty filter
+  // TODO: implement DataDeliveryModeFilter and DepthFilter when backend supports this query
   const handleApplyFilter = useCallback(() => {
     if (filter.dateTimeFilterRange) {
       dispatch(updateDateTimeFilterRange(filter.dateTimeFilterRange));
     } else {
-      dispatch(updateDateTimeFilterRange({ start: undefined, end: undefined }));
+      dispatch(updateDateTimeFilterRange({}));
     }
     if (filter.categories) {
       dispatch(updateCategories(filter.categories));
     } else {
       dispatch(updateCategories([]));
     }
+    if (filter.isImosOnlyDataset) {
+      dispatch(updateImosOnly(filter.isImosOnlyDataset));
+    } else {
+      dispatch(updateImosOnly(false));
+    }
     setShowFilters(false);
     setFilter({});
-  }, [dispatch, filter.categories, filter.dateTimeFilterRange, setShowFilters]);
+  }, [
+    dispatch,
+    filter.categories,
+    filter.dateTimeFilterRange,
+    filter.isImosOnlyDataset,
+    setShowFilters,
+  ]);
 
   return (
     <>
       <Dialog
         open={showFilters}
-        onClose={() => {
-          setShowFilters(false);
-        }}
+        onClose={handleCloseFilter}
         TransitionComponent={Fade}
         transitionDuration={{ enter: 500, exit: 300 }}
         fullWidth
@@ -159,7 +168,7 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
                 </Grid>
                 <Grid item xs={5}>
                   <FilterSection title={"Depth"}>
-                    <DepthFilter />
+                    <DepthFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={7}>
@@ -169,13 +178,16 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
                 </Grid>
                 <Grid item xs={5}>
                   <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
-                    <DataDeliveryModeFilter />
+                    <DataDeliveryModeFilter
+                      filter={filter}
+                      setFilter={setFilter}
+                    />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={2}>
                   <Box width="70%" height="100%">
                     <FilterSection title={""}>
-                      <ImosOnlySwitch />
+                      <ImosOnlySwitch filter={filter} setFilter={setFilter} />
                     </FilterSection>
                   </Box>
                 </Grid>

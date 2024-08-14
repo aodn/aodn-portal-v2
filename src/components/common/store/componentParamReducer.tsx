@@ -24,9 +24,7 @@ interface DataTimeFilterRange {
 export interface ParameterState {
   polygon?: Feature<Polygon, GeoJsonProperties>;
   isImosOnlyDataset?: boolean;
-  // Use in RemovableDateTimeFilter
   dateTimeFilterRange?: DataTimeFilterRange;
-  // Use in search box
   searchText?: string;
   commonKey?: string;
   categories?: Array<Category>;
@@ -126,7 +124,6 @@ const updateSortBy = (
 const createInitialParameterState = (): ParameterState => {
   return {
     isImosOnlyDataset: false,
-    dateTimeFilterRange: {},
     searchText: "",
   };
 };
@@ -184,6 +181,7 @@ const paramReducer = (
       return state;
   }
 };
+
 // Flatten the ParameterState json to a properties like array, where key is
 // the name.name.name... that describe multiple level json.
 // Must use any due to multiple type complicated type casting
@@ -213,14 +211,19 @@ const flattenToProperties = (
   }
   return result;
 };
+
 // Change the flatten json to xxx=yyy?xxxx=yyyy which can be use in url.
 const formatToUrlParam = (param: ParameterState) => {
   const result = flattenToProperties(param);
   const parts = [];
   for (const key in result) {
     if (Object.prototype.hasOwnProperty.call(result, key)) {
-      // Check if the value is not an empty string before adding to parts
-      if (result[key] !== "") {
+      // Only add the parameter if it's not undefined, null, or an empty string
+      if (
+        result[key] !== undefined &&
+        result[key] !== null &&
+        result[key] !== ""
+      ) {
         parts.push(
           `${encodeURIComponent(key)}=${encodeURIComponent(result[key])}`
         );
@@ -244,6 +247,7 @@ const parseQueryString = (queryString: string) => {
 
   return obj;
 };
+
 // Convert the url parameter back to ParameterState, check test case for more details
 const unFlattenToParameterState = (input: string): ParameterState => {
   const result = createInitialParameterState();
@@ -279,6 +283,7 @@ const unFlattenToParameterState = (input: string): ParameterState => {
       }
     }
   }
+
   // Special handle for polygon
   if (Object.prototype.hasOwnProperty.call(result, "polygon")) {
     // By default empty object will not be serialized, so when deserialize, we may miss some default empty value

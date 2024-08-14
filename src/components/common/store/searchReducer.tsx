@@ -281,22 +281,23 @@ const createSearchParamFrom = (i: ParameterState): SearchParameters => {
     );
   }
 
-  if (i.dateTimeFilterRange) {
+  if (
+    i.dateTimeFilterRange &&
+    (i.dateTimeFilterRange.start || i.dateTimeFilterRange.end)
+  ) {
     if (i.dateTimeFilterRange.start && i.dateTimeFilterRange.end) {
       const f = cqlDefaultFilters.get("BETWEEN_TIME_RANGE") as TemporalDuring;
       p.filter = appendFilter(
         p.filter,
         f(i.dateTimeFilterRange.start, i.dateTimeFilterRange.end)
       );
-    }
-    if (
+    } else if (
       i.dateTimeFilterRange.start === undefined &&
       i.dateTimeFilterRange.end
     ) {
       const f = cqlDefaultFilters.get("BEFORE_TIME") as TemporalAfterOrBefore;
       p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.end));
-    }
-    if (
+    } else if (
       i.dateTimeFilterRange.end === undefined &&
       i.dateTimeFilterRange.start
     ) {
