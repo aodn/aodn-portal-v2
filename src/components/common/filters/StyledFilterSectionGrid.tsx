@@ -1,8 +1,8 @@
 import { Grid } from "@mui/material";
 import { styled } from "@mui/system";
-import blue from "../components/common/colors/blue";
+import blue from "../colors/blue";
 
-import { borderRadius } from "./constants";
+import { borderRadius } from "../../../styles/constants";
 
 interface StyledFilterSectionGridProps {
   padding?: string;

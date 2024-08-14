@@ -6,18 +6,15 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Slider, Box, Grid, styled } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
   border,
   borderRadius,
   color,
   fontColor,
-  fontSize,
-  fontWeight,
   padding,
 } from "../../../styles/constants";
 import { dateDefault } from "../constants";
@@ -25,9 +22,11 @@ import { ParameterState } from "../store/componentParamReducer";
 import TimeRangeBarChart from "../charts/TimeRangeBarChart";
 import { OGCCollections } from "../store/OGCCollectionDefinitions";
 import { useDispatch } from "react-redux";
-import store, { AppDispatch, getComponentState } from "../store/store";
+import { AppDispatch } from "../store/store";
 import { fetchResultNoStore } from "../store/searchReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
+import PlainDatePicker from "../datetime/PlainDatePicker";
+import PlainSlider from "../slider/PlainSlider";
 
 const datePikerSlotProps = {
   desktopPaper: {
@@ -285,49 +284,3 @@ const DateRangeSlider: FC<DateRangeSliderProps> = ({ filter, setFilter }) => {
 };
 
 export default DateRangeSlider;
-
-const PlainDatePicker = styled(DatePicker)(() => ({
-  borderRadius: "4px",
-  boxShadow: "2px 2px 4px 0px rgba(0, 0, 0, 0.15)",
-  backgroundColor: "#fff",
-  width: "100%",
-  "& fieldset": {
-    border: "none",
-  },
-  "& input": {
-    fontSize: fontSize.label,
-    color: fontColor.gray.dark,
-    fontWeight: fontWeight.regular,
-    padding: 0,
-    textAlign: "center",
-  },
-  "& .MuiInputBase-root": {
-    padding: "6px 10px ",
-  },
-  "& .MuiInputAdornment-root": {
-    margin: 0,
-  },
-}));
-
-const PlainSlider = styled(Slider)(() => ({
-  "& .MuiSlider-valueLabel": {
-    fontSize: fontSize.info,
-    fontWeight: fontWeight.regular,
-    color: fontColor.gray.medium,
-    top: 0,
-    backgroundColor: "transparent",
-  },
-  "& .MuiSlider-track": {
-    backgroundColor: color.brightBlue.dark,
-    border: "none",
-  },
-  "& .MuiSlider-rail": {
-    backgroundColor: "#BDC7D6",
-  },
-  "& .MuiSlider-thumb": {
-    backgroundColor: "#FFF",
-    width: "18px",
-    height: "18px",
-    boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.50)",
-  },
-}));

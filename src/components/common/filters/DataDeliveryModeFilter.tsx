@@ -1,7 +1,7 @@
 import { FC, useCallback, useState } from "react";
 import { Grid, SxProps, Theme } from "@mui/material";
-import { StyledToggleButton } from "../../../styles/StyledToggleButton";
-import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup";
+import { StyledToggleButton } from "../buttons/StyledToggleButton";
+import { StyledToggleButtonGroup } from "../buttons/StyledToggleButtonGroup";
 import { ParameterState } from "../store/componentParamReducer";
 
 interface DataDeliveryModeFilterProps {

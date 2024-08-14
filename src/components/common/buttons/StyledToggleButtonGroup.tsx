@@ -1,14 +1,7 @@
 import { ToggleButtonGroup } from "@mui/material";
 import { styled } from "@mui/system";
 
-import {
-  fontColor,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  gap,
-  padding,
-} from "./constants";
+import { fontFamily, fontSize, gap, padding } from "../../../styles/constants";
 
 export const StyledToggleButtonGroup = styled(ToggleButtonGroup)({
   display: "flex",
@@ -17,10 +10,9 @@ export const StyledToggleButtonGroup = styled(ToggleButtonGroup)({
   gap: gap.lg,
   padding: padding.extraSmall,
   "& .MuiToggleButton-root": {
+    textTransform: "capitalize",
     padding: padding.extraSmall,
     fontSize: fontSize.label,
     fontFamily: fontFamily.general,
-    fontWeight: fontWeight.medium,
-    color: `${fontColor.gray.medium}`,
   },
 });

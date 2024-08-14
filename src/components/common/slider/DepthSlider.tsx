@@ -1,6 +1,5 @@
-import { FC, useState } from "react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
-import StyledSlider from "../../../styles/StyledSlider";
 import SliderLine from "./SliderLine";
 import depth_image from "@/assets/images/depth-selector.png";
 import {
@@ -11,10 +10,11 @@ import {
   padding,
 } from "../../../styles/constants";
 import { ParameterState } from "../store/componentParamReducer";
+import PlainSlider from "./PlainSlider";
 
 interface DepthSliderProps {
   filter: ParameterState;
-  setFilter: React.Dispatch<React.SetStateAction<ParameterState>>;
+  setFilter: Dispatch<SetStateAction<ParameterState>>;
 }
 
 const DEPTH_MARKS = [
@@ -52,6 +52,8 @@ const DEFAULT_VALUES = [1000, 2000];
 
 const CONTAINER_HEIGHT = 250;
 
+const MAX_DEPTH = 3000;
+
 /**
  * TODO: may need to be refactored to use theme. Currently, all colors are
  * referenced from the design document(in Figma).
@@ -71,9 +73,9 @@ const DepthSlider: FC<DepthSliderProps> = ({ filter, setFilter }) => {
   };
   const formatLabel = (value: number) => {
     if (value === -1) {
-      return <Box>{">3000m"}</Box>;
+      return <Box>{`${MAX_DEPTH}m`}</Box>;
     }
-    return <Box>{3000 - value}m</Box>;
+    return <Box>{`${MAX_DEPTH - value}m`}</Box>;
   };
 
   return (
@@ -116,14 +118,14 @@ const DepthSlider: FC<DepthSliderProps> = ({ filter, setFilter }) => {
         />
       </Grid>
       <Grid item xs={3} sx={{ height: CONTAINER_HEIGHT }}>
-        <StyledSlider
-          isvertical="true"
+        <PlainSlider
+          isVertical
           getAriaLabel={() => "depth"}
           orientation="vertical"
           defaultValue={DEFAULT_VALUES}
           valueLabelDisplay="on"
           min={-1}
-          max={3000}
+          max={MAX_DEPTH}
           valueLabelFormat={formatLabel}
           onChange={handleSliderChange}
         />

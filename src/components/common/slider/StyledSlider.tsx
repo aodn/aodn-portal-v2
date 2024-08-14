@@ -1,6 +1,7 @@
+// Unused component
 import { styled } from "@mui/system";
 import Slider from "@mui/material/Slider";
-import { fontColor, fontSize, fontWeight } from "./constants";
+import { fontColor, fontSize, fontWeight } from "../../../styles/constants";
 
 interface StyledSliderProps {
   theme?: any;

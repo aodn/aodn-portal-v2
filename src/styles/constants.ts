@@ -7,6 +7,7 @@ const gap = {
   md: "5px",
   lg: "8px",
   xlg: "10px",
+  xxlg: "15px",
 };
 
 const margin = {
@@ -31,7 +32,7 @@ const margin = {
 
 const padding = {
   nil: "0",
-  extraSmall: "5px",
+  extraSmall: "6px",
   small: "10px",
   medium: "15px",
   large: "20px",
@@ -127,10 +128,6 @@ const borderRadius = {
 const filterList = {
   filterListMaxDisplay: 4,
 };
-
-/**
- * for better readability or additions to the theme, consider putting style constants here
- */
 
 const zIndex = {
   MAP_COORD: 1,

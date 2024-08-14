@@ -1,19 +1,26 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  FC,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { Grid, SxProps, Theme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { fetchParameterCategoriesWithStore } from "../store/searchReducer";
 import { Category, ParameterState } from "../store/componentParamReducer";
-import { StyledToggleButton } from "../../../styles/StyledToggleButton";
-import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup";
+import { StyledToggleButton } from "../buttons/StyledToggleButton";
+import { StyledToggleButtonGroup } from "../buttons/StyledToggleButtonGroup";
 
 interface CategoryVocabFilterProps {
   filter: ParameterState;
-  setFilter: React.Dispatch<React.SetStateAction<ParameterState>>;
+  setFilter: Dispatch<SetStateAction<ParameterState>>;
   sx?: SxProps<Theme>;
 }
 
-const CategoryFilter: React.FC<CategoryVocabFilterProps> = ({
+const CategoryFilter: FC<CategoryVocabFilterProps> = ({
   filter,
   setFilter,
   sx,

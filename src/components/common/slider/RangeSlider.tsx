@@ -1,9 +1,10 @@
+// Unused component
 import * as React from "react";
 import { useCallback, useEffect } from "react";
 import Box from "@mui/material/Box";
 import { SxProps, Theme } from "@mui/material";
 import { dateDefault } from "../constants";
-import StyledSlider from "../../../styles/StyledSlider";
+import StyledSlider from "./StyledSlider";
 
 interface RangeSliderProps<T> {
   title?: string;

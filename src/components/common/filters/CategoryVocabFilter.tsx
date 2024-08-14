@@ -15,8 +15,8 @@ import {
   ParameterState,
   updateCategories,
 } from "../store/componentParamReducer";
-import { StyledToggleButton } from "../../../styles/StyledToggleButton";
-import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup";
+import { StyledToggleButtonGroup } from "../buttons/StyledToggleButtonGroup";
+import { StyledToggleButton } from "../buttons/StyledToggleButton";
 
 interface CategoryVocabFilterProps {
   filter: ParameterState;

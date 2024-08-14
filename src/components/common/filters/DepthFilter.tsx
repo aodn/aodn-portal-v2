@@ -1,9 +1,9 @@
+import { FC } from "react";
 import { Box, Grid, SxProps, Theme } from "@mui/material";
 import DepthSlider from "../slider/DepthSlider";
 import PlainDropdownMenu from "../dropdown/PlainDropdownMenu";
 import { margin } from "../../../styles/constants";
 import { ParameterState } from "../store/componentParamReducer";
-import { FC } from "react";
 
 interface DepthFiltersProps {
   filter: ParameterState;
@@ -25,7 +25,7 @@ const DepthFilter: FC<DepthFiltersProps> = ({ filter, setFilter, sx }) => {
   return (
     <Grid container sx={{ ...sx }}>
       <Grid item xs={12} display="flex" justifyContent="end">
-        <Box sx={{ width: "40%" }}>
+        <Box sx={{ width: "40%", marginTop: margin.lg }}>
           <PlainDropdownMenu items={DEPTH_UNITS} onSelectCallback={() => {}} />
         </Box>
       </Grid>
