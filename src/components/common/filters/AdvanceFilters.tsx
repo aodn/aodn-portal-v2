@@ -1,4 +1,11 @@
 import { FC, useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import {
+  ParameterState,
+  updateCategories,
+  updateDateTimeFilterRange,
+} from "../store/componentParamReducer";
+import store, { AppDispatch, getComponentState } from "../store/store";
 import {
   Box,
   Button,
@@ -11,9 +18,11 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import DateRangeSlider from "./DateRangeFilter";
+import CategoryFilter from "./CategoryFilter";
 import DepthFilter from "./DepthFilter";
 import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
-import CategoryVocabFilter from "./CategoryVocabFilter";
 import ImosOnlySwitch from "./ImosOnlySwitch";
 import FilterSection from "./FilterSection";
 import {
@@ -24,15 +33,6 @@ import {
   padding,
   zIndex,
 } from "../../../styles/constants";
-import CloseIcon from "@mui/icons-material/Close";
-import {
-  ParameterState,
-  updateCategories,
-  updateDateTimeFilterRange,
-} from "../store/componentParamReducer";
-import store, { AppDispatch, getComponentState } from "../store/store";
-import DateRangeSlider from "./DateRangeFilter";
-import { useDispatch } from "react-redux";
 
 export interface NonRemovableFiltersProps {
   showFilters: boolean;
@@ -50,7 +50,7 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
   const componentParam: ParameterState = getComponentState(store.getState());
 
   // state used to store the provisional filter options selected
-  // only dispatch when 'apply' button is hit
+  // only dispatch to redux when 'apply' button is hit
   const [filter, setFilter] = useState<ParameterState>({});
   console.log("filter=====", filter);
 
@@ -63,12 +63,14 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
 
   const handleCloseFilter = useCallback(() => {
     setShowFilters(false);
+    setFilter({});
   }, [setShowFilters]);
 
   const onClearAll = useCallback(() => {
     setFilter({});
   }, []);
 
+  // TODO: refactor: default-empty filter
   const handleApplyFilter = useCallback(() => {
     if (filter.dateTimeFilterRange) {
       dispatch(updateDateTimeFilterRange(filter.dateTimeFilterRange));
@@ -77,9 +79,11 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
     }
     if (filter.categories) {
       dispatch(updateCategories(filter.categories));
+    } else {
+      dispatch(updateCategories([]));
     }
-
     setShowFilters(false);
+    setFilter({});
   }, [dispatch, filter.categories, filter.dateTimeFilterRange, setShowFilters]);
 
   return (
@@ -160,10 +164,7 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
                 </Grid>
                 <Grid item xs={7}>
                   <FilterSection isTitleOnlyHeader title={"Parameter"}>
-                    <CategoryVocabFilter
-                      filter={filter}
-                      setFilter={setFilter}
-                    />
+                    <CategoryFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>

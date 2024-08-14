@@ -1,3 +1,4 @@
+// Unused component
 import Collapse from "@mui/material/Collapse";
 import { Grid } from "@mui/material";
 import NoBorderButton from "../buttons/NoBorderButton";

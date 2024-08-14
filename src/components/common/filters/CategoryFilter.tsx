@@ -1,68 +1,56 @@
-// Unused component
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Grid, SxProps, Theme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { fetchParameterCategoriesWithStore } from "../store/searchReducer";
-import {
-  Category,
-  ParameterState,
-  updateCategories,
-} from "../store/componentParamReducer";
+import { Category, ParameterState } from "../store/componentParamReducer";
 import { StyledToggleButton } from "../../../styles/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../../styles/StyledToggleButtonGroup";
 
 interface CategoryVocabFilterProps {
   filter: ParameterState;
-  setFilter: Dispatch<SetStateAction<ParameterState>>;
+  setFilter: React.Dispatch<React.SetStateAction<ParameterState>>;
   sx?: SxProps<Theme>;
 }
 
-const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
+const CategoryFilter: React.FC<CategoryVocabFilterProps> = ({
+  filter,
+  setFilter,
+  sx,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const [categories, setCategories] = useState<Array<Category>>([]);
-
-  // Because the categories using in this component have duplicate labels. They should be combined so need this state
-  // to store the labels of the buttons
+  const [categories, setCategories] = useState<Category[]>([]);
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
 
-  const selectedCategories: Category[] | undefined = useSelector(
+  // Get selected categories from Redux store
+  const selectedCategories = useSelector(
     (state: RootState) => state.paramReducer.categories
   );
 
-  const selectedCategoryStrs = selectedCategories
-    ? [...new Set(selectedCategories.map((c) => c.label))]
-    : [];
+  // Initialize local state with selected categories from Redux
+  useEffect(() => {
+    setFilter((prevFilter) => ({
+      ...prevFilter,
+      categories: selectedCategories,
+    }));
+  }, [selectedCategories, setFilter]);
 
+  // Update the local filter state using the setFilter
   const handleChange = useCallback(
-    (_: any, newAlignment: any) => {
-      // Now given the newAlignment value, we need to find the categories object
-      // from there we can get the leaf node of what values to set for categories search
-      const selected: Array<Category> = categories.filter((c) =>
+    (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
+      const selected: Category[] = categories.filter((c) =>
         newAlignment.includes(c.label)
       );
-      const childSelected = new Array<Category>();
-
-      selected.forEach((selectedCategory) => {
-        if (selectedCategory.label) {
-          childSelected.push(selectedCategory);
-        }
-      });
-
-      dispatch(updateCategories(childSelected));
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        categories: selected,
+      }));
     },
-    [dispatch, categories]
+    [categories, setFilter]
   );
 
+  // Remove all items whose label is already in the labels array
   useEffect(() => {
-    // remove all items whose label is already in the labels array
-
     const labels = [...new Set(categories.map((c) => c.label))];
     setButtonLabels(labels);
   }, [categories]);
@@ -71,7 +59,7 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
     dispatch(fetchParameterCategoriesWithStore(null))
       .unwrap()
       .then((categories: Array<Category>) => {
-        // If the item do not have a broader terms, that means it is the root level
+        // If the item does not have broader terms, that means it is the root level
         const root = categories.filter((i) => i.broader?.length === 0);
 
         // Now we need to go one level lower as this is a requirement to display second level instead of top level
@@ -86,19 +74,20 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
         );
 
         setCategories(child);
-      });
+      })
+      .catch((error) => console.error("Error fetching categories:", error));
   }, [dispatch]);
 
   return (
-    <Grid container sx={{ ...props.sx }}>
+    <Grid container sx={sx}>
       <Grid item xs={12}>
         <StyledToggleButtonGroup
-          value={selectedCategoryStrs}
-          exclusive={false}
+          value={filter.categories?.map((c) => c.label) || []}
           onChange={handleChange}
+          aria-label="category selection"
         >
           {buttonLabels.map((label) => (
-            <StyledToggleButton value={label} key={label}>
+            <StyledToggleButton value={label} key={label} aria-label={label}>
               {label}
             </StyledToggleButton>
           ))}
@@ -108,4 +97,4 @@ const CategoryVocabFilter = (props: CategoryVocabFilterProps) => {
   );
 };
 
-export default CategoryVocabFilter;
+export default CategoryFilter;

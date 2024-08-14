@@ -72,7 +72,6 @@ const DepthSlider = () => {
 
   return (
     <Grid container direction={"row"}>
-      {/* <Grid item xs={1} /> */}
       <Grid item xs={2}>
         <Stack direction="column" justifyContent="space-between" height="100%">
           {DEPTH_MARKS.map((mark, index) => (
@@ -85,7 +84,7 @@ const DepthSlider = () => {
                 fontSize: fontSize.label,
                 fontFamily: fontFamily.general,
                 fontWeight: fontWeight.medium,
-                color: `${fontColor.gray.medium}`,
+                color: fontColor.gray.medium,
               }}
             >
               {mark.label}
