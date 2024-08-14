@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "./NavigatablePanel";
-import ContactList from "../../../../components/list/ContactList";
 import TextList from "../../../../components/list/TextList";
 import { convertDateFormat } from "../../../../utils/DateUtils";
 import MetadataUrlList from "../../../../components/list/MetadataUrlList";
+import MetadataContactList from "../../../../components/list/MetadataContactList";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
@@ -72,9 +72,9 @@ const MetadataInformationPanel = () => {
       {
         title: "Metadata Contact",
         component: (
-          <ContactList
-            title="Metadata Contact"
+          <MetadataContactList
             contacts={metadataContact ? metadataContact : []}
+            title="Metadata Contact"
           />
         ),
       },
