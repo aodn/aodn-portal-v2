@@ -14,9 +14,9 @@ import {
 } from "../store/componentParamReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
 import TimeRangeBarChart from "../charts/TimeRangeBarChart";
-import StyledDateTimePicker from "../../../styles/StyledDateTimePicker";
 import { margin } from "../../../styles/constants";
 import { OGCCollections } from "../store/OGCCollectionDefinitions";
+import StyledDateTimePicker from "../datetime/StyledDateTimePicker";
 
 interface RemovableDateTimeFilterProps {
   url?: string;
