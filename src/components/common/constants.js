@@ -12,11 +12,4 @@ const pageDefault = {
   landing: "/",
 };
 
-const mapDefault = {
-  centerLongitude: 147.3353554138993,
-  centerLatitude: -42.88611707886841,
-  zoom: 4,
-  projection: "equirectangular",
-};
-
-export { dateDefault, pageDefault, mapDefault };
+export { dateDefault, pageDefault };
