@@ -14,7 +14,7 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
 }) => {
   const theme = useTheme();
   const metadataDateItem = (
-    <StyledItemGrid container>
+    <StyledItemGrid container key="Metadata date">
       {creation && (
         <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
           <Typography variant="detailContent">
