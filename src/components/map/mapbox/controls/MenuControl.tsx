@@ -26,7 +26,7 @@ import LayersIcon from "@mui/icons-material/Layers";
 import PublicIcon from "@mui/icons-material/Public";
 import grey from "../../../common/colors/grey";
 import blue from "../../../common/colors/blue";
-import { styles as mapStyles, defaultStyle } from "../Map";
+import { styles as mapStyles, MapDefault } from "../Map";
 import { borderRadius, fontSize } from "../../../../styles/constants";
 import EventEmitter from "events";
 
@@ -78,7 +78,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
   onEvent,
 }) => {
   const [currentStyle, setCurrentStyle] = useState<string>(
-    mapStyles[defaultStyle].id
+    mapStyles[MapDefault.DEFAULT_STYLE].id
   );
   // Must init the map so that it will not throw error indicate uncontrol to control component
   const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(

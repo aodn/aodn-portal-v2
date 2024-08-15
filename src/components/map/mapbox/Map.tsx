@@ -1,27 +1,24 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Map, MapboxEvent, Style } from "mapbox-gl";
+import {
+  LngLatBounds,
+  LngLatBoundsLike,
+  Map,
+  MapboxEvent,
+  Projection,
+  Style,
+} from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import loadash from "lodash";
-import { mapDefault } from "../../common/constants";
-
-type PROJECTION =
-  | "mercator"
-  | "globe"
-  | "albers"
-  | "equalEarth"
-  | "equirectangular"
-  | "lambertConformalConic"
-  | "naturalEarth"
-  | "winkelTripel";
 
 interface MapProps {
   centerLongitude?: number;
   centerLatitude?: number;
+  bbox?: LngLatBoundsLike;
   zoom?: number;
   panelId: string;
-  projection?: PROJECTION;
+  projection?: Projection | string;
   onZoomEvent?: (
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
@@ -29,6 +26,16 @@ interface MapProps {
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
 }
+
+const MapDefault = {
+  // Magic number, try and error by experience
+  DEBOUNCE_BEFORE_EVENT_FIRE: 1250,
+  CENTER_LONGITUDE: 147.3353554138993,
+  CENTER_LATITUDE: -42.88611707886841,
+  ZOOM: 4,
+  PROJECTION: "equirectangular",
+  DEFAULT_STYLE: 3,
+};
 
 // Styles can be found here https://developers.arcgis.com/rest/basemap-styles/
 // but require feeds.
@@ -56,17 +63,13 @@ const styles = [
   // Add more styles as needed
 ];
 
-const defaultStyle = 3;
-
-// Magic number, try and error by experience
-const DEBOUNCE_BEFORE_EVENT_FIRE = 1250;
-
 const ReactMap = ({
   panelId,
-  centerLongitude = mapDefault.centerLongitude,
-  centerLatitude = mapDefault.centerLatitude,
-  zoom = mapDefault.zoom,
-  projection = mapDefault.projection as PROJECTION,
+  centerLongitude = MapDefault.CENTER_LONGITUDE,
+  centerLatitude = MapDefault.CENTER_LATITUDE,
+  bbox,
+  zoom = MapDefault.ZOOM,
+  projection = MapDefault.PROJECTION,
   onZoomEvent,
   onMoveEvent,
   children,
@@ -82,7 +85,7 @@ const ReactMap = ({
         ) => onZoomEvent && onZoomEvent(event),
         [onZoomEvent]
       ),
-      DEBOUNCE_BEFORE_EVENT_FIRE
+      MapDefault.DEBOUNCE_BEFORE_EVENT_FIRE
     )
   ).current;
 
@@ -94,7 +97,7 @@ const ReactMap = ({
         ) => onMoveEvent && onMoveEvent(event),
         [onMoveEvent]
       ),
-      DEBOUNCE_BEFORE_EVENT_FIRE
+      MapDefault.DEBOUNCE_BEFORE_EVENT_FIRE
     )
   ).current;
 
@@ -104,7 +107,7 @@ const ReactMap = ({
         ? (new Map({
             container: panelId,
             accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
-            style: styles[defaultStyle].style,
+            style: styles[MapDefault.DEFAULT_STYLE].style,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
             maxZoom: 14,
@@ -119,6 +122,8 @@ const ReactMap = ({
       // Stop drag cause map to rotate.
       map.dragRotate.disable();
 
+      // If exist fit the map to this area, this useful if url pass around and
+      // the bbox in the url is not the default area of the map
       map.on("movestart", () => debounceOnZoomEvent.cancel());
       map.on("zoomestart", () => debounceOnZoomEvent.cancel());
 
@@ -157,6 +162,16 @@ const ReactMap = ({
     debounceOnMoveEvent,
   ]);
 
+  useEffect(() => {
+    // The map center is use to set the initial center point, however we may need
+    // to set to other place, for example if the user pass the url to someone
+    bbox &&
+      map &&
+      map.setCenter(
+        new LngLatBounds(bbox as [number, number, number, number]).getCenter()
+      );
+  }, [bbox, map]);
+
   return (
     map && <MapContext.Provider value={{ map }}>{children}</MapContext.Provider>
   );
@@ -164,4 +179,4 @@ const ReactMap = ({
 
 export default ReactMap;
 
-export { styles, defaultStyle };
+export { styles, MapDefault };

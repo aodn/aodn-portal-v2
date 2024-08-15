@@ -37,7 +37,7 @@
     "@types/react-window": "^1.8.8",
     "@types/redux-logger": "^3.0.13",
     "@types/wellknown": "^0.5.8",
-    "axios": "^1.6.7",
+    "axios": "^1.7.4",
     "dayjs": "^1.11.10",
     "events": "3.3.0",
     "geojson": "0.5.0",
