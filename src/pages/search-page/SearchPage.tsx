@@ -38,7 +38,7 @@ import { pageDefault } from "../../components/common/constants";
 // import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
 // import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 // Map section, you can switch to other map library, this is for mapbox
-import { MapboxEvent as MapEvent } from "mapbox-gl";
+import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
 import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
 import MapSection from "./subpages/MapSection";
@@ -60,6 +60,7 @@ const SearchPage = () => {
     SearchResultLayoutEnum.VISIBLE
   );
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
+  const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -157,7 +158,6 @@ const SearchPage = () => {
     },
     [dispatch, navigate, setLayers]
   );
-
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
@@ -185,6 +185,10 @@ const SearchPage = () => {
       if (param !== null) {
         const paramState: ParameterState = unFlattenToParameterState(param);
         dispatch(updateParameterStates(paramState));
+        // URL request, we need to adjust the map to the same area as mentioned
+        // in the url
+        setBbox(paramState.polygon?.bbox as LngLatBoundsLike);
+
         doSearch();
       }
     } else {
@@ -276,6 +280,7 @@ const SearchPage = () => {
         />
         <MapSection
           collections={layers}
+          bbox={bbox}
           showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
           onMapZoomOrMove={onMapZoomOrMove}
           onToggleClicked={onToggleDisplay}

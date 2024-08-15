@@ -4,7 +4,7 @@ import { GeoJSONSource } from "mapbox-gl";
 import MapPopup from "../component/MapPopup";
 import {
   LayersProps,
-  createCentroidDataSource,
+  createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
 } from "./Layers";
@@ -125,7 +125,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       map?.addSource(clusterSourceId, {
         type: "geojson",
-        data: createCentroidDataSource(undefined),
+        data: createCenterOfMassDataSource(undefined),
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 50,
@@ -239,7 +239,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
       (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createCentroidDataSource(collections)
+        createCenterOfMassDataSource(collections)
       );
     }
   }, [map, clusterSourceId, collections]);

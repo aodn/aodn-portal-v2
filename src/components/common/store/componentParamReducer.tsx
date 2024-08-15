@@ -123,12 +123,42 @@ const updateSortBy = (
 };
 
 // Initial State
-const createInitialParameterState = (): ParameterState => {
-  return {
+const createInitialParameterState = (
+  withDefaultPolygon: boolean = true
+): ParameterState => {
+  const state: ParameterState = {
     isImosOnlyDataset: false,
     dateTimeFilterRange: {},
     searchText: "",
   };
+
+  if (withDefaultPolygon) {
+    // This is the default area and zoom of TAS, this helps to imporve the search
+    // speed because the map will be start in this place. You can always find
+    // the polygon value in the url
+    state.polygon = {
+      type: "Feature",
+      bbox: [
+        124.4248325953249, -60.65204782465562, 170.24587823247586,
+        -25.124994472112704,
+      ],
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [124.4248325953249, -60.65204782465562],
+            [170.24587823247586, -60.65204782465562],
+            [170.24587823247586, 25.124994472112704],
+            [124.4248325953249, -25.124994472112704],
+            [124.4248325953249, -60.65204782465562],
+          ],
+        ],
+      },
+      properties: {},
+    };
+  }
+
+  return state;
 };
 
 // Reducer
@@ -246,7 +276,7 @@ const parseQueryString = (queryString: string) => {
 };
 // Convert the url parameter back to ParameterState, check test case for more details
 const unFlattenToParameterState = (input: string): ParameterState => {
-  const result = createInitialParameterState();
+  const result = createInitialParameterState(false);
   const flatObject = parseQueryString(input);
 
   for (const key in flatObject) {
