@@ -53,7 +53,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   }, [scrollDistance]);
 
   // For better scrolling animation, resizing happens after scrolling
-  const lateDeductSize = useCallback((toReSize: number) => {
+  const laybackDeductSize = useCallback((toReSize: number) => {
     setTimeout(() => {
       setSupplimentaryHeight((prevHeight) => prevHeight + toReSize);
     }, RESIZE_DELAY);
@@ -79,14 +79,14 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   useEffect(() => {
     debounceScrollHandler.current = _.debounce((scrollPosition: number) => {
       setPosition(scrollPosition);
-      const toDeduct = scrollPosition - position;
-      if (toDeduct < 0) {
-        lateDeductSize(toDeduct);
+      const differenceInPosition = scrollPosition - position;
+      if (differenceInPosition < 0) {
+        laybackDeductSize(differenceInPosition);
       }
     }, DEBOUNCE_DELAY);
 
     return () => debounceScrollHandler.current?.cancel();
-  }, [lateDeductSize, position]);
+  }, [laybackDeductSize, position]);
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
     const scrollPosition = event.currentTarget.scrollTop;
@@ -162,7 +162,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       if (neededHeight >= 0) {
         setSupplimentaryHeight((prevHeight) => prevHeight + neededHeight);
       } else {
-        lateDeductSize(neededHeight);
+        laybackDeductSize(neededHeight);
       }
       setScrollDistance(targetPosition);
     };
