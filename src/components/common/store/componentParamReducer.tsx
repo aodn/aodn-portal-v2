@@ -124,6 +124,7 @@ const updateSortBy = (
 const createInitialParameterState = (): ParameterState => {
   return {
     isImosOnlyDataset: false,
+    dateTimeFilterRange: {},
     searchText: "",
   };
 };
