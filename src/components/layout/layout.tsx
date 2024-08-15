@@ -13,7 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
   return (
     <div>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
-        <Header isLandingPage={location.pathname == "/"} />
+        <Header />
         <main>{children}</main>
         <Footer />
       </LocalizationProvider>

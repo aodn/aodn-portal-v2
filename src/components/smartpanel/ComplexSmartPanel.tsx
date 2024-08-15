@@ -63,7 +63,7 @@ const ComplexSmartPanel = (
                 sx={{ backgroundColor: "#7ba0b6" }}
               >
                 <ArrowBackIosNewIcon
-                  sx={{ pr: "4px", height: 38, width: 38, color: "white" }}
+                  sx={{ pr: "2px", height: 20, width: 20, color: "white" }}
                 />
               </IconButton>
             </Box>
@@ -72,7 +72,7 @@ const ComplexSmartPanel = (
             <Box ref={boxRef} sx={{ overflow: "hidden" }}>
               <Box
                 display="grid"
-                minWidth="1200px"
+                minWidth="800px"
                 marginTop={margin["tripleTop"]}
                 marginBottom={margin["tripleBottom"]}
                 gridTemplateColumns={"repeat(" + props.columns + ", 1fr)"}
@@ -101,7 +101,7 @@ const ComplexSmartPanel = (
                 sx={{ backgroundColor: "#7ba0b6" }}
               >
                 <ArrowForwardIosIcon
-                  sx={{ pl: "4px", height: 38, width: 38, color: "white" }}
+                  sx={{ pl: "2px", height: 20, width: 20, color: "white" }}
                 />
               </IconButton>
             </Box>

@@ -43,7 +43,8 @@ const padding = {
 };
 
 const fontSize = {
-  bannerTitle: "70px",
+  bannerTitleLarge: "78px",
+  bannerTitleMedium: "62px",
   bannerSubtitle: "20px",
   mapMenuItem: 14,
   mapMenuSubItem: 13,
@@ -73,6 +74,7 @@ const fontColor = {
     light: "#979797",
   },
   blue: {
+    dark: "#356183",
     medium: "#468CB6",
   },
 };

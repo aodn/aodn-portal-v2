@@ -19,18 +19,38 @@ const BannerOpenAccess = () => {
       }}
     >
       <Grid item xs={12}>
-        <Box sx={{ display: "flex", justifyContent: "right" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "end",
+          }}
+        >
           <Typography
             sx={{
-              fontSize: fontSize.bannerTitle,
+              fontSize: fontSize.bannerTitleMedium,
+              fontWeight: fontWeight.extraLight,
               color: "white",
               textAlign: "left",
-              pr: padding.small,
+              padding: 0,
               textShadow: theme.shadows[3],
             }}
-            variant="h1"
           >
-            Open Access <br /> to Ocean Data
+            Open Access to
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: fontSize.bannerTitleLarge,
+              fontWeight: fontWeight.bold,
+              color: "white",
+              textAlign: "left",
+              padding: 0,
+              mt: -4,
+              textShadow: theme.shadows[3],
+            }}
+          >
+            Ocean Data
           </Typography>
         </Box>
       </Grid>
@@ -42,13 +62,14 @@ const BannerOpenAccess = () => {
               color: "white",
               whiteSpace: "nowrap",
               fontSize: fontSize.bannerSubtitle,
-              fontWeight: fontWeight.extraLight,
+              fontWeight: fontWeight.light,
               letterSpacing: gap.sm,
               pr: padding.small,
               textShadow: theme.shadows[4],
             }}
           >
-            The gateway to Australian marine and climate science data
+            &quot;The gateway to Australian marine and climate science
+            data&rdquo;
           </Typography>
         </Box>
       </Grid>

@@ -16,6 +16,7 @@ import { Box, Stack } from "@mui/material";
 import { CARD_ID } from "../components/smartpanel/utils";
 import Layout from "../components/layout/layout";
 import landingImageUrl from "@/assets/images/bg_landing_page.png";
+import SmartPanel from "../components/smartpanel/SmartPanel";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -53,14 +54,25 @@ const LandingPage = () => {
           alignItems="center"
           sx={{
             minWidth: "1020px",
-            width: "70%",
-            maxWidth: "1228px",
+            width: "80%",
+            maxWidth: "1270px",
           }}
         >
-          <MainMenu />
           <BannerOpenAccess />
           <ComplexTextSearch />
-          <ShortCutSmartPanel onCardClicked={onCardClick} />
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "80px 30px",
+            }}
+          >
+            <Box width="1000px" height="160px">
+              <ShortCutSmartPanel onCardClicked={onCardClick} />
+              {/* <SmartPanel /> */}
+            </Box>
+          </Box>
         </Stack>
       </Box>
       <Box
@@ -75,8 +87,8 @@ const LandingPage = () => {
           direction="column"
           sx={{
             minWidth: "1020px",
-            width: "70%",
-            maxWidth: "1228px",
+            width: "80%",
+            maxWidth: "1270px",
           }}
         >
           <StoryBoardPanel />

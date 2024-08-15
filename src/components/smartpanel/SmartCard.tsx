@@ -28,11 +28,11 @@ interface SmartcardProps {
 const getPreferDimension = (type: CardType | undefined) => {
   switch (type) {
     case CardType.TwoOnTwo:
-      return { cardHeight: "220px", imgWidth: "100%", imgHeight: "120px" };
+      return { cardHeight: "110px", imgWidth: "100%", imgHeight: "60px" };
     case CardType.TwoOnOne:
-      return { cardHeight: "100px", imgWidth: "100%", imgHeight: "100px" };
+      return { cardHeight: "50px", imgWidth: "100%", imgHeight: "50px" };
     default:
-      return { cardHeight: "90px", imgWidth: "60px", imgHeight: "60px" };
+      return { cardHeight: "45px", imgWidth: "30px", imgHeight: "30px" };
   }
 };
 
@@ -127,7 +127,7 @@ const SmartCardContent = (props: SmartcardProps) => {
                   fontSize: "22px",
                   fontWeight: "300",
                   color: props.colour ?? "white",
-                  padding: "30px",
+                  padding: "15px",
                 }}
               >
                 {props.caption}
