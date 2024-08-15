@@ -7,12 +7,10 @@ import { Grid, Link, Typography, useTheme } from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 
 interface MetadataContactListProps {
-  title: string;
   contacts: IContact[];
 }
 
 const MetadataContactList: React.FC<MetadataContactListProps> = ({
-  title,
   contacts,
 }) => {
   const theme = useTheme();
@@ -47,7 +45,9 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
     return contactsToAdd;
   }, [contacts, theme.mp.md]);
 
-  return <ExpandableList title={title} childrenList={metadataContacts} />;
+  return (
+    <ExpandableList title="Metadata Contact" childrenList={metadataContacts} />
+  );
 };
 
 export default MetadataContactList;

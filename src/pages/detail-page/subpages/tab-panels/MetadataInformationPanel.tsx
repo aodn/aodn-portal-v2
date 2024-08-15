@@ -71,7 +71,6 @@ const MetadataInformationPanel = () => {
         component: (
           <MetadataContactList
             contacts={metadataContact ? metadataContact : []}
-            title="Metadata Contact"
           />
         ),
       },
@@ -90,13 +89,7 @@ const MetadataInformationPanel = () => {
       },
       {
         title: "Metadata Dates",
-        component: (
-          <MetadataDateList
-            title="Metadata Dates"
-            creation={creation}
-            revision={revision}
-          />
-        ),
+        component: <MetadataDateList creation={creation} revision={revision} />,
       },
     ],
     [creation, metadataContact, metadataId, metadataLink, revision]

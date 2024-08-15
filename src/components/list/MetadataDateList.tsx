@@ -4,13 +4,11 @@ import StyledItemGrid from "./listItem/StyledItemGrid";
 import { Grid, Typography, useTheme } from "@mui/material";
 
 interface MetadataDateListProps {
-  title?: string;
   creation?: string;
   revision?: string;
 }
 
 const MetadataDateList: React.FC<MetadataDateListProps> = ({
-  title,
   creation,
   revision,
 }) => {
@@ -37,7 +35,9 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
     </StyledItemGrid>
   );
 
-  return <ExpandableList childrenList={[metadataDateItem]} title={title} />;
+  return (
+    <ExpandableList childrenList={[metadataDateItem]} title="Metadata Dates" />
+  );
 };
 
 export default MetadataDateList;
