@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "./NavigatablePanel";
-import ContactList from "../../../../components/list/ContactList";
 import TextList from "../../../../components/list/TextList";
 import { convertDateFormat } from "../../../../utils/DateUtils";
 import MetadataUrlList from "../../../../components/list/MetadataUrlList";
+import MetadataContactList from "../../../../components/list/MetadataContactList";
+import MetadataDateList from "../../../../components/list/MetadataDateList";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
@@ -19,25 +20,21 @@ const MetadataInformationPanel = () => {
         ?.filter((contact) => contact.roles.includes("metadata")),
     [context.collection]
   );
-  const generateMedatataDateText = useCallback(() => {
-    let dateText = "";
-
+  const creation = useMemo(() => {
     const creation = context.collection?.getCreation();
-    const revision = context.collection?.getRevision();
-
     if (creation) {
-      dateText = dateText + `Creation: ${convertDateFormat(creation)}`;
+      return convertDateFormat(creation);
     }
-    if (revision) {
-      if (dateText) {
-        dateText += "\n";
-      }
-      dateText = dateText + `Revision: ${convertDateFormat(revision)}`;
-    }
-    return dateText;
+    return "";
   }, [context.collection]);
 
-  const dates = useMemo(generateMedatataDateText, [generateMedatataDateText]);
+  const revision = useMemo(() => {
+    const revision = context.collection?.getRevision();
+    if (revision) {
+      return convertDateFormat(revision);
+    }
+    return "";
+  }, [context.collection]);
 
   const metadataLink = useMemo(() => {
     if (context.collection) {
@@ -72,8 +69,7 @@ const MetadataInformationPanel = () => {
       {
         title: "Metadata Contact",
         component: (
-          <ContactList
-            title="Metadata Contact"
+          <MetadataContactList
             contacts={metadataContact ? metadataContact : []}
           />
         ),
@@ -93,12 +89,10 @@ const MetadataInformationPanel = () => {
       },
       {
         title: "Metadata Dates",
-        component: (
-          <TextList title="Metadata Dates" texts={dates ? [dates] : [""]} />
-        ),
+        component: <MetadataDateList creation={creation} revision={revision} />,
       },
     ],
-    [dates, metadataContact, metadataId, metadataLink]
+    [creation, metadataContact, metadataId, metadataLink, revision]
   );
   return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
 };
