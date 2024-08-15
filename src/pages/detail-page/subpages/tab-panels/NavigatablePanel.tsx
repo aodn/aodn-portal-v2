@@ -17,7 +17,7 @@ const PANEL_VISIBLE_HEIGHT = 1480;
 
 // the delay milliseconds for resizing the panel after scrolling. May change in
 // the future if users feel it is too slow / too fast.
-const RESIZE_DELAY = 400;
+const RESIZE_DELAY = 300;
 
 const DEBOUNCE_DELAY = 100;
 
@@ -53,7 +53,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   }, [scrollDistance]);
 
   // For better scrolling animation, resizing happens after scrolling
-  const lateResize = useCallback((toReSize: number) => {
+  const lateDeductSize = useCallback((toReSize: number) => {
     setTimeout(() => {
       setSupplimentaryHeight((prevHeight) => prevHeight + toReSize);
     }, RESIZE_DELAY);
@@ -79,10 +79,14 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   useEffect(() => {
     debounceScrollHandler.current = _.debounce((scrollPosition: number) => {
       setPosition(scrollPosition);
+      const toDeduct = scrollPosition - position;
+      if (toDeduct < 0) {
+        lateDeductSize(toDeduct);
+      }
     }, DEBOUNCE_DELAY);
 
     return () => debounceScrollHandler.current?.cancel();
-  }, []);
+  }, [lateDeductSize, position]);
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
     const scrollPosition = event.currentTarget.scrollTop;
@@ -158,7 +162,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       if (neededHeight >= 0) {
         setSupplimentaryHeight((prevHeight) => prevHeight + neededHeight);
       } else {
-        lateResize(neededHeight);
+        lateDeductSize(neededHeight);
       }
       setScrollDistance(targetPosition);
     };
