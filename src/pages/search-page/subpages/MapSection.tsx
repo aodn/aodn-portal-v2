@@ -10,26 +10,22 @@ import MenuControl, {
   MapLayerSwitcher,
 } from "../../../components/map/mapbox/controls/MenuControl";
 import React, { useCallback, useState } from "react";
-import { MapboxEvent as MapEvent } from "mapbox-gl";
+import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
 import Layers, {
   createStaticLayers,
 } from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
-import {
-  AustraliaMarineParkLayer,
-  StaticLayersDef,
-} from "../../../components/map/mapbox/layers/StaticLayer";
-import MapboxWorldLayer, {
-  MapboxWorldLayersDef,
-} from "../../../components/map/mapbox/layers/MapboxWorldLayer";
+import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLayer";
+import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 
 const mapContainerId = "map-container-id";
 
 interface MapSectionProps {
   collections: OGCCollection[];
   showFullMap: boolean;
+  bbox?: LngLatBoundsLike;
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
@@ -38,6 +34,7 @@ interface MapSectionProps {
 }
 
 const MapSection: React.FC<MapSectionProps> = ({
+  bbox,
   onMapZoomOrMove,
   onToggleClicked,
   onDatasetSelected,
@@ -83,6 +80,7 @@ const MapSection: React.FC<MapSectionProps> = ({
       <Paper id={mapContainerId} sx={{ minHeight: "80vh" }}>
         <Map
           panelId={mapContainerId}
+          bbox={bbox}
           onZoomEvent={onMapZoomOrMove}
           onMoveEvent={onMapZoomOrMove}
         >

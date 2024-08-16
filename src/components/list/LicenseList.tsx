@@ -13,7 +13,7 @@ const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
   const theme = useTheme();
   const licenseComponent = useMemo(() => {
     return (
-      <StyledItemGrid container>
+      <StyledItemGrid container key="licenseList">
         <Grid container item md={12}>
           <Grid item md={12}>
             <Typography variant="detailContent">{license}</Typography>

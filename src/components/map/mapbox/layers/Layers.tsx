@@ -5,7 +5,7 @@ import {
   GeoJsonProperties,
   Geometry,
 } from "geojson";
-import { centroid } from "@turf/turf";
+import { centerOfMass } from "@turf/turf";
 import { MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
@@ -33,7 +33,7 @@ const createStaticLayers = (ids: Array<string>) => (
 
 // Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
 // in a collection to the FeatureCollection
-const createCentroidDataSource = (
+const createCenterOfMassDataSource = (
   collections: Array<OGCCollection> | undefined
 ): FeatureCollection => {
   const featureCollections: FeatureCollection = {
@@ -45,7 +45,7 @@ const createCentroidDataSource = (
     // We skip the first one which is the overall bounding box, then add the remaining
     collection.extent?.getGeojsonExtents(1).features.forEach((i) =>
       featureCollections.features.push({
-        ...centroid(i.geometry),
+        ...centerOfMass(i.geometry),
         // Add the id so we can reference it easily
         properties: { uuid: collection.id },
       })
@@ -71,7 +71,7 @@ export default Layers;
 
 export {
   createStaticLayers,
-  createCentroidDataSource,
+  createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
 };
