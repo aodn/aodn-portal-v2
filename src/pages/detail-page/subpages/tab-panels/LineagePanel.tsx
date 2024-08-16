@@ -13,7 +13,9 @@ const LineagePanel = () => {
     () => [
       {
         title: "Statement",
-        component: <TextList texts={statement ? [statement] : []} />,
+        component: (
+          <TextList texts={statement ? [statement] : []} title={"Statement"} />
+        ),
       },
     ],
     [statement]

@@ -5,6 +5,7 @@ declare module "@mui/material/styles" {
     border: {
       nil: string;
       detailSubtabBtn: string;
+      detailNa: string;
     };
     mp: {
       nil: string;
@@ -28,6 +29,7 @@ declare module "@mui/material/styles" {
     border?: {
       none?: string;
       detailSubtabBtn?: string;
+      detailNa?: string;
     };
     mp?: {
       nil?: string;
@@ -51,13 +53,21 @@ declare module "@mui/material/styles" {
     detail: {
       text: string;
       listItemBG: string;
+      na: {
+        dark: string;
+        light: string;
+      };
     };
   }
 
   interface PaletteOptions {
     detail?: {
-      text: string;
+      text?: string;
       listItemBG?: string;
+      na?: {
+        dark?: string;
+        light?: string;
+      };
     };
   }
 
@@ -84,6 +94,10 @@ const theme: ThemeOptions = {
     detail: {
       text: "#5B5B5B",
       listItemBG: "#F2F6F9",
+      na: {
+        dark: "#52BDEC",
+        light: "#DCF2FB",
+      },
     },
     primary: {
       main: "#3B6E8F",
@@ -109,6 +123,7 @@ const theme: ThemeOptions = {
   border: {
     none: "none",
     detailSubtabBtn: " 1px solid var(--brand_dark-blue_80, #618CA5)",
+    detailNa: "2px solid #52BDEC",
   },
 
   mp: {

@@ -15,9 +15,9 @@ const CollapseList: React.FC<CollapseListProps> = ({ title, items }) => {
     items?.map((item, index) => {
       returnedList.push(
         <CollapseItem title={item.title} key={index}>
-          {item.content?.map((content, index) => {
-            return <TextArea key={index}>{content}</TextArea>;
-          })}
+          {item.content?.map((content, index) => (
+            <TextArea key={index}>{content}</TextArea>
+          ))}
         </CollapseItem>
       );
     });

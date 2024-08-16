@@ -3,7 +3,7 @@ import React, { ReactNode, useMemo } from "react";
 import TextItem from "./listItem/TextItem";
 
 interface TextListProps {
-  title?: string;
+  title: string;
   texts: string[];
 }
 const TextList: React.FC<TextListProps> = ({ title, texts }) => {
