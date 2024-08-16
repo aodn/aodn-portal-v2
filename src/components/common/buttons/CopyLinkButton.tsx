@@ -5,6 +5,7 @@ import {
   borderRadius,
   color,
   fontColor,
+  fontSize,
   padding,
 } from "../../../styles/constants";
 import DoneIcon from "@mui/icons-material/Done";
@@ -48,6 +49,7 @@ const CopyLinkButton = ({
     >
       <Typography
         sx={{ padding: 0 }}
+        fontSize={fontSize.label}
         color={isCopied ? color.blue.dark : fontColor.gray.dark}
       >
         Copy Link

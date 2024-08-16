@@ -7,6 +7,7 @@ const gap = {
   md: "5px",
   lg: "8px",
   xlg: "10px",
+  xxlg: "15px",
 };
 
 const margin = {
@@ -31,7 +32,7 @@ const margin = {
 
 const padding = {
   nil: "0",
-  extraSmall: "5px",
+  extraSmall: "6px",
   small: "10px",
   medium: "15px",
   large: "20px",
@@ -48,7 +49,12 @@ const fontSize = {
   mapMenuSubItem: 13,
   detailPageHeading: "20px",
   icon: "10px",
+  label: "12px",
   info: "14px",
+};
+
+const fontFamily = {
+  general: "Noto Sans",
 };
 
 const fontWeight = {
@@ -87,6 +93,9 @@ const color = {
     darkSemiTransparent: "rgba(97,140,165,0.5)",
     extraDark: "#182C3A",
   },
+  brightBlue: {
+    dark: "#51BCEB",
+  },
   gray: {
     dark: "#575757",
     medium: "#787878",
@@ -120,10 +129,6 @@ const filterList = {
   filterListMaxDisplay: 4,
 };
 
-/**
- * for better readability or additions to the theme, consider putting style constants here
- */
-
 const zIndex = {
   MAP_COORD: 1,
   FILTER_MODAL: 9,
@@ -135,6 +140,7 @@ export {
   margin,
   padding,
   fontSize,
+  fontFamily,
   fontWeight,
   fontColor,
   color,

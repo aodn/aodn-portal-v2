@@ -1,48 +1,114 @@
-import { FC } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import {
+  ParameterState,
+  updateCategories,
+  updateDateTimeFilterRange,
+  updateImosOnly,
+} from "../store/componentParamReducer";
+import store, { AppDispatch, getComponentState } from "../store/store";
 import {
   Box,
+  Button,
   Dialog,
   Fade,
   Grid,
+  IconButton,
   SxProps,
   Theme,
   Typography,
   useTheme,
 } from "@mui/material";
-import RemovableDateTimeFilter from "./RemovableDateTimeFilter";
+import CloseIcon from "@mui/icons-material/Close";
+import DateRangeFilter from "./DateRangeFilter";
+import CategoryFilter from "./CategoryFilter";
 import DepthFilter from "./DepthFilter";
 import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
-import CategoryVocabFilter from "./CategoryVocabFilter";
 import ImosOnlySwitch from "./ImosOnlySwitch";
 import FilterSection from "./FilterSection";
-import { borderRadius, padding, zIndex } from "../../../styles/constants";
+import {
+  border,
+  borderRadius,
+  color,
+  margin,
+  padding,
+  zIndex,
+} from "../../../styles/constants";
 
-export interface NonRemovableFiltersProps {
+interface AdvanceFiltersProps {
   showFilters: boolean;
   setShowFilters: (value: boolean) => void;
   sx?: SxProps<Theme>;
 }
 
-const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
+const AdvanceFilters: FC<AdvanceFiltersProps> = ({
   showFilters = false,
   setShowFilters = () => {},
   sx = {},
 }) => {
   const theme = useTheme();
+  const dispatch = useDispatch<AppDispatch>();
+  const componentParam: ParameterState = getComponentState(store.getState());
+
+  // State used to store the provisional filter options selected,
+  // only dispatch to redux when 'apply' button is hit
+  const [filter, setFilter] = useState<ParameterState>({});
+
+  // initialize filter
+  useEffect(() => {
+    if (componentParam) {
+      setFilter(componentParam);
+    }
+  }, [componentParam]);
+
+  const handleCloseFilter = useCallback(() => {
+    setShowFilters(false);
+    setFilter({});
+  }, [setShowFilters]);
+
+  const onClearAll = useCallback(() => {
+    setFilter({});
+  }, []);
+
+  // TODO: implement DataDeliveryModeFilter and DepthFilter when backend supports this query
+  const handleApplyFilter = useCallback(() => {
+    if (filter.dateTimeFilterRange) {
+      dispatch(updateDateTimeFilterRange(filter.dateTimeFilterRange));
+    } else {
+      dispatch(updateDateTimeFilterRange({}));
+    }
+    if (filter.categories) {
+      dispatch(updateCategories(filter.categories));
+    } else {
+      dispatch(updateCategories([]));
+    }
+    if (filter.isImosOnlyDataset) {
+      dispatch(updateImosOnly(filter.isImosOnlyDataset));
+    } else {
+      dispatch(updateImosOnly(false));
+    }
+    setShowFilters(false);
+    setFilter({});
+  }, [
+    dispatch,
+    filter.categories,
+    filter.dateTimeFilterRange,
+    filter.isImosOnlyDataset,
+    setShowFilters,
+  ]);
+
   return (
     <>
       <Dialog
         open={showFilters}
-        onClose={() => {
-          setShowFilters(false);
-        }}
+        onClose={handleCloseFilter}
         TransitionComponent={Fade}
         transitionDuration={{ enter: 500, exit: 300 }}
         fullWidth
       >
         <Box
           sx={{
-            zIndex: zIndex["FILTER_OVERLAY"],
+            zIndex: zIndex.FILTER_OVERLAY,
             position: "fixed",
             top: "50%",
             left: "50%",
@@ -53,15 +119,30 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
             ...sx,
           }}
         >
-          <Box sx={{ minWidth: "1300px" }}>
+          <Box sx={{ minWidth: "1000px" }}>
             <Grid
               container
-              justifyContent={"center"}
+              justifyContent="center"
               sx={{
-                borderRadius: borderRadius["filter"],
+                borderRadius: borderRadius.filter,
                 backgroundColor: theme.palette.common.white,
               }}
             >
+              <Box
+                position="absolute"
+                top={margin.sm}
+                right={0}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Button onClick={onClearAll} sx={{ paddingX: padding.medium }}>
+                  Clear All
+                </Button>
+                <IconButton onClick={handleCloseFilter}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
               <Grid
                 item
                 xs={12}
@@ -82,30 +163,54 @@ const AdvanceFilters: FC<NonRemovableFiltersProps> = ({
               >
                 <Grid item xs={12}>
                   <FilterSection title={"Time Range"}>
-                    <RemovableDateTimeFilter />
+                    <DateRangeFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <FilterSection title={"Depth"}>
-                    <DepthFilter />
+                    <DepthFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={7}>
                   <FilterSection isTitleOnlyHeader title={"Parameter"}>
-                    <CategoryVocabFilter />
+                    <CategoryFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
-                    <DataDeliveryModeFilter />
+                    <DataDeliveryModeFilter
+                      filter={filter}
+                      setFilter={setFilter}
+                    />
                   </FilterSection>
                 </Grid>
-                <Grid item xs={1}>
-                  <FilterSection title={""}>
-                    <ImosOnlySwitch />
-                  </FilterSection>
+                <Grid item xs={2}>
+                  <Box width="70%" height="100%">
+                    <FilterSection title={""}>
+                      <ImosOnlySwitch filter={filter} setFilter={setFilter} />
+                    </FilterSection>
+                  </Box>
                 </Grid>
-                <Grid item xs={5} />
+                <Grid
+                  item
+                  xs={5}
+                  display="flex"
+                  justifyContent="end"
+                  alignItems="end"
+                >
+                  <Button
+                    sx={{
+                      width: "100px",
+                      border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+                      "&:hover": {
+                        backgroundColor: color.blue.darkSemiTransparent,
+                      },
+                    }}
+                    onClick={handleApplyFilter}
+                  >
+                    Apply
+                  </Button>
+                </Grid>
               </Grid>
             </Grid>
           </Box>

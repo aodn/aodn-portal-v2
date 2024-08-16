@@ -1,7 +1,7 @@
 import { styled } from "@mui/system";
 import { Button } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { borderRadius } from "./constants";
+import { borderRadius } from "../../../styles/constants";
 
 interface StyledResultCardButtonProps {
   determinedcolor?: string;

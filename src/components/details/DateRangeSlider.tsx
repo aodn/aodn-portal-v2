@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Slider, Box, Grid, useTheme, styled } from "@mui/material";
+import { Slider, Box, Grid, styled } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import {
   border,
   borderRadius,
+  color,
   fontColor,
   fontSize,
   fontWeight,
@@ -13,6 +14,33 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { dateDefault } from "../common/constants";
+
+export const DEFAULT_DATE_PICKER_SLOT = {
+  desktopPaper: {
+    sx: {
+      border: border.xs,
+      borderRadius: borderRadius.small,
+      width: "350px",
+      ".MuiPickersYear-yearButton": {
+        color: fontColor.gray.dark,
+        padding: 0,
+      },
+      ".MuiPickersYear-yearButton.Mui-selected": {
+        color: "#fff",
+        backgroundColor: color.blue.dark,
+      },
+      ".MuiPickersMonth-monthButton": {
+        color: fontColor.gray.dark,
+        padding: 0,
+      },
+
+      ".MuiPickersMonth-monthButton.Mui-selected": {
+        color: "#fff",
+        backgroundColor: color.blue.dark,
+      },
+    },
+  },
+};
 
 const initialMinDate: Dayjs = dayjs(dateDefault.min);
 const initialMaxDate: Dayjs = dayjs(dateDefault.max);
@@ -24,7 +52,6 @@ const dateToValue = (date: Dayjs): number => date.valueOf();
 const valueToDate = (value: number): Dayjs => dayjs(value);
 
 const DateRangeSlider: React.FC = () => {
-  const theme = useTheme();
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
   const [maxDate, setMaxDate] = useState<Dayjs>(initialMaxDate);
   const [value, setValue] = useState<number[]>([
@@ -32,10 +59,7 @@ const DateRangeSlider: React.FC = () => {
     dateToValue(maxDate),
   ]);
 
-  const handleSliderChange = (
-    event: Event,
-    newValue: number | number[]
-  ): void => {
+  const handleSliderChange = (_: Event, newValue: number | number[]): void => {
     setValue(newValue as number[]);
     if (!Array.isArray(newValue)) return;
     setMinDate(valueToDate(newValue[0]));
@@ -54,33 +78,6 @@ const DateRangeSlider: React.FC = () => {
       setMaxDate(newMaxDate);
       setValue([value[0], dateToValue(newMaxDate)]);
     }
-  };
-
-  const datePikerSlotProps = {
-    desktopPaper: {
-      sx: {
-        border: border.xs,
-        borderRadius: borderRadius.small,
-        width: "350px",
-        ".MuiPickersYear-yearButton": {
-          color: fontColor.gray.dark,
-          padding: 0,
-        },
-        ".MuiPickersYear-yearButton.Mui-selected": {
-          color: "#fff",
-          backgroundColor: theme.palette.primary,
-        },
-        ".MuiPickersMonth-monthButton": {
-          color: fontColor.gray.dark,
-          padding: 0,
-        },
-
-        ".MuiPickersMonth-monthButton.Mui-selected": {
-          color: "#fff",
-          backgroundColor: theme.palette.primary,
-        },
-      },
-    },
   };
 
   return (
@@ -129,7 +126,7 @@ const DateRangeSlider: React.FC = () => {
               inputAdornment: {
                 position: "start",
               },
-              ...datePikerSlotProps,
+              ...DEFAULT_DATE_PICKER_SLOT,
             }}
           />
         </Grid>
@@ -145,7 +142,7 @@ const DateRangeSlider: React.FC = () => {
             minDate={valueToDate(value[0])}
             maxDate={initialMaxDate}
             onChange={(date) => handleMaxDateChange(date as Dayjs)}
-            slotProps={datePikerSlotProps}
+            slotProps={DEFAULT_DATE_PICKER_SLOT}
           />
         </Grid>
       </Grid>
@@ -155,17 +152,16 @@ const DateRangeSlider: React.FC = () => {
 
 export default DateRangeSlider;
 
-const PlainDatePicker = styled(DatePicker)(({ theme }) => ({
+const PlainDatePicker = styled(DatePicker)(() => ({
   backgroundColor: "transparent",
   width: "100px",
-
   "& fieldset": {
     border: "none",
   },
   "& input": {
     fontSize: "14px",
-    color: `${fontColor.gray.dark}`,
-    fontWeight: `${fontWeight.regular}`,
+    color: fontColor.gray.dark,
+    fontWeight: fontWeight.regular,
     padding: 0,
     textAlign: "center",
   },
@@ -176,9 +172,9 @@ const PlainDatePicker = styled(DatePicker)(({ theme }) => ({
 
 const PlainSlider = styled(Slider)(() => ({
   "& .MuiSlider-valueLabel": {
-    fontSize: `${fontSize.info}`,
-    fontWeight: `${fontWeight.regular}`,
-    color: `${fontColor.gray.medium}`,
+    fontSize: fontSize.info,
+    fontWeight: fontWeight.regular,
+    color: fontColor.gray.medium,
     top: -6,
     backgroundColor: "transparent",
   },

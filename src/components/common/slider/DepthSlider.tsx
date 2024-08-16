@@ -1,8 +1,58 @@
-import * as React from "react";
-import { Box, Grid } from "@mui/material";
-import StyledSlider from "../../../styles/StyledSlider";
+import { Dispatch, FC, SetStateAction, useState } from "react";
+import { Box, Grid, Stack } from "@mui/material";
 import SliderLine from "./SliderLine";
 import depth_image from "@/assets/images/depth-selector.png";
+import {
+  fontColor,
+  fontFamily,
+  fontSize,
+  fontWeight,
+  padding,
+} from "../../../styles/constants";
+import { ParameterState } from "../store/componentParamReducer";
+import PlainSlider from "./PlainSlider";
+
+interface DepthSliderProps {
+  filter: ParameterState;
+  setFilter: Dispatch<SetStateAction<ParameterState>>;
+}
+
+const DEPTH_MARKS = [
+  {
+    value: 0,
+    label: "0m",
+  },
+  {
+    value: 500,
+    label: "500m",
+  },
+  {
+    value: 1000,
+    label: "1000m",
+  },
+  {
+    value: 1500,
+    label: "1500m",
+  },
+  {
+    value: 2000,
+    label: "2000m",
+  },
+  {
+    value: 2500,
+    label: "2500m",
+  },
+  {
+    value: 3000,
+    label: ">3000m",
+  },
+];
+
+const DEFAULT_VALUES = [1000, 2000];
+
+const CONTAINER_HEIGHT = 250;
+
+const MAX_DEPTH = 3000;
 
 /**
  * TODO: may need to be refactored to use theme. Currently, all colors are
@@ -10,11 +60,9 @@ import depth_image from "@/assets/images/depth-selector.png";
  * Parameters including width, height etc. are all hard-coded. Will change in the future.
  * @constructor
  */
-const DepthSlider = () => {
-  const defaultValues = [1000, 2000];
-
-  const [sliderValues, setSliderValues] =
-    React.useState<number[]>(defaultValues);
+const DepthSlider: FC<DepthSliderProps> = ({ filter, setFilter }) => {
+  // TODO: implement DepthFilter when backend supports this query
+  const [sliderValues, setSliderValues] = useState<number[]>(DEFAULT_VALUES);
 
   const handleSliderChange = (
     _: Event,
@@ -25,81 +73,59 @@ const DepthSlider = () => {
   };
   const formatLabel = (value: number) => {
     if (value === -1) {
-      return <Box>{">3000m"}</Box>;
+      return <Box>{`${MAX_DEPTH}m`}</Box>;
     }
-    return <Box>{3000 - value}m</Box>;
+    return <Box>{`${MAX_DEPTH - value}m`}</Box>;
   };
-
-  const depthMarks = [
-    {
-      value: 0,
-      label: "0m",
-    },
-    {
-      value: 500,
-      label: "500m",
-    },
-    {
-      value: 1000,
-      label: "1000m",
-    },
-    {
-      value: 1500,
-      label: "1500m",
-    },
-    {
-      value: 2000,
-      label: "2000m",
-    },
-    {
-      value: 2500,
-      label: "2500m",
-    },
-    {
-      value: 3000,
-      label: ">3000m",
-    },
-  ];
 
   return (
     <Grid container direction={"row"}>
-      <Grid item xs={1} />
-      <Grid item xs={1}>
-        {depthMarks.map((mark, index) => (
-          <Grid
-            item
-            xs={12}
-            key={index}
-            sx={{
-              height: `${100 / depthMarks.length}%`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {mark.label}
-          </Grid>
-        ))}
+      <Grid item xs={2}>
+        <Stack direction="column" justifyContent="space-between" height="100%">
+          {DEPTH_MARKS.map((mark, index) => (
+            <Box
+              key={index}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: fontSize.label,
+                fontFamily: fontFamily.general,
+                fontWeight: fontWeight.medium,
+                color: fontColor.gray.medium,
+              }}
+            >
+              {mark.label}
+            </Box>
+          ))}
+        </Stack>
       </Grid>
-      <Grid item xs={8} sx={{ height: 300, paddingLeft: 2, paddingRight: 2 }}>
+      <Grid
+        item
+        xs={7}
+        sx={{ height: CONTAINER_HEIGHT, paddingX: padding.small }}
+      >
         <SliderLine sliderValue={sliderValues[0]} />
         <SliderLine sliderValue={sliderValues[1]} />
         <img
           src={depth_image}
           alt={"Depth"}
-          style={{ width: "100%", height: "100%" }}
+          style={{
+            objectFit: "fill",
+            width: "100%",
+            height: "100%",
+          }}
         />
       </Grid>
-      <Grid item xs={2} sx={{ height: 300 }}>
-        <StyledSlider
-          isvertical="true"
+      <Grid item xs={3} sx={{ height: CONTAINER_HEIGHT }}>
+        <PlainSlider
+          isVertical
           getAriaLabel={() => "depth"}
           orientation="vertical"
-          // getAriaValueText={valuetext}
-          defaultValue={defaultValues}
+          defaultValue={DEFAULT_VALUES}
           valueLabelDisplay="on"
           min={-1}
-          max={3000}
+          max={MAX_DEPTH}
           valueLabelFormat={formatLabel}
           onChange={handleSliderChange}
         />

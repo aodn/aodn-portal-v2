@@ -1,37 +1,40 @@
-import { Grid, SxProps, Theme } from "@mui/material";
+import { FC } from "react";
+import { Box, Grid, SxProps, Theme } from "@mui/material";
 import DepthSlider from "../slider/DepthSlider";
 import PlainDropdownMenu from "../dropdown/PlainDropdownMenu";
 import { margin } from "../../../styles/constants";
+import { ParameterState } from "../store/componentParamReducer";
 
 interface DepthFiltersProps {
+  filter: ParameterState;
+  setFilter: React.Dispatch<React.SetStateAction<ParameterState>>;
   sx?: SxProps<Theme>;
 }
 
-const DepthFilter = (props: DepthFiltersProps) => {
-  const depthUnits = [
-    "meters",
-    "feet",
-    "fathoms",
-    "centimeters",
-    "inches",
-    "millimeters",
-  ];
-  return (
-    <Grid container sx={{ ...props.sx }}>
-      <Grid container>
-        <Grid item xs={8}></Grid>
-        <Grid item xs={3}>
-          <PlainDropdownMenu items={depthUnits} onSelectCallback={() => {}} />
-        </Grid>
-      </Grid>
+const DEPTH_UNITS = [
+  "meters",
+  "feet",
+  "fathoms",
+  "centimeters",
+  "inches",
+  "millimeters",
+];
 
+const DepthFilter: FC<DepthFiltersProps> = ({ filter, setFilter, sx }) => {
+  // TODO: implement DepthFilter when backend supports this query
+  return (
+    <Grid container sx={{ ...sx }}>
+      <Grid item xs={12} display="flex" justifyContent="end">
+        <Box sx={{ width: "40%", marginTop: margin.lg }}>
+          <PlainDropdownMenu items={DEPTH_UNITS} onSelectCallback={() => {}} />
+        </Box>
+      </Grid>
       <Grid
-        container
-        sx={{ marginTop: margin["top"], marginBottom: margin["bottom"] }}
+        item
+        xs={12}
+        sx={{ marginTop: margin.top, marginBottom: margin.bottom }}
       >
-        <Grid item xs={12}>
-          <DepthSlider />
-        </Grid>
+        <DepthSlider filter={filter} setFilter={setFilter} />
       </Grid>
     </Grid>
   );

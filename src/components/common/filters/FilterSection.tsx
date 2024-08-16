@@ -1,14 +1,15 @@
-import StyledFilterSectionGrid from "../../../styles/StyledFilterSectionGrid";
+import { FC, ReactNode } from "react";
+import StyledFilterSectionGrid from "./StyledFilterSectionGrid";
 import { Typography } from "@mui/material";
-import React from "react";
+import { gap, padding } from "../../../styles/constants";
 
 interface FilterSectionContainerProps {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   isTitleOnlyHeader?: boolean;
 }
 
-const FilterSection: React.FC<FilterSectionContainerProps> = ({
+const FilterSection: FC<FilterSectionContainerProps> = ({
   title,
   children,
   isTitleOnlyHeader = false,
@@ -18,12 +19,17 @@ const FilterSection: React.FC<FilterSectionContainerProps> = ({
       padding={!title ? "0px" : "10px"}
       sx={{
         position: "relative",
-        paddingTop: isTitleOnlyHeader ? "3rem" : undefined,
+        paddingTop: isTitleOnlyHeader ? padding.triple : 0,
       }}
     >
       <Typography
         variant="h3"
-        sx={{ position: "absolute", left: "2rem", top: "0.7rem" }}
+        sx={{
+          position: "absolute",
+          left: gap.xxlg,
+          top: gap.xlg,
+          padding: 0,
+        }}
       >
         {title}
       </Typography>
