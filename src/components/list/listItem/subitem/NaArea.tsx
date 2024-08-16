@@ -14,7 +14,7 @@ const NaArea: React.FC<NaAreaProps> = ({ title }) => {
         <NoSuchDataIcon />
       </Box>
       <Typography variant="detailContent">
-        <b>{title} Not found </b>
+        <b>{title} Not Found </b>
       </Typography>
     </Grid>
   );
