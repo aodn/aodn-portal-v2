@@ -20,7 +20,7 @@ import {
   useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import DateRangeSlider from "./DateRangeFilter";
+import DateRangeFilter from "./DateRangeFilter";
 import CategoryFilter from "./CategoryFilter";
 import DepthFilter from "./DepthFilter";
 import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
@@ -35,13 +35,13 @@ import {
   zIndex,
 } from "../../../styles/constants";
 
-interface FiltersProps {
+interface AdvanceFiltersProps {
   showFilters: boolean;
   setShowFilters: (value: boolean) => void;
   sx?: SxProps<Theme>;
 }
 
-const AdvanceFilters: FC<FiltersProps> = ({
+const AdvanceFilters: FC<AdvanceFiltersProps> = ({
   showFilters = false,
   setShowFilters = () => {},
   sx = {},
@@ -163,7 +163,7 @@ const AdvanceFilters: FC<FiltersProps> = ({
               >
                 <Grid item xs={12}>
                   <FilterSection title={"Time Range"}>
-                    <DateRangeSlider filter={filter} setFilter={setFilter} />
+                    <DateRangeFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>
@@ -191,21 +191,25 @@ const AdvanceFilters: FC<FiltersProps> = ({
                     </FilterSection>
                   </Box>
                 </Grid>
-                <Grid item xs={5} display="flex" justifyContent="end">
-                  <Box alignContent="end">
-                    <Button
-                      sx={{
-                        width: "100px",
-                        border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                        "&:hover": {
-                          backgroundColor: color.blue.darkSemiTransparent,
-                        },
-                      }}
-                      onClick={handleApplyFilter}
-                    >
-                      Apply
-                    </Button>
-                  </Box>
+                <Grid
+                  item
+                  xs={5}
+                  display="flex"
+                  justifyContent="end"
+                  alignItems="end"
+                >
+                  <Button
+                    sx={{
+                      width: "100px",
+                      border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+                      "&:hover": {
+                        backgroundColor: color.blue.darkSemiTransparent,
+                      },
+                    }}
+                    onClick={handleApplyFilter}
+                  >
+                    Apply
+                  </Button>
                 </Grid>
               </Grid>
             </Grid>
@@ -217,6 +221,3 @@ const AdvanceFilters: FC<FiltersProps> = ({
 };
 
 export default AdvanceFilters;
-function dispatch(arg0: any) {
-  throw new Error("Function not implemented.");
-}

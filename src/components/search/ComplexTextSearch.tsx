@@ -12,7 +12,7 @@ import {
 } from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester";
 import { pageDefault } from "../common/constants";
-import { color, fontColor, padding } from "../../styles/constants.js";
+import { color, fontColor, padding } from "../../styles/constants";
 
 export const filterButtonWidth = 100;
 export const searchIconWidth = 44;

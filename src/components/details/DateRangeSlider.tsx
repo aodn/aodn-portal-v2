@@ -15,7 +15,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { dateDefault } from "../common/constants";
 
-const datePikerSlotProps = {
+export const DEFAULT_DATE_PICKER_SLOT = {
   desktopPaper: {
     sx: {
       border: border.xs,
@@ -126,7 +126,7 @@ const DateRangeSlider: React.FC = () => {
               inputAdornment: {
                 position: "start",
               },
-              ...datePikerSlotProps,
+              ...DEFAULT_DATE_PICKER_SLOT,
             }}
           />
         </Grid>
@@ -142,7 +142,7 @@ const DateRangeSlider: React.FC = () => {
             minDate={valueToDate(value[0])}
             maxDate={initialMaxDate}
             onChange={(date) => handleMaxDateChange(date as Dayjs)}
-            slotProps={datePikerSlotProps}
+            slotProps={DEFAULT_DATE_PICKER_SLOT}
           />
         </Grid>
       </Grid>

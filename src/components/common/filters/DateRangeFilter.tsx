@@ -10,13 +10,7 @@ import { Box, Grid } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import {
-  border,
-  borderRadius,
-  color,
-  fontColor,
-  padding,
-} from "../../../styles/constants";
+import { padding } from "../../../styles/constants";
 import { dateDefault } from "../constants";
 import { ParameterState } from "../store/componentParamReducer";
 import TimeRangeBarChart from "../charts/TimeRangeBarChart";
@@ -27,33 +21,7 @@ import { fetchResultNoStore } from "../store/searchReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
 import PlainDatePicker from "../datetime/PlainDatePicker";
 import PlainSlider from "../slider/PlainSlider";
-
-const datePikerSlotProps = {
-  desktopPaper: {
-    sx: {
-      border: border.xs,
-      borderRadius: borderRadius.small,
-      width: "350px",
-      ".MuiPickersYear-yearButton": {
-        color: fontColor.gray.dark,
-        padding: 0,
-      },
-      ".MuiPickersYear-yearButton.Mui-selected": {
-        color: "#fff",
-        backgroundColor: color.blue.dark,
-      },
-      ".MuiPickersMonth-monthButton": {
-        color: fontColor.gray.dark,
-        padding: 0,
-      },
-
-      ".MuiPickersMonth-monthButton.Mui-selected": {
-        color: "#fff",
-        backgroundColor: color.blue.dark,
-      },
-    },
-  },
-};
+import { DEFAULT_DATE_PICKER_SLOT } from "../../details/DateRangeSlider";
 
 const initialMinDate: Dayjs = dayjs(dateDefault.min);
 const initialMaxDate: Dayjs = dayjs(dateDefault.max);
@@ -64,12 +32,12 @@ const dateToValue = (date: Dayjs): number => date.valueOf();
 // Utility function to convert a numeric value back to a date
 const valueToDate = (value: number): Dayjs => dayjs(value);
 
-interface DateRangeSliderProps {
+interface DateRangeFilterProps {
   filter: ParameterState;
   setFilter: Dispatch<SetStateAction<ParameterState>>;
 }
 
-const DateRangeSlider: FC<DateRangeSliderProps> = ({ filter, setFilter }) => {
+const DateRangeFilter: FC<DateRangeFilterProps> = ({ filter, setFilter }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { dateTimeFilterRange } = filter;
 
@@ -158,13 +126,14 @@ const DateRangeSlider: FC<DateRangeSliderProps> = ({ filter, setFilter }) => {
     [minDate, setFilter, value]
   );
 
+  // States below are used to store the imos-data ids and all datasets
+  // they will be used in TimeRangeBarChart
   const [imosDataIds, setImosDataIds] = useState<string[]>([]);
   const [totalDataset, setTotalDataset] = useState<OGCCollections>({
     collections: [],
     links: [],
   });
 
-  // Initialize the component
   useEffect(() => {
     // Find all collection
     dispatch(
@@ -230,7 +199,7 @@ const DateRangeSlider: FC<DateRangeSliderProps> = ({ filter, setFilter }) => {
                   inputAdornment: {
                     position: "start",
                   },
-                  ...datePikerSlotProps,
+                  ...DEFAULT_DATE_PICKER_SLOT,
                 }}
               />
             </Box>
@@ -273,7 +242,7 @@ const DateRangeSlider: FC<DateRangeSliderProps> = ({ filter, setFilter }) => {
                 minDate={valueToDate(value[0])}
                 maxDate={initialMaxDate}
                 onChange={(date) => handleMaxDateChange(date as Dayjs)}
-                slotProps={datePikerSlotProps}
+                slotProps={DEFAULT_DATE_PICKER_SLOT}
               />
             </Box>
           </Grid>
@@ -283,4 +252,4 @@ const DateRangeSlider: FC<DateRangeSliderProps> = ({ filter, setFilter }) => {
   );
 };
 
-export default DateRangeSlider;
+export default DateRangeFilter;

@@ -14,17 +14,13 @@ import { Category, ParameterState } from "../store/componentParamReducer";
 import { StyledToggleButton } from "../buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../buttons/StyledToggleButtonGroup";
 
-interface CategoryVocabFilterProps {
+interface CategoryFilterProps {
   filter: ParameterState;
   setFilter: Dispatch<SetStateAction<ParameterState>>;
   sx?: SxProps<Theme>;
 }
 
-const CategoryFilter: FC<CategoryVocabFilterProps> = ({
-  filter,
-  setFilter,
-  sx,
-}) => {
+const CategoryFilter: FC<CategoryFilterProps> = ({ filter, setFilter, sx }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
