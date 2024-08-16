@@ -2,6 +2,7 @@ import { Box, Grid, Typography, useTheme } from "@mui/material";
 import React, { ReactNode, useState } from "react";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import ShowMoreDetailBtn from "../common/buttons/ShowMoreDetailBtn";
+import NaList from "./NaList";
 
 interface ExpandableListProps {
   title?: string;
@@ -17,10 +18,9 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
   const [isShowingMore, setIsShowingMore] = useState(false);
   return (
     <Grid container sx={{ marginTop: theme.mp.md }}>
-      {title && (
+      {title !== "Statement" && (
         <Grid item md={12} display="flex" alignItems="center">
           <Box display="flex" justifyContent="center" alignItems="center">
-            {/*<CircleRightArrowIcon />*/}
             <KeyboardDoubleArrowRightIcon />
           </Box>
           <Typography
@@ -35,22 +35,26 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
         </Grid>
       )}
 
-      <Grid item container md={12}>
-        {childrenList.map((child) => {
-          showingCollapseCount++;
-          if (!isShowingMore && showingCollapseCount > 5) {
-            return null;
-          }
-          return child;
-        })}
-        {childrenList.length > 5 && (
-          <ShowMoreDetailBtn
-            isShowingMore={isShowingMore}
-            setIsShowingMore={setIsShowingMore}
-            title={title ? title : ""}
-          />
-        )}
-      </Grid>
+      {childrenList.length === 0 ? (
+        <NaList title={title ? title : ""} />
+      ) : (
+        <Grid item container md={12}>
+          {childrenList.map((child) => {
+            showingCollapseCount++;
+            if (!isShowingMore && showingCollapseCount > 5) {
+              return null;
+            }
+            return child;
+          })}
+          {childrenList.length > 5 && (
+            <ShowMoreDetailBtn
+              isShowingMore={isShowingMore}
+              setIsShowingMore={setIsShowingMore}
+              title={title ? title : ""}
+            />
+          )}
+        </Grid>
+      )}
     </Grid>
   );
 };
