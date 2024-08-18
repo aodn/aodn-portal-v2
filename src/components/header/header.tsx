@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import IMOS from "@/assets/logos/imos-logo.png";
 import MainMenu from "../menu/MainMenu";
 import { FC } from "react";
@@ -13,52 +13,51 @@ const Header: FC = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "#FFF",
+        display: "flex",
+        justifyContent: "center",
+        backgroundColor: "#fff",
         paddingY: padding.medium,
       }}
     >
-      <Grid
-        container
+      <Box
         sx={{
+          width: "80%",
           display: "flex",
+          flexDirection: "row",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "space-between",
         }}
       >
-        <Grid item xs={4}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "end",
-            }}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "end",
+          }}
+        >
+          <a href="/">
+            <img
+              height="30px"
+              src={IMOS}
+              alt="IMOS Logo"
+              style={{ paddingRight: padding.medium }}
+            />
+          </a>
+          <Divider orientation="vertical" flexItem></Divider>
+          <Typography
+            textAlign="left"
+            fontSize={fontSize.info}
+            fontWeight={fontWeight.medium}
+            color={fontColor.blue.dark}
+            padding={0}
+            paddingLeft={padding.medium}
           >
-            <a href="/">
-              <img
-                height="30px"
-                src={IMOS}
-                alt="IMOS Logo"
-                style={{ paddingRight: padding.medium }}
-              />
-            </a>
-            <Divider orientation="vertical" flexItem></Divider>
-            <Typography
-              textAlign="left"
-              fontSize={fontSize.info}
-              fontWeight={fontWeight.medium}
-              color={fontColor.blue.dark}
-              padding={0}
-              paddingLeft={padding.medium}
-            >
-              Australian Ocean <br />
-              Data Network
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={8} sx={{ paddingLeft: padding.quadruple }}>
-          <MainMenu />
-        </Grid>
-      </Grid>
+            Australian Ocean <br />
+            Data Network
+          </Typography>
+        </Box>
+        <MainMenu />
+      </Box>
     </Box>
   );
 };

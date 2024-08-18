@@ -1,7 +1,6 @@
 import { FC } from "react";
-import { padding } from "../../styles/constants";
-import { Box, Grid } from "@mui/material";
 import PlainMenu, { type Menu } from "./PlainMenu";
+import { Stack } from "@mui/material";
 
 // TODO: implement items abd handlers once the menu function is designed
 const MAIN_MENUS: Menu[] = [
@@ -14,23 +13,16 @@ const MAIN_MENUS: Menu[] = [
 
 const Menu: FC = () => {
   return (
-    <Grid
-      container
-      sx={{
-        width: "60%",
-        backgroundColor: "transparent",
-      }}
+    <Stack
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      spacing={8}
     >
-      <Grid item xs={12}>
-        <Grid container justifyContent="space-between">
-          {MAIN_MENUS.map((menu, index) => (
-            <Box key={index}>
-              <PlainMenu menu={menu} />
-            </Box>
-          ))}
-        </Grid>
-      </Grid>
-    </Grid>
+      {MAIN_MENUS.map((menu, index) => (
+        <PlainMenu menu={menu} key={index} />
+      ))}
+    </Stack>
   );
 };
 
