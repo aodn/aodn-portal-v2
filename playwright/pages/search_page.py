@@ -21,3 +21,6 @@ class SearchPage(BasePage):
         selector = 'div[data-testid="result-card-list"]'
         first_result = self.page.locator(selector).all()[1]
         first_result.wait_for(state='detached', timeout=5000)
+
+    def click_dataset(self, title: str) -> None:
+        self.get_button(title, exact=False).click()

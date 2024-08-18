@@ -14,3 +14,4 @@ class Routes:
     COLLECTION_SELECTED = (
         f'{PREFIX}/collections?properties=id,title,description&filter=id*'
     )
+    COLLECTION_DETAIL = f'{PREFIX}/collections/*'

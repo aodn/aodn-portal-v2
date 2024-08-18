@@ -64,3 +64,11 @@ class ApiRouter:
         self.unroute(Routes.COLLECTION_ALL, all_handler)
         self.unroute(Routes.COLLECTION_POPUP, popup_handler)
         self.unroute(Routes.COLLECTION_SELECTED, popup_handler)
+
+    def route_collection_detail(self, handler_function: Callable) -> None:
+        self.route(Routes.COLLECTION_DETAIL, handler_function)
+
+    def unroute_collection_detail(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.COLLECTION_DETAIL, handler_function)
