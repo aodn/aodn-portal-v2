@@ -1,21 +1,8 @@
-import { afterAll, afterEach, beforeAll } from "vitest";
-import { server } from "../../../../../__mocks__/server";
-import { cleanup, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import ContactArea from "../ContactArea";
 import { CONTACT } from "../../../../../__mocks__/data/DETAIL_DATA";
 import AppTheme from "../../../../../utils/AppTheme";
 import { ThemeProvider } from "@mui/material/styles";
-
-beforeAll(() => {
-  server.listen();
-});
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-});
-afterAll(() => {
-  server.close();
-});
 
 describe("ContactArea", async () => {
   const theme = AppTheme;
