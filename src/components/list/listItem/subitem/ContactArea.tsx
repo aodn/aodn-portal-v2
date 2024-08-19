@@ -107,7 +107,6 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
               </Grid>
             );
           })}
-        {/*</Grid>*/}
       </Grid>
     </Grid>
   );
