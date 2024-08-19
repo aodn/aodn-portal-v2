@@ -21,7 +21,7 @@ const Header: FC = () => {
     >
       <Box
         sx={{
-          width: "80%",
+          width: "70%",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",

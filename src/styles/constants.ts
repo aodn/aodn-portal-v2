@@ -97,6 +97,7 @@ const color = {
   },
   brightBlue: {
     dark: "#51BCEB",
+    semiTransparentDark: "rgba(82, 189, 236, 0.4)",
   },
   gray: {
     dark: "#575757",
@@ -104,6 +105,9 @@ const color = {
     light: "#979797",
     extraLight: "#dfdfdf",
     xxLight: "#f8f8f8",
+  },
+  white: {
+    oneTenTransparent: " rgba(255, 255, 255, 0.1)",
   },
 };
 

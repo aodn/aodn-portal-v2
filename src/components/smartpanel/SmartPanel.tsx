@@ -1,113 +1,210 @@
-import React from "react";
+import { FC, ReactNode } from "react";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Box from "@mui/material/Box";
+import { Card, CardContent, Typography } from "@mui/material";
+import {
+  border,
+  borderRadius,
+  color,
+  fontColor,
+  fontSize,
+  padding,
+} from "../../styles/constants";
+import {
+  DEFAULT_CARD_SIZE,
+  DEFAULT_GAP,
+  ITEM_DATA,
+  ItemType,
+  SMART_PANEL_HEIGHT,
+  SMART_PANEL_WIDTH,
+} from "./constants";
+import { getItemCols, getItemRows, getSmartPanelCols } from "./utils";
 
-function srcset(image: string, size: number, rows = 1, cols = 1) {
-  return {
-    src: `${image}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format`,
-    srcSet: `${image}?w=${size * cols}&h=${
-      size * rows
-    }&fit=crop&auto=format&dpr=2 2x`,
-  };
+// TODO: use different card props for different card size
+export interface CardProps {
+  title: string;
+  icon?: string;
+  image?: string;
+  additionalInfo?: string[];
 }
 
-export default function HorizontalScrollSmartPanel() {
+const CardContainer = ({ children }: { children: ReactNode }) => (
+  <Card
+    elevation={0}
+    sx={{
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      bgcolor: color.white.oneTenTransparent,
+      border: `${border.xs} ${color.brightBlue.semiTransparentDark}`,
+      color: "#fff",
+    }}
+  >
+    {children}
+  </Card>
+);
+
+const SmallCard: FC<CardProps> = ({ title, icon }) => (
+  <CardContainer>
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      width="100%"
+      height="100%"
+    >
+      {icon && (
+        <Box height="50%" width="50%">
+          <img
+            src={icon}
+            alt={icon}
+            style={{
+              objectFit: "contain",
+              width: "100%",
+              height: "100%",
+            }}
+          />
+        </Box>
+      )}
+
+      <Typography
+        padding={padding.extraSmall}
+        fontSize={fontSize.label}
+        color="#fff"
+        sx={{
+          overflow: "hidden",
+        }}
+        noWrap
+      >
+        {title}
+      </Typography>
+    </Box>
+  </CardContainer>
+);
+
+const MediumCard: FC<CardProps> = ({ title, image }) => (
+  <CardContainer>
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      width="100%"
+      height="100%"
+      textAlign="center"
+      sx={{
+        backgroundImage: `url(${image})`,
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+      }}
+    >
+      <Typography padding={0} variant="h6">
+        {title}
+      </Typography>
+    </Box>
+  </CardContainer>
+);
+
+const LargeCard: FC<CardProps> = ({ title, image, additionalInfo }) => (
+  <CardContainer>
+    <Box sx={{ width: "100%", height: "100%" }}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        height="50%"
+        borderRadius={`${borderRadius.small}  ${borderRadius.small} 0 0`}
+        textAlign="center"
+        sx={{
+          backgroundImage: `url(${image})`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        <Typography variant="h6">{title}</Typography>
+      </Box>
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-evenly"
+        alignItems="start"
+        height="50%"
+        paddingX={padding.small}
+      >
+        {additionalInfo?.map((content) => (
+          <Typography
+            key={content}
+            padding={0}
+            fontSize={fontSize.label}
+            color="#fff"
+          >
+            {content}
+          </Typography>
+        ))}
+      </Box>
+    </Box>
+  </CardContainer>
+);
+
+const SmartPanel = () => {
   return (
-    <Box sx={{ width: "1000px", height: "160px", overflowX: "auto" }}>
+    <Box
+      sx={{
+        width: SMART_PANEL_WIDTH,
+        height: SMART_PANEL_HEIGHT,
+        overflowX: "auto",
+        overflowY: "hidden",
+      }}
+    >
       <ImageList
         sx={{
-          width: "auto",
-          height: "100%",
-          flexWrap: "nowrap",
+          width: "fit-content",
+          height: SMART_PANEL_HEIGHT,
           transform: "translateZ(0)",
+          m: 0,
+          p: 0,
         }}
         variant="quilted"
-        cols={20}
-        rowHeight={80}
+        cols={getSmartPanelCols(ITEM_DATA)}
+        rowHeight={DEFAULT_CARD_SIZE - DEFAULT_GAP}
       >
-        {itemData.map((item) => (
+        {ITEM_DATA.map((item) => (
           <ImageListItem
-            key={item.img}
-            cols={item.cols || 1}
-            rows={item.rows || 1}
+            key={item.title}
+            cols={getItemCols(item.type)}
+            rows={getItemRows(item.type)}
+            sx={{
+              width:
+                item.type === ItemType.small
+                  ? `${getItemCols(item.type) * DEFAULT_CARD_SIZE}px`
+                  : `${getItemCols(item.type) * DEFAULT_CARD_SIZE + DEFAULT_GAP}px`,
+              height: `${getItemRows(item.type) * (DEFAULT_CARD_SIZE - DEFAULT_GAP)}px`,
+            }}
           >
-            <img
-              {...srcset(item.img, 80, item.rows, item.cols)}
-              alt={item.title}
-              loading="lazy"
-              style={{ height: "100%", width: "100%", objectFit: "cover" }}
-            />
+            {item.type === "small" && (
+              <SmallCard title={item.title} icon={item.icon} />
+            )}
+            {item.type === "medium" && (
+              <MediumCard title={item.title} image={item.image} />
+            )}
+            {item.type === "large" && (
+              <LargeCard
+                title={item.title}
+                image={item.image}
+                additionalInfo={item.additionalInfo}
+              />
+            )}
           </ImageListItem>
         ))}
       </ImageList>
     </Box>
   );
-}
+};
 
-const itemData = [
-  {
-    img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-    title: "Breakfast",
-    rows: 2,
-    cols: 4,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-    title: "Burger",
-    cols: 2,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
-    title: "Camera",
-    cols: 2,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c",
-    title: "Coffee",
-    cols: 3,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1533827432537-70133748f5c8",
-    title: "Hats",
-    cols: 3,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-    author: "@arwinneil",
-    rows: 2,
-    cols: 4,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1516802273409-68526ee1bdd6",
-    title: "Basketball",
-    cols: 2,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1518756131217-31eb79b20e8f",
-    title: "Fern",
-    cols: 2,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1597645587822-e99fa5d45d25",
-    title: "Mushrooms",
-    rows: 2,
-    cols: 4,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1567306301408-9b74779a11af",
-    title: "Tomato basil",
-    cols: 2,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1471357674240-e1a485acb3e1",
-    title: "Sea star",
-    cols: 2,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1589118949245-7d38baf380d6",
-    title: "Bike",
-    cols: 3,
-  },
-];
+export default SmartPanel;
