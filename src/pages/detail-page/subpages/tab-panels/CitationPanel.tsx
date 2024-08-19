@@ -124,7 +124,9 @@ const CitationPanel = () => {
       },
       {
         title: "Constraints",
-        component: <CollapseList title="Constraints" items={constraints} />,
+        component: (
+          <CollapseList title="Constraints" items={constraints} areAllOpen />
+        ),
       },
     ],
     [
