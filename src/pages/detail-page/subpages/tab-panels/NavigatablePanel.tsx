@@ -159,10 +159,9 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       const visibleHeight = scrollableSectionRef.current.clientHeight;
       const neededHeight =
         targetPosition - (currentScrollHeight - visibleHeight);
+
       if (neededHeight >= 0) {
         setSupplimentaryHeight((prevHeight) => prevHeight + neededHeight);
-      } else {
-        laybackDeductSize(neededHeight);
       }
       setScrollDistance(targetPosition);
     };

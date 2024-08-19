@@ -27,7 +27,7 @@ const CollapseItem: React.FC<CollapseFrameProps> = ({
   };
 
   return (
-    <StyledItemGrid container>
+    <StyledItemGrid container data-testid="collapseItem">
       <Grid
         item
         md={11}
