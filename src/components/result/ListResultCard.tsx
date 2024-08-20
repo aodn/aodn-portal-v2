@@ -150,9 +150,11 @@ const ListResultCard = (props: ResultCardProps) => {
           startIcon={<InfoIcon />}
           onClick={() => {}}
         />
-        {props.content.links && (
+        {props.content.getDistributionLinks() && (
           <StaticResultCardButton
-            text={generateLinkText(props.content.links?.length)}
+            text={generateLinkText(
+              props.content.getDistributionLinks()!.length
+            )}
             startIcon={<LinkIcon />}
             onClick={() => {}}
           />

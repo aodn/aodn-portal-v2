@@ -18,6 +18,7 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
     const contactsToAdd: ReactNode[] = [];
     contacts?.map((contact, index) => {
       const suffix = contact.name ? ` - ${contact.name}` : "";
+      const email = contact?.emails?.[0];
       contactsToAdd.push(
         <TextItem key={index}>
           <Grid item container md={12} sx={{ marginBottom: theme.mp.md }}>
@@ -31,7 +32,7 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
               <MailOutlineIcon />
             </Grid>
             <Grid item md={11} sx={{ textAlign: "left", whiteSpace: "normal" }}>
-              <Link href={`mailto:${contact.emails[0]}`}>
+              <Link href={`mailto:${email ? email : ""}`}>
                 <Typography variant="detailTitle">
                   {contact.organization + suffix}
                 </Typography>
