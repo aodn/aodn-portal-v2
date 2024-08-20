@@ -36,22 +36,14 @@ const MetadataInformationPanel = () => {
     return "";
   }, [context.collection]);
 
-  const metadataLink = useMemo(() => {
+  const metadataUrl = useMemo(() => {
     if (context.collection) {
-      const links = context.collection.links;
-      if (links) {
-        const metadataLink = links.find(
-          (link) =>
-            link.title?.trim().toLowerCase() === "full metadata link" &&
-            link.type === "text/html" &&
-            link.rel === "self"
-        );
-        if (metadataLink) {
-          return metadataLink.href;
-        }
+      const metadataLink = context.collection.getMetadataUrl();
+      if (metadataLink) {
+        return metadataLink;
       }
+      return "";
     }
-    return "";
   }, [context.collection]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -85,14 +77,14 @@ const MetadataInformationPanel = () => {
       },
       {
         title: "Full Metadata Link",
-        component: <MetadataUrlList url={metadataLink} />,
+        component: <MetadataUrlList url={metadataUrl ? metadataUrl : ""} />,
       },
       {
         title: "Metadata Dates",
         component: <MetadataDateList creation={creation} revision={revision} />,
       },
     ],
-    [creation, metadataContact, metadataId, metadataLink, revision]
+    [creation, metadataContact, metadataId, metadataUrl, revision]
   );
   return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
 };
