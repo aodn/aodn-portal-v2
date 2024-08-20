@@ -1,7 +1,8 @@
 import { http, HttpResponse } from "msw";
 import { PARAMETER_CATEGORIES } from "./data/PARAMETER_CATEGORIES";
-import { SUGGESTER_OPTIONS } from "./data/SUGGESTER_OPTIONS";
 import { COLLECTIONS_WAVE } from "./data/COLLECTIONS_WAVE";
+import { getSuggesterOptionsBy } from "./utils/SuggesterHandlerUtils";
+import { NORMAL_COLLECTION } from "./data/COLLECTIONS";
 
 const PREFIX = "/api/v1/ogc";
 
@@ -35,30 +36,13 @@ export const handlers = [
       return HttpResponse.json(COLLECTIONS_WAVE);
     }
   }),
+
+  http.get(PREFIX + "/collections/:uuid", ({ params }) => {
+    const { uuid } = params;
+
+    // TODO: if more mocked records are needed, implementation here will change
+    if (uuid === NORMAL_COLLECTION.id) {
+      return HttpResponse.json(NORMAL_COLLECTION);
+    }
+  }),
 ];
-
-const getSuggesterOptionsBy = (input: string, filter: string[]) => {
-  const allCategories = SUGGESTER_OPTIONS.category_suggestions;
-  const allTitles = SUGGESTER_OPTIONS.record_suggestions.titles;
-
-  const categories = filterItemsIn(allCategories).by(input.toLowerCase());
-  const titles = filterItemsIn(allTitles).by(input.toLowerCase());
-  return {
-    category_suggestions: categories,
-    record_suggestions: {
-      titles: titles,
-    },
-  };
-};
-
-const filterItemsIn = (array: string[]) => {
-  return new ArrayToFilter(array);
-};
-
-class ArrayToFilter {
-  constructor(private readonly array: string[]) {}
-
-  public by(keyword: string) {
-    return this.array.filter((item) => item.toLowerCase().includes(keyword));
-  }
-}
