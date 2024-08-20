@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const LinksPanel = () => {
   const { collection } = useDetailPageContext();
-  const links = collection?.links;
+  const links = collection?.getDistributionLinks();
   const [clickedCopyLinkButtonIndex, setClickedCopyLinkButtonIndex] = useState<
     number[]
   >([]);

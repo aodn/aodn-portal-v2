@@ -4,6 +4,7 @@ import {
   IAssociatedRecord,
   IAssociatedRecordGroup,
   ILink,
+  RelationType,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import AssociatedRecordList from "../../../../components/list/AssociatedRecordList";
 import NavigatablePanel from "./NavigatablePanel";
@@ -43,13 +44,13 @@ const AssociatedRecordsPanel = () => {
       if (link.rel == null) {
         return;
       }
-      if (link.rel === "parent") {
+      if (link.rel === RelationType.PARENT) {
         parents.push(generateRecordBy(link));
       }
-      if (link.rel === "child") {
+      if (link.rel === RelationType.CHILD) {
         children.push(generateRecordBy(link));
       }
-      if (link.rel === "sibling") {
+      if (link.rel === RelationType.SIBLING) {
         siblings.push(generateRecordBy(link));
       }
     });
