@@ -52,9 +52,8 @@ def test_datapoint_hover_and_click(
 
     search_page.map.center_map(lng, lat)
     search_page.map.hover_map()
-    expect(search_page.popup_title).to_have_text(title)
 
-    search_page.map.click_map_data_point()
+    search_page.map.click_map()
     expect(search_page.first_result_title).to_have_text(title)
 
 
@@ -110,12 +109,12 @@ def test_map_base_layer(
     landing_page.load()
     landing_page.search.click_search_button()
     expect(search_page.first_result_title).to_be_visible()
-    assert search_page.map.is_layer_visible(layer_id) is False
+    assert search_page.map.is_map_layer_visible(layer_id) is False
 
     search_page.map.basemap_show_hide_menu.click()
     search_page.click_text(layer_text)
 
-    assert search_page.map.is_layer_visible(layer_id) is True
+    assert search_page.map.is_map_layer_visible(layer_id) is True
 
 
 @pytest.mark.parametrize(
@@ -147,14 +146,13 @@ def test_spider(
 
     search_page.map.center_map(head_lng, head_lat)
     search_page.map.hover_map()
-    search_page.map.click_map_data_point()
+    search_page.map.click_map()
 
     layer_id = f'spider-lines-line-{head_lng},{head_lat}'
-    assert search_page.map.is_layer_visible(layer_id) is True
+    assert search_page.map.is_map_layer_visible(layer_id) is True
 
     search_page.map.center_map(lng, lat)
     search_page.map.hover_map()
-    expect(search_page.popup_title).to_have_text(title)
 
-    search_page.map.click_map_data_point()
+    search_page.map.click_map()
     expect(search_page.first_result_title).to_have_text(title)

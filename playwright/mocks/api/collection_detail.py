@@ -4,5 +4,6 @@ from utils.json_utils import load_json_data
 
 
 def handle_detail_api(route: Route) -> None:
-    json_data = load_json_data('detail.json')
+    data_id = route.request.url.split('/')[-1]
+    json_data = load_json_data(f'dataset_detail/{data_id}.json')
     route.fulfill(json=json_data)
