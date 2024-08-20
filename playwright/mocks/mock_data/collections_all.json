@@ -72,6 +72,64 @@
     },
     {
       "properties": {
+        "status": "completed"
+      },
+      "id": "0015db7e-e684-7548-e053-08114f8cd4ad",
+      "title": "IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility",
+      "description": "The IMOS Bio-Acoustic Ship Of Opportunity (BA-SOOP) sub-facility is part of a major international effort that aims to determine the distribution and abundance of mid-trophic level organisms (meso-zooplanktonic and micro-nektonic) preyed by top predators (sharks, tuna) by using commercial fishing vessels (SOOP), research vessels, automated oceanic moorings, acoustic recorders, drifters and gliders.  The MAAS (Mid-trophic Automatic Acoustic Sampler) project targets two levels of technology: a high level suited to large platforms such as fixed moorings, vessels or AUV and low level platforms adapted to a large number of autonomous drifters.\n\nBA-SOOP commenced on the 1st of July 2010 to collect underway acoustic data from commercial fishing and research vessels. At present, nine vessels are participating in the BA-SOOP program. Six are commercial fishing vessels that have agreed to record data during transits to and from fishing grounds. The remaining three are scientific research vessels collecting underway acoustic data during transits and science operations. \n\nBio acoustic signals measure the distribution of mid-water prey species (micronekton) such as small fish, squid, krill and jellyfish.  Micronekton form the core of the ocean food web, transferring energy from primary producers at the ocean surface to top predators such as tunas, billfish, sharks, seals and seabirds. The mass and distribution of micronekton reflects broad-scale patterns in the structure and function of the ocean, as well as the dynamics of marine ecosystems. The mapping complements established observing systems such as physical sampling of ocean currents, surveys of ocean chemistry and biology (plankton and zooplankton), and electronic tagging and tracking of large marine fish and mammals. The combined information greatly enhances the capacity of marine scientists to monitor shifts in food availability over time, assisting in the near real-time monitoring and modelling of oceanography, ecosystems, fisheries and climate change, and in understanding the behaviour of top predators.\n\nA full metadata record is also stored in each netCDF file. The document SOOP-BA NetCDF manual v1.0.doc describes the netCDF format and metadata fields that have been defined.",
+      "links": [
+        {
+          "href": "https://thredds.aodn.org.au/thredds/catalog/IMOS/SOOP/SOOP-BA/catalog.html",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Data Link"
+        },
+        {
+          "href": "/metadata/8edf509b-1481-48fd-b9c5-b95b42247f82",
+          "rel": "related",
+          "type": "text/html",
+          "title": "AODN record"
+        },
+        {
+          "href": "https://portal.aodn.org.au/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://imos.org.au/facilities/shipsofopportunity",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://researchdata.ands.org.au/imos-bio-acoustic-sub-facility/440039/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://imos.org.au/fileadmin/user_upload/shared/SOOP/plugin-SOOP-BA_NetCDF_manual_v1.1.pdf",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/c953222f-bb17-4ddf-bdaa-5bf86d04d72a.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://marlin.csiro.au/geonetwork/srv/api/records/0015db7e-e684-7548-e053-08114f8cd4ad/attachments/image.png",
+          "rel": "preview",
+          "type": "image"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
         "status": ""
       },
       "id": "c78801d0-bffe-11dc-a463-00188b4c0af8",

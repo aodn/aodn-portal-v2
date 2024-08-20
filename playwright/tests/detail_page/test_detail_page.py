@@ -10,6 +10,7 @@ from pages.search_page import SearchPage
     'title',
     [
         ('Integrated Marine Observing System (IMOS) - Location of assets'),
+        ('IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility'),
     ],
 )
 def test_page_title_and_tab_navigation(page_mock: Page, title: str) -> None:
@@ -24,10 +25,10 @@ def test_page_title_and_tab_navigation(page_mock: Page, title: str) -> None:
     expect(detail_page.page_title).to_have_text(title)
     expect(detail_page.abstract_map).to_be_visible()
     detail_page.click_tab('About')
-    expect(detail_page.get_heading('Keywords')).to_be_visible()
+    expect(detail_page.get_tab_section('Keywords')).to_be_visible()
     detail_page.get_button('Contacts').click()
-    expect(detail_page.get_heading('Keywords')).not_to_be_in_viewport()
+    expect(detail_page.get_tab_section('Keywords')).not_to_be_in_viewport()
     detail_page.click_tab('Metadata Information')
-    expect(detail_page.get_heading('Metadata Contact')).to_be_visible()
+    expect(detail_page.get_tab_section('Metadata Contact')).to_be_visible()
     detail_page.click_tab('Abstract')
     expect(detail_page.abstract_map).to_be_visible()

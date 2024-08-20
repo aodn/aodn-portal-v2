@@ -1,4 +1,6 @@
-from playwright.sync_api import Page
+import re
+
+from playwright.sync_api import Locator, Page
 
 from pages.base_page import BasePage
 
@@ -11,4 +13,9 @@ class DetailPage(BasePage):
         self.page_title = self.get_label(text='collection title')
         self.abstract_map = page.get_by_label('Abstract').get_by_label(
             'Map', exact=True
+        )
+
+    def get_tab_section(self, title: str) -> Locator:
+        return self.page.locator('span').filter(
+            has_text=re.compile(rf'^{title}$')
         )

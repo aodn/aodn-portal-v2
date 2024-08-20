@@ -123,7 +123,7 @@ def test_map_base_layer(
         (
             '148.50000858306885',
             '-42.499994242361204',
-            'IMOS - Combined Biogeochemical parameters (reference stations)',
+            'IMOS - Australian National Mooring Network (ANMN) Facility - Temperature and salinity time-series',
             '148.48955941132638',
             '-42.497357343209494',
         ),
