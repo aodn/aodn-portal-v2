@@ -10,6 +10,7 @@ interface CollapseFrameProps {
   children: ReactNode;
   isContact?: boolean;
   isAssociatedRecord?: boolean;
+  isOpen?: boolean;
   email?: string;
 }
 
@@ -18,9 +19,10 @@ const CollapseItem: React.FC<CollapseFrameProps> = ({
   children,
   isContact = false,
   isAssociatedRecord = false,
+  isOpen = false,
   email,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(isOpen);
 
   const titleComponent = () => {
     return <Typography variant="detailTitle">{title}</Typography>;
