@@ -35,7 +35,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
         </Grid>
       )}
 
-      {childrenList.length === 0 ? (
+      {!childrenList || childrenList.length === 0 ? (
         <NaList title={title ? title : ""} />
       ) : (
         <Grid item container md={12}>

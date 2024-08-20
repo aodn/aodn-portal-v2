@@ -39,7 +39,11 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
     <Grid container>
       <Grid item container md={12}>
         <Grid item container md={1} display="flex" justifyContent="center">
-          <LocationOnOutlinedIcon />
+          {(delivery_point ||
+            city ||
+            country ||
+            postal_code ||
+            administrative_area) && <LocationOnOutlinedIcon />}
         </Grid>
         <Grid item container md={5}>
           {delivery_point?.map((line) => {

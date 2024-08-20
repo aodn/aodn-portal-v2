@@ -8,13 +8,15 @@ interface MetadataUrlListProps {
 }
 
 const MetadataUrlList: React.FC<MetadataUrlListProps> = ({ url }) => {
-  const link: ReactNode[] = [
-    <TextItem key="url">
-      <Link href={url} target="_blank" rel="noopener noreferrer">
-        {url}
-      </Link>
-    </TextItem>,
-  ];
+  const link: ReactNode[] = url
+    ? [
+        <TextItem key="url">
+          <Link href={url} target="_blank" rel="noopener noreferrer">
+            {url}
+          </Link>
+        </TextItem>,
+      ]
+    : [];
   return <ExpandableList title="Full Metadata Link" childrenList={link} />;
 };
 
