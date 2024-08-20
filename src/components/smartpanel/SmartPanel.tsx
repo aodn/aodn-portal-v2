@@ -1,208 +1,111 @@
-import { FC, ReactNode } from "react";
+import { FC, useCallback, useRef } from "react";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Box from "@mui/material/Box";
-import { Card, CardContent, Typography } from "@mui/material";
-import {
-  border,
-  borderRadius,
-  color,
-  fontColor,
-  fontSize,
-  padding,
-} from "../../styles/constants";
+import { IconButton } from "@mui/material";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { color, gap } from "../../styles/constants";
 import {
   DEFAULT_CARD_SIZE,
   DEFAULT_GAP,
   ITEM_DATA,
-  ItemType,
+  SCROLL_DISTANCE,
   SMART_PANEL_HEIGHT,
   SMART_PANEL_WIDTH,
 } from "./constants";
-import { getItemCols, getItemRows, getSmartPanelCols } from "./utils";
+import { getItemCols, getItemRows } from "./utils";
+import { LargeCard, MediumCard, SmallCard } from "./SmartCard";
 
-// TODO: use different card props for different card size
-export interface CardProps {
-  title: string;
-  icon?: string;
-  image?: string;
-  additionalInfo?: string[];
-}
-
-const CardContainer = ({ children }: { children: ReactNode }) => (
-  <Card
-    elevation={0}
-    sx={{
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      bgcolor: color.white.oneTenTransparent,
-      border: `${border.xs} ${color.brightBlue.semiTransparentDark}`,
-      color: "#fff",
-    }}
-  >
-    {children}
-  </Card>
-);
-
-const SmallCard: FC<CardProps> = ({ title, icon }) => (
-  <CardContainer>
-    <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      width="100%"
-      height="100%"
-    >
-      {icon && (
-        <Box height="50%" width="50%">
-          <img
-            src={icon}
-            alt={icon}
-            style={{
-              objectFit: "contain",
-              width: "100%",
-              height: "100%",
-            }}
-          />
-        </Box>
-      )}
-
-      <Typography
-        padding={padding.extraSmall}
-        fontSize={fontSize.label}
-        color="#fff"
+const SmartPanel: FC = () => {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const scroll = useCallback(
+    (scrollOffset: number) => {
+      if (boxRef && boxRef.current) {
+        boxRef.current.scrollTo({
+          left: boxRef.current.scrollLeft + scrollOffset,
+          behavior: "smooth",
+        });
+      }
+    },
+    [boxRef]
+  );
+  return (
+    <Box display="flex" justifyContent="space-between" alignItems="center">
+      <IconButton
+        onClick={() => scroll(-SCROLL_DISTANCE)}
         sx={{
+          backgroundColor: color.white.oneTenTransparent,
+        }}
+      >
+        <ArrowBackIosNewIcon
+          sx={{
+            pr: gap.sm,
+            height: 20,
+            width: 20,
+            color: "#fff",
+          }}
+        />
+      </IconButton>
+      <Box
+        ref={boxRef}
+        sx={{
+          width: SMART_PANEL_WIDTH,
+          height: SMART_PANEL_HEIGHT,
           overflow: "hidden",
         }}
-        noWrap
       >
-        {title}
-      </Typography>
-    </Box>
-  </CardContainer>
-);
-
-const MediumCard: FC<CardProps> = ({ title, image }) => (
-  <CardContainer>
-    <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      width="100%"
-      height="100%"
-      textAlign="center"
-      sx={{
-        backgroundImage: `url(${image})`,
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-      }}
-    >
-      <Typography padding={0} variant="h6">
-        {title}
-      </Typography>
-    </Box>
-  </CardContainer>
-);
-
-const LargeCard: FC<CardProps> = ({ title, image, additionalInfo }) => (
-  <CardContainer>
-    <Box sx={{ width: "100%", height: "100%" }}>
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        width="100%"
-        height="50%"
-        borderRadius={`${borderRadius.small}  ${borderRadius.small} 0 0`}
-        textAlign="center"
-        sx={{
-          backgroundImage: `url(${image})`,
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-        }}
-      >
-        <Typography variant="h6">{title}</Typography>
+        <ImageList
+          sx={{
+            width: "fit-content",
+            height: SMART_PANEL_HEIGHT,
+            m: 0,
+            p: 0,
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+            "-ms-overflow-style": "none",
+            "scrollbar-width": "none",
+          }}
+          variant="quilted"
+          cols={18}
+          rowHeight={DEFAULT_CARD_SIZE - DEFAULT_GAP}
+          gap={DEFAULT_GAP}
+        >
+          {ITEM_DATA.map((item) => (
+            <ImageListItem
+              key={item.title}
+              cols={getItemCols(item.type)}
+              rows={getItemRows(item.type)}
+              sx={{
+                width: `${getItemCols(item.type) * DEFAULT_CARD_SIZE - DEFAULT_GAP}px`,
+              }}
+            >
+              {item.type === "small" && (
+                <SmallCard title={item.title} icon={item.icon} />
+              )}
+              {item.type === "medium" && (
+                <MediumCard title={item.title} image={item.image} />
+              )}
+              {item.type === "large" && (
+                <LargeCard
+                  title={item.title}
+                  image={item.image}
+                  additionalInfo={item.additionalInfo}
+                />
+              )}
+            </ImageListItem>
+          ))}
+        </ImageList>
       </Box>
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="space-evenly"
-        alignItems="start"
-        height="50%"
-        paddingX={padding.small}
+      <IconButton
+        onClick={() => scroll(SCROLL_DISTANCE)}
+        sx={{ backgroundColor: color.white.oneTenTransparent }}
       >
-        {additionalInfo?.map((content) => (
-          <Typography
-            key={content}
-            padding={0}
-            fontSize={fontSize.label}
-            color="#fff"
-          >
-            {content}
-          </Typography>
-        ))}
-      </Box>
-    </Box>
-  </CardContainer>
-);
-
-const SmartPanel = () => {
-  return (
-    <Box
-      sx={{
-        width: SMART_PANEL_WIDTH,
-        height: SMART_PANEL_HEIGHT,
-        overflowX: "auto",
-        overflowY: "hidden",
-      }}
-    >
-      <ImageList
-        sx={{
-          width: "fit-content",
-          height: SMART_PANEL_HEIGHT,
-          transform: "translateZ(0)",
-          m: 0,
-          p: 0,
-        }}
-        variant="quilted"
-        cols={getSmartPanelCols(ITEM_DATA)}
-        rowHeight={DEFAULT_CARD_SIZE - DEFAULT_GAP}
-      >
-        {ITEM_DATA.map((item) => (
-          <ImageListItem
-            key={item.title}
-            cols={getItemCols(item.type)}
-            rows={getItemRows(item.type)}
-            sx={{
-              width:
-                item.type === ItemType.small
-                  ? `${getItemCols(item.type) * DEFAULT_CARD_SIZE}px`
-                  : `${getItemCols(item.type) * DEFAULT_CARD_SIZE + DEFAULT_GAP}px`,
-              height: `${getItemRows(item.type) * (DEFAULT_CARD_SIZE - DEFAULT_GAP)}px`,
-            }}
-          >
-            {item.type === "small" && (
-              <SmallCard title={item.title} icon={item.icon} />
-            )}
-            {item.type === "medium" && (
-              <MediumCard title={item.title} image={item.image} />
-            )}
-            {item.type === "large" && (
-              <LargeCard
-                title={item.title}
-                image={item.image}
-                additionalInfo={item.additionalInfo}
-              />
-            )}
-          </ImageListItem>
-        ))}
-      </ImageList>
+        <ArrowForwardIosIcon
+          sx={{ pl: gap.sm, height: 20, width: 20, color: "#fff" }}
+        />
+      </IconButton>
     </Box>
   );
 };

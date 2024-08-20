@@ -1,236 +1,140 @@
-import * as React from "react";
+import { Box, Card, Typography } from "@mui/material";
+import { FC, ReactNode } from "react";
 import {
-  Box,
-  Button,
-  Card,
-  CardActionArea,
-  CardMedia,
-  Typography,
-} from "@mui/material";
+  border,
+  borderRadius,
+  color,
+  fontSize,
+  padding,
+} from "../../styles/constants";
 
-enum CardType {
-  OneOnOne,
-  TwoOnOne,
-  TwoOnTwo,
-  ThreeOnTwo,
+export interface CardProps {
+  title: string;
+  icon?: string;
+  image?: string;
+  additionalInfo?: string[];
 }
 
-interface SmartcardProps {
-  colour?: string;
-  imageUrl?: string;
-  caption: string;
-  underline?: React.ReactNode;
-  card?: CardType;
-  isOutlined?: boolean;
-  onCardClicked?: () => void;
-}
+const CardContainer = ({ children }: { children: ReactNode }) => (
+  <Card
+    elevation={0}
+    sx={{
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      bgcolor: color.white.oneTenTransparent,
+      border: `${border.xs} ${color.brightBlue.semiTransparentDark}`,
+      color: "#fff",
+      "&:hover": {
+        scale: "101%",
+        cursor: "pointer",
+      },
+    }}
+  >
+    {children}
+  </Card>
+);
 
-const getPreferDimension = (type: CardType | undefined) => {
-  switch (type) {
-    case CardType.TwoOnTwo:
-      return { cardHeight: "110px", imgWidth: "100%", imgHeight: "60px" };
-    case CardType.TwoOnOne:
-      return { cardHeight: "50px", imgWidth: "100%", imgHeight: "50px" };
-    default:
-      return { cardHeight: "45px", imgWidth: "30px", imgHeight: "30px" };
-  }
-};
-
-const SmartCardContent = (props: SmartcardProps) => {
-  const t = props.card;
-  const dimension = getPreferDimension(t);
-  const isLittleCard = t == CardType.OneOnOne;
-
-  return (
-    <Card
-      elevation={isLittleCard ? 0 : 1}
-      sx={{
-        maxHeight: dimension.cardHeight,
-        backgroundColor: "transparent",
-        border: !isLittleCard ? "1px solid #FFFFFF" : "none",
-        paddingTop: isLittleCard ? "12px" : "0",
-      }}
+export const SmallCard: FC<CardProps> = ({ title, icon }) => (
+  <CardContainer>
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      width="100%"
+      height="100%"
     >
-      <Box
-        sx={{ position: "relative" }}
-        onClick={() => props.onCardClicked && props.onCardClicked()}
-      >
-        {props?.imageUrl ? (
-          <>
-            <CardMedia
-              component="img"
-              image={props.imageUrl}
-              sx={{
-                objectFit: "cover",
-                marginLeft: "auto",
-                marginRight: "auto",
-                left: 0,
-                right: 0,
-                width: dimension.imgWidth,
-                height: dimension.imgHeight,
-              }}
-            />
-            {
-              // Add text and position text in the middle of the image
-            }
-            {(props.card === CardType.TwoOnOne ||
-              props.card === CardType.TwoOnTwo) && (
-              <div
-                style={{
-                  position: "absolute",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  left: 0,
-                  right: 0,
-                  textAlign: "center",
-                  color: props.colour ?? "white",
-                  bottom: "40%",
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  color={props.colour ?? "white"}
-                  fontWeight={300}
-                  fontSize={"22px"}
-                  mb={props.isOutlined ? 2 : 0}
-                >
-                  {props.caption}
-                </Typography>
-              </div>
-            )}
-            {props.card === CardType.OneOnOne && (
-              <div
-                style={{
-                  justifyContent: "center",
-                  display: "flex",
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  color={props.colour ?? "white"}
-                  fontWeight={300}
-                  pt={props.isOutlined ? 0 : 1}
-                  pb={props.isOutlined ? 1 : 0}
-                >
-                  {props.caption}
-                </Typography>
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            {(props.card === CardType.TwoOnOne ||
-              props.card === CardType.TwoOnTwo) && (
-              <Button
-                variant="outlined"
-                sx={{
-                  fontSize: "22px",
-                  fontWeight: "300",
-                  color: props.colour ?? "white",
-                  padding: "15px",
-                }}
-              >
-                {props.caption}
-              </Button>
-            )}
-          </>
-        )}
+      <Box height="50%" width="50%" padding={padding.extraSmall}>
+        <img
+          src={icon}
+          alt={icon}
+          style={{
+            objectFit: "contain",
+            width: "100%",
+            height: "100%",
+          }}
+        />
       </Box>
-      {props.underline && (
-        <Box sx={{ paddingY: 1, paddingX: 2 }}>
-          <Typography
-            variant="subtitle1"
-            color="white"
-            fontWeight={300}
-            textAlign="left"
-          >
-            {props.underline}
-          </Typography>
-        </Box>
-      )}
-    </Card>
-  );
-};
-/**
- * A Card where is span two column and one row.
- * @param props
- * @constructor
- */
-const SmartCard21 = (props: SmartcardProps) => {
-  // Format string with Start / End column
-  const p = { ...props };
-  p.card = CardType.TwoOnOne;
+      <Typography
+        padding={padding.extraSmall}
+        paddingTop={0}
+        fontSize={fontSize.icon}
+        color="#fff"
+        sx={{
+          overflow: "hidden",
+        }}
+        noWrap
+      >
+        {title}
+      </Typography>
+    </Box>
+  </CardContainer>
+);
 
-  return (
+export const MediumCard: FC<CardProps> = ({ title, image }) => (
+  <CardContainer>
     <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      width="100%"
+      height="100%"
+      textAlign="center"
       sx={{
-        gridColumn: "span 2",
-        gridRow: "span 1",
+        backgroundImage: `url(${image})`,
+        backgroundPosition: "center",
+        backgroundSize: "cover",
       }}
     >
-      <SmartCardContent {...p} />
+      <Typography padding={0} variant="h6">
+        {title}
+      </Typography>
     </Box>
-  );
-};
-/**
- * A Card where is span one column and one row.
- * @param props
- * @constructor
- */
-const SmartCard11 = (props: SmartcardProps) => {
-  // Format string with Start / End column
-  const p = { ...props };
-  p.card = CardType.OneOnOne;
+  </CardContainer>
+);
 
-  return (
+export const LargeCard: FC<CardProps> = ({ title, image, additionalInfo }) => (
+  <CardContainer>
     <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      width="100%"
+      height="48%"
+      borderRadius={`${borderRadius.small}  ${borderRadius.small} 0 0`}
+      textAlign="center"
       sx={{
-        gridColumn: "span 1",
-        gridRow: "span 1",
+        backgroundImage: `url(${image})`,
+        backgroundPosition: "center",
+        backgroundSize: "cover",
       }}
     >
-      <SmartCardContent {...p} />
+      <Typography variant="h6">{title}</Typography>
     </Box>
-  );
-};
-
-/**
- * A Card where is span one column and one row.
- * @param props
- * @constructor
- */
-const SmartCard22 = (props: SmartcardProps) => {
-  // Format string with Start / End column
-  const p = { ...props };
-  p.card = CardType.TwoOnTwo;
-
-  return (
     <Box
-      sx={{
-        gridColumn: "span 2",
-        gridRow: "span 2",
-      }}
+      display="flex"
+      flexDirection="column"
+      justifyContent="space-evenly"
+      alignItems="start"
+      height="52%"
+      paddingX={padding.small}
     >
-      <SmartCardContent {...p} />
+      {additionalInfo?.map((content) => (
+        <Typography
+          key={content}
+          padding={0}
+          fontSize={fontSize.label}
+          color="#fff"
+        >
+          {content}
+        </Typography>
+      ))}
     </Box>
-  );
-};
-
-const SmartCard32 = (props: SmartcardProps) => {
-  // Format string with Start / End column
-  const p = { ...props };
-  p.card = CardType.ThreeOnTwo;
-
-  return (
-    <Box
-      sx={{
-        gridColumn: "span 3",
-        gridRow: "span 2",
-      }}
-    >
-      <SmartCardContent {...p} />
-    </Box>
-  );
-};
-
-export { SmartCard11, SmartCard21, SmartCard22, SmartCard32 };
+  </CardContainer>
+);

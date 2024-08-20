@@ -107,7 +107,7 @@ const color = {
     xxLight: "#f8f8f8",
   },
   white: {
-    oneTenTransparent: " rgba(255, 255, 255, 0.1)",
+    oneTenTransparent: " rgba(255, 255, 255, 0.2  )",
   },
 };
 
