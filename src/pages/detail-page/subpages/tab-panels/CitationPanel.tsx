@@ -103,14 +103,12 @@ const CitationPanel = () => {
       },
       {
         title: "License",
-        component: license ? (
+        component: (
           <LicenseList
-            license={license}
+            license={license ? license : ""}
             url={licenseUrl ? licenseUrl : ""}
             graphic={licenseGraphic ? licenseGraphic : ""}
           />
-        ) : (
-          <div>no license</div>
         ),
       },
       {
@@ -124,7 +122,9 @@ const CitationPanel = () => {
       },
       {
         title: "Constraints",
-        component: <CollapseList title="Constraints" items={constraints} />,
+        component: (
+          <CollapseList title="Constraints" items={constraints} areAllOpen />
+        ),
       },
     ],
     [

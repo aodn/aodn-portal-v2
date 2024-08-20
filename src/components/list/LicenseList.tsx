@@ -1,7 +1,7 @@
-import { Grid, Link } from "@mui/material";
-import { margin } from "../../styles/constants";
-import React from "react";
+import { Grid, Link, Typography, useTheme } from "@mui/material";
+import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
+import StyledItemGrid from "./listItem/StyledItemGrid";
 
 interface LicenseListProps {
   license: string;
@@ -10,49 +10,40 @@ interface LicenseListProps {
 }
 
 const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
-  const licenseComponent = () => {
+  const theme = useTheme();
+  const licenseComponent = useMemo(() => {
+    if (!license && !url && !graphic) {
+      return null;
+    }
     return (
-      <Grid
-        container
-        sx={{
-          width: "98%",
-          backgroundColor: "#F2F6F9",
-          margin: margin.lg,
-          borderRadius: "var(----s, 4px)",
-          color: "#676767",
-          fontFamily: "Noto Sans",
-        }}
-      >
-        <Grid item md={12}>
-          <Grid container>
-            <Grid item md={1} />
-            <Grid container item md={11}>
-              <Grid item md={12}>
-                {license}
-              </Grid>
-              <Grid item md={12}>
-                <Link
-                  href={url}
-                  target="_blank"
-                  rel="noreferrer"
-                  sx={{
-                    color: "#468CB6",
-                  }}
-                >
-                  {url}
-                </Link>
-              </Grid>
-              <Grid item md={12}>
-                {graphic && <img src={graphic} alt="license graphic" />}
-              </Grid>
+      <StyledItemGrid container key="licenseList">
+        <Grid container item md={12}>
+          {license && (
+            <Grid item md={12}>
+              <Typography variant="detailContent">{license}</Typography>
             </Grid>
-          </Grid>
+          )}
+          {url && (
+            <Grid item md={12}>
+              <Link href={url} target="_blank" rel="noreferrer">
+                {url}
+              </Link>
+            </Grid>
+          )}
+          {graphic && (
+            <Grid item md={12} sx={{ marginTop: theme.mp.md }}>
+              {graphic && <img src={graphic} alt="license graphic" />}
+            </Grid>
+          )}
         </Grid>
-      </Grid>
+      </StyledItemGrid>
     );
-  };
+  }, [graphic, license, theme.mp.md, url]);
   return (
-    <ExpandableList title={"License"} childrenList={[licenseComponent()]} />
+    <ExpandableList
+      title={"License"}
+      childrenList={licenseComponent ? [licenseComponent] : []}
+    />
   );
 };
 

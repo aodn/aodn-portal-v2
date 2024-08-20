@@ -7,8 +7,8 @@ interface TextListProps {
   texts: string[];
 }
 const TextList: React.FC<TextListProps> = ({ title, texts }) => {
-  const plainTextFragments: ReactNode[] = useMemo(() => {
-    const textFragmentList: ReactNode[] = [];
+  const textComponents: ReactNode[] = useMemo(() => {
+    const textsToAdd: ReactNode[] = [];
     texts?.map((text) => {
       const displayingText = [];
 
@@ -25,10 +25,10 @@ const TextList: React.FC<TextListProps> = ({ title, texts }) => {
         displayingText.push(text);
       }
 
-      textFragmentList.push(<TextItem key={text}>{displayingText}</TextItem>);
+      textsToAdd.push(<TextItem key={text}>{displayingText}</TextItem>);
     });
-    return textFragmentList;
+    return textsToAdd;
   }, [texts]);
-  return <ExpandableList title={title} childrenList={plainTextFragments} />;
+  return <ExpandableList title={title} childrenList={textComponents} />;
 };
 export default TextList;

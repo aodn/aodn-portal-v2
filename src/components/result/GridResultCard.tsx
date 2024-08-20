@@ -121,10 +121,12 @@ const GridResultCard: React.FC<GridResultCardProps> = (props) => {
               isbordered="false"
             />
           </Grid>
-          {props.content.links && (
+          {props.content.getDistributionLinks() && (
             <Grid item xs={6}>
               <StaticResultCardButton
-                text={generateLinkText(props.content.links.length)}
+                text={generateLinkText(
+                  props.content.getDistributionLinks()!.length
+                )}
                 startIcon={<LinkIcon />}
                 onClick={() => {}}
                 isbordered="false"

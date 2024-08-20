@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "./NavigatablePanel";
-import ContactList from "../../../../components/list/ContactList";
 import TextList from "../../../../components/list/TextList";
 import { convertDateFormat } from "../../../../utils/DateUtils";
 import MetadataUrlList from "../../../../components/list/MetadataUrlList";
+import MetadataContactList from "../../../../components/list/MetadataContactList";
+import MetadataDateList from "../../../../components/list/MetadataDateList";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
@@ -19,42 +20,30 @@ const MetadataInformationPanel = () => {
         ?.filter((contact) => contact.roles.includes("metadata")),
     [context.collection]
   );
-  const generateMedatataDateText = useCallback(() => {
-    let dateText = "";
-
+  const creation = useMemo(() => {
     const creation = context.collection?.getCreation();
-    const revision = context.collection?.getRevision();
-
     if (creation) {
-      dateText = dateText + `Creation: ${convertDateFormat(creation)}`;
-    }
-    if (revision) {
-      if (dateText) {
-        dateText += "\n";
-      }
-      dateText = dateText + `Revision: ${convertDateFormat(revision)}`;
-    }
-    return dateText;
-  }, [context.collection]);
-
-  const dates = useMemo(generateMedatataDateText, [generateMedatataDateText]);
-
-  const metadataLink = useMemo(() => {
-    if (context.collection) {
-      const links = context.collection.links;
-      if (links) {
-        const metadataLink = links.find(
-          (link) =>
-            link.title.trim().toLowerCase() === "full metadata link" &&
-            link.type === "text/html" &&
-            link.rel === "self"
-        );
-        if (metadataLink) {
-          return metadataLink.href;
-        }
-      }
+      return convertDateFormat(creation);
     }
     return "";
+  }, [context.collection]);
+
+  const revision = useMemo(() => {
+    const revision = context.collection?.getRevision();
+    if (revision) {
+      return convertDateFormat(revision);
+    }
+    return "";
+  }, [context.collection]);
+
+  const metadataUrl = useMemo(() => {
+    if (context.collection) {
+      const metadataLink = context.collection.getMetadataUrl();
+      if (metadataLink) {
+        return metadataLink;
+      }
+      return "";
+    }
   }, [context.collection]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -72,8 +61,7 @@ const MetadataInformationPanel = () => {
       {
         title: "Metadata Contact",
         component: (
-          <ContactList
-            title="Metadata Contact"
+          <MetadataContactList
             contacts={metadataContact ? metadataContact : []}
           />
         ),
@@ -89,16 +77,14 @@ const MetadataInformationPanel = () => {
       },
       {
         title: "Full Metadata Link",
-        component: <MetadataUrlList url={metadataLink} />,
+        component: <MetadataUrlList url={metadataUrl ? metadataUrl : ""} />,
       },
       {
         title: "Metadata Dates",
-        component: (
-          <TextList title="Metadata Dates" texts={dates ? [dates] : [""]} />
-        ),
+        component: <MetadataDateList creation={creation} revision={revision} />,
       },
     ],
-    [dates, metadataContact, metadataId, metadataLink]
+    [creation, metadataContact, metadataId, metadataUrl, revision]
   );
   return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
 };

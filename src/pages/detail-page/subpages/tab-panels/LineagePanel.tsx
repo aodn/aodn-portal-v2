@@ -9,12 +9,12 @@ const LineagePanel = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const blocks = useMemo(
+  const lists = useMemo(
     () => [
       {
         title: "Statement",
         component: (
-          <TextList title="Statement" texts={statement ? [statement] : []} />
+          <TextList texts={statement ? [statement] : []} title={"Statement"} />
         ),
       },
     ],
@@ -28,7 +28,7 @@ const LineagePanel = () => {
       setIsLoading(false);
     }
   }, [context.collection]);
-  return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
+  return <NavigatablePanel childrenList={lists} isLoading={isLoading} />;
 };
 
 export default LineagePanel;

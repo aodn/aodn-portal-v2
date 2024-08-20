@@ -74,15 +74,16 @@ const funcCategories: CategoriesIn = (categories: Array<Category>) => {
 const funcCommonTypeSearchText: (searchText: string) => undefined | string = (
   searchText: string
 ) => {
-  const results: string[] = [];
-  results.push(`discovery_categories='${searchText?.toLowerCase()}'`);
-  results.push(`fuzzy_title='${searchText?.toLowerCase()}'`);
-  results.push(`fuzzy_description='${searchText?.toLowerCase()}'`);
-  // if no category, return undefined
-  if (results.length === 0) {
+  const st = searchText?.toLowerCase();
+  if (st) {
+    const results: string[] = [];
+    results.push(`discovery_categories='${st}'`);
+    results.push(`fuzzy_content='${st}'`);
+    return `(${results.join(" or ")})`;
+  } else {
+    // if no category, return undefined
     return undefined;
   }
-  return `(${results.join(" or ")})`;
 };
 
 const funcCategoriesWithCommonTypeSearchText: CategoriesWithCommonKey = (
@@ -93,9 +94,12 @@ const funcCategoriesWithCommonTypeSearchText: CategoriesWithCommonKey = (
   categories.forEach((category) => {
     results.push(`discovery_categories='${category.label?.toLowerCase()}'`);
   });
-  results.push(`discovery_categories='${searchText?.toLowerCase()}'`);
-  results.push(`fuzzy_title='${searchText?.toLowerCase()}'`);
-  results.push(`fuzzy_description='${searchText?.toLowerCase()}'`);
+
+  const st = searchText?.toLowerCase();
+  if (st) {
+    results.push(`discovery_categories='${st}'`);
+    results.push(`fuzzy_content='${st}'`);
+  }
   // if no category, return undefined
   if (results.length === 0) {
     return undefined;

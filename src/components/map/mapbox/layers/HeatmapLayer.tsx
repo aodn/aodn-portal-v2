@@ -4,7 +4,7 @@ import MapContext from "../MapContext";
 import { Expression, GeoJSONSource, StyleFunction } from "mapbox-gl";
 import {
   LayersProps,
-  createCentroidDataSource,
+  createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
 } from "./Layers";
@@ -122,7 +122,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     // and therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
-      const dataSource = createCentroidDataSource(undefined);
+      const dataSource = createCenterOfMassDataSource(undefined);
 
       const config = mergeWithDefaults(
         defaultHeatmapConfig,
@@ -284,7 +284,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   }, [map]);
 
   const updateSource = useCallback(() => {
-    const newData = createCentroidDataSource(collections);
+    const newData = createCenterOfMassDataSource(collections);
     if (map?.getSource(heatmapSourceId)) {
       (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
     }

@@ -24,9 +24,7 @@ interface DataTimeFilterRange {
 export interface ParameterState {
   polygon?: Feature<Polygon, GeoJsonProperties>;
   isImosOnlyDataset?: boolean;
-  // Use in RemovableDateTimeFilter
   dateTimeFilterRange?: DataTimeFilterRange;
-  // Use in search box
   searchText?: string;
   commonKey?: string;
   categories?: Array<Category>;
@@ -123,12 +121,42 @@ const updateSortBy = (
 };
 
 // Initial State
-const createInitialParameterState = (): ParameterState => {
-  return {
+const createInitialParameterState = (
+  withDefaultPolygon: boolean = true
+): ParameterState => {
+  const state: ParameterState = {
     isImosOnlyDataset: false,
     dateTimeFilterRange: {},
     searchText: "",
   };
+
+  if (withDefaultPolygon) {
+    // This is the default area and zoom of TAS, this helps to imporve the search
+    // speed because the map will be start in this place. You can always find
+    // the polygon value in the url
+    state.polygon = {
+      type: "Feature",
+      bbox: [
+        124.4248325953249, -60.65204782465562, 170.24587823247586,
+        -25.124994472112704,
+      ],
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [124.4248325953249, -60.65204782465562],
+            [170.24587823247586, -60.65204782465562],
+            [170.24587823247586, 25.124994472112704],
+            [124.4248325953249, -25.124994472112704],
+            [124.4248325953249, -60.65204782465562],
+          ],
+        ],
+      },
+      properties: {},
+    };
+  }
+
+  return state;
 };
 
 // Reducer
@@ -184,6 +212,7 @@ const paramReducer = (
       return state;
   }
 };
+
 // Flatten the ParameterState json to a properties like array, where key is
 // the name.name.name... that describe multiple level json.
 // Must use any due to multiple type complicated type casting
@@ -213,14 +242,19 @@ const flattenToProperties = (
   }
   return result;
 };
+
 // Change the flatten json to xxx=yyy?xxxx=yyyy which can be use in url.
 const formatToUrlParam = (param: ParameterState) => {
   const result = flattenToProperties(param);
   const parts = [];
   for (const key in result) {
     if (Object.prototype.hasOwnProperty.call(result, key)) {
-      // Check if the value is not an empty string before adding to parts
-      if (result[key] !== "") {
+      // Only add the parameter if it's not undefined, null, or an empty string
+      if (
+        result[key] !== undefined &&
+        result[key] !== null &&
+        result[key] !== ""
+      ) {
         parts.push(
           `${encodeURIComponent(key)}=${encodeURIComponent(result[key])}`
         );
@@ -244,9 +278,10 @@ const parseQueryString = (queryString: string) => {
 
   return obj;
 };
+
 // Convert the url parameter back to ParameterState, check test case for more details
 const unFlattenToParameterState = (input: string): ParameterState => {
-  const result = createInitialParameterState();
+  const result = createInitialParameterState(false);
   const flatObject = parseQueryString(input);
 
   for (const key in flatObject) {
@@ -279,6 +314,7 @@ const unFlattenToParameterState = (input: string): ParameterState => {
       }
     }
   }
+
   // Special handle for polygon
   if (Object.prototype.hasOwnProperty.call(result, "polygon")) {
     // By default empty object will not be serialized, so when deserialize, we may miss some default empty value

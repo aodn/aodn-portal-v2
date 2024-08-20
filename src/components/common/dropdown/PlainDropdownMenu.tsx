@@ -5,6 +5,8 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import React, { useState } from "react";
+import { borderRadius, fontSize } from "../../../styles/constants";
+import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 
 interface PlainDropdownMenuProps {
   items: string[];
@@ -21,30 +23,35 @@ const PlainDropdownMenu: React.FC<PlainDropdownMenuProps> = ({
     onSelectCallback(event.target.value as string);
   };
 
-  const capitalizeFirstLetter = (str: string) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
-
   return (
     <FormControl fullWidth>
       <Select
         value={selectedItem}
         onChange={handleOnChange}
+        MenuProps={{
+          PaperProps: { sx: { borderRadius: borderRadius.small } },
+        }}
         sx={{
           padding: "0",
           textAlign: "center",
-          height: "44px",
-          borderRadius: "4px",
+          height: "30px",
+          borderRadius: borderRadius.small,
           backgroundColor: "#fff",
           "& fieldset": {
             border: "none",
           },
           boxShadow: "2px 2px 4px 0px rgba(0, 0, 0, 0.15)",
-          fontSize: "14px",
+          fontSize: fontSize.label,
         }}
       >
         {items.map((item) => (
-          <MenuItem key={item} value={item}>
+          <MenuItem
+            key={item}
+            value={item}
+            sx={{
+              fontSize: fontSize.label,
+            }}
+          >
             {capitalizeFirstLetter(item)}
           </MenuItem>
         ))}

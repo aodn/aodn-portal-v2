@@ -41,14 +41,14 @@ export class OGCCollection {
   // Locate the thumbnail from the links array
   findThumbnail = (): string => {
     const target = this.links?.find(
-      (l) => l.type === "image" && l.rel === "thumbnail"
+      (l) => l.type === "image" && l.rel === RelationType.PREVIEW
     );
     return target !== undefined ? target.href : default_thumbnail;
   };
   // Locate the logo from the links array
   findIcon = (): string | undefined => {
     const target = this.links?.find(
-      (l) => l.type === "image/png" && l.rel === "icon"
+      (l) => l.type === "image/png" && l.rel === RelationType.ICON
     );
     return target !== undefined ? target.href : undefined;
   };
@@ -66,6 +66,13 @@ export class OGCCollection {
   getLicense = (): string | undefined => this.propValue?.license;
   getCreation = (): string | undefined => this.propValue?.creation;
   getRevision = (): string | undefined => this.propValue?.revision;
+  getDistributionLinks = (): ILink[] | undefined =>
+    this.links?.filter((link) => link.rel === RelationType.RELATED);
+  getMetadataUrl = (): string | undefined =>
+    this.links?.filter(
+      (link) =>
+        link.type === "text/html" && link.rel === RelationType.DESCRIBEDBY
+    )?.[0]?.href;
 }
 
 export class SummariesProperties {
@@ -208,6 +215,13 @@ export interface IAssociatedRecord {
 export enum RelationType {
   SELF = "self",
   LICENSE = "license",
+  PARENT = "parent",
+  SIBLING = "sibling",
+  CHILD = "child",
+  RELATED = "related",
+  DESCRIBEDBY = "describedby",
+  ICON = "icon",
+  PREVIEW = "preview",
 }
 
 export enum MediaType {

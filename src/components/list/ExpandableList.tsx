@@ -1,9 +1,11 @@
-import { Button, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import React, { ReactNode, useState } from "react";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import ShowMoreDetailBtn from "../common/buttons/ShowMoreDetailBtn";
+import NaList from "./NaList";
 
 interface ExpandableListProps {
-  title: string;
+  title?: string;
   childrenList: ReactNode[];
 }
 
@@ -11,31 +13,48 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
   title,
   childrenList = [],
 }) => {
+  const theme = useTheme();
   let showingCollapseCount = 0;
   const [isShowingMore, setIsShowingMore] = useState(false);
   return (
-    <Grid container spacing={2}>
-      <Grid item md={12} display="flex" alignItems="center">
-        <KeyboardDoubleArrowRightIcon />
-        <Typography display="inline" variant="h3" sx={{ paddingTop: "0px" }}>
-          {title}
-        </Typography>
-      </Grid>
-      <Grid item container md={12}>
-        {childrenList.map((child) => {
-          showingCollapseCount++;
-          if (!isShowingMore && showingCollapseCount > 5) {
-            return null;
-          }
-          return child;
-        })}
+    <Grid container sx={{ marginTop: theme.mp.md }}>
+      {title !== "Statement" && (
+        <Grid item md={12} display="flex" alignItems="center">
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <KeyboardDoubleArrowRightIcon />
+          </Box>
+          <Typography
+            display="inline"
+            variant="detailTitle"
+            sx={{
+              marginLeft: theme.mp.sm,
+            }}
+          >
+            {title}
+          </Typography>
+        </Grid>
+      )}
 
-        {childrenList.length > 5 && (
-          <Button onClick={() => setIsShowingMore(!isShowingMore)}>
-            {isShowingMore ? `Show less ${title}` : `Show more ${title}`}
-          </Button>
-        )}
-      </Grid>
+      {!childrenList || childrenList.length === 0 ? (
+        <NaList title={title ? title : ""} />
+      ) : (
+        <Grid item container md={12}>
+          {childrenList.map((child) => {
+            showingCollapseCount++;
+            if (!isShowingMore && showingCollapseCount > 5) {
+              return null;
+            }
+            return child;
+          })}
+          {childrenList.length > 5 && (
+            <ShowMoreDetailBtn
+              isShowingMore={isShowingMore}
+              setIsShowingMore={setIsShowingMore}
+              title={title ? title : ""}
+            />
+          )}
+        </Grid>
+      )}
     </Grid>
   );
 };
