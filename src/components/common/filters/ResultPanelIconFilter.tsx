@@ -1,9 +1,9 @@
 import { Grid, Paper, Stack, styled } from "@mui/material";
-import { SmartCard11 } from "../../smartpanel/SmartCard";
-import dateTime from "@/assets/logos/time-range.png";
-import depth from "@/assets/logos/depth.png";
-import dataSettings from "@/assets/logos/data-settings.png";
-import parameter from "@/assets/logos/parameter.png";
+// import { SmartCard11 } from "../../smartpanel/SmartCard";
+// import dateTime from "@/assets/logos/time-range.png";
+// import depth from "@/assets/logos/depth.png";
+// import dataSettings from "@/assets/logos/data-settings.png";
+// import parameter from "@/assets/logos/parameter.png";
 
 const Item = styled(Paper)(({ theme }) => ({
   textAlign: "center",
@@ -14,7 +14,7 @@ const Item = styled(Paper)(({ theme }) => ({
 const ResultPanelIconFilter = () => {
   return (
     <Grid container sx={{ pl: 2 }}>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Stack direction="column" spacing={2}>
           <Item variant="outlined">
             <SmartCard11
@@ -49,7 +49,7 @@ const ResultPanelIconFilter = () => {
             />
           </Item>
         </Stack>
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 };
