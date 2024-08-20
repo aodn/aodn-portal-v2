@@ -13,30 +13,34 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
   revision,
 }) => {
   const theme = useTheme();
-  const metadataDateItem = (
-    <StyledItemGrid container key="Metadata date">
-      {creation && (
-        <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
-          <Typography variant="detailContent">
-            <b>CREATION: </b>
-            {creation}
-          </Typography>
-        </Grid>
-      )}
+  const metadataDateItem =
+    creation || revision ? (
+      <StyledItemGrid container key="Metadata date">
+        {creation && (
+          <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
+            <Typography variant="detailContent">
+              <b>CREATION: </b>
+              {creation}
+            </Typography>
+          </Grid>
+        )}
 
-      {revision && (
-        <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
-          <Typography variant="detailContent">
-            <b>REVISION: </b>
-            {revision}
-          </Typography>
-        </Grid>
-      )}
-    </StyledItemGrid>
-  );
+        {revision && (
+          <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
+            <Typography variant="detailContent">
+              <b>REVISION: </b>
+              {revision}
+            </Typography>
+          </Grid>
+        )}
+      </StyledItemGrid>
+    ) : undefined;
 
   return (
-    <ExpandableList childrenList={[metadataDateItem]} title="Metadata Dates" />
+    <ExpandableList
+      childrenList={metadataDateItem ? [metadataDateItem] : []}
+      title="Metadata Dates"
+    />
   );
 };
 
