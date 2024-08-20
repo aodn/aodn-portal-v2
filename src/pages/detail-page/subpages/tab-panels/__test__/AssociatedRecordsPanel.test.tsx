@@ -40,7 +40,8 @@ afterAll(() => {
 
 describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
-  test("should render AssociatedRecordsPanel", async () => {
+
+  beforeEach(() => {
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -50,14 +51,19 @@ describe("AssociatedRecordsPanel", async () => {
         </ThemeProvider>
       </Provider>
     );
+  });
 
+  test("should render AssociatedRecordsPanel", async () => {
     await waitFor(() => {
       const parentRecordText = screen.queryAllByText("Parent Record");
 
       // one is button, another is list title
       expect(parentRecordText).toHaveLength(2);
     });
+  });
 
+  test("should open a new tab when clicking on a record abstract", async () => {
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
     await waitFor(() => {
       const parentTitle = screen.queryByText(
         "Northern Australia Automated Marine Weather and Oceanographic Stations"
@@ -68,9 +74,50 @@ describe("AssociatedRecordsPanel", async () => {
       const parentAbstract = screen.queryByText(/weather stations have been/i);
       expect(parentAbstract).to.exist;
 
-      const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
       userEvent.click(parentAbstract!);
-      expect(openSpy).toHaveBeenCalledWith("dsf", "_blank");
+      expect(openSpy).toHaveBeenCalledWith(
+        "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
+        "_blank",
+        "noopener,noreferrer"
+      );
+    });
+  });
+
+  test("should be able to show / hide more records", async () => {
+    const lowerRecordTitle =
+      "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
+
+    await waitFor(() => {
+      const showMoreRecordsBtn = screen.queryByText(
+        "Show More Sibling Records"
+      );
+      expect(showMoreRecordsBtn).to.exist;
+
+      // final record should be hiddren first
+      expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
+      userEvent.click(showMoreRecordsBtn!);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText("Show Less Sibling Records")).to.exist;
+
+      // final record should be shown now
+      expect(screen.queryByText(lowerRecordTitle)).to.exist;
+    });
+
+    await waitFor(() => {
+      const showLessRecordsBtn = screen.queryByText(
+        "Show Less Sibling Records"
+      );
+      expect(showLessRecordsBtn).to.exist;
+      userEvent.click(showLessRecordsBtn!);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText("Show More Sibling Records")).to.exist;
+
+      // final record should be hiddren again
+      expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
     });
   });
 });

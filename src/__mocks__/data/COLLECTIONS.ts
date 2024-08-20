@@ -278,25 +278,25 @@ const NORMAL_COLLECTION = {
   links: [
     {
       href: "https://docs.ropensci.org/dataaimsr/",
-      rel: "self",
+      rel: "related",
       type: "",
       title: "Data access using R",
     },
     {
       href: "https://weather.aims.gov.au/#/station/4",
-      rel: "self",
+      rel: "related",
       type: "",
       title: "Marine Weather Observations for Davies Reef",
     },
     {
       href: "https://portal.aodn.org.au/search?uuid=0887cb5b-b443-4e08-a169-038208109466",
-      rel: "self",
+      rel: "related",
       type: "",
       title: "Data access via AODN Portal",
     },
     {
       href: "https://open-aims.github.io/data-platform/",
-      rel: "self",
+      rel: "related",
       type: "",
       title: "Data access via Programming API",
     },
@@ -308,7 +308,7 @@ const NORMAL_COLLECTION = {
     },
     {
       href: "https://apps.aims.gov.au/metadata/view/5fc91100-4ade-11dc-8f56-00008a07204e",
-      rel: "self",
+      rel: "describedBy",
       type: "text/html",
       title: "Full metadata link",
     },
