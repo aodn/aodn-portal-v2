@@ -10,12 +10,6 @@ import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 interface ResultCardsProps {
   contents: CollectionsQueryType;
   layout?: SearchResultLayoutEnum;
-  onRemoveLayer:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection | undefined
-      ) => void)
-    | undefined;
   onDownload:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -53,7 +47,6 @@ const renderCells = (
         <Grid item xs={6}>
           <GridResultCard
             content={props.contents.result.collections[leftIndex]}
-            onRemoveLayer={props.onRemoveLayer}
             onDownload={props.onDownload}
             onClickCard={props.onClickCard}
             data-testid="result-cards-grid"
@@ -62,7 +55,6 @@ const renderCells = (
         <Grid item xs={6}>
           <GridResultCard
             content={props.contents.result.collections[rightIndex]}
-            onRemoveLayer={props.onRemoveLayer}
             onDownload={props.onDownload}
             onClickCard={props.onClickCard}
           />
@@ -83,7 +75,6 @@ const renderRows = (
     <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
       <ListResultCard
         content={props.contents.result.collections[index]}
-        onRemoveLayer={props.onRemoveLayer}
         onDownload={props.onDownload}
         onTags={props.onTags}
         onMore={props.onMore}
@@ -110,7 +101,6 @@ const ResultCards = (props: ResultCardsProps) => {
           <Box key={index} width="327px" height="300px">
             <GridResultCard
               content={dataset}
-              onRemoveLayer={props.onRemoveLayer}
               onDownload={props.onDownload}
               onClickCard={props.onClickCard}
               isSelectedDataset
@@ -124,7 +114,6 @@ const ResultCards = (props: ResultCardsProps) => {
     props.datasetsSelected,
     props.onClickCard,
     props.onDownload,
-    props.onRemoveLayer,
   ]);
 
   const renderDatasetSelectedListCards = useCallback(() => {
@@ -139,7 +128,6 @@ const ResultCards = (props: ResultCardsProps) => {
           <ListResultCard
             key={index}
             content={dataset}
-            onRemoveLayer={props.onRemoveLayer}
             onDownload={props.onDownload}
             onClickCard={props.onClickCard}
             isSelectedDataset
@@ -152,7 +140,6 @@ const ResultCards = (props: ResultCardsProps) => {
     props.datasetsSelected,
     props.onClickCard,
     props.onDownload,
-    props.onRemoveLayer,
   ]);
 
   if (props.layout === SearchResultLayoutEnum.LIST) {

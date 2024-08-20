@@ -11,10 +11,7 @@ import {
   TemporalAfterOrBefore,
   TemporalDuring,
 } from "../cqlFilters";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "./OGCCollectionDefinitions";
+import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
   createErrorResponse,
   ErrorResponse,
@@ -36,7 +33,7 @@ export type SearchParameters = {
 export type SearchControl = {
   pagesize?: number;
   score?: number;
-}
+};
 
 type OGCSearchParameters = {
   q?: string;
@@ -270,21 +267,30 @@ const createSuggesterParamFrom = (
   return suggesterParam;
 };
 // Given a ParameterState object, we convert it to the correct Restful parameters
-// always call this function and do not hand craft it elsewhere, some control isn't 
+// always call this function and do not hand craft it elsewhere, some control isn't
 // part the ParameterState and therefore express as optional argument here
 const createSearchParamFrom = (
   i: ParameterState,
-  control?: SearchControl,
+  control?: SearchControl
 ): SearchParameters => {
   const p: SearchParameters = {};
   p.text = i.searchText;
   p.sortby = i.sortby;
 
-  const c = mergeWithDefaults({
-    score: DEFAULT_SEARCH_SCORE
-  }, control);
+  const c = mergeWithDefaults(
+    {
+      score: DEFAULT_SEARCH_SCORE,
+    } as SearchControl,
+    control
+  );
 
+  // The score control how relevent the records
   p.filter = `score>=${c.score}`;
+
+  // Control how many record return in 1 page.
+  if (c.pagesize) {
+    p.filter = appendFilter(p.filter, `page_size=${c.pagesize}`);
+  }
 
   if (i.isImosOnlyDataset) {
     p.filter = appendFilter(

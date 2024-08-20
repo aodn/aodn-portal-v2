@@ -21,12 +21,6 @@ import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 
 interface ResultCardProps {
   content: OGCCollection;
-  onRemoveLayer?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
   onDownload?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -72,8 +66,8 @@ const ListResultCard = (props: ResultCardProps) => {
     <Card
       variant="outlined"
       sx={{
-        width: "99%",
-        minHeight: "250px",
+        minHeight: "240px",
+        maxHeight: "240px",
         border: props.isSelectedDataset ? "2px solid #618CA5" : "none",
       }}
       data-testid="result-card-list"
@@ -133,14 +127,6 @@ const ListResultCard = (props: ResultCardProps) => {
       </CardActionArea>
 
       <CardActions sx={{ justifyContent: "space-between" }}>
-        {/*This button will be gone in the future*/}
-        <StaticResultCardButton
-          text={"Remove Layer"}
-          startIcon={<WhereToVoteIcon />}
-          onClick={(event) =>
-            props?.onRemoveLayer && props.onRemoveLayer(event, props.content)
-          }
-        />
         <DynamicResultCardButton
           status={props.content.getStatus()}
           onClick={() => {}}

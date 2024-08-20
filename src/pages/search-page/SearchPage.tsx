@@ -127,14 +127,25 @@ const SearchPage = () => {
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
-      const param = createSearchParamFrom(componentParam);
 
-      // Use standard param to get fields you need, record is stored in redux
-      dispatch(fetchResultWithStore(param)).then(() => {
-        // Use a different parameter so that it return id and bbox only and do not store the values
+      // Use standard param to get fields you need, record is stored in redux,
+      // set page so that it return fewer records
+      const paramPaged = createSearchParamFrom(componentParam, {
+        pagesize: 10,
+      });
+
+      dispatch(fetchResultWithStore(paramPaged)).then(() => {
+        // Use a different parameter so that it return id and bbox only and do not store the values,
+        // we cannot add page because we want to show all record on map
+        const paramNonPaged = createSearchParamFrom(componentParam);
         dispatch(
-          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted and ordered by uuid to avoid affecting cluster calculation
-          fetchResultNoStore({ ...param, properties: "id,bbox", sortby: "id" })
+          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+          // and ordered by uuid to avoid affecting cluster calculation
+          fetchResultNoStore({
+            ...paramNonPaged,
+            properties: "id,bbox",
+            sortby: "id",
+          })
         )
           .unwrap()
           .then((collections) => {
@@ -272,7 +283,6 @@ const SearchPage = () => {
         <ResultSection
           visibility={visibility}
           contents={contents}
-          onRemoveLayer={undefined}
           onVisibilityChanged={onVisibilityChanged}
           onClickCard={handleNavigateToDetailPage}
           onChangeSorting={onChangeSorting}
