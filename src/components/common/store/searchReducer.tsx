@@ -12,7 +12,6 @@ import {
   TemporalDuring,
 } from "../cqlFilters";
 import {
-  ILink,
   OGCCollection,
   OGCCollections,
 } from "./OGCCollectionDefinitions";
@@ -20,6 +19,7 @@ import {
   createErrorResponse,
   ErrorResponse,
 } from "../../../utils/ErrorBoundary";
+import { mergeWithDefaults } from "../utils";
 
 export type SuggesterParameters = {
   input?: string;
@@ -32,6 +32,11 @@ export type SearchParameters = {
   properties?: string;
   sortby?: string;
 };
+// Control the behavior of search behavior not part of the query
+export type SearchControl = {
+  pagesize?: number;
+  score?: number;
+}
 
 type OGCSearchParameters = {
   q?: string;
@@ -53,20 +58,19 @@ interface ObjectValue {
 const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
-  return {
-    collections: json.collections.map((collection: any) =>
+  return new OGCCollections(
+    json.collections.map((collection: any) =>
       Object.assign(new OGCCollection(), collection)
     ),
-    links: json.links,
-  };
+    json.links,
+    json.total,
+    json.search_after
+  );
 };
 
 const initialState: ObjectValue = {
   collectionsQueryResult: {
-    result: {
-      links: new Array<ILink>(),
-      collections: new Array<OGCCollection>(),
-    },
+    result: new OGCCollections(),
     query: {},
   },
   categoriesResult: new Array<Category>(),
@@ -88,9 +92,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
   // DO NOT EXPOSE score externally, you should not allow share
   // url with score, alter UI behavior which is hard to control
   if (param.filter !== undefined && param.filter.length !== 0) {
-    p.filter = param.filter + ` AND score>=${DEFAULT_SEARCH_SCORE}`;
-  } else {
-    p.filter = `score>=${DEFAULT_SEARCH_SCORE}`;
+    p.filter = param.filter;
   }
 
   if (param.sortby !== undefined && param.sortby.length !== 0) {
@@ -267,12 +269,22 @@ const createSuggesterParamFrom = (
   }
   return suggesterParam;
 };
-
-const createSearchParamFrom = (i: ParameterState): SearchParameters => {
+// Given a ParameterState object, we convert it to the correct Restful parameters
+// always call this function and do not hand craft it elsewhere, some control isn't 
+// part the ParameterState and therefore express as optional argument here
+const createSearchParamFrom = (
+  i: ParameterState,
+  control?: SearchControl,
+): SearchParameters => {
   const p: SearchParameters = {};
   p.text = i.searchText;
-  p.filter = undefined;
   p.sortby = i.sortby;
+
+  const c = mergeWithDefaults({
+    score: DEFAULT_SEARCH_SCORE
+  }, control);
+
+  p.filter = `score>=${c.score}`;
 
   if (i.isImosOnlyDataset) {
     p.filter = appendFilter(

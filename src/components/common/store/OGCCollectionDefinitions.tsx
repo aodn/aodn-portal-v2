@@ -127,11 +127,34 @@ export class Spatial {
   };
 }
 
-// interfaces:
-export interface OGCCollections {
-  collections: Array<OGCCollection>;
-  links: Array<ILink>;
+export class OGCCollections {
+  private _total: number;
+  private _search_after: Array<object>;
+  private _collections: Array<OGCCollection>;
+  private _links: Array<ILink>;
+
+  constructor(
+    collections: Array<OGCCollection> = new Array<OGCCollection>(),
+    links: Array<ILink> = new Array<ILink>(),
+    total: number = 0,
+    search_after: Array<object> = new Array<object>()
+  ) {
+    this._collections = collections;
+    this._links = links;
+    this._total = total;
+    this._search_after = search_after;
+  }
+
+  get collections() {
+    return this._collections;
+  }
+
+  get links() {
+    return this._links;
+  }
 }
+
+// interfaces:
 export interface IKeyword {
   title: string;
   content: string[];
