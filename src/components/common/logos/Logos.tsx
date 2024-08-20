@@ -1,19 +1,23 @@
-import { Divider, Grid, Box, Typography, Stack } from "@mui/material";
+import { FC, ReactNode } from "react";
+import { Divider, Grid, Box, Typography, Stack, SxProps } from "@mui/material";
+
+import AUMS from "@/assets/logos/Aus-Unstitute-of-Marine-Science.png";
+import BM from "@/assets/logos/Bureo-of-Meteorology.png";
 
 import AIOMS from "@/assets/logos/aioms-logo2.png";
 import AustralianGovernment from "@/assets/logos/aioms-logo1.png";
 import BOM from "@/assets/logos/bom-logo.png";
 import CSIRO from "@/assets/logos/csiro-logo.png";
-import CurtinUniversity from "@/assets/logos/curtinuni-logo.png";
+import CurtinUni from "@/assets/logos/curtinuni-logo.png";
 import DAWE from "@/assets/logos/dawe-aap.png";
-import DeakinUniversity from "@/assets/logos/deakinuniversity-logo.png";
+import DeakinUni from "@/assets/logos/deakinuniversity-logo.png";
 import GovSA from "@/assets/logos/govsa-logo.png";
-import MacquarieUniversity from "@/assets/logos/macquarie-logo.png";
+import MacquarieUni from "@/assets/logos/macquarie-uni.png";
 import NCRIS from "@/assets/logos/ncris-logo.png";
 import SARDI from "@/assets/logos/sardi-logo.png";
 import SIMS from "@/assets/logos/sims-logo.png";
-import UniversityOfMelbourne from "@/assets/logos/The-University-of-Melbourne-Logo.png";
-import UniversityOfSydney from "@/assets/logos/unisyd-logo.png";
+import UMEL from "@/assets/logos/The-University-of-Melbourne-Logo.png";
+import USYD from "@/assets/logos/unisyd-logo.png";
 import UNSW from "@/assets/logos/unsw-logo.png";
 import UTAS from "@/assets/logos/utas-logo.png";
 import UTS from "@/assets/logos/uts-logo.png";
@@ -21,64 +25,59 @@ import UWA from "@/assets/logos/uniwa-logo.png";
 import {
   color,
   fontColor,
+  fontSize,
   fontWeight,
+  gap,
   padding,
 } from "../../../styles/constants";
+import { Height } from "@mui/icons-material";
 
-type LogoProps = { src: string; alt: string; height: string };
+type LogoContainerProps = {
+  children: ReactNode;
+  sx?: SxProps;
+};
 
-const Logo = ({ src, alt, height }: LogoProps) => {
+const LogoContainer: FC<LogoContainerProps> = ({ children, sx }) => (
+  <Box
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    width="100%"
+    height="110px"
+    bgcolor="#fff"
+    sx={{ ...sx }}
+  >
+    {children}
+  </Box>
+);
+
+type LogoProps = { src: string; alt: string; height?: string };
+
+const Logo = ({ src, alt, height = "80%" }: LogoProps) => {
   return (
-    <Box
-      component="img"
+    <img
       src={src}
       alt={alt}
-      sx={{ height: height, padding: padding.small }}
+      style={{
+        objectFit: "contain",
+        width: "80%",
+        height: height,
+      }}
     />
   );
 };
 
 const LogoList = () => {
-  const principals = [
-    AustralianGovernment,
-    AIOMS,
-    BOM,
-    CSIRO,
-    GovSA,
-    SARDI,
-    UWA,
-  ];
-
-  const sims = [UTS, UniversityOfSydney, MacquarieUniversity, UNSW];
-  const associates = [
-    CurtinUniversity,
-    DAWE,
-    DeakinUniversity,
-    UniversityOfMelbourne,
-  ];
-
   return (
-    <Grid container spacing={6}>
+    <Grid container paddingY={padding.quadruple} spacing={2}>
       <Grid item xs={12}>
-        <Grid
-          item
-          xs={12}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Stack
-            direction="row"
-            spacing={2}
-            justifyContent="center"
-            alignItems="center"
-            sx={{
-              width: "60%",
-            }}
-          >
-            <Logo src={NCRIS} alt={"logo-NCRIS"} height="150px" />
+        <Grid container spacing={2}>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={NCRIS} alt={NCRIS} />
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={6} lg={6}>
             <Typography textAlign="left" padding={0}>
               Australia&apos;s Integrated Marine Observing System (IMOS) is
               enabled by the National Collaborative Research Infrastructre
@@ -86,116 +85,122 @@ const LogoList = () => {
               an unincorperated joint venture with the Unviersity of Tasmania as
               Lead Agent.
             </Typography>
-          </Stack>
+          </Grid>
         </Grid>
       </Grid>
-      <Grid
-        item
-        xs={12}
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Typography paddingY={padding.small} fontWeight={fontWeight.extraBold}>
-          PRINCIPLE PARTICIPANTS
-        </Typography>
-        <Stack
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          spacing={1}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Logo
-              src={UTAS}
-              alt={"logo-University-of-Tasmania"}
-              height="40px"
-            />
-            <Typography
-              fontWeight={600}
-              padding={`0 ${padding.medium} 0 0`}
-              fontSize="small"
-            >
-              LEAD AGENT
-            </Typography>
-          </Box>
-          {principals.map((logo, index) => (
-            <Box key={index}>
-              <Logo src={logo} alt={`logo-${index}`} height="60px" />
-            </Box>
-          ))}
-        </Stack>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-          spacing={1}
-        >
-          <Logo src={SIMS} alt="logo-sims" height="60px" />
-          <Divider
-            orientation="vertical"
-            sx={{
-              height: "60%",
-              "&.MuiDivider-root": {
-                borderColor: color.gray.medium,
-              },
-            }}
-          />
-          {sims.map((logo, index) => (
-            <Box key={index}>
-              <Logo src={logo} alt={`logo-${index}`} height="60px" />
-            </Box>
-          ))}
-        </Stack>
+      <Grid item xs={12}>
         <Typography
-          paddingY={padding.extraSmall}
-          fontSize="small"
-          fontWeight={fontWeight.extraBold}
-          color={fontColor.gray.light}
+          paddingY={padding.small}
+          fontWeight={fontWeight.bold}
+          color="#000"
         >
-          SIMS IS A PARTNERSHIP INVOLVING FOUR UNIVERSITIES
+          Principal Participants
         </Typography>
       </Grid>
-      <Grid
-        item
-        xs={12}
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          paddingBottom: padding.extraLarge,
-        }}
-      >
-        <Typography paddingY={padding.small} fontWeight={fontWeight.extraBold}>
-          ASSOCIATE PARTICIPANTS
-        </Typography>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-          spacing={1}
+      <Grid item xs={12}>
+        <Grid container spacing={2}>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={UTAS} alt={UTAS} height="40px" />
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={AUMS} alt={AUMS} height="50px" />
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={BM} alt={UTAS} height="100px" />
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={CSIRO} alt={CSIRO} height="70px" />
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Box>
+                <Logo src={GovSA} alt={GovSA} height="75px" />
+              </Box>
+              <Box>
+                <Logo src={SARDI} alt={SARDI} height="85px" />
+              </Box>
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={UWA} alt={UWA} height="60px" />
+            </LogoContainer>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <LogoContainer sx={{ minWidth: "100%" }}>
+          <Logo src={SIMS} alt={SIMS} height="80px" />
+          <Logo src={UTS} alt={UTS} height="50px" />
+          <Logo src={USYD} alt={USYD} height="50px" />
+          <Logo src={MacquarieUni} alt={MacquarieUni} height="80px" />
+          <Logo src={UNSW} alt={UNSW} height="70px" />
+        </LogoContainer>
+        <Typography
+          paddingTop={-padding.small}
+          fontWeight={fontWeight.regular}
+          fontSize={fontSize.label}
         >
-          {associates.map((logo, index) => (
-            <Box key={index}>
-              <Logo
-                src={logo}
-                alt={`logo-${index}`}
-                height={index === 0 ? "30px" : "60px"}
-              />
-            </Box>
-          ))}
-        </Stack>
+          SIMS is a partnership involving four universities
+        </Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <Typography
+          paddingY={padding.small}
+          fontWeight={fontWeight.bold}
+          color="#000"
+        >
+          Associate Participants
+        </Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <Grid container spacing={2}>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={CurtinUni} alt={CurtinUni} height="35px" />
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={DAWE} alt={DAWE} height="50px" />
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={DeakinUni} alt={DeakinUni} height="65px" />
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={4} lg={3}>
+            <LogoContainer>
+              <Logo src={UMEL} alt={UMEL} height="70px" />
+            </LogoContainer>
+          </Grid>
+          <Grid item xs={12}>
+            <Grid item xs={10} lg={8}></Grid>
+            <Typography
+              padding={0}
+              fontWeight={fontWeight.regular}
+              fontSize={fontSize.label}
+              lineHeight={2}
+            >
+              IMOS thanks the many other organisations who partner with IMOS,
+              providing co-investment,
+              <br />
+              funding and operational support, including investment from the
+              Tasmanian,
+              <br />
+              Western Australian and Queensland State Governments.
+            </Typography>
+          </Grid>
+        </Grid>
       </Grid>
     </Grid>
   );

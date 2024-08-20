@@ -25,8 +25,8 @@ import img_visual_tools from "@/assets/smartPanelIcons/img_visual_tools.png";
 import icon_location from "@/assets/smartPanelIcons/icon_location.png";
 import { CardProps } from "./SmartCard";
 
-export const SMART_PANEL_HEIGHT = 180;
 export const SMART_PANEL_WIDTH = 800;
+export const SMART_PANEL_HEIGHT = 180;
 
 const SMART_PANEL_ROWS = 2;
 
