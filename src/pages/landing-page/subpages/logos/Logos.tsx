@@ -29,7 +29,7 @@ import {
   fontWeight,
   gap,
   padding,
-} from "../../../styles/constants";
+} from "../../../../styles/constants";
 import { Height } from "@mui/icons-material";
 
 type LogoContainerProps = {

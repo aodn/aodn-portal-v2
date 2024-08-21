@@ -6,7 +6,7 @@ import {
   color,
   fontSize,
   padding,
-} from "../../styles/constants";
+} from "../../../../styles/constants";
 
 export interface CardProps {
   title: string;

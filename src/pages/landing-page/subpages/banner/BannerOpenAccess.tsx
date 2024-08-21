@@ -5,7 +5,7 @@ import {
   gap,
   margin,
   padding,
-} from "../../styles/constants";
+} from "../../../../styles/constants";
 
 const BannerOpenAccess = () => {
   const theme = useTheme();

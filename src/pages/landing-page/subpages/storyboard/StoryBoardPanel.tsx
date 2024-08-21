@@ -4,8 +4,8 @@ import StoryBoard from "./StoryBoard";
 import NotebookModel, {
   //NotebookModelCallbackProps,
   NotebookModelProps,
-} from "../common/ipython/NotebookModel";
-import { padding } from "../../styles/constants";
+} from "../../../../components/common/ipython/NotebookModel";
+import { padding } from "../../../../styles/constants";
 
 const StoryBoardPanel = () => {
   const [value] = React.useState(0);

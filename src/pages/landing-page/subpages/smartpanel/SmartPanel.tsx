@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import { IconButton } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { color, gap } from "../../styles/constants";
+import { color, gap } from "../../../../styles/constants";
 import {
   DEFAULT_CARD_SIZE,
   DEFAULT_GAP,

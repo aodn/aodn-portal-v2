@@ -1,13 +1,13 @@
 import { FC, ReactNode } from "react";
 import { Box, Stack, SxProps } from "@mui/material";
-import Layout from "../components/layout/layout";
-import BannerOpenAccess from "../components/banner/BannerOpenAccess";
-import ComplexTextSearch from "../components/search/ComplexTextSearch";
-import StoryBoardPanel from "../components/storyboard/StoryBoardPanel";
 import landingImageUrl from "@/assets/images/bg_landing_page.png";
-import SmartPanel from "../components/smartpanel/SmartPanel";
-import Logos from "../components/common/logos/Logos";
-import { color } from "../styles/constants";
+import Layout from "../../components/layout/layout";
+import BannerOpenAccess from "./subpages/banner/BannerOpenAccess";
+import ComplexTextSearch from "../../components/search/ComplexTextSearch";
+import SmartPanel from "./subpages/smartpanel/SmartPanel";
+import StoryBoardPanel from "./subpages/storyboard/StoryBoardPanel";
+import { color } from "../../styles/constants";
+import Logos from "./subpages/logos/Logos";
 
 const LANDING_PAGE_MIN_WIDTH = 1020;
 const LANDING_PAGE_MAX_WIDTH = 1270;
@@ -79,6 +79,16 @@ const LandingPage: FC = () => {
         <ContentContainer>
           <StoryBoardPanel />
         </ContentContainer>
+      </Box>
+      <Box
+        sx={{
+          backgroundColor: color.blue.extraDark,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ContentContainer>123</ContentContainer>
       </Box>
       <Box
         sx={{
