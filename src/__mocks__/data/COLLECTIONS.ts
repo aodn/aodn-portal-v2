@@ -308,7 +308,7 @@ const NORMAL_COLLECTION = {
     },
     {
       href: "https://apps.aims.gov.au/metadata/view/5fc91100-4ade-11dc-8f56-00008a07204e",
-      rel: "describedBy",
+      rel: "describedby",
       type: "text/html",
       title: "Full metadata link",
     },
