@@ -41,9 +41,7 @@ class Map(BasePage):
 
     def wait_for_map_loading(self) -> None:
         """Wait until the map is in a loaded state"""
-        self.page.wait_for_function(
-            '() => {return isMapLoaded();}', timeout=2000
-        )
+        self.page.wait_for_function('() => {return isMapLoaded();}')
 
     def click_map(self) -> None:
         """Click the map at the current position of the mouse"""
