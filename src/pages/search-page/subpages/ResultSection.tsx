@@ -1,5 +1,5 @@
 import ResultPanelSimpleFilter from "../../../components/common/filters/ResultPanelSimpleFilter";
-import { Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
 import React, { useCallback, useState } from "react";
 import ResultCards from "../../../components/result/ResultCards";
@@ -10,10 +10,6 @@ import { OGCCollection } from "../../../components/common/store/OGCCollectionDef
 interface SearchResultListProps {
   visibility: SearchResultLayoutEnum;
   contents: CollectionsQueryType;
-  onRemoveLayer?: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    collection: OGCCollection | undefined
-  ) => void;
   onVisibilityChanged?: (v: SearchResultLayoutEnum) => void;
   onChangeSorting: (v: SortResultEnum) => void;
   onClickCard?: (uuid: string) => void;
@@ -23,7 +19,6 @@ interface SearchResultListProps {
 const ResultSection: React.FC<SearchResultListProps> = ({
   visibility,
   contents,
-  onRemoveLayer,
   onVisibilityChanged,
   onChangeSorting,
   onClickCard,
@@ -53,11 +48,9 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   );
 
   return (
-    <Grid
-      item
+    <Box
       sx={{
-        width: "700px",
-        height: "81vh",
+        maxHeight: "85vh",
         overflow: "hidden",
         display:
           visibility === SearchResultLayoutEnum.VISIBLE ? "block" : "none",
@@ -65,20 +58,21 @@ const ResultSection: React.FC<SearchResultListProps> = ({
       data-testid="search-page-result-list"
     >
       <ResultPanelSimpleFilter
+        count={contents.result.collections.length}
+        total={contents.result.total}
         onChangeLayout={onChangeLayout}
         onChangeSorting={onChangeSorting}
       />
       <ResultCards
         layout={currentLayout}
         contents={contents}
-        onRemoveLayer={undefined}
         onDownload={undefined}
         onTags={undefined}
         onMore={undefined}
         onClickCard={onClickCard}
         datasetsSelected={datasetSelected}
       />
-    </Grid>
+    </Box>
   );
 };
 

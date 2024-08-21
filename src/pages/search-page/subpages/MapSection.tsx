@@ -1,5 +1,5 @@
 import { padding } from "../../../styles/constants";
-import { Grid, Paper } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import Map from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import ToggleControl from "../../../components/map/mapbox/controls/ToggleControl";
@@ -68,85 +68,75 @@ const MapSection: React.FC<MapSectionProps> = ({
   );
 
   return (
-    <Grid
-      item
-      sx={{
-        paddingLeft: padding.medium,
-        pr: 2,
-        pb: 2,
-        flex: 1,
-      }}
-    >
-      <Paper id={mapContainerId} sx={{ minHeight: "80vh" }}>
-        <Map
-          panelId={mapContainerId}
-          bbox={bbox}
-          onZoomEvent={onMapZoomOrMove}
-          onMoveEvent={onMapZoomOrMove}
-        >
-          <Controls>
-            <ToggleControl
-              onToggleClicked={onToggleClicked}
-              showFullMap={showFullMap}
-            />
-            <NavigationControl />
-            <ScaleControl />
-            <MenuControl
-              menu={
-                <BaseMapSwitcher
-                  layers={[
-                    {
-                      id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
-                      name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
-                      label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-                      default: false,
-                    },
-                    {
-                      id: MapboxWorldLayersDef.WORLD.id,
-                      name: MapboxWorldLayersDef.WORLD.name,
-                      default: false,
-                    },
-                  ]}
-                  onEvent={(target: EventTarget & HTMLInputElement) =>
-                    setStaticLayer((values) => {
-                      // Remove the item and add it back if selected
-                      const e = values?.filter((i) => i !== target.value);
-                      if (target.checked) {
-                        e.push(target.value);
-                      }
-                      return [...e];
-                    })
-                  }
-                />
-              }
-            />
-            <MenuControl
-              menu={
-                <MapLayerSwitcher
-                  layers={[
-                    {
-                      id: "cluster",
-                      name: "Cluster",
-                      default: selectedLayer === "cluster",
-                    },
-                    {
-                      id: "heatmap",
-                      name: "Heatmap",
-                      default: selectedLayer === "heatmap",
-                    },
-                  ]}
-                  onEvent={(id: string) => setSelectedLayer(id)}
-                />
-              }
-            />
-          </Controls>
-          <Layers>
-            {createPresentationLayers(selectedLayer)}
-            {createStaticLayers(staticLayer)}
-          </Layers>
-        </Map>
-      </Paper>
-    </Grid>
+    <Paper id={mapContainerId} sx={{ minHeight: "80vh" }}>
+      <Map
+        panelId={mapContainerId}
+        bbox={bbox}
+        onZoomEvent={onMapZoomOrMove}
+        onMoveEvent={onMapZoomOrMove}
+      >
+        <Controls>
+          <ToggleControl
+            onToggleClicked={onToggleClicked}
+            showFullMap={showFullMap}
+          />
+          <NavigationControl />
+          <ScaleControl />
+          <MenuControl
+            menu={
+              <BaseMapSwitcher
+                layers={[
+                  {
+                    id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
+                    name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+                    label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
+                    default: false,
+                  },
+                  {
+                    id: MapboxWorldLayersDef.WORLD.id,
+                    name: MapboxWorldLayersDef.WORLD.name,
+                    default: false,
+                  },
+                ]}
+                onEvent={(target: EventTarget & HTMLInputElement) =>
+                  setStaticLayer((values) => {
+                    // Remove the item and add it back if selected
+                    const e = values?.filter((i) => i !== target.value);
+                    if (target.checked) {
+                      e.push(target.value);
+                    }
+                    return [...e];
+                  })
+                }
+              />
+            }
+          />
+          <MenuControl
+            menu={
+              <MapLayerSwitcher
+                layers={[
+                  {
+                    id: "cluster",
+                    name: "Cluster",
+                    default: selectedLayer === "cluster",
+                  },
+                  {
+                    id: "heatmap",
+                    name: "Heatmap",
+                    default: selectedLayer === "heatmap",
+                  },
+                ]}
+                onEvent={(id: string) => setSelectedLayer(id)}
+              />
+            }
+          />
+        </Controls>
+        <Layers>
+          {createPresentationLayers(selectedLayer)}
+          {createStaticLayers(staticLayer)}
+        </Layers>
+      </Map>
+    </Paper>
   );
 };
 

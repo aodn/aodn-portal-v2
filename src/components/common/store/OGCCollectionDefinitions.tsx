@@ -152,6 +152,10 @@ export class OGCCollections {
   get links() {
     return this._links;
   }
+
+  get total() {
+    return this._total;
+  }
 }
 
 // interfaces:

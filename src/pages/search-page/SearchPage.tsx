@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import {
   CollectionsQueryType,
   createSearchParamFrom,
@@ -280,23 +280,52 @@ const SearchPage = () => {
         <Grid item xs={1}>
           <ResultPanelIconFilter />
         </Grid>
-        <ResultSection
-          visibility={visibility}
-          contents={contents}
-          onVisibilityChanged={onVisibilityChanged}
-          onClickCard={handleNavigateToDetailPage}
-          onChangeSorting={onChangeSorting}
-          datasetSelected={datasetsSelected}
-        />
-        <MapSection
-          collections={layers}
-          bbox={bbox}
-          showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
-          onMapZoomOrMove={onMapZoomOrMove}
-          onToggleClicked={onToggleDisplay}
-          onDatasetSelected={onDatasetSelected}
-        />
-        <Grid></Grid>
+        <Grid item xs={11}>
+          {
+            // Must group the ResultSection and MapSection together so that show hide works
+          }
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "stretch",
+              width: "100%",
+            }}
+          >
+            {visibility === SearchResultLayoutEnum.VISIBLE && (
+              <Box
+                sx={{
+                  flex: 1,
+                }}
+              >
+                <ResultSection
+                  visibility={visibility}
+                  contents={contents}
+                  onVisibilityChanged={onVisibilityChanged}
+                  onClickCard={handleNavigateToDetailPage}
+                  onChangeSorting={onChangeSorting}
+                  datasetSelected={datasetsSelected}
+                />
+              </Box>
+            )}
+            <Box
+              sx={{
+                flex: visibility === SearchResultLayoutEnum.VISIBLE ? 2 : 1,
+                padding: 2,
+              }}
+            >
+              <MapSection
+                collections={layers}
+                bbox={bbox}
+                showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
+                onMapZoomOrMove={onMapZoomOrMove}
+                onToggleClicked={onToggleDisplay}
+                onDatasetSelected={onDatasetSelected}
+              />
+            </Box>
+          </Box>
+        </Grid>
       </Grid>
     </Layout>
   );

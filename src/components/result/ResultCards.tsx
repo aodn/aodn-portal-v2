@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CollectionsQueryType } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Box, Grid, ListItem, Stack } from "@mui/material";
@@ -33,7 +33,7 @@ interface ResultCardsProps {
 }
 
 const renderCells = (
-  props: ResultCardsProps,
+  { contents, onDownload, onClickCard }: ResultCardsProps,
   child: ListChildComponentProps
 ) => {
   const { index, style } = child;
@@ -46,17 +46,17 @@ const renderCells = (
       <Grid container spacing={1}>
         <Grid item xs={6}>
           <GridResultCard
-            content={props.contents.result.collections[leftIndex]}
-            onDownload={props.onDownload}
-            onClickCard={props.onClickCard}
+            content={contents.result.collections[leftIndex]}
+            onDownload={onDownload}
+            onClickCard={onClickCard}
             data-testid="result-cards-grid"
           />
         </Grid>
         <Grid item xs={6}>
           <GridResultCard
-            content={props.contents.result.collections[rightIndex]}
-            onDownload={props.onDownload}
-            onClickCard={props.onClickCard}
+            content={contents.result.collections[rightIndex]}
+            onDownload={onDownload}
+            onClickCard={onClickCard}
           />
         </Grid>
       </Grid>
@@ -65,7 +65,7 @@ const renderCells = (
 };
 
 const renderRows = (
-  props: ResultCardsProps,
+  { contents, onClickCard, onDownload, onMore, onTags }: ResultCardsProps,
   child: ListChildComponentProps
 ) => {
   // The style must pass to the listitem else incorrect rendering
@@ -74,17 +74,20 @@ const renderRows = (
   return (
     <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
       <ListResultCard
-        content={props.contents.result.collections[index]}
-        onDownload={props.onDownload}
-        onTags={props.onTags}
-        onMore={props.onMore}
-        onClickCard={props.onClickCard}
+        content={contents.result.collections[index]}
+        onDownload={onDownload}
+        onTags={onTags}
+        onMore={onMore}
+        onClickCard={onClickCard}
       />
     </ListItem>
   );
 };
 
 const ResultCards = (props: ResultCardsProps) => {
+  const componentRef = useRef<HTMLDivElement | null>(null);
+  const [height, setHeight] = useState<number>(0);
+
   const hasSelectedDatasets =
     props.datasetsSelected && props.datasetsSelected.length > 0;
 
@@ -141,37 +144,65 @@ const ResultCards = (props: ResultCardsProps) => {
     props.onClickCard,
     props.onDownload,
   ]);
+  // This block is use to get the height of this component and
+  // use it to adjust the FixSizeList height
+  useEffect(() => {
+    const handleResize = () => {
+      if (
+        componentRef.current &&
+        componentRef.current.getBoundingClientRect()
+      ) {
+        // Update height on resize
+        setHeight(componentRef.current.getBoundingClientRect().height);
+      }
+    };
 
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      // Clean up the event listener
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  // You must set the height to 100vh, 100% of view height to may the
+  // div occupy the rest
   if (props.layout === SearchResultLayoutEnum.LIST) {
     return (
-      <>
+      <div
+        ref={componentRef}
+        style={{ height: "100vh" }}
+        data-testid="resultcard-result-list"
+      >
         {hasSelectedDatasets && renderDatasetSelectedListCards()}
         <FixedSizeList
-          height={1500}
+          height={height}
           width={"100%"}
-          itemSize={260}
+          itemSize={250}
           itemCount={props.contents.result.collections.length}
-          overscanCount={10}
         >
           {(child: ListChildComponentProps) => renderRows(props, child)}
         </FixedSizeList>
-      </>
+      </div>
     );
   } else {
     // or else render grid view
     return (
-      <>
+      <div
+        ref={componentRef}
+        style={{ height: "100vh" }}
+        data-testid="resultcard-result-grid"
+      >
         {hasSelectedDatasets && renderDatasetSelectedGridCards()}
         <FixedSizeList
-          height={1500}
+          height={height}
           width={"100%"}
           itemSize={310}
           itemCount={Math.ceil(props.contents.result.collections.length / 2)}
-          overscanCount={10}
         >
           {(child: ListChildComponentProps) => renderCells(props, child)}
         </FixedSizeList>
-      </>
+      </div>
     );
   }
 };

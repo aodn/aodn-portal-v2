@@ -7,10 +7,8 @@ import {
   Paper,
   Select,
   styled,
+  Typography,
 } from "@mui/material";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import MapListToggleButton, {
   MapListToggleButtonProps,
 } from "../buttons/MapListToggleButton";
@@ -25,9 +23,14 @@ const SlimSelect = styled(InputBase)(() => ({
 
 interface ResultPanelSimpleFilterProps
   extends MapListToggleButtonProps,
-    SortButtonProps {}
+    SortButtonProps {
+  count: number;
+  total: number;
+}
 
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
+  count,
+  total,
   onChangeLayout,
   onChangeSorting,
 }) => {
@@ -41,23 +44,12 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             p: "2px 4px",
             display: "flex",
             alignItems: "center",
-            width: { md: "500px" },
+            width: { md: "250px" },
           }}
         >
-          <IconButton sx={{ p: "10px" }} aria-label="search">
-            <ArrowBackIosIcon />
-          </IconButton>
-          <FormControl fullWidth size="small">
-            <Select
-              value={1}
-              input={<SlimSelect id="select1" name="select1" />}
-            >
-              <MenuItem value={1}>1-20 on 1258 matching</MenuItem>
-            </Select>
-          </FormControl>
-          <IconButton sx={{ p: "10px" }}>
-            <ArrowForwardIosIcon />
-          </IconButton>
+          <Typography>
+            Showing 1-{count} of {total} results
+          </Typography>
         </Paper>
         <SortButton onChangeSorting={onChangeSorting} />
         <MapListToggleButton onChangeLayout={onChangeLayout} />
