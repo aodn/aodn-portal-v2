@@ -13,7 +13,7 @@ import {
   SCROLL_DISTANCE,
   SMART_PANEL_HEIGHT,
   SMART_PANEL_WIDTH,
-} from "./constants";
+} from "./smart-panel-constants";
 import { getItemCols, getItemRows } from "./utils";
 import { LargeCard, MediumCard, SmallCard } from "./SmartCard";
 

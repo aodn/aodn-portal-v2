@@ -1,4 +1,4 @@
-import { ItemType } from "./constants";
+import { ItemType } from "./smart-panel-constants";
 
 export const getItemRows = (type: ItemType): number => {
   switch (type) {

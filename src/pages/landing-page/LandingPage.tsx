@@ -8,6 +8,8 @@ import SmartPanel from "./subpages/smartpanel/SmartPanel";
 import StoryBoardPanel from "./subpages/storyboard/StoryBoardPanel";
 import { color } from "../../styles/constants";
 import Logos from "./subpages/logos/Logos";
+import News from "./subpages/news/News";
+import Subscription from "./subpages/subscription/Subscription";
 
 const LANDING_PAGE_MIN_WIDTH = 1020;
 const LANDING_PAGE_MAX_WIDTH = 1270;
@@ -18,90 +20,83 @@ const SMART_PANEL_CONTAINER_HEIGHT = 180;
 
 interface ContentContainerProps {
   children: ReactNode;
-  sx?: SxProps;
+  contentAreaStyle?: SxProps;
+  sectionAreaStyle?: SxProps;
 }
-const ContentContainer = ({ children, sx }: ContentContainerProps) => (
-  <Stack
-    direction="column"
-    justifyContent="center"
-    alignItems="center"
+
+const SectionContainer = ({
+  children,
+  contentAreaStyle,
+  sectionAreaStyle,
+}: ContentContainerProps) => (
+  <Box
     sx={{
-      minWidth: LANDING_PAGE_MIN_WIDTH,
-      width: "80%",
-      maxWidth: LANDING_PAGE_MAX_WIDTH,
-      ...sx,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      ...sectionAreaStyle,
     }}
   >
-    {children}
-  </Stack>
+    <Stack
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      sx={{
+        minWidth: LANDING_PAGE_MIN_WIDTH,
+        width: "80%",
+        maxWidth: LANDING_PAGE_MAX_WIDTH,
+        ...contentAreaStyle,
+      }}
+    >
+      {children}
+    </Stack>
+  </Box>
 );
 
 const LandingPage: FC = () => {
   return (
     <Layout>
-      <Box
-        sx={{
+      <SectionContainer
+        sectionAreaStyle={{
           backgroundImage: `url(${landingImageUrl})`,
           backgroundSize: "cover",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
         }}
+        contentAreaStyle={{ height: BANNER_HEIGHT }}
       >
-        <ContentContainer sx={{ height: BANNER_HEIGHT }}>
-          <BannerOpenAccess />
-          <ComplexTextSearch />
+        <BannerOpenAccess />
+        <ComplexTextSearch />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
           <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
+            width={SMART_PANEL_CONTAINER_WIDTH}
+            height={SMART_PANEL_CONTAINER_HEIGHT}
           >
-            <Box
-              width={SMART_PANEL_CONTAINER_WIDTH}
-              height={SMART_PANEL_CONTAINER_HEIGHT}
-            >
-              <SmartPanel />
-            </Box>
+            <SmartPanel />
           </Box>
-        </ContentContainer>
-      </Box>
-      <Box
-        sx={{
-          backgroundColor: "#fff",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+        </Box>
+      </SectionContainer>
+      <SectionContainer sectionAreaStyle={{ backgroundColor: "#fff" }}>
+        <StoryBoardPanel />
+      </SectionContainer>
+      <SectionContainer
+        sectionAreaStyle={{ backgroundColor: color.blue.extraDark }}
       >
-        <ContentContainer>
-          <StoryBoardPanel />
-        </ContentContainer>
-      </Box>
-      <Box
-        sx={{
-          backgroundColor: color.blue.extraDark,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+        <News />
+      </SectionContainer>
+      <SectionContainer
+        sectionAreaStyle={{ backgroundColor: color.blue.light }}
       >
-        <ContentContainer>123</ContentContainer>
-      </Box>
-      <Box
-        sx={{
-          backgroundColor: color.blue.light,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <ContentContainer>
-          <Logos />
-        </ContentContainer>
-      </Box>
+        <Logos />
+      </SectionContainer>
+      <SectionContainer sectionAreaStyle={{ backgroundColor: "#fff" }}>
+        <Subscription />
+      </SectionContainer>
     </Layout>
   );
 };

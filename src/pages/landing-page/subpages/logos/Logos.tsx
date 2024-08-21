@@ -1,12 +1,7 @@
 import { FC, ReactNode } from "react";
-import { Divider, Grid, Box, Typography, Stack, SxProps } from "@mui/material";
-
+import { Grid, Box, Typography, SxProps } from "@mui/material";
 import AUMS from "@/assets/logos/Aus-Unstitute-of-Marine-Science.png";
 import BM from "@/assets/logos/Bureo-of-Meteorology.png";
-
-import AIOMS from "@/assets/logos/aioms-logo2.png";
-import AustralianGovernment from "@/assets/logos/aioms-logo1.png";
-import BOM from "@/assets/logos/bom-logo.png";
 import CSIRO from "@/assets/logos/csiro-logo.png";
 import CurtinUni from "@/assets/logos/curtinuni-logo.png";
 import DAWE from "@/assets/logos/dawe-aap.png";
@@ -22,15 +17,7 @@ import UNSW from "@/assets/logos/unsw-logo.png";
 import UTAS from "@/assets/logos/utas-logo.png";
 import UTS from "@/assets/logos/uts-logo.png";
 import UWA from "@/assets/logos/uniwa-logo.png";
-import {
-  color,
-  fontColor,
-  fontSize,
-  fontWeight,
-  gap,
-  padding,
-} from "../../../../styles/constants";
-import { Height } from "@mui/icons-material";
+import { fontSize, fontWeight, padding } from "../../../../styles/constants";
 
 type LogoContainerProps = {
   children: ReactNode;
@@ -78,7 +65,7 @@ const LogoList = () => {
             </LogoContainer>
           </Grid>
           <Grid item xs={6} lg={6}>
-            <Typography textAlign="left" padding={0}>
+            <Typography color="#000" textAlign="left" padding={0}>
               Australia&apos;s Integrated Marine Observing System (IMOS) is
               enabled by the National Collaborative Research Infrastructre
               Strategy (NCRIS) It is operated by a consortium of institutions as
@@ -89,11 +76,7 @@ const LogoList = () => {
         </Grid>
       </Grid>
       <Grid item xs={12}>
-        <Typography
-          paddingY={padding.small}
-          fontWeight={fontWeight.bold}
-          color="#000"
-        >
+        <Typography fontWeight={fontWeight.bold} color="#000">
           Principal Participants
         </Typography>
       </Grid>
@@ -153,11 +136,7 @@ const LogoList = () => {
         </Typography>
       </Grid>
       <Grid item xs={12}>
-        <Typography
-          paddingY={padding.small}
-          fontWeight={fontWeight.bold}
-          color="#000"
-        >
+        <Typography fontWeight={fontWeight.bold} color="#000">
           Associate Participants
         </Typography>
       </Grid>
