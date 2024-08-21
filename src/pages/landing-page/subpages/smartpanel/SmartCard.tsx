@@ -1,4 +1,4 @@
-import { Box, Card, Typography } from "@mui/material";
+import { Box, Card, SxProps, Typography } from "@mui/material";
 import { FC, ReactNode } from "react";
 import {
   border,
@@ -13,9 +13,19 @@ export interface CardProps {
   icon?: string;
   image?: string;
   additionalInfo?: string[];
+  containerStyle?: SxProps;
+  iconStyle?: SxProps;
+  typoStyle?: SxProps;
 }
 
-const CardContainer = ({ children }: { children: ReactNode }) => (
+interface CardContainerProps {
+  children: ReactNode;
+  containerStyle?: SxProps;
+}
+const CardContainer: FC<CardContainerProps> = ({
+  children,
+  containerStyle,
+}) => (
   <Card
     elevation={0}
     sx={{
@@ -25,21 +35,28 @@ const CardContainer = ({ children }: { children: ReactNode }) => (
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      bgcolor: color.white.oneTenTransparent,
+      bgcolor: color.white.twoTenTransparent,
       border: `${border.xs} ${color.brightBlue.semiTransparentDark}`,
       color: "#fff",
       "&:hover": {
         scale: "101%",
         cursor: "pointer",
       },
+      ...containerStyle,
     }}
   >
     {children}
   </Card>
 );
 
-export const SmallCard: FC<CardProps> = ({ title, icon }) => (
-  <CardContainer>
+export const SmallCard: FC<CardProps> = ({
+  title,
+  icon,
+  containerStyle,
+  iconStyle,
+  typoStyle,
+}) => (
+  <CardContainer containerStyle={containerStyle}>
     <Box
       display="flex"
       flexDirection="column"
@@ -48,7 +65,12 @@ export const SmallCard: FC<CardProps> = ({ title, icon }) => (
       width="100%"
       height="100%"
     >
-      <Box height="50%" width="50%" padding={padding.extraSmall}>
+      <Box
+        height="50%"
+        width="50%"
+        padding={padding.extraSmall}
+        sx={{ ...iconStyle }}
+      >
         <img
           src={icon}
           alt={icon}
@@ -66,6 +88,7 @@ export const SmallCard: FC<CardProps> = ({ title, icon }) => (
         color="#fff"
         sx={{
           overflow: "hidden",
+          ...typoStyle,
         }}
         noWrap
       >

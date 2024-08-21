@@ -35,7 +35,7 @@ const SmartPanel: FC = () => {
       <IconButton
         onClick={() => scroll(-SCROLL_DISTANCE)}
         sx={{
-          backgroundColor: color.white.oneTenTransparent,
+          backgroundColor: color.white.twoTenTransparent,
         }}
       >
         <ArrowBackIosNewIcon
@@ -100,7 +100,7 @@ const SmartPanel: FC = () => {
       </Box>
       <IconButton
         onClick={() => scroll(SCROLL_DISTANCE)}
-        sx={{ backgroundColor: color.white.oneTenTransparent }}
+        sx={{ backgroundColor: color.white.twoTenTransparent }}
       >
         <ArrowForwardIosIcon
           sx={{ pl: gap.sm, height: 20, width: 20, color: "#fff" }}

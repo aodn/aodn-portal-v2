@@ -112,7 +112,8 @@ const color = {
     xxLight: "#f8f8f8",
   },
   white: {
-    oneTenTransparent: " rgba(255, 255, 255, 0.2  )",
+    twoTenTransparent: " rgba(255, 255, 255, 0.2  )",
+    sixTenTransparent: " rgba(255, 255, 255, 0.6  )",
   },
 };
 

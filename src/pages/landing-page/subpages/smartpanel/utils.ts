@@ -23,18 +23,3 @@ export const getItemCols = (type: ItemType): number => {
       return 1;
   }
 };
-
-// Need to check later
-// const calculateTotalColumns = (items: ItemData[]): number => {
-//   return items.reduce((total, item) => total + getItemCols(item.type), 0);
-// };
-
-// const calculateTotalRows = (items: ItemData[]): number => {
-//   return items.reduce((total, item) => total + getItemRows(item.type), 0);
-// };
-
-// export const getSmartPanelCols = (items: ItemData[]) => {
-//   const totalCols = calculateTotalColumns(items);
-//   const totalRows = calculateTotalRows(items);
-//   return Math.ceil((totalCols + totalRows) / 4);
-// };

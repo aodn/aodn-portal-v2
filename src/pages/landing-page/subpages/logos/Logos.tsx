@@ -40,7 +40,7 @@ const LogoContainer: FC<LogoContainerProps> = ({ children, sx }) => (
 
 type LogoProps = { src: string; alt: string; height?: string };
 
-const Logo = ({ src, alt, height = "80%" }: LogoProps) => {
+const Logo: FC<LogoProps> = ({ src, alt, height = "80%" }) => {
   return (
     <img
       src={src}
@@ -54,7 +54,7 @@ const Logo = ({ src, alt, height = "80%" }: LogoProps) => {
   );
 };
 
-const LogoList = () => {
+const LogoList: FC = () => {
   return (
     <Grid container paddingY={padding.quadruple} spacing={2}>
       <Grid item xs={12}>

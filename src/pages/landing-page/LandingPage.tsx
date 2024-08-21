@@ -17,7 +17,7 @@ const BANNER_HEIGHT = 880;
 const SMART_PANEL_CONTAINER_WIDTH = 1000;
 const SMART_PANEL_CONTAINER_HEIGHT = 180;
 
-interface ContentContainerProps {
+interface SectionContainerProps {
   children: ReactNode;
   contentAreaStyle?: SxProps;
   sectionAreaStyle?: SxProps;
@@ -27,7 +27,7 @@ export const SectionContainer = ({
   children,
   contentAreaStyle,
   sectionAreaStyle,
-}: ContentContainerProps) => (
+}: SectionContainerProps) => (
   <Box
     sx={{
       display: "flex",
@@ -93,9 +93,6 @@ const LandingPage: FC = () => {
       >
         <Logos />
       </SectionContainer>
-      {/* <SectionContainer sectionAreaStyle={{ backgroundColor: "#fff" }}>
-        <Subscription />
-      </SectionContainer> */}
     </Layout>
   );
 };

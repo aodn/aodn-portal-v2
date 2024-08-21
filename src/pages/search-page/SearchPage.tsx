@@ -267,7 +267,7 @@ const SearchPage = () => {
           </Grid>
         </Grid>
         <Grid item xs={1}>
-          {/* <ResultPanelIconFilter /> */}
+          <ResultPanelIconFilter />
         </Grid>
         <ResultSection
           visibility={visibility}
