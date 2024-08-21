@@ -9,7 +9,6 @@ import StoryBoardPanel from "./subpages/storyboard/StoryBoardPanel";
 import { color } from "../../styles/constants";
 import Logos from "./subpages/logos/Logos";
 import News from "./subpages/news/News";
-import Subscription from "./subpages/subscription/Subscription";
 
 const LANDING_PAGE_MIN_WIDTH = 1020;
 const LANDING_PAGE_MAX_WIDTH = 1270;
@@ -24,7 +23,7 @@ interface ContentContainerProps {
   sectionAreaStyle?: SxProps;
 }
 
-const SectionContainer = ({
+export const SectionContainer = ({
   children,
   contentAreaStyle,
   sectionAreaStyle,
@@ -94,9 +93,9 @@ const LandingPage: FC = () => {
       >
         <Logos />
       </SectionContainer>
-      <SectionContainer sectionAreaStyle={{ backgroundColor: "#fff" }}>
+      {/* <SectionContainer sectionAreaStyle={{ backgroundColor: "#fff" }}>
         <Subscription />
-      </SectionContainer>
+      </SectionContainer> */}
     </Layout>
   );
 };

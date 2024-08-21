@@ -48,7 +48,7 @@ const StoryBoardPanel = () => {
                 </Typography>
               </>
             }
-            content="This tutorial demostrates several ways data can be accessed remotely and loaded into a Python environment, direct access to files on cloud storage (AWS S3), cloud-optimised formats Zarr & Parquet"
+            content="This tutorial demonstrates several ways data can be accessed remotely and loaded into a Python environment, including OPeNDAP, OGC Web Feature Service (WFS), direct access to files on cloud storage (AWS S3), cloud-optimised formats Zarr & Parquet. The examples here use data from Australia's Integrated Marine Observing System (IMOS)"
             buttons={[
               {
                 label: "iPython",
