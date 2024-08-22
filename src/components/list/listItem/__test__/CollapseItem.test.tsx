@@ -16,7 +16,7 @@ describe("CollapseItem", async () => {
     expect(screen.queryByTestId("collapseItem")).not.toBeNull;
   });
 
-  test("should not collapse if it is a contact item and already expanded", async () => {
+  test("should not collapse when clicking title, if it is a contact item and already expanded", async () => {
     render(
       <ThemeProvider theme={theme}>
         <CollapseItem title={"test collapse item title"} isContact>

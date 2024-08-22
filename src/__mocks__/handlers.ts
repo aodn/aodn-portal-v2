@@ -73,7 +73,7 @@ export const handlers = [
 
     return HttpResponse.json(
       {
-        error: `Intercepted a request about getting the collection of uuid: ${uuid}, but no didn't handled in mocked api.`,
+        error: `Intercepted a request about getting the collection of uuid: ${uuid}, but didn't handled in mocked api.`,
       },
       { status: 404 }
     );
