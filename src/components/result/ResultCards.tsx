@@ -108,10 +108,10 @@ const ResultCards = ({
         direction="row"
         flexWrap="wrap"
         gap={1}
-        sx={{ height: "305px", overflowY: "auto" }}
+        sx={{ width: "100%", height: "305px", overflowY: "auto" }}
       >
         {datasetsSelected?.map((dataset, index) => (
-          <Box key={index} width="327px" height="300px">
+          <Box key={index} width="100%" height="300px">
             <GridResultCard
               content={dataset}
               onDownload={onDownload}
@@ -130,7 +130,7 @@ const ResultCards = ({
       <Stack
         direction="column"
         gap={1}
-        sx={{ maxHeight: "260px", overflowY: "auto" }}
+        sx={{ width: "100%", maxHeight: "260px", overflowY: "auto" }}
       >
         {datasetsSelected?.map((dataset, index) => (
           <ListResultCard
@@ -158,7 +158,7 @@ const ResultCards = ({
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={height}
+              height={hasSelectedDatasets ? height - 250 : height}
               width={width}
               itemSize={250}
               itemCount={contents.result.collections.length}
@@ -186,7 +186,7 @@ const ResultCards = ({
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={height}
+              height={hasSelectedDatasets ? height - 310 : height}
               width={width}
               itemSize={310}
               itemCount={Math.ceil(contents.result.collections.length / 2)}
