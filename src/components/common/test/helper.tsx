@@ -1,17 +1,11 @@
 import React, { useEffect } from "react";
-import { merge } from "lodash";
 import { Map } from "mapbox-gl";
+import { mergeWithDefaults } from "../utils";
 
 interface TestProps {
   getMap: () => Map;
 }
 
-const mergeWithDefaults = <T extends object>(
-  defaults: T,
-  props?: Partial<T>
-): T => {
-  return merge({}, defaults, props);
-};
 // Use in test only to expose reference that need by test e2e testing.
 const TestHelper: React.FC<TestProps> = (props) => {
   useEffect(() => {
@@ -28,4 +22,4 @@ const TestHelper: React.FC<TestProps> = (props) => {
   return <React.Fragment />;
 };
 
-export { mergeWithDefaults, TestHelper };
+export { TestHelper };
