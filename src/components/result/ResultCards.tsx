@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef } from "react";
 import { CollectionsQueryType } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Box, Grid, ListItem, Stack, SxProps, Theme } from "@mui/material";
@@ -51,7 +51,6 @@ const renderCells = (
             content={contents.result.collections[leftIndex]}
             onDownload={onDownload}
             onClickCard={onClickCard}
-            data-testid="result-cards-grid"
           />
         </Grid>
         <Grid item xs={6}>
@@ -86,6 +85,9 @@ const renderRows = (
   );
 };
 
+const LIST_ITEM_SIZE = 250;
+const GRID_ITEM_SIZE = 310;
+
 const ResultCards = ({
   contents,
   layout,
@@ -97,8 +99,6 @@ const ResultCards = ({
   onTags,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
-  const [height, setHeight] = useState<number>(0);
-
   const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
 
   const renderDatasetSelectedGridCards = useCallback(() => {
@@ -158,9 +158,9 @@ const ResultCards = ({
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - 250 : height}
+              height={hasSelectedDatasets ? height - LIST_ITEM_SIZE : height}
               width={width}
-              itemSize={250}
+              itemSize={LIST_ITEM_SIZE}
               itemCount={contents.result.collections.length}
             >
               {(child: ListChildComponentProps) =>
@@ -186,9 +186,9 @@ const ResultCards = ({
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - 310 : height}
+              height={hasSelectedDatasets ? height - GRID_ITEM_SIZE : height}
               width={width}
-              itemSize={310}
+              itemSize={GRID_ITEM_SIZE}
               itemCount={Math.ceil(contents.result.collections.length / 2)}
             >
               {(child: ListChildComponentProps) =>

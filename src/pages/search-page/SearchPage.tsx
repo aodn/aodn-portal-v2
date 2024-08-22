@@ -320,8 +320,7 @@ const SearchPage = () => {
             >
               <MapSection
                 sx={{
-                  minHeight: "80vh",
-                  maxHeight: "80vh",
+                  height: "80vh",
                 }}
                 collections={layers}
                 bbox={bbox}
