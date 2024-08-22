@@ -95,8 +95,8 @@ describe("MetadataInformationPanel", async () => {
 
       console.log("structure", div!.innerHTML);
 
-      expect(screen.queryByText("Tue Nov 17 2009 00:00:00 GMT+1100")).to.exist;
-      expect(screen.queryByText("Thu Feb 15 2024 00:00:00 GMT+1100")).to.exist;
+      expect(screen.queryByText("Tue Nov 17 2009 00:00:00 GMT+0000")).to.exist;
+      expect(screen.queryByText("Thu Feb 15 2024 00:00:00 GMT+0000")).to.exist;
     });
   });
 });
