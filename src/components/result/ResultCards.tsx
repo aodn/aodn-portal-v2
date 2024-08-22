@@ -1,28 +1,30 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CollectionsQueryType } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
-import { Box, Grid, ListItem, Stack } from "@mui/material";
+import { Box, Grid, ListItem, Stack, SxProps, Theme } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import _ from "lodash";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
   layout?: SearchResultLayoutEnum;
+  sx?: SxProps<Theme>;
   onDownload:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection | undefined
       ) => void)
     | undefined;
-  onTags:
+  onTags?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
       ) => void)
     | undefined;
-  onMore:
+  onMore?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
@@ -84,12 +86,20 @@ const renderRows = (
   );
 };
 
-const ResultCards = (props: ResultCardsProps) => {
+const ResultCards = ({
+  contents,
+  layout,
+  sx,
+  datasetsSelected,
+  onClickCard,
+  onDownload,
+  onMore,
+  onTags,
+}: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
   const [height, setHeight] = useState<number>(0);
 
-  const hasSelectedDatasets =
-    props.datasetsSelected && props.datasetsSelected.length > 0;
+  const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
 
   const renderDatasetSelectedGridCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
@@ -100,24 +110,19 @@ const ResultCards = (props: ResultCardsProps) => {
         gap={1}
         sx={{ height: "305px", overflowY: "auto" }}
       >
-        {props.datasetsSelected?.map((dataset, index) => (
+        {datasetsSelected?.map((dataset, index) => (
           <Box key={index} width="327px" height="300px">
             <GridResultCard
               content={dataset}
-              onDownload={props.onDownload}
-              onClickCard={props.onClickCard}
+              onDownload={onDownload}
+              onClickCard={onClickCard}
               isSelectedDataset
             />
           </Box>
         ))}
       </Stack>
     );
-  }, [
-    hasSelectedDatasets,
-    props.datasetsSelected,
-    props.onClickCard,
-    props.onDownload,
-  ]);
+  }, [hasSelectedDatasets, datasetsSelected, onClickCard, onDownload]);
 
   const renderDatasetSelectedListCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
@@ -127,51 +132,53 @@ const ResultCards = (props: ResultCardsProps) => {
         gap={1}
         sx={{ maxHeight: "260px", overflowY: "auto" }}
       >
-        {props.datasetsSelected?.map((dataset, index) => (
+        {datasetsSelected?.map((dataset, index) => (
           <ListResultCard
             key={index}
             content={dataset}
-            onDownload={props.onDownload}
-            onClickCard={props.onClickCard}
+            onDownload={onDownload}
+            onClickCard={onClickCard}
             isSelectedDataset
           />
         ))}
       </Stack>
     );
-  }, [
-    hasSelectedDatasets,
-    props.datasetsSelected,
-    props.onClickCard,
-    props.onDownload,
-  ]);
+  }, [hasSelectedDatasets, datasetsSelected, onClickCard, onDownload]);
+
+  const handleResize = useCallback(() => {
+    // Update height on resize
+    const r = componentRef.current;
+    setHeight((h) => (r !== null ? r.getBoundingClientRect().height - 10 : h));
+  }, []);
+
+  const debouceResize = useRef(_.debounce(handleResize, 150)).current;
+
+  // cancel all debounce things when component is unmounted
+  useEffect(() => {
+    return () => {
+      debouceResize.cancel();
+    };
+  }, [debouceResize]);
+
   // This block is use to get the height of this component and
   // use it to adjust the FixSizeList height
   useEffect(() => {
-    const handleResize = () => {
-      if (
-        componentRef.current &&
-        componentRef.current.getBoundingClientRect()
-      ) {
-        // Update height on resize
-        setHeight(componentRef.current.getBoundingClientRect().height);
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
+    debouceResize();
+    window.addEventListener("resize", debouceResize, true);
 
     return () => {
       // Clean up the event listener
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", debouceResize);
     };
-  }, []);
-  // You must set the height to 100vh, 100% of view height to may the
-  // div occupy the rest
-  if (props.layout === SearchResultLayoutEnum.LIST) {
+  }, [debouceResize]);
+  // You must set the height to 100% of view height so the calculation
+  // logic .clentHeight.height have values. In short it fill the
+  // whole area.
+  if (layout === SearchResultLayoutEnum.LIST) {
     return (
-      <div
+      <Box
+        sx={{ ...sx, height: "100%" }}
         ref={componentRef}
-        style={{ height: "100vh" }}
         data-testid="resultcard-result-list"
       >
         {hasSelectedDatasets && renderDatasetSelectedListCards()}
@@ -179,18 +186,23 @@ const ResultCards = (props: ResultCardsProps) => {
           height={height}
           width={"100%"}
           itemSize={250}
-          itemCount={props.contents.result.collections.length}
+          itemCount={contents.result.collections.length}
         >
-          {(child: ListChildComponentProps) => renderRows(props, child)}
+          {(child: ListChildComponentProps) =>
+            renderRows(
+              { contents, onClickCard, onDownload, onMore, onTags },
+              child
+            )
+          }
         </FixedSizeList>
-      </div>
+      </Box>
     );
   } else {
     // or else render grid view
     return (
-      <div
+      <Box
+        sx={{ ...sx, height: "100%" }}
         ref={componentRef}
-        style={{ height: "100vh" }}
         data-testid="resultcard-result-grid"
       >
         {hasSelectedDatasets && renderDatasetSelectedGridCards()}
@@ -198,11 +210,13 @@ const ResultCards = (props: ResultCardsProps) => {
           height={height}
           width={"100%"}
           itemSize={310}
-          itemCount={Math.ceil(props.contents.result.collections.length / 2)}
+          itemCount={Math.ceil(contents.result.collections.length / 2)}
         >
-          {(child: ListChildComponentProps) => renderCells(props, child)}
+          {(child: ListChildComponentProps) =>
+            renderCells({ contents, onDownload, onClickCard }, child)
+          }
         </FixedSizeList>
-      </div>
+      </Box>
     );
   }
 };

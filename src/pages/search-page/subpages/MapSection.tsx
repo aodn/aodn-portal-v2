@@ -1,5 +1,5 @@
 import { padding } from "../../../styles/constants";
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, SxProps, Theme } from "@mui/material";
 import Map from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import ToggleControl from "../../../components/map/mapbox/controls/ToggleControl";
@@ -26,6 +26,7 @@ interface MapSectionProps {
   collections: OGCCollection[];
   showFullMap: boolean;
   bbox?: LngLatBoundsLike;
+  sx?: SxProps<Theme>;
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
@@ -40,6 +41,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   onDatasetSelected,
   collections,
   showFullMap,
+  sx,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>("heatmap");
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
@@ -68,7 +70,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   );
 
   return (
-    <Paper id={mapContainerId} sx={{ minHeight: "80vh" }}>
+    <Paper id={mapContainerId} sx={sx}>
       <Map
         panelId={mapContainerId}
         bbox={bbox}

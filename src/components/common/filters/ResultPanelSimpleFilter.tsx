@@ -7,6 +7,8 @@ import {
   Paper,
   Select,
   styled,
+  SxProps,
+  Theme,
   Typography,
 } from "@mui/material";
 import MapListToggleButton, {
@@ -26,17 +28,19 @@ interface ResultPanelSimpleFilterProps
     SortButtonProps {
   count: number;
   total: number;
+  sx?: SxProps<Theme>;
 }
 
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   count,
   total,
+  sx,
   onChangeLayout,
   onChangeSorting,
 }) => {
   return (
-    <Grid container justifyContent="center">
-      <Grid container item xs={12} sx={{ pb: 1 }}>
+    <Grid sx={sx} padding={1} container justifyContent="center">
+      <Grid item xs={6} sx={{ pb: 1 }}>
         <Paper
           variant="outlined"
           component="form"
@@ -51,7 +55,11 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             Showing 1-{count} of {total} results
           </Typography>
         </Paper>
+      </Grid>
+      <Grid item xs={3} sx={{ pb: 1 }}>
         <SortButton onChangeSorting={onChangeSorting} />
+      </Grid>
+      <Grid item xs={3} sx={{ pb: 1 }}>
         <MapListToggleButton onChangeLayout={onChangeLayout} />
       </Grid>
     </Grid>

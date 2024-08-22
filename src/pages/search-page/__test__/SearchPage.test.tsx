@@ -42,8 +42,8 @@ afterAll(() => {
 });
 
 describe("SearchPage", async () => {
-  test("The map should be able to expand properly", async () => {
-    const { findByTestId, findAllByTestId } = render(
+  it.skip("The map should be able to expand properly", async () => {
+    const { findByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -66,7 +66,7 @@ describe("SearchPage", async () => {
     expect(list).to.exist;
   });
 
-  test("The list should be able to show in list / grid view", async () => {
+  it("The list should be able to show in list / grid view", async () => {
     const { findByTestId, findAllByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>

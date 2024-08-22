@@ -300,7 +300,9 @@ const SearchPage = () => {
                 }}
               >
                 <ResultSection
-                  visibility={visibility}
+                  sx={{
+                    height: "80vh",
+                  }}
                   contents={contents}
                   onVisibilityChanged={onVisibilityChanged}
                   onClickCard={handleNavigateToDetailPage}
@@ -312,10 +314,15 @@ const SearchPage = () => {
             <Box
               sx={{
                 flex: visibility === SearchResultLayoutEnum.VISIBLE ? 2 : 1,
-                padding: 2,
+                paddingLeft: 2,
+                paddingRight: 2,
               }}
             >
               <MapSection
+                sx={{
+                  minHeight: "80vh",
+                  maxHeight: "80vh",
+                }}
                 collections={layers}
                 bbox={bbox}
                 showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
