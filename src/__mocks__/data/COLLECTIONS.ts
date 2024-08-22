@@ -1,3 +1,7 @@
+/**
+ * This record is same as the json collection returned from ogcapi. So please
+ * update this record if the collection structure of ogcapi was changed
+ */
 const NORMAL_COLLECTION = {
   properties: {
     credits: [

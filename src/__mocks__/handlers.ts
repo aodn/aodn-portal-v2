@@ -3,6 +3,13 @@ import { PARAMETER_CATEGORIES } from "./data/PARAMETER_CATEGORIES";
 import { COLLECTIONS_WAVE } from "./data/COLLECTIONS_WAVE";
 import { getSuggesterOptionsBy } from "./utils/SuggesterHandlerUtils";
 import { NORMAL_COLLECTION } from "./data/COLLECTIONS";
+import {
+  emptyAboutInfo,
+  emptyAssociatedRecordInfo,
+  emptyCitationInfo,
+  emptyLineageInfo,
+  emptyMetadataInfo,
+} from "./utils/DataModificationUtils";
 
 const PREFIX = "/api/v1/ogc";
 
@@ -40,9 +47,35 @@ export const handlers = [
   http.get(PREFIX + "/collections/:uuid", ({ params }) => {
     const { uuid } = params;
 
-    // TODO: if more mocked records are needed, implementation here will change
     if (uuid === NORMAL_COLLECTION.id) {
       return HttpResponse.json(NORMAL_COLLECTION);
     }
+
+    if (uuid == NORMAL_COLLECTION.id + "emptyabout") {
+      return HttpResponse.json(emptyAboutInfo(NORMAL_COLLECTION));
+    }
+
+    if (uuid == NORMAL_COLLECTION.id + "emptymetadata") {
+      return HttpResponse.json(emptyMetadataInfo(NORMAL_COLLECTION));
+    }
+
+    if (uuid == NORMAL_COLLECTION.id + "emptycitation") {
+      return HttpResponse.json(emptyCitationInfo(NORMAL_COLLECTION));
+    }
+
+    if (uuid == NORMAL_COLLECTION.id + "emptylineage") {
+      return HttpResponse.json(emptyLineageInfo(NORMAL_COLLECTION));
+    }
+
+    if (uuid == NORMAL_COLLECTION.id + "emptyassociatedrecords") {
+      return HttpResponse.json(emptyAssociatedRecordInfo(NORMAL_COLLECTION));
+    }
+
+    return HttpResponse.json(
+      {
+        error: `Intercepted a request about getting the collection of uuid: ${uuid}, but no didn't handled in mocked api.`,
+      },
+      { status: 404 }
+    );
   }),
 ];
