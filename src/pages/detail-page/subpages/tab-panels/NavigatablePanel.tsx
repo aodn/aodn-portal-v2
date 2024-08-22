@@ -55,7 +55,9 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   // For better scrolling animation, resizing happens after scrolling
   const laybackDeductSize = useCallback((toReSize: number) => {
     setTimeout(() => {
-      setSupplimentaryHeight((prevHeight) => prevHeight + toReSize);
+      setSupplimentaryHeight((prevHeight) =>
+        prevHeight + toReSize > 0 ? prevHeight + toReSize : 0
+      );
     }, RESIZE_DELAY);
   }, []);
 
@@ -146,26 +148,28 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     []
   );
 
-  const onNavigate = (index: number) => {
-    return () => {
-      const ref = getRefBy(index);
-      if (!scrollableSectionRef.current || !ref?.current) return;
-      const targetPosition = ref.current.offsetTop;
+  const onNavigate = useCallback(
+    (index: number) => {
+      return () => {
+        const ref = getRefBy(index);
+        if (!scrollableSectionRef.current || !ref?.current) return;
+        const targetPosition = ref.current.offsetTop;
 
-      // Calculate the needed height to scroll to the target position
-      const currentScrollHeight = basePointRef.current
-        ? basePointRef.current.offsetTop
-        : 0;
-      const visibleHeight = scrollableSectionRef.current.clientHeight;
-      const neededHeight =
-        targetPosition - (currentScrollHeight - visibleHeight);
+        // Calculate the needed height to scroll to the target position
+        const bottomHeight = basePointRef.current
+          ? basePointRef.current.offsetTop
+          : 0;
+        const neededHeight =
+          targetPosition - (bottomHeight - PANEL_VISIBLE_HEIGHT);
 
-      if (neededHeight >= 0) {
-        setSupplimentaryHeight((prevHeight) => prevHeight + neededHeight);
-      }
-      setScrollDistance(targetPosition);
-    };
-  };
+        if (neededHeight >= 0) {
+          setSupplimentaryHeight((prevHeight) => prevHeight + neededHeight);
+        }
+        setScrollDistance(targetPosition);
+      };
+    },
+    [getRefBy]
+  );
 
   return isLoading ? (
     <Grid
