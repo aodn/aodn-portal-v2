@@ -6,7 +6,7 @@ import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import _ from "lodash";
+import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
@@ -144,33 +144,6 @@ const ResultCards = ({
       </Stack>
     );
   }, [hasSelectedDatasets, datasetsSelected, onClickCard, onDownload]);
-
-  const handleResize = useCallback(() => {
-    // Update height on resize
-    const r = componentRef.current;
-    setHeight((h) => (r !== null ? r.getBoundingClientRect().height - 10 : h));
-  }, []);
-
-  const debouceResize = useRef(_.debounce(handleResize, 150)).current;
-
-  // cancel all debounce things when component is unmounted
-  useEffect(() => {
-    return () => {
-      debouceResize.cancel();
-    };
-  }, [debouceResize]);
-
-  // This block is use to get the height of this component and
-  // use it to adjust the FixSizeList height
-  useEffect(() => {
-    debouceResize();
-    window.addEventListener("resize", debouceResize, true);
-
-    return () => {
-      // Clean up the event listener
-      window.removeEventListener("resize", debouceResize);
-    };
-  }, [debouceResize]);
   // You must set the height to 100% of view height so the calculation
   // logic .clentHeight.height have values. In short it fill the
   // whole area.
@@ -182,19 +155,23 @@ const ResultCards = ({
         data-testid="resultcard-result-list"
       >
         {hasSelectedDatasets && renderDatasetSelectedListCards()}
-        <FixedSizeList
-          height={height}
-          width={"100%"}
-          itemSize={250}
-          itemCount={contents.result.collections.length}
-        >
-          {(child: ListChildComponentProps) =>
-            renderRows(
-              { contents, onClickCard, onDownload, onMore, onTags },
-              child
-            )
-          }
-        </FixedSizeList>
+        <AutoSizer>
+          {({ height, width }: Size) => (
+            <FixedSizeList
+              height={height}
+              width={width}
+              itemSize={250}
+              itemCount={contents.result.collections.length}
+            >
+              {(child: ListChildComponentProps) =>
+                renderRows(
+                  { contents, onClickCard, onDownload, onMore, onTags },
+                  child
+                )
+              }
+            </FixedSizeList>
+          )}
+        </AutoSizer>
       </Box>
     );
   } else {
@@ -206,16 +183,20 @@ const ResultCards = ({
         data-testid="resultcard-result-grid"
       >
         {hasSelectedDatasets && renderDatasetSelectedGridCards()}
-        <FixedSizeList
-          height={height}
-          width={"100%"}
-          itemSize={310}
-          itemCount={Math.ceil(contents.result.collections.length / 2)}
-        >
-          {(child: ListChildComponentProps) =>
-            renderCells({ contents, onDownload, onClickCard }, child)
-          }
-        </FixedSizeList>
+        <AutoSizer>
+          {({ height, width }: Size) => (
+            <FixedSizeList
+              height={height}
+              width={width}
+              itemSize={310}
+              itemCount={Math.ceil(contents.result.collections.length / 2)}
+            >
+              {(child: ListChildComponentProps) =>
+                renderCells({ contents, onDownload, onClickCard }, child)
+              }
+            </FixedSizeList>
+          )}
+        </AutoSizer>
       </Box>
     );
   }

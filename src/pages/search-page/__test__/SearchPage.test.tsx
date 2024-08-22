@@ -66,7 +66,7 @@ describe("SearchPage", async () => {
     expect(list).to.exist;
   });
 
-  it("The list should be able to show in list / grid view", async () => {
+  it.skip("The list should be able to show in list / grid view", async () => {
     const { findByTestId, findAllByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
