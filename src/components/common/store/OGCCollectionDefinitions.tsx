@@ -145,8 +145,20 @@ export class OGCCollections {
     this._search_after = search_after;
   }
 
+  get search_after() {
+    return this._search_after;
+  }
+
+  set search_after(sf: Array<object>) {
+    this._search_after = sf;
+  }
+
   get collections() {
     return this._collections;
+  }
+
+  set collections(collections: Array<OGCCollection>) {
+    this._collections = collections;
   }
 
   get links() {

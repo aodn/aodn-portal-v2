@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Box, Grid } from "@mui/material";
 import {
-  CollectionsQueryType,
   createSearchParamFrom,
+  DEFAULT_SEARCH_PAGE,
   fetchResultNoStore,
   fetchResultWithStore,
   SearchParameters,
@@ -21,8 +21,6 @@ import {
 import store, {
   AppDispatch,
   getComponentState,
-  RootState,
-  searchQueryResult,
 } from "../../components/common/store/store";
 import { pageDefault } from "../../components/common/constants";
 
@@ -56,6 +54,8 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  // Layers contains record with uuid and bbox only
+  const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
     SearchResultLayoutEnum.VISIBLE
   );
@@ -119,9 +119,6 @@ const SearchPage = () => {
     [getCollectionsData]
   );
 
-  // Layers contains record with uuid and bbox only
-  const [layers, setLayers] = useState<Array<OGCCollection>>([]);
-
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
       const componentParam: ParameterState = getComponentState(
@@ -131,7 +128,7 @@ const SearchPage = () => {
       // Use standard param to get fields you need, record is stored in redux,
       // set page so that it return fewer records
       const paramPaged = createSearchParamFrom(componentParam, {
-        pagesize: 10,
+        pagesize: DEFAULT_SEARCH_PAGE,
       });
 
       dispatch(fetchResultWithStore(paramPaged)).then(() => {
@@ -210,11 +207,6 @@ const SearchPage = () => {
       }
     }
   }, [location, dispatch, doSearch]);
-
-  // Get contents when no more navigate needed.
-  const contents = useSelector<RootState, CollectionsQueryType>(
-    searchQueryResult
-  );
 
   const handleNavigateToDetailPage = useCallback(
     (uuid: string) => {
@@ -303,7 +295,6 @@ const SearchPage = () => {
                   sx={{
                     height: "80vh",
                   }}
-                  contents={contents}
                   onVisibilityChanged={onVisibilityChanged}
                   onClickCard={handleNavigateToDetailPage}
                   onChangeSorting={onChangeSorting}

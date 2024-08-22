@@ -32,6 +32,7 @@ export type SearchParameters = {
 // Control the behavior of search behavior not part of the query
 export type SearchControl = {
   pagesize?: number;
+  searchafter?: Array<object>;
   score?: number;
 };
 
@@ -51,6 +52,7 @@ interface ObjectValue {
   collectionsQueryResult: CollectionsQueryType;
   categoriesResult: Array<Category>;
 }
+export const DEFAULT_SEARCH_PAGE = 11;
 
 const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
 
@@ -185,7 +187,6 @@ const fetchResultWithStore = createAsyncThunk<
   SearchParameters,
   { rejectValue: ErrorResponse }
 >("search/fetchResultWithStore", searchResult);
-
 /**
  * Trunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description. This one do not attach extraReducer
@@ -195,6 +196,12 @@ const fetchResultNoStore = createAsyncThunk<
   SearchParameters,
   { rejectValue: ErrorResponse }
 >("search/fetchResultNoStore", searchResult);
+
+const fetchResultAppendStore = createAsyncThunk<
+  OGCCollections,
+  SearchParameters,
+  { rejectValue: ErrorResponse }
+>("search/fetchResultAppendStore", searchResult);
 
 const fetchResultByUuidNoStore = createAsyncThunk<
   OGCCollection,
@@ -237,6 +244,19 @@ const searcher = createSlice({
     builder
       .addCase(fetchResultWithStore.fulfilled, (state, action) => {
         state.collectionsQueryResult.result = action.payload;
+        state.collectionsQueryResult.query = action.meta.arg;
+      })
+      .addCase(fetchResultAppendStore.fulfilled, (state, action) => {
+        const new_collections = action.payload;
+        const exist_collections =
+          state.collectionsQueryResult.result.collections;
+        // This is use to append more record into the exisitng record, it assume
+        // that the same query is in use.
+        state.collectionsQueryResult.result.collections =
+          exist_collections.concat(new_collections.collections);
+        state.collectionsQueryResult.result.search_after =
+          new_collections.search_after;
+
         state.collectionsQueryResult.query = action.meta.arg;
       })
       .addCase(fetchParameterCategoriesWithStore.fulfilled, (state, action) => {
@@ -290,6 +310,13 @@ const createSearchParamFrom = (
   // Control how many record return in 1 page.
   if (c.pagesize) {
     p.filter = appendFilter(p.filter, `page_size=${c.pagesize}`);
+  }
+
+  if (c.searchafter) {
+    p.filter = appendFilter(
+      p.filter,
+      `search_after=${c.searchafter.join(",")}`
+    );
   }
 
   if (i.isImosOnlyDataset) {
@@ -368,6 +395,7 @@ export {
   fetchSuggesterOptions,
   fetchResultWithStore,
   fetchResultNoStore,
+  fetchResultAppendStore,
   fetchResultByUuidNoStore,
   fetchParameterCategoriesWithStore,
 };

@@ -5,8 +5,14 @@ import { Box, Grid, ListItem, Stack, SxProps, Theme } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import {
+  OGCCollection,
+  OGCCollections,
+} from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
+import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
+import { AppDispatch } from "../common/store/store";
+import { useDispatch } from "react-redux";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
@@ -34,57 +40,6 @@ interface ResultCardsProps {
   datasetsSelected?: OGCCollection[];
 }
 
-const renderCells = (
-  { contents, onDownload, onClickCard }: ResultCardsProps,
-  child: ListChildComponentProps
-) => {
-  const { index, style } = child;
-
-  const leftIndex = index * 2;
-  const rightIndex = leftIndex + 1;
-
-  return (
-    <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
-      <Grid container spacing={1}>
-        <Grid item xs={6}>
-          <GridResultCard
-            content={contents.result.collections[leftIndex]}
-            onDownload={onDownload}
-            onClickCard={onClickCard}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <GridResultCard
-            content={contents.result.collections[rightIndex]}
-            onDownload={onDownload}
-            onClickCard={onClickCard}
-          />
-        </Grid>
-      </Grid>
-    </ListItem>
-  );
-};
-
-const renderRows = (
-  { contents, onClickCard, onDownload, onMore, onTags }: ResultCardsProps,
-  child: ListChildComponentProps
-) => {
-  // The style must pass to the listitem else incorrect rendering
-  const { index, style } = child;
-
-  return (
-    <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
-      <ListResultCard
-        content={contents.result.collections[index]}
-        onDownload={onDownload}
-        onTags={onTags}
-        onMore={onMore}
-        onClickCard={onClickCard}
-      />
-    </ListItem>
-  );
-};
-
 const LIST_ITEM_SIZE = 250;
 const GRID_ITEM_SIZE = 310;
 
@@ -99,6 +54,7 @@ const ResultCards = ({
   onTags,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
   const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
 
   const renderDatasetSelectedGridCards = useCallback(() => {
@@ -144,9 +100,141 @@ const ResultCards = ({
       </Stack>
     );
   }, [hasSelectedDatasets, datasetsSelected, onClickCard, onDownload]);
+
+  // const fetchMore = useCallback(
+  //   (collections: OGCCollections) => {
+  //     // This is very specific to how elastic works and then how to construct the query
+  //     const componentParam: ParameterState = getComponentState(
+  //       store.getState()
+  //     );
+  //     // Use standard param to get fields you need, record is stored in redux,
+  //     // set page so that it return fewer records
+  //     const paramPaged = createSearchParamFrom(componentParam, {
+  //       pagesize: DEFAULT_SEARCH_PAGE,
+  //       searchafter: collections.search_after,
+  //     });
+  //     dispatch(fetchResultAppendStore(paramPaged))
+  //       .unwrap()
+  //       .then((collections: OGCCollections)
+  //   },
+  //   [dispatch]
+  // );
+
+  const renderLoadMoreButton = useCallback((collections: OGCCollections) => {
+    return (
+      <DetailSubtabBtn
+        title="Load More"
+        isBordered={true}
+        navigate={() => {
+          // Comment
+        }}
+      />
+    );
+  }, []);
+
+  const renderCells = useCallback(
+    (
+      { contents, onDownload, onClickCard }: ResultCardsProps,
+      child: ListChildComponentProps
+    ) => {
+      const { index, style } = child;
+
+      const leftIndex = index * 2;
+      const rightIndex = leftIndex + 1;
+
+      if (
+        leftIndex >= contents.result.collections.length &&
+        leftIndex <= contents.result.total
+      ) {
+        // We need to display load more button
+        return (
+          <ListItem
+            sx={{
+              display: "flex",
+              alignItems: "flex-start", // Aligns the Box to the top of the ListItem
+              justifyContent: "center", // Centers the Box horizontally
+              padding: "1", // Optional: Adjust padding to your needs
+            }}
+            style={style}
+          >
+            {renderLoadMoreButton(contents.result)}
+          </ListItem>
+        );
+      } else {
+        return (
+          <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
+            <Grid container spacing={1}>
+              <Grid item xs={6}>
+                <GridResultCard
+                  content={contents.result.collections[leftIndex]}
+                  onDownload={onDownload}
+                  onClickCard={onClickCard}
+                />
+              </Grid>
+              {rightIndex < contents.result.collections.length && (
+                <Grid item xs={6}>
+                  <GridResultCard
+                    content={contents.result.collections[rightIndex]}
+                    onDownload={onDownload}
+                    onClickCard={onClickCard}
+                  />
+                </Grid>
+              )}
+            </Grid>
+          </ListItem>
+        );
+      }
+    },
+    [renderLoadMoreButton]
+  );
+
+  const renderRows = useCallback(
+    (
+      { contents, onClickCard, onDownload, onMore, onTags }: ResultCardsProps,
+      child: ListChildComponentProps
+    ) => {
+      // The style must pass to the listitem else incorrect rendering
+      const { index, style } = child;
+
+      if (
+        index === contents.result.collections.length &&
+        index <= contents.result.total
+      ) {
+        // We need to display load more button
+        return (
+          <ListItem
+            sx={{
+              display: "flex",
+              alignItems: "flex-start", // Aligns the Box to the top of the ListItem
+              justifyContent: "center", // Centers the Box horizontally
+              padding: "1", // Optional: Adjust padding to your needs
+            }}
+            style={style}
+          >
+            {renderLoadMoreButton(contents.result)}
+          </ListItem>
+        );
+      } else {
+        return (
+          <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
+            <ListResultCard
+              content={contents.result.collections[index]}
+              onDownload={onDownload}
+              onTags={onTags}
+              onMore={onMore}
+              onClickCard={onClickCard}
+            />
+          </ListItem>
+        );
+      }
+    },
+    [renderLoadMoreButton]
+  );
+
   // You must set the height to 100% of view height so the calculation
   // logic .clentHeight.height have values. In short it fill the
   // whole area.
+  // *** We need to dsiplay the load more button, hence item count + 1 ***
   if (layout === SearchResultLayoutEnum.LIST) {
     return (
       <Box
@@ -161,7 +249,7 @@ const ResultCards = ({
               height={hasSelectedDatasets ? height - LIST_ITEM_SIZE : height}
               width={width}
               itemSize={LIST_ITEM_SIZE}
-              itemCount={contents.result.collections.length}
+              itemCount={contents.result.collections.length + 1}
             >
               {(child: ListChildComponentProps) =>
                 renderRows(
@@ -189,7 +277,7 @@ const ResultCards = ({
               height={hasSelectedDatasets ? height - GRID_ITEM_SIZE : height}
               width={width}
               itemSize={GRID_ITEM_SIZE}
-              itemCount={Math.ceil(contents.result.collections.length / 2)}
+              itemCount={Math.ceil(contents.result.collections.length / 2) + 1}
             >
               {(child: ListChildComponentProps) =>
                 renderCells({ contents, onDownload, onClickCard }, child)
