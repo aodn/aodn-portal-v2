@@ -1,16 +1,27 @@
 import ResultPanelSimpleFilter from "../../../components/common/filters/ResultPanelSimpleFilter";
 import { Box, SxProps, Theme } from "@mui/material";
-import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
-import React, { useCallback, useState } from "react";
+import {
+  CollectionsQueryType,
+  createSearchParamFrom,
+  DEFAULT_SEARCH_PAGE,
+  fetchResultAppendStore,
+} from "../../../components/common/store/searchReducer";
+import React, { useCallback, useEffect, useState } from "react";
 import ResultCards from "../../../components/result/ResultCards";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapListToggleButton";
 import { SortResultEnum } from "../../../components/common/buttons/SortButton";
-import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
-import { useSelector } from "react-redux";
 import {
+  OGCCollection,
+  OGCCollections,
+} from "../../../components/common/store/OGCCollectionDefinitions";
+import { useSelector, useDispatch } from "react-redux";
+import store, {
+  AppDispatch,
+  getComponentState,
   RootState,
   searchQueryResult,
 } from "../../../components/common/store/store";
+import { ParameterState } from "../../../components/common/store/componentParamReducer";
 
 interface SearchResultListProps {
   datasetSelected?: OGCCollection[];
@@ -27,15 +38,40 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   onChangeSorting,
   onClickCard,
 }) => {
+  // Get contents from redux
+  const dispatch = useDispatch<AppDispatch>();
+  const reduxContents = useSelector<RootState, CollectionsQueryType>(
+    searchQueryResult
+  );
   // Use to remember last layout, it is either LIST or GRID at the moment
   const [currentLayout, setCurrentLayout] = useState<
     SearchResultLayoutEnum.LIST | SearchResultLayoutEnum.GRID
   >(SearchResultLayoutEnum.LIST);
 
-  // Get contents when no more navigate needed.
-  const contents = useSelector<RootState, CollectionsQueryType>(
-    searchQueryResult
-  );
+  const [contents, setContents] = useState<CollectionsQueryType>(reduxContents);
+
+  useEffect(() => {
+    setContents(reduxContents);
+  }, [reduxContents]);
+
+  const fetchMore = useCallback(() => {
+    // This is very specific to how elastic works and then how to construct the query
+    const componentParam: ParameterState = getComponentState(store.getState());
+    // Use standard param to get fields you need, record is stored in redux,
+    // set page so that it return fewer records
+    const paramPaged = createSearchParamFrom(componentParam, {
+      pagesize: DEFAULT_SEARCH_PAGE,
+      searchafter: contents.result.search_after,
+    });
+
+    dispatch(fetchResultAppendStore(paramPaged))
+      .unwrap()
+      .then((collections: OGCCollections) => {
+        contents.result = contents.result.clone();
+        contents.result.merge(collections);
+        setContents(contents);
+      });
+  }, [dispatch, contents]);
 
   const onChangeLayout = useCallback(
     (layout: SearchResultLayoutEnum) => {
@@ -77,6 +113,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
             onTags={undefined}
             onMore={undefined}
             onClickCard={onClickCard}
+            onFetchMore={fetchMore}
             datasetsSelected={datasetSelected}
           />
         </Box>

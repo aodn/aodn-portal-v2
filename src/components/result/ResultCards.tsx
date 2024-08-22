@@ -11,8 +11,6 @@ import {
 } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
-import { AppDispatch } from "../common/store/store";
-import { useDispatch } from "react-redux";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
@@ -37,6 +35,7 @@ interface ResultCardsProps {
       ) => void)
     | undefined;
   onClickCard: ((uuid: string) => void) | undefined;
+  onFetchMore?: (() => void) | undefined;
   datasetsSelected?: OGCCollection[];
 }
 
@@ -52,9 +51,9 @@ const ResultCards = ({
   onDownload,
   onMore,
   onTags,
+  onFetchMore,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
-  const dispatch = useDispatch<AppDispatch>();
   const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
 
   const renderDatasetSelectedGridCards = useCallback(() => {
@@ -101,36 +100,17 @@ const ResultCards = ({
     );
   }, [hasSelectedDatasets, datasetsSelected, onClickCard, onDownload]);
 
-  // const fetchMore = useCallback(
-  //   (collections: OGCCollections) => {
-  //     // This is very specific to how elastic works and then how to construct the query
-  //     const componentParam: ParameterState = getComponentState(
-  //       store.getState()
-  //     );
-  //     // Use standard param to get fields you need, record is stored in redux,
-  //     // set page so that it return fewer records
-  //     const paramPaged = createSearchParamFrom(componentParam, {
-  //       pagesize: DEFAULT_SEARCH_PAGE,
-  //       searchafter: collections.search_after,
-  //     });
-  //     dispatch(fetchResultAppendStore(paramPaged))
-  //       .unwrap()
-  //       .then((collections: OGCCollections)
-  //   },
-  //   [dispatch]
-  // );
-
-  const renderLoadMoreButton = useCallback((collections: OGCCollections) => {
+  const renderLoadMoreButton = useCallback(() => {
     return (
       <DetailSubtabBtn
         title="Load More"
         isBordered={true}
         navigate={() => {
-          // Comment
+          onFetchMore && onFetchMore();
         }}
       />
     );
-  }, []);
+  }, [onFetchMore]);
 
   const renderCells = useCallback(
     (
@@ -157,7 +137,7 @@ const ResultCards = ({
             }}
             style={style}
           >
-            {renderLoadMoreButton(contents.result)}
+            {renderLoadMoreButton()}
           </ListItem>
         );
       } else {
@@ -211,7 +191,7 @@ const ResultCards = ({
             }}
             style={style}
           >
-            {renderLoadMoreButton(contents.result)}
+            {renderLoadMoreButton()}
           </ListItem>
         );
       } else {

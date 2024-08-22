@@ -129,7 +129,7 @@ export class Spatial {
 
 export class OGCCollections {
   private _total: number;
-  private _search_after: Array<object>;
+  private _search_after: Array<string>;
   private _collections: Array<OGCCollection>;
   private _links: Array<ILink>;
 
@@ -137,7 +137,7 @@ export class OGCCollections {
     collections: Array<OGCCollection> = new Array<OGCCollection>(),
     links: Array<ILink> = new Array<ILink>(),
     total: number = 0,
-    search_after: Array<object> = new Array<object>()
+    search_after: Array<string> = new Array<string>()
   ) {
     this._collections = collections;
     this._links = links;
@@ -149,7 +149,7 @@ export class OGCCollections {
     return this._search_after;
   }
 
-  set search_after(sf: Array<object>) {
+  set search_after(sf: Array<string>) {
     this._search_after = sf;
   }
 
@@ -167,6 +167,20 @@ export class OGCCollections {
 
   get total() {
     return this._total;
+  }
+
+  merge(collections: OGCCollections) {
+    this.collections = this.collections.concat(collections.collections);
+    this.search_after = collections.search_after;
+  }
+
+  clone() {
+    return new OGCCollections(
+      this._collections,
+      this._links,
+      this._total,
+      this._search_after
+    );
   }
 }
 

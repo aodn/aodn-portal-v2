@@ -248,15 +248,7 @@ const searcher = createSlice({
       })
       .addCase(fetchResultAppendStore.fulfilled, (state, action) => {
         const new_collections = action.payload;
-        const exist_collections =
-          state.collectionsQueryResult.result.collections;
-        // This is use to append more record into the exisitng record, it assume
-        // that the same query is in use.
-        state.collectionsQueryResult.result.collections =
-          exist_collections.concat(new_collections.collections);
-        state.collectionsQueryResult.result.search_after =
-          new_collections.search_after;
-
+        state.collectionsQueryResult.result.merge(new_collections);
         state.collectionsQueryResult.query = action.meta.arg;
       })
       .addCase(fetchParameterCategoriesWithStore.fulfilled, (state, action) => {
@@ -315,7 +307,7 @@ const createSearchParamFrom = (
   if (c.searchafter) {
     p.filter = appendFilter(
       p.filter,
-      `search_after=${c.searchafter.join(",")}`
+      `search_after='${c.searchafter.join(",")}'`
     );
   }
 
