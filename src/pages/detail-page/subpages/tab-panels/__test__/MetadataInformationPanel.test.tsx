@@ -74,17 +74,17 @@ describe("MetadataInformationPanel", async () => {
       // medatada identifier is rendered
       expect(screen.queryByText("5fc91100-4ade-11dc-8f56-00008a07204e")).to
         .exist;
+
+      // metadata link is rendered
+      expect(
+        screen.queryByText(
+          "https://apps.aims.gov.au/metadata/view/5fc91100-4ade-11dc-8f56-00008a07204e"
+        )
+      ).to.exist;
+
+      // metadata dates are rendered
+      expect(screen.queryByText("Tue Nov 17 2009 00:00:00 GMT+1100")).to.exist;
+      expect(screen.queryByText("Thu Feb 15 2024 00:00:00 GMT+1100")).to.exist;
     });
-
-    // metadata link is rendered
-    expect(
-      screen.queryByText(
-        "https://apps.aims.gov.au/metadata/view/5fc91100-4ade-11dc-8f56-00008a07204e"
-      )
-    ).to.exist;
-
-    // metadata dates are rendered
-    expect(screen.queryByText("Tue Nov 17 2009 00:00:00 GMT+1100")).to.exist;
-    expect(screen.queryByText("Thu Feb 15 2024 00:00:00 GMT+1100")).to.exist;
   });
 });
