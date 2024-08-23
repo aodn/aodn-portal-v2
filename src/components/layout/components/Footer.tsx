@@ -135,7 +135,7 @@ const Footer: FC = () => {
                         fontSize={fontSize.label}
                         textAlign="center"
                       >
-                        Subscription
+                        Subscribe
                       </Typography>
                     </Button>
                   </Box>

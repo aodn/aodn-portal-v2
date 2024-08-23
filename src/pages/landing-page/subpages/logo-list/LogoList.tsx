@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Grid, Box, Typography, Divider } from "@mui/material";
-import AUMS from "@/assets/logos/Aus-Unstitute-of-Marine-Science.png";
-import BM from "@/assets/logos/Bureo-of-Meteorology.png";
+import AUMS from "@/assets/logos/aus-unstitute-of-marine-science.png";
+import BM from "@/assets/logos/bureo-of-meteorology.png";
 import CSIRO from "@/assets/logos/csiro-logo.png";
 import CurtinUni from "@/assets/logos/curtinuni-logo.png";
 import DAWE from "@/assets/logos/dawe-aap.png";
