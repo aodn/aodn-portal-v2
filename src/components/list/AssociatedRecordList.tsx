@@ -29,7 +29,13 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
         <CollapseItem title={`${record.title}`} key={index} isAssociatedRecord>
           <ButtonBase
             onClick={() => openRecord(record.uuid)}
-            sx={{ textAlign: "left" }}
+            sx={{
+              textAlign: "left",
+              "&:hover": {
+                textDecoration: "underline",
+                textDecorationColor: "darkgrey",
+              },
+            }}
           >
             <TextArea key={index}>{record.abstract}</TextArea>
           </ButtonBase>
