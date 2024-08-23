@@ -11,7 +11,7 @@ import MacquarieUni from "@/assets/logos/macquarie-uni.png";
 import NCRIS from "@/assets/logos/ncris-logo.png";
 import SARDI from "@/assets/logos/sardi-logo.png";
 import SIMS from "@/assets/logos/sims-logo.png";
-import UMEL from "@/assets/logos/The-University-of-Melbourne-Logo.png";
+import UMEL from "@/assets/logos/the-university-of-melbourne-logo.png";
 import USYD from "@/assets/logos/unisyd-logo.png";
 import UNSW from "@/assets/logos/unsw-logo.png";
 import UTAS from "@/assets/logos/utas-logo.png";
