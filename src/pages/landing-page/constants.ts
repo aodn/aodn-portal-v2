@@ -1,0 +1,7 @@
+export const LANDING_PAGE_MIN_WIDTH = 1020;
+export const LANDING_PAGE_MAX_WIDTH = 1270;
+
+export const BANNER_HEIGHT = 880;
+
+export const SMART_PANEL_CONTAINER_WIDTH = 1000;
+export const SMART_PANEL_CONTAINER_HEIGHT = 180;

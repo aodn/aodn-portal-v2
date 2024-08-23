@@ -1,5 +1,5 @@
-import { FC, ReactNode } from "react";
-import { Grid, Box, Typography, SxProps } from "@mui/material";
+import { FC } from "react";
+import { Grid, Box, Typography, Divider } from "@mui/material";
 import AUMS from "@/assets/logos/Aus-Unstitute-of-Marine-Science.png";
 import BM from "@/assets/logos/Bureo-of-Meteorology.png";
 import CSIRO from "@/assets/logos/csiro-logo.png";
@@ -17,42 +17,14 @@ import UNSW from "@/assets/logos/unsw-logo.png";
 import UTAS from "@/assets/logos/utas-logo.png";
 import UTS from "@/assets/logos/uts-logo.png";
 import UWA from "@/assets/logos/uniwa-logo.png";
-import { fontSize, fontWeight, padding } from "../../../../styles/constants";
-
-type LogoContainerProps = {
-  children: ReactNode;
-  sx?: SxProps;
-};
-
-const LogoContainer: FC<LogoContainerProps> = ({ children, sx }) => (
-  <Box
-    display="flex"
-    justifyContent="center"
-    alignItems="center"
-    width="100%"
-    height="110px"
-    bgcolor="#fff"
-    sx={{ ...sx }}
-  >
-    {children}
-  </Box>
-);
-
-type LogoProps = { src: string; alt: string; height?: string };
-
-const Logo: FC<LogoProps> = ({ src, alt, height = "80%" }) => {
-  return (
-    <img
-      src={src}
-      alt={alt}
-      style={{
-        objectFit: "contain",
-        width: "80%",
-        height: height,
-      }}
-    />
-  );
-};
+import {
+  color,
+  fontSize,
+  fontWeight,
+  padding,
+} from "../../../../styles/constants";
+import LogoContainer from "./components/LogoContainer";
+import Logo from "./components/Logo";
 
 const LogoList: FC = () => {
   return (
@@ -122,6 +94,10 @@ const LogoList: FC = () => {
       <Grid item xs={12}>
         <LogoContainer sx={{ minWidth: "100%" }}>
           <Logo src={SIMS} alt={SIMS} height="80px" />
+          <Divider
+            sx={{ height: "48px", m: 0.5, borderColor: color.gray.dark }}
+            orientation="vertical"
+          />
           <Logo src={UTS} alt={UTS} height="50px" />
           <Logo src={USYD} alt={USYD} height="50px" />
           <Logo src={MacquarieUni} alt={MacquarieUni} height="80px" />
@@ -163,7 +139,6 @@ const LogoList: FC = () => {
             </LogoContainer>
           </Grid>
           <Grid item xs={12}>
-            <Grid item xs={10} lg={8}></Grid>
             <Typography
               padding={0}
               fontWeight={fontWeight.regular}

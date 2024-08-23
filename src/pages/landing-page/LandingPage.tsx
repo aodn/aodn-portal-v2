@@ -1,5 +1,5 @@
-import { FC, ReactNode } from "react";
-import { Box, Stack, SxProps } from "@mui/material";
+import { FC } from "react";
+import { Box } from "@mui/material";
 import landingImageUrl from "@/assets/images/bg_landing_page.png";
 import Layout from "../../components/layout/layout";
 import BannerOpenAccess from "./subpages/banner/BannerOpenAccess";
@@ -7,50 +7,14 @@ import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import SmartPanel from "./subpages/smartpanel/SmartPanel";
 import StoryBoardPanel from "./subpages/storyboard/StoryBoardPanel";
 import { color } from "../../styles/constants";
-import Logos from "./subpages/logos/Logos";
+import Logos from "./subpages/logo-list/LogoList";
 import News from "./subpages/news/News";
-
-const LANDING_PAGE_MIN_WIDTH = 1020;
-const LANDING_PAGE_MAX_WIDTH = 1270;
-
-const BANNER_HEIGHT = 880;
-const SMART_PANEL_CONTAINER_WIDTH = 1000;
-const SMART_PANEL_CONTAINER_HEIGHT = 180;
-
-interface SectionContainerProps {
-  children: ReactNode;
-  contentAreaStyle?: SxProps;
-  sectionAreaStyle?: SxProps;
-}
-
-export const SectionContainer = ({
-  children,
-  contentAreaStyle,
-  sectionAreaStyle,
-}: SectionContainerProps) => (
-  <Box
-    sx={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      ...sectionAreaStyle,
-    }}
-  >
-    <Stack
-      direction="column"
-      justifyContent="center"
-      alignItems="center"
-      sx={{
-        minWidth: LANDING_PAGE_MIN_WIDTH,
-        width: "80%",
-        maxWidth: LANDING_PAGE_MAX_WIDTH,
-        ...contentAreaStyle,
-      }}
-    >
-      {children}
-    </Stack>
-  </Box>
-);
+import SectionContainer from "../../components/layout/components/SectionContainer";
+import {
+  BANNER_HEIGHT,
+  SMART_PANEL_CONTAINER_HEIGHT,
+  SMART_PANEL_CONTAINER_WIDTH,
+} from "./constants";
 
 const LandingPage: FC = () => {
   return (
@@ -60,7 +24,9 @@ const LandingPage: FC = () => {
           backgroundImage: `url(${landingImageUrl})`,
           backgroundSize: "cover",
         }}
-        contentAreaStyle={{ height: BANNER_HEIGHT }}
+        contentAreaStyle={{
+          height: BANNER_HEIGHT,
+        }}
       >
         <BannerOpenAccess />
         <ComplexTextSearch />

@@ -26,8 +26,8 @@ import {
   gap,
   padding,
 } from "../../../styles/constants";
-import { SectionContainer } from "../../../pages/landing-page/LandingPage";
 import AODNSiteLogo from "./AODNSiteLogo";
+import SectionContainer from "./SectionContainer";
 
 const handleBackToTop = () => {
   window.scrollTo({

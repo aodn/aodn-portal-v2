@@ -10,16 +10,19 @@ import {
   DEFAULT_CARD_SIZE,
   DEFAULT_GAP,
   ITEM_DATA,
+  ItemType,
   SCROLL_DISTANCE,
   SMART_PANEL_HEIGHT,
   SMART_PANEL_WIDTH,
-} from "./smart-panel-constants";
+} from "./constants";
 import { getItemCols, getItemRows } from "./utils";
-import { LargeCard, MediumCard, SmallCard } from "./SmartCard";
+import SmallCard from "./components/SmallCard";
+import MediumCard from "./components/MediumCard";
+import LargeCard from "./components/LargeCard";
 
 const SmartPanel: FC = () => {
   const boxRef = useRef<HTMLDivElement>(null);
-  const scroll = useCallback(
+  const handleScroll = useCallback(
     (scrollOffset: number) => {
       if (boxRef && boxRef.current) {
         boxRef.current.scrollTo({
@@ -33,7 +36,7 @@ const SmartPanel: FC = () => {
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
       <IconButton
-        onClick={() => scroll(-SCROLL_DISTANCE)}
+        onClick={() => handleScroll(-SCROLL_DISTANCE)}
         sx={{
           backgroundColor: color.white.twoTenTransparent,
         }}
@@ -69,7 +72,7 @@ const SmartPanel: FC = () => {
           }}
           variant="quilted"
           cols={18}
-          rowHeight={DEFAULT_CARD_SIZE - DEFAULT_GAP}
+          rowHeight={DEFAULT_CARD_SIZE}
           gap={DEFAULT_GAP}
         >
           {ITEM_DATA.map((item) => (
@@ -78,28 +81,21 @@ const SmartPanel: FC = () => {
               cols={getItemCols(item.type)}
               rows={getItemRows(item.type)}
               sx={{
-                width: `${getItemCols(item.type) * DEFAULT_CARD_SIZE - DEFAULT_GAP}px`,
+                width:
+                  item.type === ItemType.small
+                    ? DEFAULT_CARD_SIZE
+                    : getItemCols(item.type) * DEFAULT_CARD_SIZE + DEFAULT_GAP,
               }}
             >
-              {item.type === "small" && (
-                <SmallCard title={item.title} icon={item.icon} />
-              )}
-              {item.type === "medium" && (
-                <MediumCard title={item.title} image={item.image} />
-              )}
-              {item.type === "large" && (
-                <LargeCard
-                  title={item.title}
-                  image={item.image}
-                  additionalInfo={item.additionalInfo}
-                />
-              )}
+              {item.type === "small" && <SmallCard cardData={item} />}
+              {item.type === "medium" && <MediumCard cardData={item} />}
+              {item.type === "large" && <LargeCard cardData={item} />}
             </ImageListItem>
           ))}
         </ImageList>
       </Box>
       <IconButton
-        onClick={() => scroll(SCROLL_DISTANCE)}
+        onClick={() => handleScroll(SCROLL_DISTANCE)}
         sx={{ backgroundColor: color.white.twoTenTransparent }}
       >
         <ArrowForwardIosIcon

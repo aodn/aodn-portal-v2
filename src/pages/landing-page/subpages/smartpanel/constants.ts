@@ -23,18 +23,28 @@ import iconVessel from "@/assets/smartPanelIcons/icon_vessel.png";
 import iconGeoscientific from "@/assets/smartPanelIcons/icon_geoscientific.png";
 import imgVisualTools from "@/assets/smartPanelIcons/img_visual_tools.png";
 import iconLocation from "@/assets/smartPanelIcons/icon_location.png";
-import { CardProps } from "./SmartCard";
 
-export const SMART_PANEL_WIDTH = 800;
+export const SMART_PANEL_WIDTH = 840;
 export const SMART_PANEL_HEIGHT = 180;
 
 const SMART_PANEL_ROWS = 2;
 
+const CARD_BORDER = 1;
 export const DEFAULT_GAP = 12;
-export const DEFAULT_CARD_SIZE = SMART_PANEL_HEIGHT / SMART_PANEL_ROWS;
+export const DEFAULT_CARD_SIZE =
+  (SMART_PANEL_HEIGHT - DEFAULT_GAP * (SMART_PANEL_ROWS - 1)) /
+    SMART_PANEL_ROWS -
+  CARD_BORDER * 2;
 export const SCROLL_DISTANCE = SMART_PANEL_WIDTH / 2 + DEFAULT_GAP;
 
-export interface ItemData extends CardProps {
+export interface CardData {
+  title: string;
+  icon?: string;
+  image?: string;
+  additionalInfo?: string[];
+}
+
+export interface ItemData extends CardData {
   type: ItemType;
 }
 
