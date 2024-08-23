@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "postinstall": "husky",
     "test": "vitest",
-    "test:debug": "vitest --run --reporter=verbose --watch=false"
+    "test:debug": "vitest --run --reporter=verbose --watch=false",
+    "playwright": "docker compose -f playwright/docker-compose.yml up --abort-on-container-exit --exit-code-from tests"
   },
   "dependencies": {
     "@emotion/styled": "^11.11.0",
