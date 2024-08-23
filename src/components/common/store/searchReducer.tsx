@@ -32,7 +32,7 @@ export type SearchParameters = {
 // Control the behavior of search behavior not part of the query
 export type SearchControl = {
   pagesize?: number;
-  searchafter?: Array<object>;
+  searchafter?: Array<string>;
   score?: number;
 };
 
@@ -248,6 +248,9 @@ const searcher = createSlice({
       })
       .addCase(fetchResultAppendStore.fulfilled, (state, action) => {
         const new_collections = action.payload;
+        // Create a new instance so in case people need to use useState it signal an update
+        state.collectionsQueryResult.result =
+          state.collectionsQueryResult.result.clone();
         state.collectionsQueryResult.result.merge(new_collections);
         state.collectionsQueryResult.query = action.meta.arg;
       })

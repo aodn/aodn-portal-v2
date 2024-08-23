@@ -58,7 +58,8 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     // This is very specific to how elastic works and then how to construct the query
     const componentParam: ParameterState = getComponentState(store.getState());
     // Use standard param to get fields you need, record is stored in redux,
-    // set page so that it return fewer records
+    // set page so that it return fewer records and append the search_after
+    // to go the next batch of record.
     const paramPaged = createSearchParamFrom(componentParam, {
       pagesize: DEFAULT_SEARCH_PAGE,
       searchafter: contents.result.search_after,
@@ -67,6 +68,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     dispatch(fetchResultAppendStore(paramPaged))
       .unwrap()
       .then((collections: OGCCollections) => {
+        // Make a new object so useState trigger
         contents.result = contents.result.clone();
         contents.result.merge(collections);
         setContents(contents);

@@ -65,6 +65,7 @@ const ListResultCard = (props: ResultCardProps) => {
     <Card
       variant="outlined"
       sx={{
+        width: "100%",
         minHeight: "240px",
         maxHeight: "240px",
         border: props.isSelectedDataset ? "2px solid #618CA5" : "none",
