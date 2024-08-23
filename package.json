@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "postinstall": "husky",
     "test": "vitest",
-    "test:debug": "vitest --run --reporter=verbose --watch=false"
+    "test:debug": "vitest --run --reporter=verbose --watch=false",
+    "playwright": "docker compose -f playwright/docker-compose.yml up --abort-on-container-exit --exit-code-from tests"
   },
   "dependencies": {
     "@emotion/styled": "^11.11.0",
@@ -51,6 +52,7 @@
     "react-ipynb-renderer": "^2.1.4",
     "react-redux": "^9.1.0",
     "react-router-dom": "^6.22.0",
+    "react-virtualized-auto-sizer": "1.0.24",
     "react-window": "^1.8.10",
     "react-youtube": "^10.1.0",
     "redux-logger": "^3.0.6",

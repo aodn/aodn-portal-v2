@@ -134,11 +134,64 @@ export class Spatial {
   };
 }
 
-// interfaces:
-export interface OGCCollections {
-  collections: Array<OGCCollection>;
-  links: Array<ILink>;
+export class OGCCollections {
+  private _total: number;
+  private _search_after: Array<string>;
+  private _collections: Array<OGCCollection>;
+  private _links: Array<ILink>;
+
+  constructor(
+    collections: Array<OGCCollection> = new Array<OGCCollection>(),
+    links: Array<ILink> = new Array<ILink>(),
+    total: number = 0,
+    search_after: Array<string> = new Array<string>()
+  ) {
+    this._collections = collections;
+    this._links = links;
+    this._total = total;
+    this._search_after = search_after;
+  }
+
+  get search_after() {
+    return this._search_after;
+  }
+
+  set search_after(sf: Array<string>) {
+    this._search_after = sf;
+  }
+
+  get collections() {
+    return this._collections;
+  }
+
+  set collections(collections: Array<OGCCollection>) {
+    this._collections = collections;
+  }
+
+  get links() {
+    return this._links;
+  }
+
+  get total() {
+    return this._total;
+  }
+
+  merge(collections: OGCCollections) {
+    this.collections = this.collections.concat(collections.collections);
+    this.search_after = collections.search_after;
+  }
+
+  clone() {
+    return new OGCCollections(
+      this._collections,
+      this._links,
+      this._total,
+      this._search_after
+    );
+  }
 }
+
+// interfaces:
 export interface IKeyword {
   title: string;
   content: string[];

@@ -1,8 +1,7 @@
-import { IconButton, ListItemIcon, Menu, MenuItem } from "@mui/material";
+import { Button, ListItemIcon, Menu, MenuItem } from "@mui/material";
 import SubtitlesIcon from "@mui/icons-material/Subtitles";
 import TryIcon from "@mui/icons-material/Try";
 import EditNoteIcon from "@mui/icons-material/EditNote";
-import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
 import ActionButtonPaper from "./ActionButtonPaper";
 import RelevancyIcon from "../../icon/RelevancyIcon";
 import { FC, useCallback, useState } from "react";
@@ -56,17 +55,17 @@ const SortButton: FC<SortButtonProps> = ({ onChangeSorting }) => {
 
   return (
     <ActionButtonPaper>
-      <IconButton
+      <Button
         id="sort-list-toggle-button"
         onClick={handleClick}
         aria-controls={anchorEl != null ? "sort-list-toggle-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={anchorEl != null ? "true" : undefined}
         data-testid="sort-list-toggle-button"
+        startIcon={determineShowingIcon(resultLayout)}
       >
-        {determineShowingIcon(resultLayout)}
-        <ArrowDropDownSharpIcon />
-      </IconButton>
+        Sort
+      </Button>
       <Menu
         open={anchorEl != null}
         onClose={handleClose}
@@ -79,8 +78,7 @@ const SortButton: FC<SortButtonProps> = ({ onChangeSorting }) => {
         <MenuItem
           data-testid="sortlist-toggle-menu-relevant"
           onClick={() => {
-            // No need to set layout because we want to
-            // remember the last layout
+            setResultLayout(SortResultEnum.RELEVANT);
             handleClose();
             onChangeSorting(SortResultEnum.RELEVANT);
           }}

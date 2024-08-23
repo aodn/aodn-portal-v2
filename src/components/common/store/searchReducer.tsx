@@ -11,15 +11,12 @@ import {
   TemporalAfterOrBefore,
   TemporalDuring,
 } from "../cqlFilters";
-import {
-  ILink,
-  OGCCollection,
-  OGCCollections,
-} from "./OGCCollectionDefinitions";
+import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
   createErrorResponse,
   ErrorResponse,
 } from "../../../utils/ErrorBoundary";
+import { mergeWithDefaults } from "../utils";
 
 export type SuggesterParameters = {
   input?: string;
@@ -31,6 +28,12 @@ export type SearchParameters = {
   filter?: string;
   properties?: string;
   sortby?: string;
+};
+// Control the behavior of search behavior not part of the query
+export type SearchControl = {
+  pagesize?: number;
+  searchafter?: Array<string>;
+  score?: number;
 };
 
 type OGCSearchParameters = {
@@ -49,24 +52,24 @@ interface ObjectValue {
   collectionsQueryResult: CollectionsQueryType;
   categoriesResult: Array<Category>;
 }
+export const DEFAULT_SEARCH_PAGE = 11;
 
 const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
-  return {
-    collections: json.collections.map((collection: any) =>
+  return new OGCCollections(
+    json.collections.map((collection: any) =>
       Object.assign(new OGCCollection(), collection)
     ),
-    links: json.links,
-  };
+    json.links,
+    json.total,
+    json.search_after
+  );
 };
 
 const initialState: ObjectValue = {
   collectionsQueryResult: {
-    result: {
-      links: new Array<ILink>(),
-      collections: new Array<OGCCollection>(),
-    },
+    result: new OGCCollections(),
     query: {},
   },
   categoriesResult: new Array<Category>(),
@@ -88,9 +91,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
   // DO NOT EXPOSE score externally, you should not allow share
   // url with score, alter UI behavior which is hard to control
   if (param.filter !== undefined && param.filter.length !== 0) {
-    p.filter = param.filter + ` AND score>=${DEFAULT_SEARCH_SCORE}`;
-  } else {
-    p.filter = `score>=${DEFAULT_SEARCH_SCORE}`;
+    p.filter = param.filter;
   }
 
   if (param.sortby !== undefined && param.sortby.length !== 0) {
@@ -186,7 +187,6 @@ const fetchResultWithStore = createAsyncThunk<
   SearchParameters,
   { rejectValue: ErrorResponse }
 >("search/fetchResultWithStore", searchResult);
-
 /**
  * Trunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description. This one do not attach extraReducer
@@ -196,6 +196,12 @@ const fetchResultNoStore = createAsyncThunk<
   SearchParameters,
   { rejectValue: ErrorResponse }
 >("search/fetchResultNoStore", searchResult);
+
+const fetchResultAppendStore = createAsyncThunk<
+  OGCCollections,
+  SearchParameters,
+  { rejectValue: ErrorResponse }
+>("search/fetchResultAppendStore", searchResult);
 
 const fetchResultByUuidNoStore = createAsyncThunk<
   OGCCollection,
@@ -240,6 +246,14 @@ const searcher = createSlice({
         state.collectionsQueryResult.result = action.payload;
         state.collectionsQueryResult.query = action.meta.arg;
       })
+      .addCase(fetchResultAppendStore.fulfilled, (state, action) => {
+        const new_collections = action.payload;
+        // Create a new instance so in case people need to use useState it signal an update
+        state.collectionsQueryResult.result =
+          state.collectionsQueryResult.result.clone();
+        state.collectionsQueryResult.result.merge(new_collections);
+        state.collectionsQueryResult.query = action.meta.arg;
+      })
       .addCase(fetchParameterCategoriesWithStore.fulfilled, (state, action) => {
         state.categoriesResult = action.payload;
       });
@@ -267,12 +281,38 @@ const createSuggesterParamFrom = (
   }
   return suggesterParam;
 };
-
-const createSearchParamFrom = (i: ParameterState): SearchParameters => {
+// Given a ParameterState object, we convert it to the correct Restful parameters
+// always call this function and do not hand craft it elsewhere, some control isn't
+// part the ParameterState and therefore express as optional argument here
+const createSearchParamFrom = (
+  i: ParameterState,
+  control?: SearchControl
+): SearchParameters => {
   const p: SearchParameters = {};
   p.text = i.searchText;
-  p.filter = undefined;
   p.sortby = i.sortby;
+
+  const c = mergeWithDefaults(
+    {
+      score: DEFAULT_SEARCH_SCORE,
+    } as SearchControl,
+    control
+  );
+
+  // The score control how relevent the records
+  p.filter = `score>=${c.score}`;
+
+  // Control how many record return in 1 page.
+  if (c.pagesize) {
+    p.filter = appendFilter(p.filter, `page_size=${c.pagesize}`);
+  }
+
+  if (c.searchafter) {
+    p.filter = appendFilter(
+      p.filter,
+      `search_after='${c.searchafter.join(",")}'`
+    );
+  }
 
   if (i.isImosOnlyDataset) {
     p.filter = appendFilter(
@@ -350,6 +390,7 @@ export {
   fetchSuggesterOptions,
   fetchResultWithStore,
   fetchResultNoStore,
+  fetchResultAppendStore,
   fetchResultByUuidNoStore,
   fetchParameterCategoriesWithStore,
 };

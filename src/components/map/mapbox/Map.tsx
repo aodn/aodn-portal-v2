@@ -11,6 +11,7 @@ import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import loadash from "lodash";
+import { TestHelper } from "../../common/test/helper";
 
 interface MapProps {
   centerLongitude?: number;
@@ -173,7 +174,12 @@ const ReactMap = ({
   }, [bbox, map]);
 
   return (
-    map && <MapContext.Provider value={{ map }}>{children}</MapContext.Provider>
+    map && (
+      <MapContext.Provider value={{ map }}>
+        <TestHelper getMap={() => map} />
+        {children}
+      </MapContext.Provider>
+    )
   );
 };
 
