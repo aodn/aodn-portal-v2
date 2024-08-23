@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import {
-  CollectionsQueryType,
   createSearchParamFrom,
+  DEFAULT_SEARCH_PAGE,
   fetchResultNoStore,
   fetchResultWithStore,
   SearchParameters,
@@ -21,8 +21,6 @@ import {
 import store, {
   AppDispatch,
   getComponentState,
-  RootState,
-  searchQueryResult,
 } from "../../components/common/store/store";
 import { pageDefault } from "../../components/common/constants";
 
@@ -56,6 +54,8 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  // Layers contains record with uuid and bbox only
+  const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
     SearchResultLayoutEnum.VISIBLE
   );
@@ -119,22 +119,30 @@ const SearchPage = () => {
     [getCollectionsData]
   );
 
-  // Layers contains record with uuid and bbox only
-  const [layers, setLayers] = useState<Array<OGCCollection>>([]);
-
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
-      const param = createSearchParamFrom(componentParam);
 
-      // Use standard param to get fields you need, record is stored in redux
-      dispatch(fetchResultWithStore(param)).then(() => {
-        // Use a different parameter so that it return id and bbox only and do not store the values
+      // Use standard param to get fields you need, record is stored in redux,
+      // set page so that it return fewer records
+      const paramPaged = createSearchParamFrom(componentParam, {
+        pagesize: DEFAULT_SEARCH_PAGE,
+      });
+
+      dispatch(fetchResultWithStore(paramPaged)).then(() => {
+        // Use a different parameter so that it return id and bbox only and do not store the values,
+        // we cannot add page because we want to show all record on map
+        const paramNonPaged = createSearchParamFrom(componentParam);
         dispatch(
-          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted and ordered by uuid to avoid affecting cluster calculation
-          fetchResultNoStore({ ...param, properties: "id,bbox", sortby: "id" })
+          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+          // and ordered by uuid to avoid affecting cluster calculation
+          fetchResultNoStore({
+            ...paramNonPaged,
+            properties: "id,bbox",
+            sortby: "id",
+          })
         )
           .unwrap()
           .then((collections) => {
@@ -200,11 +208,6 @@ const SearchPage = () => {
     }
   }, [location, dispatch, doSearch]);
 
-  // Get contents when no more navigate needed.
-  const contents = useSelector<RootState, CollectionsQueryType>(
-    searchQueryResult
-  );
-
   const handleNavigateToDetailPage = useCallback(
     (uuid: string) => {
       const searchParams = new URLSearchParams();
@@ -269,24 +272,57 @@ const SearchPage = () => {
         <Grid item xs={1}>
           <ResultPanelIconFilter />
         </Grid>
-        <ResultSection
-          visibility={visibility}
-          contents={contents}
-          onRemoveLayer={undefined}
-          onVisibilityChanged={onVisibilityChanged}
-          onClickCard={handleNavigateToDetailPage}
-          onChangeSorting={onChangeSorting}
-          datasetSelected={datasetsSelected}
-        />
-        <MapSection
-          collections={layers}
-          bbox={bbox}
-          showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
-          onMapZoomOrMove={onMapZoomOrMove}
-          onToggleClicked={onToggleDisplay}
-          onDatasetSelected={onDatasetSelected}
-        />
-        <Grid></Grid>
+        <Grid item xs={11}>
+          {
+            // Must group the ResultSection and MapSection together so that show hide works
+          }
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "stretch",
+              width: "100%",
+            }}
+          >
+            {visibility === SearchResultLayoutEnum.VISIBLE && (
+              <Box
+                sx={{
+                  flex: 1,
+                }}
+              >
+                <ResultSection
+                  sx={{
+                    height: "80vh",
+                  }}
+                  onVisibilityChanged={onVisibilityChanged}
+                  onClickCard={handleNavigateToDetailPage}
+                  onChangeSorting={onChangeSorting}
+                  datasetSelected={datasetsSelected}
+                />
+              </Box>
+            )}
+            <Box
+              sx={{
+                flex: visibility === SearchResultLayoutEnum.VISIBLE ? 2 : 1,
+                paddingLeft: 2,
+                paddingRight: 2,
+              }}
+            >
+              <MapSection
+                sx={{
+                  height: "80vh",
+                }}
+                collections={layers}
+                bbox={bbox}
+                showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
+                onMapZoomOrMove={onMapZoomOrMove}
+                onToggleClicked={onToggleDisplay}
+                onDatasetSelected={onDatasetSelected}
+              />
+            </Box>
+          </Box>
+        </Grid>
       </Grid>
     </Layout>
   );

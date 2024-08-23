@@ -8,25 +8,18 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import WhereToVoteIcon from "@mui/icons-material/WhereToVote";
 import DownloadIcon from "@mui/icons-material/Download";
 import InfoIcon from "@mui/icons-material/Info";
 import LinkIcon from "@mui/icons-material/Link";
 import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
 import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
-import { useCallback } from "react";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import { margin } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { useCallback } from "react";
 
 interface ResultCardProps {
   content: OGCCollection;
-  onRemoveLayer?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
   onDownload?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -49,31 +42,32 @@ interface ResultCardProps {
   isSelectedDataset?: boolean;
 }
 
-const ListResultCard = (props: ResultCardProps) => {
-  // links here may need to be changed, because only html links are wanted
-  const generateLinkText = useCallback((linkLength: number) => {
-    if (linkLength === 0) {
-      return "No Link";
-    }
-    if (linkLength === 1) {
-      return "1 Link";
-    }
-    return `${linkLength} Links`;
-  }, []);
+// links here may need to be changed, because only html links are wanted
+const generateLinkText = (linkLength: number) => {
+  if (linkLength === 0) {
+    return "No Link";
+  }
+  if (linkLength === 1) {
+    return "1 Link";
+  }
+  return `${linkLength} Links`;
+};
 
-  const handleClick = () => {
+const ListResultCard = (props: ResultCardProps) => {
+  const handleClick = useCallback(() => {
     if (props.onClickCard && props.content && props.content.id) {
       props.onClickCard(props.content.id);
     }
-  };
+  }, [props]);
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card
       variant="outlined"
       sx={{
-        width: "99%",
-        minHeight: "250px",
+        width: "100%",
+        minHeight: "240px",
+        maxHeight: "240px",
         border: props.isSelectedDataset ? "2px solid #618CA5" : "none",
       }}
       data-testid="result-card-list"
@@ -133,14 +127,6 @@ const ListResultCard = (props: ResultCardProps) => {
       </CardActionArea>
 
       <CardActions sx={{ justifyContent: "space-between" }}>
-        {/*This button will be gone in the future*/}
-        <StaticResultCardButton
-          text={"Remove Layer"}
-          startIcon={<WhereToVoteIcon />}
-          onClick={(event) =>
-            props?.onRemoveLayer && props.onRemoveLayer(event, props.content)
-          }
-        />
         <DynamicResultCardButton
           status={props.content.getStatus()}
           onClick={() => {}}

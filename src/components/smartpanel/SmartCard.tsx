@@ -3,8 +3,9 @@ import {
   Box,
   Button,
   Card,
-  CardActionArea,
   CardMedia,
+  SxProps,
+  Theme,
   Typography,
 } from "@mui/material";
 
@@ -22,6 +23,7 @@ interface SmartcardProps {
   underline?: React.ReactNode;
   card?: CardType;
   isOutlined?: boolean;
+  sx?: SxProps<Theme>;
   onCardClicked?: () => void;
 }
 
@@ -32,7 +34,7 @@ const getPreferDimension = (type: CardType | undefined) => {
     case CardType.TwoOnOne:
       return { cardHeight: "100px", imgWidth: "100%", imgHeight: "100px" };
     default:
-      return { cardHeight: "90px", imgWidth: "60px", imgHeight: "60px" };
+      return { cardHeight: "90px", imgWidth: "40px", imgHeight: "40px" };
   }
 };
 
@@ -106,7 +108,7 @@ const SmartCardContent = (props: SmartcardProps) => {
                 }}
               >
                 <Typography
-                  variant="body1"
+                  variant="body2"
                   color={props.colour ?? "white"}
                   fontWeight={300}
                   pt={props.isOutlined ? 0 : 1}
@@ -164,6 +166,7 @@ const SmartCard21 = (props: SmartcardProps) => {
   return (
     <Box
       sx={{
+        ...props.sx,
         gridColumn: "span 2",
         gridRow: "span 1",
       }}
@@ -185,6 +188,7 @@ const SmartCard11 = (props: SmartcardProps) => {
   return (
     <Box
       sx={{
+        ...props.sx,
         gridColumn: "span 1",
         gridRow: "span 1",
       }}
@@ -207,6 +211,7 @@ const SmartCard22 = (props: SmartcardProps) => {
   return (
     <Box
       sx={{
+        ...props.sx,
         gridColumn: "span 2",
         gridRow: "span 2",
       }}
@@ -224,6 +229,7 @@ const SmartCard32 = (props: SmartcardProps) => {
   return (
     <Box
       sx={{
+        ...props.sx,
         gridColumn: "span 3",
         gridRow: "span 2",
       }}

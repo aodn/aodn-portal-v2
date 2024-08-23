@@ -129,10 +129,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ filter, setFilter }) => {
   // States below are used to store the imos-data ids and all datasets
   // they will be used in TimeRangeBarChart
   const [imosDataIds, setImosDataIds] = useState<string[]>([]);
-  const [totalDataset, setTotalDataset] = useState<OGCCollections>({
-    collections: [],
-    links: [],
-  });
+  const [totalDataset, setTotalDataset] = useState<OGCCollections>(
+    new OGCCollections()
+  );
 
   useEffect(() => {
     // Find all collection
