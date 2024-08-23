@@ -33,7 +33,7 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
               textAlign: "left",
               "&:hover": {
                 textDecoration: "underline",
-                textDecorationColor: "darkgrey",
+                textDecorationColor: "grey",
               },
             }}
           >

@@ -8,6 +8,8 @@ import {
   IContact,
   ITheme,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
+import _ from "lodash";
+
 const AboutPanel = () => {
   const context = useDetailPageContext();
   const credits = useMemo(
@@ -27,6 +29,7 @@ const AboutPanel = () => {
   );
 
   const keywords: { title: string; content: string[] }[] = useMemo(() => {
+    // getting keywords from themes
     const keywordItems: { title: string; content: string[] }[] = [];
     themes?.forEach((theme: ITheme) => {
       keywordItems.push({
@@ -36,7 +39,11 @@ const AboutPanel = () => {
         ),
       });
     });
-    return keywordItems;
+
+    // reorder them according to the title alphabetically
+    return _.sortBy(keywordItems, (item) => {
+      return item.title ? item.title : "\uffff";
+    });
   }, [themes]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -52,10 +59,6 @@ const AboutPanel = () => {
   const blocks = useMemo(
     () => [
       {
-        title: "Keywords",
-        component: <CollapseList items={keywords} title="Keywords" />,
-      },
-      {
         title: "Contacts",
         component: (
           <ContactList
@@ -67,6 +70,10 @@ const AboutPanel = () => {
       {
         title: "Credits",
         component: <TextList title="Credits" texts={credits ? credits : []} />,
+      },
+      {
+        title: "Keywords",
+        component: <CollapseList items={keywords} title="Keywords" />,
       },
     ],
     [aboutContacts, credits, keywords]
