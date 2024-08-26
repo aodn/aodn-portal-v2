@@ -1,10 +1,4 @@
-import {
-  cleanup,
-  render,
-  RenderResult,
-  act,
-  waitFor,
-} from "@testing-library/react";
+import { cleanup, render, RenderResult, waitFor } from "@testing-library/react";
 import {
   afterAll,
   afterEach,
@@ -45,8 +39,7 @@ describe("inputwithsuggester", async () => {
 
   test("Suggestion options should disappear after choosing one of them", async () => {
     let input: HTMLInputElement;
-    const { getByRole, findByTestId, findByRole, queryByRole, getAllByRole } =
-      rendered;
+    const { getByRole, queryByRole, getAllByRole } = rendered;
     waitFor(
       () =>
         expect(getByRole("input-with-suggester")) &&
