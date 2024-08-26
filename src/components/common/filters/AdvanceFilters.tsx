@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
   ParameterState,
@@ -48,11 +48,11 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
 }) => {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
-  const componentParam: ParameterState = getComponentState(store.getState());
+  const componentParam = useMemo(() => getComponentState(store.getState()), []);
 
   // State used to store the provisional filter options selected,
   // only dispatch to redux when 'apply' button is hit
-  const [filter, setFilter] = useState<ParameterState>({});
+  const [filter, setFilter] = useState<ParameterState>(componentParam);
 
   // initialize filter
   useEffect(() => {
