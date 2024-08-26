@@ -229,11 +229,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   const onInputChange = useCallback(
     async (_: any, newInputValue: string) => {
-      console.log("-------input change ------------");
       // If user type anything, then it is not a title search anymore
       dispatch(updateSearchText(newInputValue));
       if (newInputValue?.length > 0) {
-        console.log("need to refresh options");
         // wait for the debounced refresh to complete
         // dispatch updateCommonKey if there is any during the refreshing-options to ensure the commonKey comes from the latest options given any inputValue changed
         await debounceRefreshOptions(newInputValue);
