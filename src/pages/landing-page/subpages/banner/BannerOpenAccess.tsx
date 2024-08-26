@@ -43,13 +43,12 @@ const BannerOpenAccess = () => {
           Ocean Data
         </Typography>
         <Typography
-          variant="subtitle1"
           sx={{
-            color: "white",
-            whiteSpace: "nowrap",
             fontSize: fontSize.bannerSubtitle,
             fontWeight: fontWeight.light,
             letterSpacing: gap.sm,
+            color: "white",
+            whiteSpace: "nowrap",
             pr: padding.small,
             textShadow: theme.shadows[4],
           }}
