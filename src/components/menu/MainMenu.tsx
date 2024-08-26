@@ -1,52 +1,28 @@
-import { padding } from "../../styles/constants";
-import { StyledButton } from "./StyledMenu";
-import { Grid } from "@mui/material";
+import { FC } from "react";
+import PlainMenu, { type Menu } from "./PlainMenu";
+import { Stack } from "@mui/material";
 
-const Menu = () => {
+// TODO: implement items abd handlers once the menu function is designed
+const MAIN_MENUS: Menu[] = [
+  { menuName: "DATA", items: [{ name: "item 1", handler: () => {} }] },
+  { menuName: "LEARN", items: [{ name: "item 1", handler: () => {} }] },
+  { menuName: "ENGAGE", items: [{ name: "item 1", handler: () => {} }] },
+  { menuName: "CONTACT", items: [{ name: "item 1", handler: () => {} }] },
+  { menuName: "ABOUT", items: [{ name: "item 1", handler: () => {} }] },
+];
+
+const Menu: FC = () => {
   return (
-    <Grid
-      container
-      sx={{
-        backgroundColor: "transparent",
-        width: "70%",
-        paddingY: padding.large,
-      }}
+    <Stack
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      spacing={8}
     >
-      <Grid item xs={12}>
-        <Grid container justifyContent="space-between">
-          <Grid key="menu-grid-item-data" item>
-            <StyledButton
-              name={"Data"}
-              items={[{ name: "Item1", handler: () => {} }]}
-            />
-          </Grid>
-          <Grid key="menu-grid-item-learn" item>
-            <StyledButton
-              name={"Learn"}
-              items={[{ name: "Item1", handler: () => {} }]}
-            />
-          </Grid>
-          <Grid key="menu-grid-item-engage" item>
-            <StyledButton
-              name={"Engage"}
-              items={[{ name: "Item1", handler: () => {} }]}
-            />
-          </Grid>
-          <Grid key="menu-grid-item-contact" item>
-            <StyledButton
-              name={"Contact"}
-              items={[{ name: "Item1", handler: () => {} }]}
-            />
-          </Grid>
-          <Grid key="menu-grid-item-about" item>
-            <StyledButton
-              name={"About"}
-              items={[{ name: "Item1", handler: () => {} }]}
-            />
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
+      {MAIN_MENUS.map((menu, index) => (
+        <PlainMenu menu={menu} key={index} />
+      ))}
+    </Stack>
   );
 };
 

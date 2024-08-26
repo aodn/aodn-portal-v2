@@ -6,14 +6,8 @@
       "request": "launch",
       "name": "Debug Vitest Tests - Current File",
       "runtimeExecutable": "yarn",
-      "runtimeArgs": [
-        "test:debug",
-        "--",
-        "${fileBasenameNoExtension}"
-      ],
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "runtimeArgs": ["test:debug", "--", "${fileBasenameNoExtension}"],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }
