@@ -10,6 +10,7 @@ import {
   PolygonOperation,
   TemporalAfterOrBefore,
   TemporalDuring,
+  UpdateFrequency,
 } from "../cqlFilters";
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
@@ -17,6 +18,12 @@ import {
   ErrorResponse,
 } from "../../../utils/ErrorBoundary";
 import { mergeWithDefaults } from "../utils";
+
+export enum DatasetFrequency {
+  REALTIME = "real-time",
+  DELAYED = "delayed",
+  OTHER = "other",
+}
 
 export type SuggesterParameters = {
   input?: string;
@@ -321,6 +328,11 @@ const createSearchParamFrom = (
     );
   }
 
+  if (i.updateFreq) {
+    const f = cqlDefaultFilters.get("UPDATE_FREQUENCY") as UpdateFrequency;
+    p.filter = appendFilter(p.filter, f(i.updateFreq));
+  }
+
   if (
     i.dateTimeFilterRange &&
     (i.dateTimeFilterRange.start || i.dateTimeFilterRange.end)
@@ -376,17 +388,9 @@ const createSearchParamFrom = (
   return p;
 };
 
-const createSearchParamForImosRealTime = () => {
-  const p: SearchParameters = {};
-  p.filter = cqlDefaultFilters.get("REAL_TIME_ONLY") as string;
-
-  return p;
-};
-
 export {
   createSuggesterParamFrom,
   createSearchParamFrom,
-  createSearchParamForImosRealTime,
   fetchSuggesterOptions,
   fetchResultWithStore,
   fetchResultNoStore,

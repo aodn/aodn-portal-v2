@@ -4,32 +4,17 @@ import ComplexTextSearch from "../components/search/ComplexTextSearch";
 import StoryBoardPanel from "../components/storyboard/StoryBoardPanel";
 import ShortCutSmartPanel from "../components/smartpanel/ShortCutSmartPanel";
 import PromotionSmartPanel from "../components/smartpanel/PromotionSmartPanel";
-import {
-  createSearchParamForImosRealTime,
-  //createSearchParamFrom,
-  fetchResultWithStore,
-} from "../components/common/store/searchReducer";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../components/common/store/store";
 import { Box, Stack } from "@mui/material";
 import { CARD_ID } from "../components/smartpanel/utils";
 import Layout from "../components/layout/layout";
 import landingImageUrl from "@/assets/images/bg_landing_page.png";
 
 const LandingPage = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-
   const onCardClick = (id: number) => {
     switch (id) {
       case CARD_ID.ADVANCED_SEARCH:
         break;
       case CARD_ID.SATELITE:
-        dispatch(fetchResultWithStore(createSearchParamForImosRealTime()))
-          .unwrap()
-          .then(() => navigate("/search"));
-
         break;
       default:
         break;
