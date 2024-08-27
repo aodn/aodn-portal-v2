@@ -62,6 +62,10 @@ List of primary dependencies:
 
 We are using [material ui](https://mui.com/material-ui/) and our configuration theme file it's in `AppThene.ts`
 
+## Automated UI tests
+
+See [`playwright/README.md`](./playwright/README.md).
+
 ## Commit
 
 We are using [gitmoji](https://gitmoji.dev/)(OPTIONAL) with husky and commitlint. Here you have an example of the most used ones:

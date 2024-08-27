@@ -5,19 +5,15 @@ import "dayjs/locale/en-gb";
 import Header from "../header/header";
 import Footer from "../footer/footer";
 
-type LayoutProps = {
-  children: React.ReactNode;
-};
+interface LayoutProps {}
 
-const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
+const Layout = ({ children }: React.PropsWithChildren<LayoutProps>) => {
   return (
-    <div>
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
-        <Header isLandingPage={location.pathname == "/"} />
-        <main>{children}</main>
-        <Footer />
-      </LocalizationProvider>
-    </div>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
+      <Header isLandingPage={location.pathname == "/"} />
+      <main>{children}</main>
+      <Footer />
+    </LocalizationProvider>
   );
 };
 

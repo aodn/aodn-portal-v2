@@ -4562,6 +4562,7 @@ __metadata:
     react-ipynb-renderer: "npm:^2.1.4"
     react-redux: "npm:^9.1.0"
     react-router-dom: "npm:^6.22.0"
+    react-virtualized-auto-sizer: "npm:1.0.24"
     react-window: "npm:^1.8.10"
     react-youtube: "npm:^10.1.0"
     redux-logger: "npm:^3.0.6"
@@ -10722,6 +10723,16 @@ __metadata:
     react: ">=16.6.0"
     react-dom: ">=16.6.0"
   checksum: 10c0/2ba754ba748faefa15f87c96dfa700d5525054a0141de8c75763aae6734af0740e77e11261a1e8f4ffc08fd9ab78510122e05c21c2d79066c38bb6861a886c82
+  languageName: node
+  linkType: hard
+
+"react-virtualized-auto-sizer@npm:1.0.24":
+  version: 1.0.24
+  resolution: "react-virtualized-auto-sizer@npm:1.0.24"
+  peerDependencies:
+    react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0
+    react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0
+  checksum: 10c0/d400489e5005a2ad0635228958379aa26b66fdae62a5b9fbf4dcb5fecd4e99454990b1cd59fe55ff277419b37bdf098c26e7185e0ef1b6ca775a477f913bb763
   languageName: node
   linkType: hard
 

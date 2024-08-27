@@ -1,5 +1,4 @@
-import { IconButton, ListItemIcon, MenuItem } from "@mui/material";
-import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
+import { Button, ListItemIcon, MenuItem } from "@mui/material";
 import React, { FC, useCallback, useState } from "react";
 import Menu from "@mui/material/Menu";
 import ActionButtonPaper from "./ActionButtonPaper";
@@ -52,17 +51,17 @@ const MapListToggleButton: FC<MapListToggleButtonProps> = ({
 
   return (
     <ActionButtonPaper>
-      <IconButton
+      <Button
         id="map-list-toggle-button"
         onClick={handleClick}
         aria-controls={anchorEl != null ? "map-list-toggle-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={anchorEl != null ? "true" : undefined}
         data-testid="map-list-toggle-button"
+        startIcon={determineShowingIcon(resultLayout)}
       >
-        {determineShowingIcon(resultLayout)}
-        <ArrowDropDownSharpIcon />
-      </IconButton>
+        View
+      </Button>
       <Menu
         open={anchorEl != null}
         onClose={handleClose}

@@ -1,0 +1,26 @@
+name: Build and run UI test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ui_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run playwright tests
+        run: yarn playwright
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: |
+            playwright/reports/
+            playwright/test-results/
+          retention-days: 7

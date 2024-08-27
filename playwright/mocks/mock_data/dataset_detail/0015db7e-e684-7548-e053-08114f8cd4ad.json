@@ -1,0 +1,406 @@
+{
+  "properties": {
+    "revision": "2023-06-14T00:23:22",
+    "themes": [
+      {
+        "scheme": "theme",
+        "description": "",
+        "title": "GCMD Keywords",
+        "concepts": [
+          {
+            "id": "Earth Science | Biosphere | Aquatic Ecosystems | Marine Habitat",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/f6350232-b1c7-458c-bc43-bda357ebb6db"
+          },
+          {
+            "id": "Earth Science | Biosphere | Ecological Dynamics | Ecosystem Functions | Trophic Dynamics",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/bd46a0bf-5c06-48af-a6c9-022417b1fffd"
+          },
+          {
+            "id": "Earth Science | Biosphere | Aquatic Ecosystems | Pelagic Habitat",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/3d7ecc4f-e79e-40d1-8796-63059888bf5f"
+          },
+          {
+            "id": "Earth Science | Biosphere | Ecological Dynamics | Species/Population Interactions | Population Dynamics",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/ad3a5f4f-4624-4a08-b875-6723c2615e90"
+          },
+          {
+            "id": "Earth Science | Biosphere | Ecological Dynamics | Species/Population Interactions | Species Predation",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/b69d76ba-ad69-4418-8e5b-ebb659604dda"
+          },
+          {
+            "id": "Earth Science | Biosphere | Ecological Dynamics | Ecosystem Functions | Primary Production",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/ecd03762-df34-49b7-91f2-d8a51acd270e"
+          },
+          {
+            "id": "Earth Science | Oceans | Ocean Acoustics | Acoustic Scattering",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/b4a924bb-0d42-4169-bad7-3856f69f0c4a"
+          }
+        ]
+      },
+      {
+        "scheme": "equipment",
+        "description": "",
+        "title": "CSIRO Equipment",
+        "concepts": [
+          {
+            "id": "Acoustic Equipment/Echosounders",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:1"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "description": "",
+        "title": "AODN Geographic Extent Names",
+        "concepts": [
+          {
+            "id": "Global / Oceans | Indian Ocean",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:4"
+          }
+        ]
+      },
+      {
+        "scheme": "project",
+        "description": "",
+        "title": "CSIRO Project List",
+        "concepts": [
+          {
+            "id": "Marine Acoustics and IMOS bio-acoustics sampling program.",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:2381"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "description": "",
+        "title": "CSIRO Standard Data Types",
+        "concepts": [
+          {
+            "id": "Vessel Data: Acoustics (Fisheries)",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:standardDataType&id=urn:marlin.csiro.au:keywords:standardDataType:concept:3520"
+          }
+        ]
+      },
+      {
+        "scheme": "dataSource",
+        "description": "",
+        "title": "CSIRO Source List",
+        "concepts": [
+          {
+            "id": "Ship: Aurora Australis",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:1"
+          },
+          {
+            "id": "Ship: Southern Surveyor",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:8"
+          },
+          {
+            "id": "Ship: Investigator (RV)",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:309"
+          },
+          {
+            "id": "Ship: Rehua",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:284"
+          }
+        ]
+      },
+      {
+        "scheme": "survey",
+        "description": "",
+        "title": "CSIRO Survey List",
+        "concepts": [
+          {
+            "id": "Research Voyage: SS2010_V01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:1927"
+          },
+          {
+            "id": "Research Voyage: SS2011_V01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2013"
+          },
+          {
+            "id": "Research Transit: SS2010_T01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:1989"
+          },
+          {
+            "id": "Research Transit: SS2011_T02",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2019"
+          },
+          {
+            "id": "Research Voyage: SS2012_V03",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2069"
+          },
+          {
+            "id": "Research Voyage: SS2011_V07",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2027"
+          },
+          {
+            "id": "Research Voyage: SS2011_V03",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2020"
+          },
+          {
+            "id": "Research Charter: SS2013_C02",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2099"
+          },
+          {
+            "id": "Research Voyage: SS2013_V03",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2100"
+          },
+          {
+            "id": "Research Transit: SS2012_T02",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2052"
+          },
+          {
+            "id": "Research Voyage: SS2013_V06",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2113"
+          },
+          {
+            "id": "Research Voyage: IN2016_V01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2166"
+          },
+          {
+            "id": "Research Voyage: IN2017_V03",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2186"
+          },
+          {
+            "id": "Research Voyage: IN2018_V07",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2221"
+          },
+          {
+            "id": "Research Voyage: IN2015_V01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2131"
+          },
+          {
+            "id": "Research Voyage: IN2018_V01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2195"
+          },
+          {
+            "id": "Research Voyage: IN2019_V04",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2225"
+          },
+          {
+            "id": "Research Voyage: IN2018_V04",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2200"
+          },
+          {
+            "id": "Research Transit: SS2013_T02",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2101"
+          },
+          {
+            "id": "Research Voyage: IN2016_V02",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2168"
+          },
+          {
+            "id": "Research Transit: IN2018_T01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2197"
+          },
+          {
+            "id": "Research Voyage: IN2018_V02",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2196"
+          },
+          {
+            "id": "Research Voyage: IN2019_V01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2203"
+          },
+          {
+            "id": "Research Voyage: IN2020_V09",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2281"
+          },
+          {
+            "id": "Research Voyage: IN2019_V02",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2204"
+          },
+          {
+            "id": "Research Voyage: IN2020_V06",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2258"
+          },
+          {
+            "id": "Research Voyage: IN2020_V01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2230"
+          },
+          {
+            "id": "Research Voyage: IN2020_V08",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2260"
+          },
+          {
+            "id": "Research Voyage: IN2021_V01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2261"
+          },
+          {
+            "id": "Research Voyage: IN2021_V02",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2263"
+          },
+          {
+            "id": "Research Transit: IN2021_T01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2264"
+          },
+          {
+            "id": "Research Voyage: IN2021_V04",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2266"
+          },
+          {
+            "id": "Research Voyage: IN2022_V02",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2276"
+          },
+          {
+            "id": "Research Voyage: IN2022_V03",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2277"
+          },
+          {
+            "id": "Research Voyage: IN2022_V05",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2279"
+          },
+          {
+            "id": "Research Voyage: IN2022_V06",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2299"
+          },
+          {
+            "id": "Research Voyage: IN2022_V07",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2300"
+          },
+          {
+            "id": "Research Voyage: IN2022_T01",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2301"
+          }
+        ]
+      }
+    ],
+    "contacts": [
+      {
+        "name": "Downie, Ryan",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Experimental Scientist (Oceans & Atmosphere)",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "about"],
+        "phones": []
+      },
+      {
+        "name": "Kunnath, Haris",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Research Scientist (Oceans & Atmosphere)",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["custodian", "about"],
+        "phones": []
+      },
+      {
+        "name": "Data Officer (AR), Hobart",
+        "organization": "CSIRO/Oceans and Atmosphere",
+        "position": "",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["processor", "metadata"],
+        "phones": []
+      },
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": []
+      }
+    ],
+    "status": "completed",
+    "temporal": [{}],
+    "license": "",
+    "credits": [],
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [44, -66],
+              [180, -66],
+              [180, -8],
+              [44, -8],
+              [44, -66]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "statement": "DATA COLLECTION:\n   Vessels collect 38 kHz acoustic data from either Simrad EK60, ES60 (split beam) or ES70 echosounders.  Research vessel RV Southern Surveyor collects concurrent acoustic data at 12 and 120 kHz.  The research vessel Aurora Australis collects concurrent acoustic data at 12, 120 and 200 kHz.\n\nDATA POST PROCESSING:\n   The three key steps are (1) semi-automated quality control procedures to filter bad data where we also record the percentage of data removed as a metric of data quality, (2) echo integration of the quality controlled data into cells of 1000 m length by 10 m height and (3) packaging echo integrated data into netCDF along with full metadata record.",
+    "citation": {
+      "otherConstraints": [
+        "In addition to the Attribution cited with the dataset please also include for BASOOP Acoustic Transit data collected on the RV Southern Surveyor. ?Data collected on the RV Southern Surveyor granted by the Marine National Facility and processed by CSIRO Oceans and Atmosphere Flagship as part of the IMOS BASOOP Program?"
+      ]
+    }
+  },
+  "id": "0015db7e-e684-7548-e053-08114f8cd4ad",
+  "title": "IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility",
+  "description": "The IMOS Bio-Acoustic Ship Of Opportunity (BA-SOOP) sub-facility is part of a major international effort that aims to determine the distribution and abundance of mid-trophic level organisms (meso-zooplanktonic and micro-nektonic) preyed by top predators (sharks, tuna) by using commercial fishing vessels (SOOP), research vessels, automated oceanic moorings, acoustic recorders, drifters and gliders.  The MAAS (Mid-trophic Automatic Acoustic Sampler) project targets two levels of technology: a high level suited to large platforms such as fixed moorings, vessels or AUV and low level platforms adapted to a large number of autonomous drifters.\n\nBA-SOOP commenced on the 1st of July 2010 to collect underway acoustic data from commercial fishing and research vessels. At present, nine vessels are participating in the BA-SOOP program. Six are commercial fishing vessels that have agreed to record data during transits to and from fishing grounds. The remaining three are scientific research vessels collecting underway acoustic data during transits and science operations. \n\nBio acoustic signals measure the distribution of mid-water prey species (micronekton) such as small fish, squid, krill and jellyfish.  Micronekton form the core of the ocean food web, transferring energy from primary producers at the ocean surface to top predators such as tunas, billfish, sharks, seals and seabirds. The mass and distribution of micronekton reflects broad-scale patterns in the structure and function of the ocean, as well as the dynamics of marine ecosystems. The mapping complements established observing systems such as physical sampling of ocean currents, surveys of ocean chemistry and biology (plankton and zooplankton), and electronic tagging and tracking of large marine fish and mammals. The combined information greatly enhances the capacity of marine scientists to monitor shifts in food availability over time, assisting in the near real-time monitoring and modelling of oceanography, ecosystems, fisheries and climate change, and in understanding the behaviour of top predators.\n\nA full metadata record is also stored in each netCDF file. The document SOOP-BA NetCDF manual v1.0.doc describes the netCDF format and metadata fields that have been defined.",
+  "links": [
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/IMOS/SOOP/SOOP-BA/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Data Link"
+    },
+    {
+      "href": "/metadata/8edf509b-1481-48fd-b9c5-b95b42247f82",
+      "rel": "related",
+      "type": "text/html",
+      "title": "AODN record"
+    },
+    {
+      "href": "https://portal.aodn.org.au/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Data Link"
+    },
+    {
+      "href": "https://imos.org.au/facilities/shipsofopportunity",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Data Link"
+    },
+    {
+      "href": "https://researchdata.ands.org.au/imos-bio-acoustic-sub-facility/440039/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Data Link"
+    },
+    {
+      "href": "https://imos.org.au/fileadmin/user_upload/shared/SOOP/plugin-SOOP-BA_NetCDF_manual_v1.1.pdf",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Documentation Link"
+    },
+    {
+      "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/c953222f-bb17-4ddf-bdaa-5bf86d04d72a.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://marlin.csiro.au/geonetwork/srv/api/records/0015db7e-e684-7548-e053-08114f8cd4ad/attachments/image.png",
+      "rel": "preview",
+      "type": "image"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [44.0, -66.0, 180.0, -8.0],
+        [44.0, -66.0, 180.0, -8.0]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        [null, null],
+        [null, null]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

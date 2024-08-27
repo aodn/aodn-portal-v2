@@ -1,4 +1,5 @@
 export const COLLECTIONS_WAVE = {
+  total: 50,
   links: [],
   collections: [
     {

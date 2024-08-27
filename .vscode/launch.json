@@ -5,16 +5,9 @@
       "type": "node",
       "request": "launch",
       "name": "Debug Vitest Tests - Current File",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "test:debug",
-        "--",
-        "${fileBasenameNoExtension}"
-      ],
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["test:debug", "--", "${fileBasenameNoExtension}"],
+      "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }
