@@ -31,6 +31,9 @@ interface SearchResultListProps {
   onClickCard?: (uuid: string) => void;
 }
 
+const RESULT_SECTION_MIN_WIDTH = 500;
+const RESULT_SECTION_MAX_WIDTH = 600;
+
 const ResultSection: React.FC<SearchResultListProps> = ({
   datasetSelected,
   sx,
@@ -96,10 +99,17 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   return (
     contents && (
       <Box
-        sx={{ ...sx, display: "flex", flexDirection: "column" }}
+        sx={{
+          ...sx,
+          display: "flex",
+          flexDirection: "column",
+          minWidth: RESULT_SECTION_MIN_WIDTH,
+          maxWidth: RESULT_SECTION_MAX_WIDTH,
+        }}
+        gap={1}
         data-testid="search-page-result-list"
       >
-        <Box sx={{ height: "50px" }}>
+        <Box>
           <ResultPanelSimpleFilter
             count={contents.result.collections.length}
             total={contents.result.total}

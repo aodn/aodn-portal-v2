@@ -1,11 +1,7 @@
 import {
-  FormControl,
   Grid,
-  IconButton,
   InputBase,
-  MenuItem,
   Paper,
-  Select,
   styled,
   SxProps,
   Theme,
@@ -16,12 +12,7 @@ import MapListToggleButton, {
 } from "../buttons/MapListToggleButton";
 import SortButton, { SortButtonProps } from "../buttons/SortButton";
 import { FC } from "react";
-
-const SlimSelect = styled(InputBase)(() => ({
-  "& .MuiInputBase-input": {
-    border: "none",
-  },
-}));
+import { borderRadius, fontSize } from "../../../styles/constants";
 
 interface ResultPanelSimpleFilterProps
   extends MapListToggleButtonProps,
@@ -39,27 +30,27 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   onChangeSorting,
 }) => {
   return (
-    <Grid sx={sx} padding={1} container justifyContent="center">
-      <Grid item xs={6} sx={{ pb: 1 }}>
+    <Grid sx={sx} container justifyContent="center" spacing={1}>
+      <Grid item md={6} xs={12}>
         <Paper
-          variant="outlined"
-          component="form"
+          elevation={0}
           sx={{
-            p: "2px 4px",
             display: "flex",
+            justifyContent: "center",
             alignItems: "center",
-            width: { md: "250px" },
+            height: "100%",
+            borderRadius: borderRadius.medium,
           }}
         >
-          <Typography>
+          <Typography fontSize={fontSize.info} padding={0}>
             Showing 1-{count} of {total} results
           </Typography>
         </Paper>
       </Grid>
-      <Grid item xs={3} sx={{ pb: 1 }}>
+      <Grid item md={3} xs={6}>
         <SortButton onChangeSorting={onChangeSorting} />
       </Grid>
-      <Grid item xs={3} sx={{ pb: 1 }}>
+      <Grid item md={3} xs={6}>
         <MapListToggleButton onChangeLayout={onChangeLayout} />
       </Grid>
     </Grid>

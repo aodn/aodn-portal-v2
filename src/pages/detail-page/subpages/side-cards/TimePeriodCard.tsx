@@ -70,11 +70,12 @@ const TimePeriodCard: FC = () => {
       <RoundCard
         sxProps={{ border: `${border.xs} ${theme.palette.success.main}` }}
       >
-        <DataUsageIcon
-          sx={{ fontSize: "16px", paddingRight: padding.medium }}
-          color="success"
-        />
-        <Typography padding={0} color={theme.palette.success.main}>
+        <DataUsageIcon sx={{ fontSize: "16px" }} color="success" />
+        <Typography
+          padding={0}
+          paddingLeft={padding.small}
+          color={theme.palette.success.main}
+        >
           On Going
         </Typography>
       </RoundCard>
@@ -90,11 +91,12 @@ const TimePeriodCard: FC = () => {
           backgroundColor: color.blue.extraLightSemiTransparent,
         }}
       >
-        <DoneAllIcon
-          sx={{ fontSize: "18px", paddingRight: padding.medium }}
-          color="primary"
-        />
-        <Typography padding={0} color={color.blue.dark}>
+        <DoneAllIcon sx={{ fontSize: "18px" }} color="primary" />
+        <Typography
+          padding={0}
+          paddingLeft={padding.small}
+          color={color.blue.dark}
+        >
           Completed
         </Typography>
       </RoundCard>
@@ -111,11 +113,13 @@ const TimePeriodCard: FC = () => {
             backgroundColor: color.blue.extraLightSemiTransparent,
           }}
         >
-          <Typography padding={0}>{startDate}</Typography>
+          <Typography padding={0} paddingRight={padding.small}>
+            {startDate}
+          </Typography>
           <KeyboardDoubleArrowRightIcon
             sx={{
               fontSize: "18px",
-              paddingLeft: padding.small,
+
               color: color.gray.light,
             }}
           />
@@ -132,11 +136,12 @@ const TimePeriodCard: FC = () => {
             <KeyboardDoubleArrowRightIcon
               sx={{
                 fontSize: "18px",
-                paddingRight: padding.small,
                 color: color.gray.light,
               }}
             />
-            <Typography padding={0}>{endDate}</Typography>
+            <Typography padding={0} paddingLeft={padding.small}>
+              {endDate}
+            </Typography>
           </RoundCard>
         )}
       </Stack>
