@@ -5,11 +5,13 @@ import Fallback from "./pages/Fallback";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "./utils/AppTheme";
 import AppRouter from "./utils/AppRouter";
+import { CssBaseline } from "@mui/material";
 
 const app = () => {
   return (
     <div>
       <ThemeProvider theme={AppTheme}>
+        <CssBaseline />
         <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
       </ThemeProvider>
     </div>

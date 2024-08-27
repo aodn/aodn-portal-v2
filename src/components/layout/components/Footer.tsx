@@ -37,6 +37,7 @@ const handleBackToTop = () => {
 };
 
 const currentYear = dayjs(new Date()).year();
+const version = import.meta.env.VITE_APP_VERSION;
 
 const Footer: FC = () => {
   return (
@@ -171,7 +172,8 @@ const Footer: FC = () => {
           <Grid container>
             <Grid item xs={6}>
               <Typography color="#000" fontSize={fontSize.subscription}>
-                @IMOS {currentYear}
+                Copyright © {currentYear}. All rights reserved. Version :{" "}
+                {version}
               </Typography>
             </Grid>
             <Grid

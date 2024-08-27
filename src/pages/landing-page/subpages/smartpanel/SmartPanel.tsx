@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef } from "react";
+import { FC, useCallback, useMemo, useRef } from "react";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import Box from "@mui/material/Box";
@@ -7,21 +7,30 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { color, gap } from "../../../../styles/constants";
 import {
-  DEFAULT_CARD_SIZE,
-  DEFAULT_GAP,
+  SMART_PANEL_CARD_SIZE,
+  SMART_PANEL_GAP,
   ITEM_DATA,
   ItemType,
   SCROLL_DISTANCE,
   SMART_PANEL_HEIGHT,
   SMART_PANEL_WIDTH,
 } from "./constants";
-import { getItemCols, getItemRows } from "./utils";
+import {
+  calculateImageListWidth,
+  calculateTotalCols,
+  getItemCols,
+  getItemRows,
+} from "./utils";
 import SmallCard from "./components/SmallCard";
 import MediumCard from "./components/MediumCard";
 import LargeCard from "./components/LargeCard";
 
 const SmartPanel: FC = () => {
   const boxRef = useRef<HTMLDivElement>(null);
+
+  const imageListTotalCols = useMemo(() => calculateTotalCols(ITEM_DATA), []);
+  const imageListWidth = useMemo(() => calculateImageListWidth(ITEM_DATA), []);
+
   const handleScroll = useCallback(
     (scrollOffset: number) => {
       if (boxRef && boxRef.current) {
@@ -60,7 +69,7 @@ const SmartPanel: FC = () => {
       >
         <ImageList
           sx={{
-            width: "fit-content",
+            width: imageListWidth,
             height: SMART_PANEL_HEIGHT,
             m: 0,
             p: 0,
@@ -71,9 +80,9 @@ const SmartPanel: FC = () => {
             "scrollbar-width": "none",
           }}
           variant="quilted"
-          cols={18}
-          rowHeight={DEFAULT_CARD_SIZE}
-          gap={DEFAULT_GAP}
+          cols={imageListTotalCols}
+          rowHeight={SMART_PANEL_CARD_SIZE}
+          gap={SMART_PANEL_GAP}
         >
           {ITEM_DATA.map((item) => (
             <ImageListItem
@@ -82,9 +91,10 @@ const SmartPanel: FC = () => {
               rows={getItemRows(item.type)}
               sx={{
                 width:
-                  item.type === ItemType.small
-                    ? DEFAULT_CARD_SIZE
-                    : getItemCols(item.type) * DEFAULT_CARD_SIZE + DEFAULT_GAP,
+                  item.type === ItemType.Small
+                    ? SMART_PANEL_CARD_SIZE
+                    : getItemCols(item.type) * SMART_PANEL_CARD_SIZE +
+                      SMART_PANEL_GAP,
               }}
             >
               {item.type === "small" && <SmallCard cardData={item} />}
