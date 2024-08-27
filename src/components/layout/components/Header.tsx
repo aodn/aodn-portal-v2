@@ -1,7 +1,6 @@
-import { Box } from "@mui/material";
-
-import MainMenu from "../../menu/MainMenu";
 import { FC } from "react";
+import { Box } from "@mui/material";
+import MainMenu from "./MainMenu";
 import { padding } from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
 

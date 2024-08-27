@@ -1,5 +1,5 @@
 import { FC } from "react";
-import PlainMenu, { type Menu } from "./PlainMenu";
+import PlainMenu, { type Menu } from "../../menu/PlainMenu";
 import { Stack } from "@mui/material";
 
 // TODO: implement items abd handlers once the menu function is designed
