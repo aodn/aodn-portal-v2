@@ -8,6 +8,7 @@ import {
   IconButton,
   InputBase,
   Paper,
+  SxProps,
   Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -24,10 +25,21 @@ import {
   color,
   fontSize,
   gap,
+  margin,
   padding,
 } from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
+
+interface IconContainerProps {
+  children: JSX.Element;
+  sx?: SxProps;
+}
+const IconContainer: FC<IconContainerProps> = ({ children, sx }) => (
+  <Icon sx={{ color: "#000", display: "flex", alignItems: "center", ...sx }}>
+    {children}
+  </Icon>
+);
 
 const handleBackToTop = () => {
   window.scrollTo({
@@ -47,18 +59,18 @@ const Footer: FC = () => {
           <AODNSiteLogo />
           <Box>
             <Button>
-              <Icon sx={{ color: "#000", paddingBottom: padding.small }}>
+              <IconContainer>
                 <MenuIcon fontSize="small" />
-              </Icon>
-              <Typography color="#000" paddingTop={gap.md}>
+              </IconContainer>
+              <Typography color="#000" paddingTop={0}>
                 Site Menu
               </Typography>
             </Button>
             <Button onClick={handleBackToTop}>
-              <Icon sx={{ color: "#000", paddingBottom: padding.small }}>
+              <IconContainer>
                 <NorthIcon fontSize="small" />
-              </Icon>
-              <Typography color="#000" paddingTop={gap.md}>
+              </IconContainer>
+              <Typography color="#000" paddingTop={0}>
                 Back to Top
               </Typography>
             </Button>
@@ -107,9 +119,11 @@ const Footer: FC = () => {
                     overflow: "hidden",
                   }}
                 >
-                  <Icon sx={{ p: padding.extraSmall, pb: "8px" }}>
+                  <IconContainer
+                    sx={{ marginX: margin.lg, color: color.blue.extraDark }}
+                  >
                     <MailOutlineIcon />
-                  </Icon>
+                  </IconContainer>
                   <InputBase
                     sx={{ flex: 1, p: 0 }}
                     placeholder="email@example.com"
