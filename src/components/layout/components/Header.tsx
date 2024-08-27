@@ -1,32 +1,24 @@
 import { FC } from "react";
-import { Box } from "@mui/material";
 import MainMenu from "./MainMenu";
 import { padding } from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
+import SectionContainer from "./SectionContainer";
 
 const Header: FC = () => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
+    <SectionContainer
+      sectionAreaStyle={{
         backgroundColor: "#fff",
         paddingY: padding.medium,
       }}
+      contentAreaStyle={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+      }}
     >
-      <Box
-        sx={{
-          width: "70%",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <AODNSiteLogo />
-        <MainMenu />
-      </Box>
-    </Box>
+      <AODNSiteLogo />
+      <MainMenu />
+    </SectionContainer>
   );
 };
 
