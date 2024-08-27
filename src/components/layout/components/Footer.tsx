@@ -172,7 +172,7 @@ const Footer: FC = () => {
           <Grid container>
             <Grid item xs={6}>
               <Typography color="#000" fontSize={fontSize.subscription}>
-                Copyright © {currentYear}. All rights reserved. Version :{" "}
+                Copyright © {currentYear}. All rights reserved. Version :&nbsp;
                 {version}
               </Typography>
             </Grid>
