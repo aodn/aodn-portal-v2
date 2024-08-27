@@ -23,19 +23,14 @@ import iconVessel from "@/assets/smartPanelIcons/icon_vessel.png";
 import iconGeoscientific from "@/assets/smartPanelIcons/icon_geoscientific.png";
 import imgVisualTools from "@/assets/smartPanelIcons/img_visual_tools.png";
 import iconLocation from "@/assets/smartPanelIcons/icon_location.png";
+import { calculateImageListWidth } from "./utils";
 
-export const SMART_PANEL_WIDTH = 840;
+export const SMART_PANEL_GAP = 12;
+
 export const SMART_PANEL_HEIGHT = 180;
 
+// if this constant changed, we may need modify utils accordingly
 const SMART_PANEL_ROWS = 2;
-
-const CARD_BORDER = 1;
-export const DEFAULT_GAP = 12;
-export const DEFAULT_CARD_SIZE =
-  (SMART_PANEL_HEIGHT - DEFAULT_GAP * (SMART_PANEL_ROWS - 1)) /
-    SMART_PANEL_ROWS -
-  CARD_BORDER * 2;
-export const SCROLL_DISTANCE = SMART_PANEL_WIDTH / 2 + DEFAULT_GAP;
 
 export interface CardData {
   title: string;
@@ -49,137 +44,149 @@ export interface ItemData extends CardData {
 }
 
 export enum ItemType {
-  small = "small",
-  medium = "medium",
-  large = "large",
+  Small = "small",
+  Medium = "medium",
+  Large = "large",
 }
 
 export const ITEM_DATA: ItemData[] = [
   {
-    type: ItemType.medium,
+    type: ItemType.Medium,
     title: "Get Started",
     image: imgGetStarted,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "All Topics",
     icon: iconAllTopics,
   },
   {
-    type: ItemType.large,
+    type: ItemType.Large,
     title: "Surface Waves",
     image: imgSurfaceWaves,
     additionalInfo: ["Surface Temperature", "Current Velocity", "Salinity"],
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Reef",
     icon: iconReef,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Satellite",
     icon: iconLocation,
   },
   {
-    type: ItemType.medium,
+    type: ItemType.Medium,
     title: "Popular Search",
     image: imgPopularSearch,
   },
   {
-    type: ItemType.large,
+    type: ItemType.Large,
     title: "Ocean Current",
     image: imgOceanCurrent,
     additionalInfo: ["Four-hour SST", "Ocean Colour", "Adjusted Sea Level"],
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Environment",
     icon: iconEnvironment,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Climate",
     icon: iconClimate,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Moorings",
     icon: iconMoorings,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Gliders",
     icon: iconGlider,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "AUV",
     icon: iconAUV,
   },
   {
-    type: ItemType.medium,
+    type: ItemType.Medium,
     title: "Contributing Data",
     image: imgContributingData,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Tutorials",
     icon: iconTutorials,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Location",
     icon: iconLocation,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Ocean Biota",
     icon: iconOceanBiota,
   },
   {
-    type: ItemType.medium,
+    type: ItemType.Medium,
     title: "Explore on Map",
     image: imgExploreOnMap,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Fishery",
     icon: iconFishery,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Tourism",
     icon: iconTourism,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Animal Tracking",
     icon: iconAnimalTracking,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Tide",
     icon: iconTide,
   },
   {
-    type: ItemType.medium,
+    type: ItemType.Medium,
     title: "Visualisation Tools",
     image: imgVisualTools,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Argo",
     icon: iconArgo,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Vessel",
     icon: iconVessel,
   },
   {
-    type: ItemType.small,
+    type: ItemType.Small,
     title: "Geoscientific",
     icon: iconGeoscientific,
   },
 ];
+
+export const SMART_PANEL_CARD_SIZE =
+  (SMART_PANEL_HEIGHT - SMART_PANEL_GAP * (SMART_PANEL_ROWS - 1)) /
+  SMART_PANEL_ROWS;
+
+// the smart panel width will be the half width of the full image list width for now
+// if the full width is too large, should divide into a smaller size
+// to keep the smart panel width in a proper size
+export const SMART_PANEL_WIDTH =
+  calculateImageListWidth(ITEM_DATA) / 2 + SMART_PANEL_GAP / 2;
+
+export const SCROLL_DISTANCE = SMART_PANEL_WIDTH / 2 + SMART_PANEL_GAP;

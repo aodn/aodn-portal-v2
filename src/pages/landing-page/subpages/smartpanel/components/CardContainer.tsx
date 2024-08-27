@@ -20,6 +20,7 @@ const CardContainer: FC<CardContainerProps> = ({
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
+      overflow: "hidden",
       bgcolor: color.white.twoTenTransparent,
       border: `${border.xs} ${color.brightBlue.semiTransparentDark}`,
       color: "#fff",
