@@ -51,6 +51,7 @@ import {
 import { SortResultEnum } from "../../components/common/buttons/SortButton";
 
 const SEARCH_BAR_HEIGHT = 56;
+const RESULT_SECTION_WIDTH = 550;
 
 const SearchPage = () => {
   const location = useLocation();
@@ -279,14 +280,11 @@ const SearchPage = () => {
               gap={2}
             >
               {visibility === SearchResultLayoutEnum.VISIBLE && (
-                <Box
-                  sx={{
-                    flex: 1,
-                  }}
-                >
+                <Box>
                   <ResultSection
                     sx={{
                       height: "80vh",
+                      width: RESULT_SECTION_WIDTH,
                     }}
                     onVisibilityChanged={onVisibilityChanged}
                     onClickCard={handleNavigateToDetailPage}
@@ -295,11 +293,7 @@ const SearchPage = () => {
                   />
                 </Box>
               )}
-              <Box
-                sx={{
-                  flex: visibility === SearchResultLayoutEnum.VISIBLE ? 2 : 1,
-                }}
-              >
+              <Box flex={1}>
                 <MapSection
                   sx={{
                     height: "80vh",

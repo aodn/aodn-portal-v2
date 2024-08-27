@@ -5,10 +5,7 @@ import { Box, Grid, ListItem, Stack, SxProps, Theme } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 
@@ -66,7 +63,7 @@ const ResultCards = ({
         sx={{ width: "100%", height: "305px", overflowY: "auto" }}
       >
         {datasetsSelected?.map((dataset, index) => (
-          <Box key={index} width="100%" height="300px">
+          <Box key={index} width="49%" height="300px">
             <GridResultCard
               content={dataset}
               onDownload={onDownload}
