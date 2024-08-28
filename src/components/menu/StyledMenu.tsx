@@ -1,9 +1,9 @@
+// Unused component
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import Menu, { MenuProps } from "@mui/material/Menu";
 import { Button, MenuItem } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import "./MainMenu.module.css";
 
 import { fontSize } from "../../styles/constants";
 
@@ -16,14 +16,6 @@ type StyledMenuItem = {
     },
   ];
 };
-
-// const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
-//     color: theme.palette.getContrastText(grey['menu']),
-//     backgroundColor: grey['menu'],
-//     '&:hover': {
-//         backgroundColor: grey['menu'],
-//     },
-// }));
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu

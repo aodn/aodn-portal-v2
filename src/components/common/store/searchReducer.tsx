@@ -127,7 +127,7 @@ const searchParameterCategories = async (
   thunkApi: any
 ) =>
   axios
-    .get<Array<Category>>("/api/v1/ogc/ext/parameter/categories")
+    .get<Array<Category>>("/api/v1/ogc/ext/parameter/vocabs")
     .then((response) => response.data)
     .catch((error: Error | AxiosError | ErrorResponse) => {
       if (axios.isAxiosError(error) && error.response) {

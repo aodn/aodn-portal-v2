@@ -14,8 +14,8 @@ import {
 const PREFIX = "/api/v1/ogc";
 
 export const handlers = [
-  http.get(PREFIX + "/ext/parameter/categories", () => {
-    console.log("Called /ext/parameter/categories");
+  http.get(PREFIX + "/ext/parameter/vocabs", () => {
+    console.log("Called /ext/parameter/vocabs");
     return HttpResponse.json(PARAMETER_CATEGORIES);
   }),
 
