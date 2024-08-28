@@ -47,7 +47,7 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
-        "/api/v1/ogc/ext/parameter/categories": {
+        "/api/v1/ogc/ext/parameter/vocabs": {
           target: apiPath,
           changeOrigin: true,
         },

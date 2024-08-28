@@ -1,4 +1,4 @@
-import LandingPage from "../pages/LandingPage";
+import LandingPage from "../pages/landing-page/LandingPage";
 import SearchPage from "../pages/search-page/SearchPage";
 import DetailsPage from "../pages/detail-page/DetailsPage";
 import { pageDefault } from "../components/common/constants";

@@ -152,12 +152,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           .unwrap()
           .then((data) => {
             const categorySuggestions = new Set<string>(
-              data.category_suggestions
+              data.parameter_vocab_suggestions
             );
             const phrasesSuggestions = new Set<string>(
               data.record_suggestions.suggest_phrases
             );
-
             // Get the intersection of categorySuggestions and phrasesSuggestions
             const commonSuggestions = [...categorySuggestions].filter(
               (item) => {
