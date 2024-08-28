@@ -142,7 +142,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
           type: "geojson",
           data: dataSource,
           cluster: true,
-          clusterMaxZoom: 14,
+          clusterMaxZoom: 9,
           clusterRadius: config.heatmapSourceRadius,
         });
       }

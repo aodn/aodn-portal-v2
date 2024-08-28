@@ -127,7 +127,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         type: "geojson",
         data: createCenterOfMassDataSource(undefined),
         cluster: true,
-        clusterMaxZoom: 14,
+        clusterMaxZoom: 9,
         clusterRadius: 50,
       });
 
