@@ -6,6 +6,7 @@ import SideSection from "./subpages/SideSection";
 import { DetailPageProvider } from "./context/detail-page-provider";
 import ContentSection from "./subpages/ContentSection";
 import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
+import SectionContainer from "../../components/layout/components/SectionContainer";
 
 export interface DetailsProps {
   collection?: OGCCollection;
@@ -15,29 +16,24 @@ const DetailsPage = () => {
   return (
     <Layout>
       <DetailPageProvider>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+        <SectionContainer
+          sectionAreaStyle={{
             paddingY: padding.double,
             backgroundColor: color.blue.light,
           }}
         >
-          <Box sx={{ minWidth: "1020px", width: "70%", maxWidth: "1228px" }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <HeaderSection />
-              </Grid>
-              <Grid item xs={9}>
-                <ContentSection />
-              </Grid>
-              <Grid item xs={3}>
-                <SideSection />
-              </Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <HeaderSection />
             </Grid>
-          </Box>
-        </Box>
+            <Grid item xs={9}>
+              <ContentSection />
+            </Grid>
+            <Grid item xs={3}>
+              <SideSection />
+            </Grid>
+          </Grid>
+        </SectionContainer>
       </DetailPageProvider>
     </Layout>
   );

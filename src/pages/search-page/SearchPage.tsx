@@ -9,7 +9,7 @@ import {
 } from "../../components/common/store/searchReducer";
 import Layout from "../../components/layout/layout";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   formatToUrlParam,
   ParameterState,
@@ -40,7 +40,7 @@ import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
 import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
 import MapSection from "./subpages/MapSection";
-import { color, margin } from "../../styles/constants";
+import { color } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 import { bboxPolygon } from "@turf/turf";
@@ -49,6 +49,9 @@ import {
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { SortResultEnum } from "../../components/common/buttons/SortButton";
+
+const SEARCH_BAR_HEIGHT = 56;
+const RESULT_SECTION_WIDTH = 550;
 
 const SearchPage = () => {
   const location = useLocation();
@@ -250,80 +253,63 @@ const SearchPage = () => {
 
   return (
     <Layout>
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          // backgroundImage: "url(/bg_search_results.png)",
-          // backgroundSize: "cover",
-          bgcolor: color.blue.light,
-          marginTop: margin.sm,
-        }}
+      <Box
+        display="flex"
+        flexDirection="row"
+        justifyContent="center"
+        bgcolor={color.blue.light}
+        gap={2}
+        padding={2}
       >
-        <Grid item xs={12}>
-          <Grid container>
-            <Grid item xs={1} />
-            <Grid item xs={10}>
-              <ComplexTextSearch />
-            </Grid>
-            <Grid item xs={1} />
-          </Grid>
-        </Grid>
-        <Grid item xs={1}>
+        <Box paddingTop={`${SEARCH_BAR_HEIGHT}px`}>
           <ResultPanelIconFilter />
-        </Grid>
-        <Grid item xs={11}>
-          {
-            // Must group the ResultSection and MapSection together so that show hide works
-          }
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "stretch",
-              width: "100%",
-            }}
-          >
-            {visibility === SearchResultLayoutEnum.VISIBLE && (
-              <Box
-                sx={{
-                  flex: 1,
-                }}
-              >
-                <ResultSection
+        </Box>
+        <Grid container flex={1} gap={2}>
+          <Grid item xs={12} height={`${SEARCH_BAR_HEIGHT}px`}>
+            <ComplexTextSearch />
+          </Grid>
+          <Grid item xs={12}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "stretch",
+                width: "100%",
+              }}
+              gap={2}
+            >
+              {visibility === SearchResultLayoutEnum.VISIBLE && (
+                <Box>
+                  <ResultSection
+                    sx={{
+                      height: "80vh",
+                      width: RESULT_SECTION_WIDTH,
+                    }}
+                    onVisibilityChanged={onVisibilityChanged}
+                    onClickCard={handleNavigateToDetailPage}
+                    onChangeSorting={onChangeSorting}
+                    datasetSelected={datasetsSelected}
+                  />
+                </Box>
+              )}
+              <Box flex={1}>
+                <MapSection
                   sx={{
                     height: "80vh",
                   }}
-                  onVisibilityChanged={onVisibilityChanged}
-                  onClickCard={handleNavigateToDetailPage}
-                  onChangeSorting={onChangeSorting}
-                  datasetSelected={datasetsSelected}
+                  collections={layers}
+                  bbox={bbox}
+                  showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
+                  onMapZoomOrMove={onMapZoomOrMove}
+                  onToggleClicked={onToggleDisplay}
+                  onDatasetSelected={onDatasetSelected}
                 />
               </Box>
-            )}
-            <Box
-              sx={{
-                flex: visibility === SearchResultLayoutEnum.VISIBLE ? 2 : 1,
-                paddingLeft: 2,
-                paddingRight: 2,
-              }}
-            >
-              <MapSection
-                sx={{
-                  height: "80vh",
-                }}
-                collections={layers}
-                bbox={bbox}
-                showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
-                onMapZoomOrMove={onMapZoomOrMove}
-                onToggleClicked={onToggleDisplay}
-                onDatasetSelected={onDatasetSelected}
-              />
             </Box>
-          </Box>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
     </Layout>
   );
 };
