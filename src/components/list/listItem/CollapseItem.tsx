@@ -25,11 +25,15 @@ const CollapseItem: React.FC<CollapseFrameProps> = ({
   const [isExpanded, setIsExpanded] = useState(isOpen);
 
   const titleComponent = () => {
-    return <Typography variant="detailTitle">{title}</Typography>;
+    return (
+      <Typography variant="detailTitle">
+        {title ? title : "[ NO TITLE ]"}
+      </Typography>
+    );
   };
 
   return (
-    <StyledItemGrid container>
+    <StyledItemGrid container data-testid="collapseItem">
       <Grid
         item
         md={11}
@@ -73,7 +77,7 @@ const CollapseItem: React.FC<CollapseFrameProps> = ({
         <Collapse in={isExpanded}>
           <Grid container>
             <Grid item md={12}>
-              {children}
+              {children ? children : "[ NO CONTENT ]"}
             </Grid>
           </Grid>
         </Collapse>
