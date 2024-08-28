@@ -20,6 +20,10 @@ const MetadataInformationPanel = () => {
         ?.filter((contact) => contact.roles.includes("metadata")),
     [context.collection]
   );
+
+  // TODO: for the creation and revision, geonetwork still have a confusion about the time zone.
+  //  currently just make all time zone to be UTC (hard coded).
+  //  Should be resolved in the future when the geonetwork is clarified.
   const creation = useMemo(() => {
     const creation = context.collection?.getCreation();
     if (creation) {

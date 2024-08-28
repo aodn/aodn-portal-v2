@@ -14,7 +14,8 @@
     "postinstall": "husky",
     "test": "vitest",
     "test:debug": "vitest --run --reporter=verbose --watch=false",
-    "playwright": "docker compose -f playwright/docker-compose.yml up --abort-on-container-exit --exit-code-from tests"
+    "playwright": "docker compose -f playwright/docker-compose.yml up --abort-on-container-exit --exit-code-from tests",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@emotion/styled": "^11.11.0",
@@ -38,6 +39,7 @@
     "@types/react-window": "^1.8.8",
     "@types/redux-logger": "^3.0.13",
     "@types/wellknown": "^0.5.8",
+    "@vitest/coverage-v8": "^2.0.5",
     "axios": "^1.7.4",
     "dayjs": "^1.11.10",
     "events": "3.3.0",
@@ -90,7 +92,7 @@
     "typescript-eslint": "^7.2.0",
     "vite": "^5.0.8",
     "vite-plugin-eslint": "^1.8.1",
-    "vitest": "^1.3.1"
+    "vitest": "^2.0.5"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
