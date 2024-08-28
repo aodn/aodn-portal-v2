@@ -171,8 +171,8 @@ const HeaderSection = () => {
             <OrganizationLogo
               logo={collection.findIcon()}
               sx={{
-                width: "80px",
-                height: "100%",
+                width: "100%",
+                height: "60px",
                 paddingX: padding.extraSmall,
               }}
               defaultImageSrc={imosLogoWithTitle}
