@@ -28,6 +28,7 @@ interface HeatmapCircle {
 }
 
 interface HeatmapConfig {
+  clusterMaxZoom: number;
   heatmapSourceRadius: number;
   layer: HeatmapLayer;
   circle: HeatmapCircle;
@@ -39,6 +40,7 @@ interface HeatmapLayerProps extends LayersProps {
 }
 
 const defaultHeatmapConfig: HeatmapConfig = {
+  clusterMaxZoom: 8,
   heatmapSourceRadius: 10,
   circle: {
     strokeColor: "white",
@@ -129,6 +131,8 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         heatmapLayerConfig
       );
 
+      map?.setMaxZoom(config.clusterMaxZoom);
+
       if (!map?.getSource(heatmapSourceId)) {
         map?.addSource(heatmapSourceId, {
           type: "geojson",
@@ -142,7 +146,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
           type: "geojson",
           data: dataSource,
           cluster: true,
-          clusterMaxZoom: 14,
+          clusterMaxZoom: config.clusterMaxZoom,
           clusterRadius: config.heatmapSourceRadius,
         });
       }

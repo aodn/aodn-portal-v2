@@ -1,0 +1,3 @@
+export const PAGE_CONTENT_MIN_WIDTH = 1020;
+export const PAGE_CONTENT_MAX_WIDTH = 1270;
+export const PAGE_CONTENT_WIDTH = 0.8;

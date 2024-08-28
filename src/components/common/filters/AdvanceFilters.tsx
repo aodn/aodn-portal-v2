@@ -49,13 +49,12 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
 }) => {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
-  const componentParam = useMemo(() => getComponentState(store.getState()), []);
+  const componentParam = getComponentState(store.getState());
 
   // State used to store the provisional filter options selected,
   // only dispatch to redux when 'apply' button is hit
   const [filter, setFilter] = useState<ParameterState>(componentParam);
 
-  // initialize filter
   useEffect(() => {
     if (componentParam) {
       setFilter(componentParam);

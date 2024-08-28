@@ -1,9 +1,10 @@
 import { Box, Stack, SxProps } from "@mui/material";
 import { ReactNode } from "react";
 import {
-  LANDING_PAGE_MAX_WIDTH,
-  LANDING_PAGE_MIN_WIDTH,
-} from "../../../pages/landing-page/constants";
+  PAGE_CONTENT_MAX_WIDTH,
+  PAGE_CONTENT_MIN_WIDTH,
+  PAGE_CONTENT_WIDTH,
+} from "../constant";
 
 interface SectionContainerProps {
   children: ReactNode;
@@ -29,9 +30,9 @@ const SectionContainer = ({
       justifyContent="center"
       alignItems="center"
       sx={{
-        minWidth: LANDING_PAGE_MIN_WIDTH,
-        width: "80%",
-        maxWidth: LANDING_PAGE_MAX_WIDTH,
+        minWidth: PAGE_CONTENT_MIN_WIDTH,
+        width: PAGE_CONTENT_WIDTH,
+        maxWidth: PAGE_CONTENT_MAX_WIDTH,
         ...contentAreaStyle,
       }}
     >

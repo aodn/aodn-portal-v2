@@ -96,10 +96,15 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   return (
     contents && (
       <Box
-        sx={{ ...sx, display: "flex", flexDirection: "column" }}
+        sx={{
+          ...sx,
+          display: "flex",
+          flexDirection: "column",
+        }}
+        gap={1}
         data-testid="search-page-result-list"
       >
-        <Box sx={{ height: "50px" }}>
+        <Box>
           <ResultPanelSimpleFilter
             count={contents.result.collections.length}
             total={contents.result.total}
