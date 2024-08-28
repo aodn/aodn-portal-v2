@@ -105,7 +105,7 @@ const ListResultCard = (props: ResultCardProps) => {
                 </Typography>
               </Box>
               <OrganizationLogo
-                dataset={props.content}
+                logo={props.content.findIcon()}
                 sx={{
                   width: "80px",
                   height: "100%",

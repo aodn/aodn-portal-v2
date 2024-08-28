@@ -169,7 +169,7 @@ const HeaderSection = () => {
         >
           {collection && (
             <OrganizationLogo
-              dataset={collection}
+              logo={collection.findIcon()}
               sx={{
                 width: "80px",
                 height: "100%",

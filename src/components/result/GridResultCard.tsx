@@ -107,7 +107,7 @@ const GridResultCard: React.FC<GridResultCardProps> = (props) => {
                     </Typography>
                   </Box>
                   <OrganizationLogo
-                    dataset={props.content}
+                    logo={props.content.findIcon()}
                     sx={{
                       width: "50px",
                       height: "100%",
