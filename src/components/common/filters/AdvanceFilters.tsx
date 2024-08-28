@@ -5,6 +5,7 @@ import {
   updateCategories,
   updateDateTimeFilterRange,
   updateImosOnly,
+  updateUpdateFreq,
 } from "../store/componentParamReducer";
 import store, { AppDispatch, getComponentState } from "../store/store";
 import {
@@ -70,31 +71,34 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
   }, []);
 
   // TODO: implement DataDeliveryModeFilter and DepthFilter when backend supports this query
-  const handleApplyFilter = useCallback(() => {
-    if (filter.dateTimeFilterRange) {
-      dispatch(updateDateTimeFilterRange(filter.dateTimeFilterRange));
-    } else {
-      dispatch(updateDateTimeFilterRange({}));
-    }
-    if (filter.categories) {
-      dispatch(updateCategories(filter.categories));
-    } else {
-      dispatch(updateCategories([]));
-    }
-    if (filter.isImosOnlyDataset) {
-      dispatch(updateImosOnly(filter.isImosOnlyDataset));
-    } else {
-      dispatch(updateImosOnly(false));
-    }
-    setShowFilters(false);
-    setFilter({});
-  }, [
-    dispatch,
-    filter.categories,
-    filter.dateTimeFilterRange,
-    filter.isImosOnlyDataset,
-    setShowFilters,
-  ]);
+  const handleApplyFilter = useCallback(
+    (filter: ParameterState) => {
+      // Must use await so that it happen one by one, otherwise the update will be messed
+      if (filter.dateTimeFilterRange) {
+        dispatch(updateDateTimeFilterRange(filter.dateTimeFilterRange));
+      } else {
+        dispatch(updateDateTimeFilterRange({}));
+      }
+      if (filter.categories) {
+        dispatch(updateCategories(filter.categories));
+      } else {
+        dispatch(updateCategories([]));
+      }
+      if (filter.isImosOnlyDataset) {
+        dispatch(updateImosOnly(filter.isImosOnlyDataset));
+      } else {
+        dispatch(updateImosOnly(false));
+      }
+      if (filter.updateFreq) {
+        dispatch(updateUpdateFreq(filter.updateFreq));
+      } else {
+        dispatch(updateUpdateFreq(undefined));
+      }
+      setShowFilters(false);
+      setFilter({});
+    },
+    [dispatch, setShowFilters]
+  );
 
   return (
     <>
@@ -205,7 +209,7 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
                         backgroundColor: color.blue.darkSemiTransparent,
                       },
                     }}
-                    onClick={handleApplyFilter}
+                    onClick={() => handleApplyFilter(filter)}
                   >
                     Apply
                   </Button>

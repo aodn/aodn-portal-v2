@@ -44,7 +44,7 @@ module.exports = {
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["off"],
     "@typescript-eslint/no-explicit-any": "off",
-    quotes: ["error"],
+    quotes: ["error", "double", { "avoidEscape": true }],
     "no-undef": "off",
     "import/extensions": ["error", "never", { "js": "never", "jsx": "never", "ts": "never", "tsx": "never", "json": "always" }],
   },

@@ -18,5 +18,9 @@ export const convertDateFormat = (dateString: string): string => {
   const date = new Date(dateString);
   const convertedString = date.toString();
   const index = convertedString.indexOf("(");
-  return convertedString.substring(0, index).trim();
+  const dateTimeString = convertedString.substring(0, index).trim();
+
+  // TODO: hard code using GMT+0000 for now. Change the implementation after
+  //  the issue in geonetwork is resolved.
+  return dateTimeString.replace(/GMT\+\d{4}/g, "GMT+0000");
 };
