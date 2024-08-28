@@ -52,7 +52,6 @@ const ImosOnlySwitch: FC<imosOnlySwitchProps> = ({ filter, setFilter }) => {
         justifyContent="center"
       >
         <Switch
-          defaultChecked={isImosOnlyDataset ?? false}
           checked={isImosOnlyDataset ?? false}
           onClick={onImosOnlySwitch}
         />
