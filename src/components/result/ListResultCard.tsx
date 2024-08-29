@@ -91,6 +91,7 @@ const ListResultCard = (props: ResultCardProps) => {
                 WebkitLineClamp: "2",
                 WebkitBoxOrient: "vertical",
               }}
+              data-testid="result-card-item-title"
             >
               {props.content.title}
             </Typography>

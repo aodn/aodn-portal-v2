@@ -1,5 +1,6 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
+import { TestHelper } from "../../../common/test/helper";
 
 const sourceId = "mapbox-world-country-boundaries";
 const layerId = "mapbox-world-country-boundaries-layer";
@@ -91,7 +92,7 @@ const MapboxWorldLayer: FC = () => {
     };
   }, [map, createLayer]);
 
-  return <React.Fragment />;
+  return <TestHelper getWorldBoundariesLayer={() => layerId} />;
 };
 
 export { MapboxWorldLayersDef };

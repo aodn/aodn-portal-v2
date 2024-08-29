@@ -7,6 +7,7 @@ import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
 import MapPopup from "./MapPopup";
 import SpatialExtents from "./SpatialExtents";
 import { LayersProps } from "../layers/Layers";
+import { TestHelper } from "../../../common/test/helper";
 
 interface SpiderDiagramConfig {
   spiderifyFromZoomLevel: number;
@@ -432,6 +433,11 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
             getSpiderPinsLayerId(currentSpiderifiedCluster),
           ]}
           onDatasetSelected={onDatasetSelected}
+        />
+      )}
+      {currentSpiderifiedCluster && (
+        <TestHelper
+          getSpiderLayer={() => getSpiderPinsLayerId(currentSpiderifiedCluster)}
         />
       )}
     </>
