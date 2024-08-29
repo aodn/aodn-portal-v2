@@ -31,10 +31,6 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
             onClick={() => openRecord(record.uuid)}
             sx={{
               textAlign: "left",
-              "&:hover": {
-                textDecoration: "underline",
-                textDecorationColor: "grey",
-              },
             }}
           >
             <TextArea key={index}>{record.abstract}</TextArea>
