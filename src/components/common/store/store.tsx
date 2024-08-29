@@ -28,7 +28,7 @@ export type AppStore = typeof store;
 
 const searchQueryResult = (state: RootState) =>
   state.searcher.collectionsQueryResult;
-const categoriesResult = (state: RootState) => state.searcher.categoriesResult;
+
 const getComponentState = (state: RootState) => state.paramReducer;
 
 export { searchQueryResult, getComponentState };

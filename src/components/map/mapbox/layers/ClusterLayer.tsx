@@ -48,7 +48,7 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
     large: 30,
     extra_large: 50,
   },
-  clusterMaxZoom: 14,
+  clusterMaxZoom: 8,
   clusterRadius: 50,
   // circle sizes define the radius(px) of the circles used to represent clusters on the map.
   clusterCircleSize: {
@@ -123,11 +123,13 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         clusterLayerConfig
       );
 
+      map?.setMaxZoom(config.clusterMaxZoom);
+
       map?.addSource(clusterSourceId, {
         type: "geojson",
         data: createCenterOfMassDataSource(undefined),
         cluster: true,
-        clusterMaxZoom: 14,
+        clusterMaxZoom: config.clusterMaxZoom,
         clusterRadius: 50,
       });
 

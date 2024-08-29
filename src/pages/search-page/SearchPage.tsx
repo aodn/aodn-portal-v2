@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import {
-  CollectionsQueryType,
   createSearchParamFrom,
+  DEFAULT_SEARCH_PAGE,
   fetchResultNoStore,
   fetchResultWithStore,
   SearchParameters,
 } from "../../components/common/store/searchReducer";
 import Layout from "../../components/layout/layout";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   formatToUrlParam,
   ParameterState,
@@ -21,8 +21,6 @@ import {
 import store, {
   AppDispatch,
   getComponentState,
-  RootState,
-  searchQueryResult,
 } from "../../components/common/store/store";
 import { pageDefault } from "../../components/common/constants";
 
@@ -42,7 +40,7 @@ import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
 import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
 import MapSection from "./subpages/MapSection";
-import { color, margin } from "../../styles/constants";
+import { color } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 import { bboxPolygon } from "@turf/turf";
@@ -52,10 +50,15 @@ import {
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { SortResultEnum } from "../../components/common/buttons/SortButton";
 
+const SEARCH_BAR_HEIGHT = 56;
+const RESULT_SECTION_WIDTH = 550;
+
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  // Layers contains record with uuid and bbox only
+  const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
     SearchResultLayoutEnum.VISIBLE
   );
@@ -119,22 +122,30 @@ const SearchPage = () => {
     [getCollectionsData]
   );
 
-  // Layers contains record with uuid and bbox only
-  const [layers, setLayers] = useState<Array<OGCCollection>>([]);
-
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
-      const param = createSearchParamFrom(componentParam);
 
-      // Use standard param to get fields you need, record is stored in redux
-      dispatch(fetchResultWithStore(param)).then(() => {
-        // Use a different parameter so that it return id and bbox only and do not store the values
+      // Use standard param to get fields you need, record is stored in redux,
+      // set page so that it return fewer records
+      const paramPaged = createSearchParamFrom(componentParam, {
+        pagesize: DEFAULT_SEARCH_PAGE,
+      });
+
+      dispatch(fetchResultWithStore(paramPaged)).then(() => {
+        // Use a different parameter so that it return id and bbox only and do not store the values,
+        // we cannot add page because we want to show all record on map
+        const paramNonPaged = createSearchParamFrom(componentParam);
         dispatch(
-          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted and ordered by uuid to avoid affecting cluster calculation
-          fetchResultNoStore({ ...param, properties: "id,bbox", sortby: "id" })
+          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+          // and ordered by uuid to avoid affecting cluster calculation
+          fetchResultNoStore({
+            ...paramNonPaged,
+            properties: "id,bbox",
+            sortby: "id",
+          })
         )
           .unwrap()
           .then((collections) => {
@@ -200,11 +211,6 @@ const SearchPage = () => {
     }
   }, [location, dispatch, doSearch]);
 
-  // Get contents when no more navigate needed.
-  const contents = useSelector<RootState, CollectionsQueryType>(
-    searchQueryResult
-  );
-
   const handleNavigateToDetailPage = useCallback(
     (uuid: string) => {
       const searchParams = new URLSearchParams();
@@ -247,47 +253,63 @@ const SearchPage = () => {
 
   return (
     <Layout>
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          // backgroundImage: "url(/bg_search_results.png)",
-          // backgroundSize: "cover",
-          bgcolor: color.blue.light,
-          marginTop: margin.sm,
-        }}
+      <Box
+        display="flex"
+        flexDirection="row"
+        justifyContent="center"
+        bgcolor={color.blue.light}
+        gap={2}
+        padding={2}
       >
-        <Grid item xs={12}>
-          <Grid container>
-            <Grid item xs={1} />
-            <Grid item xs={10}>
-              <ComplexTextSearch />
-            </Grid>
-            <Grid item xs={1} />
+        <Box paddingTop={`${SEARCH_BAR_HEIGHT}px`}>
+          <ResultPanelIconFilter />
+        </Box>
+        <Grid container flex={1} gap={2}>
+          <Grid item xs={12} height={`${SEARCH_BAR_HEIGHT}px`}>
+            <ComplexTextSearch />
+          </Grid>
+          <Grid item xs={12}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "stretch",
+                width: "100%",
+              }}
+              gap={2}
+            >
+              {visibility === SearchResultLayoutEnum.VISIBLE && (
+                <Box>
+                  <ResultSection
+                    sx={{
+                      height: "80vh",
+                      width: RESULT_SECTION_WIDTH,
+                    }}
+                    onVisibilityChanged={onVisibilityChanged}
+                    onClickCard={handleNavigateToDetailPage}
+                    onChangeSorting={onChangeSorting}
+                    datasetSelected={datasetsSelected}
+                  />
+                </Box>
+              )}
+              <Box flex={1}>
+                <MapSection
+                  sx={{
+                    height: "80vh",
+                  }}
+                  collections={layers}
+                  bbox={bbox}
+                  showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
+                  onMapZoomOrMove={onMapZoomOrMove}
+                  onToggleClicked={onToggleDisplay}
+                  onDatasetSelected={onDatasetSelected}
+                />
+              </Box>
+            </Box>
           </Grid>
         </Grid>
-        <Grid item xs={1}>
-          <ResultPanelIconFilter />
-        </Grid>
-        <ResultSection
-          visibility={visibility}
-          contents={contents}
-          onRemoveLayer={undefined}
-          onVisibilityChanged={onVisibilityChanged}
-          onClickCard={handleNavigateToDetailPage}
-          onChangeSorting={onChangeSorting}
-          datasetSelected={datasetsSelected}
-        />
-        <MapSection
-          collections={layers}
-          bbox={bbox}
-          showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
-          onMapZoomOrMove={onMapZoomOrMove}
-          onToggleClicked={onToggleDisplay}
-          onDatasetSelected={onDatasetSelected}
-        />
-        <Grid></Grid>
-      </Grid>
+      </Box>
     </Layout>
   );
 };

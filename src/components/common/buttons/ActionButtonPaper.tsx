@@ -1,24 +1,21 @@
 import { Paper } from "@mui/material";
-import { margin } from "../../../styles/constants";
+import { borderRadius, margin } from "../../../styles/constants";
 import React from "react";
 
-interface StyledActionButtonPaperProps {
-  children: React.ReactNode;
-}
+interface StyledActionButtonPaperProps {}
 
-const ActionButtonPaper: React.FC<StyledActionButtonPaperProps> = ({
+const ActionButtonPaper = ({
   children,
-}) => {
+}: React.PropsWithChildren<StyledActionButtonPaperProps>) => {
   return (
     <Paper
-      component="form"
-      variant="outlined"
+      elevation={0}
       sx={{
-        p: "2px 14px",
-        marginLeft: margin.md,
         display: "flex",
         alignItems: "center",
-        width: { md: "50px" },
+        justifyContent: "center",
+        width: "100%",
+        borderRadius: borderRadius.medium,
       }}
     >
       {children}

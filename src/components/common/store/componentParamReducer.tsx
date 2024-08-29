@@ -4,6 +4,7 @@
  */
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
+import { DatasetFrequency } from "./searchReducer";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -13,6 +14,7 @@ const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
   "UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE";
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
 const UPDATE_CATEGORY_FILTER_VARIABLE = "UPDATE_CATEGORY_FILTER_VARIABLE";
+const UPDATE_UPDATE_FREQ_VARIABLE = "UPDATE_UPDATE_FREQ_VARIABLE";
 const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
 
 interface DataTimeFilterRange {
@@ -28,6 +30,7 @@ export interface ParameterState {
   searchText?: string;
   commonKey?: string;
   categories?: Array<Category>;
+  updateFreq?: DatasetFrequency | undefined;
   sortby?: string;
 }
 // Function use to test an input value is of type Category
@@ -101,6 +104,15 @@ const updateCategories = (input: Array<Category>): ActionType => {
     type: UPDATE_CATEGORY_FILTER_VARIABLE,
     payload: {
       categories: input,
+    } as ParameterState,
+  };
+};
+
+const updateUpdateFreq = (input: DatasetFrequency | undefined): ActionType => {
+  return {
+    type: UPDATE_UPDATE_FREQ_VARIABLE,
+    payload: {
+      updateFreq: input,
     } as ParameterState,
   };
 };
@@ -197,6 +209,11 @@ const paramReducer = (
       return {
         ...state,
         categories: action.payload.categories,
+      };
+    case UPDATE_UPDATE_FREQ_VARIABLE:
+      return {
+        ...state,
+        updateFreq: action.payload.updateFreq,
       };
     case UPDATE_SORT_BY_VARIABLE:
       return {
@@ -341,4 +358,5 @@ export {
   updateParameterStates,
   updateSortBy,
   updateCommonKey,
+  updateUpdateFreq,
 };

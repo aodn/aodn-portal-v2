@@ -7,6 +7,7 @@ import { dateDefault } from "./constants";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
 import { Category } from "./store/componentParamReducer";
+import { DatasetFrequency } from "./store/searchReducer";
 
 // TODO: refactor this, naming like this is not ideal for readability,
 //  what are T, J, R, p, i , j, c, d, x, y, z, etc. actually mean?
@@ -23,6 +24,7 @@ export type CategoriesIn = SingleArgumentFunction<
   Array<Category>,
   string | undefined
 >;
+export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
 /**
  * common key is the search text input that belongs to both "suggest_phrases" and "discovery_parameters". e.g. temperature
  * the OGC API needs to query this type of search text input differently;
@@ -42,7 +44,11 @@ export type FilterTypes =
   | CategoriesIn
   | TemporalDuring
   | TemporalAfterOrBefore
-  | PolygonOperation;
+  | PolygonOperation
+  | UpdateFrequency;
+
+const funcUpdateFrequency: UpdateFrequency = (freq: DatasetFrequency) =>
+  `update_frequency='${freq}'`;
 
 const funcTemporalAfter: TemporalAfterOrBefore = (s: number) =>
   `temporal AFTER ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}`;
@@ -60,9 +66,7 @@ const funcCategories: CategoriesIn = (categories: Array<Category>) => {
   const categoryLabels: string[] = [];
   // grab labels only
   categories.forEach((category) => {
-    categoryLabels.push(
-      `discovery_categories='${category.label?.toLowerCase()}'`
-    );
+    categoryLabels.push(`parameter_vocabs='${category.label?.toLowerCase()}'`);
   });
   // if no category, return undefined
   if (categoryLabels.length === 0) {
@@ -77,7 +81,7 @@ const funcCommonTypeSearchText: (searchText: string) => undefined | string = (
   const st = searchText?.toLowerCase();
   if (st) {
     const results: string[] = [];
-    results.push(`discovery_categories='${st}'`);
+    results.push(`parameter_vocabs='${st}'`);
     results.push(`fuzzy_content='${st}'`);
     return `(${results.join(" or ")})`;
   } else {
@@ -92,12 +96,12 @@ const funcCategoriesWithCommonTypeSearchText: CategoriesWithCommonKey = (
 ) => {
   const results: string[] = [];
   categories.forEach((category) => {
-    results.push(`discovery_categories='${category.label?.toLowerCase()}'`);
+    results.push(`parameter_vocabs='${category.label?.toLowerCase()}'`);
   });
 
   const st = searchText?.toLowerCase();
   if (st) {
-    results.push(`discovery_categories='${st}'`);
+    results.push(`parameter_vocabs='${st}'`);
     results.push(`fuzzy_content='${st}'`);
   }
   // if no category, return undefined
@@ -129,6 +133,6 @@ cqlDefaultFilters
   .set("AFTER_TIME", funcTemporalAfter)
   .set("BEFORE_TIME", funcTemporalBefore)
   .set("INTERSECT_POLYGON", funcIntersectPolygon)
-  .set("REAL_TIME_ONLY", "update_frequency='real-time'");
+  .set("UPDATE_FREQUENCY", funcUpdateFrequency);
 
 export { cqlDefaultFilters };

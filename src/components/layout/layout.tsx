@@ -2,18 +2,16 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 // TODO: Temp works but need to check user locale on date time format
 import "dayjs/locale/en-gb";
-import Header from "../header/header";
-import Footer from "../footer/footer";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
-type LayoutProps = {
-  children: React.ReactNode;
-};
+interface LayoutProps {}
 
-const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
+const Layout = ({ children }: React.PropsWithChildren<LayoutProps>) => {
   return (
     <div>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
-        <Header isLandingPage={location.pathname == "/"} />
+        <Header />
         <main>{children}</main>
         <Footer />
       </LocalizationProvider>

@@ -1,65 +1,56 @@
 import {
-  FormControl,
   Grid,
-  IconButton,
   InputBase,
-  MenuItem,
   Paper,
-  Select,
   styled,
+  SxProps,
+  Theme,
+  Typography,
 } from "@mui/material";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import MapListToggleButton, {
   MapListToggleButtonProps,
 } from "../buttons/MapListToggleButton";
 import SortButton, { SortButtonProps } from "../buttons/SortButton";
 import { FC } from "react";
-
-const SlimSelect = styled(InputBase)(() => ({
-  "& .MuiInputBase-input": {
-    border: "none",
-  },
-}));
+import { borderRadius, fontSize } from "../../../styles/constants";
 
 interface ResultPanelSimpleFilterProps
   extends MapListToggleButtonProps,
-    SortButtonProps {}
+    SortButtonProps {
+  count: number;
+  total: number;
+  sx?: SxProps<Theme>;
+}
 
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
+  count,
+  total,
+  sx,
   onChangeLayout,
   onChangeSorting,
 }) => {
   return (
-    <Grid container justifyContent="center">
-      <Grid container item xs={12} sx={{ pb: 1 }}>
+    <Grid sx={sx} container justifyContent="center" spacing={1}>
+      <Grid item md={6} xs={12}>
         <Paper
-          variant="outlined"
-          component="form"
+          elevation={0}
           sx={{
-            p: "2px 4px",
             display: "flex",
+            justifyContent: "center",
             alignItems: "center",
-            width: { md: "500px" },
+            height: "100%",
+            borderRadius: borderRadius.medium,
           }}
         >
-          <IconButton sx={{ p: "10px" }} aria-label="search">
-            <ArrowBackIosIcon />
-          </IconButton>
-          <FormControl fullWidth size="small">
-            <Select
-              value={1}
-              input={<SlimSelect id="select1" name="select1" />}
-            >
-              <MenuItem value={1}>1-20 on 1258 matching</MenuItem>
-            </Select>
-          </FormControl>
-          <IconButton sx={{ p: "10px" }}>
-            <ArrowForwardIosIcon />
-          </IconButton>
+          <Typography fontSize={fontSize.info} padding={0}>
+            Showing 1-{count} of {total} results
+          </Typography>
         </Paper>
+      </Grid>
+      <Grid item md={3} xs={6}>
         <SortButton onChangeSorting={onChangeSorting} />
+      </Grid>
+      <Grid item md={3} xs={6}>
         <MapListToggleButton onChangeLayout={onChangeLayout} />
       </Grid>
     </Grid>

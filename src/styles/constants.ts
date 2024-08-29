@@ -43,11 +43,17 @@ const padding = {
 };
 
 const fontSize = {
-  bannerTitle: "70px",
+  bannerTitleLarge: "78px",
+  bannerTitleMedium: "62px",
   bannerSubtitle: "20px",
   mapMenuItem: 14,
   mapMenuSubItem: 13,
   detailPageHeading: "20px",
+  newsHeading: "40px",
+  newsTitle: "24px",
+  newsLabel: "20px",
+  newsInfo: "16px",
+  subscription: "16px",
   icon: "10px",
   label: "12px",
   info: "14px",
@@ -73,6 +79,7 @@ const fontColor = {
     light: "#979797",
   },
   blue: {
+    dark: "#356183",
     medium: "#468CB6",
   },
 };
@@ -95,6 +102,7 @@ const color = {
   },
   brightBlue: {
     dark: "#51BCEB",
+    semiTransparentDark: "rgba(82, 189, 236, 0.4)",
   },
   gray: {
     dark: "#575757",
@@ -102,6 +110,10 @@ const color = {
     light: "#979797",
     extraLight: "#dfdfdf",
     xxLight: "#f8f8f8",
+  },
+  white: {
+    twoTenTransparent: " rgba(255, 255, 255, 0.2  )",
+    sixTenTransparent: " rgba(255, 255, 255, 0.6  )",
   },
 };
 

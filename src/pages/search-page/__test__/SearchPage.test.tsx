@@ -1,12 +1,4 @@
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  expect,
-  describe,
-  test,
-  vi,
-} from "vitest";
+import { afterAll, beforeAll, expect, describe, vi } from "vitest";
 import { server } from "../../../__mocks__/server";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom"; // for the additional matchers
@@ -28,6 +20,18 @@ vi.mock("../../../components/map/mapbox/Map", () => {
 });
 
 beforeAll(() => {
+  // With use of AutoSizer component in ResultCard, it will fail in non-UI env like vitest
+  // here we mock it so to give some screen size to let the test work.
+  vi.mock("react-virtualized-auto-sizer", () => {
+    return {
+      __esModule: true,
+      default: ({
+        children,
+      }: {
+        children: (size: { width: number; height: number }) => JSX.Element;
+      }) => children({ width: 800, height: 600 }), // Provide fixed dimensions
+    };
+  });
   server.listen();
 });
 
@@ -42,8 +46,8 @@ afterAll(() => {
 });
 
 describe("SearchPage", async () => {
-  test("The map should be able to expand properly", async () => {
-    const { findByTestId, findAllByTestId } = render(
+  it("The map should be able to expand properly", async () => {
+    const { findByTestId, queryByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -61,13 +65,13 @@ describe("SearchPage", async () => {
     expect(fullMapViewOption).to.exist;
 
     await userEvent.click(fullMapViewOption);
-
-    const list = await findByTestId("search-page-result-list");
-    expect(list).to.exist;
+    // Should not be there if full map view clicked
+    const list = queryByTestId("search-page-result-list");
+    expect(list).not.toBeInTheDocument();
   });
 
-  test("The list should be able to show in list / grid view", async () => {
-    const { findByTestId, findAllByTestId } = render(
+  it("The list should be able to show in list / grid view", async () => {
+    const { findByTestId, findAllByTestId, queryAllByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -96,6 +100,9 @@ describe("SearchPage", async () => {
     );
     expect(gridAndMapOption).toBeDefined();
     await userEvent.click(gridAndMapOption);
+
+    const gridView = await findByTestId("resultcard-result-grid");
+    expect(gridView).toBeInTheDocument();
 
     const gridList = await findAllByTestId("result-card-grid");
     expect(gridList.length).not.equal(0);

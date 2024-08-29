@@ -1,4 +1,5 @@
-import { defineConfig, loadEnv } from "vite";
+import { loadEnv } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react-swc";
 import eslint from "vite-plugin-eslint";
 import path from "path";
@@ -47,7 +48,7 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
-        "/api/v1/ogc/ext/parameter/categories": {
+        "/api/v1/ogc/ext/parameter/vocabs": {
           target: apiPath,
           changeOrigin: true,
         },
@@ -67,6 +68,10 @@ export default ({ mode }) => {
       // 👋 add the line below to add jsdom to vite
       environment: "jsdom",
       setupFiles: "./src/setupTests.ts",
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "json", "html"],
+      },
     },
     publicDir: "public",
     resolve: {

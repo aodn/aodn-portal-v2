@@ -1,0 +1,4 @@
+export const BANNER_HEIGHT = 880;
+
+export const SMART_PANEL_CONTAINER_WIDTH = 1000;
+export const SMART_PANEL_CONTAINER_HEIGHT = 180;

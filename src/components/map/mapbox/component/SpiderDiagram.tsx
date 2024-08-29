@@ -32,7 +32,7 @@ interface SpiderDiagramProps extends LayersProps {
 }
 
 const defaultSpiderDiagramConfig: SpiderDiagramConfig = {
-  spiderifyFromZoomLevel: 11,
+  spiderifyFromZoomLevel: 8,
   circleSpiralSwitchover: 9,
   circleFootSeparation: 25,
   spiralFootSeparation: 28,
@@ -166,8 +166,8 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           let angle = 0;
           return Array.from({ length: count }, (_, index) => {
             angle += spiralFootSeparation / legLength + index * 0.0005;
-            const x = legLength * Math.cos(angle);
-            const y = legLength * Math.sin(angle);
+            const x = legLength * Math.cos(angle) * 10;
+            const y = legLength * Math.sin(angle) * 10;
             legLength += (2 * Math.PI * spiralLengthFactor) / angle;
             return { x, y, angle, legLength, index };
           });
@@ -179,8 +179,8 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           return Array.from({ length: count }, (_, index) => {
             const angle = index * angleStep;
             return {
-              x: legLength * Math.cos(angle),
-              y: legLength * Math.sin(angle),
+              x: legLength * Math.cos(angle) * 15,
+              y: legLength * Math.sin(angle) * 15,
               angle,
               legLength,
               index,

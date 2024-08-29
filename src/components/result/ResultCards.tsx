@@ -1,101 +1,57 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { CollectionsQueryType } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
-import { Box, Grid, ListItem, Stack } from "@mui/material";
+import { Box, Grid, ListItem, Stack, SxProps, Theme } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import AutoSizer, { Size } from "react-virtualized-auto-sizer";
+import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
   layout?: SearchResultLayoutEnum;
-  onRemoveLayer:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection | undefined
-      ) => void)
-    | undefined;
+  sx?: SxProps<Theme>;
   onDownload:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection | undefined
       ) => void)
     | undefined;
-  onTags:
+  onTags?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
       ) => void)
     | undefined;
-  onMore:
+  onMore?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
       ) => void)
     | undefined;
   onClickCard: ((uuid: string) => void) | undefined;
+  onFetchMore?: (() => void) | undefined;
   datasetsSelected?: OGCCollection[];
 }
 
-const renderCells = (
-  props: ResultCardsProps,
-  child: ListChildComponentProps
-) => {
-  const { index, style } = child;
+const LIST_ITEM_SIZE = 250;
+const GRID_ITEM_SIZE = 310;
 
-  const leftIndex = index * 2;
-  const rightIndex = leftIndex + 1;
-
-  return (
-    <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
-      <Grid container spacing={1}>
-        <Grid item xs={6}>
-          <GridResultCard
-            content={props.contents.result.collections[leftIndex]}
-            onRemoveLayer={props.onRemoveLayer}
-            onDownload={props.onDownload}
-            onClickCard={props.onClickCard}
-            data-testid="result-cards-grid"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <GridResultCard
-            content={props.contents.result.collections[rightIndex]}
-            onRemoveLayer={props.onRemoveLayer}
-            onDownload={props.onDownload}
-            onClickCard={props.onClickCard}
-          />
-        </Grid>
-      </Grid>
-    </ListItem>
-  );
-};
-
-const renderRows = (
-  props: ResultCardsProps,
-  child: ListChildComponentProps
-) => {
-  // The style must pass to the listitem else incorrect rendering
-  const { index, style } = child;
-
-  return (
-    <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
-      <ListResultCard
-        content={props.contents.result.collections[index]}
-        onRemoveLayer={props.onRemoveLayer}
-        onDownload={props.onDownload}
-        onTags={props.onTags}
-        onMore={props.onMore}
-        onClickCard={props.onClickCard}
-      />
-    </ListItem>
-  );
-};
-
-const ResultCards = (props: ResultCardsProps) => {
-  const hasSelectedDatasets =
-    props.datasetsSelected && props.datasetsSelected.length > 0;
+const ResultCards = ({
+  contents,
+  layout,
+  sx,
+  datasetsSelected,
+  onClickCard,
+  onDownload,
+  onMore,
+  onTags,
+  onFetchMore,
+}: ResultCardsProps) => {
+  const componentRef = useRef<HTMLDivElement | null>(null);
+  const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
 
   const renderDatasetSelectedGridCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
@@ -104,28 +60,21 @@ const ResultCards = (props: ResultCardsProps) => {
         direction="row"
         flexWrap="wrap"
         gap={1}
-        sx={{ height: "305px", overflowY: "auto" }}
+        sx={{ width: "100%", height: "305px", overflowY: "auto" }}
       >
-        {props.datasetsSelected?.map((dataset, index) => (
-          <Box key={index} width="327px" height="300px">
+        {datasetsSelected?.map((dataset, index) => (
+          <Box key={index} width="49%" height="300px">
             <GridResultCard
               content={dataset}
-              onRemoveLayer={props.onRemoveLayer}
-              onDownload={props.onDownload}
-              onClickCard={props.onClickCard}
+              onDownload={onDownload}
+              onClickCard={onClickCard}
               isSelectedDataset
             />
           </Box>
         ))}
       </Stack>
     );
-  }, [
-    hasSelectedDatasets,
-    props.datasetsSelected,
-    props.onClickCard,
-    props.onDownload,
-    props.onRemoveLayer,
-  ]);
+  }, [hasSelectedDatasets, datasetsSelected, onClickCard, onDownload]);
 
   const renderDatasetSelectedListCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
@@ -133,58 +82,187 @@ const ResultCards = (props: ResultCardsProps) => {
       <Stack
         direction="column"
         gap={1}
-        sx={{ maxHeight: "260px", overflowY: "auto" }}
+        sx={{ width: "100%", maxHeight: "260px", overflowY: "auto" }}
       >
-        {props.datasetsSelected?.map((dataset, index) => (
+        {datasetsSelected?.map((dataset, index) => (
           <ListResultCard
             key={index}
             content={dataset}
-            onRemoveLayer={props.onRemoveLayer}
-            onDownload={props.onDownload}
-            onClickCard={props.onClickCard}
+            onDownload={onDownload}
+            onClickCard={onClickCard}
             isSelectedDataset
           />
         ))}
       </Stack>
     );
-  }, [
-    hasSelectedDatasets,
-    props.datasetsSelected,
-    props.onClickCard,
-    props.onDownload,
-    props.onRemoveLayer,
-  ]);
+  }, [hasSelectedDatasets, datasetsSelected, onClickCard, onDownload]);
 
-  if (props.layout === SearchResultLayoutEnum.LIST) {
+  const renderLoadMoreButton = useCallback(() => {
     return (
-      <>
+      <DetailSubtabBtn
+        title="Load More"
+        isBordered={true}
+        navigate={() => {
+          onFetchMore && onFetchMore();
+        }}
+      />
+    );
+  }, [onFetchMore]);
+
+  const renderCells = useCallback(
+    (
+      { contents, onDownload, onClickCard }: ResultCardsProps,
+      child: ListChildComponentProps
+    ) => {
+      const { index, style } = child;
+
+      const leftIndex = index * 2;
+      const rightIndex = leftIndex + 1;
+
+      if (
+        leftIndex >= contents.result.collections.length &&
+        leftIndex <= contents.result.total
+      ) {
+        // We need to display load more button
+        return (
+          <ListItem
+            sx={{
+              display: "flex",
+              alignItems: "flex-start", // Aligns the Box to the top of the ListItem
+              justifyContent: "center", // Centers the Box horizontally
+              padding: "1", // Optional: Adjust padding to your needs
+            }}
+            style={style}
+          >
+            {renderLoadMoreButton()}
+          </ListItem>
+        );
+      } else {
+        return (
+          <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
+            <Grid container spacing={1}>
+              <Grid item xs={6}>
+                <GridResultCard
+                  content={contents.result.collections[leftIndex]}
+                  onDownload={onDownload}
+                  onClickCard={onClickCard}
+                />
+              </Grid>
+              {rightIndex < contents.result.collections.length && (
+                <Grid item xs={6}>
+                  <GridResultCard
+                    content={contents.result.collections[rightIndex]}
+                    onDownload={onDownload}
+                    onClickCard={onClickCard}
+                  />
+                </Grid>
+              )}
+            </Grid>
+          </ListItem>
+        );
+      }
+    },
+    [renderLoadMoreButton]
+  );
+
+  const renderRows = useCallback(
+    (
+      { contents, onClickCard, onDownload, onMore, onTags }: ResultCardsProps,
+      child: ListChildComponentProps
+    ) => {
+      // The style must pass to the listitem else incorrect rendering
+      const { index, style } = child;
+
+      if (
+        index === contents.result.collections.length &&
+        index <= contents.result.total
+      ) {
+        // We need to display load more button
+        return (
+          <ListItem
+            sx={{
+              display: "flex",
+              alignItems: "flex-start", // Aligns the Box to the top of the ListItem
+              justifyContent: "center", // Centers the Box horizontally
+              padding: "1", // Optional: Adjust padding to your needs
+            }}
+            style={style}
+          >
+            {renderLoadMoreButton()}
+          </ListItem>
+        );
+      } else {
+        return (
+          <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
+            <ListResultCard
+              content={contents.result.collections[index]}
+              onDownload={onDownload}
+              onTags={onTags}
+              onMore={onMore}
+              onClickCard={onClickCard}
+            />
+          </ListItem>
+        );
+      }
+    },
+    [renderLoadMoreButton]
+  );
+
+  // You must set the height to 100% of view height so the calculation
+  // logic .clentHeight.height have values. In short it fill the
+  // whole area.
+  // *** We need to dsiplay the load more button, hence item count + 1 ***
+  if (layout === SearchResultLayoutEnum.LIST) {
+    return (
+      <Box
+        sx={{ ...sx, height: "100%" }}
+        ref={componentRef}
+        data-testid="resultcard-result-list"
+      >
         {hasSelectedDatasets && renderDatasetSelectedListCards()}
-        <FixedSizeList
-          height={1500}
-          width={"100%"}
-          itemSize={260}
-          itemCount={props.contents.result.collections.length}
-          overscanCount={10}
-        >
-          {(child: ListChildComponentProps) => renderRows(props, child)}
-        </FixedSizeList>
-      </>
+        <AutoSizer>
+          {({ height, width }: Size) => (
+            <FixedSizeList
+              height={hasSelectedDatasets ? height - LIST_ITEM_SIZE : height}
+              width={width}
+              itemSize={LIST_ITEM_SIZE}
+              itemCount={contents.result.collections.length + 1}
+            >
+              {(child: ListChildComponentProps) =>
+                renderRows(
+                  { contents, onClickCard, onDownload, onMore, onTags },
+                  child
+                )
+              }
+            </FixedSizeList>
+          )}
+        </AutoSizer>
+      </Box>
     );
   } else {
     // or else render grid view
     return (
-      <>
+      <Box
+        sx={{ ...sx, height: "100%" }}
+        ref={componentRef}
+        data-testid="resultcard-result-grid"
+      >
         {hasSelectedDatasets && renderDatasetSelectedGridCards()}
-        <FixedSizeList
-          height={1500}
-          width={"100%"}
-          itemSize={310}
-          itemCount={Math.ceil(props.contents.result.collections.length / 2)}
-          overscanCount={10}
-        >
-          {(child: ListChildComponentProps) => renderCells(props, child)}
-        </FixedSizeList>
-      </>
+        <AutoSizer>
+          {({ height, width }: Size) => (
+            <FixedSizeList
+              height={hasSelectedDatasets ? height - GRID_ITEM_SIZE : height}
+              width={width}
+              itemSize={GRID_ITEM_SIZE}
+              itemCount={Math.ceil(contents.result.collections.length / 2) + 1}
+            >
+              {(child: ListChildComponentProps) =>
+                renderCells({ contents, onDownload, onClickCard }, child)
+              }
+            </FixedSizeList>
+          )}
+        </AutoSizer>
+      </Box>
     );
   }
 };
