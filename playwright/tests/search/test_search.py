@@ -25,3 +25,19 @@ def test_basic_search(
     landing_page.search.click_search_button()
     expect(search_page.search.search_field).to_have_value(category_name)
     expect(search_page.first_result_title).to_be_visible()
+
+
+def test_fail_case(page_mock: Page) -> None:
+    landing_page = LandingPage(page_mock)
+
+    landing_page.load()
+
+    expect(
+        landing_page.get_text('Australian Ocean Data Network').first
+    ).to_be_visible()
+
+    expect(
+        landing_page.get_text('Open Access to Ocean Data')
+    ).to_be_visible()  # This check will fail
+
+    expect(landing_page.search.search_button).to_be_enabled()
