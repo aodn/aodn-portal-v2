@@ -29,6 +29,7 @@ import {
   formatToUrlParam,
 } from "../../../components/common/store/componentParamReducer";
 import { pageDefault } from "../../../components/common/constants";
+import OrganizationLogo from "../../../components/logo/OrganizationLogo";
 
 interface ButtonWithIcon {
   label: string;
@@ -166,16 +167,17 @@ const HeaderSection = () => {
             alignItems: "center",
           }}
         >
-          {/* TODO: replace with real org logo */}
-          <img
-            aria-label="collection image"
-            src={imosLogoWithTitle}
-            alt="imos_logo_with_title"
-            style={{
-              objectFit: "contain",
-              height: "100%",
-            }}
-          />
+          {collection && (
+            <OrganizationLogo
+              logo={collection.findIcon()}
+              sx={{
+                width: "100%",
+                height: "60px",
+                paddingX: padding.extraSmall,
+              }}
+              defaultImageSrc={imosLogoWithTitle}
+            />
+          )}
         </Grid>
       </Grid>
     </Card>
