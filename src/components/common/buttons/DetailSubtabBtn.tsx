@@ -21,6 +21,7 @@ const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
       justifyContent="flex-start"
       sx={{
         height: "45px",
+        width: "160px",
         marginX: theme.mp.lg,
       }}
     >
