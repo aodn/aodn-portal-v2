@@ -1,0 +1,10 @@
+{
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.envFile": "${workspaceFolder}/playwright/.env.debug",
+  "python.testing.pytestArgs": [
+    "playwright/tests",
+    "--rootdir=playwright",
+    "-c /dev/null" /* ignore configfile: pytest.ini */
+  ]
+}
