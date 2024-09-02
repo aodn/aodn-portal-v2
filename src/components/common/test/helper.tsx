@@ -3,7 +3,11 @@ import { Map } from "mapbox-gl";
 import { mergeWithDefaults } from "../utils";
 
 interface TestProps {
-  getMap: () => Map;
+  getMap?: () => Map;
+  getHeatmapLayer?: () => string;
+  getAUMarineParksLayer?: () => string;
+  getWorldBoundariesLayer?: () => string;
+  getSpiderLayer?: () => string;
 }
 
 // Use in test only to expose reference that need by test e2e testing.

@@ -29,6 +29,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
             sx={{
               marginLeft: theme.mp.sm,
             }}
+            data-testid={`detail-sub-section-${title}`}
           >
             {title}
           </Typography>

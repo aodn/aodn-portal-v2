@@ -12,6 +12,7 @@ import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
+import { TestHelper } from "../../../common/test/helper";
 
 interface HeatmapLayer {
   maxZoom: number;
@@ -322,6 +323,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         unclusterPointLayer={unClusterPointLayer}
         onDatasetSelected={onDatasetSelected}
       />
+      <TestHelper getHeatmapLayer={() => heatmapLayer} />
     </>
   );
 };

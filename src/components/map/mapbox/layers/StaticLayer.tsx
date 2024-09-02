@@ -9,6 +9,7 @@ import React, {
 import MapContext from "../MapContext";
 import { FeatureCollection } from "geojson";
 import { stringToColor } from "../../../common/colors/colorsUtils";
+import { TestHelper } from "../../../common/test/helper";
 
 // Data download from here
 // https://data.gov.au/dataset/ds-dcceew-https%3A%2F%2Fwww.arcgis.com%2Fhome%2Fitem.html%3Fid%3D2b3eb1d42b8d4319900cf4777f0a83b9%26sublayer%3D0/details?q=marine%20park
@@ -117,7 +118,11 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, label, features }) => {
     };
   }, [map, createLayer, layerId, sourceId, layerLabelId]);
 
-  return <React.Fragment />;
+  return id === StaticLayersDef.AUSTRALIA_MARINE_PARKS.id ? (
+    <TestHelper getAUMarineParksLayer={() => layerId} />
+  ) : (
+    <React.Fragment />
+  );
 };
 // A shortcut for australia marine parks
 const AustraliaMarineParkLayer: FC<Partial<StaticLayersProps>> = ({
