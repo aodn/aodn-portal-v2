@@ -12,9 +12,7 @@ class SearchPage(BasePage):
         self.map = Map(page)
 
         # Page locators
-        self.first_result_title = page.get_by_test_id(
-            'result-card-item-title'
-        ).first
+        self.first_result_title = page.get_by_test_id('result-card-title').first
 
     def wait_for_updated_search_result(self) -> None:
         """Wait until the second search result is detached"""

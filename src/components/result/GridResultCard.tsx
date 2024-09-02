@@ -6,6 +6,7 @@ import {
   CardContent,
   CardMedia,
   Grid,
+  Stack,
   Typography,
 } from "@mui/material";
 import React, { useCallback } from "react";
@@ -17,6 +18,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import { margin, padding } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import OrganizationLogo from "../logo/OrganizationLogo";
 
 interface GridResultCardProps {
   content?: OGCCollection;
@@ -81,21 +83,38 @@ const GridResultCard: React.FC<GridResultCardProps> = (props) => {
                   marginBottom: "10px",
                   height: "64px",
                   display: "flex",
-                  justifyContent: "space-between",
+                  flexWrap: "nowrap",
                 }}
               >
-                <Typography
-                  sx={{
-                    paddingY: padding.small,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: "2",
-                    WebkitBoxOrient: "vertical",
-                  }}
+                <Stack
+                  flex={1}
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
                 >
-                  {props.content.title}
-                </Typography>
+                  <Box flex={1}>
+                    <Typography
+                      sx={{
+                        padding: 0,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: "2",
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {props.content.title}
+                    </Typography>
+                  </Box>
+                  <OrganizationLogo
+                    logo={props.content.findIcon()}
+                    sx={{
+                      width: "50px",
+                      height: "100%",
+                      paddingX: padding.extraSmall,
+                    }}
+                  />
+                </Stack>
                 {props.isSelectedDataset && (
                   <TaskAltIcon color="primary" sx={{ mt: margin.lg }} />
                 )}

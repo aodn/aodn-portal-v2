@@ -6,6 +6,7 @@ import {
   CardContent,
   CardMedia,
   Grid,
+  Stack,
   Typography,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -14,9 +15,10 @@ import LinkIcon from "@mui/icons-material/Link";
 import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
 import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
-import { margin } from "../../styles/constants";
+import { margin, padding } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import { useCallback } from "react";
+import OrganizationLogo from "../logo/OrganizationLogo";
 
 interface ResultCardProps {
   content: OGCCollection;
@@ -79,22 +81,39 @@ const ListResultCard = (props: ResultCardProps) => {
               marginBottom: "10px",
               height: "48px",
               display: "flex",
-              justifyContent: "space-between",
+              flexWrap: "nowrap",
             }}
           >
-            <Typography
-              sx={{
-                padding: 0,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: "2",
-                WebkitBoxOrient: "vertical",
-              }}
-              data-testid="result-card-item-title"
+            <Stack
+              flex={1}
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
             >
-              {props.content.title}
-            </Typography>
+              <Box flex={1}>
+                <Typography
+                  sx={{
+                    padding: 0,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: "2",
+                    WebkitBoxOrient: "vertical",
+                  }}
+                  data-testid="result-card-title"
+                >
+                  {props.content.title}
+                </Typography>
+              </Box>
+              <OrganizationLogo
+                logo={props.content.findIcon()}
+                sx={{
+                  width: "80px",
+                  height: "100%",
+                  paddingX: padding.extraSmall,
+                }}
+              />
+            </Stack>
             {props.isSelectedDataset && (
               <TaskAltIcon color="primary" sx={{ mt: margin.sm }} />
             )}

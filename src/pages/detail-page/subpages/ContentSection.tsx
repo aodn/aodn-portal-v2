@@ -19,17 +19,18 @@ const tabs = [
   },
   { label: "About", value: "about", component: <AboutPanel /> },
   {
-    label: "Metadata Information",
-    value: "metadata information",
-    component: <MetadataInformationPanel />,
-  },
-  { label: "Citation", value: "citation", component: <CitationPanel /> },
-  {
     label: "Links",
     value: "links",
     component: <LinksPanel />,
   },
   { label: "Lineage", value: "lineage", component: <LineagePanel /> },
+  {
+    label: "Metadata Information",
+    value: "metadata information",
+    component: <MetadataInformationPanel />,
+  },
+  { label: "Citation", value: "citation", component: <CitationPanel /> },
+
   {
     label: "Associated Records",
     value: "associated records",
