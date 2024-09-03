@@ -18,9 +18,9 @@ import React, {
   useState,
 } from "react";
 import {
-  Category,
+  Vocab,
   ParameterState,
-  updateCategories,
+  updateParameterVocabs,
   updateCommonKey,
   updateSearchText,
 } from "../common/store/componentParamReducer";
@@ -32,7 +32,7 @@ import store, {
 import { useDispatch, useSelector } from "react-redux";
 import {
   createSuggesterParamFrom,
-  fetchParameterCategoriesWithStore,
+  fetchParameterVocabsWithStore,
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
 import { borderRadius, color, padding } from "../../styles/constants";
@@ -57,7 +57,7 @@ interface OptionType {
 }
 
 enum OptionGroup {
-  CATEGORY = "category",
+  PARAMETER = "parameter",
   PHRASE = "phrase",
   COMMON = "common",
 }
@@ -79,65 +79,69 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
-  const [categorySet, setCategorySet] = useState<Category[]>([]);
+  const [parameterVocabSet, setParameterVocabSet] = useState<Vocab[]>([]);
 
-  const emptyArray: Category[] = [];
-  const selectedCategories: Category[] = useSelector(
-    (state: RootState) => state.paramReducer.categories || emptyArray
+  const emptyArray: Vocab[] = [];
+  const selectedParameterVocabs: Vocab[] = useSelector(
+    (state: RootState) => state.paramReducer.parameterVocabs || emptyArray
   );
 
   const searchInput = useSelector(
     (state: RootState) => state.paramReducer.searchText
   );
 
-  const selectedCategoryStrs = selectedCategories
-    ? [...new Set(selectedCategories.map((c) => c.label))]
+  const selectedParameterVocabsStrs = selectedParameterVocabs
+    ? [...new Set(selectedParameterVocabs.map((c) => c.label))]
     : [];
   useCallback(
-    (category: string) => {
-      const currentCategories = selectedCategories
-        ? new Array(...selectedCategories)
+    (parameter_vocab: string) => {
+      const currentParameterVocabs = selectedParameterVocabs
+        ? new Array(...selectedParameterVocabs)
         : [];
-      // if categorySet contains a category whose label is category, then add it to the currentCategories
-      const categoryToAdd = categorySet.find((c) => c.label === category);
-      if (!categoryToAdd) {
+      // if parameterVocabSet contains a parameter_vocab whose label is parameter_vocab, then add it to the currentParameterVocabs
+      const parameterVocabToAdd = parameterVocabSet.find(
+        (c) => c.label === parameter_vocab
+      );
+      if (!parameterVocabToAdd) {
         //may need warning / alert in the future
-        console.error("no category found: ", category);
+        console.error("no parameter vocabs found: ", parameter_vocab);
         return;
       }
-      if (currentCategories.find((c) => c.label === category)) {
+      if (currentParameterVocabs.find((c) => c.label === parameter_vocab)) {
         //may need warning / alert in the future
-        console.error("already have category: ", category);
+        console.error("already have parameter vocab: ", parameter_vocab);
         return;
       }
-      currentCategories.push(categoryToAdd);
-      dispatch(updateCategories(currentCategories));
+      currentParameterVocabs.push(parameterVocabToAdd);
+      dispatch(updateParameterVocabs(currentParameterVocabs));
     },
-    [categorySet, dispatch, selectedCategories]
+    [parameterVocabSet, dispatch, selectedParameterVocabs]
   );
 
-  const removeCategory = useCallback(
-    (category: string) => {
-      const currentCategories = new Array(...selectedCategories);
-      const categoryToRemove = categorySet.find((c) => c.label === category);
-      if (!categoryToRemove) {
+  const removeParameterVocab = useCallback(
+    (parameterVocab: string) => {
+      const currentParameterVocabs = new Array(...selectedParameterVocabs);
+      const parameterVocabToRemove = parameterVocabSet.find(
+        (c) => c.label === parameterVocab
+      );
+      if (!parameterVocabToRemove) {
         //may need warning / alert in the future
-        console.error("no category found: ", category);
+        console.error("no parameterVocab found: ", parameterVocab);
         return;
       }
-      if (!currentCategories.find((c) => c.label === category)) {
+      if (!currentParameterVocabs.find((c) => c.label === parameterVocab)) {
         //may need warning / alert in the future
         console.error(
-          "no category found in current category state: ",
-          category
+          "no parameterVocab found in current parameterVocab state: ",
+          parameterVocab
         );
         return;
       }
-      // remove this category from currentCategories
-      _.remove(currentCategories, (c) => c.label === category);
-      dispatch(updateCategories(currentCategories));
+      // remove this parameterVocab from currentParameterVocabs
+      _.remove(currentParameterVocabs, (c) => c.label === parameterVocab);
+      dispatch(updateParameterVocabs(currentParameterVocabs));
     },
-    [categorySet, dispatch, selectedCategories]
+    [parameterVocabSet, dispatch, selectedParameterVocabs]
   );
 
   const refreshOptions = useCallback(
@@ -151,14 +155,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
           .unwrap()
           .then((data) => {
-            const categorySuggestions = new Set<string>(
-              data.parameter_vocab_suggestions
+            const parameterVocabSuggestions = new Set<string>(
+              data.suggested_parameter_vocabs
             );
-            const phrasesSuggestions = new Set<string>(
-              data.record_suggestions.suggest_phrases
-            );
-            // Get the intersection of categorySuggestions and phrasesSuggestions
-            const commonSuggestions = [...categorySuggestions].filter(
+            const phrasesSuggestions = new Set<string>(data.suggested_phrases);
+            // Get the intersection of parameterVocabSuggestions and phrasesSuggestions
+            const commonSuggestions = [...parameterVocabSuggestions].filter(
               (item) => {
                 return phrasesSuggestions.has(item);
               }
@@ -178,7 +180,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             // Create array of all unique suggestions
             const allSuggestions = new Set([
               ...commonSuggestions,
-              ...categorySuggestions,
+              ...parameterVocabSuggestions,
               ...phrasesSuggestions,
             ]);
 
@@ -193,8 +195,8 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               (suggestion) => {
                 if (commonSuggestions.includes(suggestion)) {
                   return { text: suggestion, group: OptionGroup.COMMON };
-                } else if (categorySuggestions.has(suggestion)) {
-                  return { text: suggestion, group: OptionGroup.CATEGORY };
+                } else if (parameterVocabSuggestions.has(suggestion)) {
+                  return { text: suggestion, group: OptionGroup.PARAMETER };
                 } else {
                   return { text: suggestion, group: OptionGroup.PHRASE };
                 }
@@ -245,11 +247,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   );
 
   useEffect(() => {
-    dispatch(fetchParameterCategoriesWithStore(null))
+    dispatch(fetchParameterVocabsWithStore(null))
       .unwrap()
-      .then((categories: Array<Category>) => {
-        const root = categories.filter((i) => i.broader?.length === 0);
-        let child = new Array<Category>();
+      .then((parameterVocabs: Array<Vocab>) => {
+        const root = parameterVocabs.filter((i) => i.broader?.length === 0);
+        let child = new Array<Vocab>();
         root
           .filter((i) => i.narrower?.length !== 0)
           .forEach((i) => i.narrower?.forEach((j) => child.push(j)));
@@ -257,7 +259,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         child = child.sort((a, b) =>
           a.label < b.label ? -1 : a.label > b.label ? 1 : 0
         );
-        setCategorySet(child);
+        setParameterVocabSet(child);
       });
   }, [dispatch]);
 
@@ -283,9 +285,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   };
 
   const [searchFieldWidth, setSearchFieldWidth] = useState<number>(0);
-  const [categoryWidth, setCategoryWidth] = useState<number>(0);
+  const [parameterVocabWidth, setParameterVocabWidth] = useState<number>(0);
   const searchFieldDiv = useRef(null);
-  const categoryDiv = useRef(null);
+  const parameterVocabDiv = useRef(null);
 
   useEffect(() => {
     // Create a ResizeObserver to monitor changes in element sizes
@@ -293,23 +295,23 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       for (const entry of entries) {
         if (entry.target === searchFieldDiv.current) {
           setSearchFieldWidth(entry.contentRect.width);
-        } else if (entry.target === categoryDiv.current) {
-          setCategoryWidth(entry.contentRect.width);
+        } else if (entry.target === parameterVocabDiv.current) {
+          setParameterVocabWidth(entry.contentRect.width);
         }
       }
     });
 
     // Get the elements from refs
     const searchFieldElement = searchFieldDiv.current;
-    const categoryElement = categoryDiv.current;
+    const parameterVocabElement = parameterVocabDiv.current;
 
     // Observe the elements
     if (searchFieldElement) {
       observer.observe(searchFieldElement);
     }
 
-    if (categoryElement) {
-      observer.observe(categoryElement);
+    if (parameterVocabElement) {
+      observer.observe(parameterVocabElement);
     }
 
     // Cleanup observer on component unmount
@@ -317,8 +319,8 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       if (searchFieldElement) {
         observer.unobserve(searchFieldElement);
       }
-      if (categoryElement) {
-        observer.unobserve(categoryElement);
+      if (parameterVocabElement) {
+        observer.unobserve(parameterVocabElement);
       }
     };
   }, []);
@@ -326,9 +328,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const CustomPopper = (props: any): ReactNode => {
     // Util function for calculating the suggester offset
     const calculateOffset = () => {
-      return searchFieldWidth - categoryWidth < textfieldMinWidth
+      return searchFieldWidth - parameterVocabWidth < textfieldMinWidth
         ? [-searchIconWidth, 0]
-        : [-(categoryWidth + searchIconWidth), 0];
+        : [-(parameterVocabWidth + searchIconWidth), 0];
     };
     return (
       <Popper
@@ -338,7 +340,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           {
             name: "offset",
             options: {
-              offset: calculateOffset, // Skid horizontally by categoryWidth, no vertical offset
+              offset: calculateOffset, // Skid horizontally by parameterVocabWidth, no vertical offset
             },
           },
           {
@@ -391,29 +393,29 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         renderInput={(params) => (
           <Box display="flex" flexWrap="wrap" ref={searchFieldDiv}>
             <Stack
-              display={selectedCategories?.length > 0 ? "flex" : "none"}
+              display={selectedParameterVocabs?.length > 0 ? "flex" : "none"}
               spacing={1}
               direction="row"
               useFlexGap
               flexWrap="wrap"
               paddingY={padding.small}
-              ref={categoryDiv}
+              ref={parameterVocabDiv}
             >
               <Typography
                 fontFamily={theme.typography.fontFamily}
                 fontSize="small"
                 paddingTop={padding.extraSmall}
               >
-                Categories&nbsp;:&nbsp;
+                Parameters&nbsp;:&nbsp;
               </Typography>
 
-              {selectedCategoryStrs?.map((c, i) => (
+              {selectedParameterVocabsStrs?.map((c, i) => (
                 <Box key={i}>
                   <Chip
                     sx={{ fontSize: "12px" }}
                     label={c}
                     onDelete={() => {
-                      removeCategory(c);
+                      removeParameterVocab(c);
                     }}
                   />
                 </Box>

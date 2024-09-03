@@ -9,64 +9,71 @@ import React, {
 import { Grid, SxProps, Theme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import { fetchParameterCategoriesWithStore } from "../store/searchReducer";
-import { Category, ParameterState } from "../store/componentParamReducer";
+import { fetchParameterVocabsWithStore } from "../store/searchReducer";
+import { Vocab, ParameterState } from "../store/componentParamReducer";
 import { StyledToggleButton } from "../buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../buttons/StyledToggleButtonGroup";
 
-interface CategoryFilterProps {
+interface ParameterVocabFilterProps {
   filter: ParameterState;
   setFilter: Dispatch<SetStateAction<ParameterState>>;
   sx?: SxProps<Theme>;
 }
 
-const CategoryFilter: FC<CategoryFilterProps> = ({ filter, setFilter, sx }) => {
+const ParameterVocabFilter: FC<ParameterVocabFilterProps> = ({
+  filter,
+  setFilter,
+  sx,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [parameterVocabs, setParameterVocabs] = useState<Vocab[]>([]);
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
 
-  // Get selected categories from Redux store
-  const selectedCategories = useSelector(
-    (state: RootState) => state.paramReducer.categories
+  // Get selected parameterVocabs from Redux store
+  const selectedParameterVocabs = useSelector(
+    (state: RootState) => state.paramReducer.parameterVocabs
   );
 
-  // Initialize local state with selected categories from Redux
+  // Initialize local state with selected parameterVocabs from Redux
   useEffect(() => {
     setFilter((prevFilter) => ({
       ...prevFilter,
-      categories: selectedCategories,
+      parameterVocabs: selectedParameterVocabs,
     }));
-  }, [selectedCategories, setFilter]);
+  }, [selectedParameterVocabs, setFilter]);
 
   // Update the local filter state using the setFilter
   const handleChange = useCallback(
     (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
-      const selected: Category[] = categories.filter((c) =>
+      const selected: Vocab[] = parameterVocabs.filter((c) =>
         newAlignment.includes(c.label)
       );
       setFilter((prevFilter) => ({
         ...prevFilter,
-        categories: selected,
+        parameterVocabs: selected,
       }));
     },
-    [categories, setFilter]
+    [parameterVocabs, setFilter]
   );
 
   // Remove all items whose label is already in the labels array
   useEffect(() => {
-    const labels = [...new Set(categories.map((c) => c.label))];
+    const labels = [...new Set(parameterVocabs.map((c) => c.label))];
     setButtonLabels(labels);
-  }, [categories]);
+  }, [parameterVocabs]);
 
   useEffect(() => {
-    dispatch(fetchParameterCategoriesWithStore(null))
+    dispatch(fetchParameterVocabsWithStore(null))
       .unwrap()
-      .then((categories: Array<Category>) => {
+      .then((vocabs: Array<Vocab>) => {
+        // TODO: needs to fix somewhere around here to adapt with the new response from OGC API for list of parameter vocabs
+        // the JSON response structure is similar but not exactly the same in the past
+        console.log(vocabs);
         // If the item does not have broader terms, that means it is the root level
-        const root = categories.filter((i) => i.broader?.length === 0);
+        const root = vocabs.filter((i) => i.broader?.length === 0);
 
         // Now we need to go one level lower as this is a requirement to display second level instead of top level
-        let child = new Array<Category>();
+        let child = new Array<Vocab>();
         root
           .filter((i) => i?.narrower?.length !== 0)
           .forEach((i) => i?.narrower?.forEach((j) => child.push(j)));
@@ -76,18 +83,20 @@ const CategoryFilter: FC<CategoryFilterProps> = ({ filter, setFilter, sx }) => {
           a.label < b.label ? -1 : a.label > b.label ? 1 : 0
         );
 
-        setCategories(child);
+        setParameterVocabs(child);
       })
-      .catch((error) => console.error("Error fetching categories:", error));
+      .catch((error) =>
+        console.error("Error fetching parameterVocabs:", error)
+      );
   }, [dispatch]);
 
   return (
     <Grid container sx={sx}>
       <Grid item xs={12}>
         <StyledToggleButtonGroup
-          value={filter.categories?.map((c) => c.label) || []}
+          value={filter.parameterVocabs?.map((c) => c.label) || []}
           onChange={handleChange}
-          aria-label="category selection"
+          aria-label="parameter vocab selection"
         >
           {buttonLabels.map((label) => (
             <StyledToggleButton value={label} key={label} aria-label={label}>
@@ -100,4 +109,4 @@ const CategoryFilter: FC<CategoryFilterProps> = ({ filter, setFilter, sx }) => {
   );
 };
 
-export default CategoryFilter;
+export default ParameterVocabFilter;

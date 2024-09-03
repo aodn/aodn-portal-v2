@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import { dateDefault } from "./constants";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
-import { Category } from "./store/componentParamReducer";
+import { Vocab } from "./store/componentParamReducer";
 import { DatasetFrequency } from "./store/searchReducer";
 
 // TODO: refactor this, naming like this is not ideal for readability,
@@ -20,8 +20,8 @@ export type PolygonOperation = SingleArgumentFunction<
 >;
 export type TemporalAfterOrBefore = SingleArgumentFunction<number, string>;
 export type TemporalDuring = DualArgumentFunction<number, number, string>;
-export type CategoriesIn = SingleArgumentFunction<
-  Array<Category>,
+export type ParameterVocabsIn = SingleArgumentFunction<
+  Array<Vocab>,
   string | undefined
 >;
 export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
@@ -31,8 +31,8 @@ export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
  * therefore, the constructed URI by the frontend app needs to distinguish type of particular search text input
  **/
 export type CommonKey = SingleArgumentFunction<string, string | undefined>;
-export type CategoriesWithCommonKey = DualArgumentFunction<
-  Array<Category>,
+export type ParameterVocabsWithCommonKey = DualArgumentFunction<
+  Array<Vocab>,
   string,
   string | undefined
 >;
@@ -40,8 +40,8 @@ export type CategoriesWithCommonKey = DualArgumentFunction<
 export type FilterTypes =
   | string
   | CommonKey
-  | CategoriesWithCommonKey
-  | CategoriesIn
+  | ParameterVocabsWithCommonKey
+  | ParameterVocabsIn
   | TemporalDuring
   | TemporalAfterOrBefore
   | PolygonOperation
@@ -62,17 +62,19 @@ const funcIntersectPolygon: PolygonOperation = (p) => {
   return `INTERSECTS(geometry,${wkt})`;
 };
 
-const funcCategories: CategoriesIn = (categories: Array<Category>) => {
-  const categoryLabels: string[] = [];
+const funcParameterVocabs: ParameterVocabsIn = (vocabs: Array<Vocab>) => {
+  const parameterVocabLabels: string[] = [];
   // grab labels only
-  categories.forEach((category) => {
-    categoryLabels.push(`parameter_vocabs='${category.label?.toLowerCase()}'`);
+  vocabs.forEach((vocab) => {
+    parameterVocabLabels.push(
+      `parameter_vocabs='${vocab.label?.toLowerCase()}'`
+    );
   });
-  // if no category, return undefined
-  if (categoryLabels.length === 0) {
+  // if no parameter vocabs, return undefined
+  if (parameterVocabLabels.length === 0) {
     return undefined;
   }
-  return `(${categoryLabels.join(" or ")})`;
+  return `(${parameterVocabLabels.join(" or ")})`;
 };
 
 const funcCommonTypeSearchText: (searchText: string) => undefined | string = (
@@ -85,31 +87,29 @@ const funcCommonTypeSearchText: (searchText: string) => undefined | string = (
     results.push(`fuzzy_content='${st}'`);
     return `(${results.join(" or ")})`;
   } else {
-    // if no category, return undefined
+    // if no parameter vocabs, return undefined
     return undefined;
   }
 };
 
-const funcCategoriesWithCommonTypeSearchText: CategoriesWithCommonKey = (
-  categories: Array<Category>,
-  searchText: string
-) => {
-  const results: string[] = [];
-  categories.forEach((category) => {
-    results.push(`parameter_vocabs='${category.label?.toLowerCase()}'`);
-  });
+const funcParameterVocabsWithCommonTypeSearchText: ParameterVocabsWithCommonKey =
+  (vocabs: Array<Vocab>, searchText: string) => {
+    const results: string[] = [];
+    vocabs.forEach((vocab) => {
+      results.push(`parameter_vocabs='${vocab.label?.toLowerCase()}'`);
+    });
 
-  const st = searchText?.toLowerCase();
-  if (st) {
-    results.push(`parameter_vocabs='${st}'`);
-    results.push(`fuzzy_content='${st}'`);
-  }
-  // if no category, return undefined
-  if (results.length === 0) {
-    return undefined;
-  }
-  return `(${results.join(" or ")})`;
-};
+    const st = searchText?.toLowerCase();
+    if (st) {
+      results.push(`parameter_vocabs='${st}'`);
+      results.push(`fuzzy_content='${st}'`);
+    }
+    // if no parameter vocabs, return undefined
+    if (results.length === 0) {
+      return undefined;
+    }
+    return `(${results.join(" or ")})`;
+  };
 
 /**
  * The CQL filter format for search dataset given start/end date
@@ -124,9 +124,12 @@ const funcTemporalBetween: TemporalDuring = (s: number, e: number) =>
  */
 const cqlDefaultFilters = new Map<string, FilterTypes>();
 cqlDefaultFilters
-  .set("CATEGORIES_IN", funcCategories)
+  .set("PARAMETER_VOCABS_IN", funcParameterVocabs)
   .set("COMMON_KEY", funcCommonTypeSearchText)
-  .set("CATEGORIES_WITH_COMMON_KEY", funcCategoriesWithCommonTypeSearchText)
+  .set(
+    "PARAMETER_VOCABS_WITH_COMMON_KEY",
+    funcParameterVocabsWithCommonTypeSearchText
+  )
   .set("IMOS_ONLY", "dataset_provider='IMOS'")
   .set("ALL_TIME_RANGE", "temporal after 1970-01-01T00:00:00Z")
   .set("BETWEEN_TIME_RANGE", funcTemporalBetween)

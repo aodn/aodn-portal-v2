@@ -49,7 +49,7 @@ describe("Component Reducer Function Test", () => {
         end: 45697,
       },
       searchText: "This is test",
-      categories: [
+      parameterVocabs: [
         {
           label: "cat1",
           about: "about1",
@@ -63,7 +63,7 @@ describe("Component Reducer Function Test", () => {
 
     const answer4: string = formatToUrlParam(sample4);
     expect(answer4).toEqual(
-      "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&categories.0.label=cat1&categories.1.label=cat1"
+      "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&parameterVocabs.0.label=cat1&parameterVocabs.1.label=cat1"
     );
 
     const sample5: ParameterState = {
@@ -73,7 +73,7 @@ describe("Component Reducer Function Test", () => {
         end: 45697,
       },
       searchText: "This is test",
-      categories: [
+      parameterVocabs: [
         {
           label: "cat1",
           about: "about1",
@@ -88,7 +88,7 @@ describe("Component Reducer Function Test", () => {
 
     const answer5: string = formatToUrlParam(sample5);
     expect(answer5).toEqual(
-      "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&categories.0.label=cat1&categories.1.label=cat2&polygon.type=Feature&polygon.bbox.0=10&polygon.bbox.1=20&polygon.bbox.2=-10.1&polygon.bbox.3=-20&polygon.geometry.type=Polygon&polygon.geometry.coordinates.0.0.0=10&polygon.geometry.coordinates.0.0.1=20&polygon.geometry.coordinates.0.1.0=-10.1&polygon.geometry.coordinates.0.1.1=20&polygon.geometry.coordinates.0.2.0=-10.1&polygon.geometry.coordinates.0.2.1=-20&polygon.geometry.coordinates.0.3.0=10&polygon.geometry.coordinates.0.3.1=-20&polygon.geometry.coordinates.0.4.0=10&polygon.geometry.coordinates.0.4.1=20"
+      "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&parameterVocabs.0.label=cat1&parameterVocabs.1.label=cat2&polygon.type=Feature&polygon.bbox.0=10&polygon.bbox.1=20&polygon.bbox.2=-10.1&polygon.bbox.3=-20&polygon.geometry.type=Polygon&polygon.geometry.coordinates.0.0.0=10&polygon.geometry.coordinates.0.0.1=20&polygon.geometry.coordinates.0.1.0=-10.1&polygon.geometry.coordinates.0.1.1=20&polygon.geometry.coordinates.0.2.0=-10.1&polygon.geometry.coordinates.0.2.1=-20&polygon.geometry.coordinates.0.3.0=10&polygon.geometry.coordinates.0.3.1=-20&polygon.geometry.coordinates.0.4.0=10&polygon.geometry.coordinates.0.4.1=20"
     );
   });
 
@@ -111,7 +111,7 @@ describe("Component Reducer Function Test", () => {
         end: 45697,
       },
       searchText: "This is test",
-      categories: [
+      parameterVocabs: [
         {
           label: "cat1",
         },
@@ -132,7 +132,7 @@ describe("Component Reducer Function Test", () => {
         end: 45697,
       },
       searchText: "This is test",
-      categories: [
+      parameterVocabs: [
         {
           label: "cat1",
         },
