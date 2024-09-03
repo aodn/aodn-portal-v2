@@ -258,13 +258,13 @@ const SearchPage = () => {
         flexDirection="row"
         justifyContent="center"
         bgcolor={color.blue.light}
-        gap={2}
+        gap={1}
         padding={2}
       >
         <Box paddingTop={`${SEARCH_BAR_HEIGHT}px`}>
           <ResultPanelIconFilter />
         </Box>
-        <Grid container flex={1} gap={2}>
+        <Grid container flex={1} gap={1}>
           <Grid item xs={12} height={`${SEARCH_BAR_HEIGHT}px`}>
             <ComplexTextSearch />
           </Grid>

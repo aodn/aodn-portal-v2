@@ -1,18 +1,12 @@
-import {
-  Grid,
-  InputBase,
-  Paper,
-  styled,
-  SxProps,
-  Theme,
-  Typography,
-} from "@mui/material";
-import MapListToggleButton, {
-  MapListToggleButtonProps,
-} from "../buttons/MapListToggleButton";
-import SortButton, { SortButtonProps } from "../buttons/SortButton";
+import { Grid, Paper, SxProps, Theme, Typography } from "@mui/material";
+
 import { FC } from "react";
-import { borderRadius, fontSize } from "../../../styles/constants";
+import { borderRadius, color, fontSize } from "../../../styles/constants";
+import { formatNumber } from "../../../utils/StringUtils";
+import MapViewButton from "../buttons/MapViewButon";
+import ResultListSortButton from "../buttons/ResultListSortButton";
+import { MapListToggleButtonProps } from "../buttons/MapListToggleButton";
+import { SortButtonProps } from "../buttons/SortButton";
 
 interface ResultPanelSimpleFilterProps
   extends MapListToggleButtonProps,
@@ -39,19 +33,26 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             justifyContent: "center",
             alignItems: "center",
             height: "100%",
-            borderRadius: borderRadius.medium,
+            borderRadius: borderRadius.small,
+            bgcolor: color.white.sixTenTransparent,
           }}
         >
-          <Typography fontSize={fontSize.info} padding={0}>
-            Showing 1-{count} of {total} results
-          </Typography>
+          {total === 1 ? (
+            <Typography fontSize={fontSize.info} padding={0}>
+              Showing 1 of total 1 result
+            </Typography>
+          ) : (
+            <Typography fontSize={fontSize.info} padding={0}>
+              Showing 1-{count} of {formatNumber(total)} results
+            </Typography>
+          )}
         </Paper>
       </Grid>
       <Grid item md={3} xs={6}>
-        <SortButton onChangeSorting={onChangeSorting} />
+        <ResultListSortButton onChangeSorting={onChangeSorting} />
       </Grid>
       <Grid item md={3} xs={6}>
-        <MapListToggleButton onChangeLayout={onChangeLayout} />
+        <MapViewButton onChangeLayout={onChangeLayout} />
       </Grid>
     </Grid>
   );

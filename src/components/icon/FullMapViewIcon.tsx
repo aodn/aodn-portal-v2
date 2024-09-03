@@ -1,31 +1,37 @@
-import { SvgIcon } from "@mui/material";
+import { FC } from "react";
+import { IconProps } from "./types";
 
-const FullMapViewIcon = () => {
+const FullMapViewIcon: FC<IconProps> = ({
+  width = 24,
+  height = 18,
+  color = "#ADADAD",
+  bgColor = "white",
+}) => {
   return (
-    <SvgIcon
-      xmlns="http://www.w3.org/2000/svg"
-      width="42"
-      height="31"
-      viewBox="0 0 42 31"
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 24 18"
       fill="none"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <rect
-        x="41.0494"
-        y="30.125"
-        width="40.1427"
-        height="29.6707"
-        transform="rotate(-180 41.0494 30.125)"
-        fill="#ADADAD"
+        x="23.6992"
+        y="17.6484"
+        width="22.8398"
+        height="16.8816"
+        transform="rotate(-180 23.6992 17.6484)"
+        fill={color}
       />
       <rect
-        x="37.5588"
-        y="26.6328"
-        width="3.49067"
-        height="22.6893"
-        transform="rotate(-180 37.5588 26.6328)"
-        fill="#ECECEC"
+        x="21.7148"
+        y="15.6602"
+        width="1.98607"
+        height="12.9094"
+        transform="rotate(-180 21.7148 15.6602)"
+        fill={bgColor}
       />
-    </SvgIcon>
+    </svg>
   );
 };
 

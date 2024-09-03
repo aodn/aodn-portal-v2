@@ -101,7 +101,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
           display: "flex",
           flexDirection: "column",
         }}
-        gap={1}
+        gap={0.5}
         data-testid="search-page-result-list"
       >
         <Box>

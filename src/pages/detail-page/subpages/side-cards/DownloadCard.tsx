@@ -36,10 +36,7 @@ const DownloadCard = () => {
   return (
     <Stack direction="column">
       <Stack sx={{ padding: padding.medium }} spacing={2}>
-        <CommonSelect
-          items={selects.download.selectOptions}
-          sxProps={selectSxProps}
-        />
+        <CommonSelect items={selects.download.options} sx={selectSxProps} />
         <Button
           sx={{
             backgroundColor: theme.palette.primary.main,
