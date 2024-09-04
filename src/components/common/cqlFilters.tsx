@@ -102,7 +102,8 @@ const funcCategoriesWithCommonTypeSearchText: CategoriesWithCommonKey = (
   const st = searchText?.toLowerCase();
   if (st) {
     results.push(`parameter_vocabs='${st}'`);
-    results.push(`fuzzy_content='${st}'`);
+    results.push(`fuzzy_title='${st}'`);
+    results.push(`fuzzy_desc='${st}'`);
   }
   // if no category, return undefined
   if (results.length === 0) {
