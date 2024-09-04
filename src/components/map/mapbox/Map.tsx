@@ -112,6 +112,7 @@ const ReactMap = ({
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
             maxZoom: 14,
+            testMode: import.meta.env.MODE === "dev",
             localIdeographFontFamily:
               "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
           }) as Map)

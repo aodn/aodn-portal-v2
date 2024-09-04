@@ -150,7 +150,9 @@ const AbstractAndDownloadPanel = () => {
       <Grid container>
         <Grid item xs={12}>
           <Stack direction="column">
-            <Typography sx={{ padding: 0 }}>{abstract}</Typography>
+            <Typography sx={{ padding: 0 }} data-testid="detail-abstract">
+              {abstract}
+            </Typography>
             <Box sx={{ visibility: "visible" }}>
               <Box
                 arial-label="map"
