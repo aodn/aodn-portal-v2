@@ -1,6 +1,9 @@
 import { FC } from "react";
 import IconSelect from "../dropdown/IconSelect";
 import RelevancyIcon from "../../icon/RelevancyIcon";
+import PopularityIcon from "../../icon/PopularityIcon";
+import TittleIcon from "../../icon/TittleIcon";
+import ModifiedIcon from "../../icon/ModifiedIcon";
 
 export enum SortResultEnum {
   RELEVANT = "RELEVANT",
@@ -18,17 +21,17 @@ const SORT_SELECT = [
   {
     value: SortResultEnum.TITLE,
     label: "Title",
-    icon: RelevancyIcon,
+    icon: TittleIcon,
   },
   {
     value: SortResultEnum.POPULARITY,
     label: "Popularity",
-    icon: RelevancyIcon,
+    icon: PopularityIcon,
   },
   {
     value: SortResultEnum.MODIFIED,
     label: "Modified",
-    icon: RelevancyIcon,
+    icon: ModifiedIcon,
   },
 ];
 

@@ -2,8 +2,8 @@ import { FC } from "react";
 import { IconProps } from "./types";
 
 const FullMapViewIcon: FC<IconProps> = ({
-  width = 24,
-  height = 18,
+  width = 22,
+  height = 22,
   color = "#ADADAD",
   bgColor = "white",
 }) => {
@@ -16,19 +16,19 @@ const FullMapViewIcon: FC<IconProps> = ({
       xmlns="http://www.w3.org/2000/svg"
     >
       <rect
-        x="23.6992"
-        y="17.6484"
+        x="23.7012"
+        y="17.6475"
         width="22.8398"
         height="16.8816"
-        transform="rotate(-180 23.6992 17.6484)"
+        transform="rotate(-180 23.7012 17.6475)"
         fill={color}
       />
       <rect
         x="21.7148"
-        y="15.6602"
+        y="15.6599"
         width="1.98607"
         height="12.9094"
-        transform="rotate(-180 21.7148 15.6602)"
+        transform="rotate(-180 21.7148 15.6599)"
         fill={bgColor}
       />
     </svg>

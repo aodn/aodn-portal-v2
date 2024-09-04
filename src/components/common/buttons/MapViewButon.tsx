@@ -1,8 +1,9 @@
+import { FC } from "react";
 import GridAndMapIcon from "../../icon/GridAndMapIcon";
 import ListAndMapIcon from "../../icon/ListAndMapIcon";
 import FullMapViewIcon from "../../icon/FullMapViewIcon";
 import IconSelect from "../dropdown/IconSelect";
-import { FC } from "react";
+import ListAndDetailsIcon from "../../icon/ListAndDetailsIcon";
 
 export enum SearchResultLayoutEnum {
   GRID = "GRID",
@@ -26,6 +27,12 @@ const MAP_VIEW_SELECT = [
     value: SearchResultLayoutEnum.INVISIBLE,
     label: "Full Map View",
     icon: FullMapViewIcon,
+  },
+  // TODO: Implement 'List and Details' once designed finished
+  {
+    value: SearchResultLayoutEnum.LIST,
+    label: "List and Details",
+    icon: ListAndDetailsIcon,
   },
 ];
 
