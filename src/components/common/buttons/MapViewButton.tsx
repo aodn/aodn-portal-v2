@@ -30,13 +30,13 @@ const MAP_VIEW_SELECT = [
   },
   // TODO: Implement 'List and Details' once designed finished
   {
-    value: SearchResultLayoutEnum.LIST,
+    value: SearchResultLayoutEnum.VISIBLE,
     label: "List and Details",
     icon: ListAndDetailsIcon,
   },
 ];
 
-interface MapViewButtonProps<T> {
+export interface MapViewButtonProps<T> {
   onChangeLayout: (layout: T) => void;
 }
 

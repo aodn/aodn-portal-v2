@@ -35,11 +35,11 @@ const SORT_SELECT = [
   },
 ];
 
-interface MapViewButtonProps<T> {
+export interface ResultListSortButtonProps<T> {
   onChangeSorting: (sort: T) => void;
 }
 
-const ResultListSortButton: FC<MapViewButtonProps<SortResultEnum>> = ({
+const ResultListSortButton: FC<ResultListSortButtonProps<SortResultEnum>> = ({
   onChangeSorting,
 }) => {
   return (

@@ -42,13 +42,13 @@ import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIc
 import MapSection from "./subpages/MapSection";
 import { color } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
-import { SearchResultLayoutEnum } from "../../components/common/buttons/MapListToggleButton";
 import { bboxPolygon } from "@turf/turf";
 import {
   OGCCollection,
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
-import { SortResultEnum } from "../../components/common/buttons/SortButton";
+import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewButton";
+import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 
 const SEARCH_BAR_HEIGHT = 56;
 const RESULT_SECTION_WIDTH = 550;

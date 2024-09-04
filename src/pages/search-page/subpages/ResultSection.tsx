@@ -8,8 +8,6 @@ import {
 } from "../../../components/common/store/searchReducer";
 import React, { useCallback, useEffect, useState } from "react";
 import ResultCards from "../../../components/result/ResultCards";
-import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapListToggleButton";
-import { SortResultEnum } from "../../../components/common/buttons/SortButton";
 import {
   OGCCollection,
   OGCCollections,
@@ -22,6 +20,8 @@ import store, {
   searchQueryResult,
 } from "../../../components/common/store/store";
 import { ParameterState } from "../../../components/common/store/componentParamReducer";
+import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
+import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapViewButton";
 
 interface SearchResultListProps {
   datasetSelected?: OGCCollection[];

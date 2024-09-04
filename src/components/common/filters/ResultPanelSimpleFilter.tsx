@@ -3,14 +3,18 @@ import { Grid, Paper, SxProps, Theme, Typography } from "@mui/material";
 import { FC } from "react";
 import { borderRadius, color, fontSize } from "../../../styles/constants";
 import { formatNumber } from "../../../utils/StringUtils";
-import MapViewButton from "../buttons/MapViewButon";
-import ResultListSortButton from "../buttons/ResultListSortButton";
-import { MapListToggleButtonProps } from "../buttons/MapListToggleButton";
-import { SortButtonProps } from "../buttons/SortButton";
+import MapViewButton, {
+  MapViewButtonProps,
+  SearchResultLayoutEnum,
+} from "../buttons/MapViewButton";
+import ResultListSortButton, {
+  ResultListSortButtonProps,
+  SortResultEnum,
+} from "../buttons/ResultListSortButton";
 
 interface ResultPanelSimpleFilterProps
-  extends MapListToggleButtonProps,
-    SortButtonProps {
+  extends MapViewButtonProps<SearchResultLayoutEnum>,
+    ResultListSortButtonProps<SortResultEnum> {
   count: number;
   total: number;
   sx?: SxProps<Theme>;
