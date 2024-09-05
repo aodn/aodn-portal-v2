@@ -103,7 +103,6 @@ const ReactMap = ({
   ).current;
 
   useEffect(() => {
-    console.log("aaaa map useeffect");
     setMap((m) =>
       m === null
         ? (new Map({
