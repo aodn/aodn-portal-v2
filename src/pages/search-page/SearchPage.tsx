@@ -49,6 +49,7 @@ import {
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { SortResultEnum } from "../../components/common/buttons/SortButton";
+import LoadingModal from "../../components/loading/LoadingModal";
 
 const SEARCH_BAR_HEIGHT = 56;
 const RESULT_SECTION_WIDTH = 550;
@@ -64,6 +65,7 @@ const SearchPage = () => {
   );
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -123,7 +125,7 @@ const SearchPage = () => {
   );
 
   const doSearch = useCallback(
-    (needNavigate: boolean = true) => {
+    async (needNavigate: boolean = true): Promise<void> => {
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -134,38 +136,31 @@ const SearchPage = () => {
         pagesize: DEFAULT_SEARCH_PAGE,
       });
 
-      dispatch(fetchResultWithStore(paramPaged)).then(() => {
-        // Use a different parameter so that it return id and bbox only and do not store the values,
-        // we cannot add page because we want to show all record on map
-        const paramNonPaged = createSearchParamFrom(componentParam);
-        dispatch(
-          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
-          // and ordered by uuid to avoid affecting cluster calculation
-          fetchResultNoStore({
-            ...paramNonPaged,
-            properties: "id,bbox",
-            sortby: "id",
-          })
-        )
-          .unwrap()
-          .then((collections) => {
-            setLayers(collections.collections);
-          })
-          .then(() => {
-            if (needNavigate) {
-              navigate(
-                pageDefault.search + "?" + formatToUrlParam(componentParam),
-                {
-                  state: {
-                    fromNavigate: true,
-                    requireSearch: false,
-                    referer: "SearchPage",
-                  },
-                }
-              );
-            }
-          });
-      });
+      await dispatch(fetchResultWithStore(paramPaged));
+      // Use a different parameter so that it return id and bbox only and do not store the values,
+      // we cannot add page because we want to show all record on map
+      const paramNonPaged = createSearchParamFrom(componentParam);
+      const collections = await dispatch(
+        // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+        // and ordered by uuid to avoid affecting cluster calculation
+        fetchResultNoStore({
+          ...paramNonPaged,
+          properties: "id,bbox",
+          sortby: "id",
+        })
+      ).unwrap();
+
+      setLayers(collections.collections);
+
+      if (needNavigate) {
+        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+          state: {
+            fromNavigate: true,
+            requireSearch: false,
+            referer: "SearchPage",
+          },
+        });
+      }
     },
     [dispatch, navigate, setLayers]
   );
@@ -173,6 +168,7 @@ const SearchPage = () => {
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
+      setIsLoading(true);
       if (event.type === "zoomend" || event.type === "moveend") {
         const bounds = event.target.getBounds();
         const ne = bounds.getNorthEast(); // NorthEast corner
@@ -180,7 +176,9 @@ const SearchPage = () => {
         // Note order: longitude, latitude.2
         const polygon = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
         dispatch(updateFilterPolygon(polygon));
-        doSearch();
+        doSearch().then(() => {
+          setIsLoading(false);
+        });
       }
     },
     [dispatch, doSearch]
@@ -240,7 +238,7 @@ const SearchPage = () => {
           break;
       }
 
-      doSearch();
+      doSearch().then();
     },
     [dispatch, doSearch]
   );
@@ -253,6 +251,7 @@ const SearchPage = () => {
 
   return (
     <Layout>
+      <LoadingModal isLoading={isLoading} />
       <Box
         display="flex"
         flexDirection="row"

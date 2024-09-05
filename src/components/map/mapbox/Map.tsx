@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   LngLatBounds,
   LngLatBoundsLike,
@@ -103,6 +103,7 @@ const ReactMap = ({
   ).current;
 
   useEffect(() => {
+    console.log("aaaa map useeffect");
     setMap((m) =>
       m === null
         ? (new Map({
@@ -136,7 +137,22 @@ const ReactMap = ({
       // and we need to redraw the map
       const resizeObserver = new ResizeObserver((entries) =>
         // https://stackoverflow.com/questions/70533564/mapbox-gl-flickers-when-resizing-the-container-div
-        setTimeout(() => map.resize(), 0)
+
+        {
+          const entry = entries[0];
+          if (entry && entry.contentRect) {
+            const { width, height } = entry.contentRect;
+
+            // The below check is used to prevent unexpected triggering the resize
+            // event from some rerendering which only have slightly different size
+            if (
+              Math.abs(map.getContainer().clientWidth - width) > 1 ||
+              Math.abs(map.getContainer().clientHeight - height) > 1
+            ) {
+              setTimeout(() => map.resize(), 0);
+            }
+          }
+        }
       );
       resizeObserver.observe(map.getContainer());
 
