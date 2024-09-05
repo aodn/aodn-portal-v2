@@ -1,14 +1,14 @@
 import { afterAll, beforeAll, expect, describe, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import { server } from "../../../__mocks__/server";
-import { render } from "@testing-library/react";
-import "@testing-library/jest-dom"; // for the additional matchers
 import store from "../../../components/common/store/store";
 import { ThemeProvider } from "@mui/material/styles";
 import { Provider } from "react-redux";
 import AppTheme from "../../../utils/AppTheme";
 import SearchPage from "../SearchPage";
-import { userEvent } from "@testing-library/user-event";
 import { BrowserRouter as Router } from "react-router-dom";
+
 const theme = AppTheme;
 
 vi.mock("../../../components/map/mapbox/Map", () => {
@@ -35,19 +35,14 @@ beforeAll(() => {
   server.listen();
 });
 
-// afterEach(() => {
-//   cleanup();
-//   server.resetHandlers();
-//   vi.restoreAllMocks();
-// });
-
 afterAll(() => {
   server.close();
 });
 
-describe("SearchPage", async () => {
+describe("SearchPage", () => {
   it("The map should be able to expand properly", async () => {
-    const { findByTestId, queryByTestId } = render(
+    const user = userEvent.setup();
+    render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -56,22 +51,23 @@ describe("SearchPage", async () => {
         </ThemeProvider>
       </Provider>
     );
-    const mapListToggleButton = await findByTestId("map-list-toggle-button");
-    await userEvent.click(mapListToggleButton);
 
-    const fullMapViewOption: HTMLElement = await findByTestId(
-      "maplist-toggle-menu-mapview"
-    );
-    expect(fullMapViewOption).to.exist;
+    // Find and open the Select component
+    const selectElement = screen.getByText("View");
+    await user.click(selectElement);
 
-    await userEvent.click(fullMapViewOption);
+    // Find and click the "Full Map View" option
+    const fullMapViewOption = screen.getByText("Full Map View");
+    await user.click(fullMapViewOption);
+
     // Should not be there if full map view clicked
-    const list = queryByTestId("search-page-result-list");
+    const list = screen.queryByTestId("search-page-result-list");
     expect(list).not.toBeInTheDocument();
   });
 
   it("The list should be able to show in list / grid view", async () => {
-    const { findByTestId, findAllByTestId } = render(
+    const user = userEvent.setup();
+    const { findByTestId, findAllByTestId, queryAllByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -95,14 +91,14 @@ describe("SearchPage", async () => {
     const list = await findByTestId("search-page-result-list");
     expect(list).toBeDefined();
 
-    const mapListToggleButton = await findByTestId("map-list-toggle-button");
-    await userEvent.click(mapListToggleButton);
+    // Find and open the Select component
+    const selectElement = screen.getByText("View");
+    await user.click(selectElement);
 
-    const gridAndMapOption: HTMLElement = await findByTestId(
-      "maplist-toggle-menu-gridandmap"
-    );
+    // Find and click the "Grid and Map" option
+    const gridAndMapOption = screen.getByText("Grid and Map");
     expect(gridAndMapOption).toBeDefined();
-    await userEvent.click(gridAndMapOption);
+    await user.click(gridAndMapOption);
 
     const gridView = await findByTestId("resultcard-result-grid");
     expect(gridView).toBeInTheDocument();
@@ -110,13 +106,13 @@ describe("SearchPage", async () => {
     const gridList = await findAllByTestId("result-card-grid");
     expect(gridList.length).not.equal(0);
 
-    await userEvent.click(mapListToggleButton);
+    // Open the Select component again
+    await user.click(selectElement);
 
-    const listAndMapOption: HTMLElement = await findByTestId(
-      "maplist-toggle-menu-listandmap"
-    );
-    expect(listAndMapOption).to.exist;
-    userEvent.click(listAndMapOption);
+    // Find and click the "List and Map" option
+    const listAndMapOption = screen.getByText("List and Map");
+    expect(listAndMapOption).toBeInTheDocument();
+    await user.click(listAndMapOption);
 
     const listList = await findAllByTestId("result-card-list");
     expect(listList.length).not.equal(0);

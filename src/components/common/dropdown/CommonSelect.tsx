@@ -1,22 +1,25 @@
 import {
   FormControl,
   MenuItem,
-  Paper,
   Select,
   SelectChangeEvent,
   SxProps,
-  Theme,
 } from "@mui/material";
 import { FC, useState } from "react";
-import { capitalizeFirstLetter } from "../../../utils/StringUtils";
+import { IconProps } from "../../icon/types";
 
-interface CommonSelectProps {
-  items: string[];
-  onSelectCallback?: (value: string) => void;
-  sxProps?: SxProps<Theme>;
+export interface SelectItem<T = string> {
+  value: T;
+  label: string;
+  icon?: JSX.Element | FC<IconProps>;
+}
+export interface CommonSelectProps<T = string> {
+  items: SelectItem<T>[];
+  onSelectCallback?: (value: T) => void;
+  sx?: SxProps;
 }
 
-const defaultStyle: SxProps<Theme> = {
+const DEFAULT_SELECT_STYLE: SxProps = {
   padding: "0",
   textAlign: "center",
   height: "44px",
@@ -31,10 +34,10 @@ const defaultStyle: SxProps<Theme> = {
 
 const CommonSelect: FC<CommonSelectProps> = ({
   items,
-  onSelectCallback = () => {},
-  sxProps = {} as SxProps<Theme>,
+  onSelectCallback,
+  sx,
 }) => {
-  const [selectedItem, setSelectedItem] = useState(items[0]);
+  const [selectedItem, setSelectedItem] = useState<string>(items[0].value);
 
   const handleOnChange = (event: SelectChangeEvent<string>) => {
     const selectedItem = event.target.value as string;
@@ -48,13 +51,13 @@ const CommonSelect: FC<CommonSelectProps> = ({
         value={selectedItem}
         onChange={handleOnChange}
         sx={{
-          ...defaultStyle,
-          ...sxProps,
+          ...DEFAULT_SELECT_STYLE,
+          ...sx,
         }}
       >
         {items.map((item) => (
-          <MenuItem key={item} value={item}>
-            {capitalizeFirstLetter(item)}
+          <MenuItem key={item.value} value={item.value}>
+            {item.label}
           </MenuItem>
         ))}
       </Select>
