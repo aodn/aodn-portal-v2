@@ -17,3 +17,12 @@
  */
 export const capitalizeFirstLetter = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+/**
+ * Formats a number with comma separators for thousands.
+ * @param {number} number - The number to format.
+ * @returns {string} The formatted number as a string.
+ */
+export const formatNumber = (number: number) => {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
