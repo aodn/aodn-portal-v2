@@ -4,10 +4,10 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Box, Grid, ListItem, Stack, SxProps, Theme } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
-import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
+import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
 import { LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./contants";
 
 interface ResultCardsProps {

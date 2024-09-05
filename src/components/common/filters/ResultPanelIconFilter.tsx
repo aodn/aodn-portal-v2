@@ -6,7 +6,7 @@ import { padding } from "../../../styles/constants";
 
 const ResultPanelIconFilter = () => {
   return (
-    <Stack direction="column" spacing={2} paddingTop={padding.large}>
+    <Stack direction="column" spacing={1} paddingTop={padding.large}>
       <TimeRangeIcon />
       <SpatialIcon />
       <DimensionsIcon />

@@ -149,6 +149,10 @@ const zIndex = {
   FILTER_OVERLAY: 10,
 };
 
+const shadow = {
+  inner: "inset 1px 1px rgba(0, 0, 0, 0.1)",
+};
+
 export {
   gap,
   margin,
@@ -162,4 +166,5 @@ export {
   borderRadius,
   filterList,
   zIndex,
+  shadow,
 };
