@@ -8,6 +8,7 @@ import { SearchResultLayoutEnum } from "../common/buttons/MapListToggleButton";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
+import { LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./contants";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
@@ -36,7 +37,6 @@ interface ResultCardsProps {
   datasetsSelected?: OGCCollection[];
 }
 
-const LIST_ITEM_SIZE = 250;
 const GRID_ITEM_SIZE = 310;
 
 const ResultCards = ({
@@ -82,7 +82,11 @@ const ResultCards = ({
       <Stack
         direction="column"
         gap={1}
-        sx={{ width: "100%", maxHeight: "260px", overflowY: "auto" }}
+        sx={{
+          width: "100%",
+          maxHeight: LIST_CARD_HEIGHT + LIST_CARD_GAP,
+          overflowY: "auto",
+        }}
       >
         {datasetsSelected?.map((dataset, index) => (
           <ListResultCard
@@ -223,9 +227,9 @@ const ResultCards = ({
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - LIST_ITEM_SIZE : height}
+              height={hasSelectedDatasets ? height - LIST_CARD_HEIGHT : height}
               width={width}
-              itemSize={LIST_ITEM_SIZE}
+              itemSize={LIST_CARD_HEIGHT}
               itemCount={contents.result.collections.length + 1}
             >
               {(child: ListChildComponentProps) =>

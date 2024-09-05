@@ -33,8 +33,8 @@ const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
             border: border,
           },
           borderRadius: theme.borderRadius.sm,
-          justifyContent: "flex-start",
-          textAlign: "left",
+          justifyContent: "center",
+          textAlign: "center",
         }}
         onClick={navigate}
       >

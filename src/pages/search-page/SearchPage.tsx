@@ -51,7 +51,7 @@ import {
 import { SortResultEnum } from "../../components/common/buttons/SortButton";
 
 const SEARCH_BAR_HEIGHT = 56;
-const RESULT_SECTION_WIDTH = 550;
+const RESULT_SECTION_WIDTH = 500;
 
 const SearchPage = () => {
   const location = useLocation();

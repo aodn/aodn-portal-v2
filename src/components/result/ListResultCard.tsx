@@ -2,10 +2,8 @@ import {
   Box,
   Card,
   CardActionArea,
-  CardActions,
   CardContent,
   CardMedia,
-  Grid,
   Stack,
   Typography,
 } from "@mui/material";
@@ -15,9 +13,16 @@ import LinkIcon from "@mui/icons-material/Link";
 import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
 import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
-import { margin, padding } from "../../styles/constants";
+import {
+  border,
+  color,
+  fontColor,
+  fontSize,
+  margin,
+  padding,
+} from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 
 interface ResultCardProps {
@@ -56,6 +61,8 @@ const generateLinkText = (linkLength: number) => {
 };
 
 const ListResultCard = (props: ResultCardProps) => {
+  const [showButtons, setShowButtons] = useState<boolean>(true);
+
   const handleClick = useCallback(() => {
     if (props.onClickCard && props.content && props.content.id) {
       props.onClickCard(props.content.id);
@@ -68,9 +75,10 @@ const ListResultCard = (props: ResultCardProps) => {
       variant="outlined"
       sx={{
         width: "100%",
-        minHeight: "240px",
-        maxHeight: "240px",
-        border: props.isSelectedDataset ? "2px solid #618CA5" : "none",
+        height: "100%",
+        border: props.isSelectedDataset
+          ? `${border.sm} ${color.blue.dark}`
+          : "none",
       }}
       data-testid="result-card-list"
     >
@@ -78,8 +86,6 @@ const ListResultCard = (props: ResultCardProps) => {
         <CardContent>
           <Box
             sx={{
-              marginBottom: "10px",
-              height: "48px",
               display: "flex",
               flexWrap: "nowrap",
             }}
@@ -90,89 +96,106 @@ const ListResultCard = (props: ResultCardProps) => {
               justifyContent="center"
               alignItems="center"
             >
-              <Box flex={1}>
+              <Stack direction="column" flex={1}>
+                <Box height="45px">
+                  <Typography
+                    color={fontColor.gray.dark}
+                    fontSize={fontSize.resultCardTitle}
+                    sx={{
+                      padding: 0,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      WebkitLineClamp: "2",
+                      WebkitBoxOrient: "vertical",
+                    }}
+                    data-testid="result-card-title"
+                  >
+                    {props.content.title}
+                  </Typography>
+                </Box>
+
                 <Typography
+                  color={fontColor.gray.medium}
+                  fontSize={fontSize.resultCardContent}
                   sx={{
                     padding: 0,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     display: "-webkit-box",
-                    WebkitLineClamp: "2",
+                    WebkitLineClamp: showButtons ? "3" : "5",
                     WebkitBoxOrient: "vertical",
                   }}
-                  data-testid="result-card-title"
                 >
-                  {props.content.title}
+                  {props.content.description}
                 </Typography>
-              </Box>
-              <OrganizationLogo
-                logo={props.content.findIcon()}
-                sx={{
-                  width: "80px",
-                  height: "100%",
-                  paddingX: padding.extraSmall,
-                }}
-              />
-            </Stack>
-            {props.isSelectedDataset && (
-              <TaskAltIcon color="primary" sx={{ mt: margin.sm }} />
-            )}
-          </Box>
-
-          <Grid container spacing={1}>
-            <Grid item xs={3}>
-              <CardMedia
-                sx={{ display: "flex", width: "100%", height: "100px" }}
-                component="img"
-                image={props.content.findThumbnail()}
-              />
-            </Grid>
-            <Grid item xs={9}>
-              <Typography
-                variant="body2"
-                sx={{
-                  padding: 0,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: "5",
-                  WebkitBoxOrient: "vertical",
-                }}
+                <Box sx={{ justifyContent: "space-between" }}>
+                  <DynamicResultCardButton
+                    status={props.content.getStatus()}
+                    onClick={() => {}}
+                  />
+                  <StaticResultCardButton
+                    text={"Briefs"}
+                    startIcon={<InfoIcon />}
+                    onClick={() => {}}
+                  />
+                  {props.content.getDistributionLinks() && (
+                    <StaticResultCardButton
+                      text={generateLinkText(
+                        props.content.getDistributionLinks()!.length
+                      )}
+                      startIcon={<LinkIcon />}
+                      onClick={() => {}}
+                    />
+                  )}
+                  <StaticResultCardButton
+                    text={"Download"}
+                    startIcon={<DownloadIcon />}
+                    onClick={(event) =>
+                      props?.onDownload &&
+                      props.onDownload(event, props.content)
+                    }
+                  />
+                </Box>
+              </Stack>
+              <Stack
+                direction="column"
+                flexWrap="nowrap"
+                justifyContent="center"
+                alignItems="end"
+                width="120px"
+                height="100%"
               >
-                {props.content.description}
-              </Typography>
-            </Grid>
-          </Grid>
+                <Box height="45px">
+                  <OrganizationLogo
+                    logo={props.content.findIcon()}
+                    sx={{
+                      width: "50px",
+                      height: "100%",
+                      paddingX: padding.extraSmall,
+                    }}
+                  />
+                  {props.isSelectedDataset && (
+                    <TaskAltIcon color="primary" sx={{ mt: margin.sm }} />
+                  )}
+                </Box>
+                <Box width="100%" flex={1}>
+                  <CardMedia
+                    sx={{
+                      display: "flex",
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                    component="img"
+                    image={props.content.findThumbnail()}
+                  />
+                </Box>
+              </Stack>
+            </Stack>
+          </Box>
         </CardContent>
       </CardActionArea>
-
-      <CardActions sx={{ justifyContent: "space-between" }}>
-        <DynamicResultCardButton
-          status={props.content.getStatus()}
-          onClick={() => {}}
-        />
-        <StaticResultCardButton
-          text={"Briefs"}
-          startIcon={<InfoIcon />}
-          onClick={() => {}}
-        />
-        {props.content.getDistributionLinks() && (
-          <StaticResultCardButton
-            text={generateLinkText(
-              props.content.getDistributionLinks()!.length
-            )}
-            startIcon={<LinkIcon />}
-            onClick={() => {}}
-          />
-        )}
-        <StaticResultCardButton
-          text={"Download"}
-          startIcon={<DownloadIcon />}
-          onClick={(event) =>
-            props?.onDownload && props.onDownload(event, props.content)
-          }
-        />
-      </CardActions>
     </Card>
   );
 };

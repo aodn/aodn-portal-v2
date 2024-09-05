@@ -57,6 +57,8 @@ const fontSize = {
   icon: "10px",
   label: "12px",
   info: "14px",
+  resultCardTitle: "14px",
+  resultCardContent: "12px",
 };
 
 const fontFamily = {
