@@ -67,7 +67,7 @@ describe("SearchPage", () => {
 
   it("The list should be able to show in list / grid view", async () => {
     const user = userEvent.setup();
-    const { findByTestId, findAllByTestId, queryAllByTestId } = render(
+    const { findByTestId, findAllByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -85,7 +85,7 @@ describe("SearchPage", () => {
 
     // On the web, the followting tested feature is good,
     // but keep failing in the unit test. (may because of the loading modal)
-    // just ignore this line for now
+    // just ignore this line for now and TODO later
     // expect(input.value).toEqual("wave");
 
     const list = await findByTestId("search-page-result-list");
