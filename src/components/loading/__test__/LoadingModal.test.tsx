@@ -7,7 +7,7 @@ describe("LoadingModal", () => {
     render(<LoadingModal isLoading={true} />);
   });
   test("should render LoadingModal", () => {
-    const loatingText = screen.getByText("LOADING....");
+    const loatingText = screen.getByTestId("loading-progress");
     expect(loatingText).to.exist;
   });
 });

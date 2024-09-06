@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid } from "@mui/material";
 import {
   createSearchParamFrom,
@@ -65,7 +65,45 @@ const SearchPage = () => {
   );
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
+
+  // please don't set this state directly. Use startLoading() and endLoading() instead
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const onMapMoveLoadingTag = "on map move loading";
+
+  //the search page may have multiple loadings simutaniously. So the buffer here
+  // is to control them. On the other hand, because of debounce and rendering time,
+  // the search page triggers a "map move" very late (a couple of seconds after
+  // the searchpage rendered), and we don't want users to touch anything until
+  // the onMapZoomOrMove() is fully completed. So assume the
+  // "onMapZoomOrMove()" start to run at the very begining to make sure the
+  // loading modal still appear
+  const loadingThreadBuffer: string[] = useMemo(
+    () => [onMapMoveLoadingTag],
+    []
+  );
+  const startLoading = useCallback(
+    (tag: string) => {
+      loadingThreadBuffer.push(tag);
+      setIsLoading(true);
+    },
+    [loadingThreadBuffer]
+  );
+  const endLoading = useCallback(
+    (tag: string) => {
+      // remove the first match element in loadingthreadbuffer
+      const index = loadingThreadBuffer.indexOf(tag);
+      if (index !== -1) {
+        loadingThreadBuffer.splice(index, 1);
+      }
+      if (loadingThreadBuffer.length === 0) {
+        setIsLoading(false);
+      }
+      if (loadingThreadBuffer.length < 0) {
+        throw new Error("aaa Loading thread count is negative");
+      }
+    },
+    [loadingThreadBuffer]
+  );
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -88,8 +126,7 @@ const SearchPage = () => {
     if (!Array.isArray(uuids) || uuids.length === 0) {
       return "";
     }
-    const filterConditions = uuids.map((uuid) => `id='${uuid}'`).join(" or ");
-    return filterConditions;
+    return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
   };
 
   const getCollectionsData = useCallback(
@@ -126,18 +163,20 @@ const SearchPage = () => {
 
   const doSearch = useCallback(
     async (needNavigate: boolean = true): Promise<void> => {
+      const loadingTag = "do search";
+      startLoading(loadingTag);
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
 
       // Use standard param to get fields you need, record is stored in redux,
-      // set page so that it return fewer records
+      // set page so that it returns fewer records
       const paramPaged = createSearchParamFrom(componentParam, {
         pagesize: DEFAULT_SEARCH_PAGE,
       });
 
       await dispatch(fetchResultWithStore(paramPaged));
-      // Use a different parameter so that it return id and bbox only and do not store the values,
+      // Use a different parameter so that it returns id and bbox only and do not store the values,
       // we cannot add page because we want to show all record on map
       const paramNonPaged = createSearchParamFrom(componentParam);
       const collections = await dispatch(
@@ -161,14 +200,18 @@ const SearchPage = () => {
           },
         });
       }
+      endLoading(loadingTag);
     },
-    [dispatch, navigate, setLayers]
+    [dispatch, endLoading, navigate, startLoading]
   );
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
-      setIsLoading(true);
+      if (!loadingThreadBuffer.includes(onMapMoveLoadingTag)) {
+        loadingThreadBuffer.push(onMapMoveLoadingTag);
+      }
+
       if (event.type === "zoomend" || event.type === "moveend") {
         const bounds = event.target.getBounds();
         const ne = bounds.getNorthEast(); // NorthEast corner
@@ -176,17 +219,15 @@ const SearchPage = () => {
         // Note order: longitude, latitude.2
         const polygon = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
         dispatch(updateFilterPolygon(polygon));
-        doSearch().then(() => {
-          setIsLoading(false);
-        });
+        doSearch().then(() => endLoading(onMapMoveLoadingTag));
       }
     },
-    [dispatch, doSearch]
+    [dispatch, doSearch, endLoading, loadingThreadBuffer]
   );
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
-  // and content may not refreshed
+  // and content may not refresh
   const handleNavigation = useCallback(() => {
     if (!location.state?.fromNavigate) {
       // The first char is ? in the search string, so we need to remove it.
@@ -198,13 +239,13 @@ const SearchPage = () => {
         // in the url
         setBbox(paramState.polygon?.bbox as LngLatBoundsLike);
 
-        doSearch();
+        doSearch().then();
       }
     } else {
       if (location.state?.requireSearch) {
         // Explicitly call search from navigation, so you just need search
         // but do not navigate again.
-        doSearch(false);
+        doSearch(false).then();
       }
     }
   }, [location, dispatch, doSearch]);
