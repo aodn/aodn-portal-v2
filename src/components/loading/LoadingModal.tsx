@@ -1,5 +1,5 @@
 import StyledLoadingBox from "./StyledLoadingBox";
-import { Modal, Typography } from "@mui/material";
+import { Box, CircularProgress, Modal } from "@mui/material";
 import React from "react";
 
 interface LoadingModalProps {
@@ -9,9 +9,11 @@ interface LoadingModalProps {
 const LoadingModal: React.FC<LoadingModalProps> = ({ isLoading }) => {
   return (
     <Modal open={isLoading}>
-      <StyledLoadingBox>
-        <Typography sx={{ fontSize: "30px" }}>LOADING....</Typography>
-      </StyledLoadingBox>
+      <Box sx={{ width: "100%", height: "100%" }}>
+        <StyledLoadingBox>
+          <CircularProgress />
+        </StyledLoadingBox>
+      </Box>
     </Modal>
   );
 };
