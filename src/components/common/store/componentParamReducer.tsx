@@ -209,7 +209,7 @@ const paramReducer = (
     case UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE:
       return {
         ...state,
-        categories: action.payload.parameterVocabs,
+        parameterVocabs: action.payload.parameterVocabs,
       };
     case UPDATE_UPDATE_FREQ_VARIABLE:
       return {

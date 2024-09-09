@@ -250,16 +250,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     dispatch(fetchParameterVocabsWithStore(null))
       .unwrap()
       .then((parameterVocabs: Array<Vocab>) => {
-        const root = parameterVocabs.filter((i) => i.broader?.length === 0);
-        let child = new Array<Vocab>();
-        root
-          .filter((i) => i.narrower?.length !== 0)
-          .forEach((i) => i.narrower?.forEach((j) => child.push(j)));
-
-        child = child.sort((a, b) =>
-          a.label < b.label ? -1 : a.label > b.label ? 1 : 0
-        );
-        setParameterVocabSet(child);
+        const secondLevelVocabs = parameterVocabs
+          .flatMap((rootVocab) => rootVocab.narrower)
+          .filter((vocab) => vocab !== undefined)
+          .sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
+        setParameterVocabSet(secondLevelVocabs);
       });
   }, [dispatch]);
 

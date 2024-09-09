@@ -66,24 +66,13 @@ const ParameterVocabFilter: FC<ParameterVocabFilterProps> = ({
     dispatch(fetchParameterVocabsWithStore(null))
       .unwrap()
       .then((vocabs: Array<Vocab>) => {
-        // TODO: needs to fix somewhere around here to adapt with the new response from OGC API for list of parameter vocabs
-        // the JSON response structure is similar but not exactly the same in the past
-        console.log(vocabs);
-        // If the item does not have broader terms, that means it is the root level
-        const root = vocabs.filter((i) => i.broader?.length === 0);
+        // we only want second level of vocabs
+        const secondLevelVocabs = vocabs
+          .flatMap((rootVocab) => rootVocab.narrower)
+          .filter((vocab) => vocab !== undefined)
+          .sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
 
-        // Now we need to go one level lower as this is a requirement to display second level instead of top level
-        let child = new Array<Vocab>();
-        root
-          .filter((i) => i?.narrower?.length !== 0)
-          .forEach((i) => i?.narrower?.forEach((j) => child.push(j)));
-
-        // Now sort by child
-        child = child.sort((a, b) =>
-          a.label < b.label ? -1 : a.label > b.label ? 1 : 0
-        );
-
-        setParameterVocabs(child);
+        setParameterVocabs(secondLevelVocabs);
       })
       .catch((error) =>
         console.error("Error fetching parameterVocabs:", error)
