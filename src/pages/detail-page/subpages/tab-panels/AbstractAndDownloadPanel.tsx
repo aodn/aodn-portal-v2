@@ -11,7 +11,9 @@ import {
   useTheme,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
+import CommonSelect, {
+  SelectItem,
+} from "../../../../components/common/dropdown/CommonSelect";
 import InfoIcon from "@mui/icons-material/Info";
 import {
   color,
@@ -20,6 +22,7 @@ import {
   fontWeight,
   margin,
   padding,
+  shadow,
 } from "../../../../styles/constants";
 import DateRangeSlider from "../../../../components/details/DateRangeSlider";
 import TimeRangeIcon from "../../../../components/icon/TimeRangeIcon";
@@ -42,36 +45,95 @@ import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer"
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 
+interface DownloadSelect {
+  label?: string;
+  options: SelectItem[];
+}
+
+type DownloadSelectName =
+  | "download"
+  | "selectionMode"
+  | "selectedArea"
+  | "depth"
+  | "instrument"
+  | "siteName"
+  | "institution";
+
 // TODO: replace with real select options
-export const selects = {
+export const selects: Record<DownloadSelectName, DownloadSelect> = {
   download: {
-    selectOptions: ["NetCDFs", "1", "2"],
+    options: [
+      { label: "NetCDFs", value: "NetCDFs" },
+      { label: "1", value: "1" },
+    ],
   },
   selectionMode: {
     label: "Selection mode",
-    selectOptions: ["All", "Polygon", "Point", "Line"],
+    options: [
+      { label: "All", value: "all" },
+      { label: "Polygon", value: "polygon" },
+      { label: "Point", value: "point" },
+      { label: "Line", value: "line" },
+    ],
   },
   selectedArea: {
     label: "Selected area",
-    selectOptions: ["All", "-124.248... 145.2895", "1", "2"],
+    options: [
+      { label: "All", value: "all" },
+      { label: "-124.248... 145.2895n", value: "-124.248... 145.2895" },
+    ],
   },
   depth: {
     label: "Depth",
-    selectOptions: ["All", "1", "2"],
+    options: [
+      { label: "All", value: "all" },
+      { label: "1", value: "1" },
+    ],
   },
   instrument: {
     label: "Instrument",
-    selectOptions: ["All", "1", "2"],
+    options: [
+      { label: "All", value: "all" },
+      { label: "1", value: "1" },
+    ],
   },
   siteName: {
     label: "Site name",
-    selectOptions: ["All", "1", "2"],
+    options: [
+      { label: "All", value: "all" },
+      { label: "1", value: "1" },
+    ],
   },
   institution: {
     label: "Institution",
-    selectOptions: ["All", "1", "2"],
+    options: [
+      { label: "All", value: "all" },
+      { label: "1", value: "1" },
+    ],
   },
 };
+
+const selectSxProps = {
+  height: "30px",
+  textAlign: "start",
+  backgroundColor: color.blue.extraLightSemiTransparent,
+  boxShadow: shadow.inner,
+};
+
+const renderSelect = (select: DownloadSelect) => (
+  <Stack spacing={1}>
+    {select.label && (
+      <Typography
+        sx={{
+          padding: 0,
+        }}
+      >
+        {select.label}
+      </Typography>
+    )}
+    <CommonSelect items={select.options} sx={selectSxProps} />
+  </Stack>
+);
 
 const AbstractAndDownloadPanel = () => {
   const { collection } = useDetailPageContext();
@@ -82,30 +144,6 @@ const AbstractAndDownloadPanel = () => {
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
-  const selectSxProps = {
-    height: "30px",
-    textAlign: "start",
-    backgroundColor: color.blue.extraLightSemiTransparent,
-    boxShadow: theme.shadows[5],
-  };
-
-  const renderSelect = (select: {
-    label?: string;
-    selectOptions: string[];
-  }) => (
-    <Stack spacing={1}>
-      {select.label && (
-        <Typography
-          sx={{
-            padding: 0,
-          }}
-        >
-          {select.label}
-        </Typography>
-      )}
-      <CommonSelect items={select.selectOptions} sxProps={selectSxProps} />
-    </Stack>
-  );
   if (!collection) return;
   return (
     <>
