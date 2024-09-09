@@ -49,7 +49,7 @@ const ListResultCard: FC<ResultCardProps> = ({
   onClickCard,
   isSelectedDataset,
 }) => {
-  const [showButtons, setShowButtons] = useState<boolean>(true);
+  const [showButtons, setShowButtons] = useState<boolean>(false);
 
   const handleShowSpatialExtents = useCallback(() => {
     if (onClickCard && content && content.id) {
@@ -83,6 +83,8 @@ const ListResultCard: FC<ResultCardProps> = ({
         paddingX: padding.medium,
         paddingY: padding.small,
       }}
+      onMouseEnter={() => setShowButtons(true)}
+      onMouseLeave={() => setShowButtons(false)}
       data-testid="result-card-list"
     >
       <Box
@@ -92,6 +94,7 @@ const ListResultCard: FC<ResultCardProps> = ({
         flex={1}
         height="100%"
         maxWidth="90%"
+        mr={gap.sm}
       >
         <CardActionArea onClick={handleNavigateToDetail}>
           <Box
@@ -128,21 +131,35 @@ const ListResultCard: FC<ResultCardProps> = ({
               overflow: "hidden",
               textOverflow: "ellipsis",
               display: "-webkit-box",
-              WebkitLineClamp: showButtons ? "4" : "5",
+              WebkitLineClamp: isSelectedDataset
+                ? "4"
+                : showButtons
+                  ? "4"
+                  : "5",
               WebkitBoxOrient: "vertical",
+              wordBreak: "break-word",
             }}
           >
             {content.description}
           </Typography>
         </CardActionArea>
 
-        {showButtons && (
+        {isSelectedDataset ? (
           <ResultCardButtonGroup
             content={content}
             onDownload={onDownload}
             onDetail={handleNavigateToDetail}
             shouldHideText={true}
           />
+        ) : (
+          showButtons && (
+            <ResultCardButtonGroup
+              content={content}
+              onDownload={onDownload}
+              onDetail={handleNavigateToDetail}
+              shouldHideText={true}
+            />
+          )
         )}
       </Box>
 
@@ -159,7 +176,7 @@ const ListResultCard: FC<ResultCardProps> = ({
             logo={content.findIcon()}
             sx={{
               width: "auto",
-              maxWidth: "80px",
+              maxWidth: "100px",
               height: "45px",
               paddingX: padding.extraSmall,
             }}
