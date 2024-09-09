@@ -113,18 +113,6 @@ const SearchPage = () => {
     [dispatch]
   );
 
-  // const onDatasetSelected = useCallback(
-  //   async (uuids: Array<string>) => {
-  //     if (Array.isArray(uuids) && uuids.length === 0) {
-  //       setDatasetsSelected([]);
-  //       return;
-  //     }
-  //     const collections = await getCollectionsData(uuids);
-  //     if (collections) setDatasetsSelected(collections);
-  //   },
-  //   [getCollectionsData]
-  // );
-
   // On select a dataset, update the states: selected uuid(s) and get the collection data
   const handleDatasetSelecting = useCallback(
     (uuids: Array<string>) => {
@@ -261,9 +249,12 @@ const SearchPage = () => {
     [dispatch, doSearch]
   );
 
-  const handleClickCard = useCallback((uuid: string) => {
-    setSelectedUuids([uuid]);
-  }, []);
+  const handleClickCard = useCallback(
+    (uuid: string) => {
+      handleDatasetSelecting([uuid]);
+    },
+    [handleDatasetSelecting]
+  );
 
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.

@@ -8,7 +8,7 @@ import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
-import { LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./contants";
+import { LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./constants";
 import { gap, padding } from "../../styles/constants";
 
 interface ResultCardsProps {
@@ -55,6 +55,9 @@ const ResultCards = ({
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
   const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
+
+  const count = contents.result.collections.length;
+  const total = contents.result.total;
 
   const renderDatasetSelectedGridCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
@@ -103,8 +106,8 @@ const ResultCards = ({
   const renderLoadMoreButton = useCallback(() => {
     return (
       <DetailSubtabBtn
-        title="Load More"
-        isBordered={true}
+        title="Show more results"
+        isBordered={false}
         navigate={() => {
           onFetchMore && onFetchMore();
         }}
@@ -122,11 +125,8 @@ const ResultCards = ({
       const leftIndex = index * 2;
       const rightIndex = leftIndex + 1;
 
-      if (
-        leftIndex >= contents.result.collections.length &&
-        leftIndex <= contents.result.total
-      ) {
-        // We need to display load more button
+      if (leftIndex >= count && leftIndex <= total) {
+        // We need to display load more button/placeholder in the last index place
         return (
           <ListItem
             sx={{
@@ -164,7 +164,7 @@ const ResultCards = ({
         );
       }
     },
-    [renderLoadMoreButton]
+    [count, renderLoadMoreButton, total]
   );
 
   const renderRows = useCallback(
@@ -182,11 +182,8 @@ const ResultCards = ({
       // The style must pass to the listitem else incorrect rendering
       const { index, style } = child;
 
-      if (
-        index === contents.result.collections.length &&
-        index <= contents.result.total
-      ) {
-        // We need to display load more button
+      if (index === count && index < total) {
+        // We need to display load more button/placeholder in the last index place
         return (
           <ListItem
             sx={{
@@ -214,7 +211,7 @@ const ResultCards = ({
         );
       }
     },
-    [renderLoadMoreButton]
+    [count, renderLoadMoreButton, total]
   );
 
   // You must set the height to 100% of view height so the calculation
@@ -235,7 +232,7 @@ const ResultCards = ({
               height={hasSelectedDatasets ? height - LIST_CARD_HEIGHT : height}
               width={width}
               itemSize={LIST_CARD_HEIGHT}
-              itemCount={contents.result.collections.length + 1}
+              itemCount={count + 1}
             >
               {(child: ListChildComponentProps) =>
                 renderRows(
@@ -270,7 +267,7 @@ const ResultCards = ({
               height={hasSelectedDatasets ? height - GRID_ITEM_SIZE : height}
               width={width}
               itemSize={GRID_ITEM_SIZE}
-              itemCount={Math.ceil(contents.result.collections.length / 2) + 1}
+              itemCount={Math.ceil(count / 2) + 1}
             >
               {(child: ListChildComponentProps) =>
                 renderCells(

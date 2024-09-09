@@ -41,13 +41,19 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             bgcolor: color.white.sixTenTransparent,
           }}
         >
-          {total === 1 ? (
+          {total === 0 ? (
+            <Typography fontSize={fontSize.info} padding={0}>
+              No result found
+            </Typography>
+          ) : total === 1 ? (
             <Typography fontSize={fontSize.info} padding={0}>
               Showing 1 of total 1 result
             </Typography>
           ) : (
             <Typography fontSize={fontSize.info} padding={0}>
-              Showing 1-{count} of {formatNumber(total)} results
+              {/* TODO: here is a bug that the count might be larger than total, need to fix together with ogcapi */}
+              Showing 1-{count <= total ? count : total} of
+              {formatNumber(total)} results
             </Typography>
           )}
         </Paper>

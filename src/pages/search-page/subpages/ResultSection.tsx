@@ -70,10 +70,11 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     dispatch(fetchResultAppendStore(paramPaged))
       .unwrap()
       .then((collections: OGCCollections) => {
-        // Make a new object so useState trigger
-        contents.result = contents.result.clone();
-        contents.result.merge(collections);
-        setContents(contents);
+        setContents((prevContents) => {
+          const clonedResult = prevContents.result.clone();
+          clonedResult.merge(collections);
+          return { ...prevContents, result: clonedResult };
+        });
       });
   }, [dispatch, contents]);
 

@@ -15,7 +15,7 @@ import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 
 interface ResultCardProps {
-  content: OGCCollection;
+  content: OGCCollection | undefined;
   onDownload?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -62,6 +62,8 @@ const ListResultCard: FC<ResultCardProps> = ({
       onDetail(content.id);
     }
   }, [content, onDetail]);
+
+  if (!content) return;
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (

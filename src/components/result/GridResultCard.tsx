@@ -21,7 +21,7 @@ import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import OrganizationLogo from "../logo/OrganizationLogo";
 
 interface GridResultCardProps {
-  content?: OGCCollection;
+  content: OGCCollection | undefined;
   onRemoveLayer?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
