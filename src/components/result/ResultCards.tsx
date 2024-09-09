@@ -9,7 +9,7 @@ import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
 import { LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./contants";
-import { padding } from "../../styles/constants";
+import { gap, padding } from "../../styles/constants";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
@@ -82,7 +82,7 @@ const ResultCards = ({
   const renderDatasetSelectedListCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
     return (
-      <Box height={LIST_CARD_HEIGHT - LIST_CARD_GAP * 2}>
+      <Box height={LIST_CARD_HEIGHT - LIST_CARD_GAP * 2} mb={gap.lg}>
         <ListResultCard
           content={datasetsSelected[0]}
           onDownload={onDownload}

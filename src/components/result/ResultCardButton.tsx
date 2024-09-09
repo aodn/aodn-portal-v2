@@ -1,8 +1,7 @@
 import { ElementType, FC, isValidElement } from "react";
-import { Button, SxProps, Typography, useTheme } from "@mui/material";
+import { Button, SxProps, Typography } from "@mui/material";
 import { color, fontSize, padding } from "../../styles/constants";
 import { mergeWithDefaults } from "../common/utils";
-import { ThemeContext } from "@emotion/react";
 
 interface ResultCardButtonConfig {
   color?: string;
@@ -36,7 +35,6 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     defaultResultCardButtonConfig,
     resultCardButtonConfig
   );
-  console.log(onClick);
   return (
     <Button onClick={onClick} sx={{ ...sx }}>
       {isValidElement(startIcon) ? (

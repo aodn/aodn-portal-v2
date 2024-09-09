@@ -27,11 +27,12 @@ interface MapSectionProps {
   showFullMap: boolean;
   bbox?: LngLatBoundsLike;
   sx?: SxProps<Theme>;
+  selectedUuids: string[];
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
   onToggleClicked: (v: boolean) => void;
-  onDatasetSelected?: (uuid: Array<string>) => void;
+  onDatasetSelected?: (uuids: Array<string>) => void;
 }
 
 const MapSection: React.FC<MapSectionProps> = ({
@@ -42,6 +43,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   collections,
   showFullMap,
   sx,
+  selectedUuids,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>("heatmap");
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
@@ -53,6 +55,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           return (
             <HeatmapLayer
               collections={collections}
+              selectedUuids={selectedUuids}
               onDatasetSelected={onDatasetSelected}
             />
           );
@@ -61,12 +64,13 @@ const MapSection: React.FC<MapSectionProps> = ({
           return (
             <ClusterLayer
               collections={collections}
+              selectedUuids={selectedUuids}
               onDatasetSelected={onDatasetSelected}
             />
           );
       }
     },
-    [collections, onDatasetSelected]
+    [collections, onDatasetSelected, selectedUuids]
   );
 
   return (

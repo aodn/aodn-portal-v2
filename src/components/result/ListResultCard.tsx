@@ -8,7 +8,6 @@ import {
   fontSize,
   gap,
   padding,
-  shadow,
 } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import { FC, useCallback, useState } from "react";
@@ -52,7 +51,11 @@ const ListResultCard: FC<ResultCardProps> = ({
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(true);
 
-  const handleShowSpatialExtents = useCallback(() => {}, []);
+  const handleShowSpatialExtents = useCallback(() => {
+    if (onClickCard && content && content.id) {
+      onClickCard(content.id);
+    }
+  }, [content, onClickCard]);
 
   const handleNavigateToDetail = useCallback(() => {
     if (onDetail && content && content.id) {
@@ -63,7 +66,7 @@ const ListResultCard: FC<ResultCardProps> = ({
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card
-      elevation={isSelectedDataset ? 3 : 0}
+      elevation={isSelectedDataset ? 2 : 0}
       sx={{
         position: "relative",
         display: "flex",

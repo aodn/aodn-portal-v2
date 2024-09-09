@@ -11,6 +11,8 @@ import { OGCCollections } from "../../../common/store/OGCCollectionDefinitions";
 
 interface SpatialExtentsProps {
   layerId: string;
+  // Selected uuids is managed in parent component, reflecting dataset that user selected from result list or map
+  selectedUuids?: string[];
   onDatasetSelected?: (uuid: Array<string>) => void;
   // added layer ids are layers added on current map other than spatial extents layer
   // they are used in onEmptySpaceClick to identify if the click falls in empty space or in any layers
@@ -28,12 +30,12 @@ const createSourceId = (layerId: string, uuid: string) =>
 
 const SpatialExtents: FC<SpatialExtentsProps> = ({
   layerId,
+  selectedUuids,
   onDatasetSelected,
   addedLayerIds = [],
 }) => {
   const { map } = useContext(MapContext);
   const dispatch = useDispatch<AppDispatch>();
-  const [spatialExtentsUUid, setSpatialExtentsUUid] = useState<Array<string>>();
 
   // util function to get collection data given uuid
   const getCollectionData = useCallback(
@@ -58,7 +60,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
     const sourceIds = new Array<string>();
     const layerIds = new Array<string>();
 
-    spatialExtentsUUid?.forEach(async (uuid: string) => {
+    selectedUuids?.forEach(async (uuid: string) => {
       const sourceId = createSourceId(layerId, uuid);
       sourceIds.push(sourceId);
 
@@ -122,6 +124,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           paint: {
             "fill-color": "#fff",
             "fill-opacity": 0.4,
+            "fill-outline-color": "yellow",
           },
         });
       });
@@ -148,31 +151,31 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
         }
       });
     };
-  }, [spatialExtentsUUid, layerId, getCollectionData, map]);
+  }, [selectedUuids, layerId, getCollectionData, map]);
 
   const onPointClick = useCallback(
     (ev: MapLayerMouseEvent): void => {
       ev.preventDefault();
       // Make sure even same id under same area will be set once.
-      if (ev.features) {
-        const uuids = [
-          ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
-        ];
-        setSpatialExtentsUUid(uuids);
-
-        if (onDatasetSelected) {
+      if (onDatasetSelected) {
+        if (ev.features) {
+          const uuids = [
+            ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
+          ];
           onDatasetSelected(uuids);
+        } else {
+          onDatasetSelected([]);
         }
       }
     },
-    [setSpatialExtentsUUid, onDatasetSelected]
+    [onDatasetSelected]
   );
 
   const onEmptySpaceClick = useCallback(
     (ev: MapLayerMouseEvent) => {
       const point = map?.project(ev.lngLat);
 
-      // Query for features at the clicked point, but only in the cluster and unclustered point layers
+      // Query for features at the clicked point, but only in the addedLayerIds
       const features = point
         ? map?.queryRenderedFeatures(point, {
             layers: addedLayerIds,
@@ -180,11 +183,8 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
         : [];
 
       // If no features are found at the click point (i.e., clicked on empty space)
-      if (features && features.length === 0) {
-        // Clear the spatial extents uuid array
-        setSpatialExtentsUUid([]);
-        // TODO: if we need to clear selected datasets when click on empty space
-        if (onDatasetSelected) onDatasetSelected([]);
+      if (features && features.length === 0 && onDatasetSelected) {
+        onDatasetSelected([]);
       }
     },
     [map, addedLayerIds, onDatasetSelected]
