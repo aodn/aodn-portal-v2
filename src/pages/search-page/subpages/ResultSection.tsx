@@ -29,6 +29,7 @@ interface SearchResultListProps {
   onVisibilityChanged?: (v: SearchResultLayoutEnum) => void;
   onChangeSorting: (v: SortResultEnum) => void;
   onClickCard?: (uuid: string) => void;
+  onNavigateToDetail?: (uuid: string) => void;
 }
 
 const ResultSection: React.FC<SearchResultListProps> = ({
@@ -37,6 +38,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   onVisibilityChanged,
   onChangeSorting,
   onClickCard,
+  onNavigateToDetail,
 }) => {
   // Get contents from redux
   const dispatch = useDispatch<AppDispatch>();
@@ -101,7 +103,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
           display: "flex",
           flexDirection: "column",
         }}
-        gap={0.5}
+        gap={1}
         data-testid="search-page-result-list"
       >
         <Box>
@@ -119,6 +121,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
             onDownload={undefined}
             onTags={undefined}
             onMore={undefined}
+            onDetail={onNavigateToDetail}
             onClickCard={onClickCard}
             onFetchMore={fetchMore}
             datasetsSelected={datasetSelected}

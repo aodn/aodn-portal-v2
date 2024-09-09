@@ -117,6 +117,9 @@ const color = {
     twoTenTransparent: " rgba(255, 255, 255, 0.2  )",
     sixTenTransparent: " rgba(255, 255, 255, 0.6  )",
   },
+  success: {
+    main: "#4CAF50",
+  },
 };
 
 const border = {

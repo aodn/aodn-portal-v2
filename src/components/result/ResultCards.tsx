@@ -9,6 +9,7 @@ import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
 import { LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./contants";
+import { padding } from "../../styles/constants";
 
 interface ResultCardsProps {
   contents: CollectionsQueryType;
@@ -32,6 +33,7 @@ interface ResultCardsProps {
         stac: OGCCollection
       ) => void)
     | undefined;
+  onDetail?: (uuid: string) => void;
   onClickCard: ((uuid: string) => void) | undefined;
   onFetchMore?: (() => void) | undefined;
   datasetsSelected?: OGCCollection[];
@@ -48,6 +50,7 @@ const ResultCards = ({
   onDownload,
   onMore,
   onTags,
+  onDetail,
   onFetchMore,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
@@ -60,7 +63,7 @@ const ResultCards = ({
         direction="row"
         flexWrap="wrap"
         gap={1}
-        sx={{ width: "100%", height: "305px", overflowY: "auto" }}
+        sx={{ width: "100%", overflowY: "auto" }}
       >
         {datasetsSelected?.map((dataset, index) => (
           <Box key={index} width="49%" height="300px">
@@ -79,27 +82,23 @@ const ResultCards = ({
   const renderDatasetSelectedListCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
     return (
-      <Stack
-        direction="column"
-        gap={1}
-        sx={{
-          width: "100%",
-          maxHeight: LIST_CARD_HEIGHT + LIST_CARD_GAP,
-          overflowY: "auto",
-        }}
-      >
-        {datasetsSelected?.map((dataset, index) => (
-          <ListResultCard
-            key={index}
-            content={dataset}
-            onDownload={onDownload}
-            onClickCard={onClickCard}
-            isSelectedDataset
-          />
-        ))}
-      </Stack>
+      <Box height={LIST_CARD_HEIGHT - LIST_CARD_GAP * 2}>
+        <ListResultCard
+          content={datasetsSelected[0]}
+          onDownload={onDownload}
+          onDetail={onDetail}
+          onClickCard={onClickCard}
+          isSelectedDataset
+        />
+      </Box>
     );
-  }, [hasSelectedDatasets, datasetsSelected, onClickCard, onDownload]);
+  }, [
+    hasSelectedDatasets,
+    datasetsSelected,
+    onDownload,
+    onDetail,
+    onClickCard,
+  ]);
 
   const renderLoadMoreButton = useCallback(() => {
     return (
@@ -134,7 +133,6 @@ const ResultCards = ({
               display: "flex",
               alignItems: "flex-start", // Aligns the Box to the top of the ListItem
               justifyContent: "center", // Centers the Box horizontally
-              padding: "1", // Optional: Adjust padding to your needs
             }}
             style={style}
           >
@@ -171,7 +169,14 @@ const ResultCards = ({
 
   const renderRows = useCallback(
     (
-      { contents, onClickCard, onDownload, onMore, onTags }: ResultCardsProps,
+      {
+        contents,
+        onClickCard,
+        onDownload,
+        onMore,
+        onTags,
+        onDetail,
+      }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
       // The style must pass to the listitem else incorrect rendering
@@ -188,7 +193,6 @@ const ResultCards = ({
               display: "flex",
               alignItems: "flex-start", // Aligns the Box to the top of the ListItem
               justifyContent: "center", // Centers the Box horizontally
-              padding: "1", // Optional: Adjust padding to your needs
             }}
             style={style}
           >
@@ -197,12 +201,13 @@ const ResultCards = ({
         );
       } else {
         return (
-          <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
+          <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
             <ListResultCard
               content={contents.result.collections[index]}
               onDownload={onDownload}
               onTags={onTags}
               onMore={onMore}
+              onDetail={onDetail}
               onClickCard={onClickCard}
             />
           </ListItem>
@@ -234,7 +239,14 @@ const ResultCards = ({
             >
               {(child: ListChildComponentProps) =>
                 renderRows(
-                  { contents, onClickCard, onDownload, onMore, onTags },
+                  {
+                    contents,
+                    onClickCard,
+                    onDownload,
+                    onMore,
+                    onDetail,
+                    onTags,
+                  },
                   child
                 )
               }
@@ -261,7 +273,10 @@ const ResultCards = ({
               itemCount={Math.ceil(contents.result.collections.length / 2) + 1}
             >
               {(child: ListChildComponentProps) =>
-                renderCells({ contents, onDownload, onClickCard }, child)
+                renderCells(
+                  { contents, onDownload, onDetail, onClickCard },
+                  child
+                )
               }
             </FixedSizeList>
           )}
