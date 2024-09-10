@@ -2,177 +2,207 @@ import {
   Box,
   Card,
   CardActionArea,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Grid,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download";
-import InfoIcon from "@mui/icons-material/Info";
-import LinkIcon from "@mui/icons-material/Link";
-import DynamicResultCardButton from "../common/buttons/DynamicResultCardButton";
-import StaticResultCardButton from "../common/buttons/StaticResultCardButton";
-import TaskAltIcon from "@mui/icons-material/TaskAlt";
-import { margin, padding } from "../../styles/constants";
+import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
+import {
+  border,
+  borderRadius,
+  color,
+  fontColor,
+  fontSize,
+  fontWeight,
+  gap,
+  padding,
+} from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import { useCallback } from "react";
+import { FC, useCallback, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
+import ResultCardButtonGroup from "./ResultCardButtonGroup";
 
 interface ResultCardProps {
-  content: OGCCollection;
+  content: OGCCollection | undefined;
   onDownload?:
     | ((
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
         stac: OGCCollection
       ) => void)
     | undefined;
-  onTags?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
-  onMore?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
+  onDetail?: ((uuid: string) => void) | undefined;
   onClickCard?: ((uuid: string) => void) | undefined;
   isSelectedDataset?: boolean;
 }
 
 // links here may need to be changed, because only html links are wanted
-const generateLinkText = (linkLength: number) => {
-  if (linkLength === 0) {
-    return "No Link";
-  }
-  if (linkLength === 1) {
-    return "1 Link";
-  }
-  return `${linkLength} Links`;
-};
+const ListResultCard: FC<ResultCardProps> = ({
+  content,
+  onDownload,
+  onDetail,
+  onClickCard,
+  isSelectedDataset,
+}) => {
+  const [showButtons, setShowButtons] = useState<boolean>(false);
 
-const ListResultCard = (props: ResultCardProps) => {
-  const handleClick = useCallback(() => {
-    if (props.onClickCard && props.content && props.content.id) {
-      props.onClickCard(props.content.id);
+  const handleShowSpatialExtents = useCallback(() => {
+    if (onClickCard && content && content.id) {
+      onClickCard(content.id);
     }
-  }, [props]);
+  }, [content, onClickCard]);
+
+  const handleNavigateToDetail = useCallback(() => {
+    if (onDetail && content && content.id) {
+      onDetail(content.id);
+    }
+  }, [content, onDetail]);
+
+  if (!content) return;
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card
-      variant="outlined"
+      elevation={isSelectedDataset ? 2 : 0}
       sx={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        flexWrap: "nowrap",
         width: "100%",
-        minHeight: "240px",
-        maxHeight: "240px",
-        border: props.isSelectedDataset ? "2px solid #618CA5" : "none",
+        height: "100%",
+        border: isSelectedDataset ? `${border.sm} ${color.blue.dark}` : "none",
+        borderRadius: borderRadius.small,
+        paddingX: padding.medium,
+        paddingY: padding.small,
       }}
+      onMouseEnter={() => setShowButtons(true)}
+      onMouseLeave={() => setShowButtons(false)}
       data-testid="result-card-list"
     >
-      <CardActionArea onClick={handleClick}>
-        <CardContent>
-          <Box
-            sx={{
-              marginBottom: "10px",
-              height: "48px",
-              display: "flex",
-              flexWrap: "nowrap",
-            }}
-          >
-            <Stack
-              flex={1}
-              direction="row"
-              justifyContent="center"
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        flex={1}
+        height="100%"
+        maxWidth="90%"
+        mr={gap.sm}
+      >
+        <Tooltip title="More details ..." placement="top">
+          <CardActionArea onClick={handleNavigateToDetail}>
+            <Box
+              display="flex"
               alignItems="center"
+              height="45px"
+              arial-label="result-list-card-title"
             >
-              <Box flex={1}>
-                <Typography
-                  sx={{
-                    padding: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: "2",
-                    WebkitBoxOrient: "vertical",
-                  }}
-                  data-testid="result-card-title"
-                >
-                  {props.content.title}
-                </Typography>
-              </Box>
-              <OrganizationLogo
-                logo={props.content.findIcon()}
-                sx={{
-                  width: "80px",
-                  height: "100%",
-                  paddingX: padding.extraSmall,
-                }}
-              />
-            </Stack>
-            {props.isSelectedDataset && (
-              <TaskAltIcon color="primary" sx={{ mt: margin.sm }} />
-            )}
-          </Box>
-
-          <Grid container spacing={1}>
-            <Grid item xs={3}>
-              <CardMedia
-                sx={{ display: "flex", width: "100%", height: "100px" }}
-                component="img"
-                image={props.content.findThumbnail()}
-              />
-            </Grid>
-            <Grid item xs={9}>
               <Typography
-                variant="body2"
+                color={fontColor.gray.dark}
+                fontSize={fontSize.resultCardTitle}
+                fontWeight={fontWeight.bold}
                 sx={{
                   padding: 0,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   display: "-webkit-box",
-                  WebkitLineClamp: "5",
+                  WebkitLineClamp: "2",
                   WebkitBoxOrient: "vertical",
                 }}
+                data-testid="result-card-title"
               >
-                {props.content.description}
+                {content.title}
               </Typography>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </CardActionArea>
+            </Box>
+          </CardActionArea>
+        </Tooltip>
 
-      <CardActions sx={{ justifyContent: "space-between" }}>
-        <DynamicResultCardButton
-          status={props.content.getStatus()}
-          onClick={() => {}}
-        />
-        <StaticResultCardButton
-          text={"Briefs"}
-          startIcon={<InfoIcon />}
-          onClick={() => {}}
-        />
-        {props.content.getDistributionLinks() && (
-          <StaticResultCardButton
-            text={generateLinkText(
-              props.content.getDistributionLinks()!.length
-            )}
-            startIcon={<LinkIcon />}
-            onClick={() => {}}
+        <CardActionArea
+          onClick={handleShowSpatialExtents}
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "start",
+          }}
+        >
+          <Typography
+            arial-label="result-list-card-content"
+            color={fontColor.gray.medium}
+            fontSize={fontSize.resultCardContent}
+            sx={{
+              padding: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: isSelectedDataset || showButtons ? "4" : "6",
+              WebkitBoxOrient: "vertical",
+              wordBreak: "break-word",
+            }}
+          >
+            {content.description}
+          </Typography>
+        </CardActionArea>
+        {(isSelectedDataset || showButtons) && (
+          <ResultCardButtonGroup
+            content={content}
+            onDownload={onDownload}
+            onDetail={handleNavigateToDetail}
+            shouldHideText
           />
         )}
-        <StaticResultCardButton
-          text={"Download"}
-          startIcon={<DownloadIcon />}
-          onClick={(event) =>
-            props?.onDownload && props.onDownload(event, props.content)
-          }
-        />
-      </CardActions>
+      </Box>
+
+      <Stack
+        direction="column"
+        flexWrap="nowrap"
+        justifyContent="center"
+        alignItems="end"
+        width="120px"
+        height="100%"
+      >
+        <Box display="flex" flexDirection="row">
+          <OrganizationLogo
+            logo={content.findIcon()}
+            sx={{
+              width: "auto",
+              maxWidth: "100px",
+              height: "45px",
+              paddingX: padding.extraSmall,
+            }}
+          />
+          {isSelectedDataset && (
+            <Box
+              position="absolute"
+              top={gap.lg}
+              right={gap.lg}
+              height="20px"
+              width="auto"
+            >
+              <img
+                src={MapSpatialExtents}
+                alt="selected dataset"
+                style={{
+                  objectFit: "contain",
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            </Box>
+          )}
+        </Box>
+        <Box height="90px" width="100%">
+          <img
+            src={content.findThumbnail()}
+            alt="org_logo"
+            style={{
+              objectFit: "cover",
+              width: "100%",
+              height: "100%",
+            }}
+          />
+        </Box>
+      </Stack>
     </Card>
   );
 };

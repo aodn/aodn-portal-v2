@@ -12,7 +12,12 @@ import {
 } from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester";
 import { pageDefault } from "../common/constants";
-import { color, fontColor, padding } from "../../styles/constants";
+import {
+  borderRadius,
+  color,
+  fontColor,
+  padding,
+} from "../../styles/constants";
 
 export const filterButtonWidth = 100;
 export const searchIconWidth = 44;
@@ -60,13 +65,15 @@ const ComplexTextSearch = () => {
   }, [setShowFilters]);
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={1}>
       <Grid item xs={10}>
         <Paper
+          elevation={0}
           sx={{
             display: "flex",
             alignItems: "center",
             height: "100%",
+            borderRadius: borderRadius.small,
           }}
         >
           <IconButton
@@ -108,9 +115,10 @@ const ComplexTextSearch = () => {
             color: grey["searchButtonText"],
             backgroundColor: "#fff",
             height: "100%",
+            borderRadius: borderRadius.small,
 
             ":hover": {
-              backgroundColor: "#fff",
+              backgroundColor: color.white.sixTenTransparent,
             },
           }}
           fullWidth

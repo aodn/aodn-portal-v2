@@ -29,6 +29,7 @@ interface SearchResultListProps {
   onVisibilityChanged?: (v: SearchResultLayoutEnum) => void;
   onChangeSorting: (v: SortResultEnum) => void;
   onClickCard?: (uuid: string) => void;
+  onNavigateToDetail?: (uuid: string) => void;
 }
 
 const ResultSection: React.FC<SearchResultListProps> = ({
@@ -37,6 +38,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   onVisibilityChanged,
   onChangeSorting,
   onClickCard,
+  onNavigateToDetail,
 }) => {
   // Get contents from redux
   const dispatch = useDispatch<AppDispatch>();
@@ -68,10 +70,11 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     dispatch(fetchResultAppendStore(paramPaged))
       .unwrap()
       .then((collections: OGCCollections) => {
-        // Make a new object so useState trigger
-        contents.result = contents.result.clone();
-        contents.result.merge(collections);
-        setContents(contents);
+        setContents((prevContents) => {
+          const clonedResult = prevContents.result.clone();
+          clonedResult.merge(collections);
+          return { ...prevContents, result: clonedResult };
+        });
       });
   }, [dispatch, contents]);
 
@@ -101,7 +104,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
           display: "flex",
           flexDirection: "column",
         }}
-        gap={0.5}
+        gap={1}
         data-testid="search-page-result-list"
       >
         <Box>
@@ -117,8 +120,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
             layout={currentLayout}
             contents={contents}
             onDownload={undefined}
-            onTags={undefined}
-            onMore={undefined}
+            onDetail={onNavigateToDetail}
             onClickCard={onClickCard}
             onFetchMore={fetchMore}
             datasetsSelected={datasetSelected}

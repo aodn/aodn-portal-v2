@@ -57,6 +57,8 @@ const fontSize = {
   icon: "10px",
   label: "12px",
   info: "14px",
+  resultCardTitle: "14px",
+  resultCardContent: "12px",
 };
 
 const fontFamily = {
@@ -114,6 +116,9 @@ const color = {
   white: {
     twoTenTransparent: " rgba(255, 255, 255, 0.2  )",
     sixTenTransparent: " rgba(255, 255, 255, 0.6  )",
+  },
+  success: {
+    main: "#4CAF50",
   },
 };
 

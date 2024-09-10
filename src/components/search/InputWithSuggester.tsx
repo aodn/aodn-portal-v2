@@ -165,17 +165,17 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
                 return phrasesSuggestions.has(item);
               }
             );
-
+            // TODO: This logic is error prone, need to fix this
             // check if the current inputValue is a common key or not, then dispatch updateCommonKey
-            if (
-              commonSuggestions.some(
-                (item) => item.toLowerCase() === inputValue.toLowerCase()
-              )
-            ) {
-              dispatch(updateCommonKey(inputValue));
-            } else {
-              dispatch(updateCommonKey(""));
-            }
+            // if (
+            //   commonSuggestions.some(
+            //     (item) => item.toLowerCase() === inputValue.toLowerCase()
+            //   )
+            // ) {
+            //   dispatch(updateCommonKey(inputValue));
+            // } else {
+            //   dispatch(updateCommonKey(""));
+            // }
 
             // Create array of all unique suggestions
             const allSuggestions = new Set([
