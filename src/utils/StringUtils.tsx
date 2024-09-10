@@ -26,3 +26,20 @@ export const capitalizeFirstLetter = (str: string): string =>
 export const formatNumber = (number: number) => {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
+
+/**
+ * Trims a string to a specified length and adds an ellipsis if necessary.
+ * @param c - The input string to trim. Can be undefined.
+ * @param size - The maximum length of the trimmed string. Defaults to 90.
+ * @returns The trimmed string, or an empty string if the input is undefined.
+ */
+export const trimContent = (
+  c: string | undefined,
+  size: number = 90
+): string => {
+  if (c) {
+    return `${c.slice(0, 90)}${c.length > size ? "..." : ""}`;
+  } else {
+    return "";
+  }
+};

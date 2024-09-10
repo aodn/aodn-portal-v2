@@ -1,6 +1,11 @@
 import { FC } from "react";
 import { Grid, Paper, SxProps, Theme, Typography } from "@mui/material";
-import { borderRadius, color, fontSize } from "../../../styles/constants";
+import {
+  border,
+  borderRadius,
+  color,
+  fontSize,
+} from "../../../styles/constants";
 import { formatNumber } from "../../../utils/StringUtils";
 import MapViewButton, {
   MapViewButtonProps,
@@ -36,6 +41,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             justifyContent: "center",
             alignItems: "center",
             height: "100%",
+            border: `${border.xs} ${color.blue.darkSemiTransparent}`,
             borderRadius: borderRadius.small,
             bgcolor: color.white.sixTenTransparent,
           }}

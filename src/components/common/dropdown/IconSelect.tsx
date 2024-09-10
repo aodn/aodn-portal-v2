@@ -9,6 +9,7 @@ import {
 import { FC, useState } from "react";
 import { CommonSelectProps, SelectItem } from "./CommonSelect";
 import {
+  border,
   borderRadius,
   color,
   fontSize,
@@ -122,6 +123,7 @@ const IconSelect = <T extends string | number = string>({
         sx={{
           padding: "0",
           height: "36px",
+          border: `${border.xs} ${color.blue.darkSemiTransparent}`,
           borderRadius: borderRadius.small,
           backgroundColor: selectedItem
             ? color.blue.dark
