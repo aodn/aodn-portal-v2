@@ -37,7 +37,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   );
   return (
     <Tooltip title={text} placement="top">
-      <Button onClick={onClick} sx={{ ...sx }}>
+      <Button onClick={onClick} sx={{ padding: padding.extraSmall, ...sx }}>
         {isValidElement(startIcon) ? (
           startIcon
         ) : (

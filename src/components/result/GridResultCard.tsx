@@ -67,7 +67,6 @@ const GridResultCard: FC<GridResultCardProps> = ({
         flexDirection: "column",
         justifyContent: "space-between",
         alignItems: "center",
-        flexWrap: "nowrap",
         width: "100%",
         height: "100%",
         border: isSelectedDataset ? `${border.sm} ${color.blue.dark}` : "none",
@@ -118,7 +117,24 @@ const GridResultCard: FC<GridResultCardProps> = ({
         </Box>
       </CardActionArea>
 
-      <Stack flex={1} direction="row" padding={padding.small}>
+      <Stack
+        flex={1}
+        direction="row"
+        alignItems="center"
+        paddingX={padding.small}
+      >
+        {!isSelectedDataset && !showButtons && (
+          <OrganizationLogo
+            logo={content.findIcon()}
+            sx={{
+              width: "auto",
+              maxWidth: "60px",
+              height: "45px",
+              paddingRight: padding.extraSmall,
+            }}
+          />
+        )}
+
         <Tooltip title="More details ..." placement="top">
           <CardActionArea onClick={handleNavigateToDetail}>
             <Box
@@ -135,7 +151,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   display: "-webkit-box",
-                  WebkitLineClamp: isSelectedDataset || showButtons ? "3" : "4",
+                  WebkitLineClamp: isSelectedDataset || showButtons ? "2" : "4",
                   WebkitBoxOrient: "vertical",
                   wordBreak: "break-word",
                 }}
@@ -145,28 +161,26 @@ const GridResultCard: FC<GridResultCardProps> = ({
             </Box>
           </CardActionArea>
         </Tooltip>
-
-        {!showButtons && (
+      </Stack>
+      {(isSelectedDataset || showButtons) && (
+        <Stack direction="row" paddingX={padding.small}>
           <OrganizationLogo
             logo={content.findIcon()}
             sx={{
               width: "auto",
               maxWidth: "60px",
               height: "45px",
-              paddingX: padding.extraSmall,
+              paddingRight: padding.extraSmall,
             }}
           />
-        )}
-      </Stack>
-
-      {(isSelectedDataset || showButtons) && (
-        <ResultCardButtonGroup
-          content={content}
-          isGridView
-          onDetail={handleNavigateToDetail}
-          onDownload={onDownload}
-          shouldHideText={true}
-        />
+          <ResultCardButtonGroup
+            content={content}
+            onDetail={handleNavigateToDetail}
+            onDownload={onDownload}
+            shouldHideText
+            isGridView
+          />
+        </Stack>
       )}
     </Card>
   );

@@ -45,12 +45,13 @@ const generateLinkText = (linkLength: number) => {
 const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
   onDetail,
+  isGridView,
   shouldHideText = false,
 }) => {
   const ButtonContainer: FC<ButtonContainerProps> = ({ children, sx }) => (
     <Grid
       item
-      xs={3}
+      xs={isGridView ? 6 : 3}
       display="flex"
       justifyContent="center"
       alignItems="center"

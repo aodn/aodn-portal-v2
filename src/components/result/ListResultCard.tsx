@@ -135,11 +135,7 @@ const ListResultCard: FC<ResultCardProps> = ({
               overflow: "hidden",
               textOverflow: "ellipsis",
               display: "-webkit-box",
-              WebkitLineClamp: isSelectedDataset
-                ? "4"
-                : showButtons
-                  ? "4"
-                  : "6",
+              WebkitLineClamp: isSelectedDataset || showButtons ? "4" : "6",
               WebkitBoxOrient: "vertical",
               wordBreak: "break-word",
             }}
@@ -147,23 +143,13 @@ const ListResultCard: FC<ResultCardProps> = ({
             {content.description}
           </Typography>
         </CardActionArea>
-
-        {isSelectedDataset ? (
+        {(isSelectedDataset || showButtons) && (
           <ResultCardButtonGroup
             content={content}
             onDownload={onDownload}
             onDetail={handleNavigateToDetail}
-            shouldHideText={true}
+            shouldHideText
           />
-        ) : (
-          showButtons && (
-            <ResultCardButtonGroup
-              content={content}
-              onDownload={onDownload}
-              onDetail={handleNavigateToDetail}
-              shouldHideText={true}
-            />
-          )
         )}
       </Box>
 
