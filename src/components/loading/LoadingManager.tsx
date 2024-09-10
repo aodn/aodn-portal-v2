@@ -19,7 +19,7 @@ const LoadingManager: React.FC<LoadingManagerProps> = ({ children }) => {
     if (isLoading && loadingBuffer.length === 0) {
       setIsLoading(false);
     }
-  }, [loadingBuffer.length]);
+  }, [isLoading, loadingBuffer.length]);
   const startLoadingHandler = useCallback(
     (loadingName: string) => {
       loadingBuffer.push(loadingName);
