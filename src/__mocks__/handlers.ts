@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { PARAMETER_CATEGORIES } from "./data/PARAMETER_CATEGORIES";
+import { PARAMETER_VOCABS } from "./data/PARAMETER_VOCABS";
 import { COLLECTIONS_WAVE } from "./data/COLLECTIONS_WAVE";
 import { getSuggesterOptionsBy } from "./utils/SuggesterHandlerUtils";
 import { NORMAL_COLLECTION } from "./data/COLLECTIONS";
@@ -16,7 +16,7 @@ const PREFIX = "/api/v1/ogc";
 export const handlers = [
   http.get(PREFIX + "/ext/parameter/vocabs", () => {
     console.log("Called /ext/parameter/vocabs");
-    return HttpResponse.json(PARAMETER_CATEGORIES);
+    return HttpResponse.json(PARAMETER_VOCABS);
   }),
 
   http.get(PREFIX + "/ext/autocomplete", ({ request }) => {
