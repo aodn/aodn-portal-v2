@@ -1,5 +1,5 @@
 import { ElementType, FC, isValidElement } from "react";
-import { Button, SxProps, Typography } from "@mui/material";
+import { Button, SxProps, Tooltip, Typography } from "@mui/material";
 import { color, fontSize, padding } from "../../styles/constants";
 import { mergeWithDefaults } from "../common/utils";
 
@@ -36,24 +36,28 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     resultCardButtonConfig
   );
   return (
-    <Button onClick={onClick} sx={{ ...sx }}>
-      {isValidElement(startIcon) ? (
-        startIcon
-      ) : (
-        <IconComponent fontSize="small" color={config.color} />
-      )}
+    <Tooltip title={text} placement="top">
+      <Button onClick={onClick} sx={{ ...sx }}>
+        {isValidElement(startIcon) ? (
+          startIcon
+        ) : (
+          <IconComponent fontSize="small" color={config.color} />
+        )}
 
-      {text && !shouldHideText && (
-        <Typography
-          padding={0}
-          pl={padding.extraSmall}
-          fontSize={config.size === "small" ? fontSize.label : fontSize.icon}
-          color={config.color === "success" ? color.success.main : config.color}
-        >
-          {text}
-        </Typography>
-      )}
-    </Button>
+        {text && !shouldHideText && (
+          <Typography
+            padding={0}
+            pl={padding.extraSmall}
+            fontSize={config.size === "small" ? fontSize.label : fontSize.icon}
+            color={
+              config.color === "success" ? color.success.main : config.color
+            }
+          >
+            {text}
+          </Typography>
+        )}
+      </Button>
+    </Tooltip>
   );
 };
 

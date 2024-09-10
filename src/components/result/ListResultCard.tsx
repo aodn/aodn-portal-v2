@@ -1,4 +1,11 @@
-import { Box, Card, CardActionArea, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardActionArea,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
 import {
   border,
@@ -83,35 +90,41 @@ const ListResultCard: FC<ResultCardProps> = ({
         maxWidth="90%"
         mr={gap.sm}
       >
-        <CardActionArea onClick={handleNavigateToDetail}>
-          <Box
-            display="flex"
-            alignItems="center"
-            height="45px"
-            arial-label="result-list-card-title"
-          >
-            <Typography
-              color={fontColor.gray.dark}
-              fontSize={fontSize.resultCardTitle}
-              fontWeight={fontWeight.bold}
-              sx={{
-                padding: 0,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: "2",
-                WebkitBoxOrient: "vertical",
-              }}
-              data-testid="result-card-title"
+        <Tooltip title="More details ..." placement="top">
+          <CardActionArea onClick={handleNavigateToDetail}>
+            <Box
+              display="flex"
+              alignItems="center"
+              height="45px"
+              arial-label="result-list-card-title"
             >
-              {content.title}
-            </Typography>
-          </Box>
-        </CardActionArea>
+              <Typography
+                color={fontColor.gray.dark}
+                fontSize={fontSize.resultCardTitle}
+                fontWeight={fontWeight.bold}
+                sx={{
+                  padding: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: "2",
+                  WebkitBoxOrient: "vertical",
+                }}
+                data-testid="result-card-title"
+              >
+                {content.title}
+              </Typography>
+            </Box>
+          </CardActionArea>
+        </Tooltip>
 
         <CardActionArea
           onClick={handleShowSpatialExtents}
-          sx={{ display: "flex", justifyContent: "start", alignItems: "start" }}
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "start",
+          }}
         >
           <Typography
             arial-label="result-list-card-content"

@@ -115,7 +115,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
       <ButtonContainer>
         <ResultCardButton
           startIcon={InfoIcon}
-          text="Details"
+          text="More details ..."
           shouldHideText={shouldHideText}
           onClick={onDetail}
         />

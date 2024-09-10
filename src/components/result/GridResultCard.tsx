@@ -1,5 +1,12 @@
 import React, { FC, useCallback, useState } from "react";
-import { Box, Card, CardActionArea, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardActionArea,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import {
   border,
   borderRadius,
@@ -112,30 +119,33 @@ const GridResultCard: FC<GridResultCardProps> = ({
       </CardActionArea>
 
       <Stack flex={1} direction="row" padding={padding.small}>
-        <CardActionArea onClick={handleNavigateToDetail}>
-          <Box
-            display="flex"
-            alignItems="center"
-            arial-label="grid-list-card-title"
-          >
-            <Typography
-              color={fontColor.gray.dark}
-              fontSize={fontSize.resultCardContent}
-              fontWeight={fontWeight.medium}
-              sx={{
-                padding: 0,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: showButtons ? "3" : "4",
-                WebkitBoxOrient: "vertical",
-                wordBreak: "break-word",
-              }}
+        <Tooltip title="More details ..." placement="top">
+          <CardActionArea onClick={handleNavigateToDetail}>
+            <Box
+              display="flex"
+              alignItems="center"
+              arial-label="grid-list-card-title"
             >
-              {content.title}
-            </Typography>
-          </Box>
-        </CardActionArea>
+              <Typography
+                color={fontColor.gray.dark}
+                fontSize={fontSize.resultCardContent}
+                fontWeight={fontWeight.medium}
+                sx={{
+                  padding: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: showButtons ? "3" : "4",
+                  WebkitBoxOrient: "vertical",
+                  wordBreak: "break-word",
+                }}
+              >
+                {content.title}
+              </Typography>
+            </Box>
+          </CardActionArea>
+        </Tooltip>
+
         {!showButtons && (
           <OrganizationLogo
             logo={content.findIcon()}
