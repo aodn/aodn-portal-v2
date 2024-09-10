@@ -84,7 +84,8 @@ const funcCommonTypeSearchText: (searchText: string) => undefined | string = (
   if (st) {
     const results: string[] = [];
     results.push(`parameter_vocabs='${st}'`);
-    results.push(`fuzzy_content='${st}'`);
+    results.push(`fuzzy_title='${st}'`);
+    results.push(`fuzzy_desc='${st}'`);
     return `(${results.join(" or ")})`;
   } else {
     // if no parameter vocabs, return undefined
