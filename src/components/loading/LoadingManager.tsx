@@ -13,10 +13,10 @@ const LoadingManager: React.FC<LoadingManagerProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const checkState = useCallback(() => {
-    if (loadingBuffer.length > 0) {
+    if (!isLoading && loadingBuffer.length > 0) {
       setIsLoading(true);
     }
-    if (loadingBuffer.length === 0) {
+    if (isLoading && loadingBuffer.length === 0) {
       setIsLoading(false);
     }
   }, [loadingBuffer.length]);

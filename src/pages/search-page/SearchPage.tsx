@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Box, Grid } from "@mui/material";
 import {
   createSearchParamFrom,
@@ -38,7 +38,6 @@ import { pageDefault } from "../../components/common/constants";
 // Map section, you can switch to other map library, this is for mapbox
 import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
-import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
 import MapSection from "./subpages/MapSection";
 import { color } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
@@ -138,7 +137,7 @@ const SearchPage = () => {
   );
 
   const doSearch = useCallback(
-    async (needNavigate: boolean = true): Promise<void> => {
+    (needNavigate: boolean = true) => {
       loadingEmitter.emit(EventName.START_LOADING, LoadingName.DO_SEARCH);
       const componentParam: ParameterState = getComponentState(
         store.getState()
@@ -150,34 +149,41 @@ const SearchPage = () => {
         pagesize: DEFAULT_SEARCH_PAGE,
       });
 
-      await dispatch(fetchResultWithStore(paramPaged));
-      // Use a different parameter so that it returns id and bbox only and do not store the values,
-      // we cannot add page because we want to show all record on map
-      const paramNonPaged = createSearchParamFrom(componentParam);
-      const collections = await dispatch(
-        // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
-        // and ordered by uuid to avoid affecting cluster calculation
-        fetchResultNoStore({
-          ...paramNonPaged,
-          properties: "id,bbox",
-          sortby: "id",
-        })
-      ).unwrap();
-
-      setLayers(collections.collections);
-
-      if (needNavigate) {
-        navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-          state: {
-            fromNavigate: true,
-            requireSearch: false,
-            referer: "SearchPage",
-          },
-        });
-      }
+      dispatch(fetchResultWithStore(paramPaged)).then(() => {
+        // Use a different parameter so that it return id and bbox only and do not store the values,
+        // we cannot add page because we want to show all record on map
+        const paramNonPaged = createSearchParamFrom(componentParam);
+        dispatch(
+          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+          // and ordered by uuid to avoid affecting cluster calculation
+          fetchResultNoStore({
+            ...paramNonPaged,
+            properties: "id,bbox",
+            sortby: "id",
+          })
+        )
+          .unwrap()
+          .then((collections) => {
+            setLayers(collections.collections);
+          })
+          .then(() => {
+            if (needNavigate) {
+              navigate(
+                pageDefault.search + "?" + formatToUrlParam(componentParam),
+                {
+                  state: {
+                    fromNavigate: true,
+                    requireSearch: false,
+                    referer: "SearchPage",
+                  },
+                }
+              );
+            }
+          });
+      });
       loadingEmitter.emit(EventName.END_LOADING, LoadingName.DO_SEARCH);
     },
-    [dispatch, navigate]
+    [dispatch, navigate, setLayers]
   );
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
@@ -195,10 +201,7 @@ const SearchPage = () => {
         // Note order: longitude, latitude.2
         const polygon = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
         dispatch(updateFilterPolygon(polygon));
-        doSearch()
-          .then
-          // () => endLoading(onMapMoveLoadingTag)
-          ();
+        doSearch();
       }
       loadingEmitter.emit(
         EventName.END_LOADING,
@@ -222,13 +225,13 @@ const SearchPage = () => {
         // in the url
         setBbox(paramState.polygon?.bbox as LngLatBoundsLike);
 
-        doSearch().then();
+        doSearch();
       }
     } else {
       if (location.state?.requireSearch) {
         // Explicitly call search from navigation, so you just need search
         // but do not navigate again.
-        doSearch(false).then();
+        doSearch(false);
       }
     }
   }, [location, dispatch, doSearch]);
@@ -262,7 +265,7 @@ const SearchPage = () => {
           break;
       }
 
-      doSearch().then();
+      doSearch();
     },
     [dispatch, doSearch]
   );

@@ -82,11 +82,7 @@ describe("SearchPage", () => {
     )) as HTMLInputElement;
     await userEvent.type(input, "wave");
     await userEvent.type(input, "{enter}{enter}");
-
-    // On the web, the followting tested feature is good,
-    // but keep failing in the unit test. (may because of the loading modal)
-    // just ignore this line for now and TODO later
-    // expect(input.value).toEqual("wave");
+    expect(input.value).toEqual("wave");
 
     const list = await findByTestId("search-page-result-list");
     expect(list).toBeDefined();
