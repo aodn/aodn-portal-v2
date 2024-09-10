@@ -48,6 +48,14 @@ const handleBackToTop = () => {
   });
 };
 
+const handleClickContactUs = () => {
+  const recipient = "info@aodn.org.au";
+  const subject = "This is a test - please ignore";
+  const body = "This is being sent from AODN's Data Discovery portal.";
+
+  window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+};
+
 const currentYear = dayjs(new Date()).year();
 const version = import.meta.env.VITE_APP_VERSION;
 
@@ -57,24 +65,14 @@ const Footer: FC = () => {
       <Grid container paddingY={padding.quadruple}>
         <Grid item xs={12} display="flex" justifyContent="space-between">
           <AODNSiteLogo />
-          <Box>
-            <Button>
-              <IconContainer>
-                <MenuIcon fontSize="small" />
-              </IconContainer>
-              <Typography color="#000" paddingTop={0}>
-                Site Menu
-              </Typography>
-            </Button>
-            <Button onClick={handleBackToTop}>
-              <IconContainer>
-                <NorthIcon fontSize="small" />
-              </IconContainer>
-              <Typography color="#000" paddingTop={0}>
-                Back to Top
-              </Typography>
-            </Button>
-          </Box>
+          <Button onClick={handleBackToTop}>
+            <IconContainer>
+              <NorthIcon fontSize="small" />
+            </IconContainer>
+            <Typography color="#000" paddingTop={0}>
+              Back to Top
+            </Typography>
+          </Button>
         </Grid>
         <Grid item xs={12} paddingY={padding.large}>
           <Typography
@@ -104,73 +102,63 @@ const Footer: FC = () => {
         <Grid item xs={12} paddingY={padding.small}>
           <Grid container>
             <Grid item xs={6}>
-              <Box minWidth="415px" maxWidth="70%">
-                <Paper
-                  component="form"
-                  elevation={0}
+              <Box
+                sx={{
+                  height: "100%",
+                  width: "180px",
+                  bgcolor: color.blue.extraDark,
+                  borderRadius: borderRadius.small,
+                }}
+              >
+                <Button
                   sx={{
                     display: "flex",
+                    justifyContent: "center",
                     alignItems: "center",
+                    height: "100%",
                     width: "100%",
-                    height: "50px",
-                    border: border.xs,
-                    borderBlockColor: color.blue.dark,
-                    borderRadius: borderRadius.medium,
-                    overflow: "hidden",
                   }}
+                  onClick={handleClickContactUs}
                 >
-                  <IconContainer
-                    sx={{ marginX: margin.lg, color: color.blue.extraDark }}
-                  >
+                  <IconContainer sx={{ marginRight: margin.lg, color: "#fff" }}>
                     <MailOutlineIcon />
                   </IconContainer>
-                  <InputBase
-                    sx={{ flex: 1, p: 0 }}
-                    placeholder="email@example.com"
-                  />
-                  <Box
-                    sx={{
-                      height: "100%",
-                      width: "20%",
-                      bgcolor: color.blue.extraDark,
-                    }}
+                  <Typography
+                    color="#fff"
+                    paddingTop={0}
+                    fontSize={fontSize.info}
+                    letterSpacing={1}
+                    textAlign="center"
                   >
-                    <Button
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100%",
-                        width: "100%",
-                      }}
-                    >
-                      <Typography
-                        color="#fff"
-                        paddingTop={0}
-                        fontSize={fontSize.label}
-                        textAlign="center"
-                      >
-                        Subscribe
-                      </Typography>
-                    </Button>
-                  </Box>
-                </Paper>
+                    Contact Us
+                  </Typography>
+                </Button>
               </Box>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="end" gap={2}>
-              <Button>
+              <Button
+                onClick={() => window.open("https://imos.org.au/terms-of-use")}
+              >
+                <Typography color="#000" paddingTop={gap.md}>
+                  Terms of Use
+                </Typography>
+              </Button>
+              <Button
+                onClick={() =>
+                  window.open("https://imos.org.au/resources/acknowledging-us")
+                }
+              >
                 <Typography color="#000" paddingTop={gap.md}>
                   Acknowledge Us
                 </Typography>
               </Button>
-              <Button>
+              <Button
+                onClick={() =>
+                  window.open("https://imos.org.au/conditions-of-use")
+                }
+              >
                 <Typography color="#000" paddingTop={gap.md}>
-                  Site Map
-                </Typography>
-              </Button>
-              <Button>
-                <Typography color="#000" paddingTop={gap.md}>
-                  Term of Use
+                  Conditions of Use
                 </Typography>
               </Button>
             </Grid>
