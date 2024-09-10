@@ -1,5 +1,5 @@
-import { FC, useCallback } from "react";
-import { Grid } from "@mui/material";
+import { FC, ReactNode, useCallback } from "react";
+import { Grid, SxProps } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import InfoIcon from "@mui/icons-material/Info";
 import LinkIcon from "@mui/icons-material/Link";
@@ -22,6 +22,11 @@ interface ResultCardButtonGroupProps {
   shouldHideText?: boolean;
 }
 
+interface ButtonContainerProps {
+  children: ReactNode;
+  sx?: SxProps;
+}
+
 enum Status {
   Ongoing = "ongoing",
   Completed = "completed",
@@ -39,11 +44,22 @@ const generateLinkText = (linkLength: number) => {
 
 const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
-  onDownload,
   onDetail,
-  isGridView = false,
   shouldHideText = false,
 }) => {
+  const ButtonContainer: FC<ButtonContainerProps> = ({ children, sx }) => (
+    <Grid
+      item
+      xs={3}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      sx={{ ...sx }}
+    >
+      {children}
+    </Grid>
+  );
+
   const renderStatusButton = useCallback(
     (content: OGCCollection) => {
       const status = content?.getStatus()?.toLowerCase().trim();
@@ -79,10 +95,8 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
 
   return (
     <Grid container arial-label="result-list-card-buttons">
-      <Grid item xs={isGridView ? 6 : 3}>
-        {renderStatusButton(content)}
-      </Grid>
-      <Grid item xs={isGridView ? 6 : 3}>
+      <ButtonContainer> {renderStatusButton(content)}</ButtonContainer>
+      <ButtonContainer>
         {content.getDistributionLinks() && (
           <ResultCardButton
             startIcon={LinkIcon}
@@ -90,22 +104,22 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
             shouldHideText={shouldHideText}
           />
         )}
-      </Grid>
-      <Grid item xs={isGridView ? 6 : 3}>
+      </ButtonContainer>
+      <ButtonContainer>
         <ResultCardButton
           startIcon={DownloadIcon}
           text="Download"
           shouldHideText={shouldHideText}
         />
-      </Grid>
-      <Grid item xs={isGridView ? 6 : 3}>
+      </ButtonContainer>
+      <ButtonContainer>
         <ResultCardButton
           startIcon={InfoIcon}
           text="Details"
-          shouldHideText={false}
+          shouldHideText={shouldHideText}
           onClick={onDetail}
         />
-      </Grid>
+      </ButtonContainer>
     </Grid>
   );
 };

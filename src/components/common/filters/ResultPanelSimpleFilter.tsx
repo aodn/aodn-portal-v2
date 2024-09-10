@@ -1,6 +1,5 @@
-import { Grid, Paper, SxProps, Theme, Typography } from "@mui/material";
-
 import { FC } from "react";
+import { Grid, Paper, SxProps, Theme, Typography } from "@mui/material";
 import { borderRadius, color, fontSize } from "../../../styles/constants";
 import { formatNumber } from "../../../utils/StringUtils";
 import MapViewButton, {
@@ -51,9 +50,9 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             </Typography>
           ) : (
             <Typography fontSize={fontSize.info} padding={0}>
-              {/* TODO: here is a bug that the count might be larger than total, need to fix together with ogcapi */}
-              Showing 1-{count <= total ? count : total} of
-              {formatNumber(total)} results
+              {/* TODO: here is a bug that the count number might be larger than total number */}
+              Showing 1&nbsp;-&nbsp;{count}&nbsp;of&nbsp;{formatNumber(total)}
+              &nbsp;results
             </Typography>
           )}
         </Paper>

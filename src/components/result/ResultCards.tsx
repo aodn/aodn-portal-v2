@@ -1,14 +1,14 @@
 import React, { useCallback, useRef } from "react";
 import { CollectionsQueryType } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
-import { Box, Grid, ListItem, Stack, SxProps, Theme } from "@mui/material";
+import { Box, Grid, ListItem, SxProps, Theme } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
-import { LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./constants";
+import { GRID_CARD_HEIGHT, LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./constants";
 import { gap, padding } from "../../styles/constants";
 
 interface ResultCardsProps {
@@ -21,25 +21,11 @@ interface ResultCardsProps {
         stac: OGCCollection | undefined
       ) => void)
     | undefined;
-  onTags?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
-  onMore?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
   onDetail?: (uuid: string) => void;
   onClickCard: ((uuid: string) => void) | undefined;
   onFetchMore?: (() => void) | undefined;
   datasetsSelected?: OGCCollection[];
 }
-
-const GRID_ITEM_SIZE = 310;
 
 const ResultCards = ({
   contents,
@@ -48,39 +34,41 @@ const ResultCards = ({
   datasetsSelected,
   onClickCard,
   onDownload,
-  onMore,
-  onTags,
   onDetail,
   onFetchMore,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
+
   const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
 
   const count = contents.result.collections.length;
   const total = contents.result.total;
 
+  // For now only one dataset can be selected at a time, so use datasetsSelected[0] for selected list/grid card
   const renderDatasetSelectedGridCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
     return (
-      <Stack
-        direction="row"
-        flexWrap="wrap"
-        gap={1}
-        sx={{ width: "100%", overflowY: "auto" }}
+      <Box
+        width={"calc(50% - 7px)"}
+        height={GRID_CARD_HEIGHT - LIST_CARD_GAP}
+        mb={gap.lg}
       >
-        {datasetsSelected?.map((dataset, index) => (
-          <Box key={index} width="49%" height="300px">
-            <GridResultCard
-              content={dataset}
-              onDownload={onDownload}
-              onClickCard={onClickCard}
-              isSelectedDataset
-            />
-          </Box>
-        ))}
-      </Stack>
+        <GridResultCard
+          content={datasetsSelected[0]}
+          onDownload={onDownload}
+          onClickCard={onClickCard}
+          onDetail={onDetail}
+          isSelectedDataset
+        />
+      </Box>
     );
-  }, [hasSelectedDatasets, datasetsSelected, onClickCard, onDownload]);
+  }, [
+    hasSelectedDatasets,
+    datasetsSelected,
+    onDownload,
+    onClickCard,
+    onDetail,
+  ]);
 
   const renderDatasetSelectedListCards = useCallback(() => {
     if (!hasSelectedDatasets) return;
@@ -141,21 +129,23 @@ const ResultCards = ({
         );
       } else {
         return (
-          <ListItem sx={{ pl: 0, pr: 0 }} style={style}>
-            <Grid container spacing={1}>
-              <Grid item xs={6}>
+          <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
+            <Grid container height="100%">
+              <Grid item xs={6} sx={{ pr: 0.5 }}>
                 <GridResultCard
                   content={contents.result.collections[leftIndex]}
                   onDownload={onDownload}
                   onClickCard={onClickCard}
+                  onDetail={onDetail}
                 />
               </Grid>
               {rightIndex < contents.result.collections.length && (
-                <Grid item xs={6}>
+                <Grid item xs={6} sx={{ pl: 0.5 }}>
                   <GridResultCard
                     content={contents.result.collections[rightIndex]}
                     onDownload={onDownload}
                     onClickCard={onClickCard}
+                    onDetail={onDetail}
                   />
                 </Grid>
               )}
@@ -164,19 +154,12 @@ const ResultCards = ({
         );
       }
     },
-    [count, renderLoadMoreButton, total]
+    [count, onDetail, renderLoadMoreButton, total]
   );
 
   const renderRows = useCallback(
     (
-      {
-        contents,
-        onClickCard,
-        onDownload,
-        onMore,
-        onTags,
-        onDetail,
-      }: ResultCardsProps,
+      { contents, onClickCard, onDownload, onDetail }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
       // The style must pass to the listitem else incorrect rendering
@@ -202,8 +185,6 @@ const ResultCards = ({
             <ListResultCard
               content={contents.result.collections[index]}
               onDownload={onDownload}
-              onTags={onTags}
-              onMore={onMore}
               onDetail={onDetail}
               onClickCard={onClickCard}
             />
@@ -240,9 +221,7 @@ const ResultCards = ({
                     contents,
                     onClickCard,
                     onDownload,
-                    onMore,
                     onDetail,
-                    onTags,
                   },
                   child
                 )
@@ -264,9 +243,9 @@ const ResultCards = ({
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - GRID_ITEM_SIZE : height}
+              height={hasSelectedDatasets ? height - GRID_CARD_HEIGHT : height}
               width={width}
-              itemSize={GRID_ITEM_SIZE}
+              itemSize={GRID_CARD_HEIGHT}
               itemCount={Math.ceil(count / 2) + 1}
             >
               {(child: ListChildComponentProps) =>

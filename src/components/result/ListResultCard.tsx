@@ -6,6 +6,7 @@ import {
   color,
   fontColor,
   fontSize,
+  fontWeight,
   gap,
   padding,
 } from "../../styles/constants";
@@ -22,18 +23,6 @@ interface ResultCardProps {
         stac: OGCCollection
       ) => void)
     | undefined;
-  onTags?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
-  onMore?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
   onDetail?: ((uuid: string) => void) | undefined;
   onClickCard?: ((uuid: string) => void) | undefined;
   isSelectedDataset?: boolean;
@@ -43,8 +32,6 @@ interface ResultCardProps {
 const ListResultCard: FC<ResultCardProps> = ({
   content,
   onDownload,
-  onTags,
-  onMore,
   onDetail,
   onClickCard,
   isSelectedDataset,
@@ -106,6 +93,7 @@ const ListResultCard: FC<ResultCardProps> = ({
             <Typography
               color={fontColor.gray.dark}
               fontSize={fontSize.resultCardTitle}
+              fontWeight={fontWeight.bold}
               sx={{
                 padding: 0,
                 overflow: "hidden",
@@ -121,7 +109,10 @@ const ListResultCard: FC<ResultCardProps> = ({
           </Box>
         </CardActionArea>
 
-        <CardActionArea onClick={handleShowSpatialExtents}>
+        <CardActionArea
+          onClick={handleShowSpatialExtents}
+          sx={{ display: "flex", justifyContent: "start", alignItems: "start" }}
+        >
           <Typography
             arial-label="result-list-card-content"
             color={fontColor.gray.medium}
@@ -135,7 +126,7 @@ const ListResultCard: FC<ResultCardProps> = ({
                 ? "4"
                 : showButtons
                   ? "4"
-                  : "5",
+                  : "6",
               WebkitBoxOrient: "vertical",
               wordBreak: "break-word",
             }}
