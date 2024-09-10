@@ -20,9 +20,21 @@ const LoadingManager: React.FC<LoadingManagerProps> = ({ children }) => {
       setIsLoading(false);
     }
   }, [isLoading, loadingBuffer.length]);
+
   const startLoadingHandler = useCallback(
     (loadingName: string) => {
       loadingBuffer.push(loadingName);
+      checkState();
+    },
+    [checkState, loadingBuffer]
+  );
+
+  const endLoadingHandler = useCallback(
+    (msg: string) => {
+      const index = loadingBuffer.indexOf(msg);
+      if (index !== -1) {
+        loadingBuffer.splice(index, 1);
+      }
       checkState();
     },
     [checkState, loadingBuffer]
@@ -36,17 +48,6 @@ const LoadingManager: React.FC<LoadingManagerProps> = ({ children }) => {
       startLoadingHandler(loadingName);
     },
     [loadingBuffer, startLoadingHandler]
-  );
-
-  const endLoadingHandler = useCallback(
-    (msg: string) => {
-      const index = loadingBuffer.indexOf(msg);
-      if (index !== -1) {
-        loadingBuffer.splice(index, 1);
-      }
-      checkState();
-    },
-    [checkState, loadingBuffer]
   );
 
   useEffect(() => {

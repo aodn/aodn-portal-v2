@@ -69,8 +69,8 @@ const SearchPage = () => {
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
 
   useEffect(() => {
-    // a move event of map will trigger 0.3s after finish rendering the map (move
-    // event debounce). We don't want user to do anything before the move event
+    // a move event of map will be triggerred 0.3s after finish rendering the map
+    // (move event debounce). We don't want user to do anything before the move event
     // is fully finished, so we pretend the "map move event" starts at the beginning
     loadingEmitter.emit(
       EventName.START_UNIQUE_LOADING,
