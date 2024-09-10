@@ -38,7 +38,7 @@ def test_map_drag_updates_search_results(page_mock: Page) -> None:
     'title, lng, lat',
     [
         (
-            'Wave buoys Observations - Australia - delayed (National Wave Archive)',
+            'Integrated Marine Observing System (IMOS) - Location of assets',
             '145.5',
             '-42.5',
         ),
@@ -132,7 +132,7 @@ def test_map_base_layers(
         (
             '148.50',
             '-42.49',
-            'IMOS - Australian National Mooring Network (ANMN) Facility - Temperature and salinity time-series',
+            'Integrated Marine Observing System (IMOS) - Location of assets',
             '148.44',
             '-42.48',
         ),
