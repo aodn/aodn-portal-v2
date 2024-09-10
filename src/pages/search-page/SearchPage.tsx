@@ -49,7 +49,9 @@ import {
   OGCCollection,
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
-import LoadingModal from "../../components/loading/LoadingModal";
+import loadingEmitter from "../../components/loading/LoadingEmitter";
+import { EventName } from "../../components/loading/EventName";
+import { LoadingName } from "../../components/loading/LoadingName";
 
 const SEARCH_BAR_HEIGHT = 56;
 const RESULT_SECTION_WIDTH = 550;
@@ -66,44 +68,15 @@ const SearchPage = () => {
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
 
-  // please don't set this state directly. Use startLoading() and endLoading() instead
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const onMapMoveLoadingTag = "on map move loading";
-
-  //the search page may have multiple loadings simutaniously. So the buffer here
-  // is to control them. On the other hand, because of debounce and rendering time,
-  // the search page triggers a "map move" very late (a couple of seconds after
-  // the searchpage rendered), and we don't want users to touch anything until
-  // the onMapZoomOrMove() is fully completed. So assume the
-  // "onMapZoomOrMove()" start to run at the very begining to make sure the
-  // loading modal still appear
-  const loadingThreadBuffer: string[] = useMemo(
-    () => [onMapMoveLoadingTag],
-    []
-  );
-  const startLoading = useCallback(
-    (tag: string) => {
-      loadingThreadBuffer.push(tag);
-      setIsLoading(true);
-    },
-    [loadingThreadBuffer]
-  );
-  const endLoading = useCallback(
-    (tag: string) => {
-      // remove the first match element in loadingthreadbuffer
-      const index = loadingThreadBuffer.indexOf(tag);
-      if (index !== -1) {
-        loadingThreadBuffer.splice(index, 1);
-      }
-      if (loadingThreadBuffer.length === 0) {
-        setIsLoading(false);
-      }
-      if (loadingThreadBuffer.length < 0) {
-        throw new Error("aaa Loading thread count is negative");
-      }
-    },
-    [loadingThreadBuffer]
-  );
+  useEffect(() => {
+    // a move event of map will trigger 0.3s after finish rendering the map (move
+    // event debounce). We don't want user to do anything before the move event
+    // is fully finished, so we pretend the "map move event" starts at the beginning
+    loadingEmitter.emit(
+      EventName.START_UNIQUE_LOADING,
+      LoadingName.ON_MAP_MOVE_DEBOUNCE
+    );
+  }, []);
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -163,8 +136,7 @@ const SearchPage = () => {
 
   const doSearch = useCallback(
     async (needNavigate: boolean = true): Promise<void> => {
-      const loadingTag = "do search";
-      startLoading(loadingTag);
+      loadingEmitter.emit(EventName.START_LOADING, LoadingName.DO_SEARCH);
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -200,17 +172,18 @@ const SearchPage = () => {
           },
         });
       }
-      endLoading(loadingTag);
+      loadingEmitter.emit(EventName.END_LOADING, LoadingName.DO_SEARCH);
     },
-    [dispatch, endLoading, navigate, startLoading]
+    [dispatch, navigate]
   );
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
-      if (!loadingThreadBuffer.includes(onMapMoveLoadingTag)) {
-        loadingThreadBuffer.push(onMapMoveLoadingTag);
-      }
+      loadingEmitter.emit(
+        EventName.START_UNIQUE_LOADING,
+        LoadingName.ON_MAP_MOVE_DEBOUNCE
+      );
 
       if (event.type === "zoomend" || event.type === "moveend") {
         const bounds = event.target.getBounds();
@@ -219,10 +192,17 @@ const SearchPage = () => {
         // Note order: longitude, latitude.2
         const polygon = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
         dispatch(updateFilterPolygon(polygon));
-        doSearch().then(() => endLoading(onMapMoveLoadingTag));
+        doSearch()
+          .then
+          // () => endLoading(onMapMoveLoadingTag)
+          ();
       }
+      loadingEmitter.emit(
+        EventName.END_LOADING,
+        LoadingName.ON_MAP_MOVE_DEBOUNCE
+      );
     },
-    [dispatch, doSearch, endLoading, loadingThreadBuffer]
+    [dispatch, doSearch]
   );
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
@@ -292,7 +272,6 @@ const SearchPage = () => {
 
   return (
     <Layout>
-      <LoadingModal isLoading={isLoading} />
       <Box
         display="flex"
         flexDirection="row"
