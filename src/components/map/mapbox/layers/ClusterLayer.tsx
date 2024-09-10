@@ -90,6 +90,7 @@ export const getUnclusterPointId = (layerId: string) =>
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
+  selectedUuids,
   onDatasetSelected,
   clusterLayerConfig,
 }: ClusterLayerProps) => {
@@ -262,6 +263,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       />
       <SpatialExtents
         layerId={unclusterPointLayer}
+        selectedUuids={selectedUuids}
         addedLayerIds={[clusterLayer, unclusterPointLayer]}
         onDatasetSelected={onDatasetSelected}
       />

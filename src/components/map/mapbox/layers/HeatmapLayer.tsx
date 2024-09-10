@@ -97,6 +97,7 @@ const getUnclusterPointLayerId = (layerId: string) =>
 
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
   collections,
+  selectedUuids,
   onDatasetSelected,
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
@@ -314,6 +315,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       />
       <SpatialExtents
         layerId={unClusterPointLayer}
+        selectedUuids={selectedUuids}
         addedLayerIds={[clusterLayer, unClusterPointLayer]}
         onDatasetSelected={onDatasetSelected}
       />

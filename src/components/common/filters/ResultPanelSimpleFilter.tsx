@@ -1,7 +1,11 @@
-import { Grid, Paper, SxProps, Theme, Typography } from "@mui/material";
-
 import { FC } from "react";
-import { borderRadius, color, fontSize } from "../../../styles/constants";
+import { Grid, Paper, SxProps, Theme, Typography } from "@mui/material";
+import {
+  border,
+  borderRadius,
+  color,
+  fontSize,
+} from "../../../styles/constants";
 import { formatNumber } from "../../../utils/StringUtils";
 import MapViewButton, {
   MapViewButtonProps,
@@ -37,17 +41,24 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             justifyContent: "center",
             alignItems: "center",
             height: "100%",
+            border: `${border.xs} ${color.blue.darkSemiTransparent}`,
             borderRadius: borderRadius.small,
             bgcolor: color.white.sixTenTransparent,
           }}
         >
-          {total === 1 ? (
+          {total === 0 ? (
+            <Typography fontSize={fontSize.info} padding={0}>
+              No result found
+            </Typography>
+          ) : total === 1 ? (
             <Typography fontSize={fontSize.info} padding={0}>
               Showing 1 of total 1 result
             </Typography>
           ) : (
             <Typography fontSize={fontSize.info} padding={0}>
-              Showing 1-{count} of {formatNumber(total)} results
+              {/* TODO: here is a bug that the count number might be larger than total number */}
+              Showing 1&nbsp;-&nbsp;{count}&nbsp;of&nbsp;{formatNumber(total)}
+              &nbsp;results
             </Typography>
           )}
         </Paper>

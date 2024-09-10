@@ -51,7 +51,7 @@ import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewB
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 
 const SEARCH_BAR_HEIGHT = 56;
-const RESULT_SECTION_WIDTH = 550;
+const RESULT_SECTION_WIDTH = 500;
 
 const SearchPage = () => {
   const location = useLocation();
@@ -62,6 +62,7 @@ const SearchPage = () => {
   const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
     SearchResultLayoutEnum.VISIBLE
   );
+  const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
 
@@ -97,11 +98,12 @@ const SearchPage = () => {
       if (uuidsString.length === 0) return;
       const param: SearchParameters = {
         filter: uuidsString,
-        properties: "id,title,description",
       };
       return dispatch(fetchResultNoStore(param))
         .unwrap()
-        .then((res: OGCCollections) => res.collections)
+        .then((res: OGCCollections) => {
+          setDatasetsSelected(res.collections);
+        })
         .catch((error: any) => {
           console.error("Error fetching collection data:", error);
           // TODO: handle error in ErrorBoundary
@@ -110,14 +112,15 @@ const SearchPage = () => {
     [dispatch]
   );
 
-  const onDatasetSelected = useCallback(
-    async (uuids: Array<string>) => {
-      if (Array.isArray(uuids) && uuids.length === 0) {
+  // On select a dataset, update the states: selected uuid(s) and get the collection data
+  const handleDatasetSelecting = useCallback(
+    (uuids: Array<string>) => {
+      if (uuids.length === 0) {
+        setSelectedUuids([]);
         setDatasetsSelected([]);
-        return;
       }
-      const collections = await getCollectionsData(uuids);
-      if (collections) setDatasetsSelected(collections);
+      setSelectedUuids(uuids);
+      getCollectionsData(uuids);
     },
     [getCollectionsData]
   );
@@ -245,6 +248,13 @@ const SearchPage = () => {
     [dispatch, doSearch]
   );
 
+  const handleClickCard = useCallback(
+    (uuid: string) => {
+      handleDatasetSelecting([uuid]);
+    },
+    [handleDatasetSelecting]
+  );
+
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
   // TODO: Optimize call if possible, this happens when navigate from page
@@ -261,9 +271,6 @@ const SearchPage = () => {
         gap={1}
         padding={2}
       >
-        <Box paddingTop={`${SEARCH_BAR_HEIGHT}px`}>
-          <ResultPanelIconFilter />
-        </Box>
         <Grid container flex={1} gap={1}>
           <Grid item xs={12} height={`${SEARCH_BAR_HEIGHT}px`}>
             <ComplexTextSearch />
@@ -287,7 +294,8 @@ const SearchPage = () => {
                       width: RESULT_SECTION_WIDTH,
                     }}
                     onVisibilityChanged={onVisibilityChanged}
-                    onClickCard={handleNavigateToDetailPage}
+                    onClickCard={handleClickCard}
+                    onNavigateToDetail={handleNavigateToDetailPage}
                     onChangeSorting={onChangeSorting}
                     datasetSelected={datasetsSelected}
                   />
@@ -301,9 +309,10 @@ const SearchPage = () => {
                   collections={layers}
                   bbox={bbox}
                   showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
+                  selectedUuids={selectedUuids}
                   onMapZoomOrMove={onMapZoomOrMove}
                   onToggleClicked={onToggleDisplay}
-                  onDatasetSelected={onDatasetSelected}
+                  onDatasetSelected={handleDatasetSelecting}
                 />
               </Box>
             </Box>
