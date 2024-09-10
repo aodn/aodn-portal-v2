@@ -2,7 +2,7 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
   ParameterState,
-  updateCategories,
+  updateParameterVocabs,
   updateDateTimeFilterRange,
   updateImosOnly,
   updateUpdateFreq,
@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DateRangeFilter from "./DateRangeFilter";
-import CategoryFilter from "./CategoryFilter";
+import ParameterVocabFilter from "./ParameterVocabFilter";
 import DepthFilter from "./DepthFilter";
 import DataDeliveryModeFilter from "./DataDeliveryModeFilter";
 import ImosOnlySwitch from "./ImosOnlySwitch";
@@ -79,10 +79,10 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
       } else {
         dispatch(updateDateTimeFilterRange({}));
       }
-      if (filter.categories) {
-        dispatch(updateCategories(filter.categories));
+      if (filter.parameterVocabs) {
+        dispatch(updateParameterVocabs(filter.parameterVocabs));
       } else {
-        dispatch(updateCategories([]));
+        dispatch(updateParameterVocabs([]));
       }
       if (filter.isImosOnlyDataset) {
         dispatch(updateImosOnly(filter.isImosOnlyDataset));
@@ -175,8 +175,11 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
                   </FilterSection>
                 </Grid>
                 <Grid item xs={7}>
-                  <FilterSection isTitleOnlyHeader title={"Parameter"}>
-                    <CategoryFilter filter={filter} setFilter={setFilter} />
+                  <FilterSection isTitleOnlyHeader title={"Parameters"}>
+                    <ParameterVocabFilter
+                      filter={filter}
+                      setFilter={setFilter}
+                    />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>

@@ -1,311 +1,14 @@
-export const PARAMETER_CATEGORIES: any[] = [
-  {
-    label: "Air pressure",
-    definition:
-      "(Mock API)This category contains vocabulary terms describing air pressure parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/10",
-    broader: [
-      {
-        label: "Physical-Atmosphere",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/53",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Oxygen",
-    definition:
-      "This category contains vocabulary terms describing dissolved oxygen parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/11",
-    broader: [
-      {
-        label: "Chemical",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/54",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Chlorophyll",
-    definition:
-      "This category contains vocabulary terms describing chlorophyll concentration parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/19",
-    broader: [
-      {
-        label: "Biological",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/55",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Wave",
-    definition:
-      "This category contains vocabulary terms describing waves parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/2",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Visibility",
-    definition:
-      "This category contains vocabulary terms describing atmospheric visibility parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/22",
-    broader: [
-      {
-        label: "Physical-Atmosphere",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/53",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Density",
-    definition:
-      "This category contains vocabulary terms describing density parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/23",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Water pressure",
-    definition:
-      "This category contains vocabulary terms describing water pressure parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/25",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Other Pigment",
-    definition:
-      "This category contains vocabulary terms describing pigments concentration parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/26",
-    broader: [
-      {
-        label: "Biological",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/55",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Alkalinity",
-    definition:
-      "This category contains vocabulary terms describing alkalinity parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/27",
-    broader: [
-      {
-        label: "Chemical",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/54",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Turbidity",
-    definition:
-      "This category contains vocabulary terms describing turbidity parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/28",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Current",
-    definition:
-      "This category contains vocabulary terms describing currents parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/3",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Air-Sea Fluxes",
-    definition:
-      "This category contains vocabulary terms describing Air-Sea Fluxes parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/30",
-    broader: [
-      {
-        label: "Physical-Atmosphere",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/53",
-      },
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Ocean Biota",
-    definition:
-      "This category contains vocabulary terms describing ocean biota parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/4",
-    broader: [
-      {
-        label: "Biological",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/55",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Optical properties",
-    definition:
-      "This category contains vocabulary terms describing optical properties parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/45",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Suspended particulate material",
-    definition:
-      "This category contains vocabulary terms describing suspended particulate material parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/46",
-    broader: [
-      {
-        label: "Chemical",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/54",
-      },
-      {
-        label: "Biological",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/55",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Backscattering",
-    definition:
-      "This category contains vocabulary terms describing backscattering parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/47",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "UV radiation",
-    definition:
-      "This category contains vocabulary terms describing UV radiation parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/48",
-    broader: [
-      {
-        label: "Physical-Atmosphere",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/53",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Temperature",
-    definition:
-      "This category contains vocabulary terms describing temperature parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/49",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Acoustics",
-    definition:
-      "This category contains vocabulary terms describing acoustics parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/5",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Salinity",
-    definition:
-      "This category contains vocabulary terms describing salinity parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/50",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Nutrient",
-    definition:
-      "This category contains vocabulary terms describing nutrient parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/51",
-    broader: [
-      {
-        label: "Chemical",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/54",
-      },
-      {
-        label: "Biological",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/55",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Carbon",
-    definition:
-      "This category contains vocabulary terms describing carbon parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/52",
-    broader: [
-      {
-        label: "Chemical",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/54",
-      },
-    ],
-    narrower: [],
-  },
+export const PARAMETER_VOCABS: any[] = [
   {
     label: "Physical-Atmosphere",
     definition:
       "This category contains vocabulary terms describing physical atmosphere parameters",
     about: "http://vocab.aodn.org.au/def/parameter_classes/category/53",
-    broader: [],
     narrower: [
       {
         label: "Air pressure",
+        definition:
+          "This category contains vocabulary terms describing air pressure parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/10",
         narrower: [
           {
@@ -325,6 +28,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Visibility",
+        definition:
+          "This category contains vocabulary terms describing atmospheric visibility parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/22",
         narrower: [
           {
@@ -342,6 +47,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Air-Sea Fluxes",
+        definition:
+          "This category contains vocabulary terms describing Air-Sea Fluxes parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/30",
         narrower: [
           {
@@ -406,6 +113,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "UV radiation",
+        definition:
+          "This category contains vocabulary terms describing UV radiation parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/48",
         narrower: [
           {
@@ -418,6 +127,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Wind",
+        definition:
+          "This category contains vocabulary terms describing wind parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/6",
         narrower: [
           {
@@ -474,6 +185,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Air temperature",
+        definition:
+          "This category contains vocabulary terms describing air temperature parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/7",
         narrower: [
           {
@@ -496,6 +209,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Humidity",
+        definition:
+          "This category contains vocabulary terms describing atmospheric humidity parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/8",
         narrower: [
           {
@@ -522,6 +237,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Precipitation and evaporation",
+        definition:
+          "This category contains vocabulary terms describing precipitation and evaporation parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/9",
         narrower: [
           {
@@ -565,10 +282,15 @@ export const PARAMETER_CATEGORIES: any[] = [
     definition:
       "This category contains vocabulary terms describing chemicalparameters",
     about: "http://vocab.aodn.org.au/def/parameter_classes/category/54",
-    broader: [],
     narrower: [
       {
+        label: "pH (total scale) of the water body",
+        about: "http://vocab.aodn.org.au/def/discovery_parameter/entity/27",
+      },
+      {
         label: "Oxygen",
+        definition:
+          "This category contains vocabulary terms describing dissolved oxygen parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/11",
         narrower: [
           {
@@ -596,6 +318,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Alkalinity",
+        definition:
+          "This category contains vocabulary terms describing alkalinity parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/27",
         narrower: [
           {
@@ -613,6 +337,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Suspended particulate material",
+        definition:
+          "This category contains vocabulary terms describing suspended particulate material parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/46",
         narrower: [
           {
@@ -637,6 +363,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Nutrient",
+        definition:
+          "This category contains vocabulary terms describing nutrient parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/51",
         narrower: [
           {
@@ -738,6 +466,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Carbon",
+        definition:
+          "This category contains vocabulary terms describing carbon parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/52",
         narrower: [
           {
@@ -813,10 +543,11 @@ export const PARAMETER_CATEGORIES: any[] = [
     definition:
       "This category contains vocabulary terms describing biologicalparameters",
     about: "http://vocab.aodn.org.au/def/parameter_classes/category/55",
-    broader: [],
     narrower: [
       {
         label: "Chlorophyll",
+        definition:
+          "This category contains vocabulary terms describing chlorophyll concentration parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/19",
         narrower: [
           {
@@ -947,6 +678,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Other Pigment",
+        definition:
+          "This category contains vocabulary terms describing pigments concentration parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/26",
         narrower: [
           {
@@ -1202,6 +935,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Ocean Biota",
+        definition:
+          "This category contains vocabulary terms describing ocean biota parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/4",
         narrower: [
           {
@@ -1254,6 +989,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Suspended particulate material",
+        definition:
+          "This category contains vocabulary terms describing suspended particulate material parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/46",
         narrower: [
           {
@@ -1278,6 +1015,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Nutrient",
+        definition:
+          "This category contains vocabulary terms describing nutrient parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/51",
         narrower: [
           {
@@ -1384,10 +1123,11 @@ export const PARAMETER_CATEGORIES: any[] = [
     definition:
       "This category contains vocabulary terms describing physical water parameters",
     about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-    broader: [],
     narrower: [
       {
         label: "Bathymetry",
+        definition:
+          "This category contains vocabulary terms describing bathymetry parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/1",
         narrower: [
           {
@@ -1405,6 +1145,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Wave",
+        definition:
+          "This category contains vocabulary terms describing waves parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/2",
         narrower: [
           {
@@ -1641,6 +1383,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Density",
+        definition:
+          "This category contains vocabulary terms describing density parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/23",
         narrower: [
           {
@@ -1652,6 +1396,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Water pressure",
+        definition:
+          "This category contains vocabulary terms describing water pressure parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/25",
         narrower: [
           {
@@ -1680,6 +1426,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Turbidity",
+        definition:
+          "This category contains vocabulary terms describing turbidity parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/28",
         narrower: [
           {
@@ -1692,6 +1440,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Current",
+        definition:
+          "This category contains vocabulary terms describing currents parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/3",
         narrower: [
           {
@@ -1734,6 +1484,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Air-Sea Fluxes",
+        definition:
+          "This category contains vocabulary terms describing Air-Sea Fluxes parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/30",
         narrower: [
           {
@@ -1798,6 +1550,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Optical properties",
+        definition:
+          "This category contains vocabulary terms describing optical properties parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/45",
         narrower: [
           {
@@ -1923,10 +1677,14 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Backscattering",
+        definition:
+          "This category contains vocabulary terms describing backscattering parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/47",
       },
       {
         label: "Temperature",
+        definition:
+          "This category contains vocabulary terms describing temperature parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/49",
         narrower: [
           {
@@ -1955,6 +1713,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Acoustics",
+        definition:
+          "This category contains vocabulary terms describing acoustics parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/5",
         narrower: [
           {
@@ -1984,6 +1744,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Salinity",
+        definition:
+          "This category contains vocabulary terms describing salinity parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/50",
         narrower: [
           {
@@ -2012,6 +1774,8 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Sea surface height",
+        definition:
+          "This category contains vocabulary terms describing sea surface height parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/57",
         narrower: [
           {
@@ -2032,99 +1796,10 @@ export const PARAMETER_CATEGORIES: any[] = [
       },
       {
         label: "Depth",
+        definition:
+          "This category contains vocabulary terms describing depth parameters",
         about: "http://vocab.aodn.org.au/def/parameter_classes/category/58",
       },
     ],
-  },
-  {
-    label: "Sea surface height",
-    definition:
-      "This category contains vocabulary terms describing sea surface height parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/57",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Depth",
-    definition:
-      "This category contains vocabulary terms describing depth parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/58",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Wind",
-    definition:
-      "This category contains vocabulary terms describing wind parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/6",
-    broader: [
-      {
-        label: "Physical-Atmosphere",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/53",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Air temperature",
-    definition:
-      "This category contains vocabulary terms describing air temperature parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/7",
-    broader: [
-      {
-        label: "Physical-Atmosphere",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/53",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Humidity",
-    definition:
-      "This category contains vocabulary terms describing atmospheric humidity parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/8",
-    broader: [
-      {
-        label: "Physical-Atmosphere",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/53",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Precipitation and evaporation",
-    definition:
-      "This category contains vocabulary terms describing precipitation and evaporation parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/9",
-    broader: [
-      {
-        label: "Physical-Atmosphere",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/53",
-      },
-    ],
-    narrower: [],
-  },
-  {
-    label: "Bathymetry",
-    definition:
-      "This category contains vocabulary terms describing bathymetry parameters",
-    about: "http://vocab.aodn.org.au/def/parameter_classes/category/1",
-    broader: [
-      {
-        label: "Physical-Water",
-        about: "http://vocab.aodn.org.au/def/parameter_classes/category/56",
-      },
-    ],
-    narrower: [],
   },
 ];
