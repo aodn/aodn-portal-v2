@@ -98,7 +98,6 @@ const SearchPage = () => {
       if (uuidsString.length === 0) return;
       const param: SearchParameters = {
         filter: uuidsString,
-        properties: "id,title,description",
       };
       return dispatch(fetchResultNoStore(param))
         .unwrap()

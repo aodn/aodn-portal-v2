@@ -100,7 +100,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
 
       <CardActionArea onClick={handleShowSpatialExtents}>
         <Box
-          height={showButtons ? "110px" : "130px"}
+          height={isSelectedDataset || showButtons ? "110px" : "130px"}
           width="100%"
           overflow="hidden"
           border={`${border.sm} #fff`}
@@ -135,7 +135,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   display: "-webkit-box",
-                  WebkitLineClamp: showButtons ? "3" : "4",
+                  WebkitLineClamp: isSelectedDataset || showButtons ? "3" : "4",
                   WebkitBoxOrient: "vertical",
                   wordBreak: "break-word",
                 }}
@@ -159,7 +159,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         )}
       </Stack>
 
-      {showButtons && (
+      {(isSelectedDataset || showButtons) && (
         <ResultCardButtonGroup
           content={content}
           isGridView

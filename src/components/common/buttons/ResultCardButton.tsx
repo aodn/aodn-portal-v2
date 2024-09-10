@@ -1,7 +1,7 @@
 import { ElementType, FC, isValidElement } from "react";
 import { Button, SxProps, Tooltip, Typography } from "@mui/material";
-import { color, fontSize, padding } from "../../styles/constants";
-import { mergeWithDefaults } from "../common/utils";
+import { color, fontSize, padding } from "../../../styles/constants";
+import { mergeWithDefaults } from "../utils";
 
 interface ResultCardButtonConfig {
   color?: string;

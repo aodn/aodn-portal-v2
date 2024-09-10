@@ -7,7 +7,7 @@ import TaskAltSharpIcon from "@mui/icons-material/TaskAltSharp";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import ResultCardButton from "./ResultCardButton";
+import ResultCardButton from "../common/buttons/ResultCardButton";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
