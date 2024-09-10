@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
-import { Category, ParameterState } from "./componentParamReducer";
+import { Vocab, ParameterState } from "./componentParamReducer";
 
 import {
-  CategoriesIn,
-  CategoriesWithCommonKey,
+  ParameterVocabsIn,
+  ParameterVocabsWithCommonKey,
   CommonKey,
   cqlDefaultFilters,
   PolygonOperation,
@@ -57,7 +57,7 @@ export interface CollectionsQueryType {
 
 interface ObjectValue {
   collectionsQueryResult: CollectionsQueryType;
-  categoriesResult: Array<Category>;
+  parameterVocabsResult: Array<Vocab>;
 }
 export const DEFAULT_SEARCH_PAGE = 11;
 
@@ -79,7 +79,7 @@ const initialState: ObjectValue = {
     result: new OGCCollections(),
     query: {},
   },
-  categoriesResult: new Array<Category>(),
+  parameterVocabsResult: new Array<Vocab>(),
 };
 /**
  Define search functions
@@ -129,12 +129,12 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     });
 };
 // TODO: Why no param needed?
-const searchParameterCategories = async (
+const searchParameterVocabs = async (
   param: Map<string, string> | null,
   thunkApi: any
 ) =>
   axios
-    .get<Array<Category>>("/api/v1/ogc/ext/parameter/vocabs")
+    .get<Array<Vocab>>("/api/v1/ogc/ext/parameter/vocabs")
     .then((response) => response.data)
     .catch((error: Error | AxiosError | ErrorResponse) => {
       if (axios.isAxiosError(error) && error.response) {
@@ -237,11 +237,11 @@ const fetchResultByUuidNoStore = createAsyncThunk<
     })
 );
 
-const fetchParameterCategoriesWithStore = createAsyncThunk<
-  Array<Category>,
+const fetchParameterVocabsWithStore = createAsyncThunk<
+  Array<Vocab>,
   Map<string, string> | null,
   { rejectValue: ErrorResponse }
->("search/fetchParameterCategoriesWithStore", searchParameterCategories);
+>("search/fetchParameterVocabsWithStore", searchParameterVocabs);
 
 const searcher = createSlice({
   name: "search",
@@ -261,8 +261,8 @@ const searcher = createSlice({
         state.collectionsQueryResult.result.merge(new_collections);
         state.collectionsQueryResult.query = action.meta.arg;
       })
-      .addCase(fetchParameterCategoriesWithStore.fulfilled, (state, action) => {
-        state.categoriesResult = action.payload;
+      .addCase(fetchParameterVocabsWithStore.fulfilled, (state, action) => {
+        state.parameterVocabsResult = action.payload;
       });
   },
 });
@@ -280,11 +280,11 @@ const createSuggesterParamFrom = (
 ): SuggesterParameters => {
   const suggesterParam: SuggesterParameters = {};
   suggesterParam.input = paramState.searchText ? paramState.searchText : "";
-  if (paramState.categories) {
+  if (paramState.parameterVocabs) {
     const filterGenerator = cqlDefaultFilters.get(
-      "CATEGORIES_IN"
-    ) as CategoriesIn;
-    suggesterParam.filter = filterGenerator(paramState.categories);
+      "PARAMETER_VOCABS_IN"
+    ) as ParameterVocabsIn;
+    suggesterParam.filter = filterGenerator(paramState.parameterVocabs);
   }
   return suggesterParam;
 };
@@ -363,20 +363,20 @@ const createSearchParamFrom = (
     p.filter = appendFilter(p.filter, f(i.polygon));
   }
 
-  if (i.categories && i.categories.length > 0 && !i.commonKey) {
-    const f = cqlDefaultFilters.get("CATEGORIES_IN") as CategoriesIn;
-    const categoryFilter = f(i.categories);
-    if (categoryFilter) {
-      p.filter = appendFilter(p.filter, categoryFilter);
+  if (i.parameterVocabs && i.parameterVocabs.length > 0 && !i.commonKey) {
+    const f = cqlDefaultFilters.get("PARAMETER_VOCABS_IN") as ParameterVocabsIn;
+    const parameterVocabFilter = f(i.parameterVocabs);
+    if (parameterVocabFilter) {
+      p.filter = appendFilter(p.filter, parameterVocabFilter);
     }
   }
 
   if (i.commonKey) {
-    if (i.categories && i.categories.length > 0) {
+    if (i.parameterVocabs && i.parameterVocabs.length > 0) {
       const f = cqlDefaultFilters.get(
-        "CATEGORIES_WITH_COMMON_KEY"
-      ) as CategoriesWithCommonKey;
-      p.filter = appendFilter(p.filter, f(i.categories, i.commonKey));
+        "PARAMETER_VOCABS_WITH_COMMON_KEY"
+      ) as ParameterVocabsWithCommonKey;
+      p.filter = appendFilter(p.filter, f(i.parameterVocabs, i.commonKey));
     } else {
       const f = cqlDefaultFilters.get("COMMON_KEY") as CommonKey;
       p.filter = appendFilter(p.filter, f(i.commonKey));
@@ -396,7 +396,7 @@ export {
   fetchResultNoStore,
   fetchResultAppendStore,
   fetchResultByUuidNoStore,
-  fetchParameterCategoriesWithStore,
+  fetchParameterVocabsWithStore,
 };
 
 export default searcher.reducer;

@@ -12,8 +12,8 @@ vi.mock("../DateRangeFilter", () => ({
 vi.mock("../DepthFilter", () => ({
   default: () => <div data-testid="mockDepth">mockDepth</div>,
 }));
-vi.mock("../CategoryFilter", () => ({
-  default: () => <div data-testid="mockCategory">mockCategory</div>,
+vi.mock("../ParameterVocabFilter", () => ({
+  default: () => <div data-testid="mockParameterVocab">mockParameterVocab</div>,
 }));
 vi.mock("../DataDeliveryModeFilter", () => ({
   default: () => (
@@ -59,7 +59,7 @@ describe("AdvanceFilters", () => {
 
       expect(screen.getByTestId("mockDateTime")).toBeInTheDocument();
       expect(screen.getByTestId("mockDepth")).toBeInTheDocument();
-      expect(screen.getByTestId("mockCategory")).toBeInTheDocument();
+      expect(screen.getByTestId("mockParameterVocab")).toBeInTheDocument();
       expect(screen.getByTestId("mockDataDeliveryMode")).toBeInTheDocument();
       expect(screen.getByTestId("mockIMosOnly")).toBeInTheDocument();
     });
