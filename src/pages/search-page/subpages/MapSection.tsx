@@ -18,6 +18,7 @@ import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
+import SnackbarLoader from "../../../components/loading/SnackbarLoader";
 
 const mapContainerId = "map-container-id";
 
@@ -32,6 +33,7 @@ interface MapSectionProps {
   ) => void;
   onToggleClicked: (v: boolean) => void;
   onDatasetSelected?: (uuids: Array<string>) => void;
+  isLoading: boolean;
 }
 
 const MapSection: React.FC<MapSectionProps> = ({
@@ -43,6 +45,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   showFullMap,
   sx,
   selectedUuids,
+  isLoading,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>("heatmap");
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
@@ -73,7 +76,8 @@ const MapSection: React.FC<MapSectionProps> = ({
   );
 
   return (
-    <Paper id={mapContainerId} sx={sx}>
+    <Paper id={mapContainerId} sx={{ ...sx, position: "relative" }}>
+      <SnackbarLoader isLoading={isLoading} message="Searching..." />
       <Map
         panelId={mapContainerId}
         bbox={bbox}
