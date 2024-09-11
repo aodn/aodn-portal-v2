@@ -1,8 +1,7 @@
-import StyledLoadingBox from "./StyledLoadingBox";
-import { Backdrop, Box, CircularProgress } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import loadingManager from "./LoadingManager";
 import { EventName } from "./EventName";
+import CircleLoader from "./CircleLoader";
 
 interface GlobalLoaderProps {
   children?: React.ReactNode;
@@ -72,16 +71,7 @@ const GlobalLoader: React.FC<GlobalLoaderProps> = ({ children }) => {
 
   return (
     <>
-      <Backdrop open={isLoading} sx={{ zIndex: 10 }}>
-        <Box
-          sx={{ width: "100%", height: "100%" }}
-          data-testid="loading-progress"
-        >
-          <StyledLoadingBox>
-            <CircularProgress />
-          </StyledLoadingBox>
-        </Box>
-      </Backdrop>
+      <CircleLoader isLoading={isLoading} />
       {children}
     </>
   );

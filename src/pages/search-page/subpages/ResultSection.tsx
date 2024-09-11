@@ -6,13 +6,10 @@ import {
   DEFAULT_SEARCH_PAGE,
   fetchResultAppendStore,
 } from "../../../components/common/store/searchReducer";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import ResultCards from "../../../components/result/ResultCards";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "../../../components/common/store/OGCCollectionDefinitions";
-import { useSelector, useDispatch } from "react-redux";
+import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import { useDispatch, useSelector } from "react-redux";
 import store, {
   AppDispatch,
   getComponentState,
@@ -22,6 +19,7 @@ import store, {
 import { ParameterState } from "../../../components/common/store/componentParamReducer";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapViewButton";
+import CircleLoader from "../../../components/loading/CircleLoader";
 
 interface SearchResultListProps {
   datasetSelected?: OGCCollection[];
@@ -30,6 +28,7 @@ interface SearchResultListProps {
   onChangeSorting: (v: SortResultEnum) => void;
   onClickCard?: (uuid: string) => void;
   onNavigateToDetail?: (uuid: string) => void;
+  isLoading: boolean;
 }
 
 const ResultSection: React.FC<SearchResultListProps> = ({
@@ -39,6 +38,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   onChangeSorting,
   onClickCard,
   onNavigateToDetail,
+  isLoading,
 }) => {
   // Get contents from redux
   const dispatch = useDispatch<AppDispatch>();
@@ -89,10 +89,12 @@ const ResultSection: React.FC<SearchResultListProps> = ({
           ...sx,
           display: "flex",
           flexDirection: "column",
+          position: "relative",
         }}
         gap={1}
         data-testid="search-page-result-list"
       >
+        <CircleLoader isLoading={isLoading} />
         <Box>
           <ResultPanelSimpleFilter
             count={reduxContents.result.collections.length}
