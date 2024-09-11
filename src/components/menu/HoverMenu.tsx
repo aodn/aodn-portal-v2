@@ -58,7 +58,7 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
       <Paper
         elevation={0}
         sx={{
-          border: `${border.sm} ${color.blue.dark}`,
+          border: `${border.xs} ${color.blue.dark}`,
           borderRadius: borderRadius.small,
         }}
       >
@@ -113,6 +113,7 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
         placement="bottom-start"
         transition
         disablePortal
+        sx={{ zIndex: 1 }}
       >
         {renderMenuItems}
       </Popper>
