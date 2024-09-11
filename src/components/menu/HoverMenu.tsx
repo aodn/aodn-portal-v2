@@ -36,13 +36,7 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
 
-  const handleClose = (event: Event | React.SyntheticEvent) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
-      return;
-    }
+  const handleClose = () => {
     setOpen(false);
   };
 
@@ -79,7 +73,7 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
               <MenuItem
                 onClick={(event) => {
                   item.handler(event);
-                  handleClose(event);
+                  handleClose();
                 }}
                 key={index}
                 sx={{
