@@ -62,6 +62,7 @@ const LandingPage: FC = () => {
       updateImosOnly,
       updateUpdateFreq,
       updateSearchText,
+      redirectSearch,
     ]
   );
 
