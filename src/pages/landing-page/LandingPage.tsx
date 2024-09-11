@@ -15,8 +15,29 @@ import {
   SMART_PANEL_CONTAINER_HEIGHT,
   SMART_PANEL_CONTAINER_WIDTH,
 } from "./constants";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../components/common/store/store";
+import {
+  updateDateTimeFilterRange,
+  updateImosOnly,
+  updateParameterVocabs,
+  updateSearchText,
+  updateUpdateFreq,
+} from "../../components/common/store/componentParamReducer";
 
 const LandingPage: FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  // This is a simple click smart card function that with update search input text and clear all the filters
+  // Can be change to a function-switcher if any other functions are designed in the future
+  const handleClickSmartCard = (value: string) => {
+    dispatch(updateParameterVocabs([]));
+    dispatch(updateDateTimeFilterRange({}));
+    dispatch(updateImosOnly(false));
+    dispatch(updateUpdateFreq(undefined));
+    dispatch(updateSearchText(value));
+  };
+
   return (
     <Layout>
       <SectionContainer
@@ -42,7 +63,7 @@ const LandingPage: FC = () => {
             width={SMART_PANEL_CONTAINER_WIDTH}
             height={SMART_PANEL_CONTAINER_HEIGHT}
           >
-            <SmartPanel />
+            <SmartPanel handleClickSmartCard={handleClickSmartCard} />
           </Box>
         </Box>
       </SectionContainer>
