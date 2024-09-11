@@ -12,6 +12,7 @@ interface CollapseFrameProps {
   isAssociatedRecord?: boolean;
   isOpen?: boolean;
   email?: string;
+  testId?: string;
 }
 
 const CollapseItem: React.FC<CollapseFrameProps> = ({
@@ -21,6 +22,7 @@ const CollapseItem: React.FC<CollapseFrameProps> = ({
   isAssociatedRecord = false,
   isOpen = false,
   email,
+  testId,
 }) => {
   const [isExpanded, setIsExpanded] = useState(isOpen);
 
@@ -40,6 +42,7 @@ const CollapseItem: React.FC<CollapseFrameProps> = ({
         sx={{
           alignSelf: "center",
         }}
+        data-testid={testId}
       >
         <CollapseItemBtn
           onClick={() => {

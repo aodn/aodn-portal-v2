@@ -45,7 +45,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
             postal_code ||
             administrative_area) && <LocationOnOutlinedIcon />}
         </Grid>
-        <Grid item container md={5}>
+        <Grid item container md={5} data-testid="contact-address">
           {delivery_point?.map((line) => {
             return (
               <Grid item md={12} key={line}>
@@ -76,7 +76,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
             </Grid>
           )}
         </Grid>
-        <Grid item md={6}>
+        <Grid item md={6} data-testid="contact-phone">
           {phones &&
             phones.map((phone) => {
               return (
@@ -97,7 +97,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
             })}
         </Grid>
       </Grid>
-      <Grid item container md={12}>
+      <Grid item container md={12} data-testid="contact-link">
         {links &&
           links.map((link) => {
             return (

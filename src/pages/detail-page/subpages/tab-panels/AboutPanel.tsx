@@ -73,7 +73,13 @@ const AboutPanel = () => {
       },
       {
         title: "Keywords",
-        component: <CollapseList items={keywords} title="Keywords" />,
+        component: (
+          <CollapseList
+            items={keywords}
+            title="Keywords"
+            testId="collapse-list-keywords"
+          />
+        ),
       },
     ],
     [aboutContacts, credits, keywords]
