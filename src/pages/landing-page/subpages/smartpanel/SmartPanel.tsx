@@ -25,7 +25,11 @@ import SmallCard from "./components/SmallCard";
 import MediumCard from "./components/MediumCard";
 import LargeCard from "./components/LargeCard";
 
-const SmartPanel: FC = () => {
+interface SmartPanelProps {
+  handleClickSmartCard: (value: string) => void;
+}
+
+const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
   const boxRef = useRef<HTMLDivElement>(null);
 
   const imageListTotalCols = useMemo(() => calculateTotalCols(ITEM_DATA), []);
@@ -97,9 +101,24 @@ const SmartPanel: FC = () => {
                       SMART_PANEL_GAP,
               }}
             >
-              {item.type === "small" && <SmallCard cardData={item} />}
-              {item.type === "medium" && <MediumCard cardData={item} />}
-              {item.type === "large" && <LargeCard cardData={item} />}
+              {item.type === "small" && (
+                <SmallCard
+                  cardData={item}
+                  handleClickSmartCard={handleClickSmartCard}
+                />
+              )}
+              {item.type === "medium" && (
+                <MediumCard
+                  cardData={item}
+                  handleClickSmartCard={handleClickSmartCard}
+                />
+              )}
+              {item.type === "large" && (
+                <LargeCard
+                  cardData={item}
+                  handleClickSmartCard={handleClickSmartCard}
+                />
+              )}
             </ImageListItem>
           ))}
         </ImageList>
