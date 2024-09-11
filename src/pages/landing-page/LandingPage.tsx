@@ -55,10 +55,7 @@ const LandingPage: FC = () => {
       dispatch(updateSearchText(value));
       redirectSearch();
     },
-    [
-      dispatch,
-      redirectSearch,
-    ]
+    [dispatch, redirectSearch]
   );
 
   return (
