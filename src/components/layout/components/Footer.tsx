@@ -9,6 +9,7 @@ import {
   InputBase,
   Paper,
   SxProps,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -50,8 +51,8 @@ const handleBackToTop = () => {
 
 const handleClickContactUs = () => {
   const recipient = "info@aodn.org.au";
-  const subject = "This is a test - please ignore";
-  const body = "This is being sent from AODN's Data Discovery portal.";
+  const subject = "AODN Data Discovery enquiry";
+  const body = "**This is a test - please ignore**";
 
   window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 };
@@ -102,38 +103,42 @@ const Footer: FC = () => {
         <Grid item xs={12} paddingY={padding.small}>
           <Grid container>
             <Grid item xs={6}>
-              <Box
-                sx={{
-                  height: "100%",
-                  width: "180px",
-                  bgcolor: color.blue.extraDark,
-                  borderRadius: borderRadius.small,
-                }}
-              >
-                <Button
+              <Tooltip title="Contact us by email" placement="top">
+                <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
                     height: "100%",
-                    width: "100%",
+                    width: "180px",
+                    bgcolor: color.blue.extraDark,
+                    borderRadius: borderRadius.small,
                   }}
-                  onClick={handleClickContactUs}
                 >
-                  <IconContainer sx={{ marginRight: margin.lg, color: "#fff" }}>
-                    <MailOutlineIcon />
-                  </IconContainer>
-                  <Typography
-                    color="#fff"
-                    paddingTop={0}
-                    fontSize={fontSize.info}
-                    letterSpacing={1}
-                    textAlign="center"
+                  <Button
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                      width: "100%",
+                    }}
+                    onClick={handleClickContactUs}
                   >
-                    Contact Us
-                  </Typography>
-                </Button>
-              </Box>
+                    <IconContainer
+                      sx={{ marginRight: margin.lg, color: "#fff" }}
+                    >
+                      <MailOutlineIcon />
+                    </IconContainer>
+                    <Typography
+                      color="#fff"
+                      paddingTop={0}
+                      fontSize={fontSize.info}
+                      letterSpacing={1}
+                      textAlign="center"
+                    >
+                      Contact Us
+                    </Typography>
+                  </Button>
+                </Box>
+              </Tooltip>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="end" gap={2}>
               <Button

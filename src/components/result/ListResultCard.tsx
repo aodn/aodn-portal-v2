@@ -84,7 +84,6 @@ const ListResultCard: FC<ResultCardProps> = ({
       <Box
         display="flex"
         flexDirection="column"
-        justifyContent="space-between"
         flex={1}
         height="100%"
         maxWidth="90%"
@@ -118,14 +117,7 @@ const ListResultCard: FC<ResultCardProps> = ({
           </CardActionArea>
         </Tooltip>
 
-        <CardActionArea
-          onClick={handleShowSpatialExtents}
-          sx={{
-            display: "flex",
-            justifyContent: "start",
-            alignItems: "start",
-          }}
-        >
+        <CardActionArea onClick={handleShowSpatialExtents} sx={{ flex: 1 }}>
           <Typography
             arial-label="result-list-card-content"
             color={fontColor.gray.medium}
