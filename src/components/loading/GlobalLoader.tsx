@@ -1,32 +1,25 @@
 import StyledLoadingBox from "./StyledLoadingBox";
 import { Box, CircularProgress, Modal } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import loadingEmitter from "./LoadingEmitter";
+import loadingManager from "./LoadingManager";
 import { EventName } from "./EventName";
 
-interface LoadingManagerProps {
+interface GlobalLoaderProps {
   children?: React.ReactNode;
 }
 
-const LoadingManager: React.FC<LoadingManagerProps> = ({ children }) => {
+const GlobalLoader: React.FC<GlobalLoaderProps> = ({ children }) => {
   const loadingBuffer = useMemo((): string[] => [], []);
   const [isLoading, setIsLoading] = useState(false);
 
   const checkState = useCallback(() => {
-    console.log("aaa buffer", loadingBuffer);
     if (loadingBuffer.length > 0) {
       setIsLoading(true);
-      console.log("aaa set loading true");
     }
     if (loadingBuffer.length === 0) {
       setIsLoading(false);
-      console.log("aaa set loading false");
     }
   }, [loadingBuffer]);
-
-  useEffect(() => {
-    console.log("aaa isloading", isLoading);
-  }, [isLoading]);
 
   const startLoadingHandler = useCallback(
     (loadingName: string) => {
@@ -58,16 +51,16 @@ const LoadingManager: React.FC<LoadingManagerProps> = ({ children }) => {
   );
 
   useEffect(() => {
-    loadingEmitter
-      .on(EventName.START_LOADING, startLoadingHandler)
-      .on(EventName.END_LOADING, endLoadingHandler)
-      .on(EventName.START_UNIQUE_LOADING, startUniqueLoadingHandler);
+    loadingManager
+      .subscribe(EventName.START_LOADING, startLoadingHandler)
+      .subscribe(EventName.END_LOADING, endLoadingHandler)
+      .subscribe(EventName.START_UNIQUE_LOADING, startUniqueLoadingHandler);
 
     return () => {
-      loadingEmitter
-        .off(EventName.START_LOADING, startLoadingHandler)
-        .off(EventName.END_LOADING, endLoadingHandler)
-        .off(EventName.START_UNIQUE_LOADING, startUniqueLoadingHandler);
+      loadingManager
+        .unsubscribe(EventName.START_LOADING, startLoadingHandler)
+        .unsubscribe(EventName.END_LOADING, endLoadingHandler)
+        .unsubscribe(EventName.START_UNIQUE_LOADING, startUniqueLoadingHandler);
     };
   }, [
     checkState,
@@ -94,4 +87,4 @@ const LoadingManager: React.FC<LoadingManagerProps> = ({ children }) => {
   );
 };
 
-export default LoadingManager;
+export default GlobalLoader;

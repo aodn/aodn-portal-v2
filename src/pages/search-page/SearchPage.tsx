@@ -48,8 +48,7 @@ import {
   OGCCollection,
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
-import loadingEmitter from "../../components/loading/LoadingEmitter";
-import { EventName } from "../../components/loading/EventName";
+import loadingManager from "../../components/loading/LoadingManager";
 import { LoadingName } from "../../components/loading/LoadingName";
 
 const SEARCH_BAR_HEIGHT = 56;
@@ -72,10 +71,7 @@ const SearchPage = () => {
     // a move event of map will be triggerred 0.3s after finish rendering the map
     // (move event debounce). We don't want user to do anything before the move event
     // is fully finished, so we pretend the "map move event" starts at the beginning
-    loadingEmitter.emit(
-      EventName.START_UNIQUE_LOADING,
-      LoadingName.ON_MAP_MOVE_DEBOUNCE
-    );
+    loadingManager.startUniqueLoading(LoadingName.ON_MAP_MOVE_DEBOUNCE);
   }, []);
 
   // value true meaning full map, so we set emum, else keep it as is.
@@ -138,7 +134,7 @@ const SearchPage = () => {
 
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
-      loadingEmitter.emit(EventName.START_LOADING, LoadingName.DO_SEARCH);
+      loadingManager.startLoading(LoadingName.DO_SEARCH);
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -182,9 +178,7 @@ const SearchPage = () => {
               }
             });
         })
-        .finally(() =>
-          loadingEmitter.emit(EventName.END_LOADING, LoadingName.DO_SEARCH)
-        );
+        .finally(() => loadingManager.endLoading(LoadingName.DO_SEARCH));
     },
     [dispatch, navigate, setLayers]
   );
@@ -192,10 +186,7 @@ const SearchPage = () => {
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
-      loadingEmitter.emit(
-        EventName.START_UNIQUE_LOADING,
-        LoadingName.ON_MAP_MOVE_DEBOUNCE
-      );
+      loadingManager.startUniqueLoading(LoadingName.ON_MAP_MOVE_DEBOUNCE);
 
       if (event.type === "zoomend" || event.type === "moveend") {
         const bounds = event.target.getBounds();
@@ -206,10 +197,7 @@ const SearchPage = () => {
         dispatch(updateFilterPolygon(polygon));
         doSearch();
       }
-      loadingEmitter.emit(
-        EventName.END_LOADING,
-        LoadingName.ON_MAP_MOVE_DEBOUNCE
-      );
+      loadingManager.endLoading(LoadingName.ON_MAP_MOVE_DEBOUNCE);
     },
     [dispatch, doSearch]
   );

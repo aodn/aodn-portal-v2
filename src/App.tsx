@@ -6,17 +6,17 @@ import AppTheme from "./utils/AppTheme";
 import AppRouter from "./utils/AppRouter";
 import { CssBaseline } from "@mui/material";
 import Scrollbar from "./components/common/ScrollBar";
-import LoadingManager from "./components/loading/LoadingManager";
+import GlobalLoader from "./components/loading/GlobalLoader";
 
 const app = () => {
   return (
     <div>
       <ThemeProvider theme={AppTheme}>
-        <LoadingManager>
+        <GlobalLoader>
           <CssBaseline />
           <Scrollbar />
           <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
-        </LoadingManager>
+        </GlobalLoader>
       </ThemeProvider>
     </div>
   );
