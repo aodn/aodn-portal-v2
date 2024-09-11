@@ -48,8 +48,6 @@ import {
   OGCCollection,
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
-import loadingManager from "../../components/loading/LoadingManager";
-import { LoadingName } from "../../components/loading/LoadingName";
 
 const SEARCH_BAR_HEIGHT = 56;
 const RESULT_SECTION_WIDTH = 500;
@@ -66,13 +64,17 @@ const SearchPage = () => {
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
+  const [isLoading, _setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    // a move event of map will be triggerred 0.3s after finish rendering the map
-    // (move event debounce). We don't want user to do anything before the move event
-    // is fully finished, so we pretend the "map move event" starts at the beginning
-    loadingManager.startUniqueLoading(LoadingName.ON_MAP_MOVE_DEBOUNCE);
-  }, []);
+  // a 0.5s late finish loading is useful to improve the stability of the system
+  const setIsLoading = useCallback(
+    (value: boolean) => {
+      setTimeout(() => {
+        _setIsLoading(value);
+      }, 500);
+    },
+    [_setIsLoading]
+  );
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -134,7 +136,7 @@ const SearchPage = () => {
 
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
-      loadingManager.startLoading(LoadingName.DO_SEARCH);
+      setIsLoading(true);
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -176,17 +178,17 @@ const SearchPage = () => {
               );
             }
           })
-          .finally(() => loadingManager.endLoading(LoadingName.DO_SEARCH));
+          .finally(() => {
+            setIsLoading(false);
+          });
       });
     },
-    [dispatch, navigate, setLayers]
+    [dispatch, navigate, setLayers, setIsLoading]
   );
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
-      loadingManager.startUniqueLoading(LoadingName.ON_MAP_MOVE_DEBOUNCE);
-
       if (event.type === "zoomend" || event.type === "moveend") {
         const bounds = event.target.getBounds();
         const ne = bounds.getNorthEast(); // NorthEast corner
@@ -196,7 +198,6 @@ const SearchPage = () => {
         dispatch(updateFilterPolygon(polygon));
         doSearch();
       }
-      loadingManager.endLoading(LoadingName.ON_MAP_MOVE_DEBOUNCE);
     },
     [dispatch, doSearch]
   );
@@ -310,6 +311,7 @@ const SearchPage = () => {
                     onNavigateToDetail={handleNavigateToDetailPage}
                     onChangeSorting={onChangeSorting}
                     datasetSelected={datasetsSelected}
+                    isLoading={isLoading}
                   />
                 </Box>
               )}
@@ -325,6 +327,7 @@ const SearchPage = () => {
                   onMapZoomOrMove={onMapZoomOrMove}
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
+                  isLoading={isLoading}
                 />
               </Box>
             </Box>
