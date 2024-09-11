@@ -30,7 +30,7 @@ interface MapProps {
 
 const MapDefault = {
   // Magic number, try and error by experience
-  DEBOUNCE_BEFORE_EVENT_FIRE: 300,
+  DEBOUNCE_BEFORE_EVENT_FIRE: 900,
   CENTER_LONGITUDE: 147.3353554138993,
   CENTER_LATITUDE: -42.88611707886841,
   ZOOM: 4,
