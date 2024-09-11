@@ -57,11 +57,6 @@ const LandingPage: FC = () => {
     },
     [
       dispatch,
-      updateParameterVocabs,
-      updateDateTimeFilterRange,
-      updateImosOnly,
-      updateUpdateFreq,
-      updateSearchText,
       redirectSearch,
     ]
   );
