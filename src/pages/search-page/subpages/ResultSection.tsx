@@ -50,12 +50,6 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     SearchResultLayoutEnum.LIST | SearchResultLayoutEnum.GRID
   >(SearchResultLayoutEnum.LIST);
 
-  const [contents, setContents] = useState<CollectionsQueryType>(reduxContents);
-
-  useEffect(() => {
-    setContents(reduxContents);
-  }, [reduxContents]);
-
   const fetchMore = useCallback(() => {
     // This is very specific to how elastic works and then how to construct the query
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -64,19 +58,11 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     // to go the next batch of record.
     const paramPaged = createSearchParamFrom(componentParam, {
       pagesize: DEFAULT_SEARCH_PAGE,
-      searchafter: contents.result.search_after,
+      searchafter: reduxContents.result.search_after,
     });
 
-    dispatch(fetchResultAppendStore(paramPaged))
-      .unwrap()
-      .then((collections: OGCCollections) => {
-        setContents((prevContents) => {
-          const clonedResult = prevContents.result.clone();
-          clonedResult.merge(collections);
-          return { ...prevContents, result: clonedResult };
-        });
-      });
-  }, [dispatch, contents]);
+    dispatch(fetchResultAppendStore(paramPaged));
+  }, [dispatch, reduxContents]);
 
   const onChangeLayout = useCallback(
     (layout: SearchResultLayoutEnum) => {
@@ -97,7 +83,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   );
 
   return (
-    contents && (
+    reduxContents && (
       <Box
         sx={{
           ...sx,
@@ -109,8 +95,8 @@ const ResultSection: React.FC<SearchResultListProps> = ({
       >
         <Box>
           <ResultPanelSimpleFilter
-            count={contents.result.collections.length}
-            total={contents.result.total}
+            count={reduxContents.result.collections.length}
+            total={reduxContents.result.total}
             onChangeLayout={onChangeLayout}
             onChangeSorting={onChangeSorting}
           />
@@ -118,7 +104,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
         <Box sx={{ flex: 1 }}>
           <ResultCards
             layout={currentLayout}
-            contents={contents}
+            contents={reduxContents}
             onDownload={undefined}
             onDetail={onNavigateToDetail}
             onClickCard={onClickCard}
