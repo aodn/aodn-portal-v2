@@ -13,7 +13,8 @@ const UPDATE_COMMON_KEY_VARIABLE = "UPDATE_COMMON_KEY_VARIABLE";
 const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
   "UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE";
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
-const UPDATE_CATEGORY_FILTER_VARIABLE = "UPDATE_CATEGORY_FILTER_VARIABLE";
+const UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE =
+  "UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE";
 const UPDATE_UPDATE_FREQ_VARIABLE = "UPDATE_UPDATE_FREQ_VARIABLE";
 const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
 
@@ -29,21 +30,21 @@ export interface ParameterState {
   dateTimeFilterRange?: DataTimeFilterRange;
   searchText?: string;
   commonKey?: string;
-  categories?: Array<Category>;
+  parameterVocabs?: Array<Vocab>;
   updateFreq?: DatasetFrequency | undefined;
   sortby?: string;
 }
-// Function use to test an input value is of type Category
-const isTypeCategory = (value: any): value is Category =>
-  value && (value as Category).label !== undefined;
+// Function use to test an input value is of type Vocab
+const isVocabType = (value: any): value is Vocab =>
+  value && (value as Vocab).label !== undefined;
 
-export interface Category {
+export interface Vocab {
   // The label is never undefined
   label: string;
   definition?: string;
   about?: string;
-  broader?: Array<Category>;
-  narrower?: Array<Category>;
+  broader?: Array<Vocab>;
+  narrower?: Array<Vocab>;
 }
 
 interface ActionType {
@@ -99,11 +100,11 @@ const updateImosOnly = (isImosOnly: boolean | undefined): ActionType => {
   };
 };
 
-const updateCategories = (input: Array<Category>): ActionType => {
+const updateParameterVocabs = (input: Array<Vocab>): ActionType => {
   return {
-    type: UPDATE_CATEGORY_FILTER_VARIABLE,
+    type: UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE,
     payload: {
-      categories: input,
+      parameterVocabs: input,
     } as ParameterState,
   };
 };
@@ -205,10 +206,10 @@ const paramReducer = (
         ...state,
         polygon: action.payload.polygon,
       };
-    case UPDATE_CATEGORY_FILTER_VARIABLE:
+    case UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE:
       return {
         ...state,
-        categories: action.payload.categories,
+        parameterVocabs: action.payload.parameterVocabs,
       };
     case UPDATE_UPDATE_FREQ_VARIABLE:
       return {
@@ -244,8 +245,8 @@ const flattenToProperties = (
       if (typeof param[key] === "object" && param[key] !== null) {
         flattenToProperties(param[key], propName, result);
       } else {
-        if (isTypeCategory(param)) {
-          // Special handle for category type, we only serializable
+        if (isVocabType(param)) {
+          // Special handle for vocab type, we only serializable
           // the label value, because other is of no use to search
           // and just waste space
           if (key === "label") {
@@ -354,7 +355,7 @@ export {
   updateSearchText,
   updateImosOnly,
   updateFilterPolygon,
-  updateCategories,
+  updateParameterVocabs,
   updateParameterStates,
   updateSortBy,
   updateCommonKey,

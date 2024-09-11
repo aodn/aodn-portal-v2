@@ -57,6 +57,8 @@ const fontSize = {
   icon: "10px",
   label: "12px",
   info: "14px",
+  resultCardTitle: "14px",
+  resultCardContent: "12px",
 };
 
 const fontFamily = {
@@ -115,6 +117,9 @@ const color = {
     twoTenTransparent: " rgba(255, 255, 255, 0.2  )",
     sixTenTransparent: " rgba(255, 255, 255, 0.6  )",
   },
+  success: {
+    main: "#4CAF50",
+  },
 };
 
 const border = {
@@ -147,6 +152,10 @@ const zIndex = {
   FILTER_OVERLAY: 10,
 };
 
+const shadow = {
+  inner: "inset 1px 1px rgba(0, 0, 0, 0.1)",
+};
+
 export {
   gap,
   margin,
@@ -160,4 +169,5 @@ export {
   borderRadius,
   filterList,
   zIndex,
+  shadow,
 };

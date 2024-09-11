@@ -1,22 +1,24 @@
-import {
-  Grid,
-  InputBase,
-  Paper,
-  styled,
-  SxProps,
-  Theme,
-  Typography,
-} from "@mui/material";
-import MapListToggleButton, {
-  MapListToggleButtonProps,
-} from "../buttons/MapListToggleButton";
-import SortButton, { SortButtonProps } from "../buttons/SortButton";
 import { FC } from "react";
-import { borderRadius, fontSize } from "../../../styles/constants";
+import { Grid, Paper, SxProps, Theme, Typography } from "@mui/material";
+import {
+  border,
+  borderRadius,
+  color,
+  fontSize,
+} from "../../../styles/constants";
+import { formatNumber } from "../../../utils/StringUtils";
+import MapViewButton, {
+  MapViewButtonProps,
+  SearchResultLayoutEnum,
+} from "../buttons/MapViewButton";
+import ResultListSortButton, {
+  ResultListSortButtonProps,
+  SortResultEnum,
+} from "../buttons/ResultListSortButton";
 
 interface ResultPanelSimpleFilterProps
-  extends MapListToggleButtonProps,
-    SortButtonProps {
+  extends MapViewButtonProps<SearchResultLayoutEnum>,
+    ResultListSortButtonProps<SortResultEnum> {
   count: number;
   total: number;
   sx?: SxProps<Theme>;
@@ -39,19 +41,33 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             justifyContent: "center",
             alignItems: "center",
             height: "100%",
-            borderRadius: borderRadius.medium,
+            border: `${border.xs} ${color.blue.darkSemiTransparent}`,
+            borderRadius: borderRadius.small,
+            bgcolor: color.white.sixTenTransparent,
           }}
         >
-          <Typography fontSize={fontSize.info} padding={0}>
-            Showing 1-{count} of {total} results
-          </Typography>
+          {total === 0 ? (
+            <Typography fontSize={fontSize.info} padding={0}>
+              No result found
+            </Typography>
+          ) : total === 1 ? (
+            <Typography fontSize={fontSize.info} padding={0}>
+              Showing 1 of total 1 result
+            </Typography>
+          ) : (
+            <Typography fontSize={fontSize.info} padding={0}>
+              {/* TODO: here is a bug that the count number might be larger than total number */}
+              Showing 1&nbsp;-&nbsp;{count}&nbsp;of&nbsp;{formatNumber(total)}
+              &nbsp;results
+            </Typography>
+          )}
         </Paper>
       </Grid>
       <Grid item md={3} xs={6}>
-        <SortButton onChangeSorting={onChangeSorting} />
+        <ResultListSortButton onChangeSorting={onChangeSorting} />
       </Grid>
       <Grid item md={3} xs={6}>
-        <MapListToggleButton onChangeLayout={onChangeLayout} />
+        <MapViewButton onChangeLayout={onChangeLayout} />
       </Grid>
     </Grid>
   );

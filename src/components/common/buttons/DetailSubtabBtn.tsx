@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Button, useTheme } from "@mui/material";
+import { color } from "../../../styles/constants";
 
 interface DetailSubtabProps {
   title: string;
@@ -31,10 +32,12 @@ const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
           border: border,
           "&:hover": {
             border: border,
+            backgroundColor: color.white.sixTenTransparent,
           },
           borderRadius: theme.borderRadius.sm,
-          justifyContent: "flex-start",
-          textAlign: "left",
+          justifyContent: "center",
+          textAlign: "center",
+          backgroundColor: "#fff",
         }}
         onClick={navigate}
       >
