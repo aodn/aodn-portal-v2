@@ -18,6 +18,7 @@ import {
   margin,
   padding,
 } from "../../../styles/constants";
+import { openInNewTab } from "../../../utils/LinkUtils";
 
 const HeaderMenu: FC = () => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -72,18 +73,18 @@ const HeaderMenu: FC = () => {
       items: [
         {
           name: "About IMOS",
-          handler: () => window.open("https://imos.org.au/"),
+          handler: () => openInNewTab("https://imos.org.au/"),
         },
         {
           name: "About AODN",
           handler: () =>
-            window.open(
+            openInNewTab(
               "https://imos.org.au/data/about-the-australian-ocean-data-network"
             ),
         },
         {
           name: "Contact Us Email",
-          handler: () => window.open("mailto:info@aodn.org.au"),
+          handler: () => openInNewTab("mailto:info@aodn.org.au"),
         },
       ],
     },
@@ -93,7 +94,7 @@ const HeaderMenu: FC = () => {
         {
           name: "Acknowledging Us",
           handler: () =>
-            window.open("https://imos.org.au/resources/acknowledging-us"),
+            openInNewTab("https://imos.org.au/resources/acknowledging-us"),
         },
         {
           name: "Disclaimer",
@@ -105,7 +106,7 @@ const HeaderMenu: FC = () => {
         {
           name: "Contributing Data",
           handler: () =>
-            window.open("https://help.aodn.org.au/contributing-data/"),
+            openInNewTab("https://help.aodn.org.au/contributing-data/"),
         },
       ],
     },

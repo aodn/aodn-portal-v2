@@ -142,7 +142,7 @@ const Footer: FC = () => {
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="end" gap={2}>
               <Button
-                onClick={() => window.open("https://imos.org.au/terms-of-use")}
+                onClick={() => openInNewTab("https://imos.org.au/terms-of-use")}
               >
                 <Typography color="#000" paddingTop={gap.md}>
                   Terms of Use
@@ -150,7 +150,7 @@ const Footer: FC = () => {
               </Button>
               <Button
                 onClick={() =>
-                  window.open("https://imos.org.au/resources/acknowledging-us")
+                  openInNewTab("https://imos.org.au/resources/acknowledging-us")
                 }
               >
                 <Typography color="#000" paddingTop={gap.md}>
@@ -159,7 +159,7 @@ const Footer: FC = () => {
               </Button>
               <Button
                 onClick={() =>
-                  window.open("https://imos.org.au/conditions-of-use")
+                  openInNewTab("https://imos.org.au/conditions-of-use")
                 }
               >
                 <Typography color="#000" paddingTop={gap.md}>
@@ -195,7 +195,7 @@ const Footer: FC = () => {
                   sx={{ color: color.blue.extraDark }}
                   aria-label="Facebook"
                   onClick={() =>
-                    window.open(
+                    openInNewTab(
                       "https://www.facebook.com/IntegratedMarineObservingSystem"
                     )
                   }
@@ -206,7 +206,7 @@ const Footer: FC = () => {
                   sx={{ color: color.blue.extraDark }}
                   aria-label="LinkedIn"
                   onClick={() =>
-                    window.open("https://www.linkedin.com/company/18409795")
+                    openInNewTab("https://www.linkedin.com/company/18409795")
                   }
                 >
                   <LinkedInIcon />
@@ -214,7 +214,7 @@ const Footer: FC = () => {
                 <IconButton
                   sx={{ color: color.blue.extraDark }}
                   aria-label="X"
-                  onClick={() => window.open("https://twitter.com/IMOS_AUS")}
+                  onClick={() => openInNewTab("https://twitter.com/IMOS_AUS")}
                 >
                   <XIcon />
                 </IconButton>
@@ -222,7 +222,7 @@ const Footer: FC = () => {
                   sx={{ color: color.blue.extraDark }}
                   aria-label="Instagram"
                   onClick={() =>
-                    window.open("https://www.instagram.com/imos_australia")
+                    openInNewTab("https://www.instagram.com/imos_australia")
                   }
                 >
                   <InstagramIcon />
