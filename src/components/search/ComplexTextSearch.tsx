@@ -116,9 +116,8 @@ const ComplexTextSearch = () => {
             backgroundColor: "#fff",
             height: "100%",
             borderRadius: borderRadius.small,
-
             ":hover": {
-              backgroundColor: color.white.sixTenTransparent,
+              backgroundColor: "#fff",
             },
           }}
           fullWidth

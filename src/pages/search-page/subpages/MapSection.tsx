@@ -1,5 +1,4 @@
-import { padding } from "../../../styles/constants";
-import { Box, Paper, SxProps, Theme } from "@mui/material";
+import { Paper, SxProps, Theme } from "@mui/material";
 import Map from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import ToggleControl from "../../../components/map/mapbox/controls/ToggleControl";

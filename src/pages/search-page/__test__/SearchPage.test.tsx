@@ -67,7 +67,7 @@ describe("SearchPage", () => {
 
   it("The list should be able to show in list / grid view", async () => {
     const user = userEvent.setup();
-    const { findByTestId, findAllByTestId, queryAllByTestId } = render(
+    const { findByTestId, findAllByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -76,6 +76,13 @@ describe("SearchPage", () => {
         </ThemeProvider>
       </Provider>
     );
+    // Pretend user enter wave and press two enter in search box
+    const input = (await findByTestId(
+      "input-with-suggester"
+    )) as HTMLInputElement;
+    await userEvent.type(input, "wave");
+    await userEvent.type(input, "{enter}{enter}");
+    expect(input.value).toEqual("wave");
 
     const list = await findByTestId("search-page-result-list");
     expect(list).toBeDefined();
