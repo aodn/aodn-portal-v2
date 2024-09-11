@@ -127,8 +127,9 @@ const HeaderSection = () => {
         }}
       >
         <Stack spacing={1}>
-          {renderButton(buttons.goToPrevious.icon)}
-          {renderButton(buttons.goToNext.icon)}
+          {/*TODO: hide the below 2 buttons now, for better demonstration. Can uncommented them when implementing them*/}
+          {/*{renderButton(buttons.goToPrevious.icon)}*/}
+          {/*{renderButton(buttons.goToNext.icon)}*/}
         </Stack>
       </Box>
       <Grid container>
