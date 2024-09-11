@@ -145,40 +145,39 @@ const SearchPage = () => {
         pagesize: DEFAULT_SEARCH_PAGE,
       });
 
-      dispatch(fetchResultWithStore(paramPaged))
-        .then(() => {
-          // Use a different parameter so that it return id and bbox only and do not store the values,
-          // we cannot add page because we want to show all record on map
-          const paramNonPaged = createSearchParamFrom(componentParam);
-          dispatch(
-            // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
-            // and ordered by uuid to avoid affecting cluster calculation
-            fetchResultNoStore({
-              ...paramNonPaged,
-              properties: "id,bbox",
-              sortby: "id",
-            })
-          )
-            .unwrap()
-            .then((collections) => {
-              setLayers(collections.collections);
-            })
-            .then(() => {
-              if (needNavigate) {
-                navigate(
-                  pageDefault.search + "?" + formatToUrlParam(componentParam),
-                  {
-                    state: {
-                      fromNavigate: true,
-                      requireSearch: false,
-                      referer: "SearchPage",
-                    },
-                  }
-                );
-              }
-            });
-        })
-        .finally(() => loadingManager.endLoading(LoadingName.DO_SEARCH));
+      dispatch(fetchResultWithStore(paramPaged)).then(() => {
+        // Use a different parameter so that it return id and bbox only and do not store the values,
+        // we cannot add page because we want to show all record on map
+        const paramNonPaged = createSearchParamFrom(componentParam);
+        dispatch(
+          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+          // and ordered by uuid to avoid affecting cluster calculation
+          fetchResultNoStore({
+            ...paramNonPaged,
+            properties: "id,bbox",
+            sortby: "id",
+          })
+        )
+          .unwrap()
+          .then((collections) => {
+            setLayers(collections.collections);
+          })
+          .then(() => {
+            if (needNavigate) {
+              navigate(
+                pageDefault.search + "?" + formatToUrlParam(componentParam),
+                {
+                  state: {
+                    fromNavigate: true,
+                    requireSearch: false,
+                    referer: "SearchPage",
+                  },
+                }
+              );
+            }
+          })
+          .finally(() => loadingManager.endLoading(LoadingName.DO_SEARCH));
+      });
     },
     [dispatch, navigate, setLayers]
   );
