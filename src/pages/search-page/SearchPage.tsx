@@ -64,7 +64,17 @@ const SearchPage = () => {
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, _setIsLoading] = useState<boolean>(true);
+
+  // a 0.5s late finish loading is useful to improve the stability of the system
+  const setIsLoading = useCallback(
+    (value: boolean) => {
+      setTimeout(() => {
+        _setIsLoading(value);
+      }, 500);
+    },
+    [_setIsLoading]
+  );
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -173,7 +183,7 @@ const SearchPage = () => {
           });
       });
     },
-    [dispatch, navigate, setLayers]
+    [dispatch, navigate, setLayers, setIsLoading]
   );
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
