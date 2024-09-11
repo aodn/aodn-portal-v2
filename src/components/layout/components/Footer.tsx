@@ -6,13 +6,10 @@ import {
   Grid,
   Icon,
   IconButton,
-  InputBase,
-  Paper,
   SxProps,
   Tooltip,
   Typography,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import NorthIcon from "@mui/icons-material/North";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -21,7 +18,6 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
 import dayjs from "dayjs";
 import {
-  border,
   borderRadius,
   color,
   fontSize,
@@ -31,6 +27,7 @@ import {
 } from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
+import { openInNewTab } from "../../../utils/LinkUtils";
 
 interface IconContainerProps {
   children: JSX.Element;
