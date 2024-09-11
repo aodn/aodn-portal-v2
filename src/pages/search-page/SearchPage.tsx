@@ -38,17 +38,18 @@ import { pageDefault } from "../../components/common/constants";
 // Map section, you can switch to other map library, this is for mapbox
 import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
-import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
 import MapSection from "./subpages/MapSection";
 import { color } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
+import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewButton";
+import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { bboxPolygon } from "@turf/turf";
 import {
   OGCCollection,
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
-import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewButton";
-import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
+import loadingManager from "../../components/loading/LoadingManager";
+import { LoadingName } from "../../components/loading/LoadingName";
 
 const SEARCH_BAR_HEIGHT = 56;
 const RESULT_SECTION_WIDTH = 500;
@@ -65,6 +66,13 @@ const SearchPage = () => {
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
+
+  useEffect(() => {
+    // a move event of map will be triggerred 0.3s after finish rendering the map
+    // (move event debounce). We don't want user to do anything before the move event
+    // is fully finished, so we pretend the "map move event" starts at the beginning
+    loadingManager.startUniqueLoading(LoadingName.ON_MAP_MOVE_DEBOUNCE);
+  }, []);
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -87,8 +95,7 @@ const SearchPage = () => {
     if (!Array.isArray(uuids) || uuids.length === 0) {
       return "";
     }
-    const filterConditions = uuids.map((uuid) => `id='${uuid}'`).join(" or ");
-    return filterConditions;
+    return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
   };
 
   const getCollectionsData = useCallback(
@@ -127,12 +134,13 @@ const SearchPage = () => {
 
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
+      loadingManager.startLoading(LoadingName.DO_SEARCH);
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
 
       // Use standard param to get fields you need, record is stored in redux,
-      // set page so that it return fewer records
+      // set page so that it returns fewer records
       const paramPaged = createSearchParamFrom(componentParam, {
         pagesize: DEFAULT_SEARCH_PAGE,
       });
@@ -167,7 +175,8 @@ const SearchPage = () => {
                 }
               );
             }
-          });
+          })
+          .finally(() => loadingManager.endLoading(LoadingName.DO_SEARCH));
       });
     },
     [dispatch, navigate, setLayers]
@@ -176,6 +185,8 @@ const SearchPage = () => {
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
+      loadingManager.startUniqueLoading(LoadingName.ON_MAP_MOVE_DEBOUNCE);
+
       if (event.type === "zoomend" || event.type === "moveend") {
         const bounds = event.target.getBounds();
         const ne = bounds.getNorthEast(); // NorthEast corner
@@ -185,13 +196,14 @@ const SearchPage = () => {
         dispatch(updateFilterPolygon(polygon));
         doSearch();
       }
+      loadingManager.endLoading(LoadingName.ON_MAP_MOVE_DEBOUNCE);
     },
     [dispatch, doSearch]
   );
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
-  // and content may not refreshed
+  // and content may not refresh
   const handleNavigation = useCallback(() => {
     if (!location.state?.fromNavigate) {
       // The first char is ? in the search string, so we need to remove it.
