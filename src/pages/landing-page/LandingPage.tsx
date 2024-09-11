@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { Box } from "@mui/material";
 import landingImageUrl from "@/assets/images/bg_landing_page.png";
 import Layout from "../../components/layout/layout";
@@ -15,28 +15,55 @@ import {
   SMART_PANEL_CONTAINER_HEIGHT,
   SMART_PANEL_CONTAINER_WIDTH,
 } from "./constants";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../components/common/store/store";
 import {
+  formatToUrlParam,
+  ParameterState,
   updateDateTimeFilterRange,
   updateImosOnly,
   updateParameterVocabs,
   updateSearchText,
   updateUpdateFreq,
 } from "../../components/common/store/componentParamReducer";
+import { useAppDispatch } from "../../components/common/store/hooks";
+import store, { getComponentState } from "../../components/common/store/store";
+import { pageDefault } from "../../components/common/constants";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const redirectSearch = useCallback(() => {
+    const componentParam: ParameterState = getComponentState(store.getState());
+    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+      state: {
+        fromNavigate: true,
+        requireSearch: true,
+        referer: "SmartPanel",
+      },
+    });
+  }, [navigate]);
 
   // This is a simple click smart card function that with update search input text and clear all the filters
   // Can be change to a function-switcher if any other functions are designed in the future
-  const handleClickSmartCard = (value: string) => {
-    dispatch(updateParameterVocabs([]));
-    dispatch(updateDateTimeFilterRange({}));
-    dispatch(updateImosOnly(false));
-    dispatch(updateUpdateFreq(undefined));
-    dispatch(updateSearchText(value));
-  };
+  const handleClickSmartCard = useCallback(
+    (value: string) => {
+      dispatch(updateParameterVocabs([]));
+      dispatch(updateDateTimeFilterRange({}));
+      dispatch(updateImosOnly(false));
+      dispatch(updateUpdateFreq(undefined));
+      dispatch(updateSearchText(value));
+      redirectSearch();
+    },
+    [
+      dispatch,
+      updateParameterVocabs,
+      updateDateTimeFilterRange,
+      updateImosOnly,
+      updateUpdateFreq,
+      updateSearchText,
+    ]
+  );
 
   return (
     <Layout>
