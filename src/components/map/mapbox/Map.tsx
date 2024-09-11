@@ -136,22 +136,7 @@ const ReactMap = ({
       // and we need to redraw the map
       const resizeObserver = new ResizeObserver((entries) =>
         // https://stackoverflow.com/questions/70533564/mapbox-gl-flickers-when-resizing-the-container-div
-
-        {
-          const entry = entries[0];
-          if (entry && entry.contentRect) {
-            const { width, height } = entry.contentRect;
-
-            // The below check is used to prevent unexpected triggering the resize
-            // event from some rerendering which only have slightly different size
-            if (
-              Math.abs(map.getContainer().clientWidth - width) > 1 ||
-              Math.abs(map.getContainer().clientHeight - height) > 1
-            ) {
-              setTimeout(() => map.resize(), 0);
-            }
-          }
-        }
+        setTimeout(() => map.resize(), 0.1)
       );
       resizeObserver.observe(map.getContainer());
 
