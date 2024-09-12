@@ -77,26 +77,29 @@ const SearchPage = () => {
     [_setIsLoading]
   );
 
-  const checkLoadingState = useCallback(() => {
-    if (loadingCounter > 0) {
-      setIsLoading(true);
-    }
-    if (loadingCounter === 0) {
-      setIsLoading(false);
-    }
-    if (loadingCounter < 0) {
-      // TODO: use beffer handling to replace this
-      throw new Error("Loading counter is negative");
-    }
-  }, [loadingCounter, setIsLoading]);
+  const checkLoadingState = useCallback(
+    (count: number) => {
+      if (count > 0) {
+        setIsLoading(true);
+      }
+      if (count === 0) {
+        setIsLoading(false);
+      }
+      if (count < 0) {
+        // TODO: use beffer handling to replace this
+        throw new Error("Loading counter is negative");
+      }
+    },
+    [setIsLoading]
+  );
   const startOneLoadingThread = useCallback(() => {
     loadingCounter++;
-    checkLoadingState();
+    checkLoadingState(loadingCounter);
   }, [checkLoadingState, loadingCounter]);
 
   const endOneLoadingThread = useCallback(() => {
     loadingCounter--;
-    checkLoadingState();
+    checkLoadingState(loadingCounter);
   }, [checkLoadingState, loadingCounter]);
 
   // value true meaning full map, so we set emum, else keep it as is.
