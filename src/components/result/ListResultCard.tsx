@@ -62,6 +62,7 @@ const ListResultCard: FC<ResultCardProps> = ({
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card
+      id={`result-card-${content.id}`}
       elevation={isSelectedDataset ? 2 : 0}
       sx={{
         position: "relative",
