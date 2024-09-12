@@ -64,43 +64,32 @@ const SearchPage = () => {
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
-  const [isLoading, _setIsLoading] = useState<boolean>(true);
-  let loadingCounter = 0;
+  const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
 
-  // a 0.5s late finish loading is useful to improve the stability of the system
-  const setIsLoading = useCallback(
-    (value: boolean) => {
+  const isLoading = useCallback((count: number): boolean => {
+    if (count > 0) {
+      return true;
+    }
+    if (count === 0) {
+      // a 0.5s late finish loading is useful to improve the stability of the system
       setTimeout(() => {
-        _setIsLoading(value);
+        return false;
       }, 500);
-    },
-    [_setIsLoading]
-  );
+    }
+    if (count < 0) {
+      // TODO: use beffer handling to replace this
+      throw new Error("Loading counter is negative");
+    }
+    return false;
+  }, []);
 
-  const checkLoadingState = useCallback(
-    (count: number) => {
-      if (count > 0) {
-        setIsLoading(true);
-      }
-      if (count === 0) {
-        setIsLoading(false);
-      }
-      if (count < 0) {
-        // TODO: use beffer handling to replace this
-        throw new Error("Loading counter is negative");
-      }
-    },
-    [setIsLoading]
-  );
   const startOneLoadingThread = useCallback(() => {
-    loadingCounter++;
-    checkLoadingState(loadingCounter);
-  }, [checkLoadingState, loadingCounter]);
+    setLoadingThreadCount((prev) => prev + 1);
+  }, []);
 
   const endOneLoadingThread = useCallback(() => {
-    loadingCounter--;
-    checkLoadingState(loadingCounter);
-  }, [checkLoadingState, loadingCounter]);
+    setLoadingThreadCount((prev) => prev - 1);
+  }, []);
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -337,7 +326,7 @@ const SearchPage = () => {
                     onNavigateToDetail={handleNavigateToDetailPage}
                     onChangeSorting={onChangeSorting}
                     datasetSelected={datasetsSelected}
-                    isLoading={isLoading}
+                    isLoading={isLoading(loadingThreadCount)}
                   />
                 </Box>
               )}
@@ -353,7 +342,7 @@ const SearchPage = () => {
                   onMapZoomOrMove={onMapZoomOrMove}
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
-                  isLoading={isLoading}
+                  isLoading={isLoading(loadingThreadCount)}
                 />
               </Box>
             </Box>
