@@ -64,17 +64,32 @@ const SearchPage = () => {
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
-  const [isLoading, _setIsLoading] = useState<boolean>(true);
+  const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
 
-  // a 0.5s late finish loading is useful to improve the stability of the system
-  const setIsLoading = useCallback(
-    (value: boolean) => {
+  const isLoading = useCallback((count: number): boolean => {
+    if (count > 0) {
+      return true;
+    }
+    if (count === 0) {
+      // a 0.5s late finish loading is useful to improve the stability of the system
       setTimeout(() => {
-        _setIsLoading(value);
+        return false;
       }, 500);
-    },
-    [_setIsLoading]
-  );
+    }
+    if (count < 0) {
+      // TODO: use beffer handling to replace this
+      throw new Error("Loading counter is negative");
+    }
+    return false;
+  }, []);
+
+  const startOneLoadingThread = useCallback(() => {
+    setLoadingThreadCount((prev) => prev + 1);
+  }, []);
+
+  const endOneLoadingThread = useCallback(() => {
+    setLoadingThreadCount((prev) => prev - 1);
+  }, []);
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -136,7 +151,7 @@ const SearchPage = () => {
 
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
-      setIsLoading(true);
+      startOneLoadingThread();
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -179,11 +194,11 @@ const SearchPage = () => {
             }
           })
           .finally(() => {
-            setIsLoading(false);
+            endOneLoadingThread();
           });
       });
     },
-    [dispatch, navigate, setLayers, setIsLoading]
+    [startOneLoadingThread, dispatch, navigate, endOneLoadingThread]
   );
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
@@ -311,7 +326,7 @@ const SearchPage = () => {
                     onNavigateToDetail={handleNavigateToDetailPage}
                     onChangeSorting={onChangeSorting}
                     datasetSelected={datasetsSelected}
-                    isLoading={isLoading}
+                    isLoading={isLoading(loadingThreadCount)}
                   />
                 </Box>
               )}
@@ -327,7 +342,7 @@ const SearchPage = () => {
                   onMapZoomOrMove={onMapZoomOrMove}
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
-                  isLoading={isLoading}
+                  isLoading={isLoading(loadingThreadCount)}
                 />
               </Box>
             </Box>
