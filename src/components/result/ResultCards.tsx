@@ -105,6 +105,8 @@ const ResultCards = ({
 
   const renderCells = useCallback(
     (
+      count: number,
+      total: number,
       { contents, onDownload, onClickCard }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
@@ -154,11 +156,13 @@ const ResultCards = ({
         );
       }
     },
-    [count, onDetail, renderLoadMoreButton, total]
+    [onDetail, renderLoadMoreButton]
   );
 
   const renderRows = useCallback(
     (
+      count: number,
+      total: number,
       { contents, onClickCard, onDownload, onDetail }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
@@ -169,6 +173,7 @@ const ResultCards = ({
         // We need to display load more button/placeholder in the last index place
         return (
           <ListItem
+            id="result-card-load-more-btn"
             sx={{
               display: "flex",
               alignItems: "flex-start", // Aligns the Box to the top of the ListItem
@@ -192,7 +197,7 @@ const ResultCards = ({
         );
       }
     },
-    [count, renderLoadMoreButton, total]
+    [renderLoadMoreButton]
   );
 
   // You must set the height to 100% of view height so the calculation
@@ -217,6 +222,8 @@ const ResultCards = ({
             >
               {(child: ListChildComponentProps) =>
                 renderRows(
+                  count,
+                  total,
                   {
                     contents,
                     onClickCard,
@@ -250,7 +257,14 @@ const ResultCards = ({
             >
               {(child: ListChildComponentProps) =>
                 renderCells(
-                  { contents, onDownload, onDetail, onClickCard },
+                  count,
+                  total,
+                  {
+                    contents,
+                    onDownload,
+                    onDetail,
+                    onClickCard,
+                  },
                   child
                 )
               }
