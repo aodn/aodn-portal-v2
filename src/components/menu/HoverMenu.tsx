@@ -64,7 +64,6 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
       >
         <ClickAwayListener onClickAway={handleClose}>
           <MenuList
-            autoFocusItem={open}
             onKeyDown={handleListKeyDown}
             onMouseEnter={() => setOpen(true)}
             onMouseLeave={() => setOpen(false)}
