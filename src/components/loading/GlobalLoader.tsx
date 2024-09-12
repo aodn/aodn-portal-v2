@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import loadingManager from "./LoadingManager";
-import { EventName } from "./EventName";
+import { EventName } from "./enum/EventName";
 import CircleLoader from "./CircleLoader";
 
 interface GlobalLoaderProps {
