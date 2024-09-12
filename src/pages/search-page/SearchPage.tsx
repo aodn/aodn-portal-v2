@@ -38,17 +38,16 @@ import { pageDefault } from "../../components/common/constants";
 // Map section, you can switch to other map library, this is for mapbox
 import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
-import ResultPanelIconFilter from "../../components/common/filters/ResultPanelIconFilter";
 import MapSection from "./subpages/MapSection";
 import { color } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
+import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewButton";
+import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { bboxPolygon } from "@turf/turf";
 import {
   OGCCollection,
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
-import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewButton";
-import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 
 const SEARCH_BAR_HEIGHT = 56;
 const RESULT_SECTION_WIDTH = 500;
@@ -65,6 +64,17 @@ const SearchPage = () => {
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
+  const [isLoading, _setIsLoading] = useState<boolean>(true);
+
+  // a 0.5s late finish loading is useful to improve the stability of the system
+  const setIsLoading = useCallback(
+    (value: boolean) => {
+      setTimeout(() => {
+        _setIsLoading(value);
+      }, 500);
+    },
+    [_setIsLoading]
+  );
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -87,8 +97,7 @@ const SearchPage = () => {
     if (!Array.isArray(uuids) || uuids.length === 0) {
       return "";
     }
-    const filterConditions = uuids.map((uuid) => `id='${uuid}'`).join(" or ");
-    return filterConditions;
+    return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
   };
 
   const getCollectionsData = useCallback(
@@ -127,12 +136,13 @@ const SearchPage = () => {
 
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
+      setIsLoading(true);
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
 
       // Use standard param to get fields you need, record is stored in redux,
-      // set page so that it return fewer records
+      // set page so that it returns fewer records
       const paramPaged = createSearchParamFrom(componentParam, {
         pagesize: DEFAULT_SEARCH_PAGE,
       });
@@ -167,10 +177,13 @@ const SearchPage = () => {
                 }
               );
             }
+          })
+          .finally(() => {
+            setIsLoading(false);
           });
       });
     },
-    [dispatch, navigate, setLayers]
+    [dispatch, navigate, setLayers, setIsLoading]
   );
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
@@ -191,7 +204,7 @@ const SearchPage = () => {
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
-  // and content may not refreshed
+  // and content may not refresh
   const handleNavigation = useCallback(() => {
     if (!location.state?.fromNavigate) {
       // The first char is ? in the search string, so we need to remove it.
@@ -298,6 +311,7 @@ const SearchPage = () => {
                     onNavigateToDetail={handleNavigateToDetailPage}
                     onChangeSorting={onChangeSorting}
                     datasetSelected={datasetsSelected}
+                    isLoading={isLoading}
                   />
                 </Box>
               )}
@@ -313,6 +327,7 @@ const SearchPage = () => {
                   onMapZoomOrMove={onMapZoomOrMove}
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
+                  isLoading={isLoading}
                 />
               </Box>
             </Box>

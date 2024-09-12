@@ -36,11 +36,13 @@ const tabs = [
     value: "associated records",
     component: <AssociatedRecordsPanel />,
   },
-  {
-    label: "Global Attribute",
-    value: "Global Attribute",
-    component: <GlobalAttributePanel />,
-  },
+  //TODO: hide it now, for better demonstration. Will be added back (or delete)
+  // when have final decision on it
+  // {
+  //   label: "Global Attribute",
+  //   value: "Global Attribute",
+  //   component: <GlobalAttributePanel />,
+  // },
 ];
 
 const ContentSection: FC = () => {

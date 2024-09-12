@@ -6,12 +6,10 @@ import {
   Grid,
   Icon,
   IconButton,
-  InputBase,
-  Paper,
   SxProps,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import NorthIcon from "@mui/icons-material/North";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -20,7 +18,6 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
 import dayjs from "dayjs";
 import {
-  border,
   borderRadius,
   color,
   fontSize,
@@ -30,6 +27,7 @@ import {
 } from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
+import { openInNewTab } from "../../../utils/LinkUtils";
 
 interface IconContainerProps {
   children: JSX.Element;
@@ -50,8 +48,8 @@ const handleBackToTop = () => {
 
 const handleClickContactUs = () => {
   const recipient = "info@aodn.org.au";
-  const subject = "This is a test - please ignore";
-  const body = "This is being sent from AODN's Data Discovery portal.";
+  const subject = "AODN Data Discovery enquiry";
+  const body = "**This is a test - please ignore**";
 
   window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 };
@@ -102,42 +100,46 @@ const Footer: FC = () => {
         <Grid item xs={12} paddingY={padding.small}>
           <Grid container>
             <Grid item xs={6}>
-              <Box
-                sx={{
-                  height: "100%",
-                  width: "180px",
-                  bgcolor: color.blue.extraDark,
-                  borderRadius: borderRadius.small,
-                }}
-              >
-                <Button
+              <Tooltip title="Contact us by email" placement="top">
+                <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
                     height: "100%",
-                    width: "100%",
+                    width: "180px",
+                    bgcolor: color.blue.extraDark,
+                    borderRadius: borderRadius.small,
                   }}
-                  onClick={handleClickContactUs}
                 >
-                  <IconContainer sx={{ marginRight: margin.lg, color: "#fff" }}>
-                    <MailOutlineIcon />
-                  </IconContainer>
-                  <Typography
-                    color="#fff"
-                    paddingTop={0}
-                    fontSize={fontSize.info}
-                    letterSpacing={1}
-                    textAlign="center"
+                  <Button
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                      width: "100%",
+                    }}
+                    onClick={handleClickContactUs}
                   >
-                    Contact Us
-                  </Typography>
-                </Button>
-              </Box>
+                    <IconContainer
+                      sx={{ marginRight: margin.lg, color: "#fff" }}
+                    >
+                      <MailOutlineIcon />
+                    </IconContainer>
+                    <Typography
+                      color="#fff"
+                      paddingTop={0}
+                      fontSize={fontSize.info}
+                      letterSpacing={1}
+                      textAlign="center"
+                    >
+                      Contact Us
+                    </Typography>
+                  </Button>
+                </Box>
+              </Tooltip>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="end" gap={2}>
               <Button
-                onClick={() => window.open("https://imos.org.au/terms-of-use")}
+                onClick={() => openInNewTab("https://imos.org.au/terms-of-use")}
               >
                 <Typography color="#000" paddingTop={gap.md}>
                   Terms of Use
@@ -145,7 +147,7 @@ const Footer: FC = () => {
               </Button>
               <Button
                 onClick={() =>
-                  window.open("https://imos.org.au/resources/acknowledging-us")
+                  openInNewTab("https://imos.org.au/resources/acknowledging-us")
                 }
               >
                 <Typography color="#000" paddingTop={gap.md}>
@@ -154,7 +156,7 @@ const Footer: FC = () => {
               </Button>
               <Button
                 onClick={() =>
-                  window.open("https://imos.org.au/conditions-of-use")
+                  openInNewTab("https://imos.org.au/conditions-of-use")
                 }
               >
                 <Typography color="#000" paddingTop={gap.md}>
@@ -190,7 +192,7 @@ const Footer: FC = () => {
                   sx={{ color: color.blue.extraDark }}
                   aria-label="Facebook"
                   onClick={() =>
-                    window.open(
+                    openInNewTab(
                       "https://www.facebook.com/IntegratedMarineObservingSystem"
                     )
                   }
@@ -201,7 +203,7 @@ const Footer: FC = () => {
                   sx={{ color: color.blue.extraDark }}
                   aria-label="LinkedIn"
                   onClick={() =>
-                    window.open("https://www.linkedin.com/company/18409795")
+                    openInNewTab("https://www.linkedin.com/company/18409795")
                   }
                 >
                   <LinkedInIcon />
@@ -209,7 +211,7 @@ const Footer: FC = () => {
                 <IconButton
                   sx={{ color: color.blue.extraDark }}
                   aria-label="X"
-                  onClick={() => window.open("https://twitter.com/IMOS_AUS")}
+                  onClick={() => openInNewTab("https://twitter.com/IMOS_AUS")}
                 >
                   <XIcon />
                 </IconButton>
@@ -217,7 +219,7 @@ const Footer: FC = () => {
                   sx={{ color: color.blue.extraDark }}
                   aria-label="Instagram"
                   onClick={() =>
-                    window.open("https://www.instagram.com/imos_australia")
+                    openInNewTab("https://www.instagram.com/imos_australia")
                   }
                 >
                   <InstagramIcon />

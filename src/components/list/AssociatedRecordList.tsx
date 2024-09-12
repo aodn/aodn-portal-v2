@@ -5,6 +5,7 @@ import { ButtonBase } from "@mui/material";
 import { pageDefault } from "../common/constants";
 import ExpandableList from "./ExpandableList";
 import TextArea from "./listItem/subitem/TextArea";
+import { openInNewTab } from "../../utils/LinkUtils";
 
 interface AssociatedRecordListProps {
   title: string;
@@ -19,7 +20,7 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
     const searchParams = new URLSearchParams();
     searchParams.append("uuid", uuid);
     const url = pageDefault.details + "?" + searchParams.toString();
-    window.open(url, "_blank", "noopener,noreferrer");
+    openInNewTab(url);
   }, []);
 
   const collapseComponents: ReactNode[] = useMemo(() => {
