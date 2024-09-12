@@ -15,7 +15,7 @@ export enum SortResultEnum {
 const SORT_SELECT = [
   {
     value: SortResultEnum.RELEVANT,
-    label: "Relevancy",
+    label: "Relevance",
     icon: RelevancyIcon,
   },
   {

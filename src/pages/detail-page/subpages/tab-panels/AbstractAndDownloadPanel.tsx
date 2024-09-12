@@ -246,16 +246,12 @@ const AbstractAndDownloadPanel = () => {
                       alignItems: "start",
                     }}
                   >
-                    <Icon
-                      color="disabled"
-                      sx={{
-                        paddingLeft: padding.large,
-                        paddingRight: padding.small,
-                      }}
+                    <InfoIcon color="disabled" />
+                    <Typography
+                      fontSize={fontSize.info}
+                      color={fontColor.gray.light}
+                      sx={{ padding: 0, pl: padding.extraSmall }}
                     >
-                      <InfoIcon />
-                    </Icon>
-                    <Typography fontSize={fontSize.info} sx={{ padding: 0 }}>
                       The full data collection will be downloaded. Please
                       consider filtering the collection. Citation file is
                       automatically included as part of the download.
