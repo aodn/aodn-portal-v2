@@ -49,14 +49,6 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     searchQueryResult
   );
 
-  const onChangeSortingInterceptor = useCallback(
-    (v: SortResultEnum) => {
-      // If we changed the sorting, then we need to refresh content
-      onChangeSorting(v);
-    },
-    [onChangeSorting]
-  );
-
   // Use to remember last layout, it is either LIST or GRID at the moment
   const [currentLayout, setCurrentLayout] = useState<
     SearchResultLayoutEnum.LIST | SearchResultLayoutEnum.GRID
@@ -112,7 +104,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
             count={reduxContents.result.collections.length}
             total={reduxContents.result.total}
             onChangeLayout={onChangeLayout}
-            onChangeSorting={onChangeSortingInterceptor}
+            onChangeSorting={onChangeSorting}
           />
         </Box>
         <Box sx={{ flex: 1 }}>
