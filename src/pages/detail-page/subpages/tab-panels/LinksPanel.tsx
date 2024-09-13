@@ -1,6 +1,6 @@
 import { Paper } from "@mui/material";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import LinkCard from "../../../../components/details/LinkCard";
+import LinkCard from "../../../../components/list/listItem/subitem/LinkCard";
 import { useState } from "react";
 
 const LinksPanel = () => {
