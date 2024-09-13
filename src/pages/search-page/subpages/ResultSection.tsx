@@ -6,9 +6,12 @@ import {
   DEFAULT_SEARCH_PAGE,
   fetchResultAppendStore,
 } from "../../../components/common/store/searchReducer";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ResultCards from "../../../components/result/ResultCards";
-import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import {
+  OGCCollection,
+  OGCCollections,
+} from "../../../components/common/store/OGCCollectionDefinitions";
 import { useSelector } from "react-redux";
 import store, {
   getComponentState,
@@ -45,6 +48,12 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
+  const [content, setContent] = useState<CollectionsQueryType>(reduxContents);
+
+  useEffect(() => {
+    setContent(reduxContents);
+  }, [reduxContents]);
+
   // Use to remember last layout, it is either LIST or GRID at the moment
   const [currentLayout, setCurrentLayout] = useState<
     SearchResultLayoutEnum.LIST | SearchResultLayoutEnum.GRID
@@ -58,11 +67,21 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     // to go the next batch of record.
     const paramPaged = createSearchParamFrom(componentParam, {
       pagesize: DEFAULT_SEARCH_PAGE,
-      searchafter: reduxContents.result.search_after,
+      searchafter: content.result.search_after,
     });
 
-    dispatch(fetchResultAppendStore(paramPaged));
-  }, [dispatch, reduxContents]);
+    dispatch(fetchResultAppendStore(paramPaged))
+      .unwrap()
+      .then((collections: OGCCollections) => {
+        // Make a new object so useState trigger
+        const c: CollectionsQueryType = {
+          result: content.result.clone(),
+          query: content.query,
+        };
+        c.result.merge(collections);
+        setContent(c);
+      });
+  }, [dispatch, content]);
 
   const onChangeLayout = useCallback(
     (layout: SearchResultLayoutEnum) => {
@@ -83,7 +102,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   );
 
   return (
-    reduxContents && (
+    content && (
       <Box
         sx={{
           ...sx,
@@ -97,8 +116,8 @@ const ResultSection: React.FC<SearchResultListProps> = ({
         <CircleLoader isLoading={isLoading} />
         <Box>
           <ResultPanelSimpleFilter
-            count={reduxContents.result.collections.length}
-            total={reduxContents.result.total}
+            count={content.result.collections.length}
+            total={content.result.total}
             onChangeLayout={onChangeLayout}
             onChangeSorting={onChangeSorting}
           />
@@ -106,7 +125,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
         <Box sx={{ flex: 1 }}>
           <ResultCards
             layout={currentLayout}
-            contents={reduxContents}
+            contents={content}
             onDownload={undefined}
             onDetail={onNavigateToDetail}
             onClickCard={onClickCard}
