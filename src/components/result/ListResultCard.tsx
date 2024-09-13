@@ -35,6 +35,24 @@ interface ResultCardProps {
   isSelectedDataset?: boolean;
 }
 
+const handleNavigateToDetail = (
+  content: OGCCollection | undefined,
+  onDetail?: ((uuid: string) => void) | undefined
+) => {
+  if (onDetail && content && content.id) {
+    onDetail(content.id);
+  }
+};
+
+const handleShowSpatialExtents = (
+  content: OGCCollection | undefined,
+  onClickCard?: ((uuid: string) => void) | undefined
+) => {
+  if (onClickCard && content && content.id) {
+    onClickCard(content.id);
+  }
+};
+
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ResultCardProps> = ({
   content,
@@ -44,18 +62,6 @@ const ListResultCard: FC<ResultCardProps> = ({
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
-
-  const handleShowSpatialExtents = useCallback(() => {
-    if (onClickCard && content && content.id) {
-      onClickCard(content.id);
-    }
-  }, [content, onClickCard]);
-
-  const handleNavigateToDetail = useCallback(() => {
-    if (onDetail && content && content.id) {
-      onDetail(content.id);
-    }
-  }, [content, onDetail]);
 
   if (!content) return;
 
@@ -91,7 +97,9 @@ const ListResultCard: FC<ResultCardProps> = ({
         mr={gap.sm}
       >
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea onClick={handleNavigateToDetail}>
+          <CardActionArea
+            onClick={() => handleNavigateToDetail(content, onDetail)}
+          >
             <Box
               display="flex"
               alignItems="center"
@@ -118,7 +126,10 @@ const ListResultCard: FC<ResultCardProps> = ({
           </CardActionArea>
         </Tooltip>
 
-        <CardActionArea onClick={handleShowSpatialExtents} sx={{ flex: 1 }}>
+        <CardActionArea
+          onClick={() => handleShowSpatialExtents(content, onClickCard)}
+          sx={{ flex: 1 }}
+        >
           <Typography
             arial-label="result-list-card-content"
             color={fontColor.gray.medium}
@@ -140,7 +151,7 @@ const ListResultCard: FC<ResultCardProps> = ({
           <ResultCardButtonGroup
             content={content}
             onDownload={onDownload}
-            onDetail={handleNavigateToDetail}
+            onDetail={() => handleNavigateToDetail(content, onDetail)}
             shouldHideText
           />
         )}

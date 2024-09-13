@@ -15,13 +15,12 @@ import { dateDefault } from "../constants";
 import { ParameterState } from "../store/componentParamReducer";
 import TimeRangeBarChart from "../charts/TimeRangeBarChart";
 import { OGCCollections } from "../store/OGCCollectionDefinitions";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store/store";
 import { fetchResultNoStore } from "../store/searchReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
 import PlainDatePicker from "../datetime/PlainDatePicker";
 import PlainSlider from "../slider/PlainSlider";
 import { DEFAULT_DATE_PICKER_SLOT } from "../../details/DateRangeSlider";
+import { useAppDispatch } from "../store/hooks";
 
 const initialMinDate: Dayjs = dayjs(dateDefault.min);
 const initialMaxDate: Dayjs = dayjs(dateDefault.max);
@@ -38,7 +37,7 @@ interface DateRangeFilterProps {
 }
 
 const DateRangeFilter: FC<DateRangeFilterProps> = ({ filter, setFilter }) => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const { dateTimeFilterRange } = filter;
 
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);

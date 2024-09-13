@@ -35,6 +35,24 @@ interface GridResultCardProps {
   isSelectedDataset?: boolean;
 }
 
+const handleNavigateToDetail = (
+  content: OGCCollection,
+  onDetail?: ((uuid: string) => void) | undefined
+) => {
+  if (onDetail && content && content.id) {
+    onDetail(content.id);
+  }
+};
+
+const handleShowSpatialExtents = (
+  content: OGCCollection,
+  onClickCard?: ((uuid: string) => void) | undefined
+) => {
+  if (onClickCard && content && content.id) {
+    onClickCard(content.id);
+  }
+};
+
 const GridResultCard: FC<GridResultCardProps> = ({
   content,
   onDownload,
@@ -43,18 +61,6 @@ const GridResultCard: FC<GridResultCardProps> = ({
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
-
-  const handleShowSpatialExtents = useCallback(() => {
-    if (onClickCard && content && content.id) {
-      onClickCard(content.id);
-    }
-  }, [content, onClickCard]);
-
-  const handleNavigateToDetail = useCallback(() => {
-    if (onDetail && content && content.id) {
-      onDetail(content.id);
-    }
-  }, [content, onDetail]);
 
   if (!content) return;
 
@@ -97,7 +103,9 @@ const GridResultCard: FC<GridResultCardProps> = ({
         </Box>
       )}
 
-      <CardActionArea onClick={handleShowSpatialExtents}>
+      <CardActionArea
+        onClick={() => handleShowSpatialExtents(content, onClickCard)}
+      >
         <Box
           height={isSelectedDataset || showButtons ? "110px" : "130px"}
           width="100%"
@@ -136,7 +144,9 @@ const GridResultCard: FC<GridResultCardProps> = ({
         )}
 
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea onClick={handleNavigateToDetail}>
+          <CardActionArea
+            onClick={() => handleNavigateToDetail(content, onDetail)}
+          >
             <Box
               display="flex"
               alignItems="center"
@@ -175,7 +185,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
           />
           <ResultCardButtonGroup
             content={content}
-            onDetail={handleNavigateToDetail}
+            onDetail={() => handleNavigateToDetail(content, onDetail)}
             onDownload={onDownload}
             shouldHideText
             isGridView
