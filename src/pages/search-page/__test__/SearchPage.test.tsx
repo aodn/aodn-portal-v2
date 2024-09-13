@@ -145,7 +145,10 @@ describe("SearchPage", () => {
     );
     expect(record).toBeDefined();
 
-    const loadMore = await document.getElementById("result-card-load-more-btn") as HTMLButtonElement;
+    const loadMore = (await document.getElementById(
+      "result-card-load-more-btn"
+    )) as HTMLButtonElement;
+
     expect(loadMore).toBeDefined();
     await user.click(loadMore);
     // Find the last record on second page

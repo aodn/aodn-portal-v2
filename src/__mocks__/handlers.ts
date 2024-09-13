@@ -3,7 +3,7 @@ import { PARAMETER_VOCABS } from "./data/PARAMETER_VOCABS";
 import { COLLECTIONS_WAVE } from "./data/COLLECTIONS_WAVE";
 import {
   COLLECTIONS_IMOS_PAGE1,
-  COLLECTIONS_IMOS_PAGE2
+  COLLECTIONS_IMOS_PAGE2,
 } from "./data/COLLECTIONS_IMOS";
 import { getSuggesterOptionsBy } from "./utils/SuggesterHandlerUtils";
 import { NORMAL_COLLECTION } from "./data/COLLECTIONS";
@@ -46,11 +46,13 @@ export const handlers = [
     if (q === "wave" || q === null) {
       // For simplify current test usage, return wave result only for now. May need to update in the future
       return HttpResponse.json(COLLECTIONS_WAVE);
-    }
-    else if (q === "imos" && search_after === null) {
+    } else if (q === "imos" && search_after === null) {
+      // Search word imos for first page
       return HttpResponse.json(COLLECTIONS_IMOS_PAGE1);
-    }
-    else if(q === "imos" && search_after === "8.631659,c1344e70-480e-0993-e044-00144f7bc0f4") {
+    } else if (
+      q === "imos" &&
+      search_after === "8.631659,c1344e70-480e-0993-e044-00144f7bc0f4"
+    ) {
       return HttpResponse.json(COLLECTIONS_IMOS_PAGE2);
     }
   }),
