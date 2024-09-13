@@ -39,7 +39,7 @@ import { color } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
-import { bboxPolygon } from "@turf/turf";
+import { bboxPolygon, booleanEqual } from "@turf/turf";
 import {
   OGCCollection,
   OGCCollections,
@@ -196,13 +196,26 @@ const SearchPage = () => {
   const onMapZoomOrMove = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
       if (event.type === "zoomend" || event.type === "moveend") {
+        const componentParam: ParameterState = getComponentState(
+          store.getState()
+        );
+
         const bounds = event.target.getBounds();
         const ne = bounds.getNorthEast(); // NorthEast corner
         const sw = bounds.getSouthWest(); // SouthWest corner
         // Note order: longitude, latitude.2
         const polygon = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
-        dispatch(updateFilterPolygon(polygon));
-        doSearch();
+
+        // Sometimes the map fire zoomend even nothing happens, this may
+        // due to some redraw, so in here we check if the polygon really
+        // changed, if not then there is no need to do anything
+        if (
+          componentParam.polygon &&
+          !booleanEqual(componentParam.polygon, polygon)
+        ) {
+          dispatch(updateFilterPolygon(polygon));
+          doSearch();
+        }
       }
     },
     [dispatch, doSearch]
