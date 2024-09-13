@@ -48,11 +48,14 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
-  const [content, setContent] = useState<CollectionsQueryType>(reduxContents);
 
-  useEffect(() => {
-    setContent(reduxContents);
-  }, [reduxContents]);
+  const onChangeSortingInterceptor = useCallback(
+    (v: SortResultEnum) => {
+      // If we changed the sorting, then we need to refresh content
+      onChangeSorting(v);
+    },
+    [onChangeSorting]
+  );
 
   // Use to remember last layout, it is either LIST or GRID at the moment
   const [currentLayout, setCurrentLayout] = useState<
@@ -67,21 +70,11 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     // to go the next batch of record.
     const paramPaged = createSearchParamFrom(componentParam, {
       pagesize: DEFAULT_SEARCH_PAGE,
-      searchafter: content.result.search_after,
+      searchafter: reduxContents.result.search_after,
     });
 
-    dispatch(fetchResultAppendStore(paramPaged))
-      .unwrap()
-      .then((collections: OGCCollections) => {
-        // Make a new object so useState trigger
-        const c: CollectionsQueryType = {
-          result: content.result.clone(),
-          query: content.query,
-        };
-        c.result.merge(collections);
-        setContent(c);
-      });
-  }, [dispatch, content]);
+    dispatch(fetchResultAppendStore(paramPaged));
+  }, [dispatch, reduxContents.result.search_after]);
 
   const onChangeLayout = useCallback(
     (layout: SearchResultLayoutEnum) => {
@@ -102,7 +95,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   );
 
   return (
-    content && (
+    reduxContents && (
       <Box
         sx={{
           ...sx,
@@ -116,16 +109,16 @@ const ResultSection: React.FC<SearchResultListProps> = ({
         <CircleLoader isLoading={isLoading} />
         <Box>
           <ResultPanelSimpleFilter
-            count={content.result.collections.length}
-            total={content.result.total}
+            count={reduxContents.result.collections.length}
+            total={reduxContents.result.total}
             onChangeLayout={onChangeLayout}
-            onChangeSorting={onChangeSorting}
+            onChangeSorting={onChangeSortingInterceptor}
           />
         </Box>
         <Box sx={{ flex: 1 }}>
           <ResultCards
             layout={currentLayout}
-            contents={content}
+            contents={reduxContents}
             onDownload={undefined}
             onDetail={onNavigateToDetail}
             onClickCard={onClickCard}
