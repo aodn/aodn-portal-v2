@@ -24,12 +24,8 @@ import {
   updateCommonKey,
   updateSearchText,
 } from "../common/store/componentParamReducer";
-import store, {
-  AppDispatch,
-  getComponentState,
-  RootState,
-} from "../common/store/store";
-import { useDispatch, useSelector } from "react-redux";
+import store, { getComponentState, RootState } from "../common/store/store";
+import { useSelector } from "react-redux";
 import {
   createSuggesterParamFrom,
   fetchParameterVocabsWithStore,
@@ -40,6 +36,7 @@ import { filterButtonWidth, searchIconWidth } from "./ComplexTextSearch";
 
 import _ from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
+import { useAppDispatch } from "../common/store/hooks";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -76,7 +73,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   setPendingSearch = () => {},
 }) => {
   const theme = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
   const [parameterVocabSet, setParameterVocabSet] = useState<Vocab[]>([]);

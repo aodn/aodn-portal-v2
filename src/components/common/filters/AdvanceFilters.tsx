@@ -1,5 +1,4 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
 import {
   ParameterState,
   updateParameterVocabs,
@@ -7,7 +6,7 @@ import {
   updateImosOnly,
   updateUpdateFreq,
 } from "../store/componentParamReducer";
-import store, { AppDispatch, getComponentState } from "../store/store";
+import store, { getComponentState } from "../store/store";
 import {
   Box,
   Button,
@@ -35,6 +34,7 @@ import {
   padding,
   zIndex,
 } from "../../../styles/constants";
+import { useAppDispatch } from "../store/hooks";
 
 interface AdvanceFiltersProps {
   showFilters: boolean;
@@ -48,7 +48,7 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
   sx = {},
 }) => {
   const theme = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const componentParam = getComponentState(store.getState());
 
   // State used to store the provisional filter options selected,

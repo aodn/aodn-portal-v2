@@ -9,9 +9,8 @@ import {
 import React, { useCallback, useState } from "react";
 import ResultCards from "../../../components/result/ResultCards";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import store, {
-  AppDispatch,
   getComponentState,
   RootState,
   searchQueryResult,
@@ -20,6 +19,7 @@ import { ParameterState } from "../../../components/common/store/componentParamR
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapViewButton";
 import CircleLoader from "../../../components/loading/CircleLoader";
+import { useAppDispatch } from "../../../components/common/store/hooks";
 
 interface SearchResultListProps {
   datasetSelected?: OGCCollection[];
@@ -41,7 +41,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   isLoading,
 }) => {
   // Get contents from redux
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );

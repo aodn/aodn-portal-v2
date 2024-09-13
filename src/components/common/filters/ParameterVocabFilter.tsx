@@ -7,12 +7,13 @@ import React, {
   SetStateAction,
 } from "react";
 import { Grid, SxProps, Theme } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../store/store";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 import { fetchParameterVocabsWithStore } from "../store/searchReducer";
 import { Vocab, ParameterState } from "../store/componentParamReducer";
 import { StyledToggleButton } from "../buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../buttons/StyledToggleButtonGroup";
+import { useAppDispatch } from "../store/hooks";
 
 interface ParameterVocabFilterProps {
   filter: ParameterState;
@@ -25,7 +26,7 @@ const ParameterVocabFilter: FC<ParameterVocabFilterProps> = ({
   setFilter,
   sx,
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const [parameterVocabs, setParameterVocabs] = useState<Vocab[]>([]);
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
 

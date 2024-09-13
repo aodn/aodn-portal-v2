@@ -1,13 +1,12 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from "react";
+import React, { FC, useCallback, useContext, useEffect } from "react";
 import MapContext from "../MapContext";
-import { AppDispatch } from "../../../common/store/store";
-import { useDispatch } from "react-redux";
 import {
   fetchResultNoStore,
   SearchParameters,
 } from "../../../common/store/searchReducer";
 import { MapLayerMouseEvent } from "mapbox-gl";
 import { OGCCollections } from "../../../common/store/OGCCollectionDefinitions";
+import { useAppDispatch } from "../../../common/store/hooks";
 
 interface SpatialExtentsProps {
   layerId: string;
@@ -35,7 +34,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   addedLayerIds = [],
 }) => {
   const { map } = useContext(MapContext);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   // util function to get collection data given uuid
   const getCollectionData = useCallback(

@@ -9,7 +9,6 @@ import {
 } from "../../components/common/store/searchReducer";
 import Layout from "../../components/layout/layout";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import {
   formatToUrlParam,
   ParameterState,
@@ -18,10 +17,7 @@ import {
   updateParameterStates,
   updateSortBy,
 } from "../../components/common/store/componentParamReducer";
-import store, {
-  AppDispatch,
-  getComponentState,
-} from "../../components/common/store/store";
+import store, { getComponentState } from "../../components/common/store/store";
 import { pageDefault } from "../../components/common/constants";
 
 // Map section, you can switch to other map library, this is for maplibre
@@ -48,14 +44,30 @@ import {
   OGCCollection,
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
+import { useAppDispatch } from "../../components/common/store/hooks";
 
 const SEARCH_BAR_HEIGHT = 56;
 const RESULT_SECTION_WIDTH = 500;
 
+const isLoading = (count: number): boolean => {
+  if (count > 0) {
+    return true;
+  }
+  if (count === 0) {
+    // a 0.5s late finish loading is useful to improve the stability of the system
+    setTimeout(() => false, 500);
+  }
+  if (count < 0) {
+    // TODO: use beffer handling to replace this
+    throw new Error("Loading counter is negative");
+  }
+  return false;
+};
+
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
@@ -65,23 +77,6 @@ const SearchPage = () => {
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
-
-  const isLoading = useCallback((count: number): boolean => {
-    if (count > 0) {
-      return true;
-    }
-    if (count === 0) {
-      // a 0.5s late finish loading is useful to improve the stability of the system
-      setTimeout(() => {
-        return false;
-      }, 500);
-    }
-    if (count < 0) {
-      // TODO: use beffer handling to replace this
-      throw new Error("Loading counter is negative");
-    }
-    return false;
-  }, []);
 
   const startOneLoadingThread = useCallback(() => {
     setLoadingThreadCount((prev) => prev + 1);
@@ -139,12 +134,8 @@ const SearchPage = () => {
   // On select a dataset, update the states: selected uuid(s) and get the collection data
   const handleDatasetSelecting = useCallback(
     (uuids: Array<string>) => {
-      if (uuids.length === 0) {
-        setSelectedUuids([]);
-        setDatasetsSelected([]);
-      }
-      setSelectedUuids(uuids);
-      getCollectionsData(uuids);
+      setSelectedUuids(uuids.length === 0 ? [] : uuids);
+      getCollectionsData(uuids.length === 0 ? [] : uuids);
     },
     [getCollectionsData]
   );
