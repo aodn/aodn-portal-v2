@@ -54,7 +54,7 @@ const ResultSection: React.FC<SearchResultListProps> = ({
     SearchResultLayoutEnum.LIST | SearchResultLayoutEnum.GRID
   >(SearchResultLayoutEnum.LIST);
 
-  const fetchMore = useCallback(() => {
+  const fetchMore = useCallback(async () => {
     // This is very specific to how elastic works and then how to construct the query
     const componentParam: ParameterState = getComponentState(store.getState());
     // Use standard param to get fields you need, record is stored in redux,
@@ -64,8 +64,8 @@ const ResultSection: React.FC<SearchResultListProps> = ({
       pagesize: DEFAULT_SEARCH_PAGE,
       searchafter: reduxContents.result.search_after,
     });
-
-    dispatch(fetchResultAppendStore(paramPaged));
+    // Must use await so that record updated before you exit this call
+    await dispatch(fetchResultAppendStore(paramPaged));
   }, [dispatch, reduxContents.result.search_after]);
 
   const onChangeLayout = useCallback(
