@@ -1,13 +1,5 @@
 import React, { useState, useRef } from "react";
-import {
-  Popper,
-  Paper,
-  MenuList,
-  MenuItem,
-  Grow,
-  ClickAwayListener,
-  Button,
-} from "@mui/material";
+import { Popper, Paper, MenuList, MenuItem, Grow, Button } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import {
@@ -62,30 +54,28 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
           borderRadius: borderRadius.small,
         }}
       >
-        <ClickAwayListener onClickAway={handleClose}>
-          <MenuList
-            onKeyDown={handleListKeyDown}
-            onMouseEnter={() => setOpen(true)}
-            onMouseLeave={() => setOpen(false)}
-          >
-            {menu.items.map((item, index) => (
-              <MenuItem
-                onClick={(event) => {
-                  item.handler(event);
-                  handleClose();
-                }}
-                key={index}
-                sx={{
-                  fontSize: fontSize.info,
-                  bgcolor: "transparent",
-                  ":hover": { bgcolor: color.blue.xLight },
-                }}
-              >
-                {item.name}
-              </MenuItem>
-            ))}
-          </MenuList>
-        </ClickAwayListener>
+        <MenuList
+          onKeyDown={handleListKeyDown}
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+        >
+          {menu.items.map((item, index) => (
+            <MenuItem
+              onClick={(event) => {
+                item.handler(event);
+                handleClose();
+              }}
+              key={index}
+              sx={{
+                fontSize: fontSize.info,
+                bgcolor: "transparent",
+                ":hover": { bgcolor: color.blue.xLight },
+              }}
+            >
+              {item.name}
+            </MenuItem>
+          ))}
+        </MenuList>
       </Paper>
     </Grow>
   );
@@ -96,6 +86,7 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
         ref={anchorRef}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
+        onClick={() => setOpen(true)}
         endIcon={<KeyboardArrowDownIcon />}
         sx={{
           backgroundColor: "transparent",
