@@ -1,7 +1,10 @@
 import { http, HttpResponse } from "msw";
 import { PARAMETER_VOCABS } from "./data/PARAMETER_VOCABS";
 import { COLLECTIONS_WAVE } from "./data/COLLECTIONS_WAVE";
-import { COLLECTIONS_IMOS_PAGE1, COLLECTIONS_IMOS_PAGE2 } from "./data/COLLECTIONS_IMOS";
+import {
+  COLLECTIONS_IMOS_PAGE1,
+  COLLECTIONS_IMOS_PAGE2
+} from "./data/COLLECTIONS_IMOS";
 import { getSuggesterOptionsBy } from "./utils/SuggesterHandlerUtils";
 import { NORMAL_COLLECTION } from "./data/COLLECTIONS";
 import {

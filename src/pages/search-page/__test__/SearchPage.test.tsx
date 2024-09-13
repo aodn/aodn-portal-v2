@@ -140,14 +140,18 @@ describe("SearchPage", () => {
     const list = await findByTestId("search-page-result-list");
     expect(list).toBeDefined();
     // Find the last record in the first page
-    let record = await document.getElementById("result-card-c1344979-f701-0916-e044-00144f7bc0f4")
+    let record = await document.getElementById(
+      "result-card-c1344979-f701-0916-e044-00144f7bc0f4"
+    );
     expect(record).toBeDefined();
 
     const loadMore = await document.getElementById("result-card-load-more-btn") as HTMLButtonElement;
     expect(loadMore).toBeDefined();
     await user.click(loadMore);
     // Find the last record on second page
-    record = await document.getElementById("result-card-ae70eb18-b1f0-4012-8d62-b03daf99f7f2")
+    record = await document.getElementById(
+      "result-card-ae70eb18-b1f0-4012-8d62-b03daf99f7f2"
+    );
     expect(record).toBeDefined();
 
     // Clear after test
