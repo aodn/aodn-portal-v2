@@ -1,6 +1,10 @@
 import { http, HttpResponse } from "msw";
 import { PARAMETER_VOCABS } from "./data/PARAMETER_VOCABS";
 import { COLLECTIONS_WAVE } from "./data/COLLECTIONS_WAVE";
+import {
+  COLLECTIONS_IMOS_PAGE1,
+  COLLECTIONS_IMOS_PAGE2,
+} from "./data/COLLECTIONS_IMOS";
 import { getSuggesterOptionsBy } from "./utils/SuggesterHandlerUtils";
 import { NORMAL_COLLECTION } from "./data/COLLECTIONS";
 import {
@@ -38,9 +42,18 @@ export const handlers = [
     console.log(`Called ${request.url}`);
     const url = new URL(request.url);
     const q = url.searchParams.get("q");
+    const search_after = url.searchParams.get("search_after");
     if (q === "wave" || q === null) {
       // For simplify current test usage, return wave result only for now. May need to update in the future
       return HttpResponse.json(COLLECTIONS_WAVE);
+    } else if (q === "imos" && search_after === null) {
+      // Search word imos for first page
+      return HttpResponse.json(COLLECTIONS_IMOS_PAGE1);
+    } else if (
+      q === "imos" &&
+      search_after === "8.631659,c1344e70-480e-0993-e044-00144f7bc0f4"
+    ) {
+      return HttpResponse.json(COLLECTIONS_IMOS_PAGE2);
     }
   }),
 
