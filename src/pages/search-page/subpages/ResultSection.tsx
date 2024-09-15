@@ -6,9 +6,12 @@ import {
   DEFAULT_SEARCH_PAGE,
   fetchResultAppendStore,
 } from "../../../components/common/store/searchReducer";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ResultCards from "../../../components/result/ResultCards";
-import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import {
+  OGCCollection,
+  OGCCollections,
+} from "../../../components/common/store/OGCCollectionDefinitions";
 import { useSelector } from "react-redux";
 import store, {
   getComponentState,
@@ -45,12 +48,13 @@ const ResultSection: React.FC<SearchResultListProps> = ({
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
+
   // Use to remember last layout, it is either LIST or GRID at the moment
   const [currentLayout, setCurrentLayout] = useState<
     SearchResultLayoutEnum.LIST | SearchResultLayoutEnum.GRID
   >(SearchResultLayoutEnum.LIST);
 
-  const fetchMore = useCallback(() => {
+  const fetchMore = useCallback(async () => {
     // This is very specific to how elastic works and then how to construct the query
     const componentParam: ParameterState = getComponentState(store.getState());
     // Use standard param to get fields you need, record is stored in redux,
@@ -60,9 +64,9 @@ const ResultSection: React.FC<SearchResultListProps> = ({
       pagesize: DEFAULT_SEARCH_PAGE,
       searchafter: reduxContents.result.search_after,
     });
-
-    dispatch(fetchResultAppendStore(paramPaged));
-  }, [dispatch, reduxContents]);
+    // Must use await so that record updated before you exit this call
+    await dispatch(fetchResultAppendStore(paramPaged));
+  }, [dispatch, reduxContents.result.search_after]);
 
   const onChangeLayout = useCallback(
     (layout: SearchResultLayoutEnum) => {
