@@ -9,7 +9,6 @@ import {
 } from "../../components/common/store/searchReducer";
 import Layout from "../../components/layout/layout";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import {
   formatToUrlParam,
   ParameterState,
@@ -18,10 +17,7 @@ import {
   updateParameterStates,
   updateSortBy,
 } from "../../components/common/store/componentParamReducer";
-import store, {
-  AppDispatch,
-  getComponentState,
-} from "../../components/common/store/store";
+import store, { getComponentState } from "../../components/common/store/store";
 import { pageDefault } from "../../components/common/constants";
 
 // Map section, you can switch to other map library, this is for maplibre
@@ -43,19 +39,35 @@ import { color } from "../../styles/constants";
 import ComplexTextSearch from "../../components/search/ComplexTextSearch";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
-import { bboxPolygon } from "@turf/turf";
+import { bboxPolygon, booleanEqual } from "@turf/turf";
 import {
   OGCCollection,
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
+import { useAppDispatch } from "../../components/common/store/hooks";
 
 const SEARCH_BAR_HEIGHT = 56;
 const RESULT_SECTION_WIDTH = 500;
 
+const isLoading = (count: number): boolean => {
+  if (count > 0) {
+    return true;
+  }
+  if (count === 0) {
+    // a 0.5s late finish loading is useful to improve the stability of the system
+    setTimeout(() => false, 500);
+  }
+  if (count < 0) {
+    // TODO: use beffer handling to replace this
+    throw new Error("Loading counter is negative");
+  }
+  return false;
+};
+
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
@@ -64,17 +76,15 @@ const SearchPage = () => {
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
-  const [isLoading, _setIsLoading] = useState<boolean>(true);
+  const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
 
-  // a 0.5s late finish loading is useful to improve the stability of the system
-  const setIsLoading = useCallback(
-    (value: boolean) => {
-      setTimeout(() => {
-        _setIsLoading(value);
-      }, 500);
-    },
-    [_setIsLoading]
-  );
+  const startOneLoadingThread = useCallback(() => {
+    setLoadingThreadCount((prev) => prev + 1);
+  }, []);
+
+  const endOneLoadingThread = useCallback(() => {
+    setLoadingThreadCount((prev) => prev - 1);
+  }, []);
 
   // value true meaning full map, so we set emum, else keep it as is.
   const onToggleDisplay = useCallback(
@@ -124,19 +134,15 @@ const SearchPage = () => {
   // On select a dataset, update the states: selected uuid(s) and get the collection data
   const handleDatasetSelecting = useCallback(
     (uuids: Array<string>) => {
-      if (uuids.length === 0) {
-        setSelectedUuids([]);
-        setDatasetsSelected([]);
-      }
-      setSelectedUuids(uuids);
-      getCollectionsData(uuids);
+      setSelectedUuids(uuids.length === 0 ? [] : uuids);
+      getCollectionsData(uuids.length === 0 ? [] : uuids);
     },
     [getCollectionsData]
   );
 
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
-      setIsLoading(true);
+      startOneLoadingThread();
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -179,24 +185,37 @@ const SearchPage = () => {
             }
           })
           .finally(() => {
-            setIsLoading(false);
+            endOneLoadingThread();
           });
       });
     },
-    [dispatch, navigate, setLayers, setIsLoading]
+    [startOneLoadingThread, dispatch, navigate, endOneLoadingThread]
   );
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
       if (event.type === "zoomend" || event.type === "moveend") {
+        const componentParam: ParameterState = getComponentState(
+          store.getState()
+        );
+
         const bounds = event.target.getBounds();
         const ne = bounds.getNorthEast(); // NorthEast corner
         const sw = bounds.getSouthWest(); // SouthWest corner
         // Note order: longitude, latitude.2
         const polygon = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
-        dispatch(updateFilterPolygon(polygon));
-        doSearch();
+
+        // Sometimes the map fire zoomend even nothing happens, this may
+        // due to some redraw, so in here we check if the polygon really
+        // changed, if not then there is no need to do anything
+        if (
+          componentParam.polygon &&
+          !booleanEqual(componentParam.polygon, polygon)
+        ) {
+          dispatch(updateFilterPolygon(polygon));
+          doSearch();
+        }
       }
     },
     [dispatch, doSearch]
@@ -311,7 +330,7 @@ const SearchPage = () => {
                     onNavigateToDetail={handleNavigateToDetailPage}
                     onChangeSorting={onChangeSorting}
                     datasetSelected={datasetsSelected}
-                    isLoading={isLoading}
+                    isLoading={isLoading(loadingThreadCount)}
                   />
                 </Box>
               )}
@@ -327,7 +346,7 @@ const SearchPage = () => {
                   onMapZoomOrMove={onMapZoomOrMove}
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
-                  isLoading={isLoading}
+                  isLoading={isLoading(loadingThreadCount)}
                 />
               </Box>
             </Box>

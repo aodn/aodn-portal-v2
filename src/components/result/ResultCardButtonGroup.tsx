@@ -42,6 +42,39 @@ const generateLinkText = (linkLength: number) => {
   return `${linkLength} Links`;
 };
 
+const renderStatusButton = (
+  shouldHideText: boolean,
+  content: OGCCollection
+) => {
+  const status = content?.getStatus()?.toLowerCase().trim();
+  if (status === Status.Completed) {
+    return (
+      <ResultCardButton
+        startIcon={TaskAltSharpIcon}
+        text={"Completed"}
+        shouldHideText={shouldHideText}
+      />
+    );
+  }
+  if (status === Status.Ongoing) {
+    return (
+      <ResultCardButton
+        startIcon={DoubleArrowIcon}
+        text={"On Going"}
+        resultCardButtonConfig={{ color: "success" }}
+        shouldHideText={shouldHideText}
+      />
+    );
+  }
+  return (
+    <ResultCardButton
+      startIcon={QuestionMarkIcon}
+      text="No Status"
+      shouldHideText={shouldHideText}
+    />
+  );
+};
+
 const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
   onDetail,
@@ -61,42 +94,11 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
     </Grid>
   );
 
-  const renderStatusButton = useCallback(
-    (content: OGCCollection) => {
-      const status = content?.getStatus()?.toLowerCase().trim();
-      if (status === Status.Completed) {
-        return (
-          <ResultCardButton
-            startIcon={TaskAltSharpIcon}
-            text={"Completed"}
-            shouldHideText={shouldHideText}
-          />
-        );
-      }
-      if (status === Status.Ongoing) {
-        return (
-          <ResultCardButton
-            startIcon={DoubleArrowIcon}
-            text={"On Going"}
-            resultCardButtonConfig={{ color: "success" }}
-            shouldHideText={shouldHideText}
-          />
-        );
-      }
-      return (
-        <ResultCardButton
-          startIcon={QuestionMarkIcon}
-          text="No Status"
-          shouldHideText={shouldHideText}
-        />
-      );
-    },
-    [shouldHideText]
-  );
-
   return (
     <Grid container arial-label="result-list-card-buttons">
-      <ButtonContainer> {renderStatusButton(content)}</ButtonContainer>
+      <ButtonContainer>
+        {renderStatusButton(shouldHideText, content)}
+      </ButtonContainer>
       <ButtonContainer>
         {content.getDistributionLinks() && (
           <ResultCardButton

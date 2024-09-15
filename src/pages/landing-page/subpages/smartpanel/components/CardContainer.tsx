@@ -25,7 +25,6 @@ const CardContainer: FC<CardContainerProps> = ({
       border: `${border.xs} ${color.brightBlue.semiTransparentDark}`,
       color: "#fff",
       "&:hover": {
-        scale: "101%",
         cursor: "pointer",
       },
       ...containerStyle,

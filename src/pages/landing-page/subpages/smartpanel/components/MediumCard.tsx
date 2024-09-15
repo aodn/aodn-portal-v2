@@ -1,7 +1,8 @@
 import { Box, Typography } from "@mui/material";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { CardData } from "../constants";
 import CardContainer from "./CardContainer";
+import { fontWeight } from "../../../../../styles/constants";
 
 interface MediumCardProps {
   cardData: CardData;
@@ -12,6 +13,8 @@ const MediumCard: FC<MediumCardProps> = ({
   cardData,
   handleClickSmartCard,
 }) => {
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
   const handleClick = (value: string) => {
     if (!cardData.disable) handleClickSmartCard(value);
   };
@@ -25,8 +28,16 @@ const MediumCard: FC<MediumCardProps> = ({
         backgroundSize: "cover",
       }}
     >
-      <Box onClick={() => handleClick(cardData.title)}>
-        <Typography padding={0} variant="h6">
+      <Box
+        onClick={() => handleClick(cardData.title)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <Typography
+          padding={0}
+          variant="h6"
+          fontWeight={isHovered ? fontWeight.bold : fontWeight.regular}
+        >
           {cardData.title}
         </Typography>
       </Box>
