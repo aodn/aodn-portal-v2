@@ -51,7 +51,6 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
             <ShowMoreDetailBtn
               isShowingMore={isShowingMore}
               setIsShowingMore={setIsShowingMore}
-              title={title ? title : ""}
             />
           )}
         </Grid>
