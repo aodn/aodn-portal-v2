@@ -259,11 +259,21 @@ const SearchPage = () => {
     (v: SortResultEnum) => {
       switch (v) {
         case SortResultEnum.RELEVANT:
-          dispatch(updateSortBy([{ field: "score", order: "DESC" }]));
+          dispatch(
+            updateSortBy([
+              { field: "score", order: "DESC" },
+              { field: "rank", order: "DESC" },
+            ])
+          );
           break;
 
         case SortResultEnum.TITLE:
-          dispatch(updateSortBy([{ field: "title", order: "ASC" }]));
+          dispatch(
+            updateSortBy([
+              { field: "title", order: "ASC" },
+              { field: "rank", order: "DESC" },
+            ])
+          );
           break;
 
         case SortResultEnum.POPULARITY:
@@ -271,7 +281,12 @@ const SearchPage = () => {
           break;
 
         case SortResultEnum.MODIFIED:
-          dispatch(updateSortBy([{ field: "temporal", order: "DESC" }]));
+          dispatch(
+            updateSortBy([
+              { field: "temporal", order: "DESC" },
+              { field: "rank", order: "DESC" },
+            ])
+          );
           break;
       }
 
