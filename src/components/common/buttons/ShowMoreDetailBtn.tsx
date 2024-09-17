@@ -6,11 +6,13 @@ import MinusIcon from "../../icon/MinusIcon";
 interface ShowMoreDetailButtonProps {
   isShowingMore: boolean;
   setIsShowingMore: (isShowingMore: boolean) => void;
+  title?: string;
 }
 
 const ShowMoreDetailBtn: React.FC<ShowMoreDetailButtonProps> = ({
   isShowingMore,
   setIsShowingMore,
+  title,
 }) => {
   const theme = useTheme();
 
@@ -38,6 +40,7 @@ const ShowMoreDetailBtn: React.FC<ShowMoreDetailButtonProps> = ({
       }}
     >
       <Button
+        data-testid={`show-${isShowingMore ? "less" : "more"}-detail-btn-${title}`}
         onClick={() => setIsShowingMore(!isShowingMore)}
         sx={{
           border: theme.border.detailBtnLight,
