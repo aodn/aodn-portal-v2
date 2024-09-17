@@ -41,7 +41,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
         <Grid item container md={1} display="flex" justifyContent="center">
           <LocationOnOutlinedIcon />
         </Grid>
-        <Grid item container md={5}>
+        <Grid item container md={5} data-testid="contact-address">
           {!delivery_point &&
             !city &&
             !country &&
@@ -81,7 +81,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
             </Grid>
           )}
         </Grid>
-        <Grid item md={6}>
+        <Grid item md={6} data-testid="contact-phone">
           {(!phones || phones.length === 0) && (
             <Grid item md={12}>
               [NO CONTACT]
@@ -108,7 +108,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
         </Grid>
       </Grid>
       <Grid item container md={12}>
-        <Grid item container md={12}>
+        <Grid item container md={12} data-testid="contact-link">
           <Grid item md={1} display="flex" justifyContent="center">
             <LanguageOutlinedIcon />
           </Grid>

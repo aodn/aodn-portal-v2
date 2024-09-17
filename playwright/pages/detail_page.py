@@ -26,7 +26,7 @@ class DetailPage(BasePage):
         return self.get_text(f'{item} Not Found')
 
     def click_show_more(self, item_list: str) -> None:
-        self.click_button(f'Show More {item_list}')
+        self.page.get_by_test_id(f'show-more-detail-btn-{item_list}').click()
 
     def click_show_less(self, item_list: str) -> None:
-        self.click_button(f'Show Less {item_list}')
+        self.page.get_by_test_id(f'show-less-detail-btn-{item_list}').click()

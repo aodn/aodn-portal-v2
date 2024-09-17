@@ -33,5 +33,6 @@ def test_links_sections(
     link_card.hover()
     expect(links.copy_link_button).to_be_visible()
 
-    expect(link_card.get_by_text(link_title)).to_be_visible()
-    expect(link_card.get_by_role('link', name=link_href)).to_be_visible()
+    link = link_card.get_by_role('link', name=link_title)
+    expect(link).to_be_in_viewport()
+    assert link.get_attribute('href') == link_href
