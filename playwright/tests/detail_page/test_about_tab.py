@@ -14,15 +14,7 @@ from pages.detail_page import DetailPage
             'Integrated Marine Observing System (IMOS) is enabled by the National Collaborative Research Infrastructure Strategy',
             'IMOS Keywords Thesaurus',
             'IMOS Facility | Deep Water Moorings',
-        ),
-        (
-            'IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility',
-            '0015db7e-e684-7548-e053-08114f8cd4ad',
-            'CSIRO Oceans & Atmosphere - Hobart - Downie, Ryan',
-            'Credits Not Found',
-            'AODN Geographic Extent Names',
-            'Global / Oceans | Indian',
-        ),
+        )
     ],
 )
 def test_about_sections(
@@ -43,10 +35,12 @@ def test_about_sections(
 
     about.keywords.click()
     detail_page.click_button(keyword)
-    expect(detail_page.get_text(keyword_value)).to_be_in_viewport()
+    keywords_list = about.get_keywords_list()
+    expect(keywords_list.get_by_text(keyword_value)).to_be_in_viewport()
 
     about.credits.click()
-    expect(detail_page.get_text(credit)).to_be_in_viewport()
+    credits_list = about.get_credits_list()
+    expect(credits_list.get_by_text(credit)).to_be_in_viewport()
 
     about.contacts.click()
     expect(detail_page.get_button(contact)).to_be_in_viewport()

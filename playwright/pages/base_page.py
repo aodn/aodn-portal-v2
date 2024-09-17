@@ -52,3 +52,9 @@ class BasePage:
     def click_heading(self, text: str) -> None:
         """Click on the given heading"""
         self.get_heading(text).click()
+
+    def get_collapse_list(self, item_list: str) -> Locator:
+        return self.page.get_by_test_id(f'collapse-list-{item_list}')
+
+    def get_collapse_list_items(self, item_list: str) -> Locator:
+        return self.get_collapse_list(item_list).get_by_test_id('collapseItem')

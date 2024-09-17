@@ -25,9 +25,6 @@ class DetailPage(BasePage):
     def get_not_found_element(self, item: str) -> Locator:
         return self.get_text(f'{item} Not Found')
 
-    def get_collapse_list(self, item_list: str) -> Locator:
-        return self.page.get_by_test_id(f'collapse-list-{item_list.lower()}')
-
     def click_show_more(self, item_list: str) -> None:
         self.click_button(f'Show More {item_list}')
 

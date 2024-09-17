@@ -15,8 +15,6 @@ from pages.search_page import SearchPage
 def test_basic_search(
     page_mock: Page, search_text: str, category_name: str
 ) -> None:
-    # TODO: ignore this test for now
-    pytest.skip('Test not implemented yet')
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
 
@@ -25,5 +23,6 @@ def test_basic_search(
     expect(landing_page.get_option(category_name)).to_be_visible()
     landing_page.click_option(category_name)
     landing_page.search.click_search_button()
+
     expect(search_page.search.search_field).to_have_value(category_name)
     expect(search_page.first_result_title).to_be_visible()

@@ -12,7 +12,14 @@ class SearchPage(BasePage):
         self.map = Map(page)
 
         # Page locators
+        self.loading = page.get_by_test_id(
+            'search-page-result-list'
+        ).get_by_test_id('loading-progress')
         self.first_result_title = page.get_by_test_id('result-card-title').first
+
+    def wait_for_search_to_complete(self) -> None:
+        """Wait until the search loading indicator disappears"""
+        self.loading.wait_for(state='hidden', timeout=5000)
 
     def wait_for_updated_search_result(self) -> None:
         """Wait until the second search result is detached"""
@@ -22,4 +29,4 @@ class SearchPage(BasePage):
 
     def click_dataset(self, title: str) -> None:
         """Click on the given dataset title"""
-        self.get_button(title, exact=False).click()
+        self.page.locator('button').filter(has_text=title).click()

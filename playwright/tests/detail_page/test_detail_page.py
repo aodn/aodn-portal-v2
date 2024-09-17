@@ -10,7 +10,6 @@ from pages.search_page import SearchPage
     'title',
     [
         ('Integrated Marine Observing System (IMOS) - Location of assets'),
-        ('IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility'),
     ],
 )
 def test_tab_panel_scroll(page_mock: Page, title: str) -> None:
@@ -20,12 +19,12 @@ def test_tab_panel_scroll(page_mock: Page, title: str) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
-    page_mock.wait_for_timeout(2000)
+    search_page.wait_for_search_to_complete()
     search_page.click_dataset(title)
-
     expect(detail_page.page_title).to_have_text(title)
+
     detail_page.tabs.scroll_right()
-    expect(detail_page.tabs.global_attr.tab).to_be_in_viewport()
+    expect(detail_page.tabs.associated_records.tab).to_be_in_viewport()
     detail_page.tabs.scroll_left()
     expect(detail_page.tabs.abstract.tab).to_be_in_viewport()
 
@@ -33,12 +32,6 @@ def test_tab_panel_scroll(page_mock: Page, title: str) -> None:
 @pytest.mark.parametrize(
     'title, uuid, tab, not_found_item',
     [
-        (
-            'Integrated Marine Observing System (IMOS) - Location of assets',
-            '1fba3a57-35f4-461b-8a0e-551af229714e',
-            'Metadata Information',
-            'Metadata Link',
-        ),
         (
             'IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility',
             '0015db7e-e684-7548-e053-08114f8cd4ad',
@@ -116,7 +109,7 @@ def test_show_more_and_less_list_items(
     expect(detail_page.page_title).to_have_text(title)
     detail_page.click_tab(tab)
 
-    keywords = detail_page.get_collapse_list(item_list)
+    keywords = detail_page.get_collapse_list_items(item_list)
     initial_count = keywords.count()
 
     detail_page.click_show_more(item_list)

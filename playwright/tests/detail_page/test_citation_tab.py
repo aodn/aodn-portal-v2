@@ -5,14 +5,15 @@ from pages.detail_page import DetailPage
 
 
 @pytest.mark.parametrize(
-    'title, uuid, constranits_value, suggested_citation_value, license_value',
+    'title, uuid, cited_responsible_parties, license, suggested_citation, constranits',
     [
         (
             'Integrated Marine Observing System (IMOS) - Location of assets',
             '1fba3a57-35f4-461b-8a0e-551af229714e',
-            'Use Limitation',
-            'The citation in a list of references is: "IMOS [year-of-data-download]',
+            'Department of Environment, Land, Water and Planning (DELWP), Victorian Government - Mazor, Tessa',
             'Creative Commons Attribution 4.0 International License',
+            'The citation in a list of references is: "IMOS [year-of-data-download]',
+            'Use Limitation',
         ),
     ],
 )
@@ -20,9 +21,10 @@ def test_citation_sections(
     page_mock: Page,
     title: str,
     uuid: str,
-    constranits_value: str,
-    suggested_citation_value: str,
-    license_value: str,
+    cited_responsible_parties: str,
+    license: str,
+    suggested_citation: str,
+    constranits: str,
 ) -> None:
     detail_page = DetailPage(page_mock)
 
@@ -33,10 +35,23 @@ def test_citation_sections(
     citation.tab.click()
 
     citation.constranits.click()
-    expect(detail_page.get_text(constranits_value)).to_be_in_viewport()
+    constranits_list = citation.get_constranits_list()
+    expect(constranits_list.get_by_text(constranits)).to_be_in_viewport()
 
     citation.suggested_citation.click()
-    expect(detail_page.get_text(suggested_citation_value)).to_be_in_viewport()
+    suggested_citation_list = citation.get_suggested_citation_list()
+    expect(
+        suggested_citation_list.get_by_text(suggested_citation)
+    ).to_be_in_viewport()
 
     citation.license.click()
-    expect(detail_page.get_text(license_value)).to_be_in_viewport()
+    license_list = citation.get_license_list()
+    expect(license_list.get_by_text(license)).to_be_in_viewport()
+
+    citation.cited_responsible_parties.click()
+    cited_responsible_parties_list = (
+        citation.get_cited_responsible_parties_list()
+    )
+    expect(
+        cited_responsible_parties_list.get_by_text(cited_responsible_parties)
+    ).to_be_in_viewport()

@@ -7,26 +7,19 @@ interface CollapseListProps {
   title: string;
   items: { title: string; content: string[] }[];
   areAllOpen?: boolean;
-  testId?: string;
 }
 
 const CollapseList: React.FC<CollapseListProps> = ({
   title,
   items,
   areAllOpen = false,
-  testId,
 }) => {
   // children list
   const collapseComponents: ReactNode[] = useMemo(() => {
     const returnedList: ReactNode[] = [];
     items?.map((item, index) => {
       returnedList.push(
-        <CollapseItem
-          title={item.title}
-          key={index}
-          isOpen={areAllOpen}
-          testId={testId}
-        >
+        <CollapseItem title={item.title} key={index} isOpen={areAllOpen}>
           {item.content?.map((content, index) => (
             <TextArea key={index}>{content}</TextArea>
           ))}
