@@ -1,18 +1,33 @@
-import { Button, Grid, Typography, useTheme } from "@mui/material";
+import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
 import React from "react";
+import PlusIcon from "../../icon/PlusIcon";
+import MinusIcon from "../../icon/MinusIcon";
 
 interface ShowMoreDetailButtonProps {
-  title: string;
   isShowingMore: boolean;
   setIsShowingMore: (isShowingMore: boolean) => void;
+  title?: string;
 }
 
 const ShowMoreDetailBtn: React.FC<ShowMoreDetailButtonProps> = ({
-  title,
   isShowingMore,
   setIsShowingMore,
+  title,
 }) => {
   const theme = useTheme();
+
+  function generateShowMoreBtnContent() {
+    return (
+      <>
+        <Typography variant="detailContent" color="#54BCEB">
+          {isShowingMore ? "Show Less " : "Show More "}
+        </Typography>
+        <Box sx={{ width: "9px" }} />
+        {isShowingMore ? <MinusIcon /> : <PlusIcon />}
+      </>
+    );
+  }
+
   return (
     <Grid
       item
@@ -25,18 +40,17 @@ const ShowMoreDetailBtn: React.FC<ShowMoreDetailButtonProps> = ({
       }}
     >
       <Button
+        data-testid={`show-${isShowingMore ? "less" : "more"}-detail-btn-${title}`}
         onClick={() => setIsShowingMore(!isShowingMore)}
         sx={{
-          border: theme.border.detailSubtabBtn,
+          border: theme.border.detailBtnLight,
           borderRadius: theme.borderRadius.sm,
           "&:hover": {
             border: theme.border.detailSubtabBtn,
           },
         }}
       >
-        <Typography variant="detailContent">
-          {isShowingMore ? `Show Less ${title}` : `Show More ${title}`}
-        </Typography>
+        {generateShowMoreBtnContent()}
       </Button>
     </Grid>
   );
