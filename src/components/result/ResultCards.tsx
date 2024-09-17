@@ -104,6 +104,7 @@ const ResultCards = ({
   const renderLoadMoreButton = useCallback(() => {
     return (
       <DetailSubtabBtn
+        id="result-card-load-more-btn"
         title="Show more results"
         isBordered={false}
         navigate={() => {

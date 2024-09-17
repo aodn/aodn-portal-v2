@@ -1,9 +1,9 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { ILink as LinkType } from "../common/store/OGCCollectionDefinitions";
+import { ILink as LinkType } from "../../../common/store/OGCCollectionDefinitions";
 import { Box, Grid, Link, Typography } from "@mui/material";
-import { color, fontColor, padding } from "../../styles/constants";
-import CopyLinkButton from "../common/buttons/CopyLinkButton";
-import linkIcon from "../../assets/icons/link.png";
+import { color, fontColor, padding } from "../../../../styles/constants";
+import CopyLinkButton from "../../../common/buttons/CopyLinkButton";
+import linkIcon from "../../../../assets/icons/link.png";
 
 const LinkCard = ({
   link,
@@ -56,7 +56,6 @@ const LinkCard = ({
               <Box
                 sx={{
                   width: "30%",
-                  paddingTop: padding.extraSmall,
                 }}
               >
                 <img
@@ -72,18 +71,6 @@ const LinkCard = ({
             </Grid>
             <Grid item xs={11}>
               <Box>
-                <Typography
-                  sx={{
-                    padding: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: "2",
-                    WebkitBoxOrient: "vertical",
-                  }}
-                >
-                  {link.title}
-                </Typography>
                 <Link href={link.href} underline="hover">
                   <Typography
                     color={fontColor.blue.medium}
@@ -96,7 +83,7 @@ const LinkCard = ({
                       WebkitBoxOrient: "vertical",
                     }}
                   >
-                    {link.href}
+                    {link.title}
                   </Typography>
                 </Link>
               </Box>
