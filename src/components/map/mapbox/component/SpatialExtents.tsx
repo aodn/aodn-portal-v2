@@ -1,11 +1,7 @@
 import React, { FC, useCallback, useContext, useEffect } from "react";
 import MapContext from "../MapContext";
-import {
-  fetchResultNoStore,
-  SearchParameters,
-} from "../../../common/store/searchReducer";
-import { MapLayerMouseEvent } from "mapbox-gl";
-import { OGCCollections } from "../../../common/store/OGCCollectionDefinitions";
+import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
+import { LngLat, LngLatBounds, MapLayerMouseEvent } from "mapbox-gl";
 import { useAppDispatch } from "../../../common/store/hooks";
 
 interface SpatialExtentsProps {
@@ -39,14 +35,9 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   // util function to get collection data given uuid
   const getCollectionData = useCallback(
     async (uuid: string) => {
-      const param: SearchParameters = {
-        filter: `id='${uuid}'`,
-        properties: "id,geometry",
-      };
-
-      return dispatch(fetchResultNoStore(param))
+      return dispatch(fetchResultByUuidNoStore(uuid))
         .unwrap()
-        .then((value: OGCCollections) => value.collections[0])
+        .then((collection) => collection)
         .catch((error: any) => {
           console.error("Error fetching collection data:", error);
           // TODO: handle error in ErrorBoundary
@@ -78,6 +69,20 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
             type: "geojson",
             data: collection?.getGeometry(),
           });
+
+          // Zoom to overall bounding box
+          const bboxes = collection?.extent?.bbox[0];
+          if (map && bboxes && Array.isArray(bboxes) && bboxes.length === 4) {
+            const sw = new LngLat(bboxes[0], bboxes[1]);
+            const ne = new LngLat(bboxes[2], bboxes[3]);
+            const givenBound = new LngLatBounds(sw, ne);
+
+            // we still have the problem that fit to bound not working as expected, need to find a better way
+            //  below magic numbers prevent givenBound which may have extreme shape(such as thin and long) won't fall outside of the map
+            map.fitBounds(givenBound, {
+              padding: { top: 300, bottom: 300, left: 100, right: 100 },
+            });
+          }
         }
 
         // util function to check if layer exists or not and add a before layerId
@@ -122,7 +127,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           filter: ["==", "$type", "Polygon"],
           paint: {
             "fill-color": "#fff",
-            "fill-opacity": 0.4,
+            "fill-opacity": 0.6,
             "fill-outline-color": "yellow",
           },
         });
@@ -192,7 +197,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   useEffect(() => {
     map?.on("click", layerId, onPointClick);
     map?.on("click", onEmptySpaceClick);
-
+    map?.once("moveend", () => console.log("map bound===", map?.getBounds()));
     return () => {
       map?.off("click", layerId, onPointClick);
       map?.off("click", onEmptySpaceClick);
