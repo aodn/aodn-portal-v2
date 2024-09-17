@@ -1,7 +1,7 @@
 import React from "react";
 import { ButtonBase, Grid, Link, Tooltip } from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import AssociatedRecordIcon from "../../icon/AssociatedRecordIcon";
+import EndpointedDiamondIcon from "../../icon/EndpointedDiamondIcon";
 
 interface CollapseItemBtnProps {
   onClick: () => null | undefined;
@@ -31,7 +31,7 @@ const CollapseItemBtn: React.FC<CollapseItemBtnProps> = ({
     if (isAssociatedRecord) {
       return (
         <Grid item md={1}>
-          <AssociatedRecordIcon />
+          <EndpointedDiamondIcon />
         </Grid>
       );
     }
