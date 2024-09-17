@@ -4,7 +4,7 @@ import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
 import { LngLat, LngLatBounds, MapLayerMouseEvent } from "mapbox-gl";
 import { useAppDispatch } from "../../../common/store/hooks";
 import { createCenterOfMassDataSource } from "../layers/Layers";
-
+import customMarker from "@/assets/logos/imos_logo_with_title.png";
 interface SpatialExtentsProps {
   layerId: string;
   // Selected uuids is managed in parent component, reflecting dataset that user selected from result list or map
@@ -145,13 +145,14 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
 
           addLayerIfNotExists("selected-dataset-point-layer", {
             id: "selected-dataset-point-layer",
-            type: "circle",
+            type: "symbol",
             source: "selected-dataset-point",
-            paint: {
-              "circle-radius": 8,
-              "circle-color": "#356183",
-              "circle-stroke-color": "white",
-              "circle-stroke-width": 1,
+            layout: {
+              "icon-image": "custom-marker",
+              "icon-size": 0.5,
+              "icon-allow-overlap": true,
+              "icon-anchor": "bottom", // This anchors the bottom of the icon to the point
+              "icon-offset": [0, -15], // This offsets the icon 15 pixels upwards
             },
           });
         }
@@ -221,6 +222,15 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   );
 
   useEffect(() => {
+    map?.loadImage(
+      "https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png",
+      (error, image) => {
+        if (error) throw error;
+        if (!image) return;
+        if (map.hasImage("custom-marker")) return;
+        map.addImage("custom-marker", image);
+      }
+    );
     map?.on("click", layerId, onPointClick);
     map?.on("click", onEmptySpaceClick);
 
@@ -235,6 +245,9 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
     const cleanup = addSpatialExtentsLayer();
     return () => {
       cleanup();
+      if (map?.hasImage("custom-marker")) {
+        map.removeImage("custom-marker");
+      }
     };
   }, [addSpatialExtentsLayer]);
 
