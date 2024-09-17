@@ -1,5 +1,5 @@
 import React from "react";
-import { ButtonBase, Grid, Link } from "@mui/material";
+import { ButtonBase, Grid, Link, Tooltip } from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import AssociatedRecordIcon from "../../icon/AssociatedRecordIcon";
 
@@ -52,7 +52,12 @@ const CollapseItemBtn: React.FC<CollapseItemBtnProps> = ({
           }}
         >
           {expanded && isContact ? (
-            <Link href={`mailto:${email}`}>{element}</Link>
+            <Tooltip
+              title={email ? `mail to: ${email}` : "[NO EMAIL PROVIDED]"}
+              placement="top"
+            >
+              <Link href={`mailto:${email}`}>{element}</Link>
+            </Tooltip>
           ) : (
             element
           )}

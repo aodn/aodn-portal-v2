@@ -39,13 +39,18 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
     <Grid container>
       <Grid item container md={12}>
         <Grid item container md={1} display="flex" justifyContent="center">
-          {(delivery_point ||
-            city ||
-            country ||
-            postal_code ||
-            administrative_area) && <LocationOnOutlinedIcon />}
+          <LocationOnOutlinedIcon />
         </Grid>
         <Grid item container md={5}>
+          {!delivery_point &&
+            !city &&
+            !country &&
+            !postal_code &&
+            !administrative_area && (
+              <Grid item md={12}>
+                [NO ADDRESS]
+              </Grid>
+            )}
           {delivery_point?.map((line) => {
             return (
               <Grid item md={12} key={line}>
@@ -77,6 +82,11 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
           )}
         </Grid>
         <Grid item md={6}>
+          {(!phones || phones.length === 0) && (
+            <Grid item md={12}>
+              [NO CONTACT]
+            </Grid>
+          )}
           {phones &&
             phones.map((phone) => {
               return (
@@ -98,19 +108,24 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
         </Grid>
       </Grid>
       <Grid item container md={12}>
-        {links &&
-          links.map((link) => {
-            return (
-              <Grid item container md={12} key={link.href}>
-                <Grid item md={1} display="flex" justifyContent="center">
-                  <LanguageOutlinedIcon />
-                </Grid>
-                <Grid item md={11}>
+        <Grid item container md={12}>
+          <Grid item md={1} display="flex" justifyContent="center">
+            <LanguageOutlinedIcon />
+          </Grid>
+          {(!links || links.length === 0) && (
+            <Grid item md={11}>
+              [NO URL]
+            </Grid>
+          )}
+          {links &&
+            links.map((link, index) => {
+              return (
+                <Grid item md={11} key={index}>
                   <Link href={link.href}>{link.title}</Link>
                 </Grid>
-              </Grid>
-            );
-          })}
+              );
+            })}
+        </Grid>
       </Grid>
     </Grid>
   );
