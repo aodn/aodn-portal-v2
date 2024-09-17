@@ -3,6 +3,7 @@ import MapContext from "../MapContext";
 import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
 import { LngLat, LngLatBounds, MapLayerMouseEvent } from "mapbox-gl";
 import { useAppDispatch } from "../../../common/store/hooks";
+import { createCenterOfMassDataSource } from "../layers/Layers";
 
 interface SpatialExtentsProps {
   layerId: string;
@@ -70,7 +71,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
             data: collection?.getGeometry(),
           });
 
-          // Zoom to overall bounding box
+          // Zoom to overall bounding box: bbox[0]
           const bboxes = collection?.extent?.bbox[0];
           if (map && bboxes && Array.isArray(bboxes) && bboxes.length === 4) {
             const sw = new LngLat(bboxes[0], bboxes[1]);
@@ -131,6 +132,29 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
             "fill-outline-color": "yellow",
           },
         });
+
+        if (collection) {
+          const selectedDatasetCenterPoint = createCenterOfMassDataSource([
+            collection,
+          ]);
+
+          map?.addSource("selected-dataset-point", {
+            type: "geojson",
+            data: selectedDatasetCenterPoint,
+          });
+
+          addLayerIfNotExists("selected-dataset-point-layer", {
+            id: "selected-dataset-point-layer",
+            type: "circle",
+            source: "selected-dataset-point",
+            paint: {
+              "circle-radius": 8,
+              "circle-color": "#356183",
+              "circle-stroke-color": "white",
+              "circle-stroke-width": 1,
+            },
+          });
+        }
       });
     });
 
@@ -138,6 +162,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
       layerIds.forEach((id) => {
         try {
           if (map?.getLayer(id)) map?.removeLayer(id);
+          map?.removeLayer("selected-dataset-point-layer");
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
           console.log("Ok to ignore remove layer error", error);
@@ -148,6 +173,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
       sourceIds.forEach((id) => {
         try {
           if (map?.getSource(id)) map?.removeSource(id);
+          map?.removeSource("selected-dataset-point");
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
           console.log("Ok to ignore remove source error", error);
@@ -197,7 +223,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   useEffect(() => {
     map?.on("click", layerId, onPointClick);
     map?.on("click", onEmptySpaceClick);
-    map?.once("moveend", () => console.log("map bound===", map?.getBounds()));
+
     return () => {
       map?.off("click", layerId, onPointClick);
       map?.off("click", onEmptySpaceClick);
