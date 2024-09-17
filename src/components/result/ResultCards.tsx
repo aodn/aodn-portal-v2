@@ -27,6 +27,63 @@ interface ResultCardsProps {
   datasetsSelected?: OGCCollection[];
 }
 
+const renderDatasetSelectedListCards = (
+  hasSelectedDatasets: boolean,
+  collection: OGCCollection,
+  onDownload:
+    | ((
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        stac: OGCCollection | undefined
+      ) => void)
+    | undefined,
+  onClickCard: ((uuid: string) => void) | undefined,
+  onDetail?: (uuid: string) => void
+) => {
+  if (!hasSelectedDatasets) return;
+  return (
+    <Box height={LIST_CARD_HEIGHT - LIST_CARD_GAP * 2} mb={gap.lg}>
+      <ListResultCard
+        content={collection}
+        onDownload={onDownload}
+        onDetail={onDetail}
+        onClickCard={onClickCard}
+        isSelectedDataset
+      />
+    </Box>
+  );
+};
+
+// For now only one dataset can be selected at a time, so use datasetsSelected[0] for selected list/grid card
+const renderDatasetSelectedGridCards = (
+  hasSelectedDatasets: boolean,
+  collection: OGCCollection,
+  onDownload:
+    | ((
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        stac: OGCCollection | undefined
+      ) => void)
+    | undefined,
+  onClickCard: ((uuid: string) => void) | undefined,
+  onDetail?: (uuid: string) => void
+) => {
+  if (!hasSelectedDatasets) return;
+  return (
+    <Box
+      width={"calc(50% - 7px)"}
+      height={GRID_CARD_HEIGHT - LIST_CARD_GAP}
+      mb={gap.lg}
+    >
+      <GridResultCard
+        content={collection}
+        onDownload={onDownload}
+        onClickCard={onClickCard}
+        onDetail={onDetail}
+        isSelectedDataset
+      />
+    </Box>
+  );
+};
+
 const ResultCards = ({
   contents,
   layout,
@@ -44,56 +101,10 @@ const ResultCards = ({
   const count = contents.result.collections.length;
   const total = contents.result.total;
 
-  // For now only one dataset can be selected at a time, so use datasetsSelected[0] for selected list/grid card
-  const renderDatasetSelectedGridCards = useCallback(() => {
-    if (!hasSelectedDatasets) return;
-    return (
-      <Box
-        width={"calc(50% - 7px)"}
-        height={GRID_CARD_HEIGHT - LIST_CARD_GAP}
-        mb={gap.lg}
-      >
-        <GridResultCard
-          content={datasetsSelected[0]}
-          onDownload={onDownload}
-          onClickCard={onClickCard}
-          onDetail={onDetail}
-          isSelectedDataset
-        />
-      </Box>
-    );
-  }, [
-    hasSelectedDatasets,
-    datasetsSelected,
-    onDownload,
-    onClickCard,
-    onDetail,
-  ]);
-
-  const renderDatasetSelectedListCards = useCallback(() => {
-    if (!hasSelectedDatasets) return;
-    return (
-      <Box height={LIST_CARD_HEIGHT - LIST_CARD_GAP * 2} mb={gap.lg}>
-        <ListResultCard
-          content={datasetsSelected[0]}
-          onDownload={onDownload}
-          onDetail={onDetail}
-          onClickCard={onClickCard}
-          isSelectedDataset
-        />
-      </Box>
-    );
-  }, [
-    hasSelectedDatasets,
-    datasetsSelected,
-    onDownload,
-    onDetail,
-    onClickCard,
-  ]);
-
   const renderLoadMoreButton = useCallback(() => {
     return (
       <DetailSubtabBtn
+        id="result-card-load-more-btn"
         title="Show more results"
         isBordered={false}
         navigate={() => {
@@ -105,7 +116,9 @@ const ResultCards = ({
 
   const renderCells = useCallback(
     (
-      { contents, onDownload, onClickCard }: ResultCardsProps,
+      count: number,
+      total: number,
+      { contents, onClickCard, onDownload, onDetail }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
       const { index, style } = child;
@@ -154,11 +167,13 @@ const ResultCards = ({
         );
       }
     },
-    [count, onDetail, renderLoadMoreButton, total]
+    [renderLoadMoreButton]
   );
 
   const renderRows = useCallback(
     (
+      count: number,
+      total: number,
       { contents, onClickCard, onDownload, onDetail }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
@@ -169,6 +184,7 @@ const ResultCards = ({
         // We need to display load more button/placeholder in the last index place
         return (
           <ListItem
+            id="result-card-load-more-btn"
             sx={{
               display: "flex",
               alignItems: "flex-start", // Aligns the Box to the top of the ListItem
@@ -192,7 +208,7 @@ const ResultCards = ({
         );
       }
     },
-    [count, renderLoadMoreButton, total]
+    [renderLoadMoreButton]
   );
 
   // You must set the height to 100% of view height so the calculation
@@ -206,7 +222,14 @@ const ResultCards = ({
         ref={componentRef}
         data-testid="resultcard-result-list"
       >
-        {hasSelectedDatasets && renderDatasetSelectedListCards()}
+        {hasSelectedDatasets &&
+          renderDatasetSelectedListCards(
+            hasSelectedDatasets,
+            datasetsSelected[0],
+            onDownload,
+            onClickCard,
+            onDetail
+          )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
@@ -217,6 +240,8 @@ const ResultCards = ({
             >
               {(child: ListChildComponentProps) =>
                 renderRows(
+                  count,
+                  total,
                   {
                     contents,
                     onClickCard,
@@ -239,7 +264,14 @@ const ResultCards = ({
         ref={componentRef}
         data-testid="resultcard-result-grid"
       >
-        {hasSelectedDatasets && renderDatasetSelectedGridCards()}
+        {hasSelectedDatasets &&
+          renderDatasetSelectedGridCards(
+            hasSelectedDatasets,
+            datasetsSelected[0],
+            onDownload,
+            onClickCard,
+            onDetail
+          )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
@@ -250,7 +282,14 @@ const ResultCards = ({
             >
               {(child: ListChildComponentProps) =>
                 renderCells(
-                  { contents, onDownload, onDetail, onClickCard },
+                  count,
+                  total,
+                  {
+                    contents,
+                    onClickCard,
+                    onDownload,
+                    onDetail,
+                  },
                   child
                 )
               }

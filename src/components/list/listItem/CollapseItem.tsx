@@ -5,7 +5,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import StyledItemGrid from "./StyledItemGrid";
 import CollapseItemBtn from "../../common/buttons/CollapseItemBtn";
 
-interface CollapseFrameProps {
+interface CollapseItemProps {
   title: string;
   children: ReactNode;
   isContact?: boolean;
@@ -14,7 +14,7 @@ interface CollapseFrameProps {
   email?: string;
 }
 
-const CollapseItem: React.FC<CollapseFrameProps> = ({
+const CollapseItem: React.FC<CollapseItemProps> = ({
   title,
   children,
   isContact = false,

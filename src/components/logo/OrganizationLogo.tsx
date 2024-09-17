@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { Box, CardMedia, SxProps } from "@mui/material";
-import imosLogo from "@/assets/logos/imos-logo-transparent.png";
+import defaultLogo from "@/assets/logos/default-logo.png";
 
 interface OrganizationLogoProps {
   logo?: string;
@@ -10,7 +10,7 @@ interface OrganizationLogoProps {
 const OrganizationLogo: FC<OrganizationLogoProps> = ({
   logo,
   sx,
-  defaultImageSrc = imosLogo,
+  defaultImageSrc = defaultLogo,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null | undefined>(logo);
 
@@ -23,6 +23,7 @@ const OrganizationLogo: FC<OrganizationLogoProps> = ({
           objectFit: "contain",
         }}
         component="img"
+        loading="lazy"
         image={imageSrc ?? defaultImageSrc}
         onError={() => setImageSrc(defaultImageSrc)}
       />

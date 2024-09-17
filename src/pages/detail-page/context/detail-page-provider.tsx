@@ -1,10 +1,9 @@
 import { useLocation } from "react-router-dom";
-import { AppDispatch } from "../../../components/common/store/store";
-import { useDispatch } from "react-redux";
 import { FC, ReactNode, useEffect, useState } from "react";
 import { fetchResultByUuidNoStore } from "../../../components/common/store/searchReducer";
 import { DetailPageContext, SpatialExtentPhoto } from "./detail-page-context";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import { useAppDispatch } from "../../../components/common/store/hooks";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -14,7 +13,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   children,
 }) => {
   const location = useLocation();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );

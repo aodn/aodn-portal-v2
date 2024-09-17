@@ -3,12 +3,14 @@ import { Box, Button, useTheme } from "@mui/material";
 import { color } from "../../../styles/constants";
 
 interface DetailSubtabProps {
+  id?: string;
   title: string;
   navigate: () => void;
   isBordered: boolean;
 }
 
 const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
+  id,
   title,
   navigate,
   isBordered,
@@ -27,6 +29,7 @@ const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
       }}
     >
       <Button
+        id={id}
         sx={{
           width: "100%",
           border: border,

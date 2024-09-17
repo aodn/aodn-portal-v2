@@ -88,8 +88,8 @@ describe("AssociatedRecordsPanel", async () => {
       "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
 
     await waitFor(() => {
-      const showMoreRecordsBtn = screen.queryByText(
-        "Show More Sibling Records"
+      const showMoreRecordsBtn = screen.queryByTestId(
+        "show-more-detail-btn-Sibling Records"
       );
       expect(showMoreRecordsBtn).to.exist;
 
@@ -99,22 +99,24 @@ describe("AssociatedRecordsPanel", async () => {
     });
 
     await waitFor(() => {
-      expect(screen.queryByText("Show Less Sibling Records")).to.exist;
+      expect(screen.queryByTestId("show-less-detail-btn-Sibling Records")).to
+        .exist;
 
       // final record should be shown now
       expect(screen.queryByText(lowerRecordTitle)).to.exist;
     });
 
     await waitFor(() => {
-      const showLessRecordsBtn = screen.queryByText(
-        "Show Less Sibling Records"
+      const showLessRecordsBtn = screen.queryByTestId(
+        "show-less-detail-btn-Sibling Records"
       );
       expect(showLessRecordsBtn).to.exist;
       userEvent.click(showLessRecordsBtn!);
     });
 
     await waitFor(() => {
-      expect(screen.queryByText("Show More Sibling Records")).to.exist;
+      expect(screen.queryByTestId("show-more-detail-btn-Sibling Records")).to
+        .exist;
 
       // final record should be hiddren again
       expect(screen.queryByText(lowerRecordTitle)).to.not.exist;

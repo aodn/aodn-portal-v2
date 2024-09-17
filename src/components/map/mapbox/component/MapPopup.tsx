@@ -15,8 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import { fontWeight } from "../../../../styles/constants";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../common/store/store";
 import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Point, Feature } from "geojson";
@@ -25,6 +23,7 @@ import {
   OGCCollection,
   OGCCollections,
 } from "../../../common/store/OGCCollectionDefinitions";
+import { useAppDispatch } from "../../../common/store/hooks";
 
 interface MapPopupProps {
   layerId: string;
@@ -56,7 +55,7 @@ const loadingBox = (
 );
 
 const MapPopup: FC<MapPopupProps> = ({ layerId, onDatasetSelected }) => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const { map } = useContext(MapContext);
 
   const getCollectionData = useCallback(

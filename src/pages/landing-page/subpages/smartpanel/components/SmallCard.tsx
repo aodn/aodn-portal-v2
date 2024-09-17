@@ -1,8 +1,8 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { CardData } from "../constants";
 import CardContainer from "./CardContainer";
-import { fontSize, padding } from "../../../../../styles/constants";
+import { fontSize, fontWeight, padding } from "../../../../../styles/constants";
 
 interface SmallCardProps {
   cardData: CardData;
@@ -10,6 +10,8 @@ interface SmallCardProps {
 }
 
 const SmallCard: FC<SmallCardProps> = ({ cardData, handleClickSmartCard }) => {
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
   const handleClick = (value: string) => {
     if (!cardData.disable) handleClickSmartCard(value);
   };
@@ -21,6 +23,8 @@ const SmallCard: FC<SmallCardProps> = ({ cardData, handleClickSmartCard }) => {
         width="50%"
         padding={padding.extraSmall}
         onClick={() => handleClick(cardData.title)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <img
           src={cardData.icon}
@@ -29,6 +33,7 @@ const SmallCard: FC<SmallCardProps> = ({ cardData, handleClickSmartCard }) => {
             objectFit: "contain",
             width: "100%",
             height: "100%",
+            scale: isHovered ? "105%" : "none",
           }}
         />
       </Box>
@@ -37,6 +42,7 @@ const SmallCard: FC<SmallCardProps> = ({ cardData, handleClickSmartCard }) => {
         paddingTop={0}
         fontSize={fontSize.icon}
         color="#fff"
+        fontWeight={isHovered ? fontWeight.bold : fontWeight.regular}
         sx={{
           overflow: "hidden",
         }}

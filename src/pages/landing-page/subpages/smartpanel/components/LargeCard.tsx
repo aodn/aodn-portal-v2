@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { CardData } from "../constants";
 import CardContainer from "./CardContainer";
 import { Box, Typography } from "@mui/material";
@@ -15,6 +15,8 @@ interface LargeCardProps {
 }
 
 const LargeCard: FC<LargeCardProps> = ({ cardData, handleClickSmartCard }) => {
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
   const handleClick = (value: string) => {
     if (!cardData.disable) handleClickSmartCard(value);
   };
@@ -34,8 +36,16 @@ const LargeCard: FC<LargeCardProps> = ({ cardData, handleClickSmartCard }) => {
           backgroundPosition: "center",
           backgroundSize: "cover",
         }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        <Typography variant="h6">{cardData.title}</Typography>
+        <Typography
+          variant="h6"
+          fontWeight={isHovered ? fontWeight.bold : fontWeight.regular}
+          onClick={() => handleClick(cardData.title)}
+        >
+          {cardData.title}
+        </Typography>
       </Box>
       <Box
         display="flex"

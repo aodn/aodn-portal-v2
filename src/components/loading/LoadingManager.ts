@@ -1,6 +1,6 @@
 import EventEmitter from "events";
-import { EventName } from "./EventName";
-import { LoadingName } from "./LoadingName";
+import { EventName } from "./enum/EventName";
+import { LoadingName } from "./enum/LoadingName";
 
 class LoadingManager {
   private static instance: LoadingManager;
