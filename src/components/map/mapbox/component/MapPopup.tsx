@@ -1,4 +1,11 @@
-import React, { FC, useCallback, useContext, useEffect } from "react";
+import React, {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   fetchResultNoStore,
   SearchParameters,
@@ -11,10 +18,7 @@ import {
   CardActionArea,
   CardContent,
   CircularProgress,
-  Stack,
-  Typography,
 } from "@mui/material";
-import { fontWeight } from "../../../../styles/constants";
 import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Point, Feature } from "geojson";
@@ -24,14 +28,35 @@ import {
   OGCCollections,
 } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
+import BasicMapHoverTip from "../../../common/hover-tip/BasicMapHoverTip";
+import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 
 interface MapPopupProps {
   layerId: string;
+  popupType?: PopupType;
   onDatasetSelected?: (uuid: Array<string>) => void;
 }
 
-const POPUP_WIDTH = "250px";
-const POPUP_HEIGHT = "180px";
+export enum PopupType {
+  Basic = "basic",
+  Complex = "complex",
+}
+
+interface PopupConfig {
+  width: number;
+  height: number;
+}
+
+const defaultPopupConfig: Record<PopupType, PopupConfig> = {
+  basic: {
+    width: 250,
+    height: 100,
+  },
+  complex: {
+    width: 250,
+    height: 500,
+  },
+};
 
 const popup = new Popup({
   closeButton: false,
@@ -39,24 +64,43 @@ const popup = new Popup({
   maxWidth: "none",
 });
 
-const loadingBox = (
+const renderLoadingBox = ({
+  height,
+  width,
+}: {
+  height: number;
+  width: number;
+}) => (
   <Box
     sx={{
       transition: "opacity 0.2s ease-in-out",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      height: POPUP_HEIGHT,
-      width: POPUP_WIDTH,
+      height: height,
+      width: width,
     }}
   >
     <CircularProgress />
   </Box>
 );
 
-const MapPopup: FC<MapPopupProps> = ({ layerId, onDatasetSelected }) => {
+const MapPopup: FC<MapPopupProps> = ({
+  layerId,
+  onDatasetSelected,
+  popupType = PopupType.Basic,
+}) => {
   const dispatch = useAppDispatch();
   const { map } = useContext(MapContext);
+  const { height: popupHeight, width: popupWidth } = useMemo(
+    () => defaultPopupConfig[popupType],
+    [popupType]
+  );
+  const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
+  const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
+  const [popupContent, setPopupContent] = useState<React.ReactNode | null>(
+    null
+  );
 
   const getCollectionData = useCallback(
     async (uuid: string) => {
@@ -79,68 +123,52 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, onDatasetSelected }) => {
   const contentBox = useCallback(
     (collection: void | OGCCollection) => (
       <ThemeProvider theme={AppTheme}>
-        <Card elevation={0} sx={{ height: POPUP_HEIGHT, width: POPUP_WIDTH }}>
+        <Card
+          elevation={0}
+          sx={{ height: popupHeight, width: popupWidth }}
+          onMouseEnter={() => setIsMouseOverPopup(true)}
+          onMouseLeave={() => setIsMouseOverPopup(false)}
+        >
           <CardActionArea
-            onClick={(event) =>
+            onClick={() =>
               collection &&
               onDatasetSelected &&
               onDatasetSelected([collection.id])
             }
           >
             <CardContent>
-              <Stack
-                direction="column"
-                justifyContent="left"
-                alignItems="center"
-              >
-                <Typography
-                  fontWeight={fontWeight.bold}
-                  sx={{
-                    padding: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: "2",
-                    WebkitBoxOrient: "vertical",
-                  }}
-                >
-                  {collection?.title}
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: "4",
-                    WebkitBoxOrient: "vertical",
-                    maxWidth: "100%",
-                  }}
-                >
-                  {collection?.description}
-                </Typography>
-              </Stack>
+              {popupType === PopupType.Basic && (
+                <BasicMapHoverTip content={collection?.title} />
+              )}
+              {popupType === PopupType.Complex && <ComplexMapHoverTip />}
             </CardContent>
           </CardActionArea>
         </Card>
       </ThemeProvider>
     ),
-    [onDatasetSelected]
+    [onDatasetSelected, popupHeight, popupType, popupWidth]
   );
 
-  const onPointMouseLeave = useCallback((ev: MapLayerMouseEvent) => {
-    ev.target.getCanvas().style.cursor = "";
-    popup.remove();
-  }, []);
+  const removePopup = useCallback(() => {
+    if (!isMouseOverPoint && !isMouseOverPopup) {
+      popup.remove();
+      if (map) {
+        map.getCanvas().style.cursor = "";
+      }
+      setPopupContent(null);
+    }
+  }, [isMouseOverPoint, isMouseOverPopup, map]);
+
+  const onPointMouseLeave = useCallback(() => {
+    setIsMouseOverPoint(false);
+    setTimeout(removePopup, 100);
+  }, [removePopup]);
 
   const onPointMouseEnter = useCallback(
-    async (
-      ev: MapLayerMouseEvent,
-      container: HTMLDivElement,
-      root: Root
-    ): Promise<void> => {
+    async (ev: MapLayerMouseEvent): Promise<void> => {
       if (!ev.target || !map) return;
 
+      setIsMouseOverPoint(true);
       ev.target.getCanvas().style.cursor = "pointer";
 
       // Copy coordinates array.
@@ -151,44 +179,53 @@ const MapPopup: FC<MapPopupProps> = ({ layerId, onDatasetSelected }) => {
         const uuid = feature.properties?.uuid as string;
 
         // Render a loading state in the popup
-        root.render(loadingBox);
+        setPopupContent(
+          renderLoadingBox({ height: popupHeight, width: popupWidth })
+        );
 
         // Set the popup's position and content, then add it to the map
         // subscribe to close event to clean up resource.
         popup
           .setLngLat(coordinates as [number, number])
-          .setDOMContent(container)
+          .setDOMContent(document.createElement("div"))
           .addTo(map);
 
-        // Fetch and render the actual content for the popup
-        getCollectionData(uuid).then((collection) =>
-          root.render(contentBox(collection))
-        );
+        const collection = await getCollectionData(uuid);
+        setPopupContent(contentBox(collection));
       }
     },
-    [map, getCollectionData, contentBox]
+    [map, popupHeight, popupWidth, getCollectionData, contentBox]
   );
 
   useEffect(() => {
-    const container = document.createElement("div");
-    const root = createRoot(container);
-
-    const mev = (ev: MapLayerMouseEvent) =>
-      onPointMouseEnter(ev, container, root);
-
     map?.on("mouseleave", layerId, onPointMouseLeave);
-    map?.on("mouseenter", layerId, mev);
+    map?.on("mouseenter", layerId, onPointMouseEnter);
 
     return () => {
-      // Important to free up resources, and must timeout to avoid race condition
-      setTimeout(() => root.unmount(), 500);
-
       map?.off("mouseleave", layerId, onPointMouseLeave);
-      map?.off("mouseenter", layerId, mev);
+      map?.off("mouseenter", layerId, onPointMouseEnter);
     };
   }, [map, layerId, onPointMouseEnter, onPointMouseLeave]);
 
-  return <React.Fragment />;
+  useEffect(() => {
+    removePopup();
+  }, [isMouseOverPoint, isMouseOverPopup, removePopup]);
+
+  useEffect(() => {
+    if (popupContent) {
+      const container = document.createElement("div");
+      const root = createRoot(container);
+      root.render(popupContent);
+      popup.setDOMContent(container);
+
+      // Important to free up resources, and must timeout to avoid race condition
+      return () => {
+        setTimeout(() => root.unmount(), 500);
+      };
+    }
+  }, [popupContent]);
+
+  return null;
 };
 
 export default MapPopup;

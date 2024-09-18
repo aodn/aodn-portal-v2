@@ -9,7 +9,7 @@ import {
   defaultMouseLeaveEventHandler,
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
-import MapPopup from "../component/MapPopup";
+import MapPopup, { PopupType } from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
@@ -98,6 +98,7 @@ const getUnclusterPointLayerId = (layerId: string) =>
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
   collections,
   selectedUuids,
+  showFullMap,
   onDatasetSelected,
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
@@ -311,6 +312,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     <>
       <MapPopup
         layerId={unClusterPointLayer}
+        popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
       />
       <SpatialExtents

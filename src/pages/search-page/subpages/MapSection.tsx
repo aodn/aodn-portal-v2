@@ -58,6 +58,7 @@ const MapSection: React.FC<MapSectionProps> = ({
             <HeatmapLayer
               collections={collections}
               selectedUuids={selectedUuids}
+              showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
             />
           );
@@ -67,12 +68,13 @@ const MapSection: React.FC<MapSectionProps> = ({
             <ClusterLayer
               collections={collections}
               selectedUuids={selectedUuids}
+              showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
             />
           );
       }
     },
-    [collections, onDatasetSelected, selectedUuids]
+    [collections, onDatasetSelected, selectedUuids, showFullMap]
   );
 
   return (
