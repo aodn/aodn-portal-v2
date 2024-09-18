@@ -8,7 +8,7 @@ interface CollapseItemBtnProps {
   isContact: boolean;
   isAssociatedRecord?: boolean;
   expanded: boolean;
-  email: string | undefined;
+  email?: string | undefined;
   element: React.JSX.Element;
 }
 
