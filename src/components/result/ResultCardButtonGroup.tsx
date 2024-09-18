@@ -34,7 +34,7 @@ enum Status {
 
 const generateLinkText = (linkLength: number) => {
   if (linkLength === 0) {
-    return "No Link";
+    return "No Links";
   }
   if (linkLength === 1) {
     return "1 Link";
