@@ -21,9 +21,13 @@ class BasePage:
         """Click on the given label"""
         self.get_label(text).click()
 
+    def get_text(self, text: str) -> Locator:
+        """Return element by text"""
+        return self.page.get_by_text(text)
+
     def click_text(self, text: str) -> None:
         """Click on the given text"""
-        self.page.get_by_text(text).click()
+        self.get_text(text).click()
 
     def click_option(self, text: str) -> None:
         """Click on the given option"""
