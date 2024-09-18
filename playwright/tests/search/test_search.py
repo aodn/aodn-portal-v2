@@ -23,6 +23,7 @@ def test_basic_search(
     expect(landing_page.get_option(category_name)).to_be_visible()
     landing_page.click_option(category_name)
     landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
 
     expect(search_page.search.search_field).to_have_value(category_name)
     expect(search_page.first_result_title).to_be_visible()

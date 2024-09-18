@@ -15,7 +15,7 @@ class TabContainerComponent(BasePage):
     def __init__(self, page: Page):
         self.page = page
 
-        # Page locators
+        # Tabs
         self.abstract = AbstractTab(page)
         self.about = AboutTab(page)
         self.links = LinksTab(page)
