@@ -9,10 +9,12 @@ from utils.json_utils import load_json_data
 
 class SuggesterOptions:
     def __init__(
-        self, category_suggestions: List[str], suggest_phrases: List[str]
+        self,
+        suggested_organisation_vocabs: List[str],
+        suggested_phrases: List[str],
     ):
-        self.category_suggestions = category_suggestions
-        self.suggest_phrases = suggest_phrases
+        self.suggested_organisation_vocabs = suggested_organisation_vocabs
+        self.suggested_phrases = suggested_phrases
 
     def filter_items(self, items: List[str], keyword: str) -> List[str]:
         keyword_lower = keyword.lower()
@@ -21,18 +23,21 @@ class SuggesterOptions:
     def get_suggestions(
         self, input: str
     ) -> Dict[str, Union[List[str], Dict[str, List[str]]]]:
-        phrases = self.filter_items(self.suggest_phrases, input)
+        organisation_vocabs = self.filter_items(
+            self.suggested_organisation_vocabs, input
+        )
+        phrases = self.filter_items(self.suggested_phrases, input)
         return {
-            'category_suggestions': [input],
-            'record_suggestions': {'suggest_phrases': phrases},
+            'suggested_organisation_vocabs': organisation_vocabs,
+            'suggested_phrases': phrases,
         }
 
 
 def load_suggester_options(filename: str) -> SuggesterOptions:
     data = load_json_data(filename)
     return SuggesterOptions(
-        category_suggestions=data['category_suggestions'],
-        suggest_phrases=data['record_suggestions']['suggest_phrases'],
+        suggested_organisation_vocabs=data['suggested_organisation_vocabs'],
+        suggested_phrases=data['suggested_phrases'],
     )
 
 
