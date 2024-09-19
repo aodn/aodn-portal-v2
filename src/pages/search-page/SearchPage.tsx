@@ -134,8 +134,12 @@ const SearchPage = () => {
   // On select a dataset, update the states: selected uuid(s) and get the collection data
   const handleDatasetSelecting = useCallback(
     (uuids: Array<string>) => {
-      setSelectedUuids(uuids.length === 0 ? [] : uuids);
-      getCollectionsData(uuids.length === 0 ? [] : uuids);
+      if (uuids.length === 0) {
+        setSelectedUuids([]);
+        setDatasetsSelected([]);
+      }
+      setSelectedUuids(uuids);
+      getCollectionsData(uuids);
     },
     [getCollectionsData]
   );
@@ -362,6 +366,7 @@ const SearchPage = () => {
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
                   isLoading={isLoading(loadingThreadCount)}
+                  onNavigateToDetail={handleNavigateToDetailPage}
                 />
               </Box>
             </Box>

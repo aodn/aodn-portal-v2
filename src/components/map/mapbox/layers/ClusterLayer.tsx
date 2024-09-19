@@ -1,7 +1,7 @@
 import { FC, useCallback, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
 import { GeoJSONSource } from "mapbox-gl";
-import MapPopup from "../component/MapPopup";
+import MapPopup, { PopupType } from "../component/MapPopup";
 import {
   LayersProps,
   createCenterOfMassDataSource,
@@ -92,7 +92,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
   selectedUuids,
   onDatasetSelected,
+  onNavigateToDetail,
   clusterLayerConfig,
+  showFullMap,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
 
@@ -259,7 +261,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     <>
       <MapPopup
         layerId={unclusterPointLayer}
+        popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
+        onNavigateToDetail={onNavigateToDetail}
       />
       <SpatialExtents
         layerId={unclusterPointLayer}
