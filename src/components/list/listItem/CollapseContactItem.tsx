@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import StyledItemGrid from "../StyledItemGrid";
-import { Collapse, Grid, IconButton, Typography } from "@mui/material";
-import CollapseItemBtn from "../../../common/buttons/CollapseItemBtn";
+import StyledItemGrid from "./StyledItemGrid";
+import { Collapse, Grid, IconButton } from "@mui/material";
+import CollapseItemTitle from "./subitem/CollapseItemTitle";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 
 interface CollapseContactItemProps {
-  isOpen?: boolean;
+  title: string;
   children: React.ReactNode;
   email: string;
-  title: string;
+  isOpen?: boolean;
 }
 
+// TODO: just deconstruct this from the CollapseItem for the possible future changes.
+//  so please ignore the duplicate lines between this component with the CollapseItem.
 const CollapseContactItem: React.FC<CollapseContactItemProps> = ({
   isOpen = false,
   children,
@@ -19,14 +21,6 @@ const CollapseContactItem: React.FC<CollapseContactItemProps> = ({
   title,
 }) => {
   const [isExpanded, setIsExpanded] = useState(isOpen);
-
-  const titleComponent = () => {
-    return (
-      <Typography variant="detailTitle">
-        {title ? title : "[ NO TITLE ]"}
-      </Typography>
-    );
-  };
 
   return (
     <StyledItemGrid container data-testid="collapseItem">
@@ -37,7 +31,7 @@ const CollapseContactItem: React.FC<CollapseContactItemProps> = ({
           alignSelf: "center",
         }}
       >
-        <CollapseItemBtn
+        <CollapseItemTitle
           onClick={() => {
             if (isExpanded) {
               return null;
@@ -47,7 +41,7 @@ const CollapseContactItem: React.FC<CollapseContactItemProps> = ({
           isContact={true}
           expanded={isExpanded}
           email={email}
-          element={titleComponent()}
+          title={title}
         />
       </Grid>
       <Grid

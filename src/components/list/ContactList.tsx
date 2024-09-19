@@ -2,7 +2,7 @@ import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ContactArea from "./listItem/subitem/ContactArea";
-import CollapseContactItem from "./listItem/subitem/CollapseContactItem";
+import CollapseContactItem from "./listItem/CollapseContactItem";
 
 interface ContactListProps {
   title: string;

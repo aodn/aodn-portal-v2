@@ -1,11 +1,11 @@
 import { IAssociatedRecord } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useCallback, useMemo } from "react";
-import CollapseItem from "./listItem/CollapseItem";
 import { ButtonBase } from "@mui/material";
 import { pageDefault } from "../common/constants";
 import ExpandableList from "./ExpandableList";
 import TextArea from "./listItem/subitem/TextArea";
 import { openInNewTab } from "../../utils/LinkUtils";
+import CollapseAssociatedRecordItem from "./listItem/CollapseAssociatedRecordItem";
 
 interface AssociatedRecordListProps {
   title: string;
@@ -27,7 +27,11 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
     const components: ReactNode[] = [];
     records?.map((record, index) => {
       components.push(
-        <CollapseItem title={`${record.title}`} key={index} isAssociatedRecord>
+        <CollapseAssociatedRecordItem
+          titleAction={() => openRecord(record.uuid)}
+          title={`${record.title}`}
+          key={index}
+        >
           <ButtonBase
             onClick={() => openRecord(record.uuid)}
             sx={{
@@ -36,7 +40,7 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
           >
             <TextArea key={index}>{record.abstract}</TextArea>
           </ButtonBase>
-        </CollapseItem>
+        </CollapseAssociatedRecordItem>
       );
     });
     return components;
