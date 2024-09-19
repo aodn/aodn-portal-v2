@@ -366,6 +366,7 @@ const SearchPage = () => {
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
                   isLoading={isLoading(loadingThreadCount)}
+                  onNavigateToDetail={handleNavigateToDetailPage}
                 />
               </Box>
             </Box>

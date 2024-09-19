@@ -1,39 +1,49 @@
 import { FC } from "react";
-import { Box, SxProps, Typography } from "@mui/material";
-import { fontSize, fontWeight } from "../../../styles/constants";
+import {
+  Box,
+  CardActionArea,
+  SxProps,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { fontColor, fontSize, fontWeight } from "../../../styles/constants";
 
-interface BasicMapHoverTipProps {
-  content: string | undefined | null;
+export interface BasicMapHoverTipProps {
+  content?: string | undefined | null;
   sx?: SxProps;
+  onNavigateToDetail?: () => void;
+  onDatasetSelected?: () => void;
 }
 
-const BasicMapHoverTip: FC<BasicMapHoverTipProps> = ({ content, sx }) => {
+const BasicMapHoverTip: FC<BasicMapHoverTipProps> = ({
+  sx,
+  content,
+  onDatasetSelected = () => {},
+}) => {
   if (!content) return;
 
   return (
-    <Box
-      width="100&"
-      height="100%"
-      justifyContent="left"
-      alignItems="center"
-      sx={{ ...sx }}
-    >
-      <Typography
-        fontWeight={fontWeight.bold}
-        fontSize={fontSize.info}
-        sx={{
-          padding: 0,
-          paddingTop: -100,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          display: "-webkit-box",
-          WebkitLineClamp: "4",
-          WebkitBoxOrient: "vertical",
-        }}
-      >
-        {content}
-      </Typography>
-    </Box>
+    <CardActionArea onClick={onDatasetSelected}>
+      <Tooltip title={content} placement="top">
+        <Box sx={{ ...sx }}>
+          <Typography
+            color={fontColor.gray.dark}
+            fontSize={fontSize.label}
+            fontWeight={fontWeight.bold}
+            sx={{
+              padding: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: "4",
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {content}
+          </Typography>
+        </Box>
+      </Tooltip>
+    </CardActionArea>
   );
 };
 

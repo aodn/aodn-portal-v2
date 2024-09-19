@@ -1,17 +1,14 @@
-import React, {
+import {
   FC,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import {
-  fetchResultNoStore,
-  SearchParameters,
-} from "../../../common/store/searchReducer";
+import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
-import AppTheme from "../../../../utils/AppTheme";
 import {
   Box,
   Card,
@@ -22,7 +19,11 @@ import {
 import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Point, Feature } from "geojson";
-import { createRoot, Root } from "react-dom/client";
+import {
+  fetchResultNoStore,
+  SearchParameters,
+} from "../../../common/store/searchReducer";
+import AppTheme from "../../../../utils/AppTheme";
 import {
   OGCCollection,
   OGCCollections,
@@ -35,6 +36,7 @@ interface MapPopupProps {
   layerId: string;
   popupType?: PopupType;
   onDatasetSelected?: (uuid: Array<string>) => void;
+  onNavigateToDetail?: (uuid: string) => void;
 }
 
 export enum PopupType {
@@ -43,18 +45,18 @@ export enum PopupType {
 }
 
 interface PopupConfig {
-  width: number;
-  height: number;
+  popupWidth: number;
+  popupHeight: number;
 }
 
 const defaultPopupConfig: Record<PopupType, PopupConfig> = {
   basic: {
-    width: 250,
-    height: 100,
+    popupWidth: 250,
+    popupHeight: 60,
   },
   complex: {
-    width: 250,
-    height: 500,
+    popupWidth: 250,
+    popupHeight: 370,
   },
 };
 
@@ -62,14 +64,15 @@ const popup = new Popup({
   closeButton: false,
   closeOnClick: false,
   maxWidth: "none",
+  offset: [0, -5], // Add 5px vertical offset
 });
 
 const renderLoadingBox = ({
-  height,
-  width,
+  popupHeight,
+  popupWidth,
 }: {
-  height: number;
-  width: number;
+  popupHeight: number;
+  popupWidth: number;
 }) => (
   <Box
     sx={{
@@ -77,8 +80,8 @@ const renderLoadingBox = ({
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      height: height,
-      width: width,
+      height: popupHeight,
+      width: popupWidth,
     }}
   >
     <CircularProgress />
@@ -88,25 +91,23 @@ const renderLoadingBox = ({
 const MapPopup: FC<MapPopupProps> = ({
   layerId,
   onDatasetSelected,
+  onNavigateToDetail,
   popupType = PopupType.Basic,
 }) => {
   const dispatch = useAppDispatch();
   const { map } = useContext(MapContext);
-  const { height: popupHeight, width: popupWidth } = useMemo(
+  const { popupHeight, popupWidth } = useMemo(
     () => defaultPopupConfig[popupType],
     [popupType]
   );
   const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
   const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState<React.ReactNode | null>(
-    null
-  );
+  const [popupContent, setPopupContent] = useState<ReactNode | null>(null);
 
   const getCollectionData = useCallback(
     async (uuid: string) => {
       const param: SearchParameters = {
         filter: `id='${uuid}'`,
-        properties: "title,description",
       };
 
       return dispatch(fetchResultNoStore(param))
@@ -120,33 +121,76 @@ const MapPopup: FC<MapPopupProps> = ({
     [dispatch]
   );
 
-  const contentBox = useCallback(
-    (collection: void | OGCCollection) => (
-      <ThemeProvider theme={AppTheme}>
-        <Card
-          elevation={0}
-          sx={{ height: popupHeight, width: popupWidth }}
-          onMouseEnter={() => setIsMouseOverPopup(true)}
-          onMouseLeave={() => setIsMouseOverPopup(false)}
-        >
-          <CardActionArea
-            onClick={() =>
-              collection &&
-              onDatasetSelected &&
-              onDatasetSelected([collection.id])
-            }
+  const handleNavigateToDetailPage = (
+    uuid: string,
+    onNavigateToDetail?: (uuid: string) => void
+  ) => {
+    if (onNavigateToDetail) {
+      onNavigateToDetail(uuid);
+    }
+  };
+
+  const handleDatasetSelect = (
+    uuid: string,
+    onDatasetSelected?: (uuid: Array<string>) => void
+  ) => {
+    if (onDatasetSelected) {
+      onDatasetSelected([uuid]);
+    }
+  };
+
+  const renderContentBox = useCallback(
+    (collection: void | OGCCollection) => {
+      if (!collection) {
+        return null;
+      }
+
+      return (
+        <ThemeProvider theme={AppTheme}>
+          <Card
+            elevation={0}
+            sx={{
+              height: popupHeight,
+              width: popupWidth,
+              borderRadius: 0,
+            }}
+            onMouseEnter={() => setIsMouseOverPopup(true)}
+            onMouseLeave={() => setIsMouseOverPopup(false)}
           >
-            <CardContent>
+            <CardContent
+              sx={{
+                padding: 0,
+              }}
+            >
               {popupType === PopupType.Basic && (
-                <BasicMapHoverTip content={collection?.title} />
+                <BasicMapHoverTip
+                  content={collection?.title}
+                  onDatasetSelected={() =>
+                    handleDatasetSelect(collection.id, onDatasetSelected)
+                  }
+                  sx={{ height: popupHeight }}
+                />
               )}
-              {popupType === PopupType.Complex && <ComplexMapHoverTip />}
+              {popupType === PopupType.Complex && (
+                <ComplexMapHoverTip
+                  collection={collection}
+                  onNavigateToDetail={() =>
+                    handleNavigateToDetailPage(
+                      collection.id,
+                      onNavigateToDetail
+                    )
+                  }
+                  onDatasetSelected={() =>
+                    handleDatasetSelect(collection.id, onDatasetSelected)
+                  }
+                />
+              )}
             </CardContent>
-          </CardActionArea>
-        </Card>
-      </ThemeProvider>
-    ),
-    [onDatasetSelected, popupHeight, popupType, popupWidth]
+          </Card>
+        </ThemeProvider>
+      );
+    },
+    [onDatasetSelected, onNavigateToDetail, popupHeight, popupType, popupWidth]
   );
 
   const removePopup = useCallback(() => {
@@ -159,9 +203,10 @@ const MapPopup: FC<MapPopupProps> = ({
     }
   }, [isMouseOverPoint, isMouseOverPopup, map]);
 
+  // Delay the remove of popup for user move mouse into the popup when hover a point
   const onPointMouseLeave = useCallback(() => {
-    setIsMouseOverPoint(false);
-    setTimeout(removePopup, 100);
+    setTimeout(() => setIsMouseOverPoint(false), 200);
+    setTimeout(removePopup, 200);
   }, [removePopup]);
 
   const onPointMouseEnter = useCallback(
@@ -171,17 +216,14 @@ const MapPopup: FC<MapPopupProps> = ({
       setIsMouseOverPoint(true);
       ev.target.getCanvas().style.cursor = "pointer";
 
-      // Copy coordinates array.
       if (ev.features && ev.features.length > 0) {
+        // Copy coordinates array.
         const feature = ev.features[0] as Feature<Point>;
         const geometry = feature.geometry;
         const coordinates = geometry.coordinates.slice();
-        const uuid = feature.properties?.uuid as string;
 
         // Render a loading state in the popup
-        setPopupContent(
-          renderLoadingBox({ height: popupHeight, width: popupWidth })
-        );
+        setPopupContent(renderLoadingBox({ popupHeight, popupWidth }));
 
         // Set the popup's position and content, then add it to the map
         // subscribe to close event to clean up resource.
@@ -190,11 +232,12 @@ const MapPopup: FC<MapPopupProps> = ({
           .setDOMContent(document.createElement("div"))
           .addTo(map);
 
+        const uuid = feature.properties?.uuid as string;
         const collection = await getCollectionData(uuid);
-        setPopupContent(contentBox(collection));
+        setPopupContent(renderContentBox(collection));
       }
     },
-    [map, popupHeight, popupWidth, getCollectionData, contentBox]
+    [map, popupHeight, popupWidth, getCollectionData, renderContentBox]
   );
 
   useEffect(() => {
