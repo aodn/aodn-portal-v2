@@ -52,7 +52,7 @@ interface PopupConfig {
 const defaultPopupConfig: Record<PopupType, PopupConfig> = {
   basic: {
     popupWidth: 250,
-    popupHeight: 60,
+    popupHeight: 50,
   },
   complex: {
     popupWidth: 250,
@@ -64,7 +64,8 @@ const popup = new Popup({
   closeButton: false,
   closeOnClick: false,
   maxWidth: "none",
-  offset: [0, -5], // Add 5px vertical offset
+  // Add 5px vertical offset for popup
+  offset: [0, -5],
 });
 
 const renderLoadingBox = ({
@@ -87,6 +88,24 @@ const renderLoadingBox = ({
     <CircularProgress />
   </Box>
 );
+
+const handleNavigateToDetailPage = (
+  uuid: string,
+  onNavigateToDetail?: (uuid: string) => void
+) => {
+  if (onNavigateToDetail) {
+    onNavigateToDetail(uuid);
+  }
+};
+
+const handleDatasetSelect = (
+  uuid: string,
+  onDatasetSelected?: (uuid: Array<string>) => void
+) => {
+  if (onDatasetSelected) {
+    onDatasetSelected([uuid]);
+  }
+};
 
 const MapPopup: FC<MapPopupProps> = ({
   layerId,
@@ -120,24 +139,6 @@ const MapPopup: FC<MapPopupProps> = ({
     },
     [dispatch]
   );
-
-  const handleNavigateToDetailPage = (
-    uuid: string,
-    onNavigateToDetail?: (uuid: string) => void
-  ) => {
-    if (onNavigateToDetail) {
-      onNavigateToDetail(uuid);
-    }
-  };
-
-  const handleDatasetSelect = (
-    uuid: string,
-    onDatasetSelected?: (uuid: Array<string>) => void
-  ) => {
-    if (onDatasetSelected) {
-      onDatasetSelected([uuid]);
-    }
-  };
 
   const renderContentBox = useCallback(
     (collection: void | OGCCollection) => {

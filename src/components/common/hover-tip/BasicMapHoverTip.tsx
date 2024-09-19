@@ -25,7 +25,14 @@ const BasicMapHoverTip: FC<BasicMapHoverTipProps> = ({
   return (
     <CardActionArea onClick={onDatasetSelected}>
       <Tooltip title={content} placement="top">
-        <Box sx={{ ...sx }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+            ...sx,
+          }}
+        >
           <Typography
             color={fontColor.gray.dark}
             fontSize={fontSize.label}
@@ -35,7 +42,7 @@ const BasicMapHoverTip: FC<BasicMapHoverTipProps> = ({
               overflow: "hidden",
               textOverflow: "ellipsis",
               display: "-webkit-box",
-              WebkitLineClamp: "4",
+              WebkitLineClamp: "3",
               WebkitBoxOrient: "vertical",
             }}
           >
