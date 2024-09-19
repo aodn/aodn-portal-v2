@@ -5,7 +5,6 @@ import {
   GeoJsonProperties,
   Geometry,
 } from "geojson";
-import { centerOfMass } from "@turf/turf";
 import { MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
@@ -45,9 +44,9 @@ const createCenterOfMassDataSource = (
 
   collections?.forEach((collection) => {
     // We skip the first one which is the overall bounding box, then add the remaining
-    collection.extent?.getGeojsonExtents(1).features.forEach((i) =>
+    collection.getCentroid()?.forEach((i) =>
       featureCollections.features.push({
-        ...centerOfMass(i.geometry),
+        ...i,
         // Add the id so we can reference it easily
         properties: { uuid: collection.id },
       })
