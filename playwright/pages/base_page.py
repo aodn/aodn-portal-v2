@@ -54,7 +54,9 @@ class BasePage:
         self.get_heading(text).click()
 
     def get_collapse_list(self, item_list: str) -> Locator:
+        """Returns collapse list container element"""
         return self.page.get_by_test_id(f'collapse-list-{item_list}')
 
     def get_collapse_list_items(self, item_list: str) -> Locator:
+        """Returns the given collapse list items"""
         return self.get_collapse_list(item_list).get_by_test_id('collapseItem')

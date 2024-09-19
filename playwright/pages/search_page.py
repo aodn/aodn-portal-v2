@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, TimeoutError
 
 from pages.base_page import BasePage
 from pages.components.map import Map
@@ -23,12 +23,12 @@ class SearchPage(BasePage):
         where it may appear twice. This function waits for the indicator to
         become hidden, and if it reappears, it waits again until it disappears.
         """
-        self.loading.wait_for(state='hidden', timeout=5000)
+        self.loading.wait_for(state='hidden', timeout=20 * 1000)
 
         # Handle the case when loading indicator appears twice
         try:
-            self.loading.wait_for(state='visible', timeout=5000)
-            self.loading.wait_for(state='hidden', timeout=5000)
+            self.loading.wait_for(state='visible', timeout=1000)
+            self.loading.wait_for(state='hidden', timeout=20 * 1000)
         except TimeoutError:
             # If the loading indicator doesn't reappear within the timeout,
             # assume the search is complete and ignore the exception.
