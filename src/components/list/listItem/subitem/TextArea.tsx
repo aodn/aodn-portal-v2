@@ -1,16 +1,16 @@
 import React from "react";
-import { Grid, Typography, useTheme } from "@mui/material";
+import { Typography } from "@mui/material";
+import TextAreaGrid from "./TextAreaGrid";
 
 interface TextAreaProps {
-  children: React.ReactNode;
+  text: string;
 }
 
-const TextArea: React.FC<TextAreaProps> = ({ children }) => {
-  const theme = useTheme();
+const TextArea: React.FC<TextAreaProps> = ({ text }) => {
   return (
-    <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
-      <Typography variant="detailContent">{children}</Typography>
-    </Grid>
+    <TextAreaGrid>
+      <Typography variant="detailContent">{text}</Typography>
+    </TextAreaGrid>
   );
 };
 

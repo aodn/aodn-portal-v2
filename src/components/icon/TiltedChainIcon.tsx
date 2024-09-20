@@ -1,6 +1,6 @@
 import { Box, SvgIcon } from "@mui/material";
 import React from "react";
-import { useHoverContext } from "../list/listItem/StyledItemGrid";
+import { useHoverContext } from "../list/listItem/ItemBaseGrid";
 
 const TiltedChainIcon: React.FC = () => {
   const color = "#616264";
@@ -13,7 +13,9 @@ const TiltedChainIcon: React.FC = () => {
         viewBox="-2.5 -2.5 29 29"
         fill="none"
         sx={{
-          border: isOnHover ? "1px solid #3A6F8F" : "none",
+          border: isOnHover
+            ? "1px solid rgba(58, 111, 143, 1)"
+            : "1px solid rgba(58, 111, 143, 0)",
           borderRadius: "5px",
         }}
       >

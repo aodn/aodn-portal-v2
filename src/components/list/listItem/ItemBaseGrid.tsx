@@ -1,14 +1,5 @@
-import { styled } from "@mui/material/styles";
-import { Grid, GridProps } from "@mui/material";
+import { Grid, GridProps, useTheme } from "@mui/material";
 import React, { createContext, useContext, useState } from "react";
-
-const StyledGrid = styled(Grid)(({ theme }) => ({
-  backgroundColor: theme.palette.detail.listItemBG,
-  margin: theme.mp.sm,
-  borderRadius: theme.borderRadius.sm,
-  width: "95%",
-  padding: `${theme.mp.sm} ${theme.mp.xlg}`,
-}));
 
 interface HoverContextProps {
   isOnHover: boolean;
@@ -22,19 +13,29 @@ export const useHoverContext = () => {
   }
   return context;
 };
-const StyledItemGrid: React.FC<GridProps> = (props) => {
+const ItemBaseGrid: React.FC<GridProps> = (props) => {
+  const theme = useTheme();
   const [isOnHover, setisOnHover] = useState<boolean>(false);
   return (
     <HoverContext.Provider value={{ isOnHover }}>
-      <StyledGrid
+      <Grid
         {...props}
         onMouseEnter={() => setisOnHover(true)}
         onMouseLeave={() => setisOnHover(false)}
+        sx={{
+          backgroundColor: isOnHover
+            ? theme.palette.detail.listItemBGHover
+            : theme.palette.detail.listItemBG,
+          margin: theme.mp.sm,
+          borderRadius: theme.borderRadius.sm,
+          width: "95%",
+          padding: `${theme.mp.sm} ${theme.mp.xlg}`,
+        }}
       >
         {props.children}
-      </StyledGrid>
+      </Grid>
     </HoverContext.Provider>
   );
 };
 
-export default StyledItemGrid;
+export default ItemBaseGrid;

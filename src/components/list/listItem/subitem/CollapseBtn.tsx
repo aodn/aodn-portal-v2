@@ -1,27 +1,24 @@
-import { Grid, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import React from "react";
 
 interface CollapseBtnProps {
-  onClick: () => void;
-  expanded: boolean;
+  setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+  isExpanded: boolean;
 }
 
-const CollapseBtn: React.FC<CollapseBtnProps> = ({ onClick, expanded }) => {
+const CollapseBtn: React.FC<CollapseBtnProps> = ({
+  setIsExpanded,
+  isExpanded,
+}) => {
   return (
-    <Grid
-      item
-      md={1}
-      sx={{
-        display: "flex",
-        justifyContent: "flex-end",
-      }}
+    <IconButton
+      aria-label="expand or collapse"
+      onClick={() => setIsExpanded((prev) => !prev)}
     >
-      <IconButton aria-label="expand or collapse" onClick={onClick}>
-        {expanded ? <ExpandLess /> : <ExpandMore />}
-      </IconButton>
-    </Grid>
+      {isExpanded ? <ExpandLess /> : <ExpandMore />}
+    </IconButton>
   );
 };
 
