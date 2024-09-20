@@ -1,8 +1,8 @@
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import React, { ReactNode, useState } from "react";
-import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import ShowMoreDetailBtn from "../common/buttons/ShowMoreDetailBtn";
 import NaList from "./NaList";
+import EndpointedDiamondIcon from "../icon/EndpointedDiamondIcon";
 
 interface ExpandableListProps {
   title?: string;
@@ -21,7 +21,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
       {title !== "Statement" && (
         <Grid item md={12} display="flex" alignItems="center">
           <Box display="flex" justifyContent="center" alignItems="center">
-            <KeyboardDoubleArrowRightIcon />
+            <EndpointedDiamondIcon />
           </Box>
           <Typography
             display="inline"
