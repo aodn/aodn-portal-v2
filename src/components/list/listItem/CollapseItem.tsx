@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from "react";
 import { Collapse, Grid } from "@mui/material";
-import StyledItemGrid from "./StyledItemGrid";
+import ItemBaseGrid from "./ItemBaseGrid";
 import CollapseItemTitle from "./subitem/CollapseItemTitle";
 import CollapseBtn from "./subitem/CollapseBtn";
 
@@ -18,27 +18,19 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
   const [isExpanded, setIsExpanded] = useState(isOpen);
 
   return (
-    <StyledItemGrid container data-testid="collapseItem">
-      <CollapseItemTitle
-        onClick={() => {
-          setIsExpanded(!isExpanded);
-        }}
-        expanded={isExpanded}
-        title={title}
-      />
-      <CollapseBtn
-        onClick={() => {
-          setIsExpanded(!isExpanded);
-        }}
-        expanded={isExpanded}
-      />
-
+    <ItemBaseGrid container data-testid="collapseItem">
+      <Grid item md={11} sx={{ alignSelf: "center" }}>
+        <CollapseItemTitle setIsExpanded={setIsExpanded} text={title} />
+      </Grid>
+      <Grid item md={1}>
+        <CollapseBtn isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      </Grid>
       <Grid item md={12}>
         <Collapse in={isExpanded}>
           {children ? children : "[ NO CONTENT ]"}
         </Collapse>
       </Grid>
-    </StyledItemGrid>
+    </ItemBaseGrid>
   );
 };
 

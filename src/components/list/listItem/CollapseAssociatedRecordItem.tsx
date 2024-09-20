@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from "react";
-import StyledItemGrid from "./StyledItemGrid";
-import { ButtonBase, Collapse, Grid, Typography } from "@mui/material";
+import { useHoverContext } from "./ItemBaseGrid";
+import { Collapse, Grid, Typography, useTheme } from "@mui/material";
 import CollapseBtn from "./subitem/CollapseBtn";
 import TiltedChainIcon from "../../icon/TiltedChainIcon";
 
@@ -15,8 +15,11 @@ const CollapseAssociatedRecordItem: React.FC<
 > = ({ title, titleAction, children }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const { isOnHover } = useHoverContext();
+  const theme = useTheme();
+
   return (
-    <StyledItemGrid container>
+    <Grid container>
       <Grid
         item
         md={11}
@@ -24,47 +27,44 @@ const CollapseAssociatedRecordItem: React.FC<
           alignSelf: "center",
         }}
       >
-        <ButtonBase
-          onClick={() => setIsExpanded(!isExpanded)}
-          sx={{ width: "100%" }}
-        >
-          <Grid item container md={12}>
-            <Grid
-              item
-              md={1}
-              onClick={titleAction}
-              sx={{ alignSelf: "center", justifySelf: "center" }}
-            >
-              <TiltedChainIcon />
-            </Grid>
-
-            <Grid
-              item
-              md={11}
-              sx={{
-                textAlign: "left",
-                whiteSpace: "normal",
-              }}
-            >
-              <Typography variant="detailTitle">
-                {title ? title : "[ NO TITLE ]"}
-              </Typography>
-            </Grid>
+        <Grid item container md={12} onClick={() => setIsExpanded(!isExpanded)}>
+          <Grid
+            item
+            md={1}
+            onClick={titleAction}
+            sx={{
+              alignSelf: "center",
+              justifySelf: "center",
+              cursor: "pointer",
+            }}
+          >
+            <TiltedChainIcon />
           </Grid>
-        </ButtonBase>
+
+          <Grid
+            item
+            md={11}
+            sx={{
+              textAlign: "left",
+              whiteSpace: "normal",
+            }}
+          >
+            <Typography
+              variant="detailTitle"
+              sx={{ color: isOnHover ? theme.palette.primary.main : "inherit" }}
+            >
+              {title ? title : "[ NO TITLE ]"}
+            </Typography>
+          </Grid>
+        </Grid>
       </Grid>
-      <CollapseBtn
-        onClick={() => {
-          setIsExpanded(!isExpanded);
-        }}
-        expanded={isExpanded}
-      />
+      <CollapseBtn setIsExpanded={setIsExpanded} isExpanded={isExpanded} />
       <Grid item md={12}>
         <Collapse in={isExpanded}>
           {children ? children : "[ NO CONTENT ]"}
         </Collapse>
       </Grid>
-    </StyledItemGrid>
+    </Grid>
   );
 };
 
