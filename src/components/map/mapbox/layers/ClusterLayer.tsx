@@ -7,6 +7,7 @@ import {
   createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
+  findMostVisiblePoint,
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
@@ -128,7 +129,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       map?.addSource(clusterSourceId, {
         type: "geojson",
-        data: createCenterOfMassDataSource(undefined),
+        data: findMostVisiblePoint(
+          createCenterOfMassDataSource(undefined),
+          map
+        ),
         cluster: true,
         clusterMaxZoom: config.clusterMaxZoom,
         clusterRadius: 50,
@@ -242,7 +246,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
       (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createCenterOfMassDataSource(collections)
+        findMostVisiblePoint(createCenterOfMassDataSource(collections), map)
       );
     }
   }, [map, clusterSourceId, collections]);

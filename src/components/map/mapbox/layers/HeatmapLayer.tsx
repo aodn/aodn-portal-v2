@@ -7,6 +7,7 @@ import {
   createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
+  findMostVisiblePoint,
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup from "../component/MapPopup";
@@ -126,7 +127,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     // and therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
-      const dataSource = createCenterOfMassDataSource(undefined);
+      const dataSource = findMostVisiblePoint(
+        createCenterOfMassDataSource(undefined),
+        map
+      );
 
       const config = mergeWithDefaults(
         defaultHeatmapConfig,
@@ -290,7 +294,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   }, [map]);
 
   const updateSource = useCallback(() => {
-    const newData = createCenterOfMassDataSource(collections);
+    const newData = findMostVisiblePoint(
+      createCenterOfMassDataSource(collections),
+      map
+    );
     if (map?.getSource(heatmapSourceId)) {
       (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
     }

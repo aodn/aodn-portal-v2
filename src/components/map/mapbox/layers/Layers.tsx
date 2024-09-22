@@ -4,8 +4,9 @@ import {
   FeatureCollection,
   GeoJsonProperties,
   Geometry,
+  Point,
 } from "geojson";
-import { MapMouseEvent } from "mapbox-gl";
+import { LngLat, LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
@@ -36,10 +37,10 @@ const createStaticLayers = (ids: Array<string>) => (
 // in a collection to the FeatureCollection
 const createCenterOfMassDataSource = (
   collections: Array<OGCCollection> | undefined
-): FeatureCollection => {
-  const featureCollections: FeatureCollection = {
+): FeatureCollection<Point> => {
+  const featureCollections: FeatureCollection<Point> = {
     type: "FeatureCollection",
-    features: new Array<Feature<Geometry, GeoJsonProperties>>(),
+    features: new Array<Feature<Point, GeoJsonProperties>>(),
   };
 
   collections?.forEach((collection) => {
@@ -54,6 +55,60 @@ const createCenterOfMassDataSource = (
   });
 
   return featureCollections;
+};
+
+// Function to check if a point is within the map's visible bounds
+const isFeatureVisible = (
+  feature: Feature<Point, GeoJsonProperties>,
+  map: mapboxgl.Map
+): boolean => {
+  const bounds: LngLatBounds = map.getBounds();
+  const coordinates = feature.geometry.coordinates as [number, number];
+  const lngLat = new LngLat(coordinates[0], coordinates[1]);
+  return bounds.contains(lngLat);
+};
+
+// Function to determine the most "visible" point
+const findMostVisiblePoint = (
+  featureCollection: FeatureCollection<Point>,
+  map: mapboxgl.Map | null | undefined
+): FeatureCollection<Geometry> => {
+  const featureCollections: FeatureCollection<Point> = {
+    type: "FeatureCollection",
+    features: new Array<Feature<Point, GeoJsonProperties>>(),
+  };
+  if (!map) return featureCollection;
+
+  // Filter the points that are visible
+  const visibleFeatures = featureCollection.features.filter((feature) =>
+    isFeatureVisible(feature, map)
+  );
+
+  if (visibleFeatures.length === 0) return featureCollections;
+
+  // If more than one point is visible, we select one (e.g., based on proximity to the center)
+  // This part can be adjusted based on criteria (distance from center, zoom, etc.)
+  const mapCenter = map.getCenter();
+  visibleFeatures.sort((a, b) => {
+    const distA = mapCenter.distanceTo(
+      new LngLat(a.geometry.coordinates[0], a.geometry.coordinates[1])
+    );
+    const distB = mapCenter.distanceTo(
+      new LngLat(b.geometry.coordinates[0], b.geometry.coordinates[1])
+    );
+    return distA - distB; // Sort by proximity to the map center
+  });
+  // Since it is sorted by distance, we just need to add a feature once
+  // based on uuid.
+  const uniqueFeatures = new Map<string, Feature<Point, GeoJsonProperties>>();
+  for (const feature of visibleFeatures) {
+    if (!uniqueFeatures.has(feature.properties?.uuid)) {
+      uniqueFeatures.set(feature.properties?.uuid, feature);
+    }
+  }
+  // Get all values
+  featureCollections.features = [...uniqueFeatures.values()];
+  return featureCollections; // Return the most visible point (closest to center)
 };
 
 const defaultMouseEnterEventHandler = (ev: MapMouseEvent): void => {
@@ -75,4 +130,5 @@ export {
   createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
+  findMostVisiblePoint,
 };
