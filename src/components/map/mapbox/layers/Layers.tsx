@@ -10,6 +10,7 @@ import { LngLat, LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
+import * as turf from "@turf/turf";
 
 export interface LayersProps {
   // Tile layer should added to map
@@ -87,14 +88,14 @@ const findMostVisiblePoint = (
 
   // If more than one point is visible, we select one (e.g., based on proximity to the center)
   // This part can be adjusted based on criteria (distance from center, zoom, etc.)
-  const mapCenter = map.getCenter();
+  const mapCenter = turf.point([map.getCenter().lng, map.getCenter().lat]);
   visibleFeatures.sort((a, b) => {
-    const distA = mapCenter.distanceTo(
-      new LngLat(a.geometry.coordinates[0], a.geometry.coordinates[1])
-    );
-    const distB = mapCenter.distanceTo(
-      new LngLat(b.geometry.coordinates[0], b.geometry.coordinates[1])
-    );
+    const distA = turf.distance(mapCenter, a.geometry.coordinates, {
+      units: "kilometers",
+    });
+    const distB = turf.distance(mapCenter, b.geometry.coordinates, {
+      units: "kilometers",
+    });
     return distA - distB; // Sort by proximity to the map center
   });
   // Since it is sorted by distance, we just need to add a feature once
