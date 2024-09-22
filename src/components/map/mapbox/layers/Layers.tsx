@@ -60,12 +60,10 @@ const createCenterOfMassDataSource = (
 // Function to check if a point is within the map's visible bounds
 const isFeatureVisible = (
   feature: Feature<Point, GeoJsonProperties>,
-  map: mapboxgl.Map
+  bounds: LngLatBounds
 ): boolean => {
-  const bounds: LngLatBounds = map.getBounds();
   const coordinates = feature.geometry.coordinates as [number, number];
-  const lngLat = new LngLat(coordinates[0], coordinates[1]);
-  return bounds.contains(lngLat);
+  return bounds.contains(coordinates);
 };
 
 // Function to determine the most "visible" point
@@ -79,9 +77,10 @@ const findMostVisiblePoint = (
   };
   if (!map) return featureCollection;
 
+  const bounds: LngLatBounds = map.getBounds();
   // Filter the points that are visible
   const visibleFeatures = featureCollection.features.filter((feature) =>
-    isFeatureVisible(feature, map)
+    isFeatureVisible(feature, bounds)
   );
 
   if (visibleFeatures.length === 0) return featureCollections;
@@ -99,7 +98,8 @@ const findMostVisiblePoint = (
     return distA - distB; // Sort by proximity to the map center
   });
   // Since it is sorted by distance, we just need to add a feature once
-  // based on uuid.
+  // based on uuid. So each uuid appear once with the visible area and
+  // it is as close to center as it can.
   const uniqueFeatures = new Map<string, Feature<Point, GeoJsonProperties>>();
   for (const feature of visibleFeatures) {
     if (!uniqueFeatures.has(feature.properties?.uuid)) {
