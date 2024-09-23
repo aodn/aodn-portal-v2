@@ -3,7 +3,10 @@ import { Grid, GridProps, useTheme } from "@mui/material";
 interface TextAreaGridProps extends GridProps {
   children: React.ReactNode;
 }
-const TextAreaGrid: React.FC<TextAreaGridProps> = ({ children, ...props }) => {
+const TextAreaBaseGrid: React.FC<TextAreaGridProps> = ({
+  children,
+  ...props
+}) => {
   const theme = useTheme();
   return (
     <Grid
@@ -19,4 +22,4 @@ const TextAreaGrid: React.FC<TextAreaGridProps> = ({ children, ...props }) => {
   );
 };
 
-export default TextAreaGrid;
+export default TextAreaBaseGrid;

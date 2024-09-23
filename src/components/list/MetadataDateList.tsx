@@ -1,6 +1,6 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
-import StyledItemGrid from "./listItem/StyledItemGrid";
+import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { Grid, Typography, useTheme } from "@mui/material";
 
 interface MetadataDateListProps {
@@ -15,7 +15,7 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
   const theme = useTheme();
   const metadataDateItem =
     creation || revision ? (
-      <StyledItemGrid container key="Metadata date">
+      <ItemBaseGrid container key="Metadata date">
         {creation && (
           <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
             <Typography variant="detailContent">
@@ -33,7 +33,7 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
             </Typography>
           </Grid>
         )}
-      </StyledItemGrid>
+      </ItemBaseGrid>
     ) : undefined;
 
   return (
