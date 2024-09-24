@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import TextAreaGrid from "./TextAreaGrid";
+import TextAreaBaseGrid from "./TextAreaBaseGrid";
 import { Button, Grid, Typography } from "@mui/material";
 
 interface ExpandableTextAreaProps {
@@ -26,7 +26,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   }, []);
 
   return (
-    <TextAreaGrid>
+    <TextAreaBaseGrid>
       <Grid item md={12}>
         <Typography
           variant="detailContent"
@@ -47,11 +47,11 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
       <Grid item md={12} display="flex" justifyContent="flex-end">
         {doesNeedTruncation && (
           <Button onClick={onButtonClick}>
-            {isExpanded ? "show less" : "show more"}
+            {isExpanded ? "Show Less" : "Show More"}
           </Button>
         )}
       </Grid>
-    </TextAreaGrid>
+    </TextAreaBaseGrid>
   );
 };
 

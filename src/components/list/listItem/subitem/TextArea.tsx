@@ -1,6 +1,6 @@
 import React from "react";
 import { Typography } from "@mui/material";
-import TextAreaGrid from "./TextAreaGrid";
+import TextAreaBaseGrid from "./TextAreaBaseGrid";
 
 interface TextAreaProps {
   text: string;
@@ -8,9 +8,9 @@ interface TextAreaProps {
 
 const TextArea: React.FC<TextAreaProps> = ({ text }) => {
   return (
-    <TextAreaGrid>
+    <TextAreaBaseGrid>
       <Typography variant="detailContent">{text}</Typography>
-    </TextAreaGrid>
+    </TextAreaBaseGrid>
   );
 };
 
