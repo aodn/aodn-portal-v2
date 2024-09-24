@@ -129,8 +129,11 @@ const findMostVisiblePoint = (
       uniqueFeatures.set(feature.properties?.uuid, f ? f : feature);
     }
   }
-  // Get all values
-  featureCollections.features = [...uniqueFeatures.values()];
+  // Get all values and sort by uuid because cluster map require
+  // consistance sorting order. Used map and get values() destroy order
+  featureCollections.features = [...uniqueFeatures.values()].sort((a, b) =>
+    a.properties?.uuid.localeCompare(b.properties?.uuid)
+  );
   return featureCollections; // Return the most visible point (closest to center)
 };
 
