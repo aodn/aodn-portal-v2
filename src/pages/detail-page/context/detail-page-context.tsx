@@ -8,6 +8,7 @@ export interface SpatialExtentPhoto {
 interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
+  isCollectionNotFound: boolean;
   photos: SpatialExtentPhoto[];
   setPhotos: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   extentsPhotos: SpatialExtentPhoto[] | undefined;
@@ -23,6 +24,7 @@ interface DetailPageContextType {
 const DetailPageContextDefault = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
+  isCollectionNotFound: true,
   photos: [] as SpatialExtentPhoto[],
   setPhotos: () => {},
   extentsPhotos: [] as SpatialExtentPhoto[],
