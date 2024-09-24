@@ -34,21 +34,13 @@ const CollapseAssociatedRecordItem: React.FC<
             onClick={titleAction}
             sx={{
               alignSelf: "center",
-              justifySelf: "center",
               cursor: "pointer",
             }}
           >
             <TiltedChainIcon />
           </Grid>
 
-          <Grid
-            item
-            md={11}
-            sx={{
-              textAlign: "left",
-              whiteSpace: "normal",
-            }}
-          >
+          <Grid item md={11}>
             <Typography
               variant="detailTitle"
               sx={{ color: isOnHover ? theme.palette.primary.main : "inherit" }}

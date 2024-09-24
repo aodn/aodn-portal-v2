@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "./NavigatablePanel";
-import TextList from "../../../../components/list/TextList";
 import { convertDateFormat } from "../../../../utils/DateUtils";
 import MetadataUrlList from "../../../../components/list/MetadataUrlList";
 import MetadataContactList from "../../../../components/list/MetadataContactList";
 import MetadataDateList from "../../../../components/list/MetadataDateList";
+import MetadataIdentifierList from "../../../../components/list/MetadataIdentifierList";
 
 const MetadataInformationPanel = () => {
   const context = useDetailPageContext();
@@ -72,12 +72,7 @@ const MetadataInformationPanel = () => {
       },
       {
         title: "Metadata Identifier",
-        component: (
-          <TextList
-            title="Metadata Identifier"
-            texts={metadataId ? [metadataId] : []}
-          />
-        ),
+        component: <MetadataIdentifierList identifier={metadataId ?? ""} />,
       },
       {
         title: "Full Metadata Link",
