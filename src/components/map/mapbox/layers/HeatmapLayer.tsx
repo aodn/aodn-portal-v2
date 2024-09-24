@@ -1,4 +1,11 @@
-import { FC, useCallback, useContext, useEffect, useMemo } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 
 import { Expression, GeoJSONSource, StyleFunction } from "mapbox-gl";
@@ -14,6 +21,7 @@ import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
+import { FeatureCollection, Geometry, Point } from "geojson";
 
 interface HeatmapLayer {
   maxZoom: number;
@@ -103,6 +111,9 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
+  const [lastVisiblePoint, setLastVisiblePoint] = useState<
+    FeatureCollection<Point> | undefined
+  >(undefined);
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
@@ -294,16 +305,20 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   }, [map]);
 
   const updateSource = useCallback(() => {
-    const newData = findMostVisiblePoint(
-      createCenterOfMassDataSource(collections),
-      map
-    );
-    if (map?.getSource(heatmapSourceId)) {
-      (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
-    }
-    if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
-    }
+    setLastVisiblePoint((p) => {
+      const newData = findMostVisiblePoint(
+        createCenterOfMassDataSource(collections),
+        map,
+        p
+      );
+      if (map?.getSource(heatmapSourceId)) {
+        (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
+      }
+      if (map?.getSource(clusterSourceId)) {
+        (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
+      }
+      return newData;
+    });
   }, [map, heatmapSourceId, clusterSourceId, collections]);
 
   useEffect(() => {

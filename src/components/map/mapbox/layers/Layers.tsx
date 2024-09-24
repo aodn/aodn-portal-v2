@@ -45,14 +45,27 @@ const createCenterOfMassDataSource = (
   };
 
   collections?.forEach((collection) => {
-    // We skip the first one which is the overall bounding box, then add the remaining
-    collection.getCentroid()?.forEach((i) =>
-      featureCollections.features.push({
-        ...i,
-        // Add the id so we can reference it easily
-        properties: { uuid: collection.id },
-      })
-    );
+    if (collection.getCentroid()) {
+      // If data contains pre-calculated centroid then use it
+      collection.getCentroid()?.forEach((i) =>
+        featureCollections.features.push({
+          ...i,
+          // Add the id so we can reference it easily
+          properties: { uuid: collection.id },
+        })
+      );
+    } else {
+      // Do calculation based on extents bounding box, this is old way of doing things
+      // for backward compatable
+      // We skip the first one which is the overall bounding box, then add the remaining
+      collection.extent?.getGeojsonExtents(1).features.forEach((i) =>
+        featureCollections.features.push({
+          ...turf.centerOfMass(i.geometry),
+          // Add the id so we can reference it easily
+          properties: { uuid: collection.id },
+        })
+      );
+    }
   });
 
   return featureCollections;
@@ -70,8 +83,9 @@ const isFeatureVisible = (
 // Function to determine the most "visible" point
 const findMostVisiblePoint = (
   featureCollection: FeatureCollection<Point>,
-  map: mapboxgl.Map | null | undefined
-): FeatureCollection<Geometry> => {
+  map: mapboxgl.Map | null | undefined = undefined,
+  currentVisibleCollection: FeatureCollection<Point> | undefined = undefined
+): FeatureCollection<Point> => {
   const featureCollections: FeatureCollection<Point> = {
     type: "FeatureCollection",
     features: new Array<Feature<Point, GeoJsonProperties>>(),
@@ -102,9 +116,17 @@ const findMostVisiblePoint = (
   // based on uuid. So each uuid appear once with the visible area and
   // it is as close to center as it can.
   const uniqueFeatures = new Map<string, Feature<Point, GeoJsonProperties>>();
+
   for (const feature of visibleFeatures) {
-    if (!uniqueFeatures.has(feature.properties?.uuid)) {
-      uniqueFeatures.set(feature.properties?.uuid, feature);
+    const id = feature.properties?.uuid;
+    if (!uniqueFeatures.has(id)) {
+      // Is this point visible in previous search? If yes then we prefer this
+      // point over the most center point, this helps to reduce point change
+      // for the same visible record
+      const f = currentVisibleCollection?.features?.find(
+        (o) => o.properties?.uuid === id
+      );
+      uniqueFeatures.set(feature.properties?.uuid, f ? f : feature);
     }
   }
   // Get all values

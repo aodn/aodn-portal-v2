@@ -1,4 +1,11 @@
-import { FC, useCallback, useContext, useEffect, useMemo } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 import { GeoJSONSource } from "mapbox-gl";
 import MapPopup from "../component/MapPopup";
@@ -12,6 +19,7 @@ import {
 import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
+import { FeatureCollection, Point } from "geojson";
 
 interface ClusterSize {
   default?: number | string;
@@ -96,6 +104,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   clusterLayerConfig,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
+  const [lastVisiblePoint, setLastVisiblePoint] = useState<
+    FeatureCollection<Point> | undefined
+  >(undefined);
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
@@ -245,9 +256,15 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        findMostVisiblePoint(createCenterOfMassDataSource(collections), map)
-      );
+      setLastVisiblePoint((p) => {
+        const newData = findMostVisiblePoint(
+          createCenterOfMassDataSource(collections),
+          map,
+          p
+        );
+        (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
+        return newData;
+      });
     }
   }, [map, clusterSourceId, collections]);
 
