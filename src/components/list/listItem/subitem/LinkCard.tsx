@@ -35,13 +35,18 @@ const LinkCard = ({
     >
       <Grid container>
         <Grid item xs={2}>
-          {(isShowCopyLinkButton || hasBeenCopied) && (
+          <Box
+            sx={{
+              visibility:
+                isShowCopyLinkButton || hasBeenCopied ? "visible" : "hidden",
+            }}
+          >
             <CopyLinkButton
               index={index}
               setClickedCopyLinkButtonIndex={setClickedCopyLinkButtonIndex}
               copyUrl={link.href}
             />
-          )}
+          </Box>
         </Grid>
         <Grid item xs={10}>
           <Grid container spacing={1} aria-label="link and title">
