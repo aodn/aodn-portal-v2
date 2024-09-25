@@ -20,10 +20,12 @@ import PlainAccordion from "../../../../components/common/accordion/PlainAccordi
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
 import { selects } from "../tab-panels/AbstractAndDownloadPanel";
+import { useDetailPageContext } from "../../context/detail-page-context";
 
 const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(false);
+  const { isCollectionNotFound } = useDetailPageContext();
 
   const selectSxProps = {
     height: "30px",
@@ -36,10 +38,17 @@ const DownloadCard = () => {
   return (
     <Stack direction="column">
       <Stack sx={{ padding: padding.medium }} spacing={2}>
-        <CommonSelect items={selects.download.options} sx={selectSxProps} />
+        <CommonSelect
+          items={selects.download.options}
+          sx={selectSxProps}
+          disabled={isCollectionNotFound}
+        />
         <Button
+          disabled={isCollectionNotFound}
           sx={{
-            backgroundColor: theme.palette.primary.main,
+            backgroundColor: isCollectionNotFound
+              ? "lightGrey"
+              : theme.palette.primary.main,
             borderRadius: borderRadius.small,
             ":hover": {
               backgroundColor: theme.palette.primary.main,
@@ -58,6 +67,7 @@ const DownloadCard = () => {
         onChange={() => setAccordionExpanded((prevState) => !prevState)}
       >
         <AccordionSummary
+          disabled={isCollectionNotFound}
           sx={{ paddingX: padding.medium }}
           expandIcon={<ExpandMoreIcon />}
         >

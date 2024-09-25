@@ -17,6 +17,7 @@ export interface CommonSelectProps<T = string> {
   items: SelectItem<T>[];
   onSelectCallback?: (value: T) => void;
   sx?: SxProps;
+  disabled?: boolean;
 }
 
 const DEFAULT_SELECT_STYLE: SxProps = {
@@ -36,6 +37,7 @@ const CommonSelect: FC<CommonSelectProps> = ({
   items,
   onSelectCallback,
   sx,
+  disabled = false,
 }) => {
   const [selectedItem, setSelectedItem] = useState<string>(items[0].value);
 
@@ -46,7 +48,7 @@ const CommonSelect: FC<CommonSelectProps> = ({
   };
 
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth disabled={disabled}>
       <Select
         value={selectedItem}
         onChange={handleOnChange}
