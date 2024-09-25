@@ -4,6 +4,7 @@ import { fetchResultByUuidNoStore } from "../../../components/common/store/searc
 import { DetailPageContext, SpatialExtentPhoto } from "./detail-page-context";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../components/common/store/hooks";
+import { HttpStatusCode } from "axios";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -17,6 +18,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
+  const [isCollectionNotFound, setIsCollectionNotFound] =
+    useState<boolean>(false);
   const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
   const [extentsPhotos, setExtentsPhotos] = useState<SpatialExtentPhoto[]>([]);
   const [photoHovered, setPhotoHovered] = useState<SpatialExtentPhoto>();
@@ -40,6 +43,12 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       .unwrap()
       .then((collection) => {
         setCollection(collection);
+        setIsCollectionNotFound(false);
+      })
+      .catch((error) => {
+        if (error.statusCode && error.statusCode === HttpStatusCode.NotFound) {
+          setIsCollectionNotFound(true);
+        }
       });
   }, [dispatch, location.search]);
 
@@ -48,6 +57,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       value={{
         collection,
         setCollection,
+        isCollectionNotFound,
         photos,
         setPhotos,
         extentsPhotos,
