@@ -1,6 +1,7 @@
 import * as React from "react";
+import { useEffect } from "react";
 import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
+import Tab, { TabProps } from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import {
   border,
@@ -21,6 +22,7 @@ interface Tab {
 
 interface TabsPanelProps {
   tabs: Tab[];
+  isCollectionNotFound: boolean;
 }
 
 interface TabPanelProps {
@@ -52,7 +54,17 @@ function a11yProps(index: number) {
   };
 }
 
-const TabsPanelContainer: React.FC<TabsPanelProps> = ({ tabs }) => {
+const TabsPanelContainer: React.FC<TabsPanelProps> = ({
+  tabs,
+  isCollectionNotFound,
+}) => {
+  // if no collection found, unfocus the tab
+  useEffect(() => {
+    if (isCollectionNotFound) {
+      setValue(-1);
+    }
+  }, [isCollectionNotFound]);
+
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -76,6 +88,7 @@ const TabsPanelContainer: React.FC<TabsPanelProps> = ({ tabs }) => {
             label={tab.label}
             {...a11yProps(index)}
             sx={{ textTransform: "none" }}
+            disabled={isCollectionNotFound}
           />
         ))}
       </StyledTabs>
@@ -121,21 +134,17 @@ const StyledTabs = styled((props: StyledTabsProps) => (
   },
 });
 
-interface StyledTabProps {
-  label: string;
-}
-
-const StyledTab = styled((props: StyledTabProps) => (
+const StyledTab = styled((props: TabProps) => (
   <Tab
     disableRipple
     {...props}
     sx={{ margin: `${margin.xxlg} ${margin.lg}` }}
   />
-))(({ theme }) => ({
+))(({ theme, disabled }) => ({
   textTransform: "none",
   fontWeight: fontWeight.regular,
   color: fontColor.gray.dark,
-  border: `${border.xs}  ${color.tabPanel.tabOnFocused}`,
+  border: `${border.xs}  ${disabled ? "#AAA" : color.tabPanel.tabOnFocused}`,
   borderRadius: borderRadius.xxlg,
   "&.Mui-selected": {
     color: "#fff",
