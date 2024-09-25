@@ -55,10 +55,7 @@ const ContentSection: FC = () => {
         borderRadius: borderRadius.small,
       }}
     >
-      <TabsPanelContainer
-        tabs={tabs}
-        isCollectionNotFound={isCollectionNotFound}
-      />
+      <TabsPanelContainer tabs={tabs} />
       {isCollectionNotFound && (
         <Grid container sx={{ height: "1000px" }}>
           <RecordNotFoundPanel />

@@ -17,9 +17,7 @@ const RecordNotFoundPanel = () => {
         backgroundColor: rgba,
         margin: theme.mp.xxlg,
         borderRadius: theme.borderRadius.sm,
-        // width: "99%",
         height: "120px",
-        // padding: `${theme.mp.sm} ${theme.mp.xlg}`,
         paddingY: theme.mp.xxlg,
         border: border,
       }}

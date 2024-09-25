@@ -13,6 +13,7 @@ import {
   padding,
 } from "../../styles/constants";
 import { styled } from "@mui/material";
+import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 
 interface Tab {
   label: string;
@@ -22,7 +23,6 @@ interface Tab {
 
 interface TabsPanelProps {
   tabs: Tab[];
-  isCollectionNotFound: boolean;
 }
 
 interface TabPanelProps {
@@ -54,10 +54,8 @@ function a11yProps(index: number) {
   };
 }
 
-const TabsPanelContainer: React.FC<TabsPanelProps> = ({
-  tabs,
-  isCollectionNotFound,
-}) => {
+const TabsPanelContainer: React.FC<TabsPanelProps> = ({ tabs }) => {
+  const { isCollectionNotFound } = useDetailPageContext();
   // if no collection found, unfocus the tab
   useEffect(() => {
     if (isCollectionNotFound) {
