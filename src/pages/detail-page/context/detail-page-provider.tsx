@@ -43,6 +43,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       .unwrap()
       .then((collection) => {
         setCollection(collection);
+        setIsCollectionNotFound(false);
       })
       .catch((error) => {
         if (error.statusCode && error.statusCode === HttpStatusCode.NotFound) {
