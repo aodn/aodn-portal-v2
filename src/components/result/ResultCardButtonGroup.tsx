@@ -17,7 +17,8 @@ interface ResultCardButtonGroupProps {
         stac: OGCCollection
       ) => void)
     | undefined;
-  onDetail: () => void;
+  onDetail?: () => void;
+  onLink?: () => void;
   isGridView?: boolean;
   shouldHideText?: boolean;
 }
@@ -78,6 +79,7 @@ const renderStatusButton = (
 const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
   onDetail,
+  onLink,
   isGridView,
   shouldHideText = false,
 }) => {
@@ -105,6 +107,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
             startIcon={LinkIcon}
             text={generateLinkText(content.getDistributionLinks()!.length)}
             shouldHideText={shouldHideText}
+            onClick={onLink}
           />
         )}
       </ButtonContainer>

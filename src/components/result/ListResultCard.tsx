@@ -18,9 +18,11 @@ import {
   padding,
 } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import { FC, useCallback, useState } from "react";
+import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
+import useTabNavigation from "../../hooks/useTabNavigation";
+import { pageDefault } from "../common/constants";
 
 interface ResultCardProps {
   content: OGCCollection | undefined;
@@ -36,20 +38,20 @@ interface ResultCardProps {
 }
 
 const handleNavigateToDetail = (
-  content: OGCCollection | undefined,
+  uuid: string,
   onDetail?: ((uuid: string) => void) | undefined
 ) => {
-  if (onDetail && content && content.id) {
-    onDetail(content.id);
+  if (onDetail && uuid) {
+    onDetail(uuid);
   }
 };
 
 const handleShowSpatialExtents = (
-  content: OGCCollection | undefined,
+  uuid: string,
   onClickCard?: ((uuid: string) => void) | undefined
 ) => {
-  if (onClickCard && content && content.id) {
-    onClickCard(content.id);
+  if (onClickCard && uuid) {
+    onClickCard(uuid);
   }
 };
 
@@ -62,13 +64,23 @@ const ListResultCard: FC<ResultCardProps> = ({
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
+  const navigateToTab = useTabNavigation();
 
   if (!content) return;
+  const { id: uuid, title, description, findIcon, findThumbnail } = content;
+
+  const handleNavigateToTab = (uuid: string, tab: string) => {
+    const searchParams = new URLSearchParams();
+    searchParams.append("uuid", uuid);
+    if (uuid) {
+      navigateToTab(pageDefault.details + "?" + searchParams.toString(), tab);
+    }
+  };
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card
-      id={`result-card-${content.id}`}
+      id={`result-card-${uuid}`}
       elevation={isSelectedDataset ? 2 : 0}
       sx={{
         position: "relative",
@@ -98,7 +110,7 @@ const ListResultCard: FC<ResultCardProps> = ({
       >
         <Tooltip title="More details ..." placement="top">
           <CardActionArea
-            onClick={() => handleNavigateToDetail(content, onDetail)}
+            onClick={() => handleNavigateToDetail(uuid, onDetail)}
           >
             <Box
               display="flex"
@@ -120,14 +132,14 @@ const ListResultCard: FC<ResultCardProps> = ({
                 }}
                 data-testid="result-card-title"
               >
-                {content.title}
+                {title}
               </Typography>
             </Box>
           </CardActionArea>
         </Tooltip>
 
         <CardActionArea
-          onClick={() => handleShowSpatialExtents(content, onClickCard)}
+          onClick={() => handleShowSpatialExtents(uuid, onClickCard)}
           sx={{ flex: 1 }}
         >
           <Typography
@@ -144,14 +156,15 @@ const ListResultCard: FC<ResultCardProps> = ({
               wordBreak: "break-word",
             }}
           >
-            {content.description}
+            {description}
           </Typography>
         </CardActionArea>
         {(isSelectedDataset || showButtons) && (
           <ResultCardButtonGroup
             content={content}
-            onDownload={onDownload}
-            onDetail={() => handleNavigateToDetail(content, onDetail)}
+            onDownload={() => handleNavigateToTab(uuid, "abstract")}
+            onDetail={() => handleNavigateToDetail(uuid, onDetail)}
+            onLink={() => handleNavigateToTab(uuid, "links")}
             shouldHideText
           />
         )}
@@ -167,7 +180,7 @@ const ListResultCard: FC<ResultCardProps> = ({
       >
         <Box display="flex" flexDirection="row">
           <OrganizationLogo
-            logo={content.findIcon()}
+            logo={findIcon()}
             sx={{
               width: "auto",
               maxWidth: "100px",
@@ -197,7 +210,7 @@ const ListResultCard: FC<ResultCardProps> = ({
         </Box>
         <Box height="90px" width="100%">
           <img
-            src={content.findThumbnail()}
+            src={findThumbnail()}
             alt="org_logo"
             style={{
               objectFit: "cover",
