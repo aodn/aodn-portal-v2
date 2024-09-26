@@ -6,11 +6,13 @@ import { FC } from "react";
 import AbstractAndDownloadPanel from "./tab-panels/AbstractAndDownloadPanel";
 import LineagePanel from "./tab-panels/LineagePanel";
 import AssociatedRecordsPanel from "./tab-panels/AssociatedRecordsPanel";
+import { Card, Grid } from "@mui/material";
+import { borderRadius } from "../../../styles/constants";
+import { useDetailPageContext } from "../context/detail-page-context";
+import RecordNotFoundPanel from "./tab-panels/RecordNotFoundPanel";
 import TabsPanelContainer, {
   Tab,
 } from "../../../components/details/TabsPanelContainer";
-import { Card } from "@mui/material";
-import { borderRadius } from "../../../styles/constants";
 
 export const TABS: Tab[] = [
   {
@@ -46,6 +48,7 @@ export const TABS: Tab[] = [
 ];
 
 const ContentSection: FC = () => {
+  const { isCollectionNotFound } = useDetailPageContext();
   return (
     <Card
       sx={{
@@ -54,6 +57,12 @@ const ContentSection: FC = () => {
       }}
     >
       <TabsPanelContainer tabs={TABS} />
+
+      {isCollectionNotFound && (
+        <Grid container sx={{ height: "1000px" }}>
+          <RecordNotFoundPanel />
+        </Grid>
+      )}
     </Card>
   );
 };

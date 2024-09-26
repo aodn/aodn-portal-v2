@@ -107,13 +107,19 @@ const theme: ThemeOptions = {
       dark: "#2F4F6C",
     },
     info: {
-      main: "#000000",
-      light: "#000000",
+      main: "#000000", // not in use yet, so set to black
+      light: "#000000", // not in use yet, so set to black
       dark: "#3A6F8F",
     },
     common: {
       white: "#FFF",
       black: "#000",
+    },
+    warning: {
+      main: "#E76F51",
+      light: "#000000", // not in use yet, so set to black
+      dark: "#000000", // not in use yet, so set to black
+      contrastText: "#000000", // not in use yet, so set to black
     },
     success: {
       main: "#4CAF50",

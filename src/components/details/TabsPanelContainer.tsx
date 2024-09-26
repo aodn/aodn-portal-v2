@@ -6,6 +6,7 @@ import StyledTab from "../common/tab/StyledTab";
 import { useLocation } from "react-router-dom";
 import { FC, SyntheticEvent, useEffect, useState } from "react";
 import { TABS } from "../../pages/detail-page/subpages/ContentSection";
+import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 
 export interface Tab {
   label: string;
@@ -46,6 +47,14 @@ function a11yProps(index: number) {
 }
 
 const TabsPanelContainer: FC<TabsPanelProps> = () => {
+  const { isCollectionNotFound } = useDetailPageContext();
+  // if no collection found, unfocus the tab
+  useEffect(() => {
+    if (isCollectionNotFound) {
+      setValue(-1);
+    }
+  }, [isCollectionNotFound]);
+
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -96,6 +105,7 @@ const TabsPanelContainer: FC<TabsPanelProps> = () => {
             label={tab.label}
             {...a11yProps(index)}
             sx={{ textTransform: "none" }}
+            disabled={isCollectionNotFound}
           />
         ))}
       </StyledTabs>
