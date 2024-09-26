@@ -33,7 +33,10 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
             </Grid>
             <Grid item md={11} sx={{ textAlign: "left", whiteSpace: "normal" }}>
               <Link href={`mailto:${email ? email : ""}`}>
-                <Typography variant="detailTitle">
+                <Typography
+                  variant="detailTitle"
+                  data-testid="metadata-contact-title"
+                >
                   {contact.organization + suffix}
                 </Typography>
               </Link>

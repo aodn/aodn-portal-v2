@@ -32,6 +32,7 @@ const LinkCard = ({
           backgroundColor: color.blue.light,
         },
       }}
+      data-testid="links-card"
     >
       <Grid container>
         <Grid item xs={2}>

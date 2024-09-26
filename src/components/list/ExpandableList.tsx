@@ -39,7 +39,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
       {!childrenList || childrenList.length === 0 ? (
         <NaList title={title ? title : ""} />
       ) : (
-        <Grid item container md={12}>
+        <Grid item container md={12} data-testid={`collapse-list-${title}`}>
           {childrenList.map((child) => {
             showingCollapseCount++;
             if (!isShowingMore && showingCollapseCount > 5) {

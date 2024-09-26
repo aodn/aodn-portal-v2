@@ -6,8 +6,10 @@ import SpatialCoverageCard from "./side-cards/SpatialCoverageCard";
 import TimePeriodCard from "./side-cards/TimePeriodCard";
 import ThemesCard from "./side-cards/ThemesCard";
 import RatingsAndCommentsCard from "./side-cards/RatingsAndCommentsCard";
+import { useDetailPageContext } from "../context/detail-page-context";
 
 const SideSection = () => {
+  const { isCollectionNotFound } = useDetailPageContext();
   return (
     <Stack direction="column" spacing={2}>
       <Card
@@ -18,11 +20,11 @@ const SideSection = () => {
       >
         <DownloadCard />
       </Card>
-      <OverviewCard />
-      <SpatialCoverageCard />
-      <TimePeriodCard />
-      <ThemesCard />
-      <RatingsAndCommentsCard />
+      {!isCollectionNotFound && <OverviewCard />}
+      {!isCollectionNotFound && <SpatialCoverageCard />}
+      {!isCollectionNotFound && <TimePeriodCard />}
+      {!isCollectionNotFound && <ThemesCard />}
+      {!isCollectionNotFound && <RatingsAndCommentsCard />}
     </Stack>
   );
 };
