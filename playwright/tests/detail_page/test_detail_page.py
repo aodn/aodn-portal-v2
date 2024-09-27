@@ -82,7 +82,7 @@ def test_contact_details(
     expect(detail_page.page_title).to_have_text(title)
 
     detail_page.click_tab(tab)
-    detail_page.click_button(contact_button)
+    detail_page.get_collapse_item_title(contact_button).click()
 
     expect(detail_page.contact_area.address).to_contain_text(address)
     expect(detail_page.contact_area.phone).to_contain_text(phone)
