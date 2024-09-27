@@ -83,7 +83,7 @@ const isFeatureVisible = (
 };
 
 // Function to determine the most "visible" point
-const findMostVisiblePoint = (
+const findSuitableVisiblePoint = (
   featureCollection: FeatureCollection<Point>,
   map: mapboxgl.Map | null | undefined = undefined,
   currentVisibleCollection: FeatureCollection<Point> | undefined = undefined
@@ -158,5 +158,5 @@ export {
   createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
-  findMostVisiblePoint,
+  findSuitableVisiblePoint,
 };

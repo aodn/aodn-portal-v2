@@ -133,11 +133,11 @@ def test_map_base_layers(
     'head_lng, head_lat, data_title, data_lng, data_lat',
     [
         (
-            '148.50',
-            '-42.49',
+            '137.70',
+            '-33.174',
             'Integrated Marine Observing System (IMOS) - Location of assets',
-            '148.44',
-            '-42.48',
+            '137.70',
+            '-33.174',
         ),
     ],
 )

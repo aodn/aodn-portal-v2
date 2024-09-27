@@ -14,7 +14,7 @@ import {
   createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
-  findMostVisiblePoint,
+  findSuitableVisiblePoint,
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup, { PopupType } from "../component/MapPopup";
@@ -140,7 +140,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     // and therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
-      const dataSource = findMostVisiblePoint(
+      const dataSource = findSuitableVisiblePoint(
         createCenterOfMassDataSource(undefined),
         map
       );
@@ -308,7 +308,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   const updateSource = useCallback(() => {
     setLastVisiblePoint((p) => {
-      const newData = findMostVisiblePoint(
+      const newData = findSuitableVisiblePoint(
         createCenterOfMassDataSource(collections),
         map,
         p

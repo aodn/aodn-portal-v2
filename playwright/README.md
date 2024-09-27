@@ -95,3 +95,7 @@ To install `Conda`, please refer to the [official guide](https://conda.io/projec
 ## Test Report:
 
 Test reports are generated using [pytest-html](https://pytest-html.readthedocs.io/en/latest/). The generated report for the _latest_ test run will be stored inside the `/playwright/reports` directory.
+
+## Debug on VSCode
+
+Install https://playwright.dev/docs/getting-started-vscode Playwright Test for VSCode
