@@ -17,65 +17,28 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import useTabNavigation from "../../hooks/useTabNavigation";
-import { pageDefault } from "../common/constants";
+import { ResultCard } from "./ResultCards";
 
-interface ResultCardProps {
-  content: OGCCollection | undefined;
-  onDownload?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
-  onDetail?: ((uuid: string) => void) | undefined;
-  onClickCard?: ((uuid: string) => void) | undefined;
+interface ListResultCardProps extends ResultCard {
   isSelectedDataset?: boolean;
 }
 
-const handleNavigateToDetail = (
-  uuid: string,
-  onDetail?: ((uuid: string) => void) | undefined
-) => {
-  if (onDetail && uuid) {
-    onDetail(uuid);
-  }
-};
-
-const handleShowSpatialExtents = (
-  uuid: string,
-  onClickCard?: ((uuid: string) => void) | undefined
-) => {
-  if (onClickCard && uuid) {
-    onClickCard(uuid);
-  }
-};
-
 // links here may need to be changed, because only html links are wanted
-const ListResultCard: FC<ResultCardProps> = ({
+const ListResultCard: FC<ListResultCardProps> = ({
   content,
-  onDownload,
-  onDetail,
-  onClickCard,
+  onDownload = () => {},
+  onLink = () => {},
+  onDetail = () => {},
+  onClickCard = () => {},
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
-  const navigateToTab = useTabNavigation();
 
   if (!content) return;
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
-
-  const handleNavigateToTab = (uuid: string, tab: string) => {
-    const searchParams = new URLSearchParams();
-    searchParams.append("uuid", uuid);
-    if (uuid) {
-      navigateToTab(pageDefault.details + "?" + searchParams.toString(), tab);
-    }
-  };
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
@@ -109,9 +72,7 @@ const ListResultCard: FC<ResultCardProps> = ({
         mr={gap.sm}
       >
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea
-            onClick={() => handleNavigateToDetail(uuid, onDetail)}
-          >
+          <CardActionArea onClick={() => onDetail(uuid)}>
             <Box
               display="flex"
               alignItems="center"
@@ -138,10 +99,7 @@ const ListResultCard: FC<ResultCardProps> = ({
           </CardActionArea>
         </Tooltip>
 
-        <CardActionArea
-          onClick={() => handleShowSpatialExtents(uuid, onClickCard)}
-          sx={{ flex: 1 }}
-        >
+        <CardActionArea onClick={() => onClickCard(uuid)} sx={{ flex: 1 }}>
           <Typography
             arial-label="result-list-card-content"
             color={fontColor.gray.medium}
@@ -162,9 +120,9 @@ const ListResultCard: FC<ResultCardProps> = ({
         {(isSelectedDataset || showButtons) && (
           <ResultCardButtonGroup
             content={content}
-            onDownload={() => handleNavigateToTab(uuid, "abstract")}
-            onDetail={() => handleNavigateToDetail(uuid, onDetail)}
-            onLink={() => handleNavigateToTab(uuid, "links")}
+            onDownload={() => onDownload(uuid, "abstract", "download-section")}
+            onDetail={() => onDetail(uuid)}
+            onLink={() => onLink(uuid, "links")}
             shouldHideText
           />
         )}

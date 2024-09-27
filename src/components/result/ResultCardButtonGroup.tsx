@@ -11,12 +11,7 @@ import ResultCardButton from "../common/buttons/ResultCardButton";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
-  onDownload?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
+  onDownload?: () => void;
   onDetail?: () => void;
   onLink?: () => void;
   isGridView?: boolean;
@@ -80,6 +75,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
   onDetail,
   onLink,
+  onDownload,
   isGridView,
   shouldHideText = false,
 }) => {
@@ -96,6 +92,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
     </Grid>
   );
 
+  if (!content) return;
   return (
     <Grid container arial-label="result-list-card-buttons">
       <ButtonContainer>
@@ -116,6 +113,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={DownloadIcon}
           text="Download"
           shouldHideText={shouldHideText}
+          onClick={onDownload}
         />
       </ButtonContainer>
       <ButtonContainer>

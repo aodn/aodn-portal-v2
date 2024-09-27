@@ -1,4 +1,4 @@
-import { styled, Tab } from "@mui/material";
+import { styled, Tab, TabProps } from "@mui/material";
 import {
   border,
   borderRadius,
@@ -8,11 +8,7 @@ import {
   margin,
 } from "../../../styles/constants";
 
-interface StyledTabProps {
-  label: string;
-}
-
-const StyledTab = styled((props: StyledTabProps) => (
+const StyledTab = styled((props: TabProps) => (
   <Tab
     disableRipple
     {...props}
