@@ -4,7 +4,6 @@ import {
   AccordionSummary,
   Box,
   Grid,
-  Icon,
   IconButton,
   Stack,
   Typography,
@@ -44,6 +43,7 @@ import Layers, {
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
+import useScrollToSection from "../../../../hooks/useScrollToSection";
 
 interface DownloadSelect {
   label?: string;
@@ -135,12 +135,16 @@ const renderSelect = (select: DownloadSelect) => (
   </Stack>
 );
 
+const DOWNLOAD_SECTION_REF = "download-section";
+
 const AbstractAndDownloadPanel = () => {
   const { collection } = useDetailPageContext();
+  const downloadSectionRef = useScrollToSection({
+    sectionId: DOWNLOAD_SECTION_REF,
+  });
 
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
-  const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
@@ -209,13 +213,19 @@ const AbstractAndDownloadPanel = () => {
             </Box>
           </Stack>
         </Grid>
-        <Grid item xs={12} aria-label="download section">
+        <Grid
+          item
+          xs={12}
+          aria-label="download section"
+          // id={DOWNLOAD_SECTION_REF}
+        >
           <Grid container spacing={2} aria-label="download as section">
             <Grid item xs={12}>
               <Typography
                 fontWeight={fontWeight.bold}
                 color={fontColor.gray.dark}
                 sx={{ padding: 0 }}
+                ref={downloadSectionRef}
               >
                 Download as
               </Typography>
