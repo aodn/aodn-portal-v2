@@ -4,6 +4,7 @@ import {
   GeoJsonProperties,
   Geometry,
   GeometryCollection,
+  Point,
   Position,
 } from "geojson";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
@@ -60,6 +61,8 @@ export class OGCCollection {
   getThemes = (): ITheme[] | undefined => this.propValue?.themes;
   // It is a well form geometry collection of detail spatial extents
   getGeometry = (): GeometryCollection | undefined => this.propValue?.geometry;
+  getCentroid = (): Array<Feature<Point>> | undefined =>
+    this.propValue?.centroid?.map((i) => turf.point(i));
   getTemporal = (): ITemporal[] | undefined => this.propValue?.temporal;
   getCitation = (): ICitation | undefined => this.propValue?.citation;
   getStatement = (): string | undefined => this.propValue?.statement;
@@ -88,6 +91,7 @@ export class SummariesProperties {
   readonly license?: string;
   readonly creation?: string;
   readonly revision?: string;
+  readonly centroid?: Array<Array<number>>;
 }
 
 export class Spatial {
