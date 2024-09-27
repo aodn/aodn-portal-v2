@@ -27,7 +27,13 @@ const CollapseAssociatedRecordItem: React.FC<
           alignSelf: "center",
         }}
       >
-        <Grid item container md={12} onClick={() => setIsExpanded(!isExpanded)}>
+        <Grid
+          item
+          container
+          md={12}
+          onClick={() => setIsExpanded(!isExpanded)}
+          data-testid={`collapse-item-${title}`}
+        >
           <Grid
             item
             md={1}

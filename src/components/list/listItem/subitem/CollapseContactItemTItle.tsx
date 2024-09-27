@@ -24,7 +24,13 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
   };
 
   return (
-    <Grid item container md={12} onClick={() => setIsExpanded((prev) => !prev)}>
+    <Grid
+      item
+      container
+      md={12}
+      onClick={() => setIsExpanded((prev) => !prev)}
+      data-testid={`collapse-item-${text}`}
+    >
       {isExpanded && (
         <Grid item md={1}>
           <MailOutlineIcon />

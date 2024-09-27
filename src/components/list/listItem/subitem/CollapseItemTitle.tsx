@@ -11,7 +11,13 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
   text,
 }) => {
   return (
-    <Grid item container md={12} onClick={() => setIsExpanded((prev) => !prev)}>
+    <Grid
+      item
+      container
+      md={12}
+      onClick={() => setIsExpanded((prev) => !prev)}
+      data-testid={`collapse-item-${text}`}
+    >
       <Grid
         item
         md={11}
