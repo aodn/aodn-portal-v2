@@ -168,7 +168,7 @@ const SearchPage = () => {
           // and ordered by uuid to avoid affecting cluster calculation
           fetchResultNoStore({
             ...paramNonPaged,
-            properties: "id,bbox",
+            properties: "id,centroid",
             sortby: "id",
           })
         )

@@ -19,6 +19,7 @@ import { OGCCollection } from "../../../components/common/store/OGCCollectionDef
 import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 import SnackbarLoader from "../../../components/loading/SnackbarLoader";
+import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 
 const mapContainerId = "map-container-id";
 
@@ -103,6 +104,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           />
           <NavigationControl />
           <ScaleControl />
+          <DisplayCoordinate />
           <MenuControl
             menu={
               <BaseMapSwitcher

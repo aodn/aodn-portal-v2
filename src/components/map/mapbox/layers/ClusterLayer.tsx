@@ -1,4 +1,11 @@
-import { FC, useCallback, useContext, useEffect, useMemo } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 import { GeoJSONSource } from "mapbox-gl";
 import MapPopup, { PopupType } from "../component/MapPopup";
@@ -7,10 +14,12 @@ import {
   createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
+  findSuitableVisiblePoint,
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
+import { FeatureCollection, Point } from "geojson";
 
 interface ClusterSize {
   default?: number | string;
@@ -97,6 +106,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   showFullMap,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
+  const [lastVisiblePoint, setLastVisiblePoint] = useState<
+    FeatureCollection<Point> | undefined
+  >(undefined);
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
@@ -130,7 +142,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       map?.addSource(clusterSourceId, {
         type: "geojson",
-        data: createCenterOfMassDataSource(undefined),
+        data: findSuitableVisiblePoint(
+          createCenterOfMassDataSource(undefined),
+          map
+        ),
         cluster: true,
         clusterMaxZoom: config.clusterMaxZoom,
         clusterRadius: 50,
@@ -243,9 +258,15 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
-        createCenterOfMassDataSource(collections)
-      );
+      setLastVisiblePoint((p) => {
+        const newData = findSuitableVisiblePoint(
+          createCenterOfMassDataSource(collections),
+          map,
+          p
+        );
+        (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
+        return newData;
+      });
     }
   }, [map, clusterSourceId, collections]);
 
