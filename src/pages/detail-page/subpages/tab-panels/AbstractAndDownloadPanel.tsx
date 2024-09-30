@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FC, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -7,7 +7,6 @@ import {
   IconButton,
   Stack,
   Typography,
-  useTheme,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CommonSelect, {
@@ -135,18 +134,18 @@ const renderSelect = (select: DownloadSelect) => (
   </Stack>
 );
 
-const DOWNLOAD_SECTION_REF = "download-section";
+const DOWNLOAD_SECTION_ID = "download-section";
 
-const AbstractAndDownloadPanel = () => {
+const AbstractAndDownloadPanel: FC = () => {
   const { collection } = useDetailPageContext();
   const downloadSectionRef = useScrollToSection({
-    sectionId: DOWNLOAD_SECTION_REF,
+    sectionId: DOWNLOAD_SECTION_ID,
   });
+  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
+  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
-  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   if (!collection) return;
   return (
@@ -213,12 +212,7 @@ const AbstractAndDownloadPanel = () => {
             </Box>
           </Stack>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          aria-label="download section"
-          // id={DOWNLOAD_SECTION_REF}
-        >
+        <Grid item xs={12} aria-label="download section">
           <Grid container spacing={2} aria-label="download as section">
             <Grid item xs={12}>
               <Typography
@@ -226,6 +220,7 @@ const AbstractAndDownloadPanel = () => {
                 color={fontColor.gray.dark}
                 sx={{ padding: 0 }}
                 ref={downloadSectionRef}
+                id={DOWNLOAD_SECTION_ID}
               >
                 Download as
               </Typography>
