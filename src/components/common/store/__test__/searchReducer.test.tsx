@@ -35,9 +35,11 @@ describe("Search Reducer Function Test", () => {
     // Simulate user type "tempeature" and select filter by "parameter"
     const parameterState: ParameterState = {
       searchText: "temperature",
-      parameterVocabs: [{
-        label: "temperature",
-      }],
+      parameterVocabs: [
+        {
+          label: "temperature",
+        },
+      ],
     };
 
     const sp: SearchParameters = createSearchParamFrom(parameterState);
