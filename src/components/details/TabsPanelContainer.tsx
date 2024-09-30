@@ -65,11 +65,8 @@ const TabsPanelContainer: FC<TabsPanelProps> = () => {
     const params = new URLSearchParams(location.search);
 
     const tabValue = params.get("tab");
-    if (tabValue) {
-      return TABS.findIndex((tab) => tab.value === tabValue);
-    } else {
-      return 0;
-    }
+    const index = TABS.findIndex((tab) => tab.value === tabValue);
+    return index === -1 ? 0 : index;
   });
 
   useEffect(() => {

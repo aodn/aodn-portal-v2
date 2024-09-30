@@ -15,6 +15,7 @@ interface ResultCardButtonProps {
   resultCardButtonConfig?: ResultCardButtonConfig;
   sx?: SxProps;
   shouldHideText?: boolean;
+  disable?: boolean;
 }
 
 const defaultResultCardButtonConfig: ResultCardButtonConfig = {
@@ -29,19 +30,24 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   resultCardButtonConfig,
   sx,
   shouldHideText = false,
+  disable = false,
 }) => {
   const IconComponent = startIcon as ElementType;
   const config = mergeWithDefaults(
     defaultResultCardButtonConfig,
     resultCardButtonConfig
   );
+
   return (
     <Tooltip title={text} placement="top">
-      <Button onClick={onClick} sx={{ padding: padding.extraSmall, ...sx }}>
+      <Button
+        onClick={disable ? () => {} : onClick}
+        sx={{ padding: padding.extraSmall, ...sx }}
+      >
         {isValidElement(startIcon) ? (
           startIcon
         ) : (
-          <IconComponent fontSize="small" color={config.color} />
+          <IconComponent fontSize="small" sx={{ color: config.color }} />
         )}
 
         {text && !shouldHideText && (

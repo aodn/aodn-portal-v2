@@ -8,6 +8,7 @@ import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import ResultCardButton from "../common/buttons/ResultCardButton";
+import { color } from "../../styles/constants";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
@@ -92,6 +93,8 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
     </Grid>
   );
 
+  const links = content.getDistributionLinks();
+
   if (!content) return;
   return (
     <Grid container arial-label="result-list-card-buttons">
@@ -99,12 +102,16 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
         {renderStatusButton(shouldHideText, content)}
       </ButtonContainer>
       <ButtonContainer>
-        {content.getDistributionLinks() && (
+        {links && (
           <ResultCardButton
             startIcon={LinkIcon}
-            text={generateLinkText(content.getDistributionLinks()!.length)}
+            text={generateLinkText(links.length)}
             shouldHideText={shouldHideText}
             onClick={onLink}
+            resultCardButtonConfig={{
+              color: links.length > 0 ? color.blue.dark : color.gray.light,
+            }}
+            disable={!!(links.length === 0)}
           />
         )}
       </ButtonContainer>
