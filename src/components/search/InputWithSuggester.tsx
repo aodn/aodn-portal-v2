@@ -21,7 +21,6 @@ import {
   Vocab,
   ParameterState,
   updateParameterVocabs,
-  updateCommonKey,
   updateSearchText,
 } from "../common/store/componentParamReducer";
 import store, { getComponentState, RootState } from "../common/store/store";
@@ -162,17 +161,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
                 return phrasesSuggestions.has(item);
               }
             );
-            // TODO: This logic is error prone, need to fix this
-            // check if the current inputValue is a common key or not, then dispatch updateCommonKey
-            // if (
-            //   commonSuggestions.some(
-            //     (item) => item.toLowerCase() === inputValue.toLowerCase()
-            //   )
-            // ) {
-            //   dispatch(updateCommonKey(inputValue));
-            // } else {
-            //   dispatch(updateCommonKey(""));
-            // }
 
             // Create array of all unique suggestions
             const allSuggestions = new Set([
@@ -234,10 +222,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         // wait for the debounced refresh to complete
         // dispatch updateCommonKey if there is any during the refreshing-options to ensure the commonKey comes from the latest options given any inputValue changed
         await debounceRefreshOptions(newInputValue);
-      } else {
-        // update to clear the commonKey
-        // this happens when user clear input text with button "X"
-        dispatch(updateCommonKey(""));
       }
     },
     [debounceRefreshOptions, dispatch]

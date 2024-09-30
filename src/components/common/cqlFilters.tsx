@@ -25,22 +25,8 @@ export type ParameterVocabsIn = SingleArgumentFunction<
   string | undefined
 >;
 export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
-/**
- * common key is the search text input that belongs to both "suggest_phrases" and "discovery_parameters". e.g. temperature
- * the OGC API needs to query this type of search text input differently;
- * therefore, the constructed URI by the frontend app needs to distinguish type of particular search text input
- **/
-export type CommonKey = SingleArgumentFunction<string, string | undefined>;
-export type ParameterVocabsWithCommonKey = DualArgumentFunction<
-  Array<Vocab>,
-  string,
-  string | undefined
->;
-
 export type FilterTypes =
   | string
-  | CommonKey
-  | ParameterVocabsWithCommonKey
   | ParameterVocabsIn
   | TemporalDuring
   | TemporalAfterOrBefore
@@ -93,26 +79,6 @@ const funcCommonTypeSearchText: (searchText: string) => undefined | string = (
   }
 };
 
-const funcParameterVocabsWithCommonTypeSearchText: ParameterVocabsWithCommonKey =
-  (vocabs: Array<Vocab>, searchText: string) => {
-    const results: string[] = [];
-    vocabs.forEach((vocab) => {
-      results.push(`parameter_vocabs='${vocab.label?.toLowerCase()}'`);
-    });
-
-    const st = searchText?.toLowerCase();
-    if (st) {
-      results.push(`parameter_vocabs='${st}'`);
-      results.push(`fuzzy_title='${st}'`);
-      results.push(`fuzzy_desc='${st}'`);
-    }
-    // if no parameter vocabs, return undefined
-    if (results.length === 0) {
-      return undefined;
-    }
-    return `(${results.join(" or ")})`;
-  };
-
 /**
  * The CQL filter format for search dataset given start/end date
  * @param s
@@ -127,11 +93,6 @@ const funcTemporalBetween: TemporalDuring = (s: number, e: number) =>
 const cqlDefaultFilters = new Map<string, FilterTypes>();
 cqlDefaultFilters
   .set("PARAMETER_VOCABS_IN", funcParameterVocabs)
-  .set("COMMON_KEY", funcCommonTypeSearchText)
-  .set(
-    "PARAMETER_VOCABS_WITH_COMMON_KEY",
-    funcParameterVocabsWithCommonTypeSearchText
-  )
   .set("IMOS_ONLY", "dataset_provider='IMOS'")
   .set("ALL_TIME_RANGE", "temporal after 1970-01-01T00:00:00Z")
   .set("BETWEEN_TIME_RANGE", funcTemporalBetween)

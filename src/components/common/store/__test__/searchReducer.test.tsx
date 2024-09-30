@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { OGCCollection } from "../OGCCollectionDefinitions";
+import { ParameterState } from "../componentParamReducer";
+import { createSearchParamFrom, SearchParameters } from "../searchReducer";
 
 describe("Search Reducer Function Test", () => {
   it("Empty links return default thumbnail", () => {
@@ -27,5 +29,18 @@ describe("Search Reducer Function Test", () => {
 
     const collection: OGCCollection = Object.assign(new OGCCollection(), item);
     expect(collection.getStatus()).toEqual("completed");
+  });
+
+  it("Verify generate correct parameter on temperature", () => {
+    const parameterState: ParameterState = {
+      searchText: "temperature",
+      parameterVocabs: [{
+        label: "temperature",
+      }],
+    };
+
+    const sp: SearchParameters = createSearchParamFrom(parameterState);
+    expect(sp.text).equals("temperature");
+    expect(sp.filter).contains("(parameter_vocabs='temperature')");
   });
 });
