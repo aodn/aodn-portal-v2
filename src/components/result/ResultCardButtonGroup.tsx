@@ -34,7 +34,7 @@ enum Status {
 
 const generateLinkText = (linkLength: number) => {
   if (linkLength === 0) {
-    return "No Link";
+    return "No Links";
   }
   if (linkLength === 1) {
     return "1 Link";
@@ -86,7 +86,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
       item
       xs={isGridView ? 6 : 3}
       display="flex"
-      justifyContent="center"
+      justifyContent="space-between"
       alignItems="center"
       sx={{ ...sx }}
     >

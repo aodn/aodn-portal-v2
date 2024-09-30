@@ -166,7 +166,7 @@ const SearchPage = () => {
           // and ordered by uuid to avoid affecting cluster calculation
           fetchResultNoStore({
             ...paramNonPaged,
-            properties: "id,bbox",
+            properties: "id,centroid",
             sortby: "id",
           })
         )
@@ -366,6 +366,7 @@ const SearchPage = () => {
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
                   isLoading={isLoading(loadingThreadCount)}
+                  onNavigateToDetail={handleNavigateToDetailPage}
                 />
               </Box>
             </Box>

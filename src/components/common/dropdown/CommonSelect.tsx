@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { FC, useState } from "react";
 import { IconProps } from "../../icon/types";
+import { useDetailPageContext } from "../../../pages/detail-page/context/detail-page-context";
 
 export interface SelectItem<T = string> {
   value: T;
@@ -38,6 +39,7 @@ const CommonSelect: FC<CommonSelectProps> = ({
   sx,
 }) => {
   const [selectedItem, setSelectedItem] = useState<string>(items[0].value);
+  const { isCollectionNotFound } = useDetailPageContext();
 
   const handleOnChange = (event: SelectChangeEvent<string>) => {
     const selectedItem = event.target.value as string;
@@ -46,7 +48,7 @@ const CommonSelect: FC<CommonSelectProps> = ({
   };
 
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth disabled={isCollectionNotFound}>
       <Select
         value={selectedItem}
         onChange={handleOnChange}

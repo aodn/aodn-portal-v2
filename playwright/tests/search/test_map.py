@@ -13,9 +13,6 @@ from pages.search_page import SearchPage
 
 
 def test_map_drag_updates_search_results(page_mock: Page) -> None:
-
-    # TODO: ignore this test for now
-    pytest.skip('Test not implemented yet')
     api_router = ApiRouter(page=page_mock)
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
@@ -23,6 +20,7 @@ def test_map_drag_updates_search_results(page_mock: Page) -> None:
     landing_page.load()
     landing_page.search.fill_search_text('imos')
     landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
     initial_data = search_page.first_result_title.inner_text()
 
     # Change api route to get updated response after the map drag event
@@ -33,8 +31,7 @@ def test_map_drag_updates_search_results(page_mock: Page) -> None:
     search_page.wait_for_updated_search_result()
     updated_data = search_page.first_result_title.inner_text()
 
-    # TODO: fix it later. after adding loading modal, this test still need to be fixed
-    # assert initial_data != updated_data
+    assert initial_data != updated_data
 
 
 @pytest.mark.parametrize(
@@ -50,15 +47,13 @@ def test_map_drag_updates_search_results(page_mock: Page) -> None:
 def test_map_datapoint_hover_and_click(
     page_mock: Page, title: str, lng: str, lat: str
 ) -> None:
-
-    # TODO: ignore this test for now
-    pytest.skip('Test not implemented yet')
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
 
     landing_page.load()
     landing_page.search.fill_search_text('imos')
     landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
 
     search_page.map.center_map(lng, lat)
     search_page.map.hover_map()
@@ -76,9 +71,6 @@ def test_map_datapoint_hover_and_click(
 def test_map_updates_on_search_change(
     page_mock: Page, search_text: str, updated_search_text: str
 ) -> None:
-
-    # TODO: ignore this test for now
-    pytest.skip('Test not implemented yet')
     api_router = ApiRouter(page=page_mock)
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
@@ -86,6 +78,7 @@ def test_map_updates_on_search_change(
     landing_page.load()
     landing_page.search.fill_search_text(search_text)
     landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
     expect(search_page.first_result_title).to_be_visible()
     map_layers = search_page.map.get_map_layers()
 
@@ -117,9 +110,6 @@ def test_map_updates_on_search_change(
 def test_map_base_layers(
     page_mock: Page, layer_text: str, layer_type: LayerType
 ) -> None:
-
-    # TODO: ignore this test for now
-    pytest.skip('Test not implemented yet')
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
 
@@ -127,6 +117,7 @@ def test_map_base_layers(
 
     landing_page.load()
     landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
     expect(search_page.first_result_title).to_be_visible()
 
     search_page.map.basemap_show_hide_menu.click()
@@ -142,11 +133,11 @@ def test_map_base_layers(
     'head_lng, head_lat, data_title, data_lng, data_lat',
     [
         (
-            '148.50',
-            '-42.49',
+            '137.70',
+            '-33.174',
             'Integrated Marine Observing System (IMOS) - Location of assets',
-            '148.44',
-            '-42.48',
+            '137.70',
+            '-33.174',
         ),
     ],
 )
@@ -158,15 +149,13 @@ def test_map_spider(
     data_lng: str,
     data_lat: str,
 ) -> None:
-
-    # TODO: ignore this test for now
-    pytest.skip('Test not implemented yet')
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
 
     landing_page.load()
     landing_page.search.fill_search_text('imos')
     landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
 
     search_page.map.center_map(head_lng, head_lat)
     search_page.map.hover_map()

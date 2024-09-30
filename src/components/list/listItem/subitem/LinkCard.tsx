@@ -4,6 +4,7 @@ import { Box, Grid, Link, Typography } from "@mui/material";
 import { color, fontColor, padding } from "../../../../styles/constants";
 import CopyLinkButton from "../../../common/buttons/CopyLinkButton";
 import linkIcon from "../../../../assets/icons/link.png";
+import { openInNewTab } from "../../../../utils/LinkUtils";
 
 const LinkCard = ({
   link,
@@ -31,6 +32,7 @@ const LinkCard = ({
           backgroundColor: color.blue.light,
         },
       }}
+      data-testid="links-card"
     >
       <Grid container>
         <Grid item xs={2}>
@@ -71,7 +73,14 @@ const LinkCard = ({
             </Grid>
             <Grid item xs={11}>
               <Box>
-                <Link href={link.href} underline="hover">
+                <Link
+                  href={link.href}
+                  underline="hover"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    openInNewTab(link.href);
+                  }}
+                >
                   <Typography
                     color={fontColor.blue.medium}
                     sx={{

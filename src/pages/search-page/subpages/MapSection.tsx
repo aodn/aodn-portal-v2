@@ -19,6 +19,7 @@ import { OGCCollection } from "../../../components/common/store/OGCCollectionDef
 import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 import SnackbarLoader from "../../../components/loading/SnackbarLoader";
+import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 
 const mapContainerId = "map-container-id";
 
@@ -33,6 +34,7 @@ interface MapSectionProps {
   ) => void;
   onToggleClicked: (v: boolean) => void;
   onDatasetSelected?: (uuids: Array<string>) => void;
+  onNavigateToDetail?: (uuid: string) => void;
   isLoading: boolean;
 }
 
@@ -45,6 +47,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   showFullMap,
   sx,
   selectedUuids,
+  onNavigateToDetail,
   isLoading,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>("heatmap");
@@ -58,7 +61,9 @@ const MapSection: React.FC<MapSectionProps> = ({
             <HeatmapLayer
               collections={collections}
               selectedUuids={selectedUuids}
+              showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
+              onNavigateToDetail={onNavigateToDetail}
             />
           );
 
@@ -67,12 +72,20 @@ const MapSection: React.FC<MapSectionProps> = ({
             <ClusterLayer
               collections={collections}
               selectedUuids={selectedUuids}
+              showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
+              onNavigateToDetail={onNavigateToDetail}
             />
           );
       }
     },
-    [collections, onDatasetSelected, selectedUuids]
+    [
+      collections,
+      onDatasetSelected,
+      onNavigateToDetail,
+      selectedUuids,
+      showFullMap,
+    ]
   );
 
   return (
@@ -91,6 +104,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           />
           <NavigationControl />
           <ScaleControl />
+          <DisplayCoordinate />
           <MenuControl
             menu={
               <BaseMapSwitcher
