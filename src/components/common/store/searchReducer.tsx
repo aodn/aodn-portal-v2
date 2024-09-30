@@ -317,7 +317,7 @@ const createSearchParamFrom = (
   if (c.searchafter) {
     p.filter = appendFilter(
       p.filter,
-      `search_after='${c.searchafter.join(",")}'`
+      `search_after='${c.searchafter.join("||")}'`
     );
   }
 
