@@ -32,6 +32,7 @@ describe("Search Reducer Function Test", () => {
   });
 
   it("Verify generate correct parameter on temperature", () => {
+    // Simulate user type "tempeature" and select filter by "parameter"
     const parameterState: ParameterState = {
       searchText: "temperature",
       parameterVocabs: [{
