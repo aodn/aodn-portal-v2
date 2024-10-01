@@ -46,7 +46,7 @@ interface SpiderDiagramProps extends LayersProps {
 }
 
 const defaultSpiderDiagramConfig: SpiderDiagramConfig = {
-  spiderifyFromZoomLevel: 8,
+  spiderifyFromZoomLevel: 7,
   circleSpiralSwitchover: 9,
   circleFootSeparation: 25,
   spiralFootSeparation: 28,
@@ -185,8 +185,8 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           let angle = 0;
           return Array.from({ length: count }, (_, index) => {
             angle += spiralFootSeparation / legLength + index * 0.0005;
-            const x = legLength * Math.cos(angle) * 10;
-            const y = legLength * Math.sin(angle) * 10;
+            const x = legLength * Math.cos(angle) * 20;
+            const y = legLength * Math.sin(angle) * 20;
             legLength += (2 * Math.PI * spiralLengthFactor) / angle;
             return { x, y, angle, legLength, index };
           });
@@ -198,8 +198,8 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           return Array.from({ length: count }, (_, index) => {
             const angle = index * angleStep;
             return {
-              x: legLength * Math.cos(angle) * 15,
-              y: legLength * Math.sin(angle) * 15,
+              x: legLength * Math.cos(angle) * 25,
+              y: legLength * Math.sin(angle) * 25,
               angle,
               legLength,
               index,
@@ -311,9 +311,15 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       const currentZoom = map.getZoom();
       const { spiderifiedAtZoom, expansionZoom } = spiderifiedCluster;
 
+      // calculate the difference of zoom in/out
       const zoomDiff = currentZoom - spiderifiedAtZoom;
+
+      // will unspiderify if:
+      // zoom in over 2 or zoom out over 0.5
+      // or current zoom level hasn't reach spiderify-level
+      // or current zoom level beyond next expansion zoom (cluster split now)
       const shouldUnspiderify =
-        zoomDiff >= 2 ||
+        zoomDiff >= 1 ||
         zoomDiff <= -0.5 ||
         currentZoom < spiderifyFromZoomLevel ||
         currentZoom >= expansionZoom;
@@ -375,7 +381,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       const source = map?.getSource(clusterSourceId) as GeoJSONSource;
 
       if (shouldCreateSpiderDiagram(features)) {
-        // get first 50 datasets behind the cluster
+        // get first up to 50 datasets in the cluster to avoid huge spider
         // can adjust to a proper number if need
         source.getClusterLeaves(clusterId, 50, 0, (err, leaves) => {
           if (err) {
@@ -388,15 +394,14 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
             if (err) return;
             const datasets = leaves as Feature<Point>[];
             spiderify(coordinate, datasets, zoom);
-            // clickedClusterRef.current = { id: clusterId, expansionZoom: zoom };
           });
         });
       } else {
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
           if (err) return;
 
-          // if expansionZoom level hasn't reach the spiderify-zoomLevel, keep zoom into
-          // else go to the spiderify-zoomLevel
+          // if expansionZoom level hasn't reach the spiderify-zoomLevel, keep zoom into the expansion zoom
+          // or go to the spiderify-zoomLevel if the expansion zoom beyond spiderify-zoomLevel
           const currentZoom = map?.getZoom();
           map?.easeTo({
             center: (feature.geometry as any).coordinates,
