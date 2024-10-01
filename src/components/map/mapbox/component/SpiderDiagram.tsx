@@ -1,4 +1,11 @@
-import { FC, useCallback, useContext, useEffect, useState } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 import { mergeWithDefaults } from "../../../common/utils";
 import { Feature, FeatureCollection, LineString, Point } from "geojson";
@@ -8,6 +15,12 @@ import MapPopup from "./MapPopup";
 import SpatialExtents from "./SpatialExtents";
 import { LayersProps } from "../layers/Layers";
 import { TestHelper } from "../../../common/test/helper";
+
+interface SpiderifiedClusterInfo {
+  id: string;
+  spiderifiedAtZoom: number;
+  expansionZoom: number;
+}
 
 interface SpiderDiagramConfig {
   spiderifyFromZoomLevel: number;
@@ -76,6 +89,8 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
   onDatasetSelected,
 }) => {
   const { map } = useContext(MapContext);
+  const [spiderifiedCluster, setSpiderifiedCluster] =
+    useState<SpiderifiedClusterInfo | null>(null);
 
   const config = mergeWithDefaults(
     defaultSpiderDiagramConfig,
@@ -83,11 +98,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
   );
   const { spiderifyFromZoomLevel } = config;
 
-  const [currentSpiderifiedCluster, setCurrentSpiderifiedCluster] = useState<
-    string | null
-  >(null);
-
-  // util function to check if a cluster can spiderify or not
+  // Util function to check if a cluster can spiderify or not
   const shouldCreateSpiderDiagram = useCallback(
     (features: any[]): boolean => {
       const zoom = map?.getZoom() || 0;
@@ -99,6 +110,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
     [map, spiderifyFromZoomLevel]
   );
 
+  // Util function to un-spiderify a spiderified cluster given its id
   const unspiderify = useCallback(
     (clusterCircleId: string) => {
       const spiderPinsSourceId = getSpiderPinsSourceId(clusterCircleId);
@@ -122,13 +134,18 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         map.removeSource(spiderLinesSourceId);
       }
 
-      // setCurrentSpiderifiedCluster(null);
+      setSpiderifiedCluster(null);
     },
     [map]
   );
 
+  // Util function to generate spider diagram layer given the clicked coordinate(must be a cluster point), dataset and the expansion zoom
   const spiderify = useCallback(
-    (coordinate: [number, number], datasets: Feature<Point>[]) => {
+    (
+      coordinate: [number, number],
+      datasets: Feature<Point>[],
+      expansionZoom: number
+    ) => {
       const clusterCircleId = getClusterCircleId(coordinate);
       const spiderPinsSourceId = getSpiderPinsSourceId(clusterCircleId);
       const spiderLinesSourceId = getSpiderLinesSourceId(clusterCircleId);
@@ -136,12 +153,12 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       const spiderLinesLayerId = getSpiderLinesLayerId(clusterCircleId);
 
       // Clear existing spider diagram if there is one
-      if (currentSpiderifiedCluster) {
-        unspiderify(currentSpiderifiedCluster);
+      if (spiderifiedCluster) {
+        unspiderify(spiderifiedCluster.id);
       }
 
       // If clicking on the same cluster, just clear it and return
-      if (currentSpiderifiedCluster === clusterCircleId) {
+      if (spiderifiedCluster?.id === clusterCircleId) {
         return;
       }
 
@@ -199,7 +216,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
 
         // Adjust the divisor based on zoom level for finer control
         const zoomFactor = Math.pow(2, currentZoom - spiderifyFromZoomLevel);
-        const coordDivisor = 5000 / zoomFactor;
+        const coordDivisor = 5000 * zoomFactor;
 
         const spiderLegCoordinate = [
           coordinate[0] + spiderLegParam.x / coordDivisor,
@@ -278,39 +295,42 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         },
       });
 
-      setCurrentSpiderifiedCluster(clusterCircleId);
+      setSpiderifiedCluster({
+        id: clusterCircleId,
+        spiderifiedAtZoom: currentZoom,
+        expansionZoom,
+      });
     },
-    [
-      currentSpiderifiedCluster,
-      map,
-      config,
-      unspiderify,
-      spiderifyFromZoomLevel,
-    ]
+    [spiderifiedCluster, map, config, unspiderify, spiderifyFromZoomLevel]
   );
 
+  // Util function for checking if need unspiderify on every zoom end
   const checkZoomAndUnspiderify = useCallback(() => {
-    if (map) {
+    if (map && spiderifiedCluster) {
       const currentZoom = map.getZoom();
-      setCurrentSpiderifiedCluster((currentCluster) => {
-        if (currentCluster && currentZoom < spiderifyFromZoomLevel) {
-          unspiderify(currentCluster);
-          return currentCluster;
-        }
+      const { spiderifiedAtZoom, expansionZoom } = spiderifiedCluster;
 
-        return currentCluster;
-      });
+      const zoomDiff = currentZoom - spiderifiedAtZoom;
+      const shouldUnspiderify =
+        zoomDiff >= 2 ||
+        zoomDiff <= -0.5 ||
+        currentZoom < spiderifyFromZoomLevel ||
+        currentZoom >= expansionZoom;
+
+      if (shouldUnspiderify) {
+        unspiderify(spiderifiedCluster.id);
+      }
     }
-  }, [map, spiderifyFromZoomLevel, unspiderify]);
+  }, [map, spiderifiedCluster, spiderifyFromZoomLevel, unspiderify]);
 
-  // for clear spider diagram when click on empty space
+  //Util function for clear spider diagram when click on empty space
   const onEmptySpaceClick = useCallback(
     (ev: MapMouseEvent) => {
       const point = ev.point;
 
-      setCurrentSpiderifiedCluster((currentCluster) => {
+      setSpiderifiedCluster((currentCluster) => {
         if (currentCluster) {
-          const spiderPinsLayerId = getSpiderPinsLayerId(currentCluster);
+          const spiderPinsLayerId = getSpiderPinsLayerId(currentCluster.id);
 
           if (!map?.getLayer(spiderPinsLayerId)) return null;
           const features = map?.queryRenderedFeatures(point, {
@@ -318,7 +338,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           });
 
           if (!features || features.length === 0) {
-            unspiderify(currentCluster);
+            unspiderify(currentCluster.id);
             return null;
           } else {
             return currentCluster;
@@ -331,6 +351,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
     [map, unspiderify]
   );
 
+  // Util function for handling click on a cluster: zoom in or trigger spiderify
   const onClusterClick = useCallback(
     (ev: MapMouseEvent): void => {
       const features = map?.queryRenderedFeatures(ev.point, {
@@ -353,14 +374,21 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       const source = map?.getSource(clusterSourceId) as GeoJSONSource;
 
       if (shouldCreateSpiderDiagram(features)) {
-        // get all datasets behind the cluster
-        source.getClusterLeaves(clusterId, 100, 0, (err, leaves) => {
+        // get first 50 datasets behind the cluster
+        // can adjust to a proper number if need
+        source.getClusterLeaves(clusterId, 50, 0, (err, leaves) => {
           if (err) {
             console.error("Error getting cluster leaves:", err);
             return;
           }
-          const datasets = leaves as Feature<Point>[];
-          spiderify(coordinate, datasets);
+
+          // Store the clicked cluster info
+          source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+            if (err) return;
+            const datasets = leaves as Feature<Point>[];
+            spiderify(coordinate, datasets, zoom);
+            // clickedClusterRef.current = { id: clusterId, expansionZoom: zoom };
+          });
         });
       } else {
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
@@ -418,26 +446,26 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
 
   return (
     <>
-      {currentSpiderifiedCluster && (
+      {spiderifiedCluster && (
         <MapPopup
-          layerId={getSpiderPinsLayerId(currentSpiderifiedCluster)}
+          layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
           onDatasetSelected={onDatasetSelected}
         />
       )}
-      {currentSpiderifiedCluster && (
+      {spiderifiedCluster && (
         <SpatialExtents
-          layerId={getSpiderPinsLayerId(currentSpiderifiedCluster)}
+          layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
           addedLayerIds={[
             clusterLayer,
             unclusterPointLayer,
-            getSpiderPinsLayerId(currentSpiderifiedCluster),
+            getSpiderPinsLayerId(spiderifiedCluster.id),
           ]}
           onDatasetSelected={onDatasetSelected}
         />
       )}
-      {currentSpiderifiedCluster && (
+      {spiderifiedCluster && (
         <TestHelper
-          getSpiderLayer={() => getSpiderPinsLayerId(currentSpiderifiedCluster)}
+          getSpiderLayer={() => getSpiderPinsLayerId(spiderifiedCluster.id)}
         />
       )}
     </>

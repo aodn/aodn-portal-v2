@@ -50,7 +50,7 @@ interface HeatmapLayerProps extends LayersProps {
 }
 
 const defaultHeatmapConfig: HeatmapConfig = {
-  clusterMaxZoom: 8,
+  clusterMaxZoom: 12,
   heatmapSourceRadius: 10,
   circle: {
     strokeColor: "white",

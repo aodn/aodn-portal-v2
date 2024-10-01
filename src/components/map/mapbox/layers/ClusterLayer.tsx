@@ -57,7 +57,7 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
     large: 30,
     extra_large: 50,
   },
-  clusterMaxZoom: 8,
+  clusterMaxZoom: 12,
   clusterRadius: 50,
   // circle sizes define the radius(px) of the circles used to represent clusters on the map.
   clusterCircleSize: {

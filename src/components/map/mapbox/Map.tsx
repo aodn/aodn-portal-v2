@@ -10,7 +10,7 @@ import {
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
-import loadash from "lodash";
+import lodash from "lodash";
 import { TestHelper } from "../../common/test/helper";
 
 interface MapProps {
@@ -18,6 +18,8 @@ interface MapProps {
   centerLatitude?: number;
   bbox?: LngLatBoundsLike;
   zoom?: number;
+  minZoom?: number;
+  maxZoom?: number;
   panelId: string;
   projection?: Projection | string;
   onZoomEvent?: (
@@ -34,6 +36,8 @@ const MapDefault = {
   CENTER_LONGITUDE: 134.0470865301421,
   CENTER_LATITUDE: -27.609351801462687,
   ZOOM: 4,
+  MIN_ZOOM: 1,
+  MAX_ZOOM: 12,
   PROJECTION: "equirectangular",
   DEFAULT_STYLE: 3,
 };
@@ -70,6 +74,8 @@ const ReactMap = ({
   centerLatitude = MapDefault.CENTER_LATITUDE,
   bbox,
   zoom = MapDefault.ZOOM,
+  minZoom = MapDefault.MIN_ZOOM,
+  maxZoom = MapDefault.MAX_ZOOM,
   projection = MapDefault.PROJECTION,
   onZoomEvent,
   onMoveEvent,
@@ -79,7 +85,7 @@ const ReactMap = ({
 
   // Debouce to make the map transit smoother
   const debounceOnZoomEvent = useRef(
-    loadash.debounce(
+    lodash.debounce(
       useCallback(
         async (
           event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
@@ -91,7 +97,7 @@ const ReactMap = ({
   ).current;
 
   const debounceOnMoveEvent = useRef(
-    loadash.debounce(
+    lodash.debounce(
       useCallback(
         async (
           event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
@@ -111,7 +117,8 @@ const ReactMap = ({
             style: styles[MapDefault.DEFAULT_STYLE].style,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
-            maxZoom: 14,
+            minZoom: minZoom,
+            maxZoom: maxZoom,
             testMode: import.meta.env.MODE === "dev",
             localIdeographFontFamily:
               "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
@@ -162,6 +169,8 @@ const ReactMap = ({
     onMoveEvent,
     debounceOnZoomEvent,
     debounceOnMoveEvent,
+    minZoom,
+    maxZoom,
   ]);
 
   useEffect(() => {
