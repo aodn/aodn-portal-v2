@@ -1,14 +1,12 @@
-import { useState } from "react";
+import { FC, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
   Box,
   Grid,
-  Icon,
   IconButton,
   Stack,
   Typography,
-  useTheme,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CommonSelect, {
@@ -44,6 +42,7 @@ import Layers, {
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
+import useScrollToSection from "../../../../hooks/useScrollToSection";
 
 interface DownloadSelect {
   label?: string;
@@ -135,14 +134,18 @@ const renderSelect = (select: DownloadSelect) => (
   </Stack>
 );
 
-const AbstractAndDownloadPanel = () => {
+const DOWNLOAD_SECTION_ID = "download-section";
+
+const AbstractAndDownloadPanel: FC = () => {
   const { collection } = useDetailPageContext();
+  const downloadSectionRef = useScrollToSection({
+    sectionId: DOWNLOAD_SECTION_ID,
+  });
+  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
+  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
-  const theme = useTheme();
-  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   if (!collection) return;
   return (
@@ -216,6 +219,8 @@ const AbstractAndDownloadPanel = () => {
                 fontWeight={fontWeight.bold}
                 color={fontColor.gray.dark}
                 sx={{ padding: 0 }}
+                ref={downloadSectionRef}
+                id={DOWNLOAD_SECTION_ID}
               >
                 Download as
               </Typography>

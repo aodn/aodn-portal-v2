@@ -1,17 +1,15 @@
 import ResultPanelSimpleFilter from "../../../components/common/filters/ResultPanelSimpleFilter";
-import { Box, SxProps, Theme } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   CollectionsQueryType,
   createSearchParamFrom,
   DEFAULT_SEARCH_PAGE,
   fetchResultAppendStore,
 } from "../../../components/common/store/searchReducer";
-import React, { useCallback, useEffect, useState } from "react";
-import ResultCards from "../../../components/result/ResultCards";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+import { FC, useCallback, useState } from "react";
+import ResultCards, {
+  ResultCardsList,
+} from "../../../components/result/ResultCards";
 import { useSelector } from "react-redux";
 import store, {
   getComponentState,
@@ -24,23 +22,21 @@ import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapVi
 import CircleLoader from "../../../components/loading/CircleLoader";
 import { useAppDispatch } from "../../../components/common/store/hooks";
 
-interface SearchResultListProps {
-  datasetSelected?: OGCCollection[];
-  sx?: SxProps<Theme>;
+interface ResultSectionProps extends Partial<ResultCardsList> {
   onVisibilityChanged?: (v: SearchResultLayoutEnum) => void;
   onChangeSorting: (v: SortResultEnum) => void;
-  onClickCard?: (uuid: string) => void;
-  onNavigateToDetail?: (uuid: string) => void;
   isLoading: boolean;
 }
 
-const ResultSection: React.FC<SearchResultListProps> = ({
-  datasetSelected,
+const ResultSection: FC<ResultSectionProps> = ({
+  datasetsSelected,
   sx,
   onVisibilityChanged,
   onChangeSorting,
   onClickCard,
-  onNavigateToDetail,
+  onDetail,
+  onDownload,
+  onLink,
   isLoading,
 }) => {
   // Get contents from redux
@@ -111,11 +107,12 @@ const ResultSection: React.FC<SearchResultListProps> = ({
           <ResultCards
             layout={currentLayout}
             contents={reduxContents}
-            onDownload={undefined}
-            onDetail={onNavigateToDetail}
+            onDownload={onDownload}
+            onLink={onLink}
+            onDetail={onDetail}
             onClickCard={onClickCard}
             onFetchMore={fetchMore}
-            datasetsSelected={datasetSelected}
+            datasetsSelected={datasetsSelected}
           />
         </Box>
       </Box>

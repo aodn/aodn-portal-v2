@@ -17,58 +17,33 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import { FC, useCallback, useState } from "react";
+import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
+import { ResultCard } from "./ResultCards";
 
-interface ResultCardProps {
-  content: OGCCollection | undefined;
-  onDownload?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
-  onDetail?: ((uuid: string) => void) | undefined;
-  onClickCard?: ((uuid: string) => void) | undefined;
+interface ListResultCardProps extends ResultCard {
   isSelectedDataset?: boolean;
 }
 
-const handleNavigateToDetail = (
-  content: OGCCollection | undefined,
-  onDetail?: ((uuid: string) => void) | undefined
-) => {
-  if (onDetail && content && content.id) {
-    onDetail(content.id);
-  }
-};
-
-const handleShowSpatialExtents = (
-  content: OGCCollection | undefined,
-  onClickCard?: ((uuid: string) => void) | undefined
-) => {
-  if (onClickCard && content && content.id) {
-    onClickCard(content.id);
-  }
-};
-
 // links here may need to be changed, because only html links are wanted
-const ListResultCard: FC<ResultCardProps> = ({
+const ListResultCard: FC<ListResultCardProps> = ({
   content,
-  onDownload,
-  onDetail,
-  onClickCard,
+  onDownload = () => {},
+  onLink = () => {},
+  onDetail = () => {},
+  onClickCard = () => {},
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
   if (!content) return;
+  const { id: uuid, title, description, findIcon, findThumbnail } = content;
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card
-      id={`result-card-${content.id}`}
+      id={`result-card-${uuid}`}
       elevation={isSelectedDataset ? 2 : 0}
       sx={{
         position: "relative",
@@ -97,9 +72,7 @@ const ListResultCard: FC<ResultCardProps> = ({
         mr={gap.sm}
       >
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea
-            onClick={() => handleNavigateToDetail(content, onDetail)}
-          >
+          <CardActionArea onClick={() => onDetail(uuid)}>
             <Box
               display="flex"
               alignItems="center"
@@ -120,16 +93,13 @@ const ListResultCard: FC<ResultCardProps> = ({
                 }}
                 data-testid="result-card-title"
               >
-                {content.title}
+                {title}
               </Typography>
             </Box>
           </CardActionArea>
         </Tooltip>
 
-        <CardActionArea
-          onClick={() => handleShowSpatialExtents(content, onClickCard)}
-          sx={{ flex: 1 }}
-        >
+        <CardActionArea onClick={() => onClickCard(uuid)} sx={{ flex: 1 }}>
           <Typography
             arial-label="result-list-card-content"
             color={fontColor.gray.medium}
@@ -144,14 +114,15 @@ const ListResultCard: FC<ResultCardProps> = ({
               wordBreak: "break-word",
             }}
           >
-            {content.description}
+            {description}
           </Typography>
         </CardActionArea>
         {(isSelectedDataset || showButtons) && (
           <ResultCardButtonGroup
             content={content}
-            onDownload={onDownload}
-            onDetail={() => handleNavigateToDetail(content, onDetail)}
+            onDownload={() => onDownload(uuid, "abstract", "download-section")}
+            onDetail={() => onDetail(uuid)}
+            onLink={() => onLink(uuid, "links")}
             shouldHideText
           />
         )}
@@ -167,7 +138,7 @@ const ListResultCard: FC<ResultCardProps> = ({
       >
         <Box display="flex" flexDirection="row">
           <OrganizationLogo
-            logo={content.findIcon()}
+            logo={findIcon()}
             sx={{
               width: "auto",
               maxWidth: "100px",
@@ -197,7 +168,7 @@ const ListResultCard: FC<ResultCardProps> = ({
         </Box>
         <Box height="90px" width="100%">
           <img
-            src={content.findThumbnail()}
+            src={findThumbnail()}
             alt="org_logo"
             style={{
               objectFit: "cover",

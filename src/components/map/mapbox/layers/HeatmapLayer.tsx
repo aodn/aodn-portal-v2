@@ -1,4 +1,11 @@
-import { FC, useCallback, useContext, useEffect, useMemo } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 
 import { Expression, GeoJSONSource, StyleFunction } from "mapbox-gl";
@@ -7,12 +14,14 @@ import {
   createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
+  findSuitableVisiblePoint,
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup, { PopupType } from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
+import { FeatureCollection, Geometry, Point } from "geojson";
 
 interface HeatmapLayer {
   maxZoom: number;
@@ -104,6 +113,9 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
+  const [lastVisiblePoint, setLastVisiblePoint] = useState<
+    FeatureCollection<Point> | undefined
+  >(undefined);
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
@@ -128,7 +140,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     // and therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
-      const dataSource = createCenterOfMassDataSource(undefined);
+      const dataSource = findSuitableVisiblePoint(
+        createCenterOfMassDataSource(undefined),
+        map
+      );
 
       const config = mergeWithDefaults(
         defaultHeatmapConfig,
@@ -292,13 +307,20 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   }, [map]);
 
   const updateSource = useCallback(() => {
-    const newData = createCenterOfMassDataSource(collections);
-    if (map?.getSource(heatmapSourceId)) {
-      (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
-    }
-    if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
-    }
+    setLastVisiblePoint((p) => {
+      const newData = findSuitableVisiblePoint(
+        createCenterOfMassDataSource(collections),
+        map,
+        p
+      );
+      if (map?.getSource(heatmapSourceId)) {
+        (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
+      }
+      if (map?.getSource(clusterSourceId)) {
+        (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
+      }
+      return newData;
+    });
   }, [map, heatmapSourceId, clusterSourceId, collections]);
 
   useEffect(() => {

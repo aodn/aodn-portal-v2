@@ -6,13 +6,15 @@ import { FC } from "react";
 import AbstractAndDownloadPanel from "./tab-panels/AbstractAndDownloadPanel";
 import LineagePanel from "./tab-panels/LineagePanel";
 import AssociatedRecordsPanel from "./tab-panels/AssociatedRecordsPanel";
-import TabsPanelContainer from "../../../components/details/TabsPanelContainer";
 import { Card, Grid } from "@mui/material";
 import { borderRadius } from "../../../styles/constants";
 import { useDetailPageContext } from "../context/detail-page-context";
 import RecordNotFoundPanel from "./tab-panels/RecordNotFoundPanel";
+import TabsPanelContainer, {
+  Tab,
+} from "../../../components/details/TabsPanelContainer";
 
-const tabs = [
+export const TABS: Tab[] = [
   {
     label: "Abstract",
     value: "abstract",
@@ -31,7 +33,6 @@ const tabs = [
     component: <MetadataInformationPanel />,
   },
   { label: "Citation", value: "citation", component: <CitationPanel /> },
-
   {
     label: "Associated Records",
     value: "associated records",
@@ -55,7 +56,8 @@ const ContentSection: FC = () => {
         borderRadius: borderRadius.small,
       }}
     >
-      <TabsPanelContainer tabs={tabs} />
+      <TabsPanelContainer tabs={TABS} />
+
       {isCollectionNotFound && (
         <Grid container sx={{ height: "1000px" }}>
           <RecordNotFoundPanel />

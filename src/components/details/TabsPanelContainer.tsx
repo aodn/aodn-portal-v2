@@ -1,21 +1,14 @@
-import * as React from "react";
-import { useEffect } from "react";
-import Tabs from "@mui/material/Tabs";
-import Tab, { TabProps } from "@mui/material/Tab";
+import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import {
-  border,
-  borderRadius,
-  color,
-  fontColor,
-  fontWeight,
-  margin,
-  padding,
-} from "../../styles/constants";
-import { styled } from "@mui/material";
+import { padding } from "../../styles/constants";
+import StyledTabs from "../common/tab/StyledTabs";
+import StyledTab from "../common/tab/StyledTab";
+import { useLocation } from "react-router-dom";
+import { FC, SyntheticEvent, useEffect, useState } from "react";
+import { TABS } from "../../pages/detail-page/subpages/ContentSection";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 
-interface Tab {
+export interface Tab {
   label: string;
   value: string;
   component: JSX.Element;
@@ -31,9 +24,8 @@ interface TabPanelProps {
   value: number;
 }
 
-function TabPanel(props: TabPanelProps) {
+const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
-
   return (
     <div
       role="tabpanel"
@@ -45,7 +37,7 @@ function TabPanel(props: TabPanelProps) {
       {value === index && <Box sx={{ p: padding.large }}>{children}</Box>}
     </div>
   );
-}
+};
 
 function a11yProps(index: number) {
   return {
@@ -54,7 +46,7 @@ function a11yProps(index: number) {
   };
 }
 
-const TabsPanelContainer: React.FC<TabsPanelProps> = ({ tabs }) => {
+const TabsPanelContainer: FC<TabsPanelProps> = () => {
   const { isCollectionNotFound } = useDetailPageContext();
   // if no collection found, unfocus the tab
   useEffect(() => {
@@ -63,10 +55,34 @@ const TabsPanelContainer: React.FC<TabsPanelProps> = ({ tabs }) => {
     }
   }, [isCollectionNotFound]);
 
-  const [value, setValue] = React.useState(0);
+  const location = useLocation();
+  const pathname = location.pathname;
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const params = new URLSearchParams(location.search);
+  const uuid = params.get("uuid");
+
+  const [value, setValue] = useState(() => {
+    const params = new URLSearchParams(location.search);
+
+    const tabValue = params.get("tab");
+    const index = TABS.findIndex((tab) => tab.value === tabValue);
+    return index === -1 ? 0 : index;
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabValue = params.get("tab");
+    const index = TABS.findIndex((tab) => tab.value === tabValue);
+    if (index !== -1) {
+      setValue(index);
+    }
+  }, [location]);
+
+  const handleChange = (_: SyntheticEvent, newValue: number) => {
     setValue(newValue);
+    // Update URL without navigating
+    const newUrl = `${pathname}?uuid=${uuid}&tab=${TABS[newValue].value}`;
+    window.history.pushState(null, "", newUrl);
   };
 
   return (
@@ -80,7 +96,7 @@ const TabsPanelContainer: React.FC<TabsPanelProps> = ({ tabs }) => {
         onChange={handleChange}
         aria-label="tabsPanelContainer"
       >
-        {tabs.map((tab, index) => (
+        {TABS.map((tab, index) => (
           <StyledTab
             key={index}
             label={tab.label}
@@ -90,7 +106,7 @@ const TabsPanelContainer: React.FC<TabsPanelProps> = ({ tabs }) => {
           />
         ))}
       </StyledTabs>
-      {tabs.map((tab, index) => (
+      {TABS.map((tab, index) => (
         <TabPanel key={index} value={value} index={index}>
           {tab.component}
         </TabPanel>
@@ -100,56 +116,3 @@ const TabsPanelContainer: React.FC<TabsPanelProps> = ({ tabs }) => {
 };
 
 export default TabsPanelContainer;
-
-interface StyledTabsProps {
-  children?: React.ReactNode;
-  value: number;
-  onChange: (event: React.SyntheticEvent, newValue: number) => void;
-}
-
-const StyledTabs = styled((props: StyledTabsProps) => (
-  <Tabs
-    {...props}
-    orientation="horizontal"
-    variant="scrollable"
-    TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
-  />
-))({
-  borderBottom: `${border.xs} ${color.tabPanel.divider}`,
-  "& .MuiTabs-indicator": {
-    display: "flex",
-    justifyContent: "center",
-    backgroundColor: "transparent",
-    height: "5px",
-    paddingTop: padding.medium,
-  },
-  "& .MuiTabs-indicatorSpan": {
-    width: 0,
-    height: 0,
-    borderLeft: "5px solid transparent",
-    borderRight: "5px solid transparent",
-    borderBottom: `5px solid  ${color.tabPanel.divider}`,
-  },
-});
-
-const StyledTab = styled((props: TabProps) => (
-  <Tab
-    disableRipple
-    {...props}
-    sx={{ margin: `${margin.xxlg} ${margin.lg}` }}
-  />
-))(({ theme, disabled }) => ({
-  textTransform: "none",
-  fontWeight: fontWeight.regular,
-  color: fontColor.gray.dark,
-  border: `${border.xs}  ${disabled ? "#AAA" : color.tabPanel.tabOnFocused}`,
-  borderRadius: borderRadius.xxlg,
-  "&.Mui-selected": {
-    color: "#fff",
-    backgroundColor: color.tabPanel.tabOnFocused,
-  },
-  " &:hover": {
-    backgroundColor: color.tabPanel.tabOnHover,
-    color: "#fff",
-  },
-}));
