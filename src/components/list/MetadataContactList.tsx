@@ -1,10 +1,10 @@
 import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
-import TextItem from "./listItem/TextItem";
 import ContactArea from "./listItem/subitem/ContactArea";
 import ExpandableList from "./ExpandableList";
 import { Grid, Link, Typography, useTheme } from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import ItemBaseGrid from "./listItem/ItemBaseGrid";
 
 interface MetadataContactListProps {
   contacts: IContact[];
@@ -20,7 +20,7 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
       const suffix = contact.name ? ` - ${contact.name}` : "";
       const email = contact?.emails?.[0];
       contactsToAdd.push(
-        <TextItem key={index}>
+        <ItemBaseGrid key={index}>
           <Grid item container md={12} sx={{ marginBottom: theme.mp.md }}>
             <Grid
               item
@@ -43,7 +43,7 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
             </Grid>
           </Grid>
           <ContactArea contact={contact} />
-        </TextItem>
+        </ItemBaseGrid>
       );
     });
     return contactsToAdd;

@@ -40,21 +40,21 @@ def test_associated_records_sections(
 
     associated_records.child_records.click()
     page_mock.wait_for_timeout(200)
-    detail_page.click_button(child_records)
+    detail_page.get_collapse_item_title(child_records).click()
     child_records_list = associated_records.get_child_records_list()
     expect(
         child_records_list.get_by_text(child_records_value)
     ).to_be_in_viewport()
 
     associated_records.sibling_records.click()
-    detail_page.click_button(sibling_records)
+    detail_page.get_collapse_item_title(sibling_records).click()
     sibling_records_list = associated_records.get_sibling_records_list()
     expect(
         sibling_records_list.get_by_text(sibling_records_value)
     ).to_be_in_viewport()
 
     associated_records.parent_record.click()
-    detail_page.click_button(parent_record)
+    detail_page.get_collapse_item_title(parent_record).click()
     parent_record_list = associated_records.get_parent_record_list()
     expect(
         parent_record_list.get_by_text(parent_record_value)

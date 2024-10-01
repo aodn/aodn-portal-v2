@@ -4,8 +4,6 @@ import { Vocab, ParameterState } from "./componentParamReducer";
 
 import {
   ParameterVocabsIn,
-  ParameterVocabsWithCommonKey,
-  CommonKey,
   cqlDefaultFilters,
   PolygonOperation,
   TemporalAfterOrBefore,
@@ -363,28 +361,13 @@ const createSearchParamFrom = (
     p.filter = appendFilter(p.filter, f(i.polygon));
   }
 
-  if (i.parameterVocabs && i.parameterVocabs.length > 0 && !i.commonKey) {
+  if (i.parameterVocabs && i.parameterVocabs.length > 0) {
     const f = cqlDefaultFilters.get("PARAMETER_VOCABS_IN") as ParameterVocabsIn;
     const parameterVocabFilter = f(i.parameterVocabs);
     if (parameterVocabFilter) {
       p.filter = appendFilter(p.filter, parameterVocabFilter);
     }
   }
-
-  if (i.commonKey) {
-    if (i.parameterVocabs && i.parameterVocabs.length > 0) {
-      const f = cqlDefaultFilters.get(
-        "PARAMETER_VOCABS_WITH_COMMON_KEY"
-      ) as ParameterVocabsWithCommonKey;
-      p.filter = appendFilter(p.filter, f(i.parameterVocabs, i.commonKey));
-    } else {
-      const f = cqlDefaultFilters.get("COMMON_KEY") as CommonKey;
-      p.filter = appendFilter(p.filter, f(i.commonKey));
-    }
-    // clear search text because the value is handled by the filter section instead
-    p.text = "";
-  }
-
   return p;
 };
 

@@ -69,8 +69,11 @@ describe("LinksPanel", async () => {
       const link = screen.queryByText("Data access using R");
       expect(link).to.exist;
       userEvent.hover(link!);
-      const copyBtn = screen.queryByText("Copy Link");
-      expect(copyBtn).to.exist;
+      const copyBtns = screen.queryAllByText("Copy Link");
+      const visibleCount = copyBtns.filter(
+        (btn) => getComputedStyle(btn).visibility === "visible"
+      ).length;
+      expect(visibleCount).toBe(1);
     });
   });
 });

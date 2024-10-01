@@ -1,17 +1,19 @@
 import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
-import ExpandableList from "./ExpandableList";
 import ContactArea from "./listItem/subitem/ContactArea";
 import CollapseContactItem from "./listItem/CollapseContactItem";
+import ExpandableList from "./ExpandableList";
 
-interface ContactListProps {
-  contacts: IContact[];
+interface CitedResponsiblePartyListProps {
+  responsibleParties: IContact[];
 }
 
-const ContactList: React.FC<ContactListProps> = ({ contacts }) => {
+const CitedResponsiblePartyList: React.FC<CitedResponsiblePartyListProps> = ({
+  responsibleParties,
+}) => {
   const collapseComponents: ReactNode[] = useMemo(
     () =>
-      contacts?.map((contact, index) => {
+      responsibleParties?.map((contact, index) => {
         const suffix = contact.name ? ` - ${contact.name}` : "";
         return (
           <CollapseContactItem
@@ -23,15 +25,15 @@ const ContactList: React.FC<ContactListProps> = ({ contacts }) => {
           </CollapseContactItem>
         );
       }) || [],
-    [contacts]
+    [responsibleParties]
   );
 
   return (
     <ExpandableList
-      title={"Contacts"}
+      title={"Cited Responsible Parties"}
       childrenList={collapseComponents}
     ></ExpandableList>
   );
 };
 
-export default ContactList;
+export default CitedResponsiblePartyList;

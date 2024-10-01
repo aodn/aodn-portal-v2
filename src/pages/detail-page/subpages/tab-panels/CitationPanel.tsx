@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import ContactList from "../../../../components/list/ContactList";
 import NavigatablePanel from "./NavigatablePanel";
-import TextList from "../../../../components/list/TextList";
-import CollapseList from "../../../../components/list/CollapseList";
 import LicenseList from "../../../../components/list/LicenseList";
 import {
   MediaType,
   RelationType,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
+import SuggestedCitationList from "../../../../components/list/SuggestedCitationList";
+import CitedResponsiblePartyList from "../../../../components/list/CitedResponsiblePartyList";
+import ConstraintList from "../../../../components/list/ConstraintList";
 
 const CitationPanel = () => {
   const context = useDetailPageContext();
@@ -95,9 +95,8 @@ const CitationPanel = () => {
       {
         title: "Cited Responsible Parties",
         component: (
-          <ContactList
-            title="Cited Responsible Parties"
-            contacts={citationContacts ? citationContacts : []}
+          <CitedResponsiblePartyList
+            responsibleParties={citationContacts ? citationContacts : []}
           />
         ),
       },
@@ -114,17 +113,12 @@ const CitationPanel = () => {
       {
         title: "Suggested Citation",
         component: (
-          <TextList
-            title="Suggested Citation"
-            texts={suggestedCitation ? [suggestedCitation] : []}
-          />
+          <SuggestedCitationList suggestedCitation={suggestedCitation ?? ""} />
         ),
       },
       {
         title: "Constraints",
-        component: (
-          <CollapseList title="Constraints" items={constraints} areAllOpen />
-        ),
+        component: <ConstraintList constraints={constraints} />,
       },
     ],
     [

@@ -8,16 +8,13 @@ import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import ResultCardButton from "../common/buttons/ResultCardButton";
+import { color } from "../../styles/constants";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
-  onDownload?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection
-      ) => void)
-    | undefined;
-  onDetail: () => void;
+  onDownload?: () => void;
+  onDetail?: () => void;
+  onLink?: () => void;
   isGridView?: boolean;
   shouldHideText?: boolean;
 }
@@ -78,6 +75,8 @@ const renderStatusButton = (
 const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
   onDetail,
+  onLink,
+  onDownload,
   isGridView,
   shouldHideText = false,
 }) => {
@@ -94,17 +93,25 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
     </Grid>
   );
 
+  const links = content.getDistributionLinks();
+
+  if (!content) return;
   return (
     <Grid container arial-label="result-list-card-buttons">
       <ButtonContainer>
         {renderStatusButton(shouldHideText, content)}
       </ButtonContainer>
       <ButtonContainer>
-        {content.getDistributionLinks() && (
+        {links && (
           <ResultCardButton
             startIcon={LinkIcon}
-            text={generateLinkText(content.getDistributionLinks()!.length)}
+            text={generateLinkText(links.length)}
             shouldHideText={shouldHideText}
+            onClick={onLink}
+            resultCardButtonConfig={{
+              color: links.length > 0 ? color.blue.dark : color.gray.light,
+            }}
+            disable={!!(links.length === 0)}
           />
         )}
       </ButtonContainer>
@@ -113,6 +120,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={DownloadIcon}
           text="Download"
           shouldHideText={shouldHideText}
+          onClick={onDownload}
         />
       </ButtonContainer>
       <ButtonContainer>

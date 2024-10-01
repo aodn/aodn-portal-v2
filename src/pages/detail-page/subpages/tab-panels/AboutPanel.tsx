@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import CollapseList from "../../../../components/list/CollapseList";
 import ContactList from "../../../../components/list/ContactList";
 import NavigatablePanel from "./NavigatablePanel";
-import TextList from "../../../../components/list/TextList";
 import {
   IContact,
   ITheme,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import _ from "lodash";
+import CreditList from "../../../../components/list/CreditList";
+import KeywordList from "../../../../components/list/KeywordList";
 
 const AboutPanel = () => {
   const context = useDetailPageContext();
@@ -61,19 +61,16 @@ const AboutPanel = () => {
       {
         title: "Contacts",
         component: (
-          <ContactList
-            title="Contacts"
-            contacts={aboutContacts ? aboutContacts : []}
-          />
+          <ContactList contacts={aboutContacts ? aboutContacts : []} />
         ),
       },
       {
         title: "Credits",
-        component: <TextList title="Credits" texts={credits ? credits : []} />,
+        component: <CreditList credits={credits ? credits : []} />,
       },
       {
         title: "Keywords",
-        component: <CollapseList items={keywords} title="Keywords" />,
+        component: <KeywordList keywords={keywords} />,
       },
     ],
     [aboutContacts, credits, keywords]

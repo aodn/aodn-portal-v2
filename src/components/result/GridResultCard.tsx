@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from "react";
+import { FC, useState } from "react";
 import {
   Box,
   Card,
@@ -17,52 +17,27 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
+import { ResultCard } from "./ResultCards";
 
-interface GridResultCardProps {
-  content: OGCCollection | undefined;
-  onDownload?:
-    | ((
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        stac: OGCCollection | undefined
-      ) => void)
-    | undefined;
-  onDetail?: ((uuid: string) => void) | undefined;
-  onClickCard?: ((uuid: string) => void) | undefined;
+interface GridResultCardProps extends ResultCard {
   isSelectedDataset?: boolean;
 }
 
-const handleNavigateToDetail = (
-  content: OGCCollection,
-  onDetail?: ((uuid: string) => void) | undefined
-) => {
-  if (onDetail && content && content.id) {
-    onDetail(content.id);
-  }
-};
-
-const handleShowSpatialExtents = (
-  content: OGCCollection,
-  onClickCard?: ((uuid: string) => void) | undefined
-) => {
-  if (onClickCard && content && content.id) {
-    onClickCard(content.id);
-  }
-};
-
 const GridResultCard: FC<GridResultCardProps> = ({
   content,
-  onDownload,
-  onDetail,
-  onClickCard,
+  onDownload = () => {},
+  onLink = () => {},
+  onDetail = () => {},
+  onClickCard = () => {},
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
   if (!content) return;
+  const { id: uuid, title, findIcon, findThumbnail } = content;
 
   return (
     <Card
@@ -103,9 +78,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         </Box>
       )}
 
-      <CardActionArea
-        onClick={() => handleShowSpatialExtents(content, onClickCard)}
-      >
+      <CardActionArea onClick={() => onClickCard(uuid)}>
         <Box
           height={isSelectedDataset || showButtons ? "110px" : "130px"}
           width="100%"
@@ -114,7 +87,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
           borderRadius={borderRadius.small}
         >
           <img
-            src={content.findThumbnail()}
+            src={findThumbnail()}
             alt="org_logo"
             style={{
               objectFit: "fill",
@@ -133,7 +106,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
       >
         {!isSelectedDataset && !showButtons && (
           <OrganizationLogo
-            logo={content.findIcon()}
+            logo={findIcon()}
             sx={{
               width: "auto",
               maxWidth: "60px",
@@ -144,9 +117,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         )}
 
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea
-            onClick={() => handleNavigateToDetail(content, onDetail)}
-          >
+          <CardActionArea onClick={() => onDetail(uuid)}>
             <Box
               display="flex"
               alignItems="center"
@@ -166,7 +137,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
                   wordBreak: "break-word",
                 }}
               >
-                {content.title}
+                {title}
               </Typography>
             </Box>
           </CardActionArea>
@@ -175,7 +146,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
       {(isSelectedDataset || showButtons) && (
         <Stack direction="row" paddingX={padding.small}>
           <OrganizationLogo
-            logo={content.findIcon()}
+            logo={findIcon()}
             sx={{
               width: "auto",
               maxWidth: "60px",
@@ -185,8 +156,9 @@ const GridResultCard: FC<GridResultCardProps> = ({
           />
           <ResultCardButtonGroup
             content={content}
-            onDetail={() => handleNavigateToDetail(content, onDetail)}
-            onDownload={onDownload}
+            onDownload={() => onDownload(uuid, "abstract", "download-section")}
+            onDetail={() => onDetail(uuid)}
+            onLink={() => onLink(uuid, "links")}
             shouldHideText
             isGridView
           />

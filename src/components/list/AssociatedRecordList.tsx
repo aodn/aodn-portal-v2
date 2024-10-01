@@ -1,11 +1,11 @@
 import { IAssociatedRecord } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useCallback, useMemo } from "react";
-import CollapseItem from "./listItem/CollapseItem";
-import { ButtonBase } from "@mui/material";
 import { pageDefault } from "../common/constants";
 import ExpandableList from "./ExpandableList";
-import TextArea from "./listItem/subitem/TextArea";
 import { openInNewTab } from "../../utils/LinkUtils";
+import CollapseAssociatedRecordItem from "./listItem/CollapseAssociatedRecordItem";
+import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
+import ItemBaseGrid from "./listItem/ItemBaseGrid";
 
 interface AssociatedRecordListProps {
   title: string;
@@ -27,16 +27,18 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
     const components: ReactNode[] = [];
     records?.map((record, index) => {
       components.push(
-        <CollapseItem title={`${record.title}`} key={index} isAssociatedRecord>
-          <ButtonBase
-            onClick={() => openRecord(record.uuid)}
-            sx={{
-              textAlign: "left",
-            }}
+        <ItemBaseGrid key={index}>
+          <CollapseAssociatedRecordItem
+            titleAction={() => openRecord(record.uuid)}
+            title={`${record.title}`}
           >
-            <TextArea key={index}>{record.abstract}</TextArea>
-          </ButtonBase>
-        </CollapseItem>
+            <ExpandableTextArea
+              text={record.abstract}
+              isClickable
+              onClick={() => openRecord(record.uuid)}
+            />
+          </CollapseAssociatedRecordItem>
+        </ItemBaseGrid>
       );
     });
     return components;
