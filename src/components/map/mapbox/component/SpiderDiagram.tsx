@@ -11,7 +11,7 @@ import { mergeWithDefaults } from "../../../common/utils";
 import { Feature, FeatureCollection, LineString, Point } from "geojson";
 import { createRoot } from "react-dom/client";
 import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
-import MapPopup from "./MapPopup";
+import MapPopup, { PopupType } from "./MapPopup";
 import SpatialExtents from "./SpatialExtents";
 import { LayersProps } from "../layers/Layers";
 import { TestHelper } from "../../../common/test/helper";
@@ -87,6 +87,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
   clusterSourceId,
   unclusterPointLayer,
   onDatasetSelected,
+  showFullMap,
 }) => {
   const { map } = useContext(MapContext);
   const [spiderifiedCluster, setSpiderifiedCluster] =
@@ -450,6 +451,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         <MapPopup
           layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
           onDatasetSelected={onDatasetSelected}
+          popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         />
       )}
       {spiderifiedCluster && (

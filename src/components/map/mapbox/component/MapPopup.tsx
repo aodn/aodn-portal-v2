@@ -9,13 +9,7 @@ import {
 } from "react";
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
-import {
-  Box,
-  Card,
-  CardActionArea,
-  CardContent,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Card, CardContent, CircularProgress } from "@mui/material";
 import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Point, Feature } from "geojson";

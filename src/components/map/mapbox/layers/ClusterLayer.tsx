@@ -297,6 +297,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unclusterPointLayer}
         onDatasetSelected={onDatasetSelected}
+        showFullMap={showFullMap}
       />
     </>
   );

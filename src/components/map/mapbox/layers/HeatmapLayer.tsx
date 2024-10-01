@@ -350,6 +350,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unClusterPointLayer}
         onDatasetSelected={onDatasetSelected}
+        showFullMap={showFullMap}
       />
       <TestHelper getHeatmapLayer={() => heatmapLayer} />
     </>
