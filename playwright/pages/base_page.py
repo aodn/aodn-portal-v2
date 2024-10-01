@@ -60,3 +60,7 @@ class BasePage:
     def get_collapse_list_items(self, item_list: str) -> Locator:
         """Returns the given collapse list items"""
         return self.get_collapse_list(item_list).get_by_test_id('collapseItem')
+
+    def get_collapse_item_title(self, title: str) -> Locator:
+        """Returns the given collapse item title"""
+        return self.page.get_by_test_id(f'collapse-item-{title}')

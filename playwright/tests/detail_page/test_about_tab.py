@@ -34,7 +34,7 @@ def test_about_sections(
     about.tab.click()
 
     about.keywords.click()
-    detail_page.click_button(keyword)
+    detail_page.get_collapse_item_title(keyword).click()
     keywords_list = about.get_keywords_list()
     expect(keywords_list.get_by_text(keyword_value)).to_be_in_viewport()
 
@@ -43,4 +43,4 @@ def test_about_sections(
     expect(credits_list.get_by_text(credit)).to_be_in_viewport()
 
     about.contacts.click()
-    expect(detail_page.get_button(contact)).to_be_in_viewport()
+    expect(detail_page.get_collapse_item_title(contact)).to_be_in_viewport()

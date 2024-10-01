@@ -1,7 +1,7 @@
 import { Grid, Link, Typography, useTheme } from "@mui/material";
 import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
-import StyledItemGrid from "./listItem/StyledItemGrid";
+import ItemBaseGrid from "./listItem/ItemBaseGrid";
 
 interface LicenseListProps {
   license: string;
@@ -16,7 +16,7 @@ const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
       return null;
     }
     return (
-      <StyledItemGrid container key="licenseList">
+      <ItemBaseGrid container key="licenseList">
         <Grid container item md={12}>
           {license && (
             <Grid item md={12}>
@@ -36,7 +36,7 @@ const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
             </Grid>
           )}
         </Grid>
-      </StyledItemGrid>
+      </ItemBaseGrid>
     );
   }, [graphic, license, theme.mp.md, url]);
   return (

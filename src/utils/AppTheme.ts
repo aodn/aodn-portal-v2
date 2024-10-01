@@ -55,6 +55,7 @@ declare module "@mui/material/styles" {
     detail: {
       text: string;
       listItemBG: string;
+      listItemBGHover: string;
       na: {
         dark: string;
         light: string;
@@ -66,6 +67,7 @@ declare module "@mui/material/styles" {
     detail?: {
       text?: string;
       listItemBG?: string;
+      listItemBGHover?: string;
       na?: {
         dark?: string;
         light?: string;
@@ -96,6 +98,7 @@ const theme: ThemeOptions = {
     detail: {
       text: "#5B5B5B",
       listItemBG: "#F2F6F9",
+      listItemBGHover: "#E8F0F4",
       na: {
         dark: "#52BDEC",
         light: "#DCF2FB",
@@ -187,6 +190,7 @@ const theme: ThemeOptions = {
       fontWeight: 400,
       color: "#5B5B5B",
       fontFamily: "Noto Sans",
+      wordBreak: "break-word",
     },
 
     body1: {
