@@ -67,10 +67,7 @@ describe("AssociatedRecordsPanel", async () => {
   });
 
   test("should render AssociatedRecordsPanel", () => {
-    waitFor(() => 
-      screen.findAllByText("Parent Record")
-    )
-    .then(() => {
+    waitFor(() => screen.findAllByText("Parent Record")).then(() => {
       const parentRecordText = screen.queryAllByText("Parent Record");
       // one is button, another is list title
       expect(parentRecordText).toHaveLength(2);
