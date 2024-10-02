@@ -44,11 +44,11 @@ describe("AssociatedRecordsPanel", async () => {
 
   beforeEach(() => {
     openSpy = vi.spyOn(window, "open").mockImplementation(
-      (url, target, features) => { 
-        console.log(`spy open window called ${url} ${target} ${features}`); return null 
+      (url, target, features) => {
+        console.log(`spy open window called ${url} ${target} ${features}`); return null
       }
     );
-    
+
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -75,7 +75,7 @@ describe("AssociatedRecordsPanel", async () => {
   });
 
   test("should open a new tab when clicking on a record abstract", () => {
-    waitFor(() => 
+    waitFor(() =>
       screen.findAllByText(
         "Northern Australia Automated Marine Weather and Oceanographic Stations"
       )
@@ -88,14 +88,14 @@ describe("AssociatedRecordsPanel", async () => {
       parentTitle && userEvent.click(parentTitle);
       const parentAbstract = screen.queryByText(/weather stations have been/i);
       expect(parentAbstract).to.exist;
-  
+
       parentAbstract && userEvent.click(parentAbstract)
         .then(() => {
           expect(openSpy).toHaveBeenCalledWith(
             "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
             "_blank",
             "noopener,noreferrer"
-          );    
+          );
         });
     });
   });
