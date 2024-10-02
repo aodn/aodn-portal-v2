@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, vi, SpyInstance } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, vi } from "vitest";
 import { server } from "../../../../../__mocks__/server";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import AssociatedRecordsPanel from "../AssociatedRecordsPanel";
@@ -40,14 +40,15 @@ afterAll(() => {
 
 describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
-  let openSpy: SpyInstance;
+  let openSpy: any;
 
   beforeEach(() => {
-    openSpy = vi.spyOn(window, "open").mockImplementation(
-      (url, target, features) => {
-        console.log(`spy open window called ${url} ${target} ${features}`); return null
-      }
-    );
+    openSpy = vi
+      .spyOn(window, "open")
+      .mockImplementation((url, target, features) => {
+        console.log(`spy open window called ${url} ${target} ${features}`);
+        return null;
+      });
 
     render(
       <Provider store={store}>
@@ -82,15 +83,15 @@ describe("AssociatedRecordsPanel", async () => {
     ).then(async () => {
       const parentTitle = await screen.findByTestId(
         "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
-      )
+      );
       expect(parentTitle).to.exist;
 
       parentTitle && userEvent.click(parentTitle);
       const parentAbstract = screen.queryByText(/weather stations have been/i);
       expect(parentAbstract).to.exist;
 
-      parentAbstract && userEvent.click(parentAbstract)
-        .then(() => {
+      parentAbstract &&
+        userEvent.click(parentAbstract).then(() => {
           expect(openSpy).toHaveBeenCalledWith(
             "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
             "_blank",

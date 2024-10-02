@@ -42,7 +42,7 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
       );
     });
     return components;
-  }, [openRecord, records]);
+  }, [records]);
 
   return <ExpandableList title={title} childrenList={collapseComponents} />;
 };
