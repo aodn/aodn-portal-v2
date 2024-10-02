@@ -60,7 +60,7 @@ const AssociatedRecordsPanel = () => {
     }
 
     return { parent: parents?.[0], children, siblings };
-  }, [generateRecordBy, links]);
+  }, [links]);
 
   useEffect(() => {
     if (!context.collection) {
