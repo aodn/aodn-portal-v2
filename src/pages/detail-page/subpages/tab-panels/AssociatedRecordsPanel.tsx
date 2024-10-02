@@ -10,27 +10,27 @@ import AssociatedRecordList from "../../../../components/list/AssociatedRecordLi
 import NavigatablePanel from "./NavigatablePanel";
 import { parseJson } from "../../../../utils/Helpers";
 
+const getUuid = (str: string) => {
+  if (!str.includes(":") || !str.includes("uuid")) {
+    console.error("Invalid uuid string");
+  }
+  return str.split(":").pop();
+};
+
+const generateRecordBy = (link: ILink) => {
+  const { title, recordAbstract } = parseJson(link.title);
+  const uuid = getUuid(link.href);
+  return {
+    uuid: uuid ? uuid : "",
+    title: title,
+    abstract: recordAbstract,
+  };
+};
+
 const AssociatedRecordsPanel = () => {
   const context = useDetailPageContext();
   const links = context.collection?.links;
   const [isLoading, setIsLoading] = useState(true);
-
-  const getUuid = (str: string) => {
-    if (!str.includes(":") || !str.includes("uuid")) {
-      console.error("Invalid uuid string");
-    }
-    return str.split(":").pop();
-  };
-
-  const generateRecordBy = useCallback((link: ILink) => {
-    const { title, recordAbstract } = parseJson(link.title);
-    const uuid = getUuid(link.href);
-    return {
-      uuid: uuid ? uuid : "",
-      title: title,
-      abstract: recordAbstract,
-    };
-  }, []);
 
   const associatedRecords: IAssociatedRecordGroup = useMemo(() => {
     const parents: IAssociatedRecord[] = [];

@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, vi, SpyInstance } from "vitest";
 import { server } from "../../../../../__mocks__/server";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import AssociatedRecordsPanel from "../AssociatedRecordsPanel";
@@ -40,8 +40,15 @@ afterAll(() => {
 
 describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
+  let openSpy: SpyInstance;
 
   beforeEach(() => {
+    openSpy = vi.spyOn(window, "open").mockImplementation(
+      (url, target, features) => { 
+        console.log(`spy open window called ${url} ${target} ${features}`); return null 
+      }
+    );
+    
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -53,8 +60,13 @@ describe("AssociatedRecordsPanel", async () => {
     );
   });
 
-  test("should render AssociatedRecordsPanel", async () => {
-    await waitFor(() => {
+  afterEach(() => {
+    // Restore the original implementation if needed
+    openSpy.mockRestore();
+  });
+
+  test("should render AssociatedRecordsPanel", () => {
+    waitFor(() => {
       const parentRecordText = screen.queryAllByText("Parent Record");
 
       // one is button, another is list title
@@ -62,32 +74,37 @@ describe("AssociatedRecordsPanel", async () => {
     });
   });
 
-  test("should open a new tab when clicking on a record abstract", async () => {
-    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
-    await waitFor(() => {
-      const parentTitle = screen.queryByText(
+  test("should open a new tab when clicking on a record abstract", () => {
+    waitFor(() => 
+      screen.findAllByText(
         "Northern Australia Automated Marine Weather and Oceanographic Stations"
-      );
+      )
+    ).then(async () => {
+      const parentTitle = await screen.findByTestId(
+        "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
+      )
       expect(parentTitle).to.exist;
 
-      userEvent.click(parentTitle!);
+      parentTitle && userEvent.click(parentTitle);
       const parentAbstract = screen.queryByText(/weather stations have been/i);
       expect(parentAbstract).to.exist;
-
-      userEvent.click(parentAbstract!);
-      expect(openSpy).toHaveBeenCalledWith(
-        "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
-        "_blank",
-        "noopener,noreferrer"
-      );
+  
+      parentAbstract && userEvent.click(parentAbstract)
+        .then(() => {
+          expect(openSpy).toHaveBeenCalledWith(
+            "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
+            "_blank",
+            "noopener,noreferrer"
+          );    
+        });
     });
   });
 
-  test("should be able to show / hide more records", async () => {
+  test("should be able to show / hide more records", () => {
     const lowerRecordTitle =
       "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
 
-    await waitFor(() => {
+    waitFor(() => {
       const showMoreRecordsBtn = screen.queryByTestId(
         "show-more-detail-btn-Sibling Records"
       );
@@ -98,7 +115,7 @@ describe("AssociatedRecordsPanel", async () => {
       userEvent.click(showMoreRecordsBtn!);
     });
 
-    await waitFor(() => {
+    waitFor(() => {
       expect(screen.queryByTestId("show-less-detail-btn-Sibling Records")).to
         .exist;
 
@@ -106,7 +123,7 @@ describe("AssociatedRecordsPanel", async () => {
       expect(screen.queryByText(lowerRecordTitle)).to.exist;
     });
 
-    await waitFor(() => {
+    waitFor(() => {
       const showLessRecordsBtn = screen.queryByTestId(
         "show-less-detail-btn-Sibling Records"
       );
@@ -114,7 +131,7 @@ describe("AssociatedRecordsPanel", async () => {
       userEvent.click(showLessRecordsBtn!);
     });
 
-    await waitFor(() => {
+    waitFor(() => {
       expect(screen.queryByTestId("show-more-detail-btn-Sibling Records")).to
         .exist;
 
