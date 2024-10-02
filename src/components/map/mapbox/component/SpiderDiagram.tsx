@@ -11,7 +11,7 @@ import { mergeWithDefaults } from "../../../common/utils";
 import { Feature, FeatureCollection, LineString, Point } from "geojson";
 import { createRoot } from "react-dom/client";
 import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
-import MapPopup, { PopupType } from "./MapPopup";
+import MapPopup, { MapPopupRef, PopupType } from "./MapPopup";
 import SpatialExtents from "./SpatialExtents";
 import { LayersProps } from "../layers/Layers";
 import { TestHelper } from "../../../common/test/helper";
@@ -90,6 +90,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
   showFullMap,
 }) => {
   const { map } = useContext(MapContext);
+  const mapPopupRef = useRef<MapPopupRef>(null);
   const [spiderifiedCluster, setSpiderifiedCluster] =
     useState<SpiderifiedClusterInfo | null>(null);
 
@@ -134,6 +135,9 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       if (map?.getSource(spiderLinesSourceId)) {
         map.removeSource(spiderLinesSourceId);
       }
+
+      // Ensure the popup is removed when the spider diagram is unspiderified, even if the mouse hasn't moved.
+      mapPopupRef.current?.forceRemovePopup();
 
       setSpiderifiedCluster(null);
     },
@@ -315,7 +319,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       const zoomDiff = currentZoom - spiderifiedAtZoom;
 
       // will unspiderify if:
-      // zoom in over 2 or zoom out over 0.5
+      // zoom in over 1 or zoom out over 0.5
       // or current zoom level hasn't reach spiderify-level
       // or current zoom level beyond next expansion zoom (cluster split now)
       const shouldUnspiderify =
@@ -454,6 +458,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
     <>
       {spiderifiedCluster && (
         <MapPopup
+          ref={mapPopupRef}
           layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
           onDatasetSelected={onDatasetSelected}
           popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
