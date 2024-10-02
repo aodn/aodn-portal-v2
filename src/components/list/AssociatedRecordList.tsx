@@ -12,17 +12,17 @@ interface AssociatedRecordListProps {
   records: IAssociatedRecord[];
 }
 
+const openRecord = (uuid: string) => {
+  const searchParams = new URLSearchParams();
+  searchParams.append("uuid", uuid);
+  const url = pageDefault.details + "?" + searchParams.toString();
+  openInNewTab(url);
+};
+
 const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
   title,
   records,
 }) => {
-  const openRecord = useCallback((uuid: string) => {
-    const searchParams = new URLSearchParams();
-    searchParams.append("uuid", uuid);
-    const url = pageDefault.details + "?" + searchParams.toString();
-    openInNewTab(url);
-  }, []);
-
   const collapseComponents: ReactNode[] = useMemo(() => {
     const components: ReactNode[] = [];
     records?.map((record, index) => {
@@ -42,7 +42,7 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
       );
     });
     return components;
-  }, [openRecord, records]);
+  }, [records]);
 
   return <ExpandableList title={title} childrenList={collapseComponents} />;
 };
