@@ -22,6 +22,7 @@ import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
 import { FeatureCollection, Geometry, Point } from "geojson";
+import { MapDefaultConfig } from "../Map";
 
 interface HeatmapLayer {
   maxZoom: number;
@@ -50,7 +51,7 @@ interface HeatmapLayerProps extends LayersProps {
 }
 
 const defaultHeatmapConfig: HeatmapConfig = {
-  clusterMaxZoom: 12,
+  clusterMaxZoom: MapDefaultConfig.MAX_ZOOM,
   heatmapSourceRadius: 10,
   circle: {
     strokeColor: "white",

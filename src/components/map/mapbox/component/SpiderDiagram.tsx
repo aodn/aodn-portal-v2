@@ -15,6 +15,7 @@ import MapPopup, { MapPopupRef, PopupType } from "./MapPopup";
 import SpatialExtents from "./SpatialExtents";
 import { LayersProps } from "../layers/Layers";
 import { TestHelper } from "../../../common/test/helper";
+import { MapDefaultConfig } from "../Map";
 
 interface SpiderifiedClusterInfo {
   id: string;
@@ -24,6 +25,7 @@ interface SpiderifiedClusterInfo {
 
 interface SpiderDiagramConfig {
   spiderifyFromZoomLevel: number;
+  maxSpiderLegs: number;
   circleSpiralSwitchover: number;
   circleFootSeparation: number;
   spiralFootSeparation: number;
@@ -47,6 +49,7 @@ interface SpiderDiagramProps extends LayersProps {
 
 const defaultSpiderDiagramConfig: SpiderDiagramConfig = {
   spiderifyFromZoomLevel: 7,
+  maxSpiderLegs: 50,
   circleSpiralSwitchover: 9,
   circleFootSeparation: 25,
   spiralFootSeparation: 28,
@@ -55,7 +58,7 @@ const defaultSpiderDiagramConfig: SpiderDiagramConfig = {
   lineColor: "#888",
   lineWidth: 1,
   circleRadius: 8,
-  circleColor: "green",
+  circleColor: "#f1f075",
   circleOpacity: 1,
   circleStrokeWidth: 1,
   circleStrokeColor: "#fff",
@@ -98,7 +101,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
     defaultSpiderDiagramConfig,
     spiderDiagramConfig
   );
-  const { spiderifyFromZoomLevel } = config;
+  const { spiderifyFromZoomLevel, maxSpiderLegs } = config;
 
   // Util function to check if a cluster can spiderify or not
   const shouldCreateSpiderDiagram = useCallback(
@@ -189,8 +192,8 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           let angle = 0;
           return Array.from({ length: count }, (_, index) => {
             angle += spiralFootSeparation / legLength + index * 0.0005;
-            const x = legLength * Math.cos(angle) * 20;
-            const y = legLength * Math.sin(angle) * 20;
+            const x = legLength * Math.cos(angle) * 40;
+            const y = legLength * Math.sin(angle) * 40;
             legLength += (2 * Math.PI * spiralLengthFactor) / angle;
             return { x, y, angle, legLength, index };
           });
@@ -202,8 +205,8 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           return Array.from({ length: count }, (_, index) => {
             const angle = index * angleStep;
             return {
-              x: legLength * Math.cos(angle) * 25,
-              y: legLength * Math.sin(angle) * 25,
+              x: legLength * Math.cos(angle) * 50,
+              y: legLength * Math.sin(angle) * 50,
               angle,
               legLength,
               index,
@@ -381,22 +384,28 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       // get cluster_id from feature for later query
       const clusterId = feature.properties?.cluster_id;
 
+      // get cluster count number
+      const clusterCount = Number(feature.properties?.point_count || 0);
+
       // get clicked cluster source
       const source = map?.getSource(clusterSourceId) as GeoJSONSource;
 
-      if (shouldCreateSpiderDiagram(features)) {
-        // get first up to 50 datasets in the cluster to avoid huge spider
-        // can adjust to a proper number if need
-        source.getClusterLeaves(clusterId, 50, 0, (err, leaves) => {
+      if (
+        shouldCreateSpiderDiagram(features) &&
+        clusterCount <= maxSpiderLegs
+      ) {
+        // get first up to maxSpiderLegs(default = 50) datasets in the cluster to avoid huge spider
+        // can adjust maxSpiderLegs to a proper number if need
+        source.getClusterLeaves(clusterId, maxSpiderLegs, 0, (err, leaves) => {
           if (err) {
             console.error("Error getting cluster leaves:", err);
             return;
           }
+          const datasets = leaves as Feature<Point>[];
 
           // Store the clicked cluster info
           source.getClusterExpansionZoom(clusterId, (err, zoom) => {
             if (err) return;
-            const datasets = leaves as Feature<Point>[];
             spiderify(coordinate, datasets, zoom);
           });
         });
@@ -404,17 +413,30 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
           if (err) return;
 
+          // If the next expansion zoom is larger than map default max zoom level, then no need to zoom in, just spiderify the cluster
+          if (zoom >= MapDefaultConfig.MAX_ZOOM) {
+            source.getClusterLeaves(
+              clusterId,
+              config.maxSpiderLegs,
+              0,
+              (err, leaves) => {
+                if (err) {
+                  console.error("Error getting cluster leaves:", err);
+                  return;
+                }
+                const datasets = leaves as Feature<Point>[];
+                spiderify(coordinate, datasets, zoom);
+              }
+            );
+            return;
+          }
+
           // if expansionZoom level hasn't reach the spiderify-zoomLevel, keep zoom into the expansion zoom
           // or go to the spiderify-zoomLevel if the expansion zoom beyond spiderify-zoomLevel
           const currentZoom = map?.getZoom();
           map?.easeTo({
             center: (feature.geometry as any).coordinates,
-            zoom:
-              zoom >= spiderifyFromZoomLevel
-                ? spiderifyFromZoomLevel
-                : zoom === currentZoom
-                  ? zoom + 1
-                  : zoom,
+            zoom: zoom === currentZoom ? zoom + 1 : zoom,
             duration: 500,
           });
         });
@@ -425,8 +447,9 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       clusterLayer,
       clusterSourceId,
       shouldCreateSpiderDiagram,
+      maxSpiderLegs,
       spiderify,
-      spiderifyFromZoomLevel,
+      config.maxSpiderLegs,
     ]
   );
 

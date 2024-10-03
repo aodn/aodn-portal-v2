@@ -30,7 +30,7 @@ interface MapProps {
   ) => void;
 }
 
-const MapDefault = {
+export const MapDefaultConfig = {
   // Magic number, try and error by experience
   DEBOUNCE_BEFORE_EVENT_FIRE: 700,
   CENTER_LONGITUDE: 134.0470865301421,
@@ -70,13 +70,13 @@ const styles = [
 
 const ReactMap = ({
   panelId,
-  centerLongitude = MapDefault.CENTER_LONGITUDE,
-  centerLatitude = MapDefault.CENTER_LATITUDE,
+  centerLongitude = MapDefaultConfig.CENTER_LONGITUDE,
+  centerLatitude = MapDefaultConfig.CENTER_LATITUDE,
   bbox,
-  zoom = MapDefault.ZOOM,
-  minZoom = MapDefault.MIN_ZOOM,
-  maxZoom = MapDefault.MAX_ZOOM,
-  projection = MapDefault.PROJECTION,
+  zoom = MapDefaultConfig.ZOOM,
+  minZoom = MapDefaultConfig.MIN_ZOOM,
+  maxZoom = MapDefaultConfig.MAX_ZOOM,
+  projection = MapDefaultConfig.PROJECTION,
   onZoomEvent,
   onMoveEvent,
   children,
@@ -92,7 +92,7 @@ const ReactMap = ({
         ) => onZoomEvent && onZoomEvent(event),
         [onZoomEvent]
       ),
-      MapDefault.DEBOUNCE_BEFORE_EVENT_FIRE
+      MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
     )
   ).current;
 
@@ -104,7 +104,7 @@ const ReactMap = ({
         ) => onMoveEvent && onMoveEvent(event),
         [onMoveEvent]
       ),
-      MapDefault.DEBOUNCE_BEFORE_EVENT_FIRE
+      MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
     )
   ).current;
 
@@ -114,7 +114,7 @@ const ReactMap = ({
         ? (new Map({
             container: panelId,
             accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
-            style: styles[MapDefault.DEFAULT_STYLE].style,
+            style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
             minZoom: minZoom,
@@ -195,4 +195,4 @@ const ReactMap = ({
 
 export default ReactMap;
 
-export { styles, MapDefault };
+export { styles, MapDefaultConfig as MapDefault };

@@ -20,6 +20,7 @@ import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { FeatureCollection, Point } from "geojson";
+import { MapDefaultConfig } from "../Map";
 
 interface ClusterSize {
   default?: number | string;
@@ -57,7 +58,7 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
     large: 30,
     extra_large: 50,
   },
-  clusterMaxZoom: 12,
+  clusterMaxZoom: MapDefaultConfig.MAX_ZOOM,
   clusterRadius: 50,
   // circle sizes define the radius(px) of the circles used to represent clusters on the map.
   clusterCircleSize: {
@@ -77,14 +78,12 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   clusterCircleStrokeWidth: 1,
   clusterCircleStrokeColor: "#fff",
   clusterCircleTextSize: 12,
-  unclusterPointColor: "green",
-  unclusterPointOpacity: 0.6,
+  unclusterPointColor: "#51bbd6",
+  unclusterPointOpacity: 1,
   unclusterPointStrokeWidth: 1,
   unclusterPointStrokeColor: "#fff",
   unclusterPointRadius: 8,
 };
-
-const spiderifyFromZoomLevel = 14;
 
 // These function help to get the correct id and reduce the need to set those id in the
 // useEffect list
