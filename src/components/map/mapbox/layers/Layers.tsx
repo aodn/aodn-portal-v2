@@ -99,6 +99,10 @@ const findSuitableVisiblePoint = (
   const visibleFeatures = featureCollection.features.filter((feature) =>
     isFeatureVisible(feature, bounds)
   );
+  // After map move some currentVisible point no longer visible.
+  const currentVisible = currentVisibleCollection?.features.filter((feature) =>
+    isFeatureVisible(feature, bounds)
+  );
 
   if (visibleFeatures.length === 0) return featureCollections;
 
@@ -125,9 +129,7 @@ const findSuitableVisiblePoint = (
       // Is this point visible in previous search? If yes then we prefer this
       // point over the most center point, this helps to reduce point change
       // for the same visible record
-      const f = currentVisibleCollection?.features?.find(
-        (o) => o.properties?.uuid === id
-      );
+      const f = currentVisible?.find((o) => o.properties?.uuid === id);
       uniqueFeatures.set(feature.properties?.uuid, f ? f : feature);
     }
   }
