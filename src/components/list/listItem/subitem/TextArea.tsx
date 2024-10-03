@@ -1,6 +1,7 @@
 import React from "react";
 import { Typography } from "@mui/material";
 import TextAreaBaseGrid from "./TextAreaBaseGrid";
+import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 
 interface TextAreaProps {
   text: string;
@@ -9,7 +10,9 @@ interface TextAreaProps {
 const TextArea: React.FC<TextAreaProps> = ({ text }) => {
   return (
     <TextAreaBaseGrid>
-      <Typography variant="detailContent">{text}</Typography>
+      <Typography variant="detailContent">
+        {decodeHtmlEntities(text)}
+      </Typography>
     </TextAreaBaseGrid>
   );
 };

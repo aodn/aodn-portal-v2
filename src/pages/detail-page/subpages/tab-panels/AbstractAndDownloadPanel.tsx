@@ -43,6 +43,7 @@ import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer"
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import useScrollToSection from "../../../../hooks/useScrollToSection";
+import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 
 interface DownloadSelect {
   label?: string;
@@ -154,7 +155,7 @@ const AbstractAndDownloadPanel: FC = () => {
         <Grid item xs={12}>
           <Stack direction="column">
             <Typography sx={{ padding: 0 }} data-testid="detail-abstract">
-              {abstract}
+              {decodeHtmlEntities(abstract)}
             </Typography>
             <Box sx={{ visibility: "visible" }}>
               <Box
