@@ -165,17 +165,25 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
                 }}
               >
                 <Grid item xs={12}>
-                  <FilterSection title={"Time Range"}>
+                  <FilterSection
+                    title={"Time Range"}
+                    toolTip="Recorded time span of the data"
+                    isTitleOnlyHeader
+                  >
                     <DateRangeFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>
-                  <FilterSection title={"Depth"}>
+                  <FilterSection title={"Depth"} toolTip="Depth">
                     <DepthFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={7}>
-                  <FilterSection isTitleOnlyHeader title={"Parameters"}>
+                  <FilterSection
+                    isTitleOnlyHeader
+                    title={"Parameters"}
+                    toolTip="Parameters"
+                  >
                     <ParameterVocabFilter
                       filter={filter}
                       setFilter={setFilter}
@@ -183,7 +191,11 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>
-                  <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
+                  <FilterSection
+                    isTitleOnlyHeader
+                    title={"Data Delivery Mode"}
+                    toolTip="Data Delivery Mode"
+                  >
                     <DataDeliveryModeFilter
                       filter={filter}
                       setFilter={setFilter}
