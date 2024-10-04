@@ -21,8 +21,8 @@ import MapPopup, { PopupType } from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
-import { FeatureCollection, Geometry, Point } from "geojson";
-import { MapDefaultConfig } from "../Map";
+import { FeatureCollection, Point } from "geojson";
+import { MapDefaultConfig } from "../constants";
 
 interface HeatmapLayer {
   maxZoom: number;

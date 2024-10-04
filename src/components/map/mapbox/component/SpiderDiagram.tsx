@@ -15,7 +15,7 @@ import MapPopup, { MapPopupRef, PopupType } from "./MapPopup";
 import SpatialExtents from "./SpatialExtents";
 import { LayersProps } from "../layers/Layers";
 import { TestHelper } from "../../../common/test/helper";
-import { MapDefaultConfig } from "../Map";
+import { MapDefaultConfig } from "../constants";
 
 interface SpiderifiedClusterInfo {
   id: string;

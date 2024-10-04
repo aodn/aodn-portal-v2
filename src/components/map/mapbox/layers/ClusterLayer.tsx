@@ -20,7 +20,7 @@ import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { FeatureCollection, Point } from "geojson";
-import { MapDefaultConfig } from "../Map";
+import { MapDefaultConfig } from "../constants";
 
 interface ClusterSize {
   default?: number | string;

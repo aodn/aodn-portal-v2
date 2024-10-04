@@ -12,6 +12,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import lodash from "lodash";
 import { TestHelper } from "../../common/test/helper";
+import { MapDefaultConfig } from "./constants";
 
 interface MapProps {
   centerLongitude?: number;
@@ -29,18 +30,6 @@ interface MapProps {
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
 }
-
-export const MapDefaultConfig = {
-  // Magic number, try and error by experience
-  DEBOUNCE_BEFORE_EVENT_FIRE: 700,
-  CENTER_LONGITUDE: 134.0470865301421,
-  CENTER_LATITUDE: -27.609351801462687,
-  ZOOM: 4,
-  MIN_ZOOM: 1,
-  MAX_ZOOM: 12,
-  PROJECTION: "equirectangular",
-  DEFAULT_STYLE: 3,
-};
 
 // Styles can be found here https://developers.arcgis.com/rest/basemap-styles/
 // but require feeds.
