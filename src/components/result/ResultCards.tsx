@@ -10,6 +10,8 @@ import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./constants";
 import { gap, padding } from "../../styles/constants";
+import SelectedListCard from "./SelectedListCard";
+import SelectedGridCard from "./SelectedGridCard";
 
 export interface ResultCard {
   content?: OGCCollection;
@@ -32,56 +34,6 @@ interface ResultCardsProps extends ResultCardsList {}
 interface SelectedCardsProps extends ResultCard {
   hasSelectedDatasets: boolean;
 }
-const renderSelectedListCards: FC<SelectedCardsProps> = ({
-  hasSelectedDatasets,
-  content,
-  onDownload,
-  onLink,
-  onDetail,
-  onClickCard,
-}) => {
-  if (!hasSelectedDatasets) return;
-  return (
-    <Box height={LIST_CARD_HEIGHT - LIST_CARD_GAP * 2} mb={gap.lg}>
-      <ListResultCard
-        content={content}
-        onDownload={onDownload}
-        onLink={onLink}
-        onDetail={onDetail}
-        onClickCard={onClickCard}
-        isSelectedDataset
-      />
-    </Box>
-  );
-};
-
-// For now only one dataset can be selected at a time, so use datasetsSelected[0] for selected list/grid card
-const renderSelectedGridCards: FC<SelectedCardsProps> = ({
-  hasSelectedDatasets,
-  content,
-  onDownload,
-  onLink,
-  onClickCard,
-  onDetail,
-}) => {
-  if (!hasSelectedDatasets) return;
-  return (
-    <Box
-      width={"calc(50% - 7px)"}
-      height={GRID_CARD_HEIGHT - LIST_CARD_GAP}
-      mb={gap.lg}
-    >
-      <GridResultCard
-        content={content}
-        onDownload={onDownload}
-        onLink={onLink}
-        onClickCard={onClickCard}
-        onDetail={onDetail}
-        isSelectedDataset
-      />
-    </Box>
-  );
-};
 
 const ResultCards = ({
   contents,
@@ -225,15 +177,15 @@ const ResultCards = ({
         ref={componentRef}
         data-testid="resultcard-result-list"
       >
-        {hasSelectedDatasets &&
-          renderSelectedListCards({
-            hasSelectedDatasets,
-            content: datasetsSelected[0],
-            onDownload,
-            onLink,
-            onClickCard,
-            onDetail,
-          })}
+        {hasSelectedDatasets && (
+          <SelectedListCard
+            content={datasetsSelected[0]}
+            onDownload={onDownload}
+            onLink={onLink}
+            onDetail={onDetail}
+            onClickCard={onClickCard}
+          />
+        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
@@ -269,15 +221,15 @@ const ResultCards = ({
         ref={componentRef}
         data-testid="resultcard-result-grid"
       >
-        {hasSelectedDatasets &&
-          renderSelectedGridCards({
-            hasSelectedDatasets,
-            content: datasetsSelected[0],
-            onDownload,
-            onLink,
-            onClickCard,
-            onDetail,
-          })}
+        {hasSelectedDatasets && (
+          <SelectedGridCard
+            content={datasetsSelected[0]}
+            onDownload={onDownload}
+            onLink={onLink}
+            onDetail={onDetail}
+            onClickCard={onClickCard}
+          />
+        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
