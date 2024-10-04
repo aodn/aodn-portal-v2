@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { CollectionsQueryType } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Box, Grid, ListItem, SxProps, Theme } from "@mui/material";
@@ -8,17 +8,14 @@ import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
-import { GRID_CARD_HEIGHT, LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./constants";
-import { gap, padding } from "../../styles/constants";
+import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
+import { padding } from "../../styles/constants";
 import SelectedListCard from "./SelectedListCard";
 import SelectedGridCard from "./SelectedGridCard";
-import { pageDefault } from "../common/constants";
-import { useNavigate } from "react-router-dom";
 
 export interface ResultCard {
   content?: OGCCollection;
   onClickCard?: (uuid: string) => void;
-  onDetail?: (uuid: string) => void;
 }
 
 export interface ResultCardsList extends ResultCard {
@@ -29,14 +26,22 @@ export interface ResultCardsList extends ResultCard {
   datasetsSelected?: OGCCollection[];
 }
 
-interface ResultCardsProps extends ResultCardsList {}
+interface ResultCardsProps {
+  content?: OGCCollection;
+  onClickCard?: (uuid: string) => void;
+  contents: CollectionsQueryType;
+  layout?: SearchResultLayoutEnum;
+  onFetchMore?: (() => void) | undefined;
+  sx?: SxProps<Theme>;
+  datasetsSelected?: OGCCollection[];
+}
 
 const ResultCards = ({
   contents,
   layout,
   sx,
   datasetsSelected,
-  onClickCard,
+  onClickCard = () => {},
   onFetchMore,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +50,6 @@ const ResultCards = ({
 
   const count = contents.result.collections.length;
   const total = contents.result.total;
-  const navigate = useNavigate();
 
   const renderLoadMoreButton = useCallback(() => {
     return (
@@ -64,7 +68,7 @@ const ResultCards = ({
     (
       count: number,
       total: number,
-      { contents, onClickCard, onDetail }: ResultCardsProps,
+      { contents, onClickCard }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
       const { index, style } = child;
@@ -116,7 +120,7 @@ const ResultCards = ({
     (
       count: number,
       total: number,
-      { contents, onClickCard, onDetail }: ResultCardsProps,
+      { contents, onClickCard }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
       // The style must pass to the listitem else incorrect rendering
@@ -142,7 +146,6 @@ const ResultCards = ({
           <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
             <ListResultCard
               content={contents.result.collections[index]}
-              onDetail={onDetail}
               onClickCard={onClickCard}
             />
           </ListItem>

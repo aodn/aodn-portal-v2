@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback } from "react";
+import { FC, ReactNode } from "react";
 import { Grid, SxProps } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import InfoIcon from "@mui/icons-material/Info";
@@ -10,8 +10,6 @@ import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import ResultCardButton from "../common/buttons/ResultCardButton";
 import { color } from "../../styles/constants";
 import useTabNavigation from "../../hooks/useTabNavigation";
-import { pageDefault } from "../common/constants";
-import { useNavigate } from "react-router-dom";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
@@ -79,15 +77,6 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   shouldHideText = false,
 }) => {
   const goToDetailPanel = useTabNavigation();
-  const navigate = useNavigate();
-  const onDetail = useCallback(
-    (uuid: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.append("uuid", uuid);
-      navigate(pageDefault.details + "?" + searchParams.toString());
-    },
-    [navigate]
-  );
 
   const ButtonContainer: FC<ButtonContainerProps> = ({ children, sx }) => (
     <Grid
@@ -129,7 +118,9 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={DownloadIcon}
           text="Download"
           shouldHideText={shouldHideText}
-          onClick={() => goToDetailPanel(content.id, "download-section")}
+          onClick={() =>
+            goToDetailPanel(content.id, "abstract", "download-section")
+          }
         />
       </ButtonContainer>
       <ButtonContainer>
@@ -137,7 +128,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={InfoIcon}
           text="More details ..."
           shouldHideText={shouldHideText}
-          onClick={() => onDetail(content.id)}
+          onClick={() => goToDetailPanel(content.id, "abstract")}
         />
       </ButtonContainer>
     </Grid>

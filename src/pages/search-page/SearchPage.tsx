@@ -45,7 +45,6 @@ import {
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
-import useTabNavigation from "../../hooks/useTabNavigation";
 
 const SEARCH_BAR_HEIGHT = 56;
 const RESULT_SECTION_WIDTH = 500;
@@ -347,7 +346,6 @@ const SearchPage = () => {
                     }}
                     onVisibilityChanged={onVisibilityChanged}
                     onClickCard={handleClickCard}
-                    onDetail={handleNavigateToDetailPage}
                     onChangeSorting={onChangeSorting}
                     datasetsSelected={datasetsSelected}
                     isLoading={isLoading(loadingThreadCount)}
