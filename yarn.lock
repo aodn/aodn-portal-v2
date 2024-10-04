@@ -3878,6 +3878,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/he@npm:^1":
+  version: 1.2.3
+  resolution: "@types/he@npm:1.2.3"
+  checksum: 10c0/562e4ec00e31e3d464e79e6da4b8a5c21999d38ceca6a8facaa96e89c2d646f410bb58bb81f48a7472aeb4655ce40d27b7d77e5a4fa5a2d9caa0f3037caab5b7
+  languageName: node
+  linkType: hard
+
 "@types/http-proxy@npm:^1.17.8":
   version: 1.17.14
   resolution: "@types/http-proxy@npm:1.17.14"
@@ -4774,6 +4781,7 @@ __metadata:
     "@testing-library/react": "npm:^14.3.1"
     "@testing-library/user-event": "npm:^14.5.2"
     "@turf/turf": "npm:7.0.0"
+    "@types/he": "npm:^1"
     "@types/jest": "npm:^29.5.12"
     "@types/lodash": "npm:^4.17.0"
     "@types/mapbox__geo-viewport": "npm:^0.5.3"
@@ -4805,6 +4813,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.5"
     events: "npm:3.3.0"
     geojson: "npm:0.5.0"
+    he: "npm:^1.2.0"
     http-proxy-middleware: "npm:^2.0.6"
     husky: "npm:^9.1.1"
     lint-staged: "npm:^15.2.2"
@@ -7771,6 +7780,15 @@ __metadata:
   version: 0.0.3
   resolution: "hat@npm:0.0.3"
   checksum: 10c0/9d502b26b612ed3e66491296873119574e61a4ef99dfc5501f7bf86115fde35d0f76b1167257c8224c88092eda04e40feda805ad5b86c3b90203f4e15fd99f53
+  languageName: node
+  linkType: hard
+
+"he@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "he@npm:1.2.0"
+  bin:
+    he: bin/he
+  checksum: 10c0/a27d478befe3c8192f006cdd0639a66798979dfa6e2125c6ac582a19a5ebfec62ad83e8382e6036170d873f46e4536a7e795bf8b95bf7c247f4cc0825ccc8c17
   languageName: node
   linkType: hard
 

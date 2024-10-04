@@ -1,6 +1,10 @@
 import React, { useCallback, useState } from "react";
 import TextAreaBaseGrid from "./TextAreaBaseGrid";
 import { Button, Grid, Typography } from "@mui/material";
+import {
+  decodeHtmlEntities,
+  truncateText,
+} from "../../../../utils/StringUtils";
 
 interface ExpandableTextAreaProps {
   text: string;
@@ -15,16 +19,15 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   isClickable = false,
   onClick = () => {},
 }) => {
-  const truncatedText =
-    text.length > truncateCount ? text.slice(0, truncateCount) + "..." : text;
-  const doesNeedTruncation = text.length > truncateCount;
+  const decodedText = decodeHtmlEntities(text);
+  const truncatedText = truncateText(decodedText, truncateCount);
+  const doesNeedTruncation = decodedText.length > truncateCount;
 
   const [isExpanded, setIsExpanded] = useState(false);
 
   const onButtonClick = useCallback(() => {
     setIsExpanded((prev) => !prev);
   }, []);
-
   return (
     <TextAreaBaseGrid>
       <Grid item md={12}>
@@ -41,7 +44,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
           }}
           onClick={onClick}
         >
-          {isExpanded ? text : truncatedText}
+          {isExpanded ? decodedText : truncatedText}
         </Typography>
       </Grid>
       <Grid item md={12} display="flex" justifyContent="flex-end">
