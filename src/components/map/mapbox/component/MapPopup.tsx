@@ -34,7 +34,6 @@ interface MapPopupProps {
   layerId: string;
   popupType?: PopupType;
   onDatasetSelected?: (uuid: Array<string>) => void;
-  onNavigateToDetail?: (uuid: string) => void;
 }
 export interface MapPopupRef {
   forceRemovePopup: () => void;

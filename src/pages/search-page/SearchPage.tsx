@@ -250,15 +250,6 @@ const SearchPage = () => {
     }
   }, [location, dispatch, doSearch]);
 
-  const handleNavigateToDetailPage = useCallback(
-    (uuid: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.append("uuid", uuid);
-      navigate(pageDefault.details + "?" + searchParams.toString());
-    },
-    [navigate]
-  );
-
   const onChangeSorting = useCallback(
     (v: SortResultEnum) => {
       switch (v) {
@@ -365,7 +356,6 @@ const SearchPage = () => {
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
                   isLoading={isLoading(loadingThreadCount)}
-                  onNavigateToDetail={handleNavigateToDetailPage}
                 />
               </Box>
             </Box>
