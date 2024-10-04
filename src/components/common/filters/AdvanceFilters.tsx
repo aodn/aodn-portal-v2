@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import {
   ParameterState,
   updateParameterVocabs,
@@ -166,7 +166,7 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
               >
                 <Grid item xs={12}>
                   <FilterSection
-                    title={"Time Range"}
+                    title="Time Range"
                     toolTip="Recorded time span of the data"
                     isTitleOnlyHeader
                   >
@@ -174,15 +174,18 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>
-                  <FilterSection title={"Depth"} toolTip="Depth">
+                  <FilterSection
+                    title="Depth"
+                    toolTip="Filter by the depth of the measurements"
+                  >
                     <DepthFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={7}>
                   <FilterSection
                     isTitleOnlyHeader
-                    title={"Parameters"}
-                    toolTip="Parameters"
+                    title="Parameters"
+                    toolTip="Filter by the parameter that has been measured or observed"
                   >
                     <ParameterVocabFilter
                       filter={filter}
@@ -194,7 +197,7 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
                   <FilterSection
                     isTitleOnlyHeader
                     title={"Data Delivery Mode"}
-                    toolTip="Data Delivery Mode"
+                    toolTip="Filter by the how up to date the data is"
                   >
                     <DataDeliveryModeFilter
                       filter={filter}
