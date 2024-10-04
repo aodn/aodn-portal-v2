@@ -27,6 +27,8 @@ import {
 import { useAppDispatch } from "../../../common/store/hooks";
 import BasicMapHoverTip from "../../../common/hover-tip/BasicMapHoverTip";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
+import { pageDefault } from "../../../common/constants";
+import { useNavigate } from "react-router-dom";
 
 interface MapPopupProps {
   layerId: string;
@@ -88,15 +90,6 @@ const renderLoadingBox = ({
   </Box>
 );
 
-const handleNavigateToDetailPage = (
-  uuid: string,
-  onNavigateToDetail?: (uuid: string) => void
-) => {
-  if (onNavigateToDetail) {
-    onNavigateToDetail(uuid);
-  }
-};
-
 const handleDatasetSelect = (
   uuid: string,
   onDatasetSelected?: (uuid: Array<string>) => void
@@ -107,12 +100,7 @@ const handleDatasetSelect = (
 };
 
 const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  {
-    layerId,
-    onDatasetSelected,
-    onNavigateToDetail,
-    popupType = PopupType.Basic,
-  },
+  { layerId, onDatasetSelected, popupType = PopupType.Basic },
   ref
 ) => {
   const dispatch = useAppDispatch();
@@ -124,6 +112,15 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
   const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
   const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
   const [popupContent, setPopupContent] = useState<ReactNode | null>(null);
+  const navigate = useNavigate();
+  const onNavigateToDetailPage = useCallback(
+    (uuid: string) => {
+      const searchParams = new URLSearchParams();
+      searchParams.append("uuid", uuid);
+      navigate(pageDefault.details + "?" + searchParams.toString());
+    },
+    [navigate]
+  );
 
   const getCollectionData = useCallback(
     async (uuid: string) => {
@@ -178,10 +175,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
                 <ComplexMapHoverTip
                   collection={collection}
                   onNavigateToDetail={() =>
-                    handleNavigateToDetailPage(
-                      collection.id,
-                      onNavigateToDetail
-                    )
+                    onNavigateToDetailPage(collection.id)
                   }
                   onDatasetSelected={() =>
                     handleDatasetSelect(collection.id, onDatasetSelected)
@@ -193,7 +187,13 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         </ThemeProvider>
       );
     },
-    [onDatasetSelected, onNavigateToDetail, popupHeight, popupType, popupWidth]
+    [
+      onDatasetSelected,
+      onNavigateToDetailPage,
+      popupHeight,
+      popupType,
+      popupWidth,
+    ]
   );
 
   const removePopup = useCallback(() => {

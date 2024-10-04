@@ -12,6 +12,8 @@ import { GRID_CARD_HEIGHT, LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./constants";
 import { gap, padding } from "../../styles/constants";
 import SelectedListCard from "./SelectedListCard";
 import SelectedGridCard from "./SelectedGridCard";
+import { pageDefault } from "../common/constants";
+import { useNavigate } from "react-router-dom";
 
 export interface ResultCard {
   content?: OGCCollection;
@@ -31,10 +33,6 @@ export interface ResultCardsList extends ResultCard {
 
 interface ResultCardsProps extends ResultCardsList {}
 
-interface SelectedCardsProps extends ResultCard {
-  hasSelectedDatasets: boolean;
-}
-
 const ResultCards = ({
   contents,
   layout,
@@ -43,7 +41,6 @@ const ResultCards = ({
   onClickCard,
   onDownload,
   onLink,
-  onDetail,
   onFetchMore,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
@@ -52,6 +49,16 @@ const ResultCards = ({
 
   const count = contents.result.collections.length;
   const total = contents.result.total;
+  const navigate = useNavigate();
+
+  const onDetail = useCallback(
+    (uuid: string) => {
+      const searchParams = new URLSearchParams();
+      searchParams.append("uuid", uuid);
+      navigate(pageDefault.details + "?" + searchParams.toString());
+    },
+    [navigate]
+  );
 
   const renderLoadMoreButton = useCallback(() => {
     return (
