@@ -9,12 +9,13 @@ import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import ResultCardButton from "../common/buttons/ResultCardButton";
 import { color } from "../../styles/constants";
+import useTabNavigation from "../../hooks/useTabNavigation";
+import { pageDefault } from "../common/constants";
+import { useNavigate } from "react-router-dom";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
-  onDownload?: () => void;
   onDetail?: () => void;
-  onLink?: () => void;
   isGridView?: boolean;
   shouldHideText?: boolean;
 }
@@ -74,12 +75,20 @@ const renderStatusButton = (
 
 const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
-  onDetail,
-  onLink,
-  onDownload,
   isGridView,
   shouldHideText = false,
 }) => {
+  const goToDetailPanel = useTabNavigation();
+  const navigate = useNavigate();
+  const onDetail = useCallback(
+    (uuid: string) => {
+      const searchParams = new URLSearchParams();
+      searchParams.append("uuid", uuid);
+      navigate(pageDefault.details + "?" + searchParams.toString());
+    },
+    [navigate]
+  );
+
   const ButtonContainer: FC<ButtonContainerProps> = ({ children, sx }) => (
     <Grid
       item
@@ -107,11 +116,11 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
             startIcon={LinkIcon}
             text={generateLinkText(links.length)}
             shouldHideText={shouldHideText}
-            onClick={onLink}
+            onClick={() => goToDetailPanel(content.id, "links")}
             resultCardButtonConfig={{
               color: links.length > 0 ? color.blue.dark : color.gray.light,
             }}
-            disable={!!(links.length === 0)}
+            disable={links.length === 0}
           />
         )}
       </ButtonContainer>
@@ -120,7 +129,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={DownloadIcon}
           text="Download"
           shouldHideText={shouldHideText}
-          onClick={onDownload}
+          onClick={() => goToDetailPanel(content.id, "download-section")}
         />
       </ButtonContainer>
       <ButtonContainer>
@@ -128,7 +137,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={InfoIcon}
           text="More details ..."
           shouldHideText={shouldHideText}
-          onClick={onDetail}
+          onClick={() => onDetail(content.id)}
         />
       </ButtonContainer>
     </Grid>

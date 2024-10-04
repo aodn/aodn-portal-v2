@@ -6,17 +6,11 @@ import { Box } from "@mui/material";
 
 interface SelectedGridCardProps {
   content: any;
-  onDownload: (uuid: string, tab: string, section?: string) => void;
-  onLink: (uuid: string, tab: string, section?: string) => void;
-  onDetail: (uuid: string) => void;
   onClickCard: (uuid: string) => void;
 }
 
 const SelectedGridCard: React.FC<SelectedGridCardProps> = ({
   content,
-  onDownload,
-  onLink,
-  onDetail,
   onClickCard,
 }) => {
   return (
@@ -27,10 +21,7 @@ const SelectedGridCard: React.FC<SelectedGridCardProps> = ({
     >
       <GridResultCard
         content={content}
-        onDownload={onDownload}
-        onLink={onLink}
         onClickCard={onClickCard}
-        onDetail={onDetail}
         isSelectedDataset
       />
     </Box>

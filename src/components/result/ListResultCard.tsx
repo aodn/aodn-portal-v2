@@ -29,8 +29,6 @@ interface ListResultCardProps extends ResultCard {
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
   content,
-  onDownload = () => {},
-  onLink = () => {},
   onDetail = () => {},
   onClickCard = () => {},
   isSelectedDataset,
@@ -120,9 +118,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
         {(isSelectedDataset || showButtons) && (
           <ResultCardButtonGroup
             content={content}
-            onDownload={() => onDownload(uuid, "abstract", "download-section")}
             onDetail={() => onDetail(uuid)}
-            onLink={() => onLink(uuid, "links")}
             shouldHideText
           />
         )}

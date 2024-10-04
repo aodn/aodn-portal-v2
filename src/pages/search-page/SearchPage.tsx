@@ -69,7 +69,6 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const navigateToTabAndSection = useTabNavigation();
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
@@ -351,8 +350,6 @@ const SearchPage = () => {
                     onDetail={handleNavigateToDetailPage}
                     onChangeSorting={onChangeSorting}
                     datasetsSelected={datasetsSelected}
-                    onDownload={navigateToTabAndSection}
-                    onLink={navigateToTabAndSection}
                     isLoading={isLoading(loadingThreadCount)}
                   />
                 </Box>

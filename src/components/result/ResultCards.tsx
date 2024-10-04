@@ -19,8 +19,6 @@ export interface ResultCard {
   content?: OGCCollection;
   onClickCard?: (uuid: string) => void;
   onDetail?: (uuid: string) => void;
-  onDownload?: (uuid: string, tab: string, section?: string) => void;
-  onLink?: (uuid: string, tab: string, section?: string) => void;
 }
 
 export interface ResultCardsList extends ResultCard {
@@ -39,8 +37,6 @@ const ResultCards = ({
   sx,
   datasetsSelected,
   onClickCard,
-  onDownload,
-  onLink,
   onFetchMore,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
@@ -50,15 +46,6 @@ const ResultCards = ({
   const count = contents.result.collections.length;
   const total = contents.result.total;
   const navigate = useNavigate();
-
-  const onDetail = useCallback(
-    (uuid: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.append("uuid", uuid);
-      navigate(pageDefault.details + "?" + searchParams.toString());
-    },
-    [navigate]
-  );
 
   const renderLoadMoreButton = useCallback(() => {
     return (
@@ -77,7 +64,7 @@ const ResultCards = ({
     (
       count: number,
       total: number,
-      { contents, onClickCard, onDownload, onLink, onDetail }: ResultCardsProps,
+      { contents, onClickCard, onDetail }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
       const { index, style } = child;
@@ -106,20 +93,14 @@ const ResultCards = ({
               <Grid item xs={6} sx={{ pr: 0.5 }}>
                 <GridResultCard
                   content={contents.result.collections[leftIndex]}
-                  onDownload={onDownload}
-                  onLink={onLink}
                   onClickCard={onClickCard}
-                  onDetail={onDetail}
                 />
               </Grid>
               {rightIndex < contents.result.collections.length && (
                 <Grid item xs={6} sx={{ pl: 0.5 }}>
                   <GridResultCard
                     content={contents.result.collections[rightIndex]}
-                    onDownload={onDownload}
-                    onLink={onLink}
                     onClickCard={onClickCard}
-                    onDetail={onDetail}
                   />
                 </Grid>
               )}
@@ -135,7 +116,7 @@ const ResultCards = ({
     (
       count: number,
       total: number,
-      { contents, onClickCard, onDownload, onLink, onDetail }: ResultCardsProps,
+      { contents, onClickCard, onDetail }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
       // The style must pass to the listitem else incorrect rendering
@@ -161,8 +142,6 @@ const ResultCards = ({
           <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
             <ListResultCard
               content={contents.result.collections[index]}
-              onDownload={onDownload}
-              onLink={onLink}
               onDetail={onDetail}
               onClickCard={onClickCard}
             />
@@ -187,9 +166,6 @@ const ResultCards = ({
         {hasSelectedDatasets && (
           <SelectedListCard
             content={datasetsSelected[0]}
-            onDownload={onDownload}
-            onLink={onLink}
-            onDetail={onDetail}
             onClickCard={onClickCard}
           />
         )}
@@ -208,9 +184,6 @@ const ResultCards = ({
                   {
                     contents,
                     onClickCard,
-                    onDownload,
-                    onLink,
-                    onDetail,
                   },
                   child
                 )
@@ -231,9 +204,6 @@ const ResultCards = ({
         {hasSelectedDatasets && (
           <SelectedGridCard
             content={datasetsSelected[0]}
-            onDownload={onDownload}
-            onLink={onLink}
-            onDetail={onDetail}
             onClickCard={onClickCard}
           />
         )}
@@ -252,9 +222,6 @@ const ResultCards = ({
                   {
                     contents,
                     onClickCard,
-                    onDownload,
-                    onLink,
-                    onDetail,
                   },
                   child
                 )
