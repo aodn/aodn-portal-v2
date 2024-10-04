@@ -18,6 +18,8 @@ interface MapProps {
   centerLatitude?: number;
   bbox?: LngLatBoundsLike;
   zoom?: number;
+  maxZoom?: number;
+  minZoom?: number;
   panelId: string;
   projection?: Projection | string;
   onZoomEvent?: (
@@ -34,6 +36,8 @@ const MapDefault = {
   CENTER_LONGITUDE: 134.0470865301421,
   CENTER_LATITUDE: -27.609351801462687,
   ZOOM: 4,
+  MAX_ZOOM: 14,
+  MIN_ZOOM: 2,
   PROJECTION: "equirectangular",
   DEFAULT_STYLE: 3,
 };
@@ -70,6 +74,8 @@ const ReactMap = ({
   centerLatitude = MapDefault.CENTER_LATITUDE,
   bbox,
   zoom = MapDefault.ZOOM,
+  maxZoom = MapDefault.MAX_ZOOM,
+  minZoom = MapDefault.MIN_ZOOM,
   projection = MapDefault.PROJECTION,
   onZoomEvent,
   onMoveEvent,
@@ -111,7 +117,9 @@ const ReactMap = ({
             style: styles[MapDefault.DEFAULT_STYLE].style,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
-            maxZoom: 14,
+            maxZoom: maxZoom,
+            minZoom: minZoom,
+            renderWorldCopies: true,
             testMode: import.meta.env.MODE === "dev",
             localIdeographFontFamily:
               "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
@@ -162,6 +170,8 @@ const ReactMap = ({
     onMoveEvent,
     debounceOnZoomEvent,
     debounceOnMoveEvent,
+    maxZoom,
+    minZoom,
   ]);
 
   useEffect(() => {

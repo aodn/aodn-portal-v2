@@ -1,13 +1,10 @@
 import React, { FC, useCallback, useContext, useEffect } from "react";
 import MapContext from "../MapContext";
-import {
-  fetchResultNoStore,
-  SearchParameters,
-} from "../../../common/store/searchReducer";
-import { MapLayerMouseEvent } from "mapbox-gl";
-import { OGCCollections } from "../../../common/store/OGCCollectionDefinitions";
+import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
+import { LngLat, LngLatBounds, MapLayerMouseEvent } from "mapbox-gl";
 import { useAppDispatch } from "../../../common/store/hooks";
-
+import { createCenterOfMassDataSource } from "../layers/Layers";
+import customMarker from "@/assets/logos/imos_logo_with_title.png";
 interface SpatialExtentsProps {
   layerId: string;
   // Selected uuids is managed in parent component, reflecting dataset that user selected from result list or map
@@ -39,14 +36,9 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   // util function to get collection data given uuid
   const getCollectionData = useCallback(
     async (uuid: string) => {
-      const param: SearchParameters = {
-        filter: `id='${uuid}'`,
-        properties: "id,geometry",
-      };
-
-      return dispatch(fetchResultNoStore(param))
+      return dispatch(fetchResultByUuidNoStore(uuid))
         .unwrap()
-        .then((value: OGCCollections) => value.collections[0])
+        .then((collection) => collection)
         .catch((error: any) => {
           console.error("Error fetching collection data:", error);
           // TODO: handle error in ErrorBoundary
@@ -78,6 +70,20 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
             type: "geojson",
             data: collection?.getGeometry(),
           });
+
+          // Zoom to overall bounding box: bbox[0]
+          const bboxes = collection?.extent?.bbox[0];
+          if (map && bboxes && Array.isArray(bboxes) && bboxes.length === 4) {
+            const sw = new LngLat(bboxes[0], bboxes[1]);
+            const ne = new LngLat(bboxes[2], bboxes[3]);
+            const givenBound = new LngLatBounds(sw, ne);
+
+            // we still have the problem that fit to bound not working as expected, need to find a better way
+            //  below magic numbers prevent givenBound which may have extreme shape(such as thin and long) won't fall outside of the map
+            map.fitBounds(givenBound, {
+              padding: { top: 300, bottom: 300, left: 100, right: 100 },
+            });
+          }
         }
 
         // util function to check if layer exists or not and add a before layerId
@@ -122,10 +128,34 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           filter: ["==", "$type", "Polygon"],
           paint: {
             "fill-color": "#fff",
-            "fill-opacity": 0.4,
+            "fill-opacity": 0.6,
             "fill-outline-color": "yellow",
           },
         });
+
+        if (collection) {
+          const selectedDatasetCenterPoint = createCenterOfMassDataSource([
+            collection,
+          ]);
+
+          map?.addSource("selected-dataset-point", {
+            type: "geojson",
+            data: selectedDatasetCenterPoint,
+          });
+
+          addLayerIfNotExists("selected-dataset-point-layer", {
+            id: "selected-dataset-point-layer",
+            type: "symbol",
+            source: "selected-dataset-point",
+            layout: {
+              "icon-image": "custom-marker",
+              "icon-size": 0.5,
+              "icon-allow-overlap": true,
+              "icon-anchor": "bottom", // This anchors the bottom of the icon to the point
+              "icon-offset": [0, -15], // This offsets the icon 15 pixels upwards
+            },
+          });
+        }
       });
     });
 
@@ -133,6 +163,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
       layerIds.forEach((id) => {
         try {
           if (map?.getLayer(id)) map?.removeLayer(id);
+          map?.removeLayer("selected-dataset-point-layer");
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
           console.log("Ok to ignore remove layer error", error);
@@ -143,6 +174,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
       sourceIds.forEach((id) => {
         try {
           if (map?.getSource(id)) map?.removeSource(id);
+          map?.removeSource("selected-dataset-point");
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
           console.log("Ok to ignore remove source error", error);
@@ -190,6 +222,15 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   );
 
   useEffect(() => {
+    map?.loadImage(
+      "https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png",
+      (error, image) => {
+        if (error) throw error;
+        if (!image) return;
+        if (map.hasImage("custom-marker")) return;
+        map.addImage("custom-marker", image);
+      }
+    );
     map?.on("click", layerId, onPointClick);
     map?.on("click", onEmptySpaceClick);
 
@@ -204,6 +245,9 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
     const cleanup = addSpatialExtentsLayer();
     return () => {
       cleanup();
+      if (map?.hasImage("custom-marker")) {
+        map.removeImage("custom-marker");
+      }
     };
   }, [addSpatialExtentsLayer]);
 
