@@ -11,7 +11,6 @@ import { fontColor, fontSize, fontWeight } from "../../../styles/constants";
 export interface BasicMapHoverTipProps {
   content?: string | undefined | null;
   sx?: SxProps;
-  onNavigateToDetail?: () => void;
   onDatasetSelected?: () => void;
 }
 

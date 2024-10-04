@@ -21,6 +21,7 @@ import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCard } from "./ResultCards";
+import useTabNavigation from "../../hooks/useTabNavigation";
 
 interface ListResultCardProps extends ResultCard {
   isSelectedDataset?: boolean;
@@ -29,11 +30,12 @@ interface ListResultCardProps extends ResultCard {
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
   content,
-  onDetail = () => {},
   onClickCard = () => {},
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
+
+  const goToDetailPage = useTabNavigation();
 
   if (!content) return;
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
@@ -70,7 +72,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
         mr={gap.sm}
       >
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea onClick={() => onDetail(uuid)}>
+          <CardActionArea onClick={() => goToDetailPage(uuid, "abstract")}>
             <Box
               display="flex"
               alignItems="center"
@@ -116,11 +118,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
           </Typography>
         </CardActionArea>
         {(isSelectedDataset || showButtons) && (
-          <ResultCardButtonGroup
-            content={content}
-            onDetail={() => onDetail(uuid)}
-            shouldHideText
-          />
+          <ResultCardButtonGroup content={content} shouldHideText />
         )}
       </Box>
 

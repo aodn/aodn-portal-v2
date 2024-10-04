@@ -13,7 +13,6 @@ import useTabNavigation from "../../hooks/useTabNavigation";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
-  onDetail?: () => void;
   isGridView?: boolean;
   shouldHideText?: boolean;
 }

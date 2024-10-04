@@ -14,7 +14,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { Box, Card, CardContent, CircularProgress } from "@mui/material";
 import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
-import { Point, Feature } from "geojson";
+import { Feature, Point } from "geojson";
 import {
   fetchResultNoStore,
   SearchParameters,
@@ -27,8 +27,6 @@ import {
 import { useAppDispatch } from "../../../common/store/hooks";
 import BasicMapHoverTip from "../../../common/hover-tip/BasicMapHoverTip";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
-import { pageDefault } from "../../../common/constants";
-import { useNavigate } from "react-router-dom";
 
 interface MapPopupProps {
   layerId: string;
@@ -111,15 +109,6 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
   const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
   const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
   const [popupContent, setPopupContent] = useState<ReactNode | null>(null);
-  const navigate = useNavigate();
-  const onNavigateToDetailPage = useCallback(
-    (uuid: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.append("uuid", uuid);
-      navigate(pageDefault.details + "?" + searchParams.toString());
-    },
-    [navigate]
-  );
 
   const getCollectionData = useCallback(
     async (uuid: string) => {
@@ -173,9 +162,6 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
               {popupType === PopupType.Complex && (
                 <ComplexMapHoverTip
                   collection={collection}
-                  onNavigateToDetail={() =>
-                    onNavigateToDetailPage(collection.id)
-                  }
                   onDatasetSelected={() =>
                     handleDatasetSelect(collection.id, onDatasetSelected)
                   }
@@ -186,13 +172,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         </ThemeProvider>
       );
     },
-    [
-      onDatasetSelected,
-      onNavigateToDetailPage,
-      popupHeight,
-      popupType,
-      popupWidth,
-    ]
+    [onDatasetSelected, popupHeight, popupType, popupWidth]
   );
 
   const removePopup = useCallback(() => {
