@@ -1,21 +1,17 @@
 import {
-  FC,
+  forwardRef,
+  ForwardRefRenderFunction,
   ReactNode,
   useCallback,
   useContext,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useState,
 } from "react";
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
-import {
-  Box,
-  Card,
-  CardActionArea,
-  CardContent,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Card, CardContent, CircularProgress } from "@mui/material";
 import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Point, Feature } from "geojson";
@@ -37,6 +33,9 @@ interface MapPopupProps {
   popupType?: PopupType;
   onDatasetSelected?: (uuid: Array<string>) => void;
   onNavigateToDetail?: (uuid: string) => void;
+}
+export interface MapPopupRef {
+  forceRemovePopup: () => void;
 }
 
 export enum PopupType {
@@ -107,12 +106,15 @@ const handleDatasetSelect = (
   }
 };
 
-const MapPopup: FC<MapPopupProps> = ({
-  layerId,
-  onDatasetSelected,
-  onNavigateToDetail,
-  popupType = PopupType.Basic,
-}) => {
+const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
+  {
+    layerId,
+    onDatasetSelected,
+    onNavigateToDetail,
+    popupType = PopupType.Basic,
+  },
+  ref
+) => {
   const dispatch = useAppDispatch();
   const { map } = useContext(MapContext);
   const { popupHeight, popupWidth } = useMemo(
@@ -204,6 +206,21 @@ const MapPopup: FC<MapPopupProps> = ({
     }
   }, [isMouseOverPoint, isMouseOverPopup, map]);
 
+  // Force remove the popup regardless of mouse position.
+  const forceRemovePopup = useCallback(() => {
+    popup.remove();
+    if (map) {
+      map.getCanvas().style.cursor = "";
+    }
+    setPopupContent(null);
+    setIsMouseOverPoint(false);
+    setIsMouseOverPopup(false);
+  }, [map]);
+
+  useImperativeHandle(ref, () => ({
+    forceRemovePopup,
+  }));
+
   // Delay the remove of popup for user move mouse into the popup when hover a point
   const onPointMouseLeave = useCallback(() => {
     setTimeout(() => setIsMouseOverPoint(false), 200);
@@ -272,4 +289,4 @@ const MapPopup: FC<MapPopupProps> = ({
   return null;
 };
 
-export default MapPopup;
+export default forwardRef(MapPopup);

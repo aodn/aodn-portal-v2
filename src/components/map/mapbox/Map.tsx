@@ -10,14 +10,17 @@ import {
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
-import loadash from "lodash";
+import lodash from "lodash";
 import { TestHelper } from "../../common/test/helper";
+import { MapDefaultConfig } from "./constants";
 
 interface MapProps {
   centerLongitude?: number;
   centerLatitude?: number;
   bbox?: LngLatBoundsLike;
   zoom?: number;
+  minZoom?: number;
+  maxZoom?: number;
   panelId: string;
   projection?: Projection | string;
   onZoomEvent?: (
@@ -27,16 +30,6 @@ interface MapProps {
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
 }
-
-const MapDefault = {
-  // Magic number, try and error by experience
-  DEBOUNCE_BEFORE_EVENT_FIRE: 700,
-  CENTER_LONGITUDE: 134.0470865301421,
-  CENTER_LATITUDE: -27.609351801462687,
-  ZOOM: 4,
-  PROJECTION: "equirectangular",
-  DEFAULT_STYLE: 3,
-};
 
 // Styles can be found here https://developers.arcgis.com/rest/basemap-styles/
 // but require feeds.
@@ -66,11 +59,13 @@ const styles = [
 
 const ReactMap = ({
   panelId,
-  centerLongitude = MapDefault.CENTER_LONGITUDE,
-  centerLatitude = MapDefault.CENTER_LATITUDE,
+  centerLongitude = MapDefaultConfig.CENTER_LONGITUDE,
+  centerLatitude = MapDefaultConfig.CENTER_LATITUDE,
   bbox,
-  zoom = MapDefault.ZOOM,
-  projection = MapDefault.PROJECTION,
+  zoom = MapDefaultConfig.ZOOM,
+  minZoom = MapDefaultConfig.MIN_ZOOM,
+  maxZoom = MapDefaultConfig.MAX_ZOOM,
+  projection = MapDefaultConfig.PROJECTION,
   onZoomEvent,
   onMoveEvent,
   children,
@@ -79,26 +74,26 @@ const ReactMap = ({
 
   // Debouce to make the map transit smoother
   const debounceOnZoomEvent = useRef(
-    loadash.debounce(
+    lodash.debounce(
       useCallback(
         async (
           event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
         ) => onZoomEvent && onZoomEvent(event),
         [onZoomEvent]
       ),
-      MapDefault.DEBOUNCE_BEFORE_EVENT_FIRE
+      MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
     )
   ).current;
 
   const debounceOnMoveEvent = useRef(
-    loadash.debounce(
+    lodash.debounce(
       useCallback(
         async (
           event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
         ) => onMoveEvent && onMoveEvent(event),
         [onMoveEvent]
       ),
-      MapDefault.DEBOUNCE_BEFORE_EVENT_FIRE
+      MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
     )
   ).current;
 
@@ -108,10 +103,11 @@ const ReactMap = ({
         ? (new Map({
             container: panelId,
             accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
-            style: styles[MapDefault.DEFAULT_STYLE].style,
+            style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
             center: [centerLongitude, centerLatitude],
             zoom: zoom,
-            maxZoom: 14,
+            minZoom: minZoom,
+            maxZoom: maxZoom,
             testMode: import.meta.env.MODE === "dev",
             localIdeographFontFamily:
               "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
@@ -162,6 +158,8 @@ const ReactMap = ({
     onMoveEvent,
     debounceOnZoomEvent,
     debounceOnMoveEvent,
+    minZoom,
+    maxZoom,
   ]);
 
   useEffect(() => {
@@ -186,4 +184,4 @@ const ReactMap = ({
 
 export default ReactMap;
 
-export { styles, MapDefault };
+export { styles, MapDefaultConfig as MapDefault };
