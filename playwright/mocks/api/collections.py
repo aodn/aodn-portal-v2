@@ -6,8 +6,8 @@ from playwright.sync_api import Route
 from utils.json_utils import filter_collection_by_id, load_json_data
 
 
-def handle_collections_bbox_api(route: Route) -> None:
-    json_data = load_json_data('collections_bbox.json')
+def handle_collections_centroid_api(route: Route) -> None:
+    json_data = load_json_data('collections_centroid.json')
     route.fulfill(json=json_data)
 
 
@@ -16,8 +16,8 @@ def handle_collections_all_api(route: Route) -> None:
     route.fulfill(json=json_data)
 
 
-def handle_collections_update_bbox_api(route: Route) -> None:
-    json_data = load_json_data('collections_update_bbox.json')
+def handle_collections_update_centroid_api(route: Route) -> None:
+    json_data = load_json_data('collections_update_centroid.json')
     route.fulfill(json=json_data)
 
 
@@ -39,3 +39,8 @@ def handle_collections_popup_api(route: Route) -> None:
 
     collection = filter_collection_by_id(data, data_id)
     route.fulfill(json=collection)
+
+
+def handle_collections_show_more_api(route: Route) -> None:
+    json_data = load_json_data('show_more_results.json')
+    route.fulfill(json=json_data)

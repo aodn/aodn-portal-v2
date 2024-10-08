@@ -12,7 +12,7 @@ def load_json_data(file_name: str) -> Any:
     Returns:
         Any: The JSON data loaded from the file.
     """
-    with open(f'mocks/mock_data/{file_name}', 'r') as file:
+    with open(f'mocks/mock_data/{file_name}', 'r', encoding='utf8') as file:
         return json.load(file)
 
 
