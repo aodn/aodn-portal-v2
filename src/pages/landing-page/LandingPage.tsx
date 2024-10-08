@@ -33,24 +33,19 @@ const LandingPage: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const redirectSearchFrom = useCallback(
-    (referer: string) => {
-      const componentParam: ParameterState = getComponentState(
-        store.getState()
-      );
-      navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-        state: {
-          fromNavigate: true,
-          requireSearch: true,
-          referer: referer,
-        },
-      });
-    },
-    [navigate]
-  );
+  const redirectSearch = useCallback(() => {
+    const componentParam: ParameterState = getComponentState(store.getState());
+    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
+      state: {
+        fromNavigate: true,
+        requireSearch: true,
+        referer: "SmartPanel",
+      },
+    });
+  }, [navigate]);
 
   // This is a simple click smart card function that with update search input text and clear all the filters
-  // Can be changed to a function-switcher if any other functions are designed in the future
+  // Can be change to a function-switcher if any other functions are designed in the future
   const handleClickSmartCard = useCallback(
     (value: string) => {
       dispatch(updateParameterVocabs([]));
@@ -58,9 +53,9 @@ const LandingPage: FC = () => {
       dispatch(updateImosOnly(false));
       dispatch(updateUpdateFreq(undefined));
       dispatch(updateSearchText(value));
-      redirectSearchFrom("SmartPanel");
+      redirectSearch();
     },
-    [dispatch, redirectSearchFrom]
+    [dispatch, redirectSearch]
   );
 
   return (
@@ -75,9 +70,7 @@ const LandingPage: FC = () => {
         }}
       >
         <BannerOpenAccess />
-        <ComplexTextSearch
-          onClickSearch={() => redirectSearchFrom("LandingPage")}
-        />
+        <ComplexTextSearch />
         <Box
           sx={{
             display: "flex",

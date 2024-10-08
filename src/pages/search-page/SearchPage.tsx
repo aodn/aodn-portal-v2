@@ -315,7 +315,7 @@ const SearchPage = () => {
       >
         <Grid container flex={1} gap={1}>
           <Grid item xs={12} height={`${SEARCH_BAR_HEIGHT}px`}>
-            <ComplexTextSearch onClickSearch={() => doSearch(false)} />
+            <ComplexTextSearch />
           </Grid>
           <Grid item xs={12}>
             <Box
