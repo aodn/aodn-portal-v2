@@ -135,24 +135,24 @@ const createInitialParameterState = (
   };
 
   if (withDefaultPolygon) {
-    // This is the default area and zoom of TAS, this helps to imporve the search
-    // speed because the map will be start in this place. You can always find
-    // the polygon value in the url
+    // The default area now is Australia. When changing it, please make
+    // sure it matches the default centerLongitude, centerLatitude, and
+    // zoom level in the Map.tsx
     state.polygon = {
       type: "Feature",
       bbox: [
-        124.4248325953249, -60.65204782465562, 170.24587823247586,
-        -25.124994472112704,
+        104.66613679450332, -43.66657403205866, 163.4280362657869,
+        -11.55212957087365,
       ],
       geometry: {
         type: "Polygon",
         coordinates: [
           [
-            [124.4248325953249, -60.65204782465562],
-            [170.24587823247586, -60.65204782465562],
-            [170.24587823247586, 25.124994472112704],
-            [124.4248325953249, -25.124994472112704],
-            [124.4248325953249, -60.65204782465562],
+            [104.66613679450332, -43.66657403205866],
+            [163.4280362657869, -43.66657403205866],
+            [163.4280362657869, -11.55212957087365],
+            [104.66613679450332, -11.55212957087365],
+            [104.66613679450332, -43.66657403205866],
           ],
         ],
       },
