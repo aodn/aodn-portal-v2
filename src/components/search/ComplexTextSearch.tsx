@@ -16,11 +16,11 @@ export const filterButtonWidth = 100;
 export const searchIconWidth = 44;
 
 interface ComplexTextSearchProps {
-  onSearchClick: () => void;
+  onClickSearch: () => void;
 }
 
 const ComplexTextSearch: React.FC<ComplexTextSearchProps> = ({
-  onSearchClick,
+  onClickSearch,
 }) => {
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
@@ -37,15 +37,15 @@ const ComplexTextSearch: React.FC<ComplexTextSearchProps> = ({
       // considering the debounce (300ms) and fetchSuggesterOptions(quite fast according to experience with edge) is not very long
       // we may implement this later if gap is too big
       if (event.key === "Enter" && !isSuggesterOpen && !pendingSearch) {
-        onSearchClick();
+        onClickSearch();
       }
     },
-    [pendingSearch, onSearchClick]
+    [pendingSearch, onClickSearch]
   );
 
   const handleSearchClick = useCallback(() => {
-    if (!pendingSearch) onSearchClick();
-  }, [pendingSearch, onSearchClick]);
+    if (!pendingSearch) onClickSearch();
+  }, [pendingSearch, onClickSearch]);
 
   const handleFilterClick = useCallback(() => {
     setShowFilters(true);
