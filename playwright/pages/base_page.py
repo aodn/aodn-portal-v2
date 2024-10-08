@@ -5,6 +5,10 @@ class BasePage:
     def __init__(self, page: Page):
         self.page = page
 
+    def get_by_id(self, id: str) -> Locator:
+        """Return a locator by id attribute"""
+        return self.page.locator(f'#{id}')
+
     def get_button(self, text: str, exact: bool = True) -> Locator:
         """Return button element by text"""
         return self.page.get_by_role('button', name=text, exact=exact)
