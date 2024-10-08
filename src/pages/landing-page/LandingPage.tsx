@@ -76,7 +76,7 @@ const LandingPage: FC = () => {
       >
         <BannerOpenAccess />
         <ComplexTextSearch
-          onClickSearch={() => redirectSearchFrom("LandingPage")}
+          onSearchClick={() => redirectSearchFrom("LandingPage")}
         />
         <Box
           sx={{
