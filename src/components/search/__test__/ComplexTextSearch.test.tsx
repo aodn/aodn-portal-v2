@@ -29,7 +29,7 @@ describe("ComplexTextSearch Component", () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <ComplexTextSearch />
+          <ComplexTextSearch onClickSearch={() => {}} />
         </MemoryRouter>
       </Provider>
     );

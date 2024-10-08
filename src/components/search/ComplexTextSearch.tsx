@@ -1,17 +1,10 @@
 import React, { useCallback, useState } from "react";
 import { Button, Grid, IconButton, Paper } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import grey from "../common/colors/grey";
 import { Tune } from "@mui/icons-material";
-import store, { getComponentState } from "../common/store/store";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
-import {
-  ParameterState,
-  formatToUrlParam,
-} from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester";
-import { pageDefault } from "../common/constants";
 import {
   borderRadius,
   color,
@@ -22,23 +15,17 @@ import {
 export const filterButtonWidth = 100;
 export const searchIconWidth = 44;
 
-const ComplexTextSearch = () => {
-  const navigate = useNavigate();
+interface ComplexTextSearchProps {
+  onClickSearch: () => void;
+}
+
+const ComplexTextSearch: React.FC<ComplexTextSearchProps> = ({
+  onClickSearch,
+}) => {
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
   // set the default value to false to allow user do search without typing anything
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
-
-  const redirectSearch = useCallback(() => {
-    const componentParam: ParameterState = getComponentState(store.getState());
-    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-      state: {
-        fromNavigate: true,
-        requireSearch: true,
-        referer: "ComplexTextSearch",
-      },
-    });
-  }, [navigate]);
 
   const handleEnterPressed = useCallback(
     (
@@ -50,15 +37,15 @@ const ComplexTextSearch = () => {
       // considering the debounce (300ms) and fetchSuggesterOptions(quite fast according to experience with edge) is not very long
       // we may implement this later if gap is too big
       if (event.key === "Enter" && !isSuggesterOpen && !pendingSearch) {
-        redirectSearch();
+        onClickSearch();
       }
     },
-    [pendingSearch, redirectSearch]
+    [pendingSearch, onClickSearch]
   );
 
   const handleSearchClick = useCallback(() => {
-    if (!pendingSearch) redirectSearch();
-  }, [pendingSearch, redirectSearch]);
+    if (!pendingSearch) onClickSearch();
+  }, [pendingSearch, onClickSearch]);
 
   const handleFilterClick = useCallback(() => {
     setShowFilters(true);
