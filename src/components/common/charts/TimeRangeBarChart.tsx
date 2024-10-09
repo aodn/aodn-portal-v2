@@ -1,7 +1,6 @@
 import React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { BarSeriesType } from "@mui/x-charts";
-import { useTheme } from "@mui/material";
+import { axisClasses, BarSeriesType } from "@mui/x-charts";
 import { OGCCollections } from "../store/OGCCollectionDefinitions";
 import { color } from "../../../styles/constants";
 
@@ -20,9 +19,9 @@ interface Bucket {
 }
 
 enum DividedBy {
-  day,
-  month,
-  year,
+  day = "Day",
+  month = "Month",
+  year = "Year",
 }
 
 const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
@@ -203,8 +202,10 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
     <BarChart
       height={180}
       margin={{
-        // use to control the space on right, so that it will not overlap with the legend
         right: 150,
+        left: 80, // Increased left margin to accommodate the y-axis label
+        bottom: 50, // Bottom margin for x-axis labels
+        top: 20, // Added top margin for better overall layout
       }}
       slotProps={{
         legend: {
@@ -223,17 +224,32 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
         {
           data: xValues,
           scaleType: "band",
-          // valueFormatter: (date: Date) => date.toLocaleDateString(),
           valueFormatter: xAxisLabelFormatter,
-          tickMinStep: 3600 * 1000 * 48, // min step: 48h,
-          // If you want the label rotate
-          // tickLabelStyle: {
-          //  angle: 45,
-          //  dominantBaseline: 'hanging',
-          //  textAnchor: 'start',
-          // },
+          tickMinStep: 3600 * 1000 * 48, // min step: 48h
+          label: determineChartUnit().toString(), // x-axis label
+          labelStyle: {
+            fontSize: 12,
+            fontWeight: "bold",
+          },
         },
       ]}
+      yAxis={[
+        {
+          label: "Records Count", // y-axis label
+          labelStyle: {
+            fontSize: 12,
+            fontWeight: "bold",
+          },
+          tickLabelStyle: {
+            fontSize: 12,
+          },
+        },
+      ]}
+      sx={{
+        [`.${axisClasses.left} .${axisClasses.label}`]: {
+          transform: "translate(-20px, 0)",
+        },
+      }}
       series={series}
     />
   );
