@@ -1,7 +1,6 @@
 import React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses, BarSeriesType } from "@mui/x-charts";
-import { useTheme } from "@mui/material";
 import { OGCCollections } from "../store/OGCCollectionDefinitions";
 import { color } from "../../../styles/constants";
 
@@ -20,9 +19,9 @@ interface Bucket {
 }
 
 enum DividedBy {
-  day,
-  month,
-  year,
+  day = "Day",
+  month = "Month",
+  year = "Year",
 }
 
 const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
@@ -227,7 +226,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
           scaleType: "band",
           valueFormatter: xAxisLabelFormatter,
           tickMinStep: 3600 * 1000 * 48, // min step: 48h
-          label: "Year", // x-axis label
+          label: determineChartUnit().toString(), // x-axis label
           labelStyle: {
             fontSize: 12,
             fontWeight: "bold",

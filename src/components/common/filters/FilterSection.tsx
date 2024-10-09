@@ -10,20 +10,6 @@ interface FilterSectionContainerProps {
   toolTip?: string;
 }
 
-const renderTittle = (title: string) => (
-  <Typography
-    variant="h3"
-    sx={{
-      position: "absolute",
-      left: gap.xxlg,
-      top: gap.xlg,
-      padding: 0,
-    }}
-  >
-    {title}
-  </Typography>
-);
-
 const FilterSection: FC<FilterSectionContainerProps> = ({
   title,
   children,
@@ -38,13 +24,19 @@ const FilterSection: FC<FilterSectionContainerProps> = ({
         paddingTop: isTitleOnlyHeader ? padding.triple : 0,
       }}
     >
-      {toolTip ? (
-        <Tooltip title={toolTip} placement="top">
-          {renderTittle(title)}
-        </Tooltip>
-      ) : (
-        renderTittle(title)
-      )}
+      <Tooltip title={toolTip} placement="top">
+        <Typography
+          variant="h3"
+          sx={{
+            position: "absolute",
+            left: gap.xxlg,
+            top: gap.xlg,
+            padding: 0,
+          }}
+        >
+          {title}
+        </Typography>
+      </Tooltip>
       {children}
     </StyledFilterSectionGrid>
   );
