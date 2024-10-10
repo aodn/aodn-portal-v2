@@ -9,6 +9,7 @@ import {
   padding,
 } from "../../../styles/constants";
 import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
+import useTabNavigation from "../../../hooks/useTabNavigation";
 
 interface ComplexMapHoverTipProps extends BasicMapHoverTipProps {
   collection: OGCCollection;
@@ -16,10 +17,11 @@ interface ComplexMapHoverTipProps extends BasicMapHoverTipProps {
 
 const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   collection,
-  onNavigateToDetail = () => {},
   onDatasetSelected = () => {},
   sx,
 }) => {
+  const navigateToDetailPage = useTabNavigation();
+
   return (
     <Box flex={1} sx={{ ...sx }}>
       <Stack direction="column" spacing={1}>
@@ -61,14 +63,12 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
         </CardActionArea>
 
         <Box>
-          <ResultCardButtonGroup
-            content={collection}
-            onDetail={onNavigateToDetail}
-            isGridView
-          />
+          <ResultCardButtonGroup content={collection} isGridView />
         </Box>
 
-        <CardActionArea onClick={onNavigateToDetail}>
+        <CardActionArea
+          onClick={() => navigateToDetailPage(collection.id, "abstract")}
+        >
           <Tooltip title="More detail..." placement="top">
             <Typography
               color={fontColor.gray.medium}

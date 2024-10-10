@@ -100,7 +100,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
   selectedUuids,
   onDatasetSelected,
-  onNavigateToDetail,
   clusterLayerConfig,
   showFullMap,
 }: ClusterLayerProps) => {
@@ -283,7 +282,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         layerId={unclusterPointLayer}
         popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
-        onNavigateToDetail={onNavigateToDetail}
       />
       <SpatialExtents
         layerId={unclusterPointLayer}

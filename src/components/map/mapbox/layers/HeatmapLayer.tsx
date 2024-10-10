@@ -110,7 +110,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   selectedUuids,
   showFullMap,
   onDatasetSelected,
-  onNavigateToDetail,
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
@@ -338,7 +337,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         layerId={unClusterPointLayer}
         popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
-        onNavigateToDetail={onNavigateToDetail}
       />
       <SpatialExtents
         layerId={unClusterPointLayer}
