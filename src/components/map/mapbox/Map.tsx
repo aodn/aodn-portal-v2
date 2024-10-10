@@ -131,16 +131,7 @@ const ReactMap = ({
         map.on("movestart", cancelMoveDebounce);
         map.on("zoomestart", cancelZoomDebounce);
 
-        // There is one extra zoom event happens due to initial bounds
-        // not always align with the map container bound and map need
-        // to zoom in a bit to fit it, if we do not ignore this event
-        // we will have one more extract search which is of no need.
-        map.once("zoomend", () =>
-          // Once the first zoomend event fired, we wait for map to
-          // complete all the adjustment, then we can add the event
-          // handler.
-          map.once("idle", () => map.on("zoomend", debounceOnZoomEvent))
-        );
+        map.on("zoomend", debounceOnZoomEvent);
         map.on("moveend", debounceOnMoveEvent);
       });
 
