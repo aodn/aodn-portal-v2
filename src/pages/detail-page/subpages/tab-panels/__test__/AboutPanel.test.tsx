@@ -9,36 +9,37 @@ import { DetailPageProvider } from "../../../context/detail-page-provider";
 import { Provider } from "react-redux";
 import AboutPanel from "../AboutPanel";
 
-beforeAll(() => {
-  server.listen();
-});
-
-beforeEach(() => {
-  vi.mock("react-router-dom", () => ({
-    ...vi.importActual("react-router-dom"),
-    useLocation: vi.fn(),
-  }));
-
-  vi.mocked(useLocation).mockReturnValue({
-    state: null,
-    hash: "111",
-    key: "default",
-    pathname: "/details",
-    search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
-  });
-});
-
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-  vi.restoreAllMocks();
-});
-afterAll(() => {
-  server.close();
-});
-
 describe("AboutPanel", async () => {
   const theme = AppTheme;
+
+  beforeAll(() => {
+    server.listen();
+  });
+
+  beforeEach(() => {
+    vi.mock("react-router-dom", () => ({
+      ...vi.importActual("react-router-dom"),
+      useLocation: vi.fn(),
+    }));
+
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details",
+      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+  });
+
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+    vi.restoreAllMocks();
+  });
+
+  afterAll(() => {
+    server.close();
+  });
 
   beforeEach(() => {
     render(

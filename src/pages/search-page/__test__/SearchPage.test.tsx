@@ -20,27 +20,27 @@ vi.mock("../../../components/map/mapbox/Map", () => {
   };
 });
 
-beforeAll(() => {
-  // With use of AutoSizer component in ResultCard, it will fail in non-UI env like vitest
-  // here we mock it so to give some screen size to let the test work.
-  vi.mock("react-virtualized-auto-sizer", () => {
-    return {
-      __esModule: true,
-      default: ({
-        children,
-      }: {
-        children: (size: { width: number; height: number }) => JSX.Element;
-      }) => children({ width: 800, height: 600 }), // Provide fixed dimensions
-    };
-  });
-  server.listen();
-});
-
-afterAll(() => {
-  server.close();
-});
-
 describe("SearchPage", () => {
+  beforeAll(() => {
+    // With use of AutoSizer component in ResultCard, it will fail in non-UI env like vitest
+    // here we mock it so to give some screen size to let the test work.
+    vi.mock("react-virtualized-auto-sizer", () => {
+      return {
+        __esModule: true,
+        default: ({
+          children,
+        }: {
+          children: (size: { width: number; height: number }) => JSX.Element;
+        }) => children({ width: 800, height: 600 }), // Provide fixed dimensions
+      };
+    });
+    server.listen();
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
   it("The map should be able to expand properly", async () => {
     const user = userEvent.setup();
     render(

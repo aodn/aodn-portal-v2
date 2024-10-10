@@ -13,28 +13,29 @@ import CitationPanel from "../CitationPanel";
 import LineagePanel from "../LineagePanel";
 import AssociatedRecordsPanel from "../AssociatedRecordsPanel";
 
-beforeAll(() => {
-  server.listen();
-});
-
-beforeEach(() => {
-  vi.mock("react-router-dom", () => ({
-    ...vi.importActual("react-router-dom"),
-    useLocation: vi.fn(),
-  }));
-});
-
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-  vi.restoreAllMocks();
-});
-afterAll(() => {
-  server.close();
-});
-
 describe("empty area display", async () => {
   const theme = AppTheme;
+
+  beforeAll(() => {
+    server.listen();
+  });
+
+  beforeEach(() => {
+    vi.mock("react-router-dom", () => ({
+      ...vi.importActual("react-router-dom"),
+      useLocation: vi.fn(),
+    }));
+  });
+
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+    vi.restoreAllMocks();
+  });
+
+  afterAll(() => {
+    server.close();
+  });
 
   test("about panel", async () => {
     vi.mocked(useLocation).mockReturnValue({
