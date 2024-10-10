@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import {
   ParameterState,
   updateParameterVocabs,
@@ -165,17 +165,28 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
                 }}
               >
                 <Grid item xs={12}>
-                  <FilterSection title={"Time Range"}>
+                  <FilterSection
+                    title="Time Range"
+                    toolTip="Recorded time span of the data"
+                    isTitleOnlyHeader
+                  >
                     <DateRangeFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>
-                  <FilterSection title={"Depth"}>
+                  <FilterSection
+                    title="Depth"
+                    toolTip="Filter by the depth of the measurements"
+                  >
                     <DepthFilter filter={filter} setFilter={setFilter} />
                   </FilterSection>
                 </Grid>
                 <Grid item xs={7}>
-                  <FilterSection isTitleOnlyHeader title={"Parameters"}>
+                  <FilterSection
+                    isTitleOnlyHeader
+                    title="Parameters"
+                    toolTip="Filter by the parameter that has been measured or observed"
+                  >
                     <ParameterVocabFilter
                       filter={filter}
                       setFilter={setFilter}
@@ -183,7 +194,11 @@ const AdvanceFilters: FC<AdvanceFiltersProps> = ({
                   </FilterSection>
                 </Grid>
                 <Grid item xs={5}>
-                  <FilterSection isTitleOnlyHeader title={"Data Delivery Mode"}>
+                  <FilterSection
+                    isTitleOnlyHeader
+                    title={"Data Delivery Mode"}
+                    toolTip="Filter by the how up to date the data is"
+                  >
                     <DataDeliveryModeFilter
                       filter={filter}
                       setFilter={setFilter}

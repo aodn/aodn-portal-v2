@@ -217,7 +217,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ filter, setFilter }) => {
                 min={dateToValue(initialMinDate)}
                 max={dateToValue(initialMaxDate)}
                 onChange={handleSliderChange}
-                valueLabelDisplay="on"
+                valueLabelDisplay="auto"
                 valueLabelFormat={(value: number) =>
                   valueToDate(value).format("MM/YYYY")
                 }

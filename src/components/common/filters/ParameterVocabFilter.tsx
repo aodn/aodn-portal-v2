@@ -81,10 +81,10 @@ const ParameterVocabFilter: FC<ParameterVocabFilterProps> = ({
   }, [dispatch]);
 
   return (
-    <Grid container sx={sx}>
+    <Grid container sx={{ ...sx }}>
       <Grid item xs={12}>
         <StyledToggleButtonGroup
-          value={filter.parameterVocabs?.map((c) => c.label) || []}
+          value={filter.parameterVocabs?.map((vocab) => vocab.label) || []}
           onChange={handleChange}
           aria-label="parameter vocab selection"
         >
