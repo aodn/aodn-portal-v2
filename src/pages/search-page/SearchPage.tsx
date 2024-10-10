@@ -207,10 +207,13 @@ const SearchPage = () => {
         );
 
         const bounds = event.target.getBounds();
-        const ne = bounds.getNorthEast(); // NorthEast corner
-        const sw = bounds.getSouthWest(); // SouthWest corner
-        // Note order: longitude, latitude.2
-        const polygon = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
+        // Note order: according to turf spec https://www.npmjs.com/package/@turf/bbox-polygon
+        const polygon = bboxPolygon([
+          bounds.getWest(),
+          bounds.getSouth(),
+          bounds.getEast(),
+          bounds.getNorth(),
+        ]);
 
         // Sometimes the map fire zoomend even nothing happens, this may
         // due to some redraw, so in here we check if the polygon really
@@ -220,6 +223,7 @@ const SearchPage = () => {
           !booleanEqual(componentParam.polygon, polygon)
         ) {
           dispatch(updateFilterPolygon(polygon));
+          // Must use navigate to make the URL update
           doSearch();
         }
       }

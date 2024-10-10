@@ -1,11 +1,5 @@
 import { PropsWithChildren } from "react";
-import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-  Point,
-} from "geojson";
+import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { LngLat, LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";

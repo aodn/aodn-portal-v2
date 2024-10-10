@@ -15,10 +15,7 @@ import { TestHelper } from "../../common/test/helper";
 import { MapDefaultConfig } from "./constants";
 
 interface MapProps {
-  centerLongitude?: number;
-  centerLatitude?: number;
   bbox?: LngLatBoundsLike;
-  zoom?: number;
   minZoom?: number;
   maxZoom?: number;
   panelId: string;
@@ -59,10 +56,7 @@ const styles = [
 
 const ReactMap = ({
   panelId,
-  centerLongitude = MapDefaultConfig.CENTER_LONGITUDE,
-  centerLatitude = MapDefaultConfig.CENTER_LATITUDE,
-  bbox,
-  zoom = MapDefaultConfig.ZOOM,
+  bbox = MapDefaultConfig.BBOX as LngLatBoundsLike,
   minZoom = MapDefaultConfig.MIN_ZOOM,
   maxZoom = MapDefaultConfig.MAX_ZOOM,
   projection = MapDefaultConfig.PROJECTION,
@@ -104,8 +98,7 @@ const ReactMap = ({
             container: panelId,
             accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
             style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
-            center: [centerLongitude, centerLatitude],
-            zoom: zoom,
+            bounds: bbox,
             minZoom: minZoom,
             maxZoom: maxZoom,
             testMode: import.meta.env.MODE === "dev",
@@ -120,14 +113,6 @@ const ReactMap = ({
       // Stop drag cause map to rotate.
       map.dragRotate.disable();
 
-      // If exist fit the map to this area, this useful if url pass around and
-      // the bbox in the url is not the default area of the map
-      map.on("movestart", () => debounceOnZoomEvent.cancel());
-      map.on("zoomestart", () => debounceOnZoomEvent.cancel());
-
-      map.on("zoomend", debounceOnZoomEvent);
-      map.on("moveend", debounceOnMoveEvent);
-
       // Create a resize observer to the canvas so we know if its size have changed
       // and we need to redraw the map
       const resizeObserver = new ResizeObserver((entries) =>
@@ -136,10 +121,35 @@ const ReactMap = ({
       );
       resizeObserver.observe(map.getContainer());
 
+      // If exist fit the map to this area, this useful if url pass around and
+      // the bbox in the url is not the default area of the map
+      const cancelZoomDebounce = () => debounceOnZoomEvent.cancel();
+      const cancelMoveDebounce = () => debounceOnMoveEvent.cancel();
+
+      map.on("load", () => {
+        // Wait until map is loaded, that is style and render complete
+        map.on("movestart", cancelMoveDebounce);
+        map.on("zoomestart", cancelZoomDebounce);
+
+        // There is one extra zoom event happens due to initial bounds
+        // not always align with the map container bound and map need
+        // to zoom in a bit to fit it, if we do not ignore this event
+        // we will have one more extract search which is of no need.
+        map.once("zoomend", () =>
+          // Once the first zoomend event fired, we wait for map to
+          // complete all the adjustment, then we can add the event
+          // handler.
+          map.once("idle", () => map.on("zoomend", debounceOnZoomEvent))
+        );
+        map.on("moveend", debounceOnMoveEvent);
+      });
+
       return () => {
         resizeObserver.unobserve(map.getContainer());
         map.off("zoomend", debounceOnZoomEvent);
         map.off("moveend", debounceOnMoveEvent);
+        map.off("movestart", cancelMoveDebounce);
+        map.off("zoomestart", cancelZoomDebounce);
 
         // This cleanup all associated resources include controls, so no need to
         // call removeControl()
@@ -148,10 +158,8 @@ const ReactMap = ({
       };
     }
   }, [
-    centerLatitude,
-    centerLongitude,
     panelId,
-    zoom,
+    bbox,
     projection,
     map,
     onZoomEvent,
@@ -165,11 +173,19 @@ const ReactMap = ({
   useEffect(() => {
     // The map center is use to set the initial center point, however we may need
     // to set to other place, for example if the user pass the url to someone
-    bbox &&
-      map &&
-      map.setCenter(
-        new LngLatBounds(bbox as [number, number, number, number]).getCenter()
-      );
+    if (bbox && map) {
+      const newCenter = new LngLatBounds(
+        bbox as [number, number, number, number]
+      ).getCenter();
+      const currentCenter = map.getCenter();
+
+      if (
+        newCenter.lat !== currentCenter.lat ||
+        newCenter.lng !== currentCenter.lng
+      ) {
+        map.setCenter(newCenter);
+      }
+    }
   }, [bbox, map]);
 
   return (

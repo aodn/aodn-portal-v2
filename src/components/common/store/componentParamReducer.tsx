@@ -5,6 +5,7 @@
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
 import { DatasetFrequency } from "./searchReducer";
+import { MapDefaultConfig } from "../../map/mapbox/constants";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -140,21 +141,10 @@ const createInitialParameterState = (
     // the polygon value in the url
     state.polygon = {
       type: "Feature",
-      bbox: [
-        124.4248325953249, -60.65204782465562, 170.24587823247586,
-        -25.124994472112704,
-      ],
+      bbox: MapDefaultConfig.BBOX,
       geometry: {
         type: "Polygon",
-        coordinates: [
-          [
-            [124.4248325953249, -60.65204782465562],
-            [170.24587823247586, -60.65204782465562],
-            [170.24587823247586, 25.124994472112704],
-            [124.4248325953249, -25.124994472112704],
-            [124.4248325953249, -60.65204782465562],
-          ],
-        ],
+        coordinates: MapDefaultConfig.POLYGON,
       },
       properties: {},
     };
