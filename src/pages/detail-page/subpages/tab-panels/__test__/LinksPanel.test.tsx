@@ -60,7 +60,7 @@ describe("LinksPanel", async () => {
           screen.queryAllByText("Marine Weather Observations for Davies Reef")
         ).to.exist;
         expect(screen.queryAllByText("Data access via AODN Portal")).to.exist;
-        expect(screen.queryAllByText("Data access via Programming API")).to.exist;  
+        expect(screen.queryAllByText("Data access via Programming API")).to.exist;
       });
   });
 
@@ -74,7 +74,7 @@ describe("LinksPanel", async () => {
         const visibleCount = copyBtns.filter(
           (btn) => getComputedStyle(btn).visibility === "visible"
         ).length;
-        expect(visibleCount).toBe(1);  
+        expect(visibleCount).toBe(1);
       });
   });
 });

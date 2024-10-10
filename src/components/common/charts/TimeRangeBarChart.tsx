@@ -174,7 +174,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
       type: "bar",
       valueFormatter: seriesFormatter,
       stack: "total",
-      label: "IMOS Data",
+      label: "IMOS Records",
       data: buckets.flatMap((m) => m.imosOnlyCount),
       color: color.blue.dark,
     };
@@ -183,7 +183,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
       type: "bar",
       valueFormatter: seriesFormatter,
       stack: "total",
-      label: "All Data",
+      label: "All Records",
       data: buckets.flatMap((m) => m.total - m.imosOnlyCount),
       color: color.blue.darkSemiTransparent,
     };
@@ -202,7 +202,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
     <BarChart
       height={180}
       margin={{
-        right: 150,
+        right: 170,
         left: 80, // Increased left margin to accommodate the y-axis label
         bottom: 50, // Bottom margin for x-axis labels
         top: 20, // Added top margin for better overall layout
@@ -235,7 +235,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
       ]}
       yAxis={[
         {
-          label: "Records Count", // y-axis label
+          label: "Count of Records", // y-axis label
           labelStyle: {
             fontSize: 12,
             fontWeight: "bold",
