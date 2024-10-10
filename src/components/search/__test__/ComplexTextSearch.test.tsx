@@ -13,18 +13,17 @@ vi.mock("../../common/filters/AdvanceFilters.tsx", () => {
   return { default: mockAdvanceFilters };
 });
 
-beforeAll(() => {
-  server.listen();
-});
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-});
-afterAll(() => {
-  server.close();
-});
-
 describe("ComplexTextSearch Component", () => {
+  beforeAll(() => {
+    server.listen();
+  });
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+  });
+  afterAll(() => {
+    server.close();
+  });
   beforeEach(() => {
     render(
       <Provider store={store}>
