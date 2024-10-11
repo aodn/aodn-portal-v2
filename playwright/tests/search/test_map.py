@@ -159,7 +159,7 @@ def test_map_spider(
     search_page.wait_for_search_to_complete()
 
     search_page.map.center_map(head_lng, head_lat)
-    page_mock.wait_for_timeout(1000)
+    page_mock.wait_for_timeout(5000)
 
     # Try to find and click a cluster
     cluster_found = execute_js(page_mock, 'findAndClickCluster')

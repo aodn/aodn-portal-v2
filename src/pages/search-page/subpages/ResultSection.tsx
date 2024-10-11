@@ -34,9 +34,6 @@ const ResultSection: FC<ResultSectionProps> = ({
   onVisibilityChanged,
   onChangeSorting,
   onClickCard,
-  onDetail,
-  onDownload,
-  onLink,
   isLoading,
 }) => {
   // Get contents from redux
@@ -107,9 +104,6 @@ const ResultSection: FC<ResultSectionProps> = ({
           <ResultCards
             layout={currentLayout}
             contents={reduxContents}
-            onDownload={onDownload}
-            onLink={onLink}
-            onDetail={onDetail}
             onClickCard={onClickCard}
             onFetchMore={fetchMore}
             datasetsSelected={datasetsSelected}

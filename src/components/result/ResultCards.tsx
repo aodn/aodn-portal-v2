@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { CollectionsQueryType } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Box, Grid, ListItem, SxProps, Theme } from "@mui/material";
@@ -8,15 +8,14 @@ import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
-import { GRID_CARD_HEIGHT, LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./constants";
-import { gap, padding } from "../../styles/constants";
+import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
+import { padding } from "../../styles/constants";
+import SelectedListCard from "./SelectedListCard";
+import SelectedGridCard from "./SelectedGridCard";
 
 export interface ResultCard {
   content?: OGCCollection;
   onClickCard?: (uuid: string) => void;
-  onDetail?: (uuid: string) => void;
-  onDownload?: (uuid: string, tab: string, section?: string) => void;
-  onLink?: (uuid: string, tab: string, section?: string) => void;
 }
 
 export interface ResultCardsList extends ResultCard {
@@ -27,71 +26,22 @@ export interface ResultCardsList extends ResultCard {
   datasetsSelected?: OGCCollection[];
 }
 
-interface ResultCardsProps extends ResultCardsList {}
-
-interface SelectedCardsProps extends ResultCard {
-  hasSelectedDatasets: boolean;
+interface ResultCardsProps {
+  content?: OGCCollection;
+  onClickCard?: (uuid: string) => void;
+  contents: CollectionsQueryType;
+  layout?: SearchResultLayoutEnum;
+  onFetchMore?: (() => void) | undefined;
+  sx?: SxProps<Theme>;
+  datasetsSelected?: OGCCollection[];
 }
-const renderSelectedListCards: FC<SelectedCardsProps> = ({
-  hasSelectedDatasets,
-  content,
-  onDownload,
-  onLink,
-  onDetail,
-  onClickCard,
-}) => {
-  if (!hasSelectedDatasets) return;
-  return (
-    <Box height={LIST_CARD_HEIGHT - LIST_CARD_GAP * 2} mb={gap.lg}>
-      <ListResultCard
-        content={content}
-        onDownload={onDownload}
-        onLink={onLink}
-        onDetail={onDetail}
-        onClickCard={onClickCard}
-        isSelectedDataset
-      />
-    </Box>
-  );
-};
-
-// For now only one dataset can be selected at a time, so use datasetsSelected[0] for selected list/grid card
-const renderSelectedGridCards: FC<SelectedCardsProps> = ({
-  hasSelectedDatasets,
-  content,
-  onDownload,
-  onLink,
-  onClickCard,
-  onDetail,
-}) => {
-  if (!hasSelectedDatasets) return;
-  return (
-    <Box
-      width={"calc(50% - 7px)"}
-      height={GRID_CARD_HEIGHT - LIST_CARD_GAP}
-      mb={gap.lg}
-    >
-      <GridResultCard
-        content={content}
-        onDownload={onDownload}
-        onLink={onLink}
-        onClickCard={onClickCard}
-        onDetail={onDetail}
-        isSelectedDataset
-      />
-    </Box>
-  );
-};
 
 const ResultCards = ({
   contents,
   layout,
   sx,
   datasetsSelected,
-  onClickCard,
-  onDownload,
-  onLink,
-  onDetail,
+  onClickCard = () => {},
   onFetchMore,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
@@ -118,7 +68,7 @@ const ResultCards = ({
     (
       count: number,
       total: number,
-      { contents, onClickCard, onDownload, onLink, onDetail }: ResultCardsProps,
+      { contents, onClickCard }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
       const { index, style } = child;
@@ -147,20 +97,14 @@ const ResultCards = ({
               <Grid item xs={6} sx={{ pr: 0.5 }}>
                 <GridResultCard
                   content={contents.result.collections[leftIndex]}
-                  onDownload={onDownload}
-                  onLink={onLink}
                   onClickCard={onClickCard}
-                  onDetail={onDetail}
                 />
               </Grid>
               {rightIndex < contents.result.collections.length && (
                 <Grid item xs={6} sx={{ pl: 0.5 }}>
                   <GridResultCard
                     content={contents.result.collections[rightIndex]}
-                    onDownload={onDownload}
-                    onLink={onLink}
                     onClickCard={onClickCard}
-                    onDetail={onDetail}
                   />
                 </Grid>
               )}
@@ -176,7 +120,7 @@ const ResultCards = ({
     (
       count: number,
       total: number,
-      { contents, onClickCard, onDownload, onLink, onDetail }: ResultCardsProps,
+      { contents, onClickCard }: ResultCardsProps,
       child: ListChildComponentProps
     ) => {
       // The style must pass to the listitem else incorrect rendering
@@ -202,9 +146,6 @@ const ResultCards = ({
           <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
             <ListResultCard
               content={contents.result.collections[index]}
-              onDownload={onDownload}
-              onLink={onLink}
-              onDetail={onDetail}
               onClickCard={onClickCard}
             />
           </ListItem>
@@ -225,15 +166,12 @@ const ResultCards = ({
         ref={componentRef}
         data-testid="resultcard-result-list"
       >
-        {hasSelectedDatasets &&
-          renderSelectedListCards({
-            hasSelectedDatasets,
-            content: datasetsSelected[0],
-            onDownload,
-            onLink,
-            onClickCard,
-            onDetail,
-          })}
+        {hasSelectedDatasets && (
+          <SelectedListCard
+            content={datasetsSelected[0]}
+            onClickCard={onClickCard}
+          />
+        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
@@ -249,9 +187,6 @@ const ResultCards = ({
                   {
                     contents,
                     onClickCard,
-                    onDownload,
-                    onLink,
-                    onDetail,
                   },
                   child
                 )
@@ -269,15 +204,12 @@ const ResultCards = ({
         ref={componentRef}
         data-testid="resultcard-result-grid"
       >
-        {hasSelectedDatasets &&
-          renderSelectedGridCards({
-            hasSelectedDatasets,
-            content: datasetsSelected[0],
-            onDownload,
-            onLink,
-            onClickCard,
-            onDetail,
-          })}
+        {hasSelectedDatasets && (
+          <SelectedGridCard
+            content={datasetsSelected[0]}
+            onClickCard={onClickCard}
+          />
+        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
@@ -293,9 +225,6 @@ const ResultCards = ({
                   {
                     contents,
                     onClickCard,
-                    onDownload,
-                    onLink,
-                    onDetail,
                   },
                   child
                 )

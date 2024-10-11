@@ -10,37 +10,37 @@ import store from "../../../../../components/common/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
 
-beforeAll(() => {
-  server.listen();
-});
-
-beforeEach(() => {
-  vi.mock("react-router-dom", () => ({
-    ...vi.importActual("react-router-dom"),
-    useLocation: vi.fn(),
-  }));
-
-  vi.mocked(useLocation).mockReturnValue({
-    state: null,
-    hash: "111",
-    key: "default",
-    pathname: "/details",
-    search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
-  });
-});
-
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-  vi.restoreAllMocks();
-});
-afterAll(() => {
-  server.close();
-});
-
 describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
   let openSpy: any;
+
+  beforeAll(() => {
+    server.listen();
+  });
+
+  beforeEach(() => {
+    vi.mock("react-router-dom", () => ({
+      ...vi.importActual("react-router-dom"),
+      useLocation: vi.fn(),
+    }));
+
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details",
+      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+  });
+
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+    vi.restoreAllMocks();
+  });
+  afterAll(() => {
+    server.close();
+  });
 
   beforeEach(() => {
     openSpy = vi

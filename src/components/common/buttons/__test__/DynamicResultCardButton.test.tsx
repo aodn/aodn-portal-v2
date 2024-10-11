@@ -8,18 +8,18 @@ import DynamicResultCardButton from "../DynamicResultCardButton";
 import { rgbToHex } from "@mui/material";
 import AppTheme from "../../../../utils/AppTheme";
 import { ThemeProvider } from "@mui/material/styles";
-beforeAll(() => {
-  server.listen();
-});
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-});
-afterAll(() => {
-  server.close();
-});
 
 describe("DynamicResultCardButton", async () => {
+  beforeAll(() => {
+    server.listen();
+  });
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+  });
+  afterAll(() => {
+    server.close();
+  });
   const theme = AppTheme;
   test("Button color and text should be shown properly when status is ongoing", async () => {
     render(

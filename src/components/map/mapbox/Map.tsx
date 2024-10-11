@@ -57,12 +57,12 @@ const styles = [
   // Add more styles as needed
 ];
 
+const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
+  MapDefaultConfig.BBOX_ENDPOINTS;
+
 const ReactMap = ({
   panelId,
-  centerLongitude = MapDefaultConfig.CENTER_LONGITUDE,
-  centerLatitude = MapDefaultConfig.CENTER_LATITUDE,
   bbox,
-  zoom = MapDefaultConfig.ZOOM,
   minZoom = MapDefaultConfig.MIN_ZOOM,
   maxZoom = MapDefaultConfig.MAX_ZOOM,
   projection = MapDefaultConfig.PROJECTION,
@@ -104,8 +104,7 @@ const ReactMap = ({
             container: panelId,
             accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
             style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
-            center: [centerLongitude, centerLatitude],
-            zoom: zoom,
+            bounds: [WEST_LON, SOUTH_LAT, EAST_LON, NORTH_LAT],
             minZoom: minZoom,
             maxZoom: maxZoom,
             testMode: import.meta.env.MODE === "dev",
@@ -148,10 +147,7 @@ const ReactMap = ({
       };
     }
   }, [
-    centerLatitude,
-    centerLongitude,
     panelId,
-    zoom,
     projection,
     map,
     onZoomEvent,

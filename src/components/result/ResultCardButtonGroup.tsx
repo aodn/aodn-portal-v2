@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback } from "react";
+import { FC, ReactNode } from "react";
 import { Grid, SxProps } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import InfoIcon from "@mui/icons-material/Info";
@@ -9,12 +9,10 @@ import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import ResultCardButton from "../common/buttons/ResultCardButton";
 import { color } from "../../styles/constants";
+import useTabNavigation from "../../hooks/useTabNavigation";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
-  onDownload?: () => void;
-  onDetail?: () => void;
-  onLink?: () => void;
   isGridView?: boolean;
   shouldHideText?: boolean;
 }
@@ -74,12 +72,11 @@ const renderStatusButton = (
 
 const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
-  onDetail,
-  onLink,
-  onDownload,
   isGridView,
   shouldHideText = false,
 }) => {
+  const goToDetailPanel = useTabNavigation();
+
   const ButtonContainer: FC<ButtonContainerProps> = ({ children, sx }) => (
     <Grid
       item
@@ -107,11 +104,11 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
             startIcon={LinkIcon}
             text={generateLinkText(links.length)}
             shouldHideText={shouldHideText}
-            onClick={onLink}
+            onClick={() => goToDetailPanel(content.id, "links")}
             resultCardButtonConfig={{
               color: links.length > 0 ? color.blue.dark : color.gray.light,
             }}
-            disable={!!(links.length === 0)}
+            disable={links.length === 0}
           />
         )}
       </ButtonContainer>
@@ -120,7 +117,9 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={DownloadIcon}
           text="Download"
           shouldHideText={shouldHideText}
-          onClick={onDownload}
+          onClick={() =>
+            goToDetailPanel(content.id, "abstract", "download-section")
+          }
         />
       </ButtonContainer>
       <ButtonContainer>
@@ -128,7 +127,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={InfoIcon}
           text="More details ..."
           shouldHideText={shouldHideText}
-          onClick={onDetail}
+          onClick={() => goToDetailPanel(content.id, "abstract")}
         />
       </ButtonContainer>
     </Grid>

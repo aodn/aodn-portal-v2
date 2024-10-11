@@ -14,7 +14,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { Box, Card, CardContent, CircularProgress } from "@mui/material";
 import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
-import { Point, Feature } from "geojson";
+import { Feature, Point } from "geojson";
 import {
   fetchResultNoStore,
   SearchParameters,
@@ -32,7 +32,6 @@ interface MapPopupProps {
   layerId: string;
   popupType?: PopupType;
   onDatasetSelected?: (uuid: Array<string>) => void;
-  onNavigateToDetail?: (uuid: string) => void;
 }
 export interface MapPopupRef {
   forceRemovePopup: () => void;
@@ -88,15 +87,6 @@ const renderLoadingBox = ({
   </Box>
 );
 
-const handleNavigateToDetailPage = (
-  uuid: string,
-  onNavigateToDetail?: (uuid: string) => void
-) => {
-  if (onNavigateToDetail) {
-    onNavigateToDetail(uuid);
-  }
-};
-
 const handleDatasetSelect = (
   uuid: string,
   onDatasetSelected?: (uuid: Array<string>) => void
@@ -107,12 +97,7 @@ const handleDatasetSelect = (
 };
 
 const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  {
-    layerId,
-    onDatasetSelected,
-    onNavigateToDetail,
-    popupType = PopupType.Basic,
-  },
+  { layerId, onDatasetSelected, popupType = PopupType.Basic },
   ref
 ) => {
   const dispatch = useAppDispatch();
@@ -177,12 +162,6 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
               {popupType === PopupType.Complex && (
                 <ComplexMapHoverTip
                   collection={collection}
-                  onNavigateToDetail={() =>
-                    handleNavigateToDetailPage(
-                      collection.id,
-                      onNavigateToDetail
-                    )
-                  }
                   onDatasetSelected={() =>
                     handleDatasetSelect(collection.id, onDatasetSelected)
                   }
@@ -193,7 +172,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         </ThemeProvider>
       );
     },
-    [onDatasetSelected, onNavigateToDetail, popupHeight, popupType, popupWidth]
+    [onDatasetSelected, popupHeight, popupType, popupWidth]
   );
 
   const removePopup = useCallback(() => {

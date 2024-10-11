@@ -5,6 +5,7 @@
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
 import { DatasetFrequency } from "./searchReducer";
+import { MapDefaultConfig } from "../../map/mapbox/constants";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -16,6 +17,9 @@ const UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE =
   "UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE";
 const UPDATE_UPDATE_FREQ_VARIABLE = "UPDATE_UPDATE_FREQ_VARIABLE";
 const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
+
+const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
+  MapDefaultConfig.BBOX_ENDPOINTS;
 
 interface DataTimeFilterRange {
   // Cannot use Date in Redux as it is non-serializable
@@ -135,24 +139,21 @@ const createInitialParameterState = (
   };
 
   if (withDefaultPolygon) {
-    // This is the default area and zoom of TAS, this helps to imporve the search
-    // speed because the map will be start in this place. You can always find
-    // the polygon value in the url
+    // The default area now is Australia. When changing it, please make
+    // sure it matches the default centerLongitude, centerLatitude, and
+    // zoom level in the Map.tsx
     state.polygon = {
       type: "Feature",
-      bbox: [
-        124.4248325953249, -60.65204782465562, 170.24587823247586,
-        -25.124994472112704,
-      ],
+      bbox: [WEST_LON, SOUTH_LAT, EAST_LON, NORTH_LAT],
       geometry: {
         type: "Polygon",
         coordinates: [
           [
-            [124.4248325953249, -60.65204782465562],
-            [170.24587823247586, -60.65204782465562],
-            [170.24587823247586, 25.124994472112704],
-            [124.4248325953249, -25.124994472112704],
-            [124.4248325953249, -60.65204782465562],
+            [WEST_LON, SOUTH_LAT],
+            [EAST_LON, SOUTH_LAT],
+            [EAST_LON, NORTH_LAT],
+            [WEST_LON, NORTH_LAT],
+            [WEST_LON, SOUTH_LAT],
           ],
         ],
       },
