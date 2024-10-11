@@ -5,6 +5,7 @@
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
 import { DatasetFrequency } from "./searchReducer";
+import { MapDefaultConfig } from "../../map/mapbox/constants";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -16,6 +17,9 @@ const UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE =
   "UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE";
 const UPDATE_UPDATE_FREQ_VARIABLE = "UPDATE_UPDATE_FREQ_VARIABLE";
 const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
+
+const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
+  MapDefaultConfig.BBOX_ENDPOINTS;
 
 interface DataTimeFilterRange {
   // Cannot use Date in Redux as it is non-serializable
@@ -140,19 +144,16 @@ const createInitialParameterState = (
     // zoom level in the Map.tsx
     state.polygon = {
       type: "Feature",
-      bbox: [
-        104.66613679450332, -43.66657403205866, 163.4280362657869,
-        -11.55212957087365,
-      ],
+      bbox: [WEST_LON, SOUTH_LAT, EAST_LON, NORTH_LAT],
       geometry: {
         type: "Polygon",
         coordinates: [
           [
-            [104.66613679450332, -43.66657403205866],
-            [163.4280362657869, -43.66657403205866],
-            [163.4280362657869, -11.55212957087365],
-            [104.66613679450332, -11.55212957087365],
-            [104.66613679450332, -43.66657403205866],
+            [WEST_LON, SOUTH_LAT],
+            [EAST_LON, SOUTH_LAT],
+            [EAST_LON, NORTH_LAT],
+            [WEST_LON, NORTH_LAT],
+            [WEST_LON, SOUTH_LAT],
           ],
         ],
       },
