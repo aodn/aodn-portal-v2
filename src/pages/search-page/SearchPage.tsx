@@ -47,7 +47,6 @@ import {
 import { useAppDispatch } from "../../components/common/store/hooks";
 
 const SEARCH_BAR_HEIGHT = 56;
-const RESULT_SECTION_WIDTH = 500;
 
 const isLoading = (count: number): boolean => {
   if (count > 0) {
@@ -331,10 +330,6 @@ const SearchPage = () => {
               {visibility === SearchResultLayoutEnum.VISIBLE && (
                 <Box>
                   <ResultSection
-                    sx={{
-                      height: "80vh",
-                      width: RESULT_SECTION_WIDTH,
-                    }}
                     onVisibilityChanged={onVisibilityChanged}
                     onClickCard={handleClickCard}
                     onChangeSorting={onChangeSorting}
