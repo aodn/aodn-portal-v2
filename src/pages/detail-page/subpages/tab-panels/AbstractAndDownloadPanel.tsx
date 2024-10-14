@@ -44,6 +44,7 @@ import { StaticLayersDef } from "../../../../components/map/mapbox/layers/Static
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
+import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 
 interface DownloadSelect {
   label?: string;
@@ -137,6 +138,8 @@ const renderSelect = (select: DownloadSelect) => (
 
 const DOWNLOAD_SECTION_ID = "download-section";
 
+const TRUNCATE_COUNT = 800;
+
 const AbstractAndDownloadPanel: FC = () => {
   const { collection } = useDetailPageContext();
   const downloadSectionRef = useScrollToSection({
@@ -154,9 +157,11 @@ const AbstractAndDownloadPanel: FC = () => {
       <Grid container>
         <Grid item xs={12}>
           <Stack direction="column">
-            <Typography sx={{ padding: 0 }} data-testid="detail-abstract">
-              {decodeHtmlEntities(abstract)}
-            </Typography>
+            <ExpandableTextArea
+              text={decodeHtmlEntities(abstract)}
+              showMoreStr={"Show All"}
+              truncateCount={TRUNCATE_COUNT}
+            />
             <Box sx={{ visibility: "visible" }}>
               <Box
                 arial-label="map"
