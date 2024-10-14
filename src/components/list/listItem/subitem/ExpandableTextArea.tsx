@@ -10,14 +10,18 @@ interface ExpandableTextAreaProps {
   text: string;
   isClickable?: boolean;
   onClick?: () => void;
+  truncateCount?: number;
+  showMoreStr?: string;
 }
 
-const truncateCount = 430;
+const defaultTruncateCount = 430;
 
 const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   text,
   isClickable = false,
   onClick = () => {},
+  truncateCount = defaultTruncateCount,
+  showMoreStr = "Show More",
 }) => {
   const decodedText = decodeHtmlEntities(text);
   const truncatedText = truncateText(decodedText, truncateCount);
@@ -50,7 +54,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
       <Grid item md={12} display="flex" justifyContent="flex-end">
         {doesNeedTruncation && (
           <Button onClick={onButtonClick}>
-            {isExpanded ? "Show Less" : "Show More"}
+            {isExpanded ? "Show Less" : showMoreStr}
           </Button>
         )}
       </Grid>
