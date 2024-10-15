@@ -33,13 +33,13 @@ class BasePage:
         """Click on the given label"""
         self.get_label(text).click()
 
-    def get_text(self, text: str) -> Locator:
+    def get_text(self, text: str, exact: bool = False) -> Locator:
         """Return element by text"""
-        return self.page.get_by_text(text)
+        return self.page.get_by_text(text, exact=exact)
 
-    def click_text(self, text: str) -> None:
+    def click_text(self, text: str, exact: bool = False) -> None:
         """Click on the given text"""
-        self.get_text(text).click()
+        self.get_text(text, exact=exact).click()
 
     def get_tab(self, text: str) -> Locator:
         """Return tab element by text"""

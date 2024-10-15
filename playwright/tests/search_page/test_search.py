@@ -1,9 +1,11 @@
 import pytest
 from playwright.sync_api import Page, expect
 
-from mocks.api.collections import (
-    handle_collections_update_all_api,
-    handle_collections_update_centroid_api,
+from core.enums.search_sort_type import SearchSortType
+from mocks.api.search_sort import (
+    handle_sort_by_modified,
+    handle_sort_by_relevance,
+    handle_sort_by_title,
 )
 from mocks.api_router import ApiRouter
 from pages.landing_page import LandingPage
@@ -36,30 +38,35 @@ def test_basic_search(
 
 @pytest.mark.parametrize(
     'sort_type',
-    [
-        'Title',
-        'Popularity',
-        'Modified',
-    ],
+    [SearchSortType.TITLE, SearchSortType.MODIFIED],
 )
-def test_search_result_sort(page_mock: Page, sort_type: str) -> None:
+def test_search_result_sort(page_mock: Page, sort_type: SearchSortType) -> None:
     api_router = ApiRouter(page=page_mock)
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
 
+    api_router.route_collection_all(
+        handle_sort_by_relevance
+    )  # Sort by relevance is the default sorting type
+
     landing_page.load()
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
-    expect(search_page.first_result_title).to_be_visible()
+    initial_first_title = search_page.first_result_title.inner_text()
 
-    # Change api route to get updated response after search action
-    api_router.route_collection(
-        handle_collections_update_centroid_api,
-        handle_collections_update_all_api,
-    )
+    if sort_type == SearchSortType.TITLE:
+        api_router.route_collection_all(
+            handle_sort_by_title,
+        )
+    elif sort_type == SearchSortType.MODIFIED:
+        api_router.route_collection_all(
+            handle_sort_by_modified,
+        )
 
     search_page.sort_button.click()
-    search_page.click_text(sort_type)
+    search_page.click_text(sort_type.value, exact=True)
 
     search_page.wait_for_search_to_complete()
-    expect(search_page.first_result_title).to_be_visible()
+    updated_first_title = search_page.first_result_title.inner_text()
+
+    assert initial_first_title != updated_first_title

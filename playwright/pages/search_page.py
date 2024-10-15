@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, TimeoutError
+from playwright.sync_api import Locator, Page, TimeoutError
 
 from mocks.api.collections import (
     handle_collections_show_more_api,
@@ -63,10 +63,10 @@ class SearchPage(BasePage):
         """Click on the given dataset title"""
         self.page.locator('button').filter(has_text=title).click()
 
-    def scroll_to_bottom_of_result_list(self) -> None:
+    def scroll_down_in_result_list(self, delta_y: int) -> None:
         """Scroll to the bottom of the result list"""
-        self.first_result_title.hover()
-        self.page.mouse.wheel(0, 1600)
+        self.result_list.hover()
+        self.page.mouse.wheel(0, delta_y)
 
     def click_show_more_results(self) -> None:
         """Update api route and then click "Show more results" button"""
@@ -74,6 +74,10 @@ class SearchPage(BasePage):
         api_router.route_collection_all(handle_collections_show_more_api)
 
         self.show_more_results.click()
+
+    def get_dataset_by_id(self, id: str) -> Locator:
+        """Returns result card element by dataset id"""
+        return self.get_by_id(f'result-card-{id}')
 
     def get_show_result_count_text(self, count: int, total: int) -> str:
         """Returns result count text in the specific format"""

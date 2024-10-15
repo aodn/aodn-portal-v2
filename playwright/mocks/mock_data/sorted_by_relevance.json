@@ -1,0 +1,640 @@
+{
+  "links": [],
+  "collections": [
+    {
+      "properties": {
+        "status": "completed"
+      },
+      "id": "3f870001-e54d-4ede-8aea-9982e5af1f45",
+      "title": "Rachel Cruise 08 [1984] - Biological data overview",
+      "description": "This record describes the biological data collected on Rachel Cruise 08/1984. The data were obtained from the Australian North West Shelf and northern coast between September and October 1984. The dataset consists of length, sex, species identity data for sharks, mainly Carcharhinus tilstoni, Carcharhinus sorrah, Scomberomorus commerson and Thunnus tonggol, from gillnet and longline samples. This dataset was collected as part of the CSIRO Northern Pelagic Fish Stock Research Project.",
+      "links": [
+        {
+          "href": "https://www.cmar.csiro.au/geoserver/wms?&CQL_FILTER=SURVEY_NAME%20%3D%20%27RACH198408%27",
+          "rel": "wms",
+          "type": "",
+          "title": "cmar:CATCH_HEADER_AODN_VIEW"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=877",
+          "rel": "related",
+          "type": "",
+          "title": "Cruise Plan (pdf)"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=878",
+          "rel": "related",
+          "type": "",
+          "title": "Cruise Summary (pdf)"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=RACH198408&data_type=catch",
+          "rel": "related",
+          "type": "",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://creativecommons.org/licenses/by/4.0/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://www.cmar.csiro.au/data/trawler/dataset_mapfile.cfm?survey=RACH198408&data_type=catch&img_type=tn",
+          "rel": "preview",
+          "type": "image"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "completed"
+      },
+      "id": "006565f1-90e2-7971-e053-08114f8c5c31",
+      "title": "Franklin Voyage FR 10/87 Raw Data Tapes and Documentation",
+      "description": "RV Franklin Voyage FR 10/87 -  The voyage took place in the Indian Ocean and the Gulf of Carpentaria during 3-24 November 1987. This record was created as the following paper documents located in box file \"FR10/87 EB\" received from Ed Butler were scanned and archived.The box file \"FR 10/87 EB\" can be found in the Datacentre store room, Building 5,  5SS54 -bay 3, shelf 4.\n\nOn-line Documentation: (added as of: 12/08/2014)\n-fr198710_BridgeLog_Copy.pdf\n-fr198710_EventLog_Computer.pdf\n-fr198710_EventLog_Original.pdf\n-fr198710_Cruise_Summary.pdf\n\n\nDocumentation is on the internal network: \\processedVoyageData\\RV_Franklin  [voyage]  \\global_docs.\n\nThe raw data archive is part of an LTO backup tape which holds the entire raw data collection from all Franklin voyages. Date range 1985 - 2002. Data from all MAG tapes, /data tapes, echolog tapes and echolog CDs is included. See http://www.marine.csiro.au/marq/edd_search2.cd_details?id=519 for details.",
+      "links": [
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": ""
+      },
+      "id": "194daf7c-828b-4a96-a768-6254b14b2a92",
+      "title": "Polychaetes of Northern Australia (species identifications)",
+      "description": "<p>This dataset contains identifications of polychaetes collected during surveys on the RV Solander in northern Australia:  SOL4934 (27 August-24 September, 2009) , SOL5117 (30 July-27 August, 2010), SOL5463 (3-31 May 2012), and SOL5650 (12 September-6 October 2012). Sediment was collected with a Smith McIntyre grab or boxcore and elutriated over a 500um sieve. Elutriated material was then sorted back at Geoscience Australia, and all polychaetes were removed and sent to the Museum and Art Gallery of the Northern Territory (MAGNT). Chris Glasby and Charlotte Watson taxonomically identified each animal to the lowest possible level, differentiating species using established names and operational taxonomic units (OTUs).  Specimens are lodged at the MAGNT. See relevant post-survey reports (GA Records 2010/09, 2011/08,  2012/66  and 2013/38) for further details on survey methods and specimen acquisition. This dataset is published with the permission of the CEO, Geoscience Australia.\n<p>This research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.",
+      "links": [
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/9900fc17-fef1-4db5-b3ef-1db34e018164.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "uuid:d150240e-3cb7-437f-90ca-b9fafe700a19",
+          "rel": "parent",
+          "type": "application/json",
+          "title": "{\"title\":\"NESP MB Project D1 - Ecosystem understanding to support sustainable use, management and monitoring of marine assets in the North and North-west regions\",\"recordAbstract\":\"This record provides an overview of the scope and research output of NESP Marine Biodiversity Hub Project D1 - \\\"Ecosystem understanding to support sustainable use, management and monitoring of marine assets in the North and North-west regions\\\". For specific data outputs from this project, please see child records associated with this metadata.\\n\\n--------------------\\n\\nEffective management of marine assets requires an understanding of ecosystems and the processes that influence patterns of biodiversity. Focusing on the North and North-west regions, this project will leverage previous research to improve ecosystem understanding through a synthesis of existing information and by making testable predictions about the character and extent of conservation values, including for key ecological features (KEFs) and Commonwealth Marine Reserves. End-users and stakeholders will benefit from improved regional descriptions of marine ecosystems and uncertainty statements. In turn, this will inform prioritisation of future investments in monitoring marine ecosystems and State of the Environment reporting. \\n\\nPlanned Outputs\\n• A report on the synthesis (based on collations completed in 2015) of datasets and models for the North and NW identifying areas of greatest information coverage, gaps and themed to CMRs and KEFs in those regions. This report will also describe key spatial patterns in biodiversity (benthic and pelagic) and associations between benthic environments, fish and megafauna and large scale processes (e.g. oceanography).\\n• Predictions and related products (maps) of the spatial distribution of biodiversity across the Oceanic Shoals CMR that encompasses benthic habitat, pelagic and demersal fish and megafauna communities. This will provide an example/test case at the National Prioritisation Workshop of how confidently predictive modelling can be used to describe assets and values in data poor areas to inform management and monitoring. \\n• An updated conceptual model of ecosystem processes (benthic and pelagic) within the Oceanic Shoals CMR based on extension of modelling into pelagics.\\n• A review of existing knowledge of the Ancient Coastline KEF.\\n• A qualitative model of Glomar Shoal KEF (to be confirmed in consultation with DOE).\\n• Communication products that capture activities and general interest stories of scientific results disseminated through NW Atlas social media links.\\n• Upload of new relevant spatial data layers in NW Atlas for management and planning, and engagement with end users to maximize uptake of the NW Atlas products.\"}"
+        },
+        {
+          "href": "uuid:b941d108-5e80-41a4-aa86-4ec5e33ef994",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Gifford Marine Park Bathymetry - 30m Resolution Grid\",\"recordAbstract\":\"Australia has established a network of 58 marine parks within Commonwealth waters covering a total of 3.3 million square kilometres, or 40 per cent of our exclusive economic zone (excluding Australian Antarctic Territory). These parks span a range of settings, from near coastal and shelf habitats to abyssal plains. Parks Australia manages the park network through management plans that came into effect for all parks on 1 July 2018. Geoscience Australia is contributing to their management by collating and interpreting existing environmental data, and through the collection of new marine data. “Eco-narrative” documents are being developed for those parks, where sufficient information is available, delivering collations and interpretations of seafloor geomorphology, oceanography and ecology. Many of these interpretations rely on bathymetric grids and their derived products, including those in this data release.\\n\\nBathymetry grids\\nThe bathymetry of the marine parks was created by compiling and processing Geoscience Australia’s bathymetry data holding gridded at the optimum resolution depending of the vessel’s sonar system.\\nThe bathymetry of the park is illustrated by a panchromatic geotiff image, developed by combining the bathymetric data with a hillshade image.\\n\\nMorphological Surfaces\\nGeoscience Australia has developed a new marine seafloor classification scheme, which uses the two-part seafloor mapping morphology approach of Dove et al (2016). This new scheme is semi-hierarchical and the first step divides the slope of the seafloor into three Morphological Surface categories (Plain, <2°; Slope, 2-10°; Escarpment, >10°).\\n\\nDove, D., Bradwell, T., Carter, G., Cotterill, C., Gafeira, J., Green, S., Krabbendam, M., Mellet, C., Stevenson, A., Stewart, H., Westhead, K., Scott, G., Guinan, J., Judge, M. Monteys, X., Elvenes, S., Baeten, N., Dolan, M., Thorsnes, T., Bjarnadóttir, L., Ottesen, D. (2016). Seabed geomorphology: a twopart classification system. British Geological Survey, Open Report OR/16/001. 13 pages.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:ef604d5c-6208-4a4a-9e68-9e5a26109588",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Oceanic Shoals Commonwealth Marine Reserve - Predicted pelagic diversity\",\"recordAbstract\":\"This dataset provides predictions of pelagic vertebrate species richness and relative abundance throughout sub-areas of the Oceanic Shoals Australian Marine Park (AMP). Predictive models were constructed from in situ observations made using mid-water stereo-BRUVS (baited remote underwater video systems) deployed at 116 sites within three sampling areas in the western half of the AMP. Sampling took place in September and October 2012 aboard the RV Solander (survey GA0339/SOL5650), as part of an expedition supported by the National Environmental Research Programme's Marine Biodiversity Hub (Theme 3). Expedition partners included the Australian Institute of Marine Science (AIMS), Geoscience Australia (GA), The Centre for Marine Futures at the University of Western Australia (UWA), and the Northern Territory Museum. Full methodological details can be found in the following peer-reviewed publication: Bouchet, P.J., Letessier, T.B., Caley, M.J., Nichol, S.L., Hemmi, J.M., Meeuwig, J. (2020). Submerged carbonate banks aggregate pelagic megafauna in offshore tropical Australia. Front. Mar. Sci. doi: 10.3389/fmars.2020.00530\"}"
+        },
+        {
+          "href": "uuid:ef452136-c42c-4f0a-98b3-f38a000a3752",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Oceanic Shoals Commonwealth Marine Reserve - Pelagic baited camera surveys (stereo-BRUVS)\",\"recordAbstract\":\"This dataset derives from deployments of pelagic baited camera systems (stereo-BRUVS) conducted within the Oceanic Shoals Commonwealth Marine Reserve (CMR) in the Timor Sea during September and October 2012 onboard the RV Solander.\\n\\nThis resource comprises species lists and relative abundance data (measured as MaxN, the maximum number of individuals of a given species captured in any one frame) for 116 sampling sites surveyed across three focal areas.\\n\\nThe Oceanic Shoals Commonwealth Marine Reserve survey was undertaken as an activity within the Australian Government's National Environmental Research Program Marine Biodiversity Hub and was the key component of Research Theme 4 - Regional Biodiversity Discovery to Support Marine Bioregional Plans. Hub partners involved in the survey included the Australian Institute of Marine Science, Geoscience Australia, the University of Western Australia, Museum Victoria and the Museum and Art Gallery of the Northern Territory. Data acquired during the survey included: multibeam sonar bathymetry and acoustic backscatter; sub-bottom acoustic profiles; physical samples of seabed sediments, infauna and epibenthic biota; towed underwater video and still camera observations of seabed habitats; baited video observations of demersal and pelagic fish, and; oceanographic measurements of the water column from CTD (conductivity, temperature, depth) casts and from deployment of sea surface drifters. Further information on the survey is available in the post-survey report published as Geoscience Australia Record 2013/38: Nichol, S.L., Howard, F.J.F., Kool, J., Stowar, M., Bouchet, P., Radke, L.,Siwabessy, J., Przeslawski, R., Picard, K., Alvarez de Glasby, B., Colquhoun, J., Letessier, T. & Heyward, A. 2013. Oceanic Shoals Commonwealth Marine Reserve (Timor Sea) Biodiversity Survey: GA0339/SOL5650 - Post Survey Report. Record 2013/38. Geoscience Australia: Canberra. (GEOCAT #76658).\"}"
+        },
+        {
+          "href": "uuid:e90f84bd-a1c8-4943-ac6a-dbfee0cc313e",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Sea Around Us Project - Relative demersal fish abundance inferred from commercial catch data, northwestern Australia (1997-2006)\",\"recordAbstract\":\"This dataset describes the relative abundance of an assemblage of commercially exploited demersal fishes in northwestern Australia, mapped over a 30 arc-minute (0.5 degree) spatial grid. The data cover the period 1997-2006 and are derived from an analysis of commercial landings available through the Sea Around Us Project (http://www.seaaroundus.org/). Further methodological details can be found in the following peer-reviewed publication, which applies the same analysis to a suite of mobile pelagic species: Bouchet PJ, Meeuwig JJ, Huang Z, Letessier TB, Nichol SL, Caley MJ, Watson RA. 2016. Continental-scale hotspots of pelagic fish abundance inferred from commercial catch records. Global Ecology and Biogeography.\\n\\nBelow is a full list of species/genera/families considered, with their respective contributions to the total catch (%):\\n--------------------------------------------------\\nMustelus\\t-- 26.1948%\\nPlatycephalidae -- 23.3191%\\nSeriolella -- 10.8968%\\nSillaginidae -- 9.4242%\\nGenypterus blacodes -- 5.8347%\\nPristiophorus -- 4.4934%\\nTetraodontidae -- 4.3235%\\nNemadactylus -- 4.2784%\\nSquatinidae -- 3.6071%\\nMugilidae -- 3.181%\\nSparidae -- 2.7037%\\nChelidonichthys kumu -- 0.7146%\\nRajiformes -- 0.4497%\\nPterygotrigla polyommata -- 0.3911%\\nScorpaenidae -- 0.1292%\\nCallorhinchus milii -- 0.0367%\\nRhombosolea -- 0.0046%\\nPleuronectiformes -- 0.0034%\\nLeiognathidae -- 0.003%\\nLates calcarifer -- 0.0029%\\nAriidae -- 0.0025%\\nSciaenidae -- 0.0017%\\nNemipteridae -- 0.0014%\\nNemipterus -- 0.0014%\\nUpeneus -- 0.001%\\n\\nData will be attached to this record once analyses are completed, est. December 2016.\"}"
+        },
+        {
+          "href": "uuid:f92f53af-9d6f-4f38-b15a-0de899b64c19",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Sea Surface Temperature Warming Rates in Australian Marine Parks according to the SSTAARS\",\"recordAbstract\":\"This dataset measures the mean decadal warming rates of the sea surface temperature (SST) in 58 Australian Marine Parks (with the exception of the Heard Island and McDonald Islands Marine Park) over the past 25 years (1992 to 2016). They are derived from the Sea Surface Temperature Atlas of the Australian Regional Seas (SSTAARS). The field of “trend_d” represents the linear SST trend for March 1992 to December 2016. The unit of the warming rates is Celsius degree/per decade.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:26ea2545-db37-4b17-83c6-2cceeda47403",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"MODIS Derived Primary Productivity: Seasonal Hotspots\",\"recordAbstract\":\"The dataset indicates the seasonal primary productivity hotspots of ocean surface waters. They are derived from MODIS (aqua) images using NASA's SeaDAS image processing software. The monthly chlorophyll a images between July 2002 and August 2014 are used to identify the primary productivity hotspots of the four austral seasons: winter (June, July, and August), spring (September, October and November), summer (December, January and February) and autumn (March, April and May). The extent of the dataset covers the entire Australian EEZ and surrounding waters (including the southern ocean). The value (between 0 and 1.0) of the dataset represents the likelihood of the location being a primary productivity hotspot.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:30945304-5caf-495e-a2fe-464361bb05a6",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"MODIS Derived Chlorophyll a dataset: Seasonal Variations\",\"recordAbstract\":\"The dataset measures the long-term seasonal variations of the chlorophyll a concentrations of ocean surface waters. They are derived from MODIS (aqua) images using NASA's SeaDAS image processing software. The monthly chlorophyll a images between July 2002 and December 2017 are used to calculate the standard deviations of the four austral seasons: winter (June, July, and August), spring (September, October and November), summer (December, January and February) and autumn (March, April and May). The extent of the dataset covers the entire Australian EEZ and surrounding waters (including the southern ocean). The unit of the dataset is mg/m3.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:5af57072-c4c2-4a5a-bc72-62486dc6d73e",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Juvenile shark occurrence inferred from baited remote underwater video surveys Northwest Australia (2003-2013)\",\"recordAbstract\":\"This dataset describes the predicted occurrence of juvenile sharks around Northwest Australia, mapped over a 0.01 degree spatial grid. Juvenile sharks were mapped at two taxonomic levels: order by including all juvenile sharks sampled (all juveniles) and species by considering the three most abundant species sampled separately (grey reef (Carcharhinus amblyrhynchos), sandbar (Carcharhinus plumbeus), and whitetip reef (Triaenodon obesus) sharks). The data cover the period 2003-2013 and are derived from an analysis of count data derived from baited remote underwater videos deployed through various sampling programs. Further detail can be found in the following peer-reviewed publication: Oh, BZL, Sequeira, AMM, Meekan, MG, Ruppert, JLW and Meeuwig, JJ (2017), Predicting occurrence of juvenile shark habitat to improve conservation planning. Conservation Biology, 31: 635–645. doi:10.1111/cobi.12868\\n\\nBelow is a full list of species, with contributions to the total counted (%):\\n--------------------------------------------------\\nSilvertip shark / Carcharhinus albimarginatus – 4.14%\\nGrey reef shark / Carcharhinus amblyrhynchos – 28.06%\\nBronze whaler / Carcharhinus brachyurus – 0.18%\\nGalapagos shark / Carcharhinus galapagensis – 0.09%\\nBull shark / Carcharhinus leucas – 0.18%\\nCommon-Australian blacktip shark / Carcharhinus limbatus-C.tilstoni – 1.38%\\nBlacktip reef shark / Carcharhinus melanopterus – 1.56%\\nSandbar shark / Carcharhinus plumbeus – 4.78%\\nSpot-tail shark / Carcharhinus sorrah – 0.18%\\nTiger shark / Galeocerdo cuvier – 2.39%\\nSliteye-Sharpnose shark / Loxodon macrorhinus-Rhizoprionodon spp. – 6.35%\\nLemon shark / Negaprion acutidens – 1.01%\\nWhitetip reef shark / Triaenodon obesus – 18.95%\\nTawny shark / Nebrius ferrugineus – 0.83%\\nGrey carpetshark / Chiloscyllium punctatum – 1.38%\\nTaselled wobbegong / Eucrossorhinus dasypogon – 0.09%\\nScalloped hammerhead / Sphyrna lewini – 0.46%\\nGreat hammerhead / Sphyrna mokarran – 3.86%\\nZebra shark / Stegostoma fasciatum – 0.83%\\nSicklefin houndshark / Hemitriakis falcata – 1.01%\\nGrey gummy shark / Mustelus ravidus – 0.28%\\n\\nArchived BRUVS video files used in this study are the intellectual property of multiple institutions and industry partners and are not published in this record. See credits for further information.\"}"
+        },
+        {
+          "href": "uuid:5e377c55-8760-461f-b9de-fe1af49e37e7",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Joseph Bonaparte Gulf 30 m bathymetry and derived Morphological Surfaces\",\"recordAbstract\":\"Australia has established a network of 58 marine parks within Commonwealth waters covering a total of 3.3 million square kilometres, or 40 per cent of our exclusive economic zone (excluding Australian Antarctic Territory). These parks span a range of settings, from near coastal and shelf habitats to abyssal plains. Parks Australia manages the park network through management plans that came into effect for all parks on 1 July 2018. Geoscience Australia is contributing to their management by collating and interpreting existing environmental data, and through the collection of new marine data. “Eco-narrative” documents are being developed for those parks, where sufficient information is available, delivering collations and interpretations of seafloor geomorphology, oceanography and ecology. Many of these interpretations rely on bathymetric grids and their derived products, including those in this data release.\\n\\nGeoscience Australia has developed a new marine seafloor classification scheme, which uses the two-part seafloor mapping morphology approach of Dove et al (2016). This new scheme is semi-hierarchical and the first step divides the slope of the seafloor into three Morphological Surface categories (Plain, <2°; Slope, 2-10°; Escarpment, >10°). This classification was applied to the portion of the Beaman and Spinnocia (2018) 30 m grid within the marine park. \\n\\nBeaman, R.J. and Spinoccia, M. (2018). High-resolution depth model for Northern Australia - 30 m. Geoscience Australia.\\nDove, D., Bradwell, T., Carter, G., Cotterill, C., Gafeira, J., Green, S., Krabbendam, M., Mellet, C., Stevenson, A., Stewart, H., Westhead, K., Scott, G., Guinan, J., Judge, M. Monteys, X., Elvenes, S., Baeten, N., Dolan, M., Thorsnes, T., Bjarnadóttir, L., Ottesen, D. (2016). Seabed geomorphology: a twopart classification system. British Geological Survey, Open Report OR/16/001. 13 pages.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:6a04ae7d-73f7-47c3-8fb1-f416c55ab319",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Perth Canyon Marine Park Bathymetry - 40m Resolution Grid\",\"recordAbstract\":\"Australia has established a network of 58 marine parks within Commonwealth waters covering a total of 3.3 million square kilometres, or 40 per cent of our exclusive economic zone (excluding Australian Antarctic Territory). These parks span a range of settings, from near coastal and shelf habitats to abyssal plains. Parks Australia manages the park network through management plans that came into effect for all parks on 1 July 2018. Geoscience Australia is contributing to their management by collating and interpreting existing environmental data, and through the collection of new marine data. “Eco-narrative” documents are being developed for those parks, where sufficient information is available, delivering collations and interpretations of seafloor geomorphology, oceanography and ecology. Many of these interpretations rely on bathymetric grids and their derived products, including those in this data release.\\n\\nBathymetry grids\\nThe bathymetry of the marine parks was created by compiling and processing Geoscience Australia’s bathymetry data holding gridded at the optimum resolution depending of the vessel’s sonar system.\\n\\nThe bathymetry of the park is illustrated by a panchromatic geotiff image, developed by combining the bathymetric data with a hillshade image.\\n\\nMorphological Surfaces\\nGeoscience Australia has developed a new marine seafloor classification scheme, which uses the two-part seafloor mapping morphology approach of Dove et al (2016). This new scheme is semi-hierarchical and the first step divides the slope of the seafloor into three Morphological Surface categories (Plain, <2°; Slope, 2-10°; Escarpment, >10°).\\n\\nDove, D., Bradwell, T., Carter, G., Cotterill, C., Gafeira, J., Green, S., Krabbendam, M., Mellet, C., Stevenson, A., Stewart, H., Westhead, K., Scott, G., Guinan, J., Judge, M. Monteys, X., Elvenes, S., Baeten, N., Dolan, M., Thorsnes, T., Bjarnadóttir, L., Ottesen, D. (2016). Seabed geomorphology: a twopart classification system. British Geological Survey, Open Report OR/16/001. 13 pages.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:32066411-0967-4188-9287-b1f3a33beae6",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Oceanic Shoals / Wessel Island sponge biodiversity data\",\"recordAbstract\":\"Between 2009-2012, Geoscience Australia conducted three surveys to Joseph Bonaparte Gulf and the Timor Sea on the R.V. Solander, in collaboration with the Australian Institute of Science and the Museum and Art Gallery of the Northern Territory. The study areas overlapped the Oceanic Shoals Commonwealth Marine Reserve and the carbonate banks and terraces within it. The surveys were conducted as part of the Australian Government's Energy Security Program (2007-2011) and the National Environment Research Program (2011-2015). On the surveys, a benthic sled was deployed to collect biological samples from the seafloor. Samples were sorted onboard according to phylum, photographed and then sent to taxonomists for species-level identifications. This dataset provides a list of all identified sponge species.\\n\\nThe associated image catalogue of collected sponges can be accessed here: https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/1216e0f4-099c-49f6-96f7-ed3eadc0cd15\"}"
+        },
+        {
+          "href": "uuid:8f5da38c-2041-4fb2-b30f-ef3926aa525e",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Sea Surface Temperature Warming Rates in Australian Marine Parks\",\"recordAbstract\":\"This dataset measures the overall warming rates of the sea surface temperature (SST) in 58 Australian Marine Parks (except the Heard Island and McDonald Islands Marine Park) over the past 15 years (2003 to 2017). They are derived from the monthly MODIS (aqua) SST images. The fields of \\\"slope_y\\\" and \\\"slope_m\\\" represent the annual and monthly SST warming rates, respectively. The units of the warming rates are Celsius degree/per annual and Celsius degree/per month.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:75529a6d-8367-49ab-a2a8-6a4b1cb1f289",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Kimberley Marine Park 30 m bathymetry and derived Morphological Surfaces\",\"recordAbstract\":\"Australia has established a network of 58 marine parks within Commonwealth waters covering a total of 3.3 million square kilometres, or 40 per cent of our exclusive economic zone (excluding Australian Antarctic Territory). These parks span a range of settings, from near coastal and shelf habitats to abyssal plains. Parks Australia manages the park network through management plans that came into effect for all parks on 1 July 2018. Geoscience Australia is contributing to their management by collating and interpreting existing environmental data, and through the collection of new marine data. “Eco-narrative” documents are being developed for those parks, where sufficient information is available, delivering collations and interpretations of seafloor geomorphology, oceanography and ecology. Many of these interpretations rely on bathymetric grids and their derived products, including those in this data release.\\n\\nGeoscience Australia has developed a new marine seafloor classification scheme, which uses the two-part seafloor mapping morphology approach of Dove et al (2016). This new scheme is semi-hierarchical and the first step divides the slope of the seafloor into three Morphological Surface categories (Plain, <2°; Slope, 2-10°; Escarpment, >10°). This classification was applied to the portion of the Beaman and Spinnocia (2018) 30 m grid within the Kimberley Marine Park. \\n\\nThis research is supported by the National Environmental Research Program Marine Biodiversity Hub through Project D1.\\n\\nBeaman, R.J. and Spinoccia, M. (2018). High-resolution depth model for Northern Australia - 30 m. Geoscience Australia.\\nDove, D., Bradwell, T., Carter, G., Cotterill, C., Gafeira, J., Green, S., Krabbendam, M., Mellet, C., Stevenson, A., Stewart, H., Westhead, K., Scott, G., Guinan, J., Judge, M. Monteys, X., Elvenes, S., Baeten, N., Dolan, M., Thorsnes, T., Bjarnadóttir, L., Ottesen, D. (2016). Seabed geomorphology: a twopart classification system. British Geological Survey, Open Report OR/16/001. 13 pages.\"}"
+        },
+        {
+          "href": "uuid:978bd264-a795-4959-afc5-07021e238017",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"MODIS Derived Primary Productivity: Overall Hotspots\",\"recordAbstract\":\"The dataset indicates the long-term overall primary productivity hotspots of ocean surface waters. They are derived from MODIS (aqua) images using NASA's SeaDAS image processing software. The monthly chlorophyll a images between July 2002 and August 2014 are used to identify the overall primary productivity hotspots. The extent of the dataset covers the entire Australian EEZ and surrounding waters (including the southern ocean). The value (between 0 and 1.0) of the dataset represents the likelihood of the location being a primary productivity hotspot.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:9c89059f-d0ad-49cb-a8a5-ec1da06ab3f1",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Seafloor bathymetry of the Gifford Marine Park\",\"recordAbstract\":\"Flythrough movie of Gifford Marine Park, which is located 700 km east of Brisbane, Australia. The park is situated about halfway along the Lord Howe Rise seamount chain on the western flank of the Lord Howe Rise. Seamounts along this chain formed from Miocene volcanism via a migrating magma source (“hotspot”) after the opening of the Tasman Sea. Two large, flat-topped volcanic seamounts dominate the park. Their gently sloping summits have accumulated veneers of sediment, which in places have formed fields of bedforms. Steep cliffs, debris and large mass movement scars encircle each seamount, and contrast with the lower gradient abyssal plains from which they rise. Spanning over 3 km of ocean depths, the seamounts are likely to serve multiple and important roles as breeding locations, resting areas, navigational landmarks or supplementary feeding grounds for some cetaceans (e.g. humpback whales, sperm whales). They may also act as important aggregation points for other highly migratory pelagic species. The bathymetry shown here was collected on two surveys - the first in 2007 by Geoscience Australia and the second in 2017 by Geoscience Australia in collaboration with the Japan Agency for Marine-Earth Science and Technology. The Gifford Marine Park has also been the focus of a study undertaken by the Marine Biodiversity Hub as part of the National Environmental Science Program.\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:99208235-d68e-4039-bf77-362549a7aa48",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Oceanic Shoals Commonwealth Marine Reserve - Opportunistic visual surveys of marine megafauna\",\"recordAbstract\":\"Opportunistic visual surveys were conducted in transit to, and within, the Oceanic Shoals Commonwealth Marine Reserve (CMR) in the Timor Sea during September and October 2012 onboard the RV Solander.\\n\\nThis resource comprises species lists and estimated counts of marine mammals, sea snakes, seabirds, sea turtles and other large wildlife encountered during the voyage.\\n\\nThe Oceanic Shoals Commonwealth Marine Reserve survey was undertaken as an activity within the Australian Government's National Environmental Research Program Marine Biodiversity Hub and was the key component of Research Theme 4 - Regional Biodiversity Discovery to Support Marine Bioregional Plans. Hub partners involved in the survey included the Australian Institute of Marine Science, Geoscience Australia, the University of Western Australia, Museum Victoria and the Museum and Art Gallery of the Northern Territory. Data acquired during the survey included: multibeam sonar bathymetry and acoustic backscatter; sub-bottom acoustic profiles; physical samples of seabed sediments, infauna and epibenthic biota; towed underwater video and still camera observations of seabed habitats; baited video observations of demersal and pelagic fish, and; oceanographic measurements of the water column from CTD (conductivity, temperature, depth) casts and from deployment of sea surface drifters. Further information on the survey is available in the post-survey report published as Geoscience Australia Record 2013/38: Nichol, S.L., Howard, F.J.F., Kool, J., Stowar, M., Bouchet, P., Radke, L.,Siwabessy, J., Przeslawski, R., Picard, K., Alvarez de Glasby, B., Colquhoun, J., Letessier, T. & Heyward, A. 2013. Oceanic Shoals Commonwealth Marine Reserve (Timor Sea) Biodiversity Survey: GA0339/SOL5650 - Post Survey Report. Record 2013/38. Geoscience Australia: Canberra. (GEOCAT #76658).\"}"
+        },
+        {
+          "href": "uuid:776929d7-3251-4c57-a5ef-50787ef1b4f4",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Geographe Marine Park Bathymetry - 5m Resolution Grid\",\"recordAbstract\":\"Australia has established a network of 58 marine parks within Commonwealth waters covering a total of 3.3 million square kilometres, or 40 per cent of our exclusive economic zone (excluding Australian Antarctic Territory). These parks span a range of settings, from near coastal and shelf habitats to abyssal plains. Parks Australia manages the park network through management plans that came into effect for all parks on 1 July 2018. Geoscience Australia is contributing to their management by collating and interpreting existing environmental data, and through the collection of new marine data. “Eco-narrative” documents are being developed for those parks, where sufficient information is available, delivering collations and interpretations of seafloor geomorphology, oceanography and ecology. Many of these interpretations rely on bathymetric grids and their derived products, including those in this data release.\\n\\nBathymetry grids:\\nThe bathymetry of the marine parks was created by compiling and processing Geoscience Australia’s bathymetry data holding gridded at the optimum resolution depending of the vessel’s sonar system.\\nThe bathymetry of the park is illustrated by a panchromatic geotiff image, developed by combining the bathymetric data with a hillshade image.\\n\\nMorphological Surfaces:\\nGeoscience Australia has developed a new marine seafloor classification scheme, which uses the two-part seafloor mapping morphology approach of Dove et al (2016). This new scheme is semi-hierarchical and the first step divides the slope of the seafloor into three Morphological Surface categories (Plain, <2°; Slope, 2-10°; Escarpment, >10°).\\n\\nDove, D., Bradwell, T., Carter, G., Cotterill, C., Gafeira, J., Green, S., Krabbendam, M., Mellet, C., Stevenson, A., Stewart, H., Westhead, K., Scott, G., Guinan, J., Judge, M. Monteys, X., Elvenes, S., Baeten, N., Dolan, M., Thorsnes, T., Bjarnadóttir, L., Ottesen, D. (2016). Seabed geomorphology: a twopart classification system. British Geological Survey, Open Report OR/16/001. 13 pages.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:7dfb881f-c01a-4bf5-a43e-bb2512d72974",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"MODIS Derived Sea Surface Temperature dataset: Seasonal Means\",\"recordAbstract\":\"The dataset measures the long-term seasonal means of the sea surface temperature (SST) of ocean surface waters. They are derived from MODIS (aqua) images using NASA's SeaDAS image processing software. The monthly SST images between July 2002 and December 2017 are used to calculate the means of the four austral seasons: winter (June, July, and August), spring (September, October and November), summer (December, January and February) and autumn (March, April and May). The extent of the dataset covers the entire Australian EEZ and surrounding waters (including the southern ocean). The unit of the dataset is Celsius degree.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:009e8219-9699-40b4-bcbc-f6c43156eb09",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Seafloor Bathymetry of Perth Canyon Marine Park\",\"recordAbstract\":\"Bathymetry flythrough of Perth Canyon using data acquired by Schmidt Ocean Institute in 2015 on RV Falkor (University of Western Australia et al.). The flythrough highlights geomorphic features mapped by Geoscience Australia, including landslides, escarpments and bedform fields and biodiversity associated with the canyon (benthic and pelagic). Produced as a science communication product for the Marine Biodiversity Hub (National Environmental Science Program).\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:180abeca-eefe-4a3e-b064-2c406db9195f",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"MODIS Derived Sea Surface Temperature dataset: Seasonal Variations\",\"recordAbstract\":\"The dataset measures the long-term seasonal variations of the sea surface temperature (SST) of ocean surface waters. They are derived from MODIS (aqua) images using NASA's SeaDAS image processing software. The monthly SST images between July 2002 and December 2017 are used to calculate the standard deviations of the four austral seasons: winter (June, July, and August), spring (September, October and November), summer (December, January and February) and autumn (March, April and May). The extent of the dataset covers the entire Australian EEZ and surrounding waters (including the southern ocean). The unit of the dataset is Celsius degree.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:15e4afbb-5f76-4053-a0d6-a7cf60059f5a",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Predicted seabed gravel, mud and sand content in the Timor Sea region in the Australian continental EEZ 2018\",\"recordAbstract\":\"This dataset provides the spatially continuous data of seabed gravel (sediment fraction >2000 µm), mud (sediment fraction < 63 µm) and sand content (sediment fraction 63-2000 µm) expressed as a weight percentage ranging from 0 to 100%, presented in 10 m resolution raster grids format and ascii text file.</p> \\n\\nThe dataset covers the eight areas in the Timor Sea region in the Australian continental EEZ.</p>\\n\\nThis dataset supersedes previous predictions of sediment gravel, mud and sand content for the basin with demonstrated improvements in accuracy. Accuracy of predictions varies with sediment types, with a VEcv = 71% for mud, VEcv = 72% sand and VEcv = 42% for gravel. Artefacts occur in this dataset as a result of noises associated predictive variables (e.g., horizontal and vertical lines resulted from predictive variables derived from backscatter data are the most apparent ones). To obtain the most accurate interpretation of sediment distribution in these areas, it is recommended that noises with backscatter data should be reduced and predictions updated.</p>\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        },
+        {
+          "href": "uuid:16501b1f-4b29-4b52-82d1-2e5c4d536acc",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"Sea Around Us Project - Relative pelagic fish abundance inferred from commercial catch data, Western Australia (1997-2006)\",\"recordAbstract\":\"This dataset describes the relative abundance of an assemblage of commercially exploited pelagic fishes around Western Australia, mapped over a 30 arc-minute (0.5 degree) spatial grid. The data cover the period 1997-2006 and are derived from an analysis of commercial landings available through the Sea Around Us Project (http://www.seaaroundus.org/). Further details can be found in the following peer-reviewed publication: Bouchet PJ, Meeuwig JJ, Huang Z, Letessier TBL, Nichol SL, Caley MJ, Watson RA. 2017. Continental-scale hotspots of pelagic fish abundance inferred from commercial catch records. Global Ecology and Biogeography. DOI: 10.1111/geb.12619\\n\\nBelow is a full list of species considered, with their respective contributions to the total catch (%):\\n--------------------------------------------------\\nGreenback horse mackerel / Trachurus declivis -- 10.92 %\\nGreater amberjack / Seriola dumerili -- 0.05 %\\nSamson fish / Seriola hippos -- 0.01 %\\nSilver gemfish / Rexea solandri -- 2.80 %\\nSnoek / Thyrsites atun -- 1.22 %\\nIndo-Pacific blue marlin / Makaira mazara -- 2.87 %\\nStriped marlin / Tetrapturus audax -- 0.26 %\\nBlack marlin / Makaira indica -- 0.17 %\\nIndo-Pacific sailfish / Istiophorus platypterus -- 0.06 %\\nShortbill spearfish / Tetrapturus angustirostris -- 0.00 %\\nBluefish / Pomatomus saltatrix -- 0.13 %\\nSouthern bluefin tuna / Thunnus maccoyii -- 19.17 %\\nNarrow-barred Spanish mackerel / Scomberomorus commerson -- 16.93 %\\nSkipjack tuna / Katsuwonus pelamis -- 9.82 %\\nYellowfin tuna / Thunnus albacares -- 9.40 %\\nBigeye tuna / Thunnus obesus -- 7.67 %\\nAlbacore tuna\\t/ Thunnus alalunga -- 4.16 %\\nLongtail tuna / Thunnus tonggol -- 0.78 %\\nKawakawa (mackerel tuna) / Euthynnus affinis -- 0.56 %\\nWahoo / Acanthocybium solandri -- 0.01 %\\nGreat barracuda / Sphyraena barracuda -- 0.25 %\\nTope shark / Galeorhinus galeus -- 6.66 %\\nSwordfish / Xiphias gladius -- 6.09 %\"}"
+        },
+        {
+          "href": "uuid:14c841a5-b089-461a-8776-8f44126cd4cd",
+          "rel": "sibling",
+          "type": "application/json",
+          "title": "{\"title\":\"MODIS Derived Chlorophyll a dataset: Seasonal Means\",\"recordAbstract\":\"The dataset measures the long-term seasonal means of the chlorophyll a concentrations of ocean surface waters. They are derived from MODIS (aqua) images using NASA's SeaDAS image processing software. The monthly chlorophyll a images between July 2002 and December 2017 are used to calculate the means of the four austral seasons: winter (June, July, and August), spring (September, October and November), summer (December, January and February) and autumn (March, April and May). The extent of the dataset covers the entire Australian EEZ and surrounding waters (including the southern ocean). The unit of the dataset is mg/m3.\\n\\nThis research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.\"}"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "completed"
+      },
+      "id": "70e7ce53-4b34-4576-8db0-9ea5c45f5564",
+      "title": "RV Investigator Voyage IN2019_V06 EM710 Multibeam Echosounder Data",
+      "description": "This record describes multibeam echosounder data collected on RV Investigator voyage IN2019_v06, titled 'Tropical observations of atmospheric convection, biogenic emissions, ocean mixing, and processes generating intra-seasonal SST variability' which departed Darwin on the 19th of October 2019 and returned to Darwin on the 17th of December 2019 ,consisting of two legs.\n\nLeg 1 - Darwin, 20:00, 19 October 2019 to Darwin, 19:00, 10 November 2019\nLeg 2 - Darwin, 20:00, 11 November 2019 to Darwin, 08:00, 17 December 2019\n\nThe Kongsberg EM710 multibeam echosounder was used to acquire seafloor bathymetry and backscatter information around the Northwest Shelf station (121.5 E, 14 S) for Leg 1, and between the Warruwi & Berrimah weather stations in Northern Territory for Leg 2.\n\nThe EM710 provides a 0.5  by 1  transmit and receive angular resolution respectively. The echosounder's nominal frequency range is from 70 to 100 kHz.\n\nData are stored in *.all raw format for bathymetry and backscatter and *.wcd format for watercolumn backscatter at CSIRO. \n\nLeg 1 contains 56 files totalling 9.3 GB of raw data, covering approximately 483 nautical miles and\nLeg 2 contains 279 files totalling 129 GB of raw data, covering approximately 1,448 nautical miles.\n\nSound velocity profiles were applied to this data during data acquisition. Bathymetry data contained in *.all format is corrected for motion and position.\n\nTide corrections were not applied to the processed data for Leg 1, but were applied to the processed data for Leg 2. \n\nProcessed data had outliers removed. Processed line data are available in *.gsf and ascii format, and processed bathymetry and backscatter grids in geotiff format.\n\nAdditional information regarding this dataset, including further information on processing streams, is contained in the GSM data acquisition and processing report. Additional data products may be available on request.",
+      "links": [
+        {
+          "href": "https://www.marine.csiro.au/data/gsm/gsm_extract.cfm?survey=IN2019_v06&instrument=EM710",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Geophysical Survey and Mapping website information for this data set"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=309",
+          "rel": "related",
+          "type": "text/html",
+          "title": "RV Investigator survey information"
+        },
+        {
+          "href": "https://mnf.csiro.au/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "MNF home page"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/gsm/get_report.cfm?survey=IN2019_V06",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Geophysical Survey and Mapping data acquisition and processing report"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://www.cmar.csiro.au/data/trawler/dataset_mapfile.cfm?survey=IN2019_V06&data_type=uwy",
+          "rel": "preview",
+          "type": "image"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "completed"
+      },
+      "id": "4ece77dd-1761-460f-a8a4-9efd2b85888e",
+      "title": "RV Investigator Voyage IN2019_V06 EM122 Multibeam Echosounder Data",
+      "description": "This record describes multibeam echosounder data collected on RV Investigator voyage IN2019_V06, titled 'Tropical observations of atmospheric convection, biogenic emissions, ocean mixing, and processes generating intra-seasonal SST variability' which departed Darwin on the 19th of October 2019 and returned to Darwin on the 17th of December 2019 ,consisting of two legs.\n\nLeg 1 - Darwin, 20:00, 19 October 2019 to Darwin, 19:00, 10 November 2019\n\nLeg 2 - Darwin, 20:00, 11 November 2019 to Darwin, 08:00, 17 December 2019\n\nThe Kongsberg EM122 multibeam echosounder was used to acquire seafloor bathymetry,  backscatter information and watercolumn around the Northwest Shelf station (121.5 E, 14 S) for Leg 1, however was not used in Leg 2 due to shallow water (<100m).\n\nThe EM122 provides a 1 degree by 1 degree angular resolution. The echosounder's nominal frequency is 12 kHz.\n\nData are stored in *.all raw format for bathymetry and backscatter and *.wcd format for watercolumn backscatter at CSIRO. \n\nThere are 467 files totalling 36 GB of raw data in this dataset, covering approximately 1,779 nautical miles.\n\nSound velocity profiles were applied to this data during data acquisition. Bathymetry data contained in *.all format are corrected for motion and position.\n\nTide corrections were not applied to the processed data. Processed data had outliers removed. Processed line data are available in *.gsf and ascii format, and processed bathymetry and backscatter grids in geotiff format.\n\nAdditional information regarding this dataset, including information on processing streams, is contained in the GSM data acquisition and processing report. Additional data products may be available on request.",
+      "links": [
+        {
+          "href": "https://www.marine.csiro.au/data/gsm/gsm_extract.cfm?survey=IN2019_V06&instrument=EM122",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Geophysical Survey and Mapping website information for this data set"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=309",
+          "rel": "related",
+          "type": "text/html",
+          "title": "RV Investigator survey information"
+        },
+        {
+          "href": "https://mnf.csiro.au/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "MNF home page"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/gsm/get_report.cfm?survey=in2019_v06",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Geophysical Survey and Mapping acquisition report"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://www.cmar.csiro.au/data/trawler/dataset_mapfile.cfm?survey=IN2019_V06&data_type=uwy",
+          "rel": "preview",
+          "type": "image"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "completed"
+      },
+      "id": "0d973370-85ca-48f3-8621-729f00a12a77",
+      "title": "North Marine Region demersal fish and invertebrate collection records (DEW collation)",
+      "description": "The dataset comprises catch records of demersal fish and invertebrates from demersal fish trawls, demersal prawn trawls and epibenthic sled samples from the Northern Planning Region. It is a compilation of data from 9 research voyages (SO 05/80, SO 07/80, SO 02/81, SS 03/90, SS 05/91, SS 01/93, SS 02/97, SS 08/97and SS 03/98). The catch of each species in a sample is recorded as raw weight and count, gross weight and count (raw values divided by the subsampling fraction) and per area weight and count. Species are recorded as CAAB codes. Sample attributes include the voyage, location, time, sampling gear and sampled area. The dataset was created for the Department of the Environment and Water Resources (DEW) for use in profiling of the North Marine Region during the development of a marine bioregional plan for the region. Data from all voyages are in a single set of tables and in the same structure and measurement units. The aim of the dataset is to provide convenient access to the data from the source datasets, which were stored in various data structures in various locations. Although the data are presented in uniform measurement units of counts and weights per unit area, data from different samples cannot be assumed to be comparable. In particular, the catchability of a species varies among types of sampling gears. Even samples from a given gear type on a given voyage may not all be comparable to one another. For example, gear may be altered during a voyage (e.g. multiple codend mesh sizes may be tried) and fish trawls are occasionally aimed at fish visible on the echo sounder. The data should therefore be analysed no more than semi-quantitatively. Assumptions on the comparability of samples -- even from a single voyage and gear type -- should be based on reference to the voyage reports.",
+      "links": [
+        {
+          "href": "https://creativecommons.org/licenses/by/4.0/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "completed"
+      },
+      "id": "03e1e59c-43bb-4624-b7a5-1e14d6488acb",
+      "title": "Franklin Voyage FR 08/95 CTD Data",
+      "description": "This dataset contains the processed Conductivity-Temperature-Depth (CTD) data collected on Franklin voyage FR 08/95. The voyage took place in the east Indian Ocean during 13 September - 14 October 1995. This dataset has been processed and is archived within the CSIRO Marine and Atmospheric Research Data Centre in Hobart. Additional information regarding this dataset is contained in the cruise report for this voyage and/or the data processing report (as available).",
+      "links": [
+        {
+          "href": "https://www.cmar.csiro.au/geoserver/wms?&CQL_FILTER=SURVEY_NAME%20%3D%20%27FR199508%27",
+          "rel": "wms",
+          "type": "",
+          "title": "mnf:CTD_HEADER_AODN_VIEW"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=FR199508&data_type=ctd",
+          "rel": "related",
+          "type": "",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=42",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://creativecommons.org/licenses/by/4.0/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://www.cmar.csiro.au/data/trawler/dataset_mapfile.cfm?survey=FR199508&data_type=ctd&img_type=tn",
+          "rel": "preview",
+          "type": "image"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "completed"
+      },
+      "id": "02077f4e-395c-4f6c-b85d-fd934788a5ae",
+      "title": "Southern Surveyor Voyage SS 08/95 Biological Data Overview",
+      "description": "This record is an overview entry for biological data collected on Southern Surveyor cruise SS 08/95. This cruise took place in the North West Shelf during 18 August - 9 September 1995, under the leadership of Wade Whitelaw. Biological data collected on this cruise include demersal fish and invertebrate samples from 104 stations trawled and 35 mm camera photography of 33 stations trawled. Fish catches were identifed and weighed by species with up to 90 species being caught per half hour trawl. Greatest diversity occurred at the shallower stations. Length frequency data was collected for 14 species of fish (see taxonomy keywords), and otoliths were collected for 4 of the major species (L. sebae, L. choerorynchus, S. undosquamis and N. furcosus). Approximately 50 taxonomic voucher specimens and 100 other specimens were photographed and retained for the Handbook of Australian Seafood, and about 80 specimens and 400 muscle samples were kept for the fillet analysis study. Another 80-90 unidentified specimens were also retained, being mainly deep water species, mustelus species and samples of lizard fish. 6 'fish down' trawl experiments were completed and all fish identified, counted and weighed by species with 30 stomachs collected from Lethrinus genivittatus, L. choerorynchus, Memipterus furcosus and Saurida undosquamis. Video photography and 35 mm camera photography of the trawls were also obtained. 3 hydrographic transects were completed with the sumbersible data logger (SDL) and over 195 species of sponges for taxonomic studies by the Queensland Museum were collected. 125 humpback whales and 8 unidentified cetaceans and approximately 120 dophins were also observed during the cruise. Please note: This metadata record is a preliminary entry derived from information in the cruise plan and/or cruise report. Individual data types - which may span several cruises - will be indexed separately within this metadata system in due course. - Biological Field Data Sheets recorded during this voyage have been scanned to PDF, and are available (to CSIRO Staff) on-line. See the details link under \"Stored Media List\" (below).",
+      "links": [
+        {
+          "href": "https://www.cmar.csiro.au/geoserver/wms?&CQL_FILTER=SURVEY_NAME%20%3D%20%27SS199508%27",
+          "rel": "wms",
+          "type": "",
+          "title": "cmar:CATCH_HEADER_AODN_VIEW"
+        },
+        {
+          "href": "https://www.marine.csiro.au/datacentre/projects/BioData/PDFs/BOX_AB2009_1426/BOX_AB2009_1426_index.htm",
+          "rel": "related",
+          "type": "",
+          "title": "Stored Media List (CSIRO internal use only)"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=SS199508&data_type=catch",
+          "rel": "related",
+          "type": "",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=18",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=19",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=20",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://mnf.csiro.au/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=21",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://creativecommons.org/licenses/by/4.0/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://www.cmar.csiro.au/data/trawler/dataset_mapfile.cfm?survey=SS199508&data_type=catch&img_type=tn",
+          "rel": "preview",
+          "type": "image"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "completed"
+      },
+      "id": "49862baf-b8c4-4af9-a0c4-6cc91f7fe9a1",
+      "title": "Southern Surveyor Voyage SS 08/95 Single beam acoustic data",
+      "description": "This data set contains Simrad EK500 single beam echosounder data at 38 and 120 kHz and Simrad EA500 single beam echosounder data at 12 kHz from the Southern Surveyor. The EK500 data is primarily for water column characterisation (fish stocks, microplankton distribution) and on occasions for seabed classification (particularly prior to the EM300 swath mapper being installed), while the EA500 data is primarily for bathymetric readings.",
+      "links": [
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://mnf.csiro.au/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "completed"
+      },
+      "id": "5e9ea5c7-f86d-425a-b641-7768c3896e6f",
+      "title": "Southern Surveyor Voyage SS 08/95 Underway Data",
+      "description": "This dataset contains the Underway (UWY) data collected on Southern Surveyor voyage SS 08/95. This cruise took place in the North West Shelf during 18 August - 9 September 1995, under the leadership of Wade Whitelaw. This dataset has NOT been processed and is archived within the CSIRO Marine and Atmospheric Research Data Centre in Hobart. Additional information regarding this dataset is contained in the cruise report for this voyage. The standard Underway (=continuously recorded) dataset from a research voyage includes Navigation (NAV), Sounder, Thermosalinograph (TSG) and Meteorological (MET) data. NAV data includes GPS (Global Positioning System) measurements of latitude, longitude, ship's direction and speed. MET data includes atmospheric temperature, humidity and pressure, wind speed and direction, and incident radiation intensity. Data are recorded at or averaged over 1 minute intervals.",
+      "links": [
+        {
+          "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://marlin.csiro.au/geonetwork/srv/eng/catalog.search#/metadata/5e9ea5c7-f86d-425a-b641-7768c3896e6f",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Data Link"
+        },
+        {
+          "href": "https://www.marine.csiro.au/data/requests/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://mnf.csiro.au/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://creativecommons.org/licenses/by/4.0/",
+          "rel": "related",
+          "type": "text/html",
+          "title": "Documentation Link"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        }
+      ],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "status": "onGoing"
+      },
+      "id": "40e9283b-d4ed-4176-8fe6-112b8697003f",
+      "title": "Geomorphometry of the Australian Marine Parks",
+      "description": "This dataset provides geomorphic features of the Australian Marine Parks (2022). The data was generated by Seamap Australia as part of an Our Marine Parks (Parks Australia) project with funding from the Australian Government to improve knowledge relating to classification of the Australian Marine Parks real estate.\n\nBathymetry data was collated from existing AusSeabed data holdings and compiled into multi-resolution bathymetry mosaics for each Park (see https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/fb451be4-9de1-4bc2-8fd6-0f285f90916f). All publicly available bathymetry data as at 30th June 2022 was included. Macquarie Island was updated on 25/08/2023 to reflect the new AMP boundaries.\n\nThe Whitebox tools package in R was used to calculate geomorphometry using the geomorphron function. Processing for each Park was addressed manually, with search distances and slope thresholds adjusted between Parks depending on quality and resolution of bathymetry data, and characteristics of the seafloor. Geomorphons were classified into geomorphic features using the Dove et al (2020) Seabed Morphology Features Glossary. These geomorphic units provide a consistent way to classify the seabed and may be used in combination with visual validation methods to develop benthic habitat maps.\n\nData is supplied as a Web Map Service of geomorphic features overlaid on hillshade for the mapped regions. Data is available for download as a zipped package of geotiffs with accompanying hillshade. ESRI .lyr file and QGIS .sld files are supplied for display in desktop GIS.\n\nAll Parks with 25% or more bathymetry coverage were included in processing.\nThe table below indicates the Parks included in this data package, and the percent coverage of geomorphic data for each, based on the bathymetry coverage available at the time of processing. Note that the current coverage of bathymetry may be greater than that expressed below and contained within this data package, for areas in which more recent surveys have been published.\n\nPARK\t\t\t\t\t% COVERAGE\nAbrolhos\t\t\t\t\t36%\nApollo\t\t\t\t\t52%\nBeagle\t\t\t\t\t35%\nBoags\t\t\t\t\t31%\nBremer\t\t\t\t\t70%\nCarnarvon Canyon\t\t\t72%\nCentral Eastern*\t\t\t47% (41%)\nChristmas Island*\t\t\t31% (28%)\nCod Grounds\t\t\t\t97%\nCoral Sea*\t\t\t\t100% (30%)\nEast Gippsland\t\t\t96%\nEastern Recherche\t\t\t29%\nFlinders\t\t\t\t\t30%\nFranklin\t\t\t\t\t51%\nFreycinet\t\t\t\t\t40%\nGascoyne\t\t\t\t53%\nGeographe\t\t\t\t25%\nGifford\t\t\t\t\t100%\nGreat Australian Bight\t\t36%\nHeard & McDonald Islands*†\t100% (0%)\nHunter\t\t\t\t\t90%\nHuon\t\t\t\t\t94%\nJervis\t\t\t\t\t99%\nMacquarie Island\t\t\t40%\nMermaid Reef\t\t\t\t72%\nMurray\t\t\t\t\t47%\nNelson\t\t\t\t\t58%\nNingaloo\t\t\t\t\t54%\nNorfolk\t\t\t\t\t38%\nPerth Canyon\t\t\t\t98%\nSolitary Islands\t\t\t34%\nSouth Tasman Rise\t\t\t59%\nSouth-west Corner\t\t\t46%\nTasman Fracture\t\t\t99%\nTwo Rocks\t\t\t\t27%\nWestern Eyre\t\t\t\t25%\nZeehan\t\t\t\t\t74%\n\t\n* indicates Digital Elevation Model (DEM) data was included in analysis. Coverage of surveyed (non-modelled) bathymetry is shown in parentheses ()\n† has been included in analysis but is not an Australian Marine Park\n\nFor glossary of features, see:\nDove et al. (2020) A two-part seabed geomorphology classification scheme (v.2); Part 1: morphology features glossary. http://dx.doi.org/10.5281/ZENODO.4075248",
+      "links": [
+        {
+          "href": "https://data.imas.utas.edu.au/attachments/AMP_bathymetry_derivatives/geomorph",
+          "rel": "related",
+          "type": "",
+          "title": "DATA ACCESS - geomorphometry classification Geotiffs"
+        },
+        {
+          "href": "https://data.imas.utas.edu.au/attachments/AMP_bathymetry_derivatives/hillshade/geomorph/",
+          "rel": "related",
+          "type": "",
+          "title": "DATA ACCESS - hillshade for geomorphometry Geotiffs (to use as backdrop)"
+        },
+        {
+          "href": "https://doi.org/10.3389/fmars.2023.1302108",
+          "rel": "related",
+          "type": "",
+          "title": "ASSOCIATED PUBLICATION - Geomorphometric maps of Australia’s Marine Park estate and their role in improving the integrated monitoring and management of marine ecosystems"
+        },
+        {
+          "href": "https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/fb451be4-9de1-4bc2-8fd6-0f285f90916f",
+          "rel": "related",
+          "type": "text/html",
+          "title": "RELATED DATA - bathymetry mosaics of AMPs (source data)"
+        },
+        {
+          "href": "https://github.com/jacquomo/Geomorphmetry_SeamapAus",
+          "rel": "related",
+          "type": "",
+          "title": ""
+        },
+        {
+          "href": "https://seamapaustralia.org/map/#57ab9851-4906-4338-a34d-a1a05971db61",
+          "rel": "related",
+          "type": "",
+          "title": ""
+        },
+        {
+          "href": "https://geoserver.imas.utas.edu.au/geoserver/wms",
+          "rel": "wms",
+          "type": "",
+          "title": "seamap:geomorph_AMP_grp"
+        },
+        {
+          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/1bb8f09c-99d6-431f-b902-4d3e4cef02df.png",
+          "rel": "icon",
+          "type": "image/png",
+          "title": "Suggest icon for dataset"
+        },
+        {
+          "href": "https://metadata.imas.utas.edu.au/geonetwork/srv/api/records/40e9283b-d4ed-4176-8fe6-112b8697003f/attachments/SeamapAus_logo_sq.jpg",
+          "rel": "preview",
+          "type": "image"
+        },
+        {
+          "href": "https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/40e9283b-d4ed-4176-8fe6-112b8697003f",
+          "rel": "describedby",
+          "type": "text/html",
+          "title": "Full metadata link"
+        },
+        {
+          "href": "http://i.creativecommons.org/l/by/4.0/88x31.png",
+          "rel": "license",
+          "type": "image/png"
+        },
+        {
+          "href": "http://creativecommons.org/licenses/by/4.0/",
+          "rel": "license",
+          "type": "text/html"
+        }
+      ],
+      "itemType": "Collection"
+    }
+  ],
+  "total": 11,
+  "search_after": [
+    "4.66264799E11",
+    "85",
+    "3f870001-e54d-4ede-8aea-9982e5af1f45"
+  ]
+}

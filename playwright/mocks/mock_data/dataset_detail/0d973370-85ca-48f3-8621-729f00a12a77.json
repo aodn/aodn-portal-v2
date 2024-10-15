@@ -1,0 +1,316 @@
+{
+  "properties": {
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [131, -20.4],
+              [131, -10.4],
+              [121, -10.4],
+              [121, -20.4],
+              [131, -20.4]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [131, -8.8],
+              [121, -8.8],
+              [121, -10.4],
+              [131, -10.4],
+              [131, -8.8]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [141, -20.4],
+              [141, -10.4],
+              [131, -10.4],
+              [131, -20.4],
+              [141, -20.4]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [141, -8.8],
+              [131, -8.8],
+              [131, -10.4],
+              [141, -10.4],
+              [141, -8.8]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [143, -20.4],
+              [143, -10.4],
+              [141, -10.4],
+              [141, -20.4],
+              [143, -20.4]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [143, -10.4],
+              [143, -8.8],
+              [141, -8.8],
+              [141, -10.4],
+              [143, -10.4]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "status": "completed",
+    "contacts": [
+      {
+        "name": "Moeseneder, Chris",
+        "organization": "CSIRO Oceans & Atmosphere - St. Lucia",
+        "position": "Research Technician (Oceans & Atmosphere)",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "about"],
+        "phones": []
+      },
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": []
+      }
+    ],
+    "themes": [
+      {
+        "scheme": "theme",
+        "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+        "title": "GCMD Keywords",
+        "concepts": [
+          {
+            "id": "Earth Science | Agriculture | Agricultural Aquatic Sciences | Fisheries",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/c7112a64-be39-414a-9125-f63ab44ecb5b"
+          },
+          {
+            "id": "Earth Science | Biological Classification | Animals/Invertebrates",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/abc6f016-d1f0-4725-b847-639de054d13f"
+          },
+          {
+            "id": "Earth Science | Biological Classification | Animals/Vertebrates | Fish",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/ea855d4c-f132-44f9-b31c-447e1101684d"
+          },
+          {
+            "id": "Earth Science | Biosphere | Aquatic Ecosystems | Benthic Habitat",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/09a78997-581b-4d1b-ae71-b2b3f96ef719"
+          },
+          {
+            "id": "Earth Science | Biosphere | Aquatic Ecosystems | Demersal Habitat",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/af953f41-ab6c-4569-9762-c46ad07118da"
+          },
+          {
+            "id": "Earth Science | Human Dimensions | Environmental Impacts | Conservation",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/40869a25-edea-4438-80f9-47c9e6910b9b"
+          }
+        ]
+      },
+      {
+        "scheme": "equipment",
+        "description": "",
+        "title": "CSIRO Equipment",
+        "concepts": [
+          {
+            "id": "Demersal Trawls",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:106"
+          },
+          {
+            "id": "Prawn Trawls",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:108"
+          },
+          {
+            "id": "Sledges/Sleds",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:95"
+          },
+          {
+            "id": "Trawls",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:104"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "description": "AODN GEN",
+        "title": "AODN Geographic Extent Names",
+        "concepts": [
+          {
+            "id": "Marine Features (Australia) | Gulf of Carpentaria, NT/QLD",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:83"
+          },
+          {
+            "id": "Regional Seas | Arafura Sea",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:7"
+          },
+          {
+            "id": "Regional Seas | Timor Sea",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:24"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "description": "Marlin Areas of Interest Thesaurus",
+        "title": "CSIRO Areas Of Interest",
+        "concepts": [
+          {
+            "id": "Northern Bioreg Data",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:cmarAOI&id=urn:marlin.csiro.au:keywords:cmarAOI:concept:3204"
+          }
+        ]
+      },
+      {
+        "scheme": "survey",
+        "description": "MarLIN Survey Register",
+        "title": "CSIRO Survey List",
+        "concepts": [
+          {
+            "id": "Research Voyage: SO 2/81",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:129"
+          },
+          {
+            "id": "Research Voyage: SO 5/80",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:125"
+          },
+          {
+            "id": "Research Voyage: SO 7/80",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:127"
+          },
+          {
+            "id": "Research Voyage: SS 01/93",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:190"
+          },
+          {
+            "id": "Research Voyage: SS 02/97",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:211"
+          },
+          {
+            "id": "Research Voyage: SS 03/90",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:180"
+          },
+          {
+            "id": "Research Voyage: SS 03/98",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:245"
+          },
+          {
+            "id": "Research Voyage: SS 05/91",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:185"
+          },
+          {
+            "id": "Research Voyage: SS 08/97",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:242"
+          }
+        ]
+      },
+      {
+        "scheme": "project",
+        "description": "MarLIN Project Register",
+        "title": "CSIRO Project List",
+        "concepts": [
+          {
+            "id": "Conservation Assessments of 11 Marine Areas - Stage 2 - Remaining 9 Areas",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:1768"
+          }
+        ]
+      },
+      {
+        "scheme": "dataSource",
+        "description": "MarLIN Source Register",
+        "title": "CSIRO Source List",
+        "concepts": [
+          {
+            "id": "Ship: Soela",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:7"
+          },
+          {
+            "id": "Ship: Southern Surveyor",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:8"
+          }
+        ]
+      }
+    ],
+    "citation": {
+      "otherConstraints": [
+        "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was provided by CSIRO."
+      ]
+    },
+    "temporal": [
+      {
+        "start": "1980-06-21T14:00:00Z",
+        "end": "1998-10-13T12:59:59Z"
+      }
+    ],
+    "revision": "2007-09-12T11:31:59",
+    "credits": [],
+    "license": "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was provided by CSIRO.",
+    "centroid": [
+      [125.189, -12.802],
+      [126.187, -9.196],
+      [137.382, -12.591],
+      [135.956, -9.192],
+      [141.657, -12.021],
+      [141.968, -9.392]
+    ],
+    "statement": "Data from the Southern Surveyor voyages (SS 03/90, SS 05/91, SS 01/93, SS 02/97, SS 08/97and SS 03/98) were obtained from Oracle datasets maintained by Margaret Miller (Cleveland Oracle database schemas FISHLAB, GULFISH, SS9702, SS9708 and SS9803).    Data from the Soela voyages (SO 05/80, SO 07/80, SO 02/81) were obtained from the DataTrawler on 2006-07-12.    The data from the source datasets were converted to a common data structure and measurement units."
+  },
+  "id": "0d973370-85ca-48f3-8621-729f00a12a77",
+  "title": "North Marine Region demersal fish and invertebrate collection records (DEW collation)",
+  "description": "The dataset comprises catch records of demersal fish and invertebrates from demersal fish trawls, demersal prawn trawls and epibenthic sled samples from the Northern Planning Region. It is a compilation of data from 9 research voyages (SO 05/80, SO 07/80, SO 02/81, SS 03/90, SS 05/91, SS 01/93, SS 02/97, SS 08/97and SS 03/98). The catch of each species in a sample is recorded as raw weight and count, gross weight and count (raw values divided by the subsampling fraction) and per area weight and count. Species are recorded as CAAB codes. Sample attributes include the voyage, location, time, sampling gear and sampled area. The dataset was created for the Department of the Environment and Water Resources (DEW) for use in profiling of the North Marine Region during the development of a marine bioregional plan for the region. Data from all voyages are in a single set of tables and in the same structure and measurement units. The aim of the dataset is to provide convenient access to the data from the source datasets, which were stored in various data structures in various locations. Although the data are presented in uniform measurement units of counts and weights per unit area, data from different samples cannot be assumed to be comparable. In particular, the catchability of a species varies among types of sampling gears. Even samples from a given gear type on a given voyage may not all be comparable to one another. For example, gear may be altered during a voyage (e.g. multiple codend mesh sizes may be tried) and fish trawls are occasionally aimed at fish visible on the echo sounder. The data should therefore be analysed no more than semi-quantitatively. Assumptions on the comparability of samples -- even from a single voyage and gear type -- should be based on reference to the voyage reports.",
+  "links": [
+    {
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Documentation Link"
+    },
+    {
+      "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [121.0, -20.4, 143.0, -8.8],
+        [121.0, -20.4, 143.0, -8.8]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["1980-06-21T14:00:00.000+00:00", "1998-10-13T12:59:59.000+00:00"],
+        ["1980-06-21T14:00:00.000+00:00", "1998-10-13T12:59:59.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}
