@@ -20,10 +20,12 @@ import {
 import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import { ResultCard } from "./ResultCards";
 import useTabNavigation from "../../hooks/useTabNavigation";
+import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 
-interface ListResultCardProps extends ResultCard {
+interface ListResultCardProps {
+  content?: OGCCollection;
+  onClickCard?: (uuid: string) => void;
   isSelectedDataset?: boolean;
 }
 

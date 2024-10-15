@@ -193,7 +193,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
                 key={index}
                 title={child.title}
                 isBordered={isPositionInsideBlock(position, index)}
-                navigate={onNavigate(index)}
+                onClick={onNavigate(index)}
               />
             );
           })}

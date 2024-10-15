@@ -1,5 +1,10 @@
 import { useCallback, useRef } from "react";
-import { CollectionsQueryType } from "../common/store/searchReducer";
+import {
+  CollectionsQueryType,
+  createSearchParamFrom,
+  DEFAULT_SEARCH_PAGE,
+  fetchResultAppendStore,
+} from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Box, Grid, ListItem, SxProps, Theme } from "@mui/material";
 import GridResultCard from "./GridResultCard";
@@ -12,26 +17,15 @@ import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
 import SelectedListCard from "./SelectedListCard";
 import SelectedGridCard from "./SelectedGridCard";
-
-export interface ResultCard {
-  content?: OGCCollection;
-  onClickCard?: (uuid: string) => void;
-}
-
-export interface ResultCardsList extends ResultCard {
-  contents: CollectionsQueryType;
-  layout?: SearchResultLayoutEnum;
-  onFetchMore?: (() => void) | undefined;
-  sx?: SxProps<Theme>;
-  datasetsSelected?: OGCCollection[];
-}
+import { ParameterState } from "../common/store/componentParamReducer";
+import store, { getComponentState } from "../common/store/store";
+import { useAppDispatch } from "../common/store/hooks";
 
 interface ResultCardsProps {
   content?: OGCCollection;
   onClickCard?: (uuid: string) => void;
   contents: CollectionsQueryType;
   layout?: SearchResultLayoutEnum;
-  onFetchMore?: (() => void) | undefined;
   sx?: SxProps<Theme>;
   datasetsSelected?: OGCCollection[];
 }
@@ -42,9 +36,24 @@ const ResultCards = ({
   sx,
   datasetsSelected,
   onClickCard = () => {},
-  onFetchMore,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
+
+  // Get contents from redux
+  const dispatch = useAppDispatch();
+  const fetchMore = useCallback(async () => {
+    // This is very specific to how elastic works and then how to construct the query
+    const componentParam: ParameterState = getComponentState(store.getState());
+    // Use standard param to get fields you need, record is stored in redux,
+    // set page so that it return fewer records and append the search_after
+    // to go the next batch of record.
+    const paramPaged = createSearchParamFrom(componentParam, {
+      pagesize: DEFAULT_SEARCH_PAGE,
+      searchafter: contents.result.search_after,
+    });
+    // Must use await so that record updated before you exit this call
+    await dispatch(fetchResultAppendStore(paramPaged));
+  }, [dispatch, contents.result.search_after]);
 
   const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
 
@@ -57,12 +66,10 @@ const ResultCards = ({
         id="result-card-load-more-btn"
         title="Show more results"
         isBordered={false}
-        navigate={() => {
-          onFetchMore && onFetchMore();
-        }}
+        onClick={fetchMore}
       />
     );
-  }, [onFetchMore]);
+  }, [fetchMore]);
 
   const renderCells = useCallback(
     (
@@ -87,7 +94,7 @@ const ResultCards = ({
             }}
             style={style}
           >
-            {renderLoadMoreButton()}
+            {count !== total ? renderLoadMoreButton() : null}
           </ListItem>
         );
       } else {
