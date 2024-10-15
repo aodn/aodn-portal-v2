@@ -45,10 +45,8 @@ import {
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
-import useTabNavigation from "../../hooks/useTabNavigation";
 
 const SEARCH_BAR_HEIGHT = 56;
-const RESULT_SECTION_WIDTH = 500;
 
 const isLoading = (count: number): boolean => {
   if (count > 0) {
@@ -69,7 +67,6 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const navigateToTabAndSection = useTabNavigation();
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
@@ -252,15 +249,6 @@ const SearchPage = () => {
     }
   }, [location, dispatch, doSearch]);
 
-  const handleNavigateToDetailPage = useCallback(
-    (uuid: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.append("uuid", uuid);
-      navigate(pageDefault.details + "?" + searchParams.toString());
-    },
-    [navigate]
-  );
-
   const onChangeSorting = useCallback(
     (v: SortResultEnum) => {
       switch (v) {
@@ -342,17 +330,10 @@ const SearchPage = () => {
               {visibility === SearchResultLayoutEnum.VISIBLE && (
                 <Box>
                   <ResultSection
-                    sx={{
-                      height: "80vh",
-                      width: RESULT_SECTION_WIDTH,
-                    }}
                     onVisibilityChanged={onVisibilityChanged}
                     onClickCard={handleClickCard}
-                    onDetail={handleNavigateToDetailPage}
                     onChangeSorting={onChangeSorting}
                     datasetsSelected={datasetsSelected}
-                    onDownload={navigateToTabAndSection}
-                    onLink={navigateToTabAndSection}
                     isLoading={isLoading(loadingThreadCount)}
                   />
                 </Box>
@@ -370,7 +351,6 @@ const SearchPage = () => {
                   onToggleClicked={onToggleDisplay}
                   onDatasetSelected={handleDatasetSelecting}
                   isLoading={isLoading(loadingThreadCount)}
-                  onNavigateToDetail={handleNavigateToDetailPage}
                 />
               </Box>
             </Box>

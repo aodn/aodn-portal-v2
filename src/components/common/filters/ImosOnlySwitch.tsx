@@ -1,4 +1,4 @@
-import { Grid, Switch, SwitchProps } from "@mui/material";
+import { Grid, Switch, SwitchProps, Tooltip } from "@mui/material";
 import React, { FC, useCallback } from "react";
 import imos_logo from "@/assets/logos/imos-logo-transparent.png";
 import { ParameterState } from "../store/componentParamReducer";
@@ -33,17 +33,20 @@ const ImosOnlySwitch: FC<imosOnlySwitchProps> = ({ filter, setFilter }) => {
         height: "100%",
       }}
     >
-      <Grid item xs={12}>
-        <img
-          src={imos_logo}
-          alt="imos_logo"
-          style={{
-            objectFit: "contain",
-            width: "100%",
-            height: "100%",
-          }}
-        />
-      </Grid>
+      <Tooltip title="Search for IMOS data only" placement="top">
+        <Grid item xs={12}>
+          <img
+            src={imos_logo}
+            alt="imos_logo"
+            style={{
+              objectFit: "contain",
+              width: "100%",
+              height: "100%",
+            }}
+          />
+        </Grid>
+      </Tooltip>
+
       <Grid
         item
         xs={12}

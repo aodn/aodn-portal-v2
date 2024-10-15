@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import {
   Box,
   Card,
@@ -20,21 +20,31 @@ import {
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
-import { ResultCard } from "./ResultCards";
+import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { useNavigate } from "react-router-dom";
+import { pageDefault } from "../common/constants";
 
-interface GridResultCardProps extends ResultCard {
+interface GridResultCardProps {
+  content?: OGCCollection;
+  onClickCard?: (uuid: string) => void;
   isSelectedDataset?: boolean;
 }
 
 const GridResultCard: FC<GridResultCardProps> = ({
   content,
-  onDownload = () => {},
-  onLink = () => {},
-  onDetail = () => {},
   onClickCard = () => {},
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const onDetail = useCallback(
+    (uuid: string) => {
+      const searchParams = new URLSearchParams();
+      searchParams.append("uuid", uuid);
+      navigate(pageDefault.details + "?" + searchParams.toString());
+    },
+    [navigate]
+  );
 
   if (!content) return;
   const { id: uuid, title, findIcon, findThumbnail } = content;
@@ -154,14 +164,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
               paddingRight: padding.extraSmall,
             }}
           />
-          <ResultCardButtonGroup
-            content={content}
-            onDownload={() => onDownload(uuid, "abstract", "download-section")}
-            onDetail={() => onDetail(uuid)}
-            onLink={() => onLink(uuid, "links")}
-            shouldHideText
-            isGridView
-          />
+          <ResultCardButtonGroup content={content} shouldHideText isGridView />
         </Stack>
       )}
     </Card>

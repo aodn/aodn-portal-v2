@@ -20,22 +20,24 @@ import {
 import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import { ResultCard } from "./ResultCards";
+import useTabNavigation from "../../hooks/useTabNavigation";
+import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 
-interface ListResultCardProps extends ResultCard {
+interface ListResultCardProps {
+  content?: OGCCollection;
+  onClickCard?: (uuid: string) => void;
   isSelectedDataset?: boolean;
 }
 
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
   content,
-  onDownload = () => {},
-  onLink = () => {},
-  onDetail = () => {},
   onClickCard = () => {},
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
+
+  const goToDetailPage = useTabNavigation();
 
   if (!content) return;
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
@@ -72,7 +74,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
         mr={gap.sm}
       >
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea onClick={() => onDetail(uuid)}>
+          <CardActionArea onClick={() => goToDetailPage(uuid, "abstract")}>
             <Box
               display="flex"
               alignItems="center"
@@ -118,13 +120,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
           </Typography>
         </CardActionArea>
         {(isSelectedDataset || showButtons) && (
-          <ResultCardButtonGroup
-            content={content}
-            onDownload={() => onDownload(uuid, "abstract", "download-section")}
-            onDetail={() => onDetail(uuid)}
-            onLink={() => onLink(uuid, "links")}
-            shouldHideText
-          />
+          <ResultCardButtonGroup content={content} shouldHideText />
         )}
       </Box>
 

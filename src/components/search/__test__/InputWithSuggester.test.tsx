@@ -7,7 +7,6 @@ import {
   describe,
   expect,
   test,
-  vi,
 } from "vitest";
 import { Provider } from "react-redux";
 import store from "../../common/store/store";
@@ -15,22 +14,20 @@ import InputWithSuggester from "../InputWithSuggester";
 import { server } from "../../../__mocks__/server";
 import { userEvent } from "@testing-library/user-event";
 
-beforeAll(() => {
-  server.listen();
-});
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-});
-afterAll(() => {
-  server.close();
-});
-
 // TODO: skip this test suite for now cause it will have weird failure (local all passed
 //  , but in github action failed)
 describe.skip("inputwithsuggester", async () => {
   let rendered: RenderResult;
-
+  beforeAll(() => {
+    server.listen();
+  });
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+  });
+  afterAll(() => {
+    server.close();
+  });
   beforeEach(() => {
     rendered = render(
       <Provider store={store}>

@@ -1,68 +1,42 @@
 import ResultPanelSimpleFilter from "../../../components/common/filters/ResultPanelSimpleFilter";
 import { Box } from "@mui/material";
-import {
-  CollectionsQueryType,
-  createSearchParamFrom,
-  DEFAULT_SEARCH_PAGE,
-  fetchResultAppendStore,
-} from "../../../components/common/store/searchReducer";
+import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
 import { FC, useCallback, useState } from "react";
-import ResultCards, {
-  ResultCardsList,
-} from "../../../components/result/ResultCards";
+import ResultCards from "../../../components/result/ResultCards";
 import { useSelector } from "react-redux";
-import store, {
-  getComponentState,
+import {
   RootState,
   searchQueryResult,
 } from "../../../components/common/store/store";
-import { ParameterState } from "../../../components/common/store/componentParamReducer";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapViewButton";
 import CircleLoader from "../../../components/loading/CircleLoader";
-import { useAppDispatch } from "../../../components/common/store/hooks";
+import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 
-interface ResultSectionProps extends Partial<ResultCardsList> {
+interface ResultSectionProps {
   onVisibilityChanged?: (v: SearchResultLayoutEnum) => void;
   onChangeSorting: (v: SortResultEnum) => void;
   isLoading: boolean;
+  onClickCard?: (uuid: string) => void;
+  datasetsSelected?: OGCCollection[];
 }
+
+const RESULT_SECTION_WIDTH = 500;
 
 const ResultSection: FC<ResultSectionProps> = ({
   datasetsSelected,
-  sx,
   onVisibilityChanged,
   onChangeSorting,
   onClickCard,
-  onDetail,
-  onDownload,
-  onLink,
   isLoading,
 }) => {
-  // Get contents from redux
-  const dispatch = useAppDispatch();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
-
   // Use to remember last layout, it is either LIST or GRID at the moment
   const [currentLayout, setCurrentLayout] = useState<
     SearchResultLayoutEnum.LIST | SearchResultLayoutEnum.GRID
   >(SearchResultLayoutEnum.LIST);
-
-  const fetchMore = useCallback(async () => {
-    // This is very specific to how elastic works and then how to construct the query
-    const componentParam: ParameterState = getComponentState(store.getState());
-    // Use standard param to get fields you need, record is stored in redux,
-    // set page so that it return fewer records and append the search_after
-    // to go the next batch of record.
-    const paramPaged = createSearchParamFrom(componentParam, {
-      pagesize: DEFAULT_SEARCH_PAGE,
-      searchafter: reduxContents.result.search_after,
-    });
-    // Must use await so that record updated before you exit this call
-    await dispatch(fetchResultAppendStore(paramPaged));
-  }, [dispatch, reduxContents.result.search_after]);
 
   const onChangeLayout = useCallback(
     (layout: SearchResultLayoutEnum) => {
@@ -86,7 +60,8 @@ const ResultSection: FC<ResultSectionProps> = ({
     reduxContents && (
       <Box
         sx={{
-          ...sx,
+          width: RESULT_SECTION_WIDTH,
+          height: "80vh",
           display: "flex",
           flexDirection: "column",
           position: "relative",
@@ -107,11 +82,7 @@ const ResultSection: FC<ResultSectionProps> = ({
           <ResultCards
             layout={currentLayout}
             contents={reduxContents}
-            onDownload={onDownload}
-            onLink={onLink}
-            onDetail={onDetail}
             onClickCard={onClickCard}
-            onFetchMore={fetchMore}
             datasetsSelected={datasetsSelected}
           />
         </Box>

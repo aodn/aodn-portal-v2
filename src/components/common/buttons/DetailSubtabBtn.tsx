@@ -5,14 +5,14 @@ import { color } from "../../../styles/constants";
 interface DetailSubtabProps {
   id?: string;
   title: string;
-  navigate: () => void;
+  onClick: () => void;
   isBordered: boolean;
 }
 
 const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
   id,
   title,
-  navigate,
+  onClick,
   isBordered,
 }) => {
   const theme = useTheme();
@@ -42,7 +42,7 @@ const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
           textAlign: "center",
           backgroundColor: "#fff",
         }}
-        onClick={navigate}
+        onClick={onClick}
       >
         {title}
       </Button>

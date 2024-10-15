@@ -1,12 +1,6 @@
 import { PropsWithChildren } from "react";
-import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
-  Point,
-} from "geojson";
-import { LngLat, LngLatBounds, MapMouseEvent } from "mapbox-gl";
+import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
+import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
@@ -20,7 +14,6 @@ export interface LayersProps {
   // dataset that user selected from result list or map
   selectedUuids?: string[];
   showFullMap?: boolean;
-  onNavigateToDetail?: (uuid: string) => void;
 }
 // Use to create static layer on map, you need to add menu item to select those layers,
 // refer to map section

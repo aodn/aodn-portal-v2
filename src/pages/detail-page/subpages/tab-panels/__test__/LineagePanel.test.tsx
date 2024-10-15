@@ -9,37 +9,35 @@ import { server } from "../../../../../__mocks__/server";
 import { useLocation } from "react-router-dom";
 import LineagePanel from "../LineagePanel";
 
-beforeAll(() => {
-  server.listen();
-});
-
-beforeEach(() => {
-  vi.mock("react-router-dom", () => ({
-    ...vi.importActual("react-router-dom"),
-    useLocation: vi.fn(),
-  }));
-
-  vi.mocked(useLocation).mockReturnValue({
-    state: null,
-    hash: "111",
-    key: "default",
-    pathname: "/details",
-    search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
-  });
-});
-
-afterEach(() => {
-  cleanup();
-  server.resetHandlers();
-  vi.restoreAllMocks();
-});
-afterAll(() => {
-  server.close();
-});
-
 describe("LineagePanel", async () => {
   const theme = AppTheme;
+  beforeAll(() => {
+    server.listen();
+  });
 
+  beforeEach(() => {
+    vi.mock("react-router-dom", () => ({
+      ...vi.importActual("react-router-dom"),
+      useLocation: vi.fn(),
+    }));
+
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details",
+      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+  });
+
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+    vi.restoreAllMocks();
+  });
+  afterAll(() => {
+    server.close();
+  });
   beforeEach(() => {
     render(
       <Provider store={store}>

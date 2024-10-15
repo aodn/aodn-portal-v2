@@ -5,7 +5,7 @@ import { pageDefault } from "../components/common/constants";
 const useTabNavigation = () => {
   const navigate = useNavigate();
 
-  const navigateToTabAndSection = useCallback(
+  return useCallback(
     (uuid: string, tab: string, section?: string) => {
       console.log("is called navi,tab=", tab);
       const searchParams = new URLSearchParams();
@@ -26,8 +26,6 @@ const useTabNavigation = () => {
     },
     [navigate]
   );
-
-  return navigateToTabAndSection;
 };
 
 export default useTabNavigation;
