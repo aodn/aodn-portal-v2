@@ -1,0 +1,197 @@
+{
+  "properties": {
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [127, -19],
+              [127, -9],
+              [117, -9],
+              [117, -19],
+              [127, -19]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [137, -19],
+              [137, -9],
+              [127, -9],
+              [127, -19],
+              [137, -19]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [145.8, -19],
+              [145.8, -9],
+              [137, -9],
+              [137, -19],
+              [145.8, -19]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "status": "completed",
+    "contacts": [
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "about"],
+        "phones": []
+      },
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": []
+      }
+    ],
+    "themes": [
+      {
+        "scheme": "theme",
+        "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+        "title": "GCMD Keywords",
+        "concepts": [
+          {
+            "id": "Earth Science | Oceans | Ocean Pressure | Water Pressure",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/dd025312-0d27-44e0-ae05-7cfcc1aa17f0"
+          },
+          {
+            "id": "Earth Science | Oceans | Ocean Temperature | Sea Surface Temperature",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/bd24a9a9-7d52-4c29-b2a0-6cefd216ae78"
+          },
+          {
+            "id": "Earth Science | Oceans | Ocean Temperature | Water Temperature",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/46206e8c-8def-406f-9e62-da4e74633a58"
+          },
+          {
+            "id": "Earth Science | Oceans | Salinity/Density | Salinity",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/7e95b5fc-1d58-431a-af36-948b29fa870d"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "description": "AODN GEN",
+        "title": "AODN Geographic Extent Names",
+        "concepts": [
+          {
+            "id": "Coastal Waters (Australia) | West Australia Coast, WA",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1015"
+          },
+          {
+            "id": "Global / Oceans | Indian Ocean",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:4"
+          },
+          {
+            "id": "Marine Features (Australia) | Australian North West Shelf, WA",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:65"
+          },
+          {
+            "id": "Marine Features (Australia) | Gulf of Carpentaria, NT/QLD",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:83"
+          }
+        ]
+      },
+      {
+        "scheme": "survey",
+        "description": "MarLIN Survey Register",
+        "title": "CSIRO Survey List",
+        "concepts": [
+          {
+            "id": "Research Voyage: FR 10/87",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:26"
+          }
+        ]
+      },
+      {
+        "scheme": "project",
+        "description": "MarLIN Project Register",
+        "title": "CSIRO Project List",
+        "concepts": [
+          {
+            "id": "Marine Inorganic Chemistry 1985-1989",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:1529"
+          }
+        ]
+      },
+      {
+        "scheme": "dataSource",
+        "description": "MarLIN Source Register",
+        "title": "CSIRO Source List",
+        "concepts": [
+          {
+            "id": "Ship: Franklin",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:5"
+          }
+        ]
+      }
+    ],
+    "citation": {
+      "otherConstraints": [
+        "This data is intended for use for voyage participants of the Marine National Facility for processing and QCing of data collected."
+      ]
+    },
+    "temporal": [
+      {
+        "start": "1987-11-02T13:00:00Z",
+        "end": "1987-11-24T12:59:59Z"
+      }
+    ],
+    "revision": "2015-01-14T17:23:23",
+    "credits": [],
+    "license": "",
+    "centroid": [
+      [121.355, -13.49],
+      [131.696, -11.325],
+      [140.965, -12.51]
+    ],
+    "statement": "Data source: original field data.  The following paper documents located in box file \"FR10/87 EB\" received from Ed Butler were scanned and added on: 12/08/2014: fr198710_BridgeLog_Copy.pdf, fr198710_EventLog_Computer.pdf, fr198710_EventLog_Original.pdf, fr198710_Cruise_Summary.pdf. The box file \"FR 10/87 EB\" can be found in the Datacentre store room, Building 5,  5SS54 -bay 3, shelf 4. Raw data for voyages prior to 2010 will be retrieved from LTO Tape and added to the local rawVoyageData network area. This raw data archive will be archived by the CSIRO Data Access Portal in 2015."
+  },
+  "id": "006565f1-90e2-7971-e053-08114f8c5c31",
+  "title": "Franklin Voyage FR 10/87 Raw Data Tapes and Documentation",
+  "description": "RV Franklin Voyage FR 10/87 -  The voyage took place in the Indian Ocean and the Gulf of Carpentaria during 3-24 November 1987. This record was created as the following paper documents located in box file \"FR10/87 EB\" received from Ed Butler were scanned and archived.The box file \"FR 10/87 EB\" can be found in the Datacentre store room, Building 5,  5SS54 -bay 3, shelf 4.\n\nOn-line Documentation: (added as of: 12/08/2014)\n-fr198710_BridgeLog_Copy.pdf\n-fr198710_EventLog_Computer.pdf\n-fr198710_EventLog_Original.pdf\n-fr198710_Cruise_Summary.pdf\n\n\nDocumentation is on the internal network: \\processedVoyageData\\RV_Franklin  [voyage]  \\global_docs.\n\nThe raw data archive is part of an LTO backup tape which holds the entire raw data collection from all Franklin voyages. Date range 1985 - 2002. Data from all MAG tapes, /data tapes, echolog tapes and echolog CDs is included. See http://www.marine.csiro.au/marq/edd_search2.cd_details?id=519 for details.",
+  "links": [
+    {
+      "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [117.0, -19.0, 145.8, -9.0],
+        [117.0, -19.0, 145.8, -9.0]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["1987-11-02T13:00:00.000+00:00", "1987-11-24T12:59:59.000+00:00"],
+        ["1987-11-02T13:00:00.000+00:00", "1987-11-24T12:59:59.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

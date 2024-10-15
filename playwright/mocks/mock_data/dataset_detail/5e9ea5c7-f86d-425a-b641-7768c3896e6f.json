@@ -1,0 +1,270 @@
+{
+  "properties": {
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [119, -21],
+              [119, -18],
+              [114.5, -18],
+              [114.5, -21],
+              [119, -21]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "status": "completed",
+    "contacts": [
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "about"],
+        "phones": []
+      },
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": []
+      }
+    ],
+    "themes": [
+      {
+        "scheme": "theme",
+        "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+        "title": "GCMD Keywords",
+        "concepts": [
+          {
+            "id": "Earth Science | Atmosphere | Atmospheric Pressure | Atmospheric Pressure Measurements",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/9efbc088-ba8c-4c9c-a458-ad6ad63f4188"
+          },
+          {
+            "id": "Earth Science | Atmosphere | Atmospheric Radiation | Solar Radiation",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/a0f3474e-9a54-4a82-97c4-43864b48df4c"
+          },
+          {
+            "id": "Earth Science | Atmosphere | Atmospheric Temperature | Air Temperature",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/f634ab55-de40-4d0b-93bc-691bf5408ccb"
+          },
+          {
+            "id": "Earth Science | Atmosphere | Atmospheric Water Vapor | Humidity",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/427e5121-a142-41cb-a8e9-a70b7f98eb6a"
+          },
+          {
+            "id": "Earth Science | Atmosphere | Atmospheric Winds | Surface Winds",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/10685919-bc01-43e7-901a-b62ac44627f3"
+          },
+          {
+            "id": "Earth Science | Oceans | Bathymetry/Seafloor Topography | Water Depth",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/ca477721-473b-40d7-a72b-4ffa963e48fb"
+          },
+          {
+            "id": "Earth Science | Oceans | Ocean Temperature | Sea Surface Temperature",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/bd24a9a9-7d52-4c29-b2a0-6cefd216ae78"
+          },
+          {
+            "id": "Earth Science | Oceans | Salinity/Density | Salinity",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/7e95b5fc-1d58-431a-af36-948b29fa870d"
+          }
+        ]
+      },
+      {
+        "scheme": "equipment",
+        "description": "",
+        "title": "CSIRO Equipment",
+        "concepts": [
+          {
+            "id": "Meteorological Instruments",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:61"
+          },
+          {
+            "id": "Thermosalinographs",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:101"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "description": "AODN GEN",
+        "title": "AODN Geographic Extent Names",
+        "concepts": [
+          {
+            "id": "Coastal Waters (Australia) | West Australia Coast, WA",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1015"
+          },
+          {
+            "id": "Marine Features (Australia) | Australian North West Shelf, WA",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:65"
+          }
+        ]
+      },
+      {
+        "scheme": "survey",
+        "description": "MarLIN Survey Register",
+        "title": "CSIRO Survey List",
+        "concepts": [
+          {
+            "id": "Research Voyage: SS 08/95",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:203"
+          }
+        ]
+      },
+      {
+        "scheme": "project",
+        "description": "MarLIN Project Register",
+        "title": "CSIRO Project List",
+        "concepts": [
+          {
+            "id": "North West Shelf Demersal Marine Resources Study (1982-1992)",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:171"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "description": "MarLIN Standard Datatypes Thesaurus",
+        "title": "CSIRO Standard Data Types",
+        "concepts": [
+          {
+            "id": "Vessel Data: Underway",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:standardDataType&id=urn:marlin.csiro.au:keywords:standardDataType:concept:3514"
+          }
+        ]
+      },
+      {
+        "scheme": "dataSource",
+        "description": "MarLIN Source Register",
+        "title": "CSIRO Source List",
+        "concepts": [
+          {
+            "id": "Ship: Southern Surveyor",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:8"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "description": "",
+        "title": "Keywords (DataParameter)",
+        "concepts": [
+          {
+            "id": "Practical salinity of the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/PSLTZZ01"
+          },
+          {
+            "id": "Temperature of the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/TEMPPR01"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "description": "",
+        "title": "Keywords (Instrument)",
+        "concepts": [
+          {
+            "id": "thermosalinographs",
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/133"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "description": "",
+        "title": "Keywords (Platform)",
+        "concepts": [
+          {
+            "id": "research vessel",
+            "url": "http://vocab.nerc.ac.uk/collection/L06/current/31"
+          }
+        ]
+      }
+    ],
+    "citation": {
+      "otherConstraints": [
+        "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was provided by CSIRO."
+      ]
+    },
+    "temporal": [
+      {
+        "start": "1992-02-03T13:00:00Z",
+        "end": "1992-02-25T12:59:59Z"
+      }
+    ],
+    "revision": "2001-06-19T14:57:39",
+    "credits": ["Voyage Leader: A.W. Whitelaw (CSIRO)."],
+    "license": "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was provided by CSIRO.",
+    "centroid": [[116.63, -19.37]],
+    "statement": "Data source: original field data  Data processing and quality control: Not planned."
+  },
+  "id": "5e9ea5c7-f86d-425a-b641-7768c3896e6f",
+  "title": "Southern Surveyor Voyage SS 08/95 Underway Data",
+  "description": "This dataset contains the Underway (UWY) data collected on Southern Surveyor voyage SS 08/95. This cruise took place in the North West Shelf during 18 August - 9 September 1995, under the leadership of Wade Whitelaw. This dataset has NOT been processed and is archived within the CSIRO Marine and Atmospheric Research Data Centre in Hobart. Additional information regarding this dataset is contained in the cruise report for this voyage. The standard Underway (=continuously recorded) dataset from a research voyage includes Navigation (NAV), Sounder, Thermosalinograph (TSG) and Meteorological (MET) data. NAV data includes GPS (Global Positioning System) measurements of latitude, longitude, ship's direction and speed. MET data includes atmospheric temperature, humidity and pressure, wind speed and direction, and incident radiation intensity. Data are recorded at or averaged over 1 minute intervals.",
+  "links": [
+    {
+      "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Data Link"
+    },
+    {
+      "href": "https://marlin.csiro.au/geonetwork/srv/eng/catalog.search#/metadata/5e9ea5c7-f86d-425a-b641-7768c3896e6f",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Data Link"
+    },
+    {
+      "href": "https://www.marine.csiro.au/data/requests/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Documentation Link"
+    },
+    {
+      "href": "https://mnf.csiro.au/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Documentation Link"
+    },
+    {
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Documentation Link"
+    },
+    {
+      "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [114.5, -21.0, 119.0, -18.0],
+        [114.5, -21.0, 119.0, -18.0]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["1992-02-03T13:00:00.000+00:00", "1992-02-25T12:59:59.000+00:00"],
+        ["1992-02-03T13:00:00.000+00:00", "1992-02-25T12:59:59.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

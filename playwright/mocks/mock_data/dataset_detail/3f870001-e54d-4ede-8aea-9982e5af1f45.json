@@ -1,0 +1,263 @@
+{
+  "properties": {
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [130.5, -19],
+              [130.5, -12.5],
+              [121, -12.5],
+              [121, -19],
+              [130.5, -19]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "status": "completed",
+    "contacts": [
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "about"],
+        "phones": []
+      },
+      {
+        "name": "Data Officer (AR), Hobart",
+        "organization": "CSIRO/Oceans and Atmosphere",
+        "position": "",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["processor", "metadata"],
+        "phones": []
+      },
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": []
+      }
+    ],
+    "themes": [
+      {
+        "scheme": "theme",
+        "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+        "title": "GCMD Keywords",
+        "concepts": [
+          {
+            "id": "Earth Science | Agriculture | Agricultural Aquatic Sciences | Fisheries",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/c7112a64-be39-414a-9125-f63ab44ecb5b"
+          },
+          {
+            "id": "Earth Science | Biological Classification | Animals/Vertebrates",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/14802b53-b702-438f-8c8a-f51506807ce6"
+          },
+          {
+            "id": "Earth Science | Biological Classification | Animals/Vertebrates | Fish",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/ea855d4c-f132-44f9-b31c-447e1101684d"
+          },
+          {
+            "id": "Earth Science | Biological Classification | Animals/Vertebrates | Fish | Sharks/Rays/Chimaeras",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/ed019e00-9b0a-4bdc-89aa-606cc929bd9f"
+          },
+          {
+            "id": "Earth Science | Biosphere | Aquatic Ecosystems | Pelagic Habitat",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/3d7ecc4f-e79e-40d1-8796-63059888bf5f"
+          },
+          {
+            "id": "Earth Science | Biosphere | Ecological Dynamics | Ecosystem Functions | Biomass Dynamics",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/a0eb9268-0333-4442-9bc6-efbe338d9836"
+          }
+        ]
+      },
+      {
+        "scheme": "equipment",
+        "description": "",
+        "title": "CSIRO Equipment",
+        "concepts": [
+          {
+            "id": "Gill Nets",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:74"
+          },
+          {
+            "id": "Longlines",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:58"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "description": "AODN GEN",
+        "title": "AODN Geographic Extent Names",
+        "concepts": [
+          {
+            "id": "Coastal Waters (Australia) | West Australia Coast North, WA",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1016"
+          },
+          {
+            "id": "Marine Features (Australia) | Australian North West Shelf, WA",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:65"
+          }
+        ]
+      },
+      {
+        "scheme": "survey",
+        "description": "MarLIN Survey Register",
+        "title": "CSIRO Survey List",
+        "concepts": [
+          {
+            "id": "Research Voyage: R 08 (1984)",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:664"
+          }
+        ]
+      },
+      {
+        "scheme": "project",
+        "description": "MarLIN Project Register",
+        "title": "CSIRO Project List",
+        "concepts": [
+          {
+            "id": "Northern pelagic fish stock research (FIRTA project no. 83/49) 1983-1985",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:517"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "description": "MarLIN Standard Datatypes Thesaurus",
+        "title": "CSIRO Standard Data Types",
+        "concepts": [
+          {
+            "id": "Vessel Data: Catch (by voyage)",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:standardDataType&id=urn:marlin.csiro.au:keywords:standardDataType:concept:3518"
+          }
+        ]
+      },
+      {
+        "scheme": "dataSource",
+        "description": "MarLIN Source Register",
+        "title": "CSIRO Source List",
+        "concepts": [
+          {
+            "id": "Ship: Rachel",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:18"
+          }
+        ]
+      },
+      {
+        "scheme": "taxon",
+        "description": "World Register of Marine Species (WoRMS) Taxonomic Names",
+        "title": "WoRMS - World Register of Marine Species",
+        "concepts": [
+          {
+            "id": "Carcharhinus sorrah",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.taxon.urn:lsid:marinespecies.org:taxname&id=urn:lsid:marinespecies.org:taxname:217339"
+          },
+          {
+            "id": "Carcharhinus tilstoni",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.taxon.urn:lsid:marinespecies.org:taxname&id=urn:lsid:marinespecies.org:taxname:271325"
+          },
+          {
+            "id": "Scomberomorus commerson",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.taxon.urn:lsid:marinespecies.org:taxname&id=urn:lsid:marinespecies.org:taxname:127024"
+          },
+          {
+            "id": "Thunnus tonggol",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.taxon.urn:lsid:marinespecies.org:taxname&id=urn:lsid:marinespecies.org:taxname:219722"
+          }
+        ]
+      }
+    ],
+    "citation": {
+      "otherConstraints": [
+        "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was provided by CSIRO."
+      ]
+    },
+    "temporal": [
+      {
+        "start": "1984-09-18T14:00:00Z",
+        "end": "1984-10-10T13:59:59Z"
+      }
+    ],
+    "revision": "2016-12-09T15:36:31",
+    "credits": [],
+    "license": "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was provided by CSIRO.",
+    "centroid": [[124.419, -14.466]],
+    "statement": "Data source: original field data"
+  },
+  "id": "3f870001-e54d-4ede-8aea-9982e5af1f45",
+  "title": "Rachel Cruise 08 [1984] - Biological data overview",
+  "description": "This record describes the biological data collected on Rachel Cruise 08/1984. The data were obtained from the Australian North West Shelf and northern coast between September and October 1984. The dataset consists of length, sex, species identity data for sharks, mainly Carcharhinus tilstoni, Carcharhinus sorrah, Scomberomorus commerson and Thunnus tonggol, from gillnet and longline samples. This dataset was collected as part of the CSIRO Northern Pelagic Fish Stock Research Project.",
+  "links": [
+    {
+      "href": "https://www.cmar.csiro.au/geoserver/wms?&CQL_FILTER=SURVEY_NAME%20%3D%20%27RACH198408%27",
+      "rel": "wms",
+      "type": "",
+      "title": "cmar:CATCH_HEADER_AODN_VIEW"
+    },
+    {
+      "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=877",
+      "rel": "related",
+      "type": "",
+      "title": "Cruise Plan (pdf)"
+    },
+    {
+      "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=878",
+      "rel": "related",
+      "type": "",
+      "title": "Cruise Summary (pdf)"
+    },
+    {
+      "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=RACH198408&data_type=catch",
+      "rel": "related",
+      "type": "",
+      "title": "Data Link"
+    },
+    {
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Documentation Link"
+    },
+    {
+      "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://www.cmar.csiro.au/data/trawler/dataset_mapfile.cfm?survey=RACH198408&data_type=catch&img_type=tn",
+      "rel": "preview",
+      "type": "image"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [121.0, -19.0, 130.5, -12.5],
+        [121.0, -19.0, 130.5, -12.5]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["1984-09-18T14:00:00.000+00:00", "1984-10-10T13:59:59.000+00:00"],
+        ["1984-09-18T14:00:00.000+00:00", "1984-10-10T13:59:59.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

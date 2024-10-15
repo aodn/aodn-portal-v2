@@ -1,0 +1,258 @@
+{
+  "properties": {
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [127.0577, -15.8583],
+              [127.0577, -11.2458],
+              [119.4552, -11.2458],
+              [119.4552, -15.8583],
+              [127.0577, -15.8583]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "status": "completed",
+    "contacts": [
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "about"],
+        "phones": []
+      },
+      {
+        "name": "Navidad, Cisco",
+        "organization": "CSIRO",
+        "position": "",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["processor", "metadata"],
+        "phones": []
+      },
+      {
+        "name": "Navidad, Cisco",
+        "organization": "CSIRO",
+        "position": "",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["originator", "metadata"],
+        "phones": []
+      },
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": []
+      }
+    ],
+    "themes": [
+      {
+        "scheme": "dataSource",
+        "description": "",
+        "title": "CSIRO Source List",
+        "concepts": [
+          {
+            "id": "Ship: Investigator (RV)",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:309"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "description": "",
+        "title": "CSIRO Areas Of Interest",
+        "concepts": [
+          {
+            "id": "Marine National Facility",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:cmarAOI&id=urn:marlin.csiro.au:keywords:cmarAOI:concept:3208"
+          }
+        ]
+      },
+      {
+        "scheme": "survey",
+        "description": "",
+        "title": "CSIRO Survey List",
+        "concepts": [
+          {
+            "id": "Research Voyage: IN2019_V06",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2228"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "description": "",
+        "title": "GCMD Keywords",
+        "concepts": [
+          {
+            "id": "Earth Science | Oceans | Bathymetry/Seafloor Topography",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/c16bda61-353b-4668-af2f-bbb98785b6fa"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "description": "",
+        "title": "AODN Geographic Extent Names",
+        "concepts": [
+          {
+            "id": "Coastal Waters (Australia) | Northern Territory Coast, NT",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1003"
+          },
+          {
+            "id": "Regional Seas | Timor Sea",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:24"
+          },
+          {
+            "id": "Coastal Cities / Towns (Australia) | Darwin, NT",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:110"
+          }
+        ]
+      },
+      {
+        "scheme": "equipment",
+        "description": "",
+        "title": "CSIRO Equipment",
+        "concepts": [
+          {
+            "id": "Multibeam Echosounder - EM122",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:144"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "description": "",
+        "title": "Keywords (DataParameter)",
+        "concepts": [
+          {
+            "id": "Sea-floor depth below surface of the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/574"
+          },
+          {
+            "id": "Sea-floor surface hardness",
+            "url": "N/A"
+          },
+          {
+            "id": "Density of the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/401"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "description": "",
+        "title": "Keywords (Instrument)",
+        "concepts": [
+          {
+            "id": "multi-beam echosounders",
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/157"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "description": "",
+        "title": "Keywords (Platform)",
+        "concepts": [
+          {
+            "id": "research vessel",
+            "url": "http://vocab.nerc.ac.uk/collection/L06/current/31"
+          }
+        ]
+      }
+    ],
+    "citation": {
+      "otherConstraints": [
+        "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was collected on voyage [Insert-voyage-name-here] by the Marine National Facility."
+      ]
+    },
+    "temporal": [
+      {
+        "start": "2019-10-19T09:00:00Z",
+        "end": "2019-11-10T21:00:00Z"
+      }
+    ],
+    "revision": "2020-01-20T08:42:35",
+    "credits": [],
+    "license": "Attribution 4.0",
+    "centroid": [
+      [122.953, -13.385],
+      [124.434, -15.848],
+      [124.647, -15.831]
+    ],
+    "statement": "Original field data. Processed data are SV corrected, tide not corrected and edited using CARIS version 10.3.1"
+  },
+  "id": "4ece77dd-1761-460f-a8a4-9efd2b85888e",
+  "title": "RV Investigator Voyage IN2019_V06 EM122 Multibeam Echosounder Data",
+  "description": "This record describes multibeam echosounder data collected on RV Investigator voyage IN2019_V06, titled 'Tropical observations of atmospheric convection, biogenic emissions, ocean mixing, and processes generating intra-seasonal SST variability' which departed Darwin on the 19th of October 2019 and returned to Darwin on the 17th of December 2019 ,consisting of two legs.\n\nLeg 1 - Darwin, 20:00, 19 October 2019 to Darwin, 19:00, 10 November 2019\n\nLeg 2 - Darwin, 20:00, 11 November 2019 to Darwin, 08:00, 17 December 2019\n\nThe Kongsberg EM122 multibeam echosounder was used to acquire seafloor bathymetry,  backscatter information and watercolumn around the Northwest Shelf station (121.5 E, 14 S) for Leg 1, however was not used in Leg 2 due to shallow water (<100m).\n\nThe EM122 provides a 1 degree by 1 degree angular resolution. The echosounder's nominal frequency is 12 kHz.\n\nData are stored in *.all raw format for bathymetry and backscatter and *.wcd format for watercolumn backscatter at CSIRO. \n\nThere are 467 files totalling 36 GB of raw data in this dataset, covering approximately 1,779 nautical miles.\n\nSound velocity profiles were applied to this data during data acquisition. Bathymetry data contained in *.all format are corrected for motion and position.\n\nTide corrections were not applied to the processed data. Processed data had outliers removed. Processed line data are available in *.gsf and ascii format, and processed bathymetry and backscatter grids in geotiff format.\n\nAdditional information regarding this dataset, including information on processing streams, is contained in the GSM data acquisition and processing report. Additional data products may be available on request.",
+  "links": [
+    {
+      "href": "https://www.marine.csiro.au/data/gsm/gsm_extract.cfm?survey=IN2019_V06&instrument=EM122",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Geophysical Survey and Mapping website information for this data set"
+    },
+    {
+      "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=309",
+      "rel": "related",
+      "type": "text/html",
+      "title": "RV Investigator survey information"
+    },
+    {
+      "href": "https://mnf.csiro.au/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "MNF home page"
+    },
+    {
+      "href": "https://www.marine.csiro.au/data/gsm/get_report.cfm?survey=in2019_v06",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Geophysical Survey and Mapping acquisition report"
+    },
+    {
+      "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://www.cmar.csiro.au/data/trawler/dataset_mapfile.cfm?survey=IN2019_V06&data_type=uwy",
+      "rel": "preview",
+      "type": "image"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [119.4551946649, -15.8583335065, 127.0577337274, -11.2457741841],
+        [119.4551946649, -15.8583335065, 127.0577337274, -11.2457741841]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["2019-10-19T09:00:00.000+00:00", "2019-11-10T21:00:00.000+00:00"],
+        ["2019-10-19T09:00:00.000+00:00", "2019-11-10T21:00:00.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

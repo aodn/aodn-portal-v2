@@ -1,0 +1,187 @@
+{
+  "properties": {
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [119, -21],
+              [119, -18],
+              [114.5, -18],
+              [114.5, -21],
+              [119, -21]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "status": "completed",
+    "contacts": [
+      {
+        "name": "Ryan, Tim",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Team Leader (Oceans & Atmosphere)",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "about"],
+        "phones": []
+      },
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": []
+      }
+    ],
+    "themes": [
+      {
+        "scheme": "theme",
+        "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+        "title": "GCMD Keywords",
+        "concepts": [
+          {
+            "id": "Earth Science | Oceans | Ocean Acoustics | Acoustic Reflectivity",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/6a583047-6023-4b6a-ab25-b72529721a8c"
+          },
+          {
+            "id": "Earth Science | Oceans | Ocean Acoustics | Acoustic Scattering",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/b4a924bb-0d42-4169-bad7-3856f69f0c4a"
+          }
+        ]
+      },
+      {
+        "scheme": "equipment",
+        "description": "",
+        "title": "CSIRO Equipment",
+        "concepts": [
+          {
+            "id": "Acoustic Equipment/Echosounders",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:1"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "description": "AODN GEN",
+        "title": "AODN Geographic Extent Names",
+        "concepts": [
+          {
+            "id": "Coastal Waters (Australia) | West Australia Coast, WA",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1015"
+          },
+          {
+            "id": "Marine Features (Australia) | Australian North West Shelf, WA",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:65"
+          }
+        ]
+      },
+      {
+        "scheme": "survey",
+        "description": "MarLIN Survey Register",
+        "title": "CSIRO Survey List",
+        "concepts": [
+          {
+            "id": "Research Voyage: SS 08/95",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:203"
+          }
+        ]
+      },
+      {
+        "scheme": "project",
+        "description": "MarLIN Project Register",
+        "title": "CSIRO Project List",
+        "concepts": [
+          {
+            "id": "North West Shelf Demersal Marine Resources Study (1982-1992)",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:171"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "description": "MarLIN Standard Datatypes Thesaurus",
+        "title": "CSIRO Standard Data Types",
+        "concepts": [
+          {
+            "id": "Vessel Data: Acoustics (Fisheries)",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:standardDataType&id=urn:marlin.csiro.au:keywords:standardDataType:concept:3520"
+          }
+        ]
+      },
+      {
+        "scheme": "dataSource",
+        "description": "MarLIN Source Register",
+        "title": "CSIRO Source List",
+        "concepts": [
+          {
+            "id": "Ship: Southern Surveyor",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:8"
+          }
+        ]
+      }
+    ],
+    "citation": {
+      "otherConstraints": [
+        "Release with the permission of the custodian - contact Rudy Kloser or Tim Ryan."
+      ]
+    },
+    "temporal": [
+      {
+        "start": "1995-02-03T13:00:00Z",
+        "end": "1995-02-25T12:59:59Z"
+      }
+    ],
+    "revision": "2008-08-01T10:39:20",
+    "credits": [],
+    "license": "",
+    "centroid": [[116.63, -19.37]],
+    "statement": "Original field data collected by the Marine Science Acoustic Group, CMAR CSIRO, Hobart. Data processed as required to output measures of acoustic backscatter, typically related to schooling populations of commercial fish, for the purpose of biomass estimation. No routine data products."
+  },
+  "id": "49862baf-b8c4-4af9-a0c4-6cc91f7fe9a1",
+  "title": "Southern Surveyor Voyage SS 08/95 Single beam acoustic data",
+  "description": "This data set contains Simrad EK500 single beam echosounder data at 38 and 120 kHz and Simrad EA500 single beam echosounder data at 12 kHz from the Southern Surveyor. The EK500 data is primarily for water column characterisation (fish stocks, microplankton distribution) and on occasions for seabed classification (particularly prior to the EM300 swath mapper being installed), while the EA500 data is primarily for bathymetric readings.",
+  "links": [
+    {
+      "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Data Link"
+    },
+    {
+      "href": "https://mnf.csiro.au/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Documentation Link"
+    },
+    {
+      "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [114.5, -21.0, 119.0, -18.0],
+        [114.5, -21.0, 119.0, -18.0]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["1995-02-03T13:00:00.000+00:00", "1995-02-25T12:59:59.000+00:00"],
+        ["1995-02-03T13:00:00.000+00:00", "1995-02-25T12:59:59.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

@@ -1,0 +1,15 @@
+{
+  "links": [],
+  "collections": [
+    {
+      "properties": {
+        "centroid": [[148.639, -38.353]]
+      },
+      "id": "0145df96-3847-474b-8b63-a66f0e03ff54",
+      "links": [],
+      "itemType": "Collection"
+    }
+  ],
+  "total": 1,
+  "search_after": ["0145df96-3847-474b-8b63-a66f0e03ff54"]
+}
