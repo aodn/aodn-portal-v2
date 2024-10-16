@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Button, Grid, IconButton, Paper } from "@mui/material";
+import { Badge, Box, Button, Grid, IconButton, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import grey from "../common/colors/grey";
@@ -18,9 +18,8 @@ import {
   fontColor,
   padding,
 } from "../../styles/constants";
-
-export const filterButtonWidth = 100;
-export const searchIconWidth = 44;
+import StyledBadge, { Position } from "../common/badge/StyledBadge";
+import { filterButtonWidth, searchIconWidth } from "./constants";
 
 const ComplexTextSearch = () => {
   const navigate = useNavigate();
@@ -65,45 +64,63 @@ const ComplexTextSearch = () => {
   }, [setShowFilters]);
 
   return (
-    <Grid container spacing={1}>
-      <Grid item xs={10}>
-        <Paper
-          elevation={0}
+    <Box width="100%">
+      <Paper
+        elevation={0}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+          borderRadius: borderRadius.small,
+        }}
+      >
+        <InputWithSuggester
+          handleEnterPressed={handleEnterPressed}
+          setPendingSearch={setPendingSearch}
+        />
+        <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
             height: "100%",
-            borderRadius: borderRadius.small,
+            padding: padding.extraSmall,
+            minWidth: `${filterButtonWidth}px`,
           }}
         >
+          <StyledBadge badgeContent={4} position={Position.topRight}>
+            <Button
+              fullWidth
+              sx={{
+                height: "100%",
+                color: fontColor.blue.medium,
+                paddingX: padding.large,
+                backgroundColor: color.blue.xLight,
+                borderRadius: borderRadius.small,
+                "&:hover": { backgroundColor: color.blue.light },
+              }}
+              startIcon={<Tune />}
+              onClick={handleFilterClick}
+              data-testid="filtersBtn"
+            >
+              Filters
+            </Button>
+          </StyledBadge>
+        </Box>
+        <Box height="100%">
           <IconButton
-            sx={{ width: `${searchIconWidth}px`, p: padding.small }}
+            sx={{
+              height: "100%",
+              width: `${searchIconWidth}px`,
+              color: "#fff",
+              backgroundColor: color.blue.extraDark,
+              borderRadius: borderRadius.small,
+            }}
+            onClick={handleSearchClick}
             aria-label="search"
           >
             <SearchIcon />
           </IconButton>
-          <InputWithSuggester
-            handleEnterPressed={handleEnterPressed}
-            setPendingSearch={setPendingSearch}
-          />
-          <Button
-            variant="text"
-            sx={{
-              height: "100%",
-              minWidth: `${filterButtonWidth}px`,
-              color: fontColor.blue.medium,
-              paddingX: padding.large,
-              backgroundColor: color.gray.xxLight,
-            }}
-            startIcon={<Tune />}
-            onClick={handleFilterClick}
-            data-testid={"filtersBtn"}
-          >
-            Filters
-          </Button>
-        </Paper>
-      </Grid>
-      <Grid
+        </Box>
+      </Paper>
+      {/* <Grid
         item
         xs={2}
         display="flex"
@@ -125,12 +142,12 @@ const ComplexTextSearch = () => {
         >
           Search
         </Button>
-      </Grid>
+      </Grid> */}
       <AdvanceFilters
         showFilters={showFilters}
         setShowFilters={setShowFilters}
       />
-    </Grid>
+    </Box>
   );
 };
 

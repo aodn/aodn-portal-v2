@@ -31,11 +31,14 @@ import {
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
 import { borderRadius, color, padding } from "../../styles/constants";
-import { filterButtonWidth, searchIconWidth } from "./ComplexTextSearch";
-
 import _ from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "../common/store/hooks";
+import {
+  filterButtonWidth,
+  searchIconWidth,
+  textfieldMinWidth,
+} from "./constants";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -58,8 +61,6 @@ enum OptionGroup {
   COMMON = "common",
 }
 
-const textfieldMinWidth = 200;
-
 /**
  * Customized input box with suggester. If more customization is needed, please
  * do as the below nullable props.
@@ -71,74 +72,73 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
   setPendingSearch = () => {},
 }) => {
-  const theme = useTheme();
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
-  const [parameterVocabSet, setParameterVocabSet] = useState<Vocab[]>([]);
+  // const [parameterVocabSet, setParameterVocabSet] = useState<Vocab[]>([]);
 
-  const emptyArray: Vocab[] = [];
-  const selectedParameterVocabs: Vocab[] = useSelector(
-    (state: RootState) => state.paramReducer.parameterVocabs || emptyArray
-  );
+  // const emptyArray: Vocab[] = [];
+  // const selectedParameterVocabs: Vocab[] = useSelector(
+  //   (state: RootState) => state.paramReducer.parameterVocabs || emptyArray
+  // );
 
   const searchInput = useSelector(
     (state: RootState) => state.paramReducer.searchText
   );
 
-  const selectedParameterVocabsStrs = selectedParameterVocabs
-    ? [...new Set(selectedParameterVocabs.map((c) => c.label))]
-    : [];
-  useCallback(
-    (parameter_vocab: string) => {
-      const currentParameterVocabs = selectedParameterVocabs
-        ? new Array(...selectedParameterVocabs)
-        : [];
-      // if parameterVocabSet contains a parameter_vocab whose label is parameter_vocab, then add it to the currentParameterVocabs
-      const parameterVocabToAdd = parameterVocabSet.find(
-        (c) => c.label === parameter_vocab
-      );
-      if (!parameterVocabToAdd) {
-        //may need warning / alert in the future
-        console.error("no parameter vocabs found: ", parameter_vocab);
-        return;
-      }
-      if (currentParameterVocabs.find((c) => c.label === parameter_vocab)) {
-        //may need warning / alert in the future
-        console.error("already have parameter vocab: ", parameter_vocab);
-        return;
-      }
-      currentParameterVocabs.push(parameterVocabToAdd);
-      dispatch(updateParameterVocabs(currentParameterVocabs));
-    },
-    [parameterVocabSet, dispatch, selectedParameterVocabs]
-  );
+  // const selectedParameterVocabsStrs = selectedParameterVocabs
+  //   ? [...new Set(selectedParameterVocabs.map((c) => c.label))]
+  //   : [];
+  // useCallback(
+  //   (parameter_vocab: string) => {
+  //     const currentParameterVocabs = selectedParameterVocabs
+  //       ? new Array(...selectedParameterVocabs)
+  //       : [];
+  //     // if parameterVocabSet contains a parameter_vocab whose label is parameter_vocab, then add it to the currentParameterVocabs
+  //     const parameterVocabToAdd = parameterVocabSet.find(
+  //       (c) => c.label === parameter_vocab
+  //     );
+  //     if (!parameterVocabToAdd) {
+  //       //may need warning / alert in the future
+  //       console.error("no parameter vocabs found: ", parameter_vocab);
+  //       return;
+  //     }
+  //     if (currentParameterVocabs.find((c) => c.label === parameter_vocab)) {
+  //       //may need warning / alert in the future
+  //       console.error("already have parameter vocab: ", parameter_vocab);
+  //       return;
+  //     }
+  //     currentParameterVocabs.push(parameterVocabToAdd);
+  //     dispatch(updateParameterVocabs(currentParameterVocabs));
+  //   },
+  //   [parameterVocabSet, dispatch, selectedParameterVocabs]
+  // );
 
-  const removeParameterVocab = useCallback(
-    (parameterVocab: string) => {
-      const currentParameterVocabs = new Array(...selectedParameterVocabs);
-      const parameterVocabToRemove = parameterVocabSet.find(
-        (c) => c.label === parameterVocab
-      );
-      if (!parameterVocabToRemove) {
-        //may need warning / alert in the future
-        console.error("no parameterVocab found: ", parameterVocab);
-        return;
-      }
-      if (!currentParameterVocabs.find((c) => c.label === parameterVocab)) {
-        //may need warning / alert in the future
-        console.error(
-          "no parameterVocab found in current parameterVocab state: ",
-          parameterVocab
-        );
-        return;
-      }
-      // remove this parameterVocab from currentParameterVocabs
-      _.remove(currentParameterVocabs, (c) => c.label === parameterVocab);
-      dispatch(updateParameterVocabs(currentParameterVocabs));
-    },
-    [parameterVocabSet, dispatch, selectedParameterVocabs]
-  );
+  // const removeParameterVocab = useCallback(
+  //   (parameterVocab: string) => {
+  //     const currentParameterVocabs = new Array(...selectedParameterVocabs);
+  //     const parameterVocabToRemove = parameterVocabSet.find(
+  //       (c) => c.label === parameterVocab
+  //     );
+  //     if (!parameterVocabToRemove) {
+  //       //may need warning / alert in the future
+  //       console.error("no parameterVocab found: ", parameterVocab);
+  //       return;
+  //     }
+  //     if (!currentParameterVocabs.find((c) => c.label === parameterVocab)) {
+  //       //may need warning / alert in the future
+  //       console.error(
+  //         "no parameterVocab found in current parameterVocab state: ",
+  //         parameterVocab
+  //       );
+  //       return;
+  //     }
+  //     // remove this parameterVocab from currentParameterVocabs
+  //     _.remove(currentParameterVocabs, (c) => c.label === parameterVocab);
+  //     dispatch(updateParameterVocabs(currentParameterVocabs));
+  //   },
+  //   [parameterVocabSet, dispatch, selectedParameterVocabs]
+  // );
 
   const refreshOptions = useCallback(
     async (inputValue: string) => {
@@ -227,17 +227,17 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [debounceRefreshOptions, dispatch]
   );
 
-  useEffect(() => {
-    dispatch(fetchParameterVocabsWithStore(null))
-      .unwrap()
-      .then((parameterVocabs: Array<Vocab>) => {
-        const secondLevelVocabs = parameterVocabs
-          .flatMap((rootVocab) => rootVocab.narrower)
-          .filter((vocab) => vocab !== undefined)
-          .sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
-        setParameterVocabSet(secondLevelVocabs);
-      });
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchParameterVocabsWithStore(null))
+  //     .unwrap()
+  //     .then((parameterVocabs: Array<Vocab>) => {
+  //       const secondLevelVocabs = parameterVocabs
+  //         .flatMap((rootVocab) => rootVocab.narrower)
+  //         .filter((vocab) => vocab !== undefined)
+  //         .sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
+  //       setParameterVocabSet(secondLevelVocabs);
+  //     });
+  // }, [dispatch]);
 
   const handleSuggesterOpen = () => {
     setOpen(true);
@@ -261,9 +261,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   };
 
   const [searchFieldWidth, setSearchFieldWidth] = useState<number>(0);
-  const [parameterVocabWidth, setParameterVocabWidth] = useState<number>(0);
+  // const [parameterVocabWidth, setParameterVocabWidth] = useState<number>(0);
   const searchFieldDiv = useRef(null);
-  const parameterVocabDiv = useRef(null);
+  // const parameterVocabDiv = useRef(null);
 
   useEffect(() => {
     // Create a ResizeObserver to monitor changes in element sizes
@@ -271,43 +271,44 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       for (const entry of entries) {
         if (entry.target === searchFieldDiv.current) {
           setSearchFieldWidth(entry.contentRect.width);
-        } else if (entry.target === parameterVocabDiv.current) {
-          setParameterVocabWidth(entry.contentRect.width);
         }
+        // else if (entry.target === parameterVocabDiv.current) {
+        //   setParameterVocabWidth(entry.contentRect.width);
+        // }
       }
     });
 
     // Get the elements from refs
     const searchFieldElement = searchFieldDiv.current;
-    const parameterVocabElement = parameterVocabDiv.current;
+    // const parameterVocabElement = parameterVocabDiv.current;
 
     // Observe the elements
     if (searchFieldElement) {
       observer.observe(searchFieldElement);
     }
 
-    if (parameterVocabElement) {
-      observer.observe(parameterVocabElement);
-    }
+    // if (parameterVocabElement) {
+    //   observer.observe(parameterVocabElement);
+    // }
 
     // Cleanup observer on component unmount
     return () => {
       if (searchFieldElement) {
         observer.unobserve(searchFieldElement);
       }
-      if (parameterVocabElement) {
-        observer.unobserve(parameterVocabElement);
-      }
+      // if (parameterVocabElement) {
+      //   observer.unobserve(parameterVocabElement);
+      // }
     };
   }, []);
 
   const CustomPopper = (props: any): ReactNode => {
     // Util function for calculating the suggester offset
-    const calculateOffset = () => {
-      return searchFieldWidth - parameterVocabWidth < textfieldMinWidth
-        ? [-searchIconWidth, 0]
-        : [-(parameterVocabWidth + searchIconWidth), 0];
-    };
+    // const calculateOffset = () => {
+    //   return searchFieldWidth - parameterVocabWidth < textfieldMinWidth
+    //     ? [-searchIconWidth, 0]
+    //     : [-(parameterVocabWidth + searchIconWidth), 0];
+    // };
     return (
       <Popper
         {...props}
@@ -316,7 +317,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           {
             name: "offset",
             options: {
-              offset: calculateOffset, // Skid horizontally by parameterVocabWidth, no vertical offset
+              offset: [0, 5], // Vertical offset
             },
           },
           {
@@ -335,13 +336,31 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     return (
       <Paper
         sx={{
-          backgroundColor: color.blue.xLight,
+          backgroundColor: "#fff",
+          borderRadius: borderRadius.small,
           "& .MuiAutocomplete-listbox": {
-            borderRadius: borderRadius.medium,
-            bgcolor: color.blue.xLight,
+            borderRadius: borderRadius.small,
+            // bgcolor: "#fff",
           },
-          "& .MuiListSubheader-root": {
-            bgcolor: color.blue.xLight,
+          // "& .MuiListSubheader-root": {
+          //   bgcolor: "yellow",
+          // },
+          "& .MuiAutocomplete-option": {
+            color: "#000",
+            "&[aria-selected='true']": {
+              backgroundColor: color.blue.medium,
+              color: "#000",
+            },
+            // "&[data-focus='true']": {
+            //   backgroundColor: color.blue.xLight,
+            // },
+            "&.Mui-focused": {
+              backgroundColor: `${color.blue.xLight} !important`,
+              color: "#333",
+            },
+            "&:hover": {
+              backgroundColor: color.blue.xLight,
+            },
           },
         }}
         {...props}
@@ -366,9 +385,17 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         autoComplete
         includeInputInList
         onInputChange={onInputChange}
+        sx={{
+          ".MuiOutlinedInput-root": { padding: 0, paddingLeft: padding.small },
+
+          // Keep the clear text button 'X' always visible
+          "& .MuiAutocomplete-clearIndicator": {
+            visibility: "visible",
+          },
+        }}
         renderInput={(params) => (
           <Box display="flex" flexWrap="wrap" ref={searchFieldDiv}>
-            <Stack
+            {/* <Stack
               display={selectedParameterVocabs?.length > 0 ? "flex" : "none"}
               spacing={1}
               direction="row"
@@ -396,7 +423,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
                   />
                 </Box>
               ))}
-            </Stack>
+            </Stack> */}
             <Box flexGrow={1}>
               <TextField
                 sx={{
