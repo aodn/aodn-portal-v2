@@ -16,10 +16,11 @@ import {
   borderRadius,
   color,
   fontColor,
+  gap,
   padding,
 } from "../../styles/constants";
 import StyledBadge, { Position } from "../common/badge/StyledBadge";
-import { filterButtonWidth, searchIconWidth } from "./constants";
+import { FILTER_BUTTON_WIDTH, SEARCH_ICON_WIDTH } from "./constants";
 
 const ComplexTextSearch = () => {
   const navigate = useNavigate();
@@ -81,8 +82,8 @@ const ComplexTextSearch = () => {
         <Box
           sx={{
             height: "100%",
-            padding: padding.extraSmall,
-            minWidth: `${filterButtonWidth}px`,
+            padding: gap.md,
+            minWidth: `${FILTER_BUTTON_WIDTH}px`,
           }}
         >
           <StyledBadge badgeContent={4} position={Position.topRight}>
@@ -104,20 +105,23 @@ const ComplexTextSearch = () => {
             </Button>
           </StyledBadge>
         </Box>
-        <Box height="100%">
-          <IconButton
+        <Box height="100%" Width={`${SEARCH_ICON_WIDTH}px`} padding={gap.sm}>
+          <Button
             sx={{
               height: "100%",
-              width: `${searchIconWidth}px`,
+              minWidth: "100%",
               color: "#fff",
               backgroundColor: color.blue.extraDark,
               borderRadius: borderRadius.small,
+              "&:hover": {
+                backgroundColor: color.brightBlue.dark,
+              },
             }}
             onClick={handleSearchClick}
             aria-label="search"
           >
             <SearchIcon />
-          </IconButton>
+          </Button>
         </Box>
       </Paper>
       {/* <Grid

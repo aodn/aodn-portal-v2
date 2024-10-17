@@ -1,3 +1,3 @@
-export const filterButtonWidth = 120;
-export const searchIconWidth = 45;
-export const textfieldMinWidth = 200;
+export const FILTER_BUTTON_WIDTH = 117;
+export const SEARCH_ICON_WIDTH = 45;
+export const TEXT_FIELD_MIN_WIDTH = 200;

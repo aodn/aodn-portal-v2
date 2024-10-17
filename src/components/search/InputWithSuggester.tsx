@@ -35,9 +35,9 @@ import _ from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "../common/store/hooks";
 import {
-  filterButtonWidth,
-  searchIconWidth,
-  textfieldMinWidth,
+  FILTER_BUTTON_WIDTH,
+  SEARCH_ICON_WIDTH,
+  TEXT_FIELD_MIN_WIDTH,
 } from "./constants";
 
 interface InputWithSuggesterProps {
@@ -73,6 +73,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   setPendingSearch = () => {},
 }) => {
   const dispatch = useAppDispatch();
+
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
   // const [parameterVocabSet, setParameterVocabSet] = useState<Vocab[]>([]);
@@ -326,7 +327,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           },
         ]}
         style={{
-          width: `${searchFieldWidth + searchIconWidth + filterButtonWidth}px`,
+          width: `${searchFieldWidth + SEARCH_ICON_WIDTH + FILTER_BUTTON_WIDTH}px`,
         }}
       />
     );
@@ -340,6 +341,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           borderRadius: borderRadius.small,
           "& .MuiAutocomplete-listbox": {
             borderRadius: borderRadius.small,
+            paddingX: padding.small,
             // bgcolor: "#fff",
           },
           // "& .MuiListSubheader-root": {
@@ -347,16 +349,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           // },
           "& .MuiAutocomplete-option": {
             color: "#000",
+            borderRadius: borderRadius.small,
             "&[aria-selected='true']": {
-              backgroundColor: color.blue.medium,
-              color: "#000",
+              backgroundColor: color.blue.xLight,
             },
-            // "&[data-focus='true']": {
-            //   backgroundColor: color.blue.xLight,
-            // },
             "&.Mui-focused": {
               backgroundColor: `${color.blue.xLight} !important`,
-              color: "#333",
             },
             "&:hover": {
               backgroundColor: color.blue.xLight,
@@ -394,7 +392,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           },
         }}
         renderInput={(params) => (
-          <Box display="flex" flexWrap="wrap" ref={searchFieldDiv}>
+          <Box display="flex" flexWrap="wrap" flexGrow={1} ref={searchFieldDiv}>
             {/* <Stack
               display={selectedParameterVocabs?.length > 0 ? "flex" : "none"}
               spacing={1}
@@ -424,24 +422,23 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
                 </Box>
               ))}
             </Stack> */}
-            <Box flexGrow={1}>
-              <TextField
-                sx={{
-                  minWidth: textfieldMinWidth,
-                  "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                    border: "none",
-                  },
-                }}
-                {...params}
-                placeholder="Search for open data"
-                inputProps={{
-                  "aria-label": "Search for open data",
-                  ...params.inputProps,
-                  onKeyDown: handleKeyDown,
-                  "data-testid": "input-with-suggester",
-                }}
-              />
-            </Box>
+
+            <TextField
+              sx={{
+                minWidth: TEXT_FIELD_MIN_WIDTH,
+                "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+              {...params}
+              placeholder="Search for open data"
+              inputProps={{
+                "aria-label": "Search for open data",
+                ...params.inputProps,
+                onKeyDown: handleKeyDown,
+                "data-testid": "input-with-suggester",
+              }}
+            />
           </Box>
         )}
       />
