@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -45,6 +45,12 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
+import { Dataset } from "../../../../components/common/store/DatasetDefinitions";
+import HeatmapLayer from "../../../../components/map/mapbox/layers/HeatmapLayer";
+import HeatmapLayer2 from "../../../../components/map/mapbox/layers/TestLayer";
+import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
+import ClusterLayer from "../../../../components/map/mapbox/layers/ClusterLayer";
+import { FeatureCollection, Point } from "geojson";
 
 interface DownloadSelect {
   label?: string;
@@ -141,7 +147,7 @@ const DOWNLOAD_SECTION_ID = "download-section";
 const TRUNCATE_COUNT = 800;
 
 const AbstractAndDownloadPanel: FC = () => {
-  const { collection } = useDetailPageContext();
+  const { collection, dataset } = useDetailPageContext();
   const downloadSectionRef = useScrollToSection({
     sectionId: DOWNLOAD_SECTION_ID,
   });
@@ -150,6 +156,15 @@ const AbstractAndDownloadPanel: FC = () => {
 
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
+
+  // TODO: only for working check:
+  const points: { lat: number; lon: number }[] = [];
+  useEffect(() => {
+    dataset?.getData()?.forEach((record) => {
+      const p = { lat: record.lat, lon: record.lon };
+      points.push(p);
+    });
+  }, [dataset, points]);
 
   if (!collection) return;
   return (
@@ -210,8 +225,9 @@ const AbstractAndDownloadPanel: FC = () => {
                     />
                   </Controls>
                   <Layers>
-                    <GeojsonLayer collection={collection} />
-                    {createStaticLayers(staticLayer)}
+                    {/*<GeojsonLayer collection={collection} />*/}
+                    {/*{createStaticLayers(staticLayer)}*/}
+                    <ClusterLayer points={points} />
                   </Layers>
                 </Map>
               </Box>

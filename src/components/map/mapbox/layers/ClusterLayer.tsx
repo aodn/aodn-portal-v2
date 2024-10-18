@@ -19,7 +19,7 @@ import {
 import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
-import { FeatureCollection, Point } from "geojson";
+import { FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 
 interface ClusterSize {
@@ -49,6 +49,10 @@ interface ClusterLayerConfig {
 interface ClusterLayerProps extends LayersProps {
   // Some method inherit from LayersProps
   clusterLayerConfig?: Partial<ClusterLayerConfig>;
+  points?: {
+    lat: number;
+    lon: number;
+  }[];
 }
 
 const defaultClusterLayerConfig: ClusterLayerConfig = {
@@ -97,6 +101,7 @@ export const getUnclusterPointId = (layerId: string) =>
   `${layerId}-unclustered-point`;
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
+  points,
   collections,
   selectedUuids,
   onDatasetSelected,
@@ -254,14 +259,36 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
+  const convertPointsToGeoJSON = (
+    points: { lat: number; lon: number }[]
+  ): FeatureCollection<Point, GeoJsonProperties> => {
+    return {
+      type: "FeatureCollection",
+      features: points.map((point) => ({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [point.lon, point.lat],
+        },
+        properties: {},
+      })),
+    };
+  };
+
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
       setLastVisiblePoint((p) => {
-        const newData = findSuitableVisiblePoint(
-          createCenterOfMassDataSource(collections),
-          map,
-          p
-        );
+        let newData = null;
+        if (collections) {
+          newData = findSuitableVisiblePoint(
+            createCenterOfMassDataSource(collections),
+            map,
+            p
+          );
+        } else {
+          newData = convertPointsToGeoJSON(points!);
+        }
+
         (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
         return newData;
       });

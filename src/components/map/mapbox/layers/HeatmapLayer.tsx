@@ -24,7 +24,7 @@ import { TestHelper } from "../../../common/test/helper";
 import { FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 
-interface HeatmapLayer {
+interface IHeatmapLayer {
   maxZoom: number;
   weight: number | StyleFunction | Expression;
   color: string | StyleFunction | Expression;
@@ -41,7 +41,7 @@ interface HeatmapCircle {
 interface HeatmapConfig {
   clusterMaxZoom: number;
   heatmapSourceRadius: number;
-  layer: HeatmapLayer;
+  layer: IHeatmapLayer;
   circle: HeatmapCircle;
 }
 

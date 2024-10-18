@@ -1,5 +1,6 @@
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import { Dataset } from "../../../components/common/store/DatasetDefinitions";
 
 export interface SpatialExtentPhoto {
   bbox: number[];
@@ -8,6 +9,7 @@ export interface SpatialExtentPhoto {
 interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
+  dataset: Dataset | undefined;
   isCollectionNotFound: boolean;
   photos: SpatialExtentPhoto[];
   setPhotos: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
@@ -24,6 +26,7 @@ interface DetailPageContextType {
 const DetailPageContextDefault = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
+  dataset: {} as Dataset | undefined,
   isCollectionNotFound: false,
   photos: [] as SpatialExtentPhoto[],
   setPhotos: () => {},
