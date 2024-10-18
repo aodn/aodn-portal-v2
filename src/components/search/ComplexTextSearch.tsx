@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from "react";
-import { Badge, Box, Button, Grid, IconButton, Paper } from "@mui/material";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { Box, Button, Paper } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import grey from "../common/colors/grey";
 import { Tune } from "@mui/icons-material";
-import store, { getComponentState } from "../common/store/store";
+import store, { getComponentState, RootState } from "../common/store/store";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
 import {
   ParameterState,
@@ -28,6 +28,36 @@ const ComplexTextSearch = () => {
 
   // set the default value to false to allow user do search without typing anything
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
+
+  const checkFilterCount = useCallback((filterObj: ParameterState) => {
+    let count = 0;
+
+    if (
+      filterObj.dateTimeFilterRange?.start !== undefined &&
+      filterObj.dateTimeFilterRange?.end !== undefined
+    ) {
+      count++;
+    }
+
+    if (filterObj.isImosOnlyDataset === true) {
+      count++;
+    }
+
+    if (filterObj.parameterVocabs) {
+      count += filterObj.parameterVocabs.length;
+    }
+
+    if (filterObj.updateFreq !== undefined) {
+      count++;
+    }
+
+    return count;
+  }, []);
+
+  const filterCount: number = useSelector((state: RootState) => {
+    const componentParams = getComponentState(state);
+    return checkFilterCount(componentParams);
+  });
 
   const redirectSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -86,7 +116,7 @@ const ComplexTextSearch = () => {
             minWidth: `${FILTER_BUTTON_WIDTH}px`,
           }}
         >
-          <StyledBadge badgeContent={4} position={Position.topRight}>
+          <StyledBadge badgeContent={filterCount} position={Position.topRight}>
             <Button
               fullWidth
               sx={{
@@ -105,7 +135,7 @@ const ComplexTextSearch = () => {
             </Button>
           </StyledBadge>
         </Box>
-        <Box height="100%" Width={`${SEARCH_ICON_WIDTH}px`} padding={gap.sm}>
+        <Box height="100%" width={SEARCH_ICON_WIDTH} padding={gap.sm}>
           <Button
             sx={{
               height: "100%",

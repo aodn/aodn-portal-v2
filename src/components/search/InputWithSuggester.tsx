@@ -1,14 +1,4 @@
-import {
-  Autocomplete,
-  Box,
-  Chip,
-  Paper,
-  Popper,
-  Stack,
-  TextField,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Autocomplete, Box, Paper, Popper, TextField } from "@mui/material";
 import React, {
   FC,
   ReactNode,
@@ -18,16 +8,13 @@ import React, {
   useState,
 } from "react";
 import {
-  Vocab,
   ParameterState,
-  updateParameterVocabs,
   updateSearchText,
 } from "../common/store/componentParamReducer";
 import store, { getComponentState, RootState } from "../common/store/store";
 import { useSelector } from "react-redux";
 import {
   createSuggesterParamFrom,
-  fetchParameterVocabsWithStore,
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
 import { borderRadius, color, padding } from "../../styles/constants";
@@ -73,73 +60,14 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   setPendingSearch = () => {},
 }) => {
   const dispatch = useAppDispatch();
-
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
-  // const [parameterVocabSet, setParameterVocabSet] = useState<Vocab[]>([]);
-
-  // const emptyArray: Vocab[] = [];
-  // const selectedParameterVocabs: Vocab[] = useSelector(
-  //   (state: RootState) => state.paramReducer.parameterVocabs || emptyArray
-  // );
+  const [searchFieldWidth, setSearchFieldWidth] = useState<number>(0);
+  const searchFieldDiv = useRef(null);
 
   const searchInput = useSelector(
     (state: RootState) => state.paramReducer.searchText
   );
-
-  // const selectedParameterVocabsStrs = selectedParameterVocabs
-  //   ? [...new Set(selectedParameterVocabs.map((c) => c.label))]
-  //   : [];
-  // useCallback(
-  //   (parameter_vocab: string) => {
-  //     const currentParameterVocabs = selectedParameterVocabs
-  //       ? new Array(...selectedParameterVocabs)
-  //       : [];
-  //     // if parameterVocabSet contains a parameter_vocab whose label is parameter_vocab, then add it to the currentParameterVocabs
-  //     const parameterVocabToAdd = parameterVocabSet.find(
-  //       (c) => c.label === parameter_vocab
-  //     );
-  //     if (!parameterVocabToAdd) {
-  //       //may need warning / alert in the future
-  //       console.error("no parameter vocabs found: ", parameter_vocab);
-  //       return;
-  //     }
-  //     if (currentParameterVocabs.find((c) => c.label === parameter_vocab)) {
-  //       //may need warning / alert in the future
-  //       console.error("already have parameter vocab: ", parameter_vocab);
-  //       return;
-  //     }
-  //     currentParameterVocabs.push(parameterVocabToAdd);
-  //     dispatch(updateParameterVocabs(currentParameterVocabs));
-  //   },
-  //   [parameterVocabSet, dispatch, selectedParameterVocabs]
-  // );
-
-  // const removeParameterVocab = useCallback(
-  //   (parameterVocab: string) => {
-  //     const currentParameterVocabs = new Array(...selectedParameterVocabs);
-  //     const parameterVocabToRemove = parameterVocabSet.find(
-  //       (c) => c.label === parameterVocab
-  //     );
-  //     if (!parameterVocabToRemove) {
-  //       //may need warning / alert in the future
-  //       console.error("no parameterVocab found: ", parameterVocab);
-  //       return;
-  //     }
-  //     if (!currentParameterVocabs.find((c) => c.label === parameterVocab)) {
-  //       //may need warning / alert in the future
-  //       console.error(
-  //         "no parameterVocab found in current parameterVocab state: ",
-  //         parameterVocab
-  //       );
-  //       return;
-  //     }
-  //     // remove this parameterVocab from currentParameterVocabs
-  //     _.remove(currentParameterVocabs, (c) => c.label === parameterVocab);
-  //     dispatch(updateParameterVocabs(currentParameterVocabs));
-  //   },
-  //   [parameterVocabSet, dispatch, selectedParameterVocabs]
-  // );
 
   const refreshOptions = useCallback(
     async (inputValue: string) => {
@@ -228,18 +156,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [debounceRefreshOptions, dispatch]
   );
 
-  // useEffect(() => {
-  //   dispatch(fetchParameterVocabsWithStore(null))
-  //     .unwrap()
-  //     .then((parameterVocabs: Array<Vocab>) => {
-  //       const secondLevelVocabs = parameterVocabs
-  //         .flatMap((rootVocab) => rootVocab.narrower)
-  //         .filter((vocab) => vocab !== undefined)
-  //         .sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
-  //       setParameterVocabSet(secondLevelVocabs);
-  //     });
-  // }, [dispatch]);
-
   const handleSuggesterOpen = () => {
     setOpen(true);
   };
@@ -261,11 +177,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     }
   };
 
-  const [searchFieldWidth, setSearchFieldWidth] = useState<number>(0);
-  // const [parameterVocabWidth, setParameterVocabWidth] = useState<number>(0);
-  const searchFieldDiv = useRef(null);
-  // const parameterVocabDiv = useRef(null);
-
   useEffect(() => {
     // Create a ResizeObserver to monitor changes in element sizes
     const observer = new ResizeObserver((entries) => {
@@ -273,43 +184,26 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         if (entry.target === searchFieldDiv.current) {
           setSearchFieldWidth(entry.contentRect.width);
         }
-        // else if (entry.target === parameterVocabDiv.current) {
-        //   setParameterVocabWidth(entry.contentRect.width);
-        // }
       }
     });
 
     // Get the elements from refs
     const searchFieldElement = searchFieldDiv.current;
-    // const parameterVocabElement = parameterVocabDiv.current;
 
     // Observe the elements
     if (searchFieldElement) {
       observer.observe(searchFieldElement);
     }
 
-    // if (parameterVocabElement) {
-    //   observer.observe(parameterVocabElement);
-    // }
-
     // Cleanup observer on component unmount
     return () => {
       if (searchFieldElement) {
         observer.unobserve(searchFieldElement);
       }
-      // if (parameterVocabElement) {
-      //   observer.unobserve(parameterVocabElement);
-      // }
     };
   }, []);
 
   const CustomPopper = (props: any): ReactNode => {
-    // Util function for calculating the suggester offset
-    // const calculateOffset = () => {
-    //   return searchFieldWidth - parameterVocabWidth < textfieldMinWidth
-    //     ? [-searchIconWidth, 0]
-    //     : [-(parameterVocabWidth + searchIconWidth), 0];
-    // };
     return (
       <Popper
         {...props}
@@ -342,11 +236,8 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           "& .MuiAutocomplete-listbox": {
             borderRadius: borderRadius.small,
             paddingX: padding.small,
-            // bgcolor: "#fff",
           },
-          // "& .MuiListSubheader-root": {
-          //   bgcolor: "yellow",
-          // },
+
           "& .MuiAutocomplete-option": {
             color: "#000",
             borderRadius: borderRadius.small,
@@ -392,37 +283,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           },
         }}
         renderInput={(params) => (
-          <Box display="flex" flexWrap="wrap" flexGrow={1} ref={searchFieldDiv}>
-            {/* <Stack
-              display={selectedParameterVocabs?.length > 0 ? "flex" : "none"}
-              spacing={1}
-              direction="row"
-              useFlexGap
-              flexWrap="wrap"
-              paddingY={padding.small}
-              ref={parameterVocabDiv}
-            >
-              <Typography
-                fontFamily={theme.typography.fontFamily}
-                fontSize="small"
-                paddingTop={padding.extraSmall}
-              >
-                Parameters&nbsp;:&nbsp;
-              </Typography>
-
-              {selectedParameterVocabsStrs?.map((c, i) => (
-                <Box key={i}>
-                  <Chip
-                    sx={{ fontSize: "12px" }}
-                    label={c}
-                    onDelete={() => {
-                      removeParameterVocab(c);
-                    }}
-                  />
-                </Box>
-              ))}
-            </Stack> */}
-
+          <Box flexGrow={1} ref={searchFieldDiv}>
             <TextField
               sx={{
                 minWidth: TEXT_FIELD_MIN_WIDTH,
