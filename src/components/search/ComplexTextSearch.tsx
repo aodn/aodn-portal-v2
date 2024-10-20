@@ -11,7 +11,6 @@ import {
   formatToUrlParam,
 } from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester";
-import { pageDefault } from "../common/constants";
 import {
   borderRadius,
   color,
@@ -21,6 +20,7 @@ import {
 } from "../../styles/constants";
 import StyledBadge, { Position } from "../common/badge/StyledBadge";
 import { FILTER_BUTTON_WIDTH, SEARCH_ICON_WIDTH } from "./constants";
+import { pageDefault } from "../common/constants";
 
 const ComplexTextSearch = () => {
   const navigate = useNavigate();

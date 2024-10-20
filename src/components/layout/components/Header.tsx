@@ -4,8 +4,12 @@ import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
 import { Box } from "@mui/material";
 import HeaderMenu from "./HeaderMenu";
+import MainMenu from "./MainMenu";
+import { useLocation } from "react-router-dom";
 
 const Header: FC = () => {
+  const path = useLocation().pathname;
+  console.log("path====", path);
   return (
     <>
       <SectionContainer
@@ -33,8 +37,8 @@ const Header: FC = () => {
         }}
       >
         <AODNSiteLogo />
-        {/* disable the MainMenu for demo, will implement later once design is finished */}
-        {/* <MainMenu /> */}
+        {/* Just for display, will implement later once design is finished */}
+        <MainMenu />
       </SectionContainer>
     </>
   );

@@ -18,7 +18,6 @@ import {
   updateSortBy,
 } from "../../components/common/store/componentParamReducer";
 import store, { getComponentState } from "../../components/common/store/store";
-import { pageDefault } from "../../components/common/constants";
 
 // Map section, you can switch to other map library, this is for maplibre
 // import { MapLibreEvent as MapEvent } from "maplibre-gl";
@@ -45,6 +44,7 @@ import {
   OGCCollections,
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
+import { pageDefault } from "../../components/common/constants";
 
 const SEARCH_BAR_HEIGHT = 56;
 
