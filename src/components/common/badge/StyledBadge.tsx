@@ -1,4 +1,6 @@
-import { Badge, styled, SxProps } from "@mui/material";
+import { Badge } from "@mui/material";
+import { styled } from "@mui/material/styles";
+
 import { color as colors } from "../../../styles/constants";
 
 export enum Position {
@@ -21,7 +23,6 @@ const badgePosition: Record<Position, PositionStyle> = {
 };
 
 interface StyledBadgeProps {
-  sx?: SxProps;
   position?: Position;
   color?: string;
 }
