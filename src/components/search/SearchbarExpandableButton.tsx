@@ -1,5 +1,5 @@
-import { Tune } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
+import { FC, ReactNode } from "react";
+import { Button, SxProps } from "@mui/material";
 import StyledBadge, { Position } from "../common/badge/StyledBadge";
 import {
   borderRadius,
@@ -8,34 +8,58 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-const SearchbarExpandableButton = () => {
+
+interface SearchbarExpandableButtonProps {
+  icon: ReactNode;
+  text: string;
+  onClick?: () => void;
+  showText?: boolean;
+  badgeContent?: number;
+  dotBadge?: boolean;
+  buttonSx?: SxProps;
+}
+
+const defaultButtonSx: SxProps = {
+  height: "100%",
+  color: fontColor.blue.medium,
+  minWidth: "38px",
+  paddingX: padding.small,
+  backgroundColor: color.blue.xLight,
+  borderRadius: borderRadius.small,
+  "&:hover": { backgroundColor: color.blue.light },
+};
+
+const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
+  icon,
+  text,
+  onClick = () => {},
+  badgeContent,
+  dotBadge,
+  showText = true,
+  buttonSx,
+}) => {
   return (
-    <Box
-      sx={{
-        height: "100%",
-        padding: gap.md,
-        // minWidth: `${FILTER_BUTTON_WIDTH}px`,
-      }}
+    <StyledBadge
+      badgeContent={badgeContent}
+      variant={dotBadge ? "dot" : "standard"}
+      position={Position.TopRight}
     >
-      <StyledBadge badgeContent={1} position={Position.topRight}>
-        <Button
-          fullWidth
-          sx={{
-            height: "100%",
-            color: fontColor.blue.medium,
-            paddingX: padding.large,
-            backgroundColor: color.blue.xLight,
-            borderRadius: borderRadius.small,
-            "&:hover": { backgroundColor: color.blue.light },
-          }}
-          startIcon={<Tune />}
-          onClick={() => {}}
-          data-testid="filtersBtn"
-        >
-          Filters
-        </Button>
-      </StyledBadge>
-    </Box>
+      <Button
+        fullWidth
+        sx={{
+          "& .MuiButton-startIcon": {
+            marginRight: showText ? gap.md : 0,
+            marginLeft: 0,
+          },
+          ...defaultButtonSx,
+          ...buttonSx,
+        }}
+        startIcon={icon}
+        onClick={onClick}
+      >
+        {showText && text}
+      </Button>
+    </StyledBadge>
   );
 };
 

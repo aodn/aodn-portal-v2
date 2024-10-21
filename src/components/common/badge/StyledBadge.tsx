@@ -1,12 +1,11 @@
 import { Badge } from "@mui/material";
 import { styled } from "@mui/material/styles";
-
 import { color as colors } from "../../../styles/constants";
 
 export enum Position {
-  topRight = "topRight",
-  right = "right",
-  left = "left",
+  TopRight = "topRight",
+  Right = "right",
+  Left = "left",
 }
 
 type PositionStyle = {
@@ -28,7 +27,7 @@ interface StyledBadgeProps {
 }
 
 const StyledBadge = styled(Badge)<StyledBadgeProps>(
-  ({ sx, position = Position.left, color = colors.brightBlue.dark }) => ({
+  ({ sx, position = Position.Left, color = colors.brightBlue.dark }) => ({
     "& .MuiBadge-badge": {
       padding: "0 4px",
       border: `2px solid ${color}`,

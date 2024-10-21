@@ -1,5 +1,6 @@
 import { Autocomplete, Box, Paper, Popper, TextField } from "@mui/material";
 import React, {
+  Dispatch,
   FC,
   ReactNode,
   useCallback,
@@ -26,6 +27,7 @@ import {
   SEARCH_ICON_WIDTH,
   TEXT_FIELD_MIN_WIDTH,
 } from "./constants";
+import { SearchbarButtonNames } from "./SearchbarButtonGroup";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -33,6 +35,7 @@ interface InputWithSuggesterProps {
     isSuggesterOpen: boolean
   ) => void;
   setPendingSearch?: React.Dispatch<React.SetStateAction<boolean>>;
+  setActiveButton?: Dispatch<React.SetStateAction<SearchbarButtonNames>>;
 }
 
 // TODO: Try to only use these two classes inside this file to maintain high cohesion.
@@ -58,6 +61,7 @@ enum OptionGroup {
 const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
   setPendingSearch = () => {},
+  setActiveButton = () => {},
 }) => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
@@ -157,6 +161,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   );
 
   const handleSuggesterOpen = () => {
+    setActiveButton(SearchbarButtonNames.Search);
     setOpen(true);
   };
 
