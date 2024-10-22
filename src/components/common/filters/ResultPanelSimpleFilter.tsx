@@ -45,6 +45,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             borderRadius: borderRadius.small,
             bgcolor: color.white.sixTenTransparent,
           }}
+          data-testid="show-result-count"
         >
           {total === 0 ? (
             <Typography fontSize={fontSize.info} padding={0}>

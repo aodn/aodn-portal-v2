@@ -5,6 +5,10 @@ class BasePage:
     def __init__(self, page: Page):
         self.page = page
 
+    def get_by_id(self, id: str) -> Locator:
+        """Return a locator by id attribute"""
+        return self.page.locator(f'#{id}')
+
     def get_button(self, text: str, exact: bool = True) -> Locator:
         """Return button element by text"""
         return self.page.get_by_role('button', name=text, exact=exact)
@@ -29,13 +33,13 @@ class BasePage:
         """Click on the given label"""
         self.get_label(text).click()
 
-    def get_text(self, text: str) -> Locator:
+    def get_text(self, text: str, exact: bool = False) -> Locator:
         """Return element by text"""
-        return self.page.get_by_text(text)
+        return self.page.get_by_text(text, exact=exact)
 
-    def click_text(self, text: str) -> None:
+    def click_text(self, text: str, exact: bool = False) -> None:
         """Click on the given text"""
-        self.get_text(text).click()
+        self.get_text(text, exact=exact).click()
 
     def get_tab(self, text: str) -> Locator:
         """Return tab element by text"""
