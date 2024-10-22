@@ -1,4 +1,3 @@
-import { Autocomplete, Box, Paper, Popper, TextField } from "@mui/material";
 import React, {
   Dispatch,
   FC,
@@ -8,12 +7,13 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useSelector } from "react-redux";
+import { Autocomplete, Box, Paper, Popper, TextField } from "@mui/material";
 import {
   ParameterState,
   updateSearchText,
 } from "../common/store/componentParamReducer";
 import store, { getComponentState, RootState } from "../common/store/store";
-import { useSelector } from "react-redux";
 import {
   createSuggesterParamFrom,
   fetchSuggesterOptions,
@@ -22,20 +22,18 @@ import { borderRadius, color, padding } from "../../styles/constants";
 import _ from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "../common/store/hooks";
-import {
-  FILTER_BUTTON_WIDTH,
-  SEARCH_ICON_WIDTH,
-  TEXT_FIELD_MIN_WIDTH,
-} from "./constants";
+import { TEXT_FIELD_MIN_WIDTH } from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
+import { updateSearchbarExpansion } from "../common/store/SearchbarReducer";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
     event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
-    isSuggesterOpen: boolean
+    isSearchbarFocused: boolean
   ) => void;
   setPendingSearch?: React.Dispatch<React.SetStateAction<boolean>>;
   setActiveButton?: Dispatch<React.SetStateAction<SearchbarButtonNames>>;
+  searchbarWidth?: number;
 }
 
 // TODO: Try to only use these two classes inside this file to maintain high cohesion.
@@ -62,13 +60,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
   setPendingSearch = () => {},
   setActiveButton = () => {},
+  searchbarWidth = 0,
 }) => {
   const dispatch = useAppDispatch();
-  const [open, setOpen] = useState(false);
+  const [isSearchbarActive, setIsSearchbarActive] = useState(false);
+  console.log("isSearchbarActive", isSearchbarActive);
   const [options, setOptions] = useState<OptionType[]>([]);
-  const [searchFieldWidth, setSearchFieldWidth] = useState<number>(0);
-  const searchFieldDiv = useRef(null);
-
   const searchInput = useSelector(
     (state: RootState) => state.paramReducer.searchText
   );
@@ -147,7 +144,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     };
   }, [debounceRefreshOptions]);
 
-  const onInputChange = useCallback(
+  const handleInputChange = useCallback(
     async (_: any, newInputValue: string) => {
       // If user type anything, then it is not a title search anymore
       dispatch(updateSearchText(newInputValue));
@@ -160,13 +157,16 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [debounceRefreshOptions, dispatch]
   );
 
-  const handleSuggesterOpen = () => {
+  const handleSearchbarOpen = () => {
+    console.log("trigger handleSearchbarOpen");
     setActiveButton(SearchbarButtonNames.Search);
-    setOpen(true);
+    setIsSearchbarActive(true);
   };
 
-  const handleSuggesterClose = () => {
-    setOpen(false);
+  const handleSearchbarClose = () => {
+    console.log("trigger handleSearchbarClose");
+    setIsSearchbarActive(false);
+    // setActiveButton(SearchbarButtonNames.Filter);
     setOptions([]);
   };
 
@@ -174,40 +174,21 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     if (event.key === "Enter") {
-      if (open) {
-        setOpen(false);
-      } else {
-        handleEnterPressed(event, false);
-      }
+      handleEnterPressed(event, false);
     }
   };
 
+  // Listen to isSearchbarActive | searchInput.length to update SearchbarExpansion state in redux
+  // Searchbar will keep expanded if searchbar is active or there exists a text input
   useEffect(() => {
-    // Create a ResizeObserver to monitor changes in element sizes
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target === searchFieldDiv.current) {
-          setSearchFieldWidth(entry.contentRect.width);
-        }
-      }
-    });
-
-    // Get the elements from refs
-    const searchFieldElement = searchFieldDiv.current;
-
-    // Observe the elements
-    if (searchFieldElement) {
-      observer.observe(searchFieldElement);
+    if (isSearchbarActive || (searchInput && searchInput.length > 0)) {
+      dispatch(updateSearchbarExpansion(true));
+    } else {
+      dispatch(updateSearchbarExpansion(false));
     }
+  }, [dispatch, isSearchbarActive, searchInput]);
 
-    // Cleanup observer on component unmount
-    return () => {
-      if (searchFieldElement) {
-        observer.unobserve(searchFieldElement);
-      }
-    };
-  }, []);
-
+  // Input suggester popper
   const CustomPopper = (props: any): ReactNode => {
     return (
       <Popper
@@ -217,7 +198,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 5], // Vertical offset
+              offset: [0, 2], // Vertical offset
             },
           },
           {
@@ -226,12 +207,13 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           },
         ]}
         style={{
-          width: `${searchFieldWidth + SEARCH_ICON_WIDTH + FILTER_BUTTON_WIDTH}px`,
+          width: searchbarWidth,
         }}
       />
     );
   };
 
+  // Input suggester paper
   const CustomPaper = (props: any): ReactNode => {
     return (
       <Paper
@@ -263,52 +245,50 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   };
 
   return (
-    <>
-      <Autocomplete
-        id="search"
-        fullWidth
-        freeSolo
-        PopperComponent={CustomPopper}
-        PaperComponent={CustomPaper}
-        open={open}
-        onOpen={handleSuggesterOpen}
-        onClose={handleSuggesterClose}
-        value={searchInput}
-        forcePopupIcon={false}
-        options={options.flatMap((option) => option.text)}
-        autoComplete
-        includeInputInList
-        onInputChange={onInputChange}
-        sx={{
-          ".MuiOutlinedInput-root": { padding: 0, paddingLeft: padding.small },
+    <Autocomplete
+      id="search"
+      fullWidth
+      freeSolo
+      PopperComponent={CustomPopper}
+      PaperComponent={CustomPaper}
+      open={isSearchbarActive}
+      onOpen={handleSearchbarOpen}
+      onClose={handleSearchbarClose}
+      value={searchInput}
+      forcePopupIcon={false}
+      options={options.flatMap((option) => option.text)}
+      autoComplete
+      includeInputInList
+      onInputChange={handleInputChange}
+      sx={{
+        ".MuiOutlinedInput-root": { padding: 0, paddingLeft: padding.small },
 
-          // Keep the clear text button 'X' always visible
-          "& .MuiAutocomplete-clearIndicator": {
-            visibility: "visible",
-          },
-        }}
-        renderInput={(params) => (
-          <Box flexGrow={1} ref={searchFieldDiv}>
-            <TextField
-              sx={{
-                minWidth: TEXT_FIELD_MIN_WIDTH,
-                "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                  border: "none",
-                },
-              }}
-              {...params}
-              placeholder="Search for open data"
-              inputProps={{
-                "aria-label": "Search for open data",
-                ...params.inputProps,
-                onKeyDown: handleKeyDown,
-                "data-testid": "input-with-suggester",
-              }}
-            />
-          </Box>
-        )}
-      />
-    </>
+        // Keep the clear text button 'X' always visible
+        "& .MuiAutocomplete-clearIndicator": {
+          visibility: "visible",
+        },
+      }}
+      renderInput={(params) => (
+        <Box flexGrow={1}>
+          <TextField
+            sx={{
+              minWidth: TEXT_FIELD_MIN_WIDTH,
+              "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+            }}
+            {...params}
+            placeholder="Search for open data"
+            inputProps={{
+              "aria-label": "Search for open data",
+              ...params.inputProps,
+              onKeyDown: handleKeyDown,
+              "data-testid": "input-with-suggester",
+            }}
+          />
+        </Box>
+      )}
+    />
   );
 };
 

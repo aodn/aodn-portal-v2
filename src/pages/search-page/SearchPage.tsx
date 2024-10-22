@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   createSearchParamFrom,
   DEFAULT_SEARCH_PAGE,
@@ -34,8 +34,7 @@ import store, { getComponentState } from "../../components/common/store/store";
 import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
 import MapSection from "./subpages/MapSection";
-import { color } from "../../styles/constants";
-import ComplexTextSearch from "../../components/search/ComplexTextSearch";
+import { color, padding } from "../../styles/constants";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
@@ -45,8 +44,6 @@ import {
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
-
-const SEARCH_BAR_HEIGHT = 56;
 
 const isLoading = (count: number): boolean => {
   if (count > 0) {
@@ -305,57 +302,43 @@ const SearchPage = () => {
   return (
     <Layout>
       <Box
-        display="flex"
-        flexDirection="row"
-        justifyContent="center"
-        bgcolor={color.blue.light}
-        gap={1}
-        padding={2}
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "stretch",
+          width: "100%",
+          padding: padding.small,
+          bgcolor: color.blue.light,
+        }}
+        gap={2}
       >
-        <Grid container flex={1} gap={1}>
-          <Grid item xs={12} height={`${SEARCH_BAR_HEIGHT}px`}>
-            <ComplexTextSearch />
-          </Grid>
-          <Grid item xs={12}>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "stretch",
-                width: "100%",
-              }}
-              gap={2}
-            >
-              {visibility === SearchResultLayoutEnum.VISIBLE && (
-                <Box>
-                  <ResultSection
-                    onVisibilityChanged={onVisibilityChanged}
-                    onClickCard={handleClickCard}
-                    onChangeSorting={onChangeSorting}
-                    datasetsSelected={datasetsSelected}
-                    isLoading={isLoading(loadingThreadCount)}
-                  />
-                </Box>
-              )}
-              <Box flex={1}>
-                <MapSection
-                  sx={{
-                    height: "80vh",
-                  }}
-                  collections={layers}
-                  bbox={bbox}
-                  showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
-                  selectedUuids={selectedUuids}
-                  onMapZoomOrMove={onMapZoomOrMove}
-                  onToggleClicked={onToggleDisplay}
-                  onDatasetSelected={handleDatasetSelecting}
-                  isLoading={isLoading(loadingThreadCount)}
-                />
-              </Box>
-            </Box>
-          </Grid>
-        </Grid>
+        {visibility === SearchResultLayoutEnum.VISIBLE && (
+          <Box>
+            <ResultSection
+              onVisibilityChanged={onVisibilityChanged}
+              onClickCard={handleClickCard}
+              onChangeSorting={onChangeSorting}
+              datasetsSelected={datasetsSelected}
+              isLoading={isLoading(loadingThreadCount)}
+            />
+          </Box>
+        )}
+        <Box flex={1}>
+          <MapSection
+            sx={{
+              height: "80vh",
+            }}
+            collections={layers}
+            bbox={bbox}
+            showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
+            selectedUuids={selectedUuids}
+            onMapZoomOrMove={onMapZoomOrMove}
+            onToggleClicked={onToggleDisplay}
+            onDatasetSelected={handleDatasetSelecting}
+            isLoading={isLoading(loadingThreadCount)}
+          />
+        </Box>
       </Box>
     </Layout>
   );

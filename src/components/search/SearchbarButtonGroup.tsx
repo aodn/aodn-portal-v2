@@ -54,8 +54,9 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
 }) => {
   const redirectSearch = useRedirectSearch();
   const handleSearchClick = useCallback(() => {
+    setActiveButton(SearchbarButtonNames.Search);
     if (!pendingSearch) redirectSearch("ComplexTextSearch");
-  }, [pendingSearch, redirectSearch]);
+  }, [pendingSearch, redirectSearch, setActiveButton]);
 
   const handleFilterClick = useCallback(() => {
     setShowFilters(true);
