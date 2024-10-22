@@ -1,0 +1,312 @@
+{
+  "properties": {
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [116, -25],
+              [116, -15],
+              [106, -15],
+              [106, -25],
+              [116, -25]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [116, -9],
+              [106, -9],
+              [106, -15],
+              [116, -15],
+              [116, -9]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [124, -25],
+              [124, -15],
+              [116, -15],
+              [116, -25],
+              [124, -25]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [124, -15],
+              [124, -9],
+              [116, -9],
+              [116, -15],
+              [124, -15]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "status": "completed",
+    "contacts": [
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "about"],
+        "phones": []
+      },
+      {
+        "name": "CSIRO O&A, Information & Data Centre",
+        "organization": "CSIRO Oceans & Atmosphere - Hobart",
+        "position": "Data Requests",
+        "emails": [],
+        "addresses": [],
+        "links": [],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": []
+      }
+    ],
+    "themes": [
+      {
+        "scheme": "theme",
+        "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+        "title": "GCMD Keywords",
+        "concepts": [
+          {
+            "id": "Earth Science | Oceans | Ocean Pressure | Water Pressure",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/dd025312-0d27-44e0-ae05-7cfcc1aa17f0"
+          },
+          {
+            "id": "Earth Science | Oceans | Ocean Temperature | Water Temperature",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/46206e8c-8def-406f-9e62-da4e74633a58"
+          },
+          {
+            "id": "Earth Science | Oceans | Salinity/Density | Salinity",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/7e95b5fc-1d58-431a-af36-948b29fa870d"
+          }
+        ]
+      },
+      {
+        "scheme": "equipment",
+        "description": "",
+        "title": "CSIRO Equipment",
+        "concepts": [
+          {
+            "id": "CTDs (Conductivity-Temperature-Depth Profilers)",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:33"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "description": "AODN GEN",
+        "title": "AODN Geographic Extent Names",
+        "concepts": [
+          {
+            "id": "Global / Oceans | East Indian Ocean",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1020"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "description": "Marlin Areas of Interest Thesaurus",
+        "title": "CSIRO Areas Of Interest",
+        "concepts": [
+          {
+            "id": "Marine National Facility",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:cmarAOI&id=urn:marlin.csiro.au:keywords:cmarAOI:concept:3208"
+          }
+        ]
+      },
+      {
+        "scheme": "survey",
+        "description": "MarLIN Survey Register",
+        "title": "CSIRO Survey List",
+        "concepts": [
+          {
+            "id": "Research Voyage: FR 08/95",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:109"
+          }
+        ]
+      },
+      {
+        "scheme": "project",
+        "description": "MarLIN Project Register",
+        "title": "CSIRO Project List",
+        "concepts": [
+          {
+            "id": "Climate Change 1989-1997",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:1533"
+          }
+        ]
+      },
+      {
+        "scheme": "project",
+        "description": "MarLIN Global Project Codes Register",
+        "title": "CSIRO Global Project List",
+        "concepts": [
+          {
+            "id": "World Ocean Circulation Experiment",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:globalprojectregister&id=urn:marlin.csiro.au:globalprojectregister:concept:9"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "description": "MarLIN Standard Datatypes Thesaurus",
+        "title": "CSIRO Standard Data Types",
+        "concepts": [
+          {
+            "id": "Vessel Data: CTD",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:standardDataType&id=urn:marlin.csiro.au:keywords:standardDataType:concept:3511"
+          }
+        ]
+      },
+      {
+        "scheme": "dataSource",
+        "description": "MarLIN Source Register",
+        "title": "CSIRO Source List",
+        "concepts": [
+          {
+            "id": "Ship: Franklin",
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:5"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "description": "",
+        "title": "Keywords (DataParameter)",
+        "concepts": [
+          {
+            "id": "Practical salinity of the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/PSLTZZ01"
+          },
+          {
+            "id": "Temperature of the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/TEMPPR01"
+          },
+          {
+            "id": "Pressure (measured variable) in the water body exerted by overlying sea water and any medium above it",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/565"
+          },
+          {
+            "id": "Pressure (measured variable) in the water body exerted by overlying sea water only",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/566"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "description": "",
+        "title": "Keywords (Instrument)",
+        "concepts": [
+          {
+            "id": "CTD",
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/130"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "description": "",
+        "title": "Keywords (Platform)",
+        "concepts": [
+          {
+            "id": "research vessel",
+            "url": "http://vocab.nerc.ac.uk/collection/L06/current/31"
+          }
+        ]
+      }
+    ],
+    "citation": {
+      "otherConstraints": [
+        "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was collected on voyage [Insert-voyage-name-here] by the Marine National Facility."
+      ]
+    },
+    "temporal": [
+      {
+        "start": "1995-09-15T14:00:00Z",
+        "end": "1995-10-13T12:59:59Z"
+      }
+    ],
+    "revision": "2001-03-28T11:23:29",
+    "credits": [],
+    "license": "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was collected on voyage [Insert-voyage-name-here] by the Marine National Facility.",
+    "centroid": [
+      [110.679, -19.72],
+      [111.0, -12.0],
+      [119.27, -17.409],
+      [119.967, -12.064]
+    ],
+    "statement": "Data source: original field data   Data processing and quality control: according to current CMR Data Centre CTD data processing manual. For full details, refer to documentation."
+  },
+  "id": "03e1e59c-43bb-4624-b7a5-1e14d6488acb",
+  "title": "Franklin Voyage FR 08/95 CTD Data",
+  "description": "This dataset contains the processed Conductivity-Temperature-Depth (CTD) data collected on Franklin voyage FR 08/95. The voyage took place in the east Indian Ocean during 13 September - 14 October 1995. This dataset has been processed and is archived within the CSIRO Marine and Atmospheric Research Data Centre in Hobart. Additional information regarding this dataset is contained in the cruise report for this voyage and/or the data processing report (as available).",
+  "links": [
+    {
+      "href": "https://www.cmar.csiro.au/geoserver/wms?&CQL_FILTER=SURVEY_NAME%20%3D%20%27FR199508%27",
+      "rel": "wms",
+      "type": "",
+      "title": "mnf:CTD_HEADER_AODN_VIEW"
+    },
+    {
+      "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=FR199508&data_type=ctd",
+      "rel": "related",
+      "type": "",
+      "title": "Data Link"
+    },
+    {
+      "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=42",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Documentation Link"
+    },
+    {
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Documentation Link"
+    },
+    {
+      "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://www.cmar.csiro.au/data/trawler/dataset_mapfile.cfm?survey=FR199508&data_type=ctd&img_type=tn",
+      "rel": "preview",
+      "type": "image"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [106.0, -25.0, 124.0, -9.0],
+        [106.0, -25.0, 124.0, -9.0]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["1995-09-15T14:00:00.000+00:00", "1995-10-13T12:59:59.000+00:00"],
+        ["1995-09-15T14:00:00.000+00:00", "1995-10-13T12:59:59.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}
