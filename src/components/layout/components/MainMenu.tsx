@@ -9,8 +9,7 @@ const MAIN_MENUS: Menu[] = [
   { menuName: "DATA", items: [{ name: "item 1", handler: () => {} }] },
   { menuName: "LEARN", items: [{ name: "item 1", handler: () => {} }] },
   { menuName: "ENGAGE", items: [{ name: "item 1", handler: () => {} }] },
-  { menuName: "CONTACT", items: [{ name: "item 1", handler: () => {} }] },
-  { menuName: "ABOUT", items: [{ name: "item 1", handler: () => {} }] },
+  { menuName: "NEWS", items: [{ name: "item 1", handler: () => {} }] },
 ];
 
 interface MainMenuProps {

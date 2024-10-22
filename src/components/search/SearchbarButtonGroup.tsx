@@ -92,7 +92,6 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
             backgroundColor: color.brightBlue.dark,
           },
         }}
-        aria-label="search"
       />
     </Stack>
   );
