@@ -16,6 +16,7 @@ import {
   ErrorResponse,
 } from "../../../utils/ErrorBoundary";
 import { mergeWithDefaults } from "../utils";
+import { Dataset, IFeatureGeoJson } from "./DatasetDefinitions";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -208,6 +209,26 @@ const fetchResultAppendStore = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("search/fetchResultAppendStore", searchResult);
 
+function errorHandling(thunkApi: any) {
+  return (error: Error | AxiosError | ErrorResponse) => {
+    if (axios.isAxiosError(error) && error.response) {
+      return thunkApi.rejectWithValue(
+        createErrorResponse(
+          error?.response?.status,
+          error?.response?.data.details
+            ? error?.response?.data.details
+            : error?.response?.statusText,
+          error?.response?.data.message,
+          error?.response?.data.timestamp,
+          error?.response?.data.parameters
+        )
+      );
+    } else {
+      return thunkApi.rejectWithValue(error);
+    }
+  };
+}
+
 const fetchResultByUuidNoStore = createAsyncThunk<
   OGCCollection,
   string,
@@ -216,23 +237,18 @@ const fetchResultByUuidNoStore = createAsyncThunk<
   axios
     .get<OGCCollection>(`/api/v1/ogc/collections/${id}`)
     .then((response) => Object.assign(new OGCCollection(), response.data))
-    .catch((error: Error | AxiosError | ErrorResponse) => {
-      if (axios.isAxiosError(error) && error.response) {
-        return thunkApi.rejectWithValue(
-          createErrorResponse(
-            error?.response?.status,
-            error?.response?.data.details
-              ? error?.response?.data.details
-              : error?.response?.statusText,
-            error?.response?.data.message,
-            error?.response?.data.timestamp,
-            error?.response?.data.parameters
-          )
-        );
-      } else {
-        return thunkApi.rejectWithValue(error);
-      }
-    })
+    .catch(errorHandling(thunkApi))
+);
+
+const fetchDatasetByUuid = createAsyncThunk<
+  Dataset,
+  string,
+  { rejectValue: ErrorResponse }
+>("search/fetchDatasetByUuid", async (id: string, thunkApi: any) =>
+  axios
+    .get<IFeatureGeoJson>(`/api/v1/ogc/collections/${id}/items/dataset`)
+    .then((response) => new Dataset(response.data))
+    .catch(errorHandling(thunkApi))
 );
 
 const fetchParameterVocabsWithStore = createAsyncThunk<
@@ -379,6 +395,7 @@ export {
   fetchResultNoStore,
   fetchResultAppendStore,
   fetchResultByUuidNoStore,
+  fetchDatasetByUuid,
   fetchParameterVocabsWithStore,
 };
 
