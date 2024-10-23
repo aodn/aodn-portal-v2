@@ -35,7 +35,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
   onClick = () => {},
   badgeContent,
   dotBadge,
-  showText = true,
+  showText,
   buttonSx,
 }) => {
   return (

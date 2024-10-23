@@ -45,7 +45,7 @@ const checkFilterCount = (filterObj: ParameterState) => {
 
   return count;
 };
-// Todo: determine which one should expand
+
 const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   pendingSearch,
   setShowFilters,
@@ -53,6 +53,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   setActiveButton,
 }) => {
   const redirectSearch = useRedirectSearch();
+
   const handleSearchClick = useCallback(() => {
     setActiveButton(SearchbarButtonNames.Search);
     if (!pendingSearch) redirectSearch("ComplexTextSearch");

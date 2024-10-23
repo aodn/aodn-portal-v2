@@ -63,9 +63,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   searchbarWidth = 0,
 }) => {
   const dispatch = useAppDispatch();
+
   const [isSearchbarActive, setIsSearchbarActive] = useState(false);
-  console.log("isSearchbarActive", isSearchbarActive);
+
   const [options, setOptions] = useState<OptionType[]>([]);
+
   const searchInput = useSelector(
     (state: RootState) => state.paramReducer.searchText
   );
@@ -158,15 +160,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   );
 
   const handleSearchbarOpen = () => {
-    console.log("trigger handleSearchbarOpen");
     setActiveButton(SearchbarButtonNames.Search);
     setIsSearchbarActive(true);
   };
 
   const handleSearchbarClose = () => {
-    console.log("trigger handleSearchbarClose");
     setIsSearchbarActive(false);
-    // setActiveButton(SearchbarButtonNames.Filter);
     setOptions([]);
   };
 
