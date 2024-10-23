@@ -16,7 +16,7 @@ import {
   margin,
 } from "../../../styles/constants";
 import { IconProps } from "../../icon/types";
-import { mergeWithDefaults } from "../utils";
+import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 
 interface IconSelectColorConfig {
   defaultColor: string;

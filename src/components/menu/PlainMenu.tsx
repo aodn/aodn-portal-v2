@@ -1,10 +1,9 @@
 import { FC, useState } from "react";
-import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
-import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { fontColor, fontSize, gap } from "../../styles/constants";
+import { fontColor, fontSize } from "../../styles/constants";
+import StyledMenu from "./StyledMenu";
 
 interface MenuItem {
   name: string;
@@ -19,35 +18,6 @@ export interface Menu {
 interface PlainMenuProps {
   menu: Menu;
 }
-
-const StyledMenu = styled((props: MenuProps) => (
-  <Menu
-    elevation={0}
-    anchorOrigin={{
-      vertical: "bottom",
-      horizontal: "right",
-    }}
-    transformOrigin={{
-      vertical: "top",
-      horizontal: "right",
-    }}
-    {...props}
-  />
-))(({ theme }) => ({
-  "& .MuiPaper-root": {
-    backgroundColor: "#fff",
-    borderRadius: theme.borderRadius.sm,
-    marginTop: gap.xs,
-    minWidth: "100px",
-
-    "& .MuiMenu-list": {
-      padding: "4px 0",
-    },
-    "& .MuiMenuItem-root": {
-      fontSize: fontSize.label,
-    },
-  },
-}));
 
 // TODO: implement onClick for each menu item to trigger handler once the function is designed
 const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {

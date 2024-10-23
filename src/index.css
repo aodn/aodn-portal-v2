@@ -3,6 +3,10 @@
   font-weight: 400;
 }
 
+#root {
+  width: 100%;
+}
+
 body {
   margin: 0;
   place-items: center;

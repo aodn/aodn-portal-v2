@@ -35,8 +35,9 @@ describe("ComplexTextSearch Component", () => {
   });
 
   it("renders ComplexTextSearch", () => {
-    expect(screen.getByText("Filters")).toBeInTheDocument();
-    expect(screen.getByText("Search")).toBeInTheDocument();
+    expect(screen.getByTestId("CloseIcon")).toBeInTheDocument();
+    expect(screen.getByTestId("TuneIcon")).toBeInTheDocument();
+    expect(screen.getByTestId("SearchIcon")).toBeInTheDocument();
   });
 
   // The visibility of Filter is tested in AdvanceFilters unit test

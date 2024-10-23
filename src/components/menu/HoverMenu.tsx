@@ -92,7 +92,7 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
           backgroundColor: "transparent",
           border: "none",
           color: fontColor.blue.dark,
-          fontSize: fontSize.info,
+          fontSize: fontSize.label,
         }}
       >
         {menu.menuName}
@@ -103,7 +103,7 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
         placement="bottom-start"
         transition
         disablePortal
-        sx={{ zIndex: 1 }}
+        sx={{ zIndex: 99 }}
       >
         {renderMenuItems}
       </Popper>

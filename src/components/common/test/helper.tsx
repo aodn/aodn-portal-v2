@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Map } from "mapbox-gl";
-import { mergeWithDefaults } from "../utils";
+import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 
 interface TestProps {
   getMap?: () => Map;

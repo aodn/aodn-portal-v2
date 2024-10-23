@@ -1,7 +1,8 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import searchReducer from "./searchReducer";
 import { logger } from "redux-logger";
+import searchReducer from "./searchReducer";
 import paramReducer from "./componentParamReducer";
+import searchbarReducer from "./SearchbarReducer";
 
 // https://stackoverflow.com/questions/69502147/changing-from-redux-to-redux-toolkit
 // https://redux-toolkit.js.org/api/getDefaultMiddleware
@@ -16,6 +17,7 @@ const store = configureStore({
     // Add your reducers here
     searcher: searchReducer,
     paramReducer: paramReducer,
+    searchbar: searchbarReducer,
   }),
 });
 
@@ -31,6 +33,8 @@ const searchQueryResult = (state: RootState) =>
 
 const getComponentState = (state: RootState) => state.paramReducer;
 
-export { searchQueryResult, getComponentState };
+const getSearchbarExpanded = (state: RootState) => state.searchbar.isExpanded;
+
+export { searchQueryResult, getComponentState, getSearchbarExpanded };
 
 export default store;

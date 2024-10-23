@@ -13,6 +13,7 @@ const AODNSiteLogo = () => (
       display: "flex",
       alignItems: "center",
       justifyContent: "end",
+      minWidth: "240px",
     }}
   >
     <a href="/">

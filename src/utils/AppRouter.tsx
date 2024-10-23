@@ -1,11 +1,11 @@
 import LandingPage from "../pages/landing-page/LandingPage";
 import SearchPage from "../pages/search-page/SearchPage";
 import DetailsPage from "../pages/detail-page/DetailsPage";
-import { pageDefault } from "../components/common/constants";
 import { createBrowserRouter } from "react-router-dom";
 import NotFoundPage from "../pages/NotFoundPage";
 import ErrorPage from "../pages/ErrorPage";
 import ErrorBoundary from "./ErrorBoundary";
+import { pageDefault } from "../components/common/constants";
 
 const router = createBrowserRouter([
   {

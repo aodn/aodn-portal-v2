@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { Dispatch, FC, useCallback, useEffect, useState } from "react";
 import {
   ParameterState,
   updateParameterVocabs,

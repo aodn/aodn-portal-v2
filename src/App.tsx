@@ -12,9 +12,9 @@ const app = () => {
   return (
     <div>
       <ThemeProvider theme={AppTheme}>
+        <CssBaseline />
+        <Scrollbar />
         <GlobalLoader>
-          <CssBaseline />
-          <Scrollbar />
           <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
         </GlobalLoader>
       </ThemeProvider>
