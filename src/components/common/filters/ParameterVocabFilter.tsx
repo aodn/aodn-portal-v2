@@ -6,7 +6,7 @@ import React, {
   Dispatch,
   SetStateAction,
 } from "react";
-import { Grid, SxProps, Theme } from "@mui/material";
+import { Box, SxProps, Theme } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { fetchParameterVocabsWithStore } from "../store/searchReducer";
@@ -46,8 +46,8 @@ const ParameterVocabFilter: FC<ParameterVocabFilterProps> = ({
   // Update the local filter state using the setFilter
   const handleChange = useCallback(
     (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
-      const selected: Vocab[] = parameterVocabs.filter((c) =>
-        newAlignment.includes(c.label)
+      const selected: Vocab[] = parameterVocabs.filter((vocab) =>
+        newAlignment.includes(vocab.label)
       );
       setFilter((prevFilter) => ({
         ...prevFilter,
@@ -57,23 +57,23 @@ const ParameterVocabFilter: FC<ParameterVocabFilterProps> = ({
     [parameterVocabs, setFilter]
   );
 
-  // Remove all items whose label is already in the labels array
-  useEffect(() => {
-    const labels = [...new Set(parameterVocabs.map((c) => c.label))];
-    setButtonLabels(labels);
-  }, [parameterVocabs]);
-
   useEffect(() => {
     dispatch(fetchParameterVocabsWithStore(null))
       .unwrap()
       .then((vocabs: Array<Vocab>) => {
-        // we only want second level of vocabs
-        const secondLevelVocabs = vocabs
-          .flatMap((rootVocab) => rootVocab.narrower)
-          .filter((vocab) => vocab !== undefined)
-          .sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
+        // Extract second level vocabs and remove duplicates
+        const secondLevelVocabs = Array.from(
+          new Set(
+            vocabs
+              .flatMap((rootVocab) => rootVocab.narrower || [])
+              .map((vocab) => JSON.stringify(vocab)) // Convert to string for Set deduplication
+          )
+        )
+          .map((vocabString) => JSON.parse(vocabString)) // Convert back to object
+          .sort((a, b) => a.label.localeCompare(b.label)); // localeCompare() is better for handling of international characters eg. non-English text
 
         setParameterVocabs(secondLevelVocabs);
+        setButtonLabels(secondLevelVocabs.map((vocab) => vocab.label));
       })
       .catch((error) =>
         console.error("Error fetching parameterVocabs:", error)
@@ -81,21 +81,19 @@ const ParameterVocabFilter: FC<ParameterVocabFilterProps> = ({
   }, [dispatch]);
 
   return (
-    <Grid container sx={{ ...sx }}>
-      <Grid item xs={12}>
-        <StyledToggleButtonGroup
-          value={filter.parameterVocabs?.map((vocab) => vocab.label) || []}
-          onChange={handleChange}
-          aria-label="parameter vocab selection"
-        >
-          {buttonLabels.map((label) => (
-            <StyledToggleButton value={label} key={label} aria-label={label}>
-              {label}
-            </StyledToggleButton>
-          ))}
-        </StyledToggleButtonGroup>
-      </Grid>
-    </Grid>
+    <Box sx={{ ...sx }}>
+      <StyledToggleButtonGroup
+        value={filter.parameterVocabs?.map((vocab) => vocab.label) || []}
+        onChange={handleChange}
+        aria-label="parameter vocab selection"
+      >
+        {buttonLabels.map((label) => (
+          <StyledToggleButton value={label} key={label} aria-label={label}>
+            {label}
+          </StyledToggleButton>
+        ))}
+      </StyledToggleButtonGroup>
+    </Box>
   );
 };
 
