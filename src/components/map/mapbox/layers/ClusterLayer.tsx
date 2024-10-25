@@ -10,17 +10,17 @@ import MapContext from "../MapContext";
 import { GeoJSONSource } from "mapbox-gl";
 import MapPopup, { PopupType } from "../component/MapPopup";
 import {
-  LayersProps,
-  createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
+  LayersProps,
 } from "./Layers";
 import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
-import { FeatureCollection, GeoJsonProperties, Point } from "geojson";
+import { Feature, FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
+import { generateFeatureCollectiionFrom } from "../../../../utils/GeoJsonUtils";
 
 interface ClusterSize {
   default?: number | string;
@@ -49,10 +49,6 @@ interface ClusterLayerConfig {
 interface ClusterLayerProps extends LayersProps {
   // Some method inherit from LayersProps
   clusterLayerConfig?: Partial<ClusterLayerConfig>;
-  points?: {
-    lat: number;
-    lon: number;
-  }[];
 }
 
 const defaultClusterLayerConfig: ClusterLayerConfig = {
@@ -101,15 +97,14 @@ export const getUnclusterPointId = (layerId: string) =>
   `${layerId}-unclustered-point`;
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
-  points,
-  collections,
+  features = generateFeatureCollectiionFrom(undefined),
   selectedUuids,
   onDatasetSelected,
   clusterLayerConfig,
   showFullMap,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
-  const [lastVisiblePoint, setLastVisiblePoint] = useState<
+  const [_, setLastVisiblePoint] = useState<
     FeatureCollection<Point> | undefined
   >(undefined);
 
@@ -124,12 +119,12 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [layerId]
   );
 
-  // This is use to render the cluster circle and add event handle to circles
+  // This is used to render the cluster circle and add event handle to circles
   useEffect(() => {
     if (map === null) return;
 
     // This situation is map object created, hence not null, but not completely loaded
-    // and therefore you will have problem setting source and layer. Set-up a listener
+    // ,and therefore you will have problem setting source and layer. Set up a listener
     // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
       // Function may call multiple times due to useEffect, it is not possible to avoid
@@ -146,7 +141,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       map?.addSource(clusterSourceId, {
         type: "geojson",
         data: findSuitableVisiblePoint(
-          createCenterOfMassDataSource(undefined),
+          {
+            type: "FeatureCollection",
+            features: new Array<Feature<Point>>(),
+          },
           map
         ),
         cluster: true,
@@ -154,7 +152,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         clusterRadius: 50,
       });
 
-      // Add layers for multiple items, that is cluster
+      // Add layers for multiple items, that is the cluster
       map?.addLayer({
         id: clusterLayer,
         type: "circle",
@@ -259,41 +257,16 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
-  const convertPointsToGeoJSON = (
-    points: { lat: number; lon: number }[]
-  ): FeatureCollection<Point, GeoJsonProperties> => {
-    return {
-      type: "FeatureCollection",
-      features: points.map((point) => ({
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [point.lon, point.lat],
-        },
-        properties: {},
-      })),
-    };
-  };
-
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
       setLastVisiblePoint((p) => {
-        let newData = null;
-        if (collections) {
-          newData = findSuitableVisiblePoint(
-            createCenterOfMassDataSource(collections),
-            map,
-            p
-          );
-        } else {
-          newData = convertPointsToGeoJSON(points!);
-        }
+        const newData = findSuitableVisiblePoint(features, map, p);
 
         (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
         return newData;
       });
     }
-  }, [map, clusterSourceId, collections]);
+  }, [map, clusterSourceId, features]);
 
   useEffect(() => {
     updateSource();
