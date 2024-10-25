@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -36,21 +36,13 @@ import MenuControl, {
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
 import Map from "../../../../components/map/mapbox/Map";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
-import Layers, {
-  createStaticLayers,
-} from "../../../../components/map/mapbox/layers/Layers";
-import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
+import Layers from "../../../../components/map/mapbox/layers/Layers";
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
-import { Dataset } from "../../../../components/common/store/DatasetDefinitions";
-import HeatmapLayer from "../../../../components/map/mapbox/layers/HeatmapLayer";
-import HeatmapLayer2 from "../../../../components/map/mapbox/layers/TestLayer";
-import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
 import ClusterLayer from "../../../../components/map/mapbox/layers/ClusterLayer";
-import { FeatureCollection, Point } from "geojson";
 
 interface DownloadSelect {
   label?: string;
@@ -157,15 +149,6 @@ const AbstractAndDownloadPanel: FC = () => {
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
 
-  // TODO: only for working check:
-  const points: { lat: number; lon: number }[] = [];
-  useEffect(() => {
-    dataset?.getData()?.forEach((record) => {
-      const p = { lat: record.lat, lon: record.lon };
-      points.push(p);
-    });
-  }, [dataset, points]);
-
   if (!collection) return;
   return (
     <>
@@ -227,7 +210,7 @@ const AbstractAndDownloadPanel: FC = () => {
                   <Layers>
                     {/*<GeojsonLayer collection={collection} />*/}
                     {/*{createStaticLayers(staticLayer)}*/}
-                    <ClusterLayer points={points} />
+                    <ClusterLayer />
                   </Layers>
                 </Map>
               </Box>
