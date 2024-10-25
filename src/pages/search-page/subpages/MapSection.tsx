@@ -20,9 +20,14 @@ import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLay
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 import SnackbarLoader from "../../../components/loading/SnackbarLoader";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
+import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 
 const mapContainerId = "map-container-id";
 
+enum LayerName {
+  Heatmap = "heatmap",
+  Cluster = "cluster",
+}
 interface MapSectionProps {
   collections: OGCCollection[];
   showFullMap: boolean;
@@ -48,13 +53,15 @@ const MapSection: React.FC<MapSectionProps> = ({
   selectedUuids,
   isLoading,
 }) => {
-  const [selectedLayer, setSelectedLayer] = useState<string | null>("heatmap");
+  const [selectedLayer, setSelectedLayer] = useState<string | null>(
+    LayerName.Cluster
+  );
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const createPresentationLayers = useCallback(
     (id: string | null) => {
       switch (id) {
-        case "heatmap":
+        case LayerName.Heatmap:
           return (
             <HeatmapLayer
               collections={collections}
@@ -129,14 +136,14 @@ const MapSection: React.FC<MapSectionProps> = ({
               <MapLayerSwitcher
                 layers={[
                   {
-                    id: "cluster",
-                    name: "Cluster",
-                    default: selectedLayer === "cluster",
+                    id: LayerName.Cluster,
+                    name: capitalizeFirstLetter(LayerName.Cluster),
+                    default: selectedLayer === LayerName.Cluster,
                   },
                   {
-                    id: "heatmap",
-                    name: "Heatmap",
-                    default: selectedLayer === "heatmap",
+                    id: LayerName.Heatmap,
+                    name: capitalizeFirstLetter(LayerName.Heatmap),
+                    default: selectedLayer === LayerName.Heatmap,
                   },
                 ]}
                 onEvent={(id: string) => setSelectedLayer(id)}

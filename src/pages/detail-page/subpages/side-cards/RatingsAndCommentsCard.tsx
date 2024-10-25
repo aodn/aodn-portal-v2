@@ -147,7 +147,7 @@ const RatingsAndCommentsCard = () => {
             </Grid>
           </Grid>
           <Stack direction="column">
-            <Typography>Share on Social Sites:</Typography>
+            <Typography>Share :</Typography>
             <Stack direction="row" spacing={1}>
               {socialIcons.map((icon, index) => (
                 <Box
