@@ -16,11 +16,11 @@ import {
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
 } from "./Layers";
-import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
+import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 
 interface ClusterSize {
   default?: number | string;

@@ -1,11 +1,11 @@
 import { IAssociatedRecord } from "../common/store/OGCCollectionDefinitions";
-import React, { ReactNode, useCallback, useMemo } from "react";
-import { pageDefault } from "../common/constants";
+import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import { openInNewTab } from "../../utils/LinkUtils";
 import CollapseAssociatedRecordItem from "./listItem/CollapseAssociatedRecordItem";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
+import { pageDefault } from "../common/constants";
 
 interface AssociatedRecordListProps {
   title: string;

@@ -1,136 +1,82 @@
-import React, { useCallback, useState } from "react";
-import { Button, Grid, IconButton, Paper } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import SearchIcon from "@mui/icons-material/Search";
-import grey from "../common/colors/grey";
-import { Tune } from "@mui/icons-material";
-import store, { getComponentState } from "../common/store/store";
+import React, { Dispatch, FC, useCallback, useState } from "react";
+import { Box, Paper } from "@mui/material";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
-import {
-  ParameterState,
-  formatToUrlParam,
-} from "../common/store/componentParamReducer";
 import InputWithSuggester from "./InputWithSuggester";
-import { pageDefault } from "../common/constants";
-import {
-  borderRadius,
-  color,
-  fontColor,
-  padding,
-} from "../../styles/constants";
+import { border, borderRadius, color } from "../../styles/constants";
+import SearchbarButtonGroup, {
+  SearchbarButtonNames,
+} from "./SearchbarButtonGroup";
+import useRedirectSearch from "../../hooks/useRedirectSearch";
+import useElementSize from "../../hooks/useElementSize";
 
-export const filterButtonWidth = 100;
-export const searchIconWidth = 44;
+interface ComplexTextSearchProps {
+  setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
+}
 
-const ComplexTextSearch = () => {
-  const navigate = useNavigate();
+const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
+  setShouldExpandSearchbar,
+}) => {
+  const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
+    SearchbarButtonNames.Filter
+  );
+
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
   // set the default value to false to allow user do search without typing anything
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
 
-  const redirectSearch = useCallback(() => {
-    const componentParam: ParameterState = getComponentState(store.getState());
-    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-      state: {
-        fromNavigate: true,
-        requireSearch: true,
-        referer: "ComplexTextSearch",
-      },
-    });
-  }, [navigate]);
+  const { ref, width: searchbarWidth } = useElementSize();
+
+  const redirectSearch = useRedirectSearch();
 
   const handleEnterPressed = useCallback(
     (
       event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
-      isSuggesterOpen: boolean
+      isSearchbarFocused: boolean
     ) => {
       // TODO: a more user-friendly way to execute 'enter' press function is to delay the search to wait for pendingSearch turn to true
       // instead of prevent user doing search if pendingSearch is false
       // considering the debounce (300ms) and fetchSuggesterOptions(quite fast according to experience with edge) is not very long
       // we may implement this later if gap is too big
-      if (event.key === "Enter" && !isSuggesterOpen && !pendingSearch) {
-        redirectSearch();
+      if (event.key === "Enter" && !isSearchbarFocused && !pendingSearch) {
+        redirectSearch("ComplexTextSearch");
       }
     },
     [pendingSearch, redirectSearch]
   );
 
-  const handleSearchClick = useCallback(() => {
-    if (!pendingSearch) redirectSearch();
-  }, [pendingSearch, redirectSearch]);
-
-  const handleFilterClick = useCallback(() => {
-    setShowFilters(true);
-  }, [setShowFilters]);
-
   return (
-    <Grid container spacing={1}>
-      <Grid item xs={10}>
-        <Paper
-          elevation={0}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            height: "100%",
-            borderRadius: borderRadius.small,
-          }}
-        >
-          <IconButton
-            sx={{ width: `${searchIconWidth}px`, p: padding.small }}
-            aria-label="search"
-          >
-            <SearchIcon />
-          </IconButton>
-          <InputWithSuggester
-            handleEnterPressed={handleEnterPressed}
-            setPendingSearch={setPendingSearch}
-          />
-          <Button
-            variant="text"
-            sx={{
-              height: "100%",
-              minWidth: `${filterButtonWidth}px`,
-              color: fontColor.blue.medium,
-              paddingX: padding.large,
-              backgroundColor: color.gray.xxLight,
-            }}
-            startIcon={<Tune />}
-            onClick={handleFilterClick}
-            data-testid={"filtersBtn"}
-          >
-            Filters
-          </Button>
-        </Paper>
-      </Grid>
-      <Grid
-        item
-        xs={2}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
+    <Box width="100%">
+      <Paper
+        ref={ref}
+        elevation={0}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+          border: `${border.xs} ${color.gray.extraLight}`,
+          borderRadius: borderRadius.small,
+        }}
       >
-        <Button
-          sx={{
-            color: grey["searchButtonText"],
-            backgroundColor: "#fff",
-            height: "100%",
-            borderRadius: borderRadius.small,
-            ":hover": {
-              backgroundColor: "#fff",
-            },
-          }}
-          fullWidth
-          onClick={handleSearchClick}
-        >
-          Search
-        </Button>
-      </Grid>
+        <InputWithSuggester
+          handleEnterPressed={handleEnterPressed}
+          setPendingSearch={setPendingSearch}
+          setActiveButton={setActiveButton}
+          setShouldExpandSearchbar={setShouldExpandSearchbar}
+          suggesterWidth={searchbarWidth}
+        />
+        <SearchbarButtonGroup
+          setShowFilters={setShowFilters}
+          pendingSearch={pendingSearch}
+          activeButton={activeButton}
+          setActiveButton={setActiveButton}
+        />
+      </Paper>
       <AdvanceFilters
         showFilters={showFilters}
         setShowFilters={setShowFilters}
       />
-    </Grid>
+    </Box>
   );
 };
 

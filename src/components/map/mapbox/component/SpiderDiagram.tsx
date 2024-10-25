@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import MapContext from "../MapContext";
-import { mergeWithDefaults } from "../../../common/utils";
 import { Feature, FeatureCollection, LineString, Point } from "geojson";
 import { createRoot } from "react-dom/client";
 import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
@@ -17,6 +16,7 @@ import SpatialExtents from "./SpatialExtents";
 import { LayersProps } from "../layers/Layers";
 import { TestHelper } from "../../../common/test/helper";
 import { MapDefaultConfig } from "../constants";
+import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 
 interface SpiderifiedClusterInfo {
   id: string;

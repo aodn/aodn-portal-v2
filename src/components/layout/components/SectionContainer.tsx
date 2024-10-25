@@ -27,9 +27,10 @@ const SectionContainer = ({
   >
     <Stack
       direction="column"
-      justifyContent="center"
-      alignItems="center"
+      gap={8}
       sx={{
+        justifyContent: "center",
+        alignItems: "center",
         minWidth: PAGE_CONTENT_MIN_WIDTH,
         width: PAGE_CONTENT_WIDTH,
         maxWidth: PAGE_CONTENT_MAX_WIDTH,
