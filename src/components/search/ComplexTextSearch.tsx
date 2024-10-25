@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { Dispatch, FC, useCallback, useState } from "react";
 import { Box, Paper } from "@mui/material";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
 import InputWithSuggester from "./InputWithSuggester";
@@ -9,7 +9,13 @@ import SearchbarButtonGroup, {
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
 
-const ComplexTextSearch = () => {
+interface ComplexTextSearchProps {
+  setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
+  setShouldExpandSearchbar,
+}) => {
   const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
     SearchbarButtonNames.Filter
   );
@@ -56,7 +62,8 @@ const ComplexTextSearch = () => {
           handleEnterPressed={handleEnterPressed}
           setPendingSearch={setPendingSearch}
           setActiveButton={setActiveButton}
-          searchbarWidth={searchbarWidth}
+          setShouldExpandSearchbar={setShouldExpandSearchbar}
+          suggesterWidth={searchbarWidth}
         />
         <SearchbarButtonGroup
           setShowFilters={setShowFilters}

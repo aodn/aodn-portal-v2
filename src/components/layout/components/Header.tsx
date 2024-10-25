@@ -1,6 +1,5 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 import { color, padding } from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
@@ -10,17 +9,17 @@ import MainMenu from "./MainMenu";
 import { pageDefault } from "../../common/constants";
 import ComplexTextSearch from "../../search/ComplexTextSearch";
 import { PAGE_CONTENT_MAX_WIDTH, PAGE_CONTENT_WIDTH } from "../constant";
-import { getSearchbarExpanded } from "../../common/store/store";
-import { SEARCHBAR_EXPAND_WIDTH } from "../../search/constants";
+import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
 
 const Header: FC = () => {
   const path = useLocation().pathname;
   const isSearchResultPage = path === pageDefault.search;
 
-  const shouldExpandSearchbar = useSelector(getSearchbarExpanded);
+  const [shouldExpandSearchbar, setShouldExpandSearchbar] =
+    useState<boolean>(false);
 
   return (
-    <>
+    <Box>
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: color.blue.xLight,
@@ -50,28 +49,25 @@ const Header: FC = () => {
 
         {/* Main menu just for display, will implement later once design is finished */}
         {isSearchResultPage ? (
-          shouldExpandSearchbar ? (
-            <Box
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-              gap={2}
-              minWidth={SEARCHBAR_EXPAND_WIDTH}
-            >
-              <MainMenu isCollapsed />
-              <ComplexTextSearch />
-            </Box>
-          ) : (
-            <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
-              <MainMenu />
-              <ComplexTextSearch />
-            </Box>
-          )
+          <Box
+            display="flex"
+            flexDirection="row"
+            alignItems="center"
+            gap={2}
+            minWidth={
+              shouldExpandSearchbar ? SEARCHBAR_EXPANSION_WIDTH : "none"
+            }
+          >
+            <MainMenu isCollapsed={shouldExpandSearchbar} />
+            <ComplexTextSearch
+              setShouldExpandSearchbar={setShouldExpandSearchbar}
+            />
+          </Box>
         ) : (
           <MainMenu />
         )}
       </SectionContainer>
-    </>
+    </Box>
   );
 };
 

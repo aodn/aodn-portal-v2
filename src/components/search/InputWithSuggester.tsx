@@ -24,7 +24,6 @@ import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "../common/store/hooks";
 import { TEXT_FIELD_MIN_WIDTH } from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
-import { updateSearchbarExpansion } from "../common/store/SearchbarReducer";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -33,7 +32,8 @@ interface InputWithSuggesterProps {
   ) => void;
   setPendingSearch?: React.Dispatch<React.SetStateAction<boolean>>;
   setActiveButton?: Dispatch<React.SetStateAction<SearchbarButtonNames>>;
-  searchbarWidth?: number;
+  setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
+  suggesterWidth?: number;
 }
 
 // TODO: Try to only use these two classes inside this file to maintain high cohesion.
@@ -60,7 +60,8 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
   setPendingSearch = () => {},
   setActiveButton = () => {},
-  searchbarWidth = 0,
+  setShouldExpandSearchbar = () => {},
+  suggesterWidth = 0,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -177,15 +178,15 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     }
   };
 
-  // Listen to isSearchbarActive | searchInput.length to update SearchbarExpansion state in redux
+  // Listen to isSearchbarActive | searchInput.length to update shouldExpandSearchbar with Header
   // Searchbar will keep expanded if searchbar is active or there exists a text input
   useEffect(() => {
     if (isSearchbarActive || (searchInput && searchInput.length > 0)) {
-      dispatch(updateSearchbarExpansion(true));
+      setShouldExpandSearchbar(true);
     } else {
-      dispatch(updateSearchbarExpansion(false));
+      setShouldExpandSearchbar(false);
     }
-  }, [dispatch, isSearchbarActive, searchInput]);
+  }, [isSearchbarActive, searchInput, setShouldExpandSearchbar]);
 
   // Input suggester popper
   const CustomPopper = (props: any): ReactNode => {
@@ -206,7 +207,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           },
         ]}
         style={{
-          width: searchbarWidth,
+          width: suggesterWidth,
         }}
       />
     );

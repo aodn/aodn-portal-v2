@@ -7,7 +7,6 @@ const useTabNavigation = () => {
 
   return useCallback(
     (uuid: string, tab: string, section?: string) => {
-      console.log("is called navi,tab=", tab);
       const searchParams = new URLSearchParams();
 
       // Add uuid parameter
