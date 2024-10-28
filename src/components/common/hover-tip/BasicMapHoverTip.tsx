@@ -12,6 +12,7 @@ export interface BasicMapHoverTipProps {
   content?: string | undefined | null;
   sx?: SxProps;
   onDatasetSelected?: () => void;
+  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
 }
 
 const BasicMapHoverTip: FC<BasicMapHoverTipProps> = ({

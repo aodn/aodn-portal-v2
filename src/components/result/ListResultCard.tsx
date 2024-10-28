@@ -42,6 +42,10 @@ const ListResultCard: FC<ListResultCardProps> = ({
   if (!content) return;
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
 
+  const onLinks = () => goToDetailPage(uuid, "links");
+  const onDownload = () => goToDetailPage(uuid, "abstract", "download-section");
+  const onDetail = () => goToDetailPage(uuid, "abstract");
+
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card
@@ -120,7 +124,13 @@ const ListResultCard: FC<ListResultCardProps> = ({
           </Typography>
         </CardActionArea>
         {(isSelectedDataset || showButtons) && (
-          <ResultCardButtonGroup content={content} shouldHideText />
+          <ResultCardButtonGroup
+            content={content}
+            shouldHideText
+            onLinks={onLinks}
+            onDownload={onDownload}
+            onDetail={onDetail}
+          />
         )}
       </Box>
 
