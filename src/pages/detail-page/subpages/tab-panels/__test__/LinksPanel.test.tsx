@@ -51,19 +51,16 @@ describe("LinksPanel", async () => {
     );
   });
 
-  test("should render LinksPanel", async () => {
-    await waitFor(() => {
-      expect(screen.queryAllByText("Data access using R")).to.exist;
-      expect(
-        screen.queryAllByText("Marine Weather Observations for Davies Reef")
-      ).to.exist;
-      expect(screen.queryAllByText("Data access via AODN Portal")).to.exist;
-      expect(screen.queryAllByText("Data access via Programming API")).to.exist;
-    });
+  test("should render LinksPanel", () => {
+    expect(screen.queryAllByText("Data access using R")).to.exist;
+    expect(screen.queryAllByText("Marine Weather Observations for Davies Reef"))
+      .to.exist;
+    expect(screen.queryAllByText("Data access via AODN Portal")).to.exist;
+    expect(screen.queryAllByText("Data access via Programming API")).to.exist;
   });
 
-  test("should show COPY LINK button when on hover", async () => {
-    await waitFor(() => {
+  test("should show COPY LINK button when on hover", () => {
+    waitFor(() => screen.findByText("Data access using R")).then(() => {
       const link = screen.queryByText("Data access using R");
       expect(link).to.exist;
       userEvent.hover(link!);
