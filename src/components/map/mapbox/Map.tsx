@@ -161,11 +161,7 @@ const ReactMap = ({
   useEffect(() => {
     // The map center is use to set the initial center point, however we may need
     // to set to other place, for example if the user pass the url to someone
-    bbox &&
-      map &&
-      map.setCenter(
-        new LngLatBounds(bbox as [number, number, number, number]).getCenter()
-      );
+    bbox && map && map.fitBounds(bbox);
   }, [bbox, map]);
 
   return (
