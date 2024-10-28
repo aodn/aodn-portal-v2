@@ -14,6 +14,7 @@ export interface LayersProps {
   // dataset that user selected from result list or map
   selectedUuids?: string[];
   showFullMap?: boolean;
+  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
 }
 // Use to create static layer on map, you need to add menu item to select those layers,
 // refer to map section
