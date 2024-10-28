@@ -263,9 +263,10 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       sx={{
         ".MuiOutlinedInput-root": { padding: 0, paddingLeft: padding.small },
 
-        // Keep the clear text button 'X' always visible
+        // Keep the clear text button 'X' visible when there exists text input
         "& .MuiAutocomplete-clearIndicator": {
-          visibility: "visible",
+          visibility:
+            searchInput && searchInput.length > 0 ? "visible" : "hidden",
         },
       }}
       renderInput={(params) => (
