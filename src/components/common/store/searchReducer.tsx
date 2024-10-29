@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
-import { Vocab, ParameterState } from "./componentParamReducer";
+import { ParameterState, Vocab } from "./componentParamReducer";
 
 import {
-  ParameterVocabsIn,
   cqlDefaultFilters,
+  ParameterVocabsIn,
   PolygonOperation,
   TemporalAfterOrBefore,
   TemporalDuring,
@@ -16,7 +16,7 @@ import {
   ErrorResponse,
 } from "../../../utils/ErrorBoundary";
 import { mergeWithDefaults } from "../utils";
-import { Dataset, IFeatureGeoJson } from "./DatasetDefinitions";
+import { FeatureCollection, Point } from "geojson";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -241,13 +241,14 @@ const fetchResultByUuidNoStore = createAsyncThunk<
 );
 
 const fetchDatasetByUuid = createAsyncThunk<
-  Dataset,
+  FeatureCollection<Point>,
   string,
   { rejectValue: ErrorResponse }
 >("search/fetchDatasetByUuid", async (id: string, thunkApi: any) =>
   axios
-    .get<IFeatureGeoJson>(`/api/v1/ogc/collections/${id}/items/dataset`)
-    .then((response) => new Dataset(response.data))
+    .get<FeatureCollection<Point>>(`/api/v1/ogc/collections/${id}/items`)
+    // .then((response) => new Dataset(response.data))
+    .then((response) => response.data)
     .catch(errorHandling(thunkApi))
 );
 
