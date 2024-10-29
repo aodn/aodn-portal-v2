@@ -1,6 +1,7 @@
 export const MapDefaultConfig = {
   // Magic number, try and error by experience
   DEBOUNCE_BEFORE_EVENT_FIRE: 700,
+  ZOOM: 4,
   MIN_ZOOM: 1,
   MAX_ZOOM: 12,
   PROJECTION: "equirectangular",

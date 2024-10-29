@@ -15,7 +15,6 @@ const SnackbarLoader: React.FC<SnackbarLoaderProps> = ({
     <Snackbar
       open={isLoading}
       anchorOrigin={{ vertical: "top", horizontal: "left" }}
-      // message={"Loading"}
       sx={{
         ml: theme.mp.xxlg,
         position: "absolute",

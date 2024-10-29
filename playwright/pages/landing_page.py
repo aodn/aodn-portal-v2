@@ -11,4 +11,4 @@ class LandingPage(BasePage):
         self.search = SearchComponent(page)
 
     def load(self) -> None:
-        self.page.goto(settings.baseURL, timeout=90 * 1000)
+        self.page.goto(settings.baseURL, wait_until='domcontentloaded')

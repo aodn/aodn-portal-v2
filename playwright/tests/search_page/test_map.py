@@ -128,6 +128,8 @@ def test_map_base_layers(
     layer_id = layer_factory.get_layer_id(layer_type)
     assert search_page.map.is_map_layer_visible(layer_id) is True
 
+    if not search_page.get_text(layer_text).is_visible():
+        search_page.map.basemap_show_hide_menu.click()
     search_page.click_text(layer_text)
     assert search_page.map.is_map_layer_visible(layer_id) is False
 
