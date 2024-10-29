@@ -138,13 +138,14 @@ const DetailClusterLayer: FC<DetailClusterProps> = ({
   useEffect(() => {
     if (bbox && map && isValid(bbox)) {
       map.fitBounds(bbox, {
-        padding: 20,
-        maxZoom: 15,
+        maxZoom: 2,
+        padding: 100,
       });
     }
   }, [bbox, map]);
 
   useEffect(() => {
+    if (!features.features || features.features.length === 0) return;
     const bbox = turf.bbox(features) as [number, number, number, number];
     setBbox(bbox);
   }, [features]);
