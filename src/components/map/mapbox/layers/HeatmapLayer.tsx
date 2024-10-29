@@ -110,6 +110,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   selectedUuids,
   showFullMap,
   onDatasetSelected,
+  tabNavigation,
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
@@ -337,6 +338,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         layerId={unClusterPointLayer}
         popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
+        tabNavigation={tabNavigation}
       />
       <SpatialExtents
         layerId={unClusterPointLayer}
@@ -350,6 +352,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         unclusterPointLayer={unClusterPointLayer}
         onDatasetSelected={onDatasetSelected}
         showFullMap={showFullMap}
+        tabNavigation={tabNavigation}
       />
       <TestHelper getHeatmapLayer={() => heatmapLayer} />
     </>

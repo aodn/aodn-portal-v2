@@ -32,6 +32,7 @@ interface MapPopupProps {
   layerId: string;
   popupType?: PopupType;
   onDatasetSelected?: (uuid: Array<string>) => void;
+  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
 }
 export interface MapPopupRef {
   forceRemovePopup: () => void;
@@ -97,7 +98,7 @@ const handleDatasetSelect = (
 };
 
 const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  { layerId, onDatasetSelected, popupType = PopupType.Basic },
+  { layerId, onDatasetSelected, tabNavigation, popupType = PopupType.Basic },
   ref
 ) => {
   const dispatch = useAppDispatch();
@@ -165,6 +166,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
                   onDatasetSelected={() =>
                     handleDatasetSelect(collection.id, onDatasetSelected)
                   }
+                  tabNavigation={tabNavigation}
                 />
               )}
             </CardContent>
@@ -172,7 +174,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         </ThemeProvider>
       );
     },
-    [onDatasetSelected, popupHeight, popupType, popupWidth]
+    [onDatasetSelected, popupHeight, popupType, popupWidth, tabNavigation]
   );
 
   const removePopup = useCallback(() => {
