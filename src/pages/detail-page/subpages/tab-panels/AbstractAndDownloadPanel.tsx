@@ -42,7 +42,7 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
-import ClusterLayer from "../../../../components/map/mapbox/layers/ClusterLayer";
+import DetailCluster from "../../../../components/map/mapbox/layers/DetailCluster";
 
 interface DownloadSelect {
   label?: string;
@@ -208,9 +208,9 @@ const AbstractAndDownloadPanel: FC = () => {
                     />
                   </Controls>
                   <Layers>
-                    {/*<GeojsonLayer collection={collection} />*/}
-                    {/*{createStaticLayers(staticLayer)}*/}
-                    <ClusterLayer />
+                    {/*TODO: keep the below comment as it will be useful later*/}
+                    {/*<DetailHeatMap features={dataset} />*/}
+                    <DetailCluster features={dataset} />
                   </Layers>
                 </Map>
               </Box>

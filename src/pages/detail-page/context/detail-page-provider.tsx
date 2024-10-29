@@ -8,7 +8,7 @@ import { DetailPageContext, SpatialExtentPhoto } from "./detail-page-context";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../components/common/store/hooks";
 import { HttpStatusCode } from "axios";
-import { Dataset } from "../../../components/common/store/DatasetDefinitions";
+import { FeatureCollection, Point } from "geojson";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -22,7 +22,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
-  const [dataset, setDataset] = useState<Dataset | undefined>(undefined);
+  const [dataset, setDataset] = useState<FeatureCollection<Point> | undefined>(
+    undefined
+  );
   const [isCollectionNotFound, setIsCollectionNotFound] =
     useState<boolean>(false);
   const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
