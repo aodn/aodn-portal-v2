@@ -4,7 +4,7 @@
 const gap = {
   xs: "1px",
   sm: "2px",
-  md: "5px",
+  md: "4px",
   lg: "8px",
   xlg: "10px",
   xxlg: "15px",

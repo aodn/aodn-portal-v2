@@ -13,6 +13,10 @@ from pages.search_page import SearchPage
     ],
 )
 def test_tab_panel_scroll(page_mock: Page, title: str) -> None:
+    # Precondition: Tab panel should have scroll buttons
+    # Set a smaller browser window size to make the tabs scrollable
+    page_mock.set_viewport_size({'width': 1000, 'height': 800})
+
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
     detail_page = DetailPage(page_mock)

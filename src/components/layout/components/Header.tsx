@@ -1,27 +1,38 @@
-import { FC } from "react";
+import { FC, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { Box } from "@mui/material";
 import { color, padding } from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
-import { Box } from "@mui/material";
 import HeaderMenu from "./HeaderMenu";
+import MainMenu from "./MainMenu";
+import { pageDefault } from "../../common/constants";
+import ComplexTextSearch from "../../search/ComplexTextSearch";
+import { PAGE_CONTENT_MAX_WIDTH, PAGE_CONTENT_WIDTH } from "../constant";
+import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
 
 const Header: FC = () => {
+  const path = useLocation().pathname;
+  const isSearchResultPage = path === pageDefault.search;
+
+  const [shouldExpandSearchbar, setShouldExpandSearchbar] =
+    useState<boolean>(false);
+
   return (
-    <>
+    <Box>
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: color.blue.xLight,
         }}
+        contentAreaStyle={{
+          alignItems: "end",
+          width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH,
+          maxWidth: isSearchResultPage ? "90%" : PAGE_CONTENT_MAX_WIDTH,
+        }}
       >
-        <Box
-          display="flex"
-          justifyContent="end"
-          alignItems="center"
-          width="100%"
-        >
-          <HeaderMenu />
-        </Box>
+        <HeaderMenu />
       </SectionContainer>
+
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: "#fff",
@@ -30,13 +41,33 @@ const Header: FC = () => {
         contentAreaStyle={{
           flexDirection: "row",
           justifyContent: "space-between",
+          width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH,
+          maxWidth: isSearchResultPage ? "90%" : PAGE_CONTENT_MAX_WIDTH,
         }}
       >
         <AODNSiteLogo />
-        {/* disable the MainMenu for demo, will implement later once design is finished */}
-        {/* <MainMenu /> */}
+
+        {/* Main menu just for display, will implement later once design is finished */}
+        {isSearchResultPage ? (
+          <Box
+            display="flex"
+            flexDirection="row"
+            alignItems="center"
+            gap={2}
+            minWidth={
+              shouldExpandSearchbar ? SEARCHBAR_EXPANSION_WIDTH : "none"
+            }
+          >
+            <MainMenu isCollapsed={shouldExpandSearchbar} />
+            <ComplexTextSearch
+              setShouldExpandSearchbar={setShouldExpandSearchbar}
+            />
+          </Box>
+        ) : (
+          <MainMenu />
+        )}
       </SectionContainer>
-    </>
+    </Box>
   );
 };
 

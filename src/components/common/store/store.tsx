@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import searchReducer from "./searchReducer";
 import { logger } from "redux-logger";
+import searchReducer from "./searchReducer";
 import paramReducer from "./componentParamReducer";
 
 // https://stackoverflow.com/questions/69502147/changing-from-redux-to-redux-toolkit

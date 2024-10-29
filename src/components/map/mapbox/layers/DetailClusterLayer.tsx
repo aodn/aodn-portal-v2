@@ -1,4 +1,11 @@
-import { FC, useCallback, useContext, useEffect, useMemo } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 import { GeoJSONSource } from "mapbox-gl";
 import {
@@ -7,12 +14,13 @@ import {
   findSuitableVisiblePoint,
   LayersProps,
 } from "./Layers";
-import { mergeWithDefaults } from "../../../common/utils";
+import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { Feature, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { generateFeatureCollectiionFrom } from "../../../../utils/GeoJsonUtils";
+import * as turf from "@turf/turf";
 
 interface DetailClusterSize {
   default?: number | string;
@@ -88,13 +96,17 @@ export const getClusterLayerId = (layerId: string) => `${layerId}-clusters`;
 export const getUnclusterPointId = (layerId: string) =>
   `${layerId}-unclustered-point`;
 
-const DetailCluster: FC<DetailClusterProps> = ({
+// TODO: This file is copy & paste from the clusterLayer file. It should be simplified later
+const DetailClusterLayer: FC<DetailClusterProps> = ({
   features = generateFeatureCollectiionFrom(undefined),
   selectedUuids,
   onDatasetSelected,
   clusterLayerConfig,
   showFullMap,
 }) => {
+  const [bbox, setBbox] = useState<
+    [number, number, number, number] | undefined
+  >(undefined);
   const { map } = useContext(MapContext);
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
@@ -107,6 +119,35 @@ const DetailCluster: FC<DetailClusterProps> = ({
     () => getUnclusterPointId(layerId),
     [layerId]
   );
+
+  const isValid = (bbox: [number, number, number, number]) => {
+    // lat and lon are in the range of -90 to 90 and -180 to 180 respectively
+    const [minLon, minLat, maxLon, maxLat] = bbox;
+    return (
+      minLon >= -180 &&
+      minLon <= 180 &&
+      minLat >= -90 &&
+      minLat <= 90 &&
+      maxLon >= -180 &&
+      maxLon <= 180 &&
+      maxLat >= -90 &&
+      maxLat <= 90
+    );
+  };
+
+  useEffect(() => {
+    if (bbox && map && isValid(bbox)) {
+      map.fitBounds(bbox, {
+        padding: 20,
+        maxZoom: 15,
+      });
+    }
+  }, [bbox, map]);
+
+  useEffect(() => {
+    const bbox = turf.bbox(features) as [number, number, number, number];
+    setBbox(bbox);
+  }, [features]);
 
   // This is used to render the cluster circle and add event handle to circles
   useEffect(() => {
@@ -263,4 +304,4 @@ const DetailCluster: FC<DetailClusterProps> = ({
   );
 };
 
-export default DetailCluster;
+export default DetailClusterLayer;

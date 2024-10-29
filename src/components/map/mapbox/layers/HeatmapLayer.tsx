@@ -10,19 +10,19 @@ import MapContext from "../MapContext";
 
 import { Expression, GeoJSONSource, StyleFunction } from "mapbox-gl";
 import {
-  LayersProps,
-  createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
+  LayersProps,
 } from "./Layers";
-import { mergeWithDefaults } from "../../../common/utils";
 import MapPopup, { PopupType } from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
-import { FeatureCollection, Point } from "geojson";
+import { Feature, FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
+import { generateFeatureCollectiionFrom } from "../../../../utils/GeoJsonUtils";
+import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 
 interface IHeatmapLayer {
   maxZoom: number;
@@ -106,14 +106,15 @@ const getUnclusterPointLayerId = (layerId: string) =>
   `${layerId}-uncluster-point-layer`;
 
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
-  collections,
+  features = generateFeatureCollectiionFrom(undefined),
   selectedUuids,
   showFullMap,
   onDatasetSelected,
+  tabNavigation,
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
-  const [lastVisiblePoint, setLastVisiblePoint] = useState<
+  const [_, setLastVisiblePoint] = useState<
     FeatureCollection<Point> | undefined
   >(undefined);
 
@@ -141,7 +142,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
       const dataSource = findSuitableVisiblePoint(
-        createCenterOfMassDataSource(undefined),
+        {
+          type: "FeatureCollection",
+          features: new Array<Feature<Point>>(),
+        },
         map
       );
 
@@ -308,11 +312,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   const updateSource = useCallback(() => {
     setLastVisiblePoint((p) => {
-      const newData = findSuitableVisiblePoint(
-        createCenterOfMassDataSource(collections),
-        map,
-        p
-      );
+      const newData = findSuitableVisiblePoint(features, map, p);
       if (map?.getSource(heatmapSourceId)) {
         (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
       }
@@ -321,7 +321,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       }
       return newData;
     });
-  }, [map, heatmapSourceId, clusterSourceId, collections]);
+  }, [features, map, heatmapSourceId, clusterSourceId]);
 
   useEffect(() => {
     updateSource();
@@ -337,6 +337,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         layerId={unClusterPointLayer}
         popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
+        tabNavigation={tabNavigation}
       />
       <SpatialExtents
         layerId={unClusterPointLayer}
@@ -350,6 +351,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         unclusterPointLayer={unClusterPointLayer}
         onDatasetSelected={onDatasetSelected}
         showFullMap={showFullMap}
+        tabNavigation={tabNavigation}
       />
       <TestHelper getHeatmapLayer={() => heatmapLayer} />
     </>

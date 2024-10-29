@@ -26,8 +26,8 @@ import {
 } from "../../components/common/store/componentParamReducer";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import store, { getComponentState } from "../../components/common/store/store";
-import { pageDefault } from "../../components/common/constants";
 import { useNavigate } from "react-router-dom";
+import { pageDefault } from "../../components/common/constants";
 
 const LandingPage: FC = () => {
   const dispatch = useAppDispatch();

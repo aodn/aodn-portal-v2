@@ -28,8 +28,8 @@ import {
   ParameterState,
   formatToUrlParam,
 } from "../../../components/common/store/componentParamReducer";
-import { pageDefault } from "../../../components/common/constants";
 import OrganizationLogo from "../../../components/logo/OrganizationLogo";
+import { pageDefault } from "../../../components/common/constants";
 
 interface ButtonWithIcon {
   label: string;

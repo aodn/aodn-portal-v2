@@ -15,8 +15,8 @@ import {
   createErrorResponse,
   ErrorResponse,
 } from "../../../utils/ErrorBoundary";
-import { mergeWithDefaults } from "../utils";
 import { FeatureCollection, Point } from "geojson";
+import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",

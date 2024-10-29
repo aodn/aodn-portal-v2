@@ -5,7 +5,7 @@ from core.enums.layer_type import LayerType
 from core.factories.layer import LayerFactory
 from mocks.api.collections import (
     handle_collections_update_all_api,
-    handle_collections_update_bbox_api,
+    handle_collections_update_centroid_api,
 )
 from mocks.api_router import ApiRouter
 from pages.js_scripts.js_utils import execute_js
@@ -26,7 +26,8 @@ def test_map_drag_updates_search_results(page_mock: Page) -> None:
 
     # Change api route to get updated response after the map drag event
     api_router.route_collection(
-        handle_collections_update_bbox_api, handle_collections_update_all_api
+        handle_collections_update_centroid_api,
+        handle_collections_update_all_api,
     )
     search_page.map.drag_map()
     search_page.wait_for_updated_search_result()
@@ -85,7 +86,8 @@ def test_map_updates_on_search_change(
 
     # Change api route to get updated response after search action
     api_router.route_collection(
-        handle_collections_update_bbox_api, handle_collections_update_all_api
+        handle_collections_update_centroid_api,
+        handle_collections_update_all_api,
     )
     search_page.search.fill_search_text(updated_search_text)
     search_page.search.click_search_button()

@@ -15,11 +15,12 @@ import {
   findSuitableVisiblePoint,
   LayersProps,
 } from "./Layers";
-import { mergeWithDefaults } from "../../../common/utils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
+import { TestHelper } from "../../../common/test/helper";
 import { Feature, FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
+import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import { generateFeatureCollectiionFrom } from "../../../../utils/GeoJsonUtils";
 
 interface ClusterSize {
@@ -100,6 +101,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   features = generateFeatureCollectiionFrom(undefined),
   selectedUuids,
   onDatasetSelected,
+  tabNavigation,
   clusterLayerConfig,
   showFullMap,
 }: ClusterLayerProps) => {
@@ -282,6 +284,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         layerId={unclusterPointLayer}
         popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
+        tabNavigation={tabNavigation}
       />
       <SpatialExtents
         layerId={unclusterPointLayer}
@@ -295,7 +298,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer={unclusterPointLayer}
         onDatasetSelected={onDatasetSelected}
         showFullMap={showFullMap}
+        tabNavigation={tabNavigation}
       />
+      <TestHelper getHeatmapLayer={() => clusterLayer} />
     </>
   );
 };

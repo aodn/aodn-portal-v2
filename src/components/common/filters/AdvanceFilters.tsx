@@ -1,9 +1,9 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import {
   ParameterState,
-  updateParameterVocabs,
   updateDateTimeFilterRange,
   updateImosOnly,
+  updateParameterVocabs,
   updateUpdateFreq,
 } from "../store/componentParamReducer";
 import store, { getComponentState } from "../store/store";

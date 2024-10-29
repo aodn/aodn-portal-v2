@@ -42,7 +42,7 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
-import DetailCluster from "../../../../components/map/mapbox/layers/DetailCluster";
+import DetailClusterLayer from "../../../../components/map/mapbox/layers/DetailClusterLayer";
 
 interface DownloadSelect {
   label?: string;
@@ -210,7 +210,7 @@ const AbstractAndDownloadPanel: FC = () => {
                   <Layers>
                     {/*TODO: keep the below comment as it will be useful later*/}
                     {/*<DetailHeatMap features={dataset} />*/}
-                    <DetailCluster features={dataset} />
+                    <DetailClusterLayer features={dataset} />
                   </Layers>
                 </Map>
               </Box>

@@ -9,12 +9,14 @@ import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import ResultCardButton from "../common/buttons/ResultCardButton";
 import { color } from "../../styles/constants";
-import useTabNavigation from "../../hooks/useTabNavigation";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
   isGridView?: boolean;
   shouldHideText?: boolean;
+  onLinks?: () => void;
+  onDownload?: () => void;
+  onDetail?: () => void;
 }
 
 interface ButtonContainerProps {
@@ -74,9 +76,10 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
   isGridView,
   shouldHideText = false,
+  onLinks = () => {},
+  onDownload = () => {},
+  onDetail = () => {},
 }) => {
-  const goToDetailPanel = useTabNavigation();
-
   const ButtonContainer: FC<ButtonContainerProps> = ({ children, sx }) => (
     <Grid
       item
@@ -104,7 +107,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
             startIcon={LinkIcon}
             text={generateLinkText(links.length)}
             shouldHideText={shouldHideText}
-            onClick={() => goToDetailPanel(content.id, "links")}
+            onClick={onLinks}
             resultCardButtonConfig={{
               color: links.length > 0 ? color.blue.dark : color.gray.light,
             }}
@@ -117,9 +120,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={DownloadIcon}
           text="Download"
           shouldHideText={shouldHideText}
-          onClick={() =>
-            goToDetailPanel(content.id, "abstract", "download-section")
-          }
+          onClick={onDownload}
         />
       </ButtonContainer>
       <ButtonContainer>
@@ -127,7 +128,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={InfoIcon}
           text="More details ..."
           shouldHideText={shouldHideText}
-          onClick={() => goToDetailPanel(content.id, "abstract")}
+          onClick={onDetail}
         />
       </ButtonContainer>
     </Grid>
