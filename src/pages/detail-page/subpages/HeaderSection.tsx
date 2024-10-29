@@ -30,6 +30,7 @@ import {
 } from "../../../components/common/store/componentParamReducer";
 import OrganizationLogo from "../../../components/logo/OrganizationLogo";
 import { pageDefault } from "../../../components/common/constants";
+import useRedirectSearch from "../../../hooks/useRedirectSearch";
 
 interface ButtonWithIcon {
   label: string;
@@ -54,21 +55,14 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
 };
 
 const HeaderSection = () => {
-  const navigate = useNavigate();
   const { collection } = useDetailPageContext();
   const title = collection?.title;
+  const redirectSearch = useRedirectSearch();
 
   // TODO: on click user goes back to search page where has results based on previous search params
   const onGoBack = useCallback(() => {
-    const componentParam: ParameterState = getComponentState(store.getState());
-    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-      state: {
-        fromNavigate: true,
-        requireSearch: true,
-        referer: "HeaderSection",
-      },
-    });
-  }, [navigate]);
+    redirectSearch("HeaderSection", true, false);
+  }, [redirectSearch]);
 
   // TODO: implement the goNext and goPrevious function
   // This will require the entire search results (their ids and indexes) based on search params

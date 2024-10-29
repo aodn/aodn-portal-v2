@@ -9,13 +9,17 @@ import store, { getComponentState } from "../components/common/store/store";
 const useRedirectSearch = () => {
   const navigate = useNavigate();
 
-  const redirectSearch = (referer: string) => {
+  const redirectSearch = (
+    referer: string,
+    fromNavigate: boolean = true,
+    requireSearch: boolean = true
+  ) => {
     const componentParam: ParameterState = getComponentState(store.getState());
     navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
       state: {
-        fromNavigate: true,
-        requireSearch: true,
-        referer,
+        fromNavigate: fromNavigate,
+        requireSearch: requireSearch,
+        referer: referer,
       },
     });
   };

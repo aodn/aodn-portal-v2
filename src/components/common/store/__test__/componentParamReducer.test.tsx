@@ -6,6 +6,7 @@ import {
 } from "../componentParamReducer";
 
 import { bboxPolygon } from "@turf/turf";
+import { MapDefaultConfig } from "../../../map/mapbox/constants";
 
 describe("Component Reducer Function Test", () => {
   it("Verify formatToUrlParam", () => {
@@ -97,6 +98,7 @@ describe("Component Reducer Function Test", () => {
       isImosOnlyDataset: false,
       dateTimeFilterRange: {},
       searchText: "",
+      zoom: MapDefaultConfig.ZOOM,
     };
 
     const answer1: string = formatToUrlParam(sample1);
@@ -111,6 +113,7 @@ describe("Component Reducer Function Test", () => {
         end: 45697,
       },
       searchText: "This is test",
+      zoom: MapDefaultConfig.ZOOM,
       parameterVocabs: [
         {
           label: "cat1",
@@ -132,6 +135,7 @@ describe("Component Reducer Function Test", () => {
         end: 45697,
       },
       searchText: "This is test",
+      zoom: 3,
       parameterVocabs: [
         {
           label: "cat1",

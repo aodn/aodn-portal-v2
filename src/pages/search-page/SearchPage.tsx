@@ -46,6 +46,8 @@ import {
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
 
+const REFERER = "SEARCH_PAGE";
+
 const isLoading = (count: number): boolean => {
   if (count > 0) {
     return true;
@@ -142,6 +144,27 @@ const SearchPage = () => {
     [getCollectionsData]
   );
 
+  const doMapSearch = useCallback(() => {
+    const componentParam: ParameterState = getComponentState(store.getState());
+
+    // Use a different parameter so that it return id and bbox only and do not store the values,
+    // we cannot add page because we want to show all record on map
+    const paramNonPaged = createSearchParamFrom(componentParam);
+    return dispatch(
+      // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+      // and ordered by uuid to avoid affecting cluster calculation
+      fetchResultNoStore({
+        ...paramNonPaged,
+        properties: "id,centroid",
+        sortby: "id",
+      })
+    )
+      .unwrap()
+      .then((collections) => {
+        setLayers(collections.collections);
+      });
+  }, [dispatch]);
+
   const doSearch = useCallback(
     (needNavigate: boolean = true) => {
       startOneLoadingThread();
@@ -155,43 +178,33 @@ const SearchPage = () => {
         pagesize: DEFAULT_SEARCH_PAGE,
       });
 
-      dispatch(fetchResultWithStore(paramPaged)).then(() => {
-        // Use a different parameter so that it return id and bbox only and do not store the values,
-        // we cannot add page because we want to show all record on map
-        const paramNonPaged = createSearchParamFrom(componentParam);
-        dispatch(
-          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
-          // and ordered by uuid to avoid affecting cluster calculation
-          fetchResultNoStore({
-            ...paramNonPaged,
-            properties: "id,centroid",
-            sortby: "id",
-          })
-        )
-          .unwrap()
-          .then((collections) => {
-            setLayers(collections.collections);
-          })
-          .then(() => {
-            if (needNavigate) {
-              navigate(
-                pageDefault.search + "?" + formatToUrlParam(componentParam),
-                {
-                  state: {
-                    fromNavigate: true,
-                    requireSearch: false,
-                    referer: "SearchPage",
-                  },
-                }
-              );
-            }
-          })
-          .finally(() => {
-            endOneLoadingThread();
-          });
-      });
+      dispatch(fetchResultWithStore(paramPaged));
+      doMapSearch()
+        .then(() => {
+          if (needNavigate) {
+            navigate(
+              pageDefault.search + "?" + formatToUrlParam(componentParam),
+              {
+                state: {
+                  fromNavigate: true,
+                  requireSearch: false,
+                  referer: REFERER,
+                },
+              }
+            );
+          }
+        })
+        .finally(() => {
+          endOneLoadingThread();
+        });
     },
-    [startOneLoadingThread, dispatch, navigate, endOneLoadingThread]
+    [
+      startOneLoadingThread,
+      endOneLoadingThread,
+      doMapSearch,
+      dispatch,
+      navigate,
+    ]
   );
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
@@ -253,8 +266,25 @@ const SearchPage = () => {
         // but do not navigate again.
         doSearch(false);
       }
+      // If it is navigate from this component, and no need to search, that
+      // mean we already call doSearch() + doMapSearch(), however if you
+      // come from other page, the result list is good because we remember it
+      // but the map need init again and therefore need to do a doMapSearch()
+      else if (location.state?.referer !== REFERER) {
+        const componentParam: ParameterState = getComponentState(
+          store.getState()
+        );
+        setBbox(
+          new LngLatBounds(
+            componentParam.polygon?.bbox as [number, number, number, number]
+          )
+        );
+        setZoom(componentParam.zoom);
+
+        doMapSearch();
+      }
     }
-  }, [location, dispatch, doSearch]);
+  }, [location, dispatch, doSearch, doMapSearch]);
 
   const onChangeSorting = useCallback(
     (v: SortResultEnum) => {
