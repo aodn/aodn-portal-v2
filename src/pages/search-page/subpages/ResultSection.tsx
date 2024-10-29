@@ -61,7 +61,7 @@ const ResultSection: FC<ResultSectionProps> = ({
       <Box
         sx={{
           width: RESULT_SECTION_WIDTH,
-          height: "80vh",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           position: "relative",
