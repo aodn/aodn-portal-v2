@@ -4,7 +4,7 @@ from playwright.sync_api import Page, expect
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-@pytest.mark.skip(reason="Skipping this test because of timeout issue")
+
 def test_map_expand_toggle(page_mock: Page) -> None:
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
@@ -26,8 +26,6 @@ def test_map_expand_toggle(page_mock: Page) -> None:
         'Grid and Map',
     ],
 )
-
-@pytest.mark.skip(reason="Skipping this test because of timeout issue")
 def test_grid_and_map_view(page_mock: Page, view_type: str) -> None:
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
@@ -47,8 +45,6 @@ def test_grid_and_map_view(page_mock: Page, view_type: str) -> None:
         'Full Map View',
     ],
 )
-
-@pytest.mark.skip(reason="Skipping this test because of timeout issue")
 def test_full_map_view(page_mock: Page, view_type: str) -> None:
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
@@ -73,9 +69,6 @@ def test_full_map_view(page_mock: Page, view_type: str) -> None:
         ),
     ],
 )
-
-
-@pytest.mark.skip(reason="Skipping this test because of timeout issue")
 def test_show_more_results(
     page_mock: Page,
     chunk_1_first_data: str,

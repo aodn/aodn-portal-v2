@@ -6,8 +6,14 @@ function getMap() {
   return getTestProps().getMap();
 }
 
-function getHeatmapLayer() {
-  return getTestProps().getHeatmapLayer();
+function getMapLayer() {
+  if (getTestProps().getClusterLayer) {
+    return getTestProps().getClusterLayer();
+  } else if (getTestProps().getHeatmapLayer) {
+    return getTestProps().getHeatmapLayer();
+  } else {
+    throw new Error("No Map layer found");
+  }
 }
 
 function centerMap(lng, lat, zoom) {
@@ -23,24 +29,32 @@ function isMapLoaded() {
 
 function getMapLayers() {
   const map = getMap();
-  const layer = getHeatmapLayer();
+  const layer = getMapLayer();
   return map.queryRenderedFeatures({ layers: [layer] }).length;
 }
 
 function getAUMarineParksLayer() {
-  return getTestProps().getAUMarineParksLayer
-    ? getTestProps().getAUMarineParksLayer()
-    : "";
+  if (getTestProps().getAUMarineParksLayer) {
+    return getTestProps().getAUMarineParksLayer();
+  } else {
+    throw new Error("AU Marine Parks layer not found");
+  }
 }
 
 function getWorldBoundariesLayer() {
-  return getTestProps().getWorldBoundariesLayer
-    ? getTestProps().getWorldBoundariesLayer()
-    : "";
+  if (getTestProps().getWorldBoundariesLayer) {
+    return getTestProps().getWorldBoundariesLayer();
+  } else {
+    throw new Error("World Boundaries layer not found");
+  }
 }
 
 function getSpiderLayer() {
-  return getTestProps().getSpiderLayer ? getTestProps().getSpiderLayer() : "";
+  if (getTestProps().getSpiderLayer) {
+    return getTestProps().getSpiderLayer();
+  } else {
+    throw new Error("Spider layer not found");
+  }
 }
 
 function isMapLayerVisible(layerId) {
@@ -59,7 +73,7 @@ function findAndClickCluster() {
       [0, 0],
       [width, height],
     ],
-    { layers: ["cluster-count"] }
+    { layers: [getMapLayer()] }
   );
 
   if (clusters.length > 0) {

@@ -40,8 +40,6 @@ def test_basic_search(
     'sort_type',
     [SearchSortType.TITLE, SearchSortType.MODIFIED],
 )
-
-@pytest.mark.skip(reason="Skipping this test because of timeout issue")
 def test_search_result_sort(page_mock: Page, sort_type: SearchSortType) -> None:
     api_router = ApiRouter(page=page_mock)
     landing_page = LandingPage(page_mock)
