@@ -16,6 +16,7 @@ import {
   updateFilterPolygon,
   updateParameterStates,
   updateSortBy,
+  updateZoom,
 } from "../../components/common/store/componentParamReducer";
 import store, { getComponentState } from "../../components/common/store/store";
 
@@ -217,6 +218,7 @@ const SearchPage = () => {
           setBbox(bounds);
           setZoom(event.target.getZoom());
           dispatch(updateFilterPolygon(polygon));
+          dispatch(updateZoom(event.target.getZoom()));
           doSearch();
         }
       }
@@ -241,6 +243,7 @@ const SearchPage = () => {
             paramState.polygon?.bbox as [number, number, number, number]
           )
         );
+        setZoom(paramState.zoom);
 
         doSearch();
       }

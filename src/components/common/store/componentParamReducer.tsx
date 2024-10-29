@@ -17,6 +17,7 @@ const UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE =
   "UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE";
 const UPDATE_UPDATE_FREQ_VARIABLE = "UPDATE_UPDATE_FREQ_VARIABLE";
 const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
+const UPDATE_ZOOM_VARIABLE = "UPDATE_ZOOM_VARIABLE";
 
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
   MapDefaultConfig.BBOX_ENDPOINTS;
@@ -35,6 +36,7 @@ export interface ParameterState {
   parameterVocabs?: Array<Vocab>;
   updateFreq?: DatasetFrequency | undefined;
   sortby?: string;
+  zoom?: number;
 }
 // Function use to test an input value is of type Vocab
 const isVocabType = (value: any): value is Vocab =>
@@ -128,6 +130,15 @@ const updateSortBy = (
   };
 };
 
+const updateZoom = (input: number | undefined): ActionType => {
+  return {
+    type: UPDATE_ZOOM_VARIABLE,
+    payload: {
+      zoom: input,
+    } as ParameterState,
+  };
+};
+
 // Initial State
 const createInitialParameterState = (
   withDefaultPolygon: boolean = true
@@ -136,6 +147,7 @@ const createInitialParameterState = (
     isImosOnlyDataset: false,
     dateTimeFilterRange: {},
     searchText: "",
+    zoom: MapDefaultConfig.ZOOM,
   };
 
   if (withDefaultPolygon) {
@@ -207,6 +219,11 @@ const paramReducer = (
       return {
         ...state,
         sortby: action.payload.sortby,
+      };
+    case UPDATE_ZOOM_VARIABLE:
+      return {
+        ...state,
+        zoom: action.payload.zoom,
       };
     case UPDATE_PARAMETER_STATES:
       return {
@@ -346,4 +363,5 @@ export {
   updateParameterStates,
   updateSortBy,
   updateUpdateFreq,
+  updateZoom,
 };

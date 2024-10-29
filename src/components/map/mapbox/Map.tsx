@@ -170,7 +170,6 @@ const ReactMap = ({
       map.jumpTo({
         center: bbox.getCenter(),
         zoom: zoom,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
       });
       map.on("idle", () => {
         map.on("zoomend", debounceOnZoomEvent);
