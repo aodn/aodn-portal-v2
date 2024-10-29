@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   LngLatBounds,
-  LngLatBoundsLike,
+  LngLatLike,
   Map,
   MapboxEvent,
   Projection,
@@ -17,7 +17,7 @@ import { MapDefaultConfig } from "./constants";
 interface MapProps {
   centerLongitude?: number;
   centerLatitude?: number;
-  bbox?: LngLatBoundsLike;
+  bbox?: LngLatBounds;
   zoom?: number;
   minZoom?: number;
   maxZoom?: number;
@@ -62,7 +62,8 @@ const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
 
 const ReactMap = ({
   panelId,
-  bbox,
+  bbox = new LngLatBounds([WEST_LON, SOUTH_LAT, EAST_LON, NORTH_LAT]),
+  zoom = MapDefaultConfig.ZOOM,
   minZoom = MapDefaultConfig.MIN_ZOOM,
   maxZoom = MapDefaultConfig.MAX_ZOOM,
   projection = MapDefaultConfig.PROJECTION,
@@ -104,7 +105,6 @@ const ReactMap = ({
             container: panelId,
             accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
             style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
-            bounds: [WEST_LON, SOUTH_LAT, EAST_LON, NORTH_LAT],
             minZoom: minZoom,
             maxZoom: maxZoom,
             testMode: import.meta.env.MODE === "dev",
@@ -161,8 +161,23 @@ const ReactMap = ({
   useEffect(() => {
     // The map center is use to set the initial center point, however we may need
     // to set to other place, for example if the user pass the url to someone
-    bbox && map && map.fitBounds(bbox);
-  }, [bbox, map]);
+    if (bbox && map) {
+      // Turn off event to avoid looping
+      map.off("zoomend", debounceOnZoomEvent);
+      map.off("moveend", debounceOnMoveEvent);
+      // DO NOT use fitBounds(), it will cause the zoom and padding adjust so
+      // you end up map area drift.
+      map.jumpTo({
+        center: bbox.getCenter(),
+        zoom: zoom,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+      });
+      map.on("idle", () => {
+        map.on("zoomend", debounceOnZoomEvent);
+        map.on("moveend", debounceOnMoveEvent);
+      });
+    }
+  }, [bbox, zoom, map, debounceOnZoomEvent, debounceOnMoveEvent]);
 
   return (
     map && (

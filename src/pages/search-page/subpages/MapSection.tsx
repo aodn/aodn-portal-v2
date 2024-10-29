@@ -9,7 +9,7 @@ import MenuControl, {
   MapLayerSwitcher,
 } from "../../../components/map/mapbox/controls/MenuControl";
 import React, { useCallback, useState } from "react";
-import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
+import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import Layers, {
   createStaticLayers,
 } from "../../../components/map/mapbox/layers/Layers";
@@ -31,7 +31,8 @@ enum LayerName {
 interface MapSectionProps {
   collections: OGCCollection[];
   showFullMap: boolean;
-  bbox?: LngLatBoundsLike;
+  bbox?: LngLatBounds;
+  zoom?: number;
   sx?: SxProps<Theme>;
   selectedUuids: string[];
   onMapZoomOrMove: (
@@ -44,6 +45,7 @@ interface MapSectionProps {
 
 const MapSection: React.FC<MapSectionProps> = ({
   bbox,
+  zoom,
   onMapZoomOrMove,
   onToggleClicked,
   onDatasetSelected,
@@ -94,6 +96,7 @@ const MapSection: React.FC<MapSectionProps> = ({
       <Map
         panelId={mapContainerId}
         bbox={bbox}
+        zoom={zoom}
         onZoomEvent={onMapZoomOrMove}
         onMoveEvent={onMapZoomOrMove}
       >

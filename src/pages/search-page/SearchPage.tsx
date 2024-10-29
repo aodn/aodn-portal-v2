@@ -31,7 +31,7 @@ import store, { getComponentState } from "../../components/common/store/store";
 // import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
 // import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
 // Map section, you can switch to other map library, this is for mapbox
-import { LngLatBoundsLike, MapboxEvent as MapEvent } from "mapbox-gl";
+import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
 import MapSection from "./subpages/MapSection";
 import { color, padding } from "../../styles/constants";
@@ -71,7 +71,8 @@ const SearchPage = () => {
   );
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
-  const [bbox, setBbox] = useState<LngLatBoundsLike | undefined>(undefined);
+  const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
+  const [zoom, setZoom] = useState<number | undefined>(undefined);
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
 
   const startOneLoadingThread = useCallback(() => {
@@ -213,6 +214,8 @@ const SearchPage = () => {
           componentParam.polygon &&
           !booleanEqual(componentParam.polygon, polygon)
         ) {
+          setBbox(bounds);
+          setZoom(event.target.getZoom());
           dispatch(updateFilterPolygon(polygon));
           doSearch();
         }
@@ -233,7 +236,11 @@ const SearchPage = () => {
         dispatch(updateParameterStates(paramState));
         // URL request, we need to adjust the map to the same area as mentioned
         // in the url
-        setBbox(paramState.polygon?.bbox as LngLatBoundsLike);
+        setBbox(
+          new LngLatBounds(
+            paramState.polygon?.bbox as [number, number, number, number]
+          )
+        );
 
         doSearch();
       }
@@ -308,6 +315,7 @@ const SearchPage = () => {
           justifyContent: "space-between",
           alignItems: "stretch",
           width: "100%",
+          height: "90vh",
           padding: padding.small,
           bgcolor: color.blue.light,
         }}
@@ -326,11 +334,9 @@ const SearchPage = () => {
         )}
         <Box flex={1}>
           <MapSection
-            sx={{
-              height: "80vh",
-            }}
             collections={layers}
             bbox={bbox}
+            zoom={zoom}
             showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
             selectedUuids={selectedUuids}
             onMapZoomOrMove={onMapZoomOrMove}
