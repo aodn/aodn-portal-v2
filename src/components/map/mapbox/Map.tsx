@@ -135,6 +135,11 @@ const ReactMap = ({
       );
       resizeObserver.observe(map.getContainer());
 
+      if (import.meta.env.MODE === "dev") {
+        //map.showPadding = true;
+        //map.showCollisionBoxes = true;
+      }
+
       return () => {
         resizeObserver.unobserve(map.getContainer());
         map.off("zoomend", debounceOnZoomEvent);

@@ -281,10 +281,20 @@ const SearchPage = () => {
         );
         setZoom(componentParam.zoom);
 
-        doMapSearch();
+        startOneLoadingThread();
+        doMapSearch().finally(() => {
+          endOneLoadingThread();
+        });
       }
     }
-  }, [location, dispatch, doSearch, doMapSearch]);
+  }, [
+    location,
+    dispatch,
+    doSearch,
+    doMapSearch,
+    startOneLoadingThread,
+    endOneLoadingThread,
+  ]);
 
   const onChangeSorting = useCallback(
     (v: SortResultEnum) => {
