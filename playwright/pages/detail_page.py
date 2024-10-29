@@ -18,7 +18,7 @@ class DetailPage(BasePage):
     def load(self, uuid: str) -> None:
         """Load the detail page for the given uuid"""
         url = f'{settings.baseURL}/details?uuid={uuid}'
-        self.page.goto(url, timeout=100 * 1000)
+        self.page.goto(url, wait_until='domcontentloaded')
 
     def get_tab_section(self, title: str) -> Locator:
         """Returns tab section title element"""
