@@ -101,6 +101,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   collections,
   selectedUuids,
   onDatasetSelected,
+  tabNavigation,
   clusterLayerConfig,
   showFullMap,
 }: ClusterLayerProps) => {
@@ -283,6 +284,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         layerId={unclusterPointLayer}
         popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
+        tabNavigation={tabNavigation}
       />
       <SpatialExtents
         layerId={unclusterPointLayer}
@@ -296,6 +298,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer={unclusterPointLayer}
         onDatasetSelected={onDatasetSelected}
         showFullMap={showFullMap}
+        tabNavigation={tabNavigation}
       />
       <TestHelper getHeatmapLayer={() => clusterLayer} />
     </>

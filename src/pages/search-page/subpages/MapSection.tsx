@@ -21,6 +21,7 @@ import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/Mapb
 import SnackbarLoader from "../../../components/loading/SnackbarLoader";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
+import useTabNavigation from "../../../hooks/useTabNavigation";
 
 const mapContainerId = "map-container-id";
 
@@ -58,6 +59,8 @@ const MapSection: React.FC<MapSectionProps> = ({
   );
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
+  const tabNavigation = useTabNavigation();
+
   const createPresentationLayers = useCallback(
     (id: string | null) => {
       switch (id) {
@@ -68,6 +71,7 @@ const MapSection: React.FC<MapSectionProps> = ({
               selectedUuids={selectedUuids}
               showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
+              tabNavigation={tabNavigation}
             />
           );
 
@@ -78,11 +82,12 @@ const MapSection: React.FC<MapSectionProps> = ({
               selectedUuids={selectedUuids}
               showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
+              tabNavigation={tabNavigation}
             />
           );
       }
     },
-    [collections, onDatasetSelected, selectedUuids, showFullMap]
+    [collections, onDatasetSelected, selectedUuids, showFullMap, tabNavigation]
   );
 
   return (

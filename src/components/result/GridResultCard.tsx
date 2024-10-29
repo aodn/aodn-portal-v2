@@ -21,8 +21,7 @@ import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import { useNavigate } from "react-router-dom";
-import { pageDefault } from "../common/constants";
+import useTabNavigation from "../../hooks/useTabNavigation";
 
 interface GridResultCardProps {
   content?: OGCCollection;
@@ -36,18 +35,14 @@ const GridResultCard: FC<GridResultCardProps> = ({
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
-  const navigate = useNavigate();
-  const onDetail = useCallback(
-    (uuid: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.append("uuid", uuid);
-      navigate(pageDefault.details + "?" + searchParams.toString());
-    },
-    [navigate]
-  );
+  const goToDetailPage = useTabNavigation();
 
   if (!content) return;
   const { id: uuid, title, findIcon, findThumbnail } = content;
+
+  const onLinks = () => goToDetailPage(uuid, "links");
+  const onDownload = () => goToDetailPage(uuid, "abstract", "download-section");
+  const onDetail = () => goToDetailPage(uuid, "abstract");
 
   return (
     <Card
@@ -127,7 +122,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         )}
 
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea onClick={() => onDetail(uuid)}>
+          <CardActionArea onClick={() => onDetail}>
             <Box
               display="flex"
               alignItems="center"
@@ -164,7 +159,14 @@ const GridResultCard: FC<GridResultCardProps> = ({
               paddingRight: padding.extraSmall,
             }}
           />
-          <ResultCardButtonGroup content={content} shouldHideText isGridView />
+          <ResultCardButtonGroup
+            content={content}
+            shouldHideText
+            isGridView
+            onLinks={onLinks}
+            onDownload={onDownload}
+            onDetail={onDetail}
+          />
         </Stack>
       )}
     </Card>
