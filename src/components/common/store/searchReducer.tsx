@@ -247,7 +247,6 @@ const fetchDatasetByUuid = createAsyncThunk<
 >("search/fetchDatasetByUuid", async (id: string, thunkApi: any) =>
   axios
     .get<FeatureCollection<Point>>(`/api/v1/ogc/collections/${id}/items`)
-    // .then((response) => new Dataset(response.data))
     .then((response) => response.data)
     .catch(errorHandling(thunkApi))
 );
