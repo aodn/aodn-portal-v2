@@ -4,6 +4,7 @@ import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 
 interface TestProps {
   getMap?: () => Map;
+  getClusterLayer?: () => string;
   getHeatmapLayer?: () => string;
   getAUMarineParksLayer?: () => string;
   getWorldBoundariesLayer?: () => string;

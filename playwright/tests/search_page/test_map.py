@@ -12,6 +12,7 @@ from pages.js_scripts.js_utils import execute_js
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
+
 def test_map_drag_updates_search_results(page_mock: Page) -> None:
     api_router = ApiRouter(page=page_mock)
     landing_page = LandingPage(page_mock)
@@ -69,8 +70,6 @@ def test_map_datapoint_hover_and_click(
         ('imos', 'plankton'),
     ],
 )
-
-@pytest.mark.skip(reason="Skipping this test because default layer changed to cluster layer")
 def test_map_updates_on_search_change(
     page_mock: Page, search_text: str, updated_search_text: str
 ) -> None:
@@ -111,8 +110,6 @@ def test_map_updates_on_search_change(
         ),
     ],
 )
-
-@pytest.mark.skip(reason="Skipping this test because of timeout issue")
 def test_map_base_layers(
     page_mock: Page, layer_text: str, layer_type: LayerType
 ) -> None:
@@ -147,8 +144,6 @@ def test_map_base_layers(
         ),
     ],
 )
-
-@pytest.mark.skip(reason="Skipping this test because default layer changed to cluster layer")
 def test_map_spider(
     page_mock: Page,
     head_lng: str,

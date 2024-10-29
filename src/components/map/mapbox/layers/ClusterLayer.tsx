@@ -18,6 +18,7 @@ import {
 } from "./Layers";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
+import { TestHelper } from "../../../common/test/helper";
 import { FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
@@ -296,6 +297,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         onDatasetSelected={onDatasetSelected}
         showFullMap={showFullMap}
       />
+      <TestHelper getHeatmapLayer={() => clusterLayer} />
     </>
   );
 };

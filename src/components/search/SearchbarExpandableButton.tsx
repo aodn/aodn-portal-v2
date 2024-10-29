@@ -56,6 +56,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
         }}
         startIcon={icon}
         onClick={onClick}
+        data-testid={`searchbar-${text.toLowerCase()}-button`}
       >
         {showText && text}
       </Button>
