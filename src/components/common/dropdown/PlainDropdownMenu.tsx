@@ -4,9 +4,10 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { borderRadius, fontSize } from "../../../styles/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
+import { disableScroll, enableScroll } from "./CommonSelect";
 
 interface PlainDropdownMenuProps {
   items: string[];
@@ -17,17 +18,34 @@ const PlainDropdownMenu: React.FC<PlainDropdownMenuProps> = ({
   onSelectCallback,
 }) => {
   const [selectedItem, setSelectedItem] = useState(items[0]);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handleOnChange = (event: SelectChangeEvent) => {
-    setSelectedItem(event.target.value as string);
-    onSelectCallback(event.target.value as string);
-  };
+  const handleOnChange = useCallback(
+    (event: SelectChangeEvent) => {
+      setSelectedItem(event.target.value as string);
+      onSelectCallback(event.target.value as string);
+    },
+    [onSelectCallback]
+  );
+
+  const handleOpen = useCallback(() => {
+    setIsOpen(true);
+    disableScroll();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    enableScroll();
+  }, []);
 
   return (
     <FormControl fullWidth>
       <Select
         value={selectedItem}
         onChange={handleOnChange}
+        onOpen={handleOpen}
+        onClose={handleClose}
+        open={isOpen}
         MenuProps={{
           PaperProps: { sx: { borderRadius: borderRadius.small } },
         }}

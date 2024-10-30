@@ -5,7 +5,7 @@ import {
   SelectChangeEvent,
   SxProps,
 } from "@mui/material";
-import { FC, useCallback, useEffect, useRef, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { IconProps } from "../../icon/types";
 import { useDetailPageContext } from "../../../pages/detail-page/context/detail-page-context";
 
@@ -33,14 +33,30 @@ const DEFAULT_SELECT_STYLE: SxProps = {
   fontSize: "14px",
 };
 
+const disableScroll = () => {
+  // Save current scroll position and disable the page scroll to avoid menuitem
+  // flow on top of page
+  const scrollY = window.scrollY;
+  document.body.style.position = "fixed";
+  document.body.style.width = "100%";
+  document.body.style.top = `-${scrollY}px`;
+};
+
+const enableScroll = () => {
+  // Restore scroll position
+  const scrollY = document.body.style.top;
+  document.body.style.position = "";
+  document.body.style.width = "";
+  window.scrollTo(0, parseInt(scrollY || "0", 10) * -1);
+};
+
 const CommonSelect: FC<CommonSelectProps> = ({
   items,
   onSelectCallback,
   sx,
 }) => {
-  const selectRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>(items[0].value);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const { isCollectionNotFound } = useDetailPageContext();
 
   const handleOnChange = useCallback(
@@ -51,55 +67,28 @@ const CommonSelect: FC<CommonSelectProps> = ({
     },
     [onSelectCallback]
   );
-  // If the select is outside of viewport, close the menu item
-  // otherwise the menuitem will flow on top of screen.
-  const checkIfSelectIsOffScreen = useCallback(() => {
-    if (selectRef.current) {
-      const rect = selectRef.current.getBoundingClientRect();
 
-      // Check if any part of the Select component is outside the viewport
-      const isOffScreenNow =
-        rect.top < 0 ||
-        rect.left < 0 ||
-        rect.bottom >
-          (window.innerHeight || document.documentElement.clientHeight) ||
-        rect.right >
-          (window.innerWidth || document.documentElement.clientWidth);
+  const handleOpen = useCallback(() => {
+    setIsOpen(true);
+    disableScroll();
+  }, []);
 
-      isOffScreenNow && setOpen(false);
-    }
-  }, [selectRef]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", checkIfSelectIsOffScreen);
-    window.addEventListener("resize", checkIfSelectIsOffScreen); // Also handle viewport resizing
-    checkIfSelectIsOffScreen(); // Initial check
-
-    // Cleanup listeners on component unmount
-    return () => {
-      window.removeEventListener("scroll", checkIfSelectIsOffScreen);
-      window.removeEventListener("resize", checkIfSelectIsOffScreen);
-    };
-  }, [checkIfSelectIsOffScreen]);
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    enableScroll();
+  }, []);
 
   return (
     <FormControl fullWidth disabled={isCollectionNotFound}>
       <Select
-        ref={selectRef}
         value={selectedItem}
-        open={open}
-        onOpen={() => setOpen(true)}
-        onClose={() => setOpen(false)}
+        onOpen={handleOpen}
+        onClose={handleClose}
+        open={isOpen}
         onChange={handleOnChange}
         sx={{
           ...DEFAULT_SELECT_STYLE,
           ...sx,
-        }}
-        MenuProps={{
-          // Make the menuitem stick to select on scroll, however
-          // this cannot fix issue where the menuitem flow on top
-          // even select is off viewport
-          disableScrollLock: true,
         }}
       >
         {items.map((item) => (
@@ -112,4 +101,5 @@ const CommonSelect: FC<CommonSelectProps> = ({
   );
 };
 
+export { disableScroll, enableScroll };
 export default CommonSelect;
