@@ -1,13 +1,3 @@
-import {
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import MapContext from "../MapContext";
-
 import { Expression, GeoJSONSource, StyleFunction } from "mapbox-gl";
 import {
   defaultMouseEnterEventHandler,
@@ -15,16 +5,16 @@ import {
   findSuitableVisiblePoint,
   LayersProps,
 } from "./Layers";
-import MapPopup, { PopupType } from "../component/MapPopup";
+import { MapDefaultConfig } from "../constants";
+import { FC, useCallback, useContext, useEffect, useMemo } from "react";
+import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
+import MapContext from "../MapContext";
+import { Feature, Point } from "geojson";
+import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
-import { TestHelper } from "../../../common/test/helper";
-import { FeatureCollection, Point } from "geojson";
-import { MapDefaultConfig } from "../constants";
-import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 
-interface IHeatmapLayer {
+interface IDetailHeatMap {
   maxZoom: number;
   weight: number | StyleFunction | Expression;
   color: string | StyleFunction | Expression;
@@ -41,11 +31,11 @@ interface HeatmapCircle {
 interface HeatmapConfig {
   clusterMaxZoom: number;
   heatmapSourceRadius: number;
-  layer: IHeatmapLayer;
+  layer: IDetailHeatMap;
   circle: HeatmapCircle;
 }
 
-interface HeatmapLayerProps extends LayersProps {
+interface DetailHeatMapProps extends LayersProps {
   // Some method inherit from LayersProps
   heatmapLayerConfig?: Partial<HeatmapConfig>;
 }
@@ -60,8 +50,8 @@ const defaultHeatmapConfig: HeatmapConfig = {
     color: "#51bbd6",
   },
   layer: {
-    maxZoom: 7,
-    weight: 1,
+    maxZoom: 10,
+    weight: 0.01,
     color: [
       "interpolate",
       ["linear"],
@@ -87,8 +77,8 @@ const defaultHeatmapConfig: HeatmapConfig = {
     ],
     radius: {
       stops: [
-        [11, 15],
-        [15, 20],
+        [11, 20],
+        [15, 30],
       ],
     },
   },
@@ -105,18 +95,15 @@ const getClusterCircleLayerId = (layerId: string) =>
 const getUnclusterPointLayerId = (layerId: string) =>
   `${layerId}-uncluster-point-layer`;
 
-const HeatmapLayer: FC<HeatmapLayerProps> = ({
+// TODO: This file is copy & paste from the heatmapLayer file. It should be simplified later
+const DetailHeatMapLayer: FC<DetailHeatMapProps> = ({
   features = generateFeatureCollectionFrom(undefined),
   selectedUuids,
   showFullMap,
   onDatasetSelected,
-  tabNavigation,
   heatmapLayerConfig,
-}: HeatmapLayerProps) => {
+}) => {
   const { map } = useContext(MapContext);
-  const [_, setLastVisiblePoint] = useState<
-    FeatureCollection<Point> | undefined
-  >(undefined);
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
@@ -142,7 +129,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
       const dataSource = findSuitableVisiblePoint(
-        generateFeatureCollectionFrom(undefined),
+        {
+          type: "FeatureCollection",
+          features: new Array<Feature<Point>>(),
+        },
         map
       );
 
@@ -308,16 +298,12 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   }, [map]);
 
   const updateSource = useCallback(() => {
-    setLastVisiblePoint((p) => {
-      const newData = findSuitableVisiblePoint(features, map, p);
-      if (map?.getSource(heatmapSourceId)) {
-        (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
-      }
-      if (map?.getSource(clusterSourceId)) {
-        (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
-      }
-      return newData;
-    });
+    if (map?.getSource(heatmapSourceId)) {
+      (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(features);
+    }
+    if (map?.getSource(clusterSourceId)) {
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(features);
+    }
   }, [features, map, heatmapSourceId, clusterSourceId]);
 
   useEffect(() => {
@@ -330,12 +316,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   return (
     <>
-      <MapPopup
-        layerId={unClusterPointLayer}
-        popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
-        onDatasetSelected={onDatasetSelected}
-        tabNavigation={tabNavigation}
-      />
       <SpatialExtents
         layerId={unClusterPointLayer}
         selectedUuids={selectedUuids}
@@ -348,11 +328,9 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         unclusterPointLayer={unClusterPointLayer}
         onDatasetSelected={onDatasetSelected}
         showFullMap={showFullMap}
-        tabNavigation={tabNavigation}
       />
-      <TestHelper getHeatmapLayer={() => heatmapLayer} />
     </>
   );
 };
 
-export default HeatmapLayer;
+export default DetailHeatMapLayer;

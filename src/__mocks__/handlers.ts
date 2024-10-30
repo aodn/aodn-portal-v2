@@ -91,4 +91,12 @@ export const handlers = [
       { status: 404 }
     );
   }),
+
+  http.get(PREFIX + "/collections/:uuid/items", ({ params }) => {
+    // return empty FeatureCollection<Point> for now
+    return HttpResponse.json({
+      type: "FeatureCollection",
+      features: [],
+    });
+  }),
 ];

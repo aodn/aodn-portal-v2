@@ -1,10 +1,14 @@
 import { useLocation } from "react-router-dom";
 import { FC, ReactNode, useEffect, useState } from "react";
-import { fetchResultByUuidNoStore } from "../../../components/common/store/searchReducer";
+import {
+  fetchDatasetByUuid,
+  fetchResultByUuidNoStore,
+} from "../../../components/common/store/searchReducer";
 import { DetailPageContext, SpatialExtentPhoto } from "./detail-page-context";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../components/common/store/hooks";
 import { HttpStatusCode } from "axios";
+import { FeatureCollection, Point } from "geojson";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -16,6 +20,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const location = useLocation();
   const dispatch = useAppDispatch();
   const [collection, setCollection] = useState<OGCCollection | undefined>(
+    undefined
+  );
+  const [dataset, setDataset] = useState<FeatureCollection<Point> | undefined>(
     undefined
   );
   const [isCollectionNotFound, setIsCollectionNotFound] =
@@ -52,11 +59,22 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       });
   }, [dispatch, location.search]);
 
+  useEffect(() => {
+    const uuid = new URLSearchParams(location.search).get("uuid");
+    if (!uuid) return;
+    dispatch(fetchDatasetByUuid(uuid))
+      .unwrap()
+      .then((dataset) => {
+        setDataset(dataset);
+      });
+  }, [dispatch, location.search]);
+
   return (
     <DetailPageContext.Provider
       value={{
         collection,
         setCollection,
+        dataset,
         isCollectionNotFound,
         photos,
         setPhotos,

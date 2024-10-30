@@ -8,34 +8,33 @@ import {
 } from "react";
 import MapContext from "../MapContext";
 import { GeoJSONSource } from "mapbox-gl";
-import MapPopup, { PopupType } from "../component/MapPopup";
 import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
   LayersProps,
 } from "./Layers";
+import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
-import { TestHelper } from "../../../common/test/helper";
-import { FeatureCollection, Point } from "geojson";
+import { Feature, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
+import * as turf from "@turf/turf";
 
-interface ClusterSize {
+interface DetailClusterSize {
   default?: number | string;
   medium: number | string;
   large: number | string;
   extra_large: number | string;
 }
 
-interface ClusterLayerConfig {
-  pointCountThresholds: ClusterSize;
+interface DetailClusterConfig {
+  pointCountThresholds: DetailClusterSize;
   clusterMaxZoom: number;
   clusterRadius: number;
-  clusterCircleSize: ClusterSize;
-  clusterCircleColor: ClusterSize;
+  clusterCircleSize: DetailClusterSize;
+  clusterCircleColor: DetailClusterSize;
   clusterCircleOpacity: number;
   clusterCircleStrokeWidth: number;
   clusterCircleStrokeColor: string;
@@ -47,12 +46,12 @@ interface ClusterLayerConfig {
   unclusterPointRadius: number;
 }
 
-interface ClusterLayerProps extends LayersProps {
+interface DetailClusterProps extends LayersProps {
   // Some method inherit from LayersProps
-  clusterLayerConfig?: Partial<ClusterLayerConfig>;
+  clusterLayerConfig?: Partial<DetailClusterConfig>;
 }
 
-const defaultClusterLayerConfig: ClusterLayerConfig = {
+const defaultDetailClusterConfig: DetailClusterConfig = {
   // point count thresholds define the boundaries between different cluster sizes.
   pointCountThresholds: {
     medium: 20,
@@ -97,18 +96,14 @@ export const getClusterLayerId = (layerId: string) => `${layerId}-clusters`;
 export const getUnclusterPointId = (layerId: string) =>
   `${layerId}-unclustered-point`;
 
-const ClusterLayer: FC<ClusterLayerProps> = ({
+// TODO: This file is copy & paste from the clusterLayer file. It should be simplified later
+const DetailClusterLayer: FC<DetailClusterProps> = ({
   features = generateFeatureCollectionFrom(undefined),
-  selectedUuids,
-  onDatasetSelected,
-  tabNavigation,
-  clusterLayerConfig,
-  showFullMap,
-}: ClusterLayerProps) => {
-  const { map } = useContext(MapContext);
-  const [_, setLastVisiblePoint] = useState<
-    FeatureCollection<Point> | undefined
+}) => {
+  const [bbox, setBbox] = useState<
+    [number, number, number, number] | undefined
   >(undefined);
+  const { map } = useContext(MapContext);
 
   const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
 
@@ -121,37 +116,64 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     [layerId]
   );
 
+  const isValid = (bbox: [number, number, number, number]) => {
+    // lat and lon are in the range of -90 to 90 and -180 to 180 respectively
+    const [minLon, minLat, maxLon, maxLat] = bbox;
+    return (
+      minLon >= -180 &&
+      minLon <= 180 &&
+      minLat >= -90 &&
+      minLat <= 90 &&
+      maxLon >= -180 &&
+      maxLon <= 180 &&
+      maxLat >= -90 &&
+      maxLat <= 90
+    );
+  };
+
+  useEffect(() => {
+    if (bbox && map && isValid(bbox)) {
+      map.fitBounds(bbox, {
+        maxZoom: 2,
+        padding: 100,
+      });
+    }
+  }, [bbox, map]);
+
+  useEffect(() => {
+    if (!features.features || features.features.length === 0) return;
+    const bbox = turf.bbox(features) as [number, number, number, number];
+    setBbox(bbox);
+  }, [features]);
+
   // This is used to render the cluster circle and add event handle to circles
   useEffect(() => {
     if (map === null) return;
 
-    // This situation is map object created, hence not null, but not completely loaded
-    // ,and therefore you will have problem setting source and layer. Set up a listener
-    // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
-      // Function may call multiple times due to useEffect, it is not possible to avoid
-      // these changes so use this check to avoid duplicate add
       if (map?.getSource(clusterSourceId)) return;
 
-      const config = mergeWithDefaults(
-        defaultClusterLayerConfig,
-        clusterLayerConfig
-      );
+      const config = defaultDetailClusterConfig;
 
       map?.setMaxZoom(config.clusterMaxZoom);
 
       map?.addSource(clusterSourceId, {
         type: "geojson",
         data: findSuitableVisiblePoint(
-          generateFeatureCollectionFrom(undefined),
+          {
+            type: "FeatureCollection",
+            features: new Array<Feature<Point>>(),
+          },
           map
         ),
         cluster: true,
         clusterMaxZoom: config.clusterMaxZoom,
         clusterRadius: 50,
+        clusterProperties: {
+          count: ["+", ["get", "count"]],
+        },
       });
 
-      // Add layers for multiple items, that is the cluster
       map?.addLayer({
         id: clusterLayer,
         type: "circle",
@@ -163,7 +185,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           "circle-opacity": config.clusterCircleOpacity,
           "circle-color": [
             "step",
-            ["get", "point_count"],
+            ["get", "count"],
             config.clusterCircleColor.default,
             config.pointCountThresholds.medium,
             config.clusterCircleColor.medium,
@@ -174,7 +196,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           ],
           "circle-radius": [
             "step",
-            ["get", "point_count"],
+            ["get", "count"],
             config.clusterCircleSize.default,
             config.pointCountThresholds.medium,
             config.clusterCircleSize.medium,
@@ -192,12 +214,12 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         source: clusterSourceId,
         filter: ["has", "point_count"],
         layout: {
-          "text-field": "{point_count_abbreviated}",
+          "text-field": "{count}",
           "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
           "text-size": config.clusterCircleTextSize,
         },
       });
-      // Layer for only 1 item in the circle
+
       map?.addLayer({
         id: unclusterPointLayer,
         type: "circle",
@@ -212,58 +234,33 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         },
       });
 
-      // Change the cursor to a pointer for uncluster point
       map?.on("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
-
-      // Change the cursor back to default when it leaves the unclustered points
       map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
     };
 
     map?.once("load", createLayers);
-
-    // When user change the map style, for example change base map, all layer will be removed
-    // as per mapbox design, we need to listen to that even and add back the layer
     map?.on("styledata", createLayers);
 
     return () => {
       map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
       map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
-      // Clean up resource when you click on the next spatial extents, map is
-      // still working in this page.
       try {
-        // Remove layers first
         if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
-
         if (map?.getLayer(`${layerId}-cluster-count`))
           map?.removeLayer(`${layerId}-cluster-count`);
-
         if (map?.getLayer(unclusterPointLayer))
           map?.removeLayer(unclusterPointLayer);
-
-        if (map?.getLayer(`${layerId}-unclustered-count`))
-          map?.removeLayer(`${layerId}-unclustered-count`);
-
-        // Then remove the source
         if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
       } catch (error) {
-        // If source not found and throw exception then layer will not exist
-        // TODO: handle error in ErrorBoundary
+        // Handle error
       }
     };
-    // Make sure map is the only dependency so that it will not trigger twice run
-    // where you will add source and remove layer accidentally.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map]);
+  }, [clusterLayer, clusterSourceId, layerId, map, unclusterPointLayer]);
 
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
-      setLastVisiblePoint((p) => {
-        const newData = findSuitableVisiblePoint(features, map, p);
-
-        (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
-        return newData;
-      });
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(features);
     }
   }, [map, clusterSourceId, features]);
 
@@ -275,31 +272,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     };
   }, [map, updateSource]);
 
-  return (
-    <>
-      <MapPopup
-        layerId={unclusterPointLayer}
-        popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
-        onDatasetSelected={onDatasetSelected}
-        tabNavigation={tabNavigation}
-      />
-      <SpatialExtents
-        layerId={unclusterPointLayer}
-        selectedUuids={selectedUuids}
-        addedLayerIds={[clusterLayer, unclusterPointLayer]}
-        onDatasetSelected={onDatasetSelected}
-      />
-      <SpiderDiagram
-        clusterLayer={clusterLayer}
-        clusterSourceId={clusterSourceId}
-        unclusterPointLayer={unclusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
-        showFullMap={showFullMap}
-        tabNavigation={tabNavigation}
-      />
-      <TestHelper getHeatmapLayer={() => clusterLayer} />
-    </>
-  );
+  return <></>;
 };
 
-export default ClusterLayer;
+export default DetailClusterLayer;
