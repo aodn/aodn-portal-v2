@@ -1344,7 +1344,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/material@npm:^5.15.7":
+"@mui/material@npm:^5.16.7":
   version: 5.16.7
   resolution: "@mui/material@npm:5.16.7"
   dependencies:
@@ -4771,7 +4771,7 @@ __metadata:
     "@mapbox/geo-viewport": "npm:^0.5.0"
     "@mapbox/mapbox-gl-draw": "npm:^1.4.3"
     "@mui/icons-material": "npm:^5.15.10"
-    "@mui/material": "npm:^5.15.7"
+    "@mui/material": "npm:^5.16.7"
     "@mui/system": "npm:^5.16.7"
     "@mui/x-charts": "npm:^6.19.3"
     "@mui/x-date-pickers": "npm:^6.19.3"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -27,13 +27,16 @@ const DownloadCard = () => {
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(false);
   const { isCollectionNotFound } = useDetailPageContext();
 
-  const selectSxProps = {
-    height: "30px",
-    textAlign: "start",
-    backgroundColor: "transparent",
-    boxShadow: theme.shadows[5],
-    border: `${border.xs} ${color.blue.dark}`,
-  };
+  const selectSxProps = useMemo(
+    () => ({
+      height: "30px",
+      textAlign: "start",
+      backgroundColor: "transparent",
+      boxShadow: theme.shadows[5],
+      border: `${border.xs} ${color.blue.dark}`,
+    }),
+    [theme]
+  );
 
   return (
     <Stack direction="column">

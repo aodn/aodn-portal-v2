@@ -1,9 +1,10 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { fontColor, fontSize } from "../../styles/constants";
 import StyledMenu from "./StyledMenu";
+import { disableScroll, enableScroll } from "../common/dropdown/CommonSelect";
 
 interface MenuItem {
   name: string;
@@ -21,14 +22,19 @@ interface PlainMenuProps {
 
 // TODO: implement onClick for each menu item to trigger handler once the function is designed
 const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+
+  const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    setIsOpen(true);
     setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+    disableScroll();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    enableScroll();
+  }, []);
 
   return (
     <div>
@@ -45,7 +51,7 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
         {menu.menuName}
       </Button>
       {menu.items.length > 0 && (
-        <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <StyledMenu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
           {menu.items.map((item, index) => (
             <MenuItem onClick={handleClose} key={index}>
               {item.name}
