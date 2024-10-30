@@ -2,7 +2,7 @@ import { Feature, FeatureCollection, Point } from "geojson";
 import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
 import * as turf from "@turf/turf";
 
-export const generateFeatureCollectiionFrom = (
+export const generateFeatureCollectionFrom = (
   collections: OGCCollection[] | undefined
 ): FeatureCollection<Point> => {
   const featureCollections: FeatureCollection<Point> = {

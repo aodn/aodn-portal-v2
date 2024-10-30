@@ -7,7 +7,7 @@ import {
 } from "./Layers";
 import { MapDefaultConfig } from "../constants";
 import { FC, useCallback, useContext, useEffect, useMemo } from "react";
-import { generateFeatureCollectiionFrom } from "../../../../utils/GeoJsonUtils";
+import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import MapContext from "../MapContext";
 import { Feature, Point } from "geojson";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
@@ -97,7 +97,7 @@ const getUnclusterPointLayerId = (layerId: string) =>
 
 // TODO: This file is copy & paste from the heatmapLayer file. It should be simplified later
 const DetailHeatMapLayer: FC<DetailHeatMapProps> = ({
-  features = generateFeatureCollectiionFrom(undefined),
+  features = generateFeatureCollectionFrom(undefined),
   selectedUuids,
   showFullMap,
   onDatasetSelected,

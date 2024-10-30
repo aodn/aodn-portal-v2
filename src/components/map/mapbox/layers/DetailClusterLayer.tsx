@@ -19,7 +19,7 @@ import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { Feature, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
-import { generateFeatureCollectiionFrom } from "../../../../utils/GeoJsonUtils";
+import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import * as turf from "@turf/turf";
 
 interface DetailClusterSize {
@@ -98,11 +98,7 @@ export const getUnclusterPointId = (layerId: string) =>
 
 // TODO: This file is copy & paste from the clusterLayer file. It should be simplified later
 const DetailClusterLayer: FC<DetailClusterProps> = ({
-  features = generateFeatureCollectiionFrom(undefined),
-  selectedUuids,
-  onDatasetSelected,
-  clusterLayerConfig,
-  showFullMap,
+  features = generateFeatureCollectionFrom(undefined),
 }) => {
   const [bbox, setBbox] = useState<
     [number, number, number, number] | undefined
@@ -157,10 +153,7 @@ const DetailClusterLayer: FC<DetailClusterProps> = ({
     const createLayers = () => {
       if (map?.getSource(clusterSourceId)) return;
 
-      const config = mergeWithDefaults(
-        defaultDetailClusterConfig,
-        clusterLayerConfig
-      );
+      const config = defaultDetailClusterConfig;
 
       map?.setMaxZoom(config.clusterMaxZoom);
 
@@ -263,14 +256,7 @@ const DetailClusterLayer: FC<DetailClusterProps> = ({
         // Handle error
       }
     };
-  }, [
-    clusterLayer,
-    clusterLayerConfig,
-    clusterSourceId,
-    layerId,
-    map,
-    unclusterPointLayer,
-  ]);
+  }, [clusterLayer, clusterSourceId, layerId, map, unclusterPointLayer]);
 
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
@@ -286,23 +272,7 @@ const DetailClusterLayer: FC<DetailClusterProps> = ({
     };
   }, [map, updateSource]);
 
-  return (
-    <>
-      <SpatialExtents
-        layerId={unclusterPointLayer}
-        selectedUuids={selectedUuids}
-        addedLayerIds={[clusterLayer, unclusterPointLayer]}
-        onDatasetSelected={onDatasetSelected}
-      />
-      <SpiderDiagram
-        clusterLayer={clusterLayer}
-        clusterSourceId={clusterSourceId}
-        unclusterPointLayer={unclusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
-        showFullMap={showFullMap}
-      />
-    </>
-  );
+  return <></>;
 };
 
 export default DetailClusterLayer;

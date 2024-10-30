@@ -21,7 +21,7 @@ import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
 import { Feature, FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
-import { generateFeatureCollectiionFrom } from "../../../../utils/GeoJsonUtils";
+import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 
 interface IHeatmapLayer {
@@ -106,7 +106,7 @@ const getUnclusterPointLayerId = (layerId: string) =>
   `${layerId}-uncluster-point-layer`;
 
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
-  features = generateFeatureCollectiionFrom(undefined),
+  features = generateFeatureCollectionFrom(undefined),
   selectedUuids,
   showFullMap,
   onDatasetSelected,

@@ -21,7 +21,7 @@ import { TestHelper } from "../../../common/test/helper";
 import { Feature, FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
-import { generateFeatureCollectiionFrom } from "../../../../utils/GeoJsonUtils";
+import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 
 interface ClusterSize {
   default?: number | string;
@@ -98,7 +98,7 @@ export const getUnclusterPointId = (layerId: string) =>
   `${layerId}-unclustered-point`;
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
-  features = generateFeatureCollectiionFrom(undefined),
+  features = generateFeatureCollectionFrom(undefined),
   selectedUuids,
   onDatasetSelected,
   tabNavigation,
