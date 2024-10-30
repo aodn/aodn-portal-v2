@@ -19,7 +19,7 @@ import MapPopup, { PopupType } from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
-import { Feature, FeatureCollection, Point } from "geojson";
+import { FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
@@ -142,10 +142,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     // to update the state and then this effect can be call again when map loaded.
     const createLayers = () => {
       const dataSource = findSuitableVisiblePoint(
-        {
-          type: "FeatureCollection",
-          features: new Array<Feature<Point>>(),
-        },
+        generateFeatureCollectionFrom(undefined),
         map
       );
 

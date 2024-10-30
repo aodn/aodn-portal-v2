@@ -18,7 +18,7 @@ import {
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
-import { Feature, FeatureCollection, Point } from "geojson";
+import { FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
@@ -143,10 +143,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       map?.addSource(clusterSourceId, {
         type: "geojson",
         data: findSuitableVisiblePoint(
-          {
-            type: "FeatureCollection",
-            features: new Array<Feature<Point>>(),
-          },
+          generateFeatureCollectionFrom(undefined),
           map
         ),
         cluster: true,
