@@ -166,7 +166,10 @@ const ResultCards = ({
   // logic .clentHeight.height have values. In short it fill the
   // whole area.
   // *** We need to dsiplay the load more button, hence item count + 1 ***
-  if (layout === SearchResultLayoutEnum.LIST) {
+  if (
+    layout === SearchResultLayoutEnum.LIST ||
+    layout === SearchResultLayoutEnum.FULL_LIST
+  ) {
     return (
       <Box
         sx={{ ...sx, height: "100%" }}

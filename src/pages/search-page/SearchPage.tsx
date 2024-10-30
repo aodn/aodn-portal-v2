@@ -69,9 +69,14 @@ const SearchPage = () => {
   const dispatch = useAppDispatch();
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
-  const [visibility, setVisibility] = useState<SearchResultLayoutEnum>(
-    SearchResultLayoutEnum.VISIBLE
+  // State to store the layout that user selected
+  const [selectedLayout, setSelectedLayout] = useState<SearchResultLayoutEnum>(
+    SearchResultLayoutEnum.LIST
   );
+  // CurrentLayout is used to remember last layout, which is SearchResultLayoutEnum exclude the value FULL_MAP
+  const [currentLayout, setCurrentLayout] = useState<
+    Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
+  >(SearchResultLayoutEnum.LIST);
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
@@ -86,20 +91,17 @@ const SearchPage = () => {
     setLoadingThreadCount((prev) => prev - 1);
   }, []);
 
-  // value true meaning full map, so we set emum, else keep it as is.
+  // Value true meaning full map. So if true set the selected layout as full-map
+  // Else set the selected layout as the last layout remembered (stored in currentLayout)
   const onToggleDisplay = useCallback(
-    (value: boolean) =>
-      setVisibility(
-        value
-          ? SearchResultLayoutEnum.INVISIBLE
-          : SearchResultLayoutEnum.VISIBLE
-      ),
-    [setVisibility]
-  );
-
-  const onVisibilityChanged = useCallback(
-    (value: SearchResultLayoutEnum) => setVisibility(value),
-    [setVisibility]
+    (value: boolean) => {
+      if (value) {
+        setSelectedLayout(SearchResultLayoutEnum.FULL_MAP);
+      } else {
+        setSelectedLayout(currentLayout);
+      }
+    },
+    [currentLayout]
   );
 
   //util function for join uuids in a specific pattern for fetching data
@@ -336,6 +338,16 @@ const SearchPage = () => {
     [dispatch, doSearch]
   );
 
+  const onChangeLayout = useCallback(
+    (layout: SearchResultLayoutEnum) => {
+      setSelectedLayout(layout);
+      // If user select layout full map, just return so the last selected layout is not changed in currentLayout
+      if (layout === SearchResultLayoutEnum.FULL_MAP) return;
+      setCurrentLayout(layout);
+    },
+    [setCurrentLayout]
+  );
+
   const handleClickCard = useCallback(
     (uuid: string) => {
       handleDatasetSelecting([uuid]);
@@ -364,12 +376,15 @@ const SearchPage = () => {
         }}
         gap={2}
       >
-        {visibility === SearchResultLayoutEnum.VISIBLE && (
+        {/* Ignore the FULL_LIST view for now, wait for future design */}
+        {selectedLayout !== SearchResultLayoutEnum.FULL_MAP && (
           <Box>
             <ResultSection
-              onVisibilityChanged={onVisibilityChanged}
+              // onVisibilityChanged={onVisibilityChanged}
               onClickCard={handleClickCard}
               onChangeSorting={onChangeSorting}
+              currentLayout={currentLayout}
+              onChangeLayout={onChangeLayout}
               datasetsSelected={datasetsSelected}
               isLoading={isLoading(loadingThreadCount)}
             />
@@ -380,7 +395,7 @@ const SearchPage = () => {
             collections={layers}
             bbox={bbox}
             zoom={zoom}
-            showFullMap={visibility === SearchResultLayoutEnum.INVISIBLE}
+            showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
             selectedUuids={selectedUuids}
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}

@@ -28,6 +28,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   count,
   total,
   sx,
+  currentLayout,
   onChangeLayout,
   onChangeSorting,
 }) => {
@@ -68,7 +69,10 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         <ResultListSortButton onChangeSorting={onChangeSorting} />
       </Grid>
       <Grid item md={3} xs={6}>
-        <MapViewButton onChangeLayout={onChangeLayout} />
+        <MapViewButton
+          onChangeLayout={onChangeLayout}
+          currentLayout={currentLayout}
+        />
       </Grid>
     </Grid>
   );
