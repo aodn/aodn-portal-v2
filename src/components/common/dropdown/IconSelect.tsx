@@ -6,8 +6,13 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { FC, useState } from "react";
-import { CommonSelectProps, SelectItem } from "./CommonSelect";
+import { FC, useCallback, useState } from "react";
+import {
+  CommonSelectProps,
+  disableScroll,
+  enableScroll,
+  SelectItem,
+} from "./CommonSelect";
 import {
   border,
   borderRadius,
@@ -82,12 +87,26 @@ const IconSelect = <T extends string | number = string>({
   sx,
 }: IconSelectProps<T>) => {
   const [selectedItem, setSelectedItem] = useState<T | "">("");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handleOnChange = (event: SelectChangeEvent<T>) => {
-    const selectedItem = event.target.value as T;
-    setSelectedItem(selectedItem);
-    if (onSelectCallback) onSelectCallback(selectedItem);
-  };
+  const handleOnChange = useCallback(
+    (event: SelectChangeEvent<T>) => {
+      const selectedItem = event.target.value as T;
+      setSelectedItem(selectedItem);
+      onSelectCallback && onSelectCallback(selectedItem);
+    },
+    [onSelectCallback]
+  );
+
+  const handleOpen = useCallback(() => {
+    setIsOpen(true);
+    disableScroll();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    enableScroll();
+  }, []);
 
   const config = mergeWithDefaults(defaultColorConfig, colorConfig);
 
@@ -119,6 +138,9 @@ const IconSelect = <T extends string | number = string>({
           selectedItem ? selectedValue(value) : defaultValue()
         }
         onChange={handleOnChange}
+        onOpen={handleOpen}
+        onClose={handleClose}
+        open={isOpen}
         IconComponent={() => null}
         sx={{
           padding: "0",

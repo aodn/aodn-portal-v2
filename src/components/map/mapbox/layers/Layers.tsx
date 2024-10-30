@@ -1,14 +1,14 @@
 import { PropsWithChildren } from "react";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
-import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 import * as turf from "@turf/turf";
 
 export interface LayersProps {
   // Tile layer should added to map
-  collections?: Array<OGCCollection>;
+  // collections?: Array<OGCCollection>;
+  features?: FeatureCollection<Point>;
   // Event fired when user click on the point layer
   onDatasetSelected?: (uuids: Array<string>) => void;
   // dataset that user selected from result list or map
@@ -29,43 +29,6 @@ const createStaticLayers = (ids: Array<string>) => (
     })}
   </>
 );
-
-// Given an array of OGCCollections, we convert it to a cluster layer by adding all the feature items
-// in a collection to the FeatureCollection
-const createCenterOfMassDataSource = (
-  collections: Array<OGCCollection> | undefined
-): FeatureCollection<Point> => {
-  const featureCollections: FeatureCollection<Point> = {
-    type: "FeatureCollection",
-    features: new Array<Feature<Point, GeoJsonProperties>>(),
-  };
-
-  collections?.forEach((collection) => {
-    if (collection.getCentroid()) {
-      // If data contains pre-calculated centroid then use it
-      collection.getCentroid()?.forEach((i) =>
-        featureCollections.features.push({
-          ...i,
-          // Add the id so we can reference it easily
-          properties: { uuid: collection.id },
-        })
-      );
-    } else {
-      // Do calculation based on extents bounding box, this is old way of doing things
-      // for backward compatable
-      // We skip the first one which is the overall bounding box, then add the remaining
-      collection.extent?.getGeojsonExtents(1).features.forEach((i) =>
-        featureCollections.features.push({
-          ...turf.centerOfMass(i.geometry),
-          // Add the id so we can reference it easily
-          properties: { uuid: collection.id },
-        })
-      );
-    }
-  });
-
-  return featureCollections;
-};
 
 // Function to check if a point is within the map's visible bounds
 const isFeatureVisible = (
@@ -151,7 +114,6 @@ export default Layers;
 
 export {
   createStaticLayers,
-  createCenterOfMassDataSource,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,

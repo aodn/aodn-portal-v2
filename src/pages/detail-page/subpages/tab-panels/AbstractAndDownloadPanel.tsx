@@ -36,15 +36,13 @@ import MenuControl, {
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
 import Map from "../../../../components/map/mapbox/Map";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
-import Layers, {
-  createStaticLayers,
-} from "../../../../components/map/mapbox/layers/Layers";
-import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
+import Layers from "../../../../components/map/mapbox/layers/Layers";
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
+import DetailClusterLayer from "../../../../components/map/mapbox/layers/DetailClusterLayer";
 
 interface DownloadSelect {
   label?: string;
@@ -141,7 +139,7 @@ const DOWNLOAD_SECTION_ID = "download-section";
 const TRUNCATE_COUNT = 800;
 
 const AbstractAndDownloadPanel: FC = () => {
-  const { collection } = useDetailPageContext();
+  const { collection, dataset } = useDetailPageContext();
   const downloadSectionRef = useScrollToSection({
     sectionId: DOWNLOAD_SECTION_ID,
   });
@@ -210,8 +208,9 @@ const AbstractAndDownloadPanel: FC = () => {
                     />
                   </Controls>
                   <Layers>
-                    <GeojsonLayer collection={collection} />
-                    {createStaticLayers(staticLayer)}
+                    {/*TODO: keep the below comment as it will be useful later*/}
+                    {/*<DetailHeatMap features={dataset} />*/}
+                    <DetailClusterLayer features={dataset} />
                   </Layers>
                 </Map>
               </Box>

@@ -20,6 +20,7 @@ import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLay
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 import SnackbarLoader from "../../../components/loading/SnackbarLoader";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
+import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
 
@@ -69,7 +70,7 @@ const MapSection: React.FC<MapSectionProps> = ({
         case LayerName.Heatmap:
           return (
             <HeatmapLayer
-              collections={collections}
+              features={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
               showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
@@ -80,7 +81,7 @@ const MapSection: React.FC<MapSectionProps> = ({
         default:
           return (
             <ClusterLayer
-              collections={collections}
+              features={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
               showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}

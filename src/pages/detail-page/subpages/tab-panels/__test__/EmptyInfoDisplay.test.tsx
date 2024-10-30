@@ -56,10 +56,10 @@ describe("empty area display", async () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryAllByText("N / A")).toHaveLength(3);
       expect(screen.queryByText("Keywords Not Found")).to.exist;
       expect(screen.queryByText("Contacts Not Found")).to.exist;
       expect(screen.queryByText("Credits Not Found")).to.exist;
+      expect(screen.queryAllByText("N / A")).toHaveLength(3);
     });
   });
 
