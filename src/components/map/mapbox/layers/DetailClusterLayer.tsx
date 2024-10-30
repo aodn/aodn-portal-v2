@@ -14,9 +14,6 @@ import {
   findSuitableVisiblePoint,
   LayersProps,
 } from "./Layers";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
-import SpatialExtents from "../component/SpatialExtents";
-import SpiderDiagram from "../component/SpiderDiagram";
 import { Feature, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
@@ -46,26 +43,21 @@ interface DetailClusterConfig {
   unclusterPointRadius: number;
 }
 
-interface DetailClusterProps extends LayersProps {
-  // Some method inherit from LayersProps
-  clusterLayerConfig?: Partial<DetailClusterConfig>;
-}
-
 const defaultDetailClusterConfig: DetailClusterConfig = {
   // point count thresholds define the boundaries between different cluster sizes.
   pointCountThresholds: {
-    medium: 20,
-    large: 30,
-    extra_large: 50,
+    medium: 10,
+    large: 15,
+    extra_large: 25,
   },
   clusterMaxZoom: MapDefaultConfig.MAX_ZOOM,
-  clusterRadius: 50,
+  clusterRadius: 20,
   // circle sizes define the radius(px) of the circles used to represent clusters on the map.
   clusterCircleSize: {
-    default: 20,
-    medium: 30,
-    large: 40,
-    extra_large: 60,
+    default: 10,
+    medium: 15,
+    large: 20,
+    extra_large: 30,
   },
   //cluster circle colors define the colors used for the circles representing clusters of different sizes.
   clusterCircleColor: {
@@ -97,7 +89,7 @@ export const getUnclusterPointId = (layerId: string) =>
   `${layerId}-unclustered-point`;
 
 // TODO: This file is copy & paste from the clusterLayer file. It should be simplified later
-const DetailClusterLayer: FC<DetailClusterProps> = ({
+const DetailClusterLayer: FC<LayersProps> = ({
   features = generateFeatureCollectionFrom(undefined),
 }) => {
   const [bbox, setBbox] = useState<
@@ -134,7 +126,7 @@ const DetailClusterLayer: FC<DetailClusterProps> = ({
   useEffect(() => {
     if (bbox && map && isValid(bbox)) {
       map.fitBounds(bbox, {
-        maxZoom: 2,
+        maxZoom: 4,
         padding: 100,
       });
     }
@@ -168,7 +160,7 @@ const DetailClusterLayer: FC<DetailClusterProps> = ({
         ),
         cluster: true,
         clusterMaxZoom: config.clusterMaxZoom,
-        clusterRadius: 50,
+        clusterRadius: config.clusterRadius,
         clusterProperties: {
           count: ["+", ["get", "count"]],
         },
