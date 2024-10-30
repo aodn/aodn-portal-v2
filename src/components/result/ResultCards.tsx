@@ -203,6 +203,7 @@ const ResultCards = ({
   // logic .clentHeight.height have values. In short it fill the
   // whole area.
   // *** We need to dsiplay the load more button, hence item count + 1 ***
+  // TODO: implement FULL_LIST view in the future
   if (
     !layout ||
     layout === SearchResultLayoutEnum.LIST ||

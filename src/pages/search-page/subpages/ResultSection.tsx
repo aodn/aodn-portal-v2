@@ -14,6 +14,7 @@ import CircleLoader from "../../../components/loading/CircleLoader";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 
 interface ResultSectionProps {
+  currentSort: SortResultEnum | null;
   currentLayout: Exclude<
     SearchResultLayoutEnum,
     SearchResultLayoutEnum.FULL_MAP
@@ -31,6 +32,7 @@ const ResultSection: FC<ResultSectionProps> = ({
   datasetsSelected,
   currentLayout,
   onChangeLayout,
+  currentSort,
   onChangeSorting,
   onClickCard,
   isLoading,
@@ -59,6 +61,7 @@ const ResultSection: FC<ResultSectionProps> = ({
             total={reduxContents.result.total}
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
+            currentSort={currentSort}
             onChangeSorting={onChangeSorting}
           />
         </Box>

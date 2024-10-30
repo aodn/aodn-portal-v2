@@ -78,6 +78,8 @@ const SearchPage = () => {
     SearchResultLayoutEnum,
     SearchResultLayoutEnum.FULL_MAP
   > | null>(null);
+  // State to store the sort option that user selected
+  const [currentSort, setCurrentSort] = useState<SortResultEnum | null>(null);
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
@@ -94,15 +96,14 @@ const SearchPage = () => {
 
   // Value true meaning full map. So if true set the selected layout as full-map
   // Else set the selected layout as the last layout remembered (stored in currentLayout)
+  // or LIST view by default if user hasn't chosen any view mode
   const onToggleDisplay = useCallback(
     (value: boolean) => {
-      if (value) {
-        setSelectedLayout(SearchResultLayoutEnum.FULL_MAP);
-      } else {
-        if (currentLayout) {
-          setSelectedLayout(currentLayout);
-        }
-      }
+      setSelectedLayout(
+        value
+          ? SearchResultLayoutEnum.FULL_MAP
+          : currentLayout || SearchResultLayoutEnum.LIST
+      );
     },
     [currentLayout]
   );
@@ -302,8 +303,9 @@ const SearchPage = () => {
   ]);
 
   const onChangeSorting = useCallback(
-    (v: SortResultEnum) => {
-      switch (v) {
+    (sort: SortResultEnum) => {
+      setCurrentSort(sort);
+      switch (sort) {
         case SortResultEnum.RELEVANT:
           dispatch(
             updateSortBy([
@@ -383,8 +385,8 @@ const SearchPage = () => {
         {selectedLayout !== SearchResultLayoutEnum.FULL_MAP && (
           <Box>
             <ResultSection
-              // onVisibilityChanged={onVisibilityChanged}
               onClickCard={handleClickCard}
+              currentSort={currentSort}
               onChangeSorting={onChangeSorting}
               currentLayout={currentLayout}
               onChangeLayout={onChangeLayout}
