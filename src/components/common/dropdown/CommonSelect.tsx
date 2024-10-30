@@ -5,7 +5,7 @@ import {
   SelectChangeEvent,
   SxProps,
 } from "@mui/material";
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { IconProps } from "../../icon/types";
 import { useDetailPageContext } from "../../../pages/detail-page/context/detail-page-context";
 
@@ -33,24 +33,58 @@ const DEFAULT_SELECT_STYLE: SxProps = {
   fontSize: "14px",
 };
 
+const disableScroll = () => {
+  // Save current scroll position and disable the page scroll to avoid menuitem
+  // flow on top of page
+  const scrollY = window.scrollY;
+  document.body.style.position = "fixed";
+  document.body.style.width = "100%";
+  document.body.style.top = `-${scrollY}px`;
+};
+
+const enableScroll = () => {
+  // Restore scroll position
+  const scrollY = document.body.style.top;
+  document.body.style.position = "";
+  document.body.style.width = "";
+  window.scrollTo(0, parseInt(scrollY || "0", 10) * -1);
+};
+
 const CommonSelect: FC<CommonSelectProps> = ({
   items,
   onSelectCallback,
   sx,
 }) => {
   const [selectedItem, setSelectedItem] = useState<string>(items[0].value);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const { isCollectionNotFound } = useDetailPageContext();
 
-  const handleOnChange = (event: SelectChangeEvent<string>) => {
-    const selectedItem = event.target.value as string;
-    setSelectedItem(selectedItem);
-    if (onSelectCallback) onSelectCallback(selectedItem);
-  };
+  const handleOnChange = useCallback(
+    (event: SelectChangeEvent<string>) => {
+      const selectedItem = event.target.value as string;
+      setSelectedItem(selectedItem);
+      onSelectCallback && onSelectCallback(selectedItem);
+    },
+    [onSelectCallback]
+  );
+
+  const handleOpen = useCallback(() => {
+    setIsOpen(true);
+    disableScroll();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    enableScroll();
+  }, []);
 
   return (
     <FormControl fullWidth disabled={isCollectionNotFound}>
       <Select
         value={selectedItem}
+        onOpen={handleOpen}
+        onClose={handleClose}
+        open={isOpen}
         onChange={handleOnChange}
         sx={{
           ...DEFAULT_SELECT_STYLE,
@@ -67,4 +101,5 @@ const CommonSelect: FC<CommonSelectProps> = ({
   );
 };
 
+export { disableScroll, enableScroll };
 export default CommonSelect;

@@ -20,6 +20,16 @@ import SelectedGridCard from "./SelectedGridCard";
 import { ParameterState } from "../common/store/componentParamReducer";
 import store, { getComponentState } from "../common/store/store";
 import { useAppDispatch } from "../common/store/hooks";
+import useTabNavigation from "../../hooks/useTabNavigation";
+
+export interface ItemCardProps {
+  content?: OGCCollection;
+  onClickCard?: (uuid: string) => void;
+  onClickDetail: (uuid: string) => void;
+  onClickDownload: (uuid: string) => void;
+  onClickLinks: (uuid: string) => void;
+  isSelectedDataset?: boolean;
+}
 
 interface ResultCardsProps {
   content?: OGCCollection;
@@ -41,6 +51,7 @@ const ResultCards = ({
 
   // Get contents from redux
   const dispatch = useAppDispatch();
+  const goToDetailPage = useTabNavigation();
   const fetchMore = useCallback(async () => {
     // This is very specific to how elastic works and then how to construct the query
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -60,6 +71,21 @@ const ResultCards = ({
   const count = contents.result.collections.length;
   const total = contents.result.total;
 
+  const onClickDetail = useCallback(
+    (uuid: string) => goToDetailPage(uuid, "abstract"),
+    [goToDetailPage]
+  );
+
+  const onClickDownload = useCallback(
+    (uuid: string) => goToDetailPage(uuid, "abstract", "download-section"),
+    [goToDetailPage]
+  );
+
+  const onClickLinks = useCallback(
+    (uuid: string) => goToDetailPage(uuid, "links"),
+    [goToDetailPage]
+  );
+
   const renderLoadMoreButton = useCallback(() => {
     return (
       <DetailSubtabBtn
@@ -76,6 +102,7 @@ const ResultCards = ({
       count: number,
       total: number,
       { contents, onClickCard }: ResultCardsProps,
+      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
       child: ListChildComponentProps
     ) => {
       const { index, style } = child;
@@ -105,6 +132,9 @@ const ResultCards = ({
                 <GridResultCard
                   content={contents.result.collections[leftIndex]}
                   onClickCard={onClickCard}
+                  onClickDetail={onClickDetail}
+                  onClickLinks={onClickLinks}
+                  onClickDownload={onClickDownload}
                 />
               </Grid>
               {rightIndex < contents.result.collections.length && (
@@ -112,6 +142,9 @@ const ResultCards = ({
                   <GridResultCard
                     content={contents.result.collections[rightIndex]}
                     onClickCard={onClickCard}
+                    onClickDetail={onClickDetail}
+                    onClickLinks={onClickLinks}
+                    onClickDownload={onClickDownload}
                   />
                 </Grid>
               )}
@@ -128,6 +161,7 @@ const ResultCards = ({
       count: number,
       total: number,
       { contents, onClickCard }: ResultCardsProps,
+      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
       child: ListChildComponentProps
     ) => {
       // The style must pass to the listitem else incorrect rendering
@@ -154,6 +188,9 @@ const ResultCards = ({
             <ListResultCard
               content={contents.result.collections[index]}
               onClickCard={onClickCard}
+              onClickDetail={onClickDetail}
+              onClickLinks={onClickLinks}
+              onClickDownload={onClickDownload}
             />
           </ListItem>
         );
@@ -180,6 +217,9 @@ const ResultCards = ({
           <SelectedListCard
             content={datasetsSelected[0]}
             onClickCard={onClickCard}
+            onClickDetail={onClickDetail}
+            onClickDownload={onClickDownload}
+            onClickLinks={onClickLinks}
           />
         )}
         <AutoSizer>
@@ -197,6 +237,11 @@ const ResultCards = ({
                   {
                     contents,
                     onClickCard,
+                  },
+                  {
+                    onClickDetail,
+                    onClickLinks,
+                    onClickDownload,
                   },
                   child
                 )
@@ -218,6 +263,9 @@ const ResultCards = ({
           <SelectedGridCard
             content={datasetsSelected[0]}
             onClickCard={onClickCard}
+            onClickDetail={onClickDetail}
+            onClickDownload={onClickDownload}
+            onClickLinks={onClickLinks}
           />
         )}
         <AutoSizer>
@@ -235,6 +283,11 @@ const ResultCards = ({
                   {
                     contents,
                     onClickCard,
+                  },
+                  {
+                    onClickDetail,
+                    onClickLinks,
+                    onClickDownload,
                   },
                   child
                 )

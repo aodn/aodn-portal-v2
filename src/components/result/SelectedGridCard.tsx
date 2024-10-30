@@ -3,15 +3,16 @@ import { GRID_CARD_HEIGHT, LIST_CARD_GAP } from "./constants";
 import { gap } from "../../styles/constants";
 import GridResultCard from "./GridResultCard";
 import { Box } from "@mui/material";
+import { ItemCardProps } from "./ResultCards";
 
-interface SelectedGridCardProps {
-  content: any;
-  onClickCard: (uuid: string) => void;
-}
+interface SelectedGridCardProps extends ItemCardProps {}
 
 const SelectedGridCard: React.FC<SelectedGridCardProps> = ({
   content,
   onClickCard,
+  onClickDetail,
+  onClickLinks,
+  onClickDownload,
 }) => {
   return (
     <Box
@@ -22,6 +23,9 @@ const SelectedGridCard: React.FC<SelectedGridCardProps> = ({
       <GridResultCard
         content={content}
         onClickCard={onClickCard}
+        onClickDetail={onClickDetail}
+        onClickDownload={onClickDownload}
+        onClickLinks={onClickLinks}
         isSelectedDataset
       />
     </Box>

@@ -20,31 +20,23 @@ import {
 import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import useTabNavigation from "../../hooks/useTabNavigation";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { ItemCardProps } from "./ResultCards";
 
-interface ListResultCardProps {
-  content?: OGCCollection;
-  onClickCard?: (uuid: string) => void;
-  isSelectedDataset?: boolean;
-}
+interface ListResultCardProps extends ItemCardProps {}
 
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
   content,
   onClickCard = () => {},
+  onClickDetail,
+  onClickLinks,
+  onClickDownload,
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
-  const goToDetailPage = useTabNavigation();
-
   if (!content) return;
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
-
-  const onLinks = () => goToDetailPage(uuid, "links");
-  const onDownload = () => goToDetailPage(uuid, "abstract", "download-section");
-  const onDetail = () => goToDetailPage(uuid, "abstract");
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
@@ -78,7 +70,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
         mr={gap.sm}
       >
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea onClick={() => goToDetailPage(uuid, "abstract")}>
+          <CardActionArea onClick={() => onClickDetail(uuid)}>
             <Box
               display="flex"
               alignItems="center"
@@ -127,9 +119,9 @@ const ListResultCard: FC<ListResultCardProps> = ({
           <ResultCardButtonGroup
             content={content}
             shouldHideText
-            onLinks={onLinks}
-            onDownload={onDownload}
-            onDetail={onDetail}
+            onLinks={() => onClickLinks(uuid)}
+            onDownload={() => onClickDownload(uuid)}
+            onDetail={() => onClickDetail(uuid)}
           />
         )}
       </Box>
