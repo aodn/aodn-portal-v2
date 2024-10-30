@@ -102,6 +102,7 @@ const ResultCards = ({
       count: number,
       total: number,
       { contents, onClickCard }: ResultCardsProps,
+      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
       child: ListChildComponentProps
     ) => {
       const { index, style } = child;
@@ -152,7 +153,7 @@ const ResultCards = ({
         );
       }
     },
-    [renderLoadMoreButton, onClickDetail, onClickDownload, onClickLinks]
+    [renderLoadMoreButton]
   );
 
   const renderRows = useCallback(
@@ -160,6 +161,7 @@ const ResultCards = ({
       count: number,
       total: number,
       { contents, onClickCard }: ResultCardsProps,
+      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
       child: ListChildComponentProps
     ) => {
       // The style must pass to the listitem else incorrect rendering
@@ -212,6 +214,9 @@ const ResultCards = ({
           <SelectedListCard
             content={datasetsSelected[0]}
             onClickCard={onClickCard}
+            onClickDetail={onClickDetail}
+            onClickDownload={onClickDownload}
+            onClickLinks={onClickLinks}
           />
         )}
         <AutoSizer>
@@ -229,6 +234,11 @@ const ResultCards = ({
                   {
                     contents,
                     onClickCard,
+                  },
+                  {
+                    onClickDetail,
+                    onClickLinks,
+                    onClickDownload,
                   },
                   child
                 )
@@ -250,6 +260,9 @@ const ResultCards = ({
           <SelectedGridCard
             content={datasetsSelected[0]}
             onClickCard={onClickCard}
+            onClickDetail={onClickDetail}
+            onClickDownload={onClickDownload}
+            onClickLinks={onClickLinks}
           />
         )}
         <AutoSizer>
@@ -267,6 +280,11 @@ const ResultCards = ({
                   {
                     contents,
                     onClickCard,
+                  },
+                  {
+                    onClickDetail,
+                    onClickLinks,
+                    onClickDownload,
                   },
                   child
                 )
