@@ -6,7 +6,7 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import {
   CommonSelectProps,
   disableScroll,
@@ -82,11 +82,12 @@ const renderSelectValue = (
 const IconSelect = <T extends string | number = string>({
   items,
   selectName,
+  value,
   colorConfig,
   onSelectCallback,
   sx,
 }: IconSelectProps<T>) => {
-  const [selectedItem, setSelectedItem] = useState<T | "">("");
+  const [selectedItem, setSelectedItem] = useState<T | null>(value ?? null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleOnChange = useCallback(
@@ -129,6 +130,10 @@ const IconSelect = <T extends string | number = string>({
       config.selectedBgColor
     );
   };
+
+  useEffect(() => {
+    if (value) setSelectedItem(value);
+  }, [value]);
 
   return (
     <FormControl fullWidth>

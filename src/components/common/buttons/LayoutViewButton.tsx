@@ -36,24 +36,26 @@ const MAP_VIEW_SELECT = [
   },
 ];
 
-export interface MapViewButtonProps<T> {
+export interface LayoutViewButtonProps<T> {
   currentLayout: Exclude<
     SearchResultLayoutEnum,
     SearchResultLayoutEnum.FULL_MAP
-  >;
+  > | null;
   onChangeLayout: (layout: T) => void;
 }
 
-const MapViewButton: FC<MapViewButtonProps<SearchResultLayoutEnum>> = ({
+const LayoutViewButton: FC<LayoutViewButtonProps<SearchResultLayoutEnum>> = ({
   onChangeLayout,
+  currentLayout,
 }) => {
   return (
     <IconSelect
       items={MAP_VIEW_SELECT}
       selectName="View"
       onSelectCallback={onChangeLayout}
+      value={currentLayout}
     />
   );
 };
 
-export default MapViewButton;
+export default LayoutViewButton;

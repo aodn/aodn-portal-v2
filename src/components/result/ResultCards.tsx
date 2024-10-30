@@ -12,7 +12,7 @@ import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
-import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
+import { SearchResultLayoutEnum } from "../common/buttons/LayoutViewButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
 import SelectedListCard from "./SelectedListCard";
@@ -35,7 +35,7 @@ interface ResultCardsProps {
   content?: OGCCollection;
   onClickCard?: (uuid: string) => void;
   contents: CollectionsQueryType;
-  layout?: SearchResultLayoutEnum;
+  layout?: SearchResultLayoutEnum | null;
   sx?: SxProps<Theme>;
   datasetsSelected?: OGCCollection[];
 }
@@ -204,6 +204,7 @@ const ResultCards = ({
   // whole area.
   // *** We need to dsiplay the load more button, hence item count + 1 ***
   if (
+    !layout ||
     layout === SearchResultLayoutEnum.LIST ||
     layout === SearchResultLayoutEnum.FULL_LIST
   ) {

@@ -9,7 +9,7 @@ import {
   searchQueryResult,
 } from "../../../components/common/store/store";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
-import { SearchResultLayoutEnum } from "../../../components/common/buttons/MapViewButton";
+import { SearchResultLayoutEnum } from "../../../components/common/buttons/LayoutViewButton";
 import CircleLoader from "../../../components/loading/CircleLoader";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 
@@ -17,7 +17,7 @@ interface ResultSectionProps {
   currentLayout: Exclude<
     SearchResultLayoutEnum,
     SearchResultLayoutEnum.FULL_MAP
-  >;
+  > | null;
   onChangeLayout: (layout: SearchResultLayoutEnum) => void;
   onChangeSorting: (v: SortResultEnum) => void;
   isLoading: boolean;

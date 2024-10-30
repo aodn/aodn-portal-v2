@@ -16,6 +16,8 @@ export interface SelectItem<T = string> {
 }
 export interface CommonSelectProps<T = string> {
   items: SelectItem<T>[];
+  // Once value is provided, the component is controllable
+  value?: T | null;
   onSelectCallback?: (value: T) => void;
   sx?: SxProps;
 }

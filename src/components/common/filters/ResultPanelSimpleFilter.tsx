@@ -7,17 +7,17 @@ import {
   fontSize,
 } from "../../../styles/constants";
 import { formatNumber } from "../../../utils/StringUtils";
-import MapViewButton, {
-  MapViewButtonProps,
+import LayoutViewButton, {
+  LayoutViewButtonProps,
   SearchResultLayoutEnum,
-} from "../buttons/MapViewButton";
+} from "../buttons/LayoutViewButton";
 import ResultListSortButton, {
   ResultListSortButtonProps,
   SortResultEnum,
 } from "../buttons/ResultListSortButton";
 
 interface ResultPanelSimpleFilterProps
-  extends MapViewButtonProps<SearchResultLayoutEnum>,
+  extends LayoutViewButtonProps<SearchResultLayoutEnum>,
     ResultListSortButtonProps<SortResultEnum> {
   count: number;
   total: number;
@@ -69,7 +69,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         <ResultListSortButton onChangeSorting={onChangeSorting} />
       </Grid>
       <Grid item md={3} xs={6}>
-        <MapViewButton
+        <LayoutViewButton
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
         />

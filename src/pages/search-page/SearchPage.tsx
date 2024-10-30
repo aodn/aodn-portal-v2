@@ -36,7 +36,7 @@ import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
 import MapSection from "./subpages/MapSection";
 import { color, padding } from "../../styles/constants";
-import { SearchResultLayoutEnum } from "../../components/common/buttons/MapViewButton";
+import { SearchResultLayoutEnum } from "../../components/common/buttons/LayoutViewButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
 import {
@@ -74,9 +74,10 @@ const SearchPage = () => {
     SearchResultLayoutEnum.LIST
   );
   // CurrentLayout is used to remember last layout, which is SearchResultLayoutEnum exclude the value FULL_MAP
-  const [currentLayout, setCurrentLayout] = useState<
-    Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
-  >(SearchResultLayoutEnum.LIST);
+  const [currentLayout, setCurrentLayout] = useState<Exclude<
+    SearchResultLayoutEnum,
+    SearchResultLayoutEnum.FULL_MAP
+  > | null>(null);
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
@@ -98,7 +99,9 @@ const SearchPage = () => {
       if (value) {
         setSelectedLayout(SearchResultLayoutEnum.FULL_MAP);
       } else {
-        setSelectedLayout(currentLayout);
+        if (currentLayout) {
+          setSelectedLayout(currentLayout);
+        }
       }
     },
     [currentLayout]
