@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
-import { Vocab, ParameterState } from "./componentParamReducer";
+import { ParameterState, Vocab } from "./componentParamReducer";
 
 import {
-  ParameterVocabsIn,
   cqlDefaultFilters,
+  ParameterVocabsIn,
   PolygonOperation,
   TemporalAfterOrBefore,
   TemporalDuring,
@@ -15,6 +15,7 @@ import {
   createErrorResponse,
   ErrorResponse,
 } from "../../../utils/ErrorBoundary";
+import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 
 export enum DatasetFrequency {
@@ -208,6 +209,26 @@ const fetchResultAppendStore = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("search/fetchResultAppendStore", searchResult);
 
+function errorHandling(thunkApi: any) {
+  return (error: Error | AxiosError | ErrorResponse) => {
+    if (axios.isAxiosError(error) && error.response) {
+      return thunkApi.rejectWithValue(
+        createErrorResponse(
+          error?.response?.status,
+          error?.response?.data.details
+            ? error?.response?.data.details
+            : error?.response?.statusText,
+          error?.response?.data.message,
+          error?.response?.data.timestamp,
+          error?.response?.data.parameters
+        )
+      );
+    } else {
+      return thunkApi.rejectWithValue(error);
+    }
+  };
+}
+
 const fetchResultByUuidNoStore = createAsyncThunk<
   OGCCollection,
   string,
@@ -216,23 +237,18 @@ const fetchResultByUuidNoStore = createAsyncThunk<
   axios
     .get<OGCCollection>(`/api/v1/ogc/collections/${id}`)
     .then((response) => Object.assign(new OGCCollection(), response.data))
-    .catch((error: Error | AxiosError | ErrorResponse) => {
-      if (axios.isAxiosError(error) && error.response) {
-        return thunkApi.rejectWithValue(
-          createErrorResponse(
-            error?.response?.status,
-            error?.response?.data.details
-              ? error?.response?.data.details
-              : error?.response?.statusText,
-            error?.response?.data.message,
-            error?.response?.data.timestamp,
-            error?.response?.data.parameters
-          )
-        );
-      } else {
-        return thunkApi.rejectWithValue(error);
-      }
-    })
+    .catch(errorHandling(thunkApi))
+);
+
+const fetchDatasetByUuid = createAsyncThunk<
+  FeatureCollection<Point>,
+  string,
+  { rejectValue: ErrorResponse }
+>("search/fetchDatasetByUuid", async (id: string, thunkApi: any) =>
+  axios
+    .get<FeatureCollection<Point>>(`/api/v1/ogc/collections/${id}/items`)
+    .then((response) => response.data)
+    .catch(errorHandling(thunkApi))
 );
 
 const fetchParameterVocabsWithStore = createAsyncThunk<
@@ -379,6 +395,7 @@ export {
   fetchResultNoStore,
   fetchResultAppendStore,
   fetchResultByUuidNoStore,
+  fetchDatasetByUuid,
   fetchParameterVocabsWithStore,
 };
 

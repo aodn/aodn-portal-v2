@@ -1,5 +1,6 @@
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import { FeatureCollection, Point } from "geojson";
 
 export interface SpatialExtentPhoto {
   bbox: number[];
@@ -8,6 +9,7 @@ export interface SpatialExtentPhoto {
 interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
+  dataset: FeatureCollection<Point> | undefined;
   isCollectionNotFound: boolean;
   photos: SpatialExtentPhoto[];
   setPhotos: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
@@ -24,6 +26,7 @@ interface DetailPageContextType {
 const DetailPageContextDefault = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
+  dataset: {} as FeatureCollection<Point> | undefined,
   isCollectionNotFound: false,
   photos: [] as SpatialExtentPhoto[],
   setPhotos: () => {},

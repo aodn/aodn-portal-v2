@@ -1,4 +1,4 @@
-import { Dispatch, FC, useCallback, useState } from "react";
+import { Dispatch, FC, useCallback } from "react";
 import { Tune } from "@mui/icons-material";
 import { Stack } from "@mui/material";
 import SearchbarExpandableButton from "./SearchbarExpandableButton";
