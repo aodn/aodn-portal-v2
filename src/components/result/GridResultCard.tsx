@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useState } from "react";
 import {
   Box,
   Card,
@@ -20,29 +20,22 @@ import {
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import useTabNavigation from "../../hooks/useTabNavigation";
+import { ItemCardProps } from "./ResultCards";
 
-interface GridResultCardProps {
-  content?: OGCCollection;
-  onClickCard?: (uuid: string) => void;
-  isSelectedDataset?: boolean;
-}
+interface GridResultCardProps extends ItemCardProps {}
 
 const GridResultCard: FC<GridResultCardProps> = ({
   content,
   onClickCard = () => {},
+  onClickDetail,
+  onClickLinks,
+  onClickDownload,
   isSelectedDataset,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
-  const goToDetailPage = useTabNavigation();
 
   if (!content) return;
   const { id: uuid, title, findIcon, findThumbnail } = content;
-
-  const onLinks = () => goToDetailPage(uuid, "links");
-  const onDownload = () => goToDetailPage(uuid, "abstract", "download-section");
-  const onDetail = () => goToDetailPage(uuid, "abstract");
 
   return (
     <Card
@@ -122,7 +115,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         )}
 
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea onClick={() => onDetail}>
+          <CardActionArea onClick={() => onClickDetail(uuid)}>
             <Box
               display="flex"
               alignItems="center"
@@ -163,9 +156,9 @@ const GridResultCard: FC<GridResultCardProps> = ({
             content={content}
             shouldHideText
             isGridView
-            onLinks={onLinks}
-            onDownload={onDownload}
-            onDetail={onDetail}
+            onLinks={() => onClickLinks(uuid)}
+            onDownload={() => onClickDownload(uuid)}
+            onDetail={() => onClickDetail(uuid)}
           />
         </Stack>
       )}

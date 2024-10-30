@@ -20,6 +20,16 @@ import SelectedGridCard from "./SelectedGridCard";
 import { ParameterState } from "../common/store/componentParamReducer";
 import store, { getComponentState } from "../common/store/store";
 import { useAppDispatch } from "../common/store/hooks";
+import useTabNavigation from "../../hooks/useTabNavigation";
+
+export interface ItemCardProps {
+  content?: OGCCollection;
+  onClickCard?: (uuid: string) => void;
+  onClickDetail: (uuid: string) => void;
+  onClickDownload: (uuid: string) => void;
+  onClickLinks: (uuid: string) => void;
+  isSelectedDataset?: boolean;
+}
 
 interface ResultCardsProps {
   content?: OGCCollection;
@@ -41,6 +51,7 @@ const ResultCards = ({
 
   // Get contents from redux
   const dispatch = useAppDispatch();
+  const goToDetailPage = useTabNavigation();
   const fetchMore = useCallback(async () => {
     // This is very specific to how elastic works and then how to construct the query
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -59,6 +70,21 @@ const ResultCards = ({
 
   const count = contents.result.collections.length;
   const total = contents.result.total;
+
+  const onClickDetail = useCallback(
+    (uuid: string) => goToDetailPage(uuid, "abstract"),
+    [goToDetailPage]
+  );
+
+  const onClickDownload = useCallback(
+    (uuid: string) => goToDetailPage(uuid, "abstract", "download-section"),
+    [goToDetailPage]
+  );
+
+  const onClickLinks = useCallback(
+    (uuid: string) => goToDetailPage(uuid, "links"),
+    [goToDetailPage]
+  );
 
   const renderLoadMoreButton = useCallback(() => {
     return (
@@ -105,6 +131,9 @@ const ResultCards = ({
                 <GridResultCard
                   content={contents.result.collections[leftIndex]}
                   onClickCard={onClickCard}
+                  onClickDetail={onClickDetail}
+                  onClickLinks={onClickLinks}
+                  onClickDownload={onClickDownload}
                 />
               </Grid>
               {rightIndex < contents.result.collections.length && (
@@ -112,6 +141,9 @@ const ResultCards = ({
                   <GridResultCard
                     content={contents.result.collections[rightIndex]}
                     onClickCard={onClickCard}
+                    onClickDetail={onClickDetail}
+                    onClickLinks={onClickLinks}
+                    onClickDownload={onClickDownload}
                   />
                 </Grid>
               )}
@@ -120,7 +152,7 @@ const ResultCards = ({
         );
       }
     },
-    [renderLoadMoreButton]
+    [renderLoadMoreButton, onClickDetail, onClickDownload, onClickLinks]
   );
 
   const renderRows = useCallback(
@@ -154,6 +186,9 @@ const ResultCards = ({
             <ListResultCard
               content={contents.result.collections[index]}
               onClickCard={onClickCard}
+              onClickDetail={onClickDetail}
+              onClickLinks={onClickLinks}
+              onClickDownload={onClickDownload}
             />
           </ListItem>
         );
