@@ -4,6 +4,7 @@ import { Button, Grid, Typography } from "@mui/material";
 import {
   decodeHtmlEntities,
   truncateText,
+  enrichHTML,
 } from "../../../../utils/StringUtils";
 
 interface ExpandableTextAreaProps {
@@ -24,7 +25,6 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   showMoreStr = "Show More",
 }) => {
   const decodedText = decodeHtmlEntities(text);
-  const truncatedText = truncateText(decodedText, truncateCount);
   const doesNeedTruncation = decodedText.length > truncateCount;
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -32,11 +32,19 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   const onButtonClick = useCallback(() => {
     setIsExpanded((prev) => !prev);
   }, []);
+
+  // In the typography we cannot use white-space="pre" in sx because
+  // we need to format the http link to html
   return (
     <TextAreaBaseGrid>
       <Grid item md={12}>
         <Typography
-          variant="detailContent"
+          component="div"
+          dangerouslySetInnerHTML={{
+            __html: isExpanded
+              ? enrichHTML(decodedText)
+              : enrichHTML(truncateText(decodedText, truncateCount)),
+          }}
           sx={{
             textAlign: "left",
             ...(isClickable && {
@@ -47,9 +55,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
             }),
           }}
           onClick={onClick}
-        >
-          {isExpanded ? decodedText : truncatedText}
-        </Typography>
+        />
       </Grid>
       <Grid item md={12} display="flex" justifyContent="flex-end">
         {doesNeedTruncation && (
@@ -63,3 +69,6 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
 };
 
 export default ExpandableTextArea;
+function enrchHTML(arg0: string) {
+  throw new Error("Function not implemented.");
+}
