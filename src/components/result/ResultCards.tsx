@@ -12,7 +12,7 @@ import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
-import { SearchResultLayoutEnum } from "../common/buttons/LayoutViewButton";
+import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
 import SelectedListCard from "./SelectedListCard";

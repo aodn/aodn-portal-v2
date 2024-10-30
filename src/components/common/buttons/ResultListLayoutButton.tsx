@@ -36,7 +36,7 @@ const MAP_VIEW_SELECT = [
   },
 ];
 
-export interface LayoutViewButtonProps<T> {
+export interface ResultListLayoutButtonProps<T> {
   currentLayout: Exclude<
     SearchResultLayoutEnum,
     SearchResultLayoutEnum.FULL_MAP
@@ -44,10 +44,9 @@ export interface LayoutViewButtonProps<T> {
   onChangeLayout: (layout: T) => void;
 }
 
-const LayoutViewButton: FC<LayoutViewButtonProps<SearchResultLayoutEnum>> = ({
-  onChangeLayout,
-  currentLayout,
-}) => {
+const ResultListLayoutButton: FC<
+  ResultListLayoutButtonProps<SearchResultLayoutEnum>
+> = ({ onChangeLayout, currentLayout }) => {
   return (
     <IconSelect
       items={MAP_VIEW_SELECT}
@@ -58,4 +57,4 @@ const LayoutViewButton: FC<LayoutViewButtonProps<SearchResultLayoutEnum>> = ({
   );
 };
 
-export default LayoutViewButton;
+export default ResultListLayoutButton;

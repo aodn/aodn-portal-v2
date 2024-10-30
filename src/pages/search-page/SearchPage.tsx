@@ -36,7 +36,7 @@ import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import ResultSection from "./subpages/ResultSection";
 import MapSection from "./subpages/MapSection";
 import { color, padding } from "../../styles/constants";
-import { SearchResultLayoutEnum } from "../../components/common/buttons/LayoutViewButton";
+import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
 import {

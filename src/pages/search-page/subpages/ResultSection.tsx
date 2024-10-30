@@ -9,7 +9,7 @@ import {
   searchQueryResult,
 } from "../../../components/common/store/store";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
-import { SearchResultLayoutEnum } from "../../../components/common/buttons/LayoutViewButton";
+import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import CircleLoader from "../../../components/loading/CircleLoader";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 
