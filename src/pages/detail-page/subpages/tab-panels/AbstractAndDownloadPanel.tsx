@@ -40,7 +40,6 @@ import Layers from "../../../../components/map/mapbox/layers/Layers";
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import useScrollToSection from "../../../../hooks/useScrollToSection";
-import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailClusterLayer from "../../../../components/map/mapbox/layers/DetailClusterLayer";
 
@@ -156,7 +155,7 @@ const AbstractAndDownloadPanel: FC = () => {
         <Grid item xs={12}>
           <Stack direction="column">
             <ExpandableTextArea
-              text={decodeHtmlEntities(abstract)}
+              text={abstract}
               showMoreStr={"Show All"}
               truncateCount={TRUNCATE_COUNT}
             />

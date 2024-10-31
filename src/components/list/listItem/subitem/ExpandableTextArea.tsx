@@ -4,6 +4,7 @@ import { Button, Grid, Typography } from "@mui/material";
 import {
   decodeHtmlEntities,
   truncateText,
+  enrichHTML,
 } from "../../../../utils/StringUtils";
 
 interface ExpandableTextAreaProps {
@@ -24,7 +25,6 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   showMoreStr = "Show More",
 }) => {
   const decodedText = decodeHtmlEntities(text);
-  const truncatedText = truncateText(decodedText, truncateCount);
   const doesNeedTruncation = decodedText.length > truncateCount;
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -32,11 +32,13 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   const onButtonClick = useCallback(() => {
     setIsExpanded((prev) => !prev);
   }, []);
+
   return (
     <TextAreaBaseGrid>
       <Grid item md={12}>
         <Typography
           variant="detailContent"
+          whiteSpace="pre-wrap"
           sx={{
             textAlign: "left",
             ...(isClickable && {
@@ -48,7 +50,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
           }}
           onClick={onClick}
         >
-          {isExpanded ? decodedText : truncatedText}
+          {isExpanded ? decodedText : truncateText(decodedText, truncateCount)}
         </Typography>
       </Grid>
       <Grid item md={12} display="flex" justifyContent="flex-end">
