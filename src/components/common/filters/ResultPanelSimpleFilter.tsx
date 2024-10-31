@@ -7,17 +7,17 @@ import {
   fontSize,
 } from "../../../styles/constants";
 import { formatNumber } from "../../../utils/StringUtils";
-import MapViewButton, {
-  MapViewButtonProps,
+import ResultListLayoutButton, {
+  ResultListLayoutButtonProps,
   SearchResultLayoutEnum,
-} from "../buttons/MapViewButton";
+} from "../buttons/ResultListLayoutButton";
 import ResultListSortButton, {
   ResultListSortButtonProps,
   SortResultEnum,
 } from "../buttons/ResultListSortButton";
 
 interface ResultPanelSimpleFilterProps
-  extends MapViewButtonProps<SearchResultLayoutEnum>,
+  extends ResultListLayoutButtonProps<SearchResultLayoutEnum>,
     ResultListSortButtonProps<SortResultEnum> {
   count: number;
   total: number;
@@ -28,7 +28,9 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   count,
   total,
   sx,
+  currentLayout,
   onChangeLayout,
+  currentSort,
   onChangeSorting,
 }) => {
   return (
@@ -65,10 +67,16 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         </Paper>
       </Grid>
       <Grid item md={3} xs={6}>
-        <ResultListSortButton onChangeSorting={onChangeSorting} />
+        <ResultListSortButton
+          onChangeSorting={onChangeSorting}
+          currentSort={currentSort}
+        />
       </Grid>
       <Grid item md={3} xs={6}>
-        <MapViewButton onChangeLayout={onChangeLayout} />
+        <ResultListLayoutButton
+          onChangeLayout={onChangeLayout}
+          currentLayout={currentLayout}
+        />
       </Grid>
     </Grid>
   );
