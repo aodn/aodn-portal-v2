@@ -10,6 +10,7 @@ import {
 interface ExpandableTextAreaProps {
   text: string;
   isClickable?: boolean;
+  isEnrichHtml?: boolean;
   onClick?: () => void;
   truncateCount?: number;
   showMoreStr?: string;
@@ -20,6 +21,7 @@ const defaultTruncateCount = 430;
 const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   text,
   isClickable = false,
+  isEnrichHtml = false,
   onClick = () => {},
   truncateCount = defaultTruncateCount,
   showMoreStr = "Show More",
@@ -42,8 +44,12 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
           component="div"
           dangerouslySetInnerHTML={{
             __html: isExpanded
-              ? enrichHTML(decodedText)
-              : enrichHTML(truncateText(decodedText, truncateCount)),
+              ? isEnrichHtml
+                ? enrichHTML(decodedText)
+                : decodedText
+              : isEnrichHtml
+                ? enrichHTML(truncateText(decodedText, truncateCount))
+                : truncateText(decodedText, truncateCount),
           }}
           sx={{
             textAlign: "left",

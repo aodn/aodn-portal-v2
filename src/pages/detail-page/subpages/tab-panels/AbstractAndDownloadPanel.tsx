@@ -156,6 +156,7 @@ const AbstractAndDownloadPanel: FC = () => {
           <Stack direction="column">
             <ExpandableTextArea
               text={abstract}
+              isEnrichHtml={true}
               showMoreStr={"Show All"}
               truncateCount={TRUNCATE_COUNT}
             />
