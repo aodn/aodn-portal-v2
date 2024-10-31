@@ -7,12 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { FC, useCallback, useEffect, useState } from "react";
-import {
-  CommonSelectProps,
-  disableScroll,
-  enableScroll,
-  SelectItem,
-} from "./CommonSelect";
+import { CommonSelectProps, SelectItem } from "./CommonSelect";
 import {
   border,
   borderRadius,
@@ -22,6 +17,7 @@ import {
 } from "../../../styles/constants";
 import { IconProps } from "../../icon/types";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
+import { disableScroll, enableScroll } from "../../../utils/ScrollbarUtils";
 
 interface IconSelectColorConfig {
   defaultColor: string;

@@ -7,7 +7,7 @@ import {
 import React, { useCallback, useState } from "react";
 import { borderRadius, fontSize } from "../../../styles/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
-import { disableScroll, enableScroll } from "./CommonSelect";
+import { disableScroll, enableScroll } from "../../../utils/ScrollbarUtils";
 
 interface PlainDropdownMenuProps {
   items: string[];
