@@ -47,7 +47,7 @@ export const decodeHtmlEntities = (str: string): string => {
     return str;
   }
 };
-
+// TODO: Keep it for now, we want to enhance the url later with http
 export const enrichHTML = (text: string): string => {
   // Regular expression to match URLs with http:// or https://
   const urlPattern = /\bhttps?:\/\/[^\s/$.?#].[^\s]*\b/g;
