@@ -3,9 +3,9 @@ import { GRID_CARD_HEIGHT, LIST_CARD_GAP } from "./constants";
 import { gap } from "../../styles/constants";
 import GridResultCard from "./GridResultCard";
 import { Box } from "@mui/material";
-import { ItemCardProps } from "./ResultCards";
+import { ResultCard } from "./ResultCards";
 
-interface SelectedGridCardProps extends ItemCardProps {}
+interface SelectedGridCardProps extends ResultCard {}
 
 const SelectedGridCard: React.FC<SelectedGridCardProps> = ({
   content,

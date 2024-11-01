@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { useSelector } from "react-redux";
-import { Box } from "@mui/material";
+import { Box, SxProps } from "@mui/material";
 import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
 import ResultPanelSimpleFilter from "../../../components/common/filters/ResultPanelSimpleFilter";
 import ResultCards from "../../../components/result/ResultCards";
@@ -8,70 +8,42 @@ import {
   RootState,
   searchQueryResult,
 } from "../../../components/common/store/store";
-import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import CircleLoader from "../../../components/loading/CircleLoader";
-import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import { useSearchPageContext } from "../context/SearchPageContext";
 
 interface ResultSectionProps {
-  currentSort: SortResultEnum | null;
-  currentLayout: Exclude<
-    SearchResultLayoutEnum,
-    SearchResultLayoutEnum.FULL_MAP
-  > | null;
-  onChangeLayout: (layout: SearchResultLayoutEnum) => void;
-  onChangeSorting: (v: SortResultEnum) => void;
-  isLoading: boolean;
-  onClickCard?: (uuid: string) => void;
-  datasetsSelected?: OGCCollection[];
+  sx: SxProps;
 }
 
-const RESULT_SECTION_WIDTH = 500;
-
-const ResultSection: FC<ResultSectionProps> = ({
-  datasetsSelected,
-  currentLayout,
-  onChangeLayout,
-  currentSort,
-  onChangeSorting,
-  onClickCard,
-  isLoading,
-}) => {
+const ResultSection: FC<ResultSectionProps> = ({ sx }) => {
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
+
+  const { selectedLayout, isLoading } = useSearchPageContext();
+
+  if (selectedLayout === SearchResultLayoutEnum.FULL_MAP) return;
 
   return (
     reduxContents && (
       <Box
         sx={{
-          width: RESULT_SECTION_WIDTH,
           height: "100%",
           display: "flex",
           flexDirection: "column",
           position: "relative",
+          ...sx,
         }}
         gap={1}
         data-testid="search-page-result-list"
       >
         <CircleLoader isLoading={isLoading} />
         <Box>
-          <ResultPanelSimpleFilter
-            count={reduxContents.result.collections.length}
-            total={reduxContents.result.total}
-            currentLayout={currentLayout}
-            onChangeLayout={onChangeLayout}
-            currentSort={currentSort}
-            onChangeSorting={onChangeSorting}
-          />
+          <ResultPanelSimpleFilter />
         </Box>
         <Box sx={{ flex: 1 }}>
-          <ResultCards
-            layout={currentLayout}
-            contents={reduxContents}
-            onClickCard={onClickCard}
-            datasetsSelected={datasetsSelected}
-          />
+          <ResultCards />
         </Box>
       </Box>
     )

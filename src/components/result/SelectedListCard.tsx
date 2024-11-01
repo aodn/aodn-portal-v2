@@ -4,9 +4,9 @@ import { gap } from "../../styles/constants";
 import ListResultCard from "./ListResultCard";
 import { Box } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import { ItemCardProps } from "./ResultCards";
+import { ResultCard } from "./ResultCards";
 
-interface SelectedListCardProps extends ItemCardProps {}
+interface SelectedListCardProps extends ResultCard {}
 
 const SelectedListCard: React.FC<SelectedListCardProps> = ({
   content,

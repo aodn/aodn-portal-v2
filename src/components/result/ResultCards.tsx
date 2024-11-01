@@ -18,11 +18,17 @@ import { padding } from "../../styles/constants";
 import SelectedListCard from "./SelectedListCard";
 import SelectedGridCard from "./SelectedGridCard";
 import { ParameterState } from "../common/store/componentParamReducer";
-import store, { getComponentState } from "../common/store/store";
+import store, {
+  getComponentState,
+  RootState,
+  searchQueryResult,
+} from "../common/store/store";
 import { useAppDispatch } from "../common/store/hooks";
 import useTabNavigation from "../../hooks/useTabNavigation";
+import { useSearchPageContext } from "../../pages/search-page/context/SearchPageContext";
+import { useSelector } from "react-redux";
 
-export interface ItemCardProps {
+export interface ResultCard {
   content?: OGCCollection;
   onClickCard?: (uuid: string) => void;
   onClickDetail: (uuid: string) => void;
@@ -31,27 +37,35 @@ export interface ItemCardProps {
   isSelectedDataset?: boolean;
 }
 
-interface ResultCardsProps {
-  content?: OGCCollection;
-  onClickCard?: (uuid: string) => void;
+interface ResultCardsList extends ResultCard {
+  count: number;
+  total: number;
   contents: CollectionsQueryType;
-  layout?: SearchResultLayoutEnum | null;
-  sx?: SxProps<Theme>;
-  datasetsSelected?: OGCCollection[];
+  child: ListChildComponentProps;
 }
 
-const ResultCards = ({
-  contents,
-  layout,
-  sx,
-  datasetsSelected,
-  onClickCard = () => {},
-}: ResultCardsProps) => {
+interface ResultCardsProps {
+  sx?: SxProps<Theme>;
+}
+
+const ResultCards = ({ sx }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
 
-  // Get contents from redux
   const dispatch = useAppDispatch();
+
   const goToDetailPage = useTabNavigation();
+
+  const {
+    currentLayout: layout,
+    onClickCard,
+    datasetsSelected,
+  } = useSearchPageContext();
+
+  // Get contents from redux
+  const contents = useSelector<RootState, CollectionsQueryType>(
+    searchQueryResult
+  );
+
   const fetchMore = useCallback(async () => {
     // This is very specific to how elastic works and then how to construct the query
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -69,6 +83,7 @@ const ResultCards = ({
   const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
 
   const count = contents.result.collections.length;
+
   const total = contents.result.total;
 
   const onClickDetail = useCallback(
@@ -98,13 +113,16 @@ const ResultCards = ({
   }, [fetchMore]);
 
   const renderCells = useCallback(
-    (
-      count: number,
-      total: number,
-      { contents, onClickCard }: ResultCardsProps,
-      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
-      child: ListChildComponentProps
-    ) => {
+    ({
+      count,
+      total,
+      contents,
+      onClickCard,
+      onClickDetail,
+      onClickLinks,
+      onClickDownload,
+      child,
+    }: ResultCardsList) => {
       const { index, style } = child;
 
       const leftIndex = index * 2;
@@ -157,13 +175,16 @@ const ResultCards = ({
   );
 
   const renderRows = useCallback(
-    (
-      count: number,
-      total: number,
-      { contents, onClickCard }: ResultCardsProps,
-      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
-      child: ListChildComponentProps
-    ) => {
+    ({
+      count,
+      total,
+      contents,
+      onClickCard,
+      onClickDetail,
+      onClickLinks,
+      onClickDownload,
+      child,
+    }: ResultCardsList) => {
       // The style must pass to the listitem else incorrect rendering
       const { index, style } = child;
 
@@ -199,6 +220,8 @@ const ResultCards = ({
     [renderLoadMoreButton]
   );
 
+  if (!contents) return;
+
   // You must set the height to 100% of view height so the calculation
   // logic .clentHeight.height have values. In short it fill the
   // whole area.
@@ -233,20 +256,16 @@ const ResultCards = ({
               itemCount={count + 1}
             >
               {(child: ListChildComponentProps) =>
-                renderRows(
+                renderRows({
                   count,
                   total,
-                  {
-                    contents,
-                    onClickCard,
-                  },
-                  {
-                    onClickDetail,
-                    onClickLinks,
-                    onClickDownload,
-                  },
-                  child
-                )
+                  contents,
+                  onClickCard,
+                  onClickDetail,
+                  onClickLinks,
+                  onClickDownload,
+                  child,
+                })
               }
             </FixedSizeList>
           )}
@@ -279,20 +298,16 @@ const ResultCards = ({
               itemCount={Math.ceil(count / 2) + 1}
             >
               {(child: ListChildComponentProps) =>
-                renderCells(
+                renderCells({
                   count,
                   total,
-                  {
-                    contents,
-                    onClickCard,
-                  },
-                  {
-                    onClickDetail,
-                    onClickLinks,
-                    onClickDownload,
-                  },
-                  child
-                )
+                  contents,
+                  onClickCard,
+                  onClickDetail,
+                  onClickLinks,
+                  onClickDownload,
+                  child,
+                })
               }
             </FixedSizeList>
           )}

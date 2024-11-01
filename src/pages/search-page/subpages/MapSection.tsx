@@ -1,3 +1,4 @@
+import React, { useCallback, useMemo, useState } from "react";
 import { Paper, SxProps, Theme } from "@mui/material";
 import Map from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
@@ -8,14 +9,11 @@ import MenuControl, {
   BaseMapSwitcher,
   MapLayerSwitcher,
 } from "../../../components/map/mapbox/controls/MenuControl";
-import React, { useCallback, useState } from "react";
-import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import Layers, {
   createStaticLayers,
 } from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
-import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 import SnackbarLoader from "../../../components/loading/SnackbarLoader";
@@ -23,6 +21,8 @@ import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCo
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
+import { useSearchPageContext } from "../context/SearchPageContext";
+import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 
 const mapContainerId = "map-container-id";
 
@@ -31,38 +31,33 @@ enum LayerName {
   Cluster = "cluster",
 }
 interface MapSectionProps {
-  collections: OGCCollection[];
-  showFullMap: boolean;
-  bbox?: LngLatBounds;
-  zoom?: number;
   sx?: SxProps<Theme>;
-  selectedUuids: string[];
-  onMapZoomOrMove: (
-    event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-  ) => void;
-  onToggleClicked: (v: boolean) => void;
-  onDatasetSelected?: (uuids: Array<string>) => void;
-  isLoading: boolean;
 }
 
-const MapSection: React.FC<MapSectionProps> = ({
-  bbox,
-  zoom,
-  onMapZoomOrMove,
-  onToggleClicked,
-  onDatasetSelected,
-  collections,
-  showFullMap,
-  sx,
-  selectedUuids,
-  isLoading,
-}) => {
+const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
   );
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const tabNavigation = useTabNavigation();
+
+  const {
+    onToggleDisplay,
+    selectedLayout,
+    layers: collections,
+    onMapZoomOrMove,
+    bbox,
+    zoom,
+    isLoading,
+    selectedUuids,
+    onSelectDataset,
+  } = useSearchPageContext();
+
+  const showFullMap = useMemo(
+    () => selectedLayout === SearchResultLayoutEnum.FULL_MAP,
+    [selectedLayout]
+  );
 
   const createPresentationLayers = useCallback(
     (id: string | null) => {
@@ -73,7 +68,7 @@ const MapSection: React.FC<MapSectionProps> = ({
               features={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
               showFullMap={showFullMap}
-              onDatasetSelected={onDatasetSelected}
+              onDatasetSelected={onSelectDataset}
               tabNavigation={tabNavigation}
             />
           );
@@ -84,13 +79,13 @@ const MapSection: React.FC<MapSectionProps> = ({
               features={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
               showFullMap={showFullMap}
-              onDatasetSelected={onDatasetSelected}
+              onDatasetSelected={onSelectDataset}
               tabNavigation={tabNavigation}
             />
           );
       }
     },
-    [collections, onDatasetSelected, selectedUuids, showFullMap, tabNavigation]
+    [collections, onSelectDataset, selectedUuids, showFullMap, tabNavigation]
   );
 
   return (
@@ -108,7 +103,7 @@ const MapSection: React.FC<MapSectionProps> = ({
       >
         <Controls>
           <ToggleControl
-            onToggleClicked={onToggleClicked}
+            onToggleClicked={onToggleDisplay}
             showFullMap={showFullMap}
           />
           <NavigationControl />

@@ -20,9 +20,9 @@ import {
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
-import { ItemCardProps } from "./ResultCards";
+import { ResultCard } from "./ResultCards";
 
-interface GridResultCardProps extends ItemCardProps {}
+interface GridResultCardProps extends ResultCard {}
 
 const GridResultCard: FC<GridResultCardProps> = ({
   content,

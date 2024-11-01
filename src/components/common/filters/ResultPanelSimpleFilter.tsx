@@ -7,32 +7,30 @@ import {
   fontSize,
 } from "../../../styles/constants";
 import { formatNumber } from "../../../utils/StringUtils";
-import ResultListLayoutButton, {
-  ResultListLayoutButtonProps,
-  SearchResultLayoutEnum,
-} from "../buttons/ResultListLayoutButton";
-import ResultListSortButton, {
-  ResultListSortButtonProps,
-  SortResultEnum,
-} from "../buttons/ResultListSortButton";
+import ResultListLayoutButton from "../buttons/ResultListLayoutButton";
+import ResultListSortButton from "../buttons/ResultListSortButton";
+import { useSearchPageContext } from "../../../pages/search-page/context/SearchPageContext";
+import { useSelector } from "react-redux";
+import { RootState, searchQueryResult } from "../store/store";
+import { CollectionsQueryType } from "../store/searchReducer";
 
-interface ResultPanelSimpleFilterProps
-  extends ResultListLayoutButtonProps<SearchResultLayoutEnum>,
-    ResultListSortButtonProps<SortResultEnum> {
-  count: number;
-  total: number;
+interface ResultPanelSimpleFilterProps {
   sx?: SxProps<Theme>;
 }
 
-const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
-  count,
-  total,
-  sx,
-  currentLayout,
-  onChangeLayout,
-  currentSort,
-  onChangeSorting,
-}) => {
+const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({ sx }) => {
+  const { currentLayout, onChangeLayout, currentSort, onChangeSorting } =
+    useSearchPageContext();
+
+  const reduxContents = useSelector<RootState, CollectionsQueryType>(
+    searchQueryResult
+  );
+
+  const count = reduxContents.result.collections.length;
+  const total = reduxContents.result.total;
+
+  if (!reduxContents) return;
+
   return (
     <Grid sx={sx} container justifyContent="center" spacing={1}>
       <Grid item md={6} xs={12}>
