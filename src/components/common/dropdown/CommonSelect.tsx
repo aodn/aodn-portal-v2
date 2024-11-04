@@ -65,7 +65,11 @@ const CommonSelect: FC<CommonSelectProps> = ({
   }, []);
 
   return (
-    <FormControl fullWidth disabled={isCollectionNotFound}>
+    <FormControl
+      fullWidth
+      disabled={isCollectionNotFound}
+      data-testid="common-select"
+    >
       <Select
         value={selectedItem}
         onOpen={handleOpen}
