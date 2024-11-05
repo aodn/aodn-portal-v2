@@ -91,7 +91,7 @@ def test_map_updates_on_search_change(
     )
     search_page.search.fill_search_text(updated_search_text)
     search_page.search.click_search_button()
-    page_mock.wait_for_timeout(500)
+    search_page.wait_for_timeout(500)
     updated_map_layers = search_page.map.get_map_layers()
 
     assert map_layers != updated_map_layers
@@ -163,7 +163,7 @@ def test_map_spider(
     search_page.wait_for_search_to_complete()
 
     search_page.map.center_map(head_lng, head_lat)
-    page_mock.wait_for_timeout(5000)
+    search_page.wait_for_timeout(5000)
 
     # Try to find and click a cluster
     cluster_found = execute_js(page_mock, 'findAndClickCluster')

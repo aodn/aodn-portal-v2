@@ -8,6 +8,7 @@ from pages.components.tab_container import TabContainerComponent
 
 class DetailPage(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         self.tabs = TabContainerComponent(page)
         self.contact_area = ContactAreaComponent(page)

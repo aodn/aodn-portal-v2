@@ -1,13 +1,13 @@
 from playwright.sync_api import Page
 
 from pages.base_page import BasePage
-from pages.js_scripts.js_utils import execute_js, load_js_functions
+from pages.js_scripts.js_utils import execute_js, load_map_js_functions
 
 
 class Map(BasePage):
     def __init__(self, page: Page):
         self.page = page
-        load_js_functions(page)
+        load_map_js_functions(page)
 
         # Page locators
         self.basemap_show_hide_menu = page.get_by_label(

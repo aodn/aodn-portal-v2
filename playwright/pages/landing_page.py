@@ -7,6 +7,7 @@ from pages.components.search import SearchComponent
 
 class LandingPage(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         self.search = SearchComponent(page)
 
