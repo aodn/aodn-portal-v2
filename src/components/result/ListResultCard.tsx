@@ -36,6 +36,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
   if (!content) return;
+
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
 
   // TODO: buttons are changed, but the behaviors are fake / wrong

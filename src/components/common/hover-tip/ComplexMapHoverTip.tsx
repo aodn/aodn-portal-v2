@@ -28,7 +28,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   return (
     <Box flex={1} sx={{ ...sx }}>
       <Stack direction="column" spacing={1}>
-        <CardActionArea>
+        <Box>
           <Tooltip title={collection.title} placement="top">
             <Box display="flex" alignItems="center" height="60px">
               <Typography
@@ -47,9 +47,9 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
               </Typography>
             </Box>
           </Tooltip>
-        </CardActionArea>
+        </Box>
 
-        <CardActionArea onClick={onDatasetSelected}>
+        <Box onClick={onDatasetSelected}>
           <Tooltip title="Show spatial extents" placement="top">
             <Box width="100%" height="130px">
               <img
@@ -63,7 +63,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
               />
             </Box>
           </Tooltip>
-        </CardActionArea>
+        </Box>
 
         <Box>
           <ResultCardButtonGroup
@@ -75,7 +75,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
           />
         </Box>
 
-        <CardActionArea onClick={() => {}}>
+        <Box onClick={() => {}}>
           <Tooltip title="More detail..." placement="top">
             <Typography
               color={fontColor.gray.medium}
@@ -94,7 +94,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
               {collection.description}
             </Typography>
           </Tooltip>
-        </CardActionArea>
+        </Box>
       </Stack>
     </Box>
   );

@@ -70,7 +70,6 @@ class ToggleControlClass implements IControl {
   }
 
   onRemove(_: Map): void {
-    console.log("onRemove toggle button");
     if (this.container?.parentNode) {
       // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
       // Keep the old pointer

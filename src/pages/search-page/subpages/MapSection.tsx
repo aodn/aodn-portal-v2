@@ -23,6 +23,7 @@ import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
 import { useSearchPageContext } from "../context/SearchPageContext";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
+import PinListButtonControl from "../../../components/map/mapbox/controls/PinListButtonControl";
 
 const mapContainerId = "map-container-id";
 
@@ -52,6 +53,7 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
     isLoading,
     selectedUuids,
     onSelectDataset,
+    datasetsSelected,
   } = useSearchPageContext();
 
   const showFullMap = useMemo(
@@ -109,6 +111,10 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
           <NavigationControl />
           <ScaleControl />
           <DisplayCoordinate />
+          <PinListButtonControl
+            datasetsSelected={datasetsSelected}
+            showList={datasetsSelected && datasetsSelected.length > 0}
+          />
           <MenuControl
             menu={
               <BaseMapSwitcher

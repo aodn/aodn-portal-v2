@@ -3,7 +3,6 @@ import { LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./constants";
 import { gap } from "../../styles/constants";
 import ListResultCard from "./ListResultCard";
 import { Box } from "@mui/material";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import { ResultCard } from "./ResultCards";
 
 interface SelectedListCardProps extends ResultCard {}

@@ -18,6 +18,13 @@ interface ResultPanelSimpleFilterProps {
   sx?: SxProps<Theme>;
 }
 
+const renderShowingResultsText = (total: number, count: number) =>
+  total === 0
+    ? "No result found"
+    : total === 1
+      ? "Showing 1 of total 1 result"
+      : `Showing 1 - ${count} of ${formatNumber(total)} results`;
+
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({ sx }) => {
   const { currentLayout, onChangeLayout, currentSort, onChangeSorting } =
     useSearchPageContext();
@@ -47,21 +54,9 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({ sx }) => {
           }}
           data-testid="show-result-count"
         >
-          {total === 0 ? (
-            <Typography fontSize={fontSize.info} padding={0}>
-              No result found
-            </Typography>
-          ) : total === 1 ? (
-            <Typography fontSize={fontSize.info} padding={0}>
-              Showing 1 of total 1 result
-            </Typography>
-          ) : (
-            <Typography fontSize={fontSize.info} padding={0}>
-              {/* TODO: here is a bug that the count number might be larger than total number */}
-              Showing 1&nbsp;-&nbsp;{count}&nbsp;of&nbsp;{formatNumber(total)}
-              &nbsp;results
-            </Typography>
-          )}
+          <Typography fontSize={fontSize.info} padding={0}>
+            {renderShowingResultsText(total, count)}
+          </Typography>
         </Paper>
       </Grid>
       <Grid item md={3} xs={6}>
