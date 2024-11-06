@@ -21,6 +21,7 @@ import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCard } from "./ResultCards";
+import { useSearchPageContext } from "../../pages/search-page/context/SearchPageContext";
 
 interface ListResultCardProps extends ResultCard {}
 
@@ -31,13 +32,16 @@ const ListResultCard: FC<ListResultCardProps> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
-  isSelectedDataset,
 }) => {
+  const { selectedUuids } = useSearchPageContext();
+
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
   if (!content) return;
 
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
+
+  const isSelectedDataset = uuid === selectedUuids[0];
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (

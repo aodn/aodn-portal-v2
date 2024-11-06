@@ -15,8 +15,6 @@ import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
-import SelectedListCard from "./SelectedListCard";
-import SelectedGridCard from "./SelectedGridCard";
 import { ParameterState } from "../common/store/componentParamReducer";
 import store, {
   getComponentState,
@@ -55,11 +53,7 @@ const ResultCards = ({ sx }: ResultCardsProps) => {
 
   const goToDetailPage = useTabNavigation();
 
-  const {
-    currentLayout: layout,
-    onClickCard,
-    datasetsSelected,
-  } = useSearchPageContext();
+  const { currentLayout: layout, onClickCard } = useSearchPageContext();
 
   // Get contents from redux
   const contents = useSelector<RootState, CollectionsQueryType>(
@@ -79,8 +73,6 @@ const ResultCards = ({ sx }: ResultCardsProps) => {
     // Must use await so that record updated before you exit this call
     await dispatch(fetchResultAppendStore(paramPaged));
   }, [dispatch, contents.result.search_after]);
-
-  const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
 
   const count = contents.result.collections.length;
 
@@ -238,19 +230,10 @@ const ResultCards = ({ sx }: ResultCardsProps) => {
         ref={componentRef}
         data-testid="resultcard-result-list"
       >
-        {hasSelectedDatasets && (
-          <SelectedListCard
-            content={datasetsSelected[0]}
-            onClickCard={onClickCard}
-            onClickDetail={onClickDetail}
-            onClickDownload={onClickDownload}
-            onClickLinks={onClickLinks}
-          />
-        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - LIST_CARD_HEIGHT : height}
+              height={height}
               width={width}
               itemSize={LIST_CARD_HEIGHT}
               itemCount={count + 1}
@@ -280,19 +263,10 @@ const ResultCards = ({ sx }: ResultCardsProps) => {
         ref={componentRef}
         data-testid="resultcard-result-grid"
       >
-        {hasSelectedDatasets && (
-          <SelectedGridCard
-            content={datasetsSelected[0]}
-            onClickCard={onClickCard}
-            onClickDetail={onClickDetail}
-            onClickDownload={onClickDownload}
-            onClickLinks={onClickLinks}
-          />
-        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - GRID_CARD_HEIGHT : height}
+              height={height}
               width={width}
               itemSize={GRID_CARD_HEIGHT}
               itemCount={Math.ceil(count / 2) + 1}

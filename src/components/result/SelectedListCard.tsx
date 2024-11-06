@@ -1,3 +1,4 @@
+// Unused component
 import React from "react";
 import { LIST_CARD_GAP, LIST_CARD_HEIGHT } from "./constants";
 import { gap } from "../../styles/constants";

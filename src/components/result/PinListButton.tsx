@@ -1,9 +1,8 @@
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { PinListButtonControlProps } from "../map/mapbox/controls/PinListButtonControl";
-import { Box, IconButton, Popper } from "@mui/material";
+import { IconButton, Popper } from "@mui/material";
 import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
-import { borderRadius } from "../../styles/constants";
-import ComplexMapHoverTip from "../common/hover-tip/ComplexMapHoverTip";
+
 import PinList from "./PinList";
 
 interface PinListButtonProps extends PinListButtonControlProps {}

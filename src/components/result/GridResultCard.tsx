@@ -21,6 +21,7 @@ import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
 import { ResultCard } from "./ResultCards";
+import { useSearchPageContext } from "../../pages/search-page/context/SearchPageContext";
 
 interface GridResultCardProps extends ResultCard {}
 
@@ -30,12 +31,16 @@ const GridResultCard: FC<GridResultCardProps> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
-  isSelectedDataset,
 }) => {
+  const { selectedUuids } = useSearchPageContext();
+
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
   if (!content) return;
+
   const { id: uuid, title, findIcon, findThumbnail } = content;
+
+  const isSelectedDataset = uuid === selectedUuids[0];
 
   return (
     <Card
