@@ -4,10 +4,13 @@ from playwright.sync_api import Page, expect
 from core.enums.layer_type import LayerType
 from core.factories.layer import LayerFactory
 from mocks.api.collections import (
+    handle_collections_all_api,
+    handle_collections_centroid_api,
     handle_collections_update_all_api,
     handle_collections_update_centroid_api,
 )
 from mocks.api_router import ApiRouter
+from pages.detail_page import DetailPage
 from pages.js_scripts.js_utils import execute_js
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
@@ -177,3 +180,66 @@ def test_map_spider(
     search_page.map.hover_map()
     search_page.map.click_map()
     expect(search_page.first_result_title).to_have_text(data_title)
+
+
+def test_map_state_persists_with_url(page_mock: Page) -> None:
+    landing_page = LandingPage(page_mock)
+    search_page = SearchPage(page_mock)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    search_page.map.drag_map()
+    search_page.map.zoom_to_level()
+    search_page.wait_for_search_to_complete()
+
+    map_center = search_page.map.get_map_center()
+    map_zoom = search_page.map.get_map_zoom()
+
+    # Use the current page URL and open a new tab with the same URL
+    current_url = search_page.url
+    new_page = page_mock.context.new_page()
+
+    # Add API mocking to the new page
+    api_router = ApiRouter(new_page)
+    api_router.route_collection(
+        handle_collections_centroid_api,
+        handle_collections_all_api,
+    )
+
+    new_search_page = SearchPage(new_page)
+    new_search_page.goto(current_url)
+    new_search_page.wait_for_search_to_complete()
+
+    new_map_center = new_search_page.map.get_map_center()
+    new_map_zoom = new_search_page.map.get_map_zoom()
+
+    assert map_center == new_map_center
+    assert map_zoom == new_map_zoom
+
+
+def test_map_state_persists_across_page(page_mock: Page) -> None:
+    landing_page = LandingPage(page_mock)
+    search_page = SearchPage(page_mock)
+    detail_page = DetailPage(page_mock)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    search_page.map.drag_map()
+    search_page.map.zoom_to_level()
+    search_page.wait_for_search_to_complete()
+
+    map_center = search_page.map.get_map_center()
+    map_zoom = search_page.map.get_map_zoom()
+
+    search_page.first_result_title.click()
+    detail_page.go_back_button.click()
+
+    new_map_center = search_page.map.get_map_center()
+    new_map_zoom = search_page.map.get_map_zoom()
+
+    assert map_center == new_map_center
+    assert map_zoom == new_map_zoom

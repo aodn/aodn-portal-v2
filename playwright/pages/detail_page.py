@@ -15,6 +15,7 @@ class DetailPage(BasePage):
 
         # Page locators
         self.page_title = self.get_label(text='collection title')
+        self.go_back_button = self.page.get_by_test_id('go-back-button')
 
     def load(self, uuid: str) -> None:
         """Load the detail page for the given uuid"""

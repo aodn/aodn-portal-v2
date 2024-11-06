@@ -1,3 +1,5 @@
+import random
+
 from playwright.sync_api import Page
 
 from pages.base_page import BasePage
@@ -75,3 +77,22 @@ class Map(BasePage):
         self.wait_for_map_loading()
         is_visible = execute_js(self.page, 'isMapLayerVisible', layer_id)
         return is_visible
+
+    def zoom_to_level(self, zoom_level: float = random.uniform(4, 6)) -> None:
+        """
+        Zoom the map to a specified zoom level.  If not specified, a random zoom level between 4 and 6 will be applied.
+
+        Args:
+            zoom_level (float, optional): The zoom level to set the map to. Defaults to random.uniform(4, 6).
+        """
+        execute_js(self.page, 'zoomToLevel', zoom_level)
+
+    def get_map_center(self) -> dict:
+        """Get the current center coordinates of the map"""
+        map_center = execute_js(self.page, 'getMapCenter')
+        return dict(map_center)
+
+    def get_map_zoom(self) -> float:
+        """Get the current zoom level of the map"""
+        map_zoom = execute_js(self.page, 'getMapZoom')
+        return float(map_zoom)

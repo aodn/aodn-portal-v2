@@ -7,7 +7,7 @@ from playwright.sync_api import Page
 def load_js_functions(page: Page, js_file_name: str) -> None:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     js_file_path = os.path.join(current_dir, js_file_name)
-    with open(js_file_path, 'r') as file:
+    with open(js_file_path, 'r', encoding='utf-8') as file:
         js_code = file.read()
         page.add_init_script(js_code)
 
