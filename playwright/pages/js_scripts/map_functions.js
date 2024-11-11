@@ -101,3 +101,13 @@ function zoomToLevel(targetZoom) {
   }
   return false;
 }
+
+function getMapCenter() {
+  const map = getMap();
+  return map.getCenter();
+}
+
+function getMapZoom() {
+  const map = getMap();
+  return map.getZoom();
+}

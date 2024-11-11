@@ -122,3 +122,24 @@ def test_show_more_and_less_list_items(
 
     detail_page.click_show_less(item_list)
     expect(keywords).to_have_count(initial_count)
+
+
+@pytest.mark.parametrize(
+    'uuid',
+    [
+        '0015db7e-e684-7548-e053-08114f8cd4ad',
+    ],
+)
+def test_dropdown_scroll(page_mock: Page, uuid: str) -> None:
+    detail_page = DetailPage(page_mock)
+    detail_page.load(uuid)
+
+    detail_page.select_elements.first.click()
+    detail_page.scroll_To_Bottom()
+    scroll_position = detail_page.get_Page_Scroll_Y()
+    assert scroll_position == 0
+
+    detail_page.body.click()
+    detail_page.scroll_To_Bottom()
+    new_scroll_position = detail_page.get_Page_Scroll_Y()
+    assert new_scroll_position > scroll_position

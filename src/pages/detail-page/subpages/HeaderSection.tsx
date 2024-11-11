@@ -105,6 +105,7 @@ const HeaderSection = () => {
           top: "5%",
         }}
         onClick={onGoBack}
+        data-testid="go-back-button"
       >
         {renderButton(buttons.goBack.icon)}
       </Box>

@@ -39,7 +39,7 @@ def test_associated_records_sections(
     associated_records.tab.click()
 
     associated_records.child_records.click()
-    page_mock.wait_for_timeout(200)
+    detail_page.wait_for_timeout(200)
     detail_page.get_collapse_item_title(child_records).click()
     child_records_list = associated_records.get_child_records_list()
     expect(

@@ -94,7 +94,6 @@ def test_show_more_results(
     expect(search_page.show_more_results).to_be_visible()
 
     search_page.click_show_more_results()
-    search_page.wait_for_search_to_complete()
     expect(search_page.get_dataset_by_id(chunk_2_first_data)).to_be_visible()
 
     show_result_count_text = search_page.get_show_result_count_text(
