@@ -7,7 +7,9 @@ import PinListButton from "../../../result/PinListButton";
 
 export interface PinListButtonControlProps {
   showList?: boolean;
-  datasetsSelected: OGCCollection[] | undefined;
+  pinList?: OGCCollection[] | undefined;
+  selectedUuid?: string[];
+  setSelectedUuid?: (uuids: Array<string>) => void;
 }
 
 class PinButtonControlClass implements IControl {
@@ -29,7 +31,9 @@ class PinButtonControlClass implements IControl {
       this.root.render(
         <PinListButton
           showList={this.props.showList}
-          datasetsSelected={this.props.datasetsSelected}
+          pinList={this.props.pinList}
+          selectedUuid={this.props.selectedUuid}
+          setSelectedUuid={this.props.setSelectedUuid}
         />
       );
     }

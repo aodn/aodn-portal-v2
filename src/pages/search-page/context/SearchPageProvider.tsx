@@ -333,6 +333,29 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
         .unwrap()
         .then((res: OGCCollections) => {
           setDatasetSelected(res.collections);
+
+          // Update pin list - only add datasets that don't already exist
+          setPinList((prevDatasets) => {
+            if (!Array.isArray(prevDatasets)) return res.collections;
+
+            // Create a Set of existing dataset IDs for quick lookup
+            const existingIds = new Set(
+              prevDatasets.map((dataset) => dataset.id)
+            );
+
+            // Filter out datasets that already exist in prevDatasets
+            const newDatasets = res.collections.filter(
+              (dataset) => !existingIds.has(dataset.id)
+            );
+
+            // Only update if we have new datasets to add
+            if (newDatasets.length === 0) {
+              return prevDatasets;
+            }
+
+            // Return combined array with new datasets
+            return [...newDatasets, ...prevDatasets];
+          });
         })
         .catch((error: any) => {
           console.error("Error fetching collection data:", error);
@@ -362,6 +385,7 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
     [onSelectDataset]
   );
 
+  console.log("pin list=====", pinList);
   return (
     <SearchPageContext.Provider
       value={{
@@ -379,7 +403,9 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
         onClickCard,
         selectedDataset,
         onSelectDataset,
+        pinList,
         selectedUuid,
+        setSelectedUuid,
       }}
     >
       {children}

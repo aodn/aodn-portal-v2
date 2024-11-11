@@ -1,12 +1,15 @@
-import { SyntheticEvent, useState } from "react";
+import { FC, SyntheticEvent, useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
-import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import MuiAccordion, { AccordionProps } from "@mui/material/Accordion";
 import MuiAccordionSummary, {
   AccordionSummaryProps,
 } from "@mui/material/AccordionSummary";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
+import PushPinIcon from "@mui/icons-material/PushPin";
+import { OGCCollection } from "../store/OGCCollectionDefinitions";
+import { fontColor, fontSize, fontWeight } from "../../../styles/constants";
+import ComplexMapHoverTip from "../hover-tip/ComplexMapHoverTip";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -22,14 +25,14 @@ const Accordion = styled((props: AccordionProps) => (
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
-    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: "0.9rem" }} />}
+    expandIcon={<PushPinIcon sx={{ fontSize: "0.9rem" }} />}
     {...props}
   />
 ))(({ theme }) => ({
   backgroundColor: "rgba(0, 0, 0, .03)",
   flexDirection: "row-reverse",
   "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
-    transform: "rotate(90deg)",
+    transform: "rotate(60deg)",
   },
   "& .MuiAccordionSummary-content": {
     marginLeft: theme.spacing(1),
@@ -44,32 +47,66 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   borderTop: "1px solid rgba(0, 0, 0, .125)",
 }));
 
-export default function CustomizedAccordions() {
-  const [expanded, setExpanded] = useState<string | false>("panel1");
+interface PinListAccordionGroupProps {
+  pinList: OGCCollection[] | undefined;
+  selectedUuid?: string[];
+  setSelectedUuid?: (uuids: Array<string>) => void;
+}
+
+const PinListAccordionGroup: FC<PinListAccordionGroupProps> = ({
+  pinList,
+  selectedUuid,
+  setSelectedUuid,
+}) => {
+  const [expanded, setExpanded] = useState<string | false>(false);
 
   const handleChange =
-    (panel: string) => (event: SyntheticEvent, newExpanded: boolean) => {
+    (panel: string) => (_: SyntheticEvent, newExpanded: boolean) => {
       setExpanded(newExpanded ? panel : false);
+      if (setSelectedUuid) {
+        setSelectedUuid([panel]);
+      }
     };
 
+  useEffect(() => {
+    if (selectedUuid && selectedUuid.length > 0) {
+      setExpanded(selectedUuid[0]);
+    }
+  }, [selectedUuid]);
+
+  if (!pinList) return;
+
   return (
-    <div>
-      <Accordion
-        expanded={expanded === "panel1"}
-        onChange={handleChange("panel1")}
-      >
-        <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
-          <Typography>Collapsible Group Item #1</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum
-            dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
-            lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
+    <>
+      {pinList.map((item) => (
+        <Accordion
+          key={item.id}
+          expanded={expanded === item.id}
+          onChange={handleChange(item.id)}
+        >
+          <AccordionSummary>
+            <Typography
+              color={fontColor.gray.dark}
+              fontSize={fontSize.label}
+              fontWeight={fontWeight.bold}
+              sx={{
+                padding: 0,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: "2",
+                WebkitBoxOrient: "vertical",
+              }}
+            >
+              {item.title}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <ComplexMapHoverTip collection={item} />
+          </AccordionDetails>
+        </Accordion>
+      ))}
+      {/* 
       <Accordion
         expanded={expanded === "panel2"}
         onChange={handleChange("panel2")}
@@ -101,7 +138,9 @@ export default function CustomizedAccordions() {
             lacus ex, sit amet blandit leo lobortis eget.
           </Typography>
         </AccordionDetails>
-      </Accordion>
-    </div>
+      </Accordion> */}
+    </>
   );
-}
+};
+
+export default PinListAccordionGroup;

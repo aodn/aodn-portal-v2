@@ -53,7 +53,8 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
     isLoading,
     selectedUuid,
     onSelectDataset,
-    selectedDataset,
+    pinList,
+    setSelectedUuid,
   } = useSearchPageContext();
 
   const showFullMap = useMemo(
@@ -112,8 +113,10 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
           <ScaleControl />
           <DisplayCoordinate />
           <PinListButtonControl
-            datasetsSelected={selectedDataset}
-            showList={selectedDataset && selectedDataset.length > 0}
+            pinList={pinList}
+            showList={pinList && pinList.length > 0}
+            selectedUuid={selectedUuid}
+            setSelectedUuid={setSelectedUuid}
           />
           <MenuControl
             menu={

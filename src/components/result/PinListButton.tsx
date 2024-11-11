@@ -9,23 +9,24 @@ interface PinListButtonProps extends PinListButtonControlProps {}
 
 const PinListButton: FC<PinListButtonProps> = ({
   showList = false,
-  datasetsSelected = [],
+  pinList = [],
+  selectedUuid,
+  setSelectedUuid,
 }) => {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(showList);
-  console.log("pin list selected dataset", datasetsSelected);
 
   useEffect(() => {
     setOpen(showList);
   }, [showList]);
 
   useEffect(() => {
-    if (!open && datasetsSelected && datasetsSelected.length > 0) {
+    if (!open && pinList && pinList.length > 0) {
       setOpen(true);
     }
-    // only depend on change of datasetsSelected
+    // only depend on change of pinList
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [datasetsSelected]);
+  }, [pinList]);
 
   const handleToggle = useCallback(() => {
     setOpen((prev) => !prev);
@@ -57,7 +58,12 @@ const PinListButton: FC<PinListButtonProps> = ({
           },
         ]}
       >
-        <PinList showList={showList} datasetsSelected={datasetsSelected} />
+        <PinList
+          showList={showList}
+          pinList={pinList}
+          selectedUuid={selectedUuid}
+          setSelectedUuid={setSelectedUuid}
+        />
       </Popper>
     </>
   );

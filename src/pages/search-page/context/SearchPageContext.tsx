@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, Dispatch, useContext } from "react";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
@@ -23,8 +23,10 @@ interface SearchPageContextType {
   isLoading: boolean;
   onClickCard: (uuid: string) => void;
   selectedDataset: OGCCollection[] | undefined;
+  pinList: OGCCollection[] | undefined;
   onSelectDataset: (uuids: Array<string>) => void;
   selectedUuid: string[];
+  setSelectedUuid: Dispatch<React.SetStateAction<string[]>>;
 }
 
 const searchPageContextDefault = {
@@ -41,8 +43,10 @@ const searchPageContextDefault = {
   isLoading: false,
   onClickCard: () => {},
   selectedDataset: undefined,
+  pinList: undefined,
   onSelectDataset: () => {},
   selectedUuid: [],
+  setSelectedUuid: () => {},
 };
 
 export const SearchPageContext = createContext<SearchPageContextType>(
