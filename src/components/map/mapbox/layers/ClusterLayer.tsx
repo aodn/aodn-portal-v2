@@ -99,8 +99,8 @@ export const getUnclusterPointId = (layerId: string) =>
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
   features = generateFeatureCollectionFrom(undefined),
-  selectedUuids,
-  onDatasetSelected,
+  selectedUuid,
+  onSelectDataset,
   tabNavigation,
   clusterLayerConfig,
   showFullMap,
@@ -280,20 +280,20 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       <MapPopup
         layerId={unclusterPointLayer}
         popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
-        onDatasetSelected={onDatasetSelected}
+        onSelectDataset={onSelectDataset}
         tabNavigation={tabNavigation}
       />
       <SpatialExtents
         layerId={unclusterPointLayer}
-        selectedUuids={selectedUuids}
+        selectedUuids={selectedUuid}
         addedLayerIds={[clusterLayer, unclusterPointLayer]}
-        onDatasetSelected={onDatasetSelected}
+        onSelectDataset={onSelectDataset}
       />
       <SpiderDiagram
         clusterLayer={clusterLayer}
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unclusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
+        onSelectDataset={onSelectDataset}
         showFullMap={showFullMap}
         tabNavigation={tabNavigation}
       />

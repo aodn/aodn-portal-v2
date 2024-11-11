@@ -90,7 +90,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
   clusterLayer,
   clusterSourceId,
   unclusterPointLayer,
-  onDatasetSelected,
+  onSelectDataset,
   tabNavigation,
   showFullMap,
 }) => {
@@ -501,7 +501,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         <MapPopup
           ref={mapPopupRef}
           layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
-          onDatasetSelected={onDatasetSelected}
+          onSelectDataset={onSelectDataset}
           popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
           tabNavigation={tabNavigation}
         />
@@ -514,7 +514,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
             unclusterPointLayer,
             getSpiderPinsLayerId(spiderifiedCluster.id),
           ]}
-          onDatasetSelected={onDatasetSelected}
+          onSelectDataset={onSelectDataset}
         />
       )}
       {spiderifiedCluster && (

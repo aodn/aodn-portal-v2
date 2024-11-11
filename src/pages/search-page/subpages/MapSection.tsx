@@ -51,9 +51,9 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
     bbox,
     zoom,
     isLoading,
-    selectedUuids,
+    selectedUuid,
     onSelectDataset,
-    datasetsSelected,
+    selectedDataset,
   } = useSearchPageContext();
 
   const showFullMap = useMemo(
@@ -68,9 +68,9 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
           return (
             <HeatmapLayer
               features={generateFeatureCollectionFrom(collections)}
-              selectedUuids={selectedUuids}
+              selectedUuid={selectedUuid}
               showFullMap={showFullMap}
-              onDatasetSelected={onSelectDataset}
+              onSelectDataset={onSelectDataset}
               tabNavigation={tabNavigation}
             />
           );
@@ -79,15 +79,15 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
           return (
             <ClusterLayer
               features={generateFeatureCollectionFrom(collections)}
-              selectedUuids={selectedUuids}
+              selectedUuid={selectedUuid}
               showFullMap={showFullMap}
-              onDatasetSelected={onSelectDataset}
+              onSelectDataset={onSelectDataset}
               tabNavigation={tabNavigation}
             />
           );
       }
     },
-    [collections, onSelectDataset, selectedUuids, showFullMap, tabNavigation]
+    [collections, onSelectDataset, selectedUuid, showFullMap, tabNavigation]
   );
 
   return (
@@ -112,8 +112,8 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
           <ScaleControl />
           <DisplayCoordinate />
           <PinListButtonControl
-            datasetsSelected={datasetsSelected}
-            showList={datasetsSelected && datasetsSelected.length > 0}
+            datasetsSelected={selectedDataset}
+            showList={selectedDataset && selectedDataset.length > 0}
           />
           <MenuControl
             menu={

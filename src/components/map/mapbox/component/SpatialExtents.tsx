@@ -12,7 +12,7 @@ interface SpatialExtentsProps {
   layerId: string;
   // Selected uuids is managed in parent component, reflecting dataset that user selected from result list or map
   selectedUuids?: string[];
-  onDatasetSelected?: (uuid: Array<string>) => void;
+  onSelectDataset?: (uuid: Array<string>) => void;
   // added layer ids are layers added on current map other than spatial extents layer
   // they are used in onEmptySpaceClick to identify if the click falls in empty space or in any layers
   addedLayerIds?: Array<string>;
@@ -30,7 +30,7 @@ const createSourceId = (layerId: string, uuid: string) =>
 const SpatialExtents: FC<SpatialExtentsProps> = ({
   layerId,
   selectedUuids,
-  onDatasetSelected,
+  onSelectDataset,
   addedLayerIds = [],
 }) => {
   const { map } = useContext(MapContext);
@@ -156,18 +156,18 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
     (ev: MapLayerMouseEvent): void => {
       ev.preventDefault();
       // Make sure even same id under same area will be set once.
-      if (onDatasetSelected) {
+      if (onSelectDataset) {
         if (ev.features) {
           const uuids = [
             ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
           ];
-          onDatasetSelected(uuids);
+          onSelectDataset(uuids);
         } else {
-          onDatasetSelected([]);
+          onSelectDataset([]);
         }
       }
     },
-    [onDatasetSelected]
+    [onSelectDataset]
   );
 
   const onEmptySpaceClick = useCallback(
@@ -182,11 +182,11 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
         : [];
 
       // If no features are found at the click point (i.e., clicked on empty space)
-      if (features && features.length === 0 && onDatasetSelected) {
-        onDatasetSelected([]);
+      if (features && features.length === 0 && onSelectDataset) {
+        onSelectDataset([]);
       }
     },
-    [map, addedLayerIds, onDatasetSelected]
+    [map, addedLayerIds, onSelectDataset]
   );
 
   useEffect(() => {

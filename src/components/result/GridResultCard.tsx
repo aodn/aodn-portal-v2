@@ -32,7 +32,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
   onClickLinks,
   onClickDownload,
 }) => {
-  const { selectedUuids } = useSearchPageContext();
+  const { selectedUuid } = useSearchPageContext();
 
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
@@ -40,7 +40,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
 
   const { id: uuid, title, findIcon, findThumbnail } = content;
 
-  const isSelectedDataset = uuid === selectedUuids[0];
+  const isSelectedDataset = uuid === selectedUuid[0];
 
   return (
     <Card

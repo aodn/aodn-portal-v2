@@ -22,9 +22,9 @@ interface SearchPageContextType {
   zoom: number | undefined;
   isLoading: boolean;
   onClickCard: (uuid: string) => void;
-  datasetsSelected: OGCCollection[] | undefined;
+  selectedDataset: OGCCollection[] | undefined;
   onSelectDataset: (uuids: Array<string>) => void;
-  selectedUuids: string[];
+  selectedUuid: string[];
 }
 
 const searchPageContextDefault = {
@@ -40,9 +40,9 @@ const searchPageContextDefault = {
   zoom: undefined,
   isLoading: false,
   onClickCard: () => {},
-  datasetsSelected: undefined,
+  selectedDataset: undefined,
   onSelectDataset: () => {},
-  selectedUuids: [],
+  selectedUuid: [],
 };
 
 export const SearchPageContext = createContext<SearchPageContextType>(

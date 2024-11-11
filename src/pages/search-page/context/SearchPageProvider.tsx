@@ -71,9 +71,15 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
 
   const [zoom, setZoom] = useState<number | undefined>(undefined);
 
-  const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
+  // selectedUuid is the uuid of a selected dataset when user click on a result card or dot on map
+  // it is an array of string but only contains one element, since the click of map dot returns an array of features
+  const [selectedUuid, setSelectedUuid] = useState<Array<string>>([]);
 
-  const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
+  // selectedDataset is the dataset of the selectedUuid when user click on a result card or dot on map
+  // it is an array of OGCCollection but only contains one element (if only one selectedUuid)
+  const [selectedDataset, setDatasetSelected] = useState<OGCCollection[]>([]);
+
+  const [pinList, setPinList] = useState<OGCCollection[]>([]);
 
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
 
@@ -141,10 +147,10 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
     },
     [
       startOneLoadingThread,
-      endOneLoadingThread,
-      doMapSearch,
       dispatch,
+      doMapSearch,
       navigate,
+      endOneLoadingThread,
     ]
   );
 
@@ -326,7 +332,7 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
       return dispatch(fetchResultNoStore(param))
         .unwrap()
         .then((res: OGCCollections) => {
-          setDatasetsSelected(res.collections);
+          setDatasetSelected(res.collections);
         })
         .catch((error: any) => {
           console.error("Error fetching collection data:", error);
@@ -340,10 +346,10 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
   const onSelectDataset = useCallback(
     (uuids: Array<string>) => {
       if (uuids.length === 0) {
-        setSelectedUuids([]);
-        setDatasetsSelected([]);
+        setSelectedUuid([]);
+        setDatasetSelected([]);
       }
-      setSelectedUuids(uuids);
+      setSelectedUuid(uuids);
       getCollectionsData(uuids);
     },
     [getCollectionsData]
@@ -371,9 +377,9 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
         zoom,
         isLoading,
         onClickCard,
-        datasetsSelected,
+        selectedDataset,
         onSelectDataset,
-        selectedUuids,
+        selectedUuid,
       }}
     >
       {children}

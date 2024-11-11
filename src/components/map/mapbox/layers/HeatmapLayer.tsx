@@ -107,9 +107,9 @@ const getUnclusterPointLayerId = (layerId: string) =>
 
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
   features = generateFeatureCollectionFrom(undefined),
-  selectedUuids,
+  selectedUuid,
   showFullMap,
-  onDatasetSelected,
+  onSelectDataset,
   tabNavigation,
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
@@ -333,20 +333,20 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       <MapPopup
         layerId={unClusterPointLayer}
         popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
-        onDatasetSelected={onDatasetSelected}
+        onSelectDataset={onSelectDataset}
         tabNavigation={tabNavigation}
       />
       <SpatialExtents
         layerId={unClusterPointLayer}
-        selectedUuids={selectedUuids}
+        selectedUuids={selectedUuid}
         addedLayerIds={[clusterLayer, unClusterPointLayer]}
-        onDatasetSelected={onDatasetSelected}
+        onSelectDataset={onSelectDataset}
       />
       <SpiderDiagram
         clusterLayer={clusterLayer}
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unClusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
+        onSelectDataset={onSelectDataset}
         showFullMap={showFullMap}
         tabNavigation={tabNavigation}
       />

@@ -31,7 +31,7 @@ import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 interface MapPopupProps {
   layerId: string;
   popupType?: PopupType;
-  onDatasetSelected?: (uuid: Array<string>) => void;
+  onSelectDataset?: (uuid: Array<string>) => void;
   tabNavigation?: (uuid: string, tab: string, section?: string) => void;
 }
 export interface MapPopupRef {
@@ -98,7 +98,7 @@ const handleDatasetSelect = (
 };
 
 const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  { layerId, onDatasetSelected, tabNavigation, popupType = PopupType.Basic },
+  { layerId, onSelectDataset, tabNavigation, popupType = PopupType.Basic },
   ref
 ) => {
   const dispatch = useAppDispatch();
@@ -155,7 +155,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
                 <BasicMapHoverTip
                   content={collection?.title}
                   onDatasetSelected={() =>
-                    handleDatasetSelect(collection.id, onDatasetSelected)
+                    handleDatasetSelect(collection.id, onSelectDataset)
                   }
                   sx={{ height: popupHeight }}
                 />
@@ -164,7 +164,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
                 <ComplexMapHoverTip
                   collection={collection}
                   onDatasetSelected={() =>
-                    handleDatasetSelect(collection.id, onDatasetSelected)
+                    handleDatasetSelect(collection.id, onSelectDataset)
                   }
                   tabNavigation={tabNavigation}
                 />
@@ -174,7 +174,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         </ThemeProvider>
       );
     },
-    [onDatasetSelected, popupHeight, popupType, popupWidth, tabNavigation]
+    [onSelectDataset, popupHeight, popupType, popupWidth, tabNavigation]
   );
 
   const removePopup = useCallback(() => {

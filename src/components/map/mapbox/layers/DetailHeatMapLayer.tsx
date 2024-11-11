@@ -98,9 +98,9 @@ const getUnclusterPointLayerId = (layerId: string) =>
 // TODO: This file is copy & paste from the heatmapLayer file. It should be simplified later
 const DetailHeatMapLayer: FC<DetailHeatMapProps> = ({
   features = generateFeatureCollectionFrom(undefined),
-  selectedUuids,
+  selectedUuid,
   showFullMap,
-  onDatasetSelected,
+  onSelectDataset: onDatasetSelected,
   heatmapLayerConfig,
 }) => {
   const { map } = useContext(MapContext);
@@ -318,15 +318,15 @@ const DetailHeatMapLayer: FC<DetailHeatMapProps> = ({
     <>
       <SpatialExtents
         layerId={unClusterPointLayer}
-        selectedUuids={selectedUuids}
+        selectedUuids={selectedUuid}
         addedLayerIds={[clusterLayer, unClusterPointLayer]}
-        onDatasetSelected={onDatasetSelected}
+        onSelectDataset={onDatasetSelected}
       />
       <SpiderDiagram
         clusterLayer={clusterLayer}
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unClusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
+        onSelectDataset={onDatasetSelected}
         showFullMap={showFullMap}
       />
     </>

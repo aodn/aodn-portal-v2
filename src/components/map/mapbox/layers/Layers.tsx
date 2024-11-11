@@ -10,9 +10,9 @@ export interface LayersProps {
   // collections?: Array<OGCCollection>;
   features?: FeatureCollection<Point>;
   // Event fired when user click on the point layer
-  onDatasetSelected?: (uuids: Array<string>) => void;
-  // dataset that user selected from result list or map
-  selectedUuids?: string[];
+  onSelectDataset?: (uuids: Array<string>) => void;
+  // uuid of a dataset that user selected from result list or map
+  selectedUuid?: string[];
   showFullMap?: boolean;
   tabNavigation?: (uuid: string, tab: string, section?: string) => void;
 }

@@ -33,7 +33,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   onClickLinks,
   onClickDownload,
 }) => {
-  const { selectedUuids } = useSearchPageContext();
+  const { selectedUuid } = useSearchPageContext();
 
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
@@ -41,7 +41,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
 
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
 
-  const isSelectedDataset = uuid === selectedUuids[0];
+  const isSelectedDataset = uuid === selectedUuid[0];
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
