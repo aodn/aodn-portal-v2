@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { OGCCollection } from "../store/OGCCollectionDefinitions";
 import { BasicMapHoverTipProps } from "./BasicMapHoverTip";
-import { Box, CardActionArea, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Stack, Tooltip, Typography } from "@mui/material";
 import {
   fontColor,
   fontSize,
@@ -12,10 +12,14 @@ import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
 
 interface ComplexMapHoverTipProps extends BasicMapHoverTipProps {
   collection: OGCCollection;
+  hideTittle?: boolean;
+  hideButtonGroupText?: boolean;
 }
 
 const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   collection,
+  hideTittle = false,
+  hideButtonGroupText = false,
   onDatasetSelected = () => {},
   tabNavigation = () => {},
   sx,
@@ -28,26 +32,28 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   return (
     <Box flex={1} sx={{ ...sx }}>
       <Stack direction="column" spacing={1}>
-        <Box>
-          <Tooltip title={collection.title} placement="top">
-            <Box display="flex" alignItems="center" height="60px">
-              <Typography
-                fontWeight={fontWeight.bold}
-                fontSize={fontSize.info}
-                sx={{
-                  padding: 0,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: "3",
-                  WebkitBoxOrient: "vertical",
-                }}
-              >
-                {collection.title}
-              </Typography>
-            </Box>
-          </Tooltip>
-        </Box>
+        {!hideTittle && (
+          <Box>
+            <Tooltip title={collection.title} placement="top">
+              <Box display="flex" alignItems="center" height="60px">
+                <Typography
+                  fontWeight={fontWeight.bold}
+                  fontSize={fontSize.info}
+                  sx={{
+                    padding: 0,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: "3",
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {collection.title}
+                </Typography>
+              </Box>
+            </Tooltip>
+          </Box>
+        )}
 
         <Box onClick={onDatasetSelected}>
           <Tooltip title="Show spatial extents" placement="top">
@@ -72,6 +78,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
             onLinks={onLinks}
             onDownload={onDownload}
             onDetail={onDetail}
+            shouldHideText={hideButtonGroupText}
           />
         </Box>
 

@@ -1,9 +1,10 @@
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { PinListButtonControlProps } from "../map/mapbox/controls/PinListButtonControl";
-import { IconButton, Popper } from "@mui/material";
+import { Box, IconButton, Popper } from "@mui/material";
 import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
-
-import PinList from "./PinList";
+import { PIN_LIST_WIDTH } from "./constants";
+import { borderRadius } from "../../styles/constants";
+import PinListAccordionGroup from "./PinListAccordionGroup";
 
 interface PinListButtonProps extends PinListButtonControlProps {}
 
@@ -24,7 +25,7 @@ const PinListButton: FC<PinListButtonProps> = ({
     if (!open && pinList && pinList.length > 0) {
       setOpen(true);
     }
-    // only depend on change of pinList
+    // only depends on change of pinList
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pinList]);
 
@@ -58,12 +59,22 @@ const PinListButton: FC<PinListButtonProps> = ({
           },
         ]}
       >
-        <PinList
-          showList={showList}
-          pinList={pinList}
-          selectedUuid={selectedUuid}
-          setSelectedUuid={setSelectedUuid}
-        />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: PIN_LIST_WIDTH,
+            borderRadius: borderRadius.menu,
+            backgroundColor: "#fff",
+            zIndex: 1,
+          }}
+        >
+          <PinListAccordionGroup
+            pinList={pinList}
+            selectedUuid={selectedUuid}
+            setSelectedUuid={setSelectedUuid}
+          />
+        </Box>
       </Popper>
     </>
   );
