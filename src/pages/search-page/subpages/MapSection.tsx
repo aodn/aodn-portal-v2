@@ -52,9 +52,10 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
     zoom,
     isLoading,
     selectedUuid,
+    setSelectedUuid,
     onSelectDataset,
     pinList,
-    setSelectedUuid,
+    onRemoveFromPinList,
   } = useSearchPageContext();
 
   const showFullMap = useMemo(
@@ -117,6 +118,7 @@ const MapSection: React.FC<MapSectionProps> = ({ sx }) => {
             showList={pinList && pinList.length > 0}
             selectedUuid={selectedUuid}
             setSelectedUuid={setSelectedUuid}
+            onRemoveFromPinList={onRemoveFromPinList}
           />
           <MenuControl
             menu={

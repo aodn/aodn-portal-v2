@@ -13,6 +13,7 @@ const PinListButton: FC<PinListButtonProps> = ({
   pinList = [],
   selectedUuid,
   setSelectedUuid,
+  onRemoveFromPinList,
 }) => {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(showList);
@@ -64,6 +65,8 @@ const PinListButton: FC<PinListButtonProps> = ({
             display: "flex",
             flexDirection: "column",
             width: PIN_LIST_WIDTH,
+            maxHeight: "85vh",
+            overflowY: "auto",
             borderRadius: borderRadius.menu,
             backgroundColor: "#fff",
             zIndex: 1,
@@ -73,6 +76,7 @@ const PinListButton: FC<PinListButtonProps> = ({
             pinList={pinList}
             selectedUuid={selectedUuid}
             setSelectedUuid={setSelectedUuid}
+            onRemoveFromPinList={onRemoveFromPinList}
           />
         </Box>
       </Popper>

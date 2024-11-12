@@ -24,6 +24,7 @@ interface SearchPageContextType {
   onClickCard: (uuid: string) => void;
   selectedDataset: OGCCollection[] | undefined;
   pinList: OGCCollection[] | undefined;
+  onRemoveFromPinList: (idToRemove: string) => void;
   onSelectDataset: (uuids: Array<string>) => void;
   selectedUuid: string[];
   setSelectedUuid: Dispatch<React.SetStateAction<string[]>>;
@@ -44,6 +45,7 @@ const searchPageContextDefault = {
   onClickCard: () => {},
   selectedDataset: undefined,
   pinList: undefined,
+  onRemoveFromPinList: () => {},
   onSelectDataset: () => {},
   selectedUuid: [],
   setSelectedUuid: () => {},

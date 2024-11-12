@@ -1,7 +1,7 @@
-import { IControl, Map } from "mapbox-gl";
-import { createRoot, Root } from "react-dom/client";
-import MapContext from "../MapContext";
 import React, { useContext, useEffect, useState } from "react";
+import { createRoot, Root } from "react-dom/client";
+import { IControl, Map } from "mapbox-gl";
+import MapContext from "../MapContext";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import PinListButton from "../../../result/PinListButton";
 
@@ -10,6 +10,7 @@ export interface PinListButtonControlProps {
   pinList?: OGCCollection[] | undefined;
   selectedUuid?: string[];
   setSelectedUuid?: (uuids: Array<string>) => void;
+  onRemoveFromPinList?: (idToRemove: string) => void;
 }
 
 class PinButtonControlClass implements IControl {
@@ -34,6 +35,7 @@ class PinButtonControlClass implements IControl {
           pinList={this.props.pinList}
           selectedUuid={this.props.selectedUuid}
           setSelectedUuid={this.props.setSelectedUuid}
+          onRemoveFromPinList={this.props.onRemoveFromPinList}
         />
       );
     }

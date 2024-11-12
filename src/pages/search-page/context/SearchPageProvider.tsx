@@ -385,7 +385,15 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
     [onSelectDataset]
   );
 
-  console.log("pin list=====", pinList);
+  // Clear the selected uuid if the removed dataset is now selected
+  const onRemoveFromPinList = (idToRemove: string) => {
+    setPinList((prevList) => prevList.filter((item) => item.id !== idToRemove));
+
+    if (selectedUuid?.includes(idToRemove)) {
+      setSelectedUuid([]);
+    }
+  };
+
   return (
     <SearchPageContext.Provider
       value={{
@@ -406,6 +414,7 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
         pinList,
         selectedUuid,
         setSelectedUuid,
+        onRemoveFromPinList,
       }}
     >
       {children}
