@@ -22,7 +22,6 @@ interface SearchPageContextType {
   zoom: number | undefined;
   isLoading: boolean;
   onClickCard: (uuid: string) => void;
-  selectedDataset: OGCCollection[] | undefined;
   pinList: OGCCollection[] | undefined;
   onRemoveFromPinList: (idToRemove: string) => void;
   onSelectDataset: (uuids: Array<string>) => void;
@@ -43,7 +42,6 @@ const searchPageContextDefault = {
   zoom: undefined,
   isLoading: false,
   onClickCard: () => {},
-  selectedDataset: undefined,
   pinList: undefined,
   onRemoveFromPinList: () => {},
   onSelectDataset: () => {},

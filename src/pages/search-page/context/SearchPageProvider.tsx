@@ -27,17 +27,14 @@ import store, {
 import {
   createSearchParamFrom,
   DEFAULT_SEARCH_PAGE,
+  fetchResultByUuidNoStore,
   fetchResultNoStore,
   fetchResultWithStore,
-  SearchParameters,
 } from "../../../components/common/store/searchReducer";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { pageDefault } from "../../../components/common/constants";
-import { checkLoading, createFilterString } from "./utils";
+import { checkLoading } from "./utils";
 
 interface SearchPageProviderProps {
   children: ReactNode;
@@ -74,10 +71,6 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
   // selectedUuid is the uuid of a selected dataset when user click on a result card or dot on map
   // it is an array of string but only contains one element, since the click of map dot returns an array of features
   const [selectedUuid, setSelectedUuid] = useState<Array<string>>([]);
-
-  // selectedDataset is the dataset of the selectedUuid when user click on a result card or dot on map
-  // it is an array of OGCCollection but only contains one element (if only one selectedUuid)
-  const [selectedDataset, setDatasetSelected] = useState<OGCCollection[]>([]);
 
   const [pinList, setPinList] = useState<OGCCollection[]>([]);
 
@@ -321,22 +314,14 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
     [loadingThreadCount]
   );
 
-  const getCollectionsData = useCallback(
+  const getCollectionData = useCallback(
     async (uuids: Array<string>): Promise<void | OGCCollection[]> => {
-      const uuidsString = createFilterString(uuids);
-      // if uuids array is an empty array, no need fetch collection data
-      if (uuidsString.length === 0) return;
-      const param: SearchParameters = {
-        filter: uuidsString,
-      };
-      return dispatch(fetchResultNoStore(param))
+      return dispatch(fetchResultByUuidNoStore(uuids[0]))
         .unwrap()
-        .then((res: OGCCollections) => {
-          setDatasetSelected(res.collections);
-
+        .then((collection: OGCCollection) => {
           // Update pin list - only add datasets that don't already exist
           setPinList((prevDatasets) => {
-            if (!Array.isArray(prevDatasets)) return res.collections;
+            if (!Array.isArray(prevDatasets)) return [collection];
 
             // Create a Set of existing dataset IDs for quick lookup
             const existingIds = new Set(
@@ -344,17 +329,17 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
             );
 
             // Filter out datasets that already exist in prevDatasets
-            const newDatasets = res.collections.filter(
-              (dataset) => !existingIds.has(dataset.id)
-            );
+            const newDataset = !existingIds.has(collection.id)
+              ? collection
+              : null;
 
             // Only update if we have new datasets to add
-            if (newDatasets.length === 0) {
+            if (!newDataset) {
               return prevDatasets;
             }
 
             // Return combined array with new datasets
-            return [...newDatasets, ...prevDatasets];
+            return [newDataset, ...prevDatasets];
           });
         })
         .catch((error: any) => {
@@ -370,12 +355,11 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
     (uuids: Array<string>) => {
       if (uuids.length === 0) {
         setSelectedUuid([]);
-        setDatasetSelected([]);
       }
       setSelectedUuid(uuids);
-      getCollectionsData(uuids);
+      getCollectionData(uuids);
     },
-    [getCollectionsData]
+    [getCollectionData]
   );
 
   const onClickCard = useCallback(
@@ -409,7 +393,6 @@ const SearchPageProvider: FC<SearchPageProviderProps> = ({ children }) => {
         zoom,
         isLoading,
         onClickCard,
-        selectedDataset,
         onSelectDataset,
         pinList,
         selectedUuid,

@@ -10,7 +10,7 @@ interface PinListButtonProps extends PinListButtonControlProps {}
 
 const PinListButton: FC<PinListButtonProps> = ({
   showList = false,
-  pinList = [],
+  pinList,
   selectedUuid,
   setSelectedUuid,
   onRemoveFromPinList,
@@ -23,7 +23,7 @@ const PinListButton: FC<PinListButtonProps> = ({
   }, [showList]);
 
   useEffect(() => {
-    if (!open && pinList && pinList.length > 0) {
+    if (!open && showList) {
       setOpen(true);
     }
     // only depends on change of pinList

@@ -9,17 +9,18 @@ import {
   padding,
 } from "../../../styles/constants";
 import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
+import Map from "../../map/mapbox/Map";
+import Layers from "../../map/mapbox/layers/Layers";
+import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
 
 interface ComplexMapHoverTipProps extends BasicMapHoverTipProps {
   collection: OGCCollection;
-  hideTittle?: boolean;
-  hideButtonGroupText?: boolean;
 }
+
+const mapContainerId = "map-popup-spatial-extend-overview";
 
 const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   collection,
-  hideTittle = false,
-  hideButtonGroupText = false,
   onDatasetSelected = () => {},
   tabNavigation = () => {},
   sx,
@@ -32,55 +33,49 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   return (
     <Box flex={1} sx={{ ...sx }}>
       <Stack direction="column" spacing={1}>
-        {!hideTittle && (
-          <Box>
-            <Tooltip title={collection.title} placement="top">
-              <Box display="flex" alignItems="center" height="60px">
-                <Typography
-                  fontWeight={fontWeight.bold}
-                  fontSize={fontSize.info}
-                  sx={{
-                    padding: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: "3",
-                    WebkitBoxOrient: "vertical",
-                  }}
-                >
-                  {collection.title}
-                </Typography>
-              </Box>
-            </Tooltip>
-          </Box>
-        )}
-
-        <Box onClick={onDatasetSelected}>
-          <Tooltip title="Show spatial extents" placement="top">
-            <Box width="100%" height="130px">
-              <img
-                src={collection.findThumbnail()}
-                alt="org_logo"
-                style={{
-                  objectFit: "cover",
-                  width: "100%",
-                  height: "100%",
+        <Box>
+          <Tooltip title={collection.title} placement="top">
+            <Box display="flex" alignItems="center" height="60px">
+              <Typography
+                fontWeight={fontWeight.bold}
+                fontSize={fontSize.info}
+                sx={{
+                  padding: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: "3",
+                  WebkitBoxOrient: "vertical",
                 }}
-              />
+              >
+                {collection.title}
+              </Typography>
             </Box>
           </Tooltip>
         </Box>
 
-        <Box>
-          <ResultCardButtonGroup
-            content={collection}
-            isGridView
-            onLinks={onLinks}
-            onDownload={onDownload}
-            onDetail={onDetail}
-            shouldHideText={hideButtonGroupText}
-          />
+        <Box
+          arial-label="map"
+          id={`${mapContainerId}-${collection.id}`}
+          sx={{
+            width: "100%",
+            height: "130px",
+          }}
+        >
+          <Map panelId={`${mapContainerId}-${collection.id}`}>
+            <Layers>
+              <GeojsonLayer collection={collection} />
+            </Layers>
+          </Map>
         </Box>
+
+        <ResultCardButtonGroup
+          content={collection}
+          isGridView
+          onLinks={onLinks}
+          onDownload={onDownload}
+          onDetail={onDetail}
+        />
 
         <Box onClick={() => {}}>
           <Tooltip title="More detail..." placement="top">
