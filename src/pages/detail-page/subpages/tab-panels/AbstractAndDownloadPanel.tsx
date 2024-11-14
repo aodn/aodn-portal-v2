@@ -30,9 +30,6 @@ import DimensionsIcon from "../../../../components/icon/Dimensions";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import Controls from "../../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
-import MenuControl, {
-  BaseMapSwitcher,
-} from "../../../../components/map/mapbox/controls/MenuControl";
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
 import Map from "../../../../components/map/mapbox/Map";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
@@ -42,6 +39,8 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailClusterLayer from "../../../../components/map/mapbox/layers/DetailClusterLayer";
+import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
+import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 
 interface DownloadSelect {
   label?: string;

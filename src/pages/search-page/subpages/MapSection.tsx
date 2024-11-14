@@ -5,9 +5,9 @@ import ToggleControl from "../../../components/map/mapbox/controls/ToggleControl
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MenuControl, {
-  BaseMapSwitcher,
   MapLayerSwitcher,
-} from "../../../components/map/mapbox/controls/MenuControl";
+} from "../../../components/map/mapbox/controls/menu/MenuControl";
+import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import React, { useCallback, useState } from "react";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import Layers, {
