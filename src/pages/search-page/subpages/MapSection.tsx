@@ -4,9 +4,7 @@ import Controls from "../../../components/map/mapbox/controls/Controls";
 import ToggleControl from "../../../components/map/mapbox/controls/ToggleControl";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
-import MenuControl, {
-  MapLayerSwitcher,
-} from "../../../components/map/mapbox/controls/menu/MenuControl";
+import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import React, { useCallback, useState } from "react";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
@@ -23,6 +21,7 @@ import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCo
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
+import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
 const mapContainerId = "map-container-id";
 
