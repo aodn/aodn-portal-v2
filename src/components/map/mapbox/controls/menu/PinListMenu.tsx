@@ -22,7 +22,10 @@ import Map from "../../Map";
 import StyledAccordionDetails from "../../../../common/accordion/StyledAccordionDetails";
 import StyledAccordion from "../../../../common/accordion/StyledAccordion";
 import StyledAccordionSummary from "../../../../common/accordion/StyledAccordionSummary";
-import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
+import {
+  OGCCollection,
+  OGCCollections,
+} from "../../../../common/store/OGCCollectionDefinitions";
 import Layers from "../../layers/Layers";
 import ResultCardButtonGroup from "../../../../result/ResultCardButtonGroup";
 import {
@@ -37,6 +40,11 @@ import GeojsonLayer from "../../layers/GeojsonLayer";
 import EventEmitter from "events";
 import { EVENT_MENU_CLICKED, eventEmitter } from "./MenuControl";
 import { setSelection } from "@testing-library/user-event/dist/cjs/event/selection/setSelection.js";
+import {
+  fetchResultNoStore,
+  SearchParameters,
+} from "../../../../common/store/searchReducer";
+import { useAppDispatch } from "../../../../common/store/hooks";
 
 interface PinListMenuProps extends ControlProps {
   items?: Array<OGCCollection> | undefined;
@@ -60,7 +68,7 @@ interface ItemAddEvent {
 }
 
 const PIN_LIST_WIDTH = 260;
-const mapContainerId = "pin-list-card-spatial-extend-overview";
+const mapContainerId = "pin-list-map";
 const EVENT_ADD_ITEM = "add-item";
 
 // Do not expose it directly, use function to expose it
@@ -175,10 +183,10 @@ const PinListAccordionGroup: React.FC<PinListAccordionGroupProps> = ({
   const handleRemove = useCallback(
     (item: OGCCollection) => {
       // Keep the current expansion status when remove the other un-expanded pinned datasets
-      setSelectedItem((prev) => (prev?.id === item.id ? undefined : prev));
+      setSelectedItem((prev) => (prev?.id === item.id ? items?.[0] : prev));
       onRemoveItem && onRemoveItem(item);
     },
-    [onRemoveItem]
+    [onRemoveItem, items]
   );
   useEffect(() => {
     const onAddItem = (event: ItemAddEvent) => {
@@ -282,21 +290,16 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
       }
     };
 
-    const onAddItem = (event: ItemAddEvent) => {
-      setItems((items) => {
-        if (items) {
-          // Avoid duplicate, if we cannot find in the current array add it.
-          if (items.findIndex((i) => i.id === event.component.id) === -1) {
-            // New item always add to front
-            return [event.component, ...items];
-          } else {
-            return items;
-          }
-        } else {
-          // no item, so return array of this item
-          return [event.component];
+    const onAddItem = async (event: ItemAddEvent) => {
+      if (items) {
+        // Avoid duplicate, if we cannot find in the current array add it.
+        if (items.findIndex((i) => i.id === event.component.id) === -1) {
+          // New item always add to front
+          setItems([event.component, ...items]);
         }
-      });
+      } else {
+        setItems([event.component]);
+      }
     };
 
     eventEmitter.on(EVENT_MENU_CLICKED, handleEvent);
@@ -306,7 +309,7 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
       eventEmitter.off(EVENT_MENU_CLICKED, handleEvent);
       internalEventLoop.off(EVENT_ADD_ITEM, onAddItem);
     };
-  }, []);
+  }, [items]);
 
   return (
     <>

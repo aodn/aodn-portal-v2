@@ -319,9 +319,45 @@ const SearchPage = () => {
     [setCurrentLayout]
   );
 
-  const handleClickCard = useCallback((item: OGCCollection | undefined) => {
-    item && insertItemToPinList(item) && setSelectedUuids([item.id]);
-  }, []);
+  // util function to get collection data given uuid
+  const fillGeometryIfMissing = useCallback(
+    async (collection: OGCCollection): Promise<OGCCollection> => {
+      if (!collection.getGeometry()) return collection;
+
+      const param: SearchParameters = {
+        filter: `id='${collection.id}'`,
+        properties: "id,geometry",
+      };
+
+      return await dispatch(fetchResultNoStore(param))
+        .unwrap()
+        .then((value: OGCCollections) => {
+          collection.properties = {
+            ...collection.properties,
+            ...value.collections[0].properties,
+          };
+
+          return collection;
+        })
+        .catch((error: any) => {
+          console.error("Error fetching collection data:", error);
+          return collection;
+        });
+    },
+    [dispatch]
+  );
+
+  const handleClickCard = useCallback(
+    async (item: OGCCollection | undefined) => {
+      if (item) {
+        // The item set to pin list assume spatial extents is there
+        const e = await fillGeometryIfMissing(item);
+        insertItemToPinList(e);
+        setSelectedUuids([item.id]);
+      }
+    },
+    [fillGeometryIfMissing]
+  );
 
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
