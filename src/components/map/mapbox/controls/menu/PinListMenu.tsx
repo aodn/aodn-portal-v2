@@ -36,6 +36,7 @@ import {
 import GeojsonLayer from "../../layers/GeojsonLayer";
 import EventEmitter from "events";
 import { EVENT_MENU_CLICKED, eventEmitter } from "./MenuControl";
+import { setSelection } from "@testing-library/user-event/dist/cjs/event/selection/setSelection.js";
 
 interface PinListMenuProps extends ControlProps {
   items?: Array<OGCCollection> | undefined;
@@ -70,6 +71,18 @@ const insertItemToPinList = (item: OGCCollection): void => {
     event: new MouseEvent(EVENT_ADD_ITEM),
     component: item,
   });
+};
+// Rearrange the list, so that the selected item move to the top
+// of the list
+const arrangeItems = (
+  items: Array<OGCCollection>,
+  selected: OGCCollection | undefined
+): Array<OGCCollection> => {
+  if (selected) {
+    return [selected, ...items.filter((i) => i.id !== selected.id)];
+  } else {
+    return items;
+  }
 };
 
 const PinListCard: React.FC<PinListCardProps> = ({
@@ -167,12 +180,27 @@ const PinListAccordionGroup: React.FC<PinListAccordionGroupProps> = ({
     },
     [onRemoveItem]
   );
+  useEffect(() => {
+    const onAddItem = (event: ItemAddEvent) => {
+      event &&
+        event.component &&
+        // We want to happend a bit later, so that items are set before
+        // before we expand it.
+        setTimeout(() => setSelectedItem(event.component), 100);
+    };
+
+    internalEventLoop.on(EVENT_ADD_ITEM, onAddItem);
+
+    return () => {
+      internalEventLoop.off(EVENT_ADD_ITEM, onAddItem);
+    };
+  }, []);
 
   if (!items) return;
 
   return (
     <>
-      {items.map((item) => (
+      {arrangeItems(items, selectedItem).map((item) => (
         <StyledAccordion
           key={item.id}
           expanded={selectedItem?.id === item.id}
@@ -232,7 +260,7 @@ const PinListAccordionGroup: React.FC<PinListAccordionGroupProps> = ({
 
 const PinListMenu: React.FC<PinListMenuProps> = () => {
   const anchorRef = useRef(null);
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(true);
   const [items, setItems] = useState<Array<OGCCollection> | undefined>(
     undefined
   );
@@ -245,12 +273,6 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
     setItems((items) => items?.filter((c) => c.id !== item.id));
   }, []);
 
-  const onAddItem = useCallback((event: ItemAddEvent) => {
-    setItems((items) =>
-      items ? [...items, event.component] : [event.component]
-    );
-  }, []);
-
   useEffect(() => {
     // Handle event when other control clicked, this component should close
     // the menu
@@ -260,6 +282,23 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
       }
     };
 
+    const onAddItem = (event: ItemAddEvent) => {
+      setItems((items) => {
+        if (items) {
+          // Avoid duplicate, if we cannot find in the current array add it.
+          if (items.findIndex((i) => i.id === event.component.id) === -1) {
+            // New item always add to front
+            return [event.component, ...items];
+          } else {
+            return items;
+          }
+        } else {
+          // no item, so return array of this item
+          return [event.component];
+        }
+      });
+    };
+
     eventEmitter.on(EVENT_MENU_CLICKED, handleEvent);
     internalEventLoop.on(EVENT_ADD_ITEM, onAddItem);
 
@@ -267,7 +306,7 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
       eventEmitter.off(EVENT_MENU_CLICKED, handleEvent);
       internalEventLoop.off(EVENT_ADD_ITEM, onAddItem);
     };
-  }, [onAddItem]);
+  }, []);
 
   return (
     <>
