@@ -22,14 +22,12 @@ interface ResultSectionProps {
   onChangeLayout: (layout: SearchResultLayoutEnum) => void;
   onChangeSorting: (v: SortResultEnum) => void;
   isLoading: boolean;
-  onClickCard?: (uuid: string) => void;
-  datasetsSelected?: OGCCollection[];
+  onClickCard?: (item: OGCCollection | undefined) => void;
 }
 
 const RESULT_SECTION_WIDTH = 500;
 
 const ResultSection: FC<ResultSectionProps> = ({
-  datasetsSelected,
   currentLayout,
   onChangeLayout,
   currentSort,
@@ -70,7 +68,6 @@ const ResultSection: FC<ResultSectionProps> = ({
             layout={currentLayout}
             contents={reduxContents}
             onClickCard={onClickCard}
-            datasetsSelected={datasetsSelected}
           />
         </Box>
       </Box>

@@ -76,7 +76,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         </Box>
       )}
 
-      <CardActionArea onClick={() => onClickCard(uuid)}>
+      <CardActionArea onClick={() => onClickCard(content)}>
         <Box
           height={isSelectedDataset || showButtons ? "110px" : "130px"}
           width="100%"

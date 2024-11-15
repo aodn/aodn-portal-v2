@@ -97,7 +97,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
           </CardActionArea>
         </Tooltip>
 
-        <CardActionArea onClick={() => onClickCard(uuid)} sx={{ flex: 1 }}>
+        <CardActionArea onClick={() => onClickCard(content)} sx={{ flex: 1 }}>
           <Typography
             arial-label="result-list-card-content"
             color={fontColor.gray.medium}

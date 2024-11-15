@@ -22,6 +22,7 @@ import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
 import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import PinListMenu from "../../../components/map/mapbox/controls/menu/PinListMenu";
 
 const mapContainerId = "map-container-id";
 
@@ -113,6 +114,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           <NavigationControl />
           <ScaleControl />
           <DisplayCoordinate />
+          <MenuControl menu={<PinListMenu />} />
           <MenuControl
             menu={
               <BaseMapSwitcher

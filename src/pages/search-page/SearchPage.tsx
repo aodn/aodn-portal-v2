@@ -45,6 +45,7 @@ import {
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
+import { insertItemToPinList } from "../../components/map/mapbox/controls/menu/PinListMenu";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -81,7 +82,6 @@ const SearchPage = () => {
   // State to store the sort option that user selected
   const [currentSort, setCurrentSort] = useState<SortResultEnum | null>(null);
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
-  const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
   const [zoom, setZoom] = useState<number | undefined>(undefined);
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
@@ -115,40 +115,6 @@ const SearchPage = () => {
     }
     return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
   };
-
-  const getCollectionsData = useCallback(
-    async (uuids: Array<string>): Promise<void | OGCCollection[]> => {
-      const uuidsString = createFilterString(uuids);
-      // if uuids array is an empty array, no need fetch collection data
-      if (uuidsString.length === 0) return;
-      const param: SearchParameters = {
-        filter: uuidsString,
-      };
-      return dispatch(fetchResultNoStore(param))
-        .unwrap()
-        .then((res: OGCCollections) => {
-          setDatasetsSelected(res.collections);
-        })
-        .catch((error: any) => {
-          console.error("Error fetching collection data:", error);
-          // TODO: handle error in ErrorBoundary
-        });
-    },
-    [dispatch]
-  );
-
-  // On select a dataset, update the states: selected uuid(s) and get the collection data
-  const handleDatasetSelecting = useCallback(
-    (uuids: Array<string>) => {
-      if (uuids.length === 0) {
-        setSelectedUuids([]);
-        setDatasetsSelected([]);
-      }
-      setSelectedUuids(uuids);
-      getCollectionsData(uuids);
-    },
-    [getCollectionsData]
-  );
 
   const doMapSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -353,12 +319,9 @@ const SearchPage = () => {
     [setCurrentLayout]
   );
 
-  const handleClickCard = useCallback(
-    (uuid: string) => {
-      handleDatasetSelecting([uuid]);
-    },
-    [handleDatasetSelecting]
-  );
+  const handleClickCard = useCallback((item: OGCCollection | undefined) => {
+    item && insertItemToPinList(item) && setSelectedUuids([item.id]);
+  }, []);
 
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
@@ -390,7 +353,6 @@ const SearchPage = () => {
               onChangeSorting={onChangeSorting}
               currentLayout={currentLayout}
               onChangeLayout={onChangeLayout}
-              datasetsSelected={datasetsSelected}
               isLoading={isLoading(loadingThreadCount)}
             />
           </Box>
@@ -404,7 +366,7 @@ const SearchPage = () => {
             selectedUuids={selectedUuids}
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}
-            onDatasetSelected={handleDatasetSelecting}
+            onDatasetSelected={() => {}}
             isLoading={isLoading(loadingThreadCount)}
           />
         </Box>
