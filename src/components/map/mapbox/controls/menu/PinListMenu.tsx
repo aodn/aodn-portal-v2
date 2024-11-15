@@ -118,7 +118,7 @@ const PinListCard: React.FC<PinListCardProps> = ({
           >
             <Map panelId={`${mapContainerId}-${collection.id}`}>
               <Layers>
-                <GeojsonLayer collection={collection} />
+                <GeojsonLayer collection={collection} animate={false} />
               </Layers>
             </Map>
           </Box>
@@ -290,16 +290,21 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
       }
     };
 
-    const onAddItem = async (event: ItemAddEvent) => {
-      if (items) {
-        // Avoid duplicate, if we cannot find in the current array add it.
-        if (items.findIndex((i) => i.id === event.component.id) === -1) {
-          // New item always add to front
-          setItems([event.component, ...items]);
+    const onAddItem = (event: ItemAddEvent) => {
+      setItems((items) => {
+        if (items) {
+          // Avoid duplicate, if we cannot find in the current array add it.
+          if (items.findIndex((i) => i.id === event.component.id) === -1) {
+            // New item always add to front
+            return [event.component, ...items];
+          } else {
+            return items;
+          }
+        } else {
+          // no item, so return array of this item
+          return [event.component];
         }
-      } else {
-        setItems([event.component]);
-      }
+      });
     };
 
     eventEmitter.on(EVENT_MENU_CLICKED, handleEvent);
@@ -309,7 +314,7 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
       eventEmitter.off(EVENT_MENU_CLICKED, handleEvent);
       internalEventLoop.off(EVENT_ADD_ITEM, onAddItem);
     };
-  }, [items]);
+  }, []);
 
   return (
     <>

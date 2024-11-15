@@ -35,7 +35,15 @@ export class OGCCollection {
     return this.propExtent;
   }
 
-  set properties(props: SummariesProperties) {
+  set extentInt(ext: Spatial | undefined) {
+    this.propExtent = ext;
+  }
+
+  get properties(): SummariesProperties | undefined {
+    return this.propValue;
+  }
+
+  set properties(props: SummariesProperties | undefined) {
     this.propValue = Object.assign(new SummariesProperties(), props);
   }
 

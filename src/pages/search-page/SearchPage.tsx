@@ -321,22 +321,20 @@ const SearchPage = () => {
 
   // util function to get collection data given uuid
   const fillGeometryIfMissing = useCallback(
-    async (collection: OGCCollection): Promise<OGCCollection> => {
-      if (!collection.getGeometry()) return collection;
+    (collection: OGCCollection): Promise<OGCCollection> => {
+      if (collection.getGeometry())
+        return new Promise((resolve, reject) => resolve(collection));
 
       const param: SearchParameters = {
         filter: `id='${collection.id}'`,
-        properties: "id,geometry",
+        properties: "id,bbox,geometry",
       };
 
-      return await dispatch(fetchResultNoStore(param))
+      return dispatch(fetchResultNoStore(param))
         .unwrap()
         .then((value: OGCCollections) => {
-          collection.properties = {
-            ...collection.properties,
-            ...value.collections[0].properties,
-          };
-
+          collection.properties = value.collections[0].properties;
+          collection.extentInt = value.collections[0].extent;
           return collection;
         })
         .catch((error: any) => {
