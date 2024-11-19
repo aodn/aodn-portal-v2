@@ -41,7 +41,9 @@ interface MapSectionProps {
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
   onToggleClicked: (v: boolean) => void;
-  onDatasetSelected?: (uuids: Array<string>) => void;
+  onClickMapPoint?: (uuids: Array<string>) => void;
+  onClickAccordion?: (uuid: string | undefined) => void;
+  onRemoveFromPinList?: (uuid: string) => void;
   isLoading: boolean;
 }
 
@@ -50,7 +52,9 @@ const MapSection: React.FC<MapSectionProps> = ({
   zoom,
   onMapZoomOrMove,
   onToggleClicked,
-  onDatasetSelected,
+  onClickMapPoint: onDatasetSelected,
+  onClickAccordion,
+  onRemoveFromPinList,
   collections,
   showFullMap,
   sx,
@@ -114,7 +118,14 @@ const MapSection: React.FC<MapSectionProps> = ({
           <NavigationControl />
           <ScaleControl />
           <DisplayCoordinate />
-          <MenuControl menu={<PinListMenu />} />
+          <MenuControl
+            menu={
+              <PinListMenu
+                onClickAccordion={onClickAccordion}
+                onRemoveFromPinList={onRemoveFromPinList}
+              />
+            }
+          />
           <MenuControl
             menu={
               <BaseMapSwitcher

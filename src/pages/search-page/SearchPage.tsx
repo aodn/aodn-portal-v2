@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import {
   createSearchParamFrom,
   DEFAULT_SEARCH_PAGE,
+  fetchResultByUuidNoStore,
   fetchResultNoStore,
   fetchResultWithStore,
   SearchParameters,
@@ -45,7 +46,11 @@ import {
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
-import { insertItemToPinList } from "../../components/map/mapbox/controls/menu/PinListMenu";
+import {
+  collapseAllAccordions,
+  expandAccordion,
+  insertItemToPinList,
+} from "../../components/map/mapbox/controls/menu/PinListMenu";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -345,7 +350,25 @@ const SearchPage = () => {
     [dispatch]
   );
 
-  const handleClickCard = useCallback(
+  // Handler for click on map dot: set selected uuid, expand a
+  const onClickMapPoint = useCallback(
+    (uuids: Array<string>) => {
+      if (uuids.length === 0) {
+        setSelectedUuids([]);
+        collapseAllAccordions();
+      } else {
+        setSelectedUuids(uuids);
+        dispatch(fetchResultByUuidNoStore(uuids[0]))
+          .unwrap()
+          .then((res: OGCCollection) => {
+            insertItemToPinList(res);
+          });
+      }
+    },
+    [dispatch]
+  );
+
+  const onClickCard = useCallback(
     async (item: OGCCollection | undefined) => {
       if (item) {
         // The item set to pin list assume spatial extents is there
@@ -355,6 +378,22 @@ const SearchPage = () => {
       }
     },
     [fillGeometryIfMissing]
+  );
+
+  const onClickAccordion = useCallback(
+    (uuid: string | undefined) => {
+      setSelectedUuids(uuid ? [uuid] : []);
+    },
+    [setSelectedUuids]
+  );
+
+  const onRemoveFromPinList = useCallback(
+    (uuid: string) => {
+      if (selectedUuids.includes(uuid)) {
+        setSelectedUuids([]);
+      }
+    },
+    [selectedUuids]
   );
 
   // You will see this trigger twice, this is due to use of strict-mode
@@ -382,7 +421,7 @@ const SearchPage = () => {
         {selectedLayout !== SearchResultLayoutEnum.FULL_MAP && (
           <Box>
             <ResultSection
-              onClickCard={handleClickCard}
+              onClickCard={onClickCard}
               currentSort={currentSort}
               onChangeSorting={onChangeSorting}
               currentLayout={currentLayout}
@@ -400,7 +439,9 @@ const SearchPage = () => {
             selectedUuids={selectedUuids}
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}
-            onDatasetSelected={() => {}}
+            onClickMapPoint={onClickMapPoint}
+            onClickAccordion={onClickAccordion}
+            onRemoveFromPinList={onRemoveFromPinList}
             isLoading={isLoading(loadingThreadCount)}
           />
         </Box>

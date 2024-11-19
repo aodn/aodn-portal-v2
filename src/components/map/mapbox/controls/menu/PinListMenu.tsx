@@ -5,61 +5,35 @@ import React, {
   useRef,
   SyntheticEvent,
 } from "react";
-
 import { ControlProps, MenuClickedEvent } from "./Definition";
 import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
-import {
-  Box,
-  Button,
-  IconButton,
-  Popper,
-  Stack,
-  SxProps,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import Map from "../../Map";
+import { Box, Button, IconButton, Popper, Typography } from "@mui/material";
 import StyledAccordionDetails from "../../../../common/accordion/StyledAccordionDetails";
 import StyledAccordion from "../../../../common/accordion/StyledAccordion";
 import StyledAccordionSummary from "../../../../common/accordion/StyledAccordionSummary";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "../../../../common/store/OGCCollectionDefinitions";
-import Layers from "../../layers/Layers";
-import ResultCardButtonGroup from "../../../../result/ResultCardButtonGroup";
+import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
 import {
   borderRadius,
   color,
   fontColor,
   fontSize,
   fontWeight,
-  padding,
 } from "../../../../../styles/constants";
-import GeojsonLayer from "../../layers/GeojsonLayer";
+
 import EventEmitter from "events";
 import { EVENT_MENU_CLICKED, eventEmitter } from "./MenuControl";
-import { setSelection } from "@testing-library/user-event/dist/cjs/event/selection/setSelection.js";
-import {
-  fetchResultNoStore,
-  SearchParameters,
-} from "../../../../common/store/searchReducer";
-import { useAppDispatch } from "../../../../common/store/hooks";
+import PinListCard from "../../../../result/PinListCard";
 
 interface PinListMenuProps extends ControlProps {
   items?: Array<OGCCollection> | undefined;
-}
-
-interface PinListCardProps {
-  collection: OGCCollection;
-  sx?: SxProps;
-  onDatasetSelected?: () => void;
-  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
+  onClickAccordion?: (uuid: string | undefined) => void;
+  onRemoveFromPinList?: (uuid: string) => void;
 }
 
 interface PinListAccordionGroupProps {
   items: Array<OGCCollection> | undefined;
   onRemoveItem: (item: OGCCollection) => void;
+  onClickAccordion: (uuid: string | undefined) => void;
 }
 
 interface ItemAddEvent {
@@ -67,9 +41,14 @@ interface ItemAddEvent {
   component: OGCCollection;
 }
 
+interface AccordionExpandEvent {
+  uuid: string;
+}
+
 const PIN_LIST_WIDTH = 260;
-const mapContainerId = "pin-list-map";
 const EVENT_ADD_ITEM = "add-item";
+const EVENT_ACCORDION_EXPAND = "accordion-expand";
+const EVENT_ACCORDION_COLLAPSE = "accordion-collapse";
 
 // Do not expose it directly, use function to expose it
 const internalEventLoop: EventEmitter = new EventEmitter();
@@ -80,90 +59,23 @@ const insertItemToPinList = (item: OGCCollection): void => {
     component: item,
   });
 };
-// Rearrange the list, so that the selected item move to the top
-// of the list
-const arrangeItems = (
-  items: Array<OGCCollection>,
-  selected: OGCCollection | undefined
-): Array<OGCCollection> => {
-  if (selected) {
-    return [selected, ...items.filter((i) => i.id !== selected.id)];
-  } else {
-    return items;
-  }
+
+const expandAccordion = (uuid: string): void => {
+  internalEventLoop.emit(EVENT_ACCORDION_EXPAND, {
+    uuid,
+  } as AccordionExpandEvent);
 };
 
-const PinListCard: React.FC<PinListCardProps> = ({
-  collection,
-  onDatasetSelected = () => {},
-  tabNavigation = () => {},
-  sx,
-}) => {
-  const onLinks = () => tabNavigation(collection.id, "links");
-  const onDownload = () =>
-    tabNavigation(collection.id, "abstract", "download-section");
-  const onDetail = () => tabNavigation(collection.id, "abstract");
-
-  return (
-    <Box flex={1} sx={{ ...sx }}>
-      <Stack direction="column" spacing={1}>
-        <Box onClick={onDatasetSelected}>
-          <Box
-            arial-label="map"
-            id={`${mapContainerId}-${collection.id}`}
-            sx={{
-              width: "100%",
-              height: "150px",
-            }}
-          >
-            <Map panelId={`${mapContainerId}-${collection.id}`}>
-              <Layers>
-                <GeojsonLayer collection={collection} animate={false} />
-              </Layers>
-            </Map>
-          </Box>
-        </Box>
-
-        <Box>
-          <ResultCardButtonGroup
-            content={collection}
-            isGridView
-            onLinks={onLinks}
-            onDownload={onDownload}
-            onDetail={onDetail}
-          />
-        </Box>
-
-        <Box onClick={() => {}}>
-          <Tooltip title="More detail..." placement="top">
-            <Typography
-              color={fontColor.gray.medium}
-              fontSize={fontSize.resultCardContent}
-              sx={{
-                padding: 0,
-                paddingX: padding.small,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: "5",
-                WebkitBoxOrient: "vertical",
-                wordBreak: "break-word",
-              }}
-            >
-              {collection.description}
-            </Typography>
-          </Tooltip>
-        </Box>
-      </Stack>
-    </Box>
-  );
+const collapseAllAccordions = (): void => {
+  internalEventLoop.emit(EVENT_ACCORDION_COLLAPSE);
 };
 
 const PinListAccordionGroup: React.FC<PinListAccordionGroupProps> = ({
   items,
   onRemoveItem,
+  onClickAccordion,
 }) => {
-  const [selectedItem, setSelectedItem] = useState<OGCCollection | undefined>(
+  const [expandedItem, setExpandedItem] = useState<OGCCollection | undefined>(
     undefined
   );
   const [hoverOnRemoveButton, setHoverOnRemoveButton] =
@@ -175,43 +87,67 @@ const PinListAccordionGroup: React.FC<PinListAccordionGroupProps> = ({
     (item: OGCCollection, hoverOnRemoveButton: boolean) =>
       (_: SyntheticEvent, newExpanded: boolean) => {
         if (hoverOnRemoveButton) return;
-        setSelectedItem(newExpanded ? item : undefined);
+        setExpandedItem(newExpanded ? item : undefined);
+        onClickAccordion(newExpanded ? item.id : undefined);
       },
-    []
+    [onClickAccordion]
   );
 
   const handleRemove = useCallback(
     (item: OGCCollection) => {
       // Keep the current expansion status when remove the other un-expanded pinned datasets
-      setSelectedItem((prev) => (prev?.id === item.id ? items?.[0] : prev));
+      setExpandedItem((prev) => (prev?.id === item.id ? items?.[0] : prev));
       onRemoveItem && onRemoveItem(item);
     },
     [onRemoveItem, items]
   );
+
   useEffect(() => {
-    const onAddItem = (event: ItemAddEvent) => {
-      event &&
-        event.component &&
-        // We want to happend a bit later, so that items are set before
-        // before we expand it.
-        setTimeout(() => setSelectedItem(event.component), 100);
+    // Handler for expanding specific accordion
+    const handleAccordionExpand = (event: AccordionExpandEvent) => {
+      if (!items) return;
+
+      const targetItem = items.find((item) => item.id === event.uuid);
+      if (targetItem) {
+        setExpandedItem(targetItem);
+        onClickAccordion(targetItem.id);
+      }
     };
 
-    internalEventLoop.on(EVENT_ADD_ITEM, onAddItem);
+    // Handler for collapsing all accordions
+    const handleAccordionCollapseAll = () => {
+      setExpandedItem(undefined);
+      onClickAccordion(undefined);
+    };
+
+    // Handler for adding new items
+    const handleAddItem = (event: ItemAddEvent) => {
+      event?.component &&
+        setTimeout(() => setExpandedItem(event.component), 100);
+    };
+
+    internalEventLoop.on(EVENT_ADD_ITEM, handleAddItem);
+    internalEventLoop.on(EVENT_ACCORDION_EXPAND, handleAccordionExpand);
+    internalEventLoop.on(EVENT_ACCORDION_COLLAPSE, handleAccordionCollapseAll);
 
     return () => {
-      internalEventLoop.off(EVENT_ADD_ITEM, onAddItem);
+      internalEventLoop.off(EVENT_ADD_ITEM, handleAddItem);
+      internalEventLoop.off(EVENT_ACCORDION_EXPAND, handleAccordionExpand);
+      internalEventLoop.off(
+        EVENT_ACCORDION_COLLAPSE,
+        handleAccordionCollapseAll
+      );
     };
-  }, []);
+  }, [items, onClickAccordion]);
 
   if (!items) return;
 
   return (
     <>
-      {arrangeItems(items, selectedItem).map((item) => (
+      {items.map((item) => (
         <StyledAccordion
           key={item.id}
-          expanded={selectedItem?.id === item.id}
+          expanded={expandedItem?.id === item.id}
           onChange={handleChange(item, hoverOnRemoveButton)}
         >
           <StyledAccordionSummary>
@@ -266,7 +202,10 @@ const PinListAccordionGroup: React.FC<PinListAccordionGroupProps> = ({
   );
 };
 
-const PinListMenu: React.FC<PinListMenuProps> = () => {
+const PinListMenu: React.FC<PinListMenuProps> = ({
+  onClickAccordion = () => {},
+  onRemoveFromPinList = () => {},
+}) => {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState<boolean>(true);
   const [items, setItems] = useState<Array<OGCCollection> | undefined>(
@@ -277,9 +216,13 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
     setOpen((prev) => !prev);
   }, [setOpen]);
 
-  const onRemoveItem = useCallback((item: OGCCollection) => {
-    setItems((items) => items?.filter((c) => c.id !== item.id));
-  }, []);
+  const onRemoveItem = useCallback(
+    (item: OGCCollection) => {
+      setItems((items) => items?.filter((c) => c.id !== item.id));
+      onRemoveFromPinList(item.id);
+    },
+    [onRemoveFromPinList]
+  );
 
   useEffect(() => {
     // Handle event when other control clicked, this component should close
@@ -354,7 +297,11 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
             zIndex: 1,
           }}
         >
-          <PinListAccordionGroup items={items} onRemoveItem={onRemoveItem} />
+          <PinListAccordionGroup
+            items={items}
+            onRemoveItem={onRemoveItem}
+            onClickAccordion={onClickAccordion}
+          />
         </Box>
       </Popper>
     </>
@@ -363,4 +310,4 @@ const PinListMenu: React.FC<PinListMenuProps> = () => {
 
 export default PinListMenu;
 
-export { insertItemToPinList };
+export { insertItemToPinList, expandAccordion, collapseAllAccordions };
