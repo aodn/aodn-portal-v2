@@ -218,7 +218,7 @@ def test_map_state_persists_with_url(page_mock: Page) -> None:
     assert map_center == new_map_center
     assert map_zoom == new_map_zoom
 
-@pytest.skip
+@pytest.mark.skip()
 def test_map_state_persists_across_page(page_mock: Page) -> None:
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)
