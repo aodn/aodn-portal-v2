@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import {
   CollectionsQueryType,
   createSearchParamFrom,
@@ -15,43 +15,52 @@ import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
-import SelectedListCard from "./SelectedListCard";
-import SelectedGridCard from "./SelectedGridCard";
 import { ParameterState } from "../common/store/componentParamReducer";
 import store, { getComponentState } from "../common/store/store";
 import { useAppDispatch } from "../common/store/hooks";
 import useTabNavigation from "../../hooks/useTabNavigation";
 
-export interface ItemCardProps {
+export interface ResultCard {
   content?: OGCCollection;
-  onClickCard?: (uuid: string) => void;
-  onClickDetail: (uuid: string) => void;
-  onClickDownload: (uuid: string) => void;
-  onClickLinks: (uuid: string) => void;
-  isSelectedDataset?: boolean;
+  onClickCard?: (item: OGCCollection | undefined) => void;
+  onClickDetail?: (uuid: string) => void;
+  onClickDownload?: (uuid: string) => void;
+  onClickLinks?: (uuid: string) => void;
+  selectedUuid?: string;
+}
+
+interface ResultCardsList extends ResultCard {
+  count: number;
+  total: number;
+  contents: CollectionsQueryType;
+  child: ListChildComponentProps;
 }
 
 interface ResultCardsProps {
-  content?: OGCCollection;
-  onClickCard?: (uuid: string) => void;
+  layout:
+    | SearchResultLayoutEnum.GRID
+    | SearchResultLayoutEnum.LIST
+    | SearchResultLayoutEnum.FULL_LIST
+    | null;
   contents: CollectionsQueryType;
-  layout?: SearchResultLayoutEnum | null;
+  onClickCard: ((item: OGCCollection | undefined) => void) | undefined;
+  selectedUuids: string[];
   sx?: SxProps<Theme>;
-  datasetsSelected?: OGCCollection[];
 }
 
 const ResultCards = ({
-  contents,
   layout,
+  contents,
+  onClickCard,
   sx,
-  datasetsSelected,
-  onClickCard = () => {},
+  selectedUuids,
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
 
-  // Get contents from redux
   const dispatch = useAppDispatch();
+
   const goToDetailPage = useTabNavigation();
+
   const fetchMore = useCallback(async () => {
     // This is very specific to how elastic works and then how to construct the query
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -66,10 +75,11 @@ const ResultCards = ({
     await dispatch(fetchResultAppendStore(paramPaged));
   }, [dispatch, contents.result.search_after]);
 
-  const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
-
   const count = contents.result.collections.length;
+
   const total = contents.result.total;
+
+  const selectedUuid = useMemo(() => selectedUuids[0], [selectedUuids]);
 
   const onClickDetail = useCallback(
     (uuid: string) => goToDetailPage(uuid, "abstract"),
@@ -98,13 +108,16 @@ const ResultCards = ({
   }, [fetchMore]);
 
   const renderCells = useCallback(
-    (
-      count: number,
-      total: number,
-      { contents, onClickCard }: ResultCardsProps,
-      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
-      child: ListChildComponentProps
-    ) => {
+    ({
+      count,
+      total,
+      contents,
+      onClickCard,
+      onClickDetail,
+      onClickLinks,
+      onClickDownload,
+      child,
+    }: ResultCardsList) => {
       const { index, style } = child;
 
       const leftIndex = index * 2;
@@ -135,6 +148,7 @@ const ResultCards = ({
                   onClickDetail={onClickDetail}
                   onClickLinks={onClickLinks}
                   onClickDownload={onClickDownload}
+                  selectedUuid={selectedUuid}
                 />
               </Grid>
               {rightIndex < contents.result.collections.length && (
@@ -145,6 +159,7 @@ const ResultCards = ({
                     onClickDetail={onClickDetail}
                     onClickLinks={onClickLinks}
                     onClickDownload={onClickDownload}
+                    selectedUuid={selectedUuid}
                   />
                 </Grid>
               )}
@@ -153,17 +168,20 @@ const ResultCards = ({
         );
       }
     },
-    [renderLoadMoreButton]
+    [renderLoadMoreButton, selectedUuid]
   );
 
   const renderRows = useCallback(
-    (
-      count: number,
-      total: number,
-      { contents, onClickCard }: ResultCardsProps,
-      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
-      child: ListChildComponentProps
-    ) => {
+    ({
+      count,
+      total,
+      contents,
+      onClickCard,
+      onClickDetail,
+      onClickLinks,
+      onClickDownload,
+      child,
+    }: ResultCardsList) => {
       // The style must pass to the listitem else incorrect rendering
       const { index, style } = child;
 
@@ -191,13 +209,16 @@ const ResultCards = ({
               onClickDetail={onClickDetail}
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
+              selectedUuid={selectedUuid}
             />
           </ListItem>
         );
       }
     },
-    [renderLoadMoreButton]
+    [renderLoadMoreButton, selectedUuid]
   );
+
+  if (!contents) return;
 
   // You must set the height to 100% of view height so the calculation
   // logic .clentHeight.height have values. In short it fill the
@@ -215,38 +236,25 @@ const ResultCards = ({
         ref={componentRef}
         data-testid="resultcard-result-list"
       >
-        {hasSelectedDatasets && (
-          <SelectedListCard
-            content={datasetsSelected[0]}
-            onClickCard={onClickCard}
-            onClickDetail={onClickDetail}
-            onClickDownload={onClickDownload}
-            onClickLinks={onClickLinks}
-          />
-        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - LIST_CARD_HEIGHT : height}
+              height={height}
               width={width}
               itemSize={LIST_CARD_HEIGHT}
               itemCount={count + 1}
             >
               {(child: ListChildComponentProps) =>
-                renderRows(
+                renderRows({
                   count,
                   total,
-                  {
-                    contents,
-                    onClickCard,
-                  },
-                  {
-                    onClickDetail,
-                    onClickLinks,
-                    onClickDownload,
-                  },
-                  child
-                )
+                  contents,
+                  onClickCard,
+                  onClickDetail,
+                  onClickLinks,
+                  onClickDownload,
+                  child,
+                })
               }
             </FixedSizeList>
           )}
@@ -261,38 +269,25 @@ const ResultCards = ({
         ref={componentRef}
         data-testid="resultcard-result-grid"
       >
-        {hasSelectedDatasets && (
-          <SelectedGridCard
-            content={datasetsSelected[0]}
-            onClickCard={onClickCard}
-            onClickDetail={onClickDetail}
-            onClickDownload={onClickDownload}
-            onClickLinks={onClickLinks}
-          />
-        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - GRID_CARD_HEIGHT : height}
+              height={height}
               width={width}
               itemSize={GRID_CARD_HEIGHT}
               itemCount={Math.ceil(count / 2) + 1}
             >
               {(child: ListChildComponentProps) =>
-                renderCells(
+                renderCells({
                   count,
                   total,
-                  {
-                    contents,
-                    onClickCard,
-                  },
-                  {
-                    onClickDetail,
-                    onClickLinks,
-                    onClickDownload,
-                  },
-                  child
-                )
+                  contents,
+                  onClickCard,
+                  onClickDetail,
+                  onClickLinks,
+                  onClickDownload,
+                  child,
+                })
               }
             </FixedSizeList>
           )}

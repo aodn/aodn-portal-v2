@@ -42,7 +42,11 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     <Tooltip title={text} placement="top">
       <Button
         onClick={disable ? () => {} : onClick}
-        sx={{ padding: padding.extraSmall, ...sx }}
+        sx={{
+          padding: padding.extraSmall,
+          textTransform: "none",
+          ...sx,
+        }}
       >
         {isValidElement(startIcon) ? (
           startIcon

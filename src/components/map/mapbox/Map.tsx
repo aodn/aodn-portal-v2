@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  LngLatBounds,
-  LngLatLike,
-  Map,
-  MapboxEvent,
-  Projection,
-  Style,
-} from "mapbox-gl";
+import { LngLatBounds, Map, MapboxEvent, Projection, Style } from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
@@ -72,6 +65,7 @@ const ReactMap = ({
   children,
 }: React.PropsWithChildren<MapProps>) => {
   const [map, setMap] = useState<Map | null>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
 
   // Debouce to make the map transit smoother
   const debounceOnZoomEvent = useRef(
@@ -98,23 +92,35 @@ const ReactMap = ({
     )
   ).current;
 
-  useEffect(() => {
-    setMap((m) =>
-      m === null
-        ? (new Map({
-            container: panelId,
-            accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
-            style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
-            minZoom: minZoom,
-            maxZoom: maxZoom,
-            testMode: import.meta.env.MODE === "dev",
-            localIdeographFontFamily:
-              "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
-          }) as Map)
-        : m
-    );
+  const initializeMap = useCallback(() => {
+    try {
+      // Check if container exists
+      containerRef.current = document.getElementById(panelId);
+      if (!containerRef.current) {
+        return null;
+      }
 
-    if (map !== null) {
+      // Create new map instance
+      const newMap = new Map({
+        container: panelId,
+        accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
+        style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
+        minZoom: minZoom,
+        maxZoom: maxZoom,
+        testMode: import.meta.env.MODE === "dev",
+        localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
+      });
+      return newMap;
+    } catch (err) {
+      console.log("Map initialization failed:", err);
+    }
+  }, [panelId, minZoom, maxZoom]);
+
+  useEffect(() => {
+    const setupMap = () => {
+      const map = initializeMap();
+      if (!map) return;
+
       map.setProjection(projection);
       // Stop drag cause map to rotate.
       map.dragRotate.disable();
@@ -140,56 +146,53 @@ const ReactMap = ({
         //map.showCollisionBoxes = true;
       }
 
+      setMap(map);
+
       return () => {
-        resizeObserver.unobserve(map.getContainer());
+        if (containerRef.current) {
+          resizeObserver.unobserve(containerRef.current);
+        }
         map.off("zoomend", debounceOnZoomEvent);
         map.off("moveend", debounceOnMoveEvent);
-
-        // This cleanup all associated resources include controls, so no need to
-        // call removeControl()
         map.remove();
         setMap(null);
       };
-    }
-  }, [
-    panelId,
-    projection,
-    map,
-    onZoomEvent,
-    onMoveEvent,
-    debounceOnZoomEvent,
-    debounceOnMoveEvent,
-    minZoom,
-    maxZoom,
-  ]);
+    };
+
+    const cleanup = setupMap();
+
+    return () => {
+      cleanup?.();
+    };
+  }, [initializeMap, projection, debounceOnZoomEvent, debounceOnMoveEvent]);
 
   useEffect(() => {
-    // The map center is use to set the initial center point, however we may need
-    // to set to other place, for example if the user pass the url to someone
-    if (bbox && map) {
-      // Turn off event to avoid looping
-      map.off("zoomend", debounceOnZoomEvent);
-      map.off("moveend", debounceOnMoveEvent);
-      // DO NOT use fitBounds(), it will cause the zoom and padding adjust so
-      // you end up map area drift.
-      map.jumpTo({
-        center: bbox.getCenter(),
-        zoom: zoom,
-      });
-      map.on("idle", () => {
-        map.on("zoomend", debounceOnZoomEvent);
-        map.on("moveend", debounceOnMoveEvent);
-      });
-    }
+    if (!map || !bbox || !containerRef.current?.isConnected) return;
+    // Turn off event to avoid looping
+    map.off("zoomend", debounceOnZoomEvent);
+    map.off("moveend", debounceOnMoveEvent);
+    // DO NOT use fitBounds(), it will cause the zoom and padding adjust so
+    // you end up map area drift.
+    map.jumpTo({
+      center: bbox.getCenter(),
+      zoom: zoom,
+    });
+    map.on("idle", () => {
+      map.on("zoomend", debounceOnZoomEvent);
+      map.on("moveend", debounceOnMoveEvent);
+    });
   }, [bbox, zoom, map, debounceOnZoomEvent, debounceOnMoveEvent]);
 
+  // Only render if map is initialized and container is still connected
+  if (!map || !containerRef.current?.isConnected) {
+    return null;
+  }
+
   return (
-    map && (
-      <MapContext.Provider value={{ map }}>
-        <TestHelper getMap={() => map} />
-        {children}
-      </MapContext.Provider>
-    )
+    <MapContext.Provider value={{ map }}>
+      <TestHelper getMap={() => map} />
+      {children}
+    </MapContext.Provider>
   );
 };
 

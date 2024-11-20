@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import {
   createSearchParamFrom,
   DEFAULT_SEARCH_PAGE,
+  fetchResultByUuidNoStore,
   fetchResultNoStore,
   fetchResultWithStore,
   SearchParameters,
@@ -45,6 +46,11 @@ import {
 } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
+import {
+  collapseAllAccordions,
+  insertItemToPinList,
+  setSelectedUuid,
+} from "../../components/map/mapbox/controls/menu/PinListMenu";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -81,7 +87,6 @@ const SearchPage = () => {
   // State to store the sort option that user selected
   const [currentSort, setCurrentSort] = useState<SortResultEnum | null>(null);
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
-  const [datasetsSelected, setDatasetsSelected] = useState<OGCCollection[]>();
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
   const [zoom, setZoom] = useState<number | undefined>(undefined);
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
@@ -115,40 +120,6 @@ const SearchPage = () => {
     }
     return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
   };
-
-  const getCollectionsData = useCallback(
-    async (uuids: Array<string>): Promise<void | OGCCollection[]> => {
-      const uuidsString = createFilterString(uuids);
-      // if uuids array is an empty array, no need fetch collection data
-      if (uuidsString.length === 0) return;
-      const param: SearchParameters = {
-        filter: uuidsString,
-      };
-      return dispatch(fetchResultNoStore(param))
-        .unwrap()
-        .then((res: OGCCollections) => {
-          setDatasetsSelected(res.collections);
-        })
-        .catch((error: any) => {
-          console.error("Error fetching collection data:", error);
-          // TODO: handle error in ErrorBoundary
-        });
-    },
-    [dispatch]
-  );
-
-  // On select a dataset, update the states: selected uuid(s) and get the collection data
-  const handleDatasetSelecting = useCallback(
-    (uuids: Array<string>) => {
-      if (uuids.length === 0) {
-        setSelectedUuids([]);
-        setDatasetsSelected([]);
-      }
-      setSelectedUuids(uuids);
-      getCollectionsData(uuids);
-    },
-    [getCollectionsData]
-  );
 
   const doMapSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -353,11 +324,86 @@ const SearchPage = () => {
     [setCurrentLayout]
   );
 
-  const handleClickCard = useCallback(
-    (uuid: string) => {
-      handleDatasetSelecting([uuid]);
+  // util function to get collection data given uuid
+  const fillGeometryIfMissing = useCallback(
+    (collection: OGCCollection): Promise<OGCCollection> => {
+      if (collection.getGeometry())
+        return new Promise((resolve, reject) => resolve(collection));
+
+      const param: SearchParameters = {
+        filter: `id='${collection.id}'`,
+        properties: "id,bbox,geometry",
+      };
+
+      return dispatch(fetchResultNoStore(param))
+        .unwrap()
+        .then((value: OGCCollections) => {
+          collection.properties = value.collections[0].properties;
+          collection.extentInt = value.collections[0].extent;
+          return collection;
+        })
+        .catch((error: any) => {
+          console.error("Error fetching collection data:", error);
+          return collection;
+        });
     },
-    [handleDatasetSelecting]
+    [dispatch]
+  );
+
+  // Handler for click on map
+  const onClickMapPoint = useCallback(
+    (uuids: Array<string>) => {
+      if (uuids.length === 0) {
+        setSelectedUuids([]);
+        collapseAllAccordions();
+      } else {
+        // This set state will store the selected uuid
+        setSelectedUuids(uuids);
+        // This function is exposed from PinListMenu for expanding an accordion given uuid
+        setSelectedUuid(uuids[0]);
+        // This function will fetch selected dataset and insert it to pin list
+        dispatch(fetchResultByUuidNoStore(uuids[0]))
+          .unwrap()
+          .then((res: OGCCollection) => {
+            insertItemToPinList(res);
+          });
+      }
+    },
+    [dispatch]
+  );
+
+  const onClickCard = useCallback(
+    async (item: OGCCollection | undefined) => {
+      if (item) {
+        // The item set to pin list assume spatial extents is there
+        const e = await fillGeometryIfMissing(item);
+        insertItemToPinList(e);
+        setSelectedUuids([item.id]);
+        setSelectedUuid(item.id);
+      }
+    },
+    [fillGeometryIfMissing]
+  );
+
+  const onClickAccordion = useCallback(
+    (uuid: string | undefined) => {
+      setSelectedUuids(uuid ? [uuid] : []);
+    },
+    [setSelectedUuids]
+  );
+
+  const onRemoveFromPinList = useCallback(
+    (uuid: string) => {
+      // If the removed uuid is the selected uuid, need to set selected uuids to []
+      setSelectedUuids((prevUuids) => {
+        if (prevUuids[0] && prevUuids[0] === uuid) {
+          return [];
+        } else {
+          return prevUuids;
+        }
+      });
+    },
+    [setSelectedUuids]
   );
 
   // You will see this trigger twice, this is due to use of strict-mode
@@ -385,12 +431,12 @@ const SearchPage = () => {
         {selectedLayout !== SearchResultLayoutEnum.FULL_MAP && (
           <Box>
             <ResultSection
-              onClickCard={handleClickCard}
+              onClickCard={onClickCard}
+              selectedUuids={selectedUuids}
               currentSort={currentSort}
               onChangeSorting={onChangeSorting}
               currentLayout={currentLayout}
               onChangeLayout={onChangeLayout}
-              datasetsSelected={datasetsSelected}
               isLoading={isLoading(loadingThreadCount)}
             />
           </Box>
@@ -404,7 +450,9 @@ const SearchPage = () => {
             selectedUuids={selectedUuids}
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}
-            onDatasetSelected={handleDatasetSelecting}
+            onClickMapPoint={onClickMapPoint}
+            onClickAccordion={onClickAccordion}
+            onRemoveFromPinList={onRemoveFromPinList}
             isLoading={isLoading(loadingThreadCount)}
           />
         </Box>
