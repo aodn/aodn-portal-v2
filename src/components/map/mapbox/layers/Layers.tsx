@@ -8,7 +8,7 @@ import * as turf from "@turf/turf";
 export interface LayersProps {
   // Tile layer should added to map
   // collections?: Array<OGCCollection>;
-  features?: FeatureCollection<Point>;
+  featureCollection?: FeatureCollection<Point>;
   // Event fired when user click on the point layer
   onDatasetSelected?: (uuids: Array<string>) => void;
   // dataset that user selected from result list or map

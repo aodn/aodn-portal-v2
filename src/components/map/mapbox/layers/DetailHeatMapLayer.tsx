@@ -97,7 +97,7 @@ const getUnclusterPointLayerId = (layerId: string) =>
 
 // TODO: This file is copy & paste from the heatmapLayer file. It should be simplified later
 const DetailHeatMapLayer: FC<DetailHeatMapProps> = ({
-  features = generateFeatureCollectionFrom(undefined),
+  featureCollection = generateFeatureCollectionFrom(undefined),
   selectedUuids,
   showFullMap,
   onDatasetSelected,
@@ -299,12 +299,16 @@ const DetailHeatMapLayer: FC<DetailHeatMapProps> = ({
 
   const updateSource = useCallback(() => {
     if (map?.getSource(heatmapSourceId)) {
-      (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(features);
+      (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(
+        featureCollection
+      );
     }
     if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(features);
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
+        featureCollection
+      );
     }
-  }, [features, map, heatmapSourceId, clusterSourceId]);
+  }, [featureCollection, map, heatmapSourceId, clusterSourceId]);
 
   useEffect(() => {
     updateSource();

@@ -98,7 +98,7 @@ export const getUnclusterPointId = (layerId: string) =>
   `${layerId}-unclustered-point`;
 
 const ClusterLayer: FC<ClusterLayerProps> = ({
-  features = generateFeatureCollectionFrom(undefined),
+  featureCollection = generateFeatureCollectionFrom(undefined),
   selectedUuids,
   onDatasetSelected,
   tabNavigation,
@@ -259,13 +259,13 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
       setLastVisiblePoint((p) => {
-        const newData = findSuitableVisiblePoint(features, map, p);
+        const newData = findSuitableVisiblePoint(featureCollection, map, p);
 
         (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
         return newData;
       });
     }
-  }, [map, clusterSourceId, features]);
+  }, [map, clusterSourceId, featureCollection]);
 
   useEffect(() => {
     updateSource();
