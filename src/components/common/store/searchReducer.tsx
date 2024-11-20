@@ -240,7 +240,7 @@ const fetchResultByUuidNoStore = createAsyncThunk<
     .catch(errorHandling(thunkApi))
 );
 
-const fetchDatasetByUuid = createAsyncThunk<
+const fetchFeaturesByUuid = createAsyncThunk<
   FeatureCollection<Point>,
   string,
   { rejectValue: ErrorResponse }
@@ -302,6 +302,15 @@ const createSuggesterParamFrom = (
   }
   return suggesterParam;
 };
+// The longer the text user query, there higher the score it require, this makes sense
+// because user make specific query and result should be specific too.
+const calculateScore = (
+  base: number | undefined,
+  text: string | undefined
+): number => {
+  const pump = text ? (text.length / 8 > 15 ? 15 : text.length / 8) : 0;
+  return base ? Number(base) + Number(pump) : Number(pump);
+};
 // Given a ParameterState object, we convert it to the correct Restful parameters
 // always call this function and do not hand craft it elsewhere, some control isn't
 // part the ParameterState and therefore express as optional argument here
@@ -321,7 +330,7 @@ const createSearchParamFrom = (
   );
 
   // The score control how relevent the records
-  p.filter = `score>=${c.score}`;
+  p.filter = `score>=${calculateScore(c.score, p.text)}`;
 
   // Control how many record return in 1 page.
   if (c.pagesize) {
@@ -395,11 +404,8 @@ export {
   fetchResultNoStore,
   fetchResultAppendStore,
   fetchResultByUuidNoStore,
-  fetchDatasetByUuid,
+  fetchFeaturesByUuid,
   fetchParameterVocabsWithStore,
 };
 
 export default searcher.reducer;
-function createErrorRespons(): any {
-  throw new Error("Function not implemented.");
-}

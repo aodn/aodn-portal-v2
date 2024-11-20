@@ -125,20 +125,18 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       const spiderPinsLayerId = getSpiderPinsLayerId(clusterCircleId);
       const spiderLinesLayerId = getSpiderLinesLayerId(clusterCircleId);
 
-      // Remove layers
-      if (map?.getLayer(spiderPinsLayerId)) {
-        map.removeLayer(spiderPinsLayerId);
-      }
-      if (map?.getLayer(spiderLinesLayerId)) {
-        map.removeLayer(spiderLinesLayerId);
+      try {
+        map?.removeLayer(spiderPinsLayerId);
+        map?.removeSource(spiderPinsSourceId);
+      } catch (error) {
+        // Do nothing
       }
 
-      // Remove sources
-      if (map?.getSource(spiderPinsSourceId)) {
-        map.removeSource(spiderPinsSourceId);
-      }
-      if (map?.getSource(spiderLinesSourceId)) {
-        map.removeSource(spiderLinesSourceId);
+      try {
+        map?.removeLayer(spiderLinesLayerId);
+        map?.removeSource(spiderLinesSourceId);
+      } catch (error) {
+        // Do nothing
       }
 
       // Ensure the popup is removed when the spider diagram is unspiderified, even if the mouse hasn't moved.
@@ -350,16 +348,17 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         if (currentCluster) {
           const spiderPinsLayerId = getSpiderPinsLayerId(currentCluster.id);
 
-          if (!map?.getLayer(spiderPinsLayerId)) return null;
-          const features = map?.queryRenderedFeatures(point, {
-            layers: [spiderPinsLayerId],
-          });
+          if (map?.getLayer(spiderPinsLayerId)) {
+            const features = map?.queryRenderedFeatures(point, {
+              layers: [spiderPinsLayerId],
+            });
 
-          if (!features || features.length === 0) {
-            unspiderify(currentCluster.id);
-            return null;
-          } else {
-            return currentCluster;
+            if (!features || features.length === 0) {
+              unspiderify(currentCluster.id);
+              return null;
+            } else {
+              return currentCluster;
+            }
           }
         }
 

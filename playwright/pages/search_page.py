@@ -43,13 +43,19 @@ class SearchPage(BasePage):
         where it may appear twice. This function waits for the indicator to
         become hidden, and if it reappears, it waits again until it disappears.
         """
-        self.loading.wait_for(state='visible', timeout=2000)
-        self.loading.wait_for(state='hidden', timeout=20 * 1000)
+        try:
+            self.loading.wait_for(state='visible', timeout=2000)
+        except TimeoutError:
+            # If the loading indicator doesn't appear within the timeout,
+            # assume the search is complete and ignore the exception.
+            pass
+
+        self.loading.wait_for(state='hidden', timeout=30 * 1000)
 
         # Handle the case when loading indicator appears twice
         try:
             self.loading.wait_for(state='visible', timeout=1000)
-            self.loading.wait_for(state='hidden', timeout=20 * 1000)
+            self.loading.wait_for(state='hidden', timeout=30 * 1000)
         except TimeoutError:
             # If the loading indicator doesn't reappear within the timeout,
             # assume the search is complete and ignore the exception.

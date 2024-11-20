@@ -171,13 +171,14 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   );
 
   const onEmptySpaceClick = useCallback(
-    (ev: MapLayerMouseEvent) => {
+    (ev: MapLayerMouseEvent, layerIds: string[]) => {
       const point = map?.project(ev.lngLat);
 
       // Query for features at the clicked point, but only in the addedLayerIds
+      const validIds = layerIds.filter((id) => map?.getLayer(id));
       const features = point
         ? map?.queryRenderedFeatures(point, {
-            layers: addedLayerIds,
+            layers: validIds,
           })
         : [];
 
@@ -186,18 +187,20 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
         onDatasetSelected([]);
       }
     },
-    [map, addedLayerIds, onDatasetSelected]
+    [map, onDatasetSelected]
   );
 
   useEffect(() => {
+    const e = (ev: MapLayerMouseEvent) => onEmptySpaceClick(ev, addedLayerIds);
+
     map?.on("click", layerId, onPointClick);
-    map?.on("click", onEmptySpaceClick);
+    map?.on("click", e);
 
     return () => {
       map?.off("click", layerId, onPointClick);
-      map?.off("click", onEmptySpaceClick);
+      map?.off("click", e);
     };
-  }, [map, layerId, onPointClick, onEmptySpaceClick]);
+  }, [map, layerId, addedLayerIds, onPointClick, onEmptySpaceClick]);
 
   // Remove all layers and sources created by addSpatialExtentsLayer
   useEffect(() => {
