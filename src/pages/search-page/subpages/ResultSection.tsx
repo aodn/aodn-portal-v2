@@ -23,6 +23,7 @@ interface ResultSectionProps {
   onChangeSorting: (v: SortResultEnum) => void;
   isLoading: boolean;
   onClickCard?: (item: OGCCollection | undefined) => void;
+  selectedUuids: string[];
 }
 
 const RESULT_SECTION_WIDTH = 500;
@@ -33,6 +34,7 @@ const ResultSection: FC<ResultSectionProps> = ({
   currentSort,
   onChangeSorting,
   onClickCard,
+  selectedUuids,
   isLoading,
 }) => {
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
@@ -68,6 +70,7 @@ const ResultSection: FC<ResultSectionProps> = ({
             layout={currentLayout}
             contents={reduxContents}
             onClickCard={onClickCard}
+            selectedUuids={selectedUuids}
           />
         </Box>
       </Box>

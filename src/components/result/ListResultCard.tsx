@@ -20,23 +20,25 @@ import {
 import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import { ItemCardProps } from "./ResultCards";
+import { ResultCard } from "./ResultCards";
 
-interface ListResultCardProps extends ItemCardProps {}
+interface ListResultCardProps extends ResultCard {}
 
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
   content,
   onClickCard = () => {},
-  onClickDetail,
-  onClickLinks,
-  onClickDownload,
-  isSelectedDataset,
+  onClickDetail = () => {},
+  onClickLinks = () => {},
+  onClickDownload = () => {},
+  selectedUuid,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
   if (!content) return;
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
+
+  const isSelectedDataset = uuid === selectedUuid;
 
   // TODO: buttons are changed, but the behaviors are fake / wrong
   return (

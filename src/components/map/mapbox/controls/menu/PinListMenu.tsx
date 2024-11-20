@@ -1,28 +1,13 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-  SyntheticEvent,
-} from "react";
+import { useEffect, useState, useCallback, useRef, FC } from "react";
 import { ControlProps, MenuClickedEvent } from "./Definition";
 import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
-import { Box, Button, IconButton, Popper, Typography } from "@mui/material";
-import StyledAccordionDetails from "../../../../common/accordion/StyledAccordionDetails";
-import StyledAccordion from "../../../../common/accordion/StyledAccordion";
-import StyledAccordionSummary from "../../../../common/accordion/StyledAccordionSummary";
+import { Box, IconButton, Popper } from "@mui/material";
 import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
-import {
-  borderRadius,
-  color,
-  fontColor,
-  fontSize,
-  fontWeight,
-} from "../../../../../styles/constants";
-
+import { borderRadius } from "../../../../../styles/constants";
 import EventEmitter from "events";
 import { EVENT_MENU_CLICKED, eventEmitter } from "./MenuControl";
-import PinListCard from "../../../../result/PinListCard";
+import PinListAccordionGroup from "../../../../result/PinListAccordionGroup";
+import { PIN_LIST_WIDTH } from "../../../../result/constants";
 
 interface PinListMenuProps extends ControlProps {
   items?: Array<OGCCollection> | undefined;
@@ -30,25 +15,19 @@ interface PinListMenuProps extends ControlProps {
   onRemoveFromPinList?: (uuid: string) => void;
 }
 
-interface PinListAccordionGroupProps {
-  items: Array<OGCCollection> | undefined;
-  onRemoveItem: (item: OGCCollection) => void;
-  onClickAccordion: (uuid: string | undefined) => void;
-}
-
 interface ItemAddEvent {
   event: MouseEvent;
   component: OGCCollection;
 }
 
-interface AccordionExpandEvent {
+interface ItemSelectEvent {
+  event: MouseEvent;
   uuid: string;
 }
 
-const PIN_LIST_WIDTH = 260;
 const EVENT_ADD_ITEM = "add-item";
-const EVENT_ACCORDION_EXPAND = "accordion-expand";
 const EVENT_ACCORDION_COLLAPSE = "accordion-collapse";
+const EVENT_SET_SELECTED_UUID = "set-selected-uuid";
 
 // Do not expose it directly, use function to expose it
 const internalEventLoop: EventEmitter = new EventEmitter();
@@ -60,155 +39,30 @@ const insertItemToPinList = (item: OGCCollection): void => {
   });
 };
 
-const expandAccordion = (uuid: string): void => {
-  internalEventLoop.emit(EVENT_ACCORDION_EXPAND, {
-    uuid,
-  } as AccordionExpandEvent);
-};
-
 const collapseAllAccordions = (): void => {
   internalEventLoop.emit(EVENT_ACCORDION_COLLAPSE);
 };
 
-const PinListAccordionGroup: React.FC<PinListAccordionGroupProps> = ({
-  items,
-  onRemoveItem,
-  onClickAccordion,
-}) => {
-  const [expandedItem, setExpandedItem] = useState<OGCCollection | undefined>(
-    undefined
-  );
-  const [hoverOnRemoveButton, setHoverOnRemoveButton] =
-    useState<boolean>(false);
-
-  // When click on an other accordion (if not click on the remove button) will collapse the current one and expand the click one
-  // Always set the expanded accordion dataset as the selected dataset
-  const handleChange = useCallback(
-    (item: OGCCollection, hoverOnRemoveButton: boolean) =>
-      (_: SyntheticEvent, newExpanded: boolean) => {
-        if (hoverOnRemoveButton) return;
-        setExpandedItem(newExpanded ? item : undefined);
-        onClickAccordion(newExpanded ? item.id : undefined);
-      },
-    [onClickAccordion]
-  );
-
-  const handleRemove = useCallback(
-    (item: OGCCollection) => {
-      // Keep the current expansion status when remove the other un-expanded pinned datasets
-      setExpandedItem((prev) => (prev?.id === item.id ? items?.[0] : prev));
-      onRemoveItem && onRemoveItem(item);
-    },
-    [onRemoveItem, items]
-  );
-
-  useEffect(() => {
-    // Handler for expanding specific accordion
-    const handleAccordionExpand = (event: AccordionExpandEvent) => {
-      if (!items) return;
-
-      const targetItem = items.find((item) => item.id === event.uuid);
-      if (targetItem) {
-        setExpandedItem(targetItem);
-        onClickAccordion(targetItem.id);
-      }
-    };
-
-    // Handler for collapsing all accordions
-    const handleAccordionCollapseAll = () => {
-      setExpandedItem(undefined);
-      onClickAccordion(undefined);
-    };
-
-    // Handler for adding new items
-    const handleAddItem = (event: ItemAddEvent) => {
-      event?.component &&
-        setTimeout(() => setExpandedItem(event.component), 100);
-    };
-
-    internalEventLoop.on(EVENT_ADD_ITEM, handleAddItem);
-    internalEventLoop.on(EVENT_ACCORDION_EXPAND, handleAccordionExpand);
-    internalEventLoop.on(EVENT_ACCORDION_COLLAPSE, handleAccordionCollapseAll);
-
-    return () => {
-      internalEventLoop.off(EVENT_ADD_ITEM, handleAddItem);
-      internalEventLoop.off(EVENT_ACCORDION_EXPAND, handleAccordionExpand);
-      internalEventLoop.off(
-        EVENT_ACCORDION_COLLAPSE,
-        handleAccordionCollapseAll
-      );
-    };
-  }, [items, onClickAccordion]);
-
-  if (!items) return;
-
-  return (
-    <>
-      {items.map((item) => (
-        <StyledAccordion
-          key={item.id}
-          expanded={expandedItem?.id === item.id}
-          onChange={handleChange(item, hoverOnRemoveButton)}
-        >
-          <StyledAccordionSummary>
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-              flexWrap="nowrap"
-              alignItems="center"
-              width="100%"
-            >
-              <Typography
-                color={fontColor.gray.dark}
-                fontSize={fontSize.label}
-                fontWeight={fontWeight.bold}
-                sx={{
-                  padding: 0,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: "2",
-                  WebkitBoxOrient: "vertical",
-                }}
-              >
-                {item.title}
-              </Typography>
-              <Button
-                sx={{
-                  minWidth: "15px",
-                  color: color.gray.dark,
-                  fontSize: fontSize.icon,
-                  fontWeight: fontWeight.bold,
-                  " &:hover": {
-                    color: color.blue.dark,
-                    fontSize: fontSize.info,
-                  },
-                }}
-                onClick={() => handleRemove(item)}
-                onMouseEnter={() => setHoverOnRemoveButton(true)}
-                onMouseLeave={() => setHoverOnRemoveButton(false)}
-              >
-                X
-              </Button>
-            </Box>
-          </StyledAccordionSummary>
-          <StyledAccordionDetails>
-            <PinListCard collection={item} />
-          </StyledAccordionDetails>
-        </StyledAccordion>
-      ))}
-    </>
-  );
+const setSelectedUuid = (uuid: string) => {
+  internalEventLoop.emit(EVENT_SET_SELECTED_UUID, {
+    event: new MouseEvent(EVENT_SET_SELECTED_UUID),
+    uuid: uuid,
+  });
 };
 
-const PinListMenu: React.FC<PinListMenuProps> = ({
+const PinListMenu: FC<PinListMenuProps> = ({
   onClickAccordion = () => {},
   onRemoveFromPinList = () => {},
 }) => {
   const anchorRef = useRef(null);
+  // State to store the popup open status
   const [open, setOpen] = useState<boolean>(true);
+  // State to store pin list items
   const [items, setItems] = useState<Array<OGCCollection> | undefined>(
+    undefined
+  );
+  // State to store the item expanded
+  const [expandedItem, setExpandedItem] = useState<OGCCollection | undefined>(
     undefined
   );
 
@@ -218,6 +72,7 @@ const PinListMenu: React.FC<PinListMenuProps> = ({
 
   const onRemoveItem = useCallback(
     (item: OGCCollection) => {
+      console.log("remove called in pinListMenu");
       setItems((items) => items?.filter((c) => c.id !== item.id));
       onRemoveFromPinList(item.id);
     },
@@ -238,39 +93,63 @@ const PinListMenu: React.FC<PinListMenuProps> = ({
         if (items) {
           // Avoid duplicate, if we cannot find in the current array add it.
           if (items.findIndex((i) => i.id === event.component.id) === -1) {
+            setExpandedItem(event.component);
             // New item always add to front
             return [event.component, ...items];
           } else {
             return items;
           }
         } else {
+          setExpandedItem(event.component);
           // no item, so return array of this item
           return [event.component];
         }
       });
     };
 
+    const handleSelectedUuid = (event: ItemSelectEvent) => {
+      if (!items) return;
+
+      const targetItem = items.find((item) => item.id === event.uuid);
+      if (targetItem) {
+        setExpandedItem(targetItem);
+        onClickAccordion(targetItem.id);
+      }
+    };
+
+    const handleAccordionCollapseAll = () => {
+      setExpandedItem(undefined);
+      onClickAccordion(undefined);
+    };
+
     eventEmitter.on(EVENT_MENU_CLICKED, handleEvent);
     internalEventLoop.on(EVENT_ADD_ITEM, onAddItem);
+    internalEventLoop.on(EVENT_ACCORDION_COLLAPSE, handleAccordionCollapseAll);
+    internalEventLoop.on(EVENT_SET_SELECTED_UUID, handleSelectedUuid);
 
     return () => {
       eventEmitter.off(EVENT_MENU_CLICKED, handleEvent);
       internalEventLoop.off(EVENT_ADD_ITEM, onAddItem);
+      internalEventLoop.off(
+        EVENT_ACCORDION_COLLAPSE,
+        handleAccordionCollapseAll
+      );
+      internalEventLoop.off(EVENT_SET_SELECTED_UUID, handleSelectedUuid);
     };
-  }, []);
+  }, [items, onClickAccordion]);
 
   return (
     <>
       <IconButton
-        aria-label="pinned-list-button"
-        id="pinned-list-button"
+        aria-label="pin-list-button"
+        id="pin-list-button"
         ref={anchorRef}
         onClick={handleToggle}
       >
         <LibraryAddCheckIcon />
       </IconButton>
       <Popper
-        id="pinned-list"
+        id="pin-list"
         open={open}
         anchorEl={anchorRef.current}
         role={undefined}
@@ -301,6 +180,8 @@ const PinListMenu: React.FC<PinListMenuProps> = ({
             items={items}
             onRemoveItem={onRemoveItem}
             onClickAccordion={onClickAccordion}
+            expandedItem={expandedItem}
+            setExpandedItem={setExpandedItem}
           />
         </Box>
       </Popper>
@@ -310,4 +191,4 @@ const PinListMenu: React.FC<PinListMenuProps> = ({
 
 export default PinListMenu;
 
-export { insertItemToPinList, expandAccordion, collapseAllAccordions };
+export { insertItemToPinList, setSelectedUuid, collapseAllAccordions };

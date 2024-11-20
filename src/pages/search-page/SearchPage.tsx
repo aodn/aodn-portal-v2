@@ -48,8 +48,8 @@ import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
 import {
   collapseAllAccordions,
-  expandAccordion,
   insertItemToPinList,
+  setSelectedUuid,
 } from "../../components/map/mapbox/controls/menu/PinListMenu";
 
 const REFERER = "SEARCH_PAGE";
@@ -350,14 +350,18 @@ const SearchPage = () => {
     [dispatch]
   );
 
-  // Handler for click on map dot: set selected uuid, expand a
+  // Handler for click on map
   const onClickMapPoint = useCallback(
     (uuids: Array<string>) => {
       if (uuids.length === 0) {
         setSelectedUuids([]);
         collapseAllAccordions();
       } else {
+        // This set state will store the selected uuid
         setSelectedUuids(uuids);
+        // This function is exposed from PinListMenu for expanding an accordion given uuid
+        setSelectedUuid(uuids[0]);
+        // This function will fetch selected dataset and insert it to pin list
         dispatch(fetchResultByUuidNoStore(uuids[0]))
           .unwrap()
           .then((res: OGCCollection) => {
@@ -375,6 +379,7 @@ const SearchPage = () => {
         const e = await fillGeometryIfMissing(item);
         insertItemToPinList(e);
         setSelectedUuids([item.id]);
+        setSelectedUuid(item.id);
       }
     },
     [fillGeometryIfMissing]
@@ -389,11 +394,16 @@ const SearchPage = () => {
 
   const onRemoveFromPinList = useCallback(
     (uuid: string) => {
-      if (selectedUuids.includes(uuid)) {
-        setSelectedUuids([]);
-      }
+      // If the removed uuid is the selected uuid, need to set selected uuids to []
+      setSelectedUuids((prevUuids) => {
+        if (prevUuids[0] && prevUuids[0] === uuid) {
+          return [];
+        } else {
+          return prevUuids;
+        }
+      });
     },
-    [selectedUuids]
+    [setSelectedUuids]
   );
 
   // You will see this trigger twice, this is due to use of strict-mode
@@ -422,6 +432,7 @@ const SearchPage = () => {
           <Box>
             <ResultSection
               onClickCard={onClickCard}
+              selectedUuids={selectedUuids}
               currentSort={currentSort}
               onChangeSorting={onChangeSorting}
               currentLayout={currentLayout}

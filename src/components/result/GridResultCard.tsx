@@ -20,23 +20,24 @@ import {
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
-import { ItemCardProps } from "./ResultCards";
+import { ResultCard } from "./ResultCards";
 
-interface GridResultCardProps extends ItemCardProps {}
+interface GridResultCardProps extends ResultCard {}
 
 const GridResultCard: FC<GridResultCardProps> = ({
   content,
   onClickCard = () => {},
-  onClickDetail,
-  onClickLinks,
-  onClickDownload,
-  isSelectedDataset,
+  onClickDetail = () => {},
+  onClickLinks = () => {},
+  onClickDownload = () => {},
+  selectedUuid,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
   if (!content) return;
   const { id: uuid, title, findIcon, findThumbnail } = content;
 
+  const isSelectedDataset = uuid === selectedUuid;
   return (
     <Card
       elevation={isSelectedDataset ? 2 : 0}
