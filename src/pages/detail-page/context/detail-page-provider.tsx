@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { FC, ReactNode, useEffect, useState } from "react";
 import {
-  fetchDatasetByUuid,
+  fetchFeaturesByUuid,
   fetchResultByUuidNoStore,
 } from "../../../components/common/store/searchReducer";
 import { DetailPageContext, SpatialExtentPhoto } from "./detail-page-context";
@@ -22,9 +22,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
-  const [dataset, setDataset] = useState<FeatureCollection<Point> | undefined>(
-    undefined
-  );
+  const [features, setFeatures] = useState<
+    FeatureCollection<Point> | undefined
+  >(undefined);
   const [isCollectionNotFound, setIsCollectionNotFound] =
     useState<boolean>(false);
   const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
@@ -62,10 +62,10 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   useEffect(() => {
     const uuid = new URLSearchParams(location.search).get("uuid");
     if (!uuid) return;
-    dispatch(fetchDatasetByUuid(uuid))
+    dispatch(fetchFeaturesByUuid(uuid))
       .unwrap()
-      .then((dataset) => {
-        setDataset(dataset);
+      .then((features) => {
+        setFeatures(features);
       });
   }, [dispatch, location.search]);
 
@@ -74,7 +74,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       value={{
         collection,
         setCollection,
-        dataset,
+        features,
         isCollectionNotFound,
         photos,
         setPhotos,

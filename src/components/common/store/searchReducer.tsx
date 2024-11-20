@@ -240,7 +240,7 @@ const fetchResultByUuidNoStore = createAsyncThunk<
     .catch(errorHandling(thunkApi))
 );
 
-const fetchDatasetByUuid = createAsyncThunk<
+const fetchFeaturesByUuid = createAsyncThunk<
   FeatureCollection<Point>,
   string,
   { rejectValue: ErrorResponse }
@@ -404,11 +404,8 @@ export {
   fetchResultNoStore,
   fetchResultAppendStore,
   fetchResultByUuidNoStore,
-  fetchDatasetByUuid,
+  fetchFeaturesByUuid,
   fetchParameterVocabsWithStore,
 };
 
 export default searcher.reducer;
-function createErrorRespons(): any {
-  throw new Error("Function not implemented.");
-}
