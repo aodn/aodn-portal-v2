@@ -2,6 +2,7 @@
 // e.g capitalize, concatenate, ...
 
 import { decode } from "he";
+import React from "react";
 
 /**
  * Capitalizes the first letter of a given string.
@@ -45,4 +46,16 @@ export const decodeHtmlEntities = (str: string): string => {
   } catch (ignored) {
     return str;
   }
+};
+// TODO: Keep it for now, we want to enhance the url later with http
+export const enrichHTML = (text: string): string => {
+  // Regular expression to match URLs with http:// or https://
+  const urlPattern = /\bhttps?:\/\/[^\s/$.?#].[^\s]*\b/g;
+
+  // Replace URLs in the text with anchor tags
+  const h = text.replace(urlPattern, (url) => {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+  });
+
+  return h.replace(/\n/g, "<br>");
 };

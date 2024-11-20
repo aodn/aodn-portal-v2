@@ -1,9 +1,22 @@
+from typing import Any
+
 from playwright.sync_api import Locator, Page
+
+from pages.js_scripts.js_utils import execute_js, load_common_js_functions
 
 
 class BasePage:
     def __init__(self, page: Page):
         self.page = page
+        load_common_js_functions(page)
+
+        # Common locators
+        self.body = page.locator('body')
+        self.select_elements = page.get_by_test_id('common-select')
+
+    def __getattr__(self, name: str) -> Any:
+        # Delegate attribute lookup to the page object if not found in custom 'Page' classes
+        return getattr(self.page, name)
 
     def get_by_id(self, id: str) -> Locator:
         """Return a locator by id attribute"""
@@ -68,3 +81,11 @@ class BasePage:
     def get_collapse_item_title(self, title: str) -> Locator:
         """Returns the given collapse item title"""
         return self.page.get_by_test_id(f'collapse-item-{title}')
+
+    def scroll_To_Bottom(self) -> None:
+        """Scroll to the bottom of the page"""
+        execute_js(self.page, 'scrollToBottom')
+
+    def get_Page_Scroll_Y(self) -> int:
+        """Get the current page scroll Y position"""
+        return execute_js(self.page, 'getPageScrollY')

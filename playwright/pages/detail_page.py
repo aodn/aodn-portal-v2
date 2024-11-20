@@ -8,12 +8,14 @@ from pages.components.tab_container import TabContainerComponent
 
 class DetailPage(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         self.tabs = TabContainerComponent(page)
         self.contact_area = ContactAreaComponent(page)
 
         # Page locators
         self.page_title = self.get_label(text='collection title')
+        self.go_back_button = self.page.get_by_test_id('go-back-button')
 
     def load(self, uuid: str) -> None:
         """Load the detail page for the given uuid"""

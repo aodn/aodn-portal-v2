@@ -8,6 +8,7 @@ import {
 import { FC, useCallback, useState } from "react";
 import { IconProps } from "../../icon/types";
 import { useDetailPageContext } from "../../../pages/detail-page/context/detail-page-context";
+import { disableScroll, enableScroll } from "../../../utils/ScrollbarUtils";
 
 export interface SelectItem<T = string> {
   value: T;
@@ -16,6 +17,8 @@ export interface SelectItem<T = string> {
 }
 export interface CommonSelectProps<T = string> {
   items: SelectItem<T>[];
+  // Once value is provided, the component is controllable
+  value?: T | null;
   onSelectCallback?: (value: T) => void;
   sx?: SxProps;
 }
@@ -31,23 +34,6 @@ const DEFAULT_SELECT_STYLE: SxProps = {
   },
   boxShadow: "2px 2px 4px 0px rgba(0, 0, 0, 0.15)",
   fontSize: "14px",
-};
-
-const disableScroll = () => {
-  // Save current scroll position and disable the page scroll to avoid menuitem
-  // flow on top of page
-  const scrollY = window.scrollY;
-  document.body.style.position = "fixed";
-  document.body.style.width = "100%";
-  document.body.style.top = `-${scrollY}px`;
-};
-
-const enableScroll = () => {
-  // Restore scroll position
-  const scrollY = document.body.style.top;
-  document.body.style.position = "";
-  document.body.style.width = "";
-  window.scrollTo(0, parseInt(scrollY || "0", 10) * -1);
 };
 
 const CommonSelect: FC<CommonSelectProps> = ({
@@ -79,7 +65,11 @@ const CommonSelect: FC<CommonSelectProps> = ({
   }, []);
 
   return (
-    <FormControl fullWidth disabled={isCollectionNotFound}>
+    <FormControl
+      fullWidth
+      disabled={isCollectionNotFound}
+      data-testid="common-select"
+    >
       <Select
         value={selectedItem}
         onOpen={handleOpen}
@@ -101,5 +91,4 @@ const CommonSelect: FC<CommonSelectProps> = ({
   );
 };
 
-export { disableScroll, enableScroll };
 export default CommonSelect;

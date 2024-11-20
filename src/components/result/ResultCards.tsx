@@ -12,7 +12,7 @@ import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
-import { SearchResultLayoutEnum } from "../common/buttons/MapViewButton";
+import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
 import SelectedListCard from "./SelectedListCard";
@@ -35,7 +35,7 @@ interface ResultCardsProps {
   content?: OGCCollection;
   onClickCard?: (uuid: string) => void;
   contents: CollectionsQueryType;
-  layout?: SearchResultLayoutEnum;
+  layout?: SearchResultLayoutEnum | null;
   sx?: SxProps<Theme>;
   datasetsSelected?: OGCCollection[];
 }
@@ -203,7 +203,12 @@ const ResultCards = ({
   // logic .clentHeight.height have values. In short it fill the
   // whole area.
   // *** We need to dsiplay the load more button, hence item count + 1 ***
-  if (layout === SearchResultLayoutEnum.LIST) {
+  // TODO: implement FULL_LIST view in the future
+  if (
+    !layout ||
+    layout === SearchResultLayoutEnum.LIST ||
+    layout === SearchResultLayoutEnum.FULL_LIST
+  ) {
     return (
       <Box
         sx={{ ...sx, height: "100%" }}

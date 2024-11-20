@@ -8,8 +8,8 @@ import ListAndDetailsIcon from "../../icon/ListAndDetailsIcon";
 export enum SearchResultLayoutEnum {
   GRID = "GRID",
   LIST = "LIST",
-  INVISIBLE = "INVISIBLE",
-  VISIBLE = "VISIBLE",
+  FULL_MAP = "FULL_MAP",
+  FULL_LIST = "FULL_LIST",
 }
 
 const MAP_VIEW_SELECT = [
@@ -24,32 +24,37 @@ const MAP_VIEW_SELECT = [
     icon: GridAndMapIcon,
   },
   {
-    value: SearchResultLayoutEnum.INVISIBLE,
+    value: SearchResultLayoutEnum.FULL_MAP,
     label: "Full Map View",
     icon: FullMapViewIcon,
   },
   // TODO: Implement 'List and Details' once designed finished
   {
-    value: SearchResultLayoutEnum.VISIBLE,
+    value: SearchResultLayoutEnum.FULL_LIST,
     label: "List and Details",
     icon: ListAndDetailsIcon,
   },
 ];
 
-export interface MapViewButtonProps<T> {
+export interface ResultListLayoutButtonProps<T> {
+  currentLayout: Exclude<
+    SearchResultLayoutEnum,
+    SearchResultLayoutEnum.FULL_MAP
+  > | null;
   onChangeLayout: (layout: T) => void;
 }
 
-const MapViewButton: FC<MapViewButtonProps<SearchResultLayoutEnum>> = ({
-  onChangeLayout,
-}) => {
+const ResultListLayoutButton: FC<
+  ResultListLayoutButtonProps<SearchResultLayoutEnum>
+> = ({ onChangeLayout, currentLayout }) => {
   return (
     <IconSelect
       items={MAP_VIEW_SELECT}
       selectName="View"
       onSelectCallback={onChangeLayout}
+      value={currentLayout}
     />
   );
 };
 
-export default MapViewButton;
+export default ResultListLayoutButton;
