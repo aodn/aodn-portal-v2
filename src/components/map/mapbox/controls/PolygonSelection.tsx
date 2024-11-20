@@ -1,22 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  IconButton,
-  Popper,
-  Typography,
-} from "@mui/material";
 import BBoxIcon from "../../../icon/BBoxIcon";
-import grey from "../../../common/colors/grey";
-import { borderRadius, fontSize } from "../../../../styles/constants";
-import AddIcon from "../../../icon/AddIcon";
 import XIcon from "../../../icon/XIcon";
 import { Map } from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from "@turf/turf";
+import { createRoot } from "react-dom/client";
 
 interface PolygonSelectionProps {
   map: Map | undefined | null;
@@ -66,6 +54,40 @@ const PolygonSelection: React.FC<PolygonSelectionProps> = ({ map }) => {
         trash: true,
       },
       defaultMode: "draw_polygon",
+      styles: [
+        {
+          id: "gl-draw-polygon-fill",
+          type: "fill",
+          paint: {
+            "fill-color": "#6e599f",
+            "fill-opacity": 0.5,
+          },
+        },
+        {
+          id: "gl-draw-polygon-stroke",
+          type: "line",
+          paint: {
+            "line-color": "#6e599f",
+            "line-width": 2,
+          },
+        },
+        {
+          id: "gl-draw-line",
+          type: "line",
+          paint: {
+            "line-color": "#6e599f",
+            "line-width": 2,
+          },
+        },
+        {
+          id: "gl-draw-point",
+          type: "circle",
+          paint: {
+            "circle-radius": 5,
+            "circle-color": "#6e599f",
+          },
+        },
+      ],
     });
 
     const updateArea = (e: any) => {
@@ -79,6 +101,19 @@ const PolygonSelection: React.FC<PolygonSelectionProps> = ({ map }) => {
     };
     if (map) {
       map.addControl(draw);
+
+      const drawButton = document.querySelector(".mapbox-gl-draw_polygon");
+      if (drawButton) {
+        const root = createRoot(drawButton);
+        root.render(<BBoxIcon />);
+      }
+
+      const trashButton = document.querySelector(".mapbox-gl-draw_trash");
+      if (trashButton) {
+        const root = createRoot(trashButton);
+        root.render(<XIcon />);
+      }
+
       map.on("draw.create", updateArea);
       map.on("draw.delete", updateArea);
       map.on("draw.update", updateArea);
@@ -93,91 +128,7 @@ const PolygonSelection: React.FC<PolygonSelectionProps> = ({ map }) => {
     };
   }, [map]);
 
-  return (
-    <>
-      <IconButton
-        ref={anchorRef}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-        onClick={() => setOpen(!open)}
-      >
-        <BBoxIcon />
-      </IconButton>
-      <Popper
-        id="detailmap-popper-id"
-        open={open}
-        anchorEl={anchorRef.current}
-        ref={popperRef}
-        role={undefined}
-        placement={"left-start"}
-        disablePortal
-        modifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [0, 10], // This applies an offset of 10px downward
-            },
-          },
-        ]}
-      >
-        <Box
-          sx={{
-            color: grey["mapMenuText"],
-            display: "inline-block",
-            whiteSpace: "nowrap",
-            borderRadius: borderRadius["menu"],
-            backgroundColor: grey["resultCard"],
-            zIndex: 1,
-          }}
-        >
-          <Typography
-            sx={{
-              backgroundColor: "white",
-              borderRadius: borderRadius["menuTop"],
-              fontSize: fontSize["mapMenuItem"],
-              paddingTop: "7px",
-              paddingBottom: "7px",
-              paddingLeft: "15px",
-              fontWeight: "bold",
-            }}
-          >
-            Polygon Selection
-          </Typography>
-          <Divider />
-          <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
-            <Divider />
-            <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
-              <Divider />
-              <FormControl component="fieldset">
-                <FormGroup>
-                  <FormControlLabel
-                    onClick={handleAddBBox}
-                    control={<AddIcon />}
-                    label={
-                      <Typography sx={{ fontSize: fontSize["mapMenuSubItem"] }}>
-                        Add More Selection
-                      </Typography>
-                    }
-                  />
-                  <FormControlLabel
-                    control={<XIcon />}
-                    label={
-                      <Typography sx={{ fontSize: fontSize["mapMenuSubItem"] }}>
-                        Clear Selection
-                      </Typography>
-                    }
-                  />
-                </FormGroup>
-              </FormControl>
-            </Box>
-          </Box>
-        </Box>
-      </Popper>
-    </>
-  );
+  return <></>;
 };
 
 export default PolygonSelection;

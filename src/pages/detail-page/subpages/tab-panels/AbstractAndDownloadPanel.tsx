@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import React, { FC, useCallback, useContext, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -43,6 +43,9 @@ import useScrollToSection from "../../../../hooks/useScrollToSection";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailClusterLayer from "../../../../components/map/mapbox/layers/DetailClusterLayer";
+import PolygonSelection from "../../../../components/map/mapbox/controls/PolygonSelection";
+import MapContext from "../../../../components/map/mapbox/MapContext";
+import { MapboxEvent as MapEvent } from "mapbox-gl";
 
 interface DownloadSelect {
   label?: string;
@@ -139,7 +142,7 @@ const DOWNLOAD_SECTION_ID = "download-section";
 const TRUNCATE_COUNT = 800;
 
 const AbstractAndDownloadPanel: FC = () => {
-  const { collection, dataset } = useDetailPageContext();
+  const { collection, features } = useDetailPageContext();
   const downloadSectionRef = useScrollToSection({
     sectionId: DOWNLOAD_SECTION_ID,
   });
@@ -148,6 +151,16 @@ const AbstractAndDownloadPanel: FC = () => {
 
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
+
+  const { map } = useContext(MapContext);
+
+  const handleMapChange = useCallback(
+    (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
+      // implement later
+      console.log("Map change event", event);
+    },
+    []
+  );
 
   if (!collection) return;
   return (
@@ -170,7 +183,11 @@ const AbstractAndDownloadPanel: FC = () => {
                   marginY: padding.large,
                 }}
               >
-                <Map panelId={mapContainerId}>
+                <Map
+                  panelId={mapContainerId}
+                  onMoveEvent={handleMapChange}
+                  onZoomEvent={handleMapChange}
+                >
                   <Controls>
                     <NavigationControl />
                     <ScaleControl />
@@ -206,11 +223,10 @@ const AbstractAndDownloadPanel: FC = () => {
                         />
                       }
                     />
+                    <MenuControl menu={<PolygonSelection map={map} />} />
                   </Controls>
                   <Layers>
-                    {/*TODO: keep the below comment as it will be useful later*/}
-                    {/*<DetailHeatMap features={dataset} />*/}
-                    <DetailClusterLayer features={dataset} />
+                    <DetailClusterLayer features={features} />
                   </Layers>
                 </Map>
               </Box>
