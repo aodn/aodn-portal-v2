@@ -27,6 +27,7 @@ export interface ResultCard {
   onClickDownload?: (uuid: string) => void;
   onClickLinks?: (uuid: string) => void;
   selectedUuid?: string;
+  sx?: SxProps;
 }
 
 interface ResultCardsList extends ResultCard {
@@ -37,11 +38,10 @@ interface ResultCardsList extends ResultCard {
 }
 
 interface ResultCardsProps {
-  layout:
-    | SearchResultLayoutEnum.GRID
-    | SearchResultLayoutEnum.LIST
-    | SearchResultLayoutEnum.FULL_LIST
-    | null;
+  layout: Exclude<
+    SearchResultLayoutEnum,
+    SearchResultLayoutEnum.FULL_MAP
+  > | null;
   contents: CollectionsQueryType;
   onClickCard: ((item: OGCCollection | undefined) => void) | undefined;
   selectedUuids: string[];
