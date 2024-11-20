@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { useAppDispatch } from "../common/store/hooks";
 import store, {
   getComponentState,
@@ -27,37 +27,35 @@ const FullListAndDetails: FC<FullListAndDetailsProps> = () => {
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
-  const fetchDatasets = useCallback(() => {
-    const componentParam: ParameterState = getComponentState(store.getState());
-    const paramPaged = createSearchParamFrom(componentParam, {
-      pagesize: FULL_LIST_PAGE_SIZE,
-    });
-    dispatch(fetchResultWithStore(paramPaged));
-  }, [dispatch]);
-
-  const fetchMore = useCallback(async () => {
-    // This is very specific to how elastic works and then how to construct the query
-    const componentParam: ParameterState = getComponentState(store.getState());
-    // Use standard param to get fields you need, record is stored in redux,
-    // set page so that it return fewer records and append the search_after
-    // to go the next batch of record.
-    const paramPaged = createSearchParamFrom(componentParam, {
-      pagesize: FULL_LIST_PAGE_SIZE,
-      searchafter: reduxContents.result.search_after,
-    });
-    // Must use await so that record updated before you exit this call
-    await dispatch(fetchResultAppendStore(paramPaged));
-  }, [reduxContents.result.search_after, dispatch]);
-
-  useEffect(() => {
-    fetchDatasets();
-  }, []);
-
   const {
     result: { collections },
   } = reduxContents;
 
+  useEffect(() => {
+    if (collections.length < 20) {
+      const componentParam: ParameterState = getComponentState(
+        store.getState()
+      );
+      const paramPaged = createSearchParamFrom(componentParam, {
+        pagesize: FULL_LIST_PAGE_SIZE,
+      });
+      dispatch(fetchResultWithStore(paramPaged));
+    }
+    //only for fetching initial data
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchMore = useCallback(async () => {
+    const componentParam: ParameterState = getComponentState(store.getState());
+    const paramPaged = createSearchParamFrom(componentParam, {
+      pagesize: FULL_LIST_PAGE_SIZE,
+      searchafter: reduxContents.result.search_after,
+    });
+    await dispatch(fetchResultAppendStore(paramPaged));
+  }, [reduxContents.result.search_after, dispatch]);
+
   if (!collections || collections.length === 0) return;
+
   return (
     <Box>
       <Grid container spacing={1}>
