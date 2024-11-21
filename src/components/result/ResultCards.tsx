@@ -170,7 +170,7 @@ const renderFullListView: FC<Partial<ResultCards>> = ({
   return (
     <Box sx={{ ...sx }}>
       <Grid container spacing={1}>
-        {contents?.result.collections.map((collection) => (
+        {contents.result.collections.map((collection) => (
           <Grid item xs={12} md={6} lg={4} key={collection.id}>
             <ListResultCard
               content={collection}
@@ -241,10 +241,14 @@ const ResultCards: FC<ResultCardsProps> = ({
 
   // Fetching more data for full list view if the initial records less than 20
   useEffect(() => {
-    if (layout === SearchResultLayoutEnum.FULL_LIST && count < 20) {
+    if (
+      layout === SearchResultLayoutEnum.FULL_LIST &&
+      count < total &&
+      count < 20
+    ) {
       fetchMore(FULL_LIST_PAGE_SIZE);
     }
-  }, [count, fetchMore, layout]);
+  }, [count, fetchMore, layout, total]);
 
   const renderLoadMoreButton = useCallback(() => {
     return (
