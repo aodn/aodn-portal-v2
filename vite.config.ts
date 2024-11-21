@@ -11,13 +11,6 @@ export default ({ mode }) => {
 
   const apiPath = process.env.VITE_API_HOST;
 
-  // Log a custom warning if VITE_API_HOST is not set
-  if (!apiPath) {
-    console.warn(
-      "Warning: VITE_API_HOST is not defined. API requests may fail. Please check .env file."
-    );
-  }
-
   const inlineNewRelicPlugin = () => {
     // We need to inline the relic_script in the index.html, you can dynamic include based on env here
     // https://docs.newrelic.com/docs/browser/new-relic-browser/page-load-timing-resources/instrumentation-browser-monitoring/#javascript-placement
@@ -42,27 +35,24 @@ export default ({ mode }) => {
       watch: {
         usePolling: true,
       },
-      // Only add the proxy if apiPath is defined
-      proxy: apiPath
-        ? {
-            "/api/v1/ogc/collections": {
-              target: apiPath,
-              changeOrigin: true,
-            },
-            "/api/v1/ogc/tiles": {
-              target: apiPath,
-              changeOrigin: true,
-            },
-            "/api/v1/ogc/ext/autocomplete": {
-              target: apiPath,
-              changeOrigin: true,
-            },
-            "/api/v1/ogc/ext/parameter/vocabs": {
-              target: apiPath,
-              changeOrigin: true,
-            },
-          }
-        : {}, // No proxy setup if apiPath is not defined
+      proxy: {
+        "/api/v1/ogc/collections": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/tiles": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/ext/autocomplete": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/ext/parameter/vocabs": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+      },
     },
     plugins: [
       react(),

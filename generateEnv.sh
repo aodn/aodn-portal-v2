@@ -19,4 +19,8 @@ case $env in
     cat .env.config.prod > .env.prod
     echo "VITE_APP_VERSION=$(git describe --abbrev=0 --tags)" >> .env.prod
   ;;
+  "test")
+    cat .env.config.test > .env.dev
+    echo "VITE_APP_VERSION=github-workflow" >> .env.dev
+  ;;
 esac
