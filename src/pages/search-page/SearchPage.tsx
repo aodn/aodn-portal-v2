@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import {
   createSearchParamFrom,
-  DEFAULT_SEARCH_PAGE,
+  DEFAULT_SEARCH_PAGE_SIZE,
   fetchResultByUuidNoStore,
   fetchResultNoStore,
   fetchResultWithStore,
@@ -152,7 +152,7 @@ const SearchPage = () => {
       // Use standard param to get fields you need, record is stored in redux,
       // set page so that it returns fewer records
       const paramPaged = createSearchParamFrom(componentParam, {
-        pagesize: DEFAULT_SEARCH_PAGE,
+        pagesize: DEFAULT_SEARCH_PAGE_SIZE,
       });
 
       dispatch(fetchResultWithStore(paramPaged));
@@ -427,26 +427,26 @@ const SearchPage = () => {
         }}
         gap={2}
       >
-        {/* Ignore the FULL_LIST view for now, wait for future design */}
-        {selectedLayout !== SearchResultLayoutEnum.FULL_MAP && (
-          <Box>
-            <ResultSection
-              onClickCard={onClickCard}
-              selectedUuids={selectedUuids}
-              currentSort={currentSort}
-              onChangeSorting={onChangeSorting}
-              currentLayout={currentLayout}
-              onChangeLayout={onChangeLayout}
-              isLoading={isLoading(loadingThreadCount)}
-            />
-          </Box>
-        )}
+        <Box>
+          <ResultSection
+            showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
+            showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}
+            onClickCard={onClickCard}
+            selectedUuids={selectedUuids}
+            currentSort={currentSort}
+            onChangeSorting={onChangeSorting}
+            currentLayout={currentLayout}
+            onChangeLayout={onChangeLayout}
+            isLoading={isLoading(loadingThreadCount)}
+          />
+        </Box>
         <Box flex={1}>
           <MapSection
+            showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
+            showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}
             collections={layers}
             bbox={bbox}
             zoom={zoom}
-            showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
             selectedUuids={selectedUuids}
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}

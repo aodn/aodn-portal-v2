@@ -14,6 +14,8 @@ import CircleLoader from "../../../components/loading/CircleLoader";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 
 interface ResultSectionProps {
+  showFullMap: boolean;
+  showFullList: boolean;
   currentSort: SortResultEnum | null;
   currentLayout: Exclude<
     SearchResultLayoutEnum,
@@ -29,6 +31,8 @@ interface ResultSectionProps {
 const RESULT_SECTION_WIDTH = 500;
 
 const ResultSection: FC<ResultSectionProps> = ({
+  showFullList,
+  showFullMap,
   currentLayout,
   onChangeLayout,
   currentSort,
@@ -41,40 +45,41 @@ const ResultSection: FC<ResultSectionProps> = ({
     searchQueryResult
   );
 
+  // Early return if it is full map view or no reduxContents
+  if (showFullMap || !reduxContents) return null;
+
   return (
-    reduxContents && (
-      <Box
-        sx={{
-          width: RESULT_SECTION_WIDTH,
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
-        }}
-        gap={1}
-        data-testid="search-page-result-list"
-      >
-        <CircleLoader isLoading={isLoading} />
-        <Box>
-          <ResultPanelSimpleFilter
-            count={reduxContents.result.collections.length}
-            total={reduxContents.result.total}
-            currentLayout={currentLayout}
-            onChangeLayout={onChangeLayout}
-            currentSort={currentSort}
-            onChangeSorting={onChangeSorting}
-          />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <ResultCards
-            layout={currentLayout}
-            contents={reduxContents}
-            onClickCard={onClickCard}
-            selectedUuids={selectedUuids}
-          />
-        </Box>
+    <Box
+      sx={{
+        width: showFullList ? "100%" : RESULT_SECTION_WIDTH,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+      }}
+      gap={1}
+      data-testid="search-page-result-list"
+    >
+      <CircleLoader isLoading={isLoading} />
+      <Box>
+        <ResultPanelSimpleFilter
+          count={reduxContents.result.collections.length}
+          total={reduxContents.result.total}
+          currentLayout={currentLayout}
+          onChangeLayout={onChangeLayout}
+          currentSort={currentSort}
+          onChangeSorting={onChangeSorting}
+        />
       </Box>
-    )
+      <Box sx={{ flex: 1, overflowY: "auto" }}>
+        <ResultCards
+          layout={currentLayout}
+          contents={reduxContents}
+          onClickCard={onClickCard}
+          selectedUuids={selectedUuids}
+        />
+      </Box>
+    </Box>
   );
 };
 

@@ -32,6 +32,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   onClickLinks = () => {},
   onClickDownload = () => {},
   selectedUuid,
+  sx,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
@@ -40,7 +41,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
 
   const isSelectedDataset = uuid === selectedUuid;
 
-  // TODO: buttons are changed, but the behaviors are fake / wrong
   return (
     <Card
       id={`result-card-${uuid}`}
@@ -58,6 +58,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
         borderRadius: borderRadius.small,
         paddingX: padding.medium,
         paddingY: padding.small,
+        ...sx,
       }}
       onMouseEnter={() => setShowButtons(true)}
       onMouseLeave={() => setShowButtons(false)}
