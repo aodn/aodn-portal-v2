@@ -14,9 +14,6 @@ import {
   findSuitableVisiblePoint,
   LayersProps,
 } from "./Layers";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
-import SpatialExtents from "../component/SpatialExtents";
-import SpiderDiagram from "../component/SpiderDiagram";
 import { Feature, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
@@ -46,26 +43,21 @@ interface DetailClusterConfig {
   unclusterPointRadius: number;
 }
 
-interface DetailClusterProps extends LayersProps {
-  // Some method inherit from LayersProps
-  clusterLayerConfig?: Partial<DetailClusterConfig>;
-}
-
-const defaultDetailClusterConfig: DetailClusterConfig = {
+const config: DetailClusterConfig = {
   // point count thresholds define the boundaries between different cluster sizes.
   pointCountThresholds: {
-    medium: 20,
-    large: 30,
-    extra_large: 50,
+    medium: 10,
+    large: 15,
+    extra_large: 25,
   },
   clusterMaxZoom: MapDefaultConfig.MAX_ZOOM,
-  clusterRadius: 50,
+  clusterRadius: 20,
   // circle sizes define the radius(px) of the circles used to represent clusters on the map.
   clusterCircleSize: {
-    default: 20,
-    medium: 30,
-    large: 40,
-    extra_large: 60,
+    default: 10,
+    medium: 15,
+    large: 20,
+    extra_large: 30,
   },
   //cluster circle colors define the colors used for the circles representing clusters of different sizes.
   clusterCircleColor: {
@@ -85,19 +77,22 @@ const defaultDetailClusterConfig: DetailClusterConfig = {
   unclusterPointRadius: 8,
 };
 
-// These function help to get the correct id and reduce the need to set those id in the
-// useEffect list
-export const getLayerId = (id: string | undefined) => `cluster-layer-${id}`;
+const isValid = (bbox: [number, number, number, number]) => {
+  // lat and lon are in the range of -90 to 90 and -180 to 180 respectively
+  const [minLon, minLat, maxLon, maxLat] = bbox;
+  return (
+    minLon >= -180 &&
+    minLon <= 180 &&
+    minLat >= -90 &&
+    minLat <= 90 &&
+    maxLon >= -180 &&
+    maxLon <= 180 &&
+    maxLat >= -90 &&
+    maxLat <= 90
+  );
+};
 
-export const getClusterSourceId = (layerId: string) => `${layerId}-source`;
-
-export const getClusterLayerId = (layerId: string) => `${layerId}-clusters`;
-
-export const getUnclusterPointId = (layerId: string) =>
-  `${layerId}-unclustered-point`;
-
-// TODO: This file is copy & paste from the clusterLayer file. It should be simplified later
-const DetailClusterLayer: FC<DetailClusterProps> = ({
+const DetailClusterLayer: FC<LayersProps> = ({
   features = generateFeatureCollectionFrom(undefined),
 }) => {
   const [bbox, setBbox] = useState<
@@ -105,36 +100,24 @@ const DetailClusterLayer: FC<DetailClusterProps> = ({
   >(undefined);
   const { map } = useContext(MapContext);
 
-  const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
-
-  const clusterSourceId = useMemo(() => getClusterSourceId(layerId), [layerId]);
-
-  const clusterLayer = useMemo(() => getClusterLayerId(layerId), [layerId]);
-
-  const unclusterPointLayer = useMemo(
-    () => getUnclusterPointId(layerId),
-    [layerId]
+  const layerId = useMemo(
+    () => `cluster-layer-${map?.getContainer().id}`,
+    [map]
   );
 
-  const isValid = (bbox: [number, number, number, number]) => {
-    // lat and lon are in the range of -90 to 90 and -180 to 180 respectively
-    const [minLon, minLat, maxLon, maxLat] = bbox;
-    return (
-      minLon >= -180 &&
-      minLon <= 180 &&
-      minLat >= -90 &&
-      minLat <= 90 &&
-      maxLon >= -180 &&
-      maxLon <= 180 &&
-      maxLat >= -90 &&
-      maxLat <= 90
-    );
-  };
+  const clusterSourceId = useMemo(() => `${layerId}-source`, [layerId]);
+
+  const clusterLayer = useMemo(() => `${layerId}-clusters`, [layerId]);
+
+  const unclusterPointLayer = useMemo(
+    () => `${layerId}-unclustered-point`,
+    [layerId]
+  );
 
   useEffect(() => {
     if (bbox && map && isValid(bbox)) {
       map.fitBounds(bbox, {
-        maxZoom: 2,
+        maxZoom: 4,
         padding: 100,
       });
     }
@@ -153,8 +136,6 @@ const DetailClusterLayer: FC<DetailClusterProps> = ({
     const createLayers = () => {
       if (map?.getSource(clusterSourceId)) return;
 
-      const config = defaultDetailClusterConfig;
-
       map?.setMaxZoom(config.clusterMaxZoom);
 
       map?.addSource(clusterSourceId, {
@@ -168,7 +149,7 @@ const DetailClusterLayer: FC<DetailClusterProps> = ({
         ),
         cluster: true,
         clusterMaxZoom: config.clusterMaxZoom,
-        clusterRadius: 50,
+        clusterRadius: config.clusterRadius,
         clusterProperties: {
           count: ["+", ["get", "count"]],
         },

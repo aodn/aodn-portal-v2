@@ -19,9 +19,14 @@ interface GeojsonLayerProps {
   // Vector tile layer should added to map
   collection: OGCCollection;
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
+  animate?: boolean;
 }
 
-const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
+const GeojsonLayer: FC<GeojsonLayerProps> = ({
+  collection,
+  setPhotos,
+  animate = true,
+}) => {
   const { map } = useContext(MapContext);
   const [mapLoaded, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
@@ -39,9 +44,9 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({ collection, setPhotos }) => {
   const fitToOverallBbox = useCallback(
     (bboxes: Array<Position>) => {
       const bound = bboxes[0] as LngLatBoundsLike;
-      map?.fitBounds(bound, { maxZoom: 3, padding: 10 });
+      map?.fitBounds(bound, { maxZoom: 3, padding: 10, animate: animate });
     },
-    [map]
+    [map, animate]
   );
 
   // Function to take photo of the map for given bounding boxes

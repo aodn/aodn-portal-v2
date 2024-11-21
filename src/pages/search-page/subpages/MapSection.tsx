@@ -4,10 +4,8 @@ import Controls from "../../../components/map/mapbox/controls/Controls";
 import ToggleControl from "../../../components/map/mapbox/controls/ToggleControl";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
-import MenuControl, {
-  BaseMapSwitcher,
-  MapLayerSwitcher,
-} from "../../../components/map/mapbox/controls/MenuControl";
+import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
+import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import React, { useCallback, useState } from "react";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import Layers, {
@@ -23,6 +21,8 @@ import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCo
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
+import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import PinListMenu from "../../../components/map/mapbox/controls/menu/PinListMenu";
 
 const mapContainerId = "map-container-id";
 
@@ -41,7 +41,9 @@ interface MapSectionProps {
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
   onToggleClicked: (v: boolean) => void;
-  onDatasetSelected?: (uuids: Array<string>) => void;
+  onClickMapPoint?: (uuids: Array<string>) => void;
+  onClickAccordion?: (uuid: string | undefined) => void;
+  onRemoveFromPinList?: (uuid: string) => void;
   isLoading: boolean;
 }
 
@@ -50,7 +52,9 @@ const MapSection: React.FC<MapSectionProps> = ({
   zoom,
   onMapZoomOrMove,
   onToggleClicked,
-  onDatasetSelected,
+  onClickMapPoint: onDatasetSelected,
+  onClickAccordion,
+  onRemoveFromPinList,
   collections,
   showFullMap,
   sx,
@@ -114,6 +118,14 @@ const MapSection: React.FC<MapSectionProps> = ({
           <NavigationControl />
           <ScaleControl />
           <DisplayCoordinate />
+          <MenuControl
+            menu={
+              <PinListMenu
+                onClickAccordion={onClickAccordion}
+                onRemoveFromPinList={onRemoveFromPinList}
+              />
+            }
+          />
           <MenuControl
             menu={
               <BaseMapSwitcher
