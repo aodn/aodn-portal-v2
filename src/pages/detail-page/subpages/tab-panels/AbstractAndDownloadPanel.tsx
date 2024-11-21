@@ -41,7 +41,7 @@ import { StaticLayersDef } from "../../../../components/map/mapbox/layers/Static
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
-import DetailClusterLayer from "../../../../components/map/mapbox/layers/DetailClusterLayer";
+import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import PolygonSelection from "../../../../components/map/mapbox/controls/PolygonSelection";
 import MapContext from "../../../../components/map/mapbox/MapContext";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
@@ -207,25 +207,13 @@ const AbstractAndDownloadPanel: FC = () => {
                               default: false,
                             },
                           ]}
-                          onEvent={(target: EventTarget & HTMLInputElement) =>
-                            setStaticLayer((values) => {
-                              // Remove the item and add it back if selected
-                              const e = values?.filter(
-                                (i) => i !== target.value
-                              );
-                              if (target.checked) {
-                                e.push(target.value);
-                              }
-                              return [...e];
-                            })
-                          }
                         />
                       }
                     />
                     <MenuControl menu={<PolygonSelection map={map} />} />
                   </Controls>
                   <Layers>
-                    <DetailClusterLayer features={features} />
+                    <DetailSymbolLayer featureCollection={features} />
                   </Layers>
                 </Map>
               </Box>

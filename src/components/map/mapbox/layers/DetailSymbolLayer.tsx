@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import MapContext from "../MapContext";
-import { GeoJSONSource } from "mapbox-gl";
+import mapboxgl, { GeoJSONSource, MapMouseEvent, Popup } from "mapbox-gl";
 import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
@@ -18,6 +18,10 @@ import { Feature, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import * as turf from "@turf/turf";
+import "mapbox-gl/dist/mapbox-gl.css";
+
+import legend1_img from "@/assets/images/legend1.png";
+import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 
 interface DetailClusterSize {
   default?: number | string;
@@ -92,8 +96,8 @@ const isValid = (bbox: [number, number, number, number]) => {
   );
 };
 
-const DetailClusterLayer: FC<LayersProps> = ({
-  features = generateFeatureCollectionFrom(undefined),
+const DetailSymbolLayer: FC<LayersProps> = ({
+  featureCollection = generateFeatureCollectionFrom(undefined),
 }) => {
   const [bbox, setBbox] = useState<
     [number, number, number, number] | undefined
@@ -104,6 +108,20 @@ const DetailClusterLayer: FC<LayersProps> = ({
     () => `cluster-layer-${map?.getContainer().id}`,
     [map]
   );
+
+  const maxCount = useMemo(() => {
+    let maxCount = 0;
+    if (featureCollection && featureCollection.features) {
+      featureCollection.features.forEach((feature) => {
+        if (feature.properties?.count) {
+          if (feature.properties.count > maxCount) {
+            maxCount = feature.properties.count;
+          }
+        }
+      });
+    }
+    return maxCount;
+  }, [featureCollection]);
 
   const clusterSourceId = useMemo(() => `${layerId}-source`, [layerId]);
 
@@ -124,10 +142,41 @@ const DetailClusterLayer: FC<LayersProps> = ({
   }, [bbox, map]);
 
   useEffect(() => {
-    if (!features.features || features.features.length === 0) return;
-    const bbox = turf.bbox(features) as [number, number, number, number];
+    if (!featureCollection.features || featureCollection.features.length === 0)
+      return;
+    const bbox = turf.bbox(featureCollection) as [
+      number,
+      number,
+      number,
+      number,
+    ];
     setBbox(bbox);
-  }, [features]);
+  }, [featureCollection]);
+
+  const onSymbolClick = useCallback(
+    (event: MapMouseEvent) => {
+      const features = map?.queryRenderedFeatures(event.point, {
+        layers: [clusterLayer],
+      });
+      if (features) {
+        const htmlBuilder = new InnerHtmlBuilder()
+          .addTitle("Data Records In This Area:")
+          .addText("Data Record Count: " + features[0].properties?.count)
+          .addText("Data Coordinate Accuracy: 0.01")
+          .addRange(
+            "Time Range",
+            features[0].properties?.startTime,
+            features[0].properties?.endTime
+          );
+
+        new Popup()
+          .setLngLat(event.lngLat)
+          .setHTML(htmlBuilder.getHtml())
+          .addTo(map as mapboxgl.Map);
+      }
+    },
+    [clusterLayer, map]
+  );
 
   // This is used to render the cluster circle and add event handle to circles
   useEffect(() => {
@@ -147,76 +196,45 @@ const DetailClusterLayer: FC<LayersProps> = ({
           },
           map
         ),
-        cluster: true,
-        clusterMaxZoom: config.clusterMaxZoom,
-        clusterRadius: config.clusterRadius,
-        clusterProperties: {
-          count: ["+", ["get", "count"]],
-        },
+      });
+
+      map?.loadImage(legend1_img, (error, image) => {
+        if (error) {
+          throw error;
+        }
+        if (image) {
+          map?.addImage("legend1_img", image);
+        }
       });
 
       map?.addLayer({
         id: clusterLayer,
-        type: "circle",
-        source: clusterSourceId,
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-stroke-width": config.clusterCircleStrokeWidth,
-          "circle-stroke-color": config.clusterCircleStrokeColor,
-          "circle-opacity": config.clusterCircleOpacity,
-          "circle-color": [
-            "step",
-            ["get", "count"],
-            config.clusterCircleColor.default,
-            config.pointCountThresholds.medium,
-            config.clusterCircleColor.medium,
-            config.pointCountThresholds.large,
-            config.clusterCircleColor.large,
-            config.pointCountThresholds.extra_large,
-            config.clusterCircleColor.extra_large,
-          ],
-          "circle-radius": [
-            "step",
-            ["get", "count"],
-            config.clusterCircleSize.default,
-            config.pointCountThresholds.medium,
-            config.clusterCircleSize.medium,
-            config.pointCountThresholds.large,
-            config.clusterCircleSize.large,
-            config.pointCountThresholds.extra_large,
-            config.clusterCircleSize.extra_large,
-          ],
-        },
-      });
-
-      map?.addLayer({
-        id: `${layerId}-cluster-count`,
         type: "symbol",
         source: clusterSourceId,
-        filter: ["has", "point_count"],
+        filter: ["has", "count"],
         layout: {
-          "text-field": "{count}",
-          "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-          "text-size": config.clusterCircleTextSize,
+          "icon-image": "legend1_img",
+          "icon-size": 1,
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true,
+          "icon-anchor": "bottom",
         },
-      });
-
-      map?.addLayer({
-        id: unclusterPointLayer,
-        type: "circle",
-        source: clusterSourceId,
-        filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-opacity": config.unclusterPointOpacity,
-          "circle-color": config.unclusterPointColor,
-          "circle-radius": config.unclusterPointRadius,
-          "circle-stroke-width": config.unclusterPointStrokeWidth,
-          "circle-stroke-color": config.unclusterPointStrokeColor,
+          "icon-opacity": [
+            "interpolate",
+            ["linear"],
+            ["get", "count"],
+            1, // Minimum count
+            0.5, //  minimum opacity
+            maxCount, // Maximum count
+            1, // maximum opacity
+          ],
         },
       });
 
       map?.on("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
       map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
+      map?.on("click", clusterLayer, onSymbolClick);
     };
 
     map?.once("load", createLayers);
@@ -225,6 +243,7 @@ const DetailClusterLayer: FC<LayersProps> = ({
     return () => {
       map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
       map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
+      map?.off("click", clusterLayer, onSymbolClick);
 
       try {
         if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
@@ -237,13 +256,23 @@ const DetailClusterLayer: FC<LayersProps> = ({
         // Handle error
       }
     };
-  }, [clusterLayer, clusterSourceId, layerId, map, unclusterPointLayer]);
+  }, [
+    clusterLayer,
+    clusterSourceId,
+    layerId,
+    map,
+    maxCount,
+    onSymbolClick,
+    unclusterPointLayer,
+  ]);
 
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(features);
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(
+        featureCollection
+      );
     }
-  }, [map, clusterSourceId, features]);
+  }, [map, clusterSourceId, featureCollection]);
 
   useEffect(() => {
     updateSource();
@@ -256,4 +285,4 @@ const DetailClusterLayer: FC<LayersProps> = ({
   return <></>;
 };
 
-export default DetailClusterLayer;
+export default DetailSymbolLayer;
