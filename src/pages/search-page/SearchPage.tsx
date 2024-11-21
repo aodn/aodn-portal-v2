@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import {
   createSearchParamFrom,
-  DEFAULT_SEARCH_PAGE,
+  DEFAULT_SEARCH_PAGE_SIZE,
   fetchResultByUuidNoStore,
   fetchResultNoStore,
   fetchResultWithStore,
@@ -152,7 +152,7 @@ const SearchPage = () => {
       // Use standard param to get fields you need, record is stored in redux,
       // set page so that it returns fewer records
       const paramPaged = createSearchParamFrom(componentParam, {
-        pagesize: DEFAULT_SEARCH_PAGE,
+        pagesize: DEFAULT_SEARCH_PAGE_SIZE,
       });
 
       dispatch(fetchResultWithStore(paramPaged));

@@ -8,7 +8,7 @@ import store, {
 import {
   CollectionsQueryType,
   createSearchParamFrom,
-  DEFAULT_SEARCH_PAGE,
+  DEFAULT_SEARCH_PAGE_SIZE,
   fetchResultAppendStore,
 } from "../components/common/store/searchReducer";
 import { useSelector } from "react-redux";
@@ -29,7 +29,7 @@ const useFetchData = () => {
       // set page so that it return fewer records and append the search_after
       // to go the next batch of record.
       const paramPaged = createSearchParamFrom(componentParam, {
-        pagesize: pageSize ?? DEFAULT_SEARCH_PAGE,
+        pagesize: pageSize ?? DEFAULT_SEARCH_PAGE_SIZE,
         searchafter: reduxContents.result.search_after,
       });
       // Must use await so that record updated before you exit this call

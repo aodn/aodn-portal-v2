@@ -12,7 +12,6 @@ import { SortResultEnum } from "../../../components/common/buttons/ResultListSor
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import CircleLoader from "../../../components/loading/CircleLoader";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
-import FullListAndDetails from "../../../components/result/FullListAndDetails";
 
 interface ResultSectionProps {
   showFullMap: boolean;
@@ -72,23 +71,14 @@ const ResultSection: FC<ResultSectionProps> = ({
           onChangeSorting={onChangeSorting}
         />
       </Box>
-      {showFullList ? (
-        <Box sx={{ flex: 1, overflowY: "auto" }}>
-          <FullListAndDetails
-            onClickCard={onClickCard}
-            selectedUuid={selectedUuids[0]}
-          />
-        </Box>
-      ) : (
-        <Box sx={{ flex: 1 }}>
-          <ResultCards
-            layout={currentLayout}
-            contents={reduxContents}
-            onClickCard={onClickCard}
-            selectedUuids={selectedUuids}
-          />
-        </Box>
-      )}
+      <Box sx={{ flex: 1, overflowY: "auto" }}>
+        <ResultCards
+          layout={currentLayout}
+          contents={reduxContents}
+          onClickCard={onClickCard}
+          selectedUuids={selectedUuids}
+        />
+      </Box>
     </Box>
   );
 };
