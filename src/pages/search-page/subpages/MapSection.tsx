@@ -31,8 +31,9 @@ enum LayerName {
   Cluster = "cluster",
 }
 interface MapSectionProps {
-  collections: OGCCollection[];
   showFullMap: boolean;
+  showFullList: boolean;
+  collections: OGCCollection[];
   bbox?: LngLatBounds;
   zoom?: number;
   sx?: SxProps<Theme>;
@@ -48,6 +49,8 @@ interface MapSectionProps {
 }
 
 const MapSection: React.FC<MapSectionProps> = ({
+  showFullList,
+  showFullMap,
   bbox,
   zoom,
   onMapZoomOrMove,
@@ -56,7 +59,6 @@ const MapSection: React.FC<MapSectionProps> = ({
   onClickAccordion,
   onRemoveFromPinList,
   collections,
-  showFullMap,
   sx,
   selectedUuids,
   isLoading,
@@ -96,6 +98,9 @@ const MapSection: React.FC<MapSectionProps> = ({
     },
     [collections, onDatasetSelected, selectedUuids, showFullMap, tabNavigation]
   );
+
+  // Early return if it is full list view
+  if (showFullList) return null;
 
   return (
     <Paper

@@ -1,9 +1,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import {
   CollectionsQueryType,
-  createSearchParamFrom,
   DEFAULT_SEARCH_PAGE,
-  fetchResultAppendStore,
 } from "../common/store/searchReducer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Box, Grid, ListItem, SxProps, Theme } from "@mui/material";
@@ -15,10 +13,8 @@ import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
-import { ParameterState } from "../common/store/componentParamReducer";
-import store, { getComponentState } from "../common/store/store";
-import { useAppDispatch } from "../common/store/hooks";
 import useTabNavigation from "../../hooks/useTabNavigation";
+import useFetchData from "../../hooks/useFetchData";
 
 export interface ResultCard {
   content?: OGCCollection;
@@ -57,23 +53,14 @@ const ResultCards = ({
 }: ResultCardsProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
 
-  const dispatch = useAppDispatch();
-
   const goToDetailPage = useTabNavigation();
 
-  const fetchMore = useCallback(async () => {
-    // This is very specific to how elastic works and then how to construct the query
-    const componentParam: ParameterState = getComponentState(store.getState());
-    // Use standard param to get fields you need, record is stored in redux,
-    // set page so that it return fewer records and append the search_after
-    // to go the next batch of record.
-    const paramPaged = createSearchParamFrom(componentParam, {
-      pagesize: DEFAULT_SEARCH_PAGE,
-      searchafter: contents.result.search_after,
-    });
-    // Must use await so that record updated before you exit this call
-    await dispatch(fetchResultAppendStore(paramPaged));
-  }, [dispatch, contents.result.search_after]);
+  const { fetchMore } = useFetchData();
+
+  const loadMoreResults = useCallback(
+    () => fetchMore(DEFAULT_SEARCH_PAGE),
+    [fetchMore]
+  );
 
   const count = contents.result.collections.length;
 
@@ -102,10 +89,10 @@ const ResultCards = ({
         id="result-card-load-more-btn"
         title="Show more results"
         isBordered={false}
-        onClick={fetchMore}
+        onClick={loadMoreResults}
       />
     );
-  }, [fetchMore]);
+  }, [loadMoreResults]);
 
   const renderCells = useCallback(
     ({
@@ -224,7 +211,6 @@ const ResultCards = ({
   // logic .clentHeight.height have values. In short it fill the
   // whole area.
   // *** We need to dsiplay the load more button, hence item count + 1 ***
-  // TODO: implement FULL_LIST view in the future
   if (
     !layout ||
     layout === SearchResultLayoutEnum.LIST ||

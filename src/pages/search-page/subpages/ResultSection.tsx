@@ -15,12 +15,13 @@ import { OGCCollection } from "../../../components/common/store/OGCCollectionDef
 import FullListAndDetails from "../../../components/result/FullListAndDetails";
 
 interface ResultSectionProps {
+  showFullMap: boolean;
+  showFullList: boolean;
   currentSort: SortResultEnum | null;
   currentLayout: Exclude<
     SearchResultLayoutEnum,
     SearchResultLayoutEnum.FULL_MAP
   > | null;
-  selectedLayout: SearchResultLayoutEnum;
   onChangeLayout: (layout: SearchResultLayoutEnum) => void;
   onChangeSorting: (v: SortResultEnum) => void;
   isLoading: boolean;
@@ -31,7 +32,8 @@ interface ResultSectionProps {
 const RESULT_SECTION_WIDTH = 500;
 
 const ResultSection: FC<ResultSectionProps> = ({
-  selectedLayout,
+  showFullList,
+  showFullMap,
   currentLayout,
   onChangeLayout,
   currentSort,
@@ -44,17 +46,13 @@ const ResultSection: FC<ResultSectionProps> = ({
     searchQueryResult
   );
 
-  const isFullMapView = selectedLayout === SearchResultLayoutEnum.FULL_MAP;
-  const isFullListAndDetailsView =
-    selectedLayout === SearchResultLayoutEnum.FULL_LIST;
-
   // Early return if it is full map view or no reduxContents
-  if (isFullMapView || !reduxContents) return null;
+  if (showFullMap || !reduxContents) return null;
 
   return (
     <Box
       sx={{
-        width: isFullListAndDetailsView ? "100%" : RESULT_SECTION_WIDTH,
+        width: showFullList ? "100%" : RESULT_SECTION_WIDTH,
         height: "100%",
         display: "flex",
         flexDirection: "column",
@@ -74,7 +72,7 @@ const ResultSection: FC<ResultSectionProps> = ({
           onChangeSorting={onChangeSorting}
         />
       </Box>
-      {isFullListAndDetailsView ? (
+      {showFullList ? (
         <Box sx={{ flex: 1, overflowY: "auto" }}>
           <FullListAndDetails
             onClickCard={onClickCard}

@@ -429,33 +429,33 @@ const SearchPage = () => {
       >
         <Box>
           <ResultSection
+            showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
+            showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}
             onClickCard={onClickCard}
             selectedUuids={selectedUuids}
             currentSort={currentSort}
             onChangeSorting={onChangeSorting}
             currentLayout={currentLayout}
-            selectedLayout={selectedLayout}
             onChangeLayout={onChangeLayout}
             isLoading={isLoading(loadingThreadCount)}
           />
         </Box>
-        {selectedLayout !== SearchResultLayoutEnum.FULL_LIST && (
-          <Box flex={1}>
-            <MapSection
-              collections={layers}
-              bbox={bbox}
-              zoom={zoom}
-              showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
-              selectedUuids={selectedUuids}
-              onMapZoomOrMove={onMapZoomOrMove}
-              onToggleClicked={onToggleDisplay}
-              onClickMapPoint={onClickMapPoint}
-              onClickAccordion={onClickAccordion}
-              onRemoveFromPinList={onRemoveFromPinList}
-              isLoading={isLoading(loadingThreadCount)}
-            />
-          </Box>
-        )}
+        <Box flex={1}>
+          <MapSection
+            showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
+            showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}
+            collections={layers}
+            bbox={bbox}
+            zoom={zoom}
+            selectedUuids={selectedUuids}
+            onMapZoomOrMove={onMapZoomOrMove}
+            onToggleClicked={onToggleDisplay}
+            onClickMapPoint={onClickMapPoint}
+            onClickAccordion={onClickAccordion}
+            onRemoveFromPinList={onRemoveFromPinList}
+            isLoading={isLoading(loadingThreadCount)}
+          />
+        </Box>
       </Box>
     </Layout>
   );
