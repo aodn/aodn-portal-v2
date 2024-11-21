@@ -30,9 +30,6 @@ import DimensionsIcon from "../../../../components/icon/Dimensions";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import Controls from "../../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
-import MenuControl, {
-  BaseMapSwitcher,
-} from "../../../../components/map/mapbox/controls/MenuControl";
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
 import Map from "../../../../components/map/mapbox/Map";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
@@ -45,6 +42,8 @@ import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSy
 import PolygonSelection from "../../../../components/map/mapbox/controls/PolygonSelection";
 import MapContext from "../../../../components/map/mapbox/MapContext";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
+import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
+import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 
 interface DownloadSelect {
   label?: string;

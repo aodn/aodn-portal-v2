@@ -20,25 +20,27 @@ import {
 import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import { ItemCardProps } from "./ResultCards";
+import { ResultCard } from "./ResultCards";
 
-interface ListResultCardProps extends ItemCardProps {}
+interface ListResultCardProps extends ResultCard {}
 
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
   content,
   onClickCard = () => {},
-  onClickDetail,
-  onClickLinks,
-  onClickDownload,
-  isSelectedDataset,
+  onClickDetail = () => {},
+  onClickLinks = () => {},
+  onClickDownload = () => {},
+  selectedUuid,
+  sx,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
   if (!content) return;
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
 
-  // TODO: buttons are changed, but the behaviors are fake / wrong
+  const isSelectedDataset = uuid === selectedUuid;
+
   return (
     <Card
       id={`result-card-${uuid}`}
@@ -56,6 +58,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
         borderRadius: borderRadius.small,
         paddingX: padding.medium,
         paddingY: padding.small,
+        ...sx,
       }}
       onMouseEnter={() => setShowButtons(true)}
       onMouseLeave={() => setShowButtons(false)}
@@ -97,7 +100,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
           </CardActionArea>
         </Tooltip>
 
-        <CardActionArea onClick={() => onClickCard(uuid)} sx={{ flex: 1 }}>
+        <CardActionArea onClick={() => onClickCard(content)} sx={{ flex: 1 }}>
           <Typography
             arial-label="result-list-card-content"
             color={fontColor.gray.medium}

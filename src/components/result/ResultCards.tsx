@@ -1,75 +1,228 @@
-import { useCallback, useRef } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef } from "react";
+import { FixedSizeList, ListChildComponentProps } from "react-window";
+import AutoSizer, { Size } from "react-virtualized-auto-sizer";
+import { Box, Grid, ListItem, SxProps } from "@mui/material";
 import {
   CollectionsQueryType,
-  createSearchParamFrom,
-  DEFAULT_SEARCH_PAGE,
-  fetchResultAppendStore,
+  DEFAULT_SEARCH_PAGE_SIZE,
+  FULL_LIST_PAGE_SIZE,
 } from "../common/store/searchReducer";
-import { FixedSizeList, ListChildComponentProps } from "react-window";
-import { Box, Grid, ListItem, SxProps, Theme } from "@mui/material";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import AutoSizer, { Size } from "react-virtualized-auto-sizer";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
-import SelectedListCard from "./SelectedListCard";
-import SelectedGridCard from "./SelectedGridCard";
-import { ParameterState } from "../common/store/componentParamReducer";
-import store, { getComponentState } from "../common/store/store";
-import { useAppDispatch } from "../common/store/hooks";
 import useTabNavigation from "../../hooks/useTabNavigation";
+import useFetchData from "../../hooks/useFetchData";
 
-export interface ItemCardProps {
+export interface ResultCard {
   content?: OGCCollection;
-  onClickCard?: (uuid: string) => void;
-  onClickDetail: (uuid: string) => void;
-  onClickDownload: (uuid: string) => void;
-  onClickLinks: (uuid: string) => void;
-  isSelectedDataset?: boolean;
+  onClickCard?: (item: OGCCollection | undefined) => void;
+  onClickDetail?: (uuid: string) => void;
+  onClickDownload?: (uuid: string) => void;
+  onClickLinks?: (uuid: string) => void;
+  selectedUuid?: string;
+  sx?: SxProps;
+}
+
+interface ResultCards extends ResultCard {
+  count: number;
+  total: number;
+  contents: CollectionsQueryType;
+  renderLoadMoreButton: () => JSX.Element;
+  child: ListChildComponentProps;
 }
 
 interface ResultCardsProps {
-  content?: OGCCollection;
-  onClickCard?: (uuid: string) => void;
+  layout: Exclude<
+    SearchResultLayoutEnum,
+    SearchResultLayoutEnum.FULL_MAP
+  > | null;
   contents: CollectionsQueryType;
-  layout?: SearchResultLayoutEnum | null;
-  sx?: SxProps<Theme>;
-  datasetsSelected?: OGCCollection[];
+  onClickCard: ((item: OGCCollection | undefined) => void) | undefined;
+  selectedUuids: string[];
+  sx?: SxProps;
 }
 
-const ResultCards = ({
+const renderGridView: FC<ResultCards> = ({
+  count,
+  total,
   contents,
+  onClickCard,
+  onClickDetail,
+  onClickLinks,
+  onClickDownload,
+  renderLoadMoreButton,
+  selectedUuid,
+  child,
+}) => {
+  const { index, style } = child;
+  const leftIndex = index * 2;
+  const rightIndex = leftIndex + 1;
+
+  if (leftIndex >= count && leftIndex <= total) {
+    // We need to display load more button/placeholder in the last index place
+    return (
+      <ListItem
+        sx={{
+          display: "flex",
+          alignItems: "flex-start", // Aligns the Box to the top of the ListItem
+          justifyContent: "center", // Centers the Box horizontally
+        }}
+        style={style}
+      >
+        {count !== total ? renderLoadMoreButton() : null}
+      </ListItem>
+    );
+  } else {
+    return (
+      <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
+        <Grid container height="100%">
+          <Grid item xs={6} sx={{ pr: 0.5 }}>
+            <GridResultCard
+              content={contents.result.collections[leftIndex]}
+              onClickCard={onClickCard}
+              onClickDetail={onClickDetail}
+              onClickLinks={onClickLinks}
+              onClickDownload={onClickDownload}
+              selectedUuid={selectedUuid}
+            />
+          </Grid>
+          {rightIndex < contents.result.collections.length && (
+            <Grid item xs={6} sx={{ pl: 0.5 }}>
+              <GridResultCard
+                content={contents.result.collections[rightIndex]}
+                onClickCard={onClickCard}
+                onClickDetail={onClickDetail}
+                onClickLinks={onClickLinks}
+                onClickDownload={onClickDownload}
+                selectedUuid={selectedUuid}
+              />
+            </Grid>
+          )}
+        </Grid>
+      </ListItem>
+    );
+  }
+};
+
+const renderListView: FC<ResultCards> = ({
+  count,
+  total,
+  contents,
+  onClickCard,
+  onClickDetail,
+  onClickLinks,
+  onClickDownload,
+  renderLoadMoreButton,
+  selectedUuid,
+  child,
+}) => {
+  // The style must pass to the listitem else incorrect rendering
+  const { index, style } = child;
+
+  if (index === count && index < total) {
+    // We need to display load more button/placeholder in the last index place
+    return (
+      <ListItem
+        id="result-card-load-more-btn"
+        sx={{
+          display: "flex",
+          alignItems: "flex-start", // Aligns the Box to the top of the ListItem
+          justifyContent: "center", // Centers the Box horizontally
+        }}
+        style={style}
+      >
+        {renderLoadMoreButton()}
+      </ListItem>
+    );
+  } else {
+    return (
+      <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
+        <ListResultCard
+          content={contents.result.collections[index]}
+          onClickCard={onClickCard}
+          onClickDetail={onClickDetail}
+          onClickLinks={onClickLinks}
+          onClickDownload={onClickDownload}
+          selectedUuid={selectedUuid}
+        />
+      </ListItem>
+    );
+  }
+};
+
+const renderFullListView: FC<Partial<ResultCards>> = ({
+  sx = {} as SxProps,
+  contents,
+  count,
+  total,
+  renderLoadMoreButton,
+  onClickCard,
+  onClickDetail,
+  onClickLinks,
+  onClickDownload,
+  selectedUuid,
+}) => {
+  if (!count || !total || !contents) return;
+  return (
+    <Box sx={{ ...sx }}>
+      <Grid container spacing={1}>
+        {contents.result.collections.map((collection) => (
+          <Grid item xs={12} md={6} lg={4} key={collection.id}>
+            <ListResultCard
+              content={collection}
+              onClickCard={onClickCard}
+              onClickDetail={onClickDetail}
+              onClickLinks={onClickLinks}
+              onClickDownload={onClickDownload}
+              selectedUuid={selectedUuid}
+            />
+          </Grid>
+        ))}
+        {renderLoadMoreButton && count < total && (
+          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+            {renderLoadMoreButton()}
+          </Grid>
+        )}
+      </Grid>
+    </Box>
+  );
+};
+
+const ResultCards: FC<ResultCardsProps> = ({
   layout,
+  contents,
+  onClickCard,
   sx,
-  datasetsSelected,
-  onClickCard = () => {},
-}: ResultCardsProps) => {
+  selectedUuids,
+}) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
 
-  // Get contents from redux
-  const dispatch = useAppDispatch();
   const goToDetailPage = useTabNavigation();
-  const fetchMore = useCallback(async () => {
-    // This is very specific to how elastic works and then how to construct the query
-    const componentParam: ParameterState = getComponentState(store.getState());
-    // Use standard param to get fields you need, record is stored in redux,
-    // set page so that it return fewer records and append the search_after
-    // to go the next batch of record.
-    const paramPaged = createSearchParamFrom(componentParam, {
-      pagesize: DEFAULT_SEARCH_PAGE,
-      searchafter: contents.result.search_after,
-    });
-    // Must use await so that record updated before you exit this call
-    await dispatch(fetchResultAppendStore(paramPaged));
-  }, [dispatch, contents.result.search_after]);
 
-  const hasSelectedDatasets = datasetsSelected && datasetsSelected.length > 0;
+  const { fetchMore } = useFetchData();
 
-  const count = contents.result.collections.length;
-  const total = contents.result.total;
+  const loadMoreResults = useCallback(
+    () =>
+      fetchMore(
+        layout === SearchResultLayoutEnum.FULL_LIST
+          ? FULL_LIST_PAGE_SIZE
+          : DEFAULT_SEARCH_PAGE_SIZE
+      ),
+    [fetchMore, layout]
+  );
+
+  const count = useMemo(
+    () => contents.result.collections.length,
+    [contents.result.collections.length]
+  );
+
+  const total = useMemo(() => contents.result.total, [contents.result.total]);
+
+  const selectedUuid = useMemo(() => selectedUuids[0], [selectedUuids]);
 
   const onClickDetail = useCallback(
     (uuid: string) => goToDetailPage(uuid, "abstract"),
@@ -86,167 +239,75 @@ const ResultCards = ({
     [goToDetailPage]
   );
 
+  // Fetching more data for full list view if the initial records less than 20
+  useEffect(() => {
+    if (
+      layout === SearchResultLayoutEnum.FULL_LIST &&
+      count < total &&
+      count < 20
+    ) {
+      fetchMore(FULL_LIST_PAGE_SIZE);
+    }
+  }, [count, fetchMore, layout, total]);
+
   const renderLoadMoreButton = useCallback(() => {
     return (
       <DetailSubtabBtn
         id="result-card-load-more-btn"
         title="Show more results"
         isBordered={false}
-        onClick={fetchMore}
+        onClick={loadMoreResults}
       />
     );
-  }, [fetchMore]);
+  }, [loadMoreResults]);
 
-  const renderCells = useCallback(
-    (
-      count: number,
-      total: number,
-      { contents, onClickCard }: ResultCardsProps,
-      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
-      child: ListChildComponentProps
-    ) => {
-      const { index, style } = child;
+  if (!contents) return;
 
-      const leftIndex = index * 2;
-      const rightIndex = leftIndex + 1;
-
-      if (leftIndex >= count && leftIndex <= total) {
-        // We need to display load more button/placeholder in the last index place
-        return (
-          <ListItem
-            sx={{
-              display: "flex",
-              alignItems: "flex-start", // Aligns the Box to the top of the ListItem
-              justifyContent: "center", // Centers the Box horizontally
-            }}
-            style={style}
-          >
-            {count !== total ? renderLoadMoreButton() : null}
-          </ListItem>
-        );
-      } else {
-        return (
-          <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
-            <Grid container height="100%">
-              <Grid item xs={6} sx={{ pr: 0.5 }}>
-                <GridResultCard
-                  content={contents.result.collections[leftIndex]}
-                  onClickCard={onClickCard}
-                  onClickDetail={onClickDetail}
-                  onClickLinks={onClickLinks}
-                  onClickDownload={onClickDownload}
-                />
-              </Grid>
-              {rightIndex < contents.result.collections.length && (
-                <Grid item xs={6} sx={{ pl: 0.5 }}>
-                  <GridResultCard
-                    content={contents.result.collections[rightIndex]}
-                    onClickCard={onClickCard}
-                    onClickDetail={onClickDetail}
-                    onClickLinks={onClickLinks}
-                    onClickDownload={onClickDownload}
-                  />
-                </Grid>
-              )}
-            </Grid>
-          </ListItem>
-        );
-      }
-    },
-    [renderLoadMoreButton]
-  );
-
-  const renderRows = useCallback(
-    (
-      count: number,
-      total: number,
-      { contents, onClickCard }: ResultCardsProps,
-      { onClickDetail, onClickLinks, onClickDownload }: ItemCardProps,
-      child: ListChildComponentProps
-    ) => {
-      // The style must pass to the listitem else incorrect rendering
-      const { index, style } = child;
-
-      if (index === count && index < total) {
-        // We need to display load more button/placeholder in the last index place
-        return (
-          <ListItem
-            id="result-card-load-more-btn"
-            sx={{
-              display: "flex",
-              alignItems: "flex-start", // Aligns the Box to the top of the ListItem
-              justifyContent: "center", // Centers the Box horizontally
-            }}
-            style={style}
-          >
-            {renderLoadMoreButton()}
-          </ListItem>
-        );
-      } else {
-        return (
-          <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
-            <ListResultCard
-              content={contents.result.collections[index]}
-              onClickCard={onClickCard}
-              onClickDetail={onClickDetail}
-              onClickLinks={onClickLinks}
-              onClickDownload={onClickDownload}
-            />
-          </ListItem>
-        );
-      }
-    },
-    [renderLoadMoreButton]
-  );
-
-  // You must set the height to 100% of view height so the calculation
-  // logic .clentHeight.height have values. In short it fill the
-  // whole area.
-  // *** We need to dsiplay the load more button, hence item count + 1 ***
-  // TODO: implement FULL_LIST view in the future
-  if (
-    !layout ||
-    layout === SearchResultLayoutEnum.LIST ||
-    layout === SearchResultLayoutEnum.FULL_LIST
-  ) {
+  if (layout === SearchResultLayoutEnum.FULL_LIST) {
+    return renderFullListView({
+      sx,
+      contents,
+      count,
+      total,
+      renderLoadMoreButton,
+      onClickCard,
+      onClickDetail,
+      onClickLinks,
+      onClickDownload,
+      selectedUuid,
+    });
+  } else if (layout === SearchResultLayoutEnum.GRID) {
+    // You must set the height to 100% of view height so the calculation
+    // logic .clentHeight.height have values. In short it fill the
+    // whole area.
+    // *** We need to dsiplay the load more button, hence item count + 1 ***
     return (
       <Box
         sx={{ ...sx, height: "100%" }}
         ref={componentRef}
-        data-testid="resultcard-result-list"
+        data-testid="resultcard-result-grid"
       >
-        {hasSelectedDatasets && (
-          <SelectedListCard
-            content={datasetsSelected[0]}
-            onClickCard={onClickCard}
-            onClickDetail={onClickDetail}
-            onClickDownload={onClickDownload}
-            onClickLinks={onClickLinks}
-          />
-        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - LIST_CARD_HEIGHT : height}
+              height={height}
               width={width}
-              itemSize={LIST_CARD_HEIGHT}
-              itemCount={count + 1}
+              itemSize={GRID_CARD_HEIGHT}
+              itemCount={Math.ceil(count / 2) + 1}
             >
               {(child: ListChildComponentProps) =>
-                renderRows(
+                renderGridView({
                   count,
                   total,
-                  {
-                    contents,
-                    onClickCard,
-                  },
-                  {
-                    onClickDetail,
-                    onClickLinks,
-                    onClickDownload,
-                  },
-                  child
-                )
+                  contents,
+                  onClickCard,
+                  onClickDetail,
+                  onClickLinks,
+                  onClickDownload,
+                  renderLoadMoreButton,
+                  selectedUuid,
+                  child,
+                })
               }
             </FixedSizeList>
           )}
@@ -254,45 +315,34 @@ const ResultCards = ({
       </Box>
     );
   } else {
-    // or else render grid view
+    // default list view
     return (
       <Box
         sx={{ ...sx, height: "100%" }}
         ref={componentRef}
-        data-testid="resultcard-result-grid"
+        data-testid="resultcard-result-list"
       >
-        {hasSelectedDatasets && (
-          <SelectedGridCard
-            content={datasetsSelected[0]}
-            onClickCard={onClickCard}
-            onClickDetail={onClickDetail}
-            onClickDownload={onClickDownload}
-            onClickLinks={onClickLinks}
-          />
-        )}
         <AutoSizer>
           {({ height, width }: Size) => (
             <FixedSizeList
-              height={hasSelectedDatasets ? height - GRID_CARD_HEIGHT : height}
+              height={height}
               width={width}
-              itemSize={GRID_CARD_HEIGHT}
-              itemCount={Math.ceil(count / 2) + 1}
+              itemSize={LIST_CARD_HEIGHT}
+              itemCount={count + 1}
             >
               {(child: ListChildComponentProps) =>
-                renderCells(
+                renderListView({
                   count,
                   total,
-                  {
-                    contents,
-                    onClickCard,
-                  },
-                  {
-                    onClickDetail,
-                    onClickLinks,
-                    onClickDownload,
-                  },
-                  child
-                )
+                  contents,
+                  onClickCard,
+                  onClickDetail,
+                  onClickLinks,
+                  onClickDownload,
+                  renderLoadMoreButton,
+                  selectedUuid,
+                  child,
+                })
               }
             </FixedSizeList>
           )}

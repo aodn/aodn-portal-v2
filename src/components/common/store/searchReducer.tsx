@@ -58,7 +58,8 @@ interface ObjectValue {
   collectionsQueryResult: CollectionsQueryType;
   parameterVocabsResult: Array<Vocab>;
 }
-export const DEFAULT_SEARCH_PAGE = 11;
+export const DEFAULT_SEARCH_PAGE_SIZE = 11;
+export const FULL_LIST_PAGE_SIZE = 21;
 
 const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
 

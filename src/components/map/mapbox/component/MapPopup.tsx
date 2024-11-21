@@ -15,15 +15,9 @@ import { Box, Card, CardContent, CircularProgress } from "@mui/material";
 import { MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Feature, Point } from "geojson";
-import {
-  fetchResultNoStore,
-  SearchParameters,
-} from "../../../common/store/searchReducer";
+import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
 import AppTheme from "../../../../utils/AppTheme";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "../../../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import BasicMapHoverTip from "../../../common/hover-tip/BasicMapHoverTip";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
@@ -113,13 +107,9 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
 
   const getCollectionData = useCallback(
     async (uuid: string) => {
-      const param: SearchParameters = {
-        filter: `id='${uuid}'`,
-      };
-
-      return dispatch(fetchResultNoStore(param))
+      return dispatch(fetchResultByUuidNoStore(uuid))
         .unwrap()
-        .then((value: OGCCollections) => value.collections[0])
+        .then((collection: OGCCollection) => collection)
         .catch((error: any) => {
           console.error("Error fetching collection data:", error);
           // TODO: handle error in ErrorBoundary
