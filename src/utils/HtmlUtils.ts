@@ -1,12 +1,19 @@
 import DOMPurify from "dompurify";
 
-class InnerHtmlHelper {
+class InnerHtmlBuilder {
   private html: string = "";
   constructor() {}
 
-  public addText(text: string): void {
+  public addTitle(title: string): InnerHtmlBuilder {
+    const sanitizedTitle = DOMPurify.sanitize(title);
+    this.html = `<b>${sanitizedTitle}</b>` + "<br>" + this.html;
+    return this;
+  }
+
+  public addText(text: string): InnerHtmlBuilder {
     const sanitizedText = DOMPurify.sanitize(text) + "<br>";
     this.html += sanitizedText;
+    return this;
   }
 
   /**
@@ -15,14 +22,21 @@ class InnerHtmlHelper {
    * @param startValue
    * @param endValue
    */
-  public addRange(title: string, startValue: string, endValue: string): void {
+  public addRange(
+    title: string,
+    startValue: string,
+    endValue: string
+  ): InnerHtmlBuilder {
     const sanitizedTitle = DOMPurify.sanitize(title);
     const sanitizedStartValue = DOMPurify.sanitize(startValue);
     const sanitizedEndValue = DOMPurify.sanitize(endValue);
     this.html += `${sanitizedTitle}: ${sanitizedStartValue} to ${sanitizedEndValue}<br>`;
+    return this;
   }
 
   public getHtml(): string {
     return this.html;
   }
 }
+
+export { InnerHtmlBuilder };
