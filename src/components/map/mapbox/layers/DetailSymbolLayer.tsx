@@ -22,6 +22,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import legend1_img from "@/assets/images/legend1.png";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
+import _ from "lodash";
 
 interface DetailClusterSize {
   default?: number | string;
@@ -109,19 +110,20 @@ const DetailSymbolLayer: FC<LayersProps> = ({
     [map]
   );
 
+  // TODO: still have bugs here, so i set default value to 2 to avoid the error
+  //  as a temporary solution.
+  //  The bug is: if querying featureCollection is slow, the maxCount will be the
+  //  default value 2, and the layer will not be rendered correctly (no opacity change).
+  //  Will fix it later as it is not a critical issue.
   const maxCount = useMemo(() => {
-    let maxCount = 0;
-    if (featureCollection && featureCollection.features) {
-      featureCollection.features.forEach((feature) => {
-        if (feature.properties?.count) {
-          if (feature.properties.count > maxCount) {
-            maxCount = feature.properties.count;
-          }
-        }
-      });
-    }
-    return maxCount;
-  }, [featureCollection]);
+    const maxCountFeature = _.maxBy(
+      featureCollection.features,
+      (feature) => feature.properties?.count
+    );
+    return maxCountFeature && maxCountFeature.properties
+      ? maxCountFeature.properties.count
+      : 2;
+  }, [featureCollection.features]);
 
   const clusterSourceId = useMemo(() => `${layerId}-source`, [layerId]);
 
