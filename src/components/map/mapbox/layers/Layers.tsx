@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
-import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
+import { LngLatBounds, MapMouseEvent, LngLat } from "mapbox-gl";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 import * as turf from "@turf/turf";
@@ -29,6 +29,30 @@ const createStaticLayers = (ids: Array<string>) => (
     })}
   </>
 );
+// Use to handle bounds across meridian
+const splitLngLatBounds = (bounds: LngLatBounds): Array<LngLatBounds> => {
+  const sw = bounds.getSouthWest(); // Southwest corner
+  const ne = bounds.getNorthEast(); // Northeast corner
+
+  // Check if the bounds cross the anti-meridian
+  if (ne.lng < sw.lng) {
+    // Split into two parts: one from -180 to 180 and one from 180 to -180
+
+    const leftBounds = new LngLatBounds(
+      new LngLat(sw.lng, sw.lat), // Left side (from -180 to 180)
+      new LngLat(180, ne.lat)
+    );
+
+    const rightBounds = new LngLatBounds(
+      new LngLat(-180, sw.lat), // Right side (from 180 to -180)
+      new LngLat(ne.lng, ne.lat)
+    );
+
+    return [leftBounds, rightBounds];
+  }
+  // If it doesn't cross the anti-meridian, return the original bounds
+  return [bounds];
+};
 
 // Function to check if a point is within the map's visible bounds
 const isFeatureVisible = (
@@ -36,7 +60,9 @@ const isFeatureVisible = (
   bounds: LngLatBounds
 ): boolean => {
   const coordinates = feature.geometry.coordinates as [number, number];
-  return bounds.contains(coordinates);
+  return splitLngLatBounds(bounds).some((polygon) =>
+    polygon.contains(coordinates)
+  );
 };
 
 // Function to determine the most "visible" point
@@ -117,4 +143,5 @@ export {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
+  isFeatureVisible,
 };
