@@ -4800,6 +4800,7 @@ __metadata:
     axios: "npm:^1.7.4"
     commitlint-config-gitmoji: "npm:^2.3.1"
     dayjs: "npm:^1.11.10"
+    dompurify: "npm:^3.2.0"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
     eslint-import-resolver-alias: "npm:^1.1.2"
@@ -6185,6 +6186,13 @@ __metadata:
   version: 3.1.5
   resolution: "dompurify@npm:3.1.5"
   checksum: 10c0/8227fb1328c02d94f823de8cd499fca5ee07051e03e6b52bce06b592348aeb6e56ea8e2a4b0a9cfaeac7d623e4b5a52e4326aedf72596a6c2510b88dfcf2a2b6
+  languageName: node
+  linkType: hard
+
+"dompurify@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "dompurify@npm:3.2.0"
+  checksum: 10c0/c06af011b14b415439acb5ea5d32c1971e3f1888983e1430e8aeb1ae3871709aab3dc510cfe5ceccfc459e839f66e37e40836eda0673feb696b84d8b285e69f3
   languageName: node
   linkType: hard
 

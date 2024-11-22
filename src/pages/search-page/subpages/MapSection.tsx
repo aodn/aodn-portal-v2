@@ -76,7 +76,7 @@ const MapSection: React.FC<MapSectionProps> = ({
         case LayerName.Heatmap:
           return (
             <HeatmapLayer
-              features={generateFeatureCollectionFrom(collections)}
+              featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
               showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
@@ -87,7 +87,7 @@ const MapSection: React.FC<MapSectionProps> = ({
         default:
           return (
             <ClusterLayer
-              features={generateFeatureCollectionFrom(collections)}
+              featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
               showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}

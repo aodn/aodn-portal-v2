@@ -106,7 +106,7 @@ const getUnclusterPointLayerId = (layerId: string) =>
   `${layerId}-uncluster-point-layer`;
 
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
-  features = generateFeatureCollectionFrom(undefined),
+  featureCollection = generateFeatureCollectionFrom(undefined),
   selectedUuids,
   showFullMap,
   onDatasetSelected,
@@ -309,7 +309,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   const updateSource = useCallback(() => {
     setLastVisiblePoint((p) => {
-      const newData = findSuitableVisiblePoint(features, map, p);
+      const newData = findSuitableVisiblePoint(featureCollection, map, p);
       if (map?.getSource(heatmapSourceId)) {
         (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
       }
@@ -318,7 +318,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       }
       return newData;
     });
-  }, [features, map, heatmapSourceId, clusterSourceId]);
+  }, [featureCollection, map, heatmapSourceId, clusterSourceId]);
 
   useEffect(() => {
     updateSource();
