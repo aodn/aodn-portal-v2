@@ -14,6 +14,8 @@ describe("findMostVisiblePoint", () => {
       return {
         ...actual,
         Map: vi.fn().mockImplementation(() => ({
+          // This is the current visible area of the map,
+          // we mock some random value to make test work
           getBounds: vi.fn().mockReturnValue({
             getSouthWest: () => [-203.62, -43.828],
             getNorthEast: () => [-142.79, -8.759],
