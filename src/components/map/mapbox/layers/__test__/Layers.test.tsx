@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { FeatureCollection, Point } from "geojson";
 import { findSuitableVisiblePoint } from "../Layers";
-import { Map } from "mapbox-gl";
+import { LngLatBounds, Map } from "mapbox-gl";
 
 // Define the test
 describe("findMostVisiblePoint", () => {
@@ -15,6 +15,8 @@ describe("findMostVisiblePoint", () => {
         ...actual,
         Map: vi.fn().mockImplementation(() => ({
           getBounds: vi.fn().mockReturnValue({
+            getSouthWest: () => [-203.62, -43.828],
+            getNorthEast: () => [-142.79, -8.759],
             contains: vi.fn().mockReturnValue(true),
           }),
           getCenter: vi.fn().mockReturnValue({
