@@ -29,23 +29,30 @@ const createStaticLayers = (ids: Array<string>) => (
     })}
   </>
 );
+
+const normalizeLongitude = (lng: number) =>
+  ((((lng + 180) % 360) + 360) % 360) - 180;
+
 // Use to handle bounds across meridian
 const splitLngLatBounds = (bounds: LngLatBounds): Array<LngLatBounds> => {
   const sw = bounds.getSouthWest(); // Southwest corner
   const ne = bounds.getNorthEast(); // Northeast corner
 
+  // We need to make it between -180 to 180 for checking
+  const normalNeLng = normalizeLongitude(ne.lng);
+  const normalSwLng = normalizeLongitude(sw.lng);
   // Check if the bounds cross the anti-meridian
-  if (ne.lng < sw.lng) {
+  if (normalNeLng < normalSwLng) {
     // Split into two parts: one from -180 to 180 and one from 180 to -180
 
     const leftBounds = new LngLatBounds(
-      new LngLat(sw.lng, sw.lat), // Left side (from -180 to 180)
+      new LngLat(normalSwLng, sw.lat), // Left side (from -180 to 180)
       new LngLat(180, ne.lat)
     );
 
     const rightBounds = new LngLatBounds(
       new LngLat(-180, sw.lat), // Right side (from 180 to -180)
-      new LngLat(ne.lng, ne.lat)
+      new LngLat(normalNeLng, ne.lat)
     );
 
     return [leftBounds, rightBounds];

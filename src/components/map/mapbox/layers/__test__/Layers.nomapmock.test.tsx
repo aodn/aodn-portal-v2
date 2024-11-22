@@ -33,8 +33,8 @@ describe("Test case where no map mock needed", () => {
     };
 
     const bounds: LngLatBounds = new LngLatBounds([
-      [142.59, -46.021],
-      [203.4169, -10.956],
+      [-203.62, -43.828],
+      [-142.79, -8.759],
     ]);
     // We set a LngLat where x is < -180 to create anti-meridian
     expect(isFeatureVisible(target, bounds)).toBeTruthy();
