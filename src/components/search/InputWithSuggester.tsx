@@ -198,7 +198,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 2], // Vertical offset
+              offset: [0, 5], // Vertical offset
             },
           },
           {
@@ -208,6 +208,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         ]}
         style={{
           width: suggesterWidth,
+          borderRadius: borderRadius.small,
         }}
       />
     );

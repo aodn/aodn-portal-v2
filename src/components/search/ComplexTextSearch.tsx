@@ -1,13 +1,32 @@
-import React, { Dispatch, FC, useCallback, useState } from "react";
-import { Box, Paper } from "@mui/material";
+import React, {
+  Dispatch,
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { Box, Button, Fade, Paper, Popper, Typography } from "@mui/material";
 import AdvanceFilters from "../common/filters/AdvanceFilters";
 import InputWithSuggester from "./InputWithSuggester";
-import { border, borderRadius, color } from "../../styles/constants";
+import { border, borderRadius, color, padding } from "../../styles/constants";
 import SearchbarButtonGroup, {
   SearchbarButtonNames,
 } from "./SearchbarButtonGroup";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
+import FilterSection from "../common/filters/FilterSection";
+import DateRangeFilter from "../common/filters/DateRangeFilter";
+import {
+  ParameterState,
+  updateDateTimeFilterRange,
+  updateImosOnly,
+  updateParameterVocabs,
+  updateUpdateFreq,
+} from "../common/store/componentParamReducer";
+import store, { getComponentState } from "../common/store/store";
+import { useAppDispatch } from "../common/store/hooks";
+import { POPUP_MIN_WIDTH } from "./constants";
 
 interface ComplexTextSearchProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -16,11 +35,20 @@ interface ComplexTextSearchProps {
 const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
   setShouldExpandSearchbar,
 }) => {
+  const dispatch = useAppDispatch();
+
+  const [open, setOpen] = useState(false);
+
+  const boxRef = useRef<HTMLDivElement>(null);
+
   const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
     SearchbarButtonNames.Filter
   );
 
-  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const componentParam = getComponentState(store.getState());
+  // State used to store the provisional filter options selected,
+  // only dispatch to redux when 'apply' button is hit
+  const [filter, setFilter] = useState<ParameterState>(componentParam);
 
   // set the default value to false to allow user do search without typing anything
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
@@ -45,8 +73,70 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
     [pendingSearch, redirectSearch]
   );
 
+  const handleClickButton = useCallback(
+    (button: SearchbarButtonNames) => {
+      if (open) {
+        // If clicking the same button that's currently active, just close the popup
+        if (button === activeButton) {
+          setOpen(false);
+          return;
+        }
+
+        // If switching to a different button, close then reopen
+        setOpen(false);
+        setTimeout(() => {
+          setOpen(true);
+          setActiveButton(button);
+        }, 200);
+      } else {
+        // If popup is closed, simply open it
+        setOpen(true);
+        setActiveButton(button);
+      }
+    },
+    [open, activeButton]
+  );
+
+  // TODO: always need to clear the filter on close if not hit 'apply'
+  const handleClosePopup = useCallback(() => setOpen(false), [setOpen]);
+
+  // TODO: implement DataDeliveryModeFilter and DepthFilter when backend supports this query
+  const handleApplyFilter = useCallback(
+    (filter: ParameterState) => {
+      // Must use await so that it happen one by one, otherwise the update will be messed
+      if (filter.dateTimeFilterRange) {
+        dispatch(updateDateTimeFilterRange(filter.dateTimeFilterRange));
+      } else {
+        dispatch(updateDateTimeFilterRange({}));
+      }
+      if (filter.parameterVocabs) {
+        dispatch(updateParameterVocabs(filter.parameterVocabs));
+      } else {
+        dispatch(updateParameterVocabs([]));
+      }
+      if (filter.isImosOnlyDataset) {
+        dispatch(updateImosOnly(filter.isImosOnlyDataset));
+      } else {
+        dispatch(updateImosOnly(false));
+      }
+      if (filter.updateFreq) {
+        dispatch(updateUpdateFreq(filter.updateFreq));
+      } else {
+        dispatch(updateUpdateFreq(undefined));
+      }
+      setFilter({});
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    if (componentParam) {
+      setFilter(componentParam);
+    }
+  }, [componentParam, setFilter]);
+
   return (
-    <Box width="100%">
+    <Box width="100%" ref={boxRef}>
       <Paper
         ref={ref}
         elevation={0}
@@ -66,16 +156,90 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
           suggesterWidth={searchbarWidth}
         />
         <SearchbarButtonGroup
-          setShowFilters={setShowFilters}
           pendingSearch={pendingSearch}
           activeButton={activeButton}
-          setActiveButton={setActiveButton}
+          handleClickButton={handleClickButton}
         />
       </Paper>
-      <AdvanceFilters
-        showFilters={showFilters}
-        setShowFilters={setShowFilters}
-      />
+      <Popper
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: [0, 4],
+            },
+          },
+          {
+            name: "flip",
+            enabled: false,
+          },
+        ]}
+        style={{
+          width: searchbarWidth,
+          minWidth: POPUP_MIN_WIDTH,
+          borderRadius: borderRadius.small,
+          zIndex: 99,
+        }}
+        open={open}
+        anchorEl={boxRef.current}
+        placement="bottom-end"
+        transition
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={200}>
+            <Paper sx={{ borderRadius: borderRadius.small }}>
+              {activeButton === SearchbarButtonNames.Date && (
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="end"
+                  padding={padding.large}
+                >
+                  <FilterSection
+                    title="Date Range"
+                    toolTip="Recorded time span of the data"
+                    isTitleOnlyHeader
+                  >
+                    <DateRangeFilter filter={filter} setFilter={setFilter} />
+                  </FilterSection>
+                  <Button
+                    sx={{
+                      width: "100px",
+                      border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+                      "&:hover": {
+                        border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+                        backgroundColor: color.blue.darkSemiTransparent,
+                      },
+                    }}
+                    onClick={() => handleApplyFilter(filter)}
+                  >
+                    Apply
+                  </Button>
+                </Box>
+              )}
+              {activeButton === SearchbarButtonNames.Area && (
+                <Box>
+                  <FilterSection
+                    title="Area"
+                    toolTip="Filter by area"
+                    isTitleOnlyHeader
+                  >
+                    <Typography>Location Placeholder</Typography>
+                  </FilterSection>
+                </Box>
+              )}
+              {activeButton === SearchbarButtonNames.Filter && (
+                <AdvanceFilters
+                  handleCloseFilter={handleClosePopup}
+                  filter={filter}
+                  setFilter={setFilter}
+                  handleApplyFilter={handleApplyFilter}
+                />
+              )}
+            </Paper>
+          </Fade>
+        )}
+      </Popper>
     </Box>
   );
 };

@@ -1,11 +1,12 @@
-import { Dispatch, FC, useCallback } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { Tune } from "@mui/icons-material";
 import { Stack } from "@mui/material";
 import SearchbarExpandableButton from "./SearchbarExpandableButton";
 import SearchIcon from "@mui/icons-material/Search";
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import PlaceIcon from "@mui/icons-material/Place";
 import { borderRadius, color, fontWeight, gap } from "../../styles/constants";
-import { useSelector } from "react-redux";
-import { getComponentState, RootState } from "../common/store/store";
+import store, { getComponentState } from "../common/store/store";
 import { ParameterState } from "../common/store/componentParamReducer";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
@@ -13,69 +14,115 @@ import { capitalizeFirstLetter } from "../../utils/StringUtils";
 export enum SearchbarButtonNames {
   Search = "search",
   Filter = "filter",
+  Date = "date",
+  Area = "area",
 }
 interface SearchbarButtonGroupProps {
   pendingSearch: boolean;
-  setShowFilters: Dispatch<React.SetStateAction<boolean>>;
   activeButton: SearchbarButtonNames;
-  setActiveButton: Dispatch<React.SetStateAction<SearchbarButtonNames>>;
+  handleClickButton: (button: SearchbarButtonNames) => void;
 }
 
-const checkFilterCount = (filterObj: ParameterState) => {
+const checkCount = ({
+  filterObj,
+  type,
+}: {
+  filterObj: ParameterState;
+  type: SearchbarButtonNames;
+}): number => {
   let count = 0;
 
-  if (
-    filterObj.dateTimeFilterRange?.start !== undefined &&
-    filterObj.dateTimeFilterRange?.end !== undefined
-  ) {
-    count++;
-  }
+  switch (type) {
+    case SearchbarButtonNames.Date:
+      return filterObj.dateTimeFilterRange?.start !== undefined &&
+        filterObj.dateTimeFilterRange?.end !== undefined
+        ? 1
+        : 0;
 
-  if (filterObj.isImosOnlyDataset === true) {
-    count++;
-  }
+    case SearchbarButtonNames.Filter:
+      if (filterObj.isImosOnlyDataset === true) {
+        count++;
+      }
 
-  if (filterObj.parameterVocabs) {
-    count += filterObj.parameterVocabs.length;
-  }
+      if (filterObj.parameterVocabs) {
+        count += filterObj.parameterVocabs.length;
+      }
 
-  if (filterObj.updateFreq !== undefined) {
-    count++;
-  }
+      if (filterObj.updateFreq !== undefined) {
+        count++;
+      }
 
-  return count;
+      return count;
+
+    default:
+      return 0;
+  }
 };
 
 const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   pendingSearch,
-  setShowFilters,
   activeButton,
-  setActiveButton,
+  handleClickButton,
 }) => {
+  const componentParams: ParameterState = getComponentState(store.getState());
+
   const redirectSearch = useRedirectSearch();
 
   const handleSearchClick = useCallback(() => {
-    setActiveButton(SearchbarButtonNames.Search);
+    handleClickButton(SearchbarButtonNames.Search);
     if (!pendingSearch) redirectSearch("ComplexTextSearch");
-  }, [pendingSearch, redirectSearch, setActiveButton]);
+  }, [handleClickButton, pendingSearch, redirectSearch]);
 
-  const handleFilterClick = useCallback(() => {
-    setShowFilters(true);
-    setActiveButton(SearchbarButtonNames.Filter);
-  }, [setActiveButton, setShowFilters]);
+  const dateCount = useMemo(
+    () =>
+      checkCount({
+        filterObj: componentParams,
+        type: SearchbarButtonNames.Date,
+      }),
+    [componentParams]
+  );
 
-  const filterCount: number = useSelector((state: RootState) => {
-    const componentParams = getComponentState(state);
-    return checkFilterCount(componentParams);
-  });
+  const areaCount = useMemo(
+    () =>
+      checkCount({
+        filterObj: componentParams,
+        type: SearchbarButtonNames.Area,
+      }),
+    [componentParams]
+  );
+
+  const filterCount = useMemo(
+    () =>
+      checkCount({
+        filterObj: componentParams,
+        type: SearchbarButtonNames.Filter,
+      }),
+    [componentParams]
+  );
 
   return (
     <Stack height="100%" direction="row" spacing={0.5} padding={gap.sm}>
       <SearchbarExpandableButton
+        icon={<DateRangeIcon />}
+        text={capitalizeFirstLetter(SearchbarButtonNames.Date)}
+        badgeContent={dateCount}
+        dotBadge
+        onClick={() => handleClickButton(SearchbarButtonNames.Date)}
+        showText={activeButton === SearchbarButtonNames.Date}
+      />
+      <SearchbarExpandableButton
+        icon={<PlaceIcon />}
+        text={capitalizeFirstLetter(SearchbarButtonNames.Area)}
+        badgeContent={areaCount}
+        dotBadge
+        onClick={() => handleClickButton(SearchbarButtonNames.Area)}
+        showText={activeButton === SearchbarButtonNames.Area}
+      />
+      <SearchbarExpandableButton
         icon={<Tune />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Filter)}
         badgeContent={filterCount}
-        onClick={handleFilterClick}
+        onClick={() => handleClickButton(SearchbarButtonNames.Filter)}
         showText={activeButton === SearchbarButtonNames.Filter}
         data-testid="filtersBtn"
       />

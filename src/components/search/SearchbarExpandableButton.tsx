@@ -43,6 +43,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
       badgeContent={badgeContent}
       variant={dotBadge ? "dot" : "standard"}
       position={Position.TopRight}
+      sx={{ padding: 0 }}
     >
       <Button
         fullWidth
