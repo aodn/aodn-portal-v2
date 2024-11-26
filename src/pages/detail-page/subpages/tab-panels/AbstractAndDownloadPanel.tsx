@@ -39,7 +39,7 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
-import PolygonSelection from "../../../../components/map/mapbox/controls/PolygonSelection";
+import DetailMapControls from "../../../../components/map/mapbox/controls/DetailMapControlPanel/DetailMapControls";
 import MapContext from "../../../../components/map/mapbox/MapContext";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
@@ -140,12 +140,12 @@ const DOWNLOAD_SECTION_ID = "download-section";
 const TRUNCATE_COUNT = 800;
 
 const AbstractAndDownloadPanel: FC = () => {
-  const { collection, features } = useDetailPageContext();
+  const { collection, features, setDownloadConditions } =
+    useDetailPageContext();
   const downloadSectionRef = useScrollToSection({
     sectionId: DOWNLOAD_SECTION_ID,
   });
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
@@ -209,7 +209,14 @@ const AbstractAndDownloadPanel: FC = () => {
                         />
                       }
                     />
-                    <MenuControl menu={<PolygonSelection map={map} />} />
+                    <MenuControl
+                      menu={
+                        <DetailMapControls
+                          map={map}
+                          setDownloadConditions={setDownloadConditions}
+                        />
+                      }
+                    />
                   </Controls>
                   <Layers>
                     <DetailSymbolLayer featureCollection={features} />

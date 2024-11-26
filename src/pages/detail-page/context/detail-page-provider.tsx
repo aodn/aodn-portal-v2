@@ -9,6 +9,10 @@ import { OGCCollection } from "../../../components/common/store/OGCCollectionDef
 import { useAppDispatch } from "../../../components/common/store/hooks";
 import { HttpStatusCode } from "axios";
 import { FeatureCollection, Point } from "geojson";
+import {
+  DownloadConditionType,
+  IDownloadCondition,
+} from "./DownloadDefinitions";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -27,6 +31,20 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   >(undefined);
   const [isCollectionNotFound, setIsCollectionNotFound] =
     useState<boolean>(false);
+  const [downloadConditions, _setDownloadConditions] = useState<
+    IDownloadCondition[]
+  >([]);
+  const setDownloadConditions = (
+    type: DownloadConditionType,
+    conditions: IDownloadCondition[]
+  ) => {
+    _setDownloadConditions((prev) => {
+      return prev
+        .filter((condition) => condition.type !== type)
+        .concat(conditions);
+    });
+  };
+
   const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
   const [extentsPhotos, setExtentsPhotos] = useState<SpatialExtentPhoto[]>([]);
   const [photoHovered, setPhotoHovered] = useState<SpatialExtentPhoto>();
@@ -76,6 +94,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setCollection,
         features,
         isCollectionNotFound,
+        downloadConditions,
+        setDownloadConditions,
         photos,
         setPhotos,
         extentsPhotos,
