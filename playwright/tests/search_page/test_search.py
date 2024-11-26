@@ -8,6 +8,7 @@ from mocks.api.search_sort import (
     handle_sort_by_title,
 )
 from mocks.api_router import ApiRouter
+from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
@@ -70,3 +71,30 @@ def test_search_result_sort(page_mock: Page, sort_type: SearchSortType) -> None:
     updated_first_title = search_page.first_result_title.inner_text()
 
     assert initial_first_title != updated_first_title
+
+
+@pytest.mark.parametrize(
+    'search_text',
+    [
+        'plankton biomass',
+    ],
+)
+def test_search_input_persistence_after_navigation(
+    page_mock: Page, search_text: str
+) -> None:
+    landing_page = LandingPage(page_mock)
+    search_page = SearchPage(page_mock)
+    detail_page = DetailPage(page_mock)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    search_page.search.fill_search_text(search_text)
+    search_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    search_page.first_result_title.click()
+    detail_page.go_back_button.click()
+
+    expect(search_page.search.search_field).to_have_value(search_text)
