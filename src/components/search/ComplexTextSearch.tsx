@@ -16,7 +16,6 @@ import SearchbarButtonGroup, {
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
 import FilterSection from "../common/filters/FilterSection";
-import DateRangeFilter from "../common/filters/DateRangeFilter";
 import {
   ParameterState,
   updateDateTimeFilterRange,
@@ -27,6 +26,7 @@ import {
 import store, { getComponentState } from "../common/store/store";
 import { useAppDispatch } from "../common/store/hooks";
 import { POPUP_MIN_WIDTH } from "./constants";
+import DateRange from "../common/filters/DateRange";
 
 interface ComplexTextSearchProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -187,35 +187,25 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
       >
         {({ TransitionProps }) => (
           <Fade {...TransitionProps} timeout={200}>
-            <Paper sx={{ borderRadius: borderRadius.small }}>
+            <Paper
+              elevation={1}
+              sx={{
+                borderRadius: borderRadius.small,
+                bgcolor: color.blue.xLight,
+              }}
+            >
               {activeButton === SearchbarButtonNames.Date && (
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="end"
-                  padding={padding.large}
-                >
-                  <FilterSection
-                    title="Date Range"
-                    toolTip="Recorded time span of the data"
-                    isTitleOnlyHeader
-                  >
-                    <DateRangeFilter filter={filter} setFilter={setFilter} />
-                  </FilterSection>
-                  <Button
-                    sx={{
-                      width: "100px",
-                      border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                      "&:hover": {
-                        border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                        backgroundColor: color.blue.darkSemiTransparent,
-                      },
-                    }}
-                    onClick={() => handleApplyFilter(filter)}
-                  >
-                    Apply
-                  </Button>
-                </Box>
+                // <FilterSection
+                //   title="Date Range"
+                //   toolTip="Recorded time span of the data"
+                //   isTitleOnlyHeader
+                // >
+                <DateRange
+                  filter={filter}
+                  setFilter={setFilter}
+                  handleApplyFilter={handleApplyFilter}
+                />
+                // </FilterSection>
               )}
               {activeButton === SearchbarButtonNames.Area && (
                 <Box>

@@ -18,7 +18,7 @@ import { dateDefault } from "../common/constants";
 export const DEFAULT_DATE_PICKER_SLOT = {
   desktopPaper: {
     sx: {
-      border: border.xs,
+      border: `${border.sm} ${color.blue.darkSemiTransparent}`,
       borderRadius: borderRadius.small,
       width: "350px",
       ".MuiPickersYear-yearButton": {
