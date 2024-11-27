@@ -50,6 +50,7 @@ const ResultListLayoutButton: FC<
   return (
     <IconSelect
       items={MAP_VIEW_SELECT}
+      data-testid="result-layout-button"
       selectName="View"
       onSelectCallback={onChangeLayout}
       value={currentLayout}

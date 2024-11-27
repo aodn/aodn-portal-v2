@@ -383,7 +383,8 @@ const createSearchParamFrom = (
   }
 
   if (i.polygon) {
-    const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
+    //const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
+    const f = cqlDefaultFilters.get("BBOX_POLYGON") as PolygonOperation;
     p.filter = appendFilter(p.filter, f(i.polygon));
   }
 
