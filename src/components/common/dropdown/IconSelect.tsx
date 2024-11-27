@@ -81,6 +81,7 @@ const IconSelect = <T extends string | number = string>({
   value,
   colorConfig,
   onSelectCallback,
+  "data-testid": testId,
   sx,
 }: IconSelectProps<T>) => {
   const [selectedItem, setSelectedItem] = useState<T | null>(value ?? null);
@@ -138,6 +139,7 @@ const IconSelect = <T extends string | number = string>({
         renderValue={(value) =>
           selectedItem ? selectedValue(value) : defaultValue()
         }
+        data-testid={testId}
         onChange={handleOnChange}
         onOpen={handleOpen}
         onClose={handleClose}

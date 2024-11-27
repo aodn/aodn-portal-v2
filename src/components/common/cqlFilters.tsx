@@ -8,6 +8,7 @@ import { Feature, Polygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
 import { Vocab } from "./store/componentParamReducer";
 import { DatasetFrequency } from "./store/searchReducer";
+import { bbox } from "@turf/turf";
 
 // TODO: refactor this, naming like this is not ideal for readability,
 //  what are T, J, R, p, i , j, c, d, x, y, z, etc. actually mean?
@@ -46,6 +47,11 @@ const funcIntersectPolygon: PolygonOperation = (p) => {
   const geojson = p.geometry as wellknown.GeoJSONGeometry;
   const wkt = wellknown.stringify(geojson);
   return `INTERSECTS(geometry,${wkt})`;
+};
+
+const funcBBoxPolygon: PolygonOperation = (p) => {
+  const [minx, miny, maxx, maxy] = bbox(p);
+  return `BBOX(geometry,${minx},${miny},${maxx},${maxy})`;
 };
 
 const funcParameterVocabs: ParameterVocabsIn = (vocabs: Array<Vocab>) => {
@@ -99,6 +105,7 @@ cqlDefaultFilters
   .set("AFTER_TIME", funcTemporalAfter)
   .set("BEFORE_TIME", funcTemporalBefore)
   .set("INTERSECT_POLYGON", funcIntersectPolygon)
+  .set("BBOX_POLYGON", funcBBoxPolygon)
   .set("UPDATE_FREQUENCY", funcUpdateFrequency);
 
 export { cqlDefaultFilters };
