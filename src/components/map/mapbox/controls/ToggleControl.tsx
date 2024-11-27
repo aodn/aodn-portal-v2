@@ -1,7 +1,7 @@
 import { IControl, Map } from "mapbox-gl";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../MapContext";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -70,7 +70,6 @@ class ToggleControlClass implements IControl {
   }
 
   onRemove(_: Map): void {
-    console.log("onRemove toggle button");
     if (this.container?.parentNode) {
       // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
       // Keep the old pointer

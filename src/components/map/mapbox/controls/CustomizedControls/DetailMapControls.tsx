@@ -1,84 +1,57 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { BBox, Polygon } from "geojson";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Polygon } from "geojson";
 import * as turf from "@turf/turf";
 import { Map } from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import DrawRectangle from "./DrawRectangle";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import CustomDrawControl from "./CustomDrawControl";
+import DrawRectangleControl from "./DrawRectangleControl";
+import {
+  BBoxCondition,
+  DownloadConditionType,
+  IDownloadCondition,
+} from "../../../../../pages/detail-page/context/DownloadDefinitions";
 
 interface DetailMapControlPanelProps {
   map: Map | undefined | null;
+  setDownloadConditions: (
+    type: DownloadConditionType,
+    conditions: IDownloadCondition[]
+  ) => void;
+  draw: MapboxDraw;
 }
 
-const DetailMapControlPanel: React.FC<DetailMapControlPanelProps> = ({
+const DetailMapControls: React.FC<DetailMapControlPanelProps> = ({
   map,
+  setDownloadConditions,
+  draw,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
-  const [selectedBBoxes, setSelectedBBoxes] = useState<Array<BBox>>([]);
-  const addSelectedBBox = useCallback((bbox: BBox) => {
-    setSelectedBBoxes((prev) => [...prev, bbox]);
-  }, []);
-  const removeSelectedBBox = useCallback((bbox: BBox) => {
-    setSelectedBBoxes((prev) => prev.filter((b) => b !== bbox));
-  }, []);
-
-  useEffect(() => {
-    console.log("selectedBBoxes", selectedBBoxes);
-  }, [selectedBBoxes]);
 
   const anchorRef = useRef(null);
   const popperRef = useRef<HTMLDivElement>(null);
 
-  const draw = useMemo(
-    () =>
-      new MapboxDraw({
-        displayControlsDefault: false,
-        controls: {
-          polygon: true,
-          trash: true,
-        },
-        defaultMode: "draw_polygon",
-        modes: {
-          ...MapboxDraw.modes,
-          draw_rectangle: DrawRectangle,
-        },
-      }),
-    []
-  );
-
-  const handleAddBBox = useCallback(() => {
-    setOpen(false);
-  }, []);
-
-  useEffect(() => {
-    console.log("aaamap", map);
-  }, [map]);
-
   const updateArea = useCallback(() => {
-    console.log("updateArea");
     const features = draw.getAll().features;
-    const bboxes: BBox[] = [];
+    const bboxes: BBoxCondition[] = [];
     features.forEach((feature) => {
       const geo = feature.geometry;
       if (geo.type === "Polygon") {
         const polygon = geo as Polygon;
         const bbox = turf.bbox(polygon);
         if (bbox) {
-          bboxes.push(bbox);
+          const id = feature.id
+            ? typeof feature.id === "string"
+              ? feature.id
+              : feature.id.toString()
+            : "";
+          bboxes.push(new BBoxCondition(bbox, id));
         }
       }
-      setSelectedBBoxes(bboxes);
     });
-  }, [draw]);
+    setDownloadConditions(DownloadConditionType.BBOX, bboxes);
+  }, [draw, setDownloadConditions]);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (!popperRef.current || !anchorRef.current) {
@@ -103,7 +76,7 @@ const DetailMapControlPanel: React.FC<DetailMapControlPanelProps> = ({
 
   useEffect(() => {
     if (map) {
-      map.addControl(new CustomDrawControl(draw), "top-right");
+      map.addControl(new DrawRectangleControl(draw), "top-right");
       map.addControl(draw);
 
       map.on("draw.create", updateArea);
@@ -118,9 +91,9 @@ const DetailMapControlPanel: React.FC<DetailMapControlPanelProps> = ({
       map.off("draw.update", updateArea);
       map.removeControl(draw);
     };
-  }, [map]);
+  }, [draw, map, updateArea]);
 
   return <></>;
 };
 
-export default DetailMapControlPanel;
+export default DetailMapControls;
