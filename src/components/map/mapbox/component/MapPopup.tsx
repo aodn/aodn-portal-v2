@@ -6,7 +6,6 @@ import {
   useContext,
   useEffect,
   useImperativeHandle,
-  useMemo,
   useState,
 } from "react";
 import { createRoot } from "react-dom/client";
@@ -19,12 +18,10 @@ import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
 import AppTheme from "../../../../utils/AppTheme";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
-import BasicMapHoverTip from "../../../common/hover-tip/BasicMapHoverTip";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 
 interface MapPopupProps {
   layerId: string;
-  popupType?: PopupType;
   onDatasetSelected?: (uuid: Array<string>) => void;
   tabNavigation?: (uuid: string, tab: string, section?: string) => void;
 }
@@ -32,25 +29,14 @@ export interface MapPopupRef {
   forceRemovePopup: () => void;
 }
 
-export enum PopupType {
-  Basic = "basic",
-  Complex = "complex",
-}
-
 interface PopupConfig {
   popupWidth: number;
   popupHeight: number;
 }
 
-const defaultPopupConfig: Record<PopupType, PopupConfig> = {
-  basic: {
-    popupWidth: 250,
-    popupHeight: 50,
-  },
-  complex: {
-    popupWidth: 250,
-    popupHeight: 370,
-  },
+const defaultPopupConfig: PopupConfig = {
+  popupWidth: 250,
+  popupHeight: 370,
 };
 
 const popup = new Popup({
@@ -92,15 +78,11 @@ const handleDatasetSelect = (
 };
 
 const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  { layerId, onDatasetSelected, tabNavigation, popupType = PopupType.Basic },
+  { layerId, onDatasetSelected, tabNavigation },
   ref
 ) => {
   const dispatch = useAppDispatch();
   const { map } = useContext(MapContext);
-  const { popupHeight, popupWidth } = useMemo(
-    () => defaultPopupConfig[popupType],
-    [popupType]
-  );
   const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
   const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
   const [popupContent, setPopupContent] = useState<ReactNode | null>(null);
@@ -129,8 +111,8 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
           <Card
             elevation={0}
             sx={{
-              height: popupHeight,
-              width: popupWidth,
+              height: defaultPopupConfig.popupHeight,
+              width: defaultPopupConfig.popupWidth,
               borderRadius: 0,
             }}
             onMouseEnter={() => setIsMouseOverPopup(true)}
@@ -141,30 +123,19 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
                 padding: 0,
               }}
             >
-              {popupType === PopupType.Basic && (
-                <BasicMapHoverTip
-                  content={collection?.title}
-                  onDatasetSelected={() =>
-                    handleDatasetSelect(collection.id, onDatasetSelected)
-                  }
-                  sx={{ height: popupHeight }}
-                />
-              )}
-              {popupType === PopupType.Complex && (
-                <ComplexMapHoverTip
-                  collection={collection}
-                  onDatasetSelected={() =>
-                    handleDatasetSelect(collection.id, onDatasetSelected)
-                  }
-                  tabNavigation={tabNavigation}
-                />
-              )}
+              <ComplexMapHoverTip
+                collection={collection}
+                onDatasetSelected={() =>
+                  handleDatasetSelect(collection.id, onDatasetSelected)
+                }
+                tabNavigation={tabNavigation}
+              />
             </CardContent>
           </Card>
         </ThemeProvider>
       );
     },
-    [onDatasetSelected, popupHeight, popupType, popupWidth, tabNavigation]
+    [onDatasetSelected, tabNavigation]
   );
 
   const removePopup = useCallback(() => {
@@ -212,7 +183,12 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         const coordinates = geometry.coordinates.slice();
 
         // Render a loading state in the popup
-        setPopupContent(renderLoadingBox({ popupHeight, popupWidth }));
+        setPopupContent(
+          renderLoadingBox({
+            popupHeight: defaultPopupConfig.popupHeight,
+            popupWidth: defaultPopupConfig.popupWidth,
+          })
+        );
 
         // Set the popup's position and content, then add it to the map
         // subscribe to close event to clean up resource.
@@ -226,7 +202,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         setPopupContent(renderContentBox(collection));
       }
     },
-    [map, popupHeight, popupWidth, getCollectionData, renderContentBox]
+    [map, getCollectionData, renderContentBox]
   );
 
   useEffect(() => {
