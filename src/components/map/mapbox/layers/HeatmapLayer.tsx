@@ -15,7 +15,7 @@ import {
   findSuitableVisiblePoint,
   LayersProps,
 } from "./Layers";
-import MapPopup, { PopupType } from "../component/MapPopup";
+import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
@@ -108,7 +108,6 @@ const getUnclusterPointLayerId = (layerId: string) =>
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
   featureCollection = generateFeatureCollectionFrom(undefined),
   selectedUuids,
-  showFullMap,
   onDatasetSelected,
   tabNavigation,
   heatmapLayerConfig,
@@ -332,7 +331,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     <>
       <MapPopup
         layerId={unClusterPointLayer}
-        popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
         tabNavigation={tabNavigation}
       />
@@ -347,7 +345,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unClusterPointLayer}
         onDatasetSelected={onDatasetSelected}
-        showFullMap={showFullMap}
         tabNavigation={tabNavigation}
       />
       <TestHelper getHeatmapLayer={() => heatmapLayer} />
