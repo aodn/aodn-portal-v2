@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { server } from "../../../__mocks__/server";
 import store from "../../../components/common/store/store";
@@ -41,7 +41,7 @@ describe("SearchPage", () => {
   });
   it("The map should be able to expand properly", async () => {
     const user = userEvent.setup();
-    render(
+    const { findByText, queryByText, queryByTestId, findByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -51,17 +51,23 @@ describe("SearchPage", () => {
       </Provider>
     );
 
-    // Find and open the Select component
-    const selectElement = screen.getByText("View");
-    await user.click(selectElement);
+    waitFor(() => findByTestId("result-layout-button")).then(() => {
+      // Find and open the Select component
+      const selectElement = queryByTestId(
+        "result-layout-button"
+      ) as HTMLButtonElement;
+      user.click(selectElement);
 
-    // Find and click the "Full Map View" option
-    const fullMapViewOption = screen.getByText("Full Map View");
-    await user.click(fullMapViewOption);
+      // Find and click the "Full Map View" option
+      const fullMapViewOption = queryByText(
+        "Full Map View"
+      ) as HTMLButtonElement;
+      user.click(fullMapViewOption);
 
-    // Should not be there if full map view clicked
-    const list = screen.queryByTestId("search-page-result-list");
-    expect(list).not.toBeInTheDocument();
+      // Should not be there if full map view clicked
+      const list = queryByTestId("search-page-result-list");
+      expect(list).not.toBeInTheDocument();
+    });
   });
 
   it("The list should be able to show in list / grid view", async () => {
@@ -76,46 +82,49 @@ describe("SearchPage", () => {
       </Provider>
     );
     // Pretend user enter wave and press two enter in search box
-    const input = (await findByTestId(
-      "input-with-suggester"
-    )) as HTMLInputElement;
-    await userEvent.type(input, "wave");
-    await userEvent.type(input, "{enter}{enter}");
-    expect(input.value).toEqual("wave");
+    waitFor(() => findByTestId("input-with-suggester")).then(async () => {
+      const input = (await findByTestId(
+        "input-with-suggester"
+      )) as HTMLInputElement;
 
-    const list = await findByTestId("search-page-result-list");
-    expect(list).toBeDefined();
+      userEvent.type(input, "wave");
+      userEvent.type(input, "{enter}{enter}");
+      expect(input.value).toEqual("wave");
 
-    // Find and open the Select component
-    const selectElement = screen.getByText("View");
-    await user.click(selectElement);
+      const list = await findByTestId("search-page-result-list");
+      expect(list).toBeDefined();
 
-    // Find and click the "Grid and Map" option
-    const gridAndMapOption = screen.getByText("Grid and Map");
-    expect(gridAndMapOption).toBeDefined();
-    await user.click(gridAndMapOption);
+      // Find and open the Select component
+      const selectElement = screen.getByText("View");
+      user.click(selectElement);
 
-    const gridView = await findByTestId("resultcard-result-grid");
-    expect(gridView).toBeInTheDocument();
+      // Find and click the "Grid and Map" option
+      const gridAndMapOption = screen.getByText("Grid and Map");
+      expect(gridAndMapOption).toBeDefined();
+      user.click(gridAndMapOption);
 
-    const gridList = await findAllByTestId("result-card-grid");
-    expect(gridList.length).not.equal(0);
+      const gridView = await findByTestId("resultcard-result-grid");
+      expect(gridView).toBeInTheDocument();
 
-    // Open the Select component again
-    await user.click(selectElement);
+      const gridList = await findAllByTestId("result-card-grid");
+      expect(gridList.length).not.equal(0);
 
-    // Find and click the "List and Map" option
-    const listAndMapOption = screen.getByText("List and Map");
-    expect(listAndMapOption).toBeInTheDocument();
-    await user.click(listAndMapOption);
+      // Open the Select component again
+      user.click(selectElement);
 
-    const listList = await findAllByTestId("result-card-list");
-    expect(listList.length).not.equal(0);
-    // Clear after test
-    userEvent.clear(input);
+      // Find and click the "List and Map" option
+      const listAndMapOption = screen.getByText("List and Map");
+      expect(listAndMapOption).toBeInTheDocument();
+      user.click(listAndMapOption);
+
+      const listList = await findAllByTestId("result-card-list");
+      expect(listList.length).not.equal(0);
+      // Clear after test
+      userEvent.clear(input);
+    });
   }, 60000);
 
-  it("Change sort order load correct record", async () => {
+  it("Change sort order load correct record", () => {
     const user = userEvent.setup();
     const { findByTestId } = render(
       <Provider store={store}>
@@ -127,35 +136,37 @@ describe("SearchPage", () => {
       </Provider>
     );
     // Pretend user enter wave and press two enter in search box
-    const input = (await findByTestId(
-      "input-with-suggester"
-    )) as HTMLInputElement;
+    waitFor(() => findByTestId("input-with-suggester")).then(async () => {
+      const input = (await findByTestId(
+        "input-with-suggester"
+      )) as HTMLInputElement;
+      userEvent.type(input, "imos");
+      userEvent.type(input, "{enter}{enter}");
 
-    await userEvent.type(input, "imos");
-    await userEvent.type(input, "{enter}{enter}");
-    expect(input.value).toEqual("imos");
+      waitFor(() => expect(input.value).toEqual("imos")).then(async () => {
+        const list = await findByTestId("search-page-result-list");
+        expect(list).toBeDefined();
 
-    const list = await findByTestId("search-page-result-list");
-    expect(list).toBeDefined();
-    // Find the last record in the first page
-    let record = await document.getElementById(
-      "result-card-c1344979-f701-0916-e044-00144f7bc0f4"
-    );
-    expect(record).toBeDefined();
+        // Find the last record in the first page
+        let record = await document.getElementById(
+          "result-card-c1344979-f701-0916-e044-00144f7bc0f4"
+        );
+        expect(record).toBeDefined();
+        const loadMore = (await document.getElementById(
+          "result-card-load-more-btn"
+        )) as HTMLButtonElement;
 
-    const loadMore = (await document.getElementById(
-      "result-card-load-more-btn"
-    )) as HTMLButtonElement;
+        expect(loadMore).toBeDefined();
+        await user.click(loadMore);
+        // Find the last record on second page
+        record = await document.getElementById(
+          "result-card-ae70eb18-b1f0-4012-8d62-b03daf99f7f2"
+        );
+        expect(record).toBeDefined();
 
-    expect(loadMore).toBeDefined();
-    await user.click(loadMore);
-    // Find the last record on second page
-    record = await document.getElementById(
-      "result-card-ae70eb18-b1f0-4012-8d62-b03daf99f7f2"
-    );
-    expect(record).toBeDefined();
-
-    // Clear after test
-    userEvent.clear(input);
+        // Clear after test
+        userEvent.clear(input);
+      });
+    });
   }, 60000);
 });
