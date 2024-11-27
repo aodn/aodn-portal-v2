@@ -13,6 +13,24 @@ import {
   DownloadConditionType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import DrawRectangle from "../../../components/map/mapbox/controls/CustomizedControls/DrawRectangle";
+
+import "mapbox-gl/dist/mapbox-gl.css";
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+
+const mapDraw = new MapboxDraw({
+  displayControlsDefault: false,
+  controls: {
+    polygon: true,
+    trash: true,
+  },
+  defaultMode: "draw_polygon",
+  modes: {
+    ...MapboxDraw.modes,
+    draw_rectangle: DrawRectangle,
+  },
+});
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -43,6 +61,12 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         .filter((condition) => condition.type !== type)
         .concat(conditions);
     });
+  };
+  const deleteDownloadConditionBy = (id: string) => {
+    _setDownloadConditions((prev) => {
+      return prev.filter((condition) => condition.id !== id);
+    });
+    mapDraw.delete(id);
   };
 
   const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
@@ -96,6 +120,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         isCollectionNotFound,
         downloadConditions,
         setDownloadConditions,
+        deleteDownloadConditionBy,
+        mapDraw,
         photos,
         setPhotos,
         extentsPhotos,

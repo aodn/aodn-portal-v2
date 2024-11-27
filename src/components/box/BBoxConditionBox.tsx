@@ -4,7 +4,8 @@ import {
   DownloadConditionType,
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import DownloadConditionBox from "./DownloadConditionBox";
-import _ from "lodash";
+import { Grid } from "@mui/material";
+import BBoxItem from "./BBoxItem";
 
 interface BBoxConditionProps {
   bboxCondition: BBoxCondition;
@@ -12,16 +13,17 @@ interface BBoxConditionProps {
 
 const BBoxConditionBox: React.FC<BBoxConditionProps> = ({ bboxCondition }) => {
   const bbox = bboxCondition.bbox;
-  const west = _.round(bbox[0], 2);
-  const east = _.round(bbox[2], 2);
-  const south = _.round(bbox[1], 2);
-  const north = _.round(bbox[3], 2);
   return (
-    <DownloadConditionBox type={DownloadConditionType.BBOX}>
-      <p>W: {west}</p>
-      <p>E: {east}</p>
-      <p>S: {south}</p>
-      <p>N: {north}</p>
+    <DownloadConditionBox
+      type={DownloadConditionType.BBOX}
+      conditionId={bboxCondition.id}
+    >
+      <Grid container sx={{}}>
+        <BBoxItem label={"N"} value={bbox[3]} />
+        <BBoxItem label={"W"} value={bbox[0]} />
+        <BBoxItem label={"S"} value={bbox[1]} />
+        <BBoxItem label={"E"} value={bbox[2]} />
+      </Grid>
     </DownloadConditionBox>
   );
 };

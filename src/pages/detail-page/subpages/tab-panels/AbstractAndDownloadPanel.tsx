@@ -39,7 +39,7 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
-import DetailMapControls from "../../../../components/map/mapbox/controls/DetailMapControlPanel/DetailMapControls";
+import DetailMapControls from "../../../../components/map/mapbox/controls/CustomizedControls/DetailMapControls";
 import MapContext from "../../../../components/map/mapbox/MapContext";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
@@ -140,7 +140,7 @@ const DOWNLOAD_SECTION_ID = "download-section";
 const TRUNCATE_COUNT = 800;
 
 const AbstractAndDownloadPanel: FC = () => {
-  const { collection, features, setDownloadConditions } =
+  const { collection, features, setDownloadConditions, mapDraw } =
     useDetailPageContext();
   const downloadSectionRef = useScrollToSection({
     sectionId: DOWNLOAD_SECTION_ID,
@@ -214,6 +214,7 @@ const AbstractAndDownloadPanel: FC = () => {
                         <DetailMapControls
                           map={map}
                           setDownloadConditions={setDownloadConditions}
+                          draw={mapDraw}
                         />
                       }
                     />

@@ -20,6 +20,8 @@ interface DetailPageContextType {
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
   ) => void;
+  deleteDownloadConditionBy: (id: string) => void;
+  mapDraw: MapboxDraw;
   photos: SpatialExtentPhoto[];
   setPhotos: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   extentsPhotos: SpatialExtentPhoto[] | undefined;
@@ -39,6 +41,8 @@ const DetailPageContextDefault = {
   isCollectionNotFound: false,
   downloadConditions: [],
   setDownloadConditions: () => {},
+  deleteDownloadConditionBy: () => {},
+  mapDraw: {} as MapboxDraw,
   photos: [] as SpatialExtentPhoto[],
   setPhotos: () => {},
   extentsPhotos: [] as SpatialExtentPhoto[],
