@@ -1,12 +1,14 @@
 import { DownloadConditionType } from "../../pages/detail-page/context/DownloadDefinitions";
-import React from "react";
+import React, { useCallback } from "react";
 import { Grid, IconButton, Typography, useTheme } from "@mui/material";
 import bbox from "../../assets/icons/bbox.png";
 import CloseIcon from "@mui/icons-material/Close";
+import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 
 interface DownloadConditionBoxProps {
   type: DownloadConditionType;
   children: React.ReactNode;
+  conditionId: string;
 }
 
 const getIcon = (type: DownloadConditionType) => {
@@ -33,8 +35,15 @@ const getTitle = (type: DownloadConditionType) => {
 const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
   type,
   children,
+  conditionId,
 }) => {
   const theme = useTheme();
+  const { deleteDownloadConditionBy } = useDetailPageContext();
+
+  const onConditionRemove = useCallback(() => {
+    deleteDownloadConditionBy(conditionId);
+  }, [conditionId, deleteDownloadConditionBy]);
+
   return (
     <Grid
       container
@@ -75,7 +84,7 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
         </Grid>
       </Grid>
       <Grid item md={1}>
-        <IconButton>
+        <IconButton onClick={onConditionRemove}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </Grid>

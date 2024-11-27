@@ -39,7 +39,7 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import useScrollToSection from "../../../../hooks/useScrollToSection";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
-import DetailMapControls from "../../../../components/map/mapbox/controls/CustomizedControls/DetailMapControls";
+import DrawControl from "../../../../components/map/mapbox/controls/DrawControl";
 import MapContext from "../../../../components/map/mapbox/MapContext";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
@@ -211,7 +211,7 @@ const AbstractAndDownloadPanel: FC = () => {
                     />
                     <MenuControl
                       menu={
-                        <DetailMapControls
+                        <DrawControl
                           map={map}
                           setDownloadConditions={setDownloadConditions}
                           draw={mapDraw}

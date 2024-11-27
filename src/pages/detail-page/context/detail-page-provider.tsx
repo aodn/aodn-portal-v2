@@ -14,7 +14,7 @@ import {
   IDownloadCondition,
 } from "./DownloadDefinitions";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import DrawRectangle from "../../../components/map/mapbox/controls/CustomizedControls/DrawRectangle";
+import DrawRectangle from "../../../components/map/mapbox/controls/DrawRectangle";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
@@ -22,10 +22,9 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 const mapDraw = new MapboxDraw({
   displayControlsDefault: false,
   controls: {
-    polygon: true,
     trash: true,
   },
-  defaultMode: "draw_polygon",
+  defaultMode: "simple_select",
   modes: {
     ...MapboxDraw.modes,
     draw_rectangle: DrawRectangle,

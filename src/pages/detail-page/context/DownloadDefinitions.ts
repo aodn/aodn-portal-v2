@@ -1,47 +1,36 @@
 import { BBox } from "geojson";
 
-export interface IDownloadCondition {
-  type: DownloadConditionType;
+export enum DownloadConditionType {
+  BBOX = "bbox",
+  TIME_RANGE = "time_range",
 }
 
-export class ITimeRange implements IDownloadCondition {
+export interface IDownloadCondition {
+  type: DownloadConditionType;
+  id: string;
+}
+
+export class TimeRangeCondition implements IDownloadCondition {
   type: DownloadConditionType = DownloadConditionType.TIME_RANGE;
+  id: string;
   start: string;
   end: string;
 
-  constructor(start: string, end: string) {
+  constructor(start: string, end: string, id: string) {
+    this.id = id;
     this.start = start;
     this.end = end;
   }
 }
 
-export class IBBox implements IDownloadCondition {
-  type: DownloadConditionType = DownloadConditionType.BBOX;
-  west: number;
-  south: number;
-  east: number;
-  north: number;
+export class BBoxCondition implements IDownloadCondition {
+  type: DownloadConditionType;
+  bbox: BBox;
+  id: string;
 
-  constructor(bbox: BBox) {
-    this.west = bbox[0];
-    this.south = bbox[1];
-    this.east = bbox[2];
-    this.north = bbox[3];
-  }
-}
-
-export class DownloadConditions {
-  private _conditions: IDownloadCondition[] = [];
-
-  get conditions() {
-    return this._conditions;
-  }
-
-  addCondition(condition: IDownloadCondition) {
-    this._conditions.push(condition);
-  }
-
-  removeCondition(condition: IDownloadCondition) {
-    this._conditions = this._conditions.filter((c) => c !== condition);
+  constructor(bbox: BBox, id: string) {
+    this.type = DownloadConditionType.BBOX;
+    this.id = id;
+    this.bbox = bbox;
   }
 }

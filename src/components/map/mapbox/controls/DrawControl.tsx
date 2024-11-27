@@ -11,9 +11,9 @@ import {
   BBoxCondition,
   DownloadConditionType,
   IDownloadCondition,
-} from "../../../../../pages/detail-page/context/DownloadDefinitions";
+} from "../../../../pages/detail-page/context/DownloadDefinitions";
 
-interface DetailMapControlPanelProps {
+interface DrawControlProps {
   map: Map | undefined | null;
   setDownloadConditions: (
     type: DownloadConditionType,
@@ -22,7 +22,7 @@ interface DetailMapControlPanelProps {
   draw: MapboxDraw;
 }
 
-const DetailMapControls: React.FC<DetailMapControlPanelProps> = ({
+const DrawControl: React.FC<DrawControlProps> = ({
   map,
   setDownloadConditions,
   draw,
@@ -96,4 +96,4 @@ const DetailMapControls: React.FC<DetailMapControlPanelProps> = ({
   return <></>;
 };
 
-export default DetailMapControls;
+export default DrawControl;

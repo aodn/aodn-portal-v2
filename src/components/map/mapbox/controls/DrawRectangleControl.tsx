@@ -1,7 +1,7 @@
 import { IControl, Map } from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { createRoot, Root } from "react-dom/client";
-import BBoxIcon from "../../../../icon/BBoxIcon";
+import BBoxIcon from "../../../icon/BBoxIcon";
 
 class DrawRectangleControl implements IControl {
   private draw: MapboxDraw;
