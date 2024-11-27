@@ -11,15 +11,11 @@ import { FeatureCollection } from "geojson";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { TestHelper } from "../../../common/test/helper";
 
-// Data download from here
-// https://data.gov.au/dataset/ds-dcceew-https%3A%2F%2Fwww.arcgis.com%2Fhome%2Fitem.html%3Fid%3D2b3eb1d42b8d4319900cf4777f0a83b9%26sublayer%3D0/details?q=marine%20park
-import ampJson from "./data/Australian_Marine_Parks.json";
-
 export interface StaticLayersProps {
   id: string;
   name: string;
   label: string;
-  features: FeatureCollection;
+  features?: FeatureCollection;
 }
 
 const StaticLayersDef = {
@@ -129,8 +125,21 @@ const AustraliaMarineParkLayer: FC<Partial<StaticLayersProps>> = ({
   id = StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
   name = StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
   label = StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-  features = ampJson as FeatureCollection,
-}) => <StaticLayer id={id} name={name} label={label} features={features} />;
+}) => {
+  const [data, setData] = useState<FeatureCollection>();
+
+  // Data orginated from here, we store a copy in the following path and useEffect to load it so we do not need to bundle it to the package which make is very big
+  // https://data.gov.au/dataset/ds-dcceew-https%3A%2F%2Fwww.arcgis.com%2Fhome%2Fitem.html%3Fid%3D2b3eb1d42b8d4319900cf4777f0a83b9%26sublayer%3D0/details?q=marine%20park
+  useEffect(() => {
+    fetch("./data/Australian_Marine_Parks.json")
+      .then((response) => response.json())
+      .then((json) => setData(json))
+      .catch((error) => console.error("Error fetching JSON:", error));
+  }, []);
+
+  return <StaticLayer id={id} name={name} label={label} features={data} />;
+};
+
 // Export needed layers
 export { AustraliaMarineParkLayer, StaticLayersDef };
 
