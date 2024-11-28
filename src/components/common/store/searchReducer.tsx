@@ -309,7 +309,7 @@ const calculateScore = (
   base: number | undefined,
   text: string | undefined
 ): number => {
-  const pump = text ? (text.length / 8 > 15 ? 15 : text.length / 8) : 0;
+  const pump = text ? (text.length / 2 > 50 ? 50 : text.length / 2) : 0;
   return base ? Number(base) + Number(pump) : Number(pump);
 };
 // Given a ParameterState object, we convert it to the correct Restful parameters
