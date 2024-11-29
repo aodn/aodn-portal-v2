@@ -16,6 +16,7 @@ import MapContext from "../../../../components/map/mapbox/MapContext";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
+import DateRangeControl from "../../../../components/map/mapbox/controls/DateRangeControl/DateRangeControl";
 
 const TRUNCATE_COUNT = 800;
 
@@ -94,6 +95,7 @@ const AbstractAndDownloadPanel: FC = () => {
                         />
                       }
                     />
+                    <DateRangeControl />
                   </Controls>
                   <Layers>
                     <DetailSymbolLayer featureCollection={features} />

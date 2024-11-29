@@ -7,12 +7,12 @@ import { borderRadius } from "../../../../styles/constants";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 
-interface ToggleControlProps {
+interface ToggleButtonProps {
   showFullMap: boolean;
   onToggleClicked?: (state: boolean) => void;
 }
 
-const ToggleButton: React.FC<ToggleControlProps> = ({
+const ToggleButton: React.FC<ToggleButtonProps> = ({
   showFullMap,
   onToggleClicked,
 }) => {
@@ -46,9 +46,9 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
 class ToggleControlClass implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
-  private props: ToggleControlProps;
+  private props: ToggleButtonProps;
 
-  constructor(props: ToggleControlProps) {
+  constructor(props: ToggleButtonProps) {
     this.props = props;
   }
 
@@ -85,7 +85,7 @@ class ToggleControlClass implements IControl {
 const ToggleControl = ({
   showFullMap = false,
   onToggleClicked = (v: boolean) => {},
-}: ToggleControlProps) => {
+}: ToggleButtonProps) => {
   const { map } = useContext(MapContext);
   const [control, setControl] = useState<ToggleControlClass | null>(null);
 
