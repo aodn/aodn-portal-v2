@@ -1,22 +1,22 @@
 import { FC } from "react";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import Map from "../../components/map/mapbox/Map";
+import Map from "../map/mapbox/Map";
 import Layers from "../map/mapbox/layers/Layers";
 import GeojsonLayer from "../map/mapbox/layers/GeojsonLayer";
-import ResultCardButtonGroup from "./ResultCardButtonGroup";
+import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
 import { fontColor, fontSize, padding } from "../../styles/constants";
 
-interface PinListCardProps {
+interface BookmarkListCardProps {
   collection: OGCCollection;
   sx?: SxProps;
   onDatasetSelected?: () => void;
   tabNavigation?: (uuid: string, tab: string, section?: string) => void;
 }
 
-const mapContainerId = "pin-list-map";
+const mapContainerId = "bookmark-list-map";
 
-const PinListCard: FC<PinListCardProps> = ({
+const BookmarkListCard: FC<BookmarkListCardProps> = ({
   collection,
   onDatasetSelected = () => {},
   tabNavigation = () => {},
@@ -82,4 +82,4 @@ const PinListCard: FC<PinListCardProps> = ({
   );
 };
 
-export default PinListCard;
+export default BookmarkListCard;

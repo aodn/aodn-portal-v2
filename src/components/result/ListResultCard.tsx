@@ -21,6 +21,7 @@ import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCard } from "./ResultCards";
+import BookmarkButton from "../bookmark/BookmarkButton";
 
 interface ListResultCardProps extends ResultCard {}
 
@@ -54,7 +55,9 @@ const ListResultCard: FC<ListResultCardProps> = ({
         flexWrap: "nowrap",
         width: "100%",
         height: "100%",
-        border: isSelectedDataset ? `${border.sm} ${color.blue.dark}` : "none",
+        border: isSelectedDataset
+          ? `${border.sm} ${color.blue.darkSemiTransparent}`
+          : "none",
         borderRadius: borderRadius.small,
         paddingX: padding.medium,
         paddingY: padding.small,
@@ -132,40 +135,28 @@ const ListResultCard: FC<ListResultCardProps> = ({
       <Stack
         direction="column"
         flexWrap="nowrap"
-        justifyContent="center"
-        alignItems="end"
+        justifyContent="space-around"
+        alignItems="center"
         width="120px"
         height="100%"
       >
-        <Box display="flex" flexDirection="row">
-          <OrganizationLogo
-            logo={findIcon()}
-            sx={{
-              width: "auto",
-              maxWidth: "100px",
-              height: "45px",
-              paddingX: padding.extraSmall,
-            }}
-          />
-          {isSelectedDataset && (
-            <Box
-              position="absolute"
-              top={gap.lg}
-              right={gap.lg}
-              height="20px"
-              width="auto"
-            >
-              <img
-                src={MapSpatialExtents}
-                alt="selected dataset"
-                style={{
-                  objectFit: "contain",
-                  width: "100%",
-                  height: "100%",
-                }}
-              />
-            </Box>
-          )}
+        <OrganizationLogo
+          logo={findIcon()}
+          sx={{
+            width: "auto",
+            maxWidth: "100px",
+            height: "45px",
+            paddingX: padding.extraSmall,
+          }}
+        />
+        <Box
+          position="absolute"
+          top={gap.lg}
+          right={gap.lg}
+          height="20px"
+          width="auto"
+        >
+          <BookmarkButton />
         </Box>
         <Box height="90px" width="100%">
           <img

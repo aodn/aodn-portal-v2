@@ -11,6 +11,7 @@ import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
 import Map from "../../map/mapbox/Map";
 import Layers from "../../map/mapbox/layers/Layers";
 import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
+import BookmarkButton from "../../bookmark/BookmarkButton";
 
 interface BasicMapHoverTipProps {
   content?: string | undefined | null;
@@ -40,7 +41,12 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
       <Stack direction="column" spacing={1}>
         <Box>
           <Tooltip title={collection.title} placement="top">
-            <Box display="flex" alignItems="center" height="60px">
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              height="60px"
+            >
               <Typography
                 fontWeight={fontWeight.bold}
                 fontSize={fontSize.info}
@@ -55,6 +61,14 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
               >
                 {collection.title}
               </Typography>
+              <Box
+                display="flex"
+                alignItems="start"
+                justifyContent="center"
+                height="100%"
+              >
+                <BookmarkButton />
+              </Box>
             </Box>
           </Tooltip>
         </Box>

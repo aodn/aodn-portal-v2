@@ -5,9 +5,10 @@ import StyledAccordion from "../common/accordion/StyledAccordion";
 import StyledAccordionSummary from "../common/accordion/StyledAccordionSummary";
 import { color, fontColor, fontSize, fontWeight } from "../../styles/constants";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
-import PinListCard from "./PinListCard";
+import BookmarkListCard from "./BookmarkListCard";
+import BookmarkButton from "./BookmarkButton";
 
-interface PinListAccordionGroupProps {
+interface BookmarkListAccordionGroupProps {
   items: Array<OGCCollection> | undefined;
   onRemoveItem: (item: OGCCollection) => void;
   onClickAccordion: (uuid: string | undefined) => void;
@@ -15,7 +16,7 @@ interface PinListAccordionGroupProps {
   setExpandedItem: Dispatch<React.SetStateAction<OGCCollection | undefined>>;
 }
 
-const PinListAccordionGroup: FC<PinListAccordionGroupProps> = ({
+const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   items,
   onRemoveItem,
   onClickAccordion,
@@ -64,6 +65,7 @@ const PinListAccordionGroup: FC<PinListAccordionGroupProps> = ({
               alignItems="center"
               width="100%"
             >
+              <BookmarkButton />
               <Typography
                 color={fontColor.gray.dark}
                 fontSize={fontSize.label}
@@ -82,6 +84,7 @@ const PinListAccordionGroup: FC<PinListAccordionGroupProps> = ({
               <Button
                 sx={{
                   minWidth: "15px",
+                  maxWidth: "15px",
                   color: color.gray.dark,
                   fontSize: fontSize.icon,
                   fontWeight: fontWeight.bold,
@@ -99,7 +102,7 @@ const PinListAccordionGroup: FC<PinListAccordionGroupProps> = ({
             </Box>
           </StyledAccordionSummary>
           <StyledAccordionDetails>
-            <PinListCard collection={item} />
+            <BookmarkListCard collection={item} />
           </StyledAccordionDetails>
         </StyledAccordion>
       ))}
@@ -107,4 +110,4 @@ const PinListAccordionGroup: FC<PinListAccordionGroupProps> = ({
   );
 };
 
-export default PinListAccordionGroup;
+export default BookmarkListAccordionGroup;

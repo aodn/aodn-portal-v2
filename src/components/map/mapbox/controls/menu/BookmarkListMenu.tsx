@@ -1,18 +1,18 @@
 import { useEffect, useState, useCallback, useRef, FC } from "react";
 import { ControlProps, MenuClickedEvent } from "./Definition";
-import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
+import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { Box, IconButton, Popper } from "@mui/material";
 import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
 import { borderRadius } from "../../../../../styles/constants";
 import EventEmitter from "events";
 import { EVENT_MENU_CLICKED, eventEmitter } from "./MenuControl";
-import PinListAccordionGroup from "../../../../result/PinListAccordionGroup";
-import { PIN_LIST_WIDTH } from "../../../../result/constants";
+import BookmarkListAccordionGroup from "../../../../bookmark/BookmarkListAccordionGroup";
+import { BOOKMARK_LIST_WIDTH } from "../../../../result/constants";
 
-interface PinListMenuProps extends ControlProps {
+interface BookmarkListMenuProps extends ControlProps {
   items?: Array<OGCCollection> | undefined;
   onClickAccordion?: (uuid: string | undefined) => void;
-  onRemoveFromPinList?: (uuid: string) => void;
+  onRemoveFromBookmarkList?: (uuid: string) => void;
 }
 
 interface ItemAddEvent {
@@ -32,7 +32,7 @@ const EVENT_SET_SELECTED_UUID = "set-selected-uuid";
 // Do not expose it directly, use function to expose it
 const internalEventLoop: EventEmitter = new EventEmitter();
 
-const insertItemToPinList = (item: OGCCollection): void => {
+const insertItemToBookmarkList = (item: OGCCollection): void => {
   internalEventLoop.emit(EVENT_ADD_ITEM, {
     event: new MouseEvent(EVENT_ADD_ITEM),
     component: item,
@@ -50,14 +50,14 @@ const setSelectedUuid = (uuid: string) => {
   });
 };
 
-const PinListMenu: FC<PinListMenuProps> = ({
+const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   onClickAccordion = () => {},
-  onRemoveFromPinList = () => {},
+  onRemoveFromBookmarkList = () => {},
 }) => {
   const anchorRef = useRef(null);
   // State to store the popup open status
   const [open, setOpen] = useState<boolean>(true);
-  // State to store pin list items
+  // State to store bookmark list items
   const [items, setItems] = useState<Array<OGCCollection> | undefined>(
     undefined
   );
@@ -72,18 +72,17 @@ const PinListMenu: FC<PinListMenuProps> = ({
 
   const onRemoveItem = useCallback(
     (item: OGCCollection) => {
-      console.log("remove called in pinListMenu");
       setItems((items) => items?.filter((c) => c.id !== item.id));
-      onRemoveFromPinList(item.id);
+      onRemoveFromBookmarkList(item.id);
     },
-    [onRemoveFromPinList]
+    [onRemoveFromBookmarkList]
   );
 
   useEffect(() => {
     // Handle event when other control clicked, this component should close
     // the menu
     const handleEvent = (evt: MenuClickedEvent) => {
-      if (evt.component.type !== PinListMenu) {
+      if (evt.component.type !== BookmarkListMenu) {
         setOpen(false);
       }
     };
@@ -141,15 +140,16 @@ const PinListMenu: FC<PinListMenuProps> = ({
   return (
     <>
       <IconButton
-        aria-label="pin-list-button"
-        id="pin-list-button"
+        aria-label="bookmark-list-button"
+        id="bookmark-list-button"
         ref={anchorRef}
         onClick={handleToggle}
+        sx={{ paddingTop: "3px !important" }}
       >
-        <LibraryAddCheckIcon />
+        <BookmarksIcon />
       </IconButton>
       <Popper
-        id="pin-list"
+        id="bookmark-list"
         open={open}
         anchorEl={anchorRef.current}
         role={undefined}
@@ -168,7 +168,7 @@ const PinListMenu: FC<PinListMenuProps> = ({
           sx={{
             display: "flex",
             flexDirection: "column",
-            width: PIN_LIST_WIDTH,
+            width: BOOKMARK_LIST_WIDTH,
             maxHeight: "85vh",
             overflowY: "auto",
             borderRadius: borderRadius.menu,
@@ -176,7 +176,7 @@ const PinListMenu: FC<PinListMenuProps> = ({
             zIndex: 1,
           }}
         >
-          <PinListAccordionGroup
+          <BookmarkListAccordionGroup
             items={items}
             onRemoveItem={onRemoveItem}
             onClickAccordion={onClickAccordion}
@@ -189,6 +189,6 @@ const PinListMenu: FC<PinListMenuProps> = ({
   );
 };
 
-export default PinListMenu;
+export default BookmarkListMenu;
 
-export { insertItemToPinList, setSelectedUuid, collapseAllAccordions };
+export { insertItemToBookmarkList, setSelectedUuid, collapseAllAccordions };

@@ -48,9 +48,9 @@ import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
 import {
   collapseAllAccordions,
-  insertItemToPinList,
+  insertItemToBookmarkList,
   setSelectedUuid,
-} from "../../components/map/mapbox/controls/menu/PinListMenu";
+} from "../../components/map/mapbox/controls/menu/BookmarkListMenu";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -359,13 +359,13 @@ const SearchPage = () => {
       } else {
         // This set state will store the selected uuid
         setSelectedUuids(uuids);
-        // This function is exposed from PinListMenu for expanding an accordion given uuid
+        // This function is exposed from BookmarkListMenu for expanding an accordion given uuid
         setSelectedUuid(uuids[0]);
-        // This function will fetch selected dataset and insert it to pin list
+        // This function will fetch selected dataset and insert it to bookmark list
         dispatch(fetchResultByUuidNoStore(uuids[0]))
           .unwrap()
           .then((res: OGCCollection) => {
-            insertItemToPinList(res);
+            insertItemToBookmarkList(res);
           });
       }
     },
@@ -375,9 +375,9 @@ const SearchPage = () => {
   const onClickCard = useCallback(
     async (item: OGCCollection | undefined) => {
       if (item) {
-        // The item set to pin list assume spatial extents is there
+        // The item set to bookmark list assume spatial extents is there
         const e = await fillGeometryIfMissing(item);
-        insertItemToPinList(e);
+        insertItemToBookmarkList(e);
         setSelectedUuids([item.id]);
         setSelectedUuid(item.id);
       }
@@ -392,7 +392,7 @@ const SearchPage = () => {
     [setSelectedUuids]
   );
 
-  const onRemoveFromPinList = useCallback(
+  const onRemoveFromBookmarkList = useCallback(
     (uuid: string) => {
       // If the removed uuid is the selected uuid, need to set selected uuids to []
       setSelectedUuids((prevUuids) => {
@@ -452,7 +452,7 @@ const SearchPage = () => {
             onToggleClicked={onToggleDisplay}
             onClickMapPoint={onClickMapPoint}
             onClickAccordion={onClickAccordion}
-            onRemoveFromPinList={onRemoveFromPinList}
+            onRemoveFromBookmarkList={onRemoveFromBookmarkList}
             isLoading={isLoading(loadingThreadCount)}
           />
         </Box>

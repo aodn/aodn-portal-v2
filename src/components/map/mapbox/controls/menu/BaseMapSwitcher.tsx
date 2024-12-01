@@ -103,6 +103,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
         id="basemap-show-hide-menu-button"
         ref={anchorRef}
         onClick={handleToggle}
+        sx={{ paddingTop: "2px !important" }}
       >
         <PublicIcon />
       </IconButton>

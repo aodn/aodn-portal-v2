@@ -22,7 +22,7 @@ import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
 import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import PinListMenu from "../../../components/map/mapbox/controls/menu/PinListMenu";
+import BookmarkListMenu from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 
 const mapContainerId = "map-container-id";
 
@@ -44,7 +44,7 @@ interface MapSectionProps {
   onToggleClicked: (v: boolean) => void;
   onClickMapPoint?: (uuids: Array<string>) => void;
   onClickAccordion?: (uuid: string | undefined) => void;
-  onRemoveFromPinList?: (uuid: string) => void;
+  onRemoveFromBookmarkList?: (uuid: string) => void;
   isLoading: boolean;
 }
 
@@ -57,7 +57,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   onToggleClicked,
   onClickMapPoint: onDatasetSelected,
   onClickAccordion,
-  onRemoveFromPinList,
+  onRemoveFromBookmarkList,
   collections,
   sx,
   selectedUuids,
@@ -123,9 +123,9 @@ const MapSection: React.FC<MapSectionProps> = ({
           <DisplayCoordinate />
           <MenuControl
             menu={
-              <PinListMenu
+              <BookmarkListMenu
                 onClickAccordion={onClickAccordion}
-                onRemoveFromPinList={onRemoveFromPinList}
+                onRemoveFromBookmarkList={onRemoveFromBookmarkList}
               />
             }
           />

@@ -49,7 +49,9 @@ const GridResultCard: FC<GridResultCardProps> = ({
         alignItems: "center",
         width: "100%",
         height: "100%",
-        border: isSelectedDataset ? `${border.sm} ${color.blue.dark}` : "none",
+        border: isSelectedDataset
+          ? `${border.sm} ${color.blue.darkSemiTransparent}`
+          : "none",
         borderRadius: borderRadius.small,
       }}
       onMouseEnter={() => setShowButtons(true)}
