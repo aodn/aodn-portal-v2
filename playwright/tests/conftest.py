@@ -5,7 +5,10 @@ from playwright.sync_api import Page
 
 from mocks.api.autocomplete import handle_search_autocomplete_api
 from mocks.api.categories import handle_categories_api
-from mocks.api.collection_detail import handle_detail_api
+from mocks.api.collection_detail import (
+    handle_detail_api,
+    handle_detail_item_api,
+)
 from mocks.api.collections import (
     handle_collections_all_api,
     handle_collections_centroid_api,
@@ -24,7 +27,9 @@ def page_mock(page: Page) -> Generator:
         handle_collections_all_api,
         handle_collections_popup_api,
     )
-    api_router.route_collection_detail(handle_detail_api)
+    api_router.route_collection_detail(
+        handle_detail_api, handle_detail_item_api
+    )
 
     yield page
 
