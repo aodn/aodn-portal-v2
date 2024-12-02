@@ -26,11 +26,19 @@ interface ItemSelectEvent {
 }
 
 const EVENT_ADD_ITEM = "add-item";
+const EVENT_ADD_TEMPORARY_ITEM = "add-temporary-item";
 const EVENT_ACCORDION_COLLAPSE = "accordion-collapse";
 const EVENT_SET_SELECTED_UUID = "set-selected-uuid";
 
 // Do not expose it directly, use function to expose it
 const internalEventLoop: EventEmitter = new EventEmitter();
+
+const insertTemporaryItemToBookmarkList = (item: OGCCollection): void => {
+  internalEventLoop.emit(EVENT_ADD_TEMPORARY_ITEM, {
+    event: new MouseEvent(EVENT_ADD_TEMPORARY_ITEM),
+    component: item,
+  });
+};
 
 const insertItemToBookmarkList = (item: OGCCollection): void => {
   internalEventLoop.emit(EVENT_ADD_ITEM, {
@@ -61,10 +69,18 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   const [items, setItems] = useState<Array<OGCCollection> | undefined>(
     undefined
   );
+  // State to store a temporary clicked dataset
+  const [temporaryItem, setTemporaryItem] = useState<OGCCollection | undefined>(
+    undefined
+  );
   // State to store the item expanded
   const [expandedItem, setExpandedItem] = useState<OGCCollection | undefined>(
     undefined
   );
+
+  console.log("items", items);
+  console.log("temporaryItem", temporaryItem);
+  console.log("expandedItem", expandedItem);
 
   const handleToggle = useCallback(() => {
     setOpen((prev) => !prev);
@@ -87,22 +103,73 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
       }
     };
 
+    const onAddTemporary = (event: ItemAddEvent) => {
+      const newItem = event.component;
+
+      // Check if item exists in current items array
+      const existingItem = items?.find((item) => item.id === newItem.id);
+
+      if (existingItem) {
+        // If item exists, just expand that accordion
+        setExpandedItem(existingItem);
+        onClickAccordion(existingItem.id);
+      } else {
+        // Set as temporary item and expand it
+        setTemporaryItem(newItem);
+        setExpandedItem(newItem);
+        // onClickAccordion(newItem.id);
+      }
+    };
+
     const onAddItem = (event: ItemAddEvent) => {
-      setItems((items) => {
-        if (items) {
-          // Avoid duplicate, if we cannot find in the current array add it.
-          if (items.findIndex((i) => i.id === event.component.id) === -1) {
-            setExpandedItem(event.component);
-            // New item always add to front
-            return [event.component, ...items];
-          } else {
-            return items;
-          }
+      const newItem = event.component;
+
+      setTemporaryItem((currentTemp) => {
+        // If there is a temporary item
+        if (currentTemp) {
+          setItems((items) => {
+            if (items) {
+              if (currentTemp.id === newItem.id) {
+                // If newItem matches temporaryItem, add temporary item to permanent items
+                if (items.findIndex((i) => i.id === currentTemp.id) === -1) {
+                  setExpandedItem(currentTemp);
+                  return [currentTemp, ...items];
+                }
+                return items;
+              } else {
+                // If newItem is different, only add newItem (ignore temporary)
+                if (items.findIndex((i) => i.id === newItem.id) === -1) {
+                  setExpandedItem(newItem);
+                  return [newItem, ...items];
+                }
+                return items;
+              }
+            }
+            // No existing items
+            if (currentTemp.id === newItem.id) {
+              setExpandedItem(currentTemp);
+              return [currentTemp];
+            } else {
+              setExpandedItem(newItem);
+              return [newItem];
+            }
+          });
         } else {
-          setExpandedItem(event.component);
-          // no item, so return array of this item
-          return [event.component];
+          // No temporary item, just add newItem
+          setItems((items) => {
+            if (items) {
+              if (items.findIndex((i) => i.id === newItem.id) === -1) {
+                setExpandedItem(newItem);
+                return [newItem, ...items];
+              }
+              return items;
+            }
+            setExpandedItem(newItem);
+            return [newItem];
+          });
         }
+        // Always clear temporary item
+        return undefined;
       });
     };
 
@@ -122,12 +189,14 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
     };
 
     eventEmitter.on(EVENT_MENU_CLICKED, handleEvent);
+    internalEventLoop.on(EVENT_ADD_TEMPORARY_ITEM, onAddTemporary);
     internalEventLoop.on(EVENT_ADD_ITEM, onAddItem);
     internalEventLoop.on(EVENT_ACCORDION_COLLAPSE, handleAccordionCollapseAll);
     internalEventLoop.on(EVENT_SET_SELECTED_UUID, handleSelectedUuid);
 
     return () => {
       eventEmitter.off(EVENT_MENU_CLICKED, handleEvent);
+      internalEventLoop.on(EVENT_ADD_TEMPORARY_ITEM, onAddTemporary);
       internalEventLoop.off(EVENT_ADD_ITEM, onAddItem);
       internalEventLoop.off(
         EVENT_ACCORDION_COLLAPSE,
@@ -178,6 +247,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
         >
           <BookmarkListAccordionGroup
             items={items}
+            temporaryItem={temporaryItem}
             onRemoveItem={onRemoveItem}
             onClickAccordion={onClickAccordion}
             expandedItem={expandedItem}
@@ -191,4 +261,9 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
 
 export default BookmarkListMenu;
 
-export { insertItemToBookmarkList, setSelectedUuid, collapseAllAccordions };
+export {
+  insertTemporaryItemToBookmarkList,
+  insertItemToBookmarkList,
+  setSelectedUuid,
+  collapseAllAccordions,
+};

@@ -49,6 +49,7 @@ import { pageDefault } from "../../components/common/constants";
 import {
   collapseAllAccordions,
   insertItemToBookmarkList,
+  insertTemporaryItemToBookmarkList,
   setSelectedUuid,
 } from "../../components/map/mapbox/controls/menu/BookmarkListMenu";
 
@@ -112,14 +113,6 @@ const SearchPage = () => {
     },
     [currentLayout]
   );
-
-  //util function for join uuids in a specific pattern for fetching data
-  const createFilterString = (uuids: Array<string>): string => {
-    if (!Array.isArray(uuids) || uuids.length === 0) {
-      return "";
-    }
-    return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
-  };
 
   const doMapSearch = useCallback(() => {
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -360,12 +353,13 @@ const SearchPage = () => {
         // This set state will store the selected uuid
         setSelectedUuids(uuids);
         // This function is exposed from BookmarkListMenu for expanding an accordion given uuid
-        setSelectedUuid(uuids[0]);
+        // setSelectedUuid(uuids[0]);
         // This function will fetch selected dataset and insert it to bookmark list
         dispatch(fetchResultByUuidNoStore(uuids[0]))
           .unwrap()
           .then((res: OGCCollection) => {
-            insertItemToBookmarkList(res);
+            // insertItemToBookmarkList(res);
+            insertTemporaryItemToBookmarkList(res);
           });
       }
     },
@@ -377,9 +371,10 @@ const SearchPage = () => {
       if (item) {
         // The item set to bookmark list assume spatial extents is there
         const e = await fillGeometryIfMissing(item);
-        insertItemToBookmarkList(e);
+        // insertItemToBookmarkList(e);
+        insertTemporaryItemToBookmarkList(e);
         setSelectedUuids([item.id]);
-        setSelectedUuid(item.id);
+        // setSelectedUuid(item.id);
       }
     },
     [fillGeometryIfMissing]

@@ -6,7 +6,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
 import {
   border,
   borderRadius,
@@ -32,6 +31,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   onClickDetail = () => {},
   onClickLinks = () => {},
   onClickDownload = () => {},
+  onClickBookmark = () => {},
   selectedUuid,
   sx,
 }) => {
@@ -156,7 +156,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
           height="20px"
           width="auto"
         >
-          <BookmarkButton />
+          <BookmarkButton dataset={content} onClick={onClickBookmark} />
         </Box>
         <Box height="90px" width="100%">
           <img

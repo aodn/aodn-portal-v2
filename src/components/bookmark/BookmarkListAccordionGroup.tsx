@@ -1,4 +1,11 @@
-import { Dispatch, FC, SyntheticEvent, useCallback, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import StyledAccordion from "../common/accordion/StyledAccordion";
@@ -7,9 +14,11 @@ import { color, fontColor, fontSize, fontWeight } from "../../styles/constants";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
 import BookmarkListCard from "./BookmarkListCard";
 import BookmarkButton from "./BookmarkButton";
+import { insertItemToBookmarkList } from "../map/mapbox/controls/menu/BookmarkListMenu";
 
 interface BookmarkListAccordionGroupProps {
   items: Array<OGCCollection> | undefined;
+  temporaryItem: OGCCollection | undefined;
   onRemoveItem: (item: OGCCollection) => void;
   onClickAccordion: (uuid: string | undefined) => void;
   expandedItem: OGCCollection | undefined;
@@ -18,13 +27,17 @@ interface BookmarkListAccordionGroupProps {
 
 const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   items,
+  temporaryItem,
   onRemoveItem,
   onClickAccordion,
   expandedItem,
   setExpandedItem,
 }) => {
-  const [hoverOnRemoveButton, setHoverOnRemoveButton] =
-    useState<boolean>(false);
+  const [accordionGroupItems, setAccordionGroupItems] = useState<
+    Array<OGCCollection>
+  >([]);
+
+  const [hoverOnButton, setHoverOnButton] = useState<boolean>(false);
 
   // When click on an other accordion (if not click on the remove button) will collapse the current one and expand the click one
   const handleChange = useCallback(
@@ -46,15 +59,42 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     [setExpandedItem, onRemoveItem, items]
   );
 
-  if (!items) return;
+  const handleAddBookmark = useCallback((item: OGCCollection) => {
+    insertItemToBookmarkList(item);
+  }, []);
+
+  useEffect(() => {
+    setAccordionGroupItems(() => {
+      if (items) {
+        // Create a Set of existing IDs to check for duplicates
+        const existingIds = new Set(items.map((item) => item.id));
+
+        if (temporaryItem) {
+          // If we have a temporary item, add it at the start only if it's not in items
+          if (!existingIds.has(temporaryItem.id)) {
+            return [temporaryItem, ...items];
+          }
+          return [...items];
+        } else {
+          // If no temporary item, just return items
+          return [...items];
+        }
+      } else if (temporaryItem) {
+        // If we only have a temporary item and no items
+        return [temporaryItem];
+      }
+      // If no items and no temporary item
+      return [];
+    });
+  }, [items, temporaryItem]);
 
   return (
     <>
-      {items.map((item) => (
+      {accordionGroupItems.map((item) => (
         <StyledAccordion
           key={item.id}
           expanded={expandedItem?.id === item.id}
-          onChange={handleChange(item, hoverOnRemoveButton)}
+          onChange={handleChange(item, hoverOnButton)}
         >
           <StyledAccordionSummary>
             <Box
@@ -65,7 +105,13 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               alignItems="center"
               width="100%"
             >
-              <BookmarkButton />
+              <Box
+                onMouseEnter={() => setHoverOnButton(true)}
+                onMouseLeave={() => setHoverOnButton(false)}
+              >
+                <BookmarkButton dataset={item} onClick={handleAddBookmark} />
+              </Box>
+
               <Typography
                 color={fontColor.gray.dark}
                 fontSize={fontSize.label}
@@ -94,8 +140,8 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                   },
                 }}
                 onClick={() => handleRemove(item)}
-                onMouseEnter={() => setHoverOnRemoveButton(true)}
-                onMouseLeave={() => setHoverOnRemoveButton(false)}
+                onMouseEnter={() => setHoverOnButton(true)}
+                onMouseLeave={() => setHoverOnButton(false)}
               >
                 X
               </Button>

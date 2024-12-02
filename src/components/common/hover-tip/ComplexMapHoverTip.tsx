@@ -67,7 +67,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
                 justifyContent="center"
                 height="100%"
               >
-                <BookmarkButton />
+                <BookmarkButton dataset={collection} />
               </Box>
             </Box>
           </Tooltip>

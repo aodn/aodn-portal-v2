@@ -16,6 +16,7 @@ import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
 import useTabNavigation from "../../hooks/useTabNavigation";
 import useFetchData from "../../hooks/useFetchData";
+import { insertItemToBookmarkList } from "../map/mapbox/controls/menu/BookmarkListMenu";
 
 export interface ResultCard {
   content?: OGCCollection;
@@ -23,6 +24,7 @@ export interface ResultCard {
   onClickDetail?: (uuid: string) => void;
   onClickDownload?: (uuid: string) => void;
   onClickLinks?: (uuid: string) => void;
+  onClickBookmark?: (item: OGCCollection) => void;
   selectedUuid?: string;
   sx?: SxProps;
 }
@@ -54,6 +56,7 @@ const renderGridView: FC<ResultCards> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
+  onClickBookmark,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -87,6 +90,7 @@ const renderGridView: FC<ResultCards> = ({
               onClickDetail={onClickDetail}
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
+              onClickBookmark={onClickBookmark}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -98,6 +102,7 @@ const renderGridView: FC<ResultCards> = ({
                 onClickDetail={onClickDetail}
                 onClickLinks={onClickLinks}
                 onClickDownload={onClickDownload}
+                onClickBookmark={onClickBookmark}
                 selectedUuid={selectedUuid}
               />
             </Grid>
@@ -116,6 +121,7 @@ const renderListView: FC<ResultCards> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
+  onClickBookmark,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -147,6 +153,7 @@ const renderListView: FC<ResultCards> = ({
           onClickDetail={onClickDetail}
           onClickLinks={onClickLinks}
           onClickDownload={onClickDownload}
+          onClickBookmark={onClickBookmark}
           selectedUuid={selectedUuid}
         />
       </ListItem>
@@ -164,6 +171,7 @@ const renderFullListView: FC<Partial<ResultCards>> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
+  onClickBookmark,
   selectedUuid,
 }) => {
   if (!count || !total || !contents) return;
@@ -178,6 +186,7 @@ const renderFullListView: FC<Partial<ResultCards>> = ({
               onClickDetail={onClickDetail}
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
+              onClickBookmark={onClickBookmark}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -239,6 +248,11 @@ const ResultCards: FC<ResultCardsProps> = ({
     [goToDetailPage]
   );
 
+  const onClickBookmark = useCallback((item: OGCCollection) => {
+    console.log("call onClickBookmark, item===", item);
+    insertItemToBookmarkList(item);
+  }, []);
+
   // Fetching more data for full list view if the initial records less than 20
   useEffect(() => {
     if (
@@ -274,6 +288,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       onClickDetail,
       onClickLinks,
       onClickDownload,
+      onClickBookmark,
       selectedUuid,
     });
   } else if (layout === SearchResultLayoutEnum.GRID) {
@@ -305,6 +320,7 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickLinks,
                   onClickDownload,
                   renderLoadMoreButton,
+                  onClickBookmark,
                   selectedUuid,
                   child,
                 })
@@ -339,6 +355,7 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickDetail,
                   onClickLinks,
                   onClickDownload,
+                  onClickBookmark,
                   renderLoadMoreButton,
                   selectedUuid,
                   child,
