@@ -68,10 +68,16 @@ class ApiRouter:
     def route_collection_all(self, handler_function: Callable) -> None:
         self.route(Routes.COLLECTION_ALL, handler_function)
 
-    def route_collection_detail(self, handler_function: Callable) -> None:
-        self.route(Routes.COLLECTION_DETAIL, handler_function)
+    def route_collection_detail(
+        self, detail_handler: Callable, detail_item_handler: Callable
+    ) -> None:
+        self.route(Routes.COLLECTION_DETAIL, detail_handler)
+        self.route(Routes.COLLECTION_DETAIL_ITEM, detail_item_handler)
 
     def unroute_collection_detail(
-        self, handler_function: Optional[Callable] = None
+        self,
+        detail_handler: Optional[Callable] = None,
+        detail_item_handler: Optional[Callable] = None,
     ) -> None:
-        self.unroute(Routes.COLLECTION_DETAIL, handler_function)
+        self.unroute(Routes.COLLECTION_DETAIL, detail_handler)
+        self.unroute(Routes.COLLECTION_DETAIL_ITEM, detail_item_handler)

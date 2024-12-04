@@ -111,13 +111,18 @@ const SearchPage = () => {
     [currentLayout]
   );
 
-  const doMapSearch = useCallback(() => {
+  const doMapSearch = useCallback(async () => {
     const componentParam: ParameterState = getComponentState(store.getState());
 
-    // Use a different parameter so that it return id and bbox only and do not store the values,
+    // Use a different parameter so that it returns id and bbox only and do not store the values,
     // we cannot add page because we want to show all record on map
-    const paramNonPaged = createSearchParamFrom(componentParam);
-    return dispatch(
+    // and by default we will include record without spatial extents so that BBOX
+    // will not exclude record without spatial extents however for map search
+    // it is ok to exclude it because it isn't show on map anyway
+    const paramNonPaged = createSearchParamFrom(componentParam, {
+      includeNoSpatialExtents: false,
+    });
+    const collections = await dispatch(
       // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
       // and ordered by uuid to avoid affecting cluster calculation
       fetchResultNoStore({
@@ -125,11 +130,8 @@ const SearchPage = () => {
         properties: "id,centroid",
         sortby: "id",
       })
-    )
-      .unwrap()
-      .then((collections) => {
-        setLayers(collections.collections);
-      });
+    ).unwrap();
+    setLayers(collections.collections);
   }, [dispatch]);
 
   const doSearch = useCallback(
@@ -233,7 +235,7 @@ const SearchPage = () => {
         // but do not navigate again.
         doSearch(false);
       }
-      // If it is navigate from this component, and no need to search, that
+      // If it is navigated from this component, and no need to search, that
       // mean we already call doSearch() + doMapSearch(), however if you
       // come from other page, the result list is good because we remember it
       // but the map need init again and therefore need to do a doMapSearch()
@@ -314,6 +316,7 @@ const SearchPage = () => {
     [setCurrentLayout]
   );
 
+  // Handler for click on map
   const onClickMapPoint = useCallback(
     (uuids: Array<string>) => {
       if (uuids.length === 0) {
