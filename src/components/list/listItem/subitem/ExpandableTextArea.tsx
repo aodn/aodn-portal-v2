@@ -49,6 +49,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
             }),
           }}
           onClick={onClick}
+          data-testid="expandable-text-area"
         >
           {isExpanded ? decodedText : truncateText(decodedText, truncateCount)}
         </Typography>
