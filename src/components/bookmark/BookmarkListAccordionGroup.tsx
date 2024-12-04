@@ -5,6 +5,7 @@ import {
   SyntheticEvent,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { Box, Button, Typography } from "@mui/material";
@@ -15,7 +16,10 @@ import { color, fontColor, fontSize, fontWeight } from "../../styles/constants";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
 import BookmarkListCard from "./BookmarkListCard";
 import BookmarkButton from "./BookmarkButton";
-import { insertItemToBookmarkList } from "../map/mapbox/controls/menu/BookmarkListMenu";
+import {
+  checkIsBookmarked,
+  insertItemToBookmarkList,
+} from "../map/mapbox/controls/menu/BookmarkListMenu";
 
 interface BookmarkListAccordionGroupProps {
   items: Array<OGCCollection> | undefined;
@@ -111,6 +115,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                 <BookmarkButton
                   dataset={item}
                   onClick={() => insertItemToBookmarkList(item)}
+                  // bookmarked={async () => await checkIsBookmarked(item.id)}
                 />
               </Box>
 

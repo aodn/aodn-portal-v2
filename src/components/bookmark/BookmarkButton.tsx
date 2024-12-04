@@ -1,27 +1,39 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { IconButton } from "@mui/material";
 import { color, gap } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { checkIsBookmarked } from "../map/mapbox/controls/menu/BookmarkListMenu";
 
 interface BookmarkButtonProps {
   dataset?: OGCCollection;
   onClick?: (dataset: OGCCollection) => void;
-  checked?: boolean;
+  // bookmarked?: boolean;
 }
 
 const BookmarkButton: FC<BookmarkButtonProps> = ({
   dataset = undefined,
   onClick = () => {},
-  checked = false,
+  // bookmarked = false,
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const handleClick = useCallback(() => {
     if (onClick && dataset) {
       onClick(dataset);
+      checkIsBookmarked(dataset.id, (exists) => {
+        setIsBookmarked(exists);
+      });
     }
   }, [dataset, onClick]);
+
+  useEffect(() => {
+    if (!dataset) return;
+    checkIsBookmarked(dataset.id, (exists) => {
+      setIsBookmarked(exists);
+    });
+  }, [dataset]);
 
   return (
     <IconButton
@@ -32,7 +44,7 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
         padding: gap.sm,
       }}
     >
-      {checked || isHovered ? (
+      {isBookmarked || isHovered ? (
         <BookmarkIcon sx={{ color: color.brightBlue.dark }} />
       ) : (
         <BookmarkBorderIcon

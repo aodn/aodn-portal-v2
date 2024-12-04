@@ -26,15 +26,16 @@ interface ItemAddEvent {
   component: OGCCollection;
 }
 
-interface ItemSelectEvent {
+interface ItemCheckEvent {
   event: MouseEvent;
   uuid: string;
+  callback: (exists: boolean) => void; // Add callback to receive result
 }
 
 const EVENT_ADD_ITEM = "add-item";
 const EVENT_ADD_TEMPORARY_ITEM = "add-temporary-item";
 const EVENT_ACCORDION_COLLAPSE = "accordion-collapse";
-const EVENT_ACCORDION_EXPAND = "accordion-expand";
+const EVENT_CHECK_BOOKMARK = "check-bookmark";
 
 // Do not expose it directly, use function to expose it
 const internalEventLoop: EventEmitter = new EventEmitter();
@@ -57,10 +58,14 @@ const collapseAllAccordions = (): void => {
   internalEventLoop.emit(EVENT_ACCORDION_COLLAPSE);
 };
 
-const expandAnAccordion = (uuid: string) => {
-  internalEventLoop.emit(EVENT_ACCORDION_EXPAND, {
-    event: new MouseEvent(EVENT_ACCORDION_EXPAND),
-    uuid: uuid,
+const checkIsBookmarked = (
+  uuid: string,
+  callback: (exists: boolean) => void
+): void => {
+  internalEventLoop.emit(EVENT_CHECK_BOOKMARK, {
+    event: new MouseEvent(EVENT_CHECK_BOOKMARK),
+    uuid,
+    callback, // Pass the callback in the event
   });
 };
 
@@ -111,7 +116,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
 
   useEffect(() => {
     // Handle event when other control clicked, this component should close the menu
-    const handleEvent = (evt: MenuClickedEvent) => {
+    const handleClickEvent = (evt: MenuClickedEvent) => {
       if (evt.component.type !== BookmarkListMenu) {
         setOpen(false);
       }
@@ -170,38 +175,40 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
       });
     };
 
-    const handleAccordionExpand = (event: ItemSelectEvent) => {
-      if (!items) return;
-
-      const targetItem = items.find((item) => item.id === event.uuid);
-      if (targetItem) {
-        setExpandedItem(targetItem);
-        setSelectedUuids([targetItem.id]);
-      }
-    };
-
     const handleAccordionCollapseAll = () => {
       setExpandedItem(undefined);
       setSelectedUuids([]);
     };
 
-    eventEmitter.on(EVENT_MENU_CLICKED, handleEvent);
+    // Only items in the list items should be considered as bookmarked
+    const handleCheckBookmark = (event: ItemCheckEvent) => {
+      // Only check in permanent items array, ignore temporaryItem
+      setItems((prevItems) => {
+        const exists =
+          prevItems?.some((item) => item.id === event.uuid) ?? false;
+        event.callback(exists);
+        console.log("in handleCheckBookmark, exists===", exists);
+        return prevItems;
+      });
+    };
+
+    eventEmitter.on(EVENT_MENU_CLICKED, handleClickEvent);
     internalEventLoop.on(EVENT_ADD_TEMPORARY_ITEM, handleAddTemporaryItem);
     internalEventLoop.on(EVENT_ADD_ITEM, handleAddItem);
     internalEventLoop.on(EVENT_ACCORDION_COLLAPSE, handleAccordionCollapseAll);
-    internalEventLoop.on(EVENT_ACCORDION_EXPAND, handleAccordionExpand);
+    internalEventLoop.on(EVENT_CHECK_BOOKMARK, handleCheckBookmark);
 
     return () => {
-      eventEmitter.off(EVENT_MENU_CLICKED, handleEvent);
+      eventEmitter.off(EVENT_MENU_CLICKED, handleClickEvent);
       internalEventLoop.on(EVENT_ADD_TEMPORARY_ITEM, handleAddTemporaryItem);
       internalEventLoop.off(EVENT_ADD_ITEM, handleAddItem);
       internalEventLoop.off(
         EVENT_ACCORDION_COLLAPSE,
         handleAccordionCollapseAll
       );
-      internalEventLoop.off(EVENT_ACCORDION_EXPAND, handleAccordionExpand);
+      internalEventLoop.off(EVENT_CHECK_BOOKMARK, handleCheckBookmark);
     };
-  }, [items, setSelectedUuids]);
+  }, [items, setSelectedUuids, temporaryItem?.id]);
 
   return (
     <>
@@ -261,6 +268,6 @@ export default BookmarkListMenu;
 export {
   insertTemporaryItemToBookmarkList,
   insertItemToBookmarkList,
-  expandAnAccordion,
   collapseAllAccordions,
+  checkIsBookmarked,
 };
