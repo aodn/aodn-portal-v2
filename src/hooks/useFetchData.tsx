@@ -10,9 +10,15 @@ import {
   createSearchParamFrom,
   DEFAULT_SEARCH_PAGE_SIZE,
   fetchResultAppendStore,
+  fetchResultNoStore,
+  SearchParameters,
 } from "../components/common/store/searchReducer";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../components/common/store/hooks";
+import {
+  OGCCollection,
+  OGCCollections,
+} from "../components/common/store/OGCCollectionDefinitions";
 
 const useFetchData = () => {
   const dispatch = useAppDispatch();
@@ -38,7 +44,30 @@ const useFetchData = () => {
     [componentParam, dispatch, reduxContents.result.search_after]
   );
 
-  return { fetchMore };
+  const fillGeometryIfMissing = useCallback(
+    async (collection: OGCCollection): Promise<OGCCollection> => {
+      if (collection.getGeometry())
+        return new Promise((resolve, reject) => resolve(collection));
+
+      const param: SearchParameters = {
+        filter: `id='${collection.id}'`,
+        properties: "id,bbox,geometry",
+      };
+
+      try {
+        const value = await dispatch(fetchResultNoStore(param)).unwrap();
+        collection.properties = value.collections[0].properties;
+        collection.extentInt = value.collections[0].extent;
+        return collection;
+      } catch (error) {
+        console.error("Error fetching collection data:", error);
+        return collection;
+      }
+    },
+    [dispatch]
+  );
+
+  return { fetchMore, fillGeometryIfMissing };
 };
 
 export default useFetchData;

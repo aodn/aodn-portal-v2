@@ -1,6 +1,7 @@
 import {
   Dispatch,
   FC,
+  SetStateAction,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -19,49 +20,47 @@ import { insertItemToBookmarkList } from "../map/mapbox/controls/menu/BookmarkLi
 interface BookmarkListAccordionGroupProps {
   items: Array<OGCCollection> | undefined;
   temporaryItem: OGCCollection | undefined;
-  onRemoveItem: (item: OGCCollection) => void;
-  onClickAccordion: (uuid: string | undefined) => void;
   expandedItem: OGCCollection | undefined;
+  onRemoveItem: (item: OGCCollection) => void;
   setExpandedItem: Dispatch<React.SetStateAction<OGCCollection | undefined>>;
+  setSelectedUuids: (uuids: SetStateAction<string[]>) => void;
 }
 
 const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   items,
   temporaryItem,
-  onRemoveItem,
-  onClickAccordion,
   expandedItem,
+  onRemoveItem,
   setExpandedItem,
+  setSelectedUuids,
 }) => {
+  // State to store accordion group list, which is the combination of temporary item and (bookmark list)items
   const [accordionGroupItems, setAccordionGroupItems] = useState<
     Array<OGCCollection>
   >([]);
 
+  // State to store the mouse hover status - if hovering on any button clicking will not expand/collapse an accordion
   const [hoverOnButton, setHoverOnButton] = useState<boolean>(false);
 
-  // When click on an other accordion (if not click on the remove button) will collapse the current one and expand the click one
+  // When click on an other accordion (if not click on the buttons) will collapse the current one and expand the click one
   const handleChange = useCallback(
     (item: OGCCollection, hoverOnRemoveButton: boolean) =>
       (_: SyntheticEvent, newExpanded: boolean) => {
         if (hoverOnRemoveButton) return;
         setExpandedItem(newExpanded ? item : undefined);
-        onClickAccordion(newExpanded ? item.id : undefined);
+        setSelectedUuids(newExpanded ? [item.id] : []);
       },
-    [onClickAccordion, setExpandedItem]
+    [setExpandedItem, setSelectedUuids]
   );
 
   const handleRemove = useCallback(
     (item: OGCCollection) => {
       // Keep the current expansion status when remove the other un-expanded pinned datasets
-      setExpandedItem((prev) => (prev?.id === item.id ? items?.[0] : prev));
+      setExpandedItem((prev) => (prev?.id === item.id ? undefined : prev));
       onRemoveItem && onRemoveItem(item);
     },
-    [setExpandedItem, onRemoveItem, items]
+    [setExpandedItem, onRemoveItem]
   );
-
-  const handleAddBookmark = useCallback((item: OGCCollection) => {
-    insertItemToBookmarkList(item);
-  }, []);
 
   useEffect(() => {
     setAccordionGroupItems(() => {
@@ -109,7 +108,10 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                 onMouseEnter={() => setHoverOnButton(true)}
                 onMouseLeave={() => setHoverOnButton(false)}
               >
-                <BookmarkButton dataset={item} onClick={handleAddBookmark} />
+                <BookmarkButton
+                  dataset={item}
+                  onClick={() => insertItemToBookmarkList(item)}
+                />
               </Box>
 
               <Typography

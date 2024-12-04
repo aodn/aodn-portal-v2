@@ -40,18 +40,14 @@ import { color, padding } from "../../styles/constants";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "../../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
 import {
   collapseAllAccordions,
-  insertItemToBookmarkList,
   insertTemporaryItemToBookmarkList,
-  setSelectedUuid,
 } from "../../components/map/mapbox/controls/menu/BookmarkListMenu";
+import useFetchData from "../../hooks/useFetchData";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -74,6 +70,7 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { fillGeometryIfMissing } = useFetchData();
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   // State to store the layout that user selected
@@ -317,48 +314,19 @@ const SearchPage = () => {
     [setCurrentLayout]
   );
 
-  // util function to get collection data given uuid
-  const fillGeometryIfMissing = useCallback(
-    (collection: OGCCollection): Promise<OGCCollection> => {
-      if (collection.getGeometry())
-        return new Promise((resolve, reject) => resolve(collection));
-
-      const param: SearchParameters = {
-        filter: `id='${collection.id}'`,
-        properties: "id,bbox,geometry",
-      };
-
-      return dispatch(fetchResultNoStore(param))
-        .unwrap()
-        .then((value: OGCCollections) => {
-          collection.properties = value.collections[0].properties;
-          collection.extentInt = value.collections[0].extent;
-          return collection;
-        })
-        .catch((error: any) => {
-          console.error("Error fetching collection data:", error);
-          return collection;
-        });
-    },
-    [dispatch]
-  );
-
-  // Handler for click on map
   const onClickMapPoint = useCallback(
     (uuids: Array<string>) => {
       if (uuids.length === 0) {
+        // This happens when click the empty space of map
         setSelectedUuids([]);
         collapseAllAccordions();
       } else {
-        // This set state will store the selected uuid
+        // Since map point only store uuid in its feature, so need to fetch dataset here
+        // Clicking a map dot or a result card will only add a temporary item in bookmark list, until the bookmark icon is clicked
         setSelectedUuids(uuids);
-        // This function is exposed from BookmarkListMenu for expanding an accordion given uuid
-        // setSelectedUuid(uuids[0]);
-        // This function will fetch selected dataset and insert it to bookmark list
         dispatch(fetchResultByUuidNoStore(uuids[0]))
           .unwrap()
           .then((res: OGCCollection) => {
-            // insertItemToBookmarkList(res);
             insertTemporaryItemToBookmarkList(res);
           });
       }
@@ -374,31 +342,9 @@ const SearchPage = () => {
         // insertItemToBookmarkList(e);
         insertTemporaryItemToBookmarkList(e);
         setSelectedUuids([item.id]);
-        // setSelectedUuid(item.id);
       }
     },
     [fillGeometryIfMissing]
-  );
-
-  const onClickAccordion = useCallback(
-    (uuid: string | undefined) => {
-      setSelectedUuids(uuid ? [uuid] : []);
-    },
-    [setSelectedUuids]
-  );
-
-  const onRemoveFromBookmarkList = useCallback(
-    (uuid: string) => {
-      // If the removed uuid is the selected uuid, need to set selected uuids to []
-      setSelectedUuids((prevUuids) => {
-        if (prevUuids[0] && prevUuids[0] === uuid) {
-          return [];
-        } else {
-          return prevUuids;
-        }
-      });
-    },
-    [setSelectedUuids]
   );
 
   // You will see this trigger twice, this is due to use of strict-mode
@@ -443,11 +389,10 @@ const SearchPage = () => {
             bbox={bbox}
             zoom={zoom}
             selectedUuids={selectedUuids}
+            setSelectedUuids={setSelectedUuids}
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}
             onClickMapPoint={onClickMapPoint}
-            onClickAccordion={onClickAccordion}
-            onRemoveFromBookmarkList={onRemoveFromBookmarkList}
             isLoading={isLoading(loadingThreadCount)}
           />
         </Box>

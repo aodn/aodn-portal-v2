@@ -6,7 +6,7 @@ import NavigationControl from "../../../components/map/mapbox/controls/Navigatio
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
-import React, { useCallback, useState } from "react";
+import React, { SetStateAction, useCallback, useState } from "react";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import Layers, {
   createStaticLayers,
@@ -38,13 +38,14 @@ interface MapSectionProps {
   zoom?: number;
   sx?: SxProps<Theme>;
   selectedUuids: string[];
+  setSelectedUuids?: (uuids: SetStateAction<string[]>) => void;
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
   onToggleClicked: (v: boolean) => void;
   onClickMapPoint?: (uuids: Array<string>) => void;
-  onClickAccordion?: (uuid: string | undefined) => void;
-  onRemoveFromBookmarkList?: (uuid: string) => void;
+  // onClickAccordion?: (uuid: string | undefined) => void;
+  // onRemoveFromBookmarkList?: (uuid: string) => void;
   isLoading: boolean;
 }
 
@@ -56,11 +57,12 @@ const MapSection: React.FC<MapSectionProps> = ({
   onMapZoomOrMove,
   onToggleClicked,
   onClickMapPoint: onDatasetSelected,
-  onClickAccordion,
-  onRemoveFromBookmarkList,
+  // onClickAccordion,
+  // onRemoveFromBookmarkList,
   collections,
   sx,
   selectedUuids,
+  setSelectedUuids,
   isLoading,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
@@ -124,8 +126,9 @@ const MapSection: React.FC<MapSectionProps> = ({
           <MenuControl
             menu={
               <BookmarkListMenu
-                onClickAccordion={onClickAccordion}
-                onRemoveFromBookmarkList={onRemoveFromBookmarkList}
+                setSelectedUuids={setSelectedUuids}
+                // onClickAccordion={onClickAccordion}
+                // onRemoveFromBookmarkList={onRemoveFromBookmarkList}
               />
             }
           />
