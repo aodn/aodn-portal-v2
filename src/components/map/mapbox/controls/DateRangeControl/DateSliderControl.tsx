@@ -8,6 +8,7 @@ import {
   DateRangeCondition,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import dayjs from "dayjs";
+import { SIMPLE_DATE_FORMAT } from "../../../../../pages/detail-page/subpages/tab-panels/AbstractAndDownloadPanel";
 
 class DateSliderControlClass implements IControl {
   private container: HTMLDivElement | null = null;
@@ -18,8 +19,8 @@ class DateSliderControlClass implements IControl {
     conditions: IDownloadCondition[]
   ) => void;
   private readonly onDateRangeChange = (dateRangeStamps: number[]) => {
-    const start = dayjs(dateRangeStamps[0]).format("MM-YYYY");
-    const end = dayjs(dateRangeStamps[1]).format("MM-YYYY");
+    const start = dayjs(dateRangeStamps[0]).format(SIMPLE_DATE_FORMAT);
+    const end = dayjs(dateRangeStamps[1]).format(SIMPLE_DATE_FORMAT);
 
     if (this.minDate === start && this.maxDate === end) {
       this.setDownloadConditions(DownloadConditionType.DATE_RANGE, []);

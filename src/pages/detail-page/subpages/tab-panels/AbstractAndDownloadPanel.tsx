@@ -17,9 +17,11 @@ import { MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRangeControl from "../../../../components/map/mapbox/controls/DateRangeControl/DateRangeControl";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
 const TRUNCATE_COUNT = 800;
+
+export const SIMPLE_DATE_FORMAT = "MM-YYYY";
 
 const AbstractAndDownloadPanel: FC = () => {
   const { collection, featureCollection, setDownloadConditions, mapDraw } =
@@ -30,7 +32,7 @@ const AbstractAndDownloadPanel: FC = () => {
 
   const getMinMaxDateStamps = useCallback(() => {
     let minDate = dayjs();
-    let maxDate = dayjs("10-1800", "MM-YYYY");
+    let maxDate = dayjs("10-1800", SIMPLE_DATE_FORMAT);
 
     if (featureCollection) {
       featureCollection.features.forEach((feature) => {
@@ -118,8 +120,8 @@ const AbstractAndDownloadPanel: FC = () => {
                       }
                     />
                     <DateRangeControl
-                      minDate={minDateStamp.format("MM-YYYY")}
-                      maxDate={maxDateStamp.format("MM-YYYY")}
+                      minDate={minDateStamp.format(SIMPLE_DATE_FORMAT)}
+                      maxDate={maxDateStamp.format(SIMPLE_DATE_FORMAT)}
                       setDownloadConditions={setDownloadConditions}
                     />
                   </Controls>

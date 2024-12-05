@@ -4,6 +4,7 @@ import PlainSlider from "../../../../common/slider/PlainSlider";
 import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
 import dayjs from "dayjs";
 import _ from "lodash";
+import { SIMPLE_DATE_FORMAT } from "../../../../../pages/detail-page/subpages/tab-panels/AbstractAndDownloadPanel";
 
 interface DateSliderProps {
   minDate: string;
@@ -11,15 +12,14 @@ interface DateSliderProps {
   onDateRangeChange: (dateRangeStamp: number[]) => void;
 }
 
-const dateFormat = "MM-YYYY";
 const DateSlider: React.FC<DateSliderProps> = ({
   minDate,
   maxDate,
   onDateRangeChange,
 }) => {
   const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
-    dateToValue(dayjs(minDate, dateFormat)),
-    dateToValue(dayjs(maxDate, dateFormat)),
+    dateToValue(dayjs(minDate, SIMPLE_DATE_FORMAT)),
+    dateToValue(dayjs(maxDate, SIMPLE_DATE_FORMAT)),
   ]);
   const parentRef = useRef<HTMLDivElement | null>(null);
 
@@ -28,7 +28,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
   > | null>(null);
 
   useEffect(() => {
-    debounceSliderChange.current = _.debounce((newValue: number | number[]) => {
+    debounceSliderChange.current = _.debounce((_: number | number[]) => {
       onDateRangeChange(dateRangeStamp);
     }, 500);
 
@@ -63,8 +63,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
       <Grid item md={8} container sx={{ paddingTop: "10px" }}>
         <PlainSlider
           value={dateRangeStamp}
-          min={dateToValue(dayjs(minDate, dateFormat))}
-          max={dateToValue(dayjs(maxDate, dateFormat))}
+          min={dateToValue(dayjs(minDate, SIMPLE_DATE_FORMAT))}
+          max={dateToValue(dayjs(maxDate, SIMPLE_DATE_FORMAT))}
           onChange={handleSliderChange}
           valueLabelDisplay="auto"
           valueLabelFormat={(value: number) =>
