@@ -1,4 +1,12 @@
-import { FC, useRef, useEffect, Dispatch, useState, useContext } from "react";
+import {
+  FC,
+  useRef,
+  useEffect,
+  Dispatch,
+  useState,
+  useContext,
+  SetStateAction,
+} from "react";
 import { Box, IconButton, Popper } from "@mui/material";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { ControlProps, MenuClickedEvent } from "./Definition";
@@ -15,8 +23,8 @@ import {
 import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
 
 interface BookmarkListMenuProps extends ControlProps {
-  setSelectedUuids?: Dispatch<React.SetStateAction<string[]>>;
-  bookmarkItems?: OGCCollection[];
+  setSelectedUuids?: Dispatch<SetStateAction<string[]>>;
+  bookmarkItems: Array<OGCCollection> | undefined;
   bookmarkTemporaryItem: OGCCollection | undefined;
 }
 

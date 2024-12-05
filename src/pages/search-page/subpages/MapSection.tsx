@@ -78,7 +78,9 @@ const MapSection: React.FC<MapSectionProps> = ({
   setSelectedUuids,
   isLoading,
 }) => {
-  const bookmarkItems = useSelector(selectBookmarkItems);
+  const defaultBookmarkItems: never[] = []; // Default empty array
+  const bookmarkItems =
+    useSelector(selectBookmarkItems) || defaultBookmarkItems;
   const bookmarkTemporaryItem = useSelector(selectTemporaryItem);
 
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
@@ -141,12 +143,16 @@ const MapSection: React.FC<MapSectionProps> = ({
           <ScaleControl />
           <DisplayCoordinate />
           <MenuControl
+            // TODO: this is just an example for avoiding passing undefined values to menu props, e.g bookmarkItems.length > 0
+            // also need to update similar one for bookmarkTemporaryItem
             menu={
-              <BookmarkListMenu
-                setSelectedUuids={setSelectedUuids}
-                bookmarkItems={bookmarkItems}
-                bookmarkTemporaryItem={bookmarkTemporaryItem}
-              />
+              bookmarkItems.length > 0 ? (
+                <BookmarkListMenu
+                  setSelectedUuids={setSelectedUuids}
+                  bookmarkItems={bookmarkItems}
+                  bookmarkTemporaryItem={bookmarkTemporaryItem}
+                />
+              ) : null
             }
           />
           <MenuControl

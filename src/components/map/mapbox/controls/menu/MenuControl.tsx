@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, cloneElement } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../../MapContext";
 import { Map as MapBox, IControl, MapMouseEvent } from "mapbox-gl";
@@ -15,21 +15,24 @@ const EVENT_MAP_CLICKED = "event-map-clicked";
 const EVENT_MAP_MOVE_START = "event-map-movestart";
 
 interface MenuControlProps {
-  menu: Menus;
+  menu: Menus | null;
 }
 
 class MapMenuControl implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
   private component: Menus;
+  private map: MapBox | null = null;
 
-  // When user click somewhere on map, you want to notify the MenuControl to
-  // do suitable action.
+  // When the user clicks somewhere on the map, notify the MenuControl
   private mapClickHandler: (event: MapMouseEvent) => void;
   private mapMoveStartHandler: (event: MapMouseEvent) => void;
 
-  constructor(component: Menus) {
+  constructor(component: Menus, map: MapBox) {
     this.component = component;
+    this.map = map;
+
+    // Handlers for map events
     this.mapClickHandler = (event: MapMouseEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP_CLICKED);
     this.mapMoveStartHandler = (event: MapMouseEvent) =>
@@ -84,22 +87,18 @@ const MenuControl: React.FC<MenuControlProps> = ({
   menu,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
-  const [_, setInit] = useState<boolean>(false);
+  const [init, setInit] = useState<boolean>(false);
 
   useEffect(() => {
-    if (map === null) return;
+    if (!map || !menu) return;
 
     // Make it atomic update
-    setInit((prev) => {
-      if (!prev) {
-        // If prev state is false
-        const n = new MapMenuControl(cloneElement(menu, { map: map }));
-        map?.addControl(n, "top-right");
-      }
-      // Only update once.
-      return true;
-    });
-  }, [map, menu]);
+    if (!init) {
+      const control = new MapMenuControl(menu, map);
+      map.addControl(control, "top-right");
+      setInit(true);
+    }
+  }, [map, menu, init]);
 
   return <React.Fragment />;
 };
