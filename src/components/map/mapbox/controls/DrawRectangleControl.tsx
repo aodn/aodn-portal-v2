@@ -6,9 +6,8 @@ import BBoxIcon from "../../../icon/BBoxIcon";
 class DrawRectangleControl implements IControl {
   private draw: MapboxDraw;
   private iconRoot: Root | null = null;
-  private mainContainer: HTMLDivElement | null = null;
-  private map: Map | undefined | null = undefined;
   private container: HTMLDivElement | null = null;
+  private map: Map | undefined | null = undefined;
 
   constructor(draw: MapboxDraw) {
     this.draw = draw;
@@ -16,20 +15,20 @@ class DrawRectangleControl implements IControl {
 
   onAdd(map: Map) {
     this.map = map;
-    this.mainContainer = document.createElement("div");
-    this.mainContainer.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
-    this.iconRoot = createRoot(this.mainContainer);
+    this.container = document.createElement("div");
+    this.container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
+    this.iconRoot = createRoot(this.container);
     this.iconRoot.render(<BBoxIcon />);
-    this.mainContainer.onclick = () => {
+    this.container.onclick = () => {
       this.draw.changeMode("draw_rectangle");
     };
-    this.mainContainer.style.width = "29px";
-    this.mainContainer.style.height = "29px";
-    this.mainContainer.style.display = "flex";
-    this.mainContainer.style.alignItems = "center";
-    this.mainContainer.style.justifyContent = "center";
+    this.container.style.width = "29px";
+    this.container.style.height = "29px";
+    this.container.style.display = "flex";
+    this.container.style.alignItems = "center";
+    this.container.style.justifyContent = "center";
 
-    return this.mainContainer;
+    return this.container;
   }
   onRemove() {
     this.container?.parentNode?.removeChild(this.container);

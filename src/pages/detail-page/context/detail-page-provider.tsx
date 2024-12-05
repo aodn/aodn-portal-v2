@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import {
   fetchFeaturesByUuid,
   fetchResultByUuidNoStore,
@@ -51,22 +51,22 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [downloadConditions, _setDownloadConditions] = useState<
     IDownloadCondition[]
   >([]);
-  const setDownloadConditions = (
-    type: DownloadConditionType,
-    conditions: IDownloadCondition[]
-  ) => {
-    _setDownloadConditions((prev) => {
-      return prev
-        .filter((condition) => condition.type !== type)
-        .concat(conditions);
-    });
-  };
-  const deleteDownloadConditionBy = (id: string) => {
+  const setDownloadConditions = useCallback(
+    (type: DownloadConditionType, conditions: IDownloadCondition[]) => {
+      _setDownloadConditions((prev) => {
+        return prev
+          .filter((condition) => condition.type !== type)
+          .concat(conditions);
+      });
+    },
+    []
+  );
+  const deleteDownloadConditionBy = useCallback((id: string) => {
     _setDownloadConditions((prev) => {
       return prev.filter((condition) => condition.id !== id);
     });
     mapDraw.delete(id);
-  };
+  }, []);
 
   const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
   const [extentsPhotos, setExtentsPhotos] = useState<SpatialExtentPhoto[]>([]);
