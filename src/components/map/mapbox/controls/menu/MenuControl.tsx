@@ -87,18 +87,22 @@ const MenuControl: React.FC<MenuControlProps> = ({
   menu,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
-  const [init, setInit] = useState<boolean>(false);
+  const [_, setInit] = useState<boolean>(false);
 
   useEffect(() => {
     if (!map || !menu) return;
 
     // Make it atomic update
-    if (!init) {
-      const control = new MapMenuControl(menu, map);
-      map.addControl(control, "top-right");
-      setInit(true);
-    }
-  }, [map, menu, init]);
+    setInit((prev) => {
+      if (!prev) {
+        // If prev state is false
+        const n = new MapMenuControl(menu, map);
+        map?.addControl(n, "top-right");
+      }
+      // Only update once.
+      return true;
+    });
+  }, [map, menu]);
 
   return <React.Fragment />;
 };
