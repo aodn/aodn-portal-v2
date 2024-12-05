@@ -2,7 +2,7 @@ import { BBox } from "geojson";
 
 export enum DownloadConditionType {
   BBOX = "bbox",
-  TIME_RANGE = "time_range",
+  DATE_RANGE = "date_range",
 }
 
 export interface IDownloadCondition {
@@ -10,8 +10,8 @@ export interface IDownloadCondition {
   id: string;
 }
 
-export class TimeRangeCondition implements IDownloadCondition {
-  type: DownloadConditionType = DownloadConditionType.TIME_RANGE;
+export class DateRangeCondition implements IDownloadCondition {
+  type: DownloadConditionType = DownloadConditionType.DATE_RANGE;
   id: string;
   start: string;
   end: string;

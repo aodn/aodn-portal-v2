@@ -1,7 +1,8 @@
 import { DownloadConditionType } from "../../pages/detail-page/context/DownloadDefinitions";
 import React, { useCallback } from "react";
 import { Grid, IconButton, Typography, useTheme } from "@mui/material";
-import bbox from "../../assets/icons/bbox.png";
+import BBOX_IMG from "../../assets/icons/bbox.png";
+import TIME_RANGE_IMG from "../../assets/images/time-range.png";
 import CloseIcon from "@mui/icons-material/Close";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 
@@ -15,7 +16,10 @@ const getIcon = (type: DownloadConditionType) => {
   let img = "";
   switch (type) {
     case DownloadConditionType.BBOX:
-      img = bbox;
+      img = BBOX_IMG;
+      break;
+    case DownloadConditionType.DATE_RANGE:
+      img = TIME_RANGE_IMG;
       break;
     default:
       img = "";
@@ -27,6 +31,8 @@ const getTitle = (type: DownloadConditionType) => {
   switch (type) {
     case DownloadConditionType.BBOX:
       return "Bounding Box";
+    case DownloadConditionType.DATE_RANGE:
+      return "Date Range";
     default:
       return "";
   }
