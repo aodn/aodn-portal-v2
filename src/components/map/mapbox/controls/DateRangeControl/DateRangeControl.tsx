@@ -42,6 +42,8 @@ class DateRangeControlClass implements IControl {
 }
 
 interface DateRangeControlProps {
+  minDate: string;
+  maxDate: string;
   setDownloadConditions: (
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
@@ -49,14 +51,15 @@ interface DateRangeControlProps {
 }
 
 const DateRangeControl: React.FC<DateRangeControlProps> = ({
+  minDate,
+  maxDate,
   setDownloadConditions,
 }) => {
   const { map } = useContext(MapContext);
   const [_, setDateRangeControl] = useState<DateRangeControlClass | null>(null);
   const dateSliderControl = useMemo(
-    () =>
-      new DateSliderControlClass("08-2020", "09-2022", setDownloadConditions),
-    [setDownloadConditions]
+    () => new DateSliderControlClass(minDate, maxDate, setDownloadConditions),
+    [maxDate, minDate, setDownloadConditions]
   );
 
   const [isShowingSelector, setIsShowingSelector] = useState(false);

@@ -115,7 +115,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       value={{
         collection,
         setCollection,
-        features,
+        featureCollection: features,
         isCollectionNotFound,
         downloadConditions,
         setDownloadConditions,

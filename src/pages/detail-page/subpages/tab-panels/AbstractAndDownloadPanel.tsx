@@ -17,15 +17,37 @@ import { MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRangeControl from "../../../../components/map/mapbox/controls/DateRangeControl/DateRangeControl";
+import dayjs, { Dayjs } from "dayjs";
 
 const TRUNCATE_COUNT = 800;
 
 const AbstractAndDownloadPanel: FC = () => {
-  const { collection, features, setDownloadConditions, mapDraw } =
+  const { collection, featureCollection, setDownloadConditions, mapDraw } =
     useDetailPageContext();
 
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
+
+  const getMinMaxDateStamps = useCallback(() => {
+    let minDate = dayjs();
+    let maxDate = dayjs("10-1800", "MM-YYYY");
+
+    if (featureCollection) {
+      featureCollection.features.forEach((feature) => {
+        const start = dayjs(feature.properties?.startTime);
+        const end = dayjs(feature.properties?.endTime);
+        if (start.isBefore(minDate)) {
+          minDate = start;
+        }
+        if (end.isAfter(maxDate)) {
+          maxDate = end;
+        }
+      });
+    }
+    return [minDate, maxDate];
+  }, [featureCollection]);
+
+  const [minDateStamp, maxDateStamp] = getMinMaxDateStamps();
 
   const { map } = useContext(MapContext);
 
@@ -96,11 +118,13 @@ const AbstractAndDownloadPanel: FC = () => {
                       }
                     />
                     <DateRangeControl
+                      minDate={minDateStamp.format("MM-YYYY")}
+                      maxDate={maxDateStamp.format("MM-YYYY")}
                       setDownloadConditions={setDownloadConditions}
                     />
                   </Controls>
                   <Layers>
-                    <DetailSymbolLayer featureCollection={features} />
+                    <DetailSymbolLayer featureCollection={featureCollection} />
                   </Layers>
                 </Map>
               </Box>

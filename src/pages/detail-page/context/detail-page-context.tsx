@@ -13,7 +13,7 @@ export interface SpatialExtentPhoto {
 interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
-  features: FeatureCollection<Point> | undefined;
+  featureCollection: FeatureCollection<Point> | undefined;
   isCollectionNotFound: boolean;
   downloadConditions: IDownloadCondition[];
   setDownloadConditions: (
