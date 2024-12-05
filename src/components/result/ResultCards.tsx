@@ -16,15 +16,15 @@ import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
 import useTabNavigation from "../../hooks/useTabNavigation";
 import useFetchData from "../../hooks/useFetchData";
-import { insertItemToBookmarkList } from "../map/mapbox/controls/menu/BookmarkListMenu";
+import { useBookmarkList } from "../../hooks/useBookmarkList";
+import { BookmarkButtonBasicType } from "../bookmark/BookmarkButton";
 
-export interface ResultCard {
+export interface ResultCard extends Partial<BookmarkButtonBasicType> {
   content?: OGCCollection;
   onClickCard?: (item: OGCCollection | undefined) => void;
   onClickDetail?: (uuid: string) => void;
   onClickDownload?: (uuid: string) => void;
   onClickLinks?: (uuid: string) => void;
-  onClickBookmark?: (item: OGCCollection) => void;
   selectedUuid?: string;
   sx?: SxProps;
 }
@@ -37,7 +37,7 @@ interface ResultCards extends ResultCard {
   child: ListChildComponentProps;
 }
 
-interface ResultCardsProps {
+interface ResultCardsProps extends Partial<BookmarkButtonBasicType> {
   layout: Exclude<
     SearchResultLayoutEnum,
     SearchResultLayoutEnum.FULL_MAP
@@ -57,6 +57,7 @@ const renderGridView: FC<ResultCards> = ({
   onClickLinks,
   onClickDownload,
   onClickBookmark,
+  checkIsBookmarked,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -91,6 +92,7 @@ const renderGridView: FC<ResultCards> = ({
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
               onClickBookmark={onClickBookmark}
+              checkIsBookmarked={checkIsBookmarked}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -103,6 +105,7 @@ const renderGridView: FC<ResultCards> = ({
                 onClickLinks={onClickLinks}
                 onClickDownload={onClickDownload}
                 onClickBookmark={onClickBookmark}
+                checkIsBookmarked={checkIsBookmarked}
                 selectedUuid={selectedUuid}
               />
             </Grid>
@@ -122,6 +125,7 @@ const renderListView: FC<ResultCards> = ({
   onClickLinks,
   onClickDownload,
   onClickBookmark,
+  checkIsBookmarked,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -154,6 +158,7 @@ const renderListView: FC<ResultCards> = ({
           onClickLinks={onClickLinks}
           onClickDownload={onClickDownload}
           onClickBookmark={onClickBookmark}
+          checkIsBookmarked={checkIsBookmarked}
           selectedUuid={selectedUuid}
         />
       </ListItem>
@@ -172,6 +177,7 @@ const renderFullListView: FC<Partial<ResultCards>> = ({
   onClickLinks,
   onClickDownload,
   onClickBookmark,
+  checkIsBookmarked,
   selectedUuid,
 }) => {
   if (!count || !total || !contents) return;
@@ -187,6 +193,7 @@ const renderFullListView: FC<Partial<ResultCards>> = ({
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
               onClickBookmark={onClickBookmark}
+              checkIsBookmarked={checkIsBookmarked}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -205,6 +212,8 @@ const ResultCards: FC<ResultCardsProps> = ({
   layout,
   contents,
   onClickCard,
+  onClickBookmark,
+  checkIsBookmarked,
   sx,
   selectedUuids,
 }) => {
@@ -248,11 +257,6 @@ const ResultCards: FC<ResultCardsProps> = ({
     [goToDetailPage]
   );
 
-  const onClickBookmark = useCallback((item: OGCCollection) => {
-    console.log("call onClickBookmark, item===", item);
-    insertItemToBookmarkList(item);
-  }, []);
-
   // Fetching more data for full list view if the initial records less than 20
   useEffect(() => {
     if (
@@ -289,6 +293,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       onClickLinks,
       onClickDownload,
       onClickBookmark,
+      checkIsBookmarked,
       selectedUuid,
     });
   } else if (layout === SearchResultLayoutEnum.GRID) {
@@ -321,6 +326,7 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickDownload,
                   renderLoadMoreButton,
                   onClickBookmark,
+                  checkIsBookmarked,
                   selectedUuid,
                   child,
                 })
@@ -356,6 +362,7 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickLinks,
                   onClickDownload,
                   onClickBookmark,
+                  checkIsBookmarked,
                   renderLoadMoreButton,
                   selectedUuid,
                   child,

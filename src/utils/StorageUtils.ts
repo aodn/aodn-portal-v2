@@ -1,21 +1,22 @@
 import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
 
-const BOOKMARK_ITEMS_KEY = "bookmark-items";
+const BOOKMARK_IDS_KEY = "bookmark-list";
 
-export const loadBookmarksFromStorage = (): Array<OGCCollection> => {
+export const saveBookmarkIdsToStorage = (items: Array<OGCCollection>) => {
   try {
-    const stored = localStorage.getItem(BOOKMARK_ITEMS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const ids = items.map((item) => item.id);
+    localStorage.setItem(BOOKMARK_IDS_KEY, JSON.stringify(ids));
   } catch (e) {
-    console.error("Error loading bookmarks:", e);
-    return [];
+    console.error("Error saving bookmark ids:", e);
   }
 };
 
-export const saveBookmarksToStorage = (items: Array<OGCCollection>) => {
+export const loadBookmarkIdsFromStorage = (): Array<string> => {
   try {
-    localStorage.setItem(BOOKMARK_ITEMS_KEY, JSON.stringify(items));
+    const stored = localStorage.getItem(BOOKMARK_IDS_KEY);
+    return stored ? JSON.parse(stored) : [];
   } catch (e) {
-    console.error("Error saving bookmarks:", e);
+    console.error("Error loading bookmark ids:", e);
+    return [];
   }
 };

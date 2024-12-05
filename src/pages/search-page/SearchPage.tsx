@@ -43,11 +43,16 @@ import { bboxPolygon, booleanEqual } from "@turf/turf";
 import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
-import {
-  collapseAllAccordions,
-  insertTemporaryItemToBookmarkList,
-} from "../../components/map/mapbox/controls/menu/BookmarkListMenu";
 import useFetchData from "../../hooks/useFetchData";
+// import { useBookmarkList } from "../../hooks/useBookmarkList";
+// import {
+//   addBookmarkListItem,
+//   updateBookmarkExpandedItem,
+//   updateBookmarkListTemporaryItem,
+// } from "../../components/common/store/bookmarkListReducer";
+import { useBookmarkList } from "../../hooks/useBookmarkList";
+import { useSelector } from "react-redux";
+import { selectBookmarkList } from "../../components/common/store/bookmarkListReducer";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -70,7 +75,10 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { insertTemporaryItem, collapseAllAccordions, fetchAndAddTemporary } =
+    useBookmarkList();
   const { fillGeometryIfMissing } = useFetchData();
+
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   // State to store the layout that user selected
@@ -327,27 +335,38 @@ const SearchPage = () => {
         // Since map point only store uuid in its feature, so need to fetch dataset here
         // Clicking a map dot or a result card will only add a temporary item in bookmark list, until the bookmark icon is clicked
         setSelectedUuids(uuids);
-        dispatch(fetchResultByUuidNoStore(uuids[0]))
-          .unwrap()
-          .then((res: OGCCollection) => {
-            insertTemporaryItemToBookmarkList(res);
-          });
+        fetchAndAddTemporary(uuids[0]);
+        // dispatch(fetchResultByUuidNoStore(uuids[0]))
+        //   .unwrap()
+        //   .then((res: OGCCollection) => {
+        //     dispatch(updateBookmarkListTemporaryItem(res));
+        //     dispatch(updateBookmarkExpandedItem(res));
+        //   });
       }
     },
-    [dispatch]
+    [collapseAllAccordions, fetchAndAddTemporary]
   );
 
   const onClickCard = useCallback(
     async (item: OGCCollection | undefined) => {
       if (item) {
         // The item set to bookmark list assume spatial extents is there
-        const e = await fillGeometryIfMissing(item);
-        // insertItemToBookmarkList(e);
-        insertTemporaryItemToBookmarkList(e);
+        // const e = await fillGeometryIfMissing(item);
+        // console.log("fillGeometryIfMissing", e);
+        // dispatch(updateBookmarkListTemporaryItem(e));
+        // console.log("after=====");
+        // dispatch(updateBookmarkExpandedItem(e));
+        // insertTemporaryItem(e);
+        // dispatch(fetchResultByUuidNoStore(item.id))
+        //   .unwrap()
+        //   .then((res: OGCCollection) => {
+        //     insertTemporaryItem(res);
+        //   });
+        fetchAndAddTemporary(item.id);
         setSelectedUuids([item.id]);
       }
     },
-    [fillGeometryIfMissing]
+    [fetchAndAddTemporary]
   );
 
   // You will see this trigger twice, this is due to use of strict-mode

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
@@ -12,6 +12,13 @@ import { SortResultEnum } from "../../../components/common/buttons/ResultListSor
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import CircleLoader from "../../../components/loading/CircleLoader";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import {
+  addItem,
+  selectBookmarkItems,
+  selectTemporaryItem,
+  setTemporaryItem,
+} from "../../../components/common/store/bookmarkListReducer";
+import { useAppDispatch } from "../../../components/common/store/hooks";
 
 interface ResultSectionProps {
   showFullMap: boolean;
@@ -41,8 +48,31 @@ const ResultSection: FC<ResultSectionProps> = ({
   selectedUuids,
   isLoading,
 }) => {
+  const dispatch = useAppDispatch();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
+  );
+  const bookmarkItems = useSelector(selectBookmarkItems);
+  const bookmarkTemporaryItem = useSelector(selectTemporaryItem);
+
+  const checkIsBookmarked = useCallback(
+    (uuid: string) => bookmarkItems?.some((item) => item.id === uuid),
+    [bookmarkItems]
+  );
+
+  // TODO:need to expand accordion
+  const onClickBookmark = useCallback(
+    (item: OGCCollection) => {
+      // If click on a temporaryItem
+      console.log("click bookmark");
+      if (bookmarkTemporaryItem && bookmarkTemporaryItem.id === item.id) {
+        dispatch(setTemporaryItem(undefined));
+        dispatch(addItem(item));
+      } else {
+        dispatch(addItem(item));
+      }
+    },
+    [bookmarkTemporaryItem, dispatch]
   );
 
   // Early return if it is full map view or no reduxContents
@@ -76,6 +106,8 @@ const ResultSection: FC<ResultSectionProps> = ({
           layout={currentLayout}
           contents={reduxContents}
           onClickCard={onClickCard}
+          onClickBookmark={onClickBookmark}
+          checkIsBookmarked={checkIsBookmarked}
           selectedUuids={selectedUuids}
         />
       </Box>

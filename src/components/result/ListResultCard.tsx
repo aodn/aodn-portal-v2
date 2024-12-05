@@ -32,6 +32,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   onClickLinks = () => {},
   onClickDownload = () => {},
   onClickBookmark = () => {},
+  checkIsBookmarked = () => false,
   selectedUuid,
   sx,
 }) => {
@@ -156,7 +157,11 @@ const ListResultCard: FC<ListResultCardProps> = ({
           height="20px"
           width="auto"
         >
-          <BookmarkButton dataset={content} onClick={onClickBookmark} />
+          <BookmarkButton
+            dataset={content}
+            onClickBookmark={onClickBookmark}
+            checkIsBookmarked={checkIsBookmarked}
+          />
         </Box>
         <Box height="90px" width="100%">
           <img

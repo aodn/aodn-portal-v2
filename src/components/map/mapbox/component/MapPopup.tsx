@@ -19,6 +19,13 @@ import AppTheme from "../../../../utils/AppTheme";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
+import { useSelector } from "react-redux";
+import {
+  addItem,
+  selectBookmarkItems,
+  selectTemporaryItem,
+  setTemporaryItem,
+} from "../../../common/store/bookmarkListReducer";
 
 interface MapPopupProps {
   layerId: string;
@@ -81,11 +88,34 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
   { layerId, onDatasetSelected, tabNavigation },
   ref
 ) => {
-  const dispatch = useAppDispatch();
   const { map } = useContext(MapContext);
+  const dispatch = useAppDispatch();
+  const bookmarkItems = useSelector(selectBookmarkItems);
+  const bookmarkTemporaryItem = useSelector(selectTemporaryItem);
+
   const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
   const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
   const [popupContent, setPopupContent] = useState<ReactNode | null>(null);
+
+  const checkIsBookmarked = useCallback(
+    (uuid: string) => bookmarkItems?.some((item) => item.id === uuid),
+    [bookmarkItems]
+  );
+
+  // TODO:need to expand accordion
+  const onClickBookmark = useCallback(
+    (item: OGCCollection) => {
+      // If click on a temporaryItem
+      console.log("click bookmark");
+      if (bookmarkTemporaryItem && bookmarkTemporaryItem.id === item.id) {
+        dispatch(setTemporaryItem(undefined));
+        dispatch(addItem(item));
+      } else {
+        dispatch(addItem(item));
+      }
+    },
+    [bookmarkTemporaryItem, dispatch]
+  );
 
   const getCollectionData = useCallback(
     async (uuid: string) => {
@@ -129,13 +159,15 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
                   handleDatasetSelect(collection.id, onDatasetSelected)
                 }
                 tabNavigation={tabNavigation}
+                checkIsBookmarked={checkIsBookmarked}
+                onClickBookmark={onClickBookmark}
               />
             </CardContent>
           </Card>
         </ThemeProvider>
       );
     },
-    [onDatasetSelected, tabNavigation]
+    [checkIsBookmarked, onClickBookmark, onDatasetSelected, tabNavigation]
   );
 
   const removePopup = useCallback(() => {

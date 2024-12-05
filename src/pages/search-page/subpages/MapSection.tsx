@@ -6,7 +6,13 @@ import NavigationControl from "../../../components/map/mapbox/controls/Navigatio
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
-import React, { SetStateAction, useCallback, useState } from "react";
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useState,
+} from "react";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import Layers, {
   createStaticLayers,
@@ -23,6 +29,12 @@ import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
 import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import BookmarkListMenu from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
+import { useBookmarkList } from "../../../hooks/useBookmarkList";
+import { useSelector } from "react-redux";
+import {
+  selectBookmarkItems,
+  selectTemporaryItem,
+} from "../../../components/common/store/bookmarkListReducer";
 
 const mapContainerId = "map-container-id";
 
@@ -38,7 +50,7 @@ interface MapSectionProps {
   zoom?: number;
   sx?: SxProps<Theme>;
   selectedUuids: string[];
-  setSelectedUuids?: (uuids: SetStateAction<string[]>) => void;
+  setSelectedUuids?: Dispatch<React.SetStateAction<string[]>>;
   onMapZoomOrMove: (
     event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
@@ -48,6 +60,9 @@ interface MapSectionProps {
   // onRemoveFromBookmarkList?: (uuid: string) => void;
   isLoading: boolean;
 }
+export const BookmarkContext = createContext<ReturnType<
+  typeof useBookmarkList
+> | null>(null);
 
 const MapSection: React.FC<MapSectionProps> = ({
   showFullList,
@@ -57,14 +72,15 @@ const MapSection: React.FC<MapSectionProps> = ({
   onMapZoomOrMove,
   onToggleClicked,
   onClickMapPoint: onDatasetSelected,
-  // onClickAccordion,
-  // onRemoveFromBookmarkList,
   collections,
   sx,
   selectedUuids,
   setSelectedUuids,
   isLoading,
 }) => {
+  const bookmarkItems = useSelector(selectBookmarkItems);
+  const bookmarkTemporaryItem = useSelector(selectTemporaryItem);
+
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
   );
@@ -103,6 +119,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   if (showFullList) return null;
 
   return (
+    // <BookmarkContext.Provider value={bookmarkFunctions}>
     <Paper
       id={mapContainerId}
       sx={{ height: "100%", ...sx, position: "relative" }}
@@ -127,8 +144,8 @@ const MapSection: React.FC<MapSectionProps> = ({
             menu={
               <BookmarkListMenu
                 setSelectedUuids={setSelectedUuids}
-                // onClickAccordion={onClickAccordion}
-                // onRemoveFromBookmarkList={onRemoveFromBookmarkList}
+                bookmarkItems={bookmarkItems}
+                bookmarkTemporaryItem={bookmarkTemporaryItem}
               />
             }
           />
@@ -187,6 +204,7 @@ const MapSection: React.FC<MapSectionProps> = ({
         </Layers>
       </Map>
     </Paper>
+    // </BookmarkContext.Provider>
   );
 };
 

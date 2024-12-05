@@ -67,6 +67,29 @@ const useFetchData = () => {
     [dispatch]
   );
 
+  // const fillGeometryIfMissing = useCallback(
+  //   async (collection: OGCCollection): Promise<OGCCollection> => {
+  //     if (collection.getGeometry()) {
+  //       return collection;
+  //     }
+
+  //     const param: SearchParameters = {
+  //       filter: `id='${collection.id}'`,
+  //       properties: "id,bbox,geometry",
+  //     };
+
+  //     try {
+  //       // Only fetch the data but don't modify the collection
+  //       await dispatch(fetchResultNoStore(param)).unwrap();
+  //       return collection;
+  //     } catch (error) {
+  //       console.error("Error fetching collection data:", error);
+  //       return collection;
+  //     }
+  //   },
+  //   [dispatch]
+  // );
+
   return { fetchMore, fillGeometryIfMissing };
 };
 

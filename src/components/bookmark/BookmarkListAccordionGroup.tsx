@@ -1,11 +1,10 @@
 import {
   Dispatch,
   FC,
-  SetStateAction,
   SyntheticEvent,
   useCallback,
+  useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { Box, Button, Typography } from "@mui/material";
@@ -16,37 +15,40 @@ import { color, fontColor, fontSize, fontWeight } from "../../styles/constants";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
 import BookmarkListCard from "./BookmarkListCard";
 import BookmarkButton from "./BookmarkButton";
+import { useBookmarkList } from "../../hooks/useBookmarkList";
+import { BookmarkContext } from "../../pages/search-page/subpages/MapSection";
+import { useSelector } from "react-redux";
 import {
-  checkIsBookmarked,
-  insertItemToBookmarkList,
-} from "../map/mapbox/controls/menu/BookmarkListMenu";
+  selectBookmarkItems,
+  selectTemporaryItem,
+} from "../common/store/bookmarkListReducer";
 
 interface BookmarkListAccordionGroupProps {
-  items: Array<OGCCollection> | undefined;
-  temporaryItem: OGCCollection | undefined;
-  expandedItem: OGCCollection | undefined;
-  onRemoveItem: (item: OGCCollection) => void;
-  setExpandedItem: Dispatch<React.SetStateAction<OGCCollection | undefined>>;
-  setSelectedUuids: (uuids: SetStateAction<string[]>) => void;
+  setSelectedUuids: Dispatch<React.SetStateAction<string[]>>;
 }
 
 const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
-  items,
-  temporaryItem,
-  expandedItem,
-  onRemoveItem,
-  setExpandedItem,
   setSelectedUuids,
 }) => {
-  // State to store accordion group list, which is the combination of temporary item and (bookmark list)items
+  const {
+    items,
+    temporaryItem,
+    expandedItem,
+    setExpandedItem,
+    insertItem,
+    removeItem,
+  } = useBookmarkList();
+  // const bookmarkFunctions = useContext(BookmarkContext);
+  // console.log("in accordion group, bookmarkFunctions", bookmarkFunctions);
+
+  // State to store accordion group list
   const [accordionGroupItems, setAccordionGroupItems] = useState<
     Array<OGCCollection>
   >([]);
-
-  // State to store the mouse hover status - if hovering on any button clicking will not expand/collapse an accordion
+  console.log("accordionGroupItems", accordionGroupItems);
+  // State to store the mouse hover status
   const [hoverOnButton, setHoverOnButton] = useState<boolean>(false);
 
-  // When click on an other accordion (if not click on the buttons) will collapse the current one and expand the click one
   const handleChange = useCallback(
     (item: OGCCollection, hoverOnRemoveButton: boolean) =>
       (_: SyntheticEvent, newExpanded: boolean) => {
@@ -59,34 +61,28 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
 
   const handleRemove = useCallback(
     (item: OGCCollection) => {
-      // Keep the current expansion status when remove the other un-expanded pinned datasets
-      setExpandedItem((prev) => (prev?.id === item.id ? undefined : prev));
-      onRemoveItem && onRemoveItem(item);
+      setExpandedItem(expandedItem?.id === item.id ? undefined : expandedItem);
+      removeItem(item.id);
     },
-    [setExpandedItem, onRemoveItem]
+    [expandedItem, removeItem, setExpandedItem]
   );
 
   useEffect(() => {
     setAccordionGroupItems(() => {
+      console.log("setAccordionGroupItems");
       if (items) {
-        // Create a Set of existing IDs to check for duplicates
         const existingIds = new Set(items.map((item) => item.id));
 
         if (temporaryItem) {
-          // If we have a temporary item, add it at the start only if it's not in items
           if (!existingIds.has(temporaryItem.id)) {
             return [temporaryItem, ...items];
           }
           return [...items];
-        } else {
-          // If no temporary item, just return items
-          return [...items];
         }
+        return [...items];
       } else if (temporaryItem) {
-        // If we only have a temporary item and no items
         return [temporaryItem];
       }
-      // If no items and no temporary item
       return [];
     });
   }, [items, temporaryItem]);
@@ -114,8 +110,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               >
                 <BookmarkButton
                   dataset={item}
-                  onClick={() => insertItemToBookmarkList(item)}
-                  // bookmarked={async () => await checkIsBookmarked(item.id)}
+                  onClickBookmark={() => insertItem(item)}
                 />
               </Box>
 
