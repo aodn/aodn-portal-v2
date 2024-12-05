@@ -1,15 +1,21 @@
 import mapboxgl, { IControl, Map } from "mapbox-gl";
 import { createRoot, Root } from "react-dom/client";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import MapContext from "../../MapContext";
-import DateSelectorControlClass from "./DateSelectorControl";
+import DateSliderControlClass from "./DateSliderControl";
+import { Button } from "@mui/material";
+import timeRange from "../../../../../../src/assets/images/time-range.png";
+import {
+  DownloadConditionType,
+  IDownloadCondition,
+} from "../../../../../pages/detail-page/context/DownloadDefinitions";
 
 class DateRangeControlClass implements IControl {
   private container: HTMLDivElement | null = null;
   private iconRoot: Root | null = null;
   private map: Map | undefined | null = undefined;
 
-  private setIsShowingDateSelector: () => void;
+  private readonly setIsShowingDateSelector: () => void;
 
   constructor(setIsShowingDateSelector: () => void) {
     this.setIsShowingDateSelector = setIsShowingDateSelector;
@@ -20,7 +26,11 @@ class DateRangeControlClass implements IControl {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
     this.iconRoot = createRoot(this.container);
-    this.iconRoot.render(<button>daterange</button>);
+    this.iconRoot.render(
+      <button>
+        <img alt="" src={timeRange}></img>
+      </button>
+    );
     this.container.onclick = this.setIsShowingDateSelector;
     return this.container;
   }
@@ -31,17 +41,24 @@ class DateRangeControlClass implements IControl {
   }
 }
 
-const DateRangeControl = ({
-  setIsShowingDateSelector,
-}: {
-  setIsShowingDateSelector: () => void;
+interface DateRangeControlProps {
+  setDownloadConditions: (
+    type: DownloadConditionType,
+    conditions: IDownloadCondition[]
+  ) => void;
+}
+
+const DateRangeControl: React.FC<DateRangeControlProps> = ({
+  setDownloadConditions,
 }) => {
   const { map } = useContext(MapContext);
   const [_, setDateRangeControl] = useState<DateRangeControlClass | null>(null);
-  const [dateSelectorControl, setDateSelectorControl] =
-    useState<DateSelectorControlClass>(
-      new DateSelectorControlClass("1", "2", () => {})
-    );
+  const dateSliderControl = useMemo(
+    () =>
+      new DateSliderControlClass("08-2020", "09-2022", setDownloadConditions),
+    [setDownloadConditions]
+  );
+
   const [isShowingSelector, setIsShowingSelector] = useState(false);
 
   const toggleIsShowingSelector = () => {
@@ -50,11 +67,11 @@ const DateRangeControl = ({
 
   useEffect(() => {
     if (isShowingSelector) {
-      map?.addControl(dateSelectorControl, "bottom-right");
+      map?.addControl(dateSliderControl, "bottom-right");
     } else {
-      map?.removeControl(dateSelectorControl);
+      map?.removeControl(dateSliderControl);
     }
-  }, [dateSelectorControl, isShowingSelector, map]);
+  }, [dateSliderControl, isShowingSelector, map]);
 
   useEffect(() => {
     if (map === null) return;

@@ -95,7 +95,9 @@ const AbstractAndDownloadPanel: FC = () => {
                         />
                       }
                     />
-                    <DateRangeControl />
+                    <DateRangeControl
+                      setDownloadConditions={setDownloadConditions}
+                    />
                   </Controls>
                   <Layers>
                     <DetailSymbolLayer featureCollection={features} />

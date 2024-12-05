@@ -3,44 +3,43 @@ import { Grid, Typography } from "@mui/material";
 import PlainSlider from "../../../../common/slider/PlainSlider";
 import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
 import dayjs from "dayjs";
-import { useDetailPageContext } from "../../../../../pages/detail-page/context/detail-page-context";
-import {
-  DownloadConditionType,
-  TimeRangeCondition,
-} from "../../../../../pages/detail-page/context/DownloadDefinitions";
+import _ from "lodash";
 
 interface DateSliderProps {
   minDate: string;
   maxDate: string;
-  setDownloadConditions: (startDate: string, endDate: string) => void;
+  onDateRangeChange: (dateRangeStamp: number[]) => void;
 }
 
+const dateFormat = "MM-YYYY";
 const DateSlider: React.FC<DateSliderProps> = ({
   minDate,
   maxDate,
-  setDownloadConditions,
+  onDateRangeChange,
 }) => {
   const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
-    dateToValue(dayjs(minDate, "YYYY-MM")),
-    dateToValue(dayjs(maxDate, "YYYY-MM")),
+    dateToValue(dayjs(minDate, dateFormat)),
+    dateToValue(dayjs(maxDate, dateFormat)),
   ]);
-  const { setDownloadConditions } = useDetailPageContext();
-  const [popperOpen, setPopperOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
 
+  const debounceSliderChange = useRef<_.DebouncedFunc<
+    (dateStamps: any) => void
+  > | null>(null);
+
   useEffect(() => {
-    if (
-      dateRangeStamp[0] !== dateToValue(dayjs(minDate, "YYYY-MM")) ||
-      dateRangeStamp[1] !== dateToValue(dayjs(maxDate, "YYYY-MM"))
-    ) {
-      setPopperOpen(true);
-      const start = dayjs(dateRangeStamp[0]).format("YYYY-MM");
-      const end = dayjs(dateRangeStamp[1]).format("YYYY-MM");
-      const timeRangeToSet = new TimeRangeCondition(start, end, start + end);
-      setDownloadConditions(DownloadConditionType.TIME_RANGE, [timeRangeToSet]);
-    }
-  }, [dateRangeStamp, maxDate, minDate]);
+    debounceSliderChange.current = _.debounce((newValue: number | number[]) => {
+      onDateRangeChange(dateRangeStamp);
+    }, 500);
+
+    return () => {
+      debounceSliderChange.current?.cancel();
+    };
+  }, [dateRangeStamp, onDateRangeChange]);
+
+  useEffect(() => {
+    debounceSliderChange?.current?.(dateRangeStamp);
+  }, [dateRangeStamp]);
 
   const handleSliderChange = useCallback(
     (event: Event, newValue: number | number[]) => {
@@ -64,8 +63,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
       <Grid item md={8} container sx={{ paddingTop: "10px" }}>
         <PlainSlider
           value={dateRangeStamp}
-          min={dateToValue(dayjs(minDate))}
-          max={dateToValue(dayjs(maxDate))}
+          min={dateToValue(dayjs(minDate, dateFormat))}
+          max={dateToValue(dayjs(maxDate, dateFormat))}
           onChange={handleSliderChange}
           valueLabelDisplay="auto"
           valueLabelFormat={(value: number) =>
