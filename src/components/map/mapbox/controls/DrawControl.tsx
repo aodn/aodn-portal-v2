@@ -35,7 +35,7 @@ const DrawControl: React.FC<DrawControlProps> = ({
   const updateArea = useCallback(() => {
     const features = draw.getAll().features;
     const bboxes: BBoxCondition[] = [];
-    features.forEach((feature) => {
+    features?.forEach((feature) => {
       const geo = feature.geometry;
       if (geo.type === "Polygon") {
         const polygon = geo as Polygon;
@@ -86,10 +86,14 @@ const DrawControl: React.FC<DrawControlProps> = ({
 
     return () => {
       if (!map) return;
-      map.off("draw.create", updateArea);
-      map.off("draw.delete", updateArea);
-      map.off("draw.update", updateArea);
-      map.removeControl(draw);
+      try {
+        map.off("draw.create", updateArea);
+        map.off("draw.delete", updateArea);
+        map.off("draw.update", updateArea);
+        map.removeControl(draw);
+      } catch (ignored) {
+        /* can be ignored */
+      }
     };
   }, [draw, map, updateArea]);
 

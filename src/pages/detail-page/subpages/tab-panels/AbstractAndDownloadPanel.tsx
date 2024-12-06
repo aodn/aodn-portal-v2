@@ -35,7 +35,7 @@ const AbstractAndDownloadPanel: FC = () => {
     let maxDate = dayjs("10-1800", SIMPLE_DATE_FORMAT);
 
     if (featureCollection) {
-      featureCollection.features.forEach((feature) => {
+      featureCollection.features?.forEach((feature) => {
         const start = dayjs(feature.properties?.startTime);
         const end = dayjs(feature.properties?.endTime);
         if (start.isBefore(minDate)) {
