@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import {
   fetchFeaturesByUuid,
   fetchResultByUuidNoStore,
@@ -9,6 +9,27 @@ import { OGCCollection } from "../../../components/common/store/OGCCollectionDef
 import { useAppDispatch } from "../../../components/common/store/hooks";
 import { HttpStatusCode } from "axios";
 import { FeatureCollection, Point } from "geojson";
+import {
+  DownloadConditionType,
+  IDownloadCondition,
+} from "./DownloadDefinitions";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import DrawRectangle from "../../../components/map/mapbox/controls/DrawRectangle";
+
+import "mapbox-gl/dist/mapbox-gl.css";
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+
+const mapDraw = new MapboxDraw({
+  displayControlsDefault: false,
+  controls: {
+    trash: true,
+  },
+  defaultMode: "simple_select",
+  modes: {
+    ...MapboxDraw.modes,
+    draw_rectangle: DrawRectangle,
+  },
+});
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -27,6 +48,26 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   >(undefined);
   const [isCollectionNotFound, setIsCollectionNotFound] =
     useState<boolean>(false);
+  const [downloadConditions, _setDownloadConditions] = useState<
+    IDownloadCondition[]
+  >([]);
+  const setDownloadConditions = useCallback(
+    (type: DownloadConditionType, conditions: IDownloadCondition[]) => {
+      _setDownloadConditions((prev) => {
+        return prev
+          .filter((condition) => condition.type !== type)
+          .concat(conditions);
+      });
+    },
+    []
+  );
+  const deleteDownloadConditionBy = useCallback((id: string) => {
+    _setDownloadConditions((prev) => {
+      return prev.filter((condition) => condition.id !== id);
+    });
+    mapDraw.delete(id);
+  }, []);
+
   const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
   const [extentsPhotos, setExtentsPhotos] = useState<SpatialExtentPhoto[]>([]);
   const [photoHovered, setPhotoHovered] = useState<SpatialExtentPhoto>();
@@ -74,8 +115,12 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       value={{
         collection,
         setCollection,
-        features,
+        featureCollection: features,
         isCollectionNotFound,
+        downloadConditions,
+        setDownloadConditions,
+        deleteDownloadConditionBy,
+        mapDraw,
         photos,
         setPhotos,
         extentsPhotos,

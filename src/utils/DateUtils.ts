@@ -1,5 +1,7 @@
 // This file is only for date time related helper methods e.g comparing dates, convert timezone, etc.
 
+import dayjs, { Dayjs } from "dayjs";
+
 /**
  * Converts a date string from ISO 8601 format to a more readable format.
  *
@@ -24,3 +26,9 @@ export const convertDateFormat = (dateString: string): string => {
   //  the issue in geonetwork is resolved.
   return dateTimeString.replace(/GMT\+\d{4}/g, "GMT+0000");
 };
+
+// Utility function to convert a date to a numeric value
+export const dateToValue = (date: Dayjs): number => date.valueOf();
+
+// Utility function to convert a numeric value back to a date
+export const valueToDate = (value: number): Dayjs => dayjs(value);

@@ -4820,6 +4820,7 @@ __metadata:
     lint-staged: "npm:^15.2.2"
     lodash: "npm:^4.17.21"
     mapbox-gl: "npm:3.4.0"
+    mapbox-gl-draw-rectangle-mode: "npm:^1.0.4"
     maplibre-gl: "npm:^4.0.0"
     media-typer: "npm:^1.1.0"
     msw: "npm:^2.4.9"
@@ -9159,6 +9160,13 @@ __metadata:
   version: 4.3.0
   resolution: "map-obj@npm:4.3.0"
   checksum: 10c0/1c19e1c88513c8abdab25c316367154c6a0a6a0f77e3e8c391bb7c0e093aefed293f539d026dc013d86219e5e4c25f23b0003ea588be2101ccd757bacc12d43b
+  languageName: node
+  linkType: hard
+
+"mapbox-gl-draw-rectangle-mode@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "mapbox-gl-draw-rectangle-mode@npm:1.0.4"
+  checksum: 10c0/499093962563be8168dad530ba538164edaa020fdd441bcd25733a6e751ad55b0dd3600a156903c7e53b5ffe0d5749df1104508eb907df5909209718ac5cc095
   languageName: node
   linkType: hard
 
