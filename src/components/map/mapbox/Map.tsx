@@ -136,8 +136,10 @@ const ReactMap = ({
       map.on("movestart", () => debounceOnZoomEvent.cancel());
       map.on("zoomestart", () => debounceOnZoomEvent.cancel());
 
-      map.on("zoomend", debounceOnZoomEvent);
-      map.on("moveend", debounceOnMoveEvent);
+      // Do not setup here, the useEffect block will setup it correctly, if you set it here
+      // you will get one extra data load which is of no use.
+      // map.on("zoomend", debounceOnZoomEvent);
+      // map.on("moveend", debounceOnMoveEvent);
 
       // Create a resize observer to the canvas so we know if its size have changed
       // and we need to redraw the map
@@ -158,6 +160,7 @@ const ReactMap = ({
         if (containerRef.current) {
           resizeObserver.unobserve(containerRef.current);
         }
+        // We need this when the map destroy
         map.off("zoomend", debounceOnZoomEvent);
         map.off("moveend", debounceOnMoveEvent);
         map.remove();

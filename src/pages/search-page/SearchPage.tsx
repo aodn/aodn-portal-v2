@@ -40,10 +40,7 @@ import { color, padding } from "../../styles/constants";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "../../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
 import {
@@ -113,21 +110,18 @@ const SearchPage = () => {
     [currentLayout]
   );
 
-  //util function for join uuids in a specific pattern for fetching data
-  const createFilterString = (uuids: Array<string>): string => {
-    if (!Array.isArray(uuids) || uuids.length === 0) {
-      return "";
-    }
-    return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
-  };
-
-  const doMapSearch = useCallback(() => {
+  const doMapSearch = useCallback(async () => {
     const componentParam: ParameterState = getComponentState(store.getState());
 
-    // Use a different parameter so that it return id and bbox only and do not store the values,
+    // Use a different parameter so that it returns id and bbox only and do not store the values,
     // we cannot add page because we want to show all record on map
-    const paramNonPaged = createSearchParamFrom(componentParam);
-    return dispatch(
+    // and by default we will include record without spatial extents so that BBOX
+    // will not exclude record without spatial extents however for map search
+    // it is ok to exclude it because it isn't show on map anyway
+    const paramNonPaged = createSearchParamFrom(componentParam, {
+      includeNoSpatialExtents: false,
+    });
+    const collections = await dispatch(
       // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
       // and ordered by uuid to avoid affecting cluster calculation
       fetchResultNoStore({
@@ -135,11 +129,8 @@ const SearchPage = () => {
         properties: "id,centroid",
         sortby: "id",
       })
-    )
-      .unwrap()
-      .then((collections) => {
-        setLayers(collections.collections);
-      });
+    ).unwrap();
+    setLayers(collections.collections);
   }, [dispatch]);
 
   const doSearch = useCallback(
@@ -243,7 +234,7 @@ const SearchPage = () => {
         // but do not navigate again.
         doSearch(false);
       }
-      // If it is navigate from this component, and no need to search, that
+      // If it is navigated from this component, and no need to search, that
       // mean we already call doSearch() + doMapSearch(), however if you
       // come from other page, the result list is good because we remember it
       // but the map need init again and therefore need to do a doMapSearch()
@@ -326,26 +317,24 @@ const SearchPage = () => {
 
   // util function to get collection data given uuid
   const fillGeometryIfMissing = useCallback(
-    (collection: OGCCollection): Promise<OGCCollection> => {
+    async (collection: OGCCollection): Promise<OGCCollection> => {
       if (collection.getGeometry())
-        return new Promise((resolve, reject) => resolve(collection));
+        return new Promise((resolve) => resolve(collection));
 
       const param: SearchParameters = {
         filter: `id='${collection.id}'`,
         properties: "id,bbox,geometry",
       };
 
-      return dispatch(fetchResultNoStore(param))
-        .unwrap()
-        .then((value: OGCCollections) => {
-          collection.properties = value.collections[0].properties;
-          collection.extentInt = value.collections[0].extent;
-          return collection;
-        })
-        .catch((error: any) => {
-          console.error("Error fetching collection data:", error);
-          return collection;
-        });
+      try {
+        const value = await dispatch(fetchResultNoStore(param)).unwrap();
+        collection.properties = value.collections[0].properties;
+        collection.extentInt = value.collections[0].extent;
+        return collection;
+      } catch (error) {
+        console.error("Error fetching collection data:", error);
+        return collection;
+      }
     },
     [dispatch]
   );

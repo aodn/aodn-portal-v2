@@ -8,7 +8,7 @@ import {
 } from "react";
 import MapContext from "../MapContext";
 import { GeoJSONSource } from "mapbox-gl";
-import MapPopup, { PopupType } from "../component/MapPopup";
+import MapPopup from "../component/MapPopup";
 import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
@@ -103,7 +103,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   onDatasetSelected,
   tabNavigation,
   clusterLayerConfig,
-  showFullMap,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
   const [_, setLastVisiblePoint] = useState<
@@ -279,7 +278,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     <>
       <MapPopup
         layerId={unclusterPointLayer}
-        popupType={showFullMap ? PopupType.Complex : PopupType.Basic}
         onDatasetSelected={onDatasetSelected}
         tabNavigation={tabNavigation}
       />
@@ -294,7 +292,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unclusterPointLayer}
         onDatasetSelected={onDatasetSelected}
-        showFullMap={showFullMap}
         tabNavigation={tabNavigation}
       />
       <TestHelper getHeatmapLayer={() => clusterLayer} />

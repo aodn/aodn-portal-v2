@@ -78,7 +78,6 @@ const MapSection: React.FC<MapSectionProps> = ({
             <HeatmapLayer
               featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
-              showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
               tabNavigation={tabNavigation}
             />
@@ -89,14 +88,13 @@ const MapSection: React.FC<MapSectionProps> = ({
             <ClusterLayer
               featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
-              showFullMap={showFullMap}
               onDatasetSelected={onDatasetSelected}
               tabNavigation={tabNavigation}
             />
           );
       }
     },
-    [collections, onDatasetSelected, selectedUuids, showFullMap, tabNavigation]
+    [collections, onDatasetSelected, selectedUuids, tabNavigation]
   );
 
   // Early return if it is full list view
