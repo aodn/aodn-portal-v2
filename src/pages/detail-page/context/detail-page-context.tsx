@@ -37,7 +37,7 @@ interface DetailPageContextType {
 const DetailPageContextDefault = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
-  features: {} as FeatureCollection<Point> | undefined,
+  featureCollection: {} as FeatureCollection<Point> | undefined,
   isCollectionNotFound: false,
   downloadConditions: [],
   setDownloadConditions: () => {},
