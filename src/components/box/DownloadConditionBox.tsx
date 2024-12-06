@@ -13,7 +13,7 @@ interface DownloadConditionBoxProps {
 }
 
 const getIcon = (type: DownloadConditionType) => {
-  let img = "";
+  let img: string;
   switch (type) {
     case DownloadConditionType.BBOX:
       img = BBOX_IMG;

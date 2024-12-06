@@ -47,7 +47,7 @@ class DateSliderControlClass implements IControl {
     this.setDownloadConditions = setDownloadConditions;
   }
 
-  onAdd(map: mapboxgl.Map): HTMLElement {
+  onAdd(_: mapboxgl.Map): HTMLElement {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
     this.root = createRoot(this.container!);

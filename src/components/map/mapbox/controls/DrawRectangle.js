@@ -2,6 +2,8 @@
  * It is a copy of the DrawRectangle mode from mapbox-gl-draw-rectangle-mode library.
  * Because this library is not actively maintained (newest update was 6 years ago)
  * so i copied the code here to make sure if anything imcompatible, we can fix it.
+ * The mapbox-gl-draw-rectangle-mode library is also added to the project as a dependency
+ * so we can leverage dependabot to supervise the vulnerabilities.
  * @type {{enable: doubleClickZoom.enable, disable(*): void}}
  */
 const doubleClickZoom = {

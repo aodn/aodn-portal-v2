@@ -42,7 +42,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
   }, [dateRangeStamp]);
 
   const handleSliderChange = useCallback(
-    (event: Event, newValue: number | number[]) => {
+    (_: Event, newValue: number | number[]) => {
       setDateRangeStamp(newValue as number[]);
     },
     []
@@ -68,7 +68,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
           onChange={handleSliderChange}
           valueLabelDisplay="auto"
           valueLabelFormat={(value: number) =>
-            valueToDate(value).format("MM/YYYY")
+            valueToDate(value).format(SIMPLE_DATE_FORMAT)
           }
         />
       </Grid>

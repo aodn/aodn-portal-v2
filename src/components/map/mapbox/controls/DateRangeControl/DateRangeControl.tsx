@@ -3,7 +3,6 @@ import { createRoot, Root } from "react-dom/client";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import MapContext from "../../MapContext";
 import DateSliderControlClass from "./DateSliderControl";
-import { Button } from "@mui/material";
 import timeRange from "../../../../../../src/assets/images/time-range.png";
 import {
   DownloadConditionType,
@@ -35,7 +34,7 @@ class DateRangeControlClass implements IControl {
     return this.container;
   }
 
-  onRemove(map: mapboxgl.Map) {
+  onRemove(_: mapboxgl.Map) {
     this.container?.parentNode?.removeChild(this.container);
     this.map = undefined;
   }

@@ -18,11 +18,19 @@ const BBoxConditionBox: React.FC<BBoxConditionProps> = ({ bboxCondition }) => {
       type={DownloadConditionType.BBOX}
       conditionId={bboxCondition.id}
     >
-      <Grid container sx={{}}>
-        <BBoxItem label={"N"} value={bbox[3]} />
-        <BBoxItem label={"W"} value={bbox[0]} />
-        <BBoxItem label={"S"} value={bbox[1]} />
-        <BBoxItem label={"E"} value={bbox[2]} />
+      <Grid container>
+        <Grid item md={5}>
+          <BBoxItem label={"N"} value={bbox[3]} />
+        </Grid>
+        <Grid item md={5}>
+          <BBoxItem label={"W"} value={bbox[0]} />
+        </Grid>
+        <Grid item md={5}>
+          <BBoxItem label={"S"} value={bbox[1]} />
+        </Grid>
+        <Grid item md={5}>
+          <BBoxItem label={"E"} value={bbox[2]} />
+        </Grid>
       </Grid>
     </DownloadConditionBox>
   );
