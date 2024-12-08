@@ -4,13 +4,13 @@ import { LngLatBounds, MapMouseEvent, LngLat } from "mapbox-gl";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 import * as turf from "@turf/turf";
+import { BookmarkButtonBasicType } from "../../../bookmark/BookmarkButton";
 
-export interface LayersProps {
+export interface LayerBasicType extends Partial<BookmarkButtonBasicType> {
   // Tile layer should added to map
-  // collections?: Array<OGCCollection>;
   featureCollection?: FeatureCollection<Point>;
   // Event fired when user click on the point layer
-  onDatasetSelected?: (uuids: Array<string>) => void;
+  onClickMapPoint?: (uuids: Array<string>) => void;
   // dataset that user selected from result list or map
   selectedUuids?: string[];
   tabNavigation?: (uuid: string, tab: string, section?: string) => void;
@@ -138,7 +138,7 @@ const defaultMouseLeaveEventHandler = (ev: MapMouseEvent): void => {
   ev.target.getCanvas().style.cursor = "";
 };
 
-const Layers = (props: PropsWithChildren<LayersProps>) => {
+const Layers = (props: PropsWithChildren<LayerBasicType>) => {
   return <>{props.children}</>;
 };
 

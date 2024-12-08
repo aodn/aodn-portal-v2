@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, cloneElement } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../../MapContext";
 import { Map as MapBox, IControl, MapMouseEvent } from "mapbox-gl";
@@ -15,25 +15,39 @@ const EVENT_MAP_CLICKED = "event-map-clicked";
 const EVENT_MAP_MOVE_START = "event-map-movestart";
 
 interface MenuControlProps {
-  menu: Menus;
+  menu: Menus | null;
 }
 
 class MapMenuControl implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
   private component: Menus;
+  private map: MapBox | null = null;
 
-  // When user click somewhere on map, you want to notify the MenuControl to
-  // do suitable action.
+  // When the user clicks somewhere on the map, notify the MenuControl
   private mapClickHandler: (event: MapMouseEvent) => void;
   private mapMoveStartHandler: (event: MapMouseEvent) => void;
 
-  constructor(component: Menus) {
+  constructor(component: Menus, map: MapBox) {
     this.component = component;
+    this.map = map;
+
+    // Handlers for map events
     this.mapClickHandler = (event: MapMouseEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP_CLICKED);
     this.mapMoveStartHandler = (event: MapMouseEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP_MOVE_START);
+  }
+
+  updateComponent(component: Menus) {
+    this.component = component;
+    this.render();
+  }
+
+  private render() {
+    if (this.root && this.container) {
+      this.root.render(this.component);
+    }
   }
 
   onAdd(map: MapBox) {
@@ -46,7 +60,7 @@ class MapMenuControl implements IControl {
     // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#updates-to-client-rendering-apis
     // according to document, you need "!" at the end of container
     this.root = createRoot(this.container!);
-    this.root.render(this.component);
+    this.render();
 
     map?.on("click", this.mapClickHandler);
     map?.on("movestart", this.mapMoveStartHandler);
@@ -84,22 +98,28 @@ const MenuControl: React.FC<MenuControlProps> = ({
   menu,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
-  const [_, setInit] = useState<boolean>(false);
+  const [control, setControl] = useState<MapMenuControl | null>(null);
 
+  // Creation effect
   useEffect(() => {
-    if (map === null) return;
+    if (!map || !menu) return;
 
-    // Make it atomic update
-    setInit((prev) => {
+    setControl((prev) => {
       if (!prev) {
-        // If prev state is false
-        const n = new MapMenuControl(cloneElement(menu, { map: map }));
-        map?.addControl(n, "top-right");
+        const newControl = new MapMenuControl(menu, map);
+        map?.addControl(newControl, "top-right");
+        return newControl;
       }
-      // Only update once.
-      return true;
+      return prev;
     });
   }, [map, menu]);
+
+  // Props update effect
+  useEffect(() => {
+    if (control && menu) {
+      control.updateComponent(menu);
+    }
+  }, [control, menu]);
 
   return <React.Fragment />;
 };

@@ -13,7 +13,7 @@ import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
-  LayersProps,
+  LayerBasicType,
 } from "./Layers";
 import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
@@ -45,8 +45,8 @@ interface HeatmapConfig {
   circle: HeatmapCircle;
 }
 
-interface HeatmapLayerProps extends LayersProps {
-  // Some method inherit from LayersProps
+interface HeatmapLayerProps extends LayerBasicType {
+  // Some method inherit from LayerBasicType
   heatmapLayerConfig?: Partial<HeatmapConfig>;
 }
 
@@ -108,9 +108,11 @@ const getUnclusterPointLayerId = (layerId: string) =>
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
   featureCollection = generateFeatureCollectionFrom(undefined),
   selectedUuids,
-  onDatasetSelected,
+  onClickMapPoint: onDatasetSelected,
   tabNavigation,
   heatmapLayerConfig,
+  onClickBookmark,
+  checkIsBookmarked,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
   const [_, setLastVisiblePoint] = useState<
@@ -333,6 +335,8 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         layerId={unClusterPointLayer}
         onDatasetSelected={onDatasetSelected}
         tabNavigation={tabNavigation}
+        onClickBookmark={onClickBookmark}
+        checkIsBookmarked={checkIsBookmarked}
       />
       <SpatialExtents
         layerId={unClusterPointLayer}
@@ -344,8 +348,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         clusterLayer={clusterLayer}
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unClusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
+        onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
+        onClickBookmark={onClickBookmark}
+        checkIsBookmarked={checkIsBookmarked}
       />
       <TestHelper getHeatmapLayer={() => heatmapLayer} />
     </>

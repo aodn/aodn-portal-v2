@@ -72,6 +72,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
         id="layer-show-hide-menu-button"
         ref={anchorRef}
         onClick={handleToggle}
+        sx={{ paddingTop: "3px !important" }}
       >
         <LayersIcon />
       </IconButton>

@@ -13,7 +13,7 @@ import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
-  LayersProps,
+  LayerBasicType,
 } from "./Layers";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
@@ -47,8 +47,8 @@ interface ClusterLayerConfig {
   unclusterPointRadius: number;
 }
 
-interface ClusterLayerProps extends LayersProps {
-  // Some method inherit from LayersProps
+interface ClusterLayerProps extends LayerBasicType {
+  // Some method inherit from LayerBasicType
   clusterLayerConfig?: Partial<ClusterLayerConfig>;
 }
 
@@ -100,9 +100,11 @@ export const getUnclusterPointId = (layerId: string) =>
 const ClusterLayer: FC<ClusterLayerProps> = ({
   featureCollection = generateFeatureCollectionFrom(undefined),
   selectedUuids,
-  onDatasetSelected,
+  onClickMapPoint: onDatasetSelected,
   tabNavigation,
   clusterLayerConfig,
+  onClickBookmark,
+  checkIsBookmarked,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
   const [_, setLastVisiblePoint] = useState<
@@ -280,6 +282,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         layerId={unclusterPointLayer}
         onDatasetSelected={onDatasetSelected}
         tabNavigation={tabNavigation}
+        onClickBookmark={onClickBookmark}
+        checkIsBookmarked={checkIsBookmarked}
       />
       <SpatialExtents
         layerId={unclusterPointLayer}
@@ -291,8 +295,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         clusterLayer={clusterLayer}
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unclusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
+        onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
+        onClickBookmark={onClickBookmark}
+        checkIsBookmarked={checkIsBookmarked}
       />
       <TestHelper getHeatmapLayer={() => clusterLayer} />
     </>

@@ -1,15 +1,18 @@
+import React, { useCallback, useState } from "react";
+import { MapboxEvent as MapEvent } from "mapbox-gl";
 import { Paper, SxProps, Theme } from "@mui/material";
-import Map from "../../../components/map/mapbox/Map";
+import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
-import ToggleControl from "../../../components/map/mapbox/controls/ToggleControl";
+import ToggleControl, {
+  ToggleControlBasicType,
+} from "../../../components/map/mapbox/controls/ToggleControl";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
-import React, { useCallback, useState } from "react";
-import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import Layers, {
   createStaticLayers,
+  LayerBasicType,
 } from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
@@ -22,32 +25,31 @@ import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
 import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import PinListMenu from "../../../components/map/mapbox/controls/menu/PinListMenu";
+import BookmarkListMenu, {
+  BookmarkListMenuBasicType,
+} from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 
-const mapContainerId = "map-container-id";
+interface MapSectionProps
+  extends Partial<MapBasicType>,
+    Partial<LayerBasicType>,
+    BookmarkListMenuBasicType,
+    ToggleControlBasicType {
+  showFullMap: boolean;
+  showFullList: boolean;
+  collections: OGCCollection[];
+  sx?: SxProps<Theme>;
+  onMapZoomOrMove: (
+    event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+  ) => void;
+  isLoading: boolean;
+}
+
+const mapContainerId = "result-page-main-map";
 
 enum LayerName {
   Heatmap = "heatmap",
   Cluster = "cluster",
 }
-interface MapSectionProps {
-  showFullMap: boolean;
-  showFullList: boolean;
-  collections: OGCCollection[];
-  bbox?: LngLatBounds;
-  zoom?: number;
-  sx?: SxProps<Theme>;
-  selectedUuids: string[];
-  onMapZoomOrMove: (
-    event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-  ) => void;
-  onToggleClicked: (v: boolean) => void;
-  onClickMapPoint?: (uuids: Array<string>) => void;
-  onClickAccordion?: (uuid: string | undefined) => void;
-  onRemoveFromPinList?: (uuid: string) => void;
-  isLoading: boolean;
-}
-
 const MapSection: React.FC<MapSectionProps> = ({
   showFullList,
   showFullMap,
@@ -55,13 +57,18 @@ const MapSection: React.FC<MapSectionProps> = ({
   zoom,
   onMapZoomOrMove,
   onToggleClicked,
-  onClickMapPoint: onDatasetSelected,
-  onClickAccordion,
-  onRemoveFromPinList,
+  onClickMapPoint,
   collections,
   sx,
   selectedUuids,
   isLoading,
+  items,
+  temporaryItem,
+  expandedItem,
+  onClickAccordion,
+  onRemoveFromBookmarkList,
+  checkIsBookmarked,
+  onClickBookmark,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
@@ -78,8 +85,10 @@ const MapSection: React.FC<MapSectionProps> = ({
             <HeatmapLayer
               featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
-              onDatasetSelected={onDatasetSelected}
+              onClickMapPoint={onClickMapPoint}
               tabNavigation={tabNavigation}
+              onClickBookmark={onClickBookmark}
+              checkIsBookmarked={checkIsBookmarked}
             />
           );
 
@@ -88,13 +97,22 @@ const MapSection: React.FC<MapSectionProps> = ({
             <ClusterLayer
               featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
-              onDatasetSelected={onDatasetSelected}
+              onClickMapPoint={onClickMapPoint}
               tabNavigation={tabNavigation}
+              onClickBookmark={onClickBookmark}
+              checkIsBookmarked={checkIsBookmarked}
             />
           );
       }
     },
-    [collections, onDatasetSelected, selectedUuids, tabNavigation]
+    [
+      checkIsBookmarked,
+      collections,
+      onClickBookmark,
+      onClickMapPoint,
+      selectedUuids,
+      tabNavigation,
+    ]
   );
 
   // Early return if it is full list view
@@ -123,9 +141,15 @@ const MapSection: React.FC<MapSectionProps> = ({
           <DisplayCoordinate />
           <MenuControl
             menu={
-              <PinListMenu
+              <BookmarkListMenu
+                items={items}
+                temporaryItem={temporaryItem}
+                expandedItem={expandedItem}
                 onClickAccordion={onClickAccordion}
-                onRemoveFromPinList={onRemoveFromPinList}
+                onRemoveFromBookmarkList={onRemoveFromBookmarkList}
+                onClickBookmark={onClickBookmark}
+                checkIsBookmarked={checkIsBookmarked}
+                tabNavigation={tabNavigation}
               />
             }
           />

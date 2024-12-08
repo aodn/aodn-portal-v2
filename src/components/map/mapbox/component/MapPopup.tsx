@@ -19,8 +19,9 @@ import AppTheme from "../../../../utils/AppTheme";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
+import { BookmarkButtonBasicType } from "../../../bookmark/BookmarkButton";
 
-interface MapPopupProps {
+interface MapPopupProps extends Partial<BookmarkButtonBasicType> {
   layerId: string;
   onDatasetSelected?: (uuid: Array<string>) => void;
   tabNavigation?: (uuid: string, tab: string, section?: string) => void;
@@ -78,15 +79,22 @@ const handleDatasetSelect = (
 };
 
 const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  { layerId, onDatasetSelected, tabNavigation },
+  {
+    layerId,
+    onDatasetSelected,
+    tabNavigation,
+    onClickBookmark,
+    checkIsBookmarked,
+  },
   ref
 ) => {
-  const dispatch = useAppDispatch();
   const { map } = useContext(MapContext);
+  const dispatch = useAppDispatch();
   const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
   const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
   const [popupContent, setPopupContent] = useState<ReactNode | null>(null);
 
+  // TODO: there is bug that map popup is not re-render for the interaction with bookmark button
   const getCollectionData = useCallback(
     async (uuid: string) => {
       return dispatch(fetchResultByUuidNoStore(uuid))
@@ -129,13 +137,15 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
                   handleDatasetSelect(collection.id, onDatasetSelected)
                 }
                 tabNavigation={tabNavigation}
+                checkIsBookmarked={checkIsBookmarked}
+                onClickBookmark={onClickBookmark}
               />
             </CardContent>
           </Card>
         </ThemeProvider>
       );
     },
-    [onDatasetSelected, tabNavigation]
+    [checkIsBookmarked, onClickBookmark, onDatasetSelected, tabNavigation]
   );
 
   const removePopup = useCallback(() => {

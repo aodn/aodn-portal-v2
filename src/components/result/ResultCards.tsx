@@ -7,6 +7,7 @@ import {
   DEFAULT_SEARCH_PAGE_SIZE,
   FULL_LIST_PAGE_SIZE,
 } from "../common/store/searchReducer";
+import useTabNavigation from "../../hooks/useTabNavigation";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
@@ -14,10 +15,10 @@ import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
-import useTabNavigation from "../../hooks/useTabNavigation";
 import useFetchData from "../../hooks/useFetchData";
+import { BookmarkButtonBasicType } from "../bookmark/BookmarkButton";
 
-export interface ResultCard {
+export interface ResultCardBasicType extends Partial<BookmarkButtonBasicType> {
   content?: OGCCollection;
   onClickCard?: (item: OGCCollection | undefined) => void;
   onClickDetail?: (uuid: string) => void;
@@ -27,7 +28,7 @@ export interface ResultCard {
   sx?: SxProps;
 }
 
-interface ResultCards extends ResultCard {
+interface ResultCardsListType extends ResultCardBasicType {
   count: number;
   total: number;
   contents: CollectionsQueryType;
@@ -35,18 +36,18 @@ interface ResultCards extends ResultCard {
   child: ListChildComponentProps;
 }
 
-interface ResultCardsProps {
-  layout: Exclude<
-    SearchResultLayoutEnum,
-    SearchResultLayoutEnum.FULL_MAP
-  > | null;
+export interface ResultCardsType extends Partial<BookmarkButtonBasicType> {
+  layout:
+    | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
+    | undefined;
   contents: CollectionsQueryType;
   onClickCard: ((item: OGCCollection | undefined) => void) | undefined;
-  selectedUuids: string[];
+  selectedUuids: string[] | undefined;
   sx?: SxProps;
 }
+interface ResultCardsProps extends ResultCardsType {}
 
-const renderGridView: FC<ResultCards> = ({
+const renderGridView: FC<ResultCardsListType> = ({
   count,
   total,
   contents,
@@ -54,6 +55,8 @@ const renderGridView: FC<ResultCards> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
+  onClickBookmark,
+  checkIsBookmarked,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -87,6 +90,8 @@ const renderGridView: FC<ResultCards> = ({
               onClickDetail={onClickDetail}
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
+              onClickBookmark={onClickBookmark}
+              checkIsBookmarked={checkIsBookmarked}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -98,6 +103,8 @@ const renderGridView: FC<ResultCards> = ({
                 onClickDetail={onClickDetail}
                 onClickLinks={onClickLinks}
                 onClickDownload={onClickDownload}
+                onClickBookmark={onClickBookmark}
+                checkIsBookmarked={checkIsBookmarked}
                 selectedUuid={selectedUuid}
               />
             </Grid>
@@ -108,7 +115,7 @@ const renderGridView: FC<ResultCards> = ({
   }
 };
 
-const renderListView: FC<ResultCards> = ({
+const renderListView: FC<ResultCardsListType> = ({
   count,
   total,
   contents,
@@ -116,6 +123,8 @@ const renderListView: FC<ResultCards> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
+  onClickBookmark,
+  checkIsBookmarked,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -147,6 +156,8 @@ const renderListView: FC<ResultCards> = ({
           onClickDetail={onClickDetail}
           onClickLinks={onClickLinks}
           onClickDownload={onClickDownload}
+          onClickBookmark={onClickBookmark}
+          checkIsBookmarked={checkIsBookmarked}
           selectedUuid={selectedUuid}
         />
       </ListItem>
@@ -154,7 +165,7 @@ const renderListView: FC<ResultCards> = ({
   }
 };
 
-const renderFullListView: FC<Partial<ResultCards>> = ({
+const renderFullListView: FC<Partial<ResultCardsListType>> = ({
   sx = {} as SxProps,
   contents,
   count,
@@ -164,6 +175,8 @@ const renderFullListView: FC<Partial<ResultCards>> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
+  onClickBookmark,
+  checkIsBookmarked,
   selectedUuid,
 }) => {
   if (!count || !total || !contents) return;
@@ -178,6 +191,8 @@ const renderFullListView: FC<Partial<ResultCards>> = ({
               onClickDetail={onClickDetail}
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
+              onClickBookmark={onClickBookmark}
+              checkIsBookmarked={checkIsBookmarked}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -196,6 +211,8 @@ const ResultCards: FC<ResultCardsProps> = ({
   layout,
   contents,
   onClickCard,
+  onClickBookmark,
+  checkIsBookmarked,
   sx,
   selectedUuids,
 }) => {
@@ -222,7 +239,10 @@ const ResultCards: FC<ResultCardsProps> = ({
 
   const total = useMemo(() => contents.result.total, [contents.result.total]);
 
-  const selectedUuid = useMemo(() => selectedUuids[0], [selectedUuids]);
+  const selectedUuid = useMemo(
+    () => selectedUuids && selectedUuids[0],
+    [selectedUuids]
+  );
 
   const onClickDetail = useCallback(
     (uuid: string) => goToDetailPage(uuid, "abstract"),
@@ -274,6 +294,8 @@ const ResultCards: FC<ResultCardsProps> = ({
       onClickDetail,
       onClickLinks,
       onClickDownload,
+      onClickBookmark,
+      checkIsBookmarked,
       selectedUuid,
     });
   } else if (layout === SearchResultLayoutEnum.GRID) {
@@ -305,6 +327,8 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickLinks,
                   onClickDownload,
                   renderLoadMoreButton,
+                  onClickBookmark,
+                  checkIsBookmarked,
                   selectedUuid,
                   child,
                 })
@@ -339,6 +363,8 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickDetail,
                   onClickLinks,
                   onClickDownload,
+                  onClickBookmark,
+                  checkIsBookmarked,
                   renderLoadMoreButton,
                   selectedUuid,
                   child,

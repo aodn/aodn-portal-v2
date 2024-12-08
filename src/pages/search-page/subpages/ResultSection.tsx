@@ -2,30 +2,27 @@ import { FC } from "react";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
-import ResultPanelSimpleFilter from "../../../components/common/filters/ResultPanelSimpleFilter";
-import ResultCards from "../../../components/result/ResultCards";
+import ResultPanelSimpleFilter, {
+  ResultPanelSimpleFilterType,
+} from "../../../components/common/filters/ResultPanelSimpleFilter";
+import ResultCards, {
+  ResultCardsType,
+} from "../../../components/result/ResultCards";
 import {
   RootState,
   searchQueryResult,
 } from "../../../components/common/store/store";
-import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
-import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import CircleLoader from "../../../components/loading/CircleLoader";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import { BookmarkButtonBasicType } from "../../../components/bookmark/BookmarkButton";
 
-interface ResultSectionProps {
+interface ResultSectionProps
+  extends Partial<ResultPanelSimpleFilterType>,
+    Partial<ResultCardsType>,
+    Partial<BookmarkButtonBasicType> {
   showFullMap: boolean;
   showFullList: boolean;
-  currentSort: SortResultEnum | null;
-  currentLayout: Exclude<
-    SearchResultLayoutEnum,
-    SearchResultLayoutEnum.FULL_MAP
-  > | null;
-  onChangeLayout: (layout: SearchResultLayoutEnum) => void;
-  onChangeSorting: (v: SortResultEnum) => void;
   isLoading: boolean;
-  onClickCard?: (item: OGCCollection | undefined) => void;
-  selectedUuids: string[];
 }
 
 const RESULT_SECTION_WIDTH = 500;
@@ -40,6 +37,8 @@ const ResultSection: FC<ResultSectionProps> = ({
   onClickCard,
   selectedUuids,
   isLoading,
+  checkIsBookmarked,
+  onClickBookmark,
 }) => {
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
@@ -71,11 +70,13 @@ const ResultSection: FC<ResultSectionProps> = ({
           onChangeSorting={onChangeSorting}
         />
       </Box>
-      <Box sx={{ flex: 1, overflowY: "auto" }}>
+      <Box sx={{ flex: 1 }}>
         <ResultCards
           layout={currentLayout}
           contents={reduxContents}
           onClickCard={onClickCard}
+          onClickBookmark={onClickBookmark}
+          checkIsBookmarked={checkIsBookmarked}
           selectedUuids={selectedUuids}
         />
       </Box>
