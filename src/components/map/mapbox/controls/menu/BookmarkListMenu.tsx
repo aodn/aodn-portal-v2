@@ -23,6 +23,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   onRemoveFromBookmarkList,
   checkIsBookmarked,
   onClickBookmark,
+  tabNavigation,
 }) => {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState<boolean>(true);
@@ -87,6 +88,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             onRemoveFromBookmarkList={onRemoveFromBookmarkList}
             onClickBookmark={onClickBookmark}
             checkIsBookmarked={checkIsBookmarked}
+            tabNavigation={tabNavigation}
           />
         </Box>
       </Popper>

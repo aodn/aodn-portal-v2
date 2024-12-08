@@ -149,6 +149,7 @@ const MapSection: React.FC<MapSectionProps> = ({
                 onRemoveFromBookmarkList={onRemoveFromBookmarkList}
                 onClickBookmark={onClickBookmark}
                 checkIsBookmarked={checkIsBookmarked}
+                tabNavigation={tabNavigation}
               />
             }
           />

@@ -5,11 +5,12 @@ import StyledAccordion from "../common/accordion/StyledAccordion";
 import StyledAccordionSummary from "../common/accordion/StyledAccordionSummary";
 import { color, fontColor, fontSize, fontWeight } from "../../styles/constants";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
-import BookmarkListCard from "./BookmarkListCard";
+import BookmarkListCard, { BookmarkListCardType } from "./BookmarkListCard";
 import BookmarkButton, { BookmarkButtonBasicType } from "./BookmarkButton";
 
 export interface BookmarkListAccordionGroupBasicType
-  extends Partial<BookmarkButtonBasicType> {
+  extends Partial<BookmarkButtonBasicType>,
+    Partial<BookmarkListCardType> {
   items: OGCCollection[] | undefined;
   temporaryItem: OGCCollection | undefined;
   expandedItem: OGCCollection | undefined;
@@ -28,6 +29,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   onRemoveFromBookmarkList,
   checkIsBookmarked,
   onClickBookmark,
+  tabNavigation,
 }) => {
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
   const [accordionGroupItems, setAccordionGroupItems] = useState<
@@ -136,7 +138,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               </Box>
             </StyledAccordionSummary>
             <StyledAccordionDetails>
-              <BookmarkListCard collection={item} />
+              <BookmarkListCard dataset={item} tabNavigation={tabNavigation} />
             </StyledAccordionDetails>
           </StyledAccordion>
         ))}

@@ -19,10 +19,10 @@ import {
 import { FC, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import { ResultCard } from "./ResultCards";
+import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
 
-interface ListResultCardProps extends ResultCard {}
+interface ListResultCardProps extends ResultCardBasicType {}
 
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({

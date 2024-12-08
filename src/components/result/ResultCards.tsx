@@ -18,7 +18,7 @@ import { padding } from "../../styles/constants";
 import useFetchData from "../../hooks/useFetchData";
 import { BookmarkButtonBasicType } from "../bookmark/BookmarkButton";
 
-export interface ResultCard extends Partial<BookmarkButtonBasicType> {
+export interface ResultCardBasicType extends Partial<BookmarkButtonBasicType> {
   content?: OGCCollection;
   onClickCard?: (item: OGCCollection | undefined) => void;
   onClickDetail?: (uuid: string) => void;
@@ -28,7 +28,7 @@ export interface ResultCard extends Partial<BookmarkButtonBasicType> {
   sx?: SxProps;
 }
 
-interface ResultCardsListType extends ResultCard {
+interface ResultCardsListType extends ResultCardBasicType {
   count: number;
   total: number;
   contents: CollectionsQueryType;
