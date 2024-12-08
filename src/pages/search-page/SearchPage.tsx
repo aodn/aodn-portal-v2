@@ -72,12 +72,13 @@ const SearchPage = () => {
     SearchResultLayoutEnum.LIST
   );
   // CurrentLayout is used to remember last layout, which is SearchResultLayoutEnum exclude the value FULL_MAP
-  const [currentLayout, setCurrentLayout] = useState<Exclude<
-    SearchResultLayoutEnum,
-    SearchResultLayoutEnum.FULL_MAP
-  > | null>(null);
+  const [currentLayout, setCurrentLayout] = useState<
+    Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP> | undefined
+  >(undefined);
   // State to store the sort option that user selected
-  const [currentSort, setCurrentSort] = useState<SortResultEnum | null>(null);
+  const [currentSort, setCurrentSort] = useState<SortResultEnum | undefined>(
+    undefined
+  );
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
