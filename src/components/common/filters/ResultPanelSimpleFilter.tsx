@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Grid, Paper, SxProps, Theme, Typography } from "@mui/material";
+import { Grid, Paper, SxProps, Typography } from "@mui/material";
 import {
   border,
   borderRadius,
@@ -8,21 +8,23 @@ import {
 } from "../../../styles/constants";
 import { formatNumber } from "../../../utils/StringUtils";
 import ResultListLayoutButton, {
-  ResultListLayoutButtonProps,
+  ResultListLayoutButtonType,
   SearchResultLayoutEnum,
 } from "../buttons/ResultListLayoutButton";
 import ResultListSortButton, {
-  ResultListSortButtonProps,
+  ResultListSortButtonType,
   SortResultEnum,
 } from "../buttons/ResultListSortButton";
 
-interface ResultPanelSimpleFilterProps
-  extends ResultListLayoutButtonProps<SearchResultLayoutEnum>,
-    ResultListSortButtonProps<SortResultEnum> {
+export interface ResultPanelSimpleFilterType
+  extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
+    ResultListSortButtonType<SortResultEnum> {
   count: number;
   total: number;
-  sx?: SxProps<Theme>;
+  sx?: SxProps;
 }
+
+interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 
 const renderShowingResultsText = (total: number, count: number) =>
   total === 0

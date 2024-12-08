@@ -10,6 +10,7 @@ interface BookmarkListState {
   expandedItem: OGCCollection | undefined;
 }
 
+// TODO: need to implement initial bookmark items list in the future by getting uuids array from browser storage and fetching collections
 const initialState: BookmarkListState = {
   isOpen: true,
   items: [],
@@ -47,7 +48,10 @@ const bookmarkListSlice = createSlice({
       }
     },
     removeItem: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter((item) => item.id !== action.payload);
+      const exists = state.items.some((item) => item.id === action.payload);
+      if (exists) {
+        state.items = state.items.filter((item) => item.id !== action.payload);
+      }
     },
   },
 });
@@ -66,26 +70,42 @@ export const {
 export const fetchAndInsertTemporary =
   (id: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
     try {
-      // Assuming fetchResultByUuidNoStore is imported
-      const res = await dispatch(fetchResultByUuidNoStore(id)).unwrap();
-      dispatch(setTemporaryItem(res));
+      const state = getState();
+      // Check if item exists in items array
+      const existingItem = state.bookmarkList.items.find(
+        (item) => item.id === id
+      );
+
+      // Check if item is already a temporary item
+      const isTemporaryItem = state.bookmarkList.temporaryItem?.id === id;
+
+      if (existingItem || isTemporaryItem) {
+        // If item exists in either place, just expand it
+        dispatch(
+          setExpandedItem(existingItem || state.bookmarkList.temporaryItem)
+        );
+      } else {
+        // If item doesn't exist anywhere, fetch it, set as temporary and expand
+        const res = await dispatch(fetchResultByUuidNoStore(id)).unwrap();
+        dispatch(setTemporaryItem(res));
+        dispatch(setExpandedItem(res));
+      }
     } catch (error) {
       console.error("Error in fetchAndInsertTemporary:", error);
     }
   };
 
-export const initializeBookmarkList = () => async (dispatch: AppDispatch) => {
-  try {
-    // Uncomment when storage utils are ready
-    // const ids = loadBookmarkIdsFromStorage();
-    // const items = await Promise.all(
-    //   ids.map(id => dispatch(fetchResultByUuidNoStore(id)).unwrap())
-    // );
-    // dispatch(setItems(items));
-  } catch (error) {
-    console.error("Error loading bookmark items:", error);
-  }
-};
+// export const initializeBookmarkList = () => async (dispatch: AppDispatch) => {
+//   try {
+//     const ids = loadBookmarkIdsFromStorage();
+//     const items = await Promise.all(
+//       ids.map((id) => dispatch(fetchResultByUuidNoStore(id)).unwrap())
+//     );
+//     dispatch(setItems(items));
+//   } catch (error) {
+//     console.error("Error loading bookmark items:", error);
+//   }
+// };
 
 // Selectors
 export const selectBookmarkList = (state: RootState) => state.bookmarkList;

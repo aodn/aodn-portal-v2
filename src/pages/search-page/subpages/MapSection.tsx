@@ -1,21 +1,18 @@
+import React, { useCallback, useState } from "react";
+import { MapboxEvent as MapEvent } from "mapbox-gl";
 import { Paper, SxProps, Theme } from "@mui/material";
-import Map from "../../../components/map/mapbox/Map";
+import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
-import ToggleControl from "../../../components/map/mapbox/controls/ToggleControl";
+import ToggleControl, {
+  ToggleControlBasicType,
+} from "../../../components/map/mapbox/controls/ToggleControl";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
-import React, {
-  createContext,
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useState,
-} from "react";
-import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import Layers, {
   createStaticLayers,
+  LayerBasicType,
 } from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
@@ -28,42 +25,31 @@ import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation from "../../../hooks/useTabNavigation";
 import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import BookmarkListMenu from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
-import { useBookmarkList } from "../../../hooks/useBookmarkList";
-import { useSelector } from "react-redux";
-import {
-  selectBookmarkItems,
-  selectTemporaryItem,
-} from "../../../components/common/store/bookmarkListReducer";
+import BookmarkListMenu, {
+  BookmarkListMenuBasicType,
+} from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 
-const mapContainerId = "map-container-id";
+interface MapSectionProps
+  extends Partial<MapBasicType>,
+    Partial<LayerBasicType>,
+    BookmarkListMenuBasicType,
+    ToggleControlBasicType {
+  showFullMap: boolean;
+  showFullList: boolean;
+  collections: OGCCollection[];
+  sx?: SxProps<Theme>;
+  onMapZoomOrMove: (
+    event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+  ) => void;
+  isLoading: boolean;
+}
+
+const mapContainerId = "result-page-main-map";
 
 enum LayerName {
   Heatmap = "heatmap",
   Cluster = "cluster",
 }
-interface MapSectionProps {
-  showFullMap: boolean;
-  showFullList: boolean;
-  collections: OGCCollection[];
-  bbox?: LngLatBounds;
-  zoom?: number;
-  sx?: SxProps<Theme>;
-  selectedUuids: string[];
-  setSelectedUuids?: Dispatch<React.SetStateAction<string[]>>;
-  onMapZoomOrMove: (
-    event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-  ) => void;
-  onToggleClicked: (v: boolean) => void;
-  onClickMapPoint?: (uuids: Array<string>) => void;
-  // onClickAccordion?: (uuid: string | undefined) => void;
-  // onRemoveFromBookmarkList?: (uuid: string) => void;
-  isLoading: boolean;
-}
-export const BookmarkContext = createContext<ReturnType<
-  typeof useBookmarkList
-> | null>(null);
-
 const MapSection: React.FC<MapSectionProps> = ({
   showFullList,
   showFullMap,
@@ -71,18 +57,19 @@ const MapSection: React.FC<MapSectionProps> = ({
   zoom,
   onMapZoomOrMove,
   onToggleClicked,
-  onClickMapPoint: onDatasetSelected,
+  onClickMapPoint,
   collections,
   sx,
   selectedUuids,
-  setSelectedUuids,
   isLoading,
+  items,
+  temporaryItem,
+  expandedItem,
+  onClickAccordion,
+  onRemoveFromBookmarkList,
+  checkIsBookmarked,
+  onClickBookmark,
 }) => {
-  const defaultBookmarkItems: never[] = []; // Default empty array
-  const bookmarkItems =
-    useSelector(selectBookmarkItems) || defaultBookmarkItems;
-  const bookmarkTemporaryItem = useSelector(selectTemporaryItem);
-
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
   );
@@ -98,8 +85,10 @@ const MapSection: React.FC<MapSectionProps> = ({
             <HeatmapLayer
               featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
-              onDatasetSelected={onDatasetSelected}
+              onClickMapPoint={onClickMapPoint}
               tabNavigation={tabNavigation}
+              onClickBookmark={onClickBookmark}
+              checkIsBookmarked={checkIsBookmarked}
             />
           );
 
@@ -108,20 +97,28 @@ const MapSection: React.FC<MapSectionProps> = ({
             <ClusterLayer
               featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
-              onDatasetSelected={onDatasetSelected}
+              onClickMapPoint={onClickMapPoint}
               tabNavigation={tabNavigation}
+              onClickBookmark={onClickBookmark}
+              checkIsBookmarked={checkIsBookmarked}
             />
           );
       }
     },
-    [collections, onDatasetSelected, selectedUuids, tabNavigation]
+    [
+      checkIsBookmarked,
+      collections,
+      onClickBookmark,
+      onClickMapPoint,
+      selectedUuids,
+      tabNavigation,
+    ]
   );
 
   // Early return if it is full list view
   if (showFullList) return null;
 
   return (
-    // <BookmarkContext.Provider value={bookmarkFunctions}>
     <Paper
       id={mapContainerId}
       sx={{ height: "100%", ...sx, position: "relative" }}
@@ -143,16 +140,16 @@ const MapSection: React.FC<MapSectionProps> = ({
           <ScaleControl />
           <DisplayCoordinate />
           <MenuControl
-            // TODO: this is just an example for avoiding passing undefined values to menu props, e.g bookmarkItems.length > 0
-            // also need to update similar one for bookmarkTemporaryItem
             menu={
-              bookmarkItems.length > 0 ? (
-                <BookmarkListMenu
-                  setSelectedUuids={setSelectedUuids}
-                  bookmarkItems={bookmarkItems}
-                  bookmarkTemporaryItem={bookmarkTemporaryItem}
-                />
-              ) : null
+              <BookmarkListMenu
+                items={items}
+                temporaryItem={temporaryItem}
+                expandedItem={expandedItem}
+                onClickAccordion={onClickAccordion}
+                onRemoveFromBookmarkList={onRemoveFromBookmarkList}
+                onClickBookmark={onClickBookmark}
+                checkIsBookmarked={checkIsBookmarked}
+              />
             }
           />
           <MenuControl
@@ -210,7 +207,6 @@ const MapSection: React.FC<MapSectionProps> = ({
         </Layers>
       </Map>
     </Paper>
-    // </BookmarkContext.Provider>
   );
 };
 

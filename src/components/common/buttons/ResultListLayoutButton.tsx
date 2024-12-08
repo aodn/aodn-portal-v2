@@ -36,13 +36,15 @@ const MAP_VIEW_SELECT = [
   },
 ];
 
-export interface ResultListLayoutButtonProps<T> {
-  currentLayout: Exclude<
-    SearchResultLayoutEnum,
-    SearchResultLayoutEnum.FULL_MAP
-  > | null;
-  onChangeLayout: (layout: T) => void;
+export interface ResultListLayoutButtonType<T> {
+  currentLayout:
+    | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
+    | undefined;
+  onChangeLayout?: (layout: T) => void;
 }
+
+interface ResultListLayoutButtonProps<T>
+  extends ResultListLayoutButtonType<T> {}
 
 const ResultListLayoutButton: FC<
   ResultListLayoutButtonProps<SearchResultLayoutEnum>

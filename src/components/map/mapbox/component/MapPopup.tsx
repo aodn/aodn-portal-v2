@@ -19,15 +19,9 @@ import AppTheme from "../../../../utils/AppTheme";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
-import { useSelector } from "react-redux";
-import {
-  addItem,
-  selectBookmarkItems,
-  selectTemporaryItem,
-  setTemporaryItem,
-} from "../../../common/store/bookmarkListReducer";
+import { BookmarkButtonBasicType } from "../../../bookmark/BookmarkButton";
 
-interface MapPopupProps {
+interface MapPopupProps extends Partial<BookmarkButtonBasicType> {
   layerId: string;
   onDatasetSelected?: (uuid: Array<string>) => void;
   tabNavigation?: (uuid: string, tab: string, section?: string) => void;
@@ -85,38 +79,22 @@ const handleDatasetSelect = (
 };
 
 const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  { layerId, onDatasetSelected, tabNavigation },
+  {
+    layerId,
+    onDatasetSelected,
+    tabNavigation,
+    onClickBookmark,
+    checkIsBookmarked,
+  },
   ref
 ) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
-  const bookmarkItems = useSelector(selectBookmarkItems);
-  const bookmarkTemporaryItem = useSelector(selectTemporaryItem);
-
   const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
   const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
   const [popupContent, setPopupContent] = useState<ReactNode | null>(null);
 
-  const checkIsBookmarked = useCallback(
-    (uuid: string) => bookmarkItems?.some((item) => item.id === uuid),
-    [bookmarkItems]
-  );
-
-  // TODO:need to expand accordion
-  const onClickBookmark = useCallback(
-    (item: OGCCollection) => {
-      // If click on a temporaryItem
-      console.log("click bookmark");
-      if (bookmarkTemporaryItem && bookmarkTemporaryItem.id === item.id) {
-        dispatch(setTemporaryItem(undefined));
-        dispatch(addItem(item));
-      } else {
-        dispatch(addItem(item));
-      }
-    },
-    [bookmarkTemporaryItem, dispatch]
-  );
-
+  // TODO: there is bug that map popup is not re-render for the interaction with bookmark button
   const getCollectionData = useCallback(
     async (uuid: string) => {
       return dispatch(fetchResultByUuidNoStore(uuid))

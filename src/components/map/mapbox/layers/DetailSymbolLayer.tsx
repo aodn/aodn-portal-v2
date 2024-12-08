@@ -12,7 +12,7 @@ import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
-  LayersProps,
+  LayerBasicType,
 } from "./Layers";
 import { Feature, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
@@ -97,7 +97,7 @@ const isValid = (bbox: [number, number, number, number]) => {
   );
 };
 
-const DetailSymbolLayer: FC<LayersProps> = ({
+const DetailSymbolLayer: FC<LayerBasicType> = ({
   featureCollection = generateFeatureCollectionFrom(undefined),
 }) => {
   const [bbox, setBbox] = useState<

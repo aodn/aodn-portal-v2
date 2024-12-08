@@ -39,6 +39,17 @@ class MapMenuControl implements IControl {
       this.onClickHandler(event, undefined, EVENT_MAP_MOVE_START);
   }
 
+  updateComponent(component: Menus) {
+    this.component = component;
+    this.render();
+  }
+
+  private render() {
+    if (this.root && this.container) {
+      this.root.render(this.component);
+    }
+  }
+
   onAdd(map: MapBox) {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
@@ -49,7 +60,7 @@ class MapMenuControl implements IControl {
     // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#updates-to-client-rendering-apis
     // according to document, you need "!" at the end of container
     this.root = createRoot(this.container!);
-    this.root.render(this.component);
+    this.render();
 
     map?.on("click", this.mapClickHandler);
     map?.on("movestart", this.mapMoveStartHandler);
@@ -87,22 +98,28 @@ const MenuControl: React.FC<MenuControlProps> = ({
   menu,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
-  const [_, setInit] = useState<boolean>(false);
+  const [control, setControl] = useState<MapMenuControl | null>(null);
 
+  // Creation effect
   useEffect(() => {
     if (!map || !menu) return;
 
-    // Make it atomic update
-    setInit((prev) => {
+    setControl((prev) => {
       if (!prev) {
-        // If prev state is false
-        const n = new MapMenuControl(menu, map);
-        map?.addControl(n, "top-right");
+        const newControl = new MapMenuControl(menu, map);
+        map?.addControl(newControl, "top-right");
+        return newControl;
       }
-      // Only update once.
-      return true;
+      return prev;
     });
   }, [map, menu]);
+
+  // Props update effect
+  useEffect(() => {
+    if (control && menu) {
+      control.updateComponent(menu);
+    }
+  }, [control, menu]);
 
   return <React.Fragment />;
 };

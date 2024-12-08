@@ -7,10 +7,11 @@ import { borderRadius } from "../../../../styles/constants";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 
-interface ToggleControlProps {
+export interface ToggleControlBasicType {
   showFullMap: boolean;
   onToggleClicked?: (state: boolean) => void;
 }
+interface ToggleControlProps extends ToggleControlBasicType {}
 
 const ToggleButton: React.FC<ToggleControlProps> = ({
   showFullMap,

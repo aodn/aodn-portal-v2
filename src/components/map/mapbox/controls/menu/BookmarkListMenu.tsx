@@ -1,44 +1,32 @@
-import {
-  FC,
-  useRef,
-  useEffect,
-  Dispatch,
-  useState,
-  useContext,
-  SetStateAction,
-} from "react";
+import { FC, useRef, useEffect, useState } from "react";
 import { Box, IconButton, Popper } from "@mui/material";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { ControlProps, MenuClickedEvent } from "./Definition";
 import { borderRadius } from "../../../../../styles/constants";
 import { EVENT_MENU_CLICKED, eventEmitter } from "./MenuControl";
-import BookmarkListAccordionGroup from "../../../../bookmark/BookmarkListAccordionGroup";
+import BookmarkListAccordionGroup, {
+  BookmarkListAccordionGroupBasicType,
+} from "../../../../bookmark/BookmarkListAccordionGroup";
 import { BOOKMARK_LIST_WIDTH } from "../../../../result/constants";
-import { BookmarkContext } from "../../../../../pages/search-page/subpages/MapSection";
-import { useSelector } from "react-redux";
-import {
-  selectBookmarkItems,
-  selectTemporaryItem,
-} from "../../../../common/store/bookmarkListReducer";
-import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
 
-interface BookmarkListMenuProps extends ControlProps {
-  setSelectedUuids?: Dispatch<SetStateAction<string[]>>;
-  bookmarkItems: Array<OGCCollection> | undefined;
-  bookmarkTemporaryItem: OGCCollection | undefined;
-}
+export interface BookmarkListMenuBasicType
+  extends ControlProps,
+    BookmarkListAccordionGroupBasicType {}
+
+interface BookmarkListMenuProps extends BookmarkListMenuBasicType {}
 
 const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
-  setSelectedUuids = () => {},
-  bookmarkItems,
-  bookmarkTemporaryItem,
+  items,
+  temporaryItem,
+  expandedItem,
+  onClickAccordion,
+  onRemoveFromBookmarkList,
+  checkIsBookmarked,
+  onClickBookmark,
 }) => {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState<boolean>(true);
-  // const bookmarkFunctions = useContext(BookmarkContext);
-  // console.log("bookmarkFunctions", bookmarkFunctions);
-  console.log("in MapMenu, bookmarkItems==", bookmarkItems);
-  console.log("in MapMenu,  bookmarkTemporaryItem==", bookmarkTemporaryItem);
+
   useEffect(() => {
     const handleMenuClick = (evt: MenuClickedEvent) => {
       if (evt.component.type !== BookmarkListMenu) {
@@ -53,7 +41,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   }, [setOpen]);
 
   return (
-    <>
+    <Box>
       <IconButton
         aria-label="bookmark-list-button"
         id="bookmark-list-button"
@@ -91,10 +79,18 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             zIndex: 1,
           }}
         >
-          {/* <BookmarkListAccordionGroup setSelectedUuids={setSelectedUuids} items={}/> */}
+          <BookmarkListAccordionGroup
+            items={items}
+            temporaryItem={temporaryItem}
+            expandedItem={expandedItem}
+            onClickAccordion={onClickAccordion}
+            onRemoveFromBookmarkList={onRemoveFromBookmarkList}
+            onClickBookmark={onClickBookmark}
+            checkIsBookmarked={checkIsBookmarked}
+          />
         </Box>
       </Popper>
-    </>
+    </Box>
   );
 };
 

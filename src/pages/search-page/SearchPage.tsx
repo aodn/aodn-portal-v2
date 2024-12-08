@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
+import { bboxPolygon, booleanEqual } from "@turf/turf";
+import store, { getComponentState } from "../../components/common/store/store";
 import {
   createSearchParamFrom,
   DEFAULT_SEARCH_PAGE_SIZE,
-  fetchResultByUuidNoStore,
   fetchResultNoStore,
   fetchResultWithStore,
-  SearchParameters,
 } from "../../components/common/store/searchReducer";
-import Layout from "../../components/layout/layout";
-import { useLocation, useNavigate } from "react-router-dom";
 import {
   formatToUrlParam,
   ParameterState,
@@ -19,40 +20,23 @@ import {
   updateSortBy,
   updateZoom,
 } from "../../components/common/store/componentParamReducer";
-import store, { getComponentState } from "../../components/common/store/store";
-
-// Map section, you can switch to other map library, this is for maplibre
-// import { MapLibreEvent as MapEvent } from "maplibre-gl";
-// import Map from "../components/map/maplibre/Map";
-// import Controls from "../components/map/maplibre/controls/Controls";
-// import Layers from "../components/map/maplibre/layers/Layers";
-// import NavigationControl from "../components/map/maplibre/controls/NavigationControl";
-// import ScaleControl from "../components/map/maplibre/controls/ScaleControl";
-// import DisplayCoordinate from "../components/map/maplibre/controls/DisplayCoordinate";
-// import ItemsOnMapControl from "../components/map/maplibre/controls/ItemsOnMapControl";
-// import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
-// import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
-// Map section, you can switch to other map library, this is for mapbox
-import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
+import {
+  addItem,
+  removeItem,
+  selectBookmarkList,
+  setExpandedItem,
+  setTemporaryItem,
+  fetchAndInsertTemporary,
+} from "../../components/common/store/bookmarkListReducer";
+import Layout from "../../components/layout/layout";
 import ResultSection from "./subpages/ResultSection";
 import MapSection from "./subpages/MapSection";
-import { color, padding } from "../../styles/constants";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
-import { bboxPolygon, booleanEqual } from "@turf/turf";
 import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
-import useFetchData from "../../hooks/useFetchData";
-// import { useBookmarkList } from "../../hooks/useBookmarkList";
-// import {
-//   addBookmarkListItem,
-//   updateBookmarkExpandedItem,
-//   updateBookmarkListTemporaryItem,
-// } from "../../components/common/store/bookmarkListReducer";
-import { useBookmarkList } from "../../hooks/useBookmarkList";
-import { useSelector } from "react-redux";
-import { selectBookmarkList } from "../../components/common/store/bookmarkListReducer";
+import { color, padding } from "../../styles/constants";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -75,9 +59,11 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { insertTemporaryItem, collapseAllAccordions, fetchAndAddTemporary } =
-    useBookmarkList();
-  const { fillGeometryIfMissing } = useFetchData();
+  const {
+    items: bookmarkItems,
+    expandedItem: bookmarkExpandedItem,
+    temporaryItem: bookmarkTemporaryItem,
+  } = useSelector(selectBookmarkList);
 
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -92,6 +78,7 @@ const SearchPage = () => {
   > | null>(null);
   // State to store the sort option that user selected
   const [currentSort, setCurrentSort] = useState<SortResultEnum | null>(null);
+  //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
   const [zoom, setZoom] = useState<number | undefined>(undefined);
@@ -183,6 +170,7 @@ const SearchPage = () => {
       navigate,
     ]
   );
+
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
@@ -215,6 +203,7 @@ const SearchPage = () => {
     },
     [dispatch, doSearch]
   );
+
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
@@ -330,43 +319,98 @@ const SearchPage = () => {
       if (uuids.length === 0) {
         // This happens when click the empty space of map
         setSelectedUuids([]);
-        collapseAllAccordions();
+        dispatch(setExpandedItem(undefined));
       } else {
         // Since map point only store uuid in its feature, so need to fetch dataset here
         // Clicking a map dot or a result card will only add a temporary item in bookmark list, until the bookmark icon is clicked
         setSelectedUuids(uuids);
-        fetchAndAddTemporary(uuids[0]);
-        // dispatch(fetchResultByUuidNoStore(uuids[0]))
-        //   .unwrap()
-        //   .then((res: OGCCollection) => {
-        //     dispatch(updateBookmarkListTemporaryItem(res));
-        //     dispatch(updateBookmarkExpandedItem(res));
-        //   });
+        dispatch(fetchAndInsertTemporary(uuids[0]));
       }
     },
-    [collapseAllAccordions, fetchAndAddTemporary]
+    [dispatch]
   );
 
-  const onClickCard = useCallback(
+  const onClickResultCard = useCallback(
     async (item: OGCCollection | undefined) => {
       if (item) {
-        // The item set to bookmark list assume spatial extents is there
-        // const e = await fillGeometryIfMissing(item);
-        // console.log("fillGeometryIfMissing", e);
-        // dispatch(updateBookmarkListTemporaryItem(e));
-        // console.log("after=====");
-        // dispatch(updateBookmarkExpandedItem(e));
-        // insertTemporaryItem(e);
-        // dispatch(fetchResultByUuidNoStore(item.id))
-        //   .unwrap()
-        //   .then((res: OGCCollection) => {
-        //     insertTemporaryItem(res);
-        //   });
-        fetchAndAddTemporary(item.id);
+        dispatch(fetchAndInsertTemporary(item.id));
         setSelectedUuids([item.id]);
       }
     },
-    [fetchAndAddTemporary]
+    [dispatch]
+  );
+
+  // For checking if the uuid of an item is in bookmarkItems list
+  const checkIsBookmarked = useCallback(
+    (uuid: string) => {
+      return bookmarkItems?.some((item) => item.id === uuid);
+    },
+    [bookmarkItems]
+  );
+
+  const onClickBookmark = useCallback(
+    (item: OGCCollection) => {
+      const isItemBookmarked = bookmarkItems.some(
+        (bookmarkItem) => bookmarkItem.id === item.id
+      );
+
+      if (isItemBookmarked) {
+        // If item is already bookmarked, remove it
+        dispatch(removeItem(item.id));
+
+        // If it's the expanded item, clear the expansion and selected uuid
+        if (bookmarkExpandedItem?.id === item.id) {
+          dispatch(setExpandedItem(undefined));
+          setSelectedUuids([]);
+        }
+      } else {
+        if (bookmarkTemporaryItem && bookmarkTemporaryItem.id === item.id) {
+          // If bookmark a temporary item, should clear temporaryItem then add to bookmark list
+          dispatch(setTemporaryItem(undefined));
+          dispatch(addItem(item));
+        } else {
+          // Else add to bookmark list
+          dispatch(addItem(item));
+        }
+      }
+    },
+    [bookmarkItems, bookmarkTemporaryItem, bookmarkExpandedItem, dispatch]
+  );
+
+  const onClickAccordion = useCallback(
+    (item: OGCCollection | undefined) => {
+      dispatch(setExpandedItem(item));
+      setSelectedUuids(item ? [item.id] : []);
+    },
+    [dispatch]
+  );
+
+  const onRemoveFromBookmarkList = useCallback(
+    (item: OGCCollection) => {
+      if (item.id === bookmarkTemporaryItem?.id) {
+        // If the item is a temporary item, just clear the temporary item
+        dispatch(setTemporaryItem(undefined));
+      } else {
+        // Else the item is from bookmarkItems, so remove it from the list
+        dispatch(removeItem(item.id));
+      }
+      // If the item is expanded, need to clear the bookmarkExpandedItem
+      dispatch(
+        setExpandedItem(
+          bookmarkExpandedItem?.id === item.id
+            ? undefined
+            : bookmarkExpandedItem
+        )
+      );
+      // If the item is the selected dataset, need to clear the selected uuids
+      setSelectedUuids((prev) => {
+        if (item.id === prev[0]) {
+          return [];
+        }
+        return prev;
+      });
+    },
+    [bookmarkExpandedItem, bookmarkTemporaryItem?.id, dispatch]
   );
 
   // You will see this trigger twice, this is due to use of strict-mode
@@ -394,13 +438,15 @@ const SearchPage = () => {
           <ResultSection
             showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
             showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}
-            onClickCard={onClickCard}
+            onClickCard={onClickResultCard}
             selectedUuids={selectedUuids}
             currentSort={currentSort}
             onChangeSorting={onChangeSorting}
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
             isLoading={isLoading(loadingThreadCount)}
+            checkIsBookmarked={checkIsBookmarked}
+            onClickBookmark={onClickBookmark}
           />
         </Box>
         <Box flex={1}>
@@ -411,15 +457,22 @@ const SearchPage = () => {
             bbox={bbox}
             zoom={zoom}
             selectedUuids={selectedUuids}
-            setSelectedUuids={setSelectedUuids}
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}
             onClickMapPoint={onClickMapPoint}
             isLoading={isLoading(loadingThreadCount)}
+            items={bookmarkItems}
+            temporaryItem={bookmarkTemporaryItem}
+            expandedItem={bookmarkExpandedItem}
+            onClickAccordion={onClickAccordion}
+            onRemoveFromBookmarkList={onRemoveFromBookmarkList}
+            checkIsBookmarked={checkIsBookmarked}
+            onClickBookmark={onClickBookmark}
           />
         </Box>
       </Box>
     </Layout>
   );
 };
+
 export default SearchPage;
