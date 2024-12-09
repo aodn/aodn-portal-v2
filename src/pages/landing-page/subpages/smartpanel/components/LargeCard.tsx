@@ -38,11 +38,11 @@ const LargeCard: FC<LargeCardProps> = ({ cardData, handleClickSmartCard }) => {
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={() => handleClick(cardData.title)}
       >
         <Typography
           variant="h6"
           fontWeight={isHovered ? fontWeight.bold : fontWeight.regular}
-          onClick={() => handleClick(cardData.title)}
         >
           {cardData.title}
         </Typography>
@@ -51,9 +51,9 @@ const LargeCard: FC<LargeCardProps> = ({ cardData, handleClickSmartCard }) => {
         display="flex"
         flexDirection="column"
         justifyContent="space-evenly"
-        alignItems="start"
+        alignItems="center"
         height="52%"
-        paddingX={padding.small}
+        // paddingX={padding.small}
       >
         {cardData.additionalInfo &&
           cardData.additionalInfo.map((content) => (

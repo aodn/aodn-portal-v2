@@ -27,9 +27,9 @@ const MediumCard: FC<MediumCardProps> = ({
         backgroundPosition: "center",
         backgroundSize: "cover",
       }}
+      onClick={() => handleClick(cardData.title)}
     >
       <Box
-        onClick={() => handleClick(cardData.title)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
