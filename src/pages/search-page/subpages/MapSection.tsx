@@ -69,6 +69,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   onRemoveFromBookmarkList,
   checkIsBookmarked,
   onClickBookmark,
+  onRemoveAllBookmarks,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
@@ -149,6 +150,7 @@ const MapSection: React.FC<MapSectionProps> = ({
                 onRemoveFromBookmarkList={onRemoveFromBookmarkList}
                 onClickBookmark={onClickBookmark}
                 checkIsBookmarked={checkIsBookmarked}
+                onRemoveAllBookmarks={onRemoveAllBookmarks}
                 tabNavigation={tabNavigation}
               />
             }

@@ -3,7 +3,13 @@ import { Box, Button, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import StyledAccordion from "../common/accordion/StyledAccordion";
 import StyledAccordionSummary from "../common/accordion/StyledAccordionSummary";
-import { color, fontColor, fontSize, fontWeight } from "../../styles/constants";
+import {
+  color,
+  fontColor,
+  fontSize,
+  fontWeight,
+  padding,
+} from "../../styles/constants";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
 import BookmarkListCard, { BookmarkListCardType } from "./BookmarkListCard";
 import BookmarkButton, { BookmarkButtonBasicType } from "./BookmarkButton";
@@ -16,6 +22,7 @@ export interface BookmarkListAccordionGroupBasicType
   expandedItem: OGCCollection | undefined;
   onClickAccordion: (item: OGCCollection | undefined) => void;
   onRemoveFromBookmarkList: (item: OGCCollection) => void;
+  onRemoveAllBookmarks: () => void;
 }
 
 interface BookmarkListAccordionGroupProps
@@ -29,6 +36,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   onRemoveFromBookmarkList,
   checkIsBookmarked,
   onClickBookmark,
+  onRemoveAllBookmarks,
   tabNavigation,
 }) => {
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
@@ -48,6 +56,11 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
       },
     [onClickAccordion]
   );
+
+  const handleClearAllBookmarks = () => {
+    setAccordionGroupItems([]);
+    onRemoveAllBookmarks && onRemoveAllBookmarks();
+  };
 
   // Update accordion group list by listening bookmark items and bookmark temporary item
   useEffect(() => {
@@ -75,6 +88,37 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
 
   return (
     <>
+      <Box
+        position="relative"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        padding={padding.extraSmall}
+        sx={{ backgroundColor: color.blue.darkSemiTransparent }}
+      >
+        <Typography
+          fontSize={fontSize.info}
+          color={fontColor.blue.dark}
+          fontWeight={fontWeight.bold}
+        >
+          {items
+            ? items.length === 0
+              ? "Bookmark List"
+              : items.length === 1
+                ? "1 Bookmark"
+                : `${items.length} Bookmarks`
+            : "Bookmark List"}
+        </Typography>
+        <Button
+          sx={{ position: "absolute", right: 0, textTransform: "none" }}
+          onClick={handleClearAllBookmarks}
+        >
+          <Typography fontSize={fontSize.label} color={fontColor.blue.dark}>
+            Clear
+          </Typography>
+        </Button>
+      </Box>
       {accordionGroupItems.length > 0 &&
         accordionGroupItems.map((item) => (
           <StyledAccordion

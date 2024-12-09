@@ -27,6 +27,7 @@ import {
   setExpandedItem,
   setTemporaryItem,
   fetchAndInsertTemporary,
+  removeAllItems,
 } from "../../components/common/store/bookmarkListReducer";
 import Layout from "../../components/layout/layout";
 import ResultSection from "./subpages/ResultSection";
@@ -414,6 +415,13 @@ const SearchPage = () => {
     [bookmarkExpandedItem, bookmarkTemporaryItem?.id, dispatch]
   );
 
+  const onRemoveAllBookmarks = useCallback(() => {
+    setSelectedUuids([]);
+    dispatch(setExpandedItem(undefined));
+    dispatch(setTemporaryItem(undefined));
+    dispatch(removeAllItems());
+  }, [dispatch]);
+
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
   // TODO: Optimize call if possible, this happens when navigate from page
@@ -469,6 +477,7 @@ const SearchPage = () => {
             onRemoveFromBookmarkList={onRemoveFromBookmarkList}
             checkIsBookmarked={checkIsBookmarked}
             onClickBookmark={onClickBookmark}
+            onRemoveAllBookmarks={onRemoveAllBookmarks}
           />
         </Box>
       </Box>

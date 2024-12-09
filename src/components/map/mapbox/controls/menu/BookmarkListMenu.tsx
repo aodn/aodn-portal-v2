@@ -23,6 +23,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   onRemoveFromBookmarkList,
   checkIsBookmarked,
   onClickBookmark,
+  onRemoveAllBookmarks,
   tabNavigation,
 }) => {
   const anchorRef = useRef(null);
@@ -88,6 +89,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             onRemoveFromBookmarkList={onRemoveFromBookmarkList}
             onClickBookmark={onClickBookmark}
             checkIsBookmarked={checkIsBookmarked}
+            onRemoveAllBookmarks={onRemoveAllBookmarks}
             tabNavigation={tabNavigation}
           />
         </Box>

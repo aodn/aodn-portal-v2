@@ -53,6 +53,9 @@ const bookmarkListSlice = createSlice({
         state.items = state.items.filter((item) => item.id !== action.payload);
       }
     },
+    removeAllItems: (state) => {
+      state.items = [];
+    },
   },
 });
 
@@ -64,6 +67,7 @@ export const {
   setExpandedItem,
   addItem,
   removeItem,
+  removeAllItems,
 } = bookmarkListSlice.actions;
 
 // Thunk actions for async operations
