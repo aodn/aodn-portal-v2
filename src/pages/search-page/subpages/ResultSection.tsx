@@ -71,7 +71,7 @@ const ResultSection: FC<ResultSectionProps> = ({
           onChangeSorting={onChangeSorting}
         />
       </Box>
-      <Box sx={{ flex: 1, overflowY: "auto" }}>
+      <Box sx={{ flex: 1 }}>
         <ResultCards
           layout={currentLayout}
           contents={reduxContents}

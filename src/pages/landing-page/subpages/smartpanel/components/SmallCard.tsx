@@ -17,12 +17,11 @@ const SmallCard: FC<SmallCardProps> = ({ cardData, handleClickSmartCard }) => {
   };
 
   return (
-    <CardContainer>
+    <CardContainer onClick={() => handleClick(cardData.title)}>
       <Box
         height="50%"
         width="50%"
         padding={padding.extraSmall}
-        onClick={() => handleClick(cardData.title)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -37,19 +36,24 @@ const SmallCard: FC<SmallCardProps> = ({ cardData, handleClickSmartCard }) => {
           }}
         />
       </Box>
-      <Typography
-        padding={padding.extraSmall}
-        paddingTop={0}
-        fontSize={fontSize.icon}
-        color="#fff"
-        fontWeight={isHovered ? fontWeight.bold : fontWeight.regular}
-        sx={{
-          overflow: "hidden",
-        }}
-        noWrap
+      <Box
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        {cardData.title}
-      </Typography>
+        <Typography
+          padding={padding.extraSmall}
+          paddingTop={0}
+          fontSize={fontSize.icon}
+          color="#fff"
+          fontWeight={isHovered ? fontWeight.bold : fontWeight.regular}
+          sx={{
+            overflow: "hidden",
+          }}
+          noWrap
+        >
+          {cardData.title}
+        </Typography>
+      </Box>
     </CardContainer>
   );
 };

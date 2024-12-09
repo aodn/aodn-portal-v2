@@ -5,14 +5,17 @@ import { border, color } from "../../../../../styles/constants";
 interface CardContainerProps {
   children: ReactNode;
   containerStyle?: SxProps;
+  onClick?: () => void;
 }
 
 const CardContainer: FC<CardContainerProps> = ({
   children,
   containerStyle,
+  onClick = () => {},
 }) => (
   <Card
     elevation={0}
+    onClick={onClick}
     sx={{
       height: "100%",
       width: "100%",

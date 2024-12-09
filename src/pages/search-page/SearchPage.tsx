@@ -411,6 +411,7 @@ const SearchPage = () => {
           alignItems: "stretch",
           width: "100%",
           height: "90vh",
+          overflowY: "auto",
           padding: padding.small,
           bgcolor: color.blue.light,
         }}
