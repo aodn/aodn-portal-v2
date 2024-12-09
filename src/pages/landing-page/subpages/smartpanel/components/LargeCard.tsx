@@ -53,7 +53,6 @@ const LargeCard: FC<LargeCardProps> = ({ cardData, handleClickSmartCard }) => {
         justifyContent="space-evenly"
         alignItems="center"
         height="52%"
-        // paddingX={padding.small}
       >
         {cardData.additionalInfo &&
           cardData.additionalInfo.map((content) => (
