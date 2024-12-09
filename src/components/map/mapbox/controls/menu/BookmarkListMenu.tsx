@@ -26,7 +26,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   onRemoveAllBookmarks,
   tabNavigation,
 }) => {
-  const anchorRef = useRef(null);
+  const anchorRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState<boolean>(true);
 
   useEffect(() => {
@@ -53,47 +53,49 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
       >
         <BookmarksIcon />
       </IconButton>
-      <Popper
-        id="bookmark-list"
-        open={open}
-        anchorEl={anchorRef.current}
-        role={undefined}
-        placement="left-start"
-        disablePortal
-        modifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [0, 10],
+      {anchorRef.current && (
+        <Popper
+          id="bookmark-list"
+          open={open}
+          anchorEl={anchorRef.current}
+          role={undefined}
+          placement="left-start"
+          disablePortal
+          modifiers={[
+            {
+              name: "offset",
+              options: {
+                offset: [0, 10],
+              },
             },
-          },
-        ]}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            width: BOOKMARK_LIST_WIDTH,
-            maxHeight: "85vh",
-            overflowY: "auto",
-            borderRadius: borderRadius.menu,
-            backgroundColor: "#fff",
-            zIndex: 1,
-          }}
+          ]}
         >
-          <BookmarkListAccordionGroup
-            items={items}
-            temporaryItem={temporaryItem}
-            expandedItem={expandedItem}
-            onClickAccordion={onClickAccordion}
-            onRemoveFromBookmarkList={onRemoveFromBookmarkList}
-            onClickBookmark={onClickBookmark}
-            checkIsBookmarked={checkIsBookmarked}
-            onRemoveAllBookmarks={onRemoveAllBookmarks}
-            tabNavigation={tabNavigation}
-          />
-        </Box>
-      </Popper>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: BOOKMARK_LIST_WIDTH,
+              maxHeight: "85vh",
+              overflowY: "auto",
+              borderRadius: borderRadius.menu,
+              backgroundColor: "#fff",
+              zIndex: 1,
+            }}
+          >
+            <BookmarkListAccordionGroup
+              items={items}
+              temporaryItem={temporaryItem}
+              expandedItem={expandedItem}
+              onClickAccordion={onClickAccordion}
+              onRemoveFromBookmarkList={onRemoveFromBookmarkList}
+              onClickBookmark={onClickBookmark}
+              checkIsBookmarked={checkIsBookmarked}
+              onRemoveAllBookmarks={onRemoveAllBookmarks}
+              tabNavigation={tabNavigation}
+            />
+          </Box>
+        </Popper>
+      )}
     </Box>
   );
 };
