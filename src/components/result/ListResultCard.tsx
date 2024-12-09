@@ -32,7 +32,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
   onClickLinks = () => {},
   onClickDownload = () => {},
   onClickBookmark = () => {},
-  checkIsBookmarked = () => false,
   selectedUuid,
   sx,
 }) => {
@@ -42,7 +41,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
 
   const isSelectedDataset = uuid === selectedUuid;
-
   return (
     <Card
       id={`result-card-${uuid}`}
@@ -157,11 +155,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
           height="20px"
           width="auto"
         >
-          <BookmarkButton
-            dataset={content}
-            onClickBookmark={onClickBookmark}
-            checkIsBookmarked={checkIsBookmarked}
-          />
+          <BookmarkButton dataset={content} onClickBookmark={onClickBookmark} />
         </Box>
         <Box height="90px" width="100%">
           <img

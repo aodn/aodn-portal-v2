@@ -61,8 +61,6 @@ const bookmarkListSlice = createSlice({
 
 // Export actions
 export const {
-  setOpen,
-  setItems,
   setTemporaryItem,
   setExpandedItem,
   addItem,
@@ -120,5 +118,8 @@ export const selectTemporaryItem = (state: RootState) =>
 export const selectExpandedItem = (state: RootState) =>
   state.bookmarkList.expandedItem;
 export const selectIsOpen = (state: RootState) => state.bookmarkList.isOpen;
+export const checkIsBookmarked = (state: RootState, uuid: string) => {
+  return state.bookmarkList.items?.some((item) => item.id === uuid);
+};
 
 export default bookmarkListSlice.reducer;

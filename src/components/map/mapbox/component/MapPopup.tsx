@@ -79,13 +79,7 @@ const handleDatasetSelect = (
 };
 
 const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  {
-    layerId,
-    onDatasetSelected,
-    tabNavigation,
-    onClickBookmark,
-    checkIsBookmarked,
-  },
+  { layerId, onDatasetSelected, tabNavigation, onClickBookmark },
   ref
 ) => {
   const { map } = useContext(MapContext);
@@ -137,7 +131,6 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
                   handleDatasetSelect(collection.id, onDatasetSelected)
                 }
                 tabNavigation={tabNavigation}
-                checkIsBookmarked={checkIsBookmarked}
                 onClickBookmark={onClickBookmark}
               />
             </CardContent>
@@ -145,7 +138,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         </ThemeProvider>
       );
     },
-    [checkIsBookmarked, onClickBookmark, onDatasetSelected, tabNavigation]
+    [onClickBookmark, onDatasetSelected, tabNavigation]
   );
 
   const removePopup = useCallback(() => {

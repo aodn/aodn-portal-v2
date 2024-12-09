@@ -31,7 +31,6 @@ const mapContainerId = "map-popup-spatial-extend-overview";
 const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   collection,
   tabNavigation = () => {},
-  checkIsBookmarked,
   onClickBookmark,
   sx,
 }) => {
@@ -74,7 +73,6 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
                 <BookmarkButton
                   dataset={collection}
                   onClickBookmark={onClickBookmark}
-                  checkIsBookmarked={checkIsBookmarked}
                 />
               </Box>
             </Box>

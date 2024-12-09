@@ -93,7 +93,6 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
   onClickMapPoint: onDatasetSelected,
   tabNavigation,
   onClickBookmark,
-  checkIsBookmarked,
 }) => {
   const { map } = useContext(MapContext);
   const mapPopupRef = useRef<MapPopupRef>(null);
@@ -504,7 +503,6 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           onDatasetSelected={onDatasetSelected}
           tabNavigation={tabNavigation}
           onClickBookmark={onClickBookmark}
-          checkIsBookmarked={checkIsBookmarked}
         />
       )}
       {spiderifiedCluster && (

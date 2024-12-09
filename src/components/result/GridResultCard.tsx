@@ -31,7 +31,6 @@ const GridResultCard: FC<GridResultCardProps> = ({
   onClickLinks = () => {},
   onClickDownload = () => {},
   onClickBookmark = () => {},
-  checkIsBookmarked = () => false,
   selectedUuid,
   sx,
 }) => {
@@ -70,11 +69,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         width="auto"
         zIndex={1}
       >
-        <BookmarkButton
-          dataset={content}
-          onClickBookmark={onClickBookmark}
-          checkIsBookmarked={checkIsBookmarked}
-        />
+        <BookmarkButton dataset={content} onClickBookmark={onClickBookmark} />
       </Box>
 
       <CardActionArea onClick={() => onClickCard(content)}>

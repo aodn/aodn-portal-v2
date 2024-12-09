@@ -56,7 +56,6 @@ const renderGridView: FC<ResultCardsListType> = ({
   onClickLinks,
   onClickDownload,
   onClickBookmark,
-  checkIsBookmarked,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -91,7 +90,6 @@ const renderGridView: FC<ResultCardsListType> = ({
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
               onClickBookmark={onClickBookmark}
-              checkIsBookmarked={checkIsBookmarked}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -104,7 +102,6 @@ const renderGridView: FC<ResultCardsListType> = ({
                 onClickLinks={onClickLinks}
                 onClickDownload={onClickDownload}
                 onClickBookmark={onClickBookmark}
-                checkIsBookmarked={checkIsBookmarked}
                 selectedUuid={selectedUuid}
               />
             </Grid>
@@ -124,7 +121,6 @@ const renderListView: FC<ResultCardsListType> = ({
   onClickLinks,
   onClickDownload,
   onClickBookmark,
-  checkIsBookmarked,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -157,7 +153,6 @@ const renderListView: FC<ResultCardsListType> = ({
           onClickLinks={onClickLinks}
           onClickDownload={onClickDownload}
           onClickBookmark={onClickBookmark}
-          checkIsBookmarked={checkIsBookmarked}
           selectedUuid={selectedUuid}
         />
       </ListItem>
@@ -176,7 +171,6 @@ const renderFullListView: FC<Partial<ResultCardsListType>> = ({
   onClickLinks,
   onClickDownload,
   onClickBookmark,
-  checkIsBookmarked,
   selectedUuid,
 }) => {
   if (!count || !total || !contents) return;
@@ -192,7 +186,6 @@ const renderFullListView: FC<Partial<ResultCardsListType>> = ({
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
               onClickBookmark={onClickBookmark}
-              checkIsBookmarked={checkIsBookmarked}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -212,7 +205,6 @@ const ResultCards: FC<ResultCardsProps> = ({
   contents,
   onClickCard,
   onClickBookmark,
-  checkIsBookmarked,
   sx,
   selectedUuids,
 }) => {
@@ -295,7 +287,6 @@ const ResultCards: FC<ResultCardsProps> = ({
       onClickLinks,
       onClickDownload,
       onClickBookmark,
-      checkIsBookmarked,
       selectedUuid,
     });
   } else if (layout === SearchResultLayoutEnum.GRID) {
@@ -328,7 +319,6 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickDownload,
                   renderLoadMoreButton,
                   onClickBookmark,
-                  checkIsBookmarked,
                   selectedUuid,
                   child,
                 })
@@ -364,7 +354,6 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickLinks,
                   onClickDownload,
                   onClickBookmark,
-                  checkIsBookmarked,
                   renderLoadMoreButton,
                   selectedUuid,
                   child,

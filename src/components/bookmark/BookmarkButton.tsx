@@ -1,14 +1,15 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback } from "react";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { IconButton, Tooltip } from "@mui/material";
 import { color, gap } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { checkIsBookmarked } from "../common/store/bookmarkListReducer";
+import store from "../common/store/store";
 
 export interface BookmarkButtonBasicType {
   dataset?: OGCCollection;
   onClickBookmark?: (dataset: OGCCollection) => void;
-  checkIsBookmarked?: (uuid: string) => boolean;
 }
 
 interface BookmarkButtonProps extends BookmarkButtonBasicType {}
@@ -16,12 +17,9 @@ interface BookmarkButtonProps extends BookmarkButtonBasicType {}
 const BookmarkButton: FC<BookmarkButtonProps> = ({
   dataset = undefined,
   onClickBookmark = () => {},
-  checkIsBookmarked = () => {},
 }) => {
-  const isBookmarked = useMemo(
-    () => (dataset ? checkIsBookmarked(dataset.id) : false),
-    [checkIsBookmarked, dataset]
-  );
+  const isBookmarked =
+    dataset && checkIsBookmarked(store.getState(), dataset.id);
 
   const handleClick = useCallback(() => {
     if (dataset) {

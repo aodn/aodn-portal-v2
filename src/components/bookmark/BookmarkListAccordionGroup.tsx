@@ -34,7 +34,6 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   expandedItem,
   onClickAccordion,
   onRemoveFromBookmarkList,
-  checkIsBookmarked,
   onClickBookmark,
   onRemoveAllBookmarks,
   tabNavigation,
@@ -142,7 +141,6 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                   <BookmarkButton
                     dataset={item}
                     onClickBookmark={onClickBookmark}
-                    checkIsBookmarked={checkIsBookmarked}
                   />
                 </Box>
 

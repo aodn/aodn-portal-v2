@@ -13,7 +13,6 @@ import {
   searchQueryResult,
 } from "../../../components/common/store/store";
 import CircleLoader from "../../../components/loading/CircleLoader";
-import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { BookmarkButtonBasicType } from "../../../components/bookmark/BookmarkButton";
 
 interface ResultSectionProps
@@ -37,7 +36,6 @@ const ResultSection: FC<ResultSectionProps> = ({
   onClickCard,
   selectedUuids,
   isLoading,
-  checkIsBookmarked,
   onClickBookmark,
 }) => {
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
@@ -76,7 +74,6 @@ const ResultSection: FC<ResultSectionProps> = ({
           contents={reduxContents}
           onClickCard={onClickCard}
           onClickBookmark={onClickBookmark}
-          checkIsBookmarked={checkIsBookmarked}
           selectedUuids={selectedUuids}
         />
       </Box>

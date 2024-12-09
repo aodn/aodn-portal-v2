@@ -342,14 +342,6 @@ const SearchPage = () => {
     [dispatch]
   );
 
-  // For checking if the uuid of an item is in bookmarkItems list
-  const checkIsBookmarked = useCallback(
-    (uuid: string) => {
-      return bookmarkItems?.some((item) => item.id === uuid);
-    },
-    [bookmarkItems]
-  );
-
   const onClickBookmark = useCallback(
     (item: OGCCollection) => {
       const isItemBookmarked = bookmarkItems.some(
@@ -454,7 +446,6 @@ const SearchPage = () => {
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
             isLoading={isLoading(loadingThreadCount)}
-            checkIsBookmarked={checkIsBookmarked}
             onClickBookmark={onClickBookmark}
           />
         </Box>
@@ -475,7 +466,6 @@ const SearchPage = () => {
             expandedItem={bookmarkExpandedItem}
             onClickAccordion={onClickAccordion}
             onRemoveFromBookmarkList={onRemoveFromBookmarkList}
-            checkIsBookmarked={checkIsBookmarked}
             onClickBookmark={onClickBookmark}
             onRemoveAllBookmarks={onRemoveAllBookmarks}
           />

@@ -21,7 +21,6 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   expandedItem,
   onClickAccordion,
   onRemoveFromBookmarkList,
-  checkIsBookmarked,
   onClickBookmark,
   onRemoveAllBookmarks,
   tabNavigation,
@@ -88,7 +87,6 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             onClickAccordion={onClickAccordion}
             onRemoveFromBookmarkList={onRemoveFromBookmarkList}
             onClickBookmark={onClickBookmark}
-            checkIsBookmarked={checkIsBookmarked}
             onRemoveAllBookmarks={onRemoveAllBookmarks}
             tabNavigation={tabNavigation}
           />

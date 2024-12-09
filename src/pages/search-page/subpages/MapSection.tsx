@@ -67,7 +67,6 @@ const MapSection: React.FC<MapSectionProps> = ({
   expandedItem,
   onClickAccordion,
   onRemoveFromBookmarkList,
-  checkIsBookmarked,
   onClickBookmark,
   onRemoveAllBookmarks,
 }) => {
@@ -89,7 +88,6 @@ const MapSection: React.FC<MapSectionProps> = ({
               onClickMapPoint={onClickMapPoint}
               tabNavigation={tabNavigation}
               onClickBookmark={onClickBookmark}
-              checkIsBookmarked={checkIsBookmarked}
             />
           );
 
@@ -101,13 +99,11 @@ const MapSection: React.FC<MapSectionProps> = ({
               onClickMapPoint={onClickMapPoint}
               tabNavigation={tabNavigation}
               onClickBookmark={onClickBookmark}
-              checkIsBookmarked={checkIsBookmarked}
             />
           );
       }
     },
     [
-      checkIsBookmarked,
       collections,
       onClickBookmark,
       onClickMapPoint,
@@ -149,7 +145,6 @@ const MapSection: React.FC<MapSectionProps> = ({
                 onClickAccordion={onClickAccordion}
                 onRemoveFromBookmarkList={onRemoveFromBookmarkList}
                 onClickBookmark={onClickBookmark}
-                checkIsBookmarked={checkIsBookmarked}
                 onRemoveAllBookmarks={onRemoveAllBookmarks}
                 tabNavigation={tabNavigation}
               />
