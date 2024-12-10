@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
+  Badge,
   Button,
   Divider,
   Stack,
@@ -19,13 +20,39 @@ import {
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
-import { selects } from "../tab-panels/AbstractAndDownloadPanel";
 import { useDetailPageContext } from "../../context/detail-page-context";
+import BBoxConditionBox from "../../../../components/box/BBoxConditionBox";
+import {
+  BBoxCondition,
+  DownloadConditionType,
+  DateRangeCondition,
+} from "../../context/DownloadDefinitions";
+import DateRangeConditionBox from "../../../../components/box/DateRangeConditionBox";
+
+const options = [
+  { label: "NetCDFs", value: "NetCDFs" },
+  { label: "1", value: "1" },
+];
 
 const DownloadCard = () => {
   const theme = useTheme();
-  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(false);
+  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const { isCollectionNotFound } = useDetailPageContext();
+  const { downloadConditions } = useDetailPageContext();
+
+  const bboxConditions: BBoxCondition[] = useMemo(() => {
+    const bboxConditions = downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.BBOX
+    );
+    return bboxConditions as BBoxCondition[];
+  }, [downloadConditions]);
+
+  const dateRangeCondition: DateRangeCondition[] = useMemo(() => {
+    const timerangeConditions = downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.DATE_RANGE
+    );
+    return timerangeConditions as DateRangeCondition[];
+  }, [downloadConditions]);
 
   const selectSxProps = useMemo(
     () => ({
@@ -41,7 +68,7 @@ const DownloadCard = () => {
   return (
     <Stack direction="column">
       <Stack sx={{ padding: padding.medium }} spacing={2}>
-        <CommonSelect items={selects.download.options} sx={selectSxProps} />
+        <CommonSelect items={options} sx={selectSxProps} />
         <Button
           disabled={isCollectionNotFound}
           sx={{
@@ -70,16 +97,30 @@ const DownloadCard = () => {
           sx={{ paddingX: padding.medium }}
           expandIcon={<ExpandMoreIcon />}
         >
-          <Typography
-            fontWeight={fontWeight.bold}
-            color={fontColor.gray.medium}
-            sx={{ padding: 0 }}
-          >
-            Download Subset
-          </Typography>
+          <Badge color="primary" badgeContent={downloadConditions.length}>
+            <Typography
+              fontWeight={fontWeight.bold}
+              color={fontColor.gray.medium}
+              sx={{ padding: 0, marginRight: "10px" }}
+            >
+              Download Subset
+            </Typography>
+          </Badge>
         </AccordionSummary>
         <AccordionDetails>
-          TODO: simple version of download subset
+          {bboxConditions.map((bboxCondition, index) => {
+            return (
+              <BBoxConditionBox key={index} bboxCondition={bboxCondition} />
+            );
+          })}
+          {dateRangeCondition.map((dateRangeCondition, index) => {
+            return (
+              <DateRangeConditionBox
+                key={index}
+                dateRangeCondition={dateRangeCondition}
+              />
+            );
+          })}
         </AccordionDetails>
       </PlainAccordion>
     </Stack>

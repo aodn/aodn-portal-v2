@@ -52,10 +52,16 @@ const styles = [
 
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
   MapDefaultConfig.BBOX_ENDPOINTS;
+const defaultBbox = new LngLatBounds([
+  WEST_LON,
+  SOUTH_LAT,
+  EAST_LON,
+  NORTH_LAT,
+]);
 
 const ReactMap = ({
   panelId,
-  bbox = new LngLatBounds([WEST_LON, SOUTH_LAT, EAST_LON, NORTH_LAT]),
+  bbox = defaultBbox,
   zoom = MapDefaultConfig.ZOOM,
   minZoom = MapDefaultConfig.MIN_ZOOM,
   maxZoom = MapDefaultConfig.MAX_ZOOM,

@@ -1,18 +1,19 @@
 import { IControl, Map } from "mapbox-gl";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../MapContext";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import { safeRemoveControl } from "../../../../utils/MapUtils";
 
-interface ToggleControlProps {
+interface ToggleButtonProps {
   showFullMap: boolean;
   onToggleClicked?: (state: boolean) => void;
 }
 
-const ToggleButton: React.FC<ToggleControlProps> = ({
+const ToggleButton: React.FC<ToggleButtonProps> = ({
   showFullMap,
   onToggleClicked,
 }) => {
@@ -46,9 +47,9 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
 class ToggleControlClass implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
-  private props: ToggleControlProps;
+  private props: ToggleButtonProps;
 
-  constructor(props: ToggleControlProps) {
+  constructor(props: ToggleButtonProps) {
     this.props = props;
   }
 
@@ -61,7 +62,7 @@ class ToggleControlClass implements IControl {
     );
   }
 
-  onAdd(map: Map): HTMLElement {
+  onAdd(_: Map): HTMLElement {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
     this.root = createRoot(this.container!);
@@ -70,23 +71,14 @@ class ToggleControlClass implements IControl {
   }
 
   onRemove(_: Map): void {
-    console.log("onRemove toggle button");
-    if (this.container?.parentNode) {
-      // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
-      // Keep the old pointer
-      setTimeout(() => {
-        this.container?.parentNode?.removeChild(this.container);
-        this.container = null;
-        this.root?.unmount();
-      });
-    }
+    safeRemoveControl(this.container, this.root);
   }
 }
 
 const ToggleControl = ({
   showFullMap = false,
   onToggleClicked = (v: boolean) => {},
-}: ToggleControlProps) => {
+}: ToggleButtonProps) => {
   const { map } = useContext(MapContext);
   const [control, setControl] = useState<ToggleControlClass | null>(null);
 
