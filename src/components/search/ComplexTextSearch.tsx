@@ -27,6 +27,8 @@ import store, { getComponentState } from "../common/store/store";
 import { useAppDispatch } from "../common/store/hooks";
 import { POPUP_MIN_WIDTH } from "./constants";
 import DateRange from "../common/filters/DateRange";
+import { useLocation } from "react-router-dom";
+import { pageDefault } from "../common/constants";
 
 interface ComplexTextSearchProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -35,6 +37,8 @@ interface ComplexTextSearchProps {
 const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
   setShouldExpandSearchbar,
 }) => {
+  const location = useLocation();
+
   const dispatch = useAppDispatch();
 
   const [open, setOpen] = useState(false);
@@ -43,6 +47,10 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
 
   const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
     SearchbarButtonNames.Filter
+  );
+
+  const [shouldExpandAllButtons, setShouldExpandAllButtons] = useState<boolean>(
+    location.pathname === pageDefault.landing
   );
 
   const componentParam = getComponentState(store.getState());
@@ -153,12 +161,14 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
           setPendingSearch={setPendingSearch}
           setActiveButton={setActiveButton}
           setShouldExpandSearchbar={setShouldExpandSearchbar}
+          setShouldExpandAllButtons={setShouldExpandAllButtons}
           suggesterWidth={searchbarWidth}
         />
         <SearchbarButtonGroup
           pendingSearch={pendingSearch}
           activeButton={activeButton}
           handleClickButton={handleClickButton}
+          shouldExpandAllButtons={shouldExpandAllButtons}
         />
       </Paper>
       <Popper
@@ -195,17 +205,11 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
               }}
             >
               {activeButton === SearchbarButtonNames.Date && (
-                // <FilterSection
-                //   title="Date Range"
-                //   toolTip="Recorded time span of the data"
-                //   isTitleOnlyHeader
-                // >
                 <DateRange
                   filter={filter}
                   setFilter={setFilter}
                   handleApplyFilter={handleApplyFilter}
                 />
-                // </FilterSection>
               )}
               {activeButton === SearchbarButtonNames.Area && (
                 <Box>

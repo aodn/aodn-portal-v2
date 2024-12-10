@@ -21,6 +21,7 @@ interface SearchbarButtonGroupProps {
   pendingSearch: boolean;
   activeButton: SearchbarButtonNames;
   handleClickButton: (button: SearchbarButtonNames) => void;
+  shouldExpandAllButtons: boolean;
 }
 
 const checkCount = ({
@@ -63,6 +64,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   pendingSearch,
   activeButton,
   handleClickButton,
+  shouldExpandAllButtons = false,
 }) => {
   const componentParams: ParameterState = getComponentState(store.getState());
 
@@ -108,7 +110,11 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         badgeContent={dateCount}
         dotBadge
         onClick={() => handleClickButton(SearchbarButtonNames.Date)}
-        showText={activeButton === SearchbarButtonNames.Date}
+        showText={
+          shouldExpandAllButtons
+            ? true
+            : activeButton === SearchbarButtonNames.Date
+        }
       />
       <SearchbarExpandableButton
         icon={<PlaceIcon />}
@@ -116,21 +122,33 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         badgeContent={areaCount}
         dotBadge
         onClick={() => handleClickButton(SearchbarButtonNames.Area)}
-        showText={activeButton === SearchbarButtonNames.Area}
+        showText={
+          shouldExpandAllButtons
+            ? true
+            : activeButton === SearchbarButtonNames.Area
+        }
       />
       <SearchbarExpandableButton
         icon={<Tune />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Filter)}
         badgeContent={filterCount}
         onClick={() => handleClickButton(SearchbarButtonNames.Filter)}
-        showText={activeButton === SearchbarButtonNames.Filter}
+        showText={
+          shouldExpandAllButtons
+            ? true
+            : activeButton === SearchbarButtonNames.Filter
+        }
         data-testid="filtersBtn"
       />
       <SearchbarExpandableButton
         icon={<SearchIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Search)}
         onClick={handleSearchClick}
-        showText={activeButton === SearchbarButtonNames.Search}
+        showText={
+          shouldExpandAllButtons
+            ? true
+            : activeButton === SearchbarButtonNames.Search
+        }
         buttonSx={{
           color: "#fff",
           fontWeight: fontWeight.light,

@@ -46,9 +46,9 @@ import { useAppDispatch } from "../store/hooks";
 
 enum DateRangeOptionValues {
   Custom = "custom",
-  LastYear = "last-year",
-  LastFiveYears = "last-5-years",
-  LastTenYears = "last-10-years",
+  LastYear = 1,
+  LastFiveYears = 5,
+  LastTenYears = 10,
 }
 
 interface DateRangeOption {
@@ -85,13 +85,116 @@ const DateRange: FC<DateRangeFilterProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const { dateTimeFilterRange } = filter;
-
+  const [selectedOption, setSelectedOption] = useState<DateRangeOptionValues>(
+    DateRangeOptionValues.Custom
+  );
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
   const [maxDate, setMaxDate] = useState<Dayjs>(initialMaxDate);
   const [value, setValue] = useState<number[]>([
     dateTimeFilterRange?.start ?? dateToValue(dayjs(dateDefault.min)),
     dateTimeFilterRange?.end ?? dateToValue(dayjs(dateDefault.max)),
   ]);
+
+  const updateDateRange = useCallback(
+    (startDate: Dayjs, endDate: Dayjs) => {
+      const newStart = dateToValue(startDate);
+      const newEnd = dateToValue(endDate);
+
+      setMinDate(startDate);
+      setMaxDate(endDate);
+      setValue([newStart, newEnd]);
+
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        dateTimeFilterRange: {
+          start: newStart,
+          end: newEnd,
+        },
+      }));
+    },
+    [setFilter]
+  );
+
+  const handleRadioChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const option = event.target.value;
+      setSelectedOption(option as DateRangeOptionValues);
+
+      // If it's custom, don't update the date range
+      if (option === DateRangeOptionValues.Custom) {
+        return;
+      }
+
+      // Convert option to number for year calculation
+      const years = Number(option);
+      const today = dayjs();
+      const startDate = today.subtract(years, "year");
+
+      updateDateRange(startDate, today);
+    },
+    [updateDateRange]
+  );
+
+  const handleSliderChange = useCallback(
+    (_: Event, newValue: number | number[]): void => {
+      if (!Array.isArray(newValue)) return;
+      const [newStart, newEnd] = newValue;
+
+      setValue(newValue);
+      setMinDate(dayjs(newStart));
+      setMaxDate(dayjs(newEnd));
+      setSelectedOption(DateRangeOptionValues.Custom);
+
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        dateTimeFilterRange: {
+          start: newStart,
+          end: newEnd,
+        },
+      }));
+    },
+    [setFilter]
+  );
+
+  const handleMinDateChange = useCallback(
+    (newMinDate: Dayjs | null) => {
+      if (newMinDate && dateToValue(newMinDate) < dateToValue(maxDate)) {
+        const newStart = dateToValue(newMinDate);
+        setMinDate(newMinDate);
+        setValue([newStart, value[1]]);
+        setSelectedOption(DateRangeOptionValues.Custom);
+
+        setFilter((prevFilter) => ({
+          ...prevFilter,
+          dateTimeFilterRange: {
+            ...prevFilter.dateTimeFilterRange,
+            start: newStart,
+          },
+        }));
+      }
+    },
+    [maxDate, setFilter, value]
+  );
+
+  const handleMaxDateChange = useCallback(
+    (newMaxDate: Dayjs | null) => {
+      if (newMaxDate && dateToValue(newMaxDate) > dateToValue(minDate)) {
+        const newEnd = dateToValue(newMaxDate);
+        setMaxDate(newMaxDate);
+        setValue([value[0], newEnd]);
+        setSelectedOption(DateRangeOptionValues.Custom);
+
+        setFilter((prevFilter) => ({
+          ...prevFilter,
+          dateTimeFilterRange: {
+            ...prevFilter.dateTimeFilterRange,
+            end: newEnd,
+          },
+        }));
+      }
+    },
+    [minDate, setFilter, value]
+  );
 
   useEffect(() => {
     if (dateTimeFilterRange) {
@@ -112,64 +215,6 @@ const DateRange: FC<DateRangeFilterProps> = ({
       setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
     }
   }, [dateTimeFilterRange]);
-
-  const handleSliderChange = useCallback(
-    (_: Event, newValue: number | number[]): void => {
-      if (!Array.isArray(newValue)) return;
-      const [newStart, newEnd] = newValue;
-
-      setValue(newValue);
-      setMinDate(dayjs(newStart));
-      setMaxDate(dayjs(newEnd));
-
-      setFilter((prevFilter) => ({
-        ...prevFilter,
-        dateTimeFilterRange: {
-          start: newStart,
-          end: newEnd,
-        },
-      }));
-    },
-    [setFilter]
-  );
-
-  const handleMinDateChange = useCallback(
-    (newMinDate: Dayjs | null) => {
-      if (newMinDate && dateToValue(newMinDate) < dateToValue(maxDate)) {
-        const newStart = dateToValue(newMinDate);
-        setMinDate(newMinDate);
-        setValue([newStart, value[1]]);
-
-        setFilter((prevFilter) => ({
-          ...prevFilter,
-          dateTimeFilterRange: {
-            ...prevFilter.dateTimeFilterRange,
-            start: newStart,
-          },
-        }));
-      }
-    },
-    [maxDate, setFilter, value]
-  );
-
-  const handleMaxDateChange = useCallback(
-    (newMaxDate: Dayjs | null) => {
-      if (newMaxDate && dateToValue(newMaxDate) > dateToValue(minDate)) {
-        const newEnd = dateToValue(newMaxDate);
-        setMaxDate(newMaxDate);
-        setValue([value[0], newEnd]);
-
-        setFilter((prevFilter) => ({
-          ...prevFilter,
-          dateTimeFilterRange: {
-            ...prevFilter.dateTimeFilterRange,
-            end: newEnd,
-          },
-        }));
-      }
-    },
-    [minDate, setFilter, value]
-  );
 
   // States below are used to store the imos-data ids and all datasets
   // they will be used in TimeRangeBarChart
@@ -235,12 +280,8 @@ const DateRange: FC<DateRangeFilterProps> = ({
                 sx={{ fontSize: "50px", height: "50px" }}
               />
 
-              <Typography
-                padding={0}
-                fontSize="20px"
-                fontWeight={fontWeight.bold}
-              >
-                Select Data
+              <Typography fontSize="20px" fontWeight={fontWeight.bold}>
+                Select&nbsp;Data
               </Typography>
             </Box>
             <Box
@@ -250,7 +291,11 @@ const DateRange: FC<DateRangeFilterProps> = ({
               alignItems="center"
             >
               <FormControl>
-                <RadioGroup defaultValue={DateRangeOptionValues.Custom}>
+                <RadioGroup
+                  defaultValue={DateRangeOptionValues.Custom}
+                  value={selectedOption}
+                  onChange={handleRadioChange}
+                >
                   {dateRangeOptions.map((item) => (
                     <FormControlLabel
                       value={item.value}
@@ -298,10 +343,10 @@ const DateRange: FC<DateRangeFilterProps> = ({
                     fontWeight={fontWeight.bold}
                     color={fontColor.blue.dark}
                   >
-                    Start Date
+                    Start&nbsp;Date
                   </Typography>
                   <PlainDatePicker
-                    views={["day", "month", "year"]}
+                    views={["year", "month", "day"]}
                     format="DD/MM/YYYY"
                     value={minDate}
                     minDate={initialMinDate}
@@ -318,10 +363,10 @@ const DateRange: FC<DateRangeFilterProps> = ({
                     fontWeight={fontWeight.bold}
                     color={fontColor.blue.dark}
                   >
-                    End Date
+                    End&nbsp;Date
                   </Typography>
                   <PlainDatePicker
-                    views={["day", "month", "year"]}
+                    views={["year", "month", "day"]}
                     format="DD/MM/YYYY"
                     value={maxDate}
                     minDate={valueToDate(value[0])}
@@ -364,7 +409,7 @@ const DateRange: FC<DateRangeFilterProps> = ({
                     min={dateToValue(initialMinDate)}
                     max={dateToValue(initialMaxDate)}
                     onChange={handleSliderChange}
-                    valueLabelDisplay="on"
+                    valueLabelDisplay="auto"
                     valueLabelFormat={(value: number) =>
                       valueToDate(value).format("DD/MM/YYYY")
                     }

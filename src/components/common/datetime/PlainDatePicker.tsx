@@ -2,6 +2,7 @@ import { styled } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import {
   border,
+  borderRadius,
   color,
   fontColor,
   fontFamily,
@@ -12,7 +13,7 @@ import {
 
 const PlainDatePicker = styled(DatePicker)(() => ({
   border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-  borderRadius: "4px",
+  borderRadius: borderRadius.small,
   backgroundColor: "#fff",
   width: "100%",
   "& fieldset": {
