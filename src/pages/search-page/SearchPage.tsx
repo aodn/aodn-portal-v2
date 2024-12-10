@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
@@ -21,9 +20,8 @@ import {
   updateZoom,
 } from "../../components/common/store/componentParamReducer";
 import {
-  addItem,
-  removeItem,
-  selectBookmarkList,
+  on,
+  off,
   setExpandedItem,
   setTemporaryItem,
   fetchAndInsertTemporary,
@@ -38,6 +36,10 @@ import { OGCCollection } from "../../components/common/store/OGCCollectionDefini
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
 import { color, padding } from "../../styles/constants";
+import {
+  BookmarkEvent,
+  EVENT_BOOKMARK,
+} from "../../components/map/mapbox/controls/menu/Definition";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -60,11 +62,6 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const {
-    items: bookmarkItems,
-    expandedItem: bookmarkExpandedItem,
-    temporaryItem: bookmarkTemporaryItem,
-  } = useSelector(selectBookmarkList);
 
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -339,72 +336,7 @@ const SearchPage = () => {
         setSelectedUuids([item.id]);
       }
     },
-    [dispatch]
-  );
-
-  const onClickBookmark = useCallback(
-    (item: OGCCollection) => {
-      const isItemBookmarked = bookmarkItems.some(
-        (bookmarkItem) => bookmarkItem.id === item.id
-      );
-
-      if (isItemBookmarked) {
-        // If item is already bookmarked, remove it
-        dispatch(removeItem(item.id));
-
-        // If it's the expanded item, clear the expansion and selected uuid
-        if (bookmarkExpandedItem?.id === item.id) {
-          dispatch(setExpandedItem(undefined));
-          setSelectedUuids([]);
-        }
-      } else {
-        if (bookmarkTemporaryItem && bookmarkTemporaryItem.id === item.id) {
-          // If bookmark a temporary item, should clear temporaryItem then add to bookmark list
-          dispatch(setTemporaryItem(undefined));
-          dispatch(addItem(item));
-        } else {
-          // Else add to bookmark list
-          dispatch(addItem(item));
-        }
-      }
-    },
-    [bookmarkItems, bookmarkTemporaryItem, bookmarkExpandedItem, dispatch]
-  );
-
-  const onClickAccordion = useCallback(
-    (item: OGCCollection | undefined) => {
-      dispatch(setExpandedItem(item));
-      setSelectedUuids(item ? [item.id] : []);
-    },
-    [dispatch]
-  );
-
-  const onRemoveFromBookmarkList = useCallback(
-    (item: OGCCollection) => {
-      if (item.id === bookmarkTemporaryItem?.id) {
-        // If the item is a temporary item, just clear the temporary item
-        dispatch(setTemporaryItem(undefined));
-      } else {
-        // Else the item is from bookmarkItems, so remove it from the list
-        dispatch(removeItem(item.id));
-      }
-      // If the item is expanded, need to clear the bookmarkExpandedItem
-      dispatch(
-        setExpandedItem(
-          bookmarkExpandedItem?.id === item.id
-            ? undefined
-            : bookmarkExpandedItem
-        )
-      );
-      // If the item is the selected dataset, need to clear the selected uuids
-      setSelectedUuids((prev) => {
-        if (item.id === prev[0]) {
-          return [];
-        }
-        return prev;
-      });
-    },
-    [bookmarkExpandedItem, bookmarkTemporaryItem?.id, dispatch]
+    []
   );
 
   const onRemoveAllBookmarks = useCallback(() => {
@@ -419,6 +351,18 @@ const SearchPage = () => {
   // TODO: Optimize call if possible, this happens when navigate from page
   // to this page.
   useEffect(() => handleNavigation(), [handleNavigation]);
+  useEffect(() => {
+    const bookmarkSelected = async (event: BookmarkEvent) => {
+      if (event.action === EVENT_BOOKMARK.EXPAND) {
+        await onClickResultCard(event.value);
+      }
+    };
+    on(EVENT_BOOKMARK.EXPAND, bookmarkSelected);
+
+    return () => {
+      off(EVENT_BOOKMARK.EXPAND, bookmarkSelected);
+    };
+  }, [onClickResultCard]);
 
   return (
     <Layout>
@@ -446,7 +390,6 @@ const SearchPage = () => {
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
             isLoading={isLoading(loadingThreadCount)}
-            onClickBookmark={onClickBookmark}
           />
         </Box>
         <Box flex={1}>
@@ -461,12 +404,6 @@ const SearchPage = () => {
             onToggleClicked={onToggleDisplay}
             onClickMapPoint={onClickMapPoint}
             isLoading={isLoading(loadingThreadCount)}
-            items={bookmarkItems}
-            temporaryItem={bookmarkTemporaryItem}
-            expandedItem={bookmarkExpandedItem}
-            onClickAccordion={onClickAccordion}
-            onRemoveFromBookmarkList={onRemoveFromBookmarkList}
-            onClickBookmark={onClickBookmark}
             onRemoveAllBookmarks={onRemoveAllBookmarks}
           />
         </Box>

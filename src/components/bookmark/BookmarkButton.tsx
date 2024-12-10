@@ -1,31 +1,85 @@
-import { FC, useCallback } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { IconButton, Tooltip } from "@mui/material";
 import { color, gap } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import { checkIsBookmarked } from "../common/store/bookmarkListReducer";
+import {
+  addItem,
+  checkIsBookmarked,
+  getBookmarkList,
+  off,
+  on,
+  removeItem,
+  setExpandedItem,
+  setTemporaryItem,
+} from "../common/store/bookmarkListReducer";
 import store from "../common/store/store";
+import {
+  BookmarkEvent,
+  EVENT_BOOKMARK,
+} from "../map/mapbox/controls/menu/Definition";
 
-export interface BookmarkButtonBasicType {
+export interface BookmarkButtonProps {
   dataset?: OGCCollection;
-  onClickBookmark?: (dataset: OGCCollection) => void;
 }
 
-interface BookmarkButtonProps extends BookmarkButtonBasicType {}
+const BookmarkButton: FC<BookmarkButtonProps> = ({ dataset = undefined }) => {
+  const {
+    items: bookmarkItems,
+    expandedItem: bookmarkExpandedItem,
+    temporaryItem: bookmarkTemporaryItem,
+  } = getBookmarkList(store.getState());
+  const [isBookmarked, setIsBookmarked] = useState<boolean | undefined>(
+    dataset && checkIsBookmarked(store.getState(), dataset.id)
+  );
 
-const BookmarkButton: FC<BookmarkButtonProps> = ({
-  dataset = undefined,
-  onClickBookmark = () => {},
-}) => {
-  const isBookmarked =
-    dataset && checkIsBookmarked(store.getState(), dataset.id);
+  const onClickBookmark = useCallback(
+    (
+      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      item: OGCCollection
+    ) => {
+      if (isBookmarked) {
+        // If item is already bookmarked, remove it
+        store.dispatch(removeItem(item.id));
+        // If it's the expanded item, clear the expansion and selected uuid
+        if (bookmarkExpandedItem?.id === item.id) {
+          store.dispatch(setExpandedItem(undefined));
+        }
+        setIsBookmarked(false);
+      } else {
+        if (bookmarkTemporaryItem && bookmarkTemporaryItem.id === item.id) {
+          // If bookmark a temporary item, should clear temporaryItem then add to bookmark list
+          store.dispatch(setTemporaryItem(undefined));
+          store.dispatch(addItem(item));
+        } else {
+          // Else add to bookmark list
+          store.dispatch(addItem(item));
+        }
+        setIsBookmarked(true);
+      }
+    },
+    [isBookmarked, bookmarkTemporaryItem, bookmarkExpandedItem]
+  );
 
-  const handleClick = useCallback(() => {
-    if (dataset) {
-      onClickBookmark(dataset);
-    }
-  }, [dataset, onClickBookmark]);
+  useEffect(() => {
+    const handler = (event: BookmarkEvent) => {
+      if (event.id === dataset?.id) {
+        if (event.action === EVENT_BOOKMARK.ADD) {
+          setIsBookmarked(true);
+        } else if (event.action === EVENT_BOOKMARK.REMOVE)
+          setIsBookmarked(false);
+      }
+    };
+
+    on(EVENT_BOOKMARK.ADD, handler);
+    on(EVENT_BOOKMARK.REMOVE, handler);
+
+    return () => {
+      off(EVENT_BOOKMARK.ADD, handler);
+      off(EVENT_BOOKMARK.REMOVE, handler);
+    };
+  }, [dataset?.id]);
 
   return (
     <Tooltip
@@ -33,7 +87,7 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
       placement="top"
     >
       <IconButton
-        onClick={handleClick}
+        onClick={(event) => dataset && onClickBookmark(event, dataset)}
         sx={{
           padding: gap.sm,
           ":hover": {

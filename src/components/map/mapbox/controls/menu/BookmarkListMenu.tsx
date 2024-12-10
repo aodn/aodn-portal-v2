@@ -1,9 +1,9 @@
 import { FC, useRef, useEffect, useState } from "react";
 import { Box, IconButton, Popper } from "@mui/material";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import { ControlProps, MenuClickedEvent } from "./Definition";
+import { ControlProps, EVENT_MENU, MenuClickedEvent } from "./Definition";
 import { borderRadius } from "../../../../../styles/constants";
-import { EVENT_MENU_CLICKED, eventEmitter } from "./MenuControl";
+import { eventEmitter } from "./MenuControl";
 import BookmarkListAccordionGroup, {
   BookmarkListAccordionGroupBasicType,
 } from "../../../../bookmark/BookmarkListAccordionGroup";
@@ -16,12 +16,6 @@ export interface BookmarkListMenuBasicType
 interface BookmarkListMenuProps extends BookmarkListMenuBasicType {}
 
 const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
-  items,
-  temporaryItem,
-  expandedItem,
-  onClickAccordion,
-  onRemoveFromBookmarkList,
-  onClickBookmark,
   onRemoveAllBookmarks,
   tabNavigation,
 }) => {
@@ -35,9 +29,9 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
       }
     };
 
-    eventEmitter.on(EVENT_MENU_CLICKED, handleMenuClick);
+    eventEmitter.on(EVENT_MENU.CLICKED, handleMenuClick);
     return () => {
-      eventEmitter.off(EVENT_MENU_CLICKED, handleMenuClick);
+      eventEmitter.off(EVENT_MENU.CLICKED, handleMenuClick);
     };
   }, [setOpen]);
 
@@ -81,12 +75,6 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
           }}
         >
           <BookmarkListAccordionGroup
-            items={items}
-            temporaryItem={temporaryItem}
-            expandedItem={expandedItem}
-            onClickAccordion={onClickAccordion}
-            onRemoveFromBookmarkList={onRemoveFromBookmarkList}
-            onClickBookmark={onClickBookmark}
             onRemoveAllBookmarks={onRemoveAllBookmarks}
             tabNavigation={tabNavigation}
           />

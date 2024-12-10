@@ -13,12 +13,10 @@ import {
   searchQueryResult,
 } from "../../../components/common/store/store";
 import CircleLoader from "../../../components/loading/CircleLoader";
-import { BookmarkButtonBasicType } from "../../../components/bookmark/BookmarkButton";
 
 interface ResultSectionProps
   extends Partial<ResultPanelSimpleFilterType>,
-    Partial<ResultCardsType>,
-    Partial<BookmarkButtonBasicType> {
+    Partial<ResultCardsType> {
   showFullMap: boolean;
   showFullList: boolean;
   isLoading: boolean;
@@ -36,7 +34,6 @@ const ResultSection: FC<ResultSectionProps> = ({
   onClickCard,
   selectedUuids,
   isLoading,
-  onClickBookmark,
 }) => {
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
@@ -73,7 +70,6 @@ const ResultSection: FC<ResultSectionProps> = ({
           layout={currentLayout}
           contents={reduxContents}
           onClickCard={onClickCard}
-          onClickBookmark={onClickBookmark}
           selectedUuids={selectedUuids}
         />
       </Box>

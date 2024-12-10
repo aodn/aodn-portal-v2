@@ -12,16 +12,23 @@ import {
 } from "../../styles/constants";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
 import BookmarkListCard, { BookmarkListCardType } from "./BookmarkListCard";
-import BookmarkButton, { BookmarkButtonBasicType } from "./BookmarkButton";
+import BookmarkButton from "./BookmarkButton";
+import {
+  removeItem,
+  getBookmarkList,
+  setExpandedItem,
+  setTemporaryItem,
+  on,
+  off,
+} from "../common/store/bookmarkListReducer";
+import store from "../common/store/store";
+import {
+  BookmarkEvent,
+  EVENT_BOOKMARK,
+} from "../map/mapbox/controls/menu/Definition";
 
 export interface BookmarkListAccordionGroupBasicType
-  extends Partial<BookmarkButtonBasicType>,
-    Partial<BookmarkListCardType> {
-  items: OGCCollection[] | undefined;
-  temporaryItem: OGCCollection | undefined;
-  expandedItem: OGCCollection | undefined;
-  onClickAccordion: (item: OGCCollection | undefined) => void;
-  onRemoveFromBookmarkList: (item: OGCCollection) => void;
+  extends Partial<BookmarkListCardType> {
   onRemoveAllBookmarks: () => void;
 }
 
@@ -29,12 +36,6 @@ interface BookmarkListAccordionGroupProps
   extends BookmarkListAccordionGroupBasicType {}
 
 const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
-  items,
-  temporaryItem,
-  expandedItem,
-  onClickAccordion,
-  onRemoveFromBookmarkList,
-  onClickBookmark,
   onRemoveAllBookmarks,
   tabNavigation,
 }) => {
@@ -46,14 +47,26 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   // State to store the mouse hover status
   const [hoverOnButton, setHoverOnButton] = useState<boolean>(false);
 
+  const [bookmarkItems, setBookmarkItems] = useState<
+    Array<OGCCollection> | undefined
+  >(getBookmarkList(store.getState()).items);
+
+  const [bookmarkTemporaryItem, setBookmarkTemporaryItem] = useState<
+    OGCCollection | undefined
+  >(getBookmarkList(store.getState()).temporaryItem);
+
+  const [bookmarkExpandedItem, setBookmarkExpandedItem] = useState<
+    OGCCollection | undefined
+  >(getBookmarkList(store.getState()).expandedItem);
+
   const handleChange = useCallback(
     (item: OGCCollection, hoverOnRemoveButton: boolean) =>
       (_: SyntheticEvent, newExpanded: boolean) => {
         // To prevent clicking on buttons in accordion title area to trigger the onClickAccordion
         if (hoverOnRemoveButton) return;
-        onClickAccordion(newExpanded ? item : undefined);
+        store.dispatch(setExpandedItem(newExpanded ? item : undefined));
       },
-    [onClickAccordion]
+    []
   );
 
   const handleClearAllBookmarks = () => {
@@ -61,29 +74,75 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     onRemoveAllBookmarks && onRemoveAllBookmarks();
   };
 
+  const onRemoveFromBookmarkList = useCallback(
+    (item: OGCCollection) => {
+      if (item.id === bookmarkTemporaryItem?.id) {
+        // If the item is a temporary item, just clear the temporary item
+        store.dispatch(setTemporaryItem(undefined));
+      } else {
+        // Else the item is from bookmarkItems, so remove it from the list
+        store.dispatch(removeItem(item.id));
+      }
+      // If the item is expanded, need to clear the bookmarkExpandedItem
+      store.dispatch(
+        setExpandedItem(
+          bookmarkExpandedItem?.id === item.id
+            ? undefined
+            : bookmarkExpandedItem
+        )
+      );
+    },
+    [bookmarkExpandedItem, bookmarkTemporaryItem?.id]
+  );
+
   // Update accordion group list by listening bookmark items and bookmark temporary item
   useEffect(() => {
-    // If no items and no temporary item, just return empty array
-    if (!items?.length && !temporaryItem) {
-      setAccordionGroupItems([]);
-      return;
-    }
+    const handler = (event: BookmarkEvent) => {
+      if (event.action === EVENT_BOOKMARK.ADD) {
+        setBookmarkItems((items) =>
+          items ? [event.value, ...items] : [event.value]
+        );
+        // Only add temporary item if it's not already in items
+        setAccordionGroupItems((items) =>
+          items.some((i) => i.id === event.id) ? items : [event.value, ...items]
+        );
+      }
 
-    // If we have a temporary item, check if it needs to be added
-    if (temporaryItem) {
-      const existingIds = new Set(items?.map((item) => item.id) || []);
-      // Only add temporary item if it's not already in items
-      setAccordionGroupItems(
-        !existingIds.has(temporaryItem.id)
-          ? [temporaryItem, ...(items || [])]
-          : [...(items || [])]
-      );
-      return;
-    }
+      if (event.action === EVENT_BOOKMARK.TEMP) {
+        setBookmarkTemporaryItem(event.value);
+        // Only add temporary item if it's not already in items
+        setAccordionGroupItems((items) =>
+          items.some((i) => i.id === event.id) ? items : [event.value, ...items]
+        );
+      }
 
-    // If we only have items, just use those
-    setAccordionGroupItems([...(items || [])]);
-  }, [items, temporaryItem]);
+      if (event.action === EVENT_BOOKMARK.REMOVE) {
+        setBookmarkTemporaryItem((item) =>
+          item?.id === event.id ? undefined : item
+        );
+        setBookmarkItems((items) => items?.filter((i) => i.id !== event.id));
+        setAccordionGroupItems((items) =>
+          items?.filter((i) => i.id !== event.id)
+        );
+      }
+
+      if (event.action === EVENT_BOOKMARK.EXPAND) {
+        setBookmarkExpandedItem(event.value);
+      }
+    };
+
+    on(EVENT_BOOKMARK.ADD, handler);
+    on(EVENT_BOOKMARK.REMOVE, handler);
+    on(EVENT_BOOKMARK.TEMP, handler);
+    on(EVENT_BOOKMARK.EXPAND, handler);
+
+    return () => {
+      off(EVENT_BOOKMARK.ADD, handler);
+      off(EVENT_BOOKMARK.REMOVE, handler);
+      off(EVENT_BOOKMARK.TEMP, handler);
+      off(EVENT_BOOKMARK.EXPAND, handler);
+    };
+  }, []);
 
   return (
     <>
@@ -101,12 +160,12 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
           color={fontColor.blue.dark}
           fontWeight={fontWeight.bold}
         >
-          {items
-            ? items.length === 0
+          {bookmarkItems
+            ? bookmarkItems.length === 0
               ? "Bookmark List"
-              : items.length === 1
+              : bookmarkItems.length === 1
                 ? "1 Bookmark"
-                : `${items.length} Bookmarks`
+                : `${bookmarkItems.length} Bookmarks`
             : "Bookmark List"}
         </Typography>
         <Button
@@ -122,7 +181,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         accordionGroupItems.map((item) => (
           <StyledAccordion
             key={item.id}
-            expanded={expandedItem?.id === item.id}
+            expanded={bookmarkExpandedItem?.id === item.id}
             onChange={handleChange(item, hoverOnButton)}
           >
             <StyledAccordionSummary>
@@ -138,10 +197,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                   onMouseEnter={() => setHoverOnButton(true)}
                   onMouseLeave={() => setHoverOnButton(false)}
                 >
-                  <BookmarkButton
-                    dataset={item}
-                    onClickBookmark={onClickBookmark}
-                  />
+                  <BookmarkButton dataset={item} />
                 </Box>
 
                 <Typography

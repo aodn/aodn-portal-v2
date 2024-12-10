@@ -3,16 +3,12 @@ import { createRoot, Root } from "react-dom/client";
 import MapContext from "../../MapContext";
 import { Map as MapBox, IControl, MapMouseEvent } from "mapbox-gl";
 import EventEmitter from "events";
-import { Menus } from "./Definition";
+import { EVENT_MAP, EVENT_MENU, Menus } from "./Definition";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
 const leftPadding = "15px";
 const rightPadding = "15px";
-
-const EVENT_MENU_CLICKED = "event-menu-clicked";
-const EVENT_MAP_CLICKED = "event-map-clicked";
-const EVENT_MAP_MOVE_START = "event-map-movestart";
 
 interface MenuControlProps {
   menu: Menus | null;
@@ -34,9 +30,9 @@ class MapMenuControl implements IControl {
 
     // Handlers for map events
     this.mapClickHandler = (event: MapMouseEvent) =>
-      this.onClickHandler(event, undefined, EVENT_MAP_CLICKED);
+      this.onClickHandler(event, undefined, EVENT_MAP.CLICKED);
     this.mapMoveStartHandler = (event: MapMouseEvent) =>
-      this.onClickHandler(event, undefined, EVENT_MAP_MOVE_START);
+      this.onClickHandler(event, undefined, EVENT_MAP.MOVE_START);
   }
 
   updateComponent(component: Menus) {
@@ -85,7 +81,7 @@ class MapMenuControl implements IControl {
   onClickHandler(
     event: MouseEvent | MapMouseEvent,
     component: Menus | undefined,
-    type: string = EVENT_MENU_CLICKED
+    type: string = EVENT_MENU.CLICKED
   ) {
     eventEmitter.emit(type, {
       event: event,
@@ -126,11 +122,4 @@ const MenuControl: React.FC<MenuControlProps> = ({
 
 export default MenuControl;
 
-export {
-  eventEmitter,
-  leftPadding,
-  rightPadding,
-  EVENT_MAP_CLICKED,
-  EVENT_MAP_MOVE_START,
-  EVENT_MENU_CLICKED,
-};
+export { eventEmitter, leftPadding, rightPadding };

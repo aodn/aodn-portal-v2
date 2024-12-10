@@ -62,12 +62,6 @@ const MapSection: React.FC<MapSectionProps> = ({
   sx,
   selectedUuids,
   isLoading,
-  items,
-  temporaryItem,
-  expandedItem,
-  onClickAccordion,
-  onRemoveFromBookmarkList,
-  onClickBookmark,
   onRemoveAllBookmarks,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
@@ -87,7 +81,6 @@ const MapSection: React.FC<MapSectionProps> = ({
               selectedUuids={selectedUuids}
               onClickMapPoint={onClickMapPoint}
               tabNavigation={tabNavigation}
-              onClickBookmark={onClickBookmark}
             />
           );
 
@@ -98,18 +91,11 @@ const MapSection: React.FC<MapSectionProps> = ({
               selectedUuids={selectedUuids}
               onClickMapPoint={onClickMapPoint}
               tabNavigation={tabNavigation}
-              onClickBookmark={onClickBookmark}
             />
           );
       }
     },
-    [
-      collections,
-      onClickBookmark,
-      onClickMapPoint,
-      selectedUuids,
-      tabNavigation,
-    ]
+    [collections, onClickMapPoint, selectedUuids, tabNavigation]
   );
 
   // Early return if it is full list view
@@ -139,12 +125,6 @@ const MapSection: React.FC<MapSectionProps> = ({
           <MenuControl
             menu={
               <BookmarkListMenu
-                items={items}
-                temporaryItem={temporaryItem}
-                expandedItem={expandedItem}
-                onClickAccordion={onClickAccordion}
-                onRemoveFromBookmarkList={onRemoveFromBookmarkList}
-                onClickBookmark={onClickBookmark}
                 onRemoveAllBookmarks={onRemoveAllBookmarks}
                 tabNavigation={tabNavigation}
               />

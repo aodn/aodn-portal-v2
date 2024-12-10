@@ -1,13 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ControlProps, MenuClickedEvent } from "./Definition";
 import {
-  EVENT_MAP_CLICKED,
-  EVENT_MAP_MOVE_START,
-  EVENT_MENU_CLICKED,
-  eventEmitter,
-  leftPadding,
-  rightPadding,
-} from "./MenuControl";
+  ControlProps,
+  EVENT_MAP,
+  EVENT_MENU,
+  MenuClickedEvent,
+} from "./Definition";
+import { eventEmitter, leftPadding, rightPadding } from "./MenuControl";
 import {
   Box,
   Typography,
@@ -54,14 +52,14 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
 
     const handleMapEvent = () => setOpen(false);
 
-    eventEmitter.on(EVENT_MENU_CLICKED, handleEvent);
-    eventEmitter.on(EVENT_MAP_CLICKED, handleMapEvent);
-    eventEmitter.on(EVENT_MAP_MOVE_START, handleMapEvent);
+    eventEmitter.on(EVENT_MENU.CLICKED, handleEvent);
+    eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
+    eventEmitter.on(EVENT_MAP.MOVE_START, handleMapEvent);
 
     return () => {
-      eventEmitter.off(EVENT_MENU_CLICKED, handleEvent);
-      eventEmitter.off(EVENT_MAP_MOVE_START, handleEvent);
-      eventEmitter.off(EVENT_MAP_CLICKED, handleMapEvent);
+      eventEmitter.off(EVENT_MENU.CLICKED, handleEvent);
+      eventEmitter.off(EVENT_MAP.MOVE_START, handleEvent);
+      eventEmitter.off(EVENT_MAP.CLICKED, handleMapEvent);
     };
   }, []);
 
