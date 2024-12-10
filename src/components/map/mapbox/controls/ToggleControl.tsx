@@ -6,6 +6,7 @@ import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import { safeRemoveControl } from "../../../../utils/MapUtils";
 
 interface ToggleButtonProps {
   showFullMap: boolean;
@@ -61,7 +62,7 @@ class ToggleControlClass implements IControl {
     );
   }
 
-  onAdd(map: Map): HTMLElement {
+  onAdd(_: Map): HTMLElement {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
     this.root = createRoot(this.container!);
@@ -70,15 +71,7 @@ class ToggleControlClass implements IControl {
   }
 
   onRemove(_: Map): void {
-    if (this.container?.parentNode) {
-      // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
-      // Keep the old pointer
-      setTimeout(() => {
-        this.container?.parentNode?.removeChild(this.container);
-        this.container = null;
-        this.root?.unmount();
-      });
-    }
+    safeRemoveControl(this.container, this.root);
   }
 }
 

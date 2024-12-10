@@ -2,10 +2,11 @@ import { IControl, Map } from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { createRoot, Root } from "react-dom/client";
 import BBoxIcon from "../../../icon/BBoxIcon";
+import { safeRemoveControl } from "../../../../utils/MapUtils";
 
 class DrawRectangleControl implements IControl {
   private draw: MapboxDraw;
-  private iconRoot: Root | null = null;
+  private root: Root | null = null;
   private container: HTMLDivElement | null = null;
   private map: Map | undefined | null = undefined;
 
@@ -17,8 +18,8 @@ class DrawRectangleControl implements IControl {
     this.map = map;
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
-    this.iconRoot = createRoot(this.container);
-    this.iconRoot.render(<BBoxIcon />);
+    this.root = createRoot(this.container);
+    this.root.render(<BBoxIcon />);
     this.container.onclick = () => {
       this.draw.changeMode("draw_rectangle");
     };
@@ -30,9 +31,8 @@ class DrawRectangleControl implements IControl {
 
     return this.container;
   }
-  onRemove() {
-    this.container?.parentNode?.removeChild(this.container);
-    this.map = undefined;
+  onRemove(_: Map) {
+    safeRemoveControl(this.container, this.root);
   }
 }
 

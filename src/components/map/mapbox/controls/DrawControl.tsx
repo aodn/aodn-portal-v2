@@ -12,6 +12,7 @@ import {
   DownloadConditionType,
   IDownloadCondition,
 } from "../../../../pages/detail-page/context/DownloadDefinitions";
+import _ from "lodash";
 
 interface DrawControlProps {
   map: Map | undefined | null;
@@ -31,27 +32,6 @@ const DrawControl: React.FC<DrawControlProps> = ({
 
   const anchorRef = useRef(null);
   const popperRef = useRef<HTMLDivElement>(null);
-
-  const updateArea = useCallback(() => {
-    const features = draw.getAll().features;
-    const bboxes: BBoxCondition[] = [];
-    features?.forEach((feature) => {
-      const geo = feature.geometry;
-      if (geo.type === "Polygon") {
-        const polygon = geo as Polygon;
-        const bbox = turf.bbox(polygon);
-        if (bbox) {
-          const id = feature.id
-            ? typeof feature.id === "string"
-              ? feature.id
-              : feature.id.toString()
-            : "";
-          bboxes.push(new BBoxCondition(bbox, id));
-        }
-      }
-    });
-    setDownloadConditions(DownloadConditionType.BBOX, bboxes);
-  }, [draw, setDownloadConditions]);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (!popperRef.current || !anchorRef.current) {
@@ -75,6 +55,20 @@ const DrawControl: React.FC<DrawControlProps> = ({
   }, [handleClickOutside, open]);
 
   useEffect(() => {
+    const updateArea = () => {
+      const features = draw.getAll().features;
+      const bboxes: BBoxCondition[] =
+        features
+          ?.filter((feature) => feature.geometry.type === "Polygon")
+          .map((feature) => {
+            const polygon = feature.geometry as Polygon;
+            const bbox = turf.bbox(polygon);
+            const id = _.toString(feature.id);
+            return new BBoxCondition(bbox, id);
+          }) || [];
+      setDownloadConditions(DownloadConditionType.BBOX, bboxes);
+    };
+
     if (map) {
       map.addControl(new DrawRectangleControl(draw), "top-right");
       map.addControl(draw);
@@ -95,7 +89,7 @@ const DrawControl: React.FC<DrawControlProps> = ({
         /* can be ignored */
       }
     };
-  }, [draw, map, updateArea]);
+  }, [draw, map, setDownloadConditions]);
 
   return <></>;
 };

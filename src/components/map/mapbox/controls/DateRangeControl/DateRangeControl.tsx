@@ -8,6 +8,7 @@ import {
   DownloadConditionType,
   IDownloadCondition,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
+import { safeRemoveControl } from "../../../../../utils/MapUtils";
 
 class DateRangeControlClass implements IControl {
   private container: HTMLDivElement | null = null;
@@ -34,9 +35,8 @@ class DateRangeControlClass implements IControl {
     return this.container;
   }
 
-  onRemove(_: mapboxgl.Map) {
-    this.container?.parentNode?.removeChild(this.container);
-    this.map = undefined;
+  onRemove(_: Map) {
+    safeRemoveControl(this.container, this.iconRoot);
   }
 }
 

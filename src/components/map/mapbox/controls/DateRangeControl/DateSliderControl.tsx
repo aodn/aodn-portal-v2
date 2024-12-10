@@ -1,5 +1,5 @@
 import React from "react";
-import mapboxgl, { IControl } from "mapbox-gl";
+import mapboxgl, { IControl, Map } from "mapbox-gl";
 import { createRoot, Root } from "react-dom/client";
 import DateSlider from "./DateSlider";
 import {
@@ -9,6 +9,7 @@ import {
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import dayjs from "dayjs";
 import { SIMPLE_DATE_FORMAT } from "../../../../../pages/detail-page/subpages/tab-panels/AbstractAndDownloadPanel";
+import { safeRemoveControl } from "../../../../../utils/MapUtils";
 
 class DateSliderControlClass implements IControl {
   private container: HTMLDivElement | null = null;
@@ -61,8 +62,8 @@ class DateSliderControlClass implements IControl {
     return this.container;
   }
 
-  onRemove() {
-    this.container?.parentNode?.removeChild(this.container);
+  onRemove(_: Map) {
+    safeRemoveControl(this.container, this.root);
   }
 }
 export default DateSliderControlClass;
