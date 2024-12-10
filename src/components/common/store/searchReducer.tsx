@@ -37,6 +37,7 @@ export type SearchParameters = {
 };
 // Control the behavior of search behavior not part of the query
 export type SearchControl = {
+  includeNoSpatialExtents?: boolean;
   pagesize?: number;
   searchafter?: Array<string>;
   score?: number;
@@ -309,11 +310,11 @@ const calculateScore = (
   base: number | undefined,
   text: string | undefined
 ): number => {
-  const pump = text ? (text.length / 8 > 15 ? 15 : text.length / 8) : 0;
+  const pump = text ? (text.length / 2 > 50 ? 50 : text.length / 2) : 0;
   return base ? Number(base) + Number(pump) : Number(pump);
 };
 // Given a ParameterState object, we convert it to the correct Restful parameters
-// always call this function and do not hand craft it elsewhere, some control isn't
+// always call this function and do not handcraft it elsewhere, some control isn't
 // part the ParameterState and therefore express as optional argument here
 const createSearchParamFrom = (
   i: ParameterState,
@@ -326,6 +327,7 @@ const createSearchParamFrom = (
   const c = mergeWithDefaults(
     {
       score: DEFAULT_SEARCH_SCORE,
+      includeNoSpatialExtents: true,
     } as SearchControl,
     control
   );
@@ -383,7 +385,12 @@ const createSearchParamFrom = (
   }
 
   if (i.polygon) {
-    const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
+    //const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
+    const f = cqlDefaultFilters.get(
+      c.includeNoSpatialExtents
+        ? "BBOX_POLYGON_OR_EMPTY_EXTENTS"
+        : "BBOX_POLYGON"
+    ) as PolygonOperation;
     p.filter = appendFilter(p.filter, f(i.polygon));
   }
 

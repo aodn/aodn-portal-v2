@@ -1,7 +1,6 @@
 import { FC } from "react";
 import { OGCCollection } from "../store/OGCCollectionDefinitions";
-import { BasicMapHoverTipProps } from "./BasicMapHoverTip";
-import { Box, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import {
   fontColor,
   fontSize,
@@ -12,6 +11,13 @@ import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
 import Map from "../../map/mapbox/Map";
 import Layers from "../../map/mapbox/layers/Layers";
 import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
+
+interface BasicMapHoverTipProps {
+  content?: string | undefined | null;
+  sx?: SxProps;
+  onDatasetSelected?: () => void;
+  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
+}
 
 interface ComplexMapHoverTipProps extends BasicMapHoverTipProps {
   collection: OGCCollection;

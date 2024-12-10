@@ -20,6 +20,7 @@ export interface CommonSelectProps<T = string> {
   // Once value is provided, the component is controllable
   value?: T | null;
   onSelectCallback?: (value: T) => void;
+  "data-testid"?: string | undefined;
   sx?: SxProps;
 }
 

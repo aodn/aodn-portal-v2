@@ -1,6 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
+from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
@@ -104,3 +105,27 @@ def test_show_more_results(
     search_page.scroll_down_in_result_list(1600)
     expect(search_page.get_dataset_by_id(chunk_2_last_data)).to_be_visible()
     expect(search_page.show_more_results).not_to_be_visible()
+
+
+@pytest.mark.parametrize(
+    'link_title',
+    [
+        'Data Link',
+    ],
+)
+def test_links_button_navigates_to_detail_links_tab(
+    page_mock: Page, link_title: str
+) -> None:
+    landing_page = LandingPage(page_mock)
+    search_page = SearchPage(page_mock)
+    detail_page = DetailPage(page_mock)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    first_result = search_page.result_card_list.first
+
+    first_result.hover()
+    first_result.get_by_label('Links').click()
+    expect(detail_page.get_text(link_title)).to_be_visible()

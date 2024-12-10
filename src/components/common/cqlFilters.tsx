@@ -8,6 +8,7 @@ import { Feature, Polygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
 import { Vocab } from "./store/componentParamReducer";
 import { DatasetFrequency } from "./store/searchReducer";
+import { bbox } from "@turf/turf";
 
 // TODO: refactor this, naming like this is not ideal for readability,
 //  what are T, J, R, p, i , j, c, d, x, y, z, etc. actually mean?
@@ -48,6 +49,16 @@ const funcIntersectPolygon: PolygonOperation = (p) => {
   return `INTERSECTS(geometry,${wkt})`;
 };
 
+const funcBBoxPolygon: PolygonOperation = (p) => {
+  const [minx, miny, maxx, maxy] = bbox(p);
+  return `BBOX(geometry,${minx},${miny},${maxx},${maxy})`;
+};
+// Some record do not have spatial extents, this function include those during BBOX search
+const funcBBoxPolygonOrEmptyExtents: PolygonOperation = (p) => {
+  const [minx, miny, maxx, maxy] = bbox(p);
+  return `(BBOX(geometry,${minx},${miny},${maxx},${maxy}) OR geometry IS NULL)`;
+};
+
 const funcParameterVocabs: ParameterVocabsIn = (vocabs: Array<Vocab>) => {
   const parameterVocabLabels: string[] = [];
   // grab labels only
@@ -62,23 +73,6 @@ const funcParameterVocabs: ParameterVocabsIn = (vocabs: Array<Vocab>) => {
   }
   return `(${parameterVocabLabels.join(" or ")})`;
 };
-
-const funcCommonTypeSearchText: (searchText: string) => undefined | string = (
-  searchText: string
-) => {
-  const st = searchText?.toLowerCase();
-  if (st) {
-    const results: string[] = [];
-    results.push(`parameter_vocabs='${st}'`);
-    results.push(`fuzzy_title='${st}'`);
-    results.push(`fuzzy_desc='${st}'`);
-    return `(${results.join(" or ")})`;
-  } else {
-    // if no parameter vocabs, return undefined
-    return undefined;
-  }
-};
-
 /**
  * The CQL filter format for search dataset given start/end date
  * @param s
@@ -99,6 +93,8 @@ cqlDefaultFilters
   .set("AFTER_TIME", funcTemporalAfter)
   .set("BEFORE_TIME", funcTemporalBefore)
   .set("INTERSECT_POLYGON", funcIntersectPolygon)
+  .set("BBOX_POLYGON", funcBBoxPolygon)
+  .set("BBOX_POLYGON_OR_EMPTY_EXTENTS", funcBBoxPolygonOrEmptyExtents)
   .set("UPDATE_FREQUENCY", funcUpdateFrequency);
 
 export { cqlDefaultFilters };
