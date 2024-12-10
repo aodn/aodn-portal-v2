@@ -13,7 +13,7 @@ import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
-  LayersProps,
+  LayerBasicType,
 } from "./Layers";
 import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
@@ -47,8 +47,8 @@ interface ClusterLayerConfig {
   unclusterPointRadius: number;
 }
 
-interface ClusterLayerProps extends LayersProps {
-  // Some method inherit from LayersProps
+interface ClusterLayerProps extends LayerBasicType {
+  // Some method inherit from LayerBasicType
   clusterLayerConfig?: Partial<ClusterLayerConfig>;
 }
 
@@ -100,7 +100,7 @@ export const getUnclusterPointId = (layerId: string) =>
 const ClusterLayer: FC<ClusterLayerProps> = ({
   featureCollection = generateFeatureCollectionFrom(undefined),
   selectedUuids,
-  onDatasetSelected,
+  onClickMapPoint: onDatasetSelected,
   tabNavigation,
   clusterLayerConfig,
 }: ClusterLayerProps) => {
@@ -291,7 +291,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         clusterLayer={clusterLayer}
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unclusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
+        onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
       />
       <TestHelper getHeatmapLayer={() => clusterLayer} />

@@ -7,6 +7,7 @@ import {
   DEFAULT_SEARCH_PAGE_SIZE,
   FULL_LIST_PAGE_SIZE,
 } from "../common/store/searchReducer";
+import useTabNavigation from "../../hooks/useTabNavigation";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
@@ -14,10 +15,9 @@ import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
-import useTabNavigation from "../../hooks/useTabNavigation";
 import useFetchData from "../../hooks/useFetchData";
 
-export interface ResultCard {
+export interface ResultCardBasicType {
   content?: OGCCollection;
   onClickCard?: (item: OGCCollection | undefined) => void;
   onClickDetail?: (uuid: string) => void;
@@ -27,7 +27,7 @@ export interface ResultCard {
   sx?: SxProps;
 }
 
-interface ResultCards extends ResultCard {
+interface ResultCardsListType extends ResultCardBasicType {
   count: number;
   total: number;
   contents: CollectionsQueryType;
@@ -35,18 +35,18 @@ interface ResultCards extends ResultCard {
   child: ListChildComponentProps;
 }
 
-interface ResultCardsProps {
-  layout: Exclude<
-    SearchResultLayoutEnum,
-    SearchResultLayoutEnum.FULL_MAP
-  > | null;
+export interface ResultCardsType {
+  layout:
+    | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
+    | undefined;
   contents: CollectionsQueryType;
   onClickCard: ((item: OGCCollection | undefined) => void) | undefined;
-  selectedUuids: string[];
+  selectedUuids: string[] | undefined;
   sx?: SxProps;
 }
+interface ResultCardsProps extends ResultCardsType {}
 
-const renderGridView: FC<ResultCards> = ({
+const renderGridView: FC<ResultCardsListType> = ({
   count,
   total,
   contents,
@@ -108,7 +108,7 @@ const renderGridView: FC<ResultCards> = ({
   }
 };
 
-const renderListView: FC<ResultCards> = ({
+const renderListView: FC<ResultCardsListType> = ({
   count,
   total,
   contents,
@@ -154,7 +154,7 @@ const renderListView: FC<ResultCards> = ({
   }
 };
 
-const renderFullListView: FC<Partial<ResultCards>> = ({
+const renderFullListView: FC<Partial<ResultCardsListType>> = ({
   sx = {} as SxProps,
   contents,
   count,
@@ -222,7 +222,10 @@ const ResultCards: FC<ResultCardsProps> = ({
 
   const total = useMemo(() => contents.result.total, [contents.result.total]);
 
-  const selectedUuid = useMemo(() => selectedUuids[0], [selectedUuids]);
+  const selectedUuid = useMemo(
+    () => selectedUuids && selectedUuids[0],
+    [selectedUuids]
+  );
 
   const onClickDetail = useCallback(
     (uuid: string) => goToDetailPage(uuid, "abstract"),

@@ -35,10 +35,12 @@ const SORT_SELECT = [
   },
 ];
 
-export interface ResultListSortButtonProps<T> {
-  currentSort: SortResultEnum | null;
-  onChangeSorting: (sort: T) => void;
+export interface ResultListSortButtonType<T> {
+  currentSort: SortResultEnum | undefined;
+  onChangeSorting?: (sort: T) => void;
 }
+
+interface ResultListSortButtonProps<T> extends ResultListSortButtonType<T> {}
 
 const ResultListSortButton: FC<ResultListSortButtonProps<SortResultEnum>> = ({
   currentSort,

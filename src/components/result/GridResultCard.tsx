@@ -19,10 +19,10 @@ import {
 } from "../../styles/constants";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import MapSpatialExtents from "@/assets/icons/map-spatial-extents.png";
-import { ResultCard } from "./ResultCards";
+import { ResultCardBasicType } from "./ResultCards";
+import BookmarkButton from "../bookmark/BookmarkButton";
 
-interface GridResultCardProps extends ResultCard {}
+interface GridResultCardProps extends ResultCardBasicType {}
 
 const GridResultCard: FC<GridResultCardProps> = ({
   content,
@@ -31,6 +31,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
   onClickLinks = () => {},
   onClickDownload = () => {},
   selectedUuid,
+  sx,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
 
@@ -49,33 +50,26 @@ const GridResultCard: FC<GridResultCardProps> = ({
         alignItems: "center",
         width: "100%",
         height: "100%",
-        border: isSelectedDataset ? `${border.sm} ${color.blue.dark}` : "none",
+        border: isSelectedDataset
+          ? `${border.sm} ${color.blue.darkSemiTransparent}`
+          : "none",
         borderRadius: borderRadius.small,
+        ...sx,
       }}
       onMouseEnter={() => setShowButtons(true)}
       onMouseLeave={() => setShowButtons(false)}
       data-testid="result-card-grid"
     >
-      {isSelectedDataset && (
-        <Box
-          position="absolute"
-          top={gap.lg}
-          right={gap.lg}
-          height="20px"
-          width="auto"
-          zIndex={1}
-        >
-          <img
-            src={MapSpatialExtents}
-            alt="selected dataset"
-            style={{
-              objectFit: "contain",
-              width: "100%",
-              height: "100%",
-            }}
-          />
-        </Box>
-      )}
+      <Box
+        position="absolute"
+        top={gap.lg}
+        right={gap.lg}
+        height="20px"
+        width="auto"
+        zIndex={1}
+      >
+        <BookmarkButton dataset={content} />
+      </Box>
 
       <CardActionArea onClick={() => onClickCard(content)}>
         <Box

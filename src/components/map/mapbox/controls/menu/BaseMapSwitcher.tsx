@@ -1,5 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { ControlProps, MenuClickedEvent } from "./Definition";
+import {
+  ControlProps,
+  EVENT_MAP,
+  EVENT_MENU,
+  MenuClickedEvent,
+} from "./Definition";
 import PublicIcon from "@mui/icons-material/Public";
 import { styles as mapStyles, MapDefault } from "../../Map";
 import {
@@ -15,14 +20,7 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import {
-  EVENT_MAP_CLICKED,
-  EVENT_MAP_MOVE_START,
-  EVENT_MENU_CLICKED,
-  eventEmitter,
-  leftPadding,
-  rightPadding,
-} from "./MenuControl";
+import { eventEmitter, leftPadding, rightPadding } from "./MenuControl";
 import grey from "../../../../common/colors/grey";
 import blue from "../../../../common/colors/blue";
 import { borderRadius, fontSize } from "../../../../../styles/constants";
@@ -85,14 +83,14 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
 
     const handleMapEvent = () => setOpen(false);
 
-    eventEmitter.on(EVENT_MENU_CLICKED, handleEvent);
-    eventEmitter.on(EVENT_MAP_CLICKED, handleMapEvent);
-    eventEmitter.on(EVENT_MAP_MOVE_START, handleMapEvent);
+    eventEmitter.on(EVENT_MENU.CLICKED, handleEvent);
+    eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
+    eventEmitter.on(EVENT_MAP.MOVE_START, handleMapEvent);
 
     return () => {
-      eventEmitter.off(EVENT_MENU_CLICKED, handleEvent);
-      eventEmitter.off(EVENT_MAP_MOVE_START, handleEvent);
-      eventEmitter.off(EVENT_MAP_CLICKED, handleMapEvent);
+      eventEmitter.off(EVENT_MENU.CLICKED, handleEvent);
+      eventEmitter.off(EVENT_MAP.MOVE_START, handleEvent);
+      eventEmitter.off(EVENT_MAP.CLICKED, handleMapEvent);
     };
   }, []);
 
@@ -103,6 +101,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
         id="basemap-show-hide-menu-button"
         ref={anchorRef}
         onClick={handleToggle}
+        sx={{ paddingTop: "2px !important" }}
       >
         <PublicIcon />
       </IconButton>

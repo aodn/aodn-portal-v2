@@ -2,7 +2,6 @@
 // e.g capitalize, concatenate, ...
 
 import { decode } from "he";
-import React from "react";
 
 /**
  * Capitalizes the first letter of a given string.
@@ -58,4 +57,12 @@ export const enrichHTML = (text: string): string => {
   });
 
   return h.replace(/\n/g, "<br>");
+};
+
+//util function for join uuids in a specific pattern for fetching data
+export const createFilterString = (uuids: Array<string>): string => {
+  if (!Array.isArray(uuids) || uuids.length === 0) {
+    return "";
+  }
+  return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
 };
