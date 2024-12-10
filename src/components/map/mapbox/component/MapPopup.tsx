@@ -19,9 +19,8 @@ import AppTheme from "../../../../utils/AppTheme";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
-import { BookmarkButtonBasicType } from "../../../bookmark/BookmarkButton";
 
-interface MapPopupProps extends Partial<BookmarkButtonBasicType> {
+interface MapPopupProps {
   layerId: string;
   onDatasetSelected?: (uuid: Array<string>) => void;
   tabNavigation?: (uuid: string, tab: string, section?: string) => void;
@@ -79,7 +78,7 @@ const handleDatasetSelect = (
 };
 
 const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  { layerId, onDatasetSelected, tabNavigation, onClickBookmark },
+  { layerId, onDatasetSelected, tabNavigation },
   ref
 ) => {
   const { map } = useContext(MapContext);
@@ -131,14 +130,13 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
                   handleDatasetSelect(collection.id, onDatasetSelected)
                 }
                 tabNavigation={tabNavigation}
-                onClickBookmark={onClickBookmark}
               />
             </CardContent>
           </Card>
         </ThemeProvider>
       );
     },
-    [onClickBookmark, onDatasetSelected, tabNavigation]
+    [onDatasetSelected, tabNavigation]
   );
 
   const removePopup = useCallback(() => {

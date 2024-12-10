@@ -16,9 +16,8 @@ import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { padding } from "../../styles/constants";
 import useFetchData from "../../hooks/useFetchData";
-import { BookmarkButtonBasicType } from "../bookmark/BookmarkButton";
 
-export interface ResultCardBasicType extends Partial<BookmarkButtonBasicType> {
+export interface ResultCardBasicType {
   content?: OGCCollection;
   onClickCard?: (item: OGCCollection | undefined) => void;
   onClickDetail?: (uuid: string) => void;
@@ -36,7 +35,7 @@ interface ResultCardsListType extends ResultCardBasicType {
   child: ListChildComponentProps;
 }
 
-export interface ResultCardsType extends Partial<BookmarkButtonBasicType> {
+export interface ResultCardsType {
   layout:
     | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
     | undefined;
@@ -55,7 +54,6 @@ const renderGridView: FC<ResultCardsListType> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
-  onClickBookmark,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -89,7 +87,6 @@ const renderGridView: FC<ResultCardsListType> = ({
               onClickDetail={onClickDetail}
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
-              onClickBookmark={onClickBookmark}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -101,7 +98,6 @@ const renderGridView: FC<ResultCardsListType> = ({
                 onClickDetail={onClickDetail}
                 onClickLinks={onClickLinks}
                 onClickDownload={onClickDownload}
-                onClickBookmark={onClickBookmark}
                 selectedUuid={selectedUuid}
               />
             </Grid>
@@ -120,7 +116,6 @@ const renderListView: FC<ResultCardsListType> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
-  onClickBookmark,
   renderLoadMoreButton,
   selectedUuid,
   child,
@@ -152,7 +147,6 @@ const renderListView: FC<ResultCardsListType> = ({
           onClickDetail={onClickDetail}
           onClickLinks={onClickLinks}
           onClickDownload={onClickDownload}
-          onClickBookmark={onClickBookmark}
           selectedUuid={selectedUuid}
         />
       </ListItem>
@@ -170,7 +164,6 @@ const renderFullListView: FC<Partial<ResultCardsListType>> = ({
   onClickDetail,
   onClickLinks,
   onClickDownload,
-  onClickBookmark,
   selectedUuid,
 }) => {
   if (!count || !total || !contents) return;
@@ -185,7 +178,6 @@ const renderFullListView: FC<Partial<ResultCardsListType>> = ({
               onClickDetail={onClickDetail}
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
-              onClickBookmark={onClickBookmark}
               selectedUuid={selectedUuid}
             />
           </Grid>
@@ -204,7 +196,6 @@ const ResultCards: FC<ResultCardsProps> = ({
   layout,
   contents,
   onClickCard,
-  onClickBookmark,
   sx,
   selectedUuids,
 }) => {
@@ -286,7 +277,6 @@ const ResultCards: FC<ResultCardsProps> = ({
       onClickDetail,
       onClickLinks,
       onClickDownload,
-      onClickBookmark,
       selectedUuid,
     });
   } else if (layout === SearchResultLayoutEnum.GRID) {
@@ -318,7 +308,6 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickLinks,
                   onClickDownload,
                   renderLoadMoreButton,
-                  onClickBookmark,
                   selectedUuid,
                   child,
                 })
@@ -353,7 +342,6 @@ const ResultCards: FC<ResultCardsProps> = ({
                   onClickDetail,
                   onClickLinks,
                   onClickDownload,
-                  onClickBookmark,
                   renderLoadMoreButton,
                   selectedUuid,
                   child,

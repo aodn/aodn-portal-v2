@@ -92,7 +92,6 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
   unclusterPointLayer,
   onClickMapPoint: onDatasetSelected,
   tabNavigation,
-  onClickBookmark,
 }) => {
   const { map } = useContext(MapContext);
   const mapPopupRef = useRef<MapPopupRef>(null);
@@ -502,7 +501,6 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
           onDatasetSelected={onDatasetSelected}
           tabNavigation={tabNavigation}
-          onClickBookmark={onClickBookmark}
         />
       )}
       {spiderifiedCluster && (

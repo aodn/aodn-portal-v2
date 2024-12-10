@@ -4,9 +4,8 @@ import { LngLatBounds, MapMouseEvent, LngLat } from "mapbox-gl";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 import * as turf from "@turf/turf";
-import { BookmarkButtonBasicType } from "../../../bookmark/BookmarkButton";
 
-export interface LayerBasicType extends Partial<BookmarkButtonBasicType> {
+export interface LayerBasicType {
   // Tile layer should added to map
   featureCollection?: FeatureCollection<Point>;
   // Event fired when user click on the point layer

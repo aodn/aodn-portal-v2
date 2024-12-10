@@ -30,7 +30,6 @@ const GridResultCard: FC<GridResultCardProps> = ({
   onClickDetail = () => {},
   onClickLinks = () => {},
   onClickDownload = () => {},
-  onClickBookmark = () => {},
   selectedUuid,
   sx,
 }) => {
@@ -69,7 +68,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         width="auto"
         zIndex={1}
       >
-        <BookmarkButton dataset={content} onClickBookmark={onClickBookmark} />
+        <BookmarkButton dataset={content} />
       </Box>
 
       <CardActionArea onClick={() => onClickCard(content)}>

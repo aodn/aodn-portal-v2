@@ -95,6 +95,25 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     [bookmarkExpandedItem, bookmarkTemporaryItem?.id]
   );
 
+  useEffect(() => {
+    const handler = (event: BookmarkEvent) => {
+      if (event.action === EVENT_BOOKMARK.TEMP) {
+        setAccordionGroupItems((items) => {
+          // Only one temporary item so remove it first
+          const tempRemoved = items.filter(
+            (i) => i.id !== bookmarkTemporaryItem?.id
+          );
+          return [event.value, ...tempRemoved];
+        });
+        setBookmarkTemporaryItem(event.value);
+      }
+    };
+    on(EVENT_BOOKMARK.TEMP, handler);
+    return () => {
+      off(EVENT_BOOKMARK.TEMP, handler);
+    };
+  }, [bookmarkTemporaryItem?.id]);
+
   // Update accordion group list by listening bookmark items and bookmark temporary item
   useEffect(() => {
     const handler = (event: BookmarkEvent) => {
@@ -102,14 +121,6 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         setBookmarkItems((items) =>
           items ? [event.value, ...items] : [event.value]
         );
-        // Only add temporary item if it's not already in items
-        setAccordionGroupItems((items) =>
-          items.some((i) => i.id === event.id) ? items : [event.value, ...items]
-        );
-      }
-
-      if (event.action === EVENT_BOOKMARK.TEMP) {
-        setBookmarkTemporaryItem(event.value);
         // Only add temporary item if it's not already in items
         setAccordionGroupItems((items) =>
           items.some((i) => i.id === event.id) ? items : [event.value, ...items]
@@ -133,13 +144,11 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
 
     on(EVENT_BOOKMARK.ADD, handler);
     on(EVENT_BOOKMARK.REMOVE, handler);
-    on(EVENT_BOOKMARK.TEMP, handler);
     on(EVENT_BOOKMARK.EXPAND, handler);
 
     return () => {
       off(EVENT_BOOKMARK.ADD, handler);
       off(EVENT_BOOKMARK.REMOVE, handler);
-      off(EVENT_BOOKMARK.TEMP, handler);
       off(EVENT_BOOKMARK.EXPAND, handler);
     };
   }, []);

@@ -336,7 +336,7 @@ const SearchPage = () => {
         setSelectedUuids([item.id]);
       }
     },
-    []
+    [dispatch]
   );
 
   const onRemoveAllBookmarks = useCallback(() => {

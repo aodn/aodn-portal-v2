@@ -11,11 +11,9 @@ import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
 import Map from "../../map/mapbox/Map";
 import Layers from "../../map/mapbox/layers/Layers";
 import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
-import BookmarkButton, {
-  BookmarkButtonBasicType,
-} from "../../bookmark/BookmarkButton";
+import BookmarkButton from "../../bookmark/BookmarkButton";
 
-interface BasicMapHoverTipProps extends Partial<BookmarkButtonBasicType> {
+interface BasicMapHoverTipProps {
   content?: string | undefined | null;
   sx?: SxProps;
   onDatasetSelected?: () => void;
@@ -31,7 +29,6 @@ const mapContainerId = "map-popup-spatial-extend-overview";
 const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   collection,
   tabNavigation = () => {},
-  onClickBookmark,
   sx,
 }) => {
   const onLinks = () => tabNavigation(collection.id, "links");
@@ -70,10 +67,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
                 justifyContent="center"
                 height="100%"
               >
-                <BookmarkButton
-                  dataset={collection}
-                  onClickBookmark={onClickBookmark}
-                />
+                <BookmarkButton dataset={collection} />
               </Box>
             </Box>
           </Tooltip>

@@ -16,7 +16,7 @@ enum EVENT_BOOKMARK {
   // Temp item, do not need to store in local store, and only 1 temp item
   TEMP = "event-bookmark-temp",
   // Temp item, do not need to store in local store, a status to indicate status
-  EXPAND = "event-bookmark-expend",
+  EXPAND = "event-bookmark-expand",
 }
 
 export interface ControlProps {

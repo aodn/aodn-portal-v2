@@ -103,7 +103,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   onClickMapPoint: onDatasetSelected,
   tabNavigation,
   clusterLayerConfig,
-  onClickBookmark,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
   const [_, setLastVisiblePoint] = useState<
@@ -281,7 +280,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         layerId={unclusterPointLayer}
         onDatasetSelected={onDatasetSelected}
         tabNavigation={tabNavigation}
-        onClickBookmark={onClickBookmark}
       />
       <SpatialExtents
         layerId={unclusterPointLayer}
@@ -295,7 +293,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer={unclusterPointLayer}
         onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
-        onClickBookmark={onClickBookmark}
       />
       <TestHelper getHeatmapLayer={() => clusterLayer} />
     </>
