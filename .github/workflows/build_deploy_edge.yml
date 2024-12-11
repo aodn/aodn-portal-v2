@@ -27,8 +27,8 @@ jobs:
 
       - name: Install yarn
         run: |
-          : # set-version will always download the latest version of yarn
-          yarn policies set-version 4.3.0
+          : # corepack will use the packageManager version in package.json
+          npm install -g corepack
           yarn install --immutable
 
       - name: Build Website
