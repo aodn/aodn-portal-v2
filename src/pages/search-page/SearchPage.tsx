@@ -339,12 +339,9 @@ const SearchPage = () => {
     [dispatch]
   );
 
-  const onRemoveAllBookmarks = useCallback(() => {
+  const onDeselectDataset = useCallback(() => {
     setSelectedUuids([]);
-    dispatch(setExpandedItem(undefined));
-    dispatch(setTemporaryItem(undefined));
-    dispatch(removeAllItems());
-  }, [dispatch]);
+  }, []);
 
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
@@ -404,7 +401,7 @@ const SearchPage = () => {
             onToggleClicked={onToggleDisplay}
             onClickMapPoint={onClickMapPoint}
             isLoading={isLoading(loadingThreadCount)}
-            onRemoveAllBookmarks={onRemoveAllBookmarks}
+            onDeselectDataset={onDeselectDataset}
           />
         </Box>
       </Box>
