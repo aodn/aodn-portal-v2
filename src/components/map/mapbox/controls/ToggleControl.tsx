@@ -6,14 +6,14 @@ import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import { safeRemoveControl } from "../../../../utils/MapUtils";
 
-export interface ToggleControlBasicType {
+interface ToggleButtonProps {
   showFullMap: boolean;
   onToggleClicked?: (state: boolean) => void;
 }
-interface ToggleControlProps extends ToggleControlBasicType {}
 
-const ToggleButton: React.FC<ToggleControlProps> = ({
+const ToggleButton: React.FC<ToggleButtonProps> = ({
   showFullMap,
   onToggleClicked,
 }) => {

@@ -164,7 +164,6 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
         const htmlBuilder = new InnerHtmlBuilder()
           .addTitle("Data Records In This Area:")
           .addText("Data Record Count: " + features[0].properties?.count)
-          .addText("Data Coordinate Accuracy: 0.01")
           .addRange(
             "Time Range",
             features[0].properties?.startTime,
