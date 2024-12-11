@@ -69,7 +69,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         store.dispatch(setExpandedItem(newExpanded ? item : undefined));
         onDeselectDataset && onDeselectDataset();
       },
-    []
+    [onDeselectDataset]
   );
 
   const onClearAllBookmarks = () => {
