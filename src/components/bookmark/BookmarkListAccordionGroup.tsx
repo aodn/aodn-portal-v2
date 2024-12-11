@@ -125,7 +125,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
           setAccordionGroupItems((items) => {
             // Only one temporary item so remove it first
             const tempRemoved = items.filter((i) => i.id !== currentId);
-            return [event.value, ...tempRemoved];
+            return event.value ? [event.value, ...tempRemoved] : tempRemoved;
           });
         };
 
