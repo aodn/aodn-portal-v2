@@ -19,17 +19,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Enable corepack
-        run: |
-          : # corepack will use the packageManager version in package.json
-          npm install -g corepack
-          corepack enable
-
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'yarn'
+      - run: |
+          corepack enable
 
       - name: Yarn install
         run: |
