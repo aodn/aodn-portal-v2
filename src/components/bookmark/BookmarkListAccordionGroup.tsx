@@ -42,7 +42,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
   const [accordionGroupItems, setAccordionGroupItems] = useState<
     Array<OGCCollection>
-  >([]);
+  >(getBookmarkList(store.getState()).items);
 
   // State to store the mouse hover status
   const [hoverOnButton, setHoverOnButton] = useState<boolean>(false);
