@@ -95,29 +95,6 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     [bookmarkExpandedItem, bookmarkTemporaryItem?.id]
   );
 
-  useEffect(() => {
-    const handler = (event: BookmarkEvent) => {
-      if (event.action === EVENT_BOOKMARK.TEMP) {
-        const removeTemp = (currentId: string | undefined): void => {
-          setAccordionGroupItems((items) => {
-            // Only one temporary item so remove it first
-            const tempRemoved = items.filter((i) => i.id !== currentId);
-            return [event.value, ...tempRemoved];
-          });
-        };
-
-        setBookmarkTemporaryItem((current) => {
-          removeTemp(current?.id);
-          return event.value;
-        });
-      }
-    };
-    on(EVENT_BOOKMARK.TEMP, handler);
-    return () => {
-      off(EVENT_BOOKMARK.TEMP, handler);
-    };
-  }, []);
-
   // Update accordion group list by listening bookmark items and bookmark temporary item
   useEffect(() => {
     const handler = (event: BookmarkEvent) => {
@@ -143,6 +120,21 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         );
       }
 
+      if (event.action === EVENT_BOOKMARK.TEMP) {
+        const removeTemp = (currentId: string | undefined): void => {
+          setAccordionGroupItems((items) => {
+            // Only one temporary item so remove it first
+            const tempRemoved = items.filter((i) => i.id !== currentId);
+            return [event.value, ...tempRemoved];
+          });
+        };
+
+        setBookmarkTemporaryItem((current) => {
+          removeTemp(current?.id);
+          return event.value;
+        });
+      }
+
       if (event.action === EVENT_BOOKMARK.EXPAND) {
         setBookmarkExpandedItem(event.value);
       }
@@ -151,11 +143,13 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     on(EVENT_BOOKMARK.ADD, handler);
     on(EVENT_BOOKMARK.REMOVE, handler);
     on(EVENT_BOOKMARK.EXPAND, handler);
+    on(EVENT_BOOKMARK.TEMP, handler);
 
     return () => {
       off(EVENT_BOOKMARK.ADD, handler);
       off(EVENT_BOOKMARK.REMOVE, handler);
       off(EVENT_BOOKMARK.EXPAND, handler);
+      off(EVENT_BOOKMARK.TEMP, handler);
     };
   }, []);
 
