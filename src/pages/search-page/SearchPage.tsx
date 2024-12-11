@@ -330,10 +330,10 @@ const SearchPage = () => {
   );
 
   const onClickResultCard = useCallback(
-    async (item: OGCCollection | undefined) => {
+    (item: OGCCollection | undefined) => {
       if (item) {
-        dispatch(fetchAndInsertTemporary(item.id));
         setSelectedUuids([item.id]);
+        dispatch(fetchAndInsertTemporary(item.id));
       }
     },
     [dispatch]

@@ -98,21 +98,25 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   useEffect(() => {
     const handler = (event: BookmarkEvent) => {
       if (event.action === EVENT_BOOKMARK.TEMP) {
-        setAccordionGroupItems((items) => {
-          // Only one temporary item so remove it first
-          const tempRemoved = items.filter(
-            (i) => i.id !== bookmarkTemporaryItem?.id
-          );
-          return [event.value, ...tempRemoved];
+        const removeTemp = (currentId: string | undefined): void => {
+          setAccordionGroupItems((items) => {
+            // Only one temporary item so remove it first
+            const tempRemoved = items.filter((i) => i.id !== currentId);
+            return [event.value, ...tempRemoved];
+          });
+        };
+
+        setBookmarkTemporaryItem((current) => {
+          removeTemp(current?.id);
+          return event.value;
         });
-        setBookmarkTemporaryItem(event.value);
       }
     };
     on(EVENT_BOOKMARK.TEMP, handler);
     return () => {
       off(EVENT_BOOKMARK.TEMP, handler);
     };
-  }, [bookmarkTemporaryItem?.id]);
+  }, []);
 
   // Update accordion group list by listening bookmark items and bookmark temporary item
   useEffect(() => {
@@ -123,7 +127,9 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         );
         // Only add temporary item if it's not already in items
         setAccordionGroupItems((items) =>
-          items.some((i) => i.id === event.id) ? items : [event.value, ...items]
+          items.some((i) => i?.id === event.id)
+            ? items
+            : [event.value, ...items]
         );
       }
 

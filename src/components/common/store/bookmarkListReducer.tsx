@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { OGCCollection } from "./OGCCollectionDefinitions";
 import { AppDispatch, RootState } from "./store";
 import { fetchResultByUuidNoStore } from "./searchReducer";
@@ -7,6 +7,7 @@ import {
   BookmarkEvent,
   EVENT_BOOKMARK,
 } from "../../map/mapbox/controls/menu/Definition";
+import { errorHandling, ErrorResponse } from "../../../utils/ErrorBoundary";
 
 interface BookmarkListState {
   isOpen: boolean;
@@ -15,8 +16,10 @@ interface BookmarkListState {
   expandedItem: OGCCollection | undefined;
 }
 // Bookmark button can use in multiple location for the same record, hence
-// we need some kind of call back to notify components.
+// we need some kind of call back to notify components. To avoid warning
+// we set a higher listener number
 const emitter = new EventEmitter();
+emitter.setMaxListeners(50);
 
 const on = (type: EVENT_BOOKMARK, handle: (event: BookmarkEvent) => void) =>
   emitter.on(type, handle);
@@ -47,53 +50,77 @@ const bookmarkListSlice = createSlice({
       state,
       action: PayloadAction<OGCCollection | undefined>
     ) => {
-      state.temporaryItem = action.payload;
-      emitter.emit(EVENT_BOOKMARK.TEMP, {
-        id: action.payload?.id,
-        action: EVENT_BOOKMARK.TEMP,
-        value: action.payload,
-      });
+      if (state.temporaryItem?.id !== action.payload?.id) {
+        state.temporaryItem = action.payload;
+        // Fire event later, so we completed the redux update
+        // and other can use getState() to read it without issue
+        setTimeout(() => {
+          emitter.emit(EVENT_BOOKMARK.TEMP, {
+            id: action.payload?.id,
+            action: EVENT_BOOKMARK.TEMP,
+            value: action.payload,
+          });
+        }, 0.1);
+      }
     },
     setExpandedItem: (
       state,
       action: PayloadAction<OGCCollection | undefined>
     ) => {
-      state.expandedItem = action.payload;
-      emitter.emit(EVENT_BOOKMARK.EXPAND, {
-        id: action.payload,
-        action: EVENT_BOOKMARK.EXPAND,
-        value: action.payload,
-      });
+      if (state.expandedItem?.id !== action.payload?.id) {
+        state.expandedItem = action.payload;
+        // Fire event later, so we completed the redux update
+        // and other can use getState() to read it without issue
+        setTimeout(() => {
+          emitter.emit(EVENT_BOOKMARK.EXPAND, {
+            id: action.payload,
+            action: EVENT_BOOKMARK.EXPAND,
+            value: action.payload,
+          });
+        }, 0.1);
+      }
     },
     addItem: (state, action: PayloadAction<OGCCollection>) => {
       const exists = state.items.some((item) => item.id === action.payload.id);
       if (!exists) {
         state.items.unshift(action.payload);
-        emitter.emit(EVENT_BOOKMARK.ADD, {
-          id: action.payload.id,
-          action: EVENT_BOOKMARK.ADD,
-          value: action.payload,
-        });
+        // Fire event later, so we completed the redux update
+        // and other can use getState() to read it without issue
+        setTimeout(() => {
+          emitter.emit(EVENT_BOOKMARK.ADD, {
+            id: action.payload.id,
+            action: EVENT_BOOKMARK.ADD,
+            value: action.payload,
+          });
+        }, 0.1);
       }
     },
     removeItem: (state, action: PayloadAction<string>) => {
       const exists = state.items.some((item) => item.id === action.payload);
       if (exists) {
         state.items = state.items.filter((item) => item.id !== action.payload);
-        emitter.emit(EVENT_BOOKMARK.REMOVE, {
-          id: action.payload,
-          action: EVENT_BOOKMARK.REMOVE,
-        });
+        // Fire event later, so we completed the redux update
+        // and other can use getState() to read it without issue
+        setTimeout(() => {
+          emitter.emit(EVENT_BOOKMARK.REMOVE, {
+            id: action.payload,
+            action: EVENT_BOOKMARK.REMOVE,
+          });
+        }, 0.1);
       }
     },
     removeAllItems: (state) => {
-      for (const item of state.items) {
-        emitter.emit(EVENT_BOOKMARK.REMOVE, {
-          id: item.id,
-          action: EVENT_BOOKMARK.REMOVE,
-        });
-      }
       state.items = [];
+      // Fire event later, so we completed the redux update
+      // and other can use getState() to read it without issue
+      setTimeout(() => {
+        for (const item of state.items) {
+          emitter.emit(EVENT_BOOKMARK.REMOVE, {
+            id: item.id,
+            action: EVENT_BOOKMARK.REMOVE,
+          });
+        }
+      }, 0.1);
     },
   },
 });
@@ -109,34 +136,38 @@ export const {
 
 export { on, off };
 
-// Thunk actions for async operations
-export const fetchAndInsertTemporary =
-  (id: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
-    try {
-      const state = getState();
-      // Check if item exists in items array
-      const existingItem = state.bookmarkList.items.find(
-        (item) => item.id === id
-      );
+// Thunk actions for async operations, avoid getState() where someone is calling the reducer
+export const fetchAndInsertTemporary = createAsyncThunk<
+  void,
+  string,
+  { rejectValue: ErrorResponse; state: RootState; dispatch: AppDispatch }
+>("bookmarkList/fetchAndInsertTemporary", async (id: string, thunkAPI: any) => {
+  const { dispatch, getState } = thunkAPI;
+  const state = getState();
+  // Check if item exists in items array
+  const existingItem = state.bookmarkList.items.find(
+    (item: { id: string }) => item.id === id
+  );
 
-      // Check if item is already a temporary item
-      const isTemporaryItem = state.bookmarkList.temporaryItem?.id === id;
+  // Check if item is already a temporary item
+  const isTemporaryItem = state.bookmarkList.temporaryItem?.id === id;
 
-      if (existingItem || isTemporaryItem) {
-        // If item exists in either place, just expand it
-        dispatch(
-          setExpandedItem(existingItem || state.bookmarkList.temporaryItem)
-        );
-      } else {
-        // If item doesn't exist anywhere, fetch it, set as temporary and expand
-        const res = await dispatch(fetchResultByUuidNoStore(id)).unwrap();
+  if (existingItem || isTemporaryItem) {
+    // If item exists in either place, just expand it
+    dispatch(setExpandedItem(existingItem || state.bookmarkList.temporaryItem));
+  } else {
+    // If item doesn't exist anywhere, fetch it, set as temporary and expand
+    await dispatch(fetchResultByUuidNoStore(id))
+      .unwrap()
+      .then((res: OGCCollection) => {
         dispatch(setTemporaryItem(res));
         dispatch(setExpandedItem(res));
-      }
-    } catch (error) {
-      console.error("Error in fetchAndInsertTemporary:", error);
-    }
-  };
+      })
+      .catch((err: Error) => {
+        errorHandling(thunkAPI);
+      });
+  }
+});
 
 // export const initializeBookmarkList = () => async (dispatch: AppDispatch) => {
 //   try {
