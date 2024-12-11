@@ -4,7 +4,7 @@ import { Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import ToggleControl, {
-  ToggleControlBasicType,
+  ToggleControlProps,
 } from "../../../components/map/mapbox/controls/ToggleControl";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
@@ -33,7 +33,7 @@ interface MapSectionProps
   extends Partial<MapBasicType>,
     Partial<LayerBasicType>,
     BookmarkListMenuBasicType,
-    ToggleControlBasicType {
+    ToggleControlProps {
   showFullMap: boolean;
   showFullList: boolean;
   collections: OGCCollection[];
