@@ -160,7 +160,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     return () => {
       off(EVENT_BOOKMARK.ADD, handler);
       off(EVENT_BOOKMARK.REMOVE, handler);
-      on(EVENT_BOOKMARK.REMOVE_ALL, handler);
+      off(EVENT_BOOKMARK.REMOVE_ALL, handler);
       off(EVENT_BOOKMARK.EXPAND, handler);
       off(EVENT_BOOKMARK.TEMP, handler);
     };
