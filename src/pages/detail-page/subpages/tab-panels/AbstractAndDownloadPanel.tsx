@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext } from "react";
+import React, { FC, useCallback, useContext, useMemo } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -18,17 +18,53 @@ import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/Bas
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRangeControl from "../../../../components/map/mapbox/controls/DateRangeControl/DateRangeControl";
 import dayjs from "dayjs";
+import {
+  DateRangeCondition,
+  DownloadConditionType,
+} from "../../context/DownloadDefinitions";
 
 const TRUNCATE_COUNT = 800;
 
 export const SIMPLE_DATE_FORMAT = "MM-YYYY";
 
 const AbstractAndDownloadPanel: FC = () => {
-  const { collection, featureCollection, setDownloadConditions, mapDraw } =
-    useDetailPageContext();
+  const {
+    collection,
+    featureCollection,
+    downloadConditions,
+    setDownloadConditions,
+    mapDraw,
+  } = useDetailPageContext();
 
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
+
+  const filteredFeatureCollection = useMemo(() => {
+    if (!featureCollection) {
+      return undefined;
+    }
+
+    const dateRangeConditionGeneric = downloadConditions.find(
+      (condition) => condition.type === DownloadConditionType.DATE_RANGE
+    );
+    if (!dateRangeConditionGeneric) {
+      return featureCollection;
+    }
+    const dateRangeCondition = dateRangeConditionGeneric as DateRangeCondition;
+    const conditionStart = dayjs(dateRangeCondition.start, SIMPLE_DATE_FORMAT);
+    const conditionEnd = dayjs(dateRangeCondition.end, SIMPLE_DATE_FORMAT);
+
+    const filteredFeatures = featureCollection.features?.filter((feature) => {
+      const start = dayjs(feature.properties?.startTime, "YYYY-MM");
+      const end = dayjs(feature.properties?.endTime, "YYYY-MM");
+      return start.isBefore(conditionEnd) && end.isAfter(conditionStart);
+    });
+
+    return {
+      ...featureCollection,
+      features: filteredFeatures,
+    };
+  }, [downloadConditions, featureCollection]);
 
   const getMinMaxDateStamps = useCallback(() => {
     let minDate = dayjs();
@@ -126,7 +162,9 @@ const AbstractAndDownloadPanel: FC = () => {
                     />
                   </Controls>
                   <Layers>
-                    <DetailSymbolLayer featureCollection={featureCollection} />
+                    <DetailSymbolLayer
+                      featureCollection={filteredFeatureCollection}
+                    />
                   </Layers>
                 </Map>
               </Box>
