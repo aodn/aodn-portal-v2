@@ -26,6 +26,7 @@ cd <project-name>
 3. **Install the project dependencies:**
 
 ```bash
+npm install -g corepack
 yarn install
 ```
 
