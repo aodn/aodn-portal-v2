@@ -62,7 +62,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   sx,
   selectedUuids,
   isLoading,
-  onRemoveAllBookmarks,
+  onDeselectDataset,
 }) => {
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
@@ -125,7 +125,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           <MenuControl
             menu={
               <BookmarkListMenu
-                onRemoveAllBookmarks={onRemoveAllBookmarks}
+                onDeselectDataset={onDeselectDataset}
                 tabNavigation={tabNavigation}
               />
             }

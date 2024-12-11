@@ -111,15 +111,15 @@ const bookmarkListSlice = createSlice({
     },
     removeAllItems: (state) => {
       state.items = [];
+      state.temporaryItem = undefined;
+      state.expandedItem = undefined;
       // Fire event later, so we completed the redux update
       // and other can use getState() to read it without issue
       setTimeout(() => {
-        for (const item of state.items) {
-          emitter.emit(EVENT_BOOKMARK.REMOVE, {
-            id: item.id,
-            action: EVENT_BOOKMARK.REMOVE,
-          });
-        }
+        emitter.emit(EVENT_BOOKMARK.REMOVE_ALL, {
+          id: "",
+          action: EVENT_BOOKMARK.REMOVE_ALL,
+        });
       }, 0.1);
     },
   },

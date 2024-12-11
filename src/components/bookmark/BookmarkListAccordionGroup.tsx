@@ -20,6 +20,7 @@ import {
   setTemporaryItem,
   on,
   off,
+  removeAllItems,
 } from "../common/store/bookmarkListReducer";
 import store from "../common/store/store";
 import {
@@ -29,14 +30,14 @@ import {
 
 export interface BookmarkListAccordionGroupBasicType
   extends Partial<BookmarkListCardType> {
-  onRemoveAllBookmarks: () => void;
+  onDeselectDataset: () => void;
 }
 
 interface BookmarkListAccordionGroupProps
   extends BookmarkListAccordionGroupBasicType {}
 
 const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
-  onRemoveAllBookmarks,
+  onDeselectDataset,
   tabNavigation,
 }) => {
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
@@ -66,13 +67,14 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         // To prevent clicking on buttons in accordion title area to trigger the onClickAccordion
         if (hoverOnRemoveButton) return;
         store.dispatch(setExpandedItem(newExpanded ? item : undefined));
+        onDeselectDataset && onDeselectDataset();
       },
     []
   );
 
-  const handleClearAllBookmarks = () => {
-    setAccordionGroupItems([]);
-    onRemoveAllBookmarks && onRemoveAllBookmarks();
+  const onClearAllBookmarks = () => {
+    store.dispatch(removeAllItems());
+    onDeselectDataset && onDeselectDataset();
   };
 
   const onRemoveFromBookmarkList = useCallback(
@@ -92,8 +94,9 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
             : bookmarkExpandedItem
         )
       );
+      onDeselectDataset && onDeselectDataset();
     },
-    [bookmarkExpandedItem, bookmarkTemporaryItem?.id]
+    [bookmarkExpandedItem, bookmarkTemporaryItem?.id, onDeselectDataset]
   );
 
   // Update accordion group list by listening bookmark items and bookmark temporary item
@@ -121,6 +124,13 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         );
       }
 
+      if (event.action === EVENT_BOOKMARK.REMOVE_ALL) {
+        setBookmarkItems([]);
+        setAccordionGroupItems([]);
+        setBookmarkTemporaryItem(undefined);
+        setBookmarkExpandedItem(undefined);
+      }
+
       if (event.action === EVENT_BOOKMARK.TEMP) {
         const removeTemp = (currentId: string | undefined): void => {
           setAccordionGroupItems((items) => {
@@ -143,12 +153,14 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
 
     on(EVENT_BOOKMARK.ADD, handler);
     on(EVENT_BOOKMARK.REMOVE, handler);
+    on(EVENT_BOOKMARK.REMOVE_ALL, handler);
     on(EVENT_BOOKMARK.EXPAND, handler);
     on(EVENT_BOOKMARK.TEMP, handler);
 
     return () => {
       off(EVENT_BOOKMARK.ADD, handler);
       off(EVENT_BOOKMARK.REMOVE, handler);
+      on(EVENT_BOOKMARK.REMOVE_ALL, handler);
       off(EVENT_BOOKMARK.EXPAND, handler);
       off(EVENT_BOOKMARK.TEMP, handler);
     };
@@ -180,7 +192,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         </Typography>
         <Button
           sx={{ position: "absolute", right: 0, textTransform: "none" }}
-          onClick={handleClearAllBookmarks}
+          onClick={onClearAllBookmarks}
         >
           <Typography fontSize={fontSize.label} color={fontColor.blue.dark}>
             Clear
