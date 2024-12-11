@@ -40,6 +40,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   tabNavigation,
 }) => {
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
+  // TODO need? seems replaced by bookmarkItem is possible
   const [accordionGroupItems, setAccordionGroupItems] = useState<
     Array<OGCCollection>
   >(getBookmarkList(store.getState()).items);
