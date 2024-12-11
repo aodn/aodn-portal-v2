@@ -13,7 +13,7 @@ import { createRoot } from "react-dom/client";
 import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
 import MapPopup, { MapPopupRef } from "./MapPopup";
 import SpatialExtents from "./SpatialExtents";
-import { LayersProps } from "../layers/Layers";
+import { LayerBasicType } from "../layers/Layers";
 import { TestHelper } from "../../../common/test/helper";
 import { MapDefaultConfig } from "../constants";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
@@ -41,7 +41,7 @@ interface SpiderDiagramConfig {
   circleStrokeColor: string;
 }
 
-interface SpiderDiagramProps extends LayersProps {
+interface SpiderDiagramProps extends LayerBasicType {
   spiderDiagramConfig?: Partial<SpiderDiagramConfig>;
   clusterLayer: string;
   clusterSourceId: string;
@@ -90,7 +90,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
   clusterLayer,
   clusterSourceId,
   unclusterPointLayer,
-  onDatasetSelected,
+  onClickMapPoint: onDatasetSelected,
   tabNavigation,
 }) => {
   const { map } = useContext(MapContext);

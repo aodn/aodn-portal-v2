@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { logger } from "redux-logger";
 import searchReducer from "./searchReducer";
 import paramReducer from "./componentParamReducer";
+import bookmarkListReducer from "./bookmarkListReducer";
 
 // https://stackoverflow.com/questions/69502147/changing-from-redux-to-redux-toolkit
 // https://redux-toolkit.js.org/api/getDefaultMiddleware
@@ -11,11 +12,13 @@ const store = configureStore({
     // https://stackoverflow.com/questions/61704805/getting-an-error-a-non-serializable-value-was-detected-in-the-state-when-using
     getDefaultMiddleware({
       serializableCheck: false,
+      thunk: true,
     }).concat(logger),
   reducer: combineReducers({
     // Add your reducers here
     searcher: searchReducer,
     paramReducer: paramReducer,
+    bookmarkList: bookmarkListReducer,
   }),
 });
 

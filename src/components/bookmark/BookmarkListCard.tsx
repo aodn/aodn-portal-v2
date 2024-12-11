@@ -1,55 +1,54 @@
 import { FC } from "react";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import Map from "../../components/map/mapbox/Map";
+import Map from "../map/mapbox/Map";
 import Layers from "../map/mapbox/layers/Layers";
 import GeojsonLayer from "../map/mapbox/layers/GeojsonLayer";
-import ResultCardButtonGroup from "./ResultCardButtonGroup";
+import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
 import { fontColor, fontSize, padding } from "../../styles/constants";
 
-interface PinListCardProps {
-  collection: OGCCollection;
-  sx?: SxProps;
-  onDatasetSelected?: () => void;
+export interface BookmarkListCardType {
+  dataset: OGCCollection;
   tabNavigation?: (uuid: string, tab: string, section?: string) => void;
 }
 
-const mapContainerId = "pin-list-map";
+interface BookmarkListCardProps extends BookmarkListCardType {
+  sx?: SxProps;
+}
 
-const PinListCard: FC<PinListCardProps> = ({
-  collection,
-  onDatasetSelected = () => {},
+const mapContainerId = "bookmark-list-map";
+
+const BookmarkListCard: FC<BookmarkListCardProps> = ({
+  dataset,
   tabNavigation = () => {},
   sx,
 }) => {
-  const onLinks = () => tabNavigation(collection.id, "links");
+  const onLinks = () => tabNavigation(dataset.id, "links");
   const onDownload = () =>
-    tabNavigation(collection.id, "abstract", "download-section");
-  const onDetail = () => tabNavigation(collection.id, "abstract");
+    tabNavigation(dataset.id, "abstract", "download-section");
+  const onDetail = () => tabNavigation(dataset.id, "abstract");
 
   return (
     <Box flex={1} sx={{ ...sx }}>
       <Stack direction="column" spacing={1}>
-        <Box onClick={onDatasetSelected}>
-          <Box
-            arial-label="map"
-            id={`${mapContainerId}-${collection.id}`}
-            sx={{
-              width: "100%",
-              height: "150px",
-            }}
-          >
-            <Map panelId={`${mapContainerId}-${collection.id}`}>
-              <Layers>
-                <GeojsonLayer collection={collection} animate={false} />
-              </Layers>
-            </Map>
-          </Box>
+        <Box
+          arial-label="map"
+          id={`${mapContainerId}-${dataset.id}`}
+          sx={{
+            width: "100%",
+            height: "150px",
+          }}
+        >
+          <Map panelId={`${mapContainerId}-${dataset.id}`}>
+            <Layers>
+              <GeojsonLayer collection={dataset} animate={false} />
+            </Layers>
+          </Map>
         </Box>
 
         <Box>
           <ResultCardButtonGroup
-            content={collection}
+            content={dataset}
             isGridView
             onLinks={onLinks}
             onDownload={onDownload}
@@ -73,7 +72,7 @@ const PinListCard: FC<PinListCardProps> = ({
                 wordBreak: "break-word",
               }}
             >
-              {collection.description}
+              {dataset.description}
             </Typography>
           </Tooltip>
         </Box>
@@ -82,4 +81,4 @@ const PinListCard: FC<PinListCardProps> = ({
   );
 };
 
-export default PinListCard;
+export default BookmarkListCard;

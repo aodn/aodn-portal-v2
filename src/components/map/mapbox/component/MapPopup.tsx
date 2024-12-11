@@ -81,12 +81,13 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
   { layerId, onDatasetSelected, tabNavigation },
   ref
 ) => {
-  const dispatch = useAppDispatch();
   const { map } = useContext(MapContext);
+  const dispatch = useAppDispatch();
   const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
   const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
   const [popupContent, setPopupContent] = useState<ReactNode | null>(null);
 
+  // TODO: there is bug that map popup is not re-render for the interaction with bookmark button
   const getCollectionData = useCallback(
     async (uuid: string) => {
       return dispatch(fetchResultByUuidNoStore(uuid))

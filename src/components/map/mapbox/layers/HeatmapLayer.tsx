@@ -13,7 +13,7 @@ import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
-  LayersProps,
+  LayerBasicType,
 } from "./Layers";
 import MapPopup from "../component/MapPopup";
 import SpatialExtents from "../component/SpatialExtents";
@@ -45,8 +45,8 @@ interface HeatmapConfig {
   circle: HeatmapCircle;
 }
 
-interface HeatmapLayerProps extends LayersProps {
-  // Some method inherit from LayersProps
+interface HeatmapLayerProps extends LayerBasicType {
+  // Some method inherit from LayerBasicType
   heatmapLayerConfig?: Partial<HeatmapConfig>;
 }
 
@@ -108,7 +108,7 @@ const getUnclusterPointLayerId = (layerId: string) =>
 const HeatmapLayer: FC<HeatmapLayerProps> = ({
   featureCollection = generateFeatureCollectionFrom(undefined),
   selectedUuids,
-  onDatasetSelected,
+  onClickMapPoint: onDatasetSelected,
   tabNavigation,
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
@@ -344,7 +344,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         clusterLayer={clusterLayer}
         clusterSourceId={clusterSourceId}
         unclusterPointLayer={unClusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
+        onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
       />
       <TestHelper getHeatmapLayer={() => heatmapLayer} />

@@ -1,6 +1,7 @@
 // ErrorBoundary.tsx
 import { ErrorInfo, ReactNode, Component } from "react";
 import { Navigate } from "react-router-dom";
+import axios, { AxiosError } from "axios";
 
 class ErrorResponse extends Error {
   statusCode: number;
@@ -77,7 +78,27 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 }
 
-export { createErrorResponse, ErrorResponse };
+const errorHandling = (thunkApi: any) => {
+  return (error: Error | AxiosError | ErrorResponse) => {
+    if (axios.isAxiosError(error) && error.response) {
+      return thunkApi.rejectWithValue(
+        createErrorResponse(
+          error?.response?.status,
+          error?.response?.data.details
+            ? error?.response?.data.details
+            : error?.response?.statusText,
+          error?.response?.data.message,
+          error?.response?.data.timestamp,
+          error?.response?.data.parameters
+        )
+      );
+    } else {
+      return thunkApi.rejectWithValue(error);
+    }
+  };
+};
+
+export { createErrorResponse, errorHandling, ErrorResponse };
 
 export default ErrorBoundary;
 // TODO: move this to different place that is more related

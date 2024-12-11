@@ -7,7 +7,7 @@ import lodash from "lodash";
 import { TestHelper } from "../../common/test/helper";
 import { MapDefaultConfig } from "./constants";
 
-interface MapProps {
+export interface MapBasicType {
   centerLongitude?: number;
   centerLatitude?: number;
   bbox?: LngLatBounds;
@@ -23,6 +23,8 @@ interface MapProps {
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
 }
+
+interface MapProps extends MapBasicType {}
 
 // Styles can be found here https://developers.arcgis.com/rest/basemap-styles/
 // but require feeds.
