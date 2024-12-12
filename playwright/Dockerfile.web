@@ -10,7 +10,8 @@ COPY .yarnrc.yml ./
 RUN \
     apt-get update -y \
     && apt-get upgrade -y \
-    && yarn set version 4.3.0 \
+    && npm install -g corepack \
+    && corepack enable
     && yarn install
 
 # Expose the port the app runs on
