@@ -11,7 +11,7 @@ RUN \
     apt-get update -y \
     && apt-get upgrade -y \
     && npm install -g corepack \
-    && corepack enable
+    && corepack enable \
     && yarn install
 
 # Expose the port the app runs on
