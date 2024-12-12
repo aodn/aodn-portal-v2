@@ -16,7 +16,7 @@ export interface BookmarkListMenuBasicType
 interface BookmarkListMenuProps extends BookmarkListMenuBasicType {}
 
 const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
-  onRemoveAllBookmarks,
+  onDeselectDataset,
   tabNavigation,
 }) => {
   const anchorRef = useRef<HTMLButtonElement>(null);
@@ -76,7 +76,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             }}
           >
             <BookmarkListAccordionGroup
-              onRemoveAllBookmarks={onRemoveAllBookmarks}
+              onDeselectDataset={onDeselectDataset}
               tabNavigation={tabNavigation}
             />
           </Box>
