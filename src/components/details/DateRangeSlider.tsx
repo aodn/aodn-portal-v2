@@ -19,10 +19,12 @@ export const DEFAULT_DATE_PICKER_SLOT = {
   desktopPaper: {
     sx: {
       ".MuiDateCalendar-root": {
-        color: "#ad1457",
         borderRadius: borderRadius.small,
         border: `${border.sm} ${color.blue.darkSemiTransparent}`,
         backgroundColor: "#fff",
+      },
+      ".MuiPickersCalendarHeader-root": {
+        marginTop: "8px",
       },
       ".MuiPickersYear-yearButton": {
         color: fontColor.gray.dark,
@@ -41,6 +43,34 @@ export const DEFAULT_DATE_PICKER_SLOT = {
         color: "#fff",
         backgroundColor: color.blue.dark,
       },
+    },
+    popper: {
+      disablePortal: true,
+      sx: {
+        zIndex: 1400,
+        "& .MuiPaper-root": {
+          transform: "none !important",
+        },
+        "& .MuiPickersPopper-paper": {
+          transformOrigin: "top left",
+        },
+      },
+      modifiers: [
+        {
+          name: "preventOverflow",
+          enabled: true,
+          options: {
+            altAxis: true,
+            boundary: "clippingParents",
+          },
+        },
+        {
+          name: "offset",
+          options: {
+            offset: [0, 8],
+          },
+        },
+      ],
     },
   },
 };

@@ -13,10 +13,8 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
-  Icon,
   Radio,
   RadioGroup,
-  Stack,
   Typography,
 } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
@@ -281,7 +279,7 @@ const DateRange: FC<DateRangeFilterProps> = ({
               />
 
               <Typography fontSize="20px" fontWeight={fontWeight.bold}>
-                Select&nbsp;Data
+                Select&nbsp;Date
               </Typography>
             </Box>
             <Box

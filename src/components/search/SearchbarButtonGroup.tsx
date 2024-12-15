@@ -15,7 +15,7 @@ export enum SearchbarButtonNames {
   Search = "search",
   Filter = "filter",
   Date = "date",
-  Area = "area",
+  Location = "location",
 }
 interface SearchbarButtonGroupProps {
   pendingSearch: boolean;
@@ -88,7 +88,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
     () =>
       checkCount({
         filterObj: componentParams,
-        type: SearchbarButtonNames.Area,
+        type: SearchbarButtonNames.Location,
       }),
     [componentParams]
   );
@@ -118,14 +118,14 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       />
       <SearchbarExpandableButton
         icon={<PlaceIcon />}
-        text={capitalizeFirstLetter(SearchbarButtonNames.Area)}
+        text={capitalizeFirstLetter(SearchbarButtonNames.Location)}
         badgeContent={areaCount}
         dotBadge
-        onClick={() => handleClickButton(SearchbarButtonNames.Area)}
+        onClick={() => handleClickButton(SearchbarButtonNames.Location)}
         showText={
           shouldExpandAllButtons
             ? true
-            : activeButton === SearchbarButtonNames.Area
+            : activeButton === SearchbarButtonNames.Location
         }
       />
       <SearchbarExpandableButton
