@@ -12,7 +12,7 @@ import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
-  LayersProps,
+  LayerBasicType,
 } from "./Layers";
 import { Feature, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
@@ -97,7 +97,7 @@ const isValid = (bbox: [number, number, number, number]) => {
   );
 };
 
-const DetailSymbolLayer: FC<LayersProps> = ({
+const DetailSymbolLayer: FC<LayerBasicType> = ({
   featureCollection = generateFeatureCollectionFrom(undefined),
 }) => {
   const [bbox, setBbox] = useState<
@@ -164,7 +164,6 @@ const DetailSymbolLayer: FC<LayersProps> = ({
         const htmlBuilder = new InnerHtmlBuilder()
           .addTitle("Data Records In This Area:")
           .addText("Data Record Count: " + features[0].properties?.count)
-          .addText("Data Coordinate Accuracy: 0.01")
           .addRange(
             "Time Range",
             features[0].properties?.startTime,

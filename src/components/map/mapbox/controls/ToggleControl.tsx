@@ -1,13 +1,13 @@
 import { IControl, Map } from "mapbox-gl";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../MapContext";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 
-interface ToggleControlProps {
+export interface ToggleControlProps {
   showFullMap: boolean;
   onToggleClicked?: (state: boolean) => void;
 }

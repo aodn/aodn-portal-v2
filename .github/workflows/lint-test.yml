@@ -20,15 +20,15 @@ jobs:
         node-version: [18.x]
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "yarn"
       - run: |
-          : # set-version will always download the latest version of yarn
-          yarn policies set-version 4.3.0
           yarn install --immutable
       - run: yarn run lint
       - run: yarn run test

@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
+import { bboxPolygon, booleanEqual } from "@turf/turf";
+import store, { getComponentState } from "../../components/common/store/store";
 import {
   createSearchParamFrom,
   DEFAULT_SEARCH_PAGE_SIZE,
-  fetchResultByUuidNoStore,
   fetchResultNoStore,
   fetchResultWithStore,
-  SearchParameters,
 } from "../../components/common/store/searchReducer";
-import Layout from "../../components/layout/layout";
-import { useLocation, useNavigate } from "react-router-dom";
 import {
   formatToUrlParam,
   ParameterState,
@@ -19,35 +19,27 @@ import {
   updateSortBy,
   updateZoom,
 } from "../../components/common/store/componentParamReducer";
-import store, { getComponentState } from "../../components/common/store/store";
-
-// Map section, you can switch to other map library, this is for maplibre
-// import { MapLibreEvent as MapEvent } from "maplibre-gl";
-// import Map from "../components/map/maplibre/Map";
-// import Controls from "../components/map/maplibre/controls/Controls";
-// import Layers from "../components/map/maplibre/layers/Layers";
-// import NavigationControl from "../components/map/maplibre/controls/NavigationControl";
-// import ScaleControl from "../components/map/maplibre/controls/ScaleControl";
-// import DisplayCoordinate from "../components/map/maplibre/controls/DisplayCoordinate";
-// import ItemsOnMapControl from "../components/map/maplibre/controls/ItemsOnMapControl";
-// import MapboxDrawControl from "../components/map/maplibre/controls/MapboxDrawControl";
-// import VectorTileLayers from "../components/map/maplibre/layers/VectorTileLayers";
-// Map section, you can switch to other map library, this is for mapbox
-import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
+import {
+  on,
+  off,
+  setExpandedItem,
+  setTemporaryItem,
+  fetchAndInsertTemporary,
+  removeAllItems,
+} from "../../components/common/store/bookmarkListReducer";
+import Layout from "../../components/layout/layout";
 import ResultSection from "./subpages/ResultSection";
 import MapSection from "./subpages/MapSection";
-import { color, padding } from "../../styles/constants";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
-import { bboxPolygon, booleanEqual } from "@turf/turf";
 import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
+import { color, padding } from "../../styles/constants";
 import {
-  collapseAllAccordions,
-  insertItemToPinList,
-  setSelectedUuid,
-} from "../../components/map/mapbox/controls/menu/PinListMenu";
+  BookmarkEvent,
+  EVENT_BOOKMARK,
+} from "../../components/map/mapbox/controls/menu/Definition";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -70,6 +62,7 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   // State to store the layout that user selected
@@ -77,12 +70,14 @@ const SearchPage = () => {
     SearchResultLayoutEnum.LIST
   );
   // CurrentLayout is used to remember last layout, which is SearchResultLayoutEnum exclude the value FULL_MAP
-  const [currentLayout, setCurrentLayout] = useState<Exclude<
-    SearchResultLayoutEnum,
-    SearchResultLayoutEnum.FULL_MAP
-  > | null>(null);
+  const [currentLayout, setCurrentLayout] = useState<
+    Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP> | undefined
+  >(undefined);
   // State to store the sort option that user selected
-  const [currentSort, setCurrentSort] = useState<SortResultEnum | null>(null);
+  const [currentSort, setCurrentSort] = useState<SortResultEnum | undefined>(
+    undefined
+  );
+  //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
   const [zoom, setZoom] = useState<number | undefined>(undefined);
@@ -174,6 +169,7 @@ const SearchPage = () => {
       navigate,
     ]
   );
+
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
@@ -206,6 +202,7 @@ const SearchPage = () => {
     },
     [dispatch, doSearch]
   );
+
   // If this flag is set, that means it is call from within react
   // and the search status already refresh and useSelector contains
   // the correct values, else it is user paste the url directly
@@ -315,91 +312,54 @@ const SearchPage = () => {
     [setCurrentLayout]
   );
 
-  // util function to get collection data given uuid
-  const fillGeometryIfMissing = useCallback(
-    async (collection: OGCCollection): Promise<OGCCollection> => {
-      if (collection.getGeometry())
-        return new Promise((resolve) => resolve(collection));
-
-      const param: SearchParameters = {
-        filter: `id='${collection.id}'`,
-        properties: "id,bbox,geometry",
-      };
-
-      try {
-        const value = await dispatch(fetchResultNoStore(param)).unwrap();
-        collection.properties = value.collections[0].properties;
-        collection.extentInt = value.collections[0].extent;
-        return collection;
-      } catch (error) {
-        console.error("Error fetching collection data:", error);
-        return collection;
-      }
-    },
-    [dispatch]
-  );
-
   // Handler for click on map
   const onClickMapPoint = useCallback(
     (uuids: Array<string>) => {
       if (uuids.length === 0) {
+        // This happens when click the empty space of map
         setSelectedUuids([]);
-        collapseAllAccordions();
+        dispatch(setExpandedItem(undefined));
       } else {
-        // This set state will store the selected uuid
+        // Since map point only store uuid in its feature, so need to fetch dataset here
+        // Clicking a map dot or a result card will only add a temporary item in bookmark list, until the bookmark icon is clicked
         setSelectedUuids(uuids);
-        // This function is exposed from PinListMenu for expanding an accordion given uuid
-        setSelectedUuid(uuids[0]);
-        // This function will fetch selected dataset and insert it to pin list
-        dispatch(fetchResultByUuidNoStore(uuids[0]))
-          .unwrap()
-          .then((res: OGCCollection) => {
-            insertItemToPinList(res);
-          });
+        dispatch(fetchAndInsertTemporary(uuids[0]));
       }
     },
     [dispatch]
   );
 
-  const onClickCard = useCallback(
-    async (item: OGCCollection | undefined) => {
+  const onClickResultCard = useCallback(
+    (item: OGCCollection | undefined) => {
       if (item) {
-        // The item set to pin list assume spatial extents is there
-        const e = await fillGeometryIfMissing(item);
-        insertItemToPinList(e);
         setSelectedUuids([item.id]);
-        setSelectedUuid(item.id);
+        dispatch(fetchAndInsertTemporary(item.id));
       }
     },
-    [fillGeometryIfMissing]
+    [dispatch]
   );
 
-  const onClickAccordion = useCallback(
-    (uuid: string | undefined) => {
-      setSelectedUuids(uuid ? [uuid] : []);
-    },
-    [setSelectedUuids]
-  );
-
-  const onRemoveFromPinList = useCallback(
-    (uuid: string) => {
-      // If the removed uuid is the selected uuid, need to set selected uuids to []
-      setSelectedUuids((prevUuids) => {
-        if (prevUuids[0] && prevUuids[0] === uuid) {
-          return [];
-        } else {
-          return prevUuids;
-        }
-      });
-    },
-    [setSelectedUuids]
-  );
+  const onDeselectDataset = useCallback(() => {
+    setSelectedUuids([]);
+  }, []);
 
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
   // TODO: Optimize call if possible, this happens when navigate from page
   // to this page.
   useEffect(() => handleNavigation(), [handleNavigation]);
+  useEffect(() => {
+    const bookmarkSelected = async (event: BookmarkEvent) => {
+      if (event.action === EVENT_BOOKMARK.EXPAND) {
+        await onClickResultCard(event.value);
+      }
+    };
+    on(EVENT_BOOKMARK.EXPAND, bookmarkSelected);
+
+    return () => {
+      off(EVENT_BOOKMARK.EXPAND, bookmarkSelected);
+    };
+  }, [onClickResultCard]);
 
   return (
     <Layout>
@@ -420,7 +380,7 @@ const SearchPage = () => {
           <ResultSection
             showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
             showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}
-            onClickCard={onClickCard}
+            onClickCard={onClickResultCard}
             selectedUuids={selectedUuids}
             currentSort={currentSort}
             onChangeSorting={onChangeSorting}
@@ -440,13 +400,13 @@ const SearchPage = () => {
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}
             onClickMapPoint={onClickMapPoint}
-            onClickAccordion={onClickAccordion}
-            onRemoveFromPinList={onRemoveFromPinList}
             isLoading={isLoading(loadingThreadCount)}
+            onDeselectDataset={onDeselectDataset}
           />
         </Box>
       </Box>
     </Layout>
   );
 };
+
 export default SearchPage;

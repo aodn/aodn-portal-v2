@@ -13,6 +13,7 @@ import {
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
   createErrorResponse,
+  errorHandling,
   ErrorResponse,
 } from "../../../utils/ErrorBoundary";
 import { FeatureCollection, Point } from "geojson";
@@ -210,26 +211,6 @@ const fetchResultAppendStore = createAsyncThunk<
   SearchParameters,
   { rejectValue: ErrorResponse }
 >("search/fetchResultAppendStore", searchResult);
-
-function errorHandling(thunkApi: any) {
-  return (error: Error | AxiosError | ErrorResponse) => {
-    if (axios.isAxiosError(error) && error.response) {
-      return thunkApi.rejectWithValue(
-        createErrorResponse(
-          error?.response?.status,
-          error?.response?.data.details
-            ? error?.response?.data.details
-            : error?.response?.statusText,
-          error?.response?.data.message,
-          error?.response?.data.timestamp,
-          error?.response?.data.parameters
-        )
-      );
-    } else {
-      return thunkApi.rejectWithValue(error);
-    }
-  };
-}
 
 const fetchResultByUuidNoStore = createAsyncThunk<
   OGCCollection,
