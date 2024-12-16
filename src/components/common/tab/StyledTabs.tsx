@@ -24,6 +24,8 @@ const StyledTabs = styled((props: StyledTabsProps) => (
     paddingTop: padding.medium,
   },
   "& .MuiTabs-indicatorSpan": {
+    position: "absolute",
+    bottom: "0",
     width: 0,
     height: 0,
     borderLeft: "5px solid transparent",

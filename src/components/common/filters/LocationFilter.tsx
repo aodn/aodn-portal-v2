@@ -28,7 +28,6 @@ interface LocationOptionType {
 
 // TODO: the implementation of LocationFilter will together with ogcapi
 const LocationOptions: LocationOptionType[] = [
-  { value: "worldwide", label: "Worldwide" },
   { value: "ArafuraSea", label: "Arafura Sea(NT)" },
   { value: "CoralSea", label: "Coral Sea (QLD)" },
   { value: "GreatAustralianBight", label: "Great Australian Bight" },
@@ -55,128 +54,38 @@ const LocationFilter: FC<LocationFilterProps> = () => {
   );
 
   return (
-    <Box>
-      <Grid container>
-        <Grid
-          item
-          xs={3}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          paddingY={padding.large}
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        padding: padding.large,
+      }}
+    >
+      <FormControl sx={{ maxHeight: "300px", overflowY: "scroll", flex: 1 }}>
+        <RadioGroup
+          defaultValue={LocationOptions[0].value}
+          value={selectedOption}
+          onChange={handleRadioChange}
         >
-          <Box
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            height="100%"
-            width="100%"
-          >
-            <Box
-              height="100px"
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <PlaceIcon
-                color="primary"
-                sx={{ fontSize: "50px", height: "50px" }}
-              />
-
-              <Typography
-                fontSize="20px"
-                fontWeight={fontWeight.bold}
-                textAlign="center"
-              >
-                Select
-                <br />
-                Location
-              </Typography>
-            </Box>
-          </Box>
-          <Divider
-            sx={{
-              borderColor: color.blue.darkSemiTransparent,
-            }}
-            orientation="vertical"
-          />
-        </Grid>
-        <Grid
-          item
-          xs={6}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: padding.large,
-          }}
-        >
-          <FormControl
-            sx={{ maxHeight: "300px", overflowY: "scroll", flex: 1 }}
-          >
-            <RadioGroup
-              defaultValue={LocationOptions[0].value}
-              value={selectedOption}
-              onChange={handleRadioChange}
-            >
-              {LocationOptions.map((item) => (
-                <FormControlLabel
-                  value={item.value}
-                  control={<Radio />}
-                  label={item.label}
-                  key={item.value}
-                  sx={{
-                    ".MuiFormControlLabel-label": {
-                      fontFamily: fontFamily.general,
-                      fontSize: fontSize.info,
-                      padding: 0,
-                    },
-                  }}
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
-        </Grid>
-        <Grid
-          item
-          xs={3}
-          display="flex"
-          flexDirection="column"
-          justifyContent="end"
-          alignItems="center"
-          paddingY={padding.large}
-        >
-          <Button
-            sx={{
-              width: "100px",
-              marginBottom: margin.lg,
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
-            onClick={() => {}}
-          >
-            Clear
-          </Button>
-          <Button
-            sx={{
-              width: "100px",
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
-            onClick={() => {}}
-          >
-            Apply
-          </Button>
-        </Grid>
-      </Grid>
+          {LocationOptions.map((item) => (
+            <FormControlLabel
+              value={item.value}
+              control={<Radio />}
+              label={item.label}
+              key={item.value}
+              sx={{
+                ".MuiFormControlLabel-label": {
+                  fontFamily: fontFamily.general,
+                  fontSize: fontSize.info,
+                  padding: 0,
+                },
+              }}
+            />
+          ))}
+        </RadioGroup>
+      </FormControl>
     </Box>
   );
 };

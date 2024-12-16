@@ -30,6 +30,7 @@ import DateRange from "../common/filters/DateRange";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
 import LocationFilter from "../common/filters/LocationFilter";
+import Filters from "../common/filters/Filters";
 
 interface ComplexTextSearchProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -188,7 +189,7 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
         style={{
           width:
             activeButton === SearchbarButtonNames.Location
-              ? "700px"
+              ? "300px"
               : searchbarWidth,
           minWidth:
             activeButton === SearchbarButtonNames.Location
@@ -209,7 +210,7 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
               elevation={1}
               sx={{
                 borderRadius: borderRadius.small,
-                bgcolor: color.blue.xLight,
+                bgcolor: "#fff",
               }}
             >
               {activeButton === SearchbarButtonNames.Date && (
@@ -223,7 +224,13 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
                 <LocationFilter />
               )}
               {activeButton === SearchbarButtonNames.Filter && (
-                <AdvanceFilters
+                // <AdvanceFilters
+                //   handleCloseFilter={handleClosePopup}
+                //   filter={filter}
+                //   setFilter={setFilter}
+                //   handleApplyFilter={handleApplyFilter}
+                // />
+                <Filters
                   handleCloseFilter={handleClosePopup}
                   filter={filter}
                   setFilter={setFilter}

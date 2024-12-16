@@ -255,64 +255,39 @@ const DateRange: FC<DateRangeFilterProps> = ({
           xs={2}
           display="flex"
           justifyContent="center"
-          alignItems="center"
-          paddingY={padding.large}
+          alignItems="start"
         >
           <Box
             display="flex"
-            flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            height="100%"
-            width="100%"
+            padding={padding.large}
           >
-            <Box
-              height="100px"
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <DateRangeIcon
-                color="primary"
-                sx={{ fontSize: "50px", height: "50px" }}
-              />
-
-              <Typography fontSize="20px" fontWeight={fontWeight.bold}>
-                Select&nbsp;Date
-              </Typography>
-            </Box>
-            <Box
-              flex={1}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <FormControl>
-                <RadioGroup
-                  defaultValue={DateRangeOptionValues.Custom}
-                  value={selectedOption}
-                  onChange={handleRadioChange}
-                >
-                  {dateRangeOptions.map((item) => (
-                    <FormControlLabel
-                      value={item.value}
-                      control={<Radio />}
-                      label={item.label}
-                      key={item.value}
-                      sx={{
-                        ".MuiFormControlLabel-label": {
-                          fontFamily: fontFamily.general,
-                          fontSize: fontSize.info,
-                          padding: 0,
-                        },
-                      }}
-                    />
-                  ))}
-                </RadioGroup>
-              </FormControl>
-            </Box>
+            <FormControl>
+              <RadioGroup
+                defaultValue={DateRangeOptionValues.Custom}
+                value={selectedOption}
+                onChange={handleRadioChange}
+              >
+                {dateRangeOptions.map((item) => (
+                  <FormControlLabel
+                    value={item.value}
+                    control={<Radio />}
+                    label={item.label}
+                    key={item.value}
+                    sx={{
+                      ".MuiFormControlLabel-label": {
+                        fontFamily: fontFamily.general,
+                        fontSize: fontSize.info,
+                        padding: 0,
+                      },
+                    }}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
           </Box>
+
           <Divider
             sx={{
               borderColor: color.blue.darkSemiTransparent,

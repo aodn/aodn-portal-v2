@@ -1,0 +1,98 @@
+import React, { FC, SyntheticEvent, useEffect, useState } from "react";
+import Box from "@mui/material/Box";
+import { borderRadius, padding } from "../../../styles/constants";
+import StyledTabs from "./StyledTabs";
+import StyledTab from "./StyledTab";
+
+export interface Tab {
+  label: string;
+  value: string;
+  component: JSX.Element;
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel = (props: TabPanelProps) => {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: padding.large }}>{children}</Box>}
+    </div>
+  );
+};
+
+const a11yProps = (index: number) => {
+  return {
+    id: `tab-${index}`,
+    "aria-controls": `tabpanel-${index}`,
+  };
+};
+
+interface TabsPanelContainerProps {
+  tabs: Tab[];
+  isCollectionNotFound?: boolean;
+  tabValue?: number;
+  handleTabChange?: (newValue: number) => void;
+}
+
+const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
+  tabs,
+  isCollectionNotFound = false,
+  tabValue = undefined,
+  handleTabChange,
+}) => {
+  const [value, setValue] = useState(tabValue ?? 0);
+
+  const handleChange = (_: SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+    handleTabChange && handleTabChange(newValue);
+  };
+
+  useEffect(() => {
+    if (tabValue) setValue(tabValue);
+  }, [tabValue]);
+
+  if (!tabs || tabs.length === 0) return;
+
+  return (
+    <Box
+      sx={{
+        bgcolor: "#fff",
+        borderRadius: borderRadius.small,
+      }}
+    >
+      <StyledTabs
+        value={value}
+        onChange={handleChange}
+        aria-label="tabsPanelContainer"
+      >
+        {tabs.map((tab, index) => (
+          <StyledTab
+            key={index}
+            label={tab.label}
+            {...a11yProps(index)}
+            sx={{ textTransform: "none" }}
+            disabled={isCollectionNotFound}
+          />
+        ))}
+      </StyledTabs>
+      {tabs.map((tab, index) => (
+        <TabPanel key={index} value={value} index={index}>
+          {tab.component}
+        </TabPanel>
+      ))}
+    </Box>
+  );
+};
+
+export default TabsPanelContainer;
