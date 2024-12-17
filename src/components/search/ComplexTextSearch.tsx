@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, useCallback, useRef, useState } from "react";
-import { Box, Fade, Paper, Popper } from "@mui/material";
+import { Box, Fade, Paper, Popper, ClickAwayListener } from "@mui/material";
 import InputWithSuggester from "./InputWithSuggester";
-import { borderRadius, gap } from "../../styles/constants";
+import { borderRadius, color, gap } from "../../styles/constants";
 import SearchbarButtonGroup, {
   SearchbarButtonNames,
 } from "./SearchbarButtonGroup";
@@ -77,6 +77,14 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
 
   const handleClosePopup = useCallback(() => setOpen(false), [setOpen]);
 
+  const handleClickAway = useCallback((event: MouseEvent | TouchEvent) => {
+    // Check if the click target is part of the search bar or buttons
+    if (boxRef.current?.contains(event.target as Node)) {
+      return;
+    }
+    setOpen(false);
+  }, []);
+
   return (
     <Box width="100%" ref={boxRef}>
       <Paper
@@ -106,59 +114,61 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
           sx={{ pr: gap.md }}
         />
       </Paper>
-      <Popper
-        modifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [0, 4],
+      <ClickAwayListener onClickAway={handleClickAway}>
+        <Popper
+          modifiers={[
+            {
+              name: "offset",
+              options: {
+                offset: [0, 4],
+              },
             },
-          },
-          {
-            name: "flip",
-            enabled: false,
-          },
-        ]}
-        style={{
-          width:
-            activeButton === SearchbarButtonNames.Location
-              ? "300px"
-              : searchbarWidth,
-          minWidth:
-            activeButton === SearchbarButtonNames.Location
-              ? 0
-              : POPUP_MIN_WIDTH,
-          borderRadius: borderRadius.small,
-          zIndex: 99,
-        }}
-        open={open}
-        anchorEl={boxRef.current}
-        placement="bottom-end"
-        disablePortal
-        transition
-      >
-        {({ TransitionProps }) => (
-          <Fade {...TransitionProps} timeout={200}>
-            <Paper
-              elevation={1}
-              sx={{
-                borderRadius: borderRadius.small,
-                bgcolor: "#fff",
-              }}
-            >
-              {activeButton === SearchbarButtonNames.Date && (
-                <DateRangeFilter handleClosePopup={handleClosePopup} />
-              )}
-              {activeButton === SearchbarButtonNames.Location && (
-                <LocationFilter />
-              )}
-              {activeButton === SearchbarButtonNames.Filter && (
-                <Filters handleClosePopup={handleClosePopup} />
-              )}
-            </Paper>
-          </Fade>
-        )}
-      </Popper>
+            {
+              name: "flip",
+              enabled: false,
+            },
+          ]}
+          style={{
+            width:
+              activeButton === SearchbarButtonNames.Location
+                ? "300px"
+                : searchbarWidth,
+            minWidth:
+              activeButton === SearchbarButtonNames.Location
+                ? 0
+                : POPUP_MIN_WIDTH,
+            borderRadius: borderRadius.small,
+            zIndex: 99,
+          }}
+          open={open}
+          anchorEl={boxRef.current}
+          placement="bottom-end"
+          disablePortal
+          transition
+        >
+          {({ TransitionProps }) => (
+            <Fade {...TransitionProps} timeout={200}>
+              <Paper
+                elevation={1}
+                sx={{
+                  borderRadius: borderRadius.small,
+                  bgcolor: color.blue.xLight,
+                }}
+              >
+                {activeButton === SearchbarButtonNames.Date && (
+                  <DateRangeFilter handleClosePopup={handleClosePopup} />
+                )}
+                {activeButton === SearchbarButtonNames.Location && (
+                  <LocationFilter />
+                )}
+                {activeButton === SearchbarButtonNames.Filter && (
+                  <Filters handleClosePopup={handleClosePopup} />
+                )}
+              </Paper>
+            </Fade>
+          )}
+        </Popper>
+      </ClickAwayListener>
     </Box>
   );
 };

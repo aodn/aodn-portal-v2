@@ -9,11 +9,7 @@ import {
 } from "../../../styles/constants";
 
 const StyledTab = styled((props: TabProps) => (
-  <Tab
-    disableRipple
-    {...props}
-    sx={{ margin: `${margin.xxlg} ${margin.lg}` }}
-  />
+  <Tab disableRipple {...props} sx={{ margin: `${margin.xlg} ${margin.lg}` }} />
 ))(() => ({
   textTransform: "none",
   fontWeight: fontWeight.regular,

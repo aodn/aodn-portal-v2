@@ -1,9 +1,9 @@
 import { FC } from "react";
 import { Box, Grid, SxProps, Theme } from "@mui/material";
-import DepthSlider from "../common/slider/DepthSlider";
-import PlainDropdownMenu from "../common/dropdown/PlainDropdownMenu";
-import { margin } from "../../styles/constants";
-import { ParameterState } from "../common/store/componentParamReducer";
+import DepthSlider from "../../common/slider/DepthSlider";
+import PlainDropdownMenu from "../../common/dropdown/PlainDropdownMenu";
+import { margin } from "../../../styles/constants";
+import { ParameterState } from "../../common/store/componentParamReducer";
 
 interface DepthFiltersProps {
   filter: ParameterState;

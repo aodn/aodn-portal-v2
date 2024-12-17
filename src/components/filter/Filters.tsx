@@ -25,6 +25,7 @@ import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
 import { DatasetFrequency } from "../common/store/searchReducer";
 import { useAppDispatch } from "../common/store/hooks";
+import { bgcolor } from "@mui/system";
 
 export interface ItemButton {
   value: DatasetFrequency | string;
@@ -155,7 +156,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         >
           <CloseIcon />
         </IconButton>
-        <TabsPanelContainer tabs={TABS} />
+        <TabsPanelContainer tabs={TABS} sx={{ color: color.blue.xLight }} />
         <Box
           display="flex"
           justifyContent="end"

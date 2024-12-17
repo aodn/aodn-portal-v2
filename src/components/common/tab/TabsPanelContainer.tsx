@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import { borderRadius, padding } from "../../../styles/constants";
 import StyledTabs from "./StyledTabs";
 import StyledTab from "./StyledTab";
+import { SxProps } from "@mui/system";
 
 export interface Tab {
   label: string;
@@ -43,6 +44,7 @@ interface TabsPanelContainerProps {
   isCollectionNotFound?: boolean;
   tabValue?: number;
   handleTabChange?: (newValue: number) => void;
+  sx?: SxProps;
 }
 
 const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
@@ -50,6 +52,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   isCollectionNotFound = false,
   tabValue = undefined,
   handleTabChange,
+  sx,
 }) => {
   const [value, setValue] = useState(tabValue ?? 0);
 
@@ -67,8 +70,8 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   return (
     <Box
       sx={{
-        bgcolor: "#fff",
         borderRadius: borderRadius.small,
+        ...sx,
       }}
     >
       <StyledTabs
