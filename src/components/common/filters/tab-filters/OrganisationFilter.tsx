@@ -1,6 +1,6 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback } from "react";
 import { Box, SxProps } from "@mui/material";
-import { ItemButton, TabFilterType } from "../Filters";
+import { TabFilterType } from "../Filters";
 import { StyledToggleButton } from "../../buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../buttons/StyledToggleButtonGroup";
 
@@ -44,28 +44,26 @@ const ORGANISATION = [
   },
 ];
 
-const OrganisationFilter: FC<OrganisationFilterProps> = ({ sx }) => {
-  // TODO: need to initialize the sate from parental filter
-  const [organisationFilter, setOrganisationPlatformFilter] = useState<
-    ItemButton[]
-  >([]);
-
-  // Update the local filter state
-  // TODO: need to update parental filter instead if ogcapi support this query
+const OrganisationFilter: FC<OrganisationFilterProps> = ({
+  filters,
+  setFilters,
+  sx,
+}) => {
   const handleChange = useCallback(
     (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
-      const selected: ItemButton[] = ORGANISATION.filter((item) =>
-        newAlignment.includes(item.value)
-      );
-      setOrganisationPlatformFilter(selected);
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        organisation: newAlignment,
+      }));
     },
-    []
+    [setFilters]
   );
+
   return (
     <>
       <Box sx={{ ...sx }}>
         <StyledToggleButtonGroup
-          value={organisationFilter.map((item) => item.value)}
+          value={filters.organisation}
           onChange={handleChange}
           aria-label="parameter vocab selection"
         >

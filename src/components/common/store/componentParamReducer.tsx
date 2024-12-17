@@ -22,7 +22,7 @@ const UPDATE_ZOOM_VARIABLE = "UPDATE_ZOOM_VARIABLE";
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
   MapDefaultConfig.BBOX_ENDPOINTS;
 
-interface DataTimeFilterRange {
+export interface DataTimeFilterRange {
   // Cannot use Date in Redux as it is non-serializable
   start?: number | undefined;
   end?: number | undefined;

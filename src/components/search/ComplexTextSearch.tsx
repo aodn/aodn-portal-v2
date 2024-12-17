@@ -1,30 +1,12 @@
-import React, {
-  Dispatch,
-  FC,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Box, Button, Fade, Paper, Popper, Typography } from "@mui/material";
-import AdvanceFilters from "../common/filters/AdvanceFilters";
+import React, { Dispatch, FC, useCallback, useRef, useState } from "react";
+import { Box, Fade, Paper, Popper } from "@mui/material";
 import InputWithSuggester from "./InputWithSuggester";
-import { border, borderRadius, color, padding } from "../../styles/constants";
+import { borderRadius, gap } from "../../styles/constants";
 import SearchbarButtonGroup, {
   SearchbarButtonNames,
 } from "./SearchbarButtonGroup";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
-import FilterSection from "../common/filters/FilterSection";
-import {
-  ParameterState,
-  updateDateTimeFilterRange,
-  updateImosOnly,
-  updateParameterVocabs,
-  updateUpdateFreq,
-} from "../common/store/componentParamReducer";
-import store, { getComponentState } from "../common/store/store";
-import { useAppDispatch } from "../common/store/hooks";
 import { POPUP_MIN_WIDTH } from "./constants";
 import DateRange from "../common/filters/DateRange";
 import { useLocation } from "react-router-dom";
@@ -40,31 +22,17 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
   setShouldExpandSearchbar,
 }) => {
   const location = useLocation();
-
-  const dispatch = useAppDispatch();
-
   const [open, setOpen] = useState(false);
-
   const boxRef = useRef<HTMLDivElement>(null);
-
   const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
     SearchbarButtonNames.Filter
   );
-
   const [shouldExpandAllButtons, setShouldExpandAllButtons] = useState<boolean>(
     location.pathname === pageDefault.landing
   );
-
-  const componentParam = getComponentState(store.getState());
-  // State used to store the provisional filter options selected,
-  // only dispatch to redux when 'apply' button is hit
-  const [filter, setFilter] = useState<ParameterState>(componentParam);
-
   // set the default value to false to allow user do search without typing anything
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
-
   const { ref, width: searchbarWidth } = useElementSize();
-
   const redirectSearch = useRedirectSearch();
 
   const handleEnterPressed = useCallback(
@@ -107,43 +75,7 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
     [open, activeButton]
   );
 
-  // TODO: always need to clear the filter on close if not hit 'apply'
   const handleClosePopup = useCallback(() => setOpen(false), [setOpen]);
-
-  // TODO: implement DataDeliveryModeFilter and DepthFilter when backend supports this query
-  const handleApplyFilter = useCallback(
-    (filter: ParameterState) => {
-      // Must use await so that it happen one by one, otherwise the update will be messed
-      if (filter.dateTimeFilterRange) {
-        dispatch(updateDateTimeFilterRange(filter.dateTimeFilterRange));
-      } else {
-        dispatch(updateDateTimeFilterRange({}));
-      }
-      if (filter.parameterVocabs) {
-        dispatch(updateParameterVocabs(filter.parameterVocabs));
-      } else {
-        dispatch(updateParameterVocabs([]));
-      }
-      if (filter.isImosOnlyDataset) {
-        dispatch(updateImosOnly(filter.isImosOnlyDataset));
-      } else {
-        dispatch(updateImosOnly(false));
-      }
-      if (filter.updateFreq) {
-        dispatch(updateUpdateFreq(filter.updateFreq));
-      } else {
-        dispatch(updateUpdateFreq(undefined));
-      }
-      setFilter({});
-    },
-    [dispatch]
-  );
-
-  useEffect(() => {
-    if (componentParam) {
-      setFilter(componentParam);
-    }
-  }, [componentParam, setFilter]);
 
   return (
     <Box width="100%" ref={boxRef}>
@@ -154,8 +86,8 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
           display: "flex",
           alignItems: "center",
           height: "100%",
-          border: `${border.xs} ${color.gray.extraLight}`,
           borderRadius: borderRadius.small,
+          paddingY: gap.md,
         }}
       >
         <InputWithSuggester
@@ -171,6 +103,7 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
           activeButton={activeButton}
           handleClickButton={handleClickButton}
           shouldExpandAllButtons={shouldExpandAllButtons}
+          sx={{ pr: gap.md }}
         />
       </Paper>
       <Popper
@@ -214,28 +147,13 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
               }}
             >
               {activeButton === SearchbarButtonNames.Date && (
-                <DateRange
-                  filter={filter}
-                  setFilter={setFilter}
-                  handleApplyFilter={handleApplyFilter}
-                />
+                <DateRange handleClosePopup={handleClosePopup} />
               )}
               {activeButton === SearchbarButtonNames.Location && (
                 <LocationFilter />
               )}
               {activeButton === SearchbarButtonNames.Filter && (
-                // <AdvanceFilters
-                //   handleCloseFilter={handleClosePopup}
-                //   filter={filter}
-                //   setFilter={setFilter}
-                //   handleApplyFilter={handleApplyFilter}
-                // />
-                <Filters
-                  handleCloseFilter={handleClosePopup}
-                  filter={filter}
-                  setFilter={setFilter}
-                  handleApplyFilter={handleApplyFilter}
-                />
+                <Filters handleClosePopup={handleClosePopup} />
               )}
             </Paper>
           </Fade>

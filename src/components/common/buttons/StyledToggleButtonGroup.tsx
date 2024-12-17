@@ -11,8 +11,8 @@ export const StyledToggleButtonGroup = styled(ToggleButtonGroup)({
   padding: padding.extraSmall,
   "& .MuiToggleButton-root": {
     textTransform: "capitalize",
-    padding: padding.extraSmall,
-    fontSize: fontSize.label,
+    padding: padding.small,
+    fontSize: fontSize.info,
     fontFamily: fontFamily.general,
   },
 });

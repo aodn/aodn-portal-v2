@@ -1,11 +1,5 @@
-import {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { FC, useCallback, useEffect, useState } from "react";
+import dayjs, { Dayjs } from "dayjs";
 import {
   Box,
   Button,
@@ -13,11 +7,11 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
+  IconButton,
   Radio,
   RadioGroup,
   Typography,
 } from "@mui/material";
-import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
@@ -27,20 +21,25 @@ import {
   fontFamily,
   fontSize,
   fontWeight,
+  gap,
   margin,
   padding,
 } from "../../../styles/constants";
-import DateRangeIcon from "@mui/icons-material/DateRange";
+import CloseIcon from "@mui/icons-material/Close";
 import { dateDefault } from "../constants";
-import { ParameterState } from "../store/componentParamReducer";
-import TimeRangeBarChart from "../charts/TimeRangeBarChart";
+import {
+  DataTimeFilterRange,
+  updateDateTimeFilterRange,
+} from "../store/componentParamReducer";
+import { useAppDispatch } from "../store/hooks";
+import store, { getComponentState } from "../store/store";
 import { OGCCollections } from "../store/OGCCollectionDefinitions";
 import { fetchResultNoStore } from "../store/searchReducer";
 import { cqlDefaultFilters } from "../cqlFilters";
+import TimeRangeBarChart from "../charts/TimeRangeBarChart";
 import PlainDatePicker from "../datetime/PlainDatePicker";
 import PlainSlider from "../slider/PlainSlider";
 import { DEFAULT_DATE_PICKER_SLOT } from "../../details/DateRangeSlider";
-import { useAppDispatch } from "../store/hooks";
 
 enum DateRangeOptionValues {
   Custom = "custom",
@@ -71,47 +70,46 @@ const dateToValue = (date: Dayjs): number => date.valueOf();
 const valueToDate = (value: number): Dayjs => dayjs(value);
 
 interface DateRangeFilterProps {
-  filter: ParameterState;
-  setFilter: Dispatch<SetStateAction<ParameterState>>;
-  handleApplyFilter: (filter: ParameterState) => void;
+  handleClosePopup: () => void;
 }
 
-const DateRange: FC<DateRangeFilterProps> = ({
-  filter,
-  setFilter,
-  handleApplyFilter,
-}) => {
+const DateRange: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
-  const { dateTimeFilterRange } = filter;
-  const [selectedOption, setSelectedOption] = useState<DateRangeOptionValues>(
-    DateRangeOptionValues.Custom
-  );
+
+  // State from redux
+  const { dateTimeFilterRange } = getComponentState(store.getState());
+
+  // Local state for date range
+  const [dateRange, setDateRange] = useState<DataTimeFilterRange>({});
+
+  // Local state for min/max date picker
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
   const [maxDate, setMaxDate] = useState<Dayjs>(initialMaxDate);
+
+  // Local state for date-range-slider
   const [value, setValue] = useState<number[]>([
     dateTimeFilterRange?.start ?? dateToValue(dayjs(dateDefault.min)),
     dateTimeFilterRange?.end ?? dateToValue(dayjs(dateDefault.max)),
   ]);
 
-  const updateDateRange = useCallback(
-    (startDate: Dayjs, endDate: Dayjs) => {
-      const newStart = dateToValue(startDate);
-      const newEnd = dateToValue(endDate);
-
-      setMinDate(startDate);
-      setMaxDate(endDate);
-      setValue([newStart, newEnd]);
-
-      setFilter((prevFilter) => ({
-        ...prevFilter,
-        dateTimeFilterRange: {
-          start: newStart,
-          end: newEnd,
-        },
-      }));
-    },
-    [setFilter]
+  // Local state for radio group
+  const [selectedOption, setSelectedOption] = useState<DateRangeOptionValues>(
+    DateRangeOptionValues.Custom
   );
+
+  // Helper to sync date range when radio change
+  const updateDateRange = useCallback((startDate: Dayjs, endDate: Dayjs) => {
+    const newStart = dateToValue(startDate);
+    const newEnd = dateToValue(endDate);
+
+    setMinDate(startDate);
+    setMaxDate(endDate);
+    setValue([newStart, newEnd]);
+    setDateRange({
+      start: newStart,
+      end: newEnd,
+    });
+  }, []);
 
   const handleRadioChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,16 +140,12 @@ const DateRange: FC<DateRangeFilterProps> = ({
       setMinDate(dayjs(newStart));
       setMaxDate(dayjs(newEnd));
       setSelectedOption(DateRangeOptionValues.Custom);
-
-      setFilter((prevFilter) => ({
-        ...prevFilter,
-        dateTimeFilterRange: {
-          start: newStart,
-          end: newEnd,
-        },
-      }));
+      setDateRange({
+        start: newStart,
+        end: newEnd,
+      });
     },
-    [setFilter]
+    []
   );
 
   const handleMinDateChange = useCallback(
@@ -161,17 +155,13 @@ const DateRange: FC<DateRangeFilterProps> = ({
         setMinDate(newMinDate);
         setValue([newStart, value[1]]);
         setSelectedOption(DateRangeOptionValues.Custom);
-
-        setFilter((prevFilter) => ({
-          ...prevFilter,
-          dateTimeFilterRange: {
-            ...prevFilter.dateTimeFilterRange,
-            start: newStart,
-          },
+        setDateRange((preDateRange) => ({
+          ...preDateRange,
+          start: newStart,
         }));
       }
     },
-    [maxDate, setFilter, value]
+    [maxDate, value]
   );
 
   const handleMaxDateChange = useCallback(
@@ -181,19 +171,41 @@ const DateRange: FC<DateRangeFilterProps> = ({
         setMaxDate(newMaxDate);
         setValue([value[0], newEnd]);
         setSelectedOption(DateRangeOptionValues.Custom);
-
-        setFilter((prevFilter) => ({
-          ...prevFilter,
-          dateTimeFilterRange: {
-            ...prevFilter.dateTimeFilterRange,
-            end: newEnd,
-          },
+        setDateRange((preDateRange) => ({
+          ...preDateRange,
+          start: newEnd,
         }));
       }
     },
-    [minDate, setFilter, value]
+    [minDate, value]
   );
 
+  const handleClear = useCallback(() => {
+    setDateRange({});
+    setMinDate(initialMinDate);
+    setMaxDate(initialMaxDate);
+    setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
+    setSelectedOption(DateRangeOptionValues.Custom);
+  }, []);
+
+  const handleApply = useCallback(
+    (dateRange: DataTimeFilterRange) => {
+      if (dateRange) {
+        dispatch(updateDateTimeFilterRange(dateRange));
+      } else {
+        dispatch(updateDateTimeFilterRange({}));
+      }
+      handleClosePopup();
+    },
+    [dispatch, handleClosePopup]
+  );
+
+  const handleClose = useCallback(() => {
+    handleClear();
+    handleClosePopup();
+  }, [handleClear, handleClosePopup]);
+
+  // Listen to redux dateTimeFilterRange to initialize local states
   useEffect(() => {
     if (dateTimeFilterRange) {
       setMinDate(
@@ -206,11 +218,13 @@ const DateRange: FC<DateRangeFilterProps> = ({
         dateTimeFilterRange.start ?? dateToValue(initialMinDate),
         dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
       ]);
+      setDateRange(dateTimeFilterRange);
     } else {
       // Reset to initial state when dateTimeFilterRange is null or undefined
       setMinDate(initialMinDate);
       setMaxDate(initialMaxDate);
       setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
+      setDateRange({});
     }
   }, [dateTimeFilterRange]);
 
@@ -287,7 +301,6 @@ const DateRange: FC<DateRangeFilterProps> = ({
               </RadioGroup>
             </FormControl>
           </Box>
-
           <Divider
             sx={{
               borderColor: color.blue.darkSemiTransparent,
@@ -409,6 +422,7 @@ const DateRange: FC<DateRangeFilterProps> = ({
         <Grid
           item
           xs={2}
+          position="relative"
           display="flex"
           flexDirection="column"
           justifyContent="end"
@@ -425,7 +439,7 @@ const DateRange: FC<DateRangeFilterProps> = ({
                 backgroundColor: color.blue.darkSemiTransparent,
               },
             }}
-            onClick={() => handleApplyFilter(filter)}
+            onClick={handleClear}
           >
             Clear
           </Button>
@@ -438,10 +452,16 @@ const DateRange: FC<DateRangeFilterProps> = ({
                 backgroundColor: color.blue.darkSemiTransparent,
               },
             }}
-            onClick={() => handleApplyFilter(filter)}
+            onClick={() => handleApply(dateRange)}
           >
             Apply
           </Button>
+          <IconButton
+            onClick={handleClose}
+            sx={{ position: "absolute", top: gap.lg, right: gap.lg }}
+          >
+            <CloseIcon />
+          </IconButton>
         </Grid>
       </Grid>
     </LocalizationProvider>

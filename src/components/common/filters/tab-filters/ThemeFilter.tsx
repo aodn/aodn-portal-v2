@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useCallback, FC } from "react";
-import { Box, SxProps, Theme } from "@mui/material";
-import { useSelector } from "react-redux";
+import { Box, SxProps } from "@mui/material";
 import { Vocab } from "../../store/componentParamReducer";
 import { useAppDispatch } from "../../store/hooks";
-import { RootState } from "../../store/store";
 import { fetchParameterVocabsWithStore } from "../../store/searchReducer";
 import { StyledToggleButtonGroup } from "../../buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../buttons/StyledToggleButton";
@@ -13,36 +11,22 @@ interface ThemeFilterProps extends TabFilterType {
   sx?: SxProps;
 }
 
-const ThemeFilter: FC<ThemeFilterProps> = ({ filter, setFilter, sx }) => {
+const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
   const dispatch = useAppDispatch();
-  const [parameterVocabs, setParameterVocabs] = useState<Vocab[]>([]);
+  const [allVocabs, setAllVocabs] = useState<Vocab[]>([]);
   const [buttonLabels, setButtonLabels] = useState<string[]>([]);
 
-  // Get selected parameterVocabs from Redux store
-  const selectedParameterVocabs = useSelector(
-    (state: RootState) => state.paramReducer.parameterVocabs
-  );
-
-  // Initialize local state with selected parameterVocabs from Redux
-  useEffect(() => {
-    setFilter((prevFilter) => ({
-      ...prevFilter,
-      parameterVocabs: selectedParameterVocabs,
-    }));
-  }, [selectedParameterVocabs, setFilter]);
-
-  // Update the local filter state using the setFilter
   const handleChange = useCallback(
     (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
-      const selected: Vocab[] = parameterVocabs.filter((vocab) =>
+      const selected: Vocab[] = allVocabs.filter((vocab) =>
         newAlignment.includes(vocab.label)
       );
-      setFilter((prevFilter) => ({
+      setFilters((prevFilter) => ({
         ...prevFilter,
         parameterVocabs: selected,
       }));
     },
-    [parameterVocabs, setFilter]
+    [allVocabs, setFilters]
   );
 
   useEffect(() => {
@@ -63,7 +47,7 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filter, setFilter, sx }) => {
           // localeCompare() is better for handling of international characters eg. non-English text
           .sort((a, b) => a.label.localeCompare(b.label));
 
-        setParameterVocabs(secondLevelVocabs);
+        setAllVocabs(secondLevelVocabs);
         setButtonLabels(secondLevelVocabs.map((vocab) => vocab.label));
       })
       .catch((error) =>
@@ -74,7 +58,7 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filter, setFilter, sx }) => {
   return (
     <Box sx={{ ...sx }}>
       <StyledToggleButtonGroup
-        value={filter.parameterVocabs?.map((vocab) => vocab.label) || []}
+        value={filters.parameterVocabs?.map((vocab) => vocab.label) || []}
         onChange={handleChange}
         aria-label="parameter vocab selection"
       >

@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo } from "react";
 import { Tune } from "@mui/icons-material";
-import { Stack } from "@mui/material";
+import { Stack, SxProps } from "@mui/material";
 import SearchbarExpandableButton from "./SearchbarExpandableButton";
 import SearchIcon from "@mui/icons-material/Search";
 import DateRangeIcon from "@mui/icons-material/DateRange";
@@ -22,6 +22,7 @@ interface SearchbarButtonGroupProps {
   activeButton: SearchbarButtonNames;
   handleClickButton: (button: SearchbarButtonNames) => void;
   shouldExpandAllButtons: boolean;
+  sx?: SxProps;
 }
 
 const checkCount = ({
@@ -65,6 +66,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   activeButton,
   handleClickButton,
   shouldExpandAllButtons = false,
+  sx,
 }) => {
   const componentParams: ParameterState = getComponentState(store.getState());
 
@@ -103,7 +105,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   );
 
   return (
-    <Stack height="100%" direction="row" spacing={0.5} padding={gap.sm}>
+    <Stack height="100%" direction="row" spacing={0.5} padding={gap.sm} sx={sx}>
       <SearchbarExpandableButton
         icon={<DateRangeIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Date)}

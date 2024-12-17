@@ -1,32 +1,19 @@
 import { FC, useCallback, useState } from "react";
 import {
   Box,
-  Button,
-  Divider,
   FormControl,
   FormControlLabel,
-  Grid,
   Radio,
   RadioGroup,
-  Typography,
 } from "@mui/material";
-import {
-  border,
-  color,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  margin,
-  padding,
-} from "../../../styles/constants";
-import PlaceIcon from "@mui/icons-material/Place";
+import { fontFamily, fontSize, padding } from "../../../styles/constants";
 
 interface LocationOptionType {
   value: string;
   label: string;
 }
 
-// TODO: the implementation of LocationFilter will together with ogcapi
+// TODO: fetch from ogcapi or align with ogcapi keywords
 const LocationOptions: LocationOptionType[] = [
   { value: "ArafuraSea", label: "Arafura Sea(NT)" },
   { value: "CoralSea", label: "Coral Sea (QLD)" },
@@ -42,10 +29,12 @@ const LocationOptions: LocationOptionType[] = [
 interface LocationFilterProps {}
 
 const LocationFilter: FC<LocationFilterProps> = () => {
+  // TODO: need to initialize the sate from redux
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     LocationOptions[0].value
   );
 
+  // TODO: need to update redux as well if ogcapi support this query
   const handleRadioChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setSelectedOption(event.target.value);

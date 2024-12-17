@@ -211,7 +211,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 5], // Vertical offset
+              offset: [0, 8], // Vertical offset
             },
           },
           {

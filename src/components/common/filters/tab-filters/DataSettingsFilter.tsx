@@ -1,32 +1,35 @@
-import { FC, useCallback, useState } from "react";
-import { Box, Stack, SxProps } from "@mui/material";
+import { FC, useCallback, useEffect, useState } from "react";
+import { Box, Stack, SxProps, Typography } from "@mui/material";
 import { ItemButton, TabFilterType } from "../Filters";
 import { StyledToggleButtonGroup } from "../../buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../buttons/StyledToggleButton";
+import { fontColor, fontWeight } from "../../../../styles/constants";
+import { DatasetFrequency } from "../../store/searchReducer";
 
-type DataSettingsCategory =
-  | "dataDeliveryMode"
-  | "dataDeliveryFrequency"
-  | "dataService";
+enum DataSettingsCategory {
+  dataDeliverMode = "dataDeliveryMode",
+  dataDeliveryFrequency = "dataDeliveryFrequency",
+  dataService = "dataService",
+}
 
 type DataSettingsFilterType = Record<DataSettingsCategory, ItemButton[]>;
 
 const DATA_SETTINGS: DataSettingsFilterType = {
-  dataDeliveryMode: [
+  dataDeliveryFrequency: [
     {
-      value: "real-time",
+      value: DatasetFrequency.REALTIME,
       label: "Real Time",
     },
     {
-      value: "Delayed",
-      label: "delayed",
+      value: DatasetFrequency.DELAYED,
+      label: "Delayed",
     },
     {
-      value: "one-off",
+      value: DatasetFrequency.OTHER,
       label: "One-off",
     },
   ],
-  dataDeliveryFrequency: [
+  dataDeliveryMode: [
     {
       value: "yearly",
       label: "Yearly",
@@ -64,47 +67,54 @@ interface DataSettingsFilterProps extends TabFilterType {
   sx?: SxProps;
 }
 
-const DataSettingsFilter: FC<DataSettingsFilterProps> = ({ sx }) => {
-  // Initialize state with empty arrays for each category
-  const [dataSettingsFilter, setDataSettingsFilter] =
-    useState<DataSettingsFilterType>({
-      dataDeliveryMode: [],
-      dataDeliveryFrequency: [],
-      dataService: [],
-    });
-
+const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
+  filters,
+  setFilters,
+  sx,
+}) => {
   // Update the local filter state for a specific category
   const handleChange = useCallback(
     (category: DataSettingsCategory) =>
-      (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
-        const selected: ItemButton[] = DATA_SETTINGS[category].filter((item) =>
-          newAlignment.includes(item.value)
-        );
-
-        setDataSettingsFilter((prev) => ({
-          ...prev,
-          [category]: selected,
-        }));
+      (
+        _: React.MouseEvent<HTMLElement>,
+        newAlignment: Array<DatasetFrequency>
+      ) => {
+        if (category === DataSettingsCategory.dataDeliveryFrequency) {
+          setFilters((prevFilters) => ({
+            ...prevFilters,
+            dataDeliveryFrequency: newAlignment,
+          }));
+        }
+        if (category === DataSettingsCategory.dataDeliverMode) {
+          setFilters((prevFilters) => ({
+            ...prevFilters,
+            dataDeliveryMode: newAlignment,
+          }));
+        }
+        if (category === DataSettingsCategory.dataService) {
+          setFilters((prevFilters) => ({
+            ...prevFilters,
+            dataService: newAlignment,
+          }));
+        }
       },
-    []
-  );
-
-  // Helper function to get selected values for a category
-  const getSelectedValues = useCallback(
-    (category: DataSettingsCategory) => {
-      return dataSettingsFilter[category].map((item) => item.value);
-    },
-    [dataSettingsFilter]
+    [setFilters]
   );
 
   return (
     <Stack direction="column" spacing={2} sx={sx}>
       <Box>
-        <Box sx={{ mb: 1 }}>Data Delivery Mode</Box>
+        <Typography
+          p={0}
+          pl={1}
+          fontWeight={fontWeight.bold}
+          color={fontColor.blue.dark}
+        >
+          Data Delivery Mode
+        </Typography>
         <StyledToggleButtonGroup
-          value={getSelectedValues("dataDeliveryMode")}
-          onChange={handleChange("dataDeliveryMode")}
-          aria-label="data delivery mode selection"
+          value={filters.dataDeliveryMode}
+          onChange={handleChange(DataSettingsCategory.dataDeliverMode)}
         >
           {DATA_SETTINGS.dataDeliveryMode.map((item) => (
             <StyledToggleButton
@@ -117,13 +127,18 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({ sx }) => {
           ))}
         </StyledToggleButtonGroup>
       </Box>
-
       <Box>
-        <Box sx={{ mb: 1 }}>Data Delivery Frequency</Box>
+        <Typography
+          p={0}
+          pl={1}
+          fontWeight={fontWeight.bold}
+          color={fontColor.blue.dark}
+        >
+          Data Delivery Frequency
+        </Typography>
         <StyledToggleButtonGroup
-          value={getSelectedValues("dataDeliveryFrequency")}
-          onChange={handleChange("dataDeliveryFrequency")}
-          aria-label="data delivery frequency selection"
+          value={filters.dataDeliveryFrequency}
+          onChange={handleChange(DataSettingsCategory.dataDeliveryFrequency)}
         >
           {DATA_SETTINGS.dataDeliveryFrequency.map((item) => (
             <StyledToggleButton
@@ -136,13 +151,18 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({ sx }) => {
           ))}
         </StyledToggleButtonGroup>
       </Box>
-
       <Box>
-        <Box sx={{ mb: 1 }}>Data Service</Box>
+        <Typography
+          p={0}
+          pl={1}
+          fontWeight={fontWeight.bold}
+          color={fontColor.blue.dark}
+        >
+          Data Service
+        </Typography>
         <StyledToggleButtonGroup
-          value={getSelectedValues("dataService")}
-          onChange={handleChange("dataService")}
-          aria-label="data service selection"
+          value={filters.dataService}
+          onChange={handleChange(DataSettingsCategory.dataService)}
         >
           {DATA_SETTINGS.dataService.map((item) => (
             <StyledToggleButton
