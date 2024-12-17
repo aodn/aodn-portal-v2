@@ -13,18 +13,18 @@ import {
   updateParameterVocabs,
   updateUpdateFreq,
   Vocab,
-} from "../store/componentParamReducer";
-import store, { getComponentState } from "../store/store";
+} from "../common/store/componentParamReducer";
+import store, { getComponentState } from "../common/store/store";
 import { Box, Button, IconButton, SxProps } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { border, color, gap, margin } from "../../../styles/constants";
-import TabsPanelContainer, { Tab } from "../tab/TabsPanelContainer";
+import { border, color, gap, margin } from "../../styles/constants";
+import TabsPanelContainer, { Tab } from "../common/tab/TabsPanelContainer";
 import ThemeFilter from "./tab-filters/ThemeFilter";
 import PlatformFilter from "./tab-filters/PlatformFilter";
 import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
-import { DatasetFrequency } from "../store/searchReducer";
-import { useAppDispatch } from "../store/hooks";
+import { DatasetFrequency } from "../common/store/searchReducer";
+import { useAppDispatch } from "../common/store/hooks";
 
 export interface ItemButton {
   value: DatasetFrequency | string;
@@ -98,6 +98,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
       } else {
         dispatch(updateParameterVocabs([]));
       }
+      // TODO: isImosOnly is integrated in organisation button group, need to change ogcapi then change front end
       if (filters.organisation?.includes("imos")) {
         dispatch(updateImosOnly(true));
       } else {

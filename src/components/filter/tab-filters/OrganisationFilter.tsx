@@ -1,54 +1,50 @@
 import { FC, useCallback } from "react";
 import { Box, SxProps } from "@mui/material";
 import { TabFilterType } from "../Filters";
-import { StyledToggleButton } from "../../buttons/StyledToggleButton";
-import { StyledToggleButtonGroup } from "../../buttons/StyledToggleButtonGroup";
+import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
+import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 
-interface PlatformFilterProps extends TabFilterType {
+interface OrganisationFilterProps extends TabFilterType {
   sx?: SxProps;
 }
 
 // TODO: fetch from ogcapi or align with ogcapi keywords
-const PLATFORMS = [
+const ORGANISATION = [
   {
-    value: "satellite",
-    label: "Satellite",
+    value: "imos",
+    label: "IMOS",
   },
   {
-    value: "glider",
-    label: "Glider",
+    value: "Australian-Universities",
+    label: "Australian Universities",
   },
   {
-    value: "gloat",
-    label: "Float",
+    value: "department-agencies",
+    label: "Department & Agencies",
   },
   {
-    value: "moorings-buoy",
-    label: "Moorings & Buoy",
+    value: "industry",
+    label: "Industry",
   },
   {
-    value: "vessel",
-    label: "Vessel",
+    value: "local-government",
+    label: "Local Government",
   },
   {
-    value: "aircraft",
-    label: "Aircraft",
+    value: "international",
+    label: "International",
   },
   {
-    value: "bio-platform",
-    label: "Bio Platform",
+    value: "non-government",
+    label: "Non Government",
   },
   {
-    value: "radar",
-    label: "Radar",
-  },
-  {
-    value: "auv",
-    label: "AUV",
+    value: "state-territory-agencies",
+    label: "State & Territory Dpt. & Agencies",
   },
 ];
 
-const PlatformFilter: FC<PlatformFilterProps> = ({
+const OrganisationFilter: FC<OrganisationFilterProps> = ({
   filters,
   setFilters,
   sx,
@@ -57,7 +53,7 @@ const PlatformFilter: FC<PlatformFilterProps> = ({
     (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
       setFilters((prevFilters) => ({
         ...prevFilters,
-        platform: newAlignment,
+        organisation: newAlignment,
       }));
     },
     [setFilters]
@@ -67,11 +63,11 @@ const PlatformFilter: FC<PlatformFilterProps> = ({
     <>
       <Box sx={{ ...sx }}>
         <StyledToggleButtonGroup
-          value={filters.platform}
+          value={filters.organisation}
           onChange={handleChange}
           aria-label="parameter vocab selection"
         >
-          {PLATFORMS.map((item) => (
+          {ORGANISATION.map((item) => (
             <StyledToggleButton
               value={item.value}
               key={item.value}
@@ -86,4 +82,4 @@ const PlatformFilter: FC<PlatformFilterProps> = ({
   );
 };
 
-export default PlatformFilter;
+export default OrganisationFilter;

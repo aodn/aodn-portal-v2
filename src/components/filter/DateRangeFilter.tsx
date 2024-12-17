@@ -24,22 +24,22 @@ import {
   gap,
   margin,
   padding,
-} from "../../../styles/constants";
+} from "../../styles/constants";
 import CloseIcon from "@mui/icons-material/Close";
-import { dateDefault } from "../constants";
+import { dateDefault } from "../common/constants";
 import {
   DataTimeFilterRange,
   updateDateTimeFilterRange,
-} from "../store/componentParamReducer";
-import { useAppDispatch } from "../store/hooks";
-import store, { getComponentState } from "../store/store";
-import { OGCCollections } from "../store/OGCCollectionDefinitions";
-import { fetchResultNoStore } from "../store/searchReducer";
-import { cqlDefaultFilters } from "../cqlFilters";
-import TimeRangeBarChart from "../charts/TimeRangeBarChart";
-import PlainDatePicker from "../datetime/PlainDatePicker";
-import PlainSlider from "../slider/PlainSlider";
-import { DEFAULT_DATE_PICKER_SLOT } from "../../details/DateRangeSlider";
+} from "../common/store/componentParamReducer";
+import { useAppDispatch } from "../common/store/hooks";
+import store, { getComponentState } from "../common/store/store";
+import { OGCCollections } from "../common/store/OGCCollectionDefinitions";
+import { fetchResultNoStore } from "../common/store/searchReducer";
+import { cqlDefaultFilters } from "../common/cqlFilters";
+import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
+import PlainDatePicker from "../common/datetime/PlainDatePicker";
+import PlainSlider from "../common/slider/PlainSlider";
+import { DEFAULT_DATE_PICKER_SLOT } from "../details/DateRangeSlider";
 
 enum DateRangeOptionValues {
   Custom = "custom",
@@ -73,7 +73,7 @@ interface DateRangeFilterProps {
   handleClosePopup: () => void;
 }
 
-const DateRange: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
+const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
 
   // State from redux
@@ -468,4 +468,4 @@ const DateRange: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   );
 };
 
-export default DateRange;
+export default DateRangeFilter;

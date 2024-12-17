@@ -6,7 +6,7 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-import { fontFamily, fontSize, padding } from "../../../styles/constants";
+import { fontFamily, fontSize, padding } from "../../styles/constants";
 
 interface LocationOptionType {
   value: string;

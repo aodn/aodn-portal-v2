@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback, FC } from "react";
 import { Box, SxProps } from "@mui/material";
-import { Vocab } from "../../store/componentParamReducer";
-import { useAppDispatch } from "../../store/hooks";
-import { fetchParameterVocabsWithStore } from "../../store/searchReducer";
-import { StyledToggleButtonGroup } from "../../buttons/StyledToggleButtonGroup";
-import { StyledToggleButton } from "../../buttons/StyledToggleButton";
+import { Vocab } from "../../common/store/componentParamReducer";
+import { useAppDispatch } from "../../common/store/hooks";
+import { fetchParameterVocabsWithStore } from "../../common/store/searchReducer";
+import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
+import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { TabFilterType } from "../Filters";
 
 interface ThemeFilterProps extends TabFilterType {

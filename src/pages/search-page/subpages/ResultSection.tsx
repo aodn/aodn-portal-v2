@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
 import ResultPanelSimpleFilter, {
   ResultPanelSimpleFilterType,
-} from "../../../components/common/filters/ResultPanelSimpleFilter";
+} from "../../../components/filter/ResultPanelSimpleFilter";
 import ResultCards, {
   ResultCardsType,
 } from "../../../components/result/ResultCards";

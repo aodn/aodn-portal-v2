@@ -1,10 +1,10 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
 import { ItemButton, TabFilterType } from "../Filters";
-import { StyledToggleButtonGroup } from "../../buttons/StyledToggleButtonGroup";
-import { StyledToggleButton } from "../../buttons/StyledToggleButton";
-import { fontColor, fontWeight } from "../../../../styles/constants";
-import { DatasetFrequency } from "../../store/searchReducer";
+import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
+import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
+import { fontColor, fontWeight } from "../../../styles/constants";
+import { DatasetFrequency } from "../../common/store/searchReducer";
 
 enum DataSettingsCategory {
   dataDeliverMode = "dataDeliveryMode",

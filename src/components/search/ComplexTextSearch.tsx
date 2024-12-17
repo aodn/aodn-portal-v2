@@ -8,11 +8,11 @@ import SearchbarButtonGroup, {
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
 import { POPUP_MIN_WIDTH } from "./constants";
-import DateRange from "../common/filters/DateRange";
+import DateRangeFilter from "../filter/DateRangeFilter";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
-import LocationFilter from "../common/filters/LocationFilter";
-import Filters from "../common/filters/Filters";
+import LocationFilter from "../filter/LocationFilter";
+import Filters from "../filter/Filters";
 
 interface ComplexTextSearchProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -147,7 +147,7 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
               }}
             >
               {activeButton === SearchbarButtonNames.Date && (
-                <DateRange handleClosePopup={handleClosePopup} />
+                <DateRangeFilter handleClosePopup={handleClosePopup} />
               )}
               {activeButton === SearchbarButtonNames.Location && (
                 <LocationFilter />
