@@ -1,8 +1,8 @@
 import { Stack } from "@mui/material";
-import TimeRangeIcon from "../../icon/TimeRangeIcon";
-import SpatialIcon from "../../icon/SpatialIcon";
-import DimensionsIcon from "../../icon/Dimensions";
-import { padding } from "../../../styles/constants";
+import TimeRangeIcon from "../icon/TimeRangeIcon";
+import SpatialIcon from "../icon/SpatialIcon";
+import DimensionsIcon from "../icon/Dimensions";
+import { padding } from "../../styles/constants";
 
 const ResultPanelIconFilter = () => {
   return (

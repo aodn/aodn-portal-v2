@@ -1,13 +1,18 @@
-import React, { Dispatch, FC, useCallback, useState } from "react";
-import { Box, Paper } from "@mui/material";
-import AdvanceFilters from "../common/filters/AdvanceFilters";
+import React, { Dispatch, FC, useCallback, useRef, useState } from "react";
+import { Box, Fade, Paper, Popper, ClickAwayListener } from "@mui/material";
 import InputWithSuggester from "./InputWithSuggester";
-import { border, borderRadius, color } from "../../styles/constants";
+import { borderRadius, color, gap } from "../../styles/constants";
 import SearchbarButtonGroup, {
   SearchbarButtonNames,
 } from "./SearchbarButtonGroup";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
+import { POPUP_MIN_WIDTH } from "./constants";
+import DateRangeFilter from "../filter/DateRangeFilter";
+import { useLocation } from "react-router-dom";
+import { pageDefault } from "../common/constants";
+import LocationFilter from "../filter/LocationFilter";
+import Filters from "../filter/Filters";
 
 interface ComplexTextSearchProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -16,17 +21,18 @@ interface ComplexTextSearchProps {
 const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
   setShouldExpandSearchbar,
 }) => {
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
   const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
     SearchbarButtonNames.Filter
   );
-
-  const [showFilters, setShowFilters] = useState<boolean>(false);
-
+  const [shouldExpandAllButtons, setShouldExpandAllButtons] = useState<boolean>(
+    location.pathname === pageDefault.landing
+  );
   // set the default value to false to allow user do search without typing anything
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
-
   const { ref, width: searchbarWidth } = useElementSize();
-
   const redirectSearch = useRedirectSearch();
 
   const handleEnterPressed = useCallback(
@@ -45,8 +51,42 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
     [pendingSearch, redirectSearch]
   );
 
+  const handleClickButton = useCallback(
+    (button: SearchbarButtonNames) => {
+      if (open) {
+        // If clicking the same button that's currently active, just close the popup
+        if (button === activeButton) {
+          setOpen(false);
+          return;
+        }
+
+        // If switching to a different button, close then reopen
+        setOpen(false);
+        setTimeout(() => {
+          setOpen(true);
+          setActiveButton(button);
+        }, 200);
+      } else {
+        // If popup is closed, simply open it
+        setOpen(true);
+        setActiveButton(button);
+      }
+    },
+    [open, activeButton]
+  );
+
+  const handleClosePopup = useCallback(() => setOpen(false), [setOpen]);
+
+  const handleClickAway = useCallback((event: MouseEvent | TouchEvent) => {
+    // Check if the click target is part of the search bar or buttons
+    if (boxRef.current?.contains(event.target as Node)) {
+      return;
+    }
+    setOpen(false);
+  }, []);
+
   return (
-    <Box width="100%">
+    <Box width="100%" ref={boxRef}>
       <Paper
         ref={ref}
         elevation={0}
@@ -54,8 +94,8 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
           display: "flex",
           alignItems: "center",
           height: "100%",
-          border: `${border.xs} ${color.gray.extraLight}`,
           borderRadius: borderRadius.small,
+          paddingY: gap.md,
         }}
       >
         <InputWithSuggester
@@ -63,19 +103,72 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
           setPendingSearch={setPendingSearch}
           setActiveButton={setActiveButton}
           setShouldExpandSearchbar={setShouldExpandSearchbar}
+          setShouldExpandAllButtons={setShouldExpandAllButtons}
           suggesterWidth={searchbarWidth}
         />
         <SearchbarButtonGroup
-          setShowFilters={setShowFilters}
           pendingSearch={pendingSearch}
           activeButton={activeButton}
-          setActiveButton={setActiveButton}
+          handleClickButton={handleClickButton}
+          shouldExpandAllButtons={shouldExpandAllButtons}
+          sx={{ pr: gap.md }}
         />
       </Paper>
-      <AdvanceFilters
-        showFilters={showFilters}
-        setShowFilters={setShowFilters}
-      />
+      <ClickAwayListener onClickAway={handleClickAway}>
+        <Popper
+          modifiers={[
+            {
+              name: "offset",
+              options: {
+                offset: [0, 4],
+              },
+            },
+            {
+              name: "flip",
+              enabled: false,
+            },
+          ]}
+          style={{
+            width:
+              activeButton === SearchbarButtonNames.Location
+                ? "300px"
+                : searchbarWidth,
+            minWidth:
+              activeButton === SearchbarButtonNames.Location
+                ? 0
+                : POPUP_MIN_WIDTH,
+            borderRadius: borderRadius.small,
+            zIndex: 99,
+          }}
+          open={open}
+          anchorEl={boxRef.current}
+          placement="bottom-end"
+          disablePortal
+          transition
+        >
+          {({ TransitionProps }) => (
+            <Fade {...TransitionProps} timeout={200}>
+              <Paper
+                elevation={location.pathname === pageDefault.search ? 2 : 1}
+                sx={{
+                  borderRadius: borderRadius.small,
+                  bgcolor: "#fff",
+                }}
+              >
+                {activeButton === SearchbarButtonNames.Date && (
+                  <DateRangeFilter handleClosePopup={handleClosePopup} />
+                )}
+                {activeButton === SearchbarButtonNames.Location && (
+                  <LocationFilter />
+                )}
+                {activeButton === SearchbarButtonNames.Filter && (
+                  <Filters handleClosePopup={handleClosePopup} />
+                )}
+              </Paper>
+            </Fade>
+          )}
+        </Popper>
+      </ClickAwayListener>
     </Box>
   );
 };
