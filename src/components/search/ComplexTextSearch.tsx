@@ -149,10 +149,10 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
           {({ TransitionProps }) => (
             <Fade {...TransitionProps} timeout={200}>
               <Paper
-                elevation={1}
+                elevation={location.pathname === pageDefault.search ? 2 : 1}
                 sx={{
                   borderRadius: borderRadius.small,
-                  bgcolor: color.blue.xLight,
+                  bgcolor: "#fff",
                 }}
               >
                 {activeButton === SearchbarButtonNames.Date && (

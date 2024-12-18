@@ -60,7 +60,6 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
       <StyledToggleButtonGroup
         value={filters.parameterVocabs?.map((vocab) => vocab.label) || []}
         onChange={handleChange}
-        aria-label="parameter vocab selection"
       >
         {buttonLabels.map((label) => (
           <StyledToggleButton value={label} key={label} aria-label={label}>

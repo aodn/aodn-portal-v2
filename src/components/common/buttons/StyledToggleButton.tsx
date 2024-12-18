@@ -8,10 +8,9 @@ export const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   borderRadius: 0,
   backgroundColor: "#fff",
   "&.Mui-selected": {
-    backgroundColor: color.blue.dark,
-    color: "white",
+    backgroundColor: color.blue.darkSemiTransparent,
     "&:hover": {
-      backgroundColor: color.blue.dark,
+      backgroundColor: color.blue.darkSemiTransparent,
     },
   },
 }));

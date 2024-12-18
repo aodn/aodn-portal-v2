@@ -163,11 +163,12 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
           alignItems="center"
           gap={2}
           pr={2}
+          pb={2}
         >
           <Button
             sx={{
               width: "100px",
-              marginBottom: margin.lg,
+
               border: `${border.sm} ${color.blue.darkSemiTransparent}`,
               "&:hover": {
                 border: `${border.sm} ${color.blue.darkSemiTransparent}`,
@@ -181,7 +182,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
           <Button
             sx={{
               width: "100px",
-              marginBottom: margin.lg,
+
               border: `${border.sm} ${color.blue.darkSemiTransparent}`,
               "&:hover": {
                 border: `${border.sm} ${color.blue.darkSemiTransparent}`,
