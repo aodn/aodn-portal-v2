@@ -17,6 +17,7 @@ interface SearchbarExpandableButtonProps {
   badgeContent?: number;
   dotBadge?: boolean;
   buttonSx?: SxProps;
+  "data-testid"?: string | undefined;
 }
 
 const defaultButtonSx: SxProps = {
@@ -37,6 +38,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
   dotBadge,
   showText,
   buttonSx,
+  "data-testid": testId,
 }) => {
   return (
     <StyledBadge
@@ -57,7 +59,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
         }}
         startIcon={icon}
         onClick={onClick}
-        data-testid={`searchbar-${text.toLowerCase()}-button`}
+        data-testid={testId}
       >
         {showText && text}
       </Button>

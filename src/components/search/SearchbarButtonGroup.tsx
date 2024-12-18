@@ -117,6 +117,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
             ? true
             : activeButton === SearchbarButtonNames.Date
         }
+        data-testid="date-range-button"
       />
       <SearchbarExpandableButton
         icon={<PlaceIcon />}
@@ -129,6 +130,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
             ? true
             : activeButton === SearchbarButtonNames.Location
         }
+        data-testid="location-button"
       />
       <SearchbarExpandableButton
         icon={<Tune />}
@@ -160,6 +162,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
             backgroundColor: color.brightBlue.dark,
           },
         }}
+        data-testid="search-button"
       />
     </Stack>
   );
