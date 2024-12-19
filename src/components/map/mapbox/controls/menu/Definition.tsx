@@ -19,7 +19,9 @@ enum EVENT_BOOKMARK {
   EXPAND = "event-bookmark-expand",
   REMOVE_ALL = "event-bookmark-remove-all",
 }
-
+// For those who use MenuControl, please extend you props with this interface
+// and the MenuControl will inject the map instance automatically for you
+// you can define your onEvent if you want
 export interface ControlProps {
   map?: MapBox;
   onEvent?: (...args: any[]) => void;
