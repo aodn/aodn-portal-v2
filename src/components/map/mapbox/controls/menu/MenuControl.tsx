@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { cloneElement, useContext, useEffect, useState } from "react";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../../MapContext";
 import { Map as MapBox, IControl, MapMouseEvent } from "mapbox-gl";
 import EventEmitter from "events";
-import { EVENT_MAP, EVENT_MENU, Menus } from "./Definition";
+import { ControlProps, EVENT_MAP, EVENT_MENU, Menus } from "./Definition";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
@@ -18,26 +18,19 @@ class MapMenuControl implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
   private component: Menus;
-  private map: MapBox | null = null;
 
   // When the user clicks somewhere on the map, notify the MenuControl
   private mapClickHandler: (event: MapMouseEvent) => void;
   private mapMoveStartHandler: (event: MapMouseEvent) => void;
 
-  constructor(component: Menus, map: MapBox) {
+  constructor(component: Menus) {
     this.component = component;
-    this.map = map;
 
     // Handlers for map events
     this.mapClickHandler = (event: MapMouseEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP.CLICKED);
     this.mapMoveStartHandler = (event: MapMouseEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP.MOVE_START);
-  }
-
-  updateComponent(component: Menus) {
-    this.component = component;
-    this.render();
   }
 
   private render() {
@@ -94,7 +87,7 @@ const MenuControl: React.FC<MenuControlProps> = ({
   menu,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
-  const [control, setControl] = useState<MapMenuControl | null>(null);
+  const [_, setControl] = useState<MapMenuControl | null>(null);
 
   // Creation effect
   useEffect(() => {
@@ -102,20 +95,17 @@ const MenuControl: React.FC<MenuControlProps> = ({
 
     setControl((prev) => {
       if (!prev) {
-        const newControl = new MapMenuControl(menu, map);
+        // !!Must use cloneElement, to inject the map to the argument, so you
+        // can get it in the ControlProps
+        const newControl = new MapMenuControl(
+          cloneElement<ControlProps>(menu, { map: map })
+        );
         map?.addControl(newControl, "top-right");
         return newControl;
       }
       return prev;
     });
   }, [map, menu]);
-
-  // Props update effect
-  useEffect(() => {
-    if (control && menu) {
-      control.updateComponent(menu);
-    }
-  }, [control, menu]);
 
   return <React.Fragment />;
 };

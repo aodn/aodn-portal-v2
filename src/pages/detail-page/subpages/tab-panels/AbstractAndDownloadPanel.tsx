@@ -11,8 +11,7 @@ import { StaticLayersDef } from "../../../../components/map/mapbox/layers/Static
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
-import DrawControl from "../../../../components/map/mapbox/controls/DrawControl";
-import MapContext from "../../../../components/map/mapbox/MapContext";
+import DrawRectControl from "../../../../components/map/mapbox/controls/DrawRectControl";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
@@ -86,9 +85,6 @@ const AbstractAndDownloadPanel: FC = () => {
   }, [featureCollection]);
 
   const [minDateStamp, maxDateStamp] = getMinMaxDateStamps();
-
-  const { map } = useContext(MapContext);
-
   const handleMapChange = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
       // implement later
@@ -148,8 +144,7 @@ const AbstractAndDownloadPanel: FC = () => {
                     />
                     <MenuControl
                       menu={
-                        <DrawControl
-                          map={map}
+                        <DrawRectControl
                           setDownloadConditions={setDownloadConditions}
                           draw={mapDraw}
                         />
