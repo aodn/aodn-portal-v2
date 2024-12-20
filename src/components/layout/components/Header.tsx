@@ -7,7 +7,7 @@ import SectionContainer from "./SectionContainer";
 import HeaderMenu from "./HeaderMenu";
 import MainMenu from "./MainMenu";
 import { pageDefault } from "../../common/constants";
-import ComplexTextSearch from "../../search/ComplexTextSearch";
+import Searchbar from "../../search/Searchbar";
 import { PAGE_CONTENT_MAX_WIDTH, PAGE_CONTENT_WIDTH } from "../constant";
 import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
 
@@ -59,9 +59,7 @@ const Header: FC = () => {
             }
           >
             <MainMenu isCollapsed={shouldExpandSearchbar} />
-            <ComplexTextSearch
-              setShouldExpandSearchbar={setShouldExpandSearchbar}
-            />
+            <Searchbar setShouldExpandSearchbar={setShouldExpandSearchbar} />
           </Box>
         ) : (
           <MainMenu />

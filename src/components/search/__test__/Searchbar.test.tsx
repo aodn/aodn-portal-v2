@@ -2,7 +2,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import ComplexTextSearch from "../ComplexTextSearch";
+import Searchbar from "../Searchbar";
 import store from "../../common/store/store";
 import { server } from "../../../__mocks__/server";
 
@@ -21,7 +21,7 @@ describe("ComplexTextSearch Component", () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <ComplexTextSearch />
+          <Searchbar />
         </MemoryRouter>
       </Provider>
     );

@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, useCallback, useRef, useState } from "react";
 import { Box, Fade, Paper, Popper, ClickAwayListener } from "@mui/material";
 import InputWithSuggester from "./InputWithSuggester";
-import { borderRadius, color, gap } from "../../styles/constants";
+import { border, borderRadius, color, gap } from "../../styles/constants";
 import SearchbarButtonGroup, {
   SearchbarButtonNames,
 } from "./SearchbarButtonGroup";
@@ -14,13 +14,11 @@ import { pageDefault } from "../common/constants";
 import LocationFilter from "../filter/LocationFilter";
 import Filters from "../filter/Filters";
 
-interface ComplexTextSearchProps {
+interface SearchbarProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
-  setShouldExpandSearchbar,
-}) => {
+const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -94,6 +92,10 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
           display: "flex",
           alignItems: "center",
           height: "100%",
+          border:
+            location.pathname === pageDefault.search
+              ? `${border.sm} ${color.brightBlue.semiTransparentDark}`
+              : "none",
           borderRadius: borderRadius.small,
           paddingY: gap.md,
         }}
@@ -173,4 +175,4 @@ const ComplexTextSearch: FC<ComplexTextSearchProps> = ({
   );
 };
 
-export default ComplexTextSearch;
+export default Searchbar;

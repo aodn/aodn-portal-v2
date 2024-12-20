@@ -231,6 +231,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const CustomPaper = (props: any): ReactNode => {
     return (
       <Paper
+        elevation={location.pathname === pageDefault.search ? 2 : 1}
         sx={{
           backgroundColor: "#fff",
           borderRadius: borderRadius.small,
