@@ -24,6 +24,8 @@ import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "../common/store/hooks";
 import { TEXT_FIELD_MIN_WIDTH } from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
+import { useLocation } from "react-router-dom";
+import { pageDefault } from "../common/constants";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -33,6 +35,7 @@ interface InputWithSuggesterProps {
   setPendingSearch?: React.Dispatch<React.SetStateAction<boolean>>;
   setActiveButton?: Dispatch<React.SetStateAction<SearchbarButtonNames>>;
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
+  setShouldExpandAllButtons?: Dispatch<React.SetStateAction<boolean>>;
   suggesterWidth?: number;
 }
 
@@ -61,8 +64,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   setPendingSearch = () => {},
   setActiveButton = () => {},
   setShouldExpandSearchbar = () => {},
+  setShouldExpandAllButtons = () => {},
   suggesterWidth = 0,
 }) => {
+  const location = useLocation();
+
   const dispatch = useAppDispatch();
 
   const [isSearchbarActive, setIsSearchbarActive] = useState(false);
@@ -163,10 +169,17 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const handleSearchbarOpen = () => {
     setActiveButton(SearchbarButtonNames.Search);
     setIsSearchbarActive(true);
+    if (location.pathname === pageDefault.landing) {
+      setShouldExpandAllButtons(false);
+    }
   };
 
   const handleSearchbarClose = () => {
     setIsSearchbarActive(false);
+    if (location.pathname === pageDefault.landing) {
+      setShouldExpandAllButtons(true);
+    }
+
     setOptions([]);
   };
 
@@ -198,7 +211,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 2], // Vertical offset
+              offset: [0, 8], // Vertical offset
             },
           },
           {
@@ -208,6 +221,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         ]}
         style={{
           width: suggesterWidth,
+          borderRadius: borderRadius.small,
         }}
       />
     );
@@ -217,6 +231,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const CustomPaper = (props: any): ReactNode => {
     return (
       <Paper
+        elevation={location.pathname === pageDefault.search ? 2 : 1}
         sx={{
           backgroundColor: "#fff",
           borderRadius: borderRadius.small,

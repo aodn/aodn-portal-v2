@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import landingImageUrl from "@/assets/images/bg_landing_page.png";
 import Layout from "../../components/layout/layout";
 import BannerOpenAccess from "./subpages/banner/BannerOpenAccess";
-import ComplexTextSearch from "../../components/search/ComplexTextSearch";
+import Searchbar from "../../components/search/Searchbar";
 import SmartPanel from "./subpages/smartpanel/SmartPanel";
 import StoryBoardPanel from "./subpages/storyboard/StoryBoardPanel";
 import { color } from "../../styles/constants";
@@ -70,7 +70,7 @@ const LandingPage: FC = () => {
         }}
       >
         <BannerOpenAccess />
-        <ComplexTextSearch />
+        <Searchbar />
         <Box
           sx={{
             display: "flex",

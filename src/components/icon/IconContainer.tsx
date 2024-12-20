@@ -1,12 +1,12 @@
+import { FC } from "react";
 import { Paper, SxProps, Theme, Typography } from "@mui/material";
 import { border, color, fontSize } from "../../styles/constants";
-import { FC } from "react";
 
 interface IconContainerProps {
   icon?: () => JSX.Element;
-  label: string;
+  label?: string;
   imgUrl?: string;
-  sxProps?: SxProps<Theme>;
+  sx?: SxProps<Theme>;
 }
 
 const defaultSxProps = {
@@ -16,12 +16,7 @@ const defaultSxProps = {
   border: `${border.sm} ${color.blue.darkSemiTransparent}`,
 };
 
-const IconContainer: FC<IconContainerProps> = ({
-  icon = null,
-  label,
-  imgUrl = "",
-  sxProps = {} as SxProps<Theme>,
-}) => {
+const IconContainer: FC<IconContainerProps> = ({ icon, label, imgUrl, sx }) => {
   return (
     <Paper
       elevation={0}
@@ -31,7 +26,7 @@ const IconContainer: FC<IconContainerProps> = ({
         justifyContent: "center",
         alignItems: "center",
         ...defaultSxProps,
-        ...sxProps,
+        ...sx,
       }}
     >
       {icon && icon()}
@@ -46,9 +41,11 @@ const IconContainer: FC<IconContainerProps> = ({
           }}
         />
       )}
-      <Typography fontSize={fontSize.icon} sx={{ paddingTop: 0 }}>
-        {label}
-      </Typography>
+      {label && (
+        <Typography fontSize={fontSize.icon} sx={{ paddingTop: 0 }}>
+          {label}
+        </Typography>
+      )}
     </Paper>
   );
 };

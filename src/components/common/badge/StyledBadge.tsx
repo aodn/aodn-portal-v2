@@ -18,21 +18,21 @@ type PositionStyle = {
 const badgePosition: Record<Position, PositionStyle> = {
   right: { top: "50%", right: " -10%" },
   topRight: { top: " 20%", right: " 10%" },
-  left: { top: " 50px", left: " -10%" },
+  left: { top: "50%", left: " -10%" },
 };
 
 interface StyledBadgeProps {
   position?: Position;
-  color?: string;
+  badgeColor?: string;
 }
 
 const StyledBadge = styled(Badge)<StyledBadgeProps>(
-  ({ sx, position = Position.Left, color = colors.brightBlue.dark }) => ({
+  ({ sx, position = Position.Left, badgeColor = colors.brightBlue.dark }) => ({
     "& .MuiBadge-badge": {
-      padding: "0 4px",
-      border: `2px solid ${color}`,
+      padding: "0 2px",
+      border: `2px solid ${badgeColor}`,
       color: "white",
-      backgroundColor: color,
+      backgroundColor: badgeColor,
       ...badgePosition[position],
       ...sx,
     },

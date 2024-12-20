@@ -294,6 +294,22 @@ const calculateScore = (
   const pump = text ? (text.length / 2 > 50 ? 50 : text.length / 2) : 0;
   return base ? Number(base) + Number(pump) : Number(pump);
 };
+
+// Helper function to merge search terms into search text
+const mergeToSearchText = (
+  values: string[] | undefined,
+  searchText: string | undefined
+): string[] => {
+  const terms: string[] = [];
+  if (searchText) {
+    terms.push(searchText);
+  }
+  if (values && values.length > 0) {
+    terms.push(...values);
+  }
+  return terms;
+};
+
 // Given a ParameterState object, we convert it to the correct Restful parameters
 // always call this function and do not handcraft it elsewhere, some control isn't
 // part the ParameterState and therefore express as optional argument here
@@ -302,8 +318,15 @@ const createSearchParamFrom = (
   control?: SearchControl
 ): SearchParameters => {
   const p: SearchParameters = {};
-  p.text = i.searchText;
   p.sortby = i.sortby;
+
+  // Merge searchText with platforms
+  // This is a temporary solution to deal with platform since ogcapi doesn't support platform filter so just merge it into search text for a fuzzy search
+  // TODO: need to remove this block if ogcapi support platform filter
+  const searchTerms = mergeToSearchText(i.platform, i.searchText);
+  if (searchTerms.length > 0) {
+    p.text = searchTerms.join(" ");
+  }
 
   const c = mergeWithDefaults(
     {
@@ -382,12 +405,22 @@ const createSearchParamFrom = (
       p.filter = appendFilter(p.filter, parameterVocabFilter);
     }
   }
+
+  // TODO: add platform filter if ogcapi support it
+  // if (i.platform && i.platform.length > 0) {
+  //   const f = cqlDefaultFilters.get(
+  //     "UPDATE_PLATFORM_FILTER_VARIABLES"
+  //   ) as PlatformFilter;
+  //   p.filter = appendFilter(p.filter, f(i.platform));
+  // }
+
   return p;
 };
 
 export {
   createSuggesterParamFrom,
   createSearchParamFrom,
+  mergeToSearchText,
   fetchSuggesterOptions,
   fetchResultWithStore,
   fetchResultNoStore,

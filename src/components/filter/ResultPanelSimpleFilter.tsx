@@ -1,20 +1,15 @@
 import { FC } from "react";
 import { Grid, Paper, SxProps, Typography } from "@mui/material";
-import {
-  border,
-  borderRadius,
-  color,
-  fontSize,
-} from "../../../styles/constants";
-import { formatNumber } from "../../../utils/StringUtils";
+import { border, borderRadius, color, fontSize } from "../../styles/constants";
+import { formatNumber } from "../../utils/StringUtils";
 import ResultListLayoutButton, {
   ResultListLayoutButtonType,
   SearchResultLayoutEnum,
-} from "../buttons/ResultListLayoutButton";
+} from "../common/buttons/ResultListLayoutButton";
 import ResultListSortButton, {
   ResultListSortButtonType,
   SortResultEnum,
-} from "../buttons/ResultListSortButton";
+} from "../common/buttons/ResultListSortButton";
 
 export interface ResultPanelSimpleFilterType
   extends ResultListLayoutButtonType<SearchResultLayoutEnum>,

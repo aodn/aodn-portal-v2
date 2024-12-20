@@ -26,13 +26,15 @@ export type ParameterVocabsIn = SingleArgumentFunction<
   string | undefined
 >;
 export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
+export type PlatformFilter = SingleArgumentFunction<Array<string>, string>;
 export type FilterTypes =
   | string
   | ParameterVocabsIn
   | TemporalDuring
   | TemporalAfterOrBefore
   | PolygonOperation
-  | UpdateFrequency;
+  | UpdateFrequency
+  | PlatformFilter;
 
 const funcUpdateFrequency: UpdateFrequency = (freq: DatasetFrequency) =>
   `update_frequency='${freq}'`;
@@ -73,6 +75,14 @@ const funcParameterVocabs: ParameterVocabsIn = (vocabs: Array<Vocab>) => {
   }
   return `(${parameterVocabLabels.join(" or ")})`;
 };
+
+const funcPlatformFilter: PlatformFilter = (platforms: Array<string>) => {
+  if (!platforms || platforms.length === 0) return "";
+
+  const platformQueries = platforms.map((platform) => `platform='${platform}'`);
+  return `(${platformQueries.join(" or ")})`;
+};
+
 /**
  * The CQL filter format for search dataset given start/end date
  * @param s
@@ -95,6 +105,7 @@ cqlDefaultFilters
   .set("INTERSECT_POLYGON", funcIntersectPolygon)
   .set("BBOX_POLYGON", funcBBoxPolygon)
   .set("BBOX_POLYGON_OR_EMPTY_EXTENTS", funcBBoxPolygonOrEmptyExtents)
-  .set("UPDATE_FREQUENCY", funcUpdateFrequency);
+  .set("UPDATE_FREQUENCY", funcUpdateFrequency)
+  .set("UPDATE_PLATFORM_FILTER_VARIABLES", funcPlatformFilter);
 
 export { cqlDefaultFilters };

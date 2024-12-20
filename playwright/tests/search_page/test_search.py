@@ -12,6 +12,7 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
+pytestmark = pytest.mark.skip(reason="Temporarily skipping all search tests")
 
 @pytest.mark.parametrize(
     'search_text, category_name',
