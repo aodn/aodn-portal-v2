@@ -1,15 +1,15 @@
-import { DownloadConditionType } from "../../pages/detail-page/context/DownloadDefinitions";
-import React, { useCallback } from "react";
+import React from "react";
+import {
+  DownloadConditionType,
+  IDownloadCondition,
+} from "../../pages/detail-page/context/DownloadDefinitions";
 import { Grid, IconButton, Typography, useTheme } from "@mui/material";
 import BBOX_IMG from "../../assets/icons/bbox.png";
 import TIME_RANGE_IMG from "../../assets/images/time-range.png";
 import CloseIcon from "@mui/icons-material/Close";
-import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 
-interface DownloadConditionBoxProps {
-  type: DownloadConditionType;
+interface DownloadConditionBoxProps extends IDownloadCondition {
   children: React.ReactNode;
-  conditionId: string;
 }
 
 const getIcon = (type: DownloadConditionType) => {
@@ -41,15 +41,9 @@ const getTitle = (type: DownloadConditionType) => {
 const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
   type,
   children,
-  conditionId,
+  removeCallback,
 }) => {
   const theme = useTheme();
-  const { deleteDownloadConditionBy } = useDetailPageContext();
-
-  const onConditionRemove = useCallback(() => {
-    deleteDownloadConditionBy(conditionId);
-  }, [conditionId, deleteDownloadConditionBy]);
-
   return (
     <Grid
       container
@@ -90,7 +84,7 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
         </Grid>
       </Grid>
       <Grid item md={1}>
-        <IconButton onClick={onConditionRemove}>
+        <IconButton onClick={removeCallback}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </Grid>

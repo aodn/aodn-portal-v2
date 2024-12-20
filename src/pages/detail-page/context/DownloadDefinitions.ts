@@ -8,6 +8,7 @@ export enum DownloadConditionType {
 export interface IDownloadCondition {
   type: DownloadConditionType;
   id: string;
+  removeCallback?: () => void;
 }
 
 export class DateRangeCondition implements IDownloadCondition {
@@ -27,10 +28,12 @@ export class BBoxCondition implements IDownloadCondition {
   type: DownloadConditionType;
   bbox: BBox;
   id: string;
+  removeCallback?: () => void;
 
-  constructor(bbox: BBox, id: string) {
+  constructor(id: string, bbox: BBox, removeCallback?: () => void) {
     this.type = DownloadConditionType.BBOX;
     this.id = id;
     this.bbox = bbox;
+    this.removeCallback = removeCallback;
   }
 }

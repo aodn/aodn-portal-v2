@@ -32,7 +32,6 @@ const AbstractAndDownloadPanel: FC = () => {
     featureCollection,
     downloadConditions,
     setDownloadConditions,
-    mapDraw,
   } = useDetailPageContext();
 
   const abstract = collection?.description ? collection.description : "";
@@ -146,7 +145,6 @@ const AbstractAndDownloadPanel: FC = () => {
                       menu={
                         <DrawRectControl
                           setDownloadConditions={setDownloadConditions}
-                          draw={mapDraw}
                         />
                       }
                     />

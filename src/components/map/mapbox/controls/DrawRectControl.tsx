@@ -27,13 +27,11 @@ interface DrawControlProps extends ControlProps {
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
   ) => void;
-  draw: MapboxDraw;
 }
 
 const DrawRectControl: React.FC<DrawControlProps> = ({
   map,
   setDownloadConditions,
-  draw,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const mapDraw = useMemo<MapboxDraw>(
@@ -87,7 +85,7 @@ const DrawRectControl: React.FC<DrawControlProps> = ({
               const polygon = feature.geometry as Polygon;
               const bbox = turf.bbox(polygon);
               const id = _.toString(feature.id);
-              return new BBoxCondition(bbox, id);
+              return new BBoxCondition(id, bbox, () => mapDraw.delete(id));
             }) || [];
         setDownloadConditions(DownloadConditionType.BBOX, bboxes);
       };

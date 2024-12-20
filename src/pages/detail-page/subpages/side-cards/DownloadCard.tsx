@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -37,8 +37,8 @@ const options = [
 const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const { isCollectionNotFound } = useDetailPageContext();
-  const { downloadConditions } = useDetailPageContext();
+  const { downloadConditions, isCollectionNotFound, removeDownloadCondition } =
+    useDetailPageContext();
 
   const bboxConditions: BBoxCondition[] = useMemo(() => {
     const bboxConditions = downloadConditions.filter(
@@ -63,6 +63,14 @@ const DownloadCard = () => {
       border: `${border.xs} ${color.blue.dark}`,
     }),
     [theme]
+  );
+
+  const handleRemove = useCallback(
+    (c: BBoxCondition) => {
+      c.removeCallback && c.removeCallback();
+      removeDownloadCondition(c);
+    },
+    [removeDownloadCondition]
   );
 
   return (
@@ -110,7 +118,11 @@ const DownloadCard = () => {
         <AccordionDetails>
           {bboxConditions.map((bboxCondition, index) => {
             return (
-              <BBoxConditionBox key={index} bboxCondition={bboxCondition} />
+              <BBoxConditionBox
+                key={index}
+                bboxCondition={bboxCondition}
+                onRemove={() => handleRemove(bboxCondition)}
+              />
             );
           })}
           {dateRangeCondition.map((dateRangeCondition, index) => {
