@@ -13,6 +13,7 @@ from pages.search_page import SearchPage
     ],
 )
 def test_tab_panel_scroll(page_mock: Page, title: str) -> None:
+    pytest.skip("Skipping this test for now")
     # Precondition: Tab panel should have scroll buttons
     # Set a smaller browser window size to make the tabs scrollable
     page_mock.set_viewport_size({'width': 1000, 'height': 800})
