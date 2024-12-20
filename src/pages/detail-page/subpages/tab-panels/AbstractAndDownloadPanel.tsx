@@ -21,10 +21,31 @@ import {
   DateRangeCondition,
   DownloadConditionType,
 } from "../../context/DownloadDefinitions";
+import { dateDefault } from "../../../../components/common/constants";
+import { FeatureCollection, GeoJsonProperties, Point } from "geojson";
 
 const TRUNCATE_COUNT = 800;
 
-export const SIMPLE_DATE_FORMAT = "MM-YYYY";
+const getMinMaxDateStamps = (
+  featureCollection: FeatureCollection<Point> | undefined
+) => {
+  let minDate = dayjs(dateDefault.min);
+  let maxDate = dayjs(dateDefault.max);
+
+  if (featureCollection) {
+    featureCollection.features?.forEach((feature) => {
+      const start = dayjs(feature.properties?.startTime);
+      const end = dayjs(feature.properties?.endTime);
+      if (start.isBefore(minDate)) {
+        minDate = start;
+      }
+      if (end.isAfter(maxDate)) {
+        maxDate = end;
+      }
+    });
+  }
+  return [minDate, maxDate];
+};
 
 const AbstractAndDownloadPanel: FC = () => {
   const {
@@ -34,6 +55,7 @@ const AbstractAndDownloadPanel: FC = () => {
     setDownloadConditions,
   } = useDetailPageContext();
 
+  const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
 
@@ -49,8 +71,14 @@ const AbstractAndDownloadPanel: FC = () => {
       return featureCollection;
     }
     const dateRangeCondition = dateRangeConditionGeneric as DateRangeCondition;
-    const conditionStart = dayjs(dateRangeCondition.start, SIMPLE_DATE_FORMAT);
-    const conditionEnd = dayjs(dateRangeCondition.end, SIMPLE_DATE_FORMAT);
+    const conditionStart = dayjs(
+      dateRangeCondition.start,
+      dateDefault.SIMPLE_DATE_FORMAT
+    );
+    const conditionEnd = dayjs(
+      dateRangeCondition.end,
+      dateDefault.SIMPLE_DATE_FORMAT
+    );
 
     const filteredFeatures = featureCollection.features?.filter((feature) => {
       const start = dayjs(feature.properties?.startTime, "YYYY-MM");
@@ -64,26 +92,6 @@ const AbstractAndDownloadPanel: FC = () => {
     };
   }, [downloadConditions, featureCollection]);
 
-  const getMinMaxDateStamps = useCallback(() => {
-    let minDate = dayjs();
-    let maxDate = dayjs("10-1800", SIMPLE_DATE_FORMAT);
-
-    if (featureCollection) {
-      featureCollection.features?.forEach((feature) => {
-        const start = dayjs(feature.properties?.startTime);
-        const end = dayjs(feature.properties?.endTime);
-        if (start.isBefore(minDate)) {
-          minDate = start;
-        }
-        if (end.isAfter(maxDate)) {
-          maxDate = end;
-        }
-      });
-    }
-    return [minDate, maxDate];
-  }, [featureCollection]);
-
-  const [minDateStamp, maxDateStamp] = getMinMaxDateStamps();
   const handleMapChange = useCallback(
     (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
       // implement later
@@ -92,9 +100,8 @@ const AbstractAndDownloadPanel: FC = () => {
     []
   );
 
-  if (!collection) return;
   return (
-    <>
+    collection && (
       <Grid container>
         <Grid item xs={12}>
           <Stack direction="column">
@@ -151,8 +158,12 @@ const AbstractAndDownloadPanel: FC = () => {
                     <MenuControl
                       menu={
                         <DateRange
-                          minDate={minDateStamp.format(SIMPLE_DATE_FORMAT)}
-                          maxDate={maxDateStamp.format(SIMPLE_DATE_FORMAT)}
+                          minDate={minDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
+                          maxDate={maxDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
                           setDownloadConditions={setDownloadConditions}
                         />
                       }
@@ -169,7 +180,7 @@ const AbstractAndDownloadPanel: FC = () => {
           </Stack>
         </Grid>
       </Grid>
-    </>
+    )
   );
 };
 

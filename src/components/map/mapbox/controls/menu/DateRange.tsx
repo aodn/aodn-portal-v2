@@ -9,10 +9,10 @@ import { ControlProps } from "./Definition";
 import { Grid, IconButton, Typography } from "@mui/material";
 import { MapControl } from "./MenuControl";
 import dayjs from "dayjs";
-import { SIMPLE_DATE_FORMAT } from "../../../../../pages/detail-page/subpages/tab-panels/AbstractAndDownloadPanel";
 import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
 import _ from "lodash";
 import PlainSlider from "../../../../common/slider/PlainSlider";
+import { dateDefault } from "../../../../common/constants";
 
 interface DateSliderProps {
   minDate: string;
@@ -35,8 +35,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
   onDateRangeChange,
 }) => {
   const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
-    dateToValue(dayjs(minDate, SIMPLE_DATE_FORMAT)),
-    dateToValue(dayjs(maxDate, SIMPLE_DATE_FORMAT)),
+    dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT)),
+    dateToValue(dayjs(maxDate, dateDefault.SIMPLE_DATE_FORMAT)),
   ]);
   const parentRef = useRef<HTMLDivElement | null>(null);
 
@@ -80,12 +80,12 @@ const DateSlider: React.FC<DateSliderProps> = ({
       <Grid item md={8} container sx={{ paddingTop: "10px" }}>
         <PlainSlider
           value={dateRangeStamp}
-          min={dateToValue(dayjs(minDate, SIMPLE_DATE_FORMAT))}
-          max={dateToValue(dayjs(maxDate, SIMPLE_DATE_FORMAT))}
+          min={dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT))}
+          max={dateToValue(dayjs(maxDate, dateDefault.SIMPLE_DATE_FORMAT))}
           onChange={handleSliderChange}
           valueLabelDisplay="auto"
           valueLabelFormat={(value: number) =>
-            valueToDate(value).format(SIMPLE_DATE_FORMAT)
+            valueToDate(value).format(dateDefault.SIMPLE_DATE_FORMAT)
           }
         />
       </Grid>
@@ -113,8 +113,12 @@ const DateRange: React.FC<DateRangeControlProps> = ({
 
   const onDateRangeChange = useCallback(
     (dateRangeStamps: number[]) => {
-      const start = dayjs(dateRangeStamps[0]).format(SIMPLE_DATE_FORMAT);
-      const end = dayjs(dateRangeStamps[1]).format(SIMPLE_DATE_FORMAT);
+      const start = dayjs(dateRangeStamps[0]).format(
+        dateDefault.SIMPLE_DATE_FORMAT
+      );
+      const end = dayjs(dateRangeStamps[1]).format(
+        dateDefault.SIMPLE_DATE_FORMAT
+      );
 
       if (minDate === start && maxDate === end) {
         setDownloadConditions(DownloadConditionType.DATE_RANGE, []);

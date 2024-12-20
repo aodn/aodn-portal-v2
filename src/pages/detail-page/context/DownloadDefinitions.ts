@@ -1,4 +1,6 @@
 import { BBox } from "geojson";
+import dayjs from "dayjs";
+import { dateDefault } from "../../../components/common/constants";
 
 export enum DownloadConditionType {
   BBOX = "bbox",
@@ -14,11 +16,14 @@ export interface IDownloadConditionCallback {
   removeCallback?: () => void;
 }
 
-export class DateRangeCondition implements IDownloadCondition {
+export class DateRangeCondition
+  implements IDownloadCondition, IDownloadConditionCallback
+{
   type: DownloadConditionType = DownloadConditionType.DATE_RANGE;
   id: string;
   start: string;
   end: string;
+  removeCallback?: () => void;
 
   constructor(start: string, end: string, id: string) {
     this.id = id;
