@@ -1,3 +1,4 @@
+// TODO: this component hasn't integrated in tab-filter yet, wait for ogcapi
 import { FC } from "react";
 import { Box, Grid, SxProps, Theme } from "@mui/material";
 import DepthSlider from "../../common/slider/DepthSlider";

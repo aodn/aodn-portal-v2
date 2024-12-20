@@ -50,6 +50,10 @@ const checkCount = ({
         count += filterObj.parameterVocabs.length;
       }
 
+      if (filterObj.platform) {
+        count += filterObj.platform.length;
+      }
+
       if (filterObj.updateFreq !== undefined) {
         count++;
       }

@@ -11,13 +11,14 @@ import {
 import {
   updateImosOnly,
   updateParameterVocabs,
+  updatePlatform,
   updateUpdateFreq,
   Vocab,
 } from "../common/store/componentParamReducer";
 import store, { getComponentState } from "../common/store/store";
 import { Box, Button, IconButton, SxProps } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { border, color, gap, margin } from "../../styles/constants";
+import { border, color, gap } from "../../styles/constants";
 import TabsPanelContainer, { Tab } from "../common/tab/TabsPanelContainer";
 import ThemeFilter from "./tab-filters/ThemeFilter";
 import PlatformFilter from "./tab-filters/PlatformFilter";
@@ -25,7 +26,6 @@ import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
 import { DatasetFrequency } from "../common/store/searchReducer";
 import { useAppDispatch } from "../common/store/hooks";
-import { bgcolor } from "@mui/system";
 
 export interface ItemButton {
   value: DatasetFrequency | string;
@@ -53,12 +53,34 @@ interface FiltersProps {
   sx?: SxProps;
 }
 
+const checkBadge = (filters: Filters, tabName: string): boolean => {
+  switch (tabName) {
+    case "themes":
+      return !!filters.parameterVocabs?.length;
+
+    case "platform":
+      return !!filters.platform?.length;
+
+    case "organisation":
+      return !!filters.organisation?.length;
+
+    case "data-settings":
+      return !!(
+        filters.dataDeliveryFrequency?.length ||
+        filters.dataDeliveryMode?.length ||
+        filters.dataService?.length
+      );
+
+    default:
+      return false;
+  }
+};
+
 const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   const dispatch = useAppDispatch();
 
-  const { parameterVocabs, updateFreq, isImosOnlyDataset } = getComponentState(
-    store.getState()
-  );
+  const { parameterVocabs, platform, updateFreq, isImosOnlyDataset } =
+    getComponentState(store.getState());
 
   const [filters, setFilters] = useState<Filters>({});
 
@@ -68,11 +90,13 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         label: "Themes",
         value: "themes",
         component: <ThemeFilter filters={filters} setFilters={setFilters} />,
+        showBadge: checkBadge(filters, "themes"),
       },
       {
         label: "Platform",
         value: "platform",
         component: <PlatformFilter filters={filters} setFilters={setFilters} />,
+        showBadge: checkBadge(filters, "platform"),
       },
       {
         label: "Organisation",
@@ -80,6 +104,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         component: (
           <OrganisationFilter filters={filters} setFilters={setFilters} />
         ),
+        showBadge: checkBadge(filters, "organisation"),
       },
       {
         label: "Data Settings",
@@ -87,6 +112,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         component: (
           <DataSettingsFilter filters={filters} setFilters={setFilters} />
         ),
+        showBadge: checkBadge(filters, "data-settings"),
       },
     ];
   }, [filters, setFilters]);
@@ -104,6 +130,11 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         dispatch(updateImosOnly(true));
       } else {
         dispatch(updateImosOnly(false));
+      }
+      if (filters.platform) {
+        dispatch(updatePlatform(filters.platform));
+      } else {
+        dispatch(updatePlatform([]));
       }
       // Since the ogcapi only accept single string for dataDeliveryFrequency, just update with the first item in the array.
       // TODO: need to confirm if we need multiple selection
@@ -133,6 +164,12 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         parameterVocabs,
       }));
     }
+    if (platform) {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        platform,
+      }));
+    }
     if (updateFreq) {
       setFilters((prevFilters) => ({
         ...prevFilters,
@@ -145,7 +182,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         organisation: ["imos"],
       }));
     }
-  }, [isImosOnlyDataset, parameterVocabs, updateFreq]);
+  }, [isImosOnlyDataset, parameterVocabs, platform, updateFreq]);
 
   return (
     <>

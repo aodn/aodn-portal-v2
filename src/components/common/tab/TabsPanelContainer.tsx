@@ -9,6 +9,7 @@ export interface Tab {
   label: string;
   value: string;
   component: JSX.Element;
+  showBadge?: boolean;
 }
 
 interface TabPanelProps {
@@ -85,6 +86,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
             label={tab.label}
             {...a11yProps(index)}
             sx={{ textTransform: "none" }}
+            showBadge={tab.showBadge}
             disabled={isCollectionNotFound}
           />
         ))}

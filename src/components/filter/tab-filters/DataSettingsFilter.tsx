@@ -103,7 +103,8 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
 
   return (
     <Stack direction="column" spacing={2} sx={sx}>
-      <Box>
+      {/* TODO: Comment blocks below and wait for ogcapi, can restore it in the future  */}
+      {/* <Box>
         <Typography
           p={0}
           pl={1}
@@ -126,7 +127,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
             </StyledToggleButton>
           ))}
         </StyledToggleButtonGroup>
-      </Box>
+      </Box> */}
       <Box>
         <Typography
           p={0}
@@ -151,7 +152,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
           ))}
         </StyledToggleButtonGroup>
       </Box>
-      <Box>
+      {/* <Box>
         <Typography
           p={0}
           pl={1}
@@ -174,7 +175,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
             </StyledToggleButton>
           ))}
         </StyledToggleButtonGroup>
-      </Box>
+      </Box> */}
     </Stack>
   );
 };

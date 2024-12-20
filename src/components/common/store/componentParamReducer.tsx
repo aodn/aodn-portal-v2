@@ -4,7 +4,7 @@
  */
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
-import { DatasetFrequency } from "./searchReducer";
+import { DatasetFrequency, mergeToSearchText } from "./searchReducer";
 import { MapDefaultConfig } from "../../map/mapbox/constants";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
@@ -15,6 +15,7 @@ const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
 const UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE =
   "UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE";
+const UPDATE_PLATFORM_FILTER_VARIABLE = "UPDATE_PLATFORM_FILTER_VARIABLE";
 const UPDATE_UPDATE_FREQ_VARIABLE = "UPDATE_UPDATE_FREQ_VARIABLE";
 const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
 const UPDATE_ZOOM_VARIABLE = "UPDATE_ZOOM_VARIABLE";
@@ -34,6 +35,7 @@ export interface ParameterState {
   dateTimeFilterRange?: DataTimeFilterRange;
   searchText?: string;
   parameterVocabs?: Array<Vocab>;
+  platform?: Array<string>;
   updateFreq?: DatasetFrequency | undefined;
   sortby?: string;
   zoom?: number;
@@ -76,6 +78,13 @@ const updateSearchText = (q: string): ActionType => {
   return {
     type: UPDATE_SEARCH_TEXT_FILTER_VARIABLE,
     payload: { searchText: q } as ParameterState,
+  };
+};
+
+const updatePlatform = (platform: Array<string>): ActionType => {
+  return {
+    type: UPDATE_PLATFORM_FILTER_VARIABLE,
+    payload: { platform: platform } as ParameterState,
   };
 };
 
@@ -199,6 +208,11 @@ const paramReducer = (
       return {
         ...state,
         isImosOnlyDataset: action.payload.isImosOnlyDataset,
+      };
+    case UPDATE_PLATFORM_FILTER_VARIABLE:
+      return {
+        ...state,
+        platform: action.payload.platform,
       };
     case UPDATE_POLYGON_FILTER_VARIABLE:
       return {
@@ -360,6 +374,7 @@ export {
   updateImosOnly,
   updateFilterPolygon,
   updateParameterVocabs,
+  updatePlatform,
   updateParameterStates,
   updateSortBy,
   updateUpdateFreq,

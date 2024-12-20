@@ -12,7 +12,6 @@ import AircraftIcon from "../../icon/platform/AircraftIcon";
 import BioPlatformIcon from "../../icon/platform/BioPlatformIcon";
 import RadarIcon from "../../icon/platform/RadarIcon";
 import AUVIcon from "../../icon/platform/AUVIcon";
-import { color } from "../../../styles/constants";
 
 interface PlatformFilterProps extends TabFilterType {
   sx?: SxProps;

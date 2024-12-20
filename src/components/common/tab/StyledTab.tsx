@@ -7,10 +7,33 @@ import {
   fontWeight,
   margin,
 } from "../../../styles/constants";
+import StyledBadge, { Position } from "../badge/StyledBadge";
 
-const StyledTab = styled((props: TabProps) => (
-  <Tab disableRipple {...props} sx={{ margin: `${margin.xlg} ${margin.lg}` }} />
-))(() => ({
+interface StyledTabProps extends TabProps {
+  showBadge?: boolean;
+  badgePosition?: Position;
+  badgeColor?: string;
+}
+
+const StyledTab = styled((props: StyledTabProps) => {
+  const {
+    showBadge = false,
+    badgePosition = Position.TopRight,
+    badgeColor = color.brightBlue.dark,
+    ...tabProps
+  } = props;
+
+  return (
+    <StyledBadge
+      variant="dot"
+      position={badgePosition}
+      badgeColor={badgeColor}
+      invisible={!showBadge}
+    >
+      <Tab {...tabProps} sx={{ margin: `${margin.xlg} ${margin.lg}` }} />
+    </StyledBadge>
+  );
+})(() => ({
   textTransform: "none",
   fontWeight: fontWeight.regular,
   color: fontColor.gray.dark,
