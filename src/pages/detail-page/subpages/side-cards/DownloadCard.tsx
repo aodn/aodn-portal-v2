@@ -26,6 +26,8 @@ import {
   BBoxCondition,
   DownloadConditionType,
   DateRangeCondition,
+  IDownloadCondition,
+  IDownloadConditionCallback,
 } from "../../context/DownloadDefinitions";
 import DateRangeConditionBox from "../../../../components/box/DateRangeConditionBox";
 
@@ -48,10 +50,10 @@ const DownloadCard = () => {
   }, [downloadConditions]);
 
   const dateRangeCondition: DateRangeCondition[] = useMemo(() => {
-    const timerangeConditions = downloadConditions.filter(
+    const timeRangeConditions = downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
     );
-    return timerangeConditions as DateRangeCondition[];
+    return timeRangeConditions as DateRangeCondition[];
   }, [downloadConditions]);
 
   const selectSxProps = useMemo(
@@ -66,7 +68,7 @@ const DownloadCard = () => {
   );
 
   const handleRemove = useCallback(
-    (c: BBoxCondition) => {
+    (c: IDownloadConditionCallback & IDownloadCondition) => {
       c.removeCallback && c.removeCallback();
       removeDownloadCondition(c);
     },
@@ -130,6 +132,7 @@ const DownloadCard = () => {
               <DateRangeConditionBox
                 key={index}
                 dateRangeCondition={dateRangeCondition}
+                onRemove={() => handleRemove(dateRangeCondition)}
               />
             );
           })}

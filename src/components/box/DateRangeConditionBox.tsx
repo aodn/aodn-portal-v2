@@ -8,9 +8,11 @@ import { Typography } from "@mui/material";
 
 interface DateRangeConditionBoxProps {
   dateRangeCondition: DateRangeCondition;
+  onRemove?: () => void;
 }
 
 const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
+  onRemove,
   dateRangeCondition,
 }) => {
   const start = useMemo(
@@ -20,8 +22,9 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
   const end = useMemo(() => dateRangeCondition.end, [dateRangeCondition.end]);
   return (
     <DownloadConditionBox
-      type={DownloadConditionType.DATE_RANGE}
       id={dateRangeCondition.id}
+      type={DownloadConditionType.DATE_RANGE}
+      removeCallback={() => onRemove && onRemove()}
     >
       <Typography
         sx={{

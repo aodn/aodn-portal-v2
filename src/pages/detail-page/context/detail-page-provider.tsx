@@ -51,7 +51,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     (condition: IDownloadCondition) => {
       _setDownloadConditions((prev) =>
         prev.filter(
-          (cs) => cs.type === condition.type && cs.id !== condition.id
+          (cs) => !(cs.type === condition.type && cs.id === condition.id)
         )
       );
     },

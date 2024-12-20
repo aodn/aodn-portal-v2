@@ -2,13 +2,16 @@ import React from "react";
 import {
   DownloadConditionType,
   IDownloadCondition,
+  IDownloadConditionCallback,
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import { Grid, IconButton, Typography, useTheme } from "@mui/material";
 import BBOX_IMG from "../../assets/icons/bbox.png";
 import TIME_RANGE_IMG from "../../assets/images/time-range.png";
 import CloseIcon from "@mui/icons-material/Close";
 
-interface DownloadConditionBoxProps extends IDownloadCondition {
+interface DownloadConditionBoxProps
+  extends IDownloadCondition,
+    IDownloadConditionCallback {
   children: React.ReactNode;
 }
 
