@@ -27,14 +27,14 @@ export interface ControlProps {
   onEvent?: (...args: any[]) => void;
 }
 
-export type Menus = React.ReactElement<
+export type MapControlType = React.ReactElement<
   ControlProps,
   string | React.JSXElementConstructor<any>
 >;
 
 export interface MenuClickedEvent {
   event: MouseEvent;
-  component: Menus;
+  component: MapControlType;
 }
 
 export interface BookmarkEvent {

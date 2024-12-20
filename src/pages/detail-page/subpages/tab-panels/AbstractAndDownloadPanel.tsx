@@ -15,7 +15,7 @@ import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
-import DateRangeControl from "../../../../components/map/mapbox/controls/DateRangeControl/DateRangeControl";
+import DateRange from "../../../../components/map/mapbox/controls/menu/DateRange";
 import dayjs from "dayjs";
 import {
   DateRangeCondition,
@@ -148,10 +148,14 @@ const AbstractAndDownloadPanel: FC = () => {
                         />
                       }
                     />
-                    <DateRangeControl
-                      minDate={minDateStamp.format(SIMPLE_DATE_FORMAT)}
-                      maxDate={maxDateStamp.format(SIMPLE_DATE_FORMAT)}
-                      setDownloadConditions={setDownloadConditions}
+                    <MenuControl
+                      menu={
+                        <DateRange
+                          minDate={minDateStamp.format(SIMPLE_DATE_FORMAT)}
+                          maxDate={maxDateStamp.format(SIMPLE_DATE_FORMAT)}
+                          setDownloadConditions={setDownloadConditions}
+                        />
+                      }
                     />
                   </Controls>
                   <Layers>

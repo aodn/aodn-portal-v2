@@ -1,15 +1,32 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Grid, Typography } from "@mui/material";
-import PlainSlider from "../../../../common/slider/PlainSlider";
-import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
+import timeRange from "../../../../../assets/images/time-range.png";
+import {
+  DateRangeCondition,
+  DownloadConditionType,
+  IDownloadCondition,
+} from "../../../../../pages/detail-page/context/DownloadDefinitions";
+import { ControlProps } from "./Definition";
+import { Grid, IconButton, Typography } from "@mui/material";
+import { MapControl } from "./MenuControl";
 import dayjs from "dayjs";
-import _ from "lodash";
 import { SIMPLE_DATE_FORMAT } from "../../../../../pages/detail-page/subpages/tab-panels/AbstractAndDownloadPanel";
+import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
+import _ from "lodash";
+import PlainSlider from "../../../../common/slider/PlainSlider";
 
 interface DateSliderProps {
   minDate: string;
   maxDate: string;
   onDateRangeChange: (dateRangeStamp: number[]) => void;
+}
+
+interface DateRangeControlProps extends ControlProps {
+  minDate: string;
+  maxDate: string;
+  setDownloadConditions: (
+    type: DownloadConditionType,
+    conditions: IDownloadCondition[]
+  ) => void;
 }
 
 const DateSlider: React.FC<DateSliderProps> = ({
@@ -86,4 +103,59 @@ const DateSlider: React.FC<DateSliderProps> = ({
   );
 };
 
-export default DateSlider;
+const DateRange: React.FC<DateRangeControlProps> = ({
+  minDate,
+  maxDate,
+  setDownloadConditions,
+  map,
+}) => {
+  const [isShowingSelector, setIsShowingSelector] = useState(false);
+
+  const onDateRangeChange = useCallback(
+    (dateRangeStamps: number[]) => {
+      const start = dayjs(dateRangeStamps[0]).format(SIMPLE_DATE_FORMAT);
+      const end = dayjs(dateRangeStamps[1]).format(SIMPLE_DATE_FORMAT);
+
+      if (minDate === start && maxDate === end) {
+        setDownloadConditions(DownloadConditionType.DATE_RANGE, []);
+        return;
+      }
+
+      const dateRangeCondition = new DateRangeCondition(
+        start,
+        end,
+        "date_range"
+      );
+      setDownloadConditions(DownloadConditionType.DATE_RANGE, [
+        dateRangeCondition,
+      ]);
+    },
+    [maxDate, minDate, setDownloadConditions]
+  );
+
+  useEffect(() => {
+    if (isShowingSelector) {
+      const slider: MapControl = new MapControl(
+        (
+          <DateSlider
+            minDate={minDate}
+            maxDate={maxDate}
+            onDateRangeChange={onDateRangeChange}
+          />
+        )
+      );
+      map?.addControl(slider, "bottom-right");
+      return () => {
+        map?.removeControl(slider);
+      };
+    }
+  }, [isShowingSelector, map, maxDate, minDate, onDateRangeChange]);
+
+  return (
+    <IconButton onClick={() => setIsShowingSelector((prev) => !prev)}>
+      <img alt="" src={timeRange} />
+    </IconButton>
+  );
+};
+
+export default DateRange;
