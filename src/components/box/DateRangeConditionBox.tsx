@@ -21,7 +21,7 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
   return (
     <DownloadConditionBox
       type={DownloadConditionType.DATE_RANGE}
-      conditionId={dateRangeCondition.id}
+      id={dateRangeCondition.id}
     >
       <Typography
         sx={{

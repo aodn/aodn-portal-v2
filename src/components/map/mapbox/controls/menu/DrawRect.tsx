@@ -15,12 +15,12 @@ import {
   BBoxCondition,
   DownloadConditionType,
   IDownloadCondition,
-} from "../../../../pages/detail-page/context/DownloadDefinitions";
+} from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import _ from "lodash";
 import { IconButton } from "@mui/material";
-import BBoxIcon from "../../../icon/BBoxIcon";
+import BBoxIcon from "../../../../icon/BBoxIcon";
 import DrawRectangle from "./DrawRectangle";
-import { ControlProps } from "./menu/Definition";
+import { ControlProps } from "./Definition";
 
 interface DrawControlProps extends ControlProps {
   setDownloadConditions: (
@@ -29,7 +29,7 @@ interface DrawControlProps extends ControlProps {
   ) => void;
 }
 
-const DrawRectControl: React.FC<DrawControlProps> = ({
+const DrawRect: React.FC<DrawControlProps> = ({
   map,
   setDownloadConditions,
 }) => {
@@ -121,4 +121,4 @@ const DrawRectControl: React.FC<DrawControlProps> = ({
   );
 };
 
-export default DrawRectControl;
+export default DrawRect;

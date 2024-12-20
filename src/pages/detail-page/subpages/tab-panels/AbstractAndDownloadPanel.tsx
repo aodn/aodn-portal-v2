@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useMemo } from "react";
+import React, { FC, useCallback, useMemo } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -11,7 +11,7 @@ import { StaticLayersDef } from "../../../../components/map/mapbox/layers/Static
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
-import DrawRectControl from "../../../../components/map/mapbox/controls/DrawRectControl";
+import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
@@ -143,7 +143,7 @@ const AbstractAndDownloadPanel: FC = () => {
                     />
                     <MenuControl
                       menu={
-                        <DrawRectControl
+                        <DrawRect
                           setDownloadConditions={setDownloadConditions}
                         />
                       }
