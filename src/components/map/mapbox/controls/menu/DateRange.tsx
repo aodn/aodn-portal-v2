@@ -17,7 +17,10 @@ import { dateDefault } from "../../../../common/constants";
 interface DateSliderProps {
   minDate: string;
   maxDate: string;
-  onDateRangeChange: (dateRangeStamp: number[]) => void;
+  onDateRangeChange: (
+    event: Event | React.SyntheticEvent<Element, Event>,
+    value: number | number[]
+  ) => void;
 }
 
 interface DateRangeControlProps extends ControlProps {
@@ -38,36 +41,17 @@ const DateSlider: React.FC<DateSliderProps> = ({
     dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT)),
     dateToValue(dayjs(maxDate, dateDefault.SIMPLE_DATE_FORMAT)),
   ]);
-  const parentRef = useRef<HTMLDivElement | null>(null);
-
-  const debounceSliderChange = useRef<_.DebouncedFunc<
-    (dateStamps: any) => void
-  > | null>(null);
-
-  useEffect(() => {
-    debounceSliderChange.current = _.debounce((_: number | number[]) => {
-      onDateRangeChange(dateRangeStamp);
-    }, 500);
-
-    return () => {
-      debounceSliderChange.current?.cancel();
-    };
-  }, [dateRangeStamp, onDateRangeChange]);
-
-  useEffect(() => {
-    debounceSliderChange?.current?.(dateRangeStamp);
-  }, [dateRangeStamp]);
-
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]) => {
-      setDateRangeStamp(newValue as number[]);
+      const v = newValue as number[];
+      setDateRangeStamp(v);
     },
     []
   );
 
   return (
     <Grid container width="800px" sx={{ padding: "10px" }}>
-      <Grid item md={2} container ref={parentRef} sx={{ paddingX: "10px" }}>
+      <Grid item md={2} container sx={{ paddingX: "10px" }}>
         <Grid item md={12}>
           {minDate}
         </Grid>
@@ -82,6 +66,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
           value={dateRangeStamp}
           min={dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT))}
           max={dateToValue(dayjs(maxDate, dateDefault.SIMPLE_DATE_FORMAT))}
+          onChangeCommitted={onDateRangeChange}
           onChange={handleSliderChange}
           valueLabelDisplay="auto"
           valueLabelFormat={(value: number) =>
@@ -112,27 +97,26 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   const [isShowingSelector, setIsShowingSelector] = useState(false);
 
   const onDateRangeChange = useCallback(
-    (dateRangeStamps: number[]) => {
-      const start = dayjs(dateRangeStamps[0]).format(
-        dateDefault.SIMPLE_DATE_FORMAT
-      );
-      const end = dayjs(dateRangeStamps[1]).format(
-        dateDefault.SIMPLE_DATE_FORMAT
-      );
+    (
+      _: Event | React.SyntheticEvent<Element, Event>,
+      dateRangeStamps: number | number[]
+    ) => {
+      const d = dateRangeStamps as number[];
+      const start = dayjs(d[0]).format(dateDefault.SIMPLE_DATE_FORMAT);
+      const end = dayjs(d[1]).format(dateDefault.SIMPLE_DATE_FORMAT);
 
       if (minDate === start && maxDate === end) {
         setDownloadConditions(DownloadConditionType.DATE_RANGE, []);
-        return;
+      } else {
+        const dateRangeCondition = new DateRangeCondition(
+          start,
+          end,
+          "date_range"
+        );
+        setDownloadConditions(DownloadConditionType.DATE_RANGE, [
+          dateRangeCondition,
+        ]);
       }
-
-      const dateRangeCondition = new DateRangeCondition(
-        start,
-        end,
-        "date_range"
-      );
-      setDownloadConditions(DownloadConditionType.DATE_RANGE, [
-        dateRangeCondition,
-      ]);
     },
     [maxDate, minDate, setDownloadConditions]
   );
