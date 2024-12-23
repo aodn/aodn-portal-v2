@@ -23,15 +23,15 @@ import DrawRectangle from "./DrawRectangle";
 import { ControlProps } from "./Definition";
 
 interface DrawControlProps extends ControlProps {
-  setDownloadConditions: (
+  getAndSetDownloadConditions: (
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
-  ) => void;
+  ) => IDownloadCondition[];
 }
 
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
-  setDownloadConditions,
+  getAndSetDownloadConditions,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const mapDraw = useMemo<MapboxDraw>(
@@ -87,7 +87,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
               const id = _.toString(feature.id);
               return new BBoxCondition(id, bbox, () => mapDraw.delete(id));
             }) || [];
-        setDownloadConditions(DownloadConditionType.BBOX, bboxes);
+        getAndSetDownloadConditions(DownloadConditionType.BBOX, bboxes);
       };
 
       map.addControl(mapDraw);
@@ -106,7 +106,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
         }
       };
     }
-  }, [mapDraw, map, setDownloadConditions]);
+  }, [mapDraw, map, getAndSetDownloadConditions]);
 
   return (
     <IconButton

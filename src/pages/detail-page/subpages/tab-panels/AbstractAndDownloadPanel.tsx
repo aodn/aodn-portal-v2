@@ -52,7 +52,7 @@ const AbstractAndDownloadPanel: FC = () => {
     collection,
     featureCollection,
     downloadConditions,
-    setDownloadConditions,
+    getAndSetDownloadConditions,
   } = useDetailPageContext();
 
   const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
@@ -151,7 +151,9 @@ const AbstractAndDownloadPanel: FC = () => {
                     <MenuControl
                       menu={
                         <DrawRect
-                          setDownloadConditions={setDownloadConditions}
+                          setAndGetDownloadConditions={
+                            getAndSetDownloadConditions
+                          }
                         />
                       }
                     />
@@ -164,7 +166,9 @@ const AbstractAndDownloadPanel: FC = () => {
                           maxDate={maxDateStamp.format(
                             dateDefault.SIMPLE_DATE_FORMAT
                           )}
-                          setDownloadConditions={setDownloadConditions}
+                          getAndSetDownloadConditions={
+                            getAndSetDownloadConditions
+                          }
                         />
                       }
                     />

@@ -16,10 +16,10 @@ interface DetailPageContextType {
   featureCollection: FeatureCollection<Point> | undefined;
   isCollectionNotFound: boolean;
   downloadConditions: IDownloadCondition[];
-  setDownloadConditions: (
+  getAndSetDownloadConditions: (
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
-  ) => void;
+  ) => IDownloadCondition[];
   removeDownloadCondition: (condition: IDownloadCondition) => void;
   photos: SpatialExtentPhoto[];
   setPhotos: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
@@ -39,7 +39,7 @@ const DetailPageContextDefault = {
   featureCollection: {} as FeatureCollection<Point> | undefined,
   isCollectionNotFound: false,
   downloadConditions: [],
-  setDownloadConditions: () => {},
+  getAndSetDownloadConditions: () => [],
   removeDownloadCondition: () => {},
   photos: [] as SpatialExtentPhoto[],
   setPhotos: () => {},

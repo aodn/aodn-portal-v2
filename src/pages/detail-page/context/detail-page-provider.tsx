@@ -37,13 +37,19 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [downloadConditions, _setDownloadConditions] = useState<
     IDownloadCondition[]
   >([]);
-  const setDownloadConditions = useCallback(
-    (type: DownloadConditionType, conditions: IDownloadCondition[]) => {
+  const getAndSetDownloadConditions = useCallback(
+    (
+      type: DownloadConditionType,
+      conditions: IDownloadCondition[]
+    ): IDownloadCondition[] => {
+      let p: IDownloadCondition[] = [];
       _setDownloadConditions((prev) => {
+        p = prev;
         return prev
           .filter((condition) => condition.type !== type)
           .concat(conditions);
       });
+      return p;
     },
     []
   );
@@ -108,7 +114,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         featureCollection: features,
         isCollectionNotFound,
         downloadConditions,
-        setDownloadConditions,
+        getAndSetDownloadConditions,
         removeDownloadCondition,
         photos,
         setPhotos,

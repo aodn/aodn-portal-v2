@@ -4,13 +4,13 @@ import {
   DateRangeCondition,
   DownloadConditionType,
   IDownloadCondition,
+  IDownloadConditionCallback,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
 import { Grid, IconButton, Typography } from "@mui/material";
 import { MapControl } from "./MenuControl";
 import dayjs from "dayjs";
 import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
-import _ from "lodash";
 import PlainSlider from "../../../../common/slider/PlainSlider";
 import { dateDefault } from "../../../../common/constants";
 
@@ -26,10 +26,10 @@ interface DateSliderProps {
 interface DateRangeControlProps extends ControlProps {
   minDate: string;
   maxDate: string;
-  setDownloadConditions: (
+  getAndSetDownloadConditions: (
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
-  ) => void;
+  ) => IDownloadCondition[];
 }
 
 const DateSlider: React.FC<DateSliderProps> = ({
@@ -91,7 +91,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
 const DateRange: React.FC<DateRangeControlProps> = ({
   minDate,
   maxDate,
-  setDownloadConditions,
+  getAndSetDownloadConditions,
   map,
 }) => {
   const [isShowingSelector, setIsShowingSelector] = useState(false);
@@ -106,19 +106,27 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       const end = dayjs(d[1]).format(dateDefault.SIMPLE_DATE_FORMAT);
 
       if (minDate === start && maxDate === end) {
-        setDownloadConditions(DownloadConditionType.DATE_RANGE, []);
+        const prev = getAndSetDownloadConditions(
+          DownloadConditionType.DATE_RANGE,
+          []
+        );
+        prev.forEach((p) => {
+          const callback = (p as IDownloadConditionCallback).removeCallback;
+          callback && callback();
+        });
       } else {
         const dateRangeCondition = new DateRangeCondition(
+          "date_range",
           start,
           end,
-          "date_range"
+          () => setIsShowingSelector(false)
         );
-        setDownloadConditions(DownloadConditionType.DATE_RANGE, [
+        getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
           dateRangeCondition,
         ]);
       }
     },
-    [maxDate, minDate, setDownloadConditions]
+    [maxDate, minDate, getAndSetDownloadConditions]
   );
 
   useEffect(() => {
