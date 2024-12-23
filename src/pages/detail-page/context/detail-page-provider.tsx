@@ -13,23 +13,9 @@ import {
   DownloadConditionType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import DrawRectangle from "../../../components/map/mapbox/controls/DrawRectangle";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-
-const mapDraw = new MapboxDraw({
-  displayControlsDefault: false,
-  controls: {
-    trash: true,
-  },
-  defaultMode: "simple_select",
-  modes: {
-    ...MapboxDraw.modes,
-    draw_rectangle: DrawRectangle,
-  },
-});
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -51,22 +37,32 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [downloadConditions, _setDownloadConditions] = useState<
     IDownloadCondition[]
   >([]);
-  const setDownloadConditions = useCallback(
-    (type: DownloadConditionType, conditions: IDownloadCondition[]) => {
+  const getAndSetDownloadConditions = useCallback(
+    (
+      type: DownloadConditionType,
+      conditions: IDownloadCondition[]
+    ): IDownloadCondition[] => {
+      let p: IDownloadCondition[] = [];
       _setDownloadConditions((prev) => {
+        p = prev.filter((condition) => condition.type === type);
         return prev
           .filter((condition) => condition.type !== type)
           .concat(conditions);
       });
+      return p;
     },
     []
   );
-  const deleteDownloadConditionBy = useCallback((id: string) => {
-    _setDownloadConditions((prev) => {
-      return prev.filter((condition) => condition.id !== id);
-    });
-    mapDraw.delete(id);
-  }, []);
+  const removeDownloadCondition = useCallback(
+    (condition: IDownloadCondition) => {
+      _setDownloadConditions((prev) =>
+        prev.filter(
+          (cs) => !(cs.type === condition.type && cs.id === condition.id)
+        )
+      );
+    },
+    []
+  );
 
   const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
   const [extentsPhotos, setExtentsPhotos] = useState<SpatialExtentPhoto[]>([]);
@@ -118,9 +114,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         featureCollection: features,
         isCollectionNotFound,
         downloadConditions,
-        setDownloadConditions,
-        deleteDownloadConditionBy,
-        mapDraw,
+        getAndSetDownloadConditions,
+        removeDownloadCondition,
         photos,
         setPhotos,
         extentsPhotos,

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -26,6 +26,8 @@ import {
   BBoxCondition,
   DownloadConditionType,
   DateRangeCondition,
+  IDownloadCondition,
+  IDownloadConditionCallback,
 } from "../../context/DownloadDefinitions";
 import DateRangeConditionBox from "../../../../components/box/DateRangeConditionBox";
 
@@ -37,8 +39,8 @@ const options = [
 const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const { isCollectionNotFound } = useDetailPageContext();
-  const { downloadConditions } = useDetailPageContext();
+  const { downloadConditions, isCollectionNotFound, removeDownloadCondition } =
+    useDetailPageContext();
 
   const bboxConditions: BBoxCondition[] = useMemo(() => {
     const bboxConditions = downloadConditions.filter(
@@ -48,10 +50,10 @@ const DownloadCard = () => {
   }, [downloadConditions]);
 
   const dateRangeCondition: DateRangeCondition[] = useMemo(() => {
-    const timerangeConditions = downloadConditions.filter(
+    const timeRangeConditions = downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
     );
-    return timerangeConditions as DateRangeCondition[];
+    return timeRangeConditions as DateRangeCondition[];
   }, [downloadConditions]);
 
   const selectSxProps = useMemo(
@@ -63,6 +65,14 @@ const DownloadCard = () => {
       border: `${border.xs} ${color.blue.dark}`,
     }),
     [theme]
+  );
+
+  const handleRemove = useCallback(
+    (c: IDownloadConditionCallback & IDownloadCondition) => {
+      c.removeCallback && c.removeCallback();
+      removeDownloadCondition(c);
+    },
+    [removeDownloadCondition]
   );
 
   return (
@@ -110,7 +120,11 @@ const DownloadCard = () => {
         <AccordionDetails>
           {bboxConditions.map((bboxCondition, index) => {
             return (
-              <BBoxConditionBox key={index} bboxCondition={bboxCondition} />
+              <BBoxConditionBox
+                key={index}
+                bboxCondition={bboxCondition}
+                onRemove={() => handleRemove(bboxCondition)}
+              />
             );
           })}
           {dateRangeCondition.map((dateRangeCondition, index) => {
@@ -118,6 +132,7 @@ const DownloadCard = () => {
               <DateRangeConditionBox
                 key={index}
                 dateRangeCondition={dateRangeCondition}
+                onRemove={() => handleRemove(dateRangeCondition)}
               />
             );
           })}
