@@ -14,13 +14,13 @@ const ScaleControl = ({
   unit = "metric",
 }: ScaleControlProps) => {
   const { map } = useContext(MapContext);
-  const [init, setInit] = useState<boolean>(false);
+  const [_, setInit] = useState<boolean>(false);
 
   useEffect(() => {
     if (!map) return;
 
     setInit((prev) => {
-      if (prev === false) {
+      if (!prev) {
         const scale = new MapboxScaleControl({
           maxWidth: maxWidth,
           unit: unit,

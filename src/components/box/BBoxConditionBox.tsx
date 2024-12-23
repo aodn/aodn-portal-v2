@@ -9,14 +9,19 @@ import BBoxItem from "./BBoxItem";
 
 interface BBoxConditionProps {
   bboxCondition: BBoxCondition;
+  onRemove?: () => void;
 }
 
-const BBoxConditionBox: React.FC<BBoxConditionProps> = ({ bboxCondition }) => {
+const BBoxConditionBox: React.FC<BBoxConditionProps> = ({
+  onRemove,
+  bboxCondition,
+}) => {
   const bbox = bboxCondition.bbox;
   return (
     <DownloadConditionBox
+      id={bboxCondition.id}
       type={DownloadConditionType.BBOX}
-      conditionId={bboxCondition.id}
+      removeCallback={() => onRemove && onRemove()}
     >
       <Grid container>
         <Grid item md={5}>

@@ -32,12 +32,12 @@ const styles = [
   {
     id: "1",
     name: "Street map (MapBox)",
-    style: "mapbox://styles/mapbox/streets-v11",
+    style: "mapbox://styles/mapbox/streets-v12",
   },
   {
     id: "2",
     name: "Topographic map (MapBox)",
-    style: "mapbox://styles/mapbox/outdoors-v11",
+    style: "mapbox://styles/mapbox/outdoors-v12",
   },
   {
     id: "3",
@@ -109,7 +109,7 @@ const ReactMap = ({
       }
 
       // Create new map instance
-      const newMap = new Map({
+      return new Map({
         container: panelId,
         accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
         style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
@@ -118,7 +118,6 @@ const ReactMap = ({
         testMode: import.meta.env.MODE === "dev",
         localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
       });
-      return newMap;
     } catch (err) {
       console.log("Map initialization failed:", err);
     }

@@ -1,9 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { cloneElement, useContext, useEffect, useState } from "react";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../../MapContext";
 import { Map as MapBox, IControl, MapMouseEvent } from "mapbox-gl";
 import EventEmitter from "events";
-import { EVENT_MAP, EVENT_MENU, Menus } from "./Definition";
+import {
+  ControlProps,
+  EVENT_MAP,
+  EVENT_MENU,
+  MapControlType,
+} from "./Definition";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
@@ -11,33 +16,26 @@ const leftPadding = "15px";
 const rightPadding = "15px";
 
 interface MenuControlProps {
-  menu: Menus | null;
+  menu: MapControlType | null;
 }
 
-class MapMenuControl implements IControl {
+class MapControl implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
-  private component: Menus;
-  private map: MapBox | null = null;
+  private readonly component: MapControlType;
 
   // When the user clicks somewhere on the map, notify the MenuControl
-  private mapClickHandler: (event: MapMouseEvent) => void;
-  private mapMoveStartHandler: (event: MapMouseEvent) => void;
+  private readonly mapClickHandler: (event: MapMouseEvent) => void;
+  private readonly mapMoveStartHandler: (event: MapMouseEvent) => void;
 
-  constructor(component: Menus, map: MapBox) {
+  constructor(component: MapControlType) {
     this.component = component;
-    this.map = map;
 
     // Handlers for map events
     this.mapClickHandler = (event: MapMouseEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP.CLICKED);
     this.mapMoveStartHandler = (event: MapMouseEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP.MOVE_START);
-  }
-
-  updateComponent(component: Menus) {
-    this.component = component;
-    this.render();
   }
 
   private render() {
@@ -80,7 +78,7 @@ class MapMenuControl implements IControl {
 
   onClickHandler(
     event: MouseEvent | MapMouseEvent,
-    component: Menus | undefined,
+    component: MapControlType | undefined,
     type: string = EVENT_MENU.CLICKED
   ) {
     eventEmitter.emit(type, {
@@ -94,7 +92,7 @@ const MenuControl: React.FC<MenuControlProps> = ({
   menu,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
-  const [control, setControl] = useState<MapMenuControl | null>(null);
+  const [_, setControl] = useState<MapControl | null>(null);
 
   // Creation effect
   useEffect(() => {
@@ -102,7 +100,11 @@ const MenuControl: React.FC<MenuControlProps> = ({
 
     setControl((prev) => {
       if (!prev) {
-        const newControl = new MapMenuControl(menu, map);
+        // !!Must use cloneElement, to inject the map to the argument, so you
+        // can get it in the ControlProps
+        const newControl = new MapControl(
+          cloneElement<ControlProps>(menu, { map: map })
+        );
         map?.addControl(newControl, "top-right");
         return newControl;
       }
@@ -110,16 +112,9 @@ const MenuControl: React.FC<MenuControlProps> = ({
     });
   }, [map, menu]);
 
-  // Props update effect
-  useEffect(() => {
-    if (control && menu) {
-      control.updateComponent(menu);
-    }
-  }, [control, menu]);
-
   return <React.Fragment />;
 };
 
 export default MenuControl;
 
-export { eventEmitter, leftPadding, rightPadding };
+export { eventEmitter, leftPadding, rightPadding, MapControl };
