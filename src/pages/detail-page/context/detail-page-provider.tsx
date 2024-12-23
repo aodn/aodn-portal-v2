@@ -44,7 +44,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     ): IDownloadCondition[] => {
       let p: IDownloadCondition[] = [];
       _setDownloadConditions((prev) => {
-        p = prev;
+        p = prev.filter((condition) => condition.type === type);
         return prev
           .filter((condition) => condition.type !== type)
           .concat(conditions);

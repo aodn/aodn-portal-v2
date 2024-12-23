@@ -76,30 +76,34 @@ const DrawRect: React.FC<DrawControlProps> = ({
 
   useEffect(() => {
     if (map) {
-      const updateArea = () => {
+      // This function also handle delete, the reason is draw.delete works on the highlighted draw item on map
+      // so the below logic looks for remain valid box and set all effectively remove the item
+      const onCreateOrUpdate = () => {
         const features = mapDraw.getAll().features;
-        const bboxes: BBoxCondition[] =
+        const box: BBoxCondition[] =
           features
             ?.filter((feature) => feature.geometry.type === "Polygon")
             .map((feature) => {
               const polygon = feature.geometry as Polygon;
               const bbox = turf.bbox(polygon);
               const id = _.toString(feature.id);
+              // The removeCallback will be called when use click the bbox condition delete button
               return new BBoxCondition(id, bbox, () => mapDraw.delete(id));
             }) || [];
-        getAndSetDownloadConditions(DownloadConditionType.BBOX, bboxes);
+        // In case of delete, the box already gone on map, so we just need to remove the condition
+        getAndSetDownloadConditions(DownloadConditionType.BBOX, box);
       };
 
       map.addControl(mapDraw);
-      map.on("draw.create", updateArea);
-      map.on("draw.delete", updateArea);
-      map.on("draw.update", updateArea);
+      map.on("draw.create", onCreateOrUpdate);
+      map.on("draw.delete", onCreateOrUpdate);
+      map.on("draw.update", onCreateOrUpdate);
 
       return () => {
         try {
-          map.off("draw.create", updateArea);
-          map.off("draw.delete", updateArea);
-          map.off("draw.update", updateArea);
+          map.off("draw.create", onCreateOrUpdate);
+          map.off("draw.delete", onCreateOrUpdate);
+          map.off("draw.update", onCreateOrUpdate);
           map.removeControl(mapDraw);
         } catch (ignored) {
           /* can be ignored */

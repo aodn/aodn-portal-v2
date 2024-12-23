@@ -150,7 +150,13 @@ const AbstractAndDownloadPanel: FC = () => {
                     />
                     <MenuControl
                       menu={
-                        <DrawRect
+                        <DateRange
+                          minDate={minDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
+                          maxDate={maxDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
                           getAndSetDownloadConditions={
                             getAndSetDownloadConditions
                           }
@@ -159,13 +165,7 @@ const AbstractAndDownloadPanel: FC = () => {
                     />
                     <MenuControl
                       menu={
-                        <DateRange
-                          minDate={minDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
-                          maxDate={maxDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
+                        <DrawRect
                           getAndSetDownloadConditions={
                             getAndSetDownloadConditions
                           }
