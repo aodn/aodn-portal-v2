@@ -22,7 +22,7 @@ import {
   DownloadConditionType,
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
-import { FeatureCollection, GeoJsonProperties, Point } from "geojson";
+import { FeatureCollection, Point } from "geojson";
 
 const TRUNCATE_COUNT = 800;
 
@@ -151,7 +151,7 @@ const AbstractAndDownloadPanel: FC = () => {
                     <MenuControl
                       menu={
                         <DrawRect
-                          setAndGetDownloadConditions={
+                          getAndSetDownloadConditions={
                             getAndSetDownloadConditions
                           }
                         />

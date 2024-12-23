@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import timeRange from "../../../../../assets/images/time-range.png";
 import {
   DateRangeCondition,
@@ -15,6 +15,8 @@ import PlainSlider from "../../../../common/slider/PlainSlider";
 import { dateDefault } from "../../../../common/constants";
 
 interface DateSliderProps {
+  currentMinDate: string | undefined;
+  currentMaxDate: string | undefined;
   minDate: string;
   maxDate: string;
   onDateRangeChange: (
@@ -33,13 +35,25 @@ interface DateRangeControlProps extends ControlProps {
 }
 
 const DateSlider: React.FC<DateSliderProps> = ({
+  currentMinDate,
+  currentMaxDate,
   minDate,
   maxDate,
   onDateRangeChange,
 }) => {
   const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
-    dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT)),
-    dateToValue(dayjs(maxDate, dateDefault.SIMPLE_DATE_FORMAT)),
+    dateToValue(
+      dayjs(
+        currentMinDate ? currentMinDate : minDate,
+        dateDefault.SIMPLE_DATE_FORMAT
+      )
+    ),
+    dateToValue(
+      dayjs(
+        currentMaxDate ? currentMaxDate : maxDate,
+        dateDefault.SIMPLE_DATE_FORMAT
+      )
+    ),
   ]);
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]) => {
@@ -94,7 +108,13 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   getAndSetDownloadConditions,
   map,
 }) => {
-  const [isShowingSelector, setIsShowingSelector] = useState(false);
+  const [isShowingSelector, setIsShowingSelector] = useState<boolean>(false);
+  const [currentMinDate, setCurrentMinDate] = useState<string | undefined>(
+    undefined
+  );
+  const [currentMaxDate, setCurrentMaxDate] = useState<string | undefined>(
+    undefined
+  );
 
   const onDateRangeChange = useCallback(
     (
@@ -119,11 +139,16 @@ const DateRange: React.FC<DateRangeControlProps> = ({
           "date_range",
           start,
           end,
-          () => setIsShowingSelector(false)
+          () => {
+            setCurrentMinDate(undefined);
+            setCurrentMaxDate(undefined);
+          }
         );
         getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
           dateRangeCondition,
         ]);
+        setCurrentMinDate(start);
+        setCurrentMaxDate(end);
       }
     },
     [maxDate, minDate, getAndSetDownloadConditions]
@@ -134,6 +159,8 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       const slider: MapControl = new MapControl(
         (
           <DateSlider
+            currentMinDate={currentMinDate}
+            currentMaxDate={currentMaxDate}
             minDate={minDate}
             maxDate={maxDate}
             onDateRangeChange={onDateRangeChange}
@@ -145,7 +172,15 @@ const DateRange: React.FC<DateRangeControlProps> = ({
         map?.removeControl(slider);
       };
     }
-  }, [isShowingSelector, map, maxDate, minDate, onDateRangeChange]);
+  }, [
+    currentMaxDate,
+    currentMinDate,
+    isShowingSelector,
+    map,
+    maxDate,
+    minDate,
+    onDateRangeChange,
+  ]);
 
   return (
     <IconButton onClick={() => setIsShowingSelector((prev) => !prev)}>
