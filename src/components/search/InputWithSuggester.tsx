@@ -49,7 +49,8 @@ interface OptionType {
 enum OptionGroup {
   PARAMETER = "parameter",
   PHRASE = "phrase",
-  COMMON = "common",
+  ORGANIZATION = "organization",
+  PLATFORM = "platform",
 }
 
 /**
@@ -57,6 +58,11 @@ enum OptionGroup {
  * do as the below nullable props.
  * @param handleEnterPressed handle the event when users press the ENTER on keyboard.
  * have default empty implementation. Can be overridden.
+ * @param setPendingSearch
+ * @param setActiveButton
+ * @param setShouldExpandSearchbar
+ * @param setShouldExpandAllButtons
+ * @param suggesterWidth
  * @constructor
  */
 const InputWithSuggester: FC<InputWithSuggesterProps> = ({
@@ -72,7 +78,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const dispatch = useAppDispatch();
 
   const [isSearchbarActive, setIsSearchbarActive] = useState(false);
-
   const [options, setOptions] = useState<OptionType[]>([]);
 
   const searchInput = useSelector(
@@ -90,22 +95,26 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
           .unwrap()
           .then((data) => {
-            const parameterVocabSuggestions = new Set<string>(
-              data.suggested_parameter_vocabs
+            const parameter = new Set<string>(data.suggested_parameter_vocabs);
+            const phrases = new Set<string>(data.suggested_phrases);
+            const organization = new Set<string>(
+              data.suggested_organizations_vocabs
             );
-            const phrasesSuggestions = new Set<string>(data.suggested_phrases);
+            const platform = new Set<string>(data.suggested_platform_vocabs);
+
             // Get the intersection of parameterVocabSuggestions and phrasesSuggestions
-            const commonSuggestions = [...parameterVocabSuggestions].filter(
-              (item) => {
-                return phrasesSuggestions.has(item);
-              }
-            );
+            // const commonSuggestions = [...parameterVocabSuggestions].filter(
+            //   (item) => {
+            //     return phrasesSuggestions.has(item);
+            //   }
+            // );
 
             // Create array of all unique suggestions
             const allSuggestions = new Set([
-              ...commonSuggestions,
-              ...parameterVocabSuggestions,
-              ...phrasesSuggestions,
+              ...organization,
+              ...parameter,
+              ...phrases,
+              ...platform,
             ]);
 
             // Sort suggestions by relevance
@@ -117,12 +126,14 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             // Create sorted options array
             const options: OptionType[] = sortedSuggestions.map(
               (suggestion) => {
-                if (commonSuggestions.includes(suggestion)) {
-                  return { text: suggestion, group: OptionGroup.COMMON };
-                } else if (parameterVocabSuggestions.has(suggestion)) {
+                if (organization.has(suggestion)) {
+                  return { text: suggestion, group: OptionGroup.ORGANIZATION };
+                } else if (parameter.has(suggestion)) {
                   return { text: suggestion, group: OptionGroup.PARAMETER };
-                } else {
+                } else if (phrases.has(suggestion)) {
                   return { text: suggestion, group: OptionGroup.PHRASE };
+                } else {
+                  return { text: suggestion, group: OptionGroup.PLATFORM };
                 }
               }
             );
@@ -143,7 +154,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   );
 
   const debounceRefreshOptions = useRef(
-    _.debounce(refreshOptions, 300)
+    _.debounce(refreshOptions, 500)
   ).current;
 
   // cancel all debounce things when component is unmounted
@@ -155,7 +166,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   const handleInputChange = useCallback(
     async (_: any, newInputValue: string) => {
-      // If user type anything, then it is not a title search anymore
       dispatch(updateSearchText(newInputValue));
       if (newInputValue?.length > 0) {
         // wait for the debounced refresh to complete
@@ -166,30 +176,30 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [debounceRefreshOptions, dispatch]
   );
 
-  const handleSearchbarOpen = () => {
+  const handleSearchbarOpen = useCallback(() => {
     setActiveButton(SearchbarButtonNames.Search);
     setIsSearchbarActive(true);
     if (location.pathname === pageDefault.landing) {
       setShouldExpandAllButtons(false);
     }
-  };
+  }, [location.pathname, setActiveButton, setShouldExpandAllButtons]);
 
-  const handleSearchbarClose = () => {
+  const handleSearchbarClose = useCallback(() => {
     setIsSearchbarActive(false);
     if (location.pathname === pageDefault.landing) {
       setShouldExpandAllButtons(true);
     }
-
     setOptions([]);
-  };
+  }, [location.pathname, setShouldExpandAllButtons]);
 
-  const handleKeyDown = (
-    event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    if (event.key === "Enter") {
-      handleEnterPressed(event, false);
-    }
-  };
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      if (event.key === "Enter") {
+        handleEnterPressed(event, false);
+      }
+    },
+    [handleEnterPressed]
+  );
 
   // Listen to isSearchbarActive | searchInput.length to update shouldExpandSearchbar with Header
   // Searchbar will keep expanded if searchbar is active or there exists a text input
@@ -202,62 +212,67 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   }, [isSearchbarActive, searchInput, setShouldExpandSearchbar]);
 
   // Input suggester popper
-  const CustomPopper = (props: any): ReactNode => {
-    return (
-      <Popper
-        {...props}
-        placement="bottom-start"
-        modifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [0, 8], // Vertical offset
+  const CustomPopper = useCallback(
+    (props: any): ReactNode => {
+      return (
+        <Popper
+          {...props}
+          placement="bottom-start"
+          modifiers={[
+            {
+              name: "offset",
+              options: {
+                offset: [0, 8], // Vertical offset
+              },
             },
-          },
-          {
-            name: "flip",
-            enabled: false, // Disable the flip modifier
-          },
-        ]}
-        style={{
-          width: suggesterWidth,
-          borderRadius: borderRadius.small,
-        }}
-      />
-    );
-  };
+            {
+              name: "flip",
+              enabled: false, // Disable the flip modifier
+            },
+          ]}
+          style={{
+            width: suggesterWidth,
+            borderRadius: borderRadius.small,
+          }}
+        />
+      );
+    },
+    [suggesterWidth]
+  );
 
   // Input suggester paper
-  const CustomPaper = (props: any): ReactNode => {
-    return (
-      <Paper
-        elevation={location.pathname === pageDefault.search ? 2 : 1}
-        sx={{
-          backgroundColor: "#fff",
-          borderRadius: borderRadius.small,
-          "& .MuiAutocomplete-listbox": {
+  const CustomPaper = useCallback(
+    (props: any): ReactNode => {
+      return (
+        <Paper
+          elevation={location.pathname === pageDefault.search ? 2 : 1}
+          sx={{
+            backgroundColor: "#fff",
             borderRadius: borderRadius.small,
-            paddingX: padding.small,
-          },
-
-          "& .MuiAutocomplete-option": {
-            color: "#000",
-            borderRadius: borderRadius.small,
-            "&[aria-selected='true']": {
-              backgroundColor: color.blue.xLight,
+            "& .MuiAutocomplete-listbox": {
+              borderRadius: borderRadius.small,
+              paddingX: padding.small,
             },
-            "&.Mui-focused": {
-              backgroundColor: `${color.blue.xLight} !important`,
+            "& .MuiAutocomplete-option": {
+              color: "#000",
+              borderRadius: borderRadius.small,
+              "&[aria-selected='true']": {
+                backgroundColor: color.blue.xLight,
+              },
+              "&.Mui-focused": {
+                backgroundColor: `${color.blue.xLight} !important`,
+              },
+              "&:hover": {
+                backgroundColor: color.blue.xLight,
+              },
             },
-            "&:hover": {
-              backgroundColor: color.blue.xLight,
-            },
-          },
-        }}
-        {...props}
-      />
-    );
-  };
+          }}
+          {...props}
+        />
+      );
+    },
+    [location.pathname]
+  );
 
   return (
     <Autocomplete
