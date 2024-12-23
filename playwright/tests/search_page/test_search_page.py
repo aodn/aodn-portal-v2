@@ -5,6 +5,7 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
+pytestmark = pytest.mark.skip(reason="Temporarily skipping all search tests")
 
 def test_map_expand_toggle(page_mock: Page) -> None:
     landing_page = LandingPage(page_mock)

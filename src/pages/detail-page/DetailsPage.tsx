@@ -1,5 +1,5 @@
 import Layout from "../../components/layout/layout";
-import { Box, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import { color, padding } from "../../styles/constants";
 import HeaderSection from "./subpages/HeaderSection";
 import SideSection from "./subpages/SideSection";
