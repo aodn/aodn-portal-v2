@@ -336,8 +336,11 @@ const createSearchParamFrom = (
     control
   );
 
-  // The score control how relevent the records
-  p.filter = `score>=${calculateScore(c.score, p.text)}`;
+  // The score control how relevant the records
+  // ! DO NO USE SCORE !, it will cause no result in some case because
+  // some text search only hit the filter which cause score become null
+  // if you set score you got nothing.
+  // p.filter = `score>=${calculateScore(c.score, p.text)}`;
 
   // Control how many record return in 1 page.
   if (c.pagesize) {
