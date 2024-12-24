@@ -387,6 +387,7 @@ const SearchPage = () => {
             onChangeSorting={onChangeSorting}
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
+            onDeselectDataset={onDeselectDataset}
             isLoading={isLoading(loadingThreadCount)}
           />
         </Box>

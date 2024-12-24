@@ -7,7 +7,7 @@ import { eventEmitter } from "./MenuControl";
 import BookmarkListAccordionGroup, {
   BookmarkListAccordionGroupBasicType,
 } from "../../../../bookmark/BookmarkListAccordionGroup";
-import { BOOKMARK_LIST_WIDTH } from "../../../../result/constants";
+import { BOOKMARK_LIST_WIDTH_MAP } from "../../../../result/constants";
 
 export interface BookmarkListMenuBasicType
   extends ControlProps,
@@ -67,7 +67,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             sx={{
               display: "flex",
               flexDirection: "column",
-              width: BOOKMARK_LIST_WIDTH,
+              width: BOOKMARK_LIST_WIDTH_MAP,
               maxHeight: "85vh",
               overflowY: "auto",
               borderRadius: borderRadius.menu,

@@ -63,6 +63,12 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({ dataset = undefined }) => {
   );
 
   useEffect(() => {
+    if (dataset && bookmarkItems) {
+      setIsBookmarked(checkIsBookmarked(store.getState(), dataset.id));
+    }
+  }, [bookmarkItems, dataset]);
+
+  useEffect(() => {
     const handler = (event: BookmarkEvent) => {
       if (event.id === dataset?.id) {
         if (event.action === EVENT_BOOKMARK.ADD) {

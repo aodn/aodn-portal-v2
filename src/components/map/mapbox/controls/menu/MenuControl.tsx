@@ -22,7 +22,7 @@ interface MenuControlProps {
 class MapControl implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
-  private readonly component: MapControlType;
+  private component: MapControlType;
 
   // When the user clicks somewhere on the map, notify the MenuControl
   private readonly mapClickHandler: (event: MapMouseEvent) => void;
@@ -36,6 +36,11 @@ class MapControl implements IControl {
       this.onClickHandler(event, undefined, EVENT_MAP.CLICKED);
     this.mapMoveStartHandler = (event: MapMouseEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP.MOVE_START);
+  }
+
+  updateComponent(component: MapControlType) {
+    this.component = component;
+    this.render();
   }
 
   private render() {
@@ -92,7 +97,7 @@ const MenuControl: React.FC<MenuControlProps> = ({
   menu,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
-  const [_, setControl] = useState<MapControl | null>(null);
+  const [control, setControl] = useState<MapControl | null>(null);
 
   // Creation effect
   useEffect(() => {
@@ -111,6 +116,13 @@ const MenuControl: React.FC<MenuControlProps> = ({
       return prev;
     });
   }, [map, menu]);
+
+  // Props update effect
+  useEffect(() => {
+    if (control && menu) {
+      control.updateComponent(menu);
+    }
+  }, [control, menu]);
 
   return <React.Fragment />;
 };

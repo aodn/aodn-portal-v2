@@ -53,18 +53,25 @@ interface FiltersProps {
   sx?: SxProps;
 }
 
-const checkBadge = (filters: Filters, tabName: string): boolean => {
+enum FiltersTabs {
+  Parameters = "parameters",
+  Platform = "platform",
+  Organisation = "organisation",
+  DataSettings = "data-settings",
+}
+
+const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
   switch (tabName) {
-    case "themes":
+    case FiltersTabs.Parameters:
       return !!filters.parameterVocabs?.length;
 
-    case "platform":
+    case FiltersTabs.Platform:
       return !!filters.platform?.length;
 
-    case "organisation":
+    case FiltersTabs.Organisation:
       return !!filters.organisation?.length;
 
-    case "data-settings":
+    case FiltersTabs.DataSettings:
       return !!(
         filters.dataDeliveryFrequency?.length ||
         filters.dataDeliveryMode?.length ||
@@ -87,32 +94,32 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   const TABS: Tab[] = useMemo(() => {
     return [
       {
-        label: "Themes",
-        value: "themes",
+        label: "Parameters",
+        value: FiltersTabs.Parameters,
         component: <ThemeFilter filters={filters} setFilters={setFilters} />,
-        showBadge: checkBadge(filters, "themes"),
+        showBadge: checkBadge(filters, FiltersTabs.Parameters),
       },
       {
         label: "Platform",
-        value: "platform",
+        value: FiltersTabs.Platform,
         component: <PlatformFilter filters={filters} setFilters={setFilters} />,
-        showBadge: checkBadge(filters, "platform"),
+        showBadge: checkBadge(filters, FiltersTabs.Platform),
       },
       {
         label: "Organisation",
-        value: "organisation",
+        value: FiltersTabs.Organisation,
         component: (
           <OrganisationFilter filters={filters} setFilters={setFilters} />
         ),
-        showBadge: checkBadge(filters, "organisation"),
+        showBadge: checkBadge(filters, FiltersTabs.Organisation),
       },
       {
         label: "Data Settings",
-        value: "data-settings",
+        value: FiltersTabs.DataSettings,
         component: (
           <DataSettingsFilter filters={filters} setFilters={setFilters} />
         ),
-        showBadge: checkBadge(filters, "data-settings"),
+        showBadge: checkBadge(filters, FiltersTabs.DataSettings),
       },
     ];
   }, [filters, setFilters]);
