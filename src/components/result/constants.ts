@@ -4,4 +4,5 @@ export const LIST_CARD_GAP = 5;
 export const GRID_CARD_HEIGHT = 230;
 export const GRID_CARD_GAP = 5;
 
-export const BOOKMARK_LIST_WIDTH = 260;
+export const BOOKMARK_LIST_WIDTH_MAP = 260;
+export const BOOKMARK_LIST_WIDTH_RESULTS = 500;

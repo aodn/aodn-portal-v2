@@ -40,6 +40,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
 
   const isSelectedDataset = uuid === selectedUuid;
+
   return (
     <Card
       id={`result-card-${uuid}`}

@@ -13,10 +13,15 @@ import {
   searchQueryResult,
 } from "../../../components/common/store/store";
 import CircleLoader from "../../../components/loading/CircleLoader";
+import BookmarkListButton, {
+  BookmarkListButtonBasicType,
+} from "../../../components/result/BookmarkListButton";
+import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 
 interface ResultSectionProps
   extends Partial<ResultPanelSimpleFilterType>,
-    Partial<ResultCardsType> {
+    Partial<ResultCardsType>,
+    BookmarkListButtonBasicType {
   showFullMap: boolean;
   showFullList: boolean;
   isLoading: boolean;
@@ -33,6 +38,7 @@ const ResultSection: FC<ResultSectionProps> = ({
   onChangeSorting,
   onClickCard,
   selectedUuids,
+  onDeselectDataset,
   isLoading,
 }) => {
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
@@ -55,7 +61,13 @@ const ResultSection: FC<ResultSectionProps> = ({
       data-testid="search-page-result-list"
     >
       <CircleLoader isLoading={isLoading} />
-      <Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+        }}
+        gap={1}
+      >
         <ResultPanelSimpleFilter
           count={reduxContents.result.collections.length}
           total={reduxContents.result.total}
@@ -64,6 +76,12 @@ const ResultSection: FC<ResultSectionProps> = ({
           currentSort={currentSort}
           onChangeSorting={onChangeSorting}
         />
+        {currentLayout === SearchResultLayoutEnum.FULL_LIST && (
+          <BookmarkListButton
+            onDeselectDataset={onDeselectDataset}
+            sx={{ width: "50%" }}
+          />
+        )}
       </Box>
       <Box sx={{ flex: 1 }}>
         <ResultCards

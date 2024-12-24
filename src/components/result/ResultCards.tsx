@@ -167,11 +167,13 @@ const renderFullListView: FC<Partial<ResultCardsListType>> = ({
   selectedUuid,
 }) => {
   if (!count || !total || !contents) return;
+
   return (
     <Box sx={{ ...sx }}>
       <Grid container spacing={1}>
-        {contents.result.collections.map((collection) => (
-          <Grid item xs={12} md={6} lg={4} key={collection.id}>
+        {contents.result.collections.map((collection, index) => (
+          // TODO: change to key={collection.id} will find a bug that there exists datasets with same key (duplicated datasets). Need to check front end fetch more or backend
+          <Grid item xs={12} md={6} lg={4} key={index}>
             <ListResultCard
               content={collection}
               onClickCard={onClickCard}

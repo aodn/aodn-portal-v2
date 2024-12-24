@@ -40,6 +40,7 @@ import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
 import { DEFAULT_DATE_PICKER_SLOT } from "../details/DateRangeSlider";
+import { dateToValue, valueToDate } from "../../utils/DateUtils";
 
 enum DateRangeOptionValues {
   Custom = "custom",
@@ -62,12 +63,6 @@ const dateRangeOptions: DateRangeOption[] = [
 
 const initialMinDate: Dayjs = dayjs(dateDefault.min);
 const initialMaxDate: Dayjs = dayjs(dateDefault.max);
-
-// Utility function to convert a date to a numeric value
-const dateToValue = (date: Dayjs): number => date.valueOf();
-
-// Utility function to convert a numeric value back to a date
-const valueToDate = (value: number): Dayjs => dayjs(value);
 
 interface DateRangeFilterProps {
   handleClosePopup: () => void;

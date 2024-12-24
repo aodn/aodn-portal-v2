@@ -54,7 +54,7 @@ interface FiltersProps {
 }
 
 enum FiltersTabs {
-  Themes = "themes",
+  Parameters = "parameters",
   Platform = "platform",
   Organisation = "organisation",
   DataSettings = "data-settings",
@@ -62,7 +62,7 @@ enum FiltersTabs {
 
 const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
   switch (tabName) {
-    case FiltersTabs.Themes:
+    case FiltersTabs.Parameters:
       return !!filters.parameterVocabs?.length;
 
     case FiltersTabs.Platform:
@@ -94,10 +94,10 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   const TABS: Tab[] = useMemo(() => {
     return [
       {
-        label: "Themes",
-        value: FiltersTabs.Themes,
+        label: "Parameters",
+        value: FiltersTabs.Parameters,
         component: <ThemeFilter filters={filters} setFilters={setFilters} />,
-        showBadge: checkBadge(filters, FiltersTabs.Themes),
+        showBadge: checkBadge(filters, FiltersTabs.Parameters),
       },
       {
         label: "Platform",

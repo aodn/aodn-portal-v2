@@ -27,10 +27,12 @@ import {
   BookmarkEvent,
   EVENT_BOOKMARK,
 } from "../map/mapbox/controls/menu/Definition";
+import BookmarkListHead from "./BookmarkListHead";
 
-export interface BookmarkListAccordionGroupBasicType
-  extends Partial<BookmarkListCardType> {
-  onDeselectDataset: () => void;
+export interface BookmarkListAccordionGroupBasicType {
+  onDeselectDataset?: () => void;
+  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
+  hideHead?: boolean;
 }
 
 interface BookmarkListAccordionGroupProps
@@ -39,6 +41,7 @@ interface BookmarkListAccordionGroupProps
 const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   onDeselectDataset,
   tabNavigation,
+  hideHead = false,
 }) => {
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
   // TODO need? seems replaced by bookmarkItem is possible
@@ -168,37 +171,13 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
 
   return (
     <>
-      <Box
-        position="relative"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        width="100%"
-        padding={padding.extraSmall}
-        sx={{ backgroundColor: color.blue.darkSemiTransparent }}
-      >
-        <Typography
-          fontSize={fontSize.info}
-          color={fontColor.blue.dark}
-          fontWeight={fontWeight.bold}
-        >
-          {bookmarkItems
-            ? bookmarkItems.length === 0
-              ? "Bookmark List"
-              : bookmarkItems.length === 1
-                ? "1 Bookmark"
-                : `${bookmarkItems.length} Bookmarks`
-            : "Bookmark List"}
-        </Typography>
-        <Button
-          sx={{ position: "absolute", right: 0, textTransform: "none" }}
-          onClick={onClearAllBookmarks}
-        >
-          <Typography fontSize={fontSize.label} color={fontColor.blue.dark}>
-            Clear
-          </Typography>
-        </Button>
-      </Box>
+      {!hideHead && (
+        <BookmarkListHead
+          bookmarkCount={bookmarkItems?.length}
+          onClearAllBookmarks={onClearAllBookmarks}
+        />
+      )}
+
       {accordionGroupItems.length > 0 &&
         accordionGroupItems.map((item) => (
           <StyledAccordion
