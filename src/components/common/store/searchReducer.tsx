@@ -110,6 +110,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
   return axios
     .get<OGCCollections>("/api/v1/ogc/collections", {
       params: p,
+      timeout: 30000,
     })
     .then((response) => jsonToOGCCollections(response.data))
     .catch((error: Error | AxiosError | ErrorResponse) => {
@@ -136,7 +137,9 @@ const searchParameterVocabs = async (
   thunkApi: any
 ) =>
   axios
-    .get<Array<Vocab>>("/api/v1/ogc/ext/parameter/vocabs")
+    .get<Array<Vocab>>("/api/v1/ogc/ext/parameter/vocabs", {
+      timeout: 5000,
+    })
     .then((response) => response.data)
     .catch((error: Error | AxiosError | ErrorResponse) => {
       if (axios.isAxiosError(error) && error.response) {
@@ -166,6 +169,7 @@ const fetchSuggesterOptions = createAsyncThunk<
     axios
       .get<any>("/api/v1/ogc/ext/autocomplete", {
         params: params,
+        timeout: 5000,
       })
       .then((response) => response.data)
       .catch((error: Error | AxiosError | ErrorResponse) => {
