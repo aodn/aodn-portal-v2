@@ -1,5 +1,12 @@
 import { FC, useState } from "react";
-import { Box, Button, Paper, Popper, SxProps } from "@mui/material";
+import { Box, Paper, Popper, SxProps } from "@mui/material";
+import store from "../common/store/store";
+import {
+  removeAllItems,
+  selectBookmarkItems,
+} from "../common/store/bookmarkListReducer";
+import { useSelector } from "react-redux";
+import useElementSize from "../../hooks/useElementSize";
 import BookmarkListAccordionGroup from "../bookmark/BookmarkListAccordionGroup";
 import { border, borderRadius, color } from "../../styles/constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -7,12 +14,6 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { BOOKMARK_LIST_WIDTH_RESULTS } from "./constants";
 import useTabNavigation from "../../hooks/useTabNavigation";
 import BookmarkListHead from "../bookmark/BookmarkListHead";
-import store from "../common/store/store";
-import {
-  removeAllItems,
-  selectBookmarkItems,
-} from "../common/store/bookmarkListReducer";
-import { useSelector } from "react-redux";
 
 export interface BookmarkListButtonBasicType {
   onDeselectDataset?: () => void;
@@ -27,8 +28,12 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
   onDeselectDataset,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   const bookmarkItems = useSelector(selectBookmarkItems);
+
   const tabNavigation = useTabNavigation();
+
+  const { ref, width: bookmarkButtonWidth } = useElementSize();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -44,6 +49,7 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
       <Paper
         elevation={0}
         onClick={handleClick}
+        ref={ref}
         sx={{
           display: "flex",
           justifyContent: "center",
@@ -72,9 +78,16 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
       <Popper
         open={!!anchorEl}
         anchorEl={anchorEl}
-        sx={{ width: BOOKMARK_LIST_WIDTH_RESULTS, bgcolor: "#fff" }}
+        placement="bottom-end"
+        sx={{
+          minWidth: BOOKMARK_LIST_WIDTH_RESULTS,
+          width: bookmarkButtonWidth,
+          bgcolor: "#fff",
+        }}
       >
-        <BookmarkListAccordionGroup tabNavigation={tabNavigation} hideHead />
+        <Paper elevation={1} sx={{ width: "100%" }}>
+          <BookmarkListAccordionGroup tabNavigation={tabNavigation} hideHead />
+        </Paper>
       </Popper>
     </Box>
   );
