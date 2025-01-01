@@ -12,18 +12,20 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
-import { LngLatBoundsLike } from "mapbox-gl";
+import { LngLatBoundsLike, MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 interface GeojsonLayerProps {
   // Vector tile layer should added to map
   collection: OGCCollection;
+  onLayerClick?: (event: MapMouseEvent) => void;
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   animate?: boolean;
 }
 
 const GeojsonLayer: FC<GeojsonLayerProps> = ({
   collection,
+  onLayerClick = (event: MapMouseEvent) => {},
   setPhotos,
   animate = true,
 }) => {
@@ -160,6 +162,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           // Call handleIdle when the map is idle
           const onceIdle = () => handleIdle(extent?.bbox);
           map?.once("idle", onceIdle);
+          map?.on("click", layerId, onLayerClick);
 
           return true;
         } else return prev;
@@ -169,6 +172,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       // Always remember to clean up resources
       try {
         if (map?.getSource(sourceId)) {
+          map?.off("click", layerId, onLayerClick);
           map?.removeLayer(layerId);
           map?.removeSource(sourceId);
         }
