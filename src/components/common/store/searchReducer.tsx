@@ -292,13 +292,13 @@ const createSuggesterParamFrom = (
 };
 // The longer the text user query, there higher the score it require, this makes sense
 // because user make specific query and result should be specific too.
-const calculateScore = (
-  base: number | undefined,
-  text: string | undefined
-): number => {
-  const pump = text ? (text.length / 2 > 50 ? 50 : text.length / 2) : 0;
-  return base ? Number(base) + Number(pump) : Number(pump);
-};
+// const calculateScore = (
+//   base: number | undefined,
+//   text: string | undefined
+// ): number => {
+//   const pump = text ? (text.length / 2 > 50 ? 50 : text.length / 2) : 0;
+//   return base ? Number(base) + Number(pump) : Number(pump);
+// };
 
 // Helper function to merge search terms into search text
 const mergeToSearchText = (

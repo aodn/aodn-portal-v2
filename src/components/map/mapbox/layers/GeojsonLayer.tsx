@@ -25,12 +25,12 @@ interface GeojsonLayerProps {
 
 const GeojsonLayer: FC<GeojsonLayerProps> = ({
   collection,
-  onLayerClick = (event: MapLayerMouseEvent) => {},
+  onLayerClick = (_: MapLayerMouseEvent) => {},
   setPhotos,
   animate = true,
 }) => {
   const { map } = useContext(MapContext);
-  const [mapLoaded, setMapLoaded] = useState<boolean | null>(null);
+  const [_, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
   const collectionId = useMemo(() => collection.id, [collection.id]);
   const sourceId = useMemo(
