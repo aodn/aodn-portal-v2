@@ -102,6 +102,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
   );
 };
 
+const MENU_ID = "daterange-show-hide-menu-button";
+
 const DateRange: React.FC<DateRangeControlProps> = ({
   minDate,
   maxDate,
@@ -189,5 +191,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
     </IconButton>
   );
 };
+
+export { MENU_ID };
 
 export default DateRange;

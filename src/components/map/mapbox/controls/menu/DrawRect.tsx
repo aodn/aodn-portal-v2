@@ -29,6 +29,8 @@ interface DrawControlProps extends ControlProps {
   ) => IDownloadCondition[];
 }
 
+const MENU_ID = "draw-rect-menu-button";
+
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
   getAndSetDownloadConditions,
@@ -115,7 +117,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
   return (
     <IconButton
       aria-label="draw-rect-menu"
-      id="draw-rect-menu-button"
+      id={MENU_ID}
       ref={anchorRef}
       onClick={() => mapDraw.changeMode("draw_rectangle")}
       sx={{ paddingTop: "3px !important" }}
@@ -124,5 +126,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
     </IconButton>
   );
 };
+
+export { MENU_ID };
 
 export default DrawRect;

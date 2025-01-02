@@ -9,6 +9,9 @@ import { useLocation } from "react-router-dom";
 import store from "../../../../../components/common/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
+import { MENU_ID as BASE_MAP_MENU_ID } from "../../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
+import { MENU_ID as DATE_RANGE_MENU_ID } from "../../../../../components/map/mapbox/controls/menu/DateRange";
+import { MENU_ID as DRAW_RECT_MENU_ID } from "../../../../../components/map/mapbox/controls/menu/DrawRect";
 
 describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
@@ -16,6 +19,10 @@ describe("AssociatedRecordsPanel", async () => {
 
   beforeAll(() => {
     server.listen();
+  });
+
+  afterAll(() => {
+    server.close();
   });
 
   beforeEach(() => {
@@ -37,9 +44,6 @@ describe("AssociatedRecordsPanel", async () => {
     cleanup();
     server.resetHandlers();
     vi.restoreAllMocks();
-  });
-  afterAll(() => {
-    server.close();
   });
 
   beforeEach(() => {
@@ -66,7 +70,7 @@ describe("AssociatedRecordsPanel", async () => {
     openSpy.mockRestore();
   });
 
-  test("should render AssociatedRecordsPanel", () => {
+  it("should render AssociatedRecordsPanel", () => {
     waitFor(() => screen.findAllByText("Parent Record")).then(() => {
       const parentRecordText = screen.queryAllByText("Parent Record");
       // one is button, another is list title
@@ -74,7 +78,7 @@ describe("AssociatedRecordsPanel", async () => {
     });
   });
 
-  test("should open a new tab when clicking on a record abstract", () => {
+  it("should open a new tab when clicking on a record abstract", () => {
     waitFor(() =>
       screen.findAllByText(
         "Northern Australia Automated Marine Weather and Oceanographic Stations"
@@ -100,7 +104,7 @@ describe("AssociatedRecordsPanel", async () => {
     });
   });
 
-  test("should be able to show / hide more records", () => {
+  it("should be able to show / hide more records", () => {
     const lowerRecordTitle =
       "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
 
@@ -137,6 +141,22 @@ describe("AssociatedRecordsPanel", async () => {
 
       // final record should be hiddren again
       expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
+    });
+  });
+
+  it("should render these menu control", () => {
+    waitFor(() => {
+      const baseMapMenu = document.getElementById(BASE_MAP_MENU_ID);
+      expect(baseMapMenu).to.exist;
+
+      const dateRangeMenu = document.getElementById(DATE_RANGE_MENU_ID);
+      expect(dateRangeMenu).to.exist;
+
+      const drawRectMenu = document.getElementById(DRAW_RECT_MENU_ID);
+      expect(drawRectMenu).to.exist;
+      // Delete is a build in component, so we cannot add id for it but check the title only
+      const deleteMenu = screen.getByTitle("Delete");
+      expect(deleteMenu).to.exist;
     });
   });
 });

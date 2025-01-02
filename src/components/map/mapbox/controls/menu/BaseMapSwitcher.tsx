@@ -35,6 +35,8 @@ interface BaseMapSwitcherProps extends ControlProps {
   }>;
 }
 
+const MENU_ID = "basemap-show-hide-menu-button";
+
 const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
   map,
   layers,
@@ -45,7 +47,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
   );
   // Must init the map so that it will not throw error indicate uncontrol to control component
   const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(
-    new Map(layers?.map((i) => [i.id, i.default ? true : false]))
+    new Map(layers?.map((i) => [i.id, !!i.default]))
   );
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -98,7 +100,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
     <>
       <IconButton
         aria-label="basemap-show-hide-menu"
-        id="basemap-show-hide-menu-button"
+        id={MENU_ID}
         ref={anchorRef}
         onClick={handleToggle}
         sx={{ paddingTop: "2px !important" }}
@@ -221,5 +223,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
     </>
   );
 };
+
+export { MENU_ID };
 
 export default BaseMapSwitcher;
