@@ -5,14 +5,23 @@ import HeaderSection from "./subpages/HeaderSection";
 import SideSection from "./subpages/SideSection";
 import { DetailPageProvider } from "./context/detail-page-provider";
 import ContentSection from "./subpages/ContentSection";
-import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
 import SectionContainer from "../../components/layout/components/SectionContainer";
-
-export interface DetailsProps {
-  collection?: OGCCollection;
-}
+import { LngLatBounds, MapLayerMouseEvent } from "mapbox-gl";
+import { useCallback, useState } from "react";
 
 const DetailsPage = () => {
+  const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
+  const onSpatialCoverageLayerClick = useCallback(
+    (evt: MapLayerMouseEvent) => {
+      if (evt.type === "click" && evt.lngLat) {
+        // Magic number 10 to move to a bound area given the lnglat
+        const bounds = evt.lngLat.toBounds(10);
+        setBbox(bounds);
+      }
+    },
+    [setBbox]
+  );
+
   return (
     <Layout>
       <DetailPageProvider>
@@ -27,10 +36,12 @@ const DetailsPage = () => {
               <HeaderSection />
             </Grid>
             <Grid item xs={9}>
-              <ContentSection />
+              <ContentSection mapFocusArea={bbox} />
             </Grid>
             <Grid item xs={3}>
-              <SideSection />
+              <SideSection
+                onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
+              />
             </Grid>
           </Grid>
         </SectionContainer>

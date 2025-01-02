@@ -5,14 +5,14 @@ import { useDetailPageContext } from "../../context/detail-page-context";
 import Layers from "../../../../components/map/mapbox/layers/Layers";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import { FC } from "react";
-import { MapMouseEvent } from "mapbox-gl";
+import { MapLayerMouseEvent } from "mapbox-gl";
 
-interface SpatialCoverageCardProps {
-  onLayerClick?: (event: MapMouseEvent) => void;
+export interface SpatialCoverageCardProps {
+  onSpatialCoverageLayerClick?: (event: MapLayerMouseEvent) => void;
 }
 
 const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
-  onLayerClick,
+  onSpatialCoverageLayerClick,
 }) => {
   const { collection } = useDetailPageContext();
   const mapContainerId = "map-spatial-extent-container-id";
@@ -28,11 +28,11 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
             height: "200px",
           }}
         >
-          <Map panelId={mapContainerId}>
+          <Map panelId={mapContainerId} zoom={0} minZoom={0}>
             <Layers>
               <GeojsonLayer
                 collection={collection}
-                onLayerClick={onLayerClick}
+                onLayerClick={onSpatialCoverageLayerClick}
                 animate={false}
               />
             </Layers>

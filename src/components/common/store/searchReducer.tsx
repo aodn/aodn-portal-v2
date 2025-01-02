@@ -64,6 +64,7 @@ export const DEFAULT_SEARCH_PAGE_SIZE = 11;
 export const FULL_LIST_PAGE_SIZE = 21;
 
 const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
+const TIMEOUT = 60000;
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
   return new OGCCollections(
@@ -110,7 +111,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
   return axios
     .get<OGCCollections>("/api/v1/ogc/collections", {
       params: p,
-      timeout: 30000,
+      timeout: TIMEOUT,
     })
     .then((response) => jsonToOGCCollections(response.data))
     .catch((error: Error | AxiosError | ErrorResponse) => {
@@ -138,7 +139,7 @@ const searchParameterVocabs = async (
 ) =>
   axios
     .get<Array<Vocab>>("/api/v1/ogc/ext/parameter/vocabs", {
-      timeout: 5000,
+      timeout: TIMEOUT,
     })
     .then((response) => response.data)
     .catch((error: Error | AxiosError | ErrorResponse) => {
@@ -169,7 +170,7 @@ const fetchSuggesterOptions = createAsyncThunk<
     axios
       .get<any>("/api/v1/ogc/ext/autocomplete", {
         params: params,
-        timeout: 5000,
+        timeout: TIMEOUT,
       })
       .then((response) => response.data)
       .catch((error: Error | AxiosError | ErrorResponse) => {
