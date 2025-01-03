@@ -64,6 +64,7 @@ export const DEFAULT_SEARCH_PAGE_SIZE = 11;
 export const FULL_LIST_PAGE_SIZE = 21;
 
 const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
+const TIMEOUT = 60000;
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
   return new OGCCollections(
@@ -110,6 +111,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
   return axios
     .get<OGCCollections>("/api/v1/ogc/collections", {
       params: p,
+      timeout: TIMEOUT,
     })
     .then((response) => jsonToOGCCollections(response.data))
     .catch((error: Error | AxiosError | ErrorResponse) => {
@@ -136,7 +138,9 @@ const searchParameterVocabs = async (
   thunkApi: any
 ) =>
   axios
-    .get<Array<Vocab>>("/api/v1/ogc/ext/parameter/vocabs")
+    .get<Array<Vocab>>("/api/v1/ogc/ext/parameter/vocabs", {
+      timeout: TIMEOUT,
+    })
     .then((response) => response.data)
     .catch((error: Error | AxiosError | ErrorResponse) => {
       if (axios.isAxiosError(error) && error.response) {
@@ -166,6 +170,7 @@ const fetchSuggesterOptions = createAsyncThunk<
     axios
       .get<any>("/api/v1/ogc/ext/autocomplete", {
         params: params,
+        timeout: TIMEOUT,
       })
       .then((response) => response.data)
       .catch((error: Error | AxiosError | ErrorResponse) => {
@@ -287,13 +292,13 @@ const createSuggesterParamFrom = (
 };
 // The longer the text user query, there higher the score it require, this makes sense
 // because user make specific query and result should be specific too.
-const calculateScore = (
-  base: number | undefined,
-  text: string | undefined
-): number => {
-  const pump = text ? (text.length / 2 > 50 ? 50 : text.length / 2) : 0;
-  return base ? Number(base) + Number(pump) : Number(pump);
-};
+// const calculateScore = (
+//   base: number | undefined,
+//   text: string | undefined
+// ): number => {
+//   const pump = text ? (text.length / 2 > 50 ? 50 : text.length / 2) : 0;
+//   return base ? Number(base) + Number(pump) : Number(pump);
+// };
 
 // Helper function to merge search terms into search text
 const mergeToSearchText = (

@@ -12,7 +12,7 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
-import { MapboxEvent as MapEvent } from "mapbox-gl";
+import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../../components/map/mapbox/controls/menu/DateRange";
@@ -47,7 +47,13 @@ const getMinMaxDateStamps = (
   return [minDate, maxDate];
 };
 
-const AbstractAndDownloadPanel: FC = () => {
+interface AbstractAndDownloadPanelProps {
+  bbox?: LngLatBounds;
+}
+
+const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
+  bbox,
+}) => {
   const {
     collection,
     featureCollection,
@@ -121,6 +127,7 @@ const AbstractAndDownloadPanel: FC = () => {
                 }}
               >
                 <Map
+                  bbox={bbox}
                   panelId={mapContainerId}
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}

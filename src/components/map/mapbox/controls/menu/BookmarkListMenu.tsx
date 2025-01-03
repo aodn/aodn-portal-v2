@@ -20,9 +20,10 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   tabNavigation,
 }) => {
   const anchorRef = useRef<HTMLButtonElement>(null);
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
+    // Other menu button clicked, close this menu item
     const handleMenuClick = (evt: MenuClickedEvent) => {
       if (evt.component.type !== BookmarkListMenu) {
         setOpen(false);
@@ -35,8 +36,14 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
     };
   }, [setOpen]);
 
+  useEffect(() => {
+    // Make bookmark list visible after all the init, the init false make
+    // the list invisible during init which is correct.
+    setOpen(true);
+  }, []);
+
   return (
-    <Box>
+    <>
       <IconButton
         aria-label="bookmark-list-button"
         id="bookmark-list-button"
@@ -46,43 +53,41 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
       >
         <BookmarksIcon />
       </IconButton>
-      {anchorRef.current && (
-        <Popper
-          id="bookmark-list"
-          open={open}
-          anchorEl={anchorRef.current}
-          role={undefined}
-          placement="left-start"
-          disablePortal
-          modifiers={[
-            {
-              name: "offset",
-              options: {
-                offset: [0, 10],
-              },
+      <Popper
+        id="bookmark-list"
+        open={open}
+        anchorEl={anchorRef.current}
+        role={undefined}
+        placement="left-start"
+        disablePortal
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: [0, 10],
             },
-          ]}
+          },
+        ]}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: BOOKMARK_LIST_WIDTH_MAP,
+            maxHeight: "85vh",
+            overflowY: "auto",
+            borderRadius: borderRadius.menu,
+            backgroundColor: "#fff",
+            zIndex: 1,
+          }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              width: BOOKMARK_LIST_WIDTH_MAP,
-              maxHeight: "85vh",
-              overflowY: "auto",
-              borderRadius: borderRadius.menu,
-              backgroundColor: "#fff",
-              zIndex: 1,
-            }}
-          >
-            <BookmarkListAccordionGroup
-              onDeselectDataset={onDeselectDataset}
-              tabNavigation={tabNavigation}
-            />
-          </Box>
-        </Popper>
-      )}
-    </Box>
+          <BookmarkListAccordionGroup
+            onDeselectDataset={onDeselectDataset}
+            tabNavigation={tabNavigation}
+          />
+        </Box>
+      </Popper>
+    </>
   );
 };
 

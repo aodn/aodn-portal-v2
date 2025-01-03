@@ -1,14 +1,19 @@
+import { FC } from "react";
 import { Card, Stack } from "@mui/material";
 import { borderRadius } from "../../../styles/constants";
 import DownloadCard from "./side-cards/DownloadCard";
 import OverviewCard from "./side-cards/OverviewCard";
-import SpatialCoverageCard from "./side-cards/SpatialCoverageCard";
+import SpatialCoverageCard, {
+  SpatialCoverageCardProps,
+} from "./side-cards/SpatialCoverageCard";
 import TimePeriodCard from "./side-cards/TimePeriodCard";
 import ThemesCard from "./side-cards/ThemesCard";
 import RatingsAndCommentsCard from "./side-cards/RatingsAndCommentsCard";
 import { useDetailPageContext } from "../context/detail-page-context";
 
-const SideSection = () => {
+interface SideSectionProps extends SpatialCoverageCardProps {}
+
+const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
   const { isCollectionNotFound } = useDetailPageContext();
   return (
     <Stack direction="column" spacing={2}>
@@ -20,11 +25,17 @@ const SideSection = () => {
       >
         <DownloadCard />
       </Card>
-      {!isCollectionNotFound && <OverviewCard />}
-      {!isCollectionNotFound && <SpatialCoverageCard />}
-      {!isCollectionNotFound && <TimePeriodCard />}
-      {!isCollectionNotFound && <ThemesCard />}
-      {!isCollectionNotFound && <RatingsAndCommentsCard />}
+      {!isCollectionNotFound && (
+        <>
+          <OverviewCard />
+          <SpatialCoverageCard
+            onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
+          />
+          <TimePeriodCard />
+          <ThemesCard />
+          <RatingsAndCommentsCard />
+        </>
+      )}
     </Stack>
   );
 };

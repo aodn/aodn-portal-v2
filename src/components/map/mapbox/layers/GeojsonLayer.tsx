@@ -12,23 +12,25 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
-import { LngLatBoundsLike } from "mapbox-gl";
+import { LngLatBoundsLike, MapLayerMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 interface GeojsonLayerProps {
-  // Vector tile layer should added to map
+  // Vector tile layer should add to map
   collection: OGCCollection;
+  onLayerClick?: (event: MapLayerMouseEvent) => void;
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   animate?: boolean;
 }
 
 const GeojsonLayer: FC<GeojsonLayerProps> = ({
   collection,
+  onLayerClick = (_: MapLayerMouseEvent) => {},
   setPhotos,
   animate = true,
 }) => {
   const { map } = useContext(MapContext);
-  const [mapLoaded, setMapLoaded] = useState<boolean | null>(null);
+  const [_, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
   const collectionId = useMemo(() => collection.id, [collection.id]);
   const sourceId = useMemo(
@@ -42,27 +44,31 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
 
   // Function to fit map to the overall bbox(bboxes[0])
   const fitToOverallBbox = useCallback(
-    (bboxes: Array<Position>) => {
-      const bound = bboxes[0] as LngLatBoundsLike;
-      map?.fitBounds(bound, { maxZoom: 3, padding: 10, animate: animate });
+    (bbox: Array<Position>) => {
+      const bound = bbox[0] as LngLatBoundsLike;
+      map?.fitBounds(bound, {
+        minZoom: map?.getMinZoom(),
+        maxZoom: map?.getMaxZoom(),
+        animate: animate,
+      });
     },
     [map, animate]
   );
 
   // Function to take photo of the map for given bounding boxes
   const takePhoto = useCallback(
-    (bboxes: Array<Position> | undefined, index: number) => {
-      if (!Array.isArray(bboxes) || !setPhotos) return;
+    (bbox: Array<Position> | undefined, index: number) => {
+      if (!Array.isArray(bbox) || !setPhotos) return;
 
       // when it comes to the last index, map fitBound to the first bbox (the overall bbox)
-      if (bboxes.length === index) {
-        fitToOverallBbox(bboxes);
+      if (bbox.length === index) {
+        fitToOverallBbox(bbox);
         return;
       }
 
       // before the last bbox snapshot has been taken (i.e. index < bboxes.length), map will fitBound to current bounding box (bboxes[index]) to get a snapshot once idle
-      const bound = bboxes[index] as LngLatBoundsLike;
-      const bbox = bboxes[index];
+      const bound = bbox[index] as LngLatBoundsLike;
+      const box = bbox[index];
       const m = map?.fitBounds(bound, {
         maxZoom: index === 0 ? 2 : 5,
         padding: 10,
@@ -77,8 +83,8 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
             setPhotos((prevPhotos) => [
               ...prevPhotos,
               {
-                bbox,
-                url,
+                bbox: box,
+                url: url,
               },
             ]);
           } else {
@@ -86,31 +92,30 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           }
         }, "image/png");
         // increase the index to loop
-        takePhoto(bboxes, index + 1);
+        takePhoto(bbox, index + 1);
       });
     },
     [fitToOverallBbox, map, setPhotos]
   );
 
   const handleIdle = useCallback(
-    (bboxes: Array<Position> | undefined) => {
-      if (bboxes === undefined) return;
+    (bbox: Array<Position> | undefined) => {
+      if (bbox === undefined) return;
 
       // If Layer didn't receive the setPhoto as a prop, it means no need to take photos for every bbox, therefore just call fitToOverallBbox
-      if (!setPhotos) {
-        fitToOverallBbox(bboxes);
-        return;
-      }
-
-      //  Resets the photos state and initiates the photo-taking process for the provided bounding boxes.
-      setPhotos((prevPhotos) => {
-        prevPhotos.forEach((prevPhoto) => {
-          URL.revokeObjectURL(prevPhoto.url); // Cleanup the URL
+      if (setPhotos) {
+        //  Resets the photos state and initiates the photo-taking process for the provided bounding boxes.
+        setPhotos((prevPhotos) => {
+          prevPhotos.forEach((prevPhoto) => {
+            URL.revokeObjectURL(prevPhoto.url); // Cleanup the URL
+          });
+          return [];
         });
-        return [];
-      });
-      // Call takePhoto with the bounding boxes and starts with the first bounding box (index set to 0)
-      takePhoto(bboxes, 0);
+        // Call takePhoto with the bounding boxes and starts with the first bounding box (index set to 0)
+        takePhoto(bbox, 0);
+      } else {
+        fitToOverallBbox(bbox);
+      }
     },
     [fitToOverallBbox, setPhotos, takePhoto]
   );
@@ -151,7 +156,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     if (map === null) return;
 
     // This situation is map object created, hence not null, but not completely loaded
-    // and therefore you will have problem setting source and layer. Set-up a listener
+    // therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
     map?.once("load", () =>
       setMapLoaded((prev) => {
@@ -160,6 +165,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           // Call handleIdle when the map is idle
           const onceIdle = () => handleIdle(extent?.bbox);
           map?.once("idle", onceIdle);
+          map?.on("click", layerId, onLayerClick);
 
           return true;
         } else return prev;
@@ -169,6 +175,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       // Always remember to clean up resources
       try {
         if (map?.getSource(sourceId)) {
+          map?.off("click", layerId, onLayerClick);
           map?.removeLayer(layerId);
           map?.removeSource(sourceId);
         }

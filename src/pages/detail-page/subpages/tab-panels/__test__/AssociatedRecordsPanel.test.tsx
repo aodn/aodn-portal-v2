@@ -18,6 +18,10 @@ describe("AssociatedRecordsPanel", async () => {
     server.listen();
   });
 
+  afterAll(() => {
+    server.close();
+  });
+
   beforeEach(() => {
     vi.mock("react-router-dom", () => ({
       ...vi.importActual("react-router-dom"),
@@ -37,9 +41,6 @@ describe("AssociatedRecordsPanel", async () => {
     cleanup();
     server.resetHandlers();
     vi.restoreAllMocks();
-  });
-  afterAll(() => {
-    server.close();
   });
 
   beforeEach(() => {
@@ -66,7 +67,7 @@ describe("AssociatedRecordsPanel", async () => {
     openSpy.mockRestore();
   });
 
-  test("should render AssociatedRecordsPanel", () => {
+  it("should render AssociatedRecordsPanel", () => {
     waitFor(() => screen.findAllByText("Parent Record")).then(() => {
       const parentRecordText = screen.queryAllByText("Parent Record");
       // one is button, another is list title
@@ -74,7 +75,7 @@ describe("AssociatedRecordsPanel", async () => {
     });
   });
 
-  test("should open a new tab when clicking on a record abstract", () => {
+  it("should open a new tab when clicking on a record abstract", () => {
     waitFor(() =>
       screen.findAllByText(
         "Northern Australia Automated Marine Weather and Oceanographic Stations"
@@ -100,7 +101,7 @@ describe("AssociatedRecordsPanel", async () => {
     });
   });
 
-  test("should be able to show / hide more records", () => {
+  it("should be able to show / hide more records", () => {
     const lowerRecordTitle =
       "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
 
