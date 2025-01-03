@@ -9,7 +9,7 @@ class SearchComponent(BasePage):
 
         # Page locators
         self.search_field = page.get_by_test_id('input-with-suggester')
-        self.search_button = page.get_by_test_id('searchbar-search-button')
+        self.search_button = page.get_by_test_id('search-button')
 
     def fill_search_text(self, search_text: str) -> None:
         """Fill up search text"""
