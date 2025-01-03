@@ -84,8 +84,8 @@ class BasePage:
 
     def scroll_to_bottom(self) -> None:
         """Scroll to the bottom of the page"""
-        execute_js(self.page, 'scrollToBottom')
+        execute_js(self.page, 'window.__custom.scrollToBottom')
 
     def get_page_scroll_y(self) -> int:
         """Get the current page scroll Y position"""
-        return execute_js(self.page, 'getPageScrollY')
+        return execute_js(self.page, 'window.__custom.getPageScrollY')

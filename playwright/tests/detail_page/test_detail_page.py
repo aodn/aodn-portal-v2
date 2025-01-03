@@ -133,7 +133,6 @@ def test_show_more_and_less_list_items(
     ],
 )
 def test_dropdown_scroll(page_mock: Page, uuid: str) -> None:
-    pytest.skip("Skipping this test for now")
     detail_page = DetailPage(page_mock)
     detail_page.load(uuid)
     # The Download Card with a dropdown
