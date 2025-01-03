@@ -118,6 +118,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
     <IconButton
       aria-label="draw-rect-menu"
       id={MENU_ID}
+      data-testid={MENU_ID}
       ref={anchorRef}
       onClick={() => mapDraw.changeMode("draw_rectangle")}
       sx={{ paddingTop: "3px !important" }}

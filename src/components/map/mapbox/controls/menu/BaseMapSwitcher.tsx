@@ -101,6 +101,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
       <IconButton
         aria-label="basemap-show-hide-menu"
         id={MENU_ID}
+        data-testid={MENU_ID}
         ref={anchorRef}
         onClick={handleToggle}
         sx={{ paddingTop: "2px !important" }}

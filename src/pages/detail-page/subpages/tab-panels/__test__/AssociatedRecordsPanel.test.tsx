@@ -9,9 +9,6 @@ import { useLocation } from "react-router-dom";
 import store from "../../../../../components/common/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
-import { MENU_ID as BASE_MAP_MENU_ID } from "../../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
-import { MENU_ID as DATE_RANGE_MENU_ID } from "../../../../../components/map/mapbox/controls/menu/DateRange";
-import { MENU_ID as DRAW_RECT_MENU_ID } from "../../../../../components/map/mapbox/controls/menu/DrawRect";
 
 describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
@@ -141,22 +138,6 @@ describe("AssociatedRecordsPanel", async () => {
 
       // final record should be hiddren again
       expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
-    });
-  });
-
-  it("should render these menu control", () => {
-    waitFor(() => {
-      const baseMapMenu = document.getElementById(BASE_MAP_MENU_ID);
-      expect(baseMapMenu).to.exist;
-
-      const dateRangeMenu = document.getElementById(DATE_RANGE_MENU_ID);
-      expect(dateRangeMenu).to.exist;
-
-      const drawRectMenu = document.getElementById(DRAW_RECT_MENU_ID);
-      expect(drawRectMenu).to.exist;
-      // Delete is a build in component, so we cannot add id for it but check the title only
-      const deleteMenu = screen.getByTitle("Delete");
-      expect(deleteMenu).to.exist;
     });
   });
 });

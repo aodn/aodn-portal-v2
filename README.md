@@ -26,6 +26,12 @@ cd <project-name>
 3. **Install the project dependencies:**
 
 ```bash
+# Install nvm (you may want a later version)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+
+nvm install 18.20.5
+nvm use 18.20.5
+
 npm install -g corepack
 yarn install
 ```
