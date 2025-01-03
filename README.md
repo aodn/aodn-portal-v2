@@ -7,6 +7,7 @@ To set up this project locally, follow these steps using Yarn and Vite for a smo
 ## Prerequisites
 
 - Node.js installed on your system with version 18.x || >=20.0.0 (you can use [nvm](https://github.com/nvm-sh/nvm) for changing the node version).
+- Current work node is 18.19.1
 - Npm installed on your system with version >=8.0.0
 
 ## Installation

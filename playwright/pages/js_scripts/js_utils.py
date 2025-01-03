@@ -11,7 +11,6 @@ def load_js_functions(page: Page, js_file_name: str) -> None:
         js_code = file.read()
         page.add_init_script(js_code)
 
-
 def load_map_js_functions(page: Page) -> None:
     load_js_functions(page, 'map_functions.js')
 
