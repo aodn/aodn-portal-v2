@@ -5,7 +5,6 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-
 def test_map_expand_toggle(page_mock: Page) -> None:
     landing_page = LandingPage(page_mock)
     search_page = SearchPage(page_mock)

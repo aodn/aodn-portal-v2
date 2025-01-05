@@ -65,9 +65,12 @@ To install `Conda`, please refer to the [official guide](https://conda.io/projec
    poetry install
    ```
 6. Install all supported browsers with system dependencies:
+
    ```bash
+   # If this command still fail with dependency lib, you may need to upgrade your lib or playwright version
    playwright install --with-deps
    ```
+
 7. Configure project related settings:
 
    a) Open the `settings.toml` file

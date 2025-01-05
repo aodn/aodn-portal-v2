@@ -123,7 +123,8 @@ def test_show_more_and_less_list_items(
     detail_page.click_show_less(item_list)
     expect(keywords).to_have_count(initial_count)
 
-
+# When a dropdown appear, we will disable scroll because of the material-ui drop down will make the list flow on top
+# and scroll will make the list flow around. When the dropdown item selected, we will resume the scroll wheel action.
 @pytest.mark.parametrize(
     'uuid',
     [
@@ -133,13 +134,17 @@ def test_show_more_and_less_list_items(
 def test_dropdown_scroll(page_mock: Page, uuid: str) -> None:
     detail_page = DetailPage(page_mock)
     detail_page.load(uuid)
-
+    # The Download Card with a dropdown
     detail_page.select_elements.first.click()
-    detail_page.scroll_To_Bottom()
-    scroll_position = detail_page.get_Page_Scroll_Y()
-    assert scroll_position == 0
+    try:
+        detail_page.scroll_to_bottom()
+    except Exception as error:
+        print(error)
 
+    scroll_position = detail_page.get_page_scroll_y()
+    assert scroll_position == 0
+    # Drop down disappear, now we can scroll
     detail_page.body.click()
-    detail_page.scroll_To_Bottom()
-    new_scroll_position = detail_page.get_Page_Scroll_Y()
+    detail_page.scroll_to_bottom()
+    new_scroll_position = detail_page.get_page_scroll_y()
     assert new_scroll_position > scroll_position

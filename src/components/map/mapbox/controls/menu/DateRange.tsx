@@ -34,6 +34,8 @@ interface DateRangeControlProps extends ControlProps {
   ) => IDownloadCondition[];
 }
 
+const COMPONENT_ID = "dateslider-daterange-menu-button";
+
 const DateSlider: React.FC<DateSliderProps> = ({
   currentMinDate,
   currentMaxDate,
@@ -64,7 +66,12 @@ const DateSlider: React.FC<DateSliderProps> = ({
   );
 
   return (
-    <Grid container width="800px" sx={{ padding: "10px" }}>
+    <Grid
+      container
+      width="800px"
+      sx={{ padding: "10px" }}
+      data-testid={COMPONENT_ID}
+    >
       <Grid item md={2} container sx={{ paddingX: "10px" }}>
         <Grid item md={12}>
           {minDate}
@@ -101,6 +108,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
     </Grid>
   );
 };
+
+const MENU_ID = "daterange-show-hide-menu-button";
 
 const DateRange: React.FC<DateRangeControlProps> = ({
   minDate,
@@ -184,10 +193,15 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   ]);
 
   return (
-    <IconButton onClick={() => setIsShowingSelector((prev) => !prev)}>
+    <IconButton
+      data-testid={MENU_ID}
+      onClick={() => setIsShowingSelector((prev) => !prev)}
+    >
       <img alt="" src={timeRange} />
     </IconButton>
   );
 };
+
+export { MENU_ID, COMPONENT_ID };
 
 export default DateRange;

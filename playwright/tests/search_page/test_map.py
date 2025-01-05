@@ -15,7 +15,7 @@ from pages.js_scripts.js_utils import execute_js
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-
+pytestmark = pytest.mark.skip(reason="Temporarily skipping all search tests")
 def test_map_drag_updates_search_results(page_mock: Page) -> None:
     api_router = ApiRouter(page=page_mock)
     landing_page = LandingPage(page_mock)

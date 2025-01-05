@@ -8,7 +8,7 @@ from pages.js_scripts.js_utils import execute_js, load_common_js_functions
 class BasePage:
     def __init__(self, page: Page):
         self.page = page
-        load_common_js_functions(page)
+        load_common_js_functions(self.page)
 
         # Common locators
         self.body = page.locator('body')
@@ -82,10 +82,10 @@ class BasePage:
         """Returns the given collapse item title"""
         return self.page.get_by_test_id(f'collapse-item-{title}')
 
-    def scroll_To_Bottom(self) -> None:
+    def scroll_to_bottom(self) -> None:
         """Scroll to the bottom of the page"""
-        execute_js(self.page, 'scrollToBottom')
+        execute_js(self.page, 'window.__custom.scrollToBottom')
 
-    def get_Page_Scroll_Y(self) -> int:
+    def get_page_scroll_y(self) -> int:
         """Get the current page scroll Y position"""
-        return execute_js(self.page, 'getPageScrollY')
+        return execute_js(self.page, 'window.__custom.getPageScrollY')
