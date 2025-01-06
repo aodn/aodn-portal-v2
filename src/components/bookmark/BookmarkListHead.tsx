@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import { Box, Button, SxProps, Typography } from "@mui/material";
 import {
   color,
