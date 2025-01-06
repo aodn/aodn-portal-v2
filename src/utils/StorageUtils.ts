@@ -1,3 +1,4 @@
+import { isDraft } from "immer";
 import { current } from "@reduxjs/toolkit";
 
 const BOOKMARK_IDS_KEY = "bookmark-list";
@@ -10,7 +11,7 @@ export const saveBookmarkIdsToStorage = (items: Array<any>) => {
     }
 
     // Convert from Immer draft if necessary
-    const plainItems = current(items);
+    const plainItems = isDraft(items) ? current(items) : items;
     const ids = plainItems.map((item) => item.id);
     localStorage.setItem(BOOKMARK_IDS_KEY, JSON.stringify(ids));
   } catch (e) {

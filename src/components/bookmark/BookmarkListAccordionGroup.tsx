@@ -1,4 +1,11 @@
-import { FC, SyntheticEvent, useCallback, useEffect, useState } from "react";
+import {
+  FC,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import StyledAccordion from "../common/accordion/StyledAccordion";
@@ -38,26 +45,27 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   tabNavigation,
   hideHead = false,
 }) => {
+  const state = getBookmarkList(store.getState());
+
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
-  // TODO need? seems replaced by bookmarkItem is possible
   const [accordionGroupItems, setAccordionGroupItems] = useState<
     Array<OGCCollection>
-  >(getBookmarkList(store.getState()).items);
-
-  // State to store the mouse hover status
-  const [hoverOnButton, setHoverOnButton] = useState<boolean>(false);
+  >(state.items);
 
   const [bookmarkItems, setBookmarkItems] = useState<
     Array<OGCCollection> | undefined
-  >(getBookmarkList(store.getState()).items);
+  >(state.items);
 
   const [bookmarkTemporaryItem, setBookmarkTemporaryItem] = useState<
     OGCCollection | undefined
-  >(getBookmarkList(store.getState()).temporaryItem);
+  >(state.temporaryItem);
 
   const [bookmarkExpandedItem, setBookmarkExpandedItem] = useState<
     OGCCollection | undefined
-  >(getBookmarkList(store.getState()).expandedItem);
+  >(state.expandedItem);
+
+  // State to store the mouse hover status
+  const [hoverOnButton, setHoverOnButton] = useState<boolean>(false);
 
   const handleChange = useCallback(
     (item: OGCCollection, hoverOnRemoveButton: boolean) =>
@@ -107,7 +115,12 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     const handler = (event: BookmarkEvent) => {
       if (event.action === EVENT_BOOKMARK.INIT) {
         setBookmarkItems(event.value);
-        setAccordionGroupItems(event.value);
+        setAccordionGroupItems(() => {
+          if (state.temporaryItem) {
+            return [state.temporaryItem, ...event.value];
+          }
+          return event.value;
+        });
       }
 
       if (event.action === EVENT_BOOKMARK.ADD) {
@@ -174,7 +187,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
       off(EVENT_BOOKMARK.EXPAND, handler);
       off(EVENT_BOOKMARK.TEMP, handler);
     };
-  }, []);
+  }, [state.temporaryItem]);
 
   return (
     <>
