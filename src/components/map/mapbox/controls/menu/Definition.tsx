@@ -11,6 +11,7 @@ enum EVENT_MAP {
 }
 
 enum EVENT_BOOKMARK {
+  INIT = "event-bookmark-initialization",
   ADD = "event-bookmark-added",
   REMOVE = "event-bookmark-removed",
   // Temp item, do not need to store in local store, and only 1 temp item

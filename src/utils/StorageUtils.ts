@@ -1,10 +1,17 @@
-import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
+import { current } from "@reduxjs/toolkit";
 
 const BOOKMARK_IDS_KEY = "bookmark-list";
 
-export const saveBookmarkIdsToStorage = (items: Array<OGCCollection>) => {
+export const saveBookmarkIdsToStorage = (items: Array<any>) => {
   try {
-    const ids = items.map((item) => item.id);
+    if (!items || items.length === 0) {
+      localStorage.removeItem(BOOKMARK_IDS_KEY);
+      return;
+    }
+
+    // Convert from Immer draft if necessary
+    const plainItems = current(items);
+    const ids = plainItems.map((item) => item.id);
     localStorage.setItem(BOOKMARK_IDS_KEY, JSON.stringify(ids));
   } catch (e) {
     console.error("Error saving bookmark ids:", e);

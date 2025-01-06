@@ -3,15 +3,9 @@ import { Box, Button, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import StyledAccordion from "../common/accordion/StyledAccordion";
 import StyledAccordionSummary from "../common/accordion/StyledAccordionSummary";
-import {
-  color,
-  fontColor,
-  fontSize,
-  fontWeight,
-  padding,
-} from "../../styles/constants";
+import { color, fontColor, fontSize, fontWeight } from "../../styles/constants";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
-import BookmarkListCard, { BookmarkListCardType } from "./BookmarkListCard";
+import BookmarkListCard from "./BookmarkListCard";
 import BookmarkButton from "./BookmarkButton";
 import {
   removeItem,
@@ -21,6 +15,7 @@ import {
   on,
   off,
   removeAllItems,
+  initializeBookmarkList,
 } from "../common/store/bookmarkListReducer";
 import store from "../common/store/store";
 import {
@@ -102,9 +97,19 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     [bookmarkExpandedItem, bookmarkTemporaryItem?.id, onDeselectDataset]
   );
 
+  // Initialize bookmark list with local storage
+  useEffect(() => {
+    store.dispatch(initializeBookmarkList());
+  }, []);
+
   // Update accordion group list by listening bookmark items and bookmark temporary item
   useEffect(() => {
     const handler = (event: BookmarkEvent) => {
+      if (event.action === EVENT_BOOKMARK.INIT) {
+        setBookmarkItems(event.value);
+        setAccordionGroupItems(event.value);
+      }
+
       if (event.action === EVENT_BOOKMARK.ADD) {
         setBookmarkItems((items) =>
           items ? [event.value, ...items] : [event.value]
@@ -154,6 +159,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
       }
     };
 
+    on(EVENT_BOOKMARK.INIT, handler);
     on(EVENT_BOOKMARK.ADD, handler);
     on(EVENT_BOOKMARK.REMOVE, handler);
     on(EVENT_BOOKMARK.REMOVE_ALL, handler);
@@ -161,6 +167,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     on(EVENT_BOOKMARK.TEMP, handler);
 
     return () => {
+      off(EVENT_BOOKMARK.INIT, handler);
       off(EVENT_BOOKMARK.ADD, handler);
       off(EVENT_BOOKMARK.REMOVE, handler);
       off(EVENT_BOOKMARK.REMOVE_ALL, handler);

@@ -23,9 +23,7 @@ import {
   on,
   off,
   setExpandedItem,
-  setTemporaryItem,
   fetchAndInsertTemporary,
-  removeAllItems,
 } from "../../components/common/store/bookmarkListReducer";
 import Layout from "../../components/layout/layout";
 import ResultSection from "./subpages/ResultSection";
