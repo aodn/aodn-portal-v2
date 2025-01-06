@@ -187,7 +187,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
       off(EVENT_BOOKMARK.EXPAND, handler);
       off(EVENT_BOOKMARK.TEMP, handler);
     };
-  }, []);
+  }, [state.temporaryItem]);
 
   return (
     <>
