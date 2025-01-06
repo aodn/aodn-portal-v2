@@ -45,16 +45,12 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   tabNavigation,
   hideHead = false,
 }) => {
-  const state = useMemo(() => getBookmarkList(store.getState()), []);
+  const state = getBookmarkList(store.getState());
 
-  const groupItems = useMemo(
-    () =>
-      state.temporaryItem ? [state.temporaryItem, ...state.items] : state.items,
-    [state.items, state.temporaryItem]
-  );
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
-  const [accordionGroupItems, setAccordionGroupItems] =
-    useState<Array<OGCCollection>>(groupItems);
+  const [accordionGroupItems, setAccordionGroupItems] = useState<
+    Array<OGCCollection>
+  >(state.items);
 
   const [bookmarkItems, setBookmarkItems] = useState<
     Array<OGCCollection> | undefined
@@ -119,6 +115,12 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     const handler = (event: BookmarkEvent) => {
       if (event.action === EVENT_BOOKMARK.INIT) {
         setBookmarkItems(event.value);
+        setAccordionGroupItems(() => {
+          if (state.temporaryItem) {
+            return [state.temporaryItem, ...event.value];
+          }
+          return event.value;
+        });
       }
 
       if (event.action === EVENT_BOOKMARK.ADD) {
