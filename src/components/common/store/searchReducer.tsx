@@ -330,7 +330,7 @@ const createSearchParamFrom = (
   // TODO: need to remove this block if ogcapi support platform filter
   const searchTerms = mergeToSearchText(i.platform, i.searchText);
   if (searchTerms.length > 0) {
-    p.text = searchTerms.join(" ");
+    p.text = searchTerms.join(",");
   }
 
   const c = mergeWithDefaults(
