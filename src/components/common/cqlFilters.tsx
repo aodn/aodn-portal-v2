@@ -79,7 +79,9 @@ const funcParameterVocabs: ParameterVocabsIn = (vocabs: Array<Vocab>) => {
 const funcPlatformFilter: PlatformFilter = (platforms: Array<string>) => {
   if (!platforms || platforms.length === 0) return "";
 
-  const platformQueries = platforms.map((platform) => `platform='${platform}'`);
+  const platformQueries = platforms.map(
+    (platform) => `platform_vocabs='${platform}'`
+  );
   return `(${platformQueries.join(" or ")})`;
 };
 
