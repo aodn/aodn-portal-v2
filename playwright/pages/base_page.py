@@ -2,7 +2,10 @@ from typing import Any
 
 from playwright.sync_api import Locator, Page
 
-from pages.js_scripts.js_utils import execute_js, load_common_js_functions
+from pages.js_scripts.js_utils import (
+    execute_common_js,
+    load_common_js_functions,
+)
 
 
 class BasePage:
@@ -84,8 +87,8 @@ class BasePage:
 
     def scroll_to_bottom(self) -> None:
         """Scroll to the bottom of the page"""
-        execute_js(self.page, 'window.__custom.scrollToBottom')
+        execute_common_js(self.page, 'scrollToBottom')
 
     def get_page_scroll_y(self) -> int:
         """Get the current page scroll Y position"""
-        return execute_js(self.page, 'window.__custom.getPageScrollY')
+        return execute_common_js(self.page, 'getPageScrollY')

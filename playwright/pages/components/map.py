@@ -3,7 +3,11 @@ import random
 from playwright.sync_api import Page
 
 from pages.base_page import BasePage
-from pages.js_scripts.js_utils import execute_js, load_map_js_functions
+from pages.js_scripts.js_utils import (
+    execute_map_js,
+    load_map_js_functions,
+    wait_for_js_function,
+)
 
 
 class Map(BasePage):
@@ -36,12 +40,12 @@ class Map(BasePage):
 
     def center_map(self, lng: str, lat: str) -> None:
         """Center the map to a given longitude and latitude coordinates"""
-        execute_js(self.page, 'centerMap', lng, lat, '12')
+        execute_map_js(self.page, 'centerMap', lng, lat, '12')
         self.wait_for_map_loading()
 
     def wait_for_map_loading(self) -> None:
         """Wait until the map is fully loaded"""
-        self.page.wait_for_function('() => {return isMapLoaded();}')
+        wait_for_js_function(self.page, 'isMapLoaded')
 
     def click_map(self) -> None:
         """Click the map at the current position of the mouse"""
@@ -51,13 +55,13 @@ class Map(BasePage):
     def get_map_layers(self) -> str:
         """Get the total number of heatmap layers"""
         self.wait_for_map_loading()
-        layers = execute_js(self.page, 'getMapLayers')
+        layers = execute_map_js(self.page, 'getMapLayers')
         return str(layers)
 
     def get_Layer_id_from_test_props(self, layer_function_name: str) -> str:
         """Get specific layer id"""
         self.wait_for_map_loading()
-        layer_id = execute_js(self.page, layer_function_name)
+        layer_id = execute_map_js(self.page, layer_function_name)
         return str(layer_id)
 
     def get_AU_Marine_Parks_Layer_id(self) -> str:
@@ -75,7 +79,7 @@ class Map(BasePage):
     def is_map_layer_visible(self, layer_id: str) -> bool:
         """Check whether a given map layer is visible"""
         self.wait_for_map_loading()
-        is_visible = execute_js(self.page, 'isMapLayerVisible', layer_id)
+        is_visible = execute_map_js(self.page, 'isMapLayerVisible', layer_id)
         return is_visible
 
     def zoom_to_level(self, zoom_level: float = random.uniform(4, 6)) -> None:
@@ -85,14 +89,18 @@ class Map(BasePage):
         Args:
             zoom_level (float, optional): The zoom level to set the map to. Defaults to random.uniform(4, 6).
         """
-        execute_js(self.page, 'zoomToLevel', zoom_level)
+        execute_map_js(self.page, 'zoomToLevel', zoom_level)
 
     def get_map_center(self) -> dict:
         """Get the current center coordinates of the map"""
-        map_center = execute_js(self.page, 'getMapCenter')
+        map_center = execute_map_js(self.page, 'getMapCenter')
         return dict(map_center)
 
     def get_map_zoom(self) -> float:
         """Get the current zoom level of the map"""
-        map_zoom = execute_js(self.page, 'getMapZoom')
+        map_zoom = execute_map_js(self.page, 'getMapZoom')
         return float(map_zoom)
+
+    def find_and_click_cluster(self) -> bool:
+        """Find and click on a cluster on the map"""
+        return execute_map_js(self.page, 'findAndClickCluster')

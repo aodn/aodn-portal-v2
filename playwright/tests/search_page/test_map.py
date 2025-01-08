@@ -11,11 +11,10 @@ from mocks.api.collections import (
 )
 from mocks.api_router import ApiRouter
 from pages.detail_page import DetailPage
-from pages.js_scripts.js_utils import execute_js
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-pytestmark = pytest.mark.skip(reason="Temporarily skipping all search tests")
+
 def test_map_drag_updates_search_results(page_mock: Page) -> None:
     api_router = ApiRouter(page=page_mock)
     landing_page = LandingPage(page_mock)
@@ -169,7 +168,7 @@ def test_map_spider(
     search_page.wait_for_timeout(5000)
 
     # Try to find and click a cluster
-    cluster_found = execute_js(page_mock, 'findAndClickCluster')
+    cluster_found = search_page.map.find_and_click_cluster()
     assert cluster_found is True
 
     layer_factory = LayerFactory(search_page.map)

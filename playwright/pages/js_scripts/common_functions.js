@@ -1,12 +1,8 @@
-function scrollToBottom() {
-  window.scrollTo(0, document.body.scrollHeight);
-}
-
-function getPageScrollY() {
-  return window.scrollY;
-}
-
-window.__custom = {
-  scrollToBottom: scrollToBottom,
-  getPageScrollY: getPageScrollY,
+window.__common_functions = {
+  scrollToBottom: function () {
+    window.scrollTo(0, document.body.scrollHeight);
+  },
+  getPageScrollY: function () {
+    return window.scrollY;
+  },
 };
