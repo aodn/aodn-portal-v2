@@ -12,7 +12,7 @@ const AODNSiteLogo = () => (
     sx={{
       display: "flex",
       alignItems: "center",
-      justifyContent: "end",
+      justifyContent: "center",
       minWidth: "240px",
     }}
   >

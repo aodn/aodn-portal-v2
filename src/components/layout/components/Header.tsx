@@ -10,8 +10,10 @@ import { pageDefault } from "../../common/constants";
 import Searchbar from "../../search/Searchbar";
 import { PAGE_CONTENT_MAX_WIDTH, PAGE_CONTENT_WIDTH } from "../constant";
 import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
+import useBreakpoint from "../../../hooks/useBreakpoint";
 
 const Header: FC = () => {
+  const { isMobile } = useBreakpoint();
   const path = useLocation().pathname;
   const isSearchResultPage = path === pageDefault.search;
 
@@ -48,6 +50,7 @@ const Header: FC = () => {
         <AODNSiteLogo />
 
         {/* Main menu just for display, will implement later once design is finished */}
+
         {isSearchResultPage ? (
           <Box
             display="flex"
@@ -61,6 +64,8 @@ const Header: FC = () => {
             <MainMenu isCollapsed={shouldExpandSearchbar} />
             <Searchbar setShouldExpandSearchbar={setShouldExpandSearchbar} />
           </Box>
+        ) : isMobile ? (
+          <MainMenu isCollapsed={true} />
         ) : (
           <MainMenu />
         )}

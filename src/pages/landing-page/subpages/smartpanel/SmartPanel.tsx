@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import { IconButton } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { color, gap } from "../../../../styles/constants";
+import { color, gap, padding } from "../../../../styles/constants";
 import {
   SMART_PANEL_CARD_SIZE,
   SMART_PANEL_GAP,
@@ -48,21 +48,24 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
   );
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
-      <IconButton
-        onClick={() => handleScroll(-SCROLL_DISTANCE)}
-        sx={{
-          backgroundColor: color.white.twoTenTransparent,
-        }}
-      >
-        <ArrowBackIosNewIcon
+      <Box pr={padding.medium}>
+        <IconButton
+          onClick={() => handleScroll(-SCROLL_DISTANCE)}
           sx={{
-            pr: gap.sm,
-            height: 20,
-            width: 20,
-            color: "#fff",
+            backgroundColor: color.white.twoTenTransparent,
           }}
-        />
-      </IconButton>
+        >
+          <ArrowBackIosNewIcon
+            sx={{
+              pr: gap.sm,
+              height: 20,
+              width: 20,
+              color: "#fff",
+            }}
+          />
+        </IconButton>
+      </Box>
+
       <Box
         ref={boxRef}
         sx={{
@@ -123,14 +126,16 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
           ))}
         </ImageList>
       </Box>
-      <IconButton
-        onClick={() => handleScroll(SCROLL_DISTANCE)}
-        sx={{ backgroundColor: color.white.twoTenTransparent }}
-      >
-        <ArrowForwardIosIcon
-          sx={{ pl: gap.sm, height: 20, width: 20, color: "#fff" }}
-        />
-      </IconButton>
+      <Box pl={padding.medium}>
+        <IconButton
+          onClick={() => handleScroll(SCROLL_DISTANCE)}
+          sx={{ backgroundColor: color.white.twoTenTransparent }}
+        >
+          <ArrowForwardIosIcon
+            sx={{ pl: gap.sm, height: 20, width: 20, color: "#fff" }}
+          />
+        </IconButton>
+      </Box>
     </Box>
   );
 };

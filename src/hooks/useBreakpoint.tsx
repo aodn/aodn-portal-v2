@@ -1,11 +1,3 @@
-/*
-320px  - xs (mobile)
-768px  - sm (tablet)
-1280px - md (laptop/desktop)
-1440px - lg (large desktop)
-1920px - xl (extra large/4K)
-*/
-
 import { useMediaQuery, useTheme } from "@mui/material";
 
 const useBreakpoint = () => {

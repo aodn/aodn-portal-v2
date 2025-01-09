@@ -27,7 +27,6 @@ const SectionContainer = ({
   >
     <Stack
       direction="column"
-      gap={8}
       sx={{
         justifyContent: "center",
         alignItems: "center",
