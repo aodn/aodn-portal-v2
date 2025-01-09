@@ -34,3 +34,17 @@ def page_mock(page: Page) -> Generator:
     yield page
 
     page.unroute_all()
+
+
+################################################################################
+#  Uncomment the following fixtue and run test to record video for test runs.  #
+#  Recorded video will be saved in the 'videos' directory.                     #
+################################################################################
+# @pytest.fixture
+# def browser_context_args(browser_context_args):
+#     """Fixture to configure video recording"""
+#     return {
+#         **browser_context_args,
+#         'record_video_dir': 'videos',
+#         'record_video_size': {'width': 1280, 'height': 720},
+#     }
