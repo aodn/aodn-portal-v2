@@ -158,10 +158,10 @@ const theme: ThemeOptions = {
 
   breakpoints: {
     values: {
-      xs: 0,
-      sm: 600,
-      md: 960,
-      lg: 1280,
+      xs: 320,
+      sm: 768,
+      md: 1280,
+      lg: 1440,
       xl: 1920,
     },
   },
