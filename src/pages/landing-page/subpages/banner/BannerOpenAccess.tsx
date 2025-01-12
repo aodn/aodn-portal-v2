@@ -6,9 +6,11 @@ import {
   margin,
   padding,
 } from "../../../../styles/constants";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 const BannerOpenAccess = () => {
   const theme = useTheme();
+  const { isMobile } = useBreakpoint();
   return (
     <Box
       sx={{
@@ -42,20 +44,23 @@ const BannerOpenAccess = () => {
         >
           Ocean Data
         </Typography>
-        <Typography
-          sx={{
-            fontSize: { xs: "14px", sm: fontSize.bannerSubtitle },
-            fontWeight: fontWeight.light,
-            letterSpacing: gap.sm,
-            color: "white",
-            whiteSpace: "wrap",
-            textAlign: "right",
-            pr: padding.small,
-            textShadow: theme.shadows[4],
-          }}
-        >
-          &quot;The gateway to Australian marine and climate science data&rdquo;
-        </Typography>
+        {!isMobile && (
+          <Typography
+            sx={{
+              fontSize: fontSize.bannerSubtitle,
+              fontWeight: fontWeight.light,
+              letterSpacing: gap.sm,
+              color: "white",
+              whiteSpace: "wrap",
+              textAlign: "right",
+              pr: padding.small,
+              textShadow: theme.shadows[4],
+            }}
+          >
+            &quot;The gateway to Australian marine and climate science
+            data&rdquo;
+          </Typography>
+        )}
       </Stack>
     </Box>
   );

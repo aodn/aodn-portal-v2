@@ -9,15 +9,11 @@ const News: FC = () => {
   return (
     <Grid container paddingY={{ xs: padding.medium, sm: padding.quadruple }}>
       <Grid item xs={12}>
-        <Typography color="#fff" fontSize={fontSize.newsInfo}>
-          News
-        </Typography>
         <Typography
           color="#fff"
-          fontSize={fontSize.newsHeading}
-          letterSpacing={2}
+          sx={{ fontSize: { xs: "24px", sm: fontSize.newsHeading } }}
         >
-          Read what&apos;s new
+          Featured Datasets
         </Typography>
       </Grid>
       <Grid item xs={12} paddingY={{ xs: padding.medium, sm: padding.triple }}>

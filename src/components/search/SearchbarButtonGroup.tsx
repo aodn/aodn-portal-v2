@@ -109,7 +109,15 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   );
 
   return (
-    <Stack height="100%" direction="row" spacing={0.5} padding={gap.sm} sx={sx}>
+    <Stack
+      height="100%"
+      width="100%"
+      direction="row"
+      justifyContent="end"
+      spacing={0.5}
+      padding={gap.sm}
+      sx={sx}
+    >
       <SearchbarExpandableButton
         icon={<DateRangeIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Date)}

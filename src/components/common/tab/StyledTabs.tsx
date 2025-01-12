@@ -12,6 +12,7 @@ const StyledTabs = styled((props: StyledTabsProps) => (
     {...props}
     orientation="horizontal"
     variant="scrollable"
+    scrollButtons="auto"
     TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
   />
 ))({

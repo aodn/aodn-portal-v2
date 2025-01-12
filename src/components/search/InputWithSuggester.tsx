@@ -291,6 +291,8 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       includeInputInList
       onInputChange={handleInputChange}
       sx={{
+        bgcolor: "#fff",
+        borderRadius: borderRadius.small,
         ".MuiOutlinedInput-root": { padding: 0, paddingLeft: padding.small },
 
         // Keep the clear text button 'X' visible when there exists text input

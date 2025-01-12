@@ -202,22 +202,25 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
     <BarChart
       height={180}
       margin={{
-        right: 170,
-        left: 80, // Increased left margin to accommodate the y-axis label
-        bottom: 50, // Bottom margin for x-axis labels
-        top: 20, // Added top margin for better overall layout
+        right: 50,
+        left: 80,
+        bottom: 50,
+        top: 50,
       }}
       slotProps={{
         legend: {
-          direction: "column",
+          direction: "row",
           position: {
-            vertical: "middle",
-            horizontal: "right",
+            vertical: "top", // Changed to top for better responsiveness
+            horizontal: "middle",
           },
-          itemMarkWidth: 20,
-          itemMarkHeight: 20,
+          itemMarkWidth: 15,
+          itemMarkHeight: 15,
           markGap: 10,
-          itemGap: 10,
+          itemGap: 20,
+          labelStyle: {
+            fontSize: 12,
+          },
         },
       }}
       xAxis={[

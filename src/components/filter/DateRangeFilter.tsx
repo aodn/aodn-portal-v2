@@ -66,9 +66,13 @@ const initialMaxDate: Dayjs = dayjs(dateDefault.max);
 
 interface DateRangeFilterProps {
   handleClosePopup: () => void;
+  isMobile?: boolean;
 }
 
-const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
+const DateRangeFilter: FC<DateRangeFilterProps> = ({
+  handleClosePopup,
+  isMobile = false,
+}) => {
   const dispatch = useAppDispatch();
 
   // State from redux
@@ -258,10 +262,16 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Grid container>
+      <Grid container position="relative">
+        <IconButton
+          onClick={handleClose}
+          sx={{ position: "absolute", top: gap.md, right: gap.md }}
+        >
+          <CloseIcon />
+        </IconButton>
         <Grid
           item
-          xs={2}
+          xs={isMobile ? 12 : 2}
           display="flex"
           justifyContent="center"
           alignItems="start"
@@ -270,7 +280,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
             display="flex"
             justifyContent="center"
             alignItems="center"
-            padding={padding.large}
+            p={padding.large}
+            pt={padding.triple}
           >
             <FormControl>
               <RadioGroup
@@ -296,15 +307,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
               </RadioGroup>
             </FormControl>
           </Box>
-          <Divider
-            sx={{
-              borderColor: color.blue.darkSemiTransparent,
-            }}
-            orientation="vertical"
-          />
         </Grid>
-        <Grid item xs={8}>
-          <Grid container padding={padding.large}>
+
+        <Grid item xs={isMobile ? 12 : 10}>
+          <Grid container p={padding.large} pt={padding.triple}>
             <Grid
               item
               xs={12}
@@ -312,9 +318,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
             >
               <Box
                 display="flex"
+                flexDirection={isMobile ? "column" : "row"}
                 justifyContent="space-between"
                 alignItems="center"
                 width="100%"
+                gap={2}
               >
                 <Box display="flex" alignItems="center">
                   <Typography
@@ -358,22 +366,24 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
                 </Box>
               </Box>
             </Grid>
-            <Grid
-              item
-              xs={12}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Box sx={{ width: "100%" }}>
-                <TimeRangeBarChart
-                  imosDataIds={imosDataIds}
-                  totalDataset={totalDataset}
-                  selectedStartDate={minDate.toDate()}
-                  selectedEndDate={maxDate.toDate()}
-                />
-              </Box>
-            </Grid>
+            {!isMobile && (
+              <Grid
+                item
+                xs={12}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Box sx={{ width: "100%" }}>
+                  <TimeRangeBarChart
+                    imosDataIds={imosDataIds}
+                    totalDataset={totalDataset}
+                    selectedStartDate={minDate.toDate()}
+                    selectedEndDate={maxDate.toDate()}
+                  />
+                </Box>
+              </Grid>
+            )}
             <Grid container>
               <Grid
                 item
@@ -416,47 +426,42 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         </Grid>
         <Grid
           item
-          xs={2}
-          position="relative"
+          xs={12}
           display="flex"
-          flexDirection="column"
+          flexDirection="row"
           justifyContent="end"
           alignItems="center"
-          paddingY={padding.large}
+          gap={2}
+          pr={2}
+          pb={2}
         >
           <Button
-            sx={{
-              width: "100px",
-              marginBottom: margin.lg,
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
-            onClick={handleClear}
-          >
-            Clear
-          </Button>
-          <Button
-            sx={{
-              width: "100px",
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
             onClick={() => handleApply(dateRange)}
+            sx={{
+              width: "100px",
+              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+              "&:hover": {
+                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+                backgroundColor: color.blue.darkSemiTransparent,
+              },
+            }}
           >
             Apply
           </Button>
-          <IconButton
-            onClick={handleClose}
-            sx={{ position: "absolute", top: gap.lg, right: gap.lg }}
+          <Button
+            onClick={handleClear}
+            sx={{
+              width: "100px",
+
+              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+              "&:hover": {
+                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+                backgroundColor: color.blue.darkSemiTransparent,
+              },
+            }}
           >
-            <CloseIcon />
-          </IconButton>
+            Clear
+          </Button>
         </Grid>
       </Grid>
     </LocalizationProvider>
