@@ -30,7 +30,7 @@ const PLATFORMS = [
     icon: <GliderIcon />,
   },
   {
-    value: "gloat",
+    value: "float",
     label: "Float",
     icon: <FloatIcon />,
   },

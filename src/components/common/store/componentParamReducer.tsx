@@ -4,7 +4,7 @@
  */
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
-import { DatasetFrequency, mergeToSearchText } from "./searchReducer";
+import { DatasetFrequency } from "./searchReducer";
 import { MapDefaultConfig } from "../../map/mapbox/constants";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
