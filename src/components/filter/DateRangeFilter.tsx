@@ -40,6 +40,7 @@ import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
 import { DEFAULT_DATE_PICKER_SLOT } from "../details/DateRangeSlider";
 import { dateToValue, valueToDate } from "../../utils/DateUtils";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 enum DateRangeOptionValues {
   Custom = "custom",
@@ -65,13 +66,10 @@ const initialMaxDate: Dayjs = dayjs(dateDefault.max);
 
 interface DateRangeFilterProps {
   handleClosePopup: () => void;
-  isMobile?: boolean;
 }
 
-const DateRangeFilter: FC<DateRangeFilterProps> = ({
-  handleClosePopup,
-  isMobile = false,
-}) => {
+const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
+  const { isMobile, isTablet } = useBreakpoint();
   const dispatch = useAppDispatch();
 
   // State from redux
@@ -275,7 +273,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
         </IconButton>
         <Grid
           item
-          xs={isMobile ? 12 : 2}
+          xs={isMobile || isTablet ? 12 : 2}
           display="flex"
           justifyContent="center"
           alignItems="start"
@@ -285,13 +283,16 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             justifyContent="center"
             alignItems="center"
             p={padding.large}
-            pt={isMobile ? padding.large : padding.triple}
+            pt={isMobile || isTablet ? padding.large : padding.triple}
           >
             <FormControl>
               <RadioGroup
                 defaultValue={DateRangeOptionValues.Custom}
                 value={selectedOption}
                 onChange={handleRadioChange}
+                sx={{
+                  flexDirection: { xs: "column", sm: "row", md: "column" },
+                }}
               >
                 {dateRangeOptions.map((item) => (
                   <FormControlLabel
@@ -313,11 +314,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
           </Box>
         </Grid>
 
-        <Grid item xs={isMobile ? 12 : 10}>
+        <Grid item xs={isMobile || isTablet ? 12 : 10}>
           <Grid
             container
             p={padding.large}
-            pt={isMobile ? padding.large : padding.triple}
+            pt={isMobile || isTablet ? padding.large : padding.triple}
           >
             <Grid
               item

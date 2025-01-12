@@ -111,7 +111,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   return (
     <Stack
       height="100%"
-      width="100%"
+      width={{ xs: "100%", sm: "auto" }}
       direction="row"
       justifyContent="end"
       spacing={0.5}
