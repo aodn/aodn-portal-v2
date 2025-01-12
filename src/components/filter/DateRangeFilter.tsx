@@ -22,7 +22,6 @@ import {
   fontSize,
   fontWeight,
   gap,
-  margin,
   padding,
 } from "../../styles/constants";
 import CloseIcon from "@mui/icons-material/Close";
@@ -265,7 +264,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
       <Grid container position="relative">
         <IconButton
           onClick={handleClose}
-          sx={{ position: "absolute", top: gap.md, right: gap.md }}
+          sx={{
+            position: "absolute",
+            top: gap.md,
+            right: gap.md,
+            bgcolor: color.gray.extraLight,
+          }}
         >
           <CloseIcon />
         </IconButton>
@@ -281,7 +285,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             justifyContent="center"
             alignItems="center"
             p={padding.large}
-            pt={padding.triple}
+            pt={isMobile ? padding.large : padding.triple}
           >
             <FormControl>
               <RadioGroup
@@ -310,7 +314,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
         </Grid>
 
         <Grid item xs={isMobile ? 12 : 10}>
-          <Grid container p={padding.large} pt={padding.triple}>
+          <Grid
+            container
+            p={padding.large}
+            pt={isMobile ? padding.large : padding.triple}
+          >
             <Grid
               item
               xs={12}
@@ -352,7 +360,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
                     fontWeight={fontWeight.bold}
                     color={fontColor.blue.dark}
                   >
-                    End&nbsp;Date
+                    End&nbsp;&nbsp;&nbsp;Date
                   </Typography>
                   <PlainDatePicker
                     views={["year", "month", "day"]}

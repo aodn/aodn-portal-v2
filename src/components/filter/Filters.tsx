@@ -218,7 +218,13 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
       <Box sx={{ position: "relative", width: "100%", ...sx }}>
         <IconButton
           onClick={handleClose}
-          sx={{ position: "absolute", top: gap.md, right: gap.md, zIndex: 1 }}
+          sx={{
+            position: "absolute",
+            top: gap.md,
+            right: gap.md,
+            zIndex: 1,
+            bgcolor: color.gray.extraLight,
+          }}
         >
           <CloseIcon />
         </IconButton>
