@@ -71,7 +71,13 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
         sx={{
           width: SMART_PANEL_WIDTH,
           height: SMART_PANEL_HEIGHT,
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
           overflow: "hidden",
+          overflowX: "scroll",
         }}
       >
         <ImageList
@@ -80,11 +86,6 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
             height: SMART_PANEL_HEIGHT,
             m: 0,
             p: 0,
-            "&::-webkit-scrollbar": {
-              display: "none",
-            },
-            "-ms-overflow-style": "none",
-            "scrollbar-width": "none",
           }}
           variant="quilted"
           cols={imageListTotalCols}
