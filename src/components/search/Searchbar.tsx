@@ -7,12 +7,17 @@ import SearchbarButtonGroup, {
 } from "./SearchbarButtonGroup";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
-import { POPUP_MIN_WIDTH } from "./constants";
+import {
+  POPUP_MIN_WIDTH_LAPTOP,
+  POPUP_MIN_WIDTH_MOBILE,
+  POPUP_MIN_WIDTH_TABLET,
+} from "./constants";
 import DateRangeFilter from "../filter/DateRangeFilter";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
 import LocationFilter from "../filter/LocationFilter";
 import Filters from "../filter/Filters";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 interface SearchbarProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -20,6 +25,7 @@ interface SearchbarProps {
 
 const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const location = useLocation();
+  const { isMobile, isTablet } = useBreakpoint();
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
   const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
@@ -90,6 +96,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
         elevation={0}
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           alignItems: "center",
           height: "100%",
           border:
@@ -97,6 +104,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
               ? `${border.sm} ${color.brightBlue.semiTransparentDark}`
               : "none",
           borderRadius: borderRadius.small,
+          backgroundColor: { xs: "transparent", sm: "#fff" },
           paddingY: gap.md,
         }}
       >
@@ -112,7 +120,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           pendingSearch={pendingSearch}
           activeButton={activeButton}
           handleClickButton={handleClickButton}
-          shouldExpandAllButtons={shouldExpandAllButtons}
+          shouldExpandAllButtons={isMobile ? false : shouldExpandAllButtons}
           sx={{ pr: gap.md }}
         />
       </Paper>
@@ -138,7 +146,11 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
             minWidth:
               activeButton === SearchbarButtonNames.Location
                 ? 0
-                : POPUP_MIN_WIDTH,
+                : isMobile
+                  ? POPUP_MIN_WIDTH_MOBILE
+                  : isTablet
+                    ? POPUP_MIN_WIDTH_TABLET
+                    : POPUP_MIN_WIDTH_LAPTOP,
             borderRadius: borderRadius.small,
             zIndex: 99,
           }}

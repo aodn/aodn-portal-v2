@@ -25,18 +25,24 @@ import {
 } from "../../../../styles/constants";
 import LogoContainer from "./components/LogoContainer";
 import Logo from "./components/Logo";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 const LogoList: FC = () => {
+  const { isMobile } = useBreakpoint();
   return (
-    <Grid container paddingY={padding.quadruple} spacing={2}>
+    <Grid
+      container
+      paddingY={{ xs: padding.medium, sm: padding.quadruple }}
+      spacing={2}
+    >
       <Grid item xs={12}>
         <Grid container spacing={2}>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={12} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={NCRIS} alt={NCRIS} />
             </LogoContainer>
           </Grid>
-          <Grid item xs={6} lg={6}>
+          <Grid item xs={12} sm={8} lg={9}>
             <Typography color="#000" textAlign="left" padding={0}>
               Australia&apos;s Integrated Marine Observing System (IMOS) is
               enabled by the National Collaborative Research Infrastructre
@@ -54,27 +60,27 @@ const LogoList: FC = () => {
       </Grid>
       <Grid item xs={12}>
         <Grid container spacing={2}>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={UTAS} alt={UTAS} height="40px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={AUMS} alt={AUMS} height="50px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={BM} alt={UTAS} height="100px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={CSIRO} alt={CSIRO} height="70px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Box>
                 <Logo src={GovSA} alt={GovSA} height="75px" />
@@ -84,7 +90,7 @@ const LogoList: FC = () => {
               </Box>
             </LogoContainer>
           </Grid>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={UWA} alt={UWA} height="60px" />
             </LogoContainer>
@@ -92,11 +98,24 @@ const LogoList: FC = () => {
         </Grid>
       </Grid>
       <Grid item xs={12}>
-        <LogoContainer sx={{ minWidth: "100%" }}>
+        <LogoContainer
+          sx={{
+            minWidth: "100%",
+            height: "100%",
+            flexWrap: { xs: "wrap", sm: "nowrap" },
+            gap: 1,
+            p: 1,
+          }}
+        >
           <Logo src={SIMS} alt={SIMS} height="80px" />
           <Divider
-            sx={{ height: "48px", m: 0.5, borderColor: color.gray.dark }}
-            orientation="vertical"
+            sx={{
+              height: { xs: 0, sm: "58px" },
+              width: { xs: "100%", sm: 0 },
+              m: 0.5,
+              borderColor: color.gray.dark,
+            }}
+            orientation={isMobile ? "horizontal" : "vertical"}
           />
           <Logo src={UTS} alt={UTS} height="50px" />
           <Logo src={USYD} alt={USYD} height="50px" />
@@ -118,40 +137,39 @@ const LogoList: FC = () => {
       </Grid>
       <Grid item xs={12}>
         <Grid container spacing={2}>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={CurtinUni} alt={CurtinUni} height="35px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={DAWE} alt={DAWE} height="50px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={DeakinUni} alt={DeakinUni} height="65px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={4} lg={3}>
+          <Grid item xs={6} sm={4} lg={3}>
             <LogoContainer>
               <Logo src={UMEL} alt={UMEL} height="70px" />
             </LogoContainer>
           </Grid>
           <Grid item xs={12}>
             <Typography
-              padding={0}
+              p={0}
+              px={1}
               fontWeight={fontWeight.regular}
               fontSize={fontSize.label}
+              textAlign={{ xs: "center", sm: "left" }}
               lineHeight={2}
             >
               IMOS thanks the many other organisations who partner with IMOS,
-              providing co-investment,
-              <br />
-              funding and operational support, including investment from the
-              Tasmanian,
-              <br />
-              Western Australian and Queensland State Governments.
+              providing co-investment, funding and operational support,
+              including investment from the Tasmanian, Western Australian and
+              Queensland State Governments.
             </Typography>
           </Grid>
         </Grid>

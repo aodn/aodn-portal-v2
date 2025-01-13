@@ -11,13 +11,14 @@ import Logos from "./subpages/logo-list/LogoList";
 import News from "./subpages/news/News";
 import SectionContainer from "../../components/layout/components/SectionContainer";
 import {
-  BANNER_HEIGHT,
+  BANNER_HEIGHT_MOBILE,
+  BANNER_HEIGHT_TABLET,
   SMART_PANEL_CONTAINER_HEIGHT,
-  SMART_PANEL_CONTAINER_WIDTH,
+  SMART_PANEL_CONTAINER_WIDTH_LAPTOP,
+  SMART_PANEL_CONTAINER_WIDTH_MOBILE,
+  SMART_PANEL_CONTAINER_WIDTH_TABLET,
 } from "./constants";
 import {
-  formatToUrlParam,
-  ParameterState,
   updateDateTimeFilterRange,
   updateImosOnly,
   updateParameterVocabs,
@@ -25,24 +26,13 @@ import {
   updateUpdateFreq,
 } from "../../components/common/store/componentParamReducer";
 import { useAppDispatch } from "../../components/common/store/hooks";
-import store, { getComponentState } from "../../components/common/store/store";
-import { useNavigate } from "react-router-dom";
-import { pageDefault } from "../../components/common/constants";
+import useRedirectSearch from "../../hooks/useRedirectSearch";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 const LandingPage: FC = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
-  const redirectSearch = useCallback(() => {
-    const componentParam: ParameterState = getComponentState(store.getState());
-    navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
-      state: {
-        fromNavigate: true,
-        requireSearch: true,
-        referer: "SmartPanel",
-      },
-    });
-  }, [navigate]);
+  const redirectSearch = useRedirectSearch();
+  const { isMobile } = useBreakpoint();
 
   // This is a simple click smart card function that with update search input text and clear all the filters
   // Can be change to a function-switcher if any other functions are designed in the future
@@ -53,7 +43,7 @@ const LandingPage: FC = () => {
       dispatch(updateImosOnly(false));
       dispatch(updateUpdateFreq(undefined));
       dispatch(updateSearchText(value));
-      redirectSearch();
+      redirectSearch("SmartPanel");
     },
     [dispatch, redirectSearch]
   );
@@ -66,7 +56,7 @@ const LandingPage: FC = () => {
           backgroundSize: "cover",
         }}
         contentAreaStyle={{
-          height: BANNER_HEIGHT,
+          height: isMobile ? BANNER_HEIGHT_MOBILE : BANNER_HEIGHT_TABLET,
         }}
       >
         <BannerOpenAccess />
@@ -80,8 +70,14 @@ const LandingPage: FC = () => {
           }}
         >
           <Box
-            width={SMART_PANEL_CONTAINER_WIDTH}
-            height={SMART_PANEL_CONTAINER_HEIGHT}
+            sx={{
+              width: {
+                xs: SMART_PANEL_CONTAINER_WIDTH_MOBILE,
+                sm: SMART_PANEL_CONTAINER_WIDTH_TABLET,
+                md: SMART_PANEL_CONTAINER_WIDTH_LAPTOP,
+              },
+              height: SMART_PANEL_CONTAINER_HEIGHT,
+            }}
           >
             <SmartPanel handleClickSmartCard={handleClickSmartCard} />
           </Box>

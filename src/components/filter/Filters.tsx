@@ -53,6 +53,8 @@ interface FiltersProps {
   sx?: SxProps;
 }
 
+const TAB_MAX_HEIGHT = 300;
+
 enum FiltersTabs {
   Parameters = "parameters",
   Platform = "platform",
@@ -96,20 +98,36 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
       {
         label: "Parameters",
         value: FiltersTabs.Parameters,
-        component: <ThemeFilter filters={filters} setFilters={setFilters} />,
+        component: (
+          <ThemeFilter
+            filters={filters}
+            setFilters={setFilters}
+            sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+          />
+        ),
         showBadge: checkBadge(filters, FiltersTabs.Parameters),
       },
       {
         label: "Platform",
         value: FiltersTabs.Platform,
-        component: <PlatformFilter filters={filters} setFilters={setFilters} />,
+        component: (
+          <PlatformFilter
+            filters={filters}
+            setFilters={setFilters}
+            sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+          />
+        ),
         showBadge: checkBadge(filters, FiltersTabs.Platform),
       },
       {
         label: "Organisation",
         value: FiltersTabs.Organisation,
         component: (
-          <OrganisationFilter filters={filters} setFilters={setFilters} />
+          <OrganisationFilter
+            filters={filters}
+            setFilters={setFilters}
+            sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+          />
         ),
         showBadge: checkBadge(filters, FiltersTabs.Organisation),
       },
@@ -117,7 +135,11 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         label: "Data Settings",
         value: FiltersTabs.DataSettings,
         component: (
-          <DataSettingsFilter filters={filters} setFilters={setFilters} />
+          <DataSettingsFilter
+            filters={filters}
+            setFilters={setFilters}
+            sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+          />
         ),
         showBadge: checkBadge(filters, FiltersTabs.DataSettings),
       },
@@ -196,7 +218,13 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
       <Box sx={{ position: "relative", width: "100%", ...sx }}>
         <IconButton
           onClick={handleClose}
-          sx={{ position: "absolute", top: gap.lg, right: gap.lg, zIndex: 1 }}
+          sx={{
+            position: "absolute",
+            top: gap.md,
+            right: gap.md,
+            zIndex: 1,
+            bgcolor: color.gray.extraLight,
+          }}
         >
           <CloseIcon />
         </IconButton>
@@ -212,7 +240,6 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
           <Button
             sx={{
               width: "100px",
-
               border: `${border.sm} ${color.blue.darkSemiTransparent}`,
               "&:hover": {
                 border: `${border.sm} ${color.blue.darkSemiTransparent}`,
