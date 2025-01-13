@@ -13,7 +13,7 @@ import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 
 const Header: FC = () => {
-  const { isMobile } = useBreakpoint();
+  const { isUnderLaptop, isMobile } = useBreakpoint();
   const path = useLocation().pathname;
   const isSearchResultPage = path === pageDefault.search;
 
@@ -34,7 +34,6 @@ const Header: FC = () => {
       >
         <HeaderMenu />
       </SectionContainer>
-
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: "#fff",
@@ -50,7 +49,6 @@ const Header: FC = () => {
         <AODNSiteLogo />
 
         {/* Main menu just for display, will implement later once design is finished */}
-
         {isSearchResultPage ? (
           <Box
             display="flex"
@@ -61,15 +59,26 @@ const Header: FC = () => {
               shouldExpandSearchbar ? SEARCHBAR_EXPANSION_WIDTH : "none"
             }
           >
-            <MainMenu isCollapsed={shouldExpandSearchbar} />
-            <Searchbar setShouldExpandSearchbar={setShouldExpandSearchbar} />
+            {isUnderLaptop ? (
+              <MainMenu isCollapsed={true} />
+            ) : (
+              <MainMenu isCollapsed={shouldExpandSearchbar} />
+            )}
+            {!isMobile && (
+              <Searchbar setShouldExpandSearchbar={setShouldExpandSearchbar} />
+            )}
           </Box>
-        ) : isMobile ? (
+        ) : isUnderLaptop ? (
           <MainMenu isCollapsed={true} />
         ) : (
           <MainMenu />
         )}
       </SectionContainer>
+      {isSearchResultPage && isMobile && (
+        <Box p={padding.extraSmall} pt={0}>
+          <Searchbar setShouldExpandSearchbar={setShouldExpandSearchbar} />
+        </Box>
+      )}
     </Box>
   );
 };

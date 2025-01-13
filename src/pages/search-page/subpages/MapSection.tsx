@@ -104,7 +104,12 @@ const MapSection: React.FC<MapSectionProps> = ({
   return (
     <Paper
       id={mapContainerId}
-      sx={{ height: "100%", ...sx, position: "relative" }}
+      sx={{
+        position: "relative",
+        height: "100%",
+        width: "100%",
+        ...sx,
+      }}
     >
       <SnackbarLoader isLoading={isLoading} message="Searching..." />
       <Map

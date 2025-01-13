@@ -39,6 +39,8 @@ interface IconSelectProps<T = string> extends CommonSelectProps<T> {
   colorConfig?: IconSelectColorConfig;
 }
 
+export const ICON_SELECT_DEFAULT_HEIGHT = 36;
+
 const getSelectedItemIcon = <T extends string | number>(
   value: T,
   items: SelectItem<T>[]
@@ -147,7 +149,7 @@ const IconSelect = <T extends string | number = string>({
         IconComponent={() => null}
         sx={{
           padding: "0",
-          height: "36px",
+          height: ICON_SELECT_DEFAULT_HEIGHT,
           border: `${border.xs} ${color.blue.darkSemiTransparent}`,
           borderRadius: borderRadius.small,
           backgroundColor: selectedItem

@@ -10,6 +10,7 @@ import ResultListSortButton, {
   ResultListSortButtonType,
   SortResultEnum,
 } from "../common/buttons/ResultListSortButton";
+import { ICON_SELECT_DEFAULT_HEIGHT } from "../common/dropdown/IconSelect";
 
 export interface ResultPanelSimpleFilterType
   extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
@@ -53,7 +54,11 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           }}
           data-testid="show-result-count"
         >
-          <Typography fontSize={fontSize.info} padding={0}>
+          <Typography
+            fontSize={fontSize.info}
+            padding={0}
+            lineHeight={`${ICON_SELECT_DEFAULT_HEIGHT}px`}
+          >
             {renderShowingResultsText(total, count)}
           </Typography>
         </Paper>

@@ -38,6 +38,15 @@ import {
   BookmarkEvent,
   EVENT_BOOKMARK,
 } from "../../components/map/mapbox/controls/menu/Definition";
+import {
+  SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
+  SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
+  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST,
+  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP,
+  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
+  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP,
+} from "./constants";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -60,6 +69,7 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { isUnderLaptop } = useBreakpoint();
 
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -364,18 +374,30 @@ const SearchPage = () => {
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: { xs: "column-reverse", md: "row" },
           justifyContent: "space-between",
           alignItems: "stretch",
           width: "100%",
-          height: "90vh",
+          height: {
+            xs:
+              selectedLayout === SearchResultLayoutEnum.FULL_MAP
+                ? SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP
+                : SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
+            md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
+          },
           overflowY: "auto",
           padding: padding.small,
           bgcolor: color.blue.light,
         }}
         gap={2}
       >
-        <Box>
+        <Box
+          sx={{
+            flex: isUnderLaptop ? 1 : "none",
+            height:
+              selectedLayout === SearchResultLayoutEnum.FULL_MAP ? 0 : "auto",
+          }}
+        >
           <ResultSection
             showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
             showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}
@@ -389,7 +411,18 @@ const SearchPage = () => {
             isLoading={isLoading(loadingThreadCount)}
           />
         </Box>
-        <Box flex={1}>
+        <Box
+          sx={{
+            height: isUnderLaptop
+              ? selectedLayout === SearchResultLayoutEnum.FULL_LIST
+                ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST
+                : selectedLayout === SearchResultLayoutEnum.FULL_MAP
+                  ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP
+                  : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP
+              : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
+            flex: isUnderLaptop ? "none" : 1,
+          }}
+        >
           <MapSection
             showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
             showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}

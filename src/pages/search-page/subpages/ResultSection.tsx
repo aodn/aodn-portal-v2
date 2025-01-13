@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { useSelector } from "react-redux";
-import { Box } from "@mui/material";
+import { Box, SxProps } from "@mui/material";
 import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
 import ResultPanelSimpleFilter, {
   ResultPanelSimpleFilterType,
@@ -17,6 +17,8 @@ import BookmarkListButton, {
   BookmarkListButtonBasicType,
 } from "../../../components/result/BookmarkListButton";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
+import useBreakpoint from "../../../hooks/useBreakpoint";
+import { SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH } from "../constants";
 
 interface ResultSectionProps
   extends Partial<ResultPanelSimpleFilterType>,
@@ -25,9 +27,8 @@ interface ResultSectionProps
   showFullMap: boolean;
   showFullList: boolean;
   isLoading: boolean;
+  sx?: SxProps;
 }
-
-const RESULT_SECTION_WIDTH = 500;
 
 const ResultSection: FC<ResultSectionProps> = ({
   showFullList,
@@ -40,7 +41,9 @@ const ResultSection: FC<ResultSectionProps> = ({
   selectedUuids,
   onDeselectDataset,
   isLoading,
+  sx,
 }) => {
+  const { isUnderLaptop } = useBreakpoint();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
@@ -51,11 +54,15 @@ const ResultSection: FC<ResultSectionProps> = ({
   return (
     <Box
       sx={{
-        width: showFullList ? "100%" : RESULT_SECTION_WIDTH,
+        width:
+          showFullList || isUnderLaptop
+            ? "100%"
+            : SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH,
         height: "100%",
         display: "flex",
         flexDirection: "column",
         position: "relative",
+        ...sx,
       }}
       gap={1}
       data-testid="search-page-result-list"
@@ -64,7 +71,7 @@ const ResultSection: FC<ResultSectionProps> = ({
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: { xs: "column", md: "row" },
         }}
         gap={1}
       >
@@ -79,7 +86,7 @@ const ResultSection: FC<ResultSectionProps> = ({
         {currentLayout === SearchResultLayoutEnum.FULL_LIST && (
           <BookmarkListButton
             onDeselectDataset={onDeselectDataset}
-            sx={{ width: "50%" }}
+            sx={{ width: isUnderLaptop ? "100%" : "50%" }}
           />
         )}
       </Box>
