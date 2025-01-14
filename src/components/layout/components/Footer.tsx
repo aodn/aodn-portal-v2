@@ -60,8 +60,15 @@ const version = import.meta.env.VITE_APP_VERSION;
 const Footer: FC = () => {
   return (
     <SectionContainer>
-      <Grid container paddingY={padding.quadruple}>
-        <Grid item xs={12} display="flex" justifyContent="space-between">
+      <Grid container paddingY={{ xs: padding.medium, sm: padding.quadruple }}>
+        <Grid
+          item
+          xs={12}
+          display="flex"
+          flexDirection={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          gap={{ xs: 2, sm: 0 }}
+        >
           <AODNSiteLogo />
           <Button onClick={handleBackToTop}>
             <IconContainer>
@@ -76,7 +83,9 @@ const Footer: FC = () => {
           <Typography
             color="#000"
             fontSize={fontSize.subscription}
+            textAlign="left"
             lineHeight={2}
+            px={1}
           >
             The Australian Ocean Data Network (AODN) stands at the forefront of
             marine data management in Australia, providing an essential
@@ -98,46 +107,52 @@ const Footer: FC = () => {
           }}
         />
         <Grid item xs={12} paddingY={padding.small}>
-          <Grid container>
-            <Grid item xs={6}>
-              <Tooltip title="Contact us by email" placement="top">
-                <Box
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+          >
+            <Tooltip title="Contact us by email" placement="top">
+              <Box
+                sx={{
+                  height: "100%",
+                  width: { xs: "100%", sm: "180px" },
+                  bgcolor: color.blue.extraDark,
+                  borderRadius: borderRadius.small,
+                }}
+              >
+                <Button
                   sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                     height: "100%",
-                    width: "180px",
-                    bgcolor: color.blue.extraDark,
-                    borderRadius: borderRadius.small,
+                    width: "100%",
                   }}
+                  onClick={handleClickContactUs}
                 >
-                  <Button
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "100%",
-                      width: "100%",
-                    }}
-                    onClick={handleClickContactUs}
+                  <IconContainer sx={{ marginRight: margin.lg, color: "#fff" }}>
+                    <MailOutlineIcon />
+                  </IconContainer>
+                  <Typography
+                    color="#fff"
+                    paddingTop={0}
+                    fontSize={fontSize.info}
+                    letterSpacing={1}
+                    textAlign="center"
                   >
-                    <IconContainer
-                      sx={{ marginRight: margin.lg, color: "#fff" }}
-                    >
-                      <MailOutlineIcon />
-                    </IconContainer>
-                    <Typography
-                      color="#fff"
-                      paddingTop={0}
-                      fontSize={fontSize.info}
-                      letterSpacing={1}
-                      textAlign="center"
-                    >
-                      Contact Us
-                    </Typography>
-                  </Button>
-                </Box>
-              </Tooltip>
-            </Grid>
-            <Grid item xs={6} display="flex" justifyContent="end" gap={2}>
+                    Contact Us
+                  </Typography>
+                </Button>
+              </Box>
+            </Tooltip>
+
+            <Box
+              display="flex"
+              flexDirection={{ xs: "column", sm: "row" }}
+              justifyContent="end"
+              gap={{ xs: 0, sm: 2 }}
+            >
               <Button
                 onClick={() => openInNewTab("https://imos.org.au/terms-of-use")}
               >
@@ -163,8 +178,8 @@ const Footer: FC = () => {
                   Conditions of Use
                 </Typography>
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Grid>
         <Divider
           sx={{
@@ -174,17 +189,22 @@ const Footer: FC = () => {
         />
         <Grid item xs={12} paddingY={padding.large}>
           <Grid container>
-            <Grid item xs={6}>
-              <Typography color="#000" fontSize={fontSize.subscription}>
+            <Grid item xs={12} sm={6}>
+              <Typography
+                color="#000"
+                fontSize={fontSize.subscription}
+                textAlign={{ xs: "center", sm: "left" }}
+              >
                 Copyright © {currentYear}. All rights reserved. Version :&nbsp;
                 {version}
               </Typography>
             </Grid>
             <Grid
               item
-              xs={6}
+              xs={12}
+              sm={6}
               display="flex"
-              justifyContent="end"
+              justifyContent={{ xs: "center", sm: "end" }}
               alignItems="center"
             >
               <Box>

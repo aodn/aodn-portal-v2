@@ -1,7 +1,13 @@
-import * as React from "react";
-import { Box, CardContent, Typography, Grid, Card, Stack } from "@mui/material";
+import { useCallback } from "react";
+import { Box, CardContent, Typography, Card, Stack } from "@mui/material";
 //import RoundButton from "../common/buttons/RoundButton"; TODO
 import YouTube, { YouTubeProps } from "react-youtube";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
+import {
+  STORYBOARD_VIDEO_WIDTH_LAPTOP,
+  STORYBOARD_VIDEO_WIDTH_MOBILE,
+  STORYBOARD_VIDEO_WIDTH_TABLET,
+} from "../../constants";
 
 interface ButtonEvent {
   label: string;
@@ -17,13 +23,27 @@ interface StoryBoardProps {
 }
 
 const StoryBoard = (props: StoryBoardProps) => {
+  const { isMobile, isTablet, isLaptop } = useBreakpoint();
+
+  const getWidth = useCallback(() => {
+    if (isMobile) {
+      return STORYBOARD_VIDEO_WIDTH_MOBILE;
+    } else if (isTablet) {
+      return STORYBOARD_VIDEO_WIDTH_TABLET;
+    } else if (isLaptop) {
+      return STORYBOARD_VIDEO_WIDTH_LAPTOP;
+    } else {
+      return STORYBOARD_VIDEO_WIDTH_LAPTOP;
+    }
+  }, [isLaptop, isMobile, isTablet]);
+
   const onPlayerReady: YouTubeProps["onReady"] = (event) => {
     event.target.pauseVideo();
   };
 
   const opts: YouTubeProps["opts"] = {
-    width: "480",
-    height: "270",
+    width: getWidth(),
+    height: getWidth() * 0.56,
     playerVars: {
       //autoplay: 1,
     },
@@ -31,7 +51,7 @@ const StoryBoard = (props: StoryBoardProps) => {
   return (
     <Box sx={{ display: props?.isActive ? "flex" : "none" }}>
       <Stack
-        direction="row"
+        direction={{ xs: "column", lg: "row" }}
         spacing={2}
         justifyContent="center"
         alignItems="center"
@@ -42,7 +62,7 @@ const StoryBoard = (props: StoryBoardProps) => {
               videoId={props.url}
               opts={opts}
               style={{
-                height: "270px",
+                height: getWidth() * 0.56,
               }}
               onReady={onPlayerReady}
             />
@@ -54,29 +74,16 @@ const StoryBoard = (props: StoryBoardProps) => {
           display="flex"
           justifyContent="start"
           alignItems="start"
+          maxWidth={{ xs: getWidth(), lg: "none" }}
         >
           <CardContent sx={{ flex: "1 0 auto" }}>
             {props.caption}
             <Typography
-              variant="body1"
               color="text.secondary"
-              component="div"
               style={{ lineHeightStep: "30px" }}
             >
               {props.content}
             </Typography>
-
-            {/* <Grid container spacing={3}>
-                        {props.buttons &&
-                            props.buttons?.map((button) => {
-                                return (
-                                    <Grid key={button.label} item xs='auto'>
-                                        <RoundButton variant="outlined" size="small" onClick={button.onClick}>{button.label}</RoundButton>
-                                    </Grid>
-                                );
-                            }
-                        )}
-                    </Grid> */}
           </CardContent>
         </Stack>
       </Stack>

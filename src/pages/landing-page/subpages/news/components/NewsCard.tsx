@@ -17,7 +17,7 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => (
   <Box>
     <CardActionArea
       sx={{
-        "& :hover": { cursor: "pointer", scale: "105%" },
+        "& :hover": { cursor: "pointer" },
       }}
     >
       <CardMedia
@@ -25,7 +25,7 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => (
         height="280px"
         image={news.image}
         alt={`news image-${news.title}`}
-        sx={{ borderRadius: borderRadius.large }}
+        sx={{ borderRadius: borderRadius.large, objectFit: "cover" }}
       />
     </CardActionArea>
     <Box bgcolor={color.blue.extraDark}>

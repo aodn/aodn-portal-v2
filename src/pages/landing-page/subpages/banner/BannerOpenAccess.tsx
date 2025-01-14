@@ -6,20 +6,22 @@ import {
   margin,
   padding,
 } from "../../../../styles/constants";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 const BannerOpenAccess = () => {
   const theme = useTheme();
+  const { isMobile } = useBreakpoint();
   return (
     <Box
       sx={{
-        marginY: margin.quadruple,
+        marginY: { xs: margin.md, sm: margin.quadruple },
         width: "100%",
       }}
     >
       <Stack direction="column" justifyContent="center" alignItems="end">
         <Typography
           sx={{
-            fontSize: fontSize.bannerTitleMedium,
+            fontSize: { xs: "32px", sm: fontSize.bannerTitleMedium },
             fontWeight: fontWeight.extraLight,
             color: "white",
             textAlign: "left",
@@ -31,30 +33,34 @@ const BannerOpenAccess = () => {
         </Typography>
         <Typography
           sx={{
-            fontSize: fontSize.bannerTitleLarge,
+            fontSize: { xs: "38px", sm: fontSize.bannerTitleLarge },
             fontWeight: fontWeight.bold,
             color: "white",
             textAlign: "left",
             padding: 0,
-            mt: -4,
+            mt: -2,
             textShadow: theme.shadows[3],
           }}
         >
           Ocean Data
         </Typography>
-        <Typography
-          sx={{
-            fontSize: fontSize.bannerSubtitle,
-            fontWeight: fontWeight.light,
-            letterSpacing: gap.sm,
-            color: "white",
-            whiteSpace: "nowrap",
-            pr: padding.small,
-            textShadow: theme.shadows[4],
-          }}
-        >
-          &quot;The gateway to Australian marine and climate science data&rdquo;
-        </Typography>
+        {!isMobile && (
+          <Typography
+            sx={{
+              fontSize: fontSize.bannerSubtitle,
+              fontWeight: fontWeight.light,
+              letterSpacing: gap.sm,
+              color: "white",
+              whiteSpace: "wrap",
+              textAlign: "right",
+              pr: padding.small,
+              textShadow: theme.shadows[4],
+            }}
+          >
+            &quot;The gateway to Australian marine and climate science
+            data&rdquo;
+          </Typography>
+        )}
       </Stack>
     </Box>
   );
