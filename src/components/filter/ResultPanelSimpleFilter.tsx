@@ -37,10 +37,11 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   onChangeLayout,
   currentSort,
   onChangeSorting,
+  isIconOnly,
 }) => {
   return (
     <Grid sx={sx} container justifyContent="center" spacing={1}>
-      <Grid item md={6} xs={12}>
+      <Grid item md={6} xs={8}>
         <Paper
           elevation={0}
           sx={{
@@ -63,16 +64,18 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           </Typography>
         </Paper>
       </Grid>
-      <Grid item md={3} xs={6}>
+      <Grid item md={3} xs={2}>
         <ResultListSortButton
           onChangeSorting={onChangeSorting}
           currentSort={currentSort}
+          isIconOnly={isIconOnly}
         />
       </Grid>
-      <Grid item md={3} xs={6}>
+      <Grid item md={3} xs={2}>
         <ResultListLayoutButton
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
+          isIconOnly={isIconOnly}
         />
       </Grid>
     </Grid>

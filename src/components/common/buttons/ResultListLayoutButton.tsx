@@ -31,7 +31,7 @@ const MAP_VIEW_SELECT = [
   // TODO: Implement 'List and Details' once designed finished
   {
     value: SearchResultLayoutEnum.FULL_LIST,
-    label: "List and Details",
+    label: "Full List View",
     icon: ListAndDetailsIcon,
   },
 ];
@@ -41,6 +41,7 @@ export interface ResultListLayoutButtonType<T> {
     | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
     | undefined;
   onChangeLayout?: (layout: T) => void;
+  isIconOnly?: boolean;
 }
 
 interface ResultListLayoutButtonProps<T>
@@ -48,7 +49,7 @@ interface ResultListLayoutButtonProps<T>
 
 const ResultListLayoutButton: FC<
   ResultListLayoutButtonProps<SearchResultLayoutEnum>
-> = ({ onChangeLayout, currentLayout }) => {
+> = ({ onChangeLayout, currentLayout, isIconOnly }) => {
   return (
     <IconSelect
       items={MAP_VIEW_SELECT}
@@ -56,6 +57,7 @@ const ResultListLayoutButton: FC<
       selectName="View"
       onSelectCallback={onChangeLayout}
       value={currentLayout}
+      isIconOnly={isIconOnly}
     />
   );
 };

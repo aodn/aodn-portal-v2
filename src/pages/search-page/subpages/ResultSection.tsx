@@ -43,7 +43,7 @@ const ResultSection: FC<ResultSectionProps> = ({
   isLoading,
   sx,
 }) => {
-  const { isUnderLaptop } = useBreakpoint();
+  const { isUnderLaptop, isMobile } = useBreakpoint();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
@@ -82,8 +82,10 @@ const ResultSection: FC<ResultSectionProps> = ({
           onChangeLayout={onChangeLayout}
           currentSort={currentSort}
           onChangeSorting={onChangeSorting}
+          isIconOnly={isMobile}
         />
-        {currentLayout === SearchResultLayoutEnum.FULL_LIST && (
+        {(currentLayout === SearchResultLayoutEnum.FULL_LIST ||
+          isUnderLaptop) && (
           <BookmarkListButton
             onDeselectDataset={onDeselectDataset}
             sx={{ width: isUnderLaptop ? "100%" : "50%" }}

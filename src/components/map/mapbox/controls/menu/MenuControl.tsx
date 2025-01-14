@@ -44,6 +44,11 @@ class MapControl implements IControl {
     }
   }
 
+  // Helper method to check if control is currently on the map
+  isAttached(): boolean {
+    return this.container !== null && this.container.parentNode !== null;
+  }
+
   onAdd(map: MapBox) {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";

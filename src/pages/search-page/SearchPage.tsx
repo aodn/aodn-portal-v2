@@ -386,6 +386,7 @@ const SearchPage = () => {
             md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
           },
           overflowY: "auto",
+          overflowX: "hidden",
           padding: padding.small,
           bgcolor: color.blue.light,
         }}
@@ -394,6 +395,10 @@ const SearchPage = () => {
         <Box
           sx={{
             flex: isUnderLaptop ? 1 : "none",
+            width:
+              selectedLayout === SearchResultLayoutEnum.FULL_LIST
+                ? "100%"
+                : "none",
             height:
               selectedLayout === SearchResultLayoutEnum.FULL_MAP ? 0 : "auto",
           }}
@@ -413,6 +418,7 @@ const SearchPage = () => {
         </Box>
         <Box
           sx={{
+            flex: isUnderLaptop ? "none" : 1,
             height: isUnderLaptop
               ? selectedLayout === SearchResultLayoutEnum.FULL_LIST
                 ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST
@@ -420,7 +426,6 @@ const SearchPage = () => {
                   ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP
                   : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP
               : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
-            flex: isUnderLaptop ? "none" : 1,
           }}
         >
           <MapSection
