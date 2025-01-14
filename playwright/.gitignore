@@ -170,3 +170,6 @@ test-results
 
 # File to check if docker build is necessary
 .docker_build_time
+
+# Video recording of the tests
+videos
