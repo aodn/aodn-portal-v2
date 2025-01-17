@@ -28,6 +28,7 @@ import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLa
 import BookmarkListMenu, {
   BookmarkListMenuBasicType,
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
+import useBreakpoint from "../../../hooks/useBreakpoint";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -64,6 +65,8 @@ const MapSection: React.FC<MapSectionProps> = ({
   isLoading,
   onDeselectDataset,
 }) => {
+  const { isUnderLaptop } = useBreakpoint();
+
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
   );
@@ -104,7 +107,12 @@ const MapSection: React.FC<MapSectionProps> = ({
   return (
     <Paper
       id={mapContainerId}
-      sx={{ height: "100%", ...sx, position: "relative" }}
+      sx={{
+        position: "relative",
+        height: "100%",
+        width: "100%",
+        ...sx,
+      }}
     >
       <SnackbarLoader isLoading={isLoading} message="Searching..." />
       <Map
@@ -123,6 +131,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           <ScaleControl />
           <DisplayCoordinate />
           <MenuControl
+            visible={!isUnderLaptop}
             menu={
               <BookmarkListMenu
                 onDeselectDataset={onDeselectDataset}

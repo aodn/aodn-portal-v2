@@ -38,6 +38,7 @@ const SORT_SELECT = [
 export interface ResultListSortButtonType<T> {
   currentSort: SortResultEnum | undefined;
   onChangeSorting?: (sort: T) => void;
+  isIconOnly?: boolean;
 }
 
 interface ResultListSortButtonProps<T> extends ResultListSortButtonType<T> {}
@@ -45,6 +46,7 @@ interface ResultListSortButtonProps<T> extends ResultListSortButtonType<T> {}
 const ResultListSortButton: FC<ResultListSortButtonProps<SortResultEnum>> = ({
   currentSort,
   onChangeSorting,
+  isIconOnly,
 }) => {
   return (
     <IconSelect
@@ -52,6 +54,7 @@ const ResultListSortButton: FC<ResultListSortButtonProps<SortResultEnum>> = ({
       selectName="Sort"
       onSelectCallback={onChangeSorting}
       value={currentSort}
+      isIconOnly={isIconOnly}
     />
   );
 };

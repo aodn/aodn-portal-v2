@@ -96,7 +96,10 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
         elevation={0}
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
+          flexDirection: {
+            xs: location.pathname === pageDefault.search ? "row" : "column",
+            sm: "row",
+          },
           alignItems: "center",
           height: "100%",
           border:
