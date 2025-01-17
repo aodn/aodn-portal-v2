@@ -56,7 +56,11 @@ const Header: FC = () => {
             alignItems="center"
             gap={2}
             minWidth={
-              shouldExpandSearchbar ? SEARCHBAR_EXPANSION_WIDTH : "none"
+              shouldExpandSearchbar
+                ? isUnderLaptop
+                  ? "auto"
+                  : SEARCHBAR_EXPANSION_WIDTH
+                : "auto"
             }
           >
             {isUnderLaptop ? (

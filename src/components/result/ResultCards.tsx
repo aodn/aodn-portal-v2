@@ -64,7 +64,7 @@ const renderListCards: FC<ResultCardsListType> = ({
   const isFullListView = layout === SearchResultLayoutEnum.FULL_LIST;
 
   return (
-    <Box sx={sx}>
+    <Box sx={sx} data-testid="resultcard-result-list">
       <Grid container spacing={1}>
         {contents.result.collections.map((collection, index) => (
           // TODO: change to key={collection.id} will find a bug that there exists datasets with same key (duplicated datasets). Need to check front end fetch more or backend
@@ -111,7 +111,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
   if (!count || !total || !contents) return;
 
   return (
-    <Box sx={sx}>
+    <Box sx={sx} data-testid="resultcard-result-grid">
       <Grid container spacing={1}>
         {contents.result.collections.map((collection, index) => (
           <Grid item xs={6} sm={4} md={6} lg={6} key={index}>
@@ -207,6 +207,7 @@ const ResultCards: FC<ResultCardsProps> = ({
   if (!contents) return;
 
   if (layout === SearchResultLayoutEnum.FULL_LIST) {
+    // Render full list view
     return renderListCards({
       sx,
       contents,
@@ -221,6 +222,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       layout: SearchResultLayoutEnum.FULL_LIST,
     });
   } else if (layout === SearchResultLayoutEnum.GRID) {
+    // Render grid view
     return renderGridCards({
       sx,
       contents,
@@ -235,7 +237,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       layout: SearchResultLayoutEnum.GRID,
     });
   } else {
-    // default list view
+    // Default render list view
     return renderListCards({
       sx,
       contents,
