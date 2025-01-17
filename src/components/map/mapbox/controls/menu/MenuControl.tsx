@@ -45,14 +45,12 @@ class MapControl implements IControl {
     }
   }
 
-  // Helper method to check if control is currently on the map
-  isAttached(): boolean {
-    return this.container !== null && this.container.parentNode !== null;
-  }
-
   setVisible(visible: boolean): void {
     if (this.container) {
       this.container.style.visibility = visible ? "visible" : "hidden";
+      // Magic numbers below are Mapbox default styles for controls
+      this.container.style.height = visible ? "29px" : "0px";
+      this.container.style.marginTop = visible ? "10px" : "0px";
     }
   }
 

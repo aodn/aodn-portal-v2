@@ -73,7 +73,13 @@ const renderSelectValue = (
       )}
 
       {!isIconOnly && label && (
-        <Typography padding={0} fontSize={fontSize.info} color={color}>
+        <Typography
+          padding={0}
+          fontSize={fontSize.info}
+          color={color}
+          overflow="hidden"
+          textOverflow="ellipsis"
+        >
           {label}
         </Typography>
       )}

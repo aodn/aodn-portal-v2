@@ -32,7 +32,6 @@ interface ResultCardsListType extends ResultCardBasicType {
   layout?:
     | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
     | undefined;
-  child: ListChildComponentProps;
 }
 
 export interface ResultCardsType {
@@ -42,11 +41,12 @@ export interface ResultCardsType {
   contents: CollectionsQueryType;
   onClickCard: ((item: OGCCollection | undefined) => void) | undefined;
   selectedUuids: string[] | undefined;
+}
+interface ResultCardsProps extends ResultCardsType {
   sx?: SxProps;
 }
-interface ResultCardsProps extends ResultCardsType {}
 
-const renderListCards: FC<Partial<ResultCardsListType>> = ({
+const renderListCards: FC<ResultCardsListType> = ({
   sx = {} as SxProps,
   contents,
   count,
@@ -64,7 +64,7 @@ const renderListCards: FC<Partial<ResultCardsListType>> = ({
   const isFullListView = layout === SearchResultLayoutEnum.FULL_LIST;
 
   return (
-    <Box sx={{ height: "1000px", overflowY: "auto", ...sx }}>
+    <Box sx={sx}>
       <Grid container spacing={1}>
         {contents.result.collections.map((collection, index) => (
           // TODO: change to key={collection.id} will find a bug that there exists datasets with same key (duplicated datasets). Need to check front end fetch more or backend
@@ -96,7 +96,7 @@ const renderListCards: FC<Partial<ResultCardsListType>> = ({
   );
 };
 
-const renderGridCards: FC<Partial<ResultCardsListType>> = ({
+const renderGridCards: FC<ResultCardsListType> = ({
   sx = {} as SxProps,
   contents,
   count,
@@ -111,7 +111,7 @@ const renderGridCards: FC<Partial<ResultCardsListType>> = ({
   if (!count || !total || !contents) return;
 
   return (
-    <Box sx={{ height: "1000px", overflowY: "auto", ...sx }}>
+    <Box sx={sx}>
       <Grid container spacing={1}>
         {contents.result.collections.map((collection, index) => (
           <Grid item xs={6} sm={4} md={6} lg={6} key={index}>
