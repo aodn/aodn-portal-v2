@@ -35,7 +35,7 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
       }}
     >
       {showFullMap ? (
-        <CloseFullscreenIcon fontSize="medium" />
+        <CloseFullscreenIcon fontSize="small" />
       ) : (
         <FullscreenIcon fontSize="medium" />
       )}

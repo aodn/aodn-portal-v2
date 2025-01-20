@@ -42,11 +42,13 @@ import {
   SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
   SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST,
-  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP,
+  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET,
+  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE,
 } from "./constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import { MapDefault } from "../../components/map/mapbox/Map";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -69,7 +71,7 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { isUnderLaptop } = useBreakpoint();
+  const { isUnderLaptop, isMobile } = useBreakpoint();
 
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -88,7 +90,13 @@ const SearchPage = () => {
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
-  const [zoom, setZoom] = useState<number | undefined>(undefined);
+  const [zoom, setZoom] = useState<number | undefined>(
+    isUnderLaptop
+      ? isMobile
+        ? MapDefault.ZOOM_MOBILE
+        : MapDefault.ZOOM_TABLET
+      : MapDefault.ZOOM
+  );
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
 
   const startOneLoadingThread = useCallback(() => {
@@ -356,6 +364,7 @@ const SearchPage = () => {
   // TODO: Optimize call if possible, this happens when navigate from page
   // to this page.
   useEffect(() => handleNavigation(), [handleNavigation]);
+
   useEffect(() => {
     const bookmarkSelected = async (event: BookmarkEvent) => {
       if (event.action === EVENT_BOOKMARK.EXPAND) {
@@ -381,7 +390,7 @@ const SearchPage = () => {
           height: {
             xs:
               selectedLayout === SearchResultLayoutEnum.FULL_MAP
-                ? SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP
+                ? "auto"
                 : SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
             md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
           },
@@ -390,7 +399,7 @@ const SearchPage = () => {
           padding: padding.small,
           bgcolor: color.blue.light,
         }}
-        gap={2}
+        gap={selectedLayout === SearchResultLayoutEnum.FULL_MAP ? 0 : 2}
       >
         <Box
           sx={{
@@ -398,7 +407,7 @@ const SearchPage = () => {
             width:
               selectedLayout === SearchResultLayoutEnum.FULL_LIST
                 ? "100%"
-                : "none",
+                : "auto",
             height:
               selectedLayout === SearchResultLayoutEnum.FULL_MAP ? 0 : "auto",
           }}
@@ -423,7 +432,9 @@ const SearchPage = () => {
               ? selectedLayout === SearchResultLayoutEnum.FULL_LIST
                 ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST
                 : selectedLayout === SearchResultLayoutEnum.FULL_MAP
-                  ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP
+                  ? isMobile
+                    ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE
+                    : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET
                   : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP
               : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
           }}
