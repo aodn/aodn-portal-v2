@@ -23,16 +23,22 @@ import {
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
+import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 
 const TRUNCATE_COUNT = 800;
-
+// TODO: Add vitest
 const getMinMaxDateStamps = (
   featureCollection: FeatureCollection<Point> | undefined
 ) => {
-  let minDate = dayjs(dateDefault.min);
-  let maxDate = dayjs(dateDefault.max);
+  if (
+    featureCollection &&
+    featureCollection.features &&
+    featureCollection.features.length > 0
+  ) {
+    // This default will trigger new value assign in the loop
+    let minDate = dayjs(dateDefault.max);
+    let maxDate = dayjs(dateDefault.min);
 
-  if (featureCollection) {
     featureCollection.features?.forEach((feature) => {
       const start = dayjs(feature.properties?.startTime);
       const end = dayjs(feature.properties?.endTime);
@@ -43,8 +49,10 @@ const getMinMaxDateStamps = (
         maxDate = end;
       }
     });
+    return [minDate, maxDate];
+  } else {
+    return [dayjs(dateDefault.min), dayjs(dateDefault.max)];
   }
-  return [minDate, maxDate];
 };
 
 interface AbstractAndDownloadPanelProps {
@@ -77,6 +85,7 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
       return featureCollection;
     }
     const dateRangeCondition = dateRangeConditionGeneric as DateRangeCondition;
+
     const conditionStart = dayjs(
       dateRangeCondition.start,
       dateDefault.SIMPLE_DATE_FORMAT
@@ -87,8 +96,14 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
     );
 
     const filteredFeatures = featureCollection.features?.filter((feature) => {
-      const start = dayjs(feature.properties?.startTime, "YYYY-MM");
-      const end = dayjs(feature.properties?.endTime, "YYYY-MM");
+      const start = dayjs(
+        feature.properties?.startTime,
+        dateDefault.DATE_TIME_FORMAT
+      );
+      const end = dayjs(
+        feature.properties?.endTime,
+        dateDefault.DATE_TIME_FORMAT
+      );
       return start.isBefore(conditionEnd) && end.isAfter(conditionStart);
     });
 
@@ -135,6 +150,7 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
                   <Controls>
                     <NavigationControl />
                     <ScaleControl />
+                    <DisplayCoordinate />
                     <MenuControl
                       menu={
                         <BaseMapSwitcher
