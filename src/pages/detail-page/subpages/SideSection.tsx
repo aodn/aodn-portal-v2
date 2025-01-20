@@ -15,12 +15,18 @@ interface SideSectionProps extends SpatialCoverageCardProps {}
 
 const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
   const { isCollectionNotFound } = useDetailPageContext();
+
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack
+      direction={{ xs: "column", sm: "row", md: "column" }}
+      gap={2}
+      flexWrap="wrap"
+    >
       <Card
         sx={{
           backgroundColor: "#fff",
           borderRadius: borderRadius.small,
+          width: "100%",
         }}
       >
         <DownloadCard />
