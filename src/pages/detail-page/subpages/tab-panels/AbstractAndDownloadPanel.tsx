@@ -137,7 +137,7 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
                 id={mapContainerId}
                 sx={{
                   width: "100%",
-                  minHeight: "700px",
+                  minHeight: "550px",
                   marginY: padding.large,
                 }}
               >
