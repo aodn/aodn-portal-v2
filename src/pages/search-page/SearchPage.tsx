@@ -48,7 +48,7 @@ import {
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE,
 } from "./constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
-import { MapDefault } from "../../components/map/mapbox/Map";
+import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 
 const REFERER = "SEARCH_PAGE";
 
@@ -93,9 +93,9 @@ const SearchPage = () => {
   const [zoom, setZoom] = useState<number | undefined>(
     isUnderLaptop
       ? isMobile
-        ? MapDefault.ZOOM_MOBILE
-        : MapDefault.ZOOM_TABLET
-      : MapDefault.ZOOM
+        ? MapDefaultConfig.ZOOM_MOBILE
+        : MapDefaultConfig.ZOOM_TABLET
+      : undefined
   );
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
 
