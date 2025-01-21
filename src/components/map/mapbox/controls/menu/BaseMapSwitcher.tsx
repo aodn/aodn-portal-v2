@@ -6,7 +6,7 @@ import {
   MenuClickedEvent,
 } from "./Definition";
 import PublicIcon from "@mui/icons-material/Public";
-import { styles as mapStyles, MapDefault } from "../../Map";
+import { styles as mapStyles } from "../../Map";
 import {
   Box,
   Typography,
@@ -24,6 +24,7 @@ import { eventEmitter, leftPadding, rightPadding } from "./MenuControl";
 import grey from "../../../../common/colors/grey";
 import blue from "../../../../common/colors/blue";
 import { borderRadius, fontSize } from "../../../../../styles/constants";
+import { MapDefaultConfig } from "../../constants";
 
 interface BaseMapSwitcherProps extends ControlProps {
   // Static layer to be added to the switch
@@ -43,7 +44,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
   onEvent,
 }) => {
   const [currentStyle, setCurrentStyle] = useState<string>(
-    mapStyles[MapDefault.DEFAULT_STYLE].id
+    mapStyles[MapDefaultConfig.DEFAULT_STYLE].id
   );
   // Must init the map so that it will not throw error indicate uncontrol to control component
   const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(

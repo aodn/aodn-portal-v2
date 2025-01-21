@@ -22,6 +22,7 @@ interface SearchbarButtonGroupProps {
   activeButton: SearchbarButtonNames;
   handleClickButton: (button: SearchbarButtonNames) => void;
   shouldExpandAllButtons: boolean;
+  shouldShrinkAllButtons?: boolean;
   sx?: SxProps;
 }
 
@@ -70,6 +71,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   activeButton,
   handleClickButton,
   shouldExpandAllButtons = false,
+  shouldShrinkAllButtons = false,
   sx,
 }) => {
   const componentParams: ParameterState = getComponentState(store.getState());
@@ -125,9 +127,11 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         dotBadge
         onClick={() => handleClickButton(SearchbarButtonNames.Date)}
         showText={
-          shouldExpandAllButtons
-            ? true
-            : activeButton === SearchbarButtonNames.Date
+          shouldShrinkAllButtons
+            ? false
+            : shouldExpandAllButtons
+              ? true
+              : activeButton === SearchbarButtonNames.Date
         }
         data-testid="date-range-button"
       />
@@ -138,9 +142,11 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         dotBadge
         onClick={() => handleClickButton(SearchbarButtonNames.Location)}
         showText={
-          shouldExpandAllButtons
-            ? true
-            : activeButton === SearchbarButtonNames.Location
+          shouldShrinkAllButtons
+            ? false
+            : shouldExpandAllButtons
+              ? true
+              : activeButton === SearchbarButtonNames.Location
         }
         data-testid="location-button"
       />
@@ -150,9 +156,11 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         badgeContent={filterCount}
         onClick={() => handleClickButton(SearchbarButtonNames.Filter)}
         showText={
-          shouldExpandAllButtons
-            ? true
-            : activeButton === SearchbarButtonNames.Filter
+          shouldShrinkAllButtons
+            ? false
+            : shouldExpandAllButtons
+              ? true
+              : activeButton === SearchbarButtonNames.Filter
         }
         data-testid="filtersBtn"
       />
@@ -161,9 +169,11 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         text={capitalizeFirstLetter(SearchbarButtonNames.Search)}
         onClick={handleSearchClick}
         showText={
-          shouldExpandAllButtons
-            ? true
-            : activeButton === SearchbarButtonNames.Search
+          shouldShrinkAllButtons
+            ? false
+            : shouldExpandAllButtons
+              ? true
+              : activeButton === SearchbarButtonNames.Search
         }
         buttonSx={{
           color: "#fff",

@@ -124,6 +124,9 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           activeButton={activeButton}
           handleClickButton={handleClickButton}
           shouldExpandAllButtons={isMobile ? false : shouldExpandAllButtons}
+          shouldShrinkAllButtons={
+            isMobile && location.pathname === pageDefault.search
+          }
           sx={{ pr: gap.md }}
         />
       </Paper>

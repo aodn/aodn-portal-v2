@@ -208,4 +208,4 @@ const ReactMap = ({
 
 export default ReactMap;
 
-export { styles, MapDefaultConfig as MapDefault };
+export { styles };
