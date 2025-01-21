@@ -4,7 +4,7 @@ import {
   IDownloadCondition,
   IDownloadConditionCallback,
 } from "../../pages/detail-page/context/DownloadDefinitions";
-import { Grid, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
 import BBOX_IMG from "../../assets/icons/bbox.png";
 import TIME_RANGE_IMG from "../../assets/images/time-range.png";
 import CloseIcon from "@mui/icons-material/Close";
@@ -51,46 +51,48 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
     <Grid
       container
       sx={{
+        position: "relative",
         border: "1.5px solid rgba(97, 140, 165, 0.3)",
         borderRadius: theme.borderRadius.md,
         backgroundColor: "rgba(231, 242, 255, 0.3)",
-        marginY: theme.mp.md,
-        paddingBottom: theme.mp.md,
+        marginTop: theme.mp.md,
       }}
     >
-      <Grid item md={2} sx={{ padding: theme.mp.md }}>
+      <Grid item xs={2} sm={1} md={3} xl={2} sx={{ padding: theme.mp.md }}>
         {getIcon(type)}
       </Grid>
-      <Grid container item md={8}>
-        <Grid
-          sx={{ paddingX: theme.mp.lg, paddingY: theme.mp.sm }}
-          item
-          md={12}
-        >
+      <Grid
+        container
+        item
+        xs={10}
+        sm={11}
+        md={9}
+        xl={10}
+        gap={2}
+        paddingY={theme.mp.lg}
+      >
+        <Grid item xs={12}>
           <Typography
             sx={{
               color: "#7194AB",
               fontSize: "12px",
               fontWeight: "400",
               lineHeight: "8px",
+              padding: 0,
             }}
           >
             {getTitle(type)}
           </Typography>
         </Grid>
-        <Grid
-          item
-          md={12}
-          sx={{ paddingX: theme.mp.lg, paddingY: theme.mp.sm }}
-        >
+        <Grid item xs={12}>
           {children}
         </Grid>
       </Grid>
-      <Grid item md={1}>
+      <Box position="absolute" top={1} right={1}>
         <IconButton onClick={removeCallback}>
           <CloseIcon fontSize="small" />
         </IconButton>
-      </Grid>
+      </Box>
     </Grid>
   );
 };
