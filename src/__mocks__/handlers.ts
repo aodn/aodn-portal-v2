@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { PARAMETER_VOCABS } from "./data/PARAMETER_VOCABS";
 import { COLLECTIONS_WAVE } from "./data/COLLECTIONS_WAVE";
+import { COLLECTIONS_ITEM_SUMMARY } from "./data/COLLECTIONS_ITEM_SUMMARY";
 import {
   COLLECTIONS_IMOS_PAGE1,
   COLLECTIONS_IMOS_PAGE2,
@@ -92,8 +93,13 @@ export const handlers = [
     );
   }),
 
-  http.get(PREFIX + "/collections/:uuid/items", ({ params }) => {
+  http.get(PREFIX + "/collections/:uuid/items/summary", ({ params }) => {
+    const { uuid } = params;
     // return empty FeatureCollection<Point> for now
+    if (uuid == NORMAL_COLLECTION.id) {
+      return HttpResponse.json(COLLECTIONS_ITEM_SUMMARY);
+    }
+
     return HttpResponse.json({
       type: "FeatureCollection",
       features: [],

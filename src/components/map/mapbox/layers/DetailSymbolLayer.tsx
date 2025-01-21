@@ -1,26 +1,16 @@
-import {
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FC, useCallback, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
 import mapboxgl, { GeoJSONSource, MapMouseEvent, Popup } from "mapbox-gl";
 import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
-  findSuitableVisiblePoint,
   LayerBasicType,
 } from "./Layers";
-import { Feature, Point } from "geojson";
+
 import { MapDefaultConfig } from "../constants";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
-import * as turf from "@turf/turf";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-import legend1_img from "@/assets/images/legend1.png";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 import _ from "lodash";
 
@@ -41,11 +31,6 @@ interface DetailClusterConfig {
   clusterCircleStrokeWidth: number;
   clusterCircleStrokeColor: string;
   clusterCircleTextSize: number;
-  unclusterPointColor: string;
-  unclusterPointOpacity: number;
-  unclusterPointStrokeWidth: number;
-  unclusterPointStrokeColor: string;
-  unclusterPointRadius: number;
 }
 
 const config: DetailClusterConfig = {
@@ -75,40 +60,14 @@ const config: DetailClusterConfig = {
   clusterCircleStrokeWidth: 1,
   clusterCircleStrokeColor: "#fff",
   clusterCircleTextSize: 12,
-  unclusterPointColor: "#51bbd6",
-  unclusterPointOpacity: 1,
-  unclusterPointStrokeWidth: 1,
-  unclusterPointStrokeColor: "#fff",
-  unclusterPointRadius: 8,
-};
-
-const isValid = (bbox: [number, number, number, number]) => {
-  // lat and lon are in the range of -90 to 90 and -180 to 180 respectively
-  const [minLon, minLat, maxLon, maxLat] = bbox;
-  return (
-    minLon >= -180 &&
-    minLon <= 180 &&
-    minLat >= -90 &&
-    minLat <= 90 &&
-    maxLon >= -180 &&
-    maxLon <= 180 &&
-    maxLat >= -90 &&
-    maxLat <= 90
-  );
 };
 
 const DetailSymbolLayer: FC<LayerBasicType> = ({
   featureCollection = generateFeatureCollectionFrom(undefined),
 }) => {
-  const [bbox, setBbox] = useState<
-    [number, number, number, number] | undefined
-  >(undefined);
   const { map } = useContext(MapContext);
 
-  const layerId = useMemo(
-    () => `cluster-layer-${map?.getContainer().id}`,
-    [map]
-  );
+  const layerId = useMemo(() => `co-layer-${map?.getContainer().id}`, [map]);
 
   // TODO: still have bugs here, so i set default value to 2 to avoid the error
   //  as a temporary solution.
@@ -128,32 +87,6 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
   const clusterSourceId = useMemo(() => `${layerId}-source`, [layerId]);
 
   const clusterLayer = useMemo(() => `${layerId}-clusters`, [layerId]);
-
-  const unclusterPointLayer = useMemo(
-    () => `${layerId}-unclustered-point`,
-    [layerId]
-  );
-
-  useEffect(() => {
-    if (bbox && map && isValid(bbox)) {
-      map.fitBounds(bbox, {
-        maxZoom: 4,
-        padding: 100,
-      });
-    }
-  }, [bbox, map]);
-
-  useEffect(() => {
-    if (!featureCollection.features || featureCollection.features.length === 0)
-      return;
-    const bbox = turf.bbox(featureCollection) as [
-      number,
-      number,
-      number,
-      number,
-    ];
-    setBbox(bbox);
-  }, [featureCollection]);
 
   const onSymbolClick = useCallback(
     (event: MapMouseEvent) => {
@@ -190,16 +123,10 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
 
       map?.addSource(clusterSourceId, {
         type: "geojson",
-        data: findSuitableVisiblePoint(
-          {
-            type: "FeatureCollection",
-            features: new Array<Feature<Point>>(),
-          },
-          map
-        ),
+        data: featureCollection,
       });
 
-      map?.loadImage(legend1_img, (error, image) => {
+      map?.loadImage("/images/legend1.png", (error, image) => {
         if (error) {
           throw error;
         }
@@ -248,10 +175,6 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
 
       try {
         if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
-        if (map?.getLayer(`${layerId}-cluster-count`))
-          map?.removeLayer(`${layerId}-cluster-count`);
-        if (map?.getLayer(unclusterPointLayer))
-          map?.removeLayer(unclusterPointLayer);
         if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
       } catch (error) {
         // Handle error
@@ -260,11 +183,11 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
   }, [
     clusterLayer,
     clusterSourceId,
+    featureCollection,
     layerId,
     map,
     maxCount,
     onSymbolClick,
-    unclusterPointLayer,
   ]);
 
   const updateSource = useCallback(() => {

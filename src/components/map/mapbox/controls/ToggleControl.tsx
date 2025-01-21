@@ -4,8 +4,8 @@ import MapContext from "../MapContext";
 import React, { useContext, useEffect, useState } from "react";
 import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 
 export interface ToggleControlProps {
   showFullMap: boolean;
@@ -35,9 +35,9 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
       }}
     >
       {showFullMap ? (
-        <ArrowForwardIosSharpIcon fontSize="small" />
+        <CloseFullscreenIcon fontSize="small" />
       ) : (
-        <ArrowBackIosNewIcon fontSize="small" />
+        <FullscreenIcon fontSize="medium" />
       )}
     </IconButton>
   );
