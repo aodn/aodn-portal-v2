@@ -17,6 +17,7 @@ const rightPadding = "15px";
 
 interface MenuControlProps {
   menu: MapControlType | null;
+  visible?: boolean;
 }
 
 class MapControl implements IControl {
@@ -41,6 +42,15 @@ class MapControl implements IControl {
   private render() {
     if (this.root && this.container) {
       this.root.render(this.component);
+    }
+  }
+
+  setVisible(visible: boolean): void {
+    if (this.container) {
+      this.container.style.visibility = visible ? "visible" : "hidden";
+      // Magic numbers below are Mapbox default styles for controls
+      this.container.style.height = visible ? "29px" : "0px";
+      this.container.style.marginTop = visible ? "10px" : "0px";
     }
   }
 
@@ -91,9 +101,10 @@ class MapControl implements IControl {
 // test all control on map in different page !!
 const MenuControl: React.FC<MenuControlProps> = ({
   menu,
+  visible = true,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
-  const [_, setControl] = useState<MapControl | null>(null);
+  const [control, setControl] = useState<MapControl | null>(null);
 
   // Creation effect
   useEffect(() => {
@@ -111,7 +122,11 @@ const MenuControl: React.FC<MenuControlProps> = ({
       }
       return prev;
     });
-  }, [map, menu]);
+
+    if (control) {
+      control.setVisible(visible);
+    }
+  }, [map, menu, visible, control]);
 
   return <React.Fragment />;
 };

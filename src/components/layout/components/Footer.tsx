@@ -65,16 +65,22 @@ const Footer: FC = () => {
           item
           xs={12}
           display="flex"
-          flexDirection={{ xs: "column", sm: "row" }}
+          flexDirection={{ xs: "column-reverse", sm: "row" }}
           justifyContent="space-between"
           gap={{ xs: 2, sm: 0 }}
         >
           <AODNSiteLogo />
           <Button onClick={handleBackToTop}>
             <IconContainer>
-              <NorthIcon fontSize="small" />
+              <NorthIcon
+                sx={{ color: color.gray.medium, fontSize: fontSize.info }}
+              />
             </IconContainer>
-            <Typography color="#000" paddingTop={0}>
+            <Typography
+              paddingTop={0}
+              color={color.gray.medium}
+              fontSize={fontSize.info}
+            >
               Back to Top
             </Typography>
           </Button>

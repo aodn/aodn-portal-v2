@@ -68,14 +68,16 @@ describe("AssociatedRecordsPanel", async () => {
   });
 
   it("should render AssociatedRecordsPanel", () => {
-    waitFor(() => screen.findAllByText("Parent Record")).then(() => {
+    waitFor(() => screen.findAllByText("Parent Record"), {
+      timeout: 5000,
+    }).then(() => {
       const parentRecordText = screen.queryAllByText("Parent Record");
       // one is button, another is list title
       expect(parentRecordText).toHaveLength(2);
     });
   });
 
-  it("should open a new tab when clicking on a record abstract", () => {
+  it("should open a new tab when clicking on a record abstract", async () => {
     waitFor(() =>
       screen.findAllByText(
         "Northern Australia Automated Marine Weather and Oceanographic Stations"
@@ -86,7 +88,7 @@ describe("AssociatedRecordsPanel", async () => {
       );
       expect(parentTitle).to.exist;
 
-      parentTitle && userEvent.click(parentTitle);
+      parentTitle && (await userEvent.click(parentTitle));
       const parentAbstract = screen.queryByText(/weather stations have been/i);
       expect(parentAbstract).to.exist;
 

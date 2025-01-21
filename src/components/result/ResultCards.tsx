@@ -1,7 +1,6 @@
-import { FC, useCallback, useEffect, useMemo, useRef } from "react";
-import { FixedSizeList, ListChildComponentProps } from "react-window";
-import AutoSizer, { Size } from "react-virtualized-auto-sizer";
-import { Box, Grid, ListItem, SxProps } from "@mui/material";
+import { FC, useCallback, useEffect, useMemo } from "react";
+import { ListChildComponentProps } from "react-window";
+import { Box, Grid, SxProps } from "@mui/material";
 import {
   CollectionsQueryType,
   DEFAULT_SEARCH_PAGE_SIZE,
@@ -13,8 +12,6 @@ import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
-import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
-import { padding } from "../../styles/constants";
 import useFetchData from "../../hooks/useFetchData";
 
 export interface ResultCardBasicType {
@@ -32,7 +29,9 @@ interface ResultCardsListType extends ResultCardBasicType {
   total: number;
   contents: CollectionsQueryType;
   renderLoadMoreButton: () => JSX.Element;
-  child: ListChildComponentProps;
+  layout?:
+    | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
+    | undefined;
 }
 
 export interface ResultCardsType {
@@ -42,47 +41,43 @@ export interface ResultCardsType {
   contents: CollectionsQueryType;
   onClickCard: ((item: OGCCollection | undefined) => void) | undefined;
   selectedUuids: string[] | undefined;
+}
+interface ResultCardsProps extends ResultCardsType {
   sx?: SxProps;
 }
-interface ResultCardsProps extends ResultCardsType {}
 
-const renderGridView: FC<ResultCardsListType> = ({
+const renderListCards: FC<ResultCardsListType> = ({
+  sx = {} as SxProps,
+  contents,
   count,
   total,
-  contents,
+  renderLoadMoreButton,
   onClickCard,
   onClickDetail,
   onClickLinks,
   onClickDownload,
-  renderLoadMoreButton,
   selectedUuid,
-  child,
+  layout,
 }) => {
-  const { index, style } = child;
-  const leftIndex = index * 2;
-  const rightIndex = leftIndex + 1;
+  if (!count || !total || !contents) return;
 
-  if (leftIndex >= count && leftIndex <= total) {
-    // We need to display load more button/placeholder in the last index place
-    return (
-      <ListItem
-        sx={{
-          display: "flex",
-          alignItems: "flex-start", // Aligns the Box to the top of the ListItem
-          justifyContent: "center", // Centers the Box horizontally
-        }}
-        style={style}
-      >
-        {count !== total ? renderLoadMoreButton() : null}
-      </ListItem>
-    );
-  } else {
-    return (
-      <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
-        <Grid container height="100%">
-          <Grid item xs={6} sx={{ pr: 0.5 }}>
-            <GridResultCard
-              content={contents.result.collections[leftIndex]}
+  const isFullListView = layout === SearchResultLayoutEnum.FULL_LIST;
+
+  return (
+    <Box sx={sx} data-testid="resultcard-result-list">
+      <Grid container spacing={1}>
+        {contents.result.collections.map((collection, index) => (
+          // TODO: change to key={collection.id} will find a bug that there exists datasets with same key (duplicated datasets). Need to check front end fetch more or backend
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={isFullListView ? 4 : 12}
+            lg={isFullListView ? 3 : 12}
+            key={index}
+          >
+            <ListResultCard
+              content={collection}
               onClickCard={onClickCard}
               onClickDetail={onClickDetail}
               onClickLinks={onClickLinks}
@@ -90,71 +85,18 @@ const renderGridView: FC<ResultCardsListType> = ({
               selectedUuid={selectedUuid}
             />
           </Grid>
-          {rightIndex < contents.result.collections.length && (
-            <Grid item xs={6} sx={{ pl: 0.5 }}>
-              <GridResultCard
-                content={contents.result.collections[rightIndex]}
-                onClickCard={onClickCard}
-                onClickDetail={onClickDetail}
-                onClickLinks={onClickLinks}
-                onClickDownload={onClickDownload}
-                selectedUuid={selectedUuid}
-              />
-            </Grid>
-          )}
-        </Grid>
-      </ListItem>
-    );
-  }
+        ))}
+        {renderLoadMoreButton && count < total && (
+          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+            {renderLoadMoreButton()}
+          </Grid>
+        )}
+      </Grid>
+    </Box>
+  );
 };
 
-const renderListView: FC<ResultCardsListType> = ({
-  count,
-  total,
-  contents,
-  onClickCard,
-  onClickDetail,
-  onClickLinks,
-  onClickDownload,
-  renderLoadMoreButton,
-  selectedUuid,
-  child,
-}) => {
-  // The style must pass to the listitem else incorrect rendering
-  const { index, style } = child;
-
-  if (index === count && index < total) {
-    // We need to display load more button/placeholder in the last index place
-    return (
-      <ListItem
-        id="result-card-load-more-btn"
-        sx={{
-          display: "flex",
-          alignItems: "flex-start", // Aligns the Box to the top of the ListItem
-          justifyContent: "center", // Centers the Box horizontally
-        }}
-        style={style}
-      >
-        {renderLoadMoreButton()}
-      </ListItem>
-    );
-  } else {
-    return (
-      <ListItem sx={{ p: 0, pb: padding.small }} style={style}>
-        <ListResultCard
-          content={contents.result.collections[index]}
-          onClickCard={onClickCard}
-          onClickDetail={onClickDetail}
-          onClickLinks={onClickLinks}
-          onClickDownload={onClickDownload}
-          selectedUuid={selectedUuid}
-        />
-      </ListItem>
-    );
-  }
-};
-
-const renderFullListView: FC<Partial<ResultCardsListType>> = ({
+const renderGridCards: FC<ResultCardsListType> = ({
   sx = {} as SxProps,
   contents,
   count,
@@ -169,12 +111,11 @@ const renderFullListView: FC<Partial<ResultCardsListType>> = ({
   if (!count || !total || !contents) return;
 
   return (
-    <Box sx={{ ...sx }}>
+    <Box sx={sx} data-testid="resultcard-result-grid">
       <Grid container spacing={1}>
         {contents.result.collections.map((collection, index) => (
-          // TODO: change to key={collection.id} will find a bug that there exists datasets with same key (duplicated datasets). Need to check front end fetch more or backend
-          <Grid item xs={12} md={6} lg={4} key={index}>
-            <ListResultCard
+          <Grid item xs={6} sm={4} md={6} lg={6} key={index}>
+            <GridResultCard
               content={collection}
               onClickCard={onClickCard}
               onClickDetail={onClickDetail}
@@ -201,10 +142,7 @@ const ResultCards: FC<ResultCardsProps> = ({
   sx,
   selectedUuids,
 }) => {
-  const componentRef = useRef<HTMLDivElement | null>(null);
-
   const goToDetailPage = useTabNavigation();
-
   const { fetchMore } = useFetchData();
 
   const loadMoreResults = useCallback(
@@ -269,7 +207,8 @@ const ResultCards: FC<ResultCardsProps> = ({
   if (!contents) return;
 
   if (layout === SearchResultLayoutEnum.FULL_LIST) {
-    return renderFullListView({
+    // Render full list view
+    return renderListCards({
       sx,
       contents,
       count,
@@ -280,80 +219,38 @@ const ResultCards: FC<ResultCardsProps> = ({
       onClickLinks,
       onClickDownload,
       selectedUuid,
+      layout: SearchResultLayoutEnum.FULL_LIST,
     });
   } else if (layout === SearchResultLayoutEnum.GRID) {
-    // You must set the height to 100% of view height so the calculation
-    // logic .clentHeight.height have values. In short it fill the
-    // whole area.
-    // *** We need to dsiplay the load more button, hence item count + 1 ***
-    return (
-      <Box
-        sx={{ ...sx, height: "100%" }}
-        ref={componentRef}
-        data-testid="resultcard-result-grid"
-      >
-        <AutoSizer>
-          {({ height, width }: Size) => (
-            <FixedSizeList
-              height={height}
-              width={width}
-              itemSize={GRID_CARD_HEIGHT}
-              itemCount={Math.ceil(count / 2) + 1}
-            >
-              {(child: ListChildComponentProps) =>
-                renderGridView({
-                  count,
-                  total,
-                  contents,
-                  onClickCard,
-                  onClickDetail,
-                  onClickLinks,
-                  onClickDownload,
-                  renderLoadMoreButton,
-                  selectedUuid,
-                  child,
-                })
-              }
-            </FixedSizeList>
-          )}
-        </AutoSizer>
-      </Box>
-    );
+    // Render grid view
+    return renderGridCards({
+      sx,
+      contents,
+      count,
+      total,
+      renderLoadMoreButton,
+      onClickCard,
+      onClickDetail,
+      onClickLinks,
+      onClickDownload,
+      selectedUuid,
+      layout: SearchResultLayoutEnum.GRID,
+    });
   } else {
-    // default list view
-    return (
-      <Box
-        sx={{ ...sx, height: "100%" }}
-        ref={componentRef}
-        data-testid="resultcard-result-list"
-      >
-        <AutoSizer>
-          {({ height, width }: Size) => (
-            <FixedSizeList
-              height={height}
-              width={width}
-              itemSize={LIST_CARD_HEIGHT}
-              itemCount={count + 1}
-            >
-              {(child: ListChildComponentProps) =>
-                renderListView({
-                  count,
-                  total,
-                  contents,
-                  onClickCard,
-                  onClickDetail,
-                  onClickLinks,
-                  onClickDownload,
-                  renderLoadMoreButton,
-                  selectedUuid,
-                  child,
-                })
-              }
-            </FixedSizeList>
-          )}
-        </AutoSizer>
-      </Box>
-    );
+    // Default render list view
+    return renderListCards({
+      sx,
+      contents,
+      count,
+      total,
+      renderLoadMoreButton,
+      onClickCard,
+      onClickDetail,
+      onClickLinks,
+      onClickDownload,
+      selectedUuid,
+      layout: SearchResultLayoutEnum.LIST,
+    });
   }
 };
 
