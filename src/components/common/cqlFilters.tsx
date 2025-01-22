@@ -27,6 +27,7 @@ export type ParameterVocabsIn = SingleArgumentFunction<
 >;
 export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
 export type PlatformFilter = SingleArgumentFunction<Array<string>, string>;
+export type IsNotNull = SingleArgumentFunction<string, string>;
 export type FilterTypes =
   | string
   | ParameterVocabsIn
@@ -34,7 +35,10 @@ export type FilterTypes =
   | TemporalAfterOrBefore
   | PolygonOperation
   | UpdateFrequency
-  | PlatformFilter;
+  | PlatformFilter
+  | IsNotNull;
+
+const funcIsNotNull: IsNotNull = (field: string) => `(${field} IS NOT NULL)`;
 
 const funcUpdateFrequency: UpdateFrequency = (freq: DatasetFrequency) =>
   `update_frequency='${freq}'`;
@@ -108,6 +112,7 @@ cqlDefaultFilters
   .set("BBOX_POLYGON", funcBBoxPolygon)
   .set("BBOX_POLYGON_OR_EMPTY_EXTENTS", funcBBoxPolygonOrEmptyExtents)
   .set("UPDATE_FREQUENCY", funcUpdateFrequency)
-  .set("UPDATE_PLATFORM_FILTER_VARIABLES", funcPlatformFilter);
+  .set("UPDATE_PLATFORM_FILTER_VARIABLES", funcPlatformFilter)
+  .set("IS_NOT_NULL", funcIsNotNull);
 
 export { cqlDefaultFilters };

@@ -19,6 +19,8 @@ const UPDATE_PLATFORM_FILTER_VARIABLE = "UPDATE_PLATFORM_FILTER_VARIABLE";
 const UPDATE_UPDATE_FREQ_VARIABLE = "UPDATE_UPDATE_FREQ_VARIABLE";
 const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
 const UPDATE_ZOOM_VARIABLE = "UPDATE_ZOOM_VARIABLE";
+// Contains cloud optimized data where download possible
+const UPDATE_HAS_DATA = "UPDATE_HAS_DATA";
 
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
   MapDefaultConfig.BBOX_ENDPOINTS;
@@ -32,6 +34,7 @@ export interface DataTimeFilterRange {
 export interface ParameterState {
   polygon?: Feature<Polygon, GeoJsonProperties>;
   isImosOnlyDataset?: boolean;
+  hasCOData?: boolean;
   dateTimeFilterRange?: DataTimeFilterRange;
   searchText?: string;
   parameterVocabs?: Array<Vocab>;
@@ -102,6 +105,15 @@ const updateImosOnly = (isImosOnly: boolean | undefined): ActionType => {
     type: UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE,
     payload: {
       isImosOnlyDataset: isImosOnly === undefined ? false : isImosOnly,
+    } as ParameterState,
+  };
+};
+
+const updateHasData = (hasCOData: boolean | undefined): ActionType => {
+  return {
+    type: UPDATE_HAS_DATA,
+    payload: {
+      hasCOData: hasCOData === undefined ? false : hasCOData,
     } as ParameterState,
   };
 };
@@ -208,6 +220,11 @@ const paramReducer = (
       return {
         ...state,
         isImosOnlyDataset: action.payload.isImosOnlyDataset,
+      };
+    case UPDATE_HAS_DATA:
+      return {
+        ...state,
+        hasCOData: action.payload.hasCOData,
       };
     case UPDATE_PLATFORM_FILTER_VARIABLE:
       return {
@@ -379,4 +396,5 @@ export {
   updateSortBy,
   updateUpdateFreq,
   updateZoom,
+  updateHasData,
 };

@@ -1,6 +1,5 @@
 import {
   Dispatch,
-  ElementType,
   FC,
   SetStateAction,
   useCallback,
@@ -9,6 +8,7 @@ import {
   useState,
 } from "react";
 import {
+  updateHasData,
   updateImosOnly,
   updateParameterVocabs,
   updatePlatform,
@@ -26,11 +26,13 @@ import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
 import { DatasetFrequency } from "../common/store/searchReducer";
 import { useAppDispatch } from "../common/store/hooks";
+import { IndexDataType } from "./FilterDefinition";
 
-export interface ItemButton {
-  value: DatasetFrequency | string;
-  label: string;
-  icon?: ElementType;
+enum FiltersTabs {
+  Parameters = "parameters",
+  Platform = "platform",
+  Organisation = "organisation",
+  DataSettings = "data-settings",
 }
 
 // The type of each item in Filters should consistent with ParameterState
@@ -41,6 +43,7 @@ interface Filters {
   organisation?: Array<string>;
   dataDeliveryFrequency?: Array<DatasetFrequency> | undefined;
   dataDeliveryMode?: Array<string>;
+  dataIndexedType?: Array<IndexDataType>;
   dataService?: Array<string>;
 }
 
@@ -54,13 +57,6 @@ interface FiltersProps {
 }
 
 const TAB_MAX_HEIGHT = 300;
-
-enum FiltersTabs {
-  Parameters = "parameters",
-  Platform = "platform",
-  Organisation = "organisation",
-  DataSettings = "data-settings",
-}
 
 const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
   switch (tabName) {
@@ -88,8 +84,13 @@ const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
 const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   const dispatch = useAppDispatch();
 
-  const { parameterVocabs, platform, updateFreq, isImosOnlyDataset } =
-    getComponentState(store.getState());
+  const {
+    parameterVocabs,
+    platform,
+    updateFreq,
+    isImosOnlyDataset,
+    hasCOData,
+  } = getComponentState(store.getState());
 
   const [filters, setFilters] = useState<Filters>({});
 
@@ -160,6 +161,11 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
       } else {
         dispatch(updateImosOnly(false));
       }
+
+      dispatch(
+        updateHasData(filters.dataIndexedType?.includes(IndexDataType.CLOUD))
+      );
+
       if (filters.platform) {
         dispatch(updatePlatform(filters.platform));
       } else {
@@ -211,7 +217,13 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         organisation: ["imos"],
       }));
     }
-  }, [isImosOnlyDataset, parameterVocabs, platform, updateFreq]);
+    if (hasCOData) {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        dataIndexedType: [IndexDataType.CLOUD],
+      }));
+    }
+  }, [hasCOData, isImosOnlyDataset, parameterVocabs, platform, updateFreq]);
 
   return (
     <>
