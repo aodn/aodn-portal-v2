@@ -1,6 +1,5 @@
 import {
   Dispatch,
-  ElementType,
   FC,
   SetStateAction,
   useCallback,
@@ -27,22 +26,13 @@ import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
 import { DatasetFrequency } from "../common/store/searchReducer";
 import { useAppDispatch } from "../common/store/hooks";
+import { IndexDataType } from "./FilterDefinition";
 
 enum FiltersTabs {
   Parameters = "parameters",
   Platform = "platform",
   Organisation = "organisation",
   DataSettings = "data-settings",
-}
-
-export enum IndexDataType {
-  Cloud = "cloud",
-}
-
-export interface ItemButton {
-  value: DatasetFrequency | IndexDataType | string;
-  label: string;
-  icon?: ElementType;
 }
 
 // The type of each item in Filters should consistent with ParameterState
@@ -173,7 +163,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
       }
 
       dispatch(
-        updateHasData(filters.dataIndexedType?.includes(IndexDataType.Cloud))
+        updateHasData(filters.dataIndexedType?.includes(IndexDataType.CLOUD))
       );
 
       if (filters.platform) {
@@ -230,7 +220,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     if (hasCOData) {
       setFilters((prevFilters) => ({
         ...prevFilters,
-        dataAvailability: [IndexDataType.Cloud],
+        dataAvailability: [IndexDataType.CLOUD],
       }));
     }
   }, [hasCOData, isImosOnlyDataset, parameterVocabs, platform, updateFreq]);
