@@ -3,6 +3,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Badge,
+  Box,
   Button,
   Divider,
   Stack,
@@ -118,24 +119,26 @@ const DownloadCard = () => {
           </Badge>
         </AccordionSummary>
         <AccordionDetails>
-          {bboxConditions.map((bboxCondition, index) => {
-            return (
-              <BBoxConditionBox
-                key={index}
-                bboxCondition={bboxCondition}
-                onRemove={() => handleRemove(bboxCondition)}
-              />
-            );
-          })}
-          {dateRangeCondition.map((dateRangeCondition, index) => {
-            return (
-              <DateRangeConditionBox
-                key={index}
-                dateRangeCondition={dateRangeCondition}
-                onRemove={() => handleRemove(dateRangeCondition)}
-              />
-            );
-          })}
+          <Box gap={2}>
+            {bboxConditions.map((bboxCondition, index) => {
+              return (
+                <BBoxConditionBox
+                  key={index}
+                  bboxCondition={bboxCondition}
+                  onRemove={() => handleRemove(bboxCondition)}
+                />
+              );
+            })}
+            {dateRangeCondition.map((dateRangeCondition, index) => {
+              return (
+                <DateRangeConditionBox
+                  key={index}
+                  dateRangeCondition={dateRangeCondition}
+                  onRemove={() => handleRemove(dateRangeCondition)}
+                />
+              );
+            })}
+          </Box>
         </AccordionDetails>
       </PlainAccordion>
     </Stack>

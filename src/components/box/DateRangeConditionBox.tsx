@@ -32,6 +32,7 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
           fontSize: "12px",
           fontWeight: "400",
           lineHeight: "8px",
+          padding: 0,
         }}
       >
         {start + " to " + end}

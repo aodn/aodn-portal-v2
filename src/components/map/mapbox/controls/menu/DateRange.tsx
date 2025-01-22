@@ -13,6 +13,8 @@ import dayjs from "dayjs";
 import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
 import PlainSlider from "../../../../common/slider/PlainSlider";
 import { dateDefault } from "../../../../common/constants";
+import useBreakpoint from "../../../../../hooks/useBreakpoint";
+import { color, fontSize, padding } from "../../../../../styles/constants";
 
 interface DateSliderProps {
   currentMinDate: string | undefined;
@@ -35,6 +37,9 @@ interface DateRangeControlProps extends ControlProps {
 }
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
+const SLIDER_WIDTH_DEFAULT = 600;
+const SLIDER_WIDTH_TABLET = 400;
+const SLIDER_WIDTH_MOBILE = 250;
 
 const DateSlider: React.FC<DateSliderProps> = ({
   currentMinDate,
@@ -43,6 +48,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
   maxDate,
   onDateRangeChange,
 }) => {
+  const { isMobile, isTablet } = useBreakpoint();
   const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
     dateToValue(
       dayjs(
@@ -68,21 +74,17 @@ const DateSlider: React.FC<DateSliderProps> = ({
   return (
     <Grid
       container
-      width="800px"
-      sx={{ padding: "10px" }}
+      width={
+        isMobile
+          ? SLIDER_WIDTH_MOBILE
+          : isTablet
+            ? SLIDER_WIDTH_TABLET
+            : SLIDER_WIDTH_DEFAULT
+      }
       data-testid={COMPONENT_ID}
+      padding={padding.small}
     >
-      <Grid item md={2} container sx={{ paddingX: "10px" }}>
-        <Grid item md={12}>
-          {minDate}
-        </Grid>
-        <Grid item md={12}>
-          <Typography fontSize="12px" display="inline">
-            Start Date
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid item md={8} container sx={{ paddingTop: "10px" }}>
+      <Grid item xs={12} container sx={{ paddingX: padding.medium }}>
         <PlainSlider
           value={dateRangeStamp}
           min={dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT))}
@@ -95,15 +97,27 @@ const DateSlider: React.FC<DateSliderProps> = ({
           }
         />
       </Grid>
-      <Grid item md={2} container sx={{ paddingX: "20px" }}>
-        <Grid item md={12}>
+      <Grid
+        item
+        xs={12}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <Typography
+          padding={0}
+          fontSize={fontSize.label}
+          color={color.gray.light}
+        >
+          {minDate}
+        </Typography>
+        <Typography
+          padding={0}
+          fontSize={fontSize.label}
+          color={color.gray.light}
+        >
           {maxDate}
-        </Grid>
-        <Grid item md={12}>
-          <Typography fontSize="12px" display="inline">
-            End Date
-          </Typography>
-        </Grid>
+        </Typography>
       </Grid>
     </Grid>
   );

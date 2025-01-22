@@ -19,18 +19,10 @@ import ReplyIcon from "@mui/icons-material/Reply";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import { useDetailPageContext } from "../context/detail-page-context";
-import { useNavigate } from "react-router-dom";
 import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
-import store, {
-  getComponentState,
-} from "../../../components/common/store/store";
-import {
-  ParameterState,
-  formatToUrlParam,
-} from "../../../components/common/store/componentParamReducer";
 import OrganizationLogo from "../../../components/logo/OrganizationLogo";
-import { pageDefault } from "../../../components/common/constants";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
+import useBreakpoint from "../../../hooks/useBreakpoint";
 
 interface ButtonWithIcon {
   label: string;
@@ -55,9 +47,11 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
 };
 
 const HeaderSection = () => {
-  const { collection } = useDetailPageContext();
-  const title = collection?.title;
+  const { isMobile } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
+  const { collection } = useDetailPageContext();
+
+  const title = collection?.title;
 
   // TODO: on click user goes back to search page where has results based on previous search params
   const onGoBack = useCallback(() => {
@@ -107,7 +101,7 @@ const HeaderSection = () => {
         onClick={onGoBack}
         data-testid="go-back-button"
       >
-        {renderButton(buttons.goBack.icon)}
+        {!isMobile && renderButton(buttons.goBack.icon)}
       </Box>
       <Box
         aria-label="go-previous & go-next button group"
