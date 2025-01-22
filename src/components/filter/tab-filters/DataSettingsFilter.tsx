@@ -1,6 +1,6 @@
 import { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
-import { IndexDataType, ItemButton, TabFilterType } from "../Filters";
+import { ItemButton, TabFilterType } from "../Filters";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { fontColor, fontWeight } from "../../../styles/constants";
@@ -20,35 +20,35 @@ const DATA_SETTINGS: DataSettingsFilterType = {
     {
       value: DatasetFrequency.REALTIME,
       label: "Real Time",
-    },
+    } as ItemButton,
     {
       value: DatasetFrequency.DELAYED,
       label: "Delayed",
-    },
+    } as ItemButton,
     {
       value: DatasetFrequency.OTHER,
       label: "One-off",
-    },
+    } as ItemButton,
   ],
   dataIndexedType: [
     {
-      value: IndexDataType.CloudOptimized,
+      value: "cloud",
       label: "Cloud Optimized",
-    },
+    } as ItemButton,
   ],
   dataDeliveryMode: [
     {
       value: "yearly",
       label: "Yearly",
-    },
+    } as ItemButton,
     {
       value: "quarterly",
       label: "Quarterly",
-    },
+    } as ItemButton,
     {
       value: "monthly",
       label: "Monthly",
-    },
+    } as ItemButton,
     {
       value: "daily",
       label: "Daily",

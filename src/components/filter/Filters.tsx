@@ -28,12 +28,6 @@ import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
 import { DatasetFrequency } from "../common/store/searchReducer";
 import { useAppDispatch } from "../common/store/hooks";
 
-export interface ItemButton {
-  value: DatasetFrequency | IndexDataType | string;
-  label: string;
-  icon?: ElementType;
-}
-
 enum FiltersTabs {
   Parameters = "parameters",
   Platform = "platform",
@@ -41,8 +35,14 @@ enum FiltersTabs {
   DataSettings = "data-settings",
 }
 
-enum IndexDataType {
-  CloudOptimized = "cloudOptimized",
+export enum IndexDataType {
+  Cloud = "cloud",
+}
+
+export interface ItemButton {
+  value: DatasetFrequency | IndexDataType | string;
+  label: string;
+  icon?: ElementType;
 }
 
 // The type of each item in Filters should consistent with ParameterState
@@ -171,7 +171,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
       } else {
         dispatch(updateImosOnly(false));
       }
-      if (filters.dataIndexedType?.includes(IndexDataType.CloudOptimized)) {
+      if (filters.dataIndexedType?.includes(IndexDataType.Cloud)) {
         dispatch(updateHasData(true));
       } else {
         dispatch(updateHasData(false));
@@ -230,7 +230,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     if (hasCOData) {
       setFilters((prevFilters) => ({
         ...prevFilters,
-        dataAvailability: [IndexDataType.CloudOptimized],
+        dataAvailability: [IndexDataType.Cloud],
       }));
     }
   }, [hasCOData, isImosOnlyDataset, parameterVocabs, platform, updateFreq]);
@@ -291,7 +291,5 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     </>
   );
 };
-
-export { IndexDataType };
 
 export default Filters;

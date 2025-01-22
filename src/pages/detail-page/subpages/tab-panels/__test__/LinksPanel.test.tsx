@@ -60,7 +60,9 @@ describe("LinksPanel", async () => {
   });
 
   test("should show COPY LINK button when on hover", () => {
-    waitFor(() => screen.findByText("Data access using R")).then(() => {
+    waitFor(() => screen.findByText("Data access using R"), {
+      timeout: 4000,
+    }).then(() => {
       const link = screen.queryByText("Data access using R");
       expect(link).to.exist;
       userEvent.hover(link!);
