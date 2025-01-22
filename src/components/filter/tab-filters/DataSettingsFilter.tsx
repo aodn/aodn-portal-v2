@@ -32,7 +32,7 @@ const DATA_SETTINGS: DataSettingsFilterType = {
   ],
   dataIndexedType: [
     {
-      value: IndexDataType.Cloud,
+      value: "cloud",
       label: "Cloud Optimized",
     } as ItemButton,
   ],
