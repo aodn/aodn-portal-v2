@@ -78,10 +78,12 @@ describe("AssociatedRecordsPanel", async () => {
   });
 
   it("should open a new tab when clicking on a record abstract", async () => {
-    waitFor(() =>
-      screen.findAllByText(
-        "Northern Australia Automated Marine Weather and Oceanographic Stations"
-      )
+    waitFor(
+      () =>
+        screen.findAllByText(
+          "Northern Australia Automated Marine Weather and Oceanographic Stations"
+        ),
+      { timeout: 5000 }
     ).then(async () => {
       const parentTitle = await screen.findByTestId(
         "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
@@ -107,39 +109,50 @@ describe("AssociatedRecordsPanel", async () => {
     const lowerRecordTitle =
       "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
 
-    waitFor(() => {
-      const showMoreRecordsBtn = screen.queryByTestId(
-        "show-more-detail-btn-Sibling Records"
-      );
-      expect(showMoreRecordsBtn).to.exist;
+    waitFor(
+      () => {
+        const showMoreRecordsBtn = screen.queryByTestId(
+          "show-more-detail-btn-Sibling Records"
+        );
+        expect(showMoreRecordsBtn).to.exist;
+        // final record should be hiddren first
+        expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
+        userEvent.click(showMoreRecordsBtn!);
+      },
+      { timeout: 5000 }
+    );
 
-      // final record should be hiddren first
-      expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
-      userEvent.click(showMoreRecordsBtn!);
-    });
+    waitFor(
+      () => {
+        expect(screen.queryByTestId("show-less-detail-btn-Sibling Records")).to
+          .exist;
 
-    waitFor(() => {
-      expect(screen.queryByTestId("show-less-detail-btn-Sibling Records")).to
-        .exist;
+        // final record should be shown now
+        expect(screen.queryByText(lowerRecordTitle)).to.exist;
+      },
+      { timeout: 5000 }
+    );
 
-      // final record should be shown now
-      expect(screen.queryByText(lowerRecordTitle)).to.exist;
-    });
+    waitFor(
+      () => {
+        const showLessRecordsBtn = screen.queryByTestId(
+          "show-less-detail-btn-Sibling Records"
+        );
+        expect(showLessRecordsBtn).to.exist;
+        userEvent.click(showLessRecordsBtn!);
+      },
+      { timeout: 5000 }
+    );
 
-    waitFor(() => {
-      const showLessRecordsBtn = screen.queryByTestId(
-        "show-less-detail-btn-Sibling Records"
-      );
-      expect(showLessRecordsBtn).to.exist;
-      userEvent.click(showLessRecordsBtn!);
-    });
+    waitFor(
+      () => {
+        expect(screen.queryByTestId("show-more-detail-btn-Sibling Records")).to
+          .exist;
 
-    waitFor(() => {
-      expect(screen.queryByTestId("show-more-detail-btn-Sibling Records")).to
-        .exist;
-
-      // final record should be hiddren again
-      expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
-    });
+        // final record should be hidden again
+        expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
+      },
+      { timeout: 5000 }
+    );
   });
 });

@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import {
+  updateHasData,
   updateImosOnly,
   updateParameterVocabs,
   updatePlatform,
@@ -28,9 +29,20 @@ import { DatasetFrequency } from "../common/store/searchReducer";
 import { useAppDispatch } from "../common/store/hooks";
 
 export interface ItemButton {
-  value: DatasetFrequency | string;
+  value: DatasetFrequency | IndexDataType | string;
   label: string;
   icon?: ElementType;
+}
+
+enum FiltersTabs {
+  Parameters = "parameters",
+  Platform = "platform",
+  Organisation = "organisation",
+  DataSettings = "data-settings",
+}
+
+enum IndexDataType {
+  CloudOptimized = "cloudOptimized",
 }
 
 // The type of each item in Filters should consistent with ParameterState
@@ -41,6 +53,7 @@ interface Filters {
   organisation?: Array<string>;
   dataDeliveryFrequency?: Array<DatasetFrequency> | undefined;
   dataDeliveryMode?: Array<string>;
+  dataIndexedType?: Array<IndexDataType>;
   dataService?: Array<string>;
 }
 
@@ -54,13 +67,6 @@ interface FiltersProps {
 }
 
 const TAB_MAX_HEIGHT = 300;
-
-enum FiltersTabs {
-  Parameters = "parameters",
-  Platform = "platform",
-  Organisation = "organisation",
-  DataSettings = "data-settings",
-}
 
 const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
   switch (tabName) {
@@ -88,8 +94,13 @@ const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
 const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   const dispatch = useAppDispatch();
 
-  const { parameterVocabs, platform, updateFreq, isImosOnlyDataset } =
-    getComponentState(store.getState());
+  const {
+    parameterVocabs,
+    platform,
+    updateFreq,
+    isImosOnlyDataset,
+    hasCOData,
+  } = getComponentState(store.getState());
 
   const [filters, setFilters] = useState<Filters>({});
 
@@ -160,6 +171,11 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
       } else {
         dispatch(updateImosOnly(false));
       }
+      if (filters.dataIndexedType?.includes(IndexDataType.CloudOptimized)) {
+        dispatch(updateHasData(true));
+      } else {
+        dispatch(updateHasData(false));
+      }
       if (filters.platform) {
         dispatch(updatePlatform(filters.platform));
       } else {
@@ -211,7 +227,13 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         organisation: ["imos"],
       }));
     }
-  }, [isImosOnlyDataset, parameterVocabs, platform, updateFreq]);
+    if (hasCOData) {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        dataAvailability: [IndexDataType.CloudOptimized],
+      }));
+    }
+  }, [hasCOData, isImosOnlyDataset, parameterVocabs, platform, updateFreq]);
 
   return (
     <>
@@ -269,5 +291,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     </>
   );
 };
+
+export { IndexDataType };
 
 export default Filters;

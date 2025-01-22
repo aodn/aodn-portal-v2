@@ -1,6 +1,6 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
-import { ItemButton, TabFilterType } from "../Filters";
+import { IndexDataType, ItemButton, TabFilterType } from "../Filters";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { fontColor, fontWeight } from "../../../styles/constants";
@@ -9,6 +9,7 @@ import { DatasetFrequency } from "../../common/store/searchReducer";
 enum DataSettingsCategory {
   dataDeliverMode = "dataDeliveryMode",
   dataDeliveryFrequency = "dataDeliveryFrequency",
+  dataIndexedType = "dataIndexedType",
   dataService = "dataService",
 }
 
@@ -27,6 +28,12 @@ const DATA_SETTINGS: DataSettingsFilterType = {
     {
       value: DatasetFrequency.OTHER,
       label: "One-off",
+    },
+  ],
+  dataIndexedType: [
+    {
+      value: IndexDataType.CloudOptimized,
+      label: "Cloud Optimized",
     },
   ],
   dataDeliveryMode: [
@@ -97,6 +104,12 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
             dataService: newAlignment,
           }));
         }
+        if (category === DataSettingsCategory.dataIndexedType) {
+          setFilters((prevFilters) => ({
+            ...prevFilters,
+            dataAvailability: newAlignment,
+          }));
+        }
       },
     [setFilters]
   );
@@ -142,6 +155,30 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
           onChange={handleChange(DataSettingsCategory.dataDeliveryFrequency)}
         >
           {DATA_SETTINGS.dataDeliveryFrequency.map((item) => (
+            <StyledToggleButton
+              value={item.value}
+              key={item.value}
+              aria-label={item.label}
+            >
+              {item.label}
+            </StyledToggleButton>
+          ))}
+        </StyledToggleButtonGroup>
+      </Box>
+      <Box>
+        <Typography
+          p={0}
+          pl={1}
+          fontWeight={fontWeight.bold}
+          color={fontColor.blue.dark}
+        >
+          Data Available
+        </Typography>
+        <StyledToggleButtonGroup
+          value={filters.dataIndexedType}
+          onChange={handleChange(DataSettingsCategory.dataIndexedType)}
+        >
+          {DATA_SETTINGS.dataIndexedType.map((item) => (
             <StyledToggleButton
               value={item.value}
               key={item.value}
