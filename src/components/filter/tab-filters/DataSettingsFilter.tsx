@@ -1,6 +1,6 @@
 import { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
-import { ItemButton, TabFilterType } from "../Filters";
+import { IndexDataType, ItemButton, TabFilterType } from "../Filters";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { fontColor, fontWeight } from "../../../styles/constants";
@@ -32,7 +32,7 @@ const DATA_SETTINGS: DataSettingsFilterType = {
   ],
   dataIndexedType: [
     {
-      value: "cloud",
+      value: IndexDataType.Cloud,
       label: "Cloud Optimized",
     } as ItemButton,
   ],
@@ -84,12 +84,12 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
     (category: DataSettingsCategory) =>
       (
         _: React.MouseEvent<HTMLElement>,
-        newAlignment: Array<DatasetFrequency>
+        newAlignment: Array<DatasetFrequency> | Array<IndexDataType>
       ) => {
         if (category === DataSettingsCategory.dataDeliveryFrequency) {
           setFilters((prevFilters) => ({
             ...prevFilters,
-            dataDeliveryFrequency: newAlignment,
+            dataDeliveryFrequency: newAlignment as Array<DatasetFrequency>,
           }));
         }
         if (category === DataSettingsCategory.dataDeliverMode) {
@@ -107,7 +107,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
         if (category === DataSettingsCategory.dataIndexedType) {
           setFilters((prevFilters) => ({
             ...prevFilters,
-            dataAvailability: newAlignment,
+            dataIndexedType: newAlignment as Array<IndexDataType>,
           }));
         }
       },

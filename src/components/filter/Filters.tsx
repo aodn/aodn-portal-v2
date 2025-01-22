@@ -171,11 +171,11 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
       } else {
         dispatch(updateImosOnly(false));
       }
-      if (filters.dataIndexedType?.includes(IndexDataType.Cloud)) {
-        dispatch(updateHasData(true));
-      } else {
-        dispatch(updateHasData(false));
-      }
+
+      dispatch(
+        updateHasData(filters.dataIndexedType?.includes(IndexDataType.Cloud))
+      );
+
       if (filters.platform) {
         dispatch(updatePlatform(filters.platform));
       } else {
