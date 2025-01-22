@@ -220,7 +220,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     if (hasCOData) {
       setFilters((prevFilters) => ({
         ...prevFilters,
-        dataAvailability: [IndexDataType.CLOUD],
+        dataIndexedType: [IndexDataType.CLOUD],
       }));
     }
   }, [hasCOData, isImosOnlyDataset, parameterVocabs, platform, updateFreq]);

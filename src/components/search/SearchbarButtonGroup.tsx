@@ -59,6 +59,10 @@ const checkCount = ({
         count++;
       }
 
+      if (filterObj.hasCOData) {
+        count++;
+      }
+
       return count;
 
     default:
