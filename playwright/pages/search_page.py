@@ -18,6 +18,9 @@ class SearchPage(BasePage):
 
         # -- Page locators --
 
+        self.main_map = self.get_by_id('result-page-main-map')
+        self.bookmark_list = page.get_by_test_id('bookmark-list-head')
+
         # results view
         self.show_result_count = page.get_by_test_id('show-result-count')
         self.result_list = page.get_by_test_id('search-page-result-list')

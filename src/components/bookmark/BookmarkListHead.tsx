@@ -27,6 +27,7 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
       width="100%"
       padding={padding.extraSmall}
       sx={{ backgroundColor: color.blue.darkSemiTransparent, ...sx }}
+      data-testid="bookmark-list-head"
     >
       <Typography
         padding={0}
