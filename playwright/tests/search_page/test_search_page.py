@@ -60,6 +60,27 @@ def test_full_map_view(page_mock: Page, view_type: str) -> None:
 
 
 @pytest.mark.parametrize(
+    'view_type',
+    [
+        'Full List View',
+    ],
+)
+def test_full_list_view(page_mock: Page, view_type: str) -> None:
+    landing_page = LandingPage(page_mock)
+    search_page = SearchPage(page_mock)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+
+    expect(search_page.main_map).to_be_visible()
+    search_page.view_button.click()
+    search_page.click_text(view_type)
+    expect(search_page.main_map).not_to_be_visible()
+    expect(search_page.result_list).to_be_visible()
+    expect(search_page.bookmark_list).to_be_visible()
+
+
+@pytest.mark.parametrize(
     'chunk_1_first_data, chunk_1_last_data, chunk_2_first_data, chunk_2_last_data',
     [
         (
