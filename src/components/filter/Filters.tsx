@@ -133,7 +133,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         showBadge: checkBadge(filters, FiltersTabs.Organisation),
       },
       {
-        label: "Data Settings",
+        label: "Data",
         value: FiltersTabs.DataSettings,
         component: (
           <DataSettingsFilter
