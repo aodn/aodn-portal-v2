@@ -144,7 +144,7 @@ const ReactMap = ({
 
       // Create a resize observer to the canvas so we know if its size have changed
       // and we need to redraw the map
-      const resizeObserver = new ResizeObserver((entries) =>
+      const resizeObserver = new ResizeObserver((_) =>
         // https://stackoverflow.com/questions/70533564/mapbox-gl-flickers-when-resizing-the-container-div
         setTimeout(() => map.resize(), 0.1)
       );
@@ -183,7 +183,7 @@ const ReactMap = ({
     map.off("moveend", debounceOnMoveEvent);
     // DO NOT use fitBounds(), it will cause the zoom and padding adjust so
     // you end up map area drift.
-    map.jumpTo({
+    map.easeTo({
       center: bbox.getCenter(),
       zoom: zoom,
     });
