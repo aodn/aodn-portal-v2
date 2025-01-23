@@ -14,7 +14,7 @@ import {
   fontWeight,
   padding,
 } from "../../../styles/constants";
-import { useCallback } from "react";
+import { ReactElement, useCallback } from "react";
 import ReplyIcon from "@mui/icons-material/Reply";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
@@ -62,7 +62,7 @@ const HeaderSection = () => {
   // This will require the entire search results (their ids and indexes) based on search params
   // and current-collection-index
 
-  const renderButton = useCallback((icon: JSX.Element) => {
+  const renderButton = useCallback((icon: ReactElement) => {
     return (
       <Paper
         elevation={3}
