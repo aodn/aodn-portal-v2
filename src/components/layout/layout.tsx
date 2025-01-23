@@ -4,6 +4,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import "dayjs/locale/en-gb";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ScrollToTop from "../common/scroll/ScrollToTop";
 
 interface LayoutProps {}
 
@@ -11,6 +12,7 @@ const Layout = ({ children }: React.PropsWithChildren<LayoutProps>) => {
   return (
     <div>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
+        <ScrollToTop />
         <Header />
         <main>{children}</main>
         <Footer />

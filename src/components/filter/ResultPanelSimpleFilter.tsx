@@ -18,6 +18,7 @@ export interface ResultPanelSimpleFilterType
   count: number;
   total: number;
   sx?: SxProps;
+  isUnderLaptop?: boolean;
 }
 
 interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
@@ -38,6 +39,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   currentSort,
   onChangeSorting,
   isIconOnly,
+  isUnderLaptop,
 }) => {
   return (
     <Grid sx={sx} container justifyContent="center" spacing={1}>
@@ -76,6 +78,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
           isIconOnly={isIconOnly}
+          isUnderLaptop={isUnderLaptop}
         />
       </Grid>
     </Grid>

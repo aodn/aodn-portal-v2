@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Box, SxProps } from "@mui/material";
 import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
@@ -48,6 +48,13 @@ const ResultSection: FC<ResultSectionProps> = ({
     searchQueryResult
   );
 
+  // Switch default layout to full-list in small screens
+  useEffect(() => {
+    if (isUnderLaptop) {
+      onChangeLayout && onChangeLayout(SearchResultLayoutEnum.FULL_LIST);
+    }
+  }, [isUnderLaptop, onChangeLayout]);
+
   // Early return if it is full map view or no reduxContents
   if (showFullMap || !reduxContents) return null;
 
@@ -83,6 +90,7 @@ const ResultSection: FC<ResultSectionProps> = ({
           currentSort={currentSort}
           onChangeSorting={onChangeSorting}
           isIconOnly={isMobile}
+          isUnderLaptop={isUnderLaptop}
         />
         {(currentLayout === SearchResultLayoutEnum.FULL_LIST ||
           isUnderLaptop) && (

@@ -28,7 +28,6 @@ const MAP_VIEW_SELECT = [
     label: "Full Map View",
     icon: FullMapViewIcon,
   },
-  // TODO: Implement 'List and Details' once designed finished
   {
     value: SearchResultLayoutEnum.FULL_LIST,
     label: "Full List View",
@@ -42,6 +41,7 @@ export interface ResultListLayoutButtonType<T> {
     | undefined;
   onChangeLayout?: (layout: T) => void;
   isIconOnly?: boolean;
+  isUnderLaptop?: boolean;
 }
 
 interface ResultListLayoutButtonProps<T>
@@ -49,10 +49,21 @@ interface ResultListLayoutButtonProps<T>
 
 const ResultListLayoutButton: FC<
   ResultListLayoutButtonProps<SearchResultLayoutEnum>
-> = ({ onChangeLayout, currentLayout, isIconOnly }) => {
+> = ({ onChangeLayout, currentLayout, isIconOnly, isUnderLaptop }) => {
+  // Filter out List+Map and Grid+Map options for mobile
+  const filteredOptions = MAP_VIEW_SELECT.filter((option) => {
+    if (isUnderLaptop) {
+      return ![
+        SearchResultLayoutEnum.LIST,
+        SearchResultLayoutEnum.GRID,
+      ].includes(option.value);
+    }
+    return true;
+  });
+
   return (
     <IconSelect
-      items={MAP_VIEW_SELECT}
+      items={filteredOptions}
       data-testid="result-layout-button"
       selectName="View"
       onSelectCallback={onChangeLayout}
