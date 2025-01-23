@@ -34,7 +34,7 @@ const DATA_SETTINGS: DataSettingsFilterType = {
   dataIndexedType: [
     {
       value: IndexDataType.CLOUD,
-      label: "Cloud Optimized",
+      label: "Yes",
     },
   ],
   dataDeliveryMode: [
