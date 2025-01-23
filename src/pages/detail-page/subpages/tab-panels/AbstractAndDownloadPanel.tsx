@@ -154,6 +154,7 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
               >
                 <Map
                   bbox={bbox}
+                  animate={true}
                   panelId={mapContainerId}
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
