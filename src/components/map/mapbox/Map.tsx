@@ -183,7 +183,7 @@ const ReactMap = ({
     map.off("moveend", debounceOnMoveEvent);
     // DO NOT use fitBounds(), it will cause the zoom and padding adjust so
     // you end up map area drift.
-    map.easeTo({
+    map.jumpTo({
       center: bbox.getCenter(),
       zoom: zoom,
     });
