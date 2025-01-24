@@ -33,7 +33,12 @@ import BookmarkListHead from "./BookmarkListHead";
 
 export interface BookmarkListAccordionGroupBasicType {
   onDeselectDataset?: () => void;
-  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
+  tabNavigation?: (
+    uuid: string,
+    tab: string,
+    referer: string,
+    section?: string
+  ) => void;
   hideHead?: boolean;
 }
 

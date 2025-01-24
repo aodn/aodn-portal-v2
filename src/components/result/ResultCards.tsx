@@ -1,5 +1,4 @@
 import { FC, useCallback, useEffect, useMemo } from "react";
-import { ListChildComponentProps } from "react-window";
 import { Box, Grid, SxProps } from "@mui/material";
 import {
   CollectionsQueryType,
@@ -13,6 +12,7 @@ import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import useFetchData from "../../hooks/useFetchData";
+import { SEARCH_PAGE_REFERER } from "../../pages/search-page/constants";
 
 export interface ResultCardBasicType {
   content?: OGCCollection;
@@ -168,17 +168,18 @@ const ResultCards: FC<ResultCardsProps> = ({
   );
 
   const onClickDetail = useCallback(
-    (uuid: string) => goToDetailPage(uuid, "abstract"),
+    (uuid: string) => goToDetailPage(uuid, "abstract", SEARCH_PAGE_REFERER),
     [goToDetailPage]
   );
 
   const onClickDownload = useCallback(
-    (uuid: string) => goToDetailPage(uuid, "abstract", "download-section"),
+    (uuid: string) =>
+      goToDetailPage(uuid, "abstract", SEARCH_PAGE_REFERER, "download-section"),
     [goToDetailPage]
   );
 
   const onClickLinks = useCallback(
-    (uuid: string) => goToDetailPage(uuid, "links"),
+    (uuid: string) => goToDetailPage(uuid, "links", SEARCH_PAGE_REFERER),
     [goToDetailPage]
   );
 

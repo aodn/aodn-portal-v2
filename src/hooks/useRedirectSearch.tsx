@@ -9,7 +9,7 @@ import store, { getComponentState } from "../components/common/store/store";
 const useRedirectSearch = () => {
   const navigate = useNavigate();
 
-  const redirectSearch = (
+  return (
     referer: string,
     fromNavigate: boolean = true,
     requireSearch: boolean = true
@@ -23,8 +23,6 @@ const useRedirectSearch = () => {
       },
     });
   };
-
-  return redirectSearch;
 };
 
 export default useRedirectSearch;

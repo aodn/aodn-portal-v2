@@ -12,7 +12,12 @@ export interface LayerBasicType {
   onClickMapPoint?: (uuids: Array<string>) => void;
   // dataset that user selected from result list or map
   selectedUuids?: string[];
-  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
+  tabNavigation?: (
+    uuid: string,
+    tab: string,
+    referer: string,
+    section?: string
+  ) => void;
 }
 // Use to create static layer on map, you need to add menu item to select those layers,
 // refer to map section

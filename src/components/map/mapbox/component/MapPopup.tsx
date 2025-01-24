@@ -23,7 +23,12 @@ import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 interface MapPopupProps {
   layerId: string;
   onDatasetSelected?: (uuid: Array<string>) => void;
-  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
+  tabNavigation?: (
+    uuid: string,
+    tab: string,
+    referer: string,
+    section?: string
+  ) => void;
 }
 export interface MapPopupRef {
   forceRemovePopup: () => void;

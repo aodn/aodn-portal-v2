@@ -6,7 +6,7 @@ const useTabNavigation = () => {
   const navigate = useNavigate();
 
   return useCallback(
-    (uuid: string, tab: string, section?: string) => {
+    (uuid: string, tab: string, referer: string, section?: string) => {
       const searchParams = new URLSearchParams();
 
       // Add uuid parameter
@@ -21,7 +21,11 @@ const useTabNavigation = () => {
       }
 
       // Navigate to the constructed URL
-      navigate(`${pageDefault.details}?${searchParams.toString()}`);
+      navigate(`${pageDefault.details}?${searchParams.toString()}`, {
+        state: {
+          referer: referer,
+        },
+      });
     },
     [navigate]
   );
