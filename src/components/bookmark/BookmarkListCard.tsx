@@ -6,10 +6,12 @@ import Layers from "../map/mapbox/layers/Layers";
 import GeojsonLayer from "../map/mapbox/layers/GeojsonLayer";
 import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
 import { fontColor, fontSize, padding } from "../../styles/constants";
+import { SEARCH_PAGE_REFERER } from "../../pages/search-page/constants";
+import { TabNavigation } from "../../hooks/useTabNavigation";
 
 export interface BookmarkListCardType {
   dataset: OGCCollection;
-  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
+  tabNavigation?: TabNavigation;
 }
 
 interface BookmarkListCardProps extends BookmarkListCardType {
@@ -23,10 +25,16 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
   tabNavigation = () => {},
   sx,
 }) => {
-  const onLinks = () => tabNavigation(dataset.id, "links");
+  const onLinks = () => tabNavigation(dataset.id, "links", SEARCH_PAGE_REFERER);
   const onDownload = () =>
-    tabNavigation(dataset.id, "abstract", "download-section");
-  const onDetail = () => tabNavigation(dataset.id, "abstract");
+    tabNavigation(
+      dataset.id,
+      "abstract",
+      SEARCH_PAGE_REFERER,
+      "download-section"
+    );
+  const onDetail = () =>
+    tabNavigation(dataset.id, "abstract", SEARCH_PAGE_REFERER);
 
   return (
     <Box flex={1} sx={{ ...sx }}>
