@@ -47,7 +47,7 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
 };
 
 const HeaderSection = () => {
-  const { isMobile } = useBreakpoint();
+  const { isUnderLaptop } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
   const { collection } = useDetailPageContext();
 
@@ -101,7 +101,7 @@ const HeaderSection = () => {
         onClick={onGoBack}
         data-testid="go-back-button"
       >
-        {!isMobile && renderButton(buttons.goBack.icon)}
+        {!isUnderLaptop && renderButton(buttons.goBack.icon)}
       </Box>
       <Box
         aria-label="go-previous & go-next button group"

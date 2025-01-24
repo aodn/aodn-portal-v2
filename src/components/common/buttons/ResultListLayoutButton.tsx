@@ -41,7 +41,7 @@ export interface ResultListLayoutButtonType<T> {
     | undefined;
   onChangeLayout?: (layout: T) => void;
   isIconOnly?: boolean;
-  isUnderLaptop?: boolean;
+  excludeOptions?: SearchResultLayoutEnum[];
 }
 
 interface ResultListLayoutButtonProps<T>
@@ -49,18 +49,10 @@ interface ResultListLayoutButtonProps<T>
 
 const ResultListLayoutButton: FC<
   ResultListLayoutButtonProps<SearchResultLayoutEnum>
-> = ({ onChangeLayout, currentLayout, isIconOnly, isUnderLaptop }) => {
-  // Filter out List+Map and Grid+Map options for mobile
-  const filteredOptions = MAP_VIEW_SELECT.filter((option) => {
-    if (isUnderLaptop) {
-      return ![
-        SearchResultLayoutEnum.LIST,
-        SearchResultLayoutEnum.GRID,
-      ].includes(option.value);
-    }
-    return true;
-  });
-
+> = ({ onChangeLayout, currentLayout, isIconOnly, excludeOptions = [] }) => {
+  const filteredOptions = MAP_VIEW_SELECT.filter(
+    (option) => !excludeOptions.includes(option.value)
+  );
   return (
     <IconSelect
       items={filteredOptions}

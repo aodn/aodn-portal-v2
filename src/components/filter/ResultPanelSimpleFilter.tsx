@@ -11,6 +11,7 @@ import ResultListSortButton, {
   SortResultEnum,
 } from "../common/buttons/ResultListSortButton";
 import { ICON_SELECT_DEFAULT_HEIGHT } from "../common/dropdown/IconSelect";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 export interface ResultPanelSimpleFilterType
   extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
@@ -18,7 +19,6 @@ export interface ResultPanelSimpleFilterType
   count: number;
   total: number;
   sx?: SxProps;
-  isUnderLaptop?: boolean;
 }
 
 interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
@@ -39,8 +39,8 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   currentSort,
   onChangeSorting,
   isIconOnly,
-  isUnderLaptop,
 }) => {
+  const { isUnderLaptop } = useBreakpoint();
   return (
     <Grid sx={sx} container justifyContent="center" spacing={1}>
       <Grid item md={6} xs={8}>
@@ -78,7 +78,11 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
           isIconOnly={isIconOnly}
-          isUnderLaptop={isUnderLaptop}
+          excludeOptions={
+            isUnderLaptop
+              ? [SearchResultLayoutEnum.GRID, SearchResultLayoutEnum.LIST]
+              : []
+          }
         />
       </Grid>
     </Grid>

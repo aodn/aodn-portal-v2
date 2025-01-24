@@ -1,5 +1,4 @@
 import { FC, useCallback, useEffect, useMemo } from "react";
-import { ListChildComponentProps } from "react-window";
 import { Box, Grid, SxProps } from "@mui/material";
 import {
   CollectionsQueryType,
@@ -13,6 +12,7 @@ import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import useFetchData from "../../hooks/useFetchData";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 export interface ResultCardBasicType {
   content?: OGCCollection;
@@ -22,6 +22,7 @@ export interface ResultCardBasicType {
   onClickLinks?: (uuid: string) => void;
   selectedUuid?: string;
   sx?: SxProps;
+  isSimplified?: boolean;
 }
 
 interface ResultCardsListType extends ResultCardBasicType {
@@ -58,6 +59,7 @@ const renderListCards: FC<ResultCardsListType> = ({
   onClickDownload,
   selectedUuid,
   layout,
+  isSimplified,
 }) => {
   if (!count || !total || !contents) return;
 
@@ -83,6 +85,7 @@ const renderListCards: FC<ResultCardsListType> = ({
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
               selectedUuid={selectedUuid}
+              isSimplified={isSimplified}
             />
           </Grid>
         ))}
@@ -107,6 +110,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
   onClickLinks,
   onClickDownload,
   selectedUuid,
+  isSimplified,
 }) => {
   if (!count || !total || !contents) return;
 
@@ -122,6 +126,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
               onClickLinks={onClickLinks}
               onClickDownload={onClickDownload}
               selectedUuid={selectedUuid}
+              isSimplified={isSimplified}
             />
           </Grid>
         ))}
@@ -142,6 +147,7 @@ const ResultCards: FC<ResultCardsProps> = ({
   sx,
   selectedUuids,
 }) => {
+  const { isUnderLaptop } = useBreakpoint();
   const goToDetailPage = useTabNavigation();
   const { fetchMore } = useFetchData();
 
@@ -220,6 +226,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       onClickDownload,
       selectedUuid,
       layout: SearchResultLayoutEnum.FULL_LIST,
+      isSimplified: isUnderLaptop,
     });
   } else if (layout === SearchResultLayoutEnum.GRID) {
     // Render grid view
@@ -235,6 +242,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       onClickDownload,
       selectedUuid,
       layout: SearchResultLayoutEnum.GRID,
+      isSimplified: isUnderLaptop,
     });
   } else {
     // Default render list view
@@ -250,6 +258,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       onClickDownload,
       selectedUuid,
       layout: SearchResultLayoutEnum.LIST,
+      isSimplified: isUnderLaptop,
     });
   }
 };

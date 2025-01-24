@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Box, SxProps } from "@mui/material";
 import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
@@ -90,7 +90,6 @@ const ResultSection: FC<ResultSectionProps> = ({
           currentSort={currentSort}
           onChangeSorting={onChangeSorting}
           isIconOnly={isMobile}
-          isUnderLaptop={isUnderLaptop}
         />
         {(currentLayout === SearchResultLayoutEnum.FULL_LIST ||
           isUnderLaptop) && (

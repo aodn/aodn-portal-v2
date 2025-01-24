@@ -32,6 +32,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   onClickLinks = () => {},
   onClickDownload = () => {},
   selectedUuid,
+  isSimplified = false,
   sx,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
@@ -102,7 +103,14 @@ const ListResultCard: FC<ListResultCardProps> = ({
           </CardActionArea>
         </Tooltip>
 
-        <CardActionArea onClick={() => onClickCard(content)} sx={{ flex: 1 }}>
+        <CardActionArea
+          onClick={
+            isSimplified
+              ? () => onClickDetail(uuid)
+              : () => onClickCard(content)
+          }
+          sx={{ flex: 1 }}
+        >
           <Typography
             arial-label="result-list-card-content"
             color={fontColor.gray.medium}
