@@ -6,6 +6,7 @@ import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, { getComponentState } from "../../components/common/store/store";
 import {
   createSearchParamFrom,
+  DEFAULT_SEARCH_MAP_SIZE,
   DEFAULT_SEARCH_PAGE_SIZE,
   fetchResultNoStore,
   fetchResultWithStore,
@@ -131,6 +132,7 @@ const SearchPage = () => {
     // it is ok to exclude it because it isn't show on map anyway
     const paramNonPaged = createSearchParamFrom(componentParam, {
       includeNoSpatialExtents: false,
+      pagesize: DEFAULT_SEARCH_MAP_SIZE,
     });
     const collections = await dispatch(
       // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted

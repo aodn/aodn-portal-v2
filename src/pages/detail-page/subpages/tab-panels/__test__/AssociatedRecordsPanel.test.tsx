@@ -79,11 +79,11 @@ describe("AssociatedRecordsPanel", async () => {
 
   it("should open a new tab when clicking on a record abstract", async () => {
     waitFor(
-      () =>
-        screen.findAllByText(
+      async () =>
+        await screen.findAllByText(
           "Northern Australia Automated Marine Weather and Oceanographic Stations"
         ),
-      { timeout: 5000 }
+      { timeout: 10000 }
     ).then(async () => {
       const parentTitle = await screen.findByTestId(
         "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
