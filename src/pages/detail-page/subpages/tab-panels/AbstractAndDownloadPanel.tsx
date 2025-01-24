@@ -24,8 +24,12 @@ import {
 import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 const TRUNCATE_COUNT = 800;
+const TRUNCATE_COUNT_TABLET = 500;
+const TRUNCATE_COUNT_MOBILE = 200;
+
 // TODO: Add vitest
 const getMinMaxDateStamps = (
   featureCollection: FeatureCollection<Point> | undefined
@@ -62,6 +66,7 @@ interface AbstractAndDownloadPanelProps {
 const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
   bbox,
 }) => {
+  const { isUnderLaptop, isMobile } = useBreakpoint();
   const {
     collection,
     featureCollection,
@@ -129,7 +134,13 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
             <ExpandableTextArea
               text={abstract}
               showMoreStr={"Show All"}
-              truncateCount={TRUNCATE_COUNT}
+              truncateCount={
+                isUnderLaptop
+                  ? isMobile
+                    ? TRUNCATE_COUNT_MOBILE
+                    : TRUNCATE_COUNT_TABLET
+                  : TRUNCATE_COUNT
+              }
             />
             <Box sx={{ visibility: "visible" }}>
               <Box
@@ -143,6 +154,7 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
               >
                 <Map
                   bbox={bbox}
+                  animate={true}
                   panelId={mapContainerId}
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}

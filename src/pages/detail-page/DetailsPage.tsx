@@ -35,10 +35,10 @@ const DetailsPage = () => {
             <Grid item xs={12}>
               <HeaderSection />
             </Grid>
-            <Grid item xs={9}>
+            <Grid item xs={12} md={9}>
               <ContentSection mapFocusArea={bbox} />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={12} md={3}>
               <SideSection
                 onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
               />

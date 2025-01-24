@@ -19,6 +19,9 @@ interface GeojsonLayerProps {
   // Vector tile layer should add to map
   collection: OGCCollection;
   onLayerClick?: (event: MapLayerMouseEvent) => void;
+  onMouseEnter?: (event: MapLayerMouseEvent) => void;
+  onMouseLeave?: (event: MapLayerMouseEvent) => void;
+  onMouseMove?: (event: MapLayerMouseEvent) => void;
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   animate?: boolean;
 }
@@ -26,6 +29,9 @@ interface GeojsonLayerProps {
 const GeojsonLayer: FC<GeojsonLayerProps> = ({
   collection,
   onLayerClick = (_: MapLayerMouseEvent) => {},
+  onMouseEnter = (_: MapLayerMouseEvent) => {},
+  onMouseLeave = (_: MapLayerMouseEvent) => {},
+  onMouseMove = (_: MapLayerMouseEvent) => {},
   setPhotos,
   animate = true,
 }) => {
@@ -166,6 +172,9 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           const onceIdle = () => handleIdle(extent?.bbox);
           map?.once("idle", onceIdle);
           map?.on("click", layerId, onLayerClick);
+          map?.on("mouseenter", layerId, onMouseEnter);
+          map?.on("mouseleave", layerId, onMouseLeave);
+          map?.on("mousemove", layerId, onMouseMove);
 
           return true;
         } else return prev;
@@ -175,9 +184,13 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       // Always remember to clean up resources
       try {
         if (map?.getSource(sourceId)) {
-          map?.off("click", layerId, onLayerClick);
           map?.removeLayer(layerId);
           map?.removeSource(sourceId);
+
+          map?.off("click", layerId, onLayerClick);
+          map?.off("mouseenter", layerId, onMouseEnter);
+          map?.off("mouseleave", layerId, onMouseLeave);
+          map?.off("mousemove", layerId, onMouseMove);
         }
       } catch (error) {
         // OK to ignore error here

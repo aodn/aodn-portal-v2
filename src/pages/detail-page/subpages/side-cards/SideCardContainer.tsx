@@ -1,4 +1,4 @@
-import { Box, Card, Divider, Stack, Typography } from "@mui/material";
+import { Box, Card, Divider, Typography } from "@mui/material";
 import { FC, ReactNode } from "react";
 import {
   borderRadius,
@@ -16,6 +16,7 @@ const SideCardContainer: FC<SideCardContainerProps> = ({ children, title }) => {
       sx={{
         backgroundColor: "#fff",
         borderRadius: borderRadius.small,
+        width: { xs: "100%", sm: "48.5%", md: "100%" },
       }}
     >
       <Box

@@ -4,6 +4,7 @@ import { ParameterState, Vocab } from "./componentParamReducer";
 
 import {
   cqlDefaultFilters,
+  IsNotNull,
   ParameterVocabsIn,
   PlatformFilter,
   PolygonOperation,
@@ -62,6 +63,7 @@ interface ObjectValue {
   parameterVocabsResult: Array<Vocab>;
 }
 export const DEFAULT_SEARCH_PAGE_SIZE = 11;
+export const DEFAULT_SEARCH_MAP_SIZE = 1500;
 export const FULL_LIST_PAGE_SIZE = 21;
 
 const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
@@ -345,6 +347,12 @@ const createSearchParamFrom = (
       p.filter,
       cqlDefaultFilters.get("IMOS_ONLY") as string
     );
+  }
+
+  if (i.hasCOData) {
+    // If this field is not null, that means we have indexed cloud optimized data
+    const f = cqlDefaultFilters.get("IS_NOT_NULL") as IsNotNull;
+    p.filter = appendFilter(p.filter, f("assets_summary"));
   }
 
   if (i.updateFreq) {

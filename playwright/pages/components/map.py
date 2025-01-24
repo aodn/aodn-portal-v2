@@ -16,9 +16,17 @@ class Map(BasePage):
         load_map_js_functions(page)
 
         # Page locators
-        self.basemap_show_hide_menu = page.get_by_label(
-            'basemap-show-hide-menu'
+        self.bookmarks_icon = page.get_by_test_id('BookmarksIcon')
+        self.basemap_show_hide_menu = page.get_by_test_id('PublicIcon')
+        self.layers_icon = page.get_by_test_id('LayersIcon')
+
+        self.daterange_show_hide_menu_button = page.get_by_test_id(
+            'daterange-show-hide-menu-button'
         )
+        self.draw_rect_menu_button = page.get_by_test_id(
+            'draw-rect-menu-button'
+        )
+        self.delete_button = self.get_button('Delete')
 
     def hover_map(self) -> None:
         """Move the mouse cursor to the center of the map"""

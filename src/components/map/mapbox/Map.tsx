@@ -15,6 +15,7 @@ export interface MapBasicType {
   minZoom?: number;
   maxZoom?: number;
   panelId: string;
+  animate?: boolean;
   projection?: Projection | string;
   onZoomEvent?: (
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
@@ -68,6 +69,7 @@ const ReactMap = ({
   minZoom = MapDefaultConfig.MIN_ZOOM,
   maxZoom = MapDefaultConfig.MAX_ZOOM,
   projection = MapDefaultConfig.PROJECTION,
+  animate = false,
   onZoomEvent,
   onMoveEvent,
   children,
@@ -144,7 +146,7 @@ const ReactMap = ({
 
       // Create a resize observer to the canvas so we know if its size have changed
       // and we need to redraw the map
-      const resizeObserver = new ResizeObserver((entries) =>
+      const resizeObserver = new ResizeObserver((_) =>
         // https://stackoverflow.com/questions/70533564/mapbox-gl-flickers-when-resizing-the-container-div
         setTimeout(() => map.resize(), 0.1)
       );
@@ -183,15 +185,22 @@ const ReactMap = ({
     map.off("moveend", debounceOnMoveEvent);
     // DO NOT use fitBounds(), it will cause the zoom and padding adjust so
     // you end up map area drift.
-    map.jumpTo({
-      center: bbox.getCenter(),
-      zoom: zoom,
-    });
+    if (animate) {
+      map.easeTo({
+        center: bbox.getCenter(),
+        zoom: zoom,
+      });
+    } else {
+      map.jumpTo({
+        center: bbox.getCenter(),
+        zoom: zoom,
+      });
+    }
     map.on("idle", () => {
       map.on("zoomend", debounceOnZoomEvent);
       map.on("moveend", debounceOnMoveEvent);
     });
-  }, [bbox, zoom, map, debounceOnZoomEvent, debounceOnMoveEvent]);
+  }, [bbox, zoom, map, debounceOnZoomEvent, debounceOnMoveEvent, animate]);
 
   // Only render if map is initialized and container is still connected
   if (!map || !containerRef.current?.isConnected) {

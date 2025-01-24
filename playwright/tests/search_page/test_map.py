@@ -244,6 +244,35 @@ def test_map_state_persists_across_page(page_mock: Page) -> None:
     assert map_zoom == new_map_zoom
 
 
+def test_map_buttons(page_mock: Page) -> None:
+    """
+    Ensures that the map buttons on both the search page and the detail page are displayed correctly.
+
+    This test addresses a previously identified issue where modifications to the search page map buttons
+    caused the detail page map buttons to disappear. By verifying the visibility of map buttons on
+    both pages, it ensures that all expected map buttons are present in their respective contexts.
+    """
+    landing_page = LandingPage(page_mock)
+    search_page = SearchPage(page_mock)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    # Check the visibility of search page map buttons
+    expect(search_page.map.bookmarks_icon).to_be_visible()
+    expect(search_page.map.basemap_show_hide_menu).to_be_visible()
+    expect(search_page.map.layers_icon).to_be_visible()
+
+    search_page.first_result_title.click()
+
+    # Check the visibility of detail page map buttons
+    expect(search_page.map.basemap_show_hide_menu).to_be_visible()
+    expect(search_page.map.daterange_show_hide_menu_button).to_be_visible()
+    expect(search_page.map.draw_rect_menu_button).to_be_visible()
+    expect(search_page.map.delete_button).to_be_visible()
+
+
 def test_map_zoom_out_and_drag_does_not_crash(page_mock: Page) -> None:
     """
     Verifies that zooming out and dragging the map on the search page does not cause the application to crash.

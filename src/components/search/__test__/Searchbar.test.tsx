@@ -1,7 +1,7 @@
 import { render, screen, cleanup } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import Searchbar from "../Searchbar";
 import store from "../../common/store/store";
 import { server } from "../../../__mocks__/server";
