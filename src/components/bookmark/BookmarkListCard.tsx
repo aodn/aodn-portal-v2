@@ -7,15 +7,11 @@ import GeojsonLayer from "../map/mapbox/layers/GeojsonLayer";
 import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
 import { fontColor, fontSize, padding } from "../../styles/constants";
 import { SEARCH_PAGE_REFERER } from "../../pages/search-page/constants";
+import { TabNavigation } from "../../hooks/useTabNavigation";
 
 export interface BookmarkListCardType {
   dataset: OGCCollection;
-  tabNavigation?: (
-    uuid: string,
-    tab: string,
-    referer: string,
-    section?: string
-  ) => void;
+  tabNavigation?: TabNavigation;
 }
 
 interface BookmarkListCardProps extends BookmarkListCardType {

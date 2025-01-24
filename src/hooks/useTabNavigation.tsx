@@ -2,10 +2,17 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { pageDefault } from "../components/common/constants";
 
+export type TabNavigation = (
+  uuid: string,
+  tab: string,
+  referer: string,
+  section?: string
+) => void;
+
 const useTabNavigation = () => {
   const navigate = useNavigate();
 
-  return useCallback(
+  return useCallback<TabNavigation>(
     (uuid: string, tab: string, referer: string, section?: string) => {
       const searchParams = new URLSearchParams();
 

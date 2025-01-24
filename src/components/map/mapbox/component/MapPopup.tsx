@@ -19,16 +19,12 @@ import AppTheme from "../../../../utils/AppTheme";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
+import { TabNavigation } from "../../../../hooks/useTabNavigation";
 
 interface MapPopupProps {
   layerId: string;
   onDatasetSelected?: (uuid: Array<string>) => void;
-  tabNavigation?: (
-    uuid: string,
-    tab: string,
-    referer: string,
-    section?: string
-  ) => void;
+  tabNavigation?: TabNavigation;
 }
 export interface MapPopupRef {
   forceRemovePopup: () => void;
