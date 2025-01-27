@@ -4,7 +4,7 @@ import {
   Grid,
   IconButton,
   Paper,
-  Stack,
+  SxProps,
   Typography,
 } from "@mui/material";
 import {
@@ -52,9 +52,9 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
 const HeaderSection = () => {
   const location = useLocation();
   const { isUnderLaptop } = useBreakpoint();
+  const { collection } = useDetailPageContext();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
-  const { collection } = useDetailPageContext();
 
   const title = collection?.title;
 
@@ -69,10 +69,6 @@ const HeaderSection = () => {
     },
     [redirectHome, redirectSearch]
   );
-
-  // TODO: implement the goNext and goPrevious function
-  // This will require the entire search results (their ids and indexes) based on search params
-  // and current-collection-index
 
   const renderButton = useCallback((icon: ReactElement) => {
     return (
@@ -89,6 +85,29 @@ const HeaderSection = () => {
       </Paper>
     );
   }, []);
+  // Render the go back button next to the header
+  const renderNavigateButtons = useCallback(
+    (isUnderLaptop: boolean, clickHandler: () => void) => {
+      const style: SxProps = {
+        top: "5%",
+      };
+      if (isUnderLaptop) {
+        style.position = "absolute";
+        style.left = "-50px";
+      }
+      return (
+        <Box
+          aria-label="go-back button"
+          sx={style}
+          onClick={clickHandler}
+          data-testid="go-back-button"
+        >
+          {renderButton(buttons.goBack.icon)}
+        </Box>
+      );
+    },
+    [renderButton]
+  );
 
   return (
     <Card
@@ -103,36 +122,6 @@ const HeaderSection = () => {
         overflow: "visible",
       }}
     >
-      <Box
-        aria-label="go-back button"
-        sx={{
-          position: "absolute",
-          left: "-50px",
-          top: "5%",
-        }}
-        onClick={() => onGoBack(location.state?.referer)}
-        data-testid="go-back-button"
-      >
-        {!isUnderLaptop && renderButton(buttons.goBack.icon)}
-      </Box>
-      <Box
-        aria-label="go-previous & go-next button group"
-        sx={{
-          position: "absolute",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          right: "-50px",
-          top: "5%",
-        }}
-      >
-        <Stack spacing={1}>
-          {/*TODO: hide the below 2 buttons now, for better demonstration. Can uncommented them when implementing them*/}
-          {/*{renderButton(buttons.goToPrevious.icon)}*/}
-          {/*{renderButton(buttons.goToNext.icon)}*/}
-        </Stack>
-      </Box>
       <Grid container>
         <Grid
           item
@@ -143,13 +132,16 @@ const HeaderSection = () => {
             alignItems: "center",
           }}
         >
+          {renderNavigateButtons(!isUnderLaptop, () =>
+            onGoBack(location.state?.referer)
+          )}
           <Typography
             aria-label="collection title"
             fontSize={fontSize.detailPageHeading}
             fontWeight={fontWeight.bold}
             color={fontColor.gray.dark}
             sx={{
-              padding: 0,
+              padding: 1,
               overflow: "hidden",
               textOverflow: "ellipsis",
               display: "-webkit-box",
