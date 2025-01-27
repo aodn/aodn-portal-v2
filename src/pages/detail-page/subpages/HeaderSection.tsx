@@ -22,11 +22,14 @@ import { useDetailPageContext } from "../context/detail-page-context";
 import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
 import OrganizationLogo from "../../../components/logo/OrganizationLogo";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
+import useRedirectHome from "../../../hooks/useRedirectHome";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import { useLocation } from "react-router-dom";
+import { SEARCH_PAGE_REFERER } from "../../search-page/constants";
 
 interface ButtonWithIcon {
   label: string;
-  icon: JSX.Element;
+  icon: ReactElement;
 }
 
 type ButtonName = "goBack" | "goToNext" | "goToPrevious";
@@ -47,6 +50,8 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
 };
 
 const HeaderSection = () => {
+  const location = useLocation();
+  const { isMobile } = useBreakpoint();
   const { isUnderLaptop } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
   const { collection } = useDetailPageContext();
@@ -54,9 +59,16 @@ const HeaderSection = () => {
   const title = collection?.title;
 
   // TODO: on click user goes back to search page where has results based on previous search params
-  const onGoBack = useCallback(() => {
-    redirectSearch("HeaderSection", true, false);
-  }, [redirectSearch]);
+  const onGoBack = useCallback(
+    (referer: string) => {
+      if (referer !== SEARCH_PAGE_REFERER) {
+        redirectHome("HeaderSection", true);
+      } else {
+        redirectSearch("HeaderSection", true, false);
+      }
+    },
+    [redirectHome, redirectSearch]
+  );
 
   // TODO: implement the goNext and goPrevious function
   // This will require the entire search results (their ids and indexes) based on search params
@@ -98,7 +110,7 @@ const HeaderSection = () => {
           left: "-50px",
           top: "5%",
         }}
-        onClick={onGoBack}
+        onClick={() => onGoBack(location.state?.referer)}
         data-testid="go-back-button"
       >
         {!isUnderLaptop && renderButton(buttons.goBack.icon)}

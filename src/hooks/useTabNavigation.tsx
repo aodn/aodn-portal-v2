@@ -2,11 +2,18 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { pageDefault } from "../components/common/constants";
 
+export type TabNavigation = (
+  uuid: string,
+  tab: string,
+  referer: string,
+  section?: string
+) => void;
+
 const useTabNavigation = () => {
   const navigate = useNavigate();
 
-  return useCallback(
-    (uuid: string, tab: string, section?: string) => {
+  return useCallback<TabNavigation>(
+    (uuid: string, tab: string, referer: string, section?: string) => {
       const searchParams = new URLSearchParams();
 
       // Add uuid parameter
@@ -21,7 +28,11 @@ const useTabNavigation = () => {
       }
 
       // Navigate to the constructed URL
-      navigate(`${pageDefault.details}?${searchParams.toString()}`);
+      navigate(`${pageDefault.details}?${searchParams.toString()}`, {
+        state: {
+          referer: referer,
+        },
+      });
     },
     [navigate]
   );
