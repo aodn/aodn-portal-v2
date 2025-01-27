@@ -14,7 +14,7 @@ import {
   fontWeight,
   padding,
 } from "../../../styles/constants";
-import { ReactElement, useCallback } from "react";
+import { ReactElement, useCallback, useMemo } from "react";
 import ReplyIcon from "@mui/icons-material/Reply";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
@@ -56,7 +56,7 @@ const HeaderSection = () => {
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
-  const title = collection?.title;
+  const title = useMemo(() => collection?.title, [collection?.title]);
 
   // TODO: on click user goes back to search page where has results based on previous search params
   const onGoBack = useCallback(
