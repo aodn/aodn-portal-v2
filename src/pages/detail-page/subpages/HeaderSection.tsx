@@ -22,8 +22,8 @@ import { useDetailPageContext } from "../context/detail-page-context";
 import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
 import OrganizationLogo from "../../../components/logo/OrganizationLogo";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
-import useRedirectHome from "../../../hooks/useRedirectHome";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import useRedirectHome from "../../../hooks/useRedirectHome";
 import { useLocation } from "react-router-dom";
 import { SEARCH_PAGE_REFERER } from "../../search-page/constants";
 
@@ -51,8 +51,8 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
 
 const HeaderSection = () => {
   const location = useLocation();
-  const { isMobile } = useBreakpoint();
   const { isUnderLaptop } = useBreakpoint();
+  const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
   const { collection } = useDetailPageContext();
 
