@@ -8,7 +8,10 @@ import HeaderMenu from "./HeaderMenu";
 import MainMenu from "./MainMenu";
 import { pageDefault } from "../../common/constants";
 import Searchbar from "../../search/Searchbar";
-import { PAGE_CONTENT_MAX_WIDTH, PAGE_CONTENT_WIDTH } from "../constant";
+import {
+  PAGE_CONTENT_MAX_WIDTH,
+  PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+} from "../constant";
 import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 
@@ -28,7 +31,7 @@ const Header: FC = () => {
         }}
         contentAreaStyle={{
           alignItems: "end",
-          width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH,
+          width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
           maxWidth: isSearchResultPage ? "90%" : PAGE_CONTENT_MAX_WIDTH,
         }}
       >
@@ -42,7 +45,7 @@ const Header: FC = () => {
         contentAreaStyle={{
           flexDirection: "row",
           justifyContent: "space-between",
-          width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH,
+          width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
           maxWidth: isSearchResultPage ? "90%" : PAGE_CONTENT_MAX_WIDTH,
         }}
       >

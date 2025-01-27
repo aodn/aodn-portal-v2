@@ -395,12 +395,15 @@ const SearchPage = () => {
                 : SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
             md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
           },
-          overflowY: "auto",
           overflowX: "hidden",
           padding: padding.small,
           bgcolor: color.blue.light,
         }}
-        gap={selectedLayout === SearchResultLayoutEnum.FULL_MAP ? 0 : 2}
+        gap={
+          selectedLayout === SearchResultLayoutEnum.FULL_MAP || isUnderLaptop
+            ? 0
+            : 2
+        }
       >
         <Box
           sx={{

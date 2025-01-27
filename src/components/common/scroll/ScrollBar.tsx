@@ -1,5 +1,5 @@
 import { GlobalStyles } from "@mui/material";
-import { color } from "../../styles/constants";
+import { color } from "../../../styles/constants";
 
 // TODO: firefox browser does not support webkit, need to find a way to fix
 const Scrollbar = () => (

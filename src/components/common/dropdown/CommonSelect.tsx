@@ -8,7 +8,7 @@ import {
 import { FC, useCallback, useState } from "react";
 import { IconProps } from "../../icon/types";
 import { useDetailPageContext } from "../../../pages/detail-page/context/detail-page-context";
-import { disableScroll, enableScroll } from "../../../utils/ScrollbarUtils";
+import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 
 export interface SelectItem<T = string> {
   value: T;

@@ -3,8 +3,10 @@ import { ReactNode } from "react";
 import {
   PAGE_CONTENT_MAX_WIDTH,
   PAGE_CONTENT_MIN_WIDTH,
-  PAGE_CONTENT_WIDTH,
+  PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+  PAGE_CONTENT_WIDTH_UNDER_LAPTOP,
 } from "../constant";
+import useBreakpoint from "../../../hooks/useBreakpoint";
 
 interface SectionContainerProps {
   children: ReactNode;
@@ -16,29 +18,34 @@ const SectionContainer = ({
   children,
   contentAreaStyle,
   sectionAreaStyle,
-}: SectionContainerProps) => (
-  <Box
-    sx={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      ...sectionAreaStyle,
-    }}
-  >
-    <Stack
-      direction="column"
+}: SectionContainerProps) => {
+  const { isUnderLaptop } = useBreakpoint();
+  return (
+    <Box
       sx={{
+        display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minWidth: PAGE_CONTENT_MIN_WIDTH,
-        width: PAGE_CONTENT_WIDTH,
-        maxWidth: PAGE_CONTENT_MAX_WIDTH,
-        ...contentAreaStyle,
+        ...sectionAreaStyle,
       }}
     >
-      {children}
-    </Stack>
-  </Box>
-);
+      <Stack
+        direction="column"
+        sx={{
+          justifyContent: "center",
+          alignItems: "center",
+          minWidth: PAGE_CONTENT_MIN_WIDTH,
+          width: isUnderLaptop
+            ? PAGE_CONTENT_WIDTH_UNDER_LAPTOP
+            : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+          maxWidth: PAGE_CONTENT_MAX_WIDTH,
+          ...contentAreaStyle,
+        }}
+      >
+        {children}
+      </Stack>
+    </Box>
+  );
+};
 
 export default SectionContainer;

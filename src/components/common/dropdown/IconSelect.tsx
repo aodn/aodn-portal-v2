@@ -17,7 +17,7 @@ import {
 } from "../../../styles/constants";
 import { IconProps } from "../../icon/types";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
-import { disableScroll, enableScroll } from "../../../utils/ScrollbarUtils";
+import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 
 interface IconSelectColorConfig {
   defaultColor: string;

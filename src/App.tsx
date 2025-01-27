@@ -5,7 +5,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "./utils/AppTheme";
 import AppRouter from "./utils/AppRouter";
 import { CssBaseline } from "@mui/material";
-import Scrollbar from "./components/common/ScrollBar";
+import Scrollbar from "./components/common/scroll/ScrollBar";
 import GlobalLoader from "./components/loading/GlobalLoader";
 
 const app = () => {

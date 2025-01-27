@@ -33,3 +33,17 @@ export const enableScroll = () => {
   document.body.style.width = "";
   window.scrollTo(0, parseInt(scrollY || "0", 10) * -1);
 };
+
+/**
+ * Scrolls the window smoothly to the top of the page.
+ *
+ * @example
+ * // Scroll page to top with smooth animation
+ * scrollToTop();
+ */
+export const scrollToTop = (scrollBehavior: ScrollBehavior = "smooth") => {
+  window.scrollTo({
+    top: 0,
+    behavior: scrollBehavior,
+  });
+};
