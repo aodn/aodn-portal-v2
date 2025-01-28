@@ -47,11 +47,10 @@ import {
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE,
+  SEARCH_PAGE_REFERER,
 } from "./constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
-
-const REFERER = "SEARCH_PAGE";
 
 const isLoading = (count: number): boolean => {
   if (count > 0) {
@@ -169,7 +168,7 @@ const SearchPage = () => {
                 state: {
                   fromNavigate: true,
                   requireSearch: false,
-                  referer: REFERER,
+                  referer: SEARCH_PAGE_REFERER,
                 },
               }
             );
@@ -253,7 +252,7 @@ const SearchPage = () => {
       // mean we already call doSearch() + doMapSearch(), however if you
       // come from other page, the result list is good because we remember it
       // but the map need init again and therefore need to do a doMapSearch()
-      else if (location.state?.referer !== REFERER) {
+      else if (location.state?.referer !== SEARCH_PAGE_REFERER) {
         const componentParam: ParameterState = getComponentState(
           store.getState()
         );
@@ -396,12 +395,15 @@ const SearchPage = () => {
                 : SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
             md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
           },
-          overflowY: "auto",
           overflowX: "hidden",
           padding: padding.small,
           bgcolor: color.blue.light,
         }}
-        gap={selectedLayout === SearchResultLayoutEnum.FULL_MAP ? 0 : 2}
+        gap={
+          selectedLayout === SearchResultLayoutEnum.FULL_MAP || isUnderLaptop
+            ? 0
+            : 2
+        }
       >
         <Box
           sx={{

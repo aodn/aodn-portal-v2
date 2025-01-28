@@ -4,7 +4,7 @@ import {
   Grid,
   IconButton,
   Paper,
-  Stack,
+  SxProps,
   Typography,
 } from "@mui/material";
 import {
@@ -14,7 +14,7 @@ import {
   fontWeight,
   padding,
 } from "../../../styles/constants";
-import { ReactElement, useCallback } from "react";
+import { ReactElement, useCallback, useMemo } from "react";
 import ReplyIcon from "@mui/icons-material/Reply";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
@@ -23,10 +23,13 @@ import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
 import OrganizationLogo from "../../../components/logo/OrganizationLogo";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import useRedirectHome from "../../../hooks/useRedirectHome";
+import { useLocation } from "react-router-dom";
+import { SEARCH_PAGE_REFERER } from "../../search-page/constants";
 
 interface ButtonWithIcon {
   label: string;
-  icon: JSX.Element;
+  icon: ReactElement;
 }
 
 type ButtonName = "goBack" | "goToNext" | "goToPrevious";
@@ -47,20 +50,25 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
 };
 
 const HeaderSection = () => {
-  const { isMobile } = useBreakpoint();
-  const redirectSearch = useRedirectSearch();
+  const location = useLocation();
+  const { isUnderLaptop } = useBreakpoint();
   const { collection } = useDetailPageContext();
+  const redirectHome = useRedirectHome();
+  const redirectSearch = useRedirectSearch();
 
-  const title = collection?.title;
+  const title = useMemo(() => collection?.title, [collection?.title]);
 
   // TODO: on click user goes back to search page where has results based on previous search params
-  const onGoBack = useCallback(() => {
-    redirectSearch("HeaderSection", true, false);
-  }, [redirectSearch]);
-
-  // TODO: implement the goNext and goPrevious function
-  // This will require the entire search results (their ids and indexes) based on search params
-  // and current-collection-index
+  const onGoBack = useCallback(
+    (referer: string) => {
+      if (referer !== SEARCH_PAGE_REFERER) {
+        redirectHome("HeaderSection", true);
+      } else {
+        redirectSearch("HeaderSection", true, false);
+      }
+    },
+    [redirectHome, redirectSearch]
+  );
 
   const renderButton = useCallback((icon: ReactElement) => {
     return (
@@ -77,6 +85,29 @@ const HeaderSection = () => {
       </Paper>
     );
   }, []);
+  // Render the go back button next to the header
+  const renderNavigateButtons = useCallback(
+    (isUnderLaptop: boolean, clickHandler: () => void) => {
+      const style: SxProps = {
+        top: "5%",
+      };
+      if (isUnderLaptop) {
+        style.position = "absolute";
+        style.left = "-50px";
+      }
+      return (
+        <Box
+          aria-label="go-back button"
+          sx={style}
+          onClick={clickHandler}
+          data-testid="go-back-button"
+        >
+          {renderButton(buttons.goBack.icon)}
+        </Box>
+      );
+    },
+    [renderButton]
+  );
 
   return (
     <Card
@@ -91,36 +122,6 @@ const HeaderSection = () => {
         overflow: "visible",
       }}
     >
-      <Box
-        aria-label="go-back button"
-        sx={{
-          position: "absolute",
-          left: "-50px",
-          top: "5%",
-        }}
-        onClick={onGoBack}
-        data-testid="go-back-button"
-      >
-        {!isMobile && renderButton(buttons.goBack.icon)}
-      </Box>
-      <Box
-        aria-label="go-previous & go-next button group"
-        sx={{
-          position: "absolute",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          right: "-50px",
-          top: "5%",
-        }}
-      >
-        <Stack spacing={1}>
-          {/*TODO: hide the below 2 buttons now, for better demonstration. Can uncommented them when implementing them*/}
-          {/*{renderButton(buttons.goToPrevious.icon)}*/}
-          {/*{renderButton(buttons.goToNext.icon)}*/}
-        </Stack>
-      </Box>
       <Grid container>
         <Grid
           item
@@ -131,13 +132,16 @@ const HeaderSection = () => {
             alignItems: "center",
           }}
         >
+          {renderNavigateButtons(!isUnderLaptop, () =>
+            onGoBack(location.state?.referer)
+          )}
           <Typography
             aria-label="collection title"
             fontSize={fontSize.detailPageHeading}
             fontWeight={fontWeight.bold}
             color={fontColor.gray.dark}
             sx={{
-              padding: 0,
+              padding: 1,
               overflow: "hidden",
               textOverflow: "ellipsis",
               display: "-webkit-box",

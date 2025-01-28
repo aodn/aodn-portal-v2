@@ -28,11 +28,20 @@ import {
 import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
 import { openInNewTab } from "../../../utils/LinkUtils";
+import { scrollToTop } from "../../../utils/ScrollUtils";
+import useBreakpoint from "../../../hooks/useBreakpoint";
+import { useLocation } from "react-router-dom";
+import { pageDefault } from "../../common/constants";
 
 interface IconContainerProps {
   children: JSX.Element;
   sx?: SxProps;
 }
+
+const recipient = "info@aodn.org.au";
+const subject = "AODN Data Discovery enquiry";
+const body = "**This is a test - please ignore**";
+
 const IconContainer: FC<IconContainerProps> = ({ children, sx }) => (
   <Icon sx={{ color: "#000", display: "flex", alignItems: "center", ...sx }}>
     {children}
@@ -40,17 +49,10 @@ const IconContainer: FC<IconContainerProps> = ({ children, sx }) => (
 );
 
 const handleBackToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
+  scrollToTop();
 };
 
 const handleClickContactUs = () => {
-  const recipient = "info@aodn.org.au";
-  const subject = "AODN Data Discovery enquiry";
-  const body = "**This is a test - please ignore**";
-
   window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 };
 
@@ -58,6 +60,8 @@ const currentYear = dayjs(new Date()).year();
 const version = import.meta.env.VITE_APP_VERSION;
 
 const Footer: FC = () => {
+  const { pathname } = useLocation();
+
   return (
     <SectionContainer>
       <Grid container paddingY={{ xs: padding.medium, sm: padding.quadruple }}>
@@ -86,26 +90,29 @@ const Footer: FC = () => {
           </Button>
         </Grid>
         <Grid item xs={12} paddingY={padding.large}>
-          <Typography
-            color="#000"
-            fontSize={fontSize.subscription}
-            textAlign="left"
-            lineHeight={2}
-            px={1}
-          >
-            The Australian Ocean Data Network (AODN) stands at the forefront of
-            marine data management in Australia, providing an essential
-            infrastructure for the discovery, sharing and reuse of comprehensive
-            marine and climate data. By managing the IMOS data collection
-            program and incorporating contributions from universities and
-            government research agencies, AODN supports a diverse range of users
-            including researchers, data scientists, government, and industry.
-            Our commitment to making these data freely available underscores our
-            dedication to fostering an informed and engaged public, promoting
-            sustainable environmental practices and driving economic growth
-            through innovation.
-          </Typography>
+          {!(pathname === pageDefault.search) && (
+            <Typography
+              color="#000"
+              fontSize={fontSize.subscription}
+              textAlign="left"
+              lineHeight={2}
+              px={1}
+            >
+              The Australian Ocean Data Network (AODN) stands at the forefront
+              of marine data management in Australia, providing an essential
+              infrastructure for the discovery, sharing and reuse of
+              comprehensive marine and climate data. By managing the IMOS data
+              collection program and incorporating contributions from
+              universities and government research agencies, AODN supports a
+              diverse range of users including researchers, data scientists,
+              government, and industry. Our commitment to making these data
+              freely available underscores our dedication to fostering an
+              informed and engaged public, promoting sustainable environmental
+              practices and driving economic growth through innovation.
+            </Typography>
+          )}
         </Grid>
+
         <Divider
           sx={{
             width: "100%",

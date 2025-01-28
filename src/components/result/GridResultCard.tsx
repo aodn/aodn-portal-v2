@@ -31,6 +31,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
   onClickLinks = () => {},
   onClickDownload = () => {},
   selectedUuid,
+  isSimplified = false,
   sx,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
@@ -71,7 +72,11 @@ const GridResultCard: FC<GridResultCardProps> = ({
         <BookmarkButton dataset={content} />
       </Box>
 
-      <CardActionArea onClick={() => onClickCard(content)}>
+      <CardActionArea
+        onClick={
+          isSimplified ? () => onClickDetail(uuid) : () => onClickCard(content)
+        }
+      >
         <Box
           height={isSelectedDataset || showButtons ? "110px" : "130px"}
           width="100%"

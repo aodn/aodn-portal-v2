@@ -12,12 +12,14 @@ import Map from "../../map/mapbox/Map";
 import Layers from "../../map/mapbox/layers/Layers";
 import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
 import BookmarkButton from "../../bookmark/BookmarkButton";
+import { SEARCH_PAGE_REFERER } from "../../../pages/search-page/constants";
+import { TabNavigation } from "../../../hooks/useTabNavigation";
 
 interface BasicMapHoverTipProps {
   content?: string | undefined | null;
   sx?: SxProps;
   onDatasetSelected?: () => void;
-  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
+  tabNavigation?: TabNavigation;
 }
 
 interface ComplexMapHoverTipProps extends BasicMapHoverTipProps {
@@ -31,10 +33,12 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   tabNavigation = () => {},
   sx,
 }) => {
-  const onLinks = () => tabNavigation(collection.id, "links");
+  const onLinks = () =>
+    tabNavigation(collection.id, "links", SEARCH_PAGE_REFERER);
   const onDownload = () =>
     tabNavigation(collection.id, "abstract", "download-section");
-  const onDetail = () => tabNavigation(collection.id, "abstract");
+  const onDetail = () =>
+    tabNavigation(collection.id, "abstract", SEARCH_PAGE_REFERER);
 
   return (
     <Box flex={1} sx={{ ...sx }}>

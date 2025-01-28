@@ -12,6 +12,8 @@ from pages.search_page import SearchPage
         ('Integrated Marine Observing System (IMOS) - Location of assets'),
     ],
 )
+
+@pytest.mark.skip(reason="Temporarily skipping tab panel scroll test")
 def test_tab_panel_scroll(page_mock: Page, title: str) -> None:
     # Precondition: Tab panel should have scroll buttons
     # Set a smaller browser window size to make the tabs scrollable

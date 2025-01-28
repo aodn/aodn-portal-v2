@@ -4,7 +4,7 @@ import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { fontColor, fontSize } from "../../styles/constants";
 import StyledMenu from "./StyledMenu";
-import { disableScroll, enableScroll } from "../../utils/ScrollbarUtils";
+import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 
 interface MenuItem {
   name: string;

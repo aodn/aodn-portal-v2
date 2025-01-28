@@ -1,11 +1,4 @@
-import {
-  FC,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FC, SyntheticEvent, useCallback, useEffect, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import StyledAccordion from "../common/accordion/StyledAccordion";
@@ -30,10 +23,11 @@ import {
   EVENT_BOOKMARK,
 } from "../map/mapbox/controls/menu/Definition";
 import BookmarkListHead from "./BookmarkListHead";
+import { TabNavigation } from "../../hooks/useTabNavigation";
 
 export interface BookmarkListAccordionGroupBasicType {
   onDeselectDataset?: () => void;
-  tabNavigation?: (uuid: string, tab: string, section?: string) => void;
+  tabNavigation?: TabNavigation;
   hideHead?: boolean;
 }
 
