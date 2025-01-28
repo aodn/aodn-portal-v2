@@ -32,9 +32,27 @@ class Map(BasePage):
         """Move the mouse cursor to the center of the map"""
         self.page.get_by_label('Map', exact=True).hover()
 
-    def drag_map(self) -> None:
-        """Drag the map to a fixed distance using the mouse"""
-        self.hover_map()
+    def drag_map(
+        self, left: int = 0, right: int = 0, up: int = 0, down: int = 0
+    ) -> None:
+        """
+        Drag the map to a specified distance using the mouse.
+
+        This method drags the map by a specified number of pixels in the left, right, up,
+        or down directions from the center of the map. If no direction is specified,
+        it performs a default drag of 150 pixels to the right and 50 pixels down.
+
+        Args:
+            left (int, optional): Number of pixels to drag to the left. Defaults to 0.
+            right (int, optional): Number of pixels to drag to the right. Defaults to 0.
+            up (int, optional): Number of pixels to drag upwards. Defaults to 0.
+            down (int, optional): Number of pixels to drag downwards. Defaults to 0.
+
+        Returns:
+            None
+        """
+        self.hover_map()  # Moves the mouse to the center of the map
+
         # Calculate the center coordinates
         bounding_box = self.page.get_by_label('Map', exact=True).bounding_box()
         x, y = 0.0, 0.0
@@ -42,8 +60,18 @@ class Map(BasePage):
             x = bounding_box['x'] + bounding_box['width'] / 2
             y = bounding_box['y'] + bounding_box['height'] / 2
 
+        # Calculate the new coordinates
+        if any([left, right, up, down]):
+            x += right - left  # Combine horizontal movements
+            y += down - up  # Combine vertical movements
+        else:
+            # If no parameters are passed, perform a fixed distance drag
+            x += 150
+            y += 50
+
+        # Perform the drag
         self.page.mouse.down()
-        self.page.mouse.move(x + 150, y + 50)  # fixed mouse move
+        self.page.mouse.move(x, y)
         self.page.mouse.up()
 
     def center_map(self, lng: str, lat: str) -> None:

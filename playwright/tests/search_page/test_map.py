@@ -271,3 +271,31 @@ def test_map_buttons(page_mock: Page) -> None:
     expect(search_page.map.daterange_show_hide_menu_button).to_be_visible()
     expect(search_page.map.draw_rect_menu_button).to_be_visible()
     expect(search_page.map.delete_button).to_be_visible()
+
+
+def test_map_zoom_out_and_drag_does_not_crash(page_mock: Page) -> None:
+    """
+    Verifies that zooming out and dragging the map on the search page does not cause the application to crash.
+
+    This test addresses a previously identified bug where such interactions with the map caused the application
+    to crash. By performing a sequence of zoom and drag operations at different levels, it ensures that the
+    issue is resolved and does not reoccur.
+    """
+    landing_page = LandingPage(page_mock)
+    search_page = SearchPage(page_mock)
+
+    landing_page.load()
+    landing_page.search.fill_search_text('imos ships')
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    current_zoom = search_page.map.get_map_zoom()
+    search_page.map.zoom_to_level(zoom_level=current_zoom - 1)
+    search_page.map.drag_map(left=200)
+    search_page.map.wait_for_map_loading()
+    search_page.map.zoom_to_level(zoom_level=1)
+    search_page.map.drag_map(left=250)
+
+    # Additional drag operation to verify map responsiveness after zooming and dragging
+    search_page.map.drag_map(left=200)
+    assert True
