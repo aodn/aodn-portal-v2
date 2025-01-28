@@ -72,7 +72,7 @@ class SearchPage(BasePage):
 
     def click_dataset(self, title: str) -> None:
         """Click on the given dataset title"""
-        self.page.locator('button').filter(has_text=title).click()
+        self.page.locator('button').filter(has_text=title).first.click()
 
     def scroll_down_in_result_list(self, delta_y: int) -> None:
         """Scroll to the bottom of the result list"""
