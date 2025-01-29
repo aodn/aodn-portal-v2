@@ -14,6 +14,7 @@ import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton
 import useFetchData from "../../hooks/useFetchData";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { SEARCH_PAGE_REFERER } from "../../pages/search-page/constants";
+import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 
 export interface ResultCardBasicType {
   content?: OGCCollection;
@@ -78,6 +79,10 @@ const renderListCards: FC<ResultCardsListType> = ({
             md={isFullListView ? 4 : 12}
             lg={isFullListView ? 3 : 12}
             key={index}
+            sx={{
+              // Must hardcode, else the box will expand if not enough height
+              height: LIST_CARD_HEIGHT,
+            }}
           >
             <ListResultCard
               content={collection}
@@ -119,7 +124,18 @@ const renderGridCards: FC<ResultCardsListType> = ({
     <Box sx={sx} data-testid="resultcard-result-grid">
       <Grid container spacing={1}>
         {contents.result.collections.map((collection, index) => (
-          <Grid item xs={6} sm={4} md={6} lg={6} key={index}>
+          <Grid
+            item
+            xs={6}
+            sm={4}
+            md={6}
+            lg={6}
+            key={index}
+            sx={{
+              // Must hardcode, else the box will expand if not enough height
+              height: GRID_CARD_HEIGHT,
+            }}
+          >
             <GridResultCard
               content={collection}
               onClickCard={onClickCard}
