@@ -21,6 +21,7 @@ import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
+import default_thumbnail from "@/assets/images/default-thumbnail.png";
 
 interface ListResultCardProps extends ResultCardBasicType {}
 
@@ -170,7 +171,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
             src={findThumbnail()}
             alt="org_logo"
             style={{
-              objectFit: "cover",
+              objectFit:
+                findThumbnail() === default_thumbnail ? "cover" : "contain",
               width: "100%",
               height: "100%",
             }}
