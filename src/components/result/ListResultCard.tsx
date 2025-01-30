@@ -145,7 +145,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
               {thumbnail !== default_thumbnail && (
                 <Box
                   sx={{
-                    width: 90,
+                    maxWidth: 120,
                     height: 90,
                     padding: 1,
                   }}
@@ -153,10 +153,11 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   <img
                     src={thumbnail}
                     alt="org_logo"
+                    fetchPriority="low"
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "fill",
+                      objectFit: "contain",
                     }}
                   />
                 </Box>
