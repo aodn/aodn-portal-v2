@@ -82,14 +82,9 @@ window.__map_functions = {
 
     return false;
   },
-  zoomToLevel: function (targetZoom) {
+  zoomToLevel: function (zoom_level) {
     const map = this.getMap();
-    const currentZoom = map.getZoom();
-    if (currentZoom < targetZoom) {
-      map.zoomTo(targetZoom, { duration: 1000 });
-      return true;
-    }
-    return false;
+    map.setZoom(zoom_level);
   },
   getMapCenter: function () {
     const map = this.getMap();
