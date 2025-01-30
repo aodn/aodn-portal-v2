@@ -1,7 +1,9 @@
 import {
   Box,
   Card,
-  CardActionArea,
+  CardActions,
+  CardContent,
+  CardHeader,
   Stack,
   Tooltip,
   Typography,
@@ -22,6 +24,7 @@ import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
+import { LIST_CARD_TITLE_HEIGHT } from "./constants";
 
 interface ListResultCardProps extends ResultCardBasicType {}
 
@@ -41,6 +44,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   if (content) {
     const { id: uuid, title, description, findIcon, findThumbnail } = content;
     const isSelectedDataset = uuid === selectedUuid;
+    const thumbnail: string = findThumbnail();
 
     return (
       <Card
@@ -72,88 +76,117 @@ const ListResultCard: FC<ListResultCardProps> = ({
           flexDirection="column"
           flex={1}
           height="100%"
-          maxWidth="90%"
           mr={gap.sm}
         >
-          <Tooltip title={title} placement="top">
-            <CardActionArea onClick={() => onClickDetail(uuid)}>
-              <Box
-                display="flex"
-                alignItems="center"
-                height="45px"
-                arial-label="result-list-card-title"
-              >
+          <Box maxHeight="80%">
+            <Tooltip title={title} placement="top">
+              <CardHeader
+                sx={{ p: 0 }}
+                title={
+                  <Typography
+                    onClick={() => onClickDetail(uuid)}
+                    color={fontColor.gray.dark}
+                    fontSize={fontSize.resultCardTitle}
+                    fontWeight={fontWeight.bold}
+                    sx={{
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      WebkitLineClamp: "2",
+                      WebkitBoxOrient: "vertical",
+                      cursor: "pointer",
+                      alignItems: "flex-start",
+                    }}
+                    data-testid="result-card-title"
+                  >
+                    {title}
+                  </Typography>
+                }
+                action={
+                  <OrganizationLogo
+                    logo={findIcon()}
+                    sx={{
+                      width: "auto",
+                      maxWidth: "100px",
+                      height: LIST_CARD_TITLE_HEIGHT,
+                      paddingX: padding.double,
+                    }}
+                  />
+                }
+              />
+            </Tooltip>
+            <CardContent
+              sx={{ p: 0, display: "flex", justifyContent: "space-between" }}
+            >
+              <Box sx={{ flex: 1 }}>
                 <Typography
-                  color={fontColor.gray.dark}
-                  fontSize={fontSize.resultCardTitle}
-                  fontWeight={fontWeight.bold}
+                  arial-label="result-list-card-content"
+                  color={fontColor.gray.medium}
+                  fontSize={fontSize.resultCardContent}
+                  onClick={
+                    isSimplified
+                      ? () => onClickDetail(uuid)
+                      : () => onClickCard(content)
+                  }
                   sx={{
                     padding: 0,
                     overflow: "hidden",
-                    textOverflow: "ellipsis",
                     display: "-webkit-box",
-                    WebkitLineClamp: "2",
+                    cursor: "pointer",
+                    WebkitLineClamp:
+                      isSelectedDataset || showButtons ? "4" : "6",
                     WebkitBoxOrient: "vertical",
+                    wordBreak: "break-word",
                   }}
-                  data-testid="result-card-title"
                 >
-                  {title}
+                  {description}
                 </Typography>
               </Box>
-            </CardActionArea>
-          </Tooltip>
-          <CardActionArea
-            onClick={
-              isSimplified
-                ? () => onClickDetail(uuid)
-                : () => onClickCard(content)
-            }
-            sx={{ flex: 1 }}
-          >
-            <Typography
-              arial-label="result-list-card-content"
-              color={fontColor.gray.medium}
-              fontSize={fontSize.resultCardContent}
-              sx={{
-                padding: 0,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: isSelectedDataset || showButtons ? "4" : "6",
-                WebkitBoxOrient: "vertical",
-                wordBreak: "break-word",
-              }}
-            >
-              {description}
-            </Typography>
+              {thumbnail !== default_thumbnail && (
+                <Box
+                  sx={{
+                    width: 90,
+                    height: 90,
+                    padding: 1,
+                  }}
+                >
+                  <img
+                    src={thumbnail}
+                    alt="org_logo"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Box>
+              )}
+            </CardContent>
+          </Box>
+          <Box>
             {(isSelectedDataset || showButtons) && (
-              <ResultCardButtonGroup
-                content={content}
-                shouldHideText
-                onLinks={() => onClickLinks(uuid)}
-                onDownload={() => onClickDownload(uuid)}
-                onDetail={() => onClickDetail(uuid)}
-              />
+              <CardActions
+                sx={{
+                  backgroundColor: "white",
+                }}
+              >
+                <ResultCardButtonGroup
+                  content={content}
+                  shouldHideText
+                  onLinks={() => onClickLinks(uuid)}
+                  onDownload={() => onClickDownload(uuid)}
+                  onDetail={() => onClickDetail(uuid)}
+                />
+              </CardActions>
             )}
-          </CardActionArea>
+          </Box>
         </Box>
         <Stack
           direction="column"
           flexWrap="nowrap"
           justifyContent="space-around"
           alignItems="center"
-          width="120px"
           height="100%"
         >
-          <OrganizationLogo
-            logo={findIcon()}
-            sx={{
-              width: "auto",
-              maxWidth: "100px",
-              height: "45px",
-              paddingX: padding.extraSmall,
-            }}
-          />
           <Box
             position="absolute"
             top={gap.lg}
@@ -162,18 +195,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
             width="auto"
           >
             <BookmarkButton dataset={content} />
-          </Box>
-          <Box height="90px" width="100%">
-            <img
-              src={findThumbnail()}
-              alt="org_logo"
-              style={{
-                objectFit:
-                  findThumbnail() === default_thumbnail ? "cover" : "contain",
-                width: "100%",
-                height: "100%",
-              }}
-            />
           </Box>
         </Stack>
       </Card>
