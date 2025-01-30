@@ -145,7 +145,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
               {thumbnail !== default_thumbnail && (
                 <Box
                   sx={{
-                    maxWidth: 120,
+                    maxWidth: 150,
                     height: 90,
                     padding: 1,
                   }}
