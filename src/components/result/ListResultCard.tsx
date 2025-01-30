@@ -89,6 +89,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     fontSize={fontSize.resultCardTitle}
                     fontWeight={fontWeight.bold}
                     sx={{
+                      overflow: "hidden",
                       textOverflow: "ellipsis",
                       display: "-webkit-box",
                       WebkitLineClamp: "2",
@@ -106,7 +107,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     logo={findIcon()}
                     sx={{
                       width: "auto",
-                      maxWidth: "100px",
+                      maxWidth: "200px",
                       height: LIST_CARD_TITLE_HEIGHT,
                       paddingX: padding.double,
                     }}
@@ -155,7 +156,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "contain",
+                      objectFit: "fill",
                     }}
                   />
                 </Box>
