@@ -20,6 +20,7 @@ interface ResultCardButtonGroupProps {
 }
 
 interface ButtonContainerProps {
+  isGridView?: boolean;
   children: ReactNode;
   sx?: SxProps;
 }
@@ -72,6 +73,23 @@ const renderStatusButton = (
   );
 };
 
+const ButtonContainer: FC<ButtonContainerProps> = ({
+  isGridView,
+  children,
+  sx,
+}) => (
+  <Grid
+    item
+    xs={isGridView ? 3 : 3}
+    display="flex"
+    justifyContent="space-between"
+    alignItems="center"
+    sx={{ ...sx }}
+  >
+    {children}
+  </Grid>
+);
+
 const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
   isGridView,
@@ -80,28 +98,15 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   onDownload = () => {},
   onDetail = () => {},
 }) => {
-  const ButtonContainer: FC<ButtonContainerProps> = ({ children, sx }) => (
-    <Grid
-      item
-      xs={isGridView ? 6 : 3}
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
-      sx={{ ...sx }}
-    >
-      {children}
-    </Grid>
-  );
-
   const links = content.getDistributionLinks();
 
   if (!content) return;
   return (
     <Grid container arial-label="result-list-card-buttons">
-      <ButtonContainer>
+      <ButtonContainer isGridView={isGridView}>
         {renderStatusButton(shouldHideText, content)}
       </ButtonContainer>
-      <ButtonContainer>
+      <ButtonContainer isGridView={isGridView}>
         {links && (
           <ResultCardButton
             startIcon={LinkIcon}
@@ -115,7 +120,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           />
         )}
       </ButtonContainer>
-      <ButtonContainer>
+      <ButtonContainer isGridView={isGridView}>
         <ResultCardButton
           startIcon={DownloadIcon}
           text="Download"
@@ -123,7 +128,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           onClick={onDownload}
         />
       </ButtonContainer>
-      <ButtonContainer>
+      <ButtonContainer isGridView={isGridView}>
         <ResultCardButton
           startIcon={InfoIcon}
           text="More details ..."

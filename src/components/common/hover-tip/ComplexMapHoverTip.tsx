@@ -85,7 +85,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
             height: "130px",
           }}
         >
-          <Map panelId={`${mapContainerId}-${collection.id}`}>
+          <Map panelId={`${mapContainerId}-${collection.id}`} animate={false}>
             <Layers>
               <GeojsonLayer collection={collection} />
             </Layers>
