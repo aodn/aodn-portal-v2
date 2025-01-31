@@ -14,13 +14,15 @@ const NavigationControl = ({
   visualizePitch = true,
 }: NavigationControlProps) => {
   const { map } = useContext(MapContext);
-  const [init, setInit] = useState<boolean>(false);
+  const [_, setControl] = useState<MapboxNavigationControl | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     if (map === null) return;
 
-    setInit((prev) => {
-      if (prev === false) {
+    setControl((prev: MapboxNavigationControl | undefined) => {
+      if (!prev) {
         const n = new MapboxNavigationControl({
           showCompass: showCompass,
           showZoom: showZoom,
@@ -28,8 +30,9 @@ const NavigationControl = ({
         });
 
         map?.addControl(n, "top-left");
+        return n;
       }
-      return true;
+      return prev;
     });
   }, [map, showCompass, showZoom, visualizePitch]);
 
