@@ -16,6 +16,7 @@ import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 interface MapPopupProps {
   layerId: string;
@@ -73,6 +74,7 @@ const MapPopup: React.FC<MapPopupProps> = ({
 }) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
+  const { isUnderLaptop } = useBreakpoint();
 
   // TODO: there is bug that map popup is not re-render for the interaction with bookmark button
   const getCollectionData = useCallback(
@@ -208,12 +210,14 @@ const MapPopup: React.FC<MapPopupProps> = ({
         popup.remove();
       }
     };
-
-    map?.on("mouseleave", layerId, onPointMouseLeave);
-    map?.on("mouseenter", layerId, onPointMouseEnter);
-    // Handle case when move out of map without leaving popup box
-    // then do a search
-    map?.on("sourcedata", onSourceChange);
+    // No need to show popup as no hover event for handheld device
+    if (!isUnderLaptop) {
+      map?.on("mouseleave", layerId, onPointMouseLeave);
+      map?.on("mouseenter", layerId, onPointMouseEnter);
+      // Handle case when move out of map without leaving popup box
+      // then do a search
+      map?.on("sourcedata", onSourceChange);
+    }
 
     return () => {
       map?.off("mouseleave", layerId, onPointMouseLeave);
@@ -222,7 +226,7 @@ const MapPopup: React.FC<MapPopupProps> = ({
       popup?.remove();
       setTimeout(() => root?.unmount(), 500);
     };
-  }, [getCollectionData, layerId, map, renderContentBox]);
+  }, [getCollectionData, isUnderLaptop, layerId, map, renderContentBox]);
 
   return <React.Fragment />;
 };
