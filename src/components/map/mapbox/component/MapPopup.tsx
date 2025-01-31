@@ -1,12 +1,8 @@
-import {
-  forwardRef,
-  ForwardRefRenderFunction,
-  ReactNode,
+import React, {
+  MouseEventHandler,
   useCallback,
   useContext,
   useEffect,
-  useImperativeHandle,
-  useState,
 } from "react";
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
@@ -40,14 +36,6 @@ const defaultPopupConfig: PopupConfig = {
   popupHeight: 370,
 };
 
-const popup = new Popup({
-  closeButton: false,
-  closeOnClick: false,
-  maxWidth: "none",
-  // Add 5px vertical offset for popup
-  offset: [0, -5],
-});
-
 const renderLoadingBox = ({
   popupHeight,
   popupWidth,
@@ -78,15 +66,13 @@ const handleDatasetSelect = (
   }
 };
 
-const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
-  { layerId, onDatasetSelected, tabNavigation },
-  ref
-) => {
+const MapPopup: React.FC<MapPopupProps> = ({
+  layerId,
+  onDatasetSelected,
+  tabNavigation,
+}) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
-  const [isMouseOverPoint, setIsMouseOverPoint] = useState(false);
-  const [isMouseOverPopup, setIsMouseOverPopup] = useState(false);
-  const [popupContent, setPopupContent] = useState<ReactNode | null>(null);
 
   // TODO: there is bug that map popup is not re-render for the interaction with bookmark button
   const getCollectionData = useCallback(
@@ -103,7 +89,10 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
   );
 
   const renderContentBox = useCallback(
-    (collection: void | OGCCollection) => {
+    (
+      collection: void | OGCCollection,
+      onMouseLeave: MouseEventHandler<HTMLDivElement>
+    ) => {
       if (!collection) {
         return null;
       }
@@ -117,8 +106,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
               width: defaultPopupConfig.popupWidth,
               borderRadius: 0,
             }}
-            onMouseEnter={() => setIsMouseOverPopup(true)}
-            onMouseLeave={() => setIsMouseOverPopup(false)}
+            onMouseLeave={onMouseLeave}
           >
             <CardContent
               sx={{
@@ -140,44 +128,53 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
     [onDatasetSelected, tabNavigation]
   );
 
-  const removePopup = useCallback(() => {
-    if (!isMouseOverPoint && !isMouseOverPopup) {
-      popup.remove();
-      if (map) {
-        map.getCanvas().style.cursor = "";
+  useEffect(() => {
+    const popup = new Popup({
+      closeButton: false,
+      closeOnClick: false,
+      maxWidth: "none",
+      // Add 5px vertical offset for popup
+      offset: [0, -5],
+    });
+
+    const container = document.createElement("div");
+    const root = createRoot(container);
+
+    const onPointMouseLeave = (event: MapLayerMouseEvent) => {
+      const rect = popup.getElement().getBoundingClientRect();
+      // Use event.originalEvent.clientX / clientY for screen coordinates
+      const mouseX = event.originalEvent.clientX;
+      const mouseY = event.originalEvent.clientY;
+      if (
+        mouseX >= rect.left &&
+        mouseX <= rect.right &&
+        mouseY >= rect.top &&
+        mouseY <= rect.bottom
+      ) {
+        // Inside the popup, do nothing
+      } else {
+        popup.remove();
       }
-      setPopupContent(null);
-    }
-  }, [isMouseOverPoint, isMouseOverPopup, map]);
+    };
 
-  // Force remove the popup regardless of mouse position.
-  const forceRemovePopup = useCallback(() => {
-    popup.remove();
-    if (map) {
-      map.getCanvas().style.cursor = "";
-    }
-    setPopupContent(null);
-    setIsMouseOverPoint(false);
-    setIsMouseOverPopup(false);
-  }, [map]);
+    const onPopupMouseLeave = (ev: React.MouseEvent<HTMLDivElement>) => {
+      const rect = popup.getElement().getBoundingClientRect();
+      if (
+        ev.clientX >= rect.left &&
+        ev.clientX <= rect.right &&
+        ev.clientY >= rect.top &&
+        ev.clientY <= rect.bottom
+      ) {
+        // Inside the popup, do nothing
+      } else {
+        popup.remove();
+      }
+    };
 
-  useImperativeHandle(ref, () => ({
-    forceRemovePopup,
-  }));
-
-  // Delay the remove of popup for user move mouse into the popup when hover a point
-  const onPointMouseLeave = useCallback(() => {
-    setTimeout(() => setIsMouseOverPoint(false), 200);
-    setTimeout(removePopup, 200);
-  }, [removePopup]);
-
-  const onPointMouseEnter = useCallback(
-    async (ev: MapLayerMouseEvent): Promise<void> => {
+    const onPointMouseEnter = (ev: MapLayerMouseEvent) => {
       if (!ev.target || !map) return;
 
-      setIsMouseOverPoint(true);
       ev.target.getCanvas().style.cursor = "pointer";
-
       if (ev.features && ev.features.length > 0) {
         // Copy coordinates array.
         const feature = ev.features[0] as Feature<Point>;
@@ -185,7 +182,7 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         const coordinates = geometry.coordinates.slice();
 
         // Render a loading state in the popup
-        setPopupContent(
+        root.render(
           renderLoadingBox({
             popupHeight: defaultPopupConfig.popupHeight,
             popupWidth: defaultPopupConfig.popupWidth,
@@ -196,46 +193,37 @@ const MapPopup: ForwardRefRenderFunction<MapPopupRef, MapPopupProps> = (
         // subscribe to close event to clean up resource.
         popup
           .setLngLat(coordinates as [number, number])
-          .setDOMContent(document.createElement("div"))
+          .setDOMContent(container)
           .addTo(map);
 
         const uuid = feature.properties?.uuid as string;
-        const collection = await getCollectionData(uuid);
-        setPopupContent(renderContentBox(collection));
+        getCollectionData(uuid).then((collection) => {
+          root.render(renderContentBox(collection, onPopupMouseLeave));
+        });
       }
-    },
-    [map, getCollectionData, renderContentBox]
-  );
+    };
 
-  useEffect(() => {
+    const onSourceChange = (event: any) => {
+      if (event.sourceId === layerId && event.isSourceLoaded) {
+        popup.remove();
+      }
+    };
+
     map?.on("mouseleave", layerId, onPointMouseLeave);
     map?.on("mouseenter", layerId, onPointMouseEnter);
+    // Handle case when move out of map without leaving popup box
+    // then do a search
+    map?.on("sourcedata", onSourceChange);
 
     return () => {
       map?.off("mouseleave", layerId, onPointMouseLeave);
       map?.off("mouseenter", layerId, onPointMouseEnter);
+      map?.off("sourcedata", onSourceChange);
+      setTimeout(() => root.unmount(), 500);
     };
-  }, [map, layerId, onPointMouseEnter, onPointMouseLeave]);
+  }, [getCollectionData, layerId, map, renderContentBox]);
 
-  useEffect(() => {
-    removePopup();
-  }, [isMouseOverPoint, isMouseOverPopup, removePopup]);
-
-  useEffect(() => {
-    if (popupContent) {
-      const container = document.createElement("div");
-      const root = createRoot(container);
-      root.render(popupContent);
-      popup.setDOMContent(container);
-
-      // Important to free up resources, and must timeout to avoid race condition
-      return () => {
-        setTimeout(() => root.unmount(), 500);
-      };
-    }
-  }, [popupContent]);
-
-  return null;
+  return <React.Fragment />;
 };
 
-export default forwardRef(MapPopup);
+export default MapPopup;
