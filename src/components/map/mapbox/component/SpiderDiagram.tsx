@@ -497,7 +497,6 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
     <>
       {spiderifiedCluster && (
         <MapPopup
-          ref={mapPopupRef}
           layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
           onDatasetSelected={onDatasetSelected}
           tabNavigation={tabNavigation}
