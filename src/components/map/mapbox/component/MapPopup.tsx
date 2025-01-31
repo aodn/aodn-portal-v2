@@ -219,7 +219,8 @@ const MapPopup: React.FC<MapPopupProps> = ({
       map?.off("mouseleave", layerId, onPointMouseLeave);
       map?.off("mouseenter", layerId, onPointMouseEnter);
       map?.off("sourcedata", onSourceChange);
-      setTimeout(() => root.unmount(), 500);
+      popup?.remove();
+      setTimeout(() => root?.unmount(), 500);
     };
   }, [getCollectionData, layerId, map, renderContentBox]);
 
