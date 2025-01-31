@@ -127,7 +127,7 @@ const MapSection: React.FC<MapSectionProps> = ({
             onToggleClicked={onToggleClicked}
             showFullMap={showFullMap}
           />
-          <NavigationControl />
+          <NavigationControl visible={!isUnderLaptop} />
           <ScaleControl />
           <DisplayCoordinate />
           <MenuControl
