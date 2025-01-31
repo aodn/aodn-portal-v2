@@ -82,26 +82,27 @@ const ListResultCard: FC<ListResultCardProps> = ({
             <CardHeader
               sx={{ p: 0 }}
               title={
-                <Tooltip title={title} placement="top">
-                  <Typography
-                    onClick={() => onClickDetail(uuid)}
-                    color={fontColor.gray.dark}
-                    fontSize={fontSize.resultCardTitle}
-                    fontWeight={fontWeight.bold}
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitLineClamp: "2",
-                      WebkitBoxOrient: "vertical",
-                      cursor: "pointer",
-                      alignItems: "flex-start",
-                    }}
-                    data-testid="result-card-title"
-                  >
-                    {title}
-                  </Typography>
-                </Tooltip>
+                <Typography
+                  onClick={() => onClickDetail(uuid)}
+                  color={fontColor.gray.dark}
+                  fontSize={fontSize.resultCardTitle}
+                  fontWeight={fontWeight.bold}
+                  title={title}
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: "2",
+                    WebkitBoxOrient: "vertical",
+                    cursor: "pointer",
+                    alignItems: "flex-start",
+                  }}
+                  data-testid="result-card-title"
+                >
+                  <Tooltip title={title} arrow>
+                    <>{title}</>
+                  </Tooltip>
+                </Typography>
               }
               action={
                 <OrganizationLogo

@@ -19,21 +19,21 @@ const NavigationControl = ({
   );
 
   useEffect(() => {
-    if (map === null) return;
+    if (map !== null) {
+      setControl((prev: MapboxNavigationControl | undefined) => {
+        if (!prev) {
+          const n = new MapboxNavigationControl({
+            showCompass: showCompass,
+            showZoom: showZoom,
+            visualizePitch: visualizePitch,
+          });
 
-    setControl((prev: MapboxNavigationControl | undefined) => {
-      if (!prev) {
-        const n = new MapboxNavigationControl({
-          showCompass: showCompass,
-          showZoom: showZoom,
-          visualizePitch: visualizePitch,
-        });
-
-        map?.addControl(n, "top-left");
-        return n;
-      }
-      return prev;
-    });
+          map?.addControl(n, "top-left");
+          return n;
+        }
+        return prev;
+      });
+    }
   }, [map, showCompass, showZoom, visualizePitch]);
 
   return <React.Fragment />;
