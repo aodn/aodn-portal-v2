@@ -78,43 +78,44 @@ const ListResultCard: FC<ListResultCardProps> = ({
           height="100%"
           mr={gap.sm}
         >
-          <Box maxHeight="80%">
-            <Tooltip title={title} placement="top">
-              <CardHeader
-                sx={{ p: 0 }}
-                title={
-                  <Typography
-                    onClick={() => onClickDetail(uuid)}
-                    color={fontColor.gray.dark}
-                    fontSize={fontSize.resultCardTitle}
-                    fontWeight={fontWeight.bold}
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitLineClamp: "2",
-                      WebkitBoxOrient: "vertical",
-                      cursor: "pointer",
-                      alignItems: "flex-start",
-                    }}
-                    data-testid="result-card-title"
-                  >
-                    {title}
-                  </Typography>
-                }
-                action={
-                  <OrganizationLogo
-                    logo={findIcon()}
-                    sx={{
-                      width: "auto",
-                      maxWidth: "200px",
-                      height: LIST_CARD_TITLE_HEIGHT,
-                      paddingX: padding.double,
-                    }}
-                  />
-                }
-              />
-            </Tooltip>
+          <Box maxHeight={isSimplified ? "100%" : "80%"}>
+            <CardHeader
+              sx={{ p: 0 }}
+              title={
+                <Typography
+                  onClick={() => onClickDetail(uuid)}
+                  color={fontColor.gray.dark}
+                  fontSize={fontSize.resultCardTitle}
+                  fontWeight={fontWeight.bold}
+                  title={title}
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: "2",
+                    WebkitBoxOrient: "vertical",
+                    cursor: "pointer",
+                    alignItems: "flex-start",
+                  }}
+                  data-testid="result-card-title"
+                >
+                  <Tooltip title={title} arrow>
+                    <>{title}</>
+                  </Tooltip>
+                </Typography>
+              }
+              action={
+                <OrganizationLogo
+                  logo={findIcon()}
+                  sx={{
+                    width: "auto",
+                    maxWidth: "200px",
+                    height: LIST_CARD_TITLE_HEIGHT,
+                    paddingX: padding.double,
+                  }}
+                />
+              }
+            />
             <CardContent
               sx={{ p: 0, display: "flex", justifyContent: "space-between" }}
             >
@@ -123,10 +124,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   arial-label="result-list-card-content"
                   color={fontColor.gray.medium}
                   fontSize={fontSize.resultCardContent}
-                  onClick={
-                    isSimplified
-                      ? () => onClickDetail(uuid)
-                      : () => onClickCard(content)
+                  onClick={() =>
+                    isSimplified ? onClickDetail(uuid) : onClickCard(content)
                   }
                   sx={{
                     padding: 0,
@@ -134,7 +133,9 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     display: "-webkit-box",
                     cursor: "pointer",
                     WebkitLineClamp:
-                      isSelectedDataset || showButtons ? "4" : "6",
+                      (isSelectedDataset || showButtons) && !isSimplified
+                        ? "4"
+                        : "6",
                     WebkitBoxOrient: "vertical",
                     wordBreak: "break-word",
                   }}
@@ -153,7 +154,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   <img
                     src={thumbnail}
                     alt="org_logo"
-                    fetchPriority="low"
                     style={{
                       width: "100%",
                       height: "100%",
@@ -164,8 +164,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
               )}
             </CardContent>
           </Box>
-          <Box>
-            {(isSelectedDataset || showButtons) && (
+          {(isSelectedDataset || showButtons) && !isSimplified && (
+            <Box>
               <CardActions
                 sx={{
                   backgroundColor: "white",
@@ -179,8 +179,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   onDetail={() => onClickDetail(uuid)}
                 />
               </CardActions>
-            )}
-          </Box>
+            </Box>
+          )}
         </Box>
         <Stack
           direction="column"
