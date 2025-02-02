@@ -80,7 +80,7 @@ const ButtonContainer: FC<ButtonContainerProps> = ({
 }) => (
   <Grid
     item
-    xs={isGridView ? 3 : 3}
+    xs={isGridView ? 6 : 3}
     display="flex"
     justifyContent="space-between"
     alignItems="center"
