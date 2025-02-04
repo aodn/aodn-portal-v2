@@ -516,6 +516,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       )}
       {spiderifiedCluster && (
         <TestHelper
+          mapId={map?.getContainer().id || ""}
           getSpiderLayer={() => getSpiderPinsLayerId(spiderifiedCluster.id)}
         />
       )}

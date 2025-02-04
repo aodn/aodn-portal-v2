@@ -347,7 +347,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
       />
-      <TestHelper getHeatmapLayer={() => heatmapLayer} />
+      <TestHelper
+        mapId={map?.getContainer().id || ""}
+        getHeatmapLayer={() => heatmapLayer}
+      />
     </>
   );
 };

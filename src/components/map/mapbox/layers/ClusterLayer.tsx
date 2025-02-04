@@ -294,7 +294,10 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
       />
-      <TestHelper getHeatmapLayer={() => clusterLayer} />
+      <TestHelper
+        mapId={map?.getContainer().id || ""}
+        getHeatmapLayer={() => clusterLayer}
+      />
     </>
   );
 };

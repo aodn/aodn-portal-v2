@@ -3,19 +3,31 @@ from playwright.sync_api import Locator, Page
 from config import settings
 from pages.base_page import BasePage
 from pages.components.contact_area import ContactAreaComponent
+from pages.components.map import Map
 from pages.components.tab_container import TabContainerComponent
 
 
 class DetailPage(BasePage):
+    DETAIL_MAP_ID = 'map-detail-container-id'
+    SPATIAL_MAP_ID = 'map-spatial-extent-container-id'
+
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
         self.tabs = TabContainerComponent(page)
+        self.detail_map = Map(page, self.DETAIL_MAP_ID)
+        self.spatial_map = Map(page, self.SPATIAL_MAP_ID)
         self.contact_area = ContactAreaComponent(page)
 
         # Page locators
         self.page_title = self.get_label(text='collection title')
         self.go_back_button = self.page.get_by_test_id('go-back-button')
+
+        # download condition boxes
+        self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')
+        self.date_range_condition_box = self.page.get_by_test_id(
+            'date-range-condition-box'
+        )
 
     def load(self, uuid: str) -> None:
         """Load the detail page for the given uuid"""

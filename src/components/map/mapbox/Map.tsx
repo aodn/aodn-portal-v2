@@ -209,7 +209,7 @@ const ReactMap = ({
 
   return (
     <MapContext.Provider value={{ map }}>
-      <TestHelper getMap={() => map} />
+      <TestHelper mapId={panelId} getMap={() => map} />
       {children}
     </MapContext.Provider>
   );

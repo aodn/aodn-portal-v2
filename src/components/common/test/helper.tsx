@@ -3,6 +3,7 @@ import { Map } from "mapbox-gl";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 
 interface TestProps {
+  mapId: string;
   getMap?: () => Map;
   getClusterLayer?: () => string;
   getHeatmapLayer?: () => string;
@@ -15,12 +16,19 @@ interface TestProps {
 const TestHelper: React.FC<TestProps> = (props) => {
   useEffect(() => {
     if (import.meta.env.MODE === "dev") {
+      const { mapId, ...restProps } = props;
+
       const w = window as Window &
         typeof globalThis & {
-          testProps: TestProps;
+          testProps: Record<string, Omit<TestProps, "mapId">>;
         };
 
-      w.testProps = mergeWithDefaults(w.testProps, props);
+      // Initialize testProps if it doesn't exist
+      w.testProps = w.testProps || {};
+
+      // Merge existing props for the given mapId with the new props
+      const existingProps = w.testProps[mapId] || {};
+      w.testProps[mapId] = mergeWithDefaults(existingProps, restProps);
     }
   }, [props]);
 
