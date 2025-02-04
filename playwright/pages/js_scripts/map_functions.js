@@ -1,60 +1,60 @@
 window.__map_functions = {
-  getTestProps: function () {
-    return window.testProps;
+  getTestProps: function (mapId) {
+    return window.testProps[mapId];
   },
-  getMap: function () {
-    return this.getTestProps().getMap();
+  getMap: function (mapId) {
+    return this.getTestProps(mapId).getMap();
   },
-  getMapLayer: function () {
-    if (this.getTestProps().getClusterLayer) {
-      return this.getTestProps().getClusterLayer();
-    } else if (this.getTestProps().getHeatmapLayer) {
-      return this.getTestProps().getHeatmapLayer();
+  getMapLayer: function (mapId) {
+    if (this.getTestProps(mapId).getClusterLayer) {
+      return this.getTestProps(mapId).getClusterLayer();
+    } else if (this.getTestProps(mapId).getHeatmapLayer) {
+      return this.getTestProps(mapId).getHeatmapLayer();
     } else {
       throw new Error("No Map layer found");
     }
   },
-  centerMap: function (lng, lat, zoom) {
-    const map = this.getMap();
+  centerMap: function (mapId, lng, lat, zoom) {
+    const map = this.getMap(mapId);
     map.setZoom(zoom);
     map.setCenter([lng, lat]);
   },
-  isMapLoaded: function () {
-    const map = this.getMap();
+  isMapLoaded: function (mapId) {
+    const map = this.getMap(mapId);
     return map.loaded();
   },
-  getMapLayers: function () {
-    const map = this.getMap();
-    const layer = this.getMapLayer();
+  getMapLayers: function (mapId) {
+    const map = this.getMap(mapId);
+    const layer = this.getMapLayer(mapId);
     return map.queryRenderedFeatures({ layers: [layer] }).length;
   },
-  getAUMarineParksLayer: function () {
-    if (this.getTestProps().getAUMarineParksLayer) {
-      return this.getTestProps().getAUMarineParksLayer();
+  getAUMarineParksLayer: function (mapId) {
+    if (this.getTestProps(mapId).getAUMarineParksLayer) {
+      return this.getTestProps(mapId).getAUMarineParksLayer();
     } else {
       throw new Error("AU Marine Parks layer not found");
     }
   },
-  getWorldBoundariesLayer: function () {
-    if (this.getTestProps().getWorldBoundariesLayer) {
-      return this.getTestProps().getWorldBoundariesLayer();
+  getWorldBoundariesLayer: function (mapId) {
+    if (this.getTestProps(mapId).getWorldBoundariesLayer) {
+      return this.getTestProps(mapId).getWorldBoundariesLayer();
     } else {
       throw new Error("World Boundaries layer not found");
     }
   },
-  getSpiderLayer: function () {
-    if (this.getTestProps().getSpiderLayer) {
-      return this.getTestProps().getSpiderLayer();
+  getSpiderLayer: function (mapId) {
+    if (this.getTestProps(mapId).getSpiderLayer) {
+      return this.getTestProps(mapId).getSpiderLayer();
     } else {
       throw new Error("Spider layer not found");
     }
   },
-  isMapLayerVisible: function (layerId) {
-    const map = this.getMap();
+  isMapLayerVisible: function (mapId, layerId) {
+    const map = this.getMap(mapId);
     return undefined != map.getLayer(layerId);
   },
-  findAndClickCluster: function () {
-    const map = this.getMap();
+  findAndClickCluster: function (mapId) {
+    const map = this.getMap(mapId);
     const canvas = map.getCanvas();
     const width = canvas.width;
     const height = canvas.height;
@@ -64,7 +64,7 @@ window.__map_functions = {
         [0, 0],
         [width, height],
       ],
-      { layers: [this.getMapLayer()] }
+      { layers: [this.getMapLayer(mapId)] }
     );
 
     if (clusters.length > 0) {
@@ -82,16 +82,16 @@ window.__map_functions = {
 
     return false;
   },
-  zoomToLevel: function (zoom_level) {
-    const map = this.getMap();
+  zoomToLevel: function (mapId, zoom_level) {
+    const map = this.getMap(mapId);
     map.setZoom(zoom_level);
   },
-  getMapCenter: function () {
-    const map = this.getMap();
+  getMapCenter: function (mapId) {
+    const map = this.getMap(mapId);
     return map.getCenter();
   },
-  getMapZoom: function () {
-    const map = this.getMap();
+  getMapZoom: function (mapId) {
+    const map = this.getMap(mapId);
     return map.getZoom();
   },
 };

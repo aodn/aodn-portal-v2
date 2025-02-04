@@ -34,6 +34,7 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
           lineHeight: "8px",
           padding: 0,
         }}
+        data-testid="date-range-condition-box"
       >
         {start + " to " + end}
       </Typography>

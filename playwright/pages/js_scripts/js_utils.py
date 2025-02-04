@@ -38,7 +38,10 @@ def execute_common_js(page: Page, func_name: str, *args: Any) -> Any:
 
 
 def wait_for_js_function(
-    page: Page, func_name: str, timeout: Optional[float] = DEFAULT_TIMEOUT
+    page: Page,
+    func_name: str,
+    timeout: Optional[float] = DEFAULT_TIMEOUT,
+    *args: Any,
 ) -> Any:
     """
     Wait for a JavaScript function to return true.
@@ -47,6 +50,8 @@ def wait_for_js_function(
         page: Playwright Page object
         func_name: Name of the function to wait for
         timeout: Optional timeout in milliseconds (defaults to 30 seconds)
+        *args: Variable length argument list to pass to the JavaScript function
     """
-    script = f'() => {{return {MAP_JS_NAMESPACE}.{func_name}();}}'
+    args_str = ', '.join(map(repr, args))
+    script = f'() => {{return {MAP_JS_NAMESPACE}.{func_name}({args_str});}}'
     return page.wait_for_function(script, timeout=timeout)

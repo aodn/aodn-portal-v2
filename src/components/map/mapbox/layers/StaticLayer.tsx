@@ -115,7 +115,10 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, label, features }) => {
   }, [map, createLayer, layerId, sourceId, layerLabelId]);
 
   return id === StaticLayersDef.AUSTRALIA_MARINE_PARKS.id ? (
-    <TestHelper getAUMarineParksLayer={() => layerId} />
+    <TestHelper
+      mapId={map?.getContainer().id || ""}
+      getAUMarineParksLayer={() => layerId}
+    />
   ) : (
     <React.Fragment />
   );

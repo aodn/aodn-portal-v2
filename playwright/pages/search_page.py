@@ -10,11 +10,13 @@ from pages.components.search import SearchComponent
 
 
 class SearchPage(BasePage):
+    MAP_ID = 'result-page-main-map'
+
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
         self.search = SearchComponent(page)
-        self.map = Map(page)
+        self.map = Map(page, self.MAP_ID)
 
         # -- Page locators --
 
