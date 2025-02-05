@@ -15,9 +15,15 @@ import {
 import { useDetailPageContext } from "../../context/detail-page-context";
 import {
   BBoxCondition,
+  DatasetDownloadRequest,
   DateRangeCondition,
   DownloadConditionType,
 } from "../../context/DownloadDefinitions";
+import { useLocation } from "react-router-dom";
+import { useAppDispatch } from "../../../../components/common/store/hooks";
+import { processDatasetDownload } from "../../../../components/common/store/searchReducer";
+import dayjs from "dayjs";
+import { dateDefault } from "../../../../components/common/constants";
 
 interface DownloadDialogProps {
   open: boolean;
@@ -25,11 +31,13 @@ interface DownloadDialogProps {
 }
 
 const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+  const { downloadConditions } = useDetailPageContext();
+
   const handleClose = useCallback(() => {
     setOpen(false);
   }, [setOpen]);
-
-  const { downloadConditions } = useDetailPageContext();
 
   const bboxConditions: BBoxCondition[] = useMemo(() => {
     const bboxConditions = downloadConditions.filter(
@@ -45,6 +53,44 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
     return timeRangeConditions as DateRangeCondition[];
   }, [downloadConditions]);
 
+  const submitJob = useCallback(
+    (email: string) => {
+      const uuid = new URLSearchParams(location.search).get("uuid");
+      if (!uuid) {
+        return;
+      }
+      const formattedStart = dayjs(
+        dateRangeCondition[0].start,
+        dateDefault.SIMPLE_DATE_FORMAT
+      ).format(dateDefault.DATE_FORMAT);
+
+      const formattedEnd = dayjs(
+        dateRangeCondition[0].end,
+        dateDefault.SIMPLE_DATE_FORMAT
+      ).format(dateDefault.DATE_FORMAT);
+
+      const request: DatasetDownloadRequest = {
+        inputs: {
+          UUID: uuid,
+          RECIPIENT: email,
+          START_DATE: formattedStart,
+          END_DATE: formattedEnd,
+          MIN_LAT: bboxConditions[0].bbox[3].toString(),
+          MAX_LAT: bboxConditions[0].bbox[1].toString(),
+          MIN_LON: bboxConditions[0].bbox[0].toString(),
+          MAX_LON: bboxConditions[0].bbox[2].toString(),
+        },
+      };
+
+      dispatch(processDatasetDownload(request))
+        .unwrap()
+        .then((response) => {
+          console.log("response", response);
+        });
+    },
+    [bboxConditions, dateRangeCondition, dispatch, location.search]
+  );
+
   return (
     <Dialog
       open={open}
@@ -56,7 +102,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
           const formData = new FormData(event.currentTarget);
           const formJson = Object.fromEntries((formData as any).entries());
           const email = formJson.email;
-          console.log(email);
+          submitJob(email);
           handleClose();
         },
       }}
@@ -85,11 +131,11 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
         </DialogContentText>
         <DialogContentText>
           <Typography variant={"body2"}>
-            ** Processing dataset download may take some time. It is varied by
+            *** Processing dataset download may take some time. It is varied by
             the size of the dataset, the selected conditions, and the server
             load (may take several seconds to several hours or even more).
             Please provide your email address to receive the download link and
-            necessary information.
+            necessary information.***
           </Typography>
         </DialogContentText>
         <TextField
