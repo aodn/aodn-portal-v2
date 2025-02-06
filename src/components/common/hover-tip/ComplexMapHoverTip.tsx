@@ -24,12 +24,14 @@ interface BasicMapHoverTipProps {
 
 interface ComplexMapHoverTipProps extends BasicMapHoverTipProps {
   collection: OGCCollection;
+  isUnderLaptop?: boolean;
 }
 
 const mapContainerId = "map-popup-spatial-extend-overview";
 
 const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   collection,
+  isUnderLaptop = false,
   tabNavigation = () => {},
   sx,
 }) => {
@@ -76,22 +78,22 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
             </Box>
           </Tooltip>
         </Box>
-
-        <Box
-          arial-label="map"
-          id={`${mapContainerId}-${collection.id}`}
-          sx={{
-            width: "100%",
-            height: "130px",
-          }}
-        >
-          <Map panelId={`${mapContainerId}-${collection.id}`} animate={false}>
-            <Layers>
-              <GeojsonLayer collection={collection} />
-            </Layers>
-          </Map>
-        </Box>
-
+        {!isUnderLaptop && (
+          <Box
+            arial-label="map"
+            id={`${mapContainerId}-${collection.id}`}
+            sx={{
+              width: "100%",
+              height: "130px",
+            }}
+          >
+            <Map panelId={`${mapContainerId}-${collection.id}`} animate={false}>
+              <Layers>
+                <GeojsonLayer collection={collection} />
+              </Layers>
+            </Map>
+          </Box>
+        )}
         <ResultCardButtonGroup
           content={collection}
           isGridView
@@ -99,7 +101,6 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
           onDownload={onDownload}
           onDetail={onDetail}
         />
-
         <Box>
           <Tooltip title="More detail..." placement="top">
             <Typography

@@ -329,11 +329,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   return (
     <>
-      <MapPopup
-        layerId={unClusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
-        tabNavigation={tabNavigation}
-      />
+      <MapPopup layerId={unClusterPointLayer} tabNavigation={tabNavigation} />
       <SpatialExtents
         layerId={unClusterPointLayer}
         selectedUuids={selectedUuids}

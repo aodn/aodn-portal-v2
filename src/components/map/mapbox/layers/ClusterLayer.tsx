@@ -276,11 +276,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   return (
     <>
-      <MapPopup
-        layerId={unclusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
-        tabNavigation={tabNavigation}
-      />
+      <MapPopup layerId={unclusterPointLayer} tabNavigation={tabNavigation} />
       <SpatialExtents
         layerId={unclusterPointLayer}
         selectedUuids={selectedUuids}
