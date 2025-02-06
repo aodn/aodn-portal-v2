@@ -14,6 +14,20 @@ export interface IDownloadConditionCallback {
   removeCallback?: () => void;
 }
 
+// TODO: will support multi polygons later. currently only for 1 bbox
+export interface DatasetDownloadRequest {
+  inputs: {
+    UUID: string;
+    RECIPIENT: string;
+    START_DATE: string;
+    END_DATE: string;
+    MIN_LAT: string;
+    MAX_LAT: string;
+    MIN_LON: string;
+    MAX_LON: string;
+  };
+}
+
 export class DateRangeCondition
   implements IDownloadCondition, IDownloadConditionCallback
 {
