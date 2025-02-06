@@ -52,6 +52,10 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
+        "/api/v1/ogc/processes": {
+          target: apiPath,
+          changeOrigin: true,
+        },
       },
     },
     plugins: [
