@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { OGCCollection } from "../store/OGCCollectionDefinitions";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import {
@@ -24,23 +24,27 @@ interface BasicMapHoverTipProps {
 
 interface ComplexMapHoverTipProps extends BasicMapHoverTipProps {
   collection: OGCCollection;
-  isUnderLaptop?: boolean;
 }
 
 const mapContainerId = "map-popup-spatial-extend-overview";
 
 const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   collection,
-  isUnderLaptop = false,
   tabNavigation = () => {},
   sx,
 }) => {
-  const onLinks = () =>
-    tabNavigation(collection.id, "links", SEARCH_PAGE_REFERER);
-  const onDownload = () =>
-    tabNavigation(collection.id, "abstract", "download-section");
-  const onDetail = () =>
-    tabNavigation(collection.id, "abstract", SEARCH_PAGE_REFERER);
+  const onLinks = useCallback(
+    () => tabNavigation(collection.id, "links", SEARCH_PAGE_REFERER),
+    [collection.id, tabNavigation]
+  );
+  const onDownload = useCallback(
+    () => tabNavigation(collection.id, "abstract", "download-section"),
+    [collection.id, tabNavigation]
+  );
+  const onDetail = useCallback(
+    () => tabNavigation(collection.id, "abstract", SEARCH_PAGE_REFERER),
+    [collection.id, tabNavigation]
+  );
 
   return (
     <Box flex={1} sx={{ ...sx }}>
@@ -78,22 +82,20 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
             </Box>
           </Tooltip>
         </Box>
-        {!isUnderLaptop && (
-          <Box
-            arial-label="map"
-            id={`${mapContainerId}-${collection.id}`}
-            sx={{
-              width: "100%",
-              height: "130px",
-            }}
-          >
-            <Map panelId={`${mapContainerId}-${collection.id}`} animate={false}>
-              <Layers>
-                <GeojsonLayer collection={collection} />
-              </Layers>
-            </Map>
-          </Box>
-        )}
+        <Box
+          arial-label="map"
+          id={`${mapContainerId}-${collection.id}`}
+          sx={{
+            width: "100%",
+            height: "130px",
+          }}
+        >
+          <Map panelId={`${mapContainerId}-${collection.id}`} animate={false}>
+            <Layers>
+              <GeojsonLayer collection={collection} />
+            </Layers>
+          </Map>
+        </Box>
         <ResultCardButtonGroup
           content={collection}
           isGridView

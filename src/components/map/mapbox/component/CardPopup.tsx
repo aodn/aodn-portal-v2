@@ -6,8 +6,14 @@ import React, {
   useState,
 } from "react";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
-import { fontSize, fontWeight, zIndex } from "../../../../styles/constants";
-import { Card, CardContent, Typography } from "@mui/material";
+import {
+  fontColor,
+  fontSize,
+  fontWeight,
+  padding,
+  zIndex,
+} from "../../../../styles/constants";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import MapContext from "../MapContext";
 import { useAppDispatch } from "../../../common/store/hooks";
 import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
@@ -15,18 +21,44 @@ import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { MapboxEvent, MapLayerMouseEvent } from "mapbox-gl";
 import { Feature, Point } from "geojson";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import Map from "../Map";
+import Layers from "../layers/Layers";
+import GeojsonLayer from "../layers/GeojsonLayer";
+import ResultCardButtonGroup from "../../../result/ResultCardButtonGroup";
+import { SEARCH_PAGE_REFERER } from "../../../../pages/search-page/constants";
 
 interface CardPopupProps {
   layerId: string;
   tabNavigation?: TabNavigation;
 }
 
-const CardPopup: React.FC<CardPopupProps> = ({ layerId, tabNavigation }) => {
+const mapContainerId = "card-popup-map";
+
+const CardPopup: React.FC<CardPopupProps> = ({
+  layerId,
+  tabNavigation = () => {},
+}) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
-  const { isUnderLaptop } = useBreakpoint();
+  const { isUnderLaptop, isTablet } = useBreakpoint();
   const panel = useRef<HTMLDivElement>(null);
-  const [collection, setCollection] = useState<OGCCollection | void>();
+  const [collection, setCollection] = useState<OGCCollection>();
+
+  const onLinks = useCallback(
+    (collection: OGCCollection) =>
+      tabNavigation(collection.id, "links", SEARCH_PAGE_REFERER),
+    [tabNavigation]
+  );
+  const onDownload = useCallback(
+    (collection: OGCCollection) =>
+      tabNavigation(collection.id, "abstract", "download-section"),
+    [tabNavigation]
+  );
+  const onDetail = useCallback(
+    (collection: OGCCollection) =>
+      tabNavigation(collection.id, "abstract", SEARCH_PAGE_REFERER),
+    [tabNavigation]
+  );
 
   const getCollectionData = useCallback(
     async (uuid: string) => {
@@ -49,7 +81,7 @@ const CardPopup: React.FC<CardPopupProps> = ({ layerId, tabNavigation }) => {
           const uuid = feature?.properties?.uuid as string;
 
           getCollectionData(uuid).then((collection) => {
-            setCollection(collection);
+            collection && setCollection(collection);
           });
           panel.current.style.visibility = "visible";
         } else {
@@ -93,51 +125,93 @@ const CardPopup: React.FC<CardPopupProps> = ({ layerId, tabNavigation }) => {
   }, [getCollectionData, isUnderLaptop, layerId, map]);
 
   return (
-    isUnderLaptop && (
-      <div
-        id={"card-popup"}
-        ref={panel}
-        style={{
+    <div
+      id={"card-popup"}
+      ref={panel}
+      style={{
+        display: "flex",
+        visibility: "hidden",
+        flexDirection: "column",
+        position: "absolute",
+        top: 0,
+        height: "100%",
+        width: "100%",
+        pointerEvents: "none", // Forward all event to behind
+        zIndex: zIndex["MAP_COORD"],
+      }}
+    >
+      <Card
+        elevation={0}
+        sx={{
           display: "flex",
-          visibility: "hidden",
-          flexDirection: "column",
-          position: "absolute",
-          top: 0,
-          height: "100%",
+          borderRadius: 0,
+          marginTop: "auto",
+          height: "30%",
           width: "100%",
-          pointerEvents: "none", // Forward all event to behind
-          zIndex: zIndex["MAP_COORD"],
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          pointerEvents: "auto",
         }}
       >
-        <Card
-          elevation={0}
-          sx={{
-            borderRadius: 0,
-            marginTop: "auto",
-            height: "30%",
-            width: "100%",
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
-          }}
+        <CardMedia
+          component="div"
+          id={`${mapContainerId}`}
+          sx={{ height: "100%", width: "30%" }}
         >
-          <CardContent>
+          <Map
+            panelId={`${mapContainerId}`}
+            zoom={isUnderLaptop ? 1 : 2}
+            animate={false}
+          >
+            <Layers>
+              {collection && <GeojsonLayer collection={collection} />}
+            </Layers>
+          </Map>
+        </CardMedia>
+        <CardContent sx={{ width: "70%" }}>
+          <Typography
+            fontWeight={fontWeight.bold}
+            fontSize={fontSize.info}
+            sx={{
+              padding: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: "3",
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {collection?.title}
+          </Typography>
+          {isTablet && (
             <Typography
-              fontWeight={fontWeight.bold}
-              fontSize={fontSize.info}
+              color={fontColor.gray.medium}
+              fontSize={fontSize.resultCardContent}
               sx={{
                 padding: 0,
+                paddingX: padding.small,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
-                WebkitLineClamp: "3",
+                WebkitLineClamp: "5",
                 WebkitBoxOrient: "vertical",
+                wordBreak: "break-word",
               }}
             >
-              {collection?.title}
+              {collection?.description}
             </Typography>
-          </CardContent>
-        </Card>
-      </div>
-    )
+          )}
+          {collection && (
+            <ResultCardButtonGroup
+              content={collection}
+              isGridView
+              onLinks={() => onLinks(collection)}
+              onDownload={() => onDownload(collection)}
+              onDetail={() => onDetail(collection)}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

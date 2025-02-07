@@ -118,6 +118,7 @@ const ReactMap = ({
         minZoom: minZoom,
         maxZoom: maxZoom,
         testMode: import.meta.env.MODE === "dev",
+        attributionControl: false,
         localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
       });
     } catch (err) {
