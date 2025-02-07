@@ -7,7 +7,7 @@ import React, {
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
 import { Box, Card, CardContent, CircularProgress } from "@mui/material";
-import { MapLayerMouseEvent, Popup } from "mapbox-gl";
+import { MapboxEvent, MapLayerMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Feature, Point } from "geojson";
 import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
@@ -20,7 +20,6 @@ import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 interface MapPopupProps {
   layerId: string;
-  onDatasetSelected?: (uuid: Array<string>) => void;
   tabNavigation?: TabNavigation;
 }
 export interface MapPopupRef {
@@ -58,20 +57,7 @@ const renderLoadingBox = ({
   </Box>
 );
 
-const handleDatasetSelect = (
-  uuid: string,
-  onDatasetSelected?: (uuid: Array<string>) => void
-) => {
-  if (onDatasetSelected) {
-    onDatasetSelected([uuid]);
-  }
-};
-
-const MapPopup: React.FC<MapPopupProps> = ({
-  layerId,
-  onDatasetSelected,
-  tabNavigation,
-}) => {
+const MapPopup: React.FC<MapPopupProps> = ({ layerId, tabNavigation }) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
   const { isUnderLaptop } = useBreakpoint();
@@ -93,6 +79,7 @@ const MapPopup: React.FC<MapPopupProps> = ({
   const renderContentBox = useCallback(
     (
       collection: void | OGCCollection,
+      isUnderLaptop: boolean,
       onMouseLeave: MouseEventHandler<HTMLDivElement>
     ) => {
       if (!collection) {
@@ -117,9 +104,6 @@ const MapPopup: React.FC<MapPopupProps> = ({
             >
               <ComplexMapHoverTip
                 collection={collection}
-                onDatasetSelected={() =>
-                  handleDatasetSelect(collection.id, onDatasetSelected)
-                }
                 tabNavigation={tabNavigation}
               />
             </CardContent>
@@ -127,7 +111,7 @@ const MapPopup: React.FC<MapPopupProps> = ({
         </ThemeProvider>
       );
     },
-    [onDatasetSelected, tabNavigation]
+    [tabNavigation]
   );
 
   useEffect(() => {
@@ -200,7 +184,9 @@ const MapPopup: React.FC<MapPopupProps> = ({
 
         const uuid = feature.properties?.uuid as string;
         getCollectionData(uuid).then((collection) => {
-          root.render(renderContentBox(collection, onPopupMouseLeave));
+          root.render(
+            renderContentBox(collection, isUnderLaptop, onPopupMouseLeave)
+          );
         });
       }
     };
@@ -210,18 +196,31 @@ const MapPopup: React.FC<MapPopupProps> = ({
         popup.remove();
       }
     };
-    // No need to show popup as no hover event for handheld device
+
+    const onMapMoveEndOrClick = (
+      _: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+    ) => {
+      popup.remove();
+    };
+
     if (!isUnderLaptop) {
+      // We do not need to show the MapPopup for small screen
+      // without the event, the popup will not show but instance still
+      // created, so when user enlarge the screen, this popup will work
+      // automatically.
       map?.on("mouseleave", layerId, onPointMouseLeave);
       map?.on("mouseenter", layerId, onPointMouseEnter);
+
+      map?.on("moveend", onMapMoveEndOrClick);
       // Handle case when move out of map without leaving popup box
       // then do a search
       map?.on("sourcedata", onSourceChange);
     }
-
     return () => {
       map?.off("mouseleave", layerId, onPointMouseLeave);
       map?.off("mouseenter", layerId, onPointMouseEnter);
+
+      map?.off("moveend", onMapMoveEndOrClick);
       map?.off("sourcedata", onSourceChange);
       popup?.remove();
       setTimeout(() => root?.unmount(), 500);
