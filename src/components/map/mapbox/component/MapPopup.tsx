@@ -104,7 +104,6 @@ const MapPopup: React.FC<MapPopupProps> = ({ layerId, tabNavigation }) => {
             >
               <ComplexMapHoverTip
                 collection={collection}
-                isUnderLaptop={isUnderLaptop}
                 tabNavigation={tabNavigation}
               />
             </CardContent>

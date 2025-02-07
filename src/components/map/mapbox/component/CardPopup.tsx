@@ -42,7 +42,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
   const dispatch = useAppDispatch();
   const { isUnderLaptop, isTablet } = useBreakpoint();
   const panel = useRef<HTMLDivElement>(null);
-  const [collection, setCollection] = useState<OGCCollection>();
+  const [content, setContent] = useState<OGCCollection>(new OGCCollection());
 
   const onLinks = useCallback(
     (collection: OGCCollection) =>
@@ -81,7 +81,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
           const uuid = feature?.properties?.uuid as string;
 
           getCollectionData(uuid).then((collection) => {
-            collection && setCollection(collection);
+            collection && setContent(collection);
           });
           panel.current.style.visibility = "visible";
         } else {
@@ -152,22 +152,24 @@ const CardPopup: React.FC<CardPopupProps> = ({
           pointerEvents: "auto",
         }}
       >
-        <CardMedia
-          component="div"
-          id={`${mapContainerId}`}
-          sx={{ height: "100%", width: "30%" }}
-        >
-          <Map
-            panelId={`${mapContainerId}`}
-            zoom={isUnderLaptop ? 1 : 2}
-            animate={false}
+        {isTablet && (
+          <CardMedia
+            component="div"
+            id={`${mapContainerId}`}
+            sx={{ height: "100%", width: "250px" }}
           >
-            <Layers>
-              {collection && <GeojsonLayer collection={collection} />}
-            </Layers>
-          </Map>
-        </CardMedia>
-        <CardContent sx={{ width: "70%" }}>
+            <Map
+              panelId={`${mapContainerId}`}
+              zoom={isUnderLaptop ? 1 : 2}
+              animate={false}
+            >
+              <Layers>
+                <GeojsonLayer collection={content} />
+              </Layers>
+            </Map>
+          </CardMedia>
+        )}
+        <CardContent sx={{ width: isTablet ? "calc(100% - 250px)" : "100%" }}>
           <Typography
             fontWeight={fontWeight.bold}
             fontSize={fontSize.info}
@@ -180,7 +182,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
               WebkitBoxOrient: "vertical",
             }}
           >
-            {collection?.title}
+            {content?.title}
           </Typography>
           {isTablet && (
             <Typography
@@ -197,16 +199,16 @@ const CardPopup: React.FC<CardPopupProps> = ({
                 wordBreak: "break-word",
               }}
             >
-              {collection?.description}
+              {content?.description}
             </Typography>
           )}
-          {collection && (
+          {content && (
             <ResultCardButtonGroup
-              content={collection}
+              content={content}
               isGridView
-              onLinks={() => onLinks(collection)}
-              onDownload={() => onDownload(collection)}
-              onDetail={() => onDetail(collection)}
+              onLinks={() => onLinks(content)}
+              onDownload={() => onDownload(content)}
+              onDetail={() => onDetail(content)}
             />
           )}
         </CardContent>
