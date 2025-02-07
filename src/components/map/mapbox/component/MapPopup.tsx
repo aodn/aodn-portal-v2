@@ -20,7 +20,6 @@ import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 interface MapPopupProps {
   layerId: string;
-  onDatasetSelected?: (uuid: Array<string>) => void;
   tabNavigation?: TabNavigation;
 }
 export interface MapPopupRef {
@@ -205,14 +204,19 @@ const MapPopup: React.FC<MapPopupProps> = ({ layerId, tabNavigation }) => {
       popup.remove();
     };
 
-    map?.on("mouseleave", layerId, onPointMouseLeave);
-    map?.on("mouseenter", layerId, onPointMouseEnter);
+    if (!isUnderLaptop) {
+      // We do not need to show the MapPopup for small screen
+      // without the event, the popup will not show but instance still
+      // created, so when user enlarge the screen, this popup will work
+      // automatically.
+      map?.on("mouseleave", layerId, onPointMouseLeave);
+      map?.on("mouseenter", layerId, onPointMouseEnter);
 
-    map?.on("moveend", onMapMoveEndOrClick);
-    // Handle case when move out of map without leaving popup box
-    // then do a search
-    map?.on("sourcedata", onSourceChange);
-
+      map?.on("moveend", onMapMoveEndOrClick);
+      // Handle case when move out of map without leaving popup box
+      // then do a search
+      map?.on("sourcedata", onSourceChange);
+    }
     return () => {
       map?.off("mouseleave", layerId, onPointMouseLeave);
       map?.off("mouseenter", layerId, onPointMouseEnter);
