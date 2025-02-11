@@ -100,7 +100,7 @@ class Map(BasePage):
 
     def center_map(self, lng: str, lat: str) -> None:
         """Center the map to a given longitude and latitude coordinates"""
-        execute_map_js(self.page, 'centerMap', self.map_id, lng, lat, '12')
+        execute_map_js(self.page, 'centerMap', self.map_id, lng, lat)
         self.wait_for_map_loading()
 
     def wait_for_map_loading(self) -> None:

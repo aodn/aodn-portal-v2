@@ -14,9 +14,8 @@ window.__map_functions = {
       throw new Error("No Map layer found");
     }
   },
-  centerMap: function (mapId, lng, lat, zoom) {
+  centerMap: function (mapId, lng, lat) {
     const map = this.getMap(mapId);
-    map.setZoom(zoom);
     map.setCenter([lng, lat]);
   },
   isMapLoaded: function (mapId) {
