@@ -39,14 +39,10 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   const [_, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
   const collectionId = useMemo(() => collection.id, [collection.id]);
-  const sourceId = useMemo(
-    () => `geojson-${map?.getContainer().id}-source-${collectionId}`,
-    [collectionId, map]
-  );
-  const layerId = useMemo(
-    () => `geojson-${map?.getContainer().id}-layer-${collectionId}`,
-    [collectionId, map]
-  );
+  // Do not use memo on this, some case result in wrong id.
+  const containerId = map?.getContainer().id;
+  const sourceId = `geojson-${containerId}-source-${collectionId}`;
+  const layerId = `geojson-${containerId}-layer-${collectionId}`;
 
   // Function to fit map to the overall bbox(bboxes[0])
   const fitToOverallBbox = useCallback(
@@ -132,6 +128,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     //
     if (map?.getSource(sourceId)) return true;
 
+    console.log("geojson, create layer " + map?.getContainer().id);
     map?.addSource(sourceId, {
       type: "geojson",
       // Use a URL for the value for the `data` property.
@@ -186,14 +183,14 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         if (map?.getSource(sourceId)) {
           map?.removeLayer(layerId);
           map?.removeSource(sourceId);
-
-          map?.off("click", layerId, onLayerClick);
-          map?.off("mouseenter", layerId, onMouseEnter);
-          map?.off("mouseleave", layerId, onMouseLeave);
-          map?.off("mousemove", layerId, onMouseMove);
         }
       } catch (error) {
         // OK to ignore error here
+      } finally {
+        map?.off("click", layerId, onLayerClick);
+        map?.off("mouseenter", layerId, onMouseEnter);
+        map?.off("mouseleave", layerId, onMouseLeave);
+        map?.off("mousemove", layerId, onMouseMove);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

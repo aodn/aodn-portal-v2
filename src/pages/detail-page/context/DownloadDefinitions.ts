@@ -1,4 +1,4 @@
-import { BBox } from "geojson";
+import { BBox, MultiPolygon } from "geojson";
 
 export enum DownloadConditionType {
   BBOX = "bbox",
@@ -12,6 +12,17 @@ export interface IDownloadCondition {
 
 export interface IDownloadConditionCallback {
   removeCallback?: () => void;
+}
+
+// TODO: will support multi polygons later. currently only for 1 bbox
+export interface DatasetDownloadRequest {
+  inputs: {
+    uuid: string;
+    recipient: string;
+    start_date: string;
+    end_date: string;
+    multi_polygon: MultiPolygon;
+  };
 }
 
 export class DateRangeCondition

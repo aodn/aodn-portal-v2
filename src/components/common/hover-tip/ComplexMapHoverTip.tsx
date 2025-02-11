@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { OGCCollection } from "../store/OGCCollectionDefinitions";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import {
@@ -33,12 +33,18 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   tabNavigation = () => {},
   sx,
 }) => {
-  const onLinks = () =>
-    tabNavigation(collection.id, "links", SEARCH_PAGE_REFERER);
-  const onDownload = () =>
-    tabNavigation(collection.id, "abstract", "download-section");
-  const onDetail = () =>
-    tabNavigation(collection.id, "abstract", SEARCH_PAGE_REFERER);
+  const onLinks = useCallback(
+    () => tabNavigation(collection.id, "links", SEARCH_PAGE_REFERER),
+    [collection.id, tabNavigation]
+  );
+  const onDownload = useCallback(
+    () => tabNavigation(collection.id, "abstract", "download-section"),
+    [collection.id, tabNavigation]
+  );
+  const onDetail = useCallback(
+    () => tabNavigation(collection.id, "abstract", SEARCH_PAGE_REFERER),
+    [collection.id, tabNavigation]
+  );
 
   return (
     <Box flex={1} sx={{ ...sx }}>
@@ -76,7 +82,6 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
             </Box>
           </Tooltip>
         </Box>
-
         <Box
           arial-label="map"
           id={`${mapContainerId}-${collection.id}`}
@@ -91,7 +96,6 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
             </Layers>
           </Map>
         </Box>
-
         <ResultCardButtonGroup
           content={collection}
           isGridView
@@ -99,7 +103,6 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
           onDownload={onDownload}
           onDetail={onDetail}
         />
-
         <Box>
           <Tooltip title="More detail..." placement="top">
             <Typography

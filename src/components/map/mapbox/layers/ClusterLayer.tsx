@@ -22,6 +22,7 @@ import { FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
+import CardPopup from "../component/CardPopup";
 
 interface ClusterSize {
   default?: number | string;
@@ -276,11 +277,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   return (
     <>
-      <MapPopup
-        layerId={unclusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
-        tabNavigation={tabNavigation}
-      />
+      <MapPopup layerId={unclusterPointLayer} tabNavigation={tabNavigation} />
+      <CardPopup layerId={unclusterPointLayer} tabNavigation={tabNavigation} />
       <SpatialExtents
         layerId={unclusterPointLayer}
         selectedUuids={selectedUuids}

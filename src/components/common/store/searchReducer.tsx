@@ -20,6 +20,7 @@ import {
 } from "../../../utils/ErrorBoundary";
 import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
+import { DatasetDownloadRequest } from "../../../pages/detail-page/context/DownloadDefinitions";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -244,6 +245,25 @@ const fetchFeaturesByUuid = createAsyncThunk<
     .catch(errorHandling(thunkApi))
 );
 
+const processDatasetDownload = createAsyncThunk<
+  any,
+  DatasetDownloadRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "download/downloadDataset",
+  async (reequest: DatasetDownloadRequest, thunkAPI: any) => {
+    try {
+      const response = await axios.post(
+        "/api/v1/ogc/processes/download/execution",
+        reequest
+      );
+      return response.data;
+    } catch (error) {
+      errorHandling(thunkAPI);
+    }
+  }
+);
+
 const fetchParameterVocabsWithStore = createAsyncThunk<
   Array<Vocab>,
   Map<string, string> | null,
@@ -423,6 +443,7 @@ export {
   fetchResultByUuidNoStore,
   fetchFeaturesByUuid,
   fetchParameterVocabsWithStore,
+  processDatasetDownload,
 };
 
 export default searcher.reducer;
