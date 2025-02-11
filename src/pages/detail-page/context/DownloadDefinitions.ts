@@ -1,4 +1,4 @@
-import { BBox } from "geojson";
+import { BBox, MultiPolygon } from "geojson";
 
 export enum DownloadConditionType {
   BBOX = "bbox",
@@ -17,14 +17,11 @@ export interface IDownloadConditionCallback {
 // TODO: will support multi polygons later. currently only for 1 bbox
 export interface DatasetDownloadRequest {
   inputs: {
-    UUID: string;
-    RECIPIENT: string;
-    START_DATE: string;
-    END_DATE: string;
-    MIN_LAT: string;
-    MAX_LAT: string;
-    MIN_LON: string;
-    MAX_LON: string;
+    uuid: string;
+    recipient: string;
+    start_date: string;
+    end_date: string;
+    multi_polygon: MultiPolygon;
   };
 }
 
