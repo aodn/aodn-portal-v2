@@ -1,6 +1,8 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
+  Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,14 +18,15 @@ import { useDetailPageContext } from "../../context/detail-page-context";
 import {
   BBoxCondition,
   DatasetDownloadRequest,
-  DateRangeCondition,
   DownloadConditionType,
 } from "../../context/DownloadDefinitions";
 import { useLocation } from "react-router-dom";
 import { useAppDispatch } from "../../../../components/common/store/hooks";
 import { processDatasetDownload } from "../../../../components/common/store/searchReducer";
-import dayjs from "dayjs";
-import { dateDefault } from "../../../../components/common/constants";
+import {
+  getDateConditionFrom,
+  getMultiPolygonFrom,
+} from "../../../../utils/DownloadConditionUtils";
 
 interface DownloadDialogProps {
   open: boolean;
@@ -34,24 +37,47 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const { downloadConditions } = useDetailPageContext();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<string>("");
+
+  const bboxConditions = useMemo(
+    () =>
+      downloadConditions.filter(
+        (condition) => condition.type === DownloadConditionType.BBOX
+      ) as BBoxCondition[],
+    [downloadConditions]
+  );
 
   const handleClose = useCallback(() => {
+    setProcessingStatus("");
     setOpen(false);
   }, [setOpen]);
 
-  const bboxConditions: BBoxCondition[] = useMemo(() => {
-    const bboxConditions = downloadConditions.filter(
-      (condition) => condition.type === DownloadConditionType.BBOX
-    );
-    return bboxConditions as BBoxCondition[];
-  }, [downloadConditions]);
+  const dateRange = useMemo(
+    () => getDateConditionFrom(downloadConditions),
+    [downloadConditions]
+  );
 
-  const dateRangeCondition: DateRangeCondition[] = useMemo(() => {
-    const timeRangeConditions = downloadConditions.filter(
-      (condition) => condition.type === DownloadConditionType.DATE_RANGE
-    );
-    return timeRangeConditions as DateRangeCondition[];
-  }, [downloadConditions]);
+  const multiPolygon = useMemo(
+    () => getMultiPolygonFrom(downloadConditions),
+    [downloadConditions]
+  );
+
+  const getProcessStatusText = useCallback((): string => {
+    if (processingStatus === "") {
+      return "";
+    }
+    if (/^5\d{2}$/.test(processingStatus)) {
+      return "Failed! Please try again later";
+    }
+    if (/^2\d{2}$/.test(processingStatus)) {
+      return "Succeeded! An email will be sent to you shortly";
+    }
+    if (/^4\d{2}$/.test(processingStatus)) {
+      return "Failed! Please try again later";
+    }
+    return "Something went wrong";
+  }, [processingStatus]);
 
   const submitJob = useCallback(
     (email: string) => {
@@ -59,36 +85,25 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
       if (!uuid) {
         return;
       }
-      const formattedStart = dayjs(
-        dateRangeCondition[0].start,
-        dateDefault.SIMPLE_DATE_FORMAT
-      ).format(dateDefault.DATE_FORMAT);
-
-      const formattedEnd = dayjs(
-        dateRangeCondition[0].end,
-        dateDefault.SIMPLE_DATE_FORMAT
-      ).format(dateDefault.DATE_FORMAT);
-
       const request: DatasetDownloadRequest = {
         inputs: {
-          UUID: uuid,
-          RECIPIENT: email,
-          START_DATE: formattedStart,
-          END_DATE: formattedEnd,
-          MIN_LAT: bboxConditions[0].bbox[3].toString(),
-          MAX_LAT: bboxConditions[0].bbox[1].toString(),
-          MIN_LON: bboxConditions[0].bbox[0].toString(),
-          MAX_LON: bboxConditions[0].bbox[2].toString(),
+          uuid: uuid,
+          recipient: email,
+          start_date: dateRange.start,
+          end_date: dateRange.end,
+          multi_polygon: multiPolygon,
         },
       };
 
       dispatch(processDatasetDownload(request))
         .unwrap()
         .then((response) => {
-          console.log("response", response);
+          setProcessingStatus(response.status.message);
+          setIsProcessing(false);
+          return response;
         });
     },
-    [bboxConditions, dateRangeCondition, dispatch, location.search]
+    [dateRange.end, dateRange.start, dispatch, location.search, multiPolygon]
   );
 
   return (
@@ -99,11 +114,11 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
         component: "form",
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
+          setIsProcessing(true);
           const formData = new FormData(event.currentTarget);
           const formJson = Object.fromEntries((formData as any).entries());
           const email = formJson.email;
           submitJob(email);
-          handleClose();
         },
       }}
     >
@@ -119,14 +134,12 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
                 />
               </ListItem>
             ))}
-            {dateRangeCondition.map((dateRangeCondition, index) => (
-              <ListItem key={index}>
-                <ListItemText
-                  primary={"Date Range Condition"}
-                  secondary={`${dateRangeCondition.start} to ${dateRangeCondition.end}`}
-                />
-              </ListItem>
-            ))}
+            <ListItem>
+              <ListItemText
+                primary={"Date Range Condition"}
+                secondary={`${dateRange.start} to ${dateRange.end}`}
+              />
+            </ListItem>
           </List>
         </DialogContentText>
         <DialogContentText>
@@ -148,10 +161,29 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
           fullWidth
           variant="standard"
         />
+        <Box display="flex" justifyContent="center">
+          <Typography variant={"body1"}>{getProcessStatusText()}</Typography>
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button type="submit">Process</Button>
+        <Box sx={{ m: 1, position: "relative" }}>
+          <Button type="submit" disabled={isProcessing}>
+            Process
+          </Button>
+          {isProcessing && (
+            <CircularProgress
+              size={24}
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                marginTop: "-12px",
+                marginLeft: "-12px",
+              }}
+            />
+          )}
+        </Box>
       </DialogActions>
     </Dialog>
   );
