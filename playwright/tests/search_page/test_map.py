@@ -164,6 +164,7 @@ def test_map_spider(
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
 
+    search_page.map.zoom_to_level(12)
     search_page.map.center_map(head_lng, head_lat)
     search_page.wait_for_timeout(5000)
 
@@ -175,6 +176,7 @@ def test_map_spider(
     layer_id = layer_factory.get_layer_id(LayerType.SPIDER)
     assert search_page.map.is_map_layer_visible(layer_id) is True
 
+    search_page.map.zoom_to_level(12)
     search_page.map.center_map(data_lng, data_lat)
     search_page.map.hover_map()
     search_page.map.click_map()
