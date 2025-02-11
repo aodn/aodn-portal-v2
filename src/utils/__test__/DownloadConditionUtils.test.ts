@@ -9,6 +9,7 @@ import {
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import { MultiPolygon } from "geojson";
 import { dateDefault } from "../../components/common/constants";
+import dayjs from "dayjs";
 
 describe("DownloadConditionUtils", () => {
   describe("getDateConditionFrom", () => {
@@ -36,8 +37,8 @@ describe("DownloadConditionUtils", () => {
       expect(result).toEqual(
         new DateRangeCondition(
           "defaultid",
-          dateDefault.min.getDate().toString(),
-          dateDefault.max.getDate().toString()
+          dayjs(dateDefault.min).format(dateDefault.DATE_FORMAT),
+          dayjs(dateDefault.max).format(dateDefault.DATE_FORMAT)
         )
       );
     });
