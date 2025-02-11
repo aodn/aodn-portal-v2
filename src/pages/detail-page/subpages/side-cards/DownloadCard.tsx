@@ -31,10 +31,11 @@ import {
   IDownloadConditionCallback,
 } from "../../context/DownloadDefinitions";
 import DateRangeConditionBox from "../../../../components/box/DateRangeConditionBox";
+import DownloadDialog from "./DownloadDialog";
 
 const options = [
-  { label: "NetCDFs", value: "NetCDFs" },
-  { label: "1", value: "1" },
+  // { label: "NetCDFs", value: "NetCDFs" },
+  { label: "CSV", value: "csv" },
 ];
 
 const DownloadCard = () => {
@@ -42,6 +43,7 @@ const DownloadCard = () => {
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const { downloadConditions, isCollectionNotFound, removeDownloadCondition } =
     useDetailPageContext();
+  const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
 
   const bboxConditions: BBoxCondition[] = useMemo(() => {
     const bboxConditions = downloadConditions.filter(
@@ -56,6 +58,10 @@ const DownloadCard = () => {
     );
     return timeRangeConditions as DateRangeCondition[];
   }, [downloadConditions]);
+
+  const onDownload = useCallback(() => {
+    setDownloadDialogOpen(true);
+  }, []);
 
   const selectSxProps = useMemo(
     () => ({
@@ -78,6 +84,10 @@ const DownloadCard = () => {
 
   return (
     <Stack direction="column">
+      <DownloadDialog
+        open={downloadDialogOpen}
+        setOpen={setDownloadDialogOpen}
+      />
       <Stack sx={{ padding: padding.medium }} spacing={2}>
         <CommonSelect items={options} sx={selectSxProps} />
         <Button
@@ -91,6 +101,7 @@ const DownloadCard = () => {
               backgroundColor: theme.palette.primary.main,
             },
           }}
+          onClick={onDownload}
         >
           <Typography padding={0} color="#fff">
             Download

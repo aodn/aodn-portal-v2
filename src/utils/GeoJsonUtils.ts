@@ -1,4 +1,10 @@
-import { Feature, FeatureCollection, Point } from "geojson";
+import {
+  Feature,
+  FeatureCollection,
+  MultiPolygon,
+  Point,
+  Polygon,
+} from "geojson";
 import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
 import * as turf from "@turf/turf";
 
@@ -35,4 +41,30 @@ export const generateFeatureCollectionFrom = (
   });
 
   return featureCollections;
+};
+
+const bboxToPolygon = (bbox: [number, number, number, number]): Polygon => {
+  const [minLon, minLat, maxLon, maxLat] = bbox;
+  return {
+    type: "Polygon",
+    coordinates: [
+      [
+        [minLon, minLat],
+        [maxLon, minLat],
+        [maxLon, maxLat],
+        [minLon, maxLat],
+        [minLon, minLat],
+      ],
+    ],
+  };
+};
+
+export const combineBBoxesToMultiPolygon = (
+  bboxes: [number, number, number, number][]
+): MultiPolygon => {
+  const polygons = bboxes.map(bboxToPolygon);
+  return {
+    type: "MultiPolygon",
+    coordinates: polygons.map((polygon) => polygon.coordinates),
+  };
 };
