@@ -12,14 +12,14 @@ from pages.search_page import SearchPage
         ('Integrated Marine Observing System (IMOS) - Location of assets'),
     ],
 )
-def test_tab_panel_scroll(page_mock: Page, title: str) -> None:
+def test_tab_panel_scroll(desktop_page: Page, title: str) -> None:
     # Precondition: Tab panel should have scroll buttons
     # Set a smaller browser window size to make the tabs scrollable
-    page_mock.set_viewport_size({'width': 800, 'height': 800})
+    desktop_page.set_viewport_size({'width': 800, 'height': 800})
 
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
-    detail_page = DetailPage(page_mock)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+    detail_page = DetailPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
@@ -45,9 +45,9 @@ def test_tab_panel_scroll(page_mock: Page, title: str) -> None:
     ],
 )
 def test_not_found_item(
-    page_mock: Page, title: str, uuid: str, tab: str, not_found_item: str
+    mobile_page: Page, title: str, uuid: str, tab: str, not_found_item: str
 ) -> None:
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(mobile_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
@@ -71,7 +71,7 @@ def test_not_found_item(
     ],
 )
 def test_contact_details(
-    page_mock: Page,
+    responsive_page: Page,
     title: str,
     uuid: str,
     tab: str,
@@ -80,7 +80,7 @@ def test_contact_details(
     phone: str,
     link: str,
 ) -> None:
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
