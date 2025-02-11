@@ -92,7 +92,12 @@ const MapboxWorldLayer: FC = () => {
     };
   }, [map, createLayer]);
 
-  return <TestHelper getWorldBoundariesLayer={() => layerId} />;
+  return (
+    <TestHelper
+      mapId={map?.getContainer().id || ""}
+      getWorldBoundariesLayer={() => layerId}
+    />
+  );
 };
 
 export { MapboxWorldLayersDef };

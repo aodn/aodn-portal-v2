@@ -73,8 +73,8 @@ const GridResultCard: FC<GridResultCardProps> = ({
       </Box>
 
       <CardActionArea
-        onClick={
-          isSimplified ? () => onClickDetail(uuid) : () => onClickCard(content)
+        onClick={() =>
+          isSimplified ? onClickDetail(uuid) : onClickCard(content)
         }
       >
         <Box
@@ -152,14 +152,16 @@ const GridResultCard: FC<GridResultCardProps> = ({
               paddingRight: padding.extraSmall,
             }}
           />
-          <ResultCardButtonGroup
-            content={content}
-            shouldHideText
-            isGridView
-            onLinks={() => onClickLinks(uuid)}
-            onDownload={() => onClickDownload(uuid)}
-            onDetail={() => onClickDetail(uuid)}
-          />
+          {!isSimplified && (
+            <ResultCardButtonGroup
+              content={content}
+              shouldHideText
+              isGridView
+              onLinks={() => onClickLinks(uuid)}
+              onDownload={() => onClickDownload(uuid)}
+              onDetail={() => onClickDetail(uuid)}
+            />
+          )}
         </Stack>
       )}
     </Card>

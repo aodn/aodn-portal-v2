@@ -24,6 +24,8 @@ class MapControl implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
   private readonly component: MapControlType;
+  private height: string = "";
+  private marginTop: string = "";
 
   // When the user clicks somewhere on the map, notify the MenuControl
   private readonly mapClickHandler: (event: MapMouseEvent) => void;
@@ -49,8 +51,8 @@ class MapControl implements IControl {
     if (this.container) {
       this.container.style.visibility = visible ? "visible" : "hidden";
       // Magic numbers below are Mapbox default styles for controls
-      this.container.style.height = visible ? "29px" : "0px";
-      this.container.style.marginTop = visible ? "10px" : "0px";
+      this.container.style.height = visible ? this.height : "0px";
+      this.container.style.marginTop = visible ? this.marginTop : "0px";
     }
   }
 
@@ -65,6 +67,9 @@ class MapControl implements IControl {
     // according to document, you need "!" at the end of container
     this.root = createRoot(this.container!);
     this.render();
+    // Remember the initial height and marginTop
+    this.height = this.container!.style.height;
+    this.marginTop = this.container!.style.marginTop;
 
     map?.on("click", this.mapClickHandler);
     map?.on("movestart", this.mapMoveStartHandler);

@@ -10,11 +10,13 @@ from pages.components.search import SearchComponent
 
 
 class SearchPage(BasePage):
+    MAP_ID = 'result-page-main-map'
+
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
         self.search = SearchComponent(page)
-        self.map = Map(page)
+        self.map = Map(page, self.MAP_ID)
 
         # -- Page locators --
 
@@ -27,7 +29,8 @@ class SearchPage(BasePage):
         self.result_card_list = page.get_by_test_id('result-card-list')
         self.result_grid = page.get_by_test_id('resultcard-result-grid')
         self.result_card_grid = page.get_by_test_id('result-card-grid')
-        self.first_result_title = page.get_by_test_id('result-card-title').first
+        self.result_title = page.get_by_test_id('result-card-title')
+        self.first_result_title = self.result_title.first
         self.loading = self.result_list.get_by_test_id('loading-progress')
 
         # buttons
@@ -72,7 +75,7 @@ class SearchPage(BasePage):
 
     def click_dataset(self, title: str) -> None:
         """Click on the given dataset title"""
-        self.page.locator('button').filter(has_text=title).first.click()
+        self.result_title.filter(has_text=title).first.click()
 
     def scroll_down_in_result_list(self, delta_y: int) -> None:
         """Scroll to the bottom of the result list"""

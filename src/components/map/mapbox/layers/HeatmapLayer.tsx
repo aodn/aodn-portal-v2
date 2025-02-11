@@ -329,11 +329,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   return (
     <>
-      <MapPopup
-        layerId={unClusterPointLayer}
-        onDatasetSelected={onDatasetSelected}
-        tabNavigation={tabNavigation}
-      />
+      <MapPopup layerId={unClusterPointLayer} tabNavigation={tabNavigation} />
       <SpatialExtents
         layerId={unClusterPointLayer}
         selectedUuids={selectedUuids}
@@ -347,7 +343,10 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
       />
-      <TestHelper getHeatmapLayer={() => heatmapLayer} />
+      <TestHelper
+        mapId={map?.getContainer().id || ""}
+        getHeatmapLayer={() => heatmapLayer}
+      />
     </>
   );
 };
