@@ -49,6 +49,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
   );
 
   const handleClose = useCallback(() => {
+    // reset relevant states
     setProcessingStatus("");
     setOpen(false);
   }, [setOpen]);
