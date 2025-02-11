@@ -97,7 +97,7 @@ def test_spatial_map_click_zooms_detail_map(page_mock: Page, uuid: str) -> None:
 
     detail_page = DetailPage(page_mock)
     detail_page.load(uuid)
-    detail_page.wait_for_timeout(1000)
+    detail_page.wait_for_timeout(2000)
 
     detail_map_center = detail_page.detail_map.get_map_center()
     spatial_map_center = detail_page.spatial_map.get_map_center()
@@ -111,7 +111,7 @@ def test_spatial_map_click_zooms_detail_map(page_mock: Page, uuid: str) -> None:
     # Click on the spatial map
     detail_page.spatial_map.hover_map()
     detail_page.spatial_map.click_map()
-    detail_page.wait_for_timeout(1000)
+    detail_page.wait_for_timeout(2000)
 
     new_detail_map_center = detail_page.detail_map.get_map_center()
 
@@ -120,4 +120,3 @@ def test_spatial_map_click_zooms_detail_map(page_mock: Page, uuid: str) -> None:
         f'New detail map center {new_detail_map_center} should be within ±1 degree of '
         f'spatial map center {spatial_map_center}'
     )
-    page_mock.pause()
