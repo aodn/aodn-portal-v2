@@ -7,6 +7,7 @@ import {
 import { dateDefault } from "../components/common/constants";
 import { MultiPolygon } from "geojson";
 import { combineBBoxesToMultiPolygon } from "./GeoJsonUtils";
+import dayjs from "dayjs";
 
 export const getDateConditionFrom = (
   conditions: IDownloadCondition[]
@@ -22,8 +23,8 @@ export const getDateConditionFrom = (
   }
   return new DateRangeCondition(
     "defaultid",
-    dateDefault.min.getDate().toString(),
-    dateDefault.max.getDate().toString()
+    dayjs(dateDefault.min).format(dateDefault.DATE_FORMAT),
+    dayjs(dateDefault.max).format(dateDefault.DATE_FORMAT)
   );
 };
 
