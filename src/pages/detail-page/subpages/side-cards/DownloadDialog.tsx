@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -33,12 +33,26 @@ interface DownloadDialogProps {
   setOpen: (open: boolean) => void;
 }
 
+const TIMEOUT_LIMIT = 8000;
+
 const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const { downloadConditions } = useDetailPageContext();
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<string>("");
+
+  // if a request is processing too long, we assume it is failed
+  useEffect(() => {
+    if (isProcessing) {
+      const timer = setTimeout(() => {
+        console.log("Processing time out.");
+        setProcessingStatus("408");
+        setIsProcessing(false);
+      }, TIMEOUT_LIMIT);
+      return () => clearTimeout(timer);
+    }
+  }, [isProcessing]);
 
   const bboxConditions = useMemo(
     () =>
@@ -74,6 +88,9 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
     if (/^2\d{2}$/.test(processingStatus)) {
       return "Succeeded! An email will be sent to you shortly";
     }
+    if (processingStatus === "408") {
+      return "Request timeout! Please try again later";
+    }
     if (/^4\d{2}$/.test(processingStatus)) {
       return "Failed! Please try again later";
     }
@@ -86,6 +103,10 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
       if (!uuid) {
         return;
       }
+
+      // make sure the email is not capital-sensitive
+      email = email.toLowerCase();
+
       const request: DatasetDownloadRequest = {
         inputs: {
           uuid: uuid,
@@ -101,7 +122,6 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
         .then((response) => {
           setProcessingStatus(response.status.message);
           setIsProcessing(false);
-          return response;
         });
     },
     [dateRange.end, dateRange.start, dispatch, location.search, multiPolygon]
