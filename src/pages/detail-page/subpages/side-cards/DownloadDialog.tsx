@@ -33,6 +33,8 @@ interface DownloadDialogProps {
   setOpen: (open: boolean) => void;
 }
 
+const TIMEOUT_LIMIT = 8000;
+
 const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -47,7 +49,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
         console.log("Processing time out.");
         setProcessingStatus("408");
         setIsProcessing(false);
-      }, 8000);
+      }, TIMEOUT_LIMIT);
       return () => clearTimeout(timer);
     }
   }, [isProcessing]);
