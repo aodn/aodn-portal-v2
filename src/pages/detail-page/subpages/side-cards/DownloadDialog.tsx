@@ -101,6 +101,10 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
       if (!uuid) {
         return;
       }
+
+      // make sure the email is not capital-sensitive
+      email = email.toLowerCase();
+
       const request: DatasetDownloadRequest = {
         inputs: {
           uuid: uuid,
