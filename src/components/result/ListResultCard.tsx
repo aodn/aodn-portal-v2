@@ -71,6 +71,9 @@ const ListResultCard: FC<ListResultCardProps> = ({
         onMouseLeave={() => setShowButtons(false)}
         data-testid="result-card-list"
       >
+        <Box position="absolute" top={gap.md} right={gap.md}>
+          <BookmarkButton dataset={content} />
+        </Box>
         <Box
           display="flex"
           flexDirection="column"
@@ -80,7 +83,12 @@ const ListResultCard: FC<ListResultCardProps> = ({
         >
           <Box maxHeight={isSimplified ? "100%" : "80%"}>
             <CardHeader
-              sx={{ p: 0 }}
+              sx={{
+                p: 0,
+                "& .MuiCardHeader-action": {
+                  margin: 0,
+                },
+              }}
               title={
                 <Typography
                   onClick={() => onClickDetail(uuid)}
@@ -88,6 +96,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   fontSize={fontSize.resultCardTitle}
                   fontWeight={fontWeight.bold}
                   title={title}
+                  padding={0}
                   sx={{
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -111,7 +120,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     width: "auto",
                     maxWidth: "200px",
                     height: LIST_CARD_TITLE_HEIGHT,
-                    paddingX: padding.double,
+                    pr: padding.double,
+                    pl: padding.large,
                   }}
                 />
               }
@@ -182,23 +192,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
             </Box>
           )}
         </Box>
-        <Stack
-          direction="column"
-          flexWrap="nowrap"
-          justifyContent="space-around"
-          alignItems="center"
-          height="100%"
-        >
-          <Box
-            position="absolute"
-            top={gap.lg}
-            right={gap.lg}
-            height="20px"
-            width="auto"
-          >
-            <BookmarkButton dataset={content} />
-          </Box>
-        </Stack>
       </Card>
     );
   }

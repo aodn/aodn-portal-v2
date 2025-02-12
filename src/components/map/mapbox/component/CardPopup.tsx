@@ -10,10 +10,11 @@ import {
   fontColor,
   fontSize,
   fontWeight,
+  gap,
   padding,
   zIndex,
 } from "../../../../styles/constants";
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material";
 import MapContext from "../MapContext";
 import { useAppDispatch } from "../../../common/store/hooks";
 import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
@@ -26,6 +27,7 @@ import Layers from "../layers/Layers";
 import GeojsonLayer from "../layers/GeojsonLayer";
 import ResultCardButtonGroup from "../../../result/ResultCardButtonGroup";
 import { SEARCH_PAGE_REFERER } from "../../../../pages/search-page/constants";
+import BookmarkButton from "../../../bookmark/BookmarkButton";
 
 interface CardPopupProps {
   layerId: string;
@@ -169,11 +171,20 @@ const CardPopup: React.FC<CardPopupProps> = ({
             </Map>
           </CardMedia>
         )}
-        <CardContent sx={{ width: isTablet ? "calc(100% - 250px)" : "100%" }}>
+        <CardContent
+          sx={{
+            position: "relative",
+            width: isTablet ? "calc(100% - 250px)" : "100%",
+          }}
+        >
+          <Box position="absolute" sx={{ top: gap.md, right: gap.md }}>
+            <BookmarkButton dataset={content} />
+          </Box>
           <Typography
             fontWeight={fontWeight.bold}
             fontSize={fontSize.info}
             sx={{
+              width: "95%",
               padding: 0,
               overflow: "hidden",
               textOverflow: "ellipsis",
