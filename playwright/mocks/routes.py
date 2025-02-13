@@ -6,7 +6,7 @@ class Routes:
     AUTOCOMPLETE = f'{PREFIX}/ext/autocomplete?*'
     COLLECTION_CENTROID = f'{PREFIX}/collections?properties=id,centroid&*'
     COLLECTION_ALL = (
-        f'{PREFIX}/collections?properties=id,title,description,status,links&*'
+        f'{PREFIX}/collections?properties=id,title,description,status,links,assets_summary&*'
     )
     COLLECTION_POPUP = (
         f'{PREFIX}/collections?properties=title,description&filter=id*'

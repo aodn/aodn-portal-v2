@@ -221,6 +221,7 @@ const ReactMap = ({
   return (
     <MapContext.Provider value={{ map }}>
       <Paper
+        data-testid="announcement-panel"
         sx={{
           display: "flex",
           justifyContent: "center",
