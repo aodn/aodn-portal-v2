@@ -159,7 +159,7 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
                   announcement={
                     collection.hasSummaryFeature()
                       ? undefined
-                      : "No data available"
+                      : "model:No data available"
                   }
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}

@@ -229,6 +229,7 @@ const ReactMap = ({
           height: "100%",
           width: "100%",
           background: "transparent",
+          pointerEvents: announcement?.startsWith("model") ? undefined : "none",
           visibility: announcement ? "visible" : "hidden",
         }}
       >
@@ -238,7 +239,7 @@ const ReactMap = ({
             backgroundColor: "white",
           }}
         >
-          {announcement}
+          {announcement?.replace(/^model:/, "")}
         </Paper>
       </Paper>
       <TestHelper mapId={panelId} getMap={() => map} />
