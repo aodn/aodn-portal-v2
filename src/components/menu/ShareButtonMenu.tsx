@@ -10,6 +10,7 @@ import {
   useTheme,
 } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   borderRadius,
   color,
@@ -29,9 +30,10 @@ export interface ShareMenuItem {
 
 interface ShareButtonProps {
   menuItems: ShareMenuItem[];
+  onClose?: () => void;
 }
 
-const ShareButton: FC<ShareButtonProps> = ({ menuItems }) => {
+const ShareButtonMenu: FC<ShareButtonProps> = ({ menuItems, onClose }) => {
   const theme = useTheme();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -46,7 +48,8 @@ const ShareButton: FC<ShareButtonProps> = ({ menuItems }) => {
   const handleClose = useCallback(() => {
     setIsOpen(false);
     enableScroll();
-  }, []);
+    onClose && onClose();
+  }, [onClose]);
 
   return (
     <>
@@ -59,7 +62,7 @@ const ShareButton: FC<ShareButtonProps> = ({ menuItems }) => {
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        bgcolor={isHovered || isOpen ? color.brightBlue.dark : "#fff"}
+        bgcolor={isHovered || isOpen ? color.blue.dark : "#fff"}
         borderRadius={borderRadius.small}
         sx={{
           ":hover": {
@@ -129,6 +132,13 @@ const ShareButton: FC<ShareButtonProps> = ({ menuItems }) => {
           >
             Share
           </Typography>
+          <Box position="absolute" top={gap.sm} right={gap.sm}>
+            <IconButton onClick={handleClose}>
+              <CloseIcon
+                sx={{ fontSize: fontSize.info, color: color.gray.light }}
+              />
+            </IconButton>
+          </Box>
         </Box>
 
         {menuItems.map((item, index) => (
@@ -151,4 +161,4 @@ const ShareButton: FC<ShareButtonProps> = ({ menuItems }) => {
   );
 };
 
-export default ShareButton;
+export default ShareButtonMenu;

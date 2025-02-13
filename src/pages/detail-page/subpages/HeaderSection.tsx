@@ -2,7 +2,6 @@ import { ReactElement, useCallback, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Box,
-  Card,
   Grid,
   IconButton,
   Paper,
@@ -29,9 +28,9 @@ import {
   fontWeight,
   padding,
 } from "../../../styles/constants";
-import ShareButton, {
+import ShareButtonMenu, {
   ShareMenuItem,
-} from "../../../components/share/ShareButton";
+} from "../../../components/menu/ShareButtonMenu";
 
 interface ButtonWithIcon {
   label: string;
@@ -213,7 +212,7 @@ const HeaderSection = () => {
           borderRadius: borderRadius.small,
         }}
       >
-        <ShareButton menuItems={shareItems} />
+        <ShareButtonMenu menuItems={shareItems} onClose={resetCopyState} />
       </Paper>
     </Box>
   );
