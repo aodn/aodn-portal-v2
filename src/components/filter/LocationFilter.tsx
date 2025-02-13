@@ -13,7 +13,10 @@ interface LocationOptionType {
   label: string;
 }
 
-// TODO: fetch from ogcapi or align with ogcapi keywords
+// Geojson download place
+// Arafura Sea -> https://asgs.linked.fsdf.org.au/dataset/asgsed3/collections/SAL/items/30070
+// Coral Sea -> https://asgs.linked.fsdf.org.au/dataset/asgsed3/collections/SAL/items/30717
+// Greate Australian Bight -> Inside the australian marine parks.json
 const LocationOptions: LocationOptionType[] = [
   { value: "ArafuraSea", label: "Arafura Sea(NT)" },
   { value: "CoralSea", label: "Coral Sea (QLD)" },
