@@ -49,6 +49,7 @@ const fontSize = {
   mapMenuItem: 14,
   mapMenuSubItem: 13,
   detailPageHeading: "20px",
+  detailPageHeadingMobile: "14px",
   newsHeading: "40px",
   newsTitle: "20px",
   newsLabel: "16px",
