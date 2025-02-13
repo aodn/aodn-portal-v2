@@ -84,6 +84,8 @@ export class OGCCollection {
       (link) =>
         link.type === "text/html" && link.rel === RelationType.DESCRIBEDBY
     )?.[0]?.href;
+  // A feature call summary is provided if you do cloud optimized data download
+  hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
 }
 
 export class SummariesProperties {

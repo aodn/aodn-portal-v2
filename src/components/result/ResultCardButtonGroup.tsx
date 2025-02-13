@@ -95,8 +95,8 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   isGridView,
   shouldHideText = false,
   onLinks = () => {},
-  onDownload = () => {},
-  onDetail = () => {},
+  onDownload = undefined,
+  onDetail = undefined,
 }) => {
   const links = content.getDistributionLinks();
 
@@ -125,6 +125,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={DownloadIcon}
           text="Download"
           shouldHideText={shouldHideText}
+          disable={onDownload === undefined}
           onClick={onDownload}
         />
       </ButtonContainer>
@@ -133,6 +134,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={InfoIcon}
           text="More details ..."
           shouldHideText={shouldHideText}
+          disable={onDetail === undefined}
           onClick={onDetail}
         />
       </ButtonContainer>

@@ -96,7 +96,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     properties:
       param.properties !== undefined
         ? param.properties
-        : "id,title,description,status,links",
+        : "id,title,description,status,links,assets_summary",
   };
 
   if (param.text !== undefined && param.text.length !== 0) {
