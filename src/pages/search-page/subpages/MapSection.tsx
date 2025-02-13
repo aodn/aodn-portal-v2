@@ -19,7 +19,6 @@ import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
-import SnackbarLoader from "../../../components/loading/SnackbarLoader";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
@@ -114,11 +113,11 @@ const MapSection: React.FC<MapSectionProps> = ({
         ...sx,
       }}
     >
-      <SnackbarLoader isLoading={isLoading} message="Searching..." />
       <Map
         panelId={mapContainerId}
         bbox={bbox}
         zoom={zoom}
+        announcement={isLoading ? "Searching..." : undefined}
         onZoomEvent={onMapZoomOrMove}
         onMoveEvent={onMapZoomOrMove}
       >

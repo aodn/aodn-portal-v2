@@ -14,7 +14,7 @@ import { useDetailPageContext } from "../context/detail-page-context";
 interface SideSectionProps extends SpatialCoverageCardProps {}
 
 const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
-  const { isCollectionNotFound } = useDetailPageContext();
+  const { isCollectionNotFound, collection } = useDetailPageContext();
 
   return (
     <Stack
@@ -22,15 +22,17 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
       gap={2}
       flexWrap="wrap"
     >
-      <Card
-        sx={{
-          backgroundColor: "#fff",
-          borderRadius: borderRadius.small,
-          width: "100%",
-        }}
-      >
-        <DownloadCard />
-      </Card>
+      {collection?.hasSummaryFeature() && (
+        <Card
+          sx={{
+            backgroundColor: "#fff",
+            borderRadius: borderRadius.small,
+            width: "100%",
+          }}
+        >
+          <DownloadCard />
+        </Card>
+      )}
       {!isCollectionNotFound && (
         <>
           <OverviewCard />
