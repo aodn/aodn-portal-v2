@@ -205,7 +205,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
-                WebkitLineClamp: "5",
+                WebkitLineClamp: "4",
                 WebkitBoxOrient: "vertical",
                 wordBreak: "break-word",
               }}
