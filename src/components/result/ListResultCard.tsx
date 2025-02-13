@@ -34,7 +34,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   onClickCard = () => {},
   onClickDetail = () => {},
   onClickLinks = () => {},
-  onClickDownload = () => {},
+  onClickDownload = undefined,
   selectedUuid,
   isSimplified = false,
   sx,
@@ -185,7 +185,11 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   content={content}
                   shouldHideText
                   onLinks={() => onClickLinks(uuid)}
-                  onDownload={() => onClickDownload(uuid)}
+                  onDownload={
+                    onClickDownload
+                      ? () => onClickDownload(uuid)
+                      : onClickDownload
+                  }
                   onDetail={() => onClickDetail(uuid)}
                 />
               </CardActions>

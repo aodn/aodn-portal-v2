@@ -41,10 +41,12 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   return (
     <Tooltip title={text} placement="top">
       <Button
-        onClick={disable ? () => {} : onClick}
+        onClick={onClick}
+        disabled={disable}
         sx={{
           padding: padding.extraSmall,
           textTransform: "none",
+          opacity: disable ? 0.5 : 1,
           ...sx,
         }}
       >

@@ -156,6 +156,11 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
                   bbox={bbox}
                   animate={true}
                   panelId={mapContainerId}
+                  announcement={
+                    collection.hasSummaryFeature()
+                      ? undefined
+                      : "model:No data available"
+                  }
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
                 >
