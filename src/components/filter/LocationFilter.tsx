@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import {
   Box,
   FormControl,
@@ -7,43 +7,105 @@ import {
   RadioGroup,
 } from "@mui/material";
 import { fontFamily, fontSize, padding } from "../../styles/constants";
+import { marineParkDefault } from "../common/constants";
+import { Feature, FeatureCollection, Polygon } from "geojson";
+import _ from "lodash";
+import {
+  ParameterState,
+  updateFilterPolygon,
+} from "../common/store/componentParamReducer";
+import { useAppDispatch } from "../common/store/hooks";
+import store, { getComponentState } from "../common/store/store";
+import { booleanEqual } from "@turf/boolean-equal";
 
 interface LocationOptionType {
   value: string;
   label: string;
+  geo?: FeatureCollection<Polygon>;
 }
-
-// Geojson download place
-// Arafura Sea -> https://asgs.linked.fsdf.org.au/dataset/asgsed3/collections/SAL/items/30070
-// Coral Sea -> https://asgs.linked.fsdf.org.au/dataset/asgsed3/collections/SAL/items/30717
-// Greate Australian Bight -> Inside the australian marine parks.json
-const LocationOptions: LocationOptionType[] = [
-  { value: "ArafuraSea", label: "Arafura Sea(NT)" },
-  { value: "CoralSea", label: "Coral Sea (QLD)" },
-  { value: "GreatAustralianBight", label: "Great Australian Bight" },
-  { value: "GreatBarrierReef", label: "Great Barrier Reef (QLD)" },
-  { value: "TasmanSeaNSW", label: "Tasman Sea (NSW)" },
-  { value: "TasmanSeaTAS", label: "Tasman Sea (TAS)" },
-  { value: "TasmanSeaVIC", label: "Tasman Sea (VIC)" },
-  { value: "TimorSea", label: "Timor Sea (NT)" },
-  { value: "TorresStrait", label: "Torres Strait (QLD)" },
-];
 
 interface LocationFilterProps {}
 
+const locationOptions: LocationOptionType[] = [];
+
+const NONE_LOCATION = {
+  label: "None",
+  value: "none",
+};
+// Given a polygon find the item in the location type option that matches
+// the feature geometry
+const findMatch = (
+  polygon: Feature<Polygon> | undefined,
+  locations: LocationOptionType[]
+): string => {
+  const o = locations.find(
+    (l) =>
+      l.geo?.features[0] && polygon && booleanEqual(l.geo?.features[0], polygon)
+  );
+  return o ? o.value : "none";
+};
+
+fetch(marineParkDefault.geojson)
+  .then((response) => response.json())
+  .then((json: FeatureCollection<Polygon>) => {
+    // Regroup the Features by name and create a new array or FeatureCollection
+    const grouped = _.groupBy(
+      json.features,
+      (feature) => feature.properties?.RESNAME
+    );
+    return Object.values(grouped).map<FeatureCollection<Polygon>>(
+      (features) => ({
+        type: "FeatureCollection",
+        features: features as Feature<Polygon>[],
+      })
+    );
+  })
+  .then((values: Array<FeatureCollection<Polygon>>) => {
+    // Create the drop -own list items
+    const l = values
+      .map<LocationOptionType>((value) => {
+        const option: LocationOptionType = {
+          label: value.features[0].properties?.RESNAME,
+          value: "" + value.features[0].properties?.OBJECTID,
+          geo: value,
+        };
+        return option;
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    locationOptions.push(NONE_LOCATION);
+    locationOptions.push(...l);
+  })
+  .catch((error) => console.error("Error fetching JSON:", error));
+
 const LocationFilter: FC<LocationFilterProps> = () => {
+  const dispatch = useAppDispatch();
+  const componentParam: ParameterState = getComponentState(store.getState());
+
   // TODO: need to initialize the sate from redux
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
-    LocationOptions[0].value
+    "none"
   );
 
   // TODO: need to update redux as well if ogcapi support this query
   const handleRadioChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSelectedOption(event.target.value);
+      const l = locationOptions?.find((o) => o.value === event.target.value);
+      if (l && l.geo?.features) {
+        // The marineParkDefault is a boundary json so only 1 feature found.
+        dispatch(updateFilterPolygon(l.geo.features[0]));
+        setSelectedOption(event.target.value);
+      } else {
+        dispatch(updateFilterPolygon(undefined));
+        setSelectedOption(NONE_LOCATION.value);
+      }
     },
-    []
+    [dispatch]
   );
+
+  useEffect(() => {
+    setSelectedOption(findMatch(componentParam.polygon, locationOptions));
+  }, [componentParam.polygon]);
 
   return (
     <Box
@@ -57,11 +119,11 @@ const LocationFilter: FC<LocationFilterProps> = () => {
     >
       <FormControl sx={{ maxHeight: "300px", overflowY: "scroll", flex: 1 }}>
         <RadioGroup
-          defaultValue={LocationOptions[0].value}
+          defaultValue={locationOptions[0].value}
           value={selectedOption}
           onChange={handleRadioChange}
         >
-          {LocationOptions.map((item) => (
+          {locationOptions.map((item) => (
             <FormControlLabel
               value={item.value}
               control={<Radio />}
