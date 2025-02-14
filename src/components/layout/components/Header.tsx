@@ -5,7 +5,6 @@ import { color, padding } from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
 import HeaderMenu from "./HeaderMenu";
-import MainMenu from "./MainMenu";
 import { pageDefault } from "../../common/constants";
 import Searchbar from "../../search/Searchbar";
 import {
@@ -37,10 +36,11 @@ const Header: FC = () => {
       >
         <HeaderMenu />
       </SectionContainer>
+
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: "#fff",
-          paddingY: padding.medium,
+          paddingY: padding.small,
         }}
         contentAreaStyle={{
           flexDirection: "row",
@@ -51,8 +51,7 @@ const Header: FC = () => {
       >
         <AODNSiteLogo />
 
-        {/* Main menu just for display, will implement later once design is finished */}
-        {isSearchResultPage ? (
+        {isSearchResultPage && (
           <Box
             display="flex"
             flexDirection="row"
@@ -66,21 +65,13 @@ const Header: FC = () => {
                 : "auto"
             }
           >
-            {isUnderLaptop ? (
-              <MainMenu isCollapsed={true} />
-            ) : (
-              <MainMenu isCollapsed={shouldExpandSearchbar} />
-            )}
             {!isMobile && (
               <Searchbar setShouldExpandSearchbar={setShouldExpandSearchbar} />
             )}
           </Box>
-        ) : isUnderLaptop ? (
-          <MainMenu isCollapsed={true} />
-        ) : (
-          <MainMenu />
         )}
       </SectionContainer>
+
       {isSearchResultPage && isMobile && (
         <Box p={padding.extraSmall} pt={0}>
           <Searchbar setShouldExpandSearchbar={setShouldExpandSearchbar} />

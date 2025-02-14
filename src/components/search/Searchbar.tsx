@@ -92,6 +92,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   return (
     <Box width="100%" ref={boxRef}>
       <Paper
+        id="searchbar-paper"
         ref={ref}
         elevation={0}
         sx={{
@@ -127,7 +128,13 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           shouldShrinkAllButtons={
             isMobile && location.pathname === pageDefault.search
           }
-          sx={{ pr: gap.md }}
+          sx={{
+            pr: gap.md,
+            width:
+              isMobile && location.pathname === pageDefault.landing
+                ? "100%"
+                : "auto",
+          }}
         />
       </Paper>
       <ClickAwayListener onClickAway={handleClickAway}>
