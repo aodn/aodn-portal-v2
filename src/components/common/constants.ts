@@ -14,4 +14,8 @@ const pageDefault = {
   landing: "/",
 };
 
-export { dateDefault, pageDefault };
+const marineParkDefault = {
+  geojson: "./data/Australian_Marine_Parks_boundaries.json",
+};
+
+export { dateDefault, pageDefault, marineParkDefault };

@@ -7,9 +7,10 @@ import React, {
   useState,
 } from "react";
 import MapContext from "../MapContext";
-import { FeatureCollection } from "geojson";
+import { FeatureCollection, Polygon } from "geojson";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { TestHelper } from "../../../common/test/helper";
+import { marineParkDefault } from "../../../common/constants";
 
 export interface StaticLayersProps {
   id: string;
@@ -28,7 +29,7 @@ const StaticLayersDef = {
 
 const StaticLayer: FC<StaticLayersProps> = ({ id, name, label, features }) => {
   const { map } = useContext(MapContext);
-  const [created, setCreated] = useState<boolean>(false);
+  const [_, setCreated] = useState<boolean>(false);
   const sourceId = useMemo(
     () => `static-geojson-${map?.getContainer().id}-source-${id}`,
     [id, map]
@@ -129,14 +130,14 @@ const AustraliaMarineParkLayer: FC<Partial<StaticLayersProps>> = ({
   name = StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
   label = StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
 }) => {
-  const [data, setData] = useState<FeatureCollection>();
+  const [data, setData] = useState<FeatureCollection<Polygon>>();
 
   // Data orginated from here, we store a copy in the following path and useEffect to load it so we do not need to bundle it to the package which make is very big
   // https://data.gov.au/dataset/ds-dcceew-https%3A%2F%2Fwww.arcgis.com%2Fhome%2Fitem.html%3Fid%3D2b3eb1d42b8d4319900cf4777f0a83b9%26sublayer%3D0/details?q=marine%20park
   useEffect(() => {
-    fetch("./data/Australian_Marine_Parks.json")
+    fetch(marineParkDefault.geojson)
       .then((response) => response.json())
-      .then((json) => setData(json))
+      .then((json: FeatureCollection<Polygon>) => setData(json))
       .catch((error) => console.error("Error fetching JSON:", error));
   }, []);
 

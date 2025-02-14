@@ -37,7 +37,7 @@ const checkCount = ({
 
   switch (type) {
     case SearchbarButtonNames.Date:
-      return filterObj.dateTimeFilterRange?.start !== undefined &&
+      return filterObj.dateTimeFilterRange?.start !== undefined ||
         filterObj.dateTimeFilterRange?.end !== undefined
         ? 1
         : 0;
@@ -64,6 +64,9 @@ const checkCount = ({
       }
 
       return count;
+
+    case SearchbarButtonNames.Location:
+      return filterObj.polygon ? 1 : 0;
 
     default:
       return 0;

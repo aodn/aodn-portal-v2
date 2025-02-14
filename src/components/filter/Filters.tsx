@@ -265,7 +265,6 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
           <Button
             sx={{
               width: "100px",
-
               border: `${border.sm} ${color.blue.darkSemiTransparent}`,
               "&:hover": {
                 border: `${border.sm} ${color.blue.darkSemiTransparent}`,
