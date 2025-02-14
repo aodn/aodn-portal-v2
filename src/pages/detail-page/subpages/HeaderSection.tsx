@@ -1,12 +1,26 @@
+import { ReactElement, useCallback, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Box,
-  Card,
   Grid,
   IconButton,
   Paper,
   SxProps,
   Typography,
 } from "@mui/material";
+import ReplyIcon from "@mui/icons-material/Reply";
+import SkipNextIcon from "@mui/icons-material/SkipNext";
+import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
+import ContentCopy from "@mui/icons-material/ContentCopy";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+import { useDetailPageContext } from "../context/detail-page-context";
+import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
+import OrganizationLogo from "../../../components/logo/OrganizationLogo";
+import useRedirectSearch from "../../../hooks/useRedirectSearch";
+import useBreakpoint from "../../../hooks/useBreakpoint";
+import useRedirectHome from "../../../hooks/useRedirectHome";
+import useCopyToClipboard from "../../../hooks/useCopyToClipboard";
+import { SEARCH_PAGE_REFERER } from "../../search-page/constants";
 import {
   borderRadius,
   fontColor,
@@ -14,18 +28,9 @@ import {
   fontWeight,
   padding,
 } from "../../../styles/constants";
-import { ReactElement, useCallback, useMemo } from "react";
-import ReplyIcon from "@mui/icons-material/Reply";
-import SkipNextIcon from "@mui/icons-material/SkipNext";
-import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
-import { useDetailPageContext } from "../context/detail-page-context";
-import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
-import OrganizationLogo from "../../../components/logo/OrganizationLogo";
-import useRedirectSearch from "../../../hooks/useRedirectSearch";
-import useBreakpoint from "../../../hooks/useBreakpoint";
-import useRedirectHome from "../../../hooks/useRedirectHome";
-import { useLocation } from "react-router-dom";
-import { SEARCH_PAGE_REFERER } from "../../search-page/constants";
+import ShareButtonMenu, {
+  ShareMenuItem,
+} from "../../../components/menu/ShareButtonMenu";
 
 interface ButtonWithIcon {
   label: string;
@@ -51,14 +56,30 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
 
 const HeaderSection = () => {
   const location = useLocation();
-  const { isUnderLaptop } = useBreakpoint();
+  const { isUnderLaptop, isMobile } = useBreakpoint();
   const { collection } = useDetailPageContext();
+  const { isCopied, copyToClipboard, resetCopyState } = useCopyToClipboard();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
   const title = useMemo(() => collection?.title, [collection?.title]);
 
-  // TODO: on click user goes back to search page where has results based on previous search params
+  const copyUrl = window.location.href;
+  const shareItems: ShareMenuItem[] = useMemo(
+    () => [
+      {
+        name: "Copy Link",
+        icon: isCopied ? (
+          <DoneAllIcon fontSize="small" color="primary" />
+        ) : (
+          <ContentCopy fontSize="small" color="primary" />
+        ),
+        handler: () => copyToClipboard(copyUrl),
+      },
+    ],
+    [copyToClipboard, copyUrl, isCopied]
+  );
+
   const onGoBack = useCallback(
     (referer: string) => {
       if (referer !== SEARCH_PAGE_REFERER) {
@@ -85,6 +106,7 @@ const HeaderSection = () => {
       </Paper>
     );
   }, []);
+
   // Render the go back button next to the header
   const renderNavigateButtons = useCallback(
     (isUnderLaptop: boolean, clickHandler: () => void) => {
@@ -110,71 +132,89 @@ const HeaderSection = () => {
   );
 
   return (
-    <Card
-      aria-label="header panel"
-      elevation={3}
-      sx={{
-        position: "relative",
-        padding: padding.medium,
-        paddingX: padding.large,
-        backgroundColor: "white",
-        borderRadius: borderRadius.small,
-        overflow: "visible",
-      }}
-    >
-      <Grid container>
-        <Grid
-          item
-          xs={10}
-          sx={{
-            display: "flex",
-            justifyContent: "start",
-            alignItems: "center",
-          }}
-        >
-          {renderNavigateButtons(!isUnderLaptop, () =>
-            onGoBack(location.state?.referer)
-          )}
-          <Typography
-            aria-label="collection title"
-            fontSize={fontSize.detailPageHeading}
-            fontWeight={fontWeight.bold}
-            color={fontColor.gray.dark}
+    <Box display="flex" flexDirection="row" gap={1} width="100%">
+      <Paper
+        aria-label="header"
+        elevation={3}
+        sx={{
+          position: "relative",
+          padding: padding.medium,
+          backgroundColor: "white",
+          borderRadius: borderRadius.small,
+          flex: 1,
+        }}
+      >
+        <Grid container>
+          <Grid
+            item
+            xs={9}
+            sm={10}
             sx={{
-              padding: 1,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: "2",
-              WebkitBoxOrient: "vertical",
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "center",
             }}
           >
-            {title}
-          </Typography>
-        </Grid>
-        <Grid
-          item
-          xs={2}
-          sx={{
-            display: "flex",
-            justifyContent: "right",
-            alignItems: "center",
-          }}
-        >
-          {collection && (
-            <OrganizationLogo
-              logo={collection.findIcon()}
+            {renderNavigateButtons(!isUnderLaptop, () =>
+              onGoBack(location.state?.referer)
+            )}
+            <Typography
+              aria-label="collection title"
+              fontSize={
+                isMobile
+                  ? fontSize.detailPageHeadingMobile
+                  : fontSize.detailPageHeading
+              }
+              fontWeight={fontWeight.bold}
+              color={fontColor.gray.dark}
               sx={{
-                width: "100%",
-                height: "60px",
-                paddingX: padding.extraSmall,
+                p: 0,
+                paddingX: padding.small,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: "2",
+                WebkitBoxOrient: "vertical",
               }}
-              defaultImageSrc={imosLogoWithTitle}
-            />
-          )}
+            >
+              {title}
+            </Typography>
+          </Grid>
+          <Grid
+            item
+            xs={3}
+            sm={2}
+            sx={{
+              display: "flex",
+              justifyContent: "right",
+              alignItems: "center",
+            }}
+          >
+            {collection && (
+              <OrganizationLogo
+                logo={collection.findIcon()}
+                sx={{
+                  width: "100%",
+                  height: "60px",
+                  paddingX: padding.extraSmall,
+                }}
+                defaultImageSrc={imosLogoWithTitle}
+              />
+            )}
+          </Grid>
         </Grid>
-      </Grid>
-    </Card>
+      </Paper>
+      <Paper
+        aria-label="share button"
+        elevation={3}
+        sx={{
+          backgroundColor: "white",
+          borderRadius: borderRadius.small,
+        }}
+      >
+        <ShareButtonMenu menuItems={shareItems} onClose={resetCopyState} />
+      </Paper>
+    </Box>
   );
 };
 
