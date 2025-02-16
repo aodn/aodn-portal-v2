@@ -9,6 +9,7 @@ import {
 import SuggestedCitationList from "../../../../components/list/SuggestedCitationList";
 import CitedResponsiblePartyList from "../../../../components/list/CitedResponsiblePartyList";
 import ConstraintList from "../../../../components/list/ConstraintList";
+import { detailPageDefault } from "../../../../components/common/constants";
 
 const CitationPanel = () => {
   const context = useDetailPageContext();
@@ -38,7 +39,9 @@ const CitationPanel = () => {
     () =>
       context.collection
         ?.getContacts()
-        ?.filter((contact) => contact.roles.includes("citation")),
+        ?.filter((contact) =>
+          contact.roles.includes(detailPageDefault.CITATION)
+        ),
     [context.collection]
   );
   const suggestedCitation = useMemo(

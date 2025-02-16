@@ -14,4 +14,14 @@ const pageDefault = {
   landing: "/",
 };
 
-export { dateDefault, pageDefault };
+const detailPageDefault = {
+  ABOUT: "about",
+  ASSOCIATED_RECORDS: "associated records",
+  CITATION: "citation",
+  LINKS: "links",
+  LINEAGE: "lineage",
+  METADATA_INFORMATION: "metadata information",
+  SUMMARY: "summary",
+};
+
+export { dateDefault, pageDefault, detailPageDefault };
