@@ -163,7 +163,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
           display: "flex",
           borderRadius: 0,
           marginTop: "auto",
-          height: "30%",
+          height: "auto",
           width: "100%",
           backgroundColor: "rgba(255, 255, 255, 0.9)",
           pointerEvents: "auto",
@@ -235,7 +235,6 @@ const CardPopup: React.FC<CardPopupProps> = ({
               onLinks={() => onLinks(content)}
               onDownload={() => onDownload(content)}
               onDetail={() => onDetail(content)}
-              resultCardButtonConfig={{ size: ResultCardButtonSize.SMALL }}
             />
           )}
         </CardContent>

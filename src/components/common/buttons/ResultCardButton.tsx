@@ -24,7 +24,7 @@ interface ResultCardButtonProps {
 
 const defaultResultCardButtonConfig: ResultCardButtonConfig = {
   color: color.blue.dark,
-  size: ResultCardButtonSize.MEDIUM,
+  size: ResultCardButtonSize.SMALL,
 };
 
 const ResultCardButton: FC<ResultCardButtonProps> = ({

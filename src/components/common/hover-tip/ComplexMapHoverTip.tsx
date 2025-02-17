@@ -98,7 +98,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
           onDownload={onDownload}
           onDetail={onDetail}
         />
-        <Box height="auto">
+        <Box>
           <Typography
             color={fontColor.gray.medium}
             fontSize={fontSize.resultCardContent}
@@ -107,9 +107,6 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
               paddingX: padding.small,
               overflow: "hidden",
               textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: "4",
-              WebkitBoxOrient: "vertical",
               wordBreak: "break-word",
             }}
           >
