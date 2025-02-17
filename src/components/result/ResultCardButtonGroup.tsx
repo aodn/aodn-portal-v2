@@ -7,7 +7,9 @@ import TaskAltSharpIcon from "@mui/icons-material/TaskAltSharp";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import ResultCardButton from "../common/buttons/ResultCardButton";
+import ResultCardButton, {
+  ResultCardButtonConfig,
+} from "../common/buttons/ResultCardButton";
 import { color } from "../../styles/constants";
 
 interface ResultCardButtonGroupProps {
@@ -17,6 +19,7 @@ interface ResultCardButtonGroupProps {
   onLinks?: () => void;
   onDownload?: () => void;
   onDetail?: () => void;
+  resultCardButtonConfig?: ResultCardButtonConfig;
 }
 
 interface ButtonContainerProps {
@@ -42,7 +45,8 @@ const generateLinkText = (linkLength: number) => {
 
 const renderStatusButton = (
   shouldHideText: boolean,
-  content: OGCCollection
+  content: OGCCollection,
+  resultCardButtonConfig?: ResultCardButtonConfig
 ) => {
   const status = content?.getStatus()?.toLowerCase().trim();
   if (status === Status.Completed) {
@@ -51,6 +55,7 @@ const renderStatusButton = (
         startIcon={TaskAltSharpIcon}
         text={"Completed"}
         shouldHideText={shouldHideText}
+        resultCardButtonConfig={resultCardButtonConfig}
       />
     );
   }
@@ -59,7 +64,7 @@ const renderStatusButton = (
       <ResultCardButton
         startIcon={DoubleArrowIcon}
         text={"On Going"}
-        resultCardButtonConfig={{ color: "success" }}
+        resultCardButtonConfig={{ ...resultCardButtonConfig, color: "success" }}
         shouldHideText={shouldHideText}
       />
     );
@@ -69,6 +74,7 @@ const renderStatusButton = (
       startIcon={QuestionMarkIcon}
       text="No Status"
       shouldHideText={shouldHideText}
+      resultCardButtonConfig={resultCardButtonConfig}
     />
   );
 };
@@ -97,6 +103,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   onLinks = () => {},
   onDownload = undefined,
   onDetail = undefined,
+  resultCardButtonConfig,
 }) => {
   const links = content.getDistributionLinks();
 
@@ -104,7 +111,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   return (
     <Grid container arial-label="result-list-card-buttons">
       <ButtonContainer isGridView={isGridView}>
-        {renderStatusButton(shouldHideText, content)}
+        {renderStatusButton(shouldHideText, content, resultCardButtonConfig)}
       </ButtonContainer>
       <ButtonContainer isGridView={isGridView}>
         {links && (
@@ -114,6 +121,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
             shouldHideText={shouldHideText}
             onClick={onLinks}
             resultCardButtonConfig={{
+              ...resultCardButtonConfig,
               color: links.length > 0 ? color.blue.dark : color.gray.light,
             }}
             disable={links.length === 0}
@@ -127,6 +135,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           shouldHideText={shouldHideText}
           disable={onDownload === undefined}
           onClick={onDownload}
+          resultCardButtonConfig={resultCardButtonConfig}
         />
       </ButtonContainer>
       <ButtonContainer isGridView={isGridView}>
@@ -136,6 +145,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           shouldHideText={shouldHideText}
           disable={onDetail === undefined}
           onClick={onDetail}
+          resultCardButtonConfig={resultCardButtonConfig}
         />
       </ButtonContainer>
     </Grid>
