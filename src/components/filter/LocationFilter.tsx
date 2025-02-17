@@ -16,7 +16,7 @@ import {
 } from "../common/store/componentParamReducer";
 import { useAppDispatch } from "../common/store/hooks";
 import store, { getComponentState } from "../common/store/store";
-import { booleanEqual } from "@turf/boolean-equal";
+import { simplify, booleanEqual } from "@turf/turf";
 
 interface LocationOptionType {
   value: string;
@@ -28,9 +28,10 @@ interface LocationFilterProps {}
 
 const locationOptions: LocationOptionType[] = [];
 
-const NONE_LOCATION = {
+const DEFAULT_LOCATION = {
   label: "None",
   value: "none",
+  geo: undefined,
 };
 // Given a polygon find the item in the location type option that matches
 // the feature geometry
@@ -61,9 +62,14 @@ fetch(marineParkDefault.geojson)
     );
   })
   .then((values: Array<FeatureCollection<Polygon>>) => {
-    // Create the drop -own list items
+    // Create the drop-down list items
     const l = values
       .map<LocationOptionType>((value) => {
+        // simplify the polygon here, otherwise too big of url for query
+        value.features[0] = simplify(value.features[0], {
+          tolerance: 0.01,
+          highQuality: false,
+        });
         const option: LocationOptionType = {
           label: value.features[0].properties?.RESNAME,
           value: "" + value.features[0].properties?.OBJECTID,
@@ -73,7 +79,7 @@ fetch(marineParkDefault.geojson)
       })
       .sort((a, b) => a.label.localeCompare(b.label));
 
-    locationOptions.push(NONE_LOCATION);
+    locationOptions.push(DEFAULT_LOCATION);
     locationOptions.push(...l);
   })
   .catch((error) => console.error("Error fetching JSON:", error));
@@ -81,8 +87,6 @@ fetch(marineParkDefault.geojson)
 const LocationFilter: FC<LocationFilterProps> = () => {
   const dispatch = useAppDispatch();
   const componentParam: ParameterState = getComponentState(store.getState());
-
-  // TODO: need to initialize the sate from redux
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     "none"
   );
@@ -97,14 +101,17 @@ const LocationFilter: FC<LocationFilterProps> = () => {
         setSelectedOption(event.target.value);
       } else {
         dispatch(updateFilterPolygon(undefined));
-        setSelectedOption(NONE_LOCATION.value);
+        setSelectedOption(DEFAULT_LOCATION.value);
       }
     },
     [dispatch]
   );
 
   useEffect(() => {
-    setSelectedOption(findMatch(componentParam.polygon, locationOptions));
+    setSelectedOption((v) => {
+      const n = findMatch(componentParam.polygon, locationOptions);
+      return v === n ? v : n;
+    });
   }, [componentParam.polygon]);
 
   return (

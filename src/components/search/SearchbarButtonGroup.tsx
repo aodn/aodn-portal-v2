@@ -7,9 +7,13 @@ import DateRangeIcon from "@mui/icons-material/DateRange";
 import PlaceIcon from "@mui/icons-material/Place";
 import { borderRadius, color, fontWeight, gap } from "../../styles/constants";
 import store, { getComponentState } from "../common/store/store";
-import { ParameterState } from "../common/store/componentParamReducer";
+import {
+  DEFAULT_SEARCH_LOCATION,
+  ParameterState,
+} from "../common/store/componentParamReducer";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
+import { booleanEqual } from "@turf/boolean-equal";
 
 export enum SearchbarButtonNames {
   Search = "search",
@@ -66,7 +70,13 @@ const checkCount = ({
       return count;
 
     case SearchbarButtonNames.Location:
-      return filterObj.polygon ? 1 : 0;
+      // If the polygon is undefined, then it means no filter
+      // If the polygon is also the default search polygon, it means no filter too
+      // as this is the default
+      return filterObj.polygon &&
+        !booleanEqual(filterObj.polygon, DEFAULT_SEARCH_LOCATION)
+        ? 1
+        : 0;
 
     default:
       return 0;
