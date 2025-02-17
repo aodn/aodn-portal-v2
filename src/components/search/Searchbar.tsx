@@ -34,7 +34,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const [shouldExpandAllButtons, setShouldExpandAllButtons] = useState<boolean>(
     location.pathname === pageDefault.landing
   );
-  // set the default value to false to allow user do search without typing anything
+  // set the default value false to allow user do search without typing anything
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
   const { ref, width: searchbarWidth } = useElementSize();
   const redirectSearch = useRedirectSearch();

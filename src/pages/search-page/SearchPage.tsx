@@ -15,7 +15,7 @@ import {
   formatToUrlParam,
   ParameterState,
   unFlattenToParameterState,
-  updateFilterPolygon,
+  updateFilterBBox,
   updateParameterStates,
   updateSortBy,
   updateZoom,
@@ -130,7 +130,6 @@ const SearchPage = () => {
     // will not exclude record without spatial extents however for map search
     // it is ok to exclude it because it isn't show on map anyway
     const paramNonPaged = createSearchParamFrom(componentParam, {
-      includeNoSpatialExtents: false,
       pagesize: DEFAULT_SEARCH_MAP_SIZE,
     });
     const collections = await dispatch(
@@ -200,18 +199,15 @@ const SearchPage = () => {
         const ne = bounds.getNorthEast(); // NorthEast corner
         const sw = bounds.getSouthWest(); // SouthWest corner
         // Note order: longitude, latitude.2
-        const polygon = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
+        const bbox = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
 
         // Sometimes the map fire zoomend even nothing happens, this may
         // due to some redraw, so in here we check if the polygon really
         // changed, if not then there is no need to do anything
-        if (
-          componentParam.polygon &&
-          !booleanEqual(componentParam.polygon, polygon)
-        ) {
+        if (componentParam.bbox && !booleanEqual(componentParam.bbox, bbox)) {
           setBbox(bounds);
           setZoom(event.target.getZoom());
-          dispatch(updateFilterPolygon(polygon));
+          dispatch(updateFilterBBox(bbox));
           dispatch(updateZoom(event.target.getZoom()));
           doSearch();
         }
@@ -235,7 +231,7 @@ const SearchPage = () => {
         // in the url
         setBbox(
           new LngLatBounds(
-            paramState.polygon?.bbox as [number, number, number, number]
+            paramState.bbox?.bbox as [number, number, number, number]
           )
         );
         setZoom(paramState.zoom);
@@ -258,7 +254,7 @@ const SearchPage = () => {
         );
         setBbox(
           new LngLatBounds(
-            componentParam.polygon?.bbox as [number, number, number, number]
+            componentParam.bbox?.bbox as [number, number, number, number]
           )
         );
         setZoom(componentParam.zoom);
