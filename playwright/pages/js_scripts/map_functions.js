@@ -93,4 +93,7 @@ window.__map_functions = {
     const map = this.getMap(mapId);
     return map.getZoom();
   },
+  getMapClickLngLat: function (mapId) {
+    return this.getTestProps(mapId).getMapClickLngLat();
+  },
 };
