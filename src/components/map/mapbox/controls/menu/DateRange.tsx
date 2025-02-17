@@ -82,9 +82,15 @@ const DateSlider: React.FC<DateSliderProps> = ({
             : SLIDER_WIDTH_DEFAULT
       }
       data-testid={COMPONENT_ID}
-      padding={padding.small}
+      paddingY={padding.extraSmall}
+      paddingX={padding.small}
     >
-      <Grid item xs={12} container sx={{ paddingX: padding.medium }}>
+      <Grid
+        item
+        xs={12}
+        container
+        sx={{ paddingX: padding.medium, pt: padding.small }}
+      >
         <PlainSlider
           value={dateRangeStamp}
           min={dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT))}

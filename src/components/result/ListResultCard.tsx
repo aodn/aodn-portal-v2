@@ -84,6 +84,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
           <Box maxHeight={isSimplified ? "100%" : "80%"}>
             <CardHeader
               sx={{
+                height: "auto",
+                width: "90%",
                 p: 0,
                 "& .MuiCardHeader-action": {
                   margin: 0,
@@ -93,7 +95,11 @@ const ListResultCard: FC<ListResultCardProps> = ({
                 <Typography
                   onClick={() => onClickDetail(uuid)}
                   color={fontColor.gray.dark}
-                  fontSize={fontSize.resultCardTitle}
+                  fontSize={
+                    isSimplified
+                      ? fontSize.resultCardTitleUnderLaptop
+                      : fontSize.resultCardTitle
+                  }
                   fontWeight={fontWeight.bold}
                   title={title}
                   padding={0}
@@ -101,7 +107,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     display: "-webkit-box",
-                    WebkitLineClamp: "2",
+                    WebkitLineClamp: isSimplified ? undefined : "2",
                     WebkitBoxOrient: "vertical",
                     cursor: "pointer",
                     alignItems: "flex-start",
@@ -114,36 +120,50 @@ const ListResultCard: FC<ListResultCardProps> = ({
                 </Typography>
               }
               action={
-                <OrganizationLogo
-                  logo={findIcon()}
-                  sx={{
-                    width: "auto",
-                    maxWidth: "200px",
-                    height: LIST_CARD_TITLE_HEIGHT,
-                    pr: padding.double,
-                    pl: padding.large,
-                  }}
-                />
+                isSimplified ? null : (
+                  <OrganizationLogo
+                    logo={findIcon()}
+                    sx={{
+                      width: "auto",
+                      maxWidth: "200px",
+                      height: LIST_CARD_TITLE_HEIGHT,
+                      pr: padding.double,
+                      pl: padding.large,
+                    }}
+                  />
+                )
               }
             />
             <CardContent
-              sx={{ p: 0, display: "flex", justifyContent: "space-between" }}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                p: 0,
+                "&:last-child": {
+                  pb: 0,
+                },
+              }}
             >
               <Box sx={{ flex: 1 }}>
                 <Typography
                   arial-label="result-list-card-content"
                   color={fontColor.gray.medium}
-                  fontSize={fontSize.resultCardContent}
+                  fontSize={
+                    isSimplified
+                      ? fontSize.resultCardContentUnderLaptop
+                      : fontSize.resultCardContent
+                  }
                   onClick={() =>
                     isSimplified ? onClickDetail(uuid) : onClickCard(content)
                   }
                   sx={{
-                    padding: 0,
+                    pt: padding.extraSmall,
                     overflow: "hidden",
                     display: "-webkit-box",
                     cursor: "pointer",
-                    WebkitLineClamp:
-                      (isSelectedDataset || showButtons) && !isSimplified
+                    WebkitLineClamp: isSimplified
+                      ? 5
+                      : isSelectedDataset || showButtons
                         ? "4"
                         : "6",
                     WebkitBoxOrient: "vertical",
@@ -183,7 +203,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
               >
                 <ResultCardButtonGroup
                   content={content}
-                  shouldHideText
+                  shouldHideText={isSimplified}
                   onLinks={() => onClickLinks(uuid)}
                   onDownload={
                     onClickDownload
