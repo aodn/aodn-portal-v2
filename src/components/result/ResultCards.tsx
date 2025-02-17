@@ -84,7 +84,8 @@ const renderListCards: FC<ResultCardsListType> = ({
               key={index}
               sx={{
                 // Must hardcode, else the box will expand if not enough height
-                height: LIST_CARD_HEIGHT,
+                height: isSimplified ? "auto" : LIST_CARD_HEIGHT,
+                maxHeight: LIST_CARD_HEIGHT,
               }}
             >
               <ListResultCard

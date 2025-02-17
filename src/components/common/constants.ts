@@ -14,6 +14,10 @@ const pageDefault = {
   landing: "/",
 };
 
+const marineParkDefault = {
+  geojson: "./data/Australian_Marine_Parks_boundaries.json",
+};
+
 const detailPageDefault = {
   ABOUT: "about",
   ASSOCIATED_RECORDS: "associated records",

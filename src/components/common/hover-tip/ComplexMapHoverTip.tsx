@@ -5,6 +5,7 @@ import {
   fontColor,
   fontSize,
   fontWeight,
+  gap,
   padding,
 } from "../../../styles/constants";
 import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
@@ -65,34 +66,30 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   return (
     <Box flex={1} sx={{ ...sx }}>
       <Stack direction="column" spacing={1}>
-        <Box>
+        <Box position="relative">
           <Tooltip title={collection.title} placement="top">
             <Box
               display="flex"
               alignItems="center"
               justifyContent="space-between"
-              height="60px"
+              height="auto"
+              width="90%"
             >
               <Typography
                 fontWeight={fontWeight.bold}
-                fontSize={fontSize.info}
+                fontSize={fontSize.label}
                 sx={{
                   padding: 0,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   display: "-webkit-box",
-                  WebkitLineClamp: "3",
+                  WebkitLineClamp: "5",
                   WebkitBoxOrient: "vertical",
                 }}
               >
                 {collection.title}
               </Typography>
-              <Box
-                display="flex"
-                alignItems="start"
-                justifyContent="center"
-                height="100%"
-              >
+              <Box position="absolute" top={gap.xs} right={gap.xs}>
                 <BookmarkButton dataset={collection} />
               </Box>
             </Box>
@@ -101,10 +98,8 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
         <Box
           arial-label="map"
           id={`${mapContainerId}-${collection.id}`}
-          sx={{
-            width: "100%",
-            height: "130px",
-          }}
+          width="100%"
+          height="130px"
         >
           <Map panelId={`${mapContainerId}-${collection.id}`} animate={false}>
             <Layers>
@@ -120,24 +115,19 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
           onDetail={onDetail}
         />
         <Box>
-          <Tooltip title="More detail..." placement="top">
-            <Typography
-              color={fontColor.gray.medium}
-              fontSize={fontSize.resultCardContent}
-              sx={{
-                padding: 0,
-                paddingX: padding.small,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: "5",
-                WebkitBoxOrient: "vertical",
-                wordBreak: "break-word",
-              }}
-            >
-              {collection.description}
-            </Typography>
-          </Tooltip>
+          <Typography
+            color={fontColor.gray.medium}
+            fontSize={fontSize.resultCardContent}
+            sx={{
+              padding: 0,
+              paddingX: padding.small,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              wordBreak: "break-word",
+            }}
+          >
+            {collection.description}
+          </Typography>
         </Box>
       </Stack>
     </Box>
