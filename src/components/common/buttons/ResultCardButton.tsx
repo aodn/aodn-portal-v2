@@ -39,37 +39,34 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   );
 
   return (
-    <Tooltip title={text} placement="top">
-      <Button
-        onClick={onClick}
-        disabled={disable}
-        sx={{
-          padding: padding.extraSmall,
-          textTransform: "none",
-          opacity: disable ? 0.5 : 1,
-          ...sx,
-        }}
-      >
-        {isValidElement(startIcon) ? (
-          startIcon
-        ) : (
+    <Button
+      onClick={onClick}
+      disabled={disable}
+      sx={{
+        padding: padding.extraSmall,
+        textTransform: "none",
+        opacity: disable ? 0.5 : 1,
+        ...sx,
+      }}
+    >
+      {isValidElement(startIcon) ? (
+        startIcon
+      ) : (
+        <Tooltip title={text} placement="top">
           <IconComponent fontSize="small" sx={{ color: config.color }} />
-        )}
-
-        {text && !shouldHideText && (
-          <Typography
-            padding={0}
-            pl={padding.extraSmall}
-            fontSize={config.size === "small" ? fontSize.label : fontSize.icon}
-            color={
-              config.color === "success" ? color.success.main : config.color
-            }
-          >
-            {text}
-          </Typography>
-        )}
-      </Button>
-    </Tooltip>
+        </Tooltip>
+      )}
+      {text && !shouldHideText && (
+        <Typography
+          padding={0}
+          pl={padding.extraSmall}
+          fontSize={config.size === "small" ? fontSize.label : fontSize.icon}
+          color={config.color === "success" ? color.success.main : config.color}
+        >
+          {text}
+        </Typography>
+      )}
+    </Button>
   );
 };
 
