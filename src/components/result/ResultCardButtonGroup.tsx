@@ -90,6 +90,7 @@ const ButtonContainer: FC<ButtonContainerProps> = ({
     display="flex"
     justifyContent="space-between"
     alignItems="center"
+    height="100%"
     sx={{ ...sx }}
   >
     {children}
@@ -141,7 +142,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
       <ButtonContainer isGridView={isGridView}>
         <ResultCardButton
           startIcon={InfoIcon}
-          text="More details ..."
+          text="More details"
           shouldHideText={shouldHideText}
           disable={onDetail === undefined}
           onClick={onDetail}
