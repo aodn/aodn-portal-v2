@@ -164,6 +164,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
           borderRadius: 0,
           marginTop: "auto",
           height: "auto",
+          maxHeight: "50%",
           width: "100%",
           backgroundColor: "rgba(255, 255, 255, 0.9)",
           pointerEvents: "auto",
@@ -191,6 +192,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
             position: "relative",
             width: isTablet ? "calc(100% - 250px)" : "100%",
             height: "auto",
+            maxHeight: "50%",
           }}
         >
           <Box position="absolute" sx={{ top: gap.md, right: gap.md }}>
