@@ -1,11 +1,15 @@
 import { ElementType, FC, isValidElement } from "react";
 import { Button, SxProps, Tooltip, Typography } from "@mui/material";
-import { color, fontSize, padding } from "../../../styles/constants";
+import { color, padding } from "../../../styles/constants";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 
-interface ResultCardButtonConfig {
+export enum ResultCardButtonSize {
+  SMALL = "small",
+  MEDIUM = "medium",
+}
+export interface ResultCardButtonConfig {
   color?: string;
-  size?: string;
+  size?: ResultCardButtonSize;
 }
 
 interface ResultCardButtonProps {
@@ -20,7 +24,7 @@ interface ResultCardButtonProps {
 
 const defaultResultCardButtonConfig: ResultCardButtonConfig = {
   color: color.blue.dark,
-  size: "small",
+  size: ResultCardButtonSize.SMALL,
 };
 
 const ResultCardButton: FC<ResultCardButtonProps> = ({
@@ -53,14 +57,19 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
         {isValidElement(startIcon) ? (
           startIcon
         ) : (
-          <IconComponent fontSize="small" sx={{ color: config.color }} />
+          <IconComponent
+            sx={{
+              color: config.color,
+              fontSize: config.size === "small" ? "14px" : "18px",
+            }}
+          />
         )}
 
         {text && !shouldHideText && (
           <Typography
             padding={0}
             pl={padding.extraSmall}
-            fontSize={config.size === "small" ? fontSize.label : fontSize.icon}
+            fontSize={config.size === "small" ? "12px" : "14px"}
             color={
               config.color === "success" ? color.success.main : config.color
             }

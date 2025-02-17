@@ -33,16 +33,10 @@ interface PopupConfig {
 
 const defaultPopupConfig: PopupConfig = {
   popupWidth: 250,
-  popupHeight: 370,
+  popupHeight: 375,
 };
 
-const renderLoadingBox = ({
-  popupHeight,
-  popupWidth,
-}: {
-  popupHeight: number;
-  popupWidth: number;
-}) => (
+const renderLoadingBox = ({ popupHeight, popupWidth }: PopupConfig) => (
   <Box
     sx={{
       transition: "opacity 0.2s ease-in-out",

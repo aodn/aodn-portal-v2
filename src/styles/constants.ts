@@ -61,7 +61,9 @@ const fontSize = {
   label: "12px",
   info: "14px",
   resultCardTitle: "14px",
+  resultCardTitleUnderLaptop: "12px",
   resultCardContent: "12px",
+  resultCardContentUnderLaptop: "10px",
 };
 
 const fontFamily = {
