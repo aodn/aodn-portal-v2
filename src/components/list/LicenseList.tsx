@@ -2,14 +2,21 @@ import { Grid, Link, Typography, useTheme } from "@mui/material";
 import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
+import { MODE } from "./CommonDef";
 
 interface LicenseListProps {
-  license: string;
-  url: string;
-  graphic: string;
+  license?: string;
+  url?: string;
+  graphic?: string;
+  mode?: MODE;
 }
 
-const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
+const LicenseList: React.FC<LicenseListProps> = ({
+  license,
+  url,
+  graphic,
+  mode = MODE.NORMAL,
+}) => {
   const theme = useTheme();
   const licenseComponent = useMemo(() => {
     if (!license && !url && !graphic) {
@@ -39,12 +46,20 @@ const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
       </ItemBaseGrid>
     );
   }, [graphic, license, theme.mp.md, url]);
-  return (
-    <ExpandableList
-      title={"License"}
-      childrenList={licenseComponent ? [licenseComponent] : []}
-    />
-  );
+
+  switch (mode) {
+    case MODE.COMPACT:
+      return licenseComponent;
+
+    case MODE.NORMAL:
+    default:
+      return (
+        <ExpandableList
+          title={"License"}
+          childrenList={licenseComponent ? [licenseComponent] : []}
+        />
+      );
+  }
 };
 
 export default LicenseList;

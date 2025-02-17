@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "./NavigatablePanel";
 import LicenseList from "../../../../components/list/LicenseList";
@@ -10,8 +10,14 @@ import SuggestedCitationList from "../../../../components/list/SuggestedCitation
 import CitedResponsiblePartyList from "../../../../components/list/CitedResponsiblePartyList";
 import ConstraintList from "../../../../components/list/ConstraintList";
 import { detailPageDefault } from "../../../../components/common/constants";
+import { MODE } from "../../../../components/list/CommonDef";
+import SideCardContainer from "../side-cards/SideCardContainer";
 
-const CitationPanel = () => {
+interface CitationPanelProps {
+  mode?: MODE;
+}
+
+const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
   const context = useDetailPageContext();
 
   const license = useMemo(
@@ -134,7 +140,23 @@ const CitationPanel = () => {
     ]
   );
 
-  return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
+  switch (mode) {
+    case MODE.COMPACT:
+      return (
+        <SideCardContainer title="License">
+          <LicenseList
+            license={license ? license : ""}
+            url={licenseUrl ? licenseUrl : ""}
+            graphic={licenseGraphic ? licenseGraphic : ""}
+            mode={mode}
+          />
+        </SideCardContainer>
+      );
+
+    case MODE.NORMAL:
+    default:
+      return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
+  }
 };
 
 export default CitationPanel;
