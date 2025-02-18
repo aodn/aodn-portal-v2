@@ -3,6 +3,7 @@ import {
   Box,
   FormControl,
   FormControlLabel,
+  ListSubheader,
   Radio,
   RadioGroup,
 } from "@mui/material";
@@ -130,6 +131,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
           value={selectedOption}
           onChange={handleRadioChange}
         >
+          <ListSubheader>Australia Marine Parks</ListSubheader>
           {locationOptions.map((item) => (
             <FormControlLabel
               value={item.value}
