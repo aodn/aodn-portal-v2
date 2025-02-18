@@ -8,7 +8,7 @@ class CitationTab(BasePage):
     CITED_RESPONSIBLE_PARTIES = 'Cited Responsible Parties'
     LICENSE = 'License'
     SUGGESTED_CITATION = 'Suggested Citation'
-    CONSTRANITS = 'Constraints'
+    CONSTRAINTS = 'Constraints'
 
     def __init__(self, page: Page):
         self.page = page
@@ -21,7 +21,7 @@ class CitationTab(BasePage):
         )
         self.license = self.get_button(self.LICENSE)
         self.suggested_citation = self.get_button(self.SUGGESTED_CITATION)
-        self.constranits = self.get_button(self.CONSTRANITS)
+        self.constraints = self.get_button(self.CONSTRAINTS)
 
     def get_cited_responsible_parties_list(self) -> Locator:
         return self.get_collapse_list(self.CITED_RESPONSIBLE_PARTIES)
@@ -32,5 +32,5 @@ class CitationTab(BasePage):
     def get_suggested_citation_list(self) -> Locator:
         return self.get_collapse_list(self.SUGGESTED_CITATION)
 
-    def get_constranits_list(self) -> Locator:
-        return self.get_collapse_list(self.CONSTRANITS)
+    def get_constraints_list(self) -> Locator:
+        return self.get_collapse_list(self.CONSTRAINTS)

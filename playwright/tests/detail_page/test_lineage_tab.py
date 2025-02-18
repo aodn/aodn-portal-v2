@@ -15,12 +15,12 @@ from pages.detail_page import DetailPage
     ],
 )
 def test_lineage_sections(
-    page_mock: Page,
+    responsive_page: Page,
     title: str,
     uuid: str,
     content: str,
 ) -> None:
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)

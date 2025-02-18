@@ -6,9 +6,9 @@ from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
 
-def test_map_expand_toggle(page_mock: Page) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+def test_map_expand_toggle(desktop_page: Page) -> None:
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
@@ -27,14 +27,14 @@ def test_map_expand_toggle(page_mock: Page) -> None:
         'Grid and Map',
     ],
 )
-def test_grid_and_map_view(page_mock: Page, view_type: str) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+def test_grid_and_map_view(desktop_page: Page, view_type: str) -> None:
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
 
-    search_page.view_button.click()
+    search_page.result_layout_button.click()
     search_page.click_text(view_type)
     expect(search_page.result_grid).to_be_visible()
     expect(search_page.result_card_grid).not_to_have_count(0)
@@ -46,15 +46,15 @@ def test_grid_and_map_view(page_mock: Page, view_type: str) -> None:
         'Full Map View',
     ],
 )
-def test_full_map_view(page_mock: Page, view_type: str) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+def test_full_map_view(responsive_page: Page, view_type: str) -> None:
+    landing_page = LandingPage(responsive_page)
+    search_page = SearchPage(responsive_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
 
     expect(search_page.result_list).to_be_visible()
-    search_page.view_button.click()
+    search_page.result_layout_button.click()
     search_page.click_text(view_type)
     expect(search_page.result_list).not_to_be_visible()
 
@@ -65,15 +65,15 @@ def test_full_map_view(page_mock: Page, view_type: str) -> None:
         'Full List View',
     ],
 )
-def test_full_list_view(page_mock: Page, view_type: str) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+def test_full_list_view(desktop_page: Page, view_type: str) -> None:
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
 
     expect(search_page.main_map).to_be_visible()
-    search_page.view_button.click()
+    search_page.result_layout_button.click()
     search_page.click_text(view_type)
     expect(search_page.main_map).not_to_be_visible()
     expect(search_page.result_list).to_be_visible()
@@ -92,14 +92,14 @@ def test_full_list_view(page_mock: Page, view_type: str) -> None:
     ],
 )
 def test_show_more_results(
-    page_mock: Page,
+    desktop_page: Page,
     chunk_1_first_data: str,
     chunk_1_last_data: str,
     chunk_2_first_data: str,
     chunk_2_last_data: str,
 ) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
@@ -135,11 +135,11 @@ def test_show_more_results(
     ],
 )
 def test_links_button_navigates_to_detail_links_tab(
-    page_mock: Page, link_title: str
+    desktop_page: Page, link_title: str
 ) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
-    detail_page = DetailPage(page_mock)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+    detail_page = DetailPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()

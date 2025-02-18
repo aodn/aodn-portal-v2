@@ -15,10 +15,10 @@ from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
 
-def test_map_drag_updates_search_results(page_mock: Page) -> None:
-    api_router = ApiRouter(page=page_mock)
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+def test_map_drag_updates_search_results(desktop_page: Page) -> None:
+    api_router = ApiRouter(page=desktop_page)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.fill_search_text('imos')
@@ -49,10 +49,10 @@ def test_map_drag_updates_search_results(page_mock: Page) -> None:
     ],
 )
 def test_map_datapoint_hover_and_click(
-    page_mock: Page, title: str, lng: str, lat: str
+    desktop_page: Page, title: str, lng: str, lat: str
 ) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.fill_search_text('imos')
@@ -73,11 +73,11 @@ def test_map_datapoint_hover_and_click(
     ],
 )
 def test_map_updates_on_search_change(
-    page_mock: Page, search_text: str, updated_search_text: str
+    desktop_page: Page, search_text: str, updated_search_text: str
 ) -> None:
-    api_router = ApiRouter(page=page_mock)
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+    api_router = ApiRouter(page=desktop_page)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.fill_search_text(search_text)
@@ -113,10 +113,10 @@ def test_map_updates_on_search_change(
     ],
 )
 def test_map_base_layers(
-    page_mock: Page, layer_text: str, layer_type: LayerType
+    desktop_page: Page, layer_text: str, layer_type: LayerType
 ) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     layer_factory = LayerFactory(search_page.map)
 
@@ -149,15 +149,15 @@ def test_map_base_layers(
     ],
 )
 def test_map_spider(
-    page_mock: Page,
+    desktop_page: Page,
     head_lng: str,
     head_lat: str,
     data_title: str,
     data_lng: str,
     data_lat: str,
 ) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.fill_search_text('imos')
@@ -181,9 +181,9 @@ def test_map_spider(
     expect(search_page.first_result_title).to_have_text(data_title)
 
 
-def test_map_state_persists_with_url(page_mock: Page) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+def test_map_state_persists_with_url(desktop_page: Page) -> None:
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
@@ -198,7 +198,7 @@ def test_map_state_persists_with_url(page_mock: Page) -> None:
 
     # Use the current page URL and open a new tab with the same URL
     current_url = search_page.url
-    new_page = page_mock.context.new_page()
+    new_page = desktop_page.context.new_page()
 
     # Add API mocking to the new page
     api_router = ApiRouter(new_page)
@@ -218,10 +218,10 @@ def test_map_state_persists_with_url(page_mock: Page) -> None:
     assert map_zoom == new_map_zoom
 
 
-def test_map_state_persists_across_page(page_mock: Page) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
-    detail_page = DetailPage(page_mock)
+def test_map_state_persists_across_page(desktop_page: Page) -> None:
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+    detail_page = DetailPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
@@ -244,7 +244,7 @@ def test_map_state_persists_across_page(page_mock: Page) -> None:
     assert map_zoom == new_map_zoom
 
 
-def test_map_buttons(page_mock: Page) -> None:
+def test_map_buttons(desktop_page: Page) -> None:
     """
     Ensures that the map buttons on both the search page and the detail page are displayed correctly.
 
@@ -252,8 +252,8 @@ def test_map_buttons(page_mock: Page) -> None:
     caused the detail page map buttons to disappear. By verifying the visibility of map buttons on
     both pages, it ensures that all expected map buttons are present in their respective contexts.
     """
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
@@ -273,7 +273,7 @@ def test_map_buttons(page_mock: Page) -> None:
     expect(search_page.map.delete_button).to_be_visible()
 
 
-def test_map_zoom_out_and_drag_does_not_crash(page_mock: Page) -> None:
+def test_map_zoom_out_and_drag_does_not_crash(desktop_page: Page) -> None:
     """
     Verifies that zooming out and dragging the map on the search page does not cause the application to crash.
 
@@ -281,8 +281,8 @@ def test_map_zoom_out_and_drag_does_not_crash(page_mock: Page) -> None:
     to crash. By performing a sequence of zoom and drag operations at different levels, it ensures that the
     issue is resolved and does not reoccur.
     """
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
 
     landing_page.load()
     landing_page.search.fill_search_text('imos ships')

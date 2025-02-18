@@ -10,12 +10,14 @@ from pages.detail_page import DetailPage
         '0015db7e-e684-7548-e053-08114f8cd4ad',
     ],
 )
-def test_drawing_shape_adds_download_filter(page_mock: Page, uuid: str) -> None:
+def test_drawing_shape_adds_download_filter(
+    desktop_page: Page, uuid: str
+) -> None:
     """
     Verifies that drawing a rectangular shape on the detail map
     creates a download filter item.
     """
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
     detail_page.wait_for_timeout(1000)
 
@@ -44,13 +46,13 @@ def test_drawing_shape_adds_download_filter(page_mock: Page, uuid: str) -> None:
     ],
 )
 def test_selecting_date_range_adds_download_filter(
-    page_mock: Page, uuid: str
+    desktop_page: Page, uuid: str
 ) -> None:
     """
     Verifies that selecting a date range via the slider
     creates a download filter item.
     """
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
 
     # Select a date range using the slider

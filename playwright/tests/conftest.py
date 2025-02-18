@@ -1,4 +1,4 @@
-from typing import Callable, Generator
+from typing import Any, Callable, Generator
 
 import pytest
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright
@@ -53,15 +53,17 @@ def setup_page(
     browser = playwright.chromium.launch()
     context_kwargs = device_config.device_config or {}
     context = browser.new_context(**context_kwargs)
-    context.is_mobile = device_config.is_mobile
-    context.viewport = device_config.viewport
+    if hasattr(context, 'is_mobile'):
+        context.is_mobile = device_config.is_mobile
+    if hasattr(context, 'viewport'):
+        context.viewport = device_config.viewport
     page = context.new_page()
     apply_mock(page)
     return browser, context, page
 
 
 def create_page_fixture(
-    config_factory: Callable[..., DeviceConfig],
+    config_factory: Any,
 ) -> Callable:
     def _fixture(playwright: Playwright) -> Generator:
         config = (
@@ -82,11 +84,17 @@ def create_page_fixture(
 
 @pytest.fixture
 def desktop_page(playwright: Playwright) -> Generator:
+    """
+    Use the desktop_page fixture to run tests on desktop only
+    """
     yield from create_page_fixture(get_desktop_config)(playwright)
 
 
 @pytest.fixture
 def mobile_page(playwright: Playwright) -> Generator:
+    """
+    Use the mobile_page fixture to run tests on mobile only
+    """
     yield from create_page_fixture(get_mobile_config)(playwright)
 
 
@@ -94,6 +102,9 @@ def mobile_page(playwright: Playwright) -> Generator:
 def responsive_page(
     request: pytest.FixtureRequest, playwright: Playwright
 ) -> Generator:
+    """
+    Use the responsive_page fixture to run tests on both desktop and mobile
+    """
     config_factory = (
         get_desktop_config if request.param == 'desktop' else get_mobile_config
     )

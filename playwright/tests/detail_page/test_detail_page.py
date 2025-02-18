@@ -45,9 +45,9 @@ def test_tab_panel_scroll(desktop_page: Page, title: str) -> None:
     ],
 )
 def test_not_found_item(
-    mobile_page: Page, title: str, uuid: str, tab: str, not_found_item: str
+    responsive_page: Page, title: str, uuid: str, tab: str, not_found_item: str
 ) -> None:
-    detail_page = DetailPage(mobile_page)
+    detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
@@ -105,9 +105,9 @@ def test_contact_details(
     ],
 )
 def test_show_more_and_less_list_items(
-    page_mock: Page, title: str, uuid: str, tab: str, item_list: str
+    responsive_page: Page, title: str, uuid: str, tab: str, item_list: str
 ) -> None:
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
@@ -132,8 +132,8 @@ def test_show_more_and_less_list_items(
         '0015db7e-e684-7548-e053-08114f8cd4ad',
     ],
 )
-def test_dropdown_scroll(page_mock: Page, uuid: str) -> None:
-    detail_page = DetailPage(page_mock)
+def test_dropdown_scroll(responsive_page: Page, uuid: str) -> None:
+    detail_page = DetailPage(responsive_page)
     detail_page.load(uuid)
     # The Download Card with a dropdown
     detail_page.select_elements.first.click()
