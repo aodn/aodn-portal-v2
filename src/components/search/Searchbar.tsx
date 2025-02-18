@@ -103,10 +103,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           },
           alignItems: "center",
           height: "100%",
-          border:
-            location.pathname === pageDefault.search
-              ? `${border.sm} ${color.brightBlue.semiTransparentDark}`
-              : "none",
+          border: `${border.sm} ${color.brightBlue.semiTransparentDark}`,
           borderRadius: borderRadius.small,
           backgroundColor: { xs: "transparent", sm: "#fff" },
           paddingY: gap.md,

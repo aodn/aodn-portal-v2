@@ -45,9 +45,12 @@ const padding = {
 const fontSize = {
   AODNSiteLogoText: "14px",
   AODNSiteLogoTextMobile: "12px",
-  bannerTitleLarge: "78px",
-  bannerTitleMedium: "62px",
-  bannerSubtitle: "20px",
+  bannerTitleExtraLarge: "64px",
+  bannerTitleLarge: "48px",
+  bannerTitleMedium: "36px",
+  bannerTitleSmall: "28px",
+  bannerSubtitle: "14px",
+  bannerSubtitleSmall: "12px",
   mapMenuItem: 14,
   mapMenuSubItem: 13,
   detailPageHeading: "20px",
@@ -63,7 +66,7 @@ const fontSize = {
   resultCardTitle: "14px",
   resultCardTitleUnderLaptop: "12px",
   resultCardContent: "12px",
-  resultCardContentUnderLaptop: "10px",
+  resultCardContentUnderLaptop: "12px",
 };
 
 const fontFamily = {
@@ -81,6 +84,7 @@ const fontWeight = {
 
 const fontColor = {
   gray: {
+    extraDark: "#3C3C3C",
     dark: "#575757",
     medium: "#787878",
     light: "#979797",
@@ -155,10 +159,12 @@ const zIndex = {
   MAP_COORD: 1,
   FILTER_MODAL: 9,
   FILTER_OVERLAY: 10,
+  header: 100,
 };
 
 const shadow = {
   inner: "inset 1px 1px rgba(0, 0, 0, 0.1)",
+  bottom: "0 2px 2px 0 rgba(0, 0, 0, 0.1)",
 };
 
 export {
