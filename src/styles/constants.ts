@@ -50,7 +50,7 @@ const fontSize = {
   bannerTitleMedium: "36px",
   bannerTitleSmall: "28px",
   bannerSubtitle: "14px",
-  bannerSubtitleSmall: "12px",
+  bannerSubtitleSmall: "10px",
   mapMenuItem: 14,
   mapMenuSubItem: 13,
   detailPageHeading: "20px",
