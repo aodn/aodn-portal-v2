@@ -6,6 +6,8 @@ import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import lodash from "lodash";
 import { TestHelper } from "../../common/test/helper";
 import { MapDefaultConfig } from "./constants";
+import { Paper } from "@mui/material";
+import { padding } from "../../../styles/constants";
 
 export interface MapBasicType {
   centerLongitude?: number;
@@ -17,6 +19,7 @@ export interface MapBasicType {
   panelId: string;
   animate?: boolean;
   projection?: Projection | string;
+  announcement?: string;
   onZoomEvent?: (
     event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
   ) => void;
@@ -70,6 +73,7 @@ const ReactMap = ({
   maxZoom = MapDefaultConfig.MAX_ZOOM,
   projection = MapDefaultConfig.PROJECTION,
   animate = false,
+  announcement = undefined,
   onZoomEvent,
   onMoveEvent,
   children,
@@ -216,6 +220,29 @@ const ReactMap = ({
 
   return (
     <MapContext.Provider value={{ map }}>
+      <Paper
+        data-testid="announcement-panel"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "absolute",
+          height: "100%",
+          width: "100%",
+          background: "transparent",
+          pointerEvents: announcement?.startsWith("model") ? undefined : "none",
+          visibility: announcement ? "visible" : "hidden",
+        }}
+      >
+        <Paper
+          sx={{
+            padding: padding.medium,
+            backgroundColor: "white",
+          }}
+        >
+          {announcement?.replace(/^model:/, "")}
+        </Paper>
+      </Paper>
       <TestHelper mapId={panelId} getMap={() => map} />
       {children}
     </MapContext.Provider>

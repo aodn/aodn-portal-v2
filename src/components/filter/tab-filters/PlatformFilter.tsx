@@ -17,7 +17,7 @@ interface PlatformFilterProps extends TabFilterType {
   sx?: SxProps;
 }
 
-// TODO: fetch from ogcapi or align with ogcapi keywords
+// The value needs to match ARDC AODN Platform Category Vocabulary
 const PLATFORMS = [
   {
     value: "satellite",
@@ -35,7 +35,7 @@ const PLATFORMS = [
     icon: <FloatIcon />,
   },
   {
-    value: "moorings-buoy",
+    value: "mooring and buoy",
     label: "Moorings & Buoy",
     icon: <MooringsBuoyIcon />,
   },
@@ -50,7 +50,7 @@ const PLATFORMS = [
     icon: <AircraftIcon />,
   },
   {
-    value: "bio-platform",
+    value: "biological platform",
     label: "Bio Platform",
     icon: <BioPlatformIcon />,
   },

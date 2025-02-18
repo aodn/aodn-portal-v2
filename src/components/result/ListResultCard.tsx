@@ -34,7 +34,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   onClickCard = () => {},
   onClickDetail = () => {},
   onClickLinks = () => {},
-  onClickDownload = () => {},
+  onClickDownload = undefined,
   selectedUuid,
   isSimplified = false,
   sx,
@@ -71,6 +71,9 @@ const ListResultCard: FC<ListResultCardProps> = ({
         onMouseLeave={() => setShowButtons(false)}
         data-testid="result-card-list"
       >
+        <Box position="absolute" top={gap.md} right={gap.md}>
+          <BookmarkButton dataset={content} />
+        </Box>
         <Box
           display="flex"
           flexDirection="column"
@@ -80,19 +83,31 @@ const ListResultCard: FC<ListResultCardProps> = ({
         >
           <Box maxHeight={isSimplified ? "100%" : "80%"}>
             <CardHeader
-              sx={{ p: 0 }}
+              sx={{
+                height: "auto",
+                width: "90%",
+                p: 0,
+                "& .MuiCardHeader-action": {
+                  margin: 0,
+                },
+              }}
               title={
                 <Typography
                   onClick={() => onClickDetail(uuid)}
                   color={fontColor.gray.dark}
-                  fontSize={fontSize.resultCardTitle}
+                  fontSize={
+                    isSimplified
+                      ? fontSize.resultCardTitleUnderLaptop
+                      : fontSize.resultCardTitle
+                  }
                   fontWeight={fontWeight.bold}
                   title={title}
+                  padding={0}
                   sx={{
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     display: "-webkit-box",
-                    WebkitLineClamp: "2",
+                    WebkitLineClamp: isSimplified ? undefined : "2",
                     WebkitBoxOrient: "vertical",
                     cursor: "pointer",
                     alignItems: "flex-start",
@@ -105,35 +120,50 @@ const ListResultCard: FC<ListResultCardProps> = ({
                 </Typography>
               }
               action={
-                <OrganizationLogo
-                  logo={findIcon()}
-                  sx={{
-                    width: "auto",
-                    maxWidth: "200px",
-                    height: LIST_CARD_TITLE_HEIGHT,
-                    paddingX: padding.double,
-                  }}
-                />
+                isSimplified ? null : (
+                  <OrganizationLogo
+                    logo={findIcon()}
+                    sx={{
+                      width: "auto",
+                      maxWidth: "200px",
+                      height: LIST_CARD_TITLE_HEIGHT,
+                      pr: padding.double,
+                      pl: padding.large,
+                    }}
+                  />
+                )
               }
             />
             <CardContent
-              sx={{ p: 0, display: "flex", justifyContent: "space-between" }}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                p: 0,
+                "&:last-child": {
+                  pb: 0,
+                },
+              }}
             >
               <Box sx={{ flex: 1 }}>
                 <Typography
                   arial-label="result-list-card-content"
                   color={fontColor.gray.medium}
-                  fontSize={fontSize.resultCardContent}
+                  fontSize={
+                    isSimplified
+                      ? fontSize.resultCardContentUnderLaptop
+                      : fontSize.resultCardContent
+                  }
                   onClick={() =>
                     isSimplified ? onClickDetail(uuid) : onClickCard(content)
                   }
                   sx={{
-                    padding: 0,
+                    pt: padding.extraSmall,
                     overflow: "hidden",
                     display: "-webkit-box",
                     cursor: "pointer",
-                    WebkitLineClamp:
-                      (isSelectedDataset || showButtons) && !isSimplified
+                    WebkitLineClamp: isSimplified
+                      ? 5
+                      : isSelectedDataset || showButtons
                         ? "4"
                         : "6",
                     WebkitBoxOrient: "vertical",
@@ -173,32 +203,19 @@ const ListResultCard: FC<ListResultCardProps> = ({
               >
                 <ResultCardButtonGroup
                   content={content}
-                  shouldHideText
+                  shouldHideText={isSimplified}
                   onLinks={() => onClickLinks(uuid)}
-                  onDownload={() => onClickDownload(uuid)}
+                  onDownload={
+                    onClickDownload
+                      ? () => onClickDownload(uuid)
+                      : onClickDownload
+                  }
                   onDetail={() => onClickDetail(uuid)}
                 />
               </CardActions>
             </Box>
           )}
         </Box>
-        <Stack
-          direction="column"
-          flexWrap="nowrap"
-          justifyContent="space-around"
-          alignItems="center"
-          height="100%"
-        >
-          <Box
-            position="absolute"
-            top={gap.lg}
-            right={gap.lg}
-            height="20px"
-            width="auto"
-          >
-            <BookmarkButton dataset={content} />
-          </Box>
-        </Stack>
       </Card>
     );
   }

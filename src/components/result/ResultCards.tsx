@@ -70,31 +70,37 @@ const renderListCards: FC<ResultCardsListType> = ({
   return (
     <Box sx={sx} data-testid="resultcard-result-list">
       <Grid container spacing={1}>
-        {contents.result.collections.map((collection, index) => (
-          // TODO: change to key={collection.id} will find a bug that there exists datasets with same key (duplicated datasets). Need to check front end fetch more or backend
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            md={isFullListView ? 4 : 12}
-            lg={isFullListView ? 3 : 12}
-            key={index}
-            sx={{
-              // Must hardcode, else the box will expand if not enough height
-              height: LIST_CARD_HEIGHT,
-            }}
-          >
-            <ListResultCard
-              content={collection}
-              onClickCard={onClickCard}
-              onClickDetail={onClickDetail}
-              onClickLinks={onClickLinks}
-              onClickDownload={onClickDownload}
-              selectedUuid={selectedUuid}
-              isSimplified={isSimplified}
-            />
-          </Grid>
-        ))}
+        {contents.result.collections.map(
+          (collection: OGCCollection, index: number) => (
+            // TODO: change to key={collection.id} will find a bug that there exists datasets
+            // with same key (duplicated datasets). Need to check front end fetch more or backend
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={isFullListView ? 4 : 12}
+              lg={isFullListView ? 3 : 12}
+              key={index}
+              sx={{
+                // Must hardcode, else the box will expand if not enough height
+                height: isSimplified ? "auto" : LIST_CARD_HEIGHT,
+                maxHeight: LIST_CARD_HEIGHT,
+              }}
+            >
+              <ListResultCard
+                content={collection}
+                onClickCard={onClickCard}
+                onClickDetail={onClickDetail}
+                onClickLinks={onClickLinks}
+                onClickDownload={
+                  collection.hasSummaryFeature() ? onClickDownload : undefined
+                }
+                selectedUuid={selectedUuid}
+                isSimplified={isSimplified}
+              />
+            </Grid>
+          )
+        )}
         {renderLoadMoreButton && count < total && (
           <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
             {renderLoadMoreButton()}
@@ -123,30 +129,34 @@ const renderGridCards: FC<ResultCardsListType> = ({
   return (
     <Box sx={sx} data-testid="resultcard-result-grid">
       <Grid container spacing={1}>
-        {contents.result.collections.map((collection, index) => (
-          <Grid
-            item
-            xs={6}
-            sm={4}
-            md={6}
-            lg={6}
-            key={index}
-            sx={{
-              // Must hardcode, else the box will expand if not enough height
-              height: GRID_CARD_HEIGHT,
-            }}
-          >
-            <GridResultCard
-              content={collection}
-              onClickCard={onClickCard}
-              onClickDetail={onClickDetail}
-              onClickLinks={onClickLinks}
-              onClickDownload={onClickDownload}
-              selectedUuid={selectedUuid}
-              isSimplified={isSimplified}
-            />
-          </Grid>
-        ))}
+        {contents.result.collections.map(
+          (collection: OGCCollection, index: number) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={6}
+              lg={6}
+              key={index}
+              sx={{
+                // Must hardcode, else the box will expand if not enough height
+                height: GRID_CARD_HEIGHT,
+              }}
+            >
+              <GridResultCard
+                content={collection}
+                onClickCard={onClickCard}
+                onClickDetail={onClickDetail}
+                onClickLinks={onClickLinks}
+                onClickDownload={
+                  collection.hasSummaryFeature() ? onClickDownload : undefined
+                }
+                selectedUuid={selectedUuid}
+                isSimplified={isSimplified}
+              />
+            </Grid>
+          )
+        )}
         {renderLoadMoreButton && count < total && (
           <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
             {renderLoadMoreButton()}

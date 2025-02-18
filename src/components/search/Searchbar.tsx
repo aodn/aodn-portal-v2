@@ -34,7 +34,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const [shouldExpandAllButtons, setShouldExpandAllButtons] = useState<boolean>(
     location.pathname === pageDefault.landing
   );
-  // set the default value to false to allow user do search without typing anything
+  // set the default value false to allow user do search without typing anything
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
   const { ref, width: searchbarWidth } = useElementSize();
   const redirectSearch = useRedirectSearch();
@@ -92,6 +92,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   return (
     <Box width="100%" ref={boxRef}>
       <Paper
+        id="searchbar-paper"
         ref={ref}
         elevation={0}
         sx={{
@@ -127,7 +128,13 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           shouldShrinkAllButtons={
             isMobile && location.pathname === pageDefault.search
           }
-          sx={{ pr: gap.md }}
+          sx={{
+            pr: gap.md,
+            width:
+              isMobile && location.pathname === pageDefault.landing
+                ? "100%"
+                : "auto",
+          }}
         />
       </Paper>
       <ClickAwayListener onClickAway={handleClickAway}>

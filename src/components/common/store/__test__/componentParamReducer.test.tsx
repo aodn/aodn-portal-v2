@@ -144,7 +144,7 @@ describe("Component Reducer Function Test", () => {
           label: "cat2",
         },
       ],
-      polygon: bboxPolygon([10, 20, -10.1, -20.0]),
+      bbox: bboxPolygon([10, 20, -10.1, -20.0]),
     };
 
     console.debug(JSON.stringify(sample5, null, 2));

@@ -5,15 +5,15 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
 import {
   fontColor,
   fontSize,
   fontWeight,
-  padding,
+  gap,
   zIndex,
 } from "../../../../styles/constants";
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import MapContext from "../MapContext";
 import { useAppDispatch } from "../../../common/store/hooks";
 import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
@@ -26,6 +26,8 @@ import Layers from "../layers/Layers";
 import GeojsonLayer from "../layers/GeojsonLayer";
 import ResultCardButtonGroup from "../../../result/ResultCardButtonGroup";
 import { SEARCH_PAGE_REFERER } from "../../../../pages/search-page/constants";
+import BookmarkButton from "../../../bookmark/BookmarkButton";
+import { ResultCardButtonSize } from "../../../common/buttons/ResultCardButton";
 
 interface CardPopupProps {
   layerId: string;
@@ -40,7 +42,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
 }) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
-  const { isUnderLaptop, isTablet } = useBreakpoint();
+  const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
   const panel = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState<OGCCollection>(new OGCCollection());
 
@@ -76,15 +78,30 @@ const CardPopup: React.FC<CardPopupProps> = ({
   useEffect(() => {
     const onMouseClick = (ev: MapLayerMouseEvent): void => {
       if (ev.target && map && panel && panel.current) {
-        if (ev.features && ev.features.length > 0) {
-          const feature = ev.features[0] as Feature<Point>;
+        // Convert click coordinates to point for feature querying
+        const point = map.project(ev.lngLat);
+        // Query features from the specified layer at the clicked point
+        const features = point
+          ? map.queryRenderedFeatures(point, {
+              layers: [layerId],
+            })
+          : [];
+
+        // Check if we found any features at the clicked location
+        if (features && features.length > 0) {
+          const feature = features[0] as Feature<Point>;
           const uuid = feature?.properties?.uuid as string;
 
-          getCollectionData(uuid).then((collection) => {
-            collection && setContent(collection);
-          });
-          panel.current.style.visibility = "visible";
+          if (uuid) {
+            getCollectionData(uuid).then((collection) => {
+              collection && setContent(collection);
+            });
+            panel.current.style.visibility = "visible";
+          } else {
+            panel.current.style.visibility = "hidden";
+          }
         } else {
+          // If no features found (i.e. click in empty space), hide the popup
           panel.current.style.visibility = "hidden";
         }
       }
@@ -110,7 +127,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
     };
 
     if (isUnderLaptop) {
-      map?.on("click", layerId, onMouseClick);
+      map?.on("click", onMouseClick);
       map?.on("moveend", onMouseMoved);
       // Handle case when move out of map without leaving popup box
       // then do a search
@@ -118,7 +135,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
     }
 
     return () => {
-      map?.off("click", layerId, onMouseClick);
+      map?.off("click", onMouseClick);
       map?.off("moveend", onMouseMoved);
       map?.off("sourcedata", onSourceChange);
     };
@@ -146,7 +163,8 @@ const CardPopup: React.FC<CardPopupProps> = ({
           display: "flex",
           borderRadius: 0,
           marginTop: "auto",
-          height: "30%",
+          height: "auto",
+          maxHeight: "50%",
           width: "100%",
           backgroundColor: "rgba(255, 255, 255, 0.9)",
           pointerEvents: "auto",
@@ -169,16 +187,27 @@ const CardPopup: React.FC<CardPopupProps> = ({
             </Map>
           </CardMedia>
         )}
-        <CardContent sx={{ width: isTablet ? "calc(100% - 250px)" : "100%" }}>
+        <CardContent
+          sx={{
+            position: "relative",
+            width: isTablet ? "calc(100% - 250px)" : "100%",
+            height: "auto",
+            maxHeight: "50%",
+          }}
+        >
+          <Box position="absolute" sx={{ top: gap.md, right: gap.md }}>
+            <BookmarkButton dataset={content} />
+          </Box>
           <Typography
             fontWeight={fontWeight.bold}
-            fontSize={fontSize.info}
+            fontSize={isMobile ? fontSize.label : fontSize.info}
             sx={{
+              width: "95%",
               padding: 0,
               overflow: "hidden",
               textOverflow: "ellipsis",
               display: "-webkit-box",
-              WebkitLineClamp: "3",
+              WebkitLineClamp: "5",
               WebkitBoxOrient: "vertical",
             }}
           >
@@ -190,11 +219,10 @@ const CardPopup: React.FC<CardPopupProps> = ({
               fontSize={fontSize.resultCardContent}
               sx={{
                 padding: 0,
-                paddingX: padding.small,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
-                WebkitLineClamp: "5",
+                WebkitLineClamp: "4",
                 WebkitBoxOrient: "vertical",
                 wordBreak: "break-word",
               }}

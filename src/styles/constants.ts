@@ -43,12 +43,15 @@ const padding = {
 };
 
 const fontSize = {
+  AODNSiteLogoText: "14px",
+  AODNSiteLogoTextMobile: "12px",
   bannerTitleLarge: "78px",
   bannerTitleMedium: "62px",
   bannerSubtitle: "20px",
   mapMenuItem: 14,
   mapMenuSubItem: 13,
   detailPageHeading: "20px",
+  detailPageHeadingMobile: "14px",
   newsHeading: "40px",
   newsTitle: "20px",
   newsLabel: "16px",
@@ -58,7 +61,9 @@ const fontSize = {
   label: "12px",
   info: "14px",
   resultCardTitle: "14px",
+  resultCardTitleUnderLaptop: "12px",
   resultCardContent: "12px",
+  resultCardContentUnderLaptop: "10px",
 };
 
 const fontFamily = {

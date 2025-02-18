@@ -41,7 +41,6 @@ export type SearchParameters = {
 };
 // Control the behavior of search behavior not part of the query
 export type SearchControl = {
-  includeNoSpatialExtents?: boolean;
   pagesize?: number;
   searchafter?: Array<string>;
   score?: number;
@@ -96,7 +95,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     properties:
       param.properties !== undefined
         ? param.properties
-        : "id,title,description,status,links",
+        : "id,title,description,status,links,assets_summary",
   };
 
   if (param.text !== undefined && param.text.length !== 0) {
@@ -339,7 +338,6 @@ const createSearchParamFrom = (
   const c = mergeWithDefaults(
     {
       score: DEFAULT_SEARCH_SCORE,
-      includeNoSpatialExtents: true,
     } as SearchControl,
     control
   );
@@ -405,13 +403,15 @@ const createSearchParamFrom = (
     }
   }
 
-  if (i.polygon) {
-    //const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
+  if (i.bbox) {
     const f = cqlDefaultFilters.get(
-      c.includeNoSpatialExtents
-        ? "BBOX_POLYGON_OR_EMPTY_EXTENTS"
-        : "BBOX_POLYGON"
+      i.polygon ? "BBOX_POLYGON" : "BBOX_POLYGON_OR_EMPTY_EXTENTS"
     ) as PolygonOperation;
+    p.filter = appendFilter(p.filter, f(i.bbox));
+  }
+
+  if (i.polygon) {
+    const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
     p.filter = appendFilter(p.filter, f(i.polygon));
   }
 

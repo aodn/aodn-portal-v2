@@ -255,7 +255,7 @@ const theme: ThemeOptions = {
     "0 0 10px rgba(0, 0, 0, 0.1)", // banner heading
     "0 0 30px rgba(0, 0, 0, 1.9)", // banner subtitle
     "inset 1px 1px rgba(0, 0, 0, 0.1)", // detail page select
-    "placeholder",
+    "0 0 10px rgba(0, 0, 0, 0.1)", // share button header
     "placeholder",
     "placeholder",
     "placeholder",

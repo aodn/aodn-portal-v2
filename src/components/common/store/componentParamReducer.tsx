@@ -13,6 +13,7 @@ const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = "UPDATE_SEARCH_TEXT_FILTER_VARIABLE";
 const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
   "UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE";
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
+const UPDATE_BBOX_FILTER_VARIABLE = "UPDATE_BBOX_FILTER_VARIABLE";
 const UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE =
   "UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE";
 const UPDATE_PLATFORM_FILTER_VARIABLE = "UPDATE_PLATFORM_FILTER_VARIABLE";
@@ -25,6 +26,27 @@ const UPDATE_HAS_DATA = "UPDATE_HAS_DATA";
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
   MapDefaultConfig.BBOX_ENDPOINTS;
 
+// The default area now is Australia. When changing it, please make
+// sure it matches the default centerLongitude, centerLatitude, and
+// zoom level in the Map.tsx
+const DEFAULT_SEARCH_LOCATION: Feature<Polygon> = {
+  type: "Feature",
+  bbox: [WEST_LON, SOUTH_LAT, EAST_LON, NORTH_LAT],
+  geometry: {
+    type: "Polygon",
+    coordinates: [
+      [
+        [WEST_LON, SOUTH_LAT],
+        [EAST_LON, SOUTH_LAT],
+        [EAST_LON, NORTH_LAT],
+        [WEST_LON, NORTH_LAT],
+        [WEST_LON, SOUTH_LAT],
+      ],
+    ],
+  },
+  properties: {},
+};
+
 export interface DataTimeFilterRange {
   // Cannot use Date in Redux as it is non-serializable
   start?: number | undefined;
@@ -32,7 +54,8 @@ export interface DataTimeFilterRange {
 }
 
 export interface ParameterState {
-  polygon?: Feature<Polygon, GeoJsonProperties>;
+  bbox?: Feature<Polygon>;
+  polygon?: Feature<Polygon>;
   isImosOnlyDataset?: boolean;
   hasCOData?: boolean;
   dateTimeFilterRange?: DataTimeFilterRange;
@@ -100,6 +123,15 @@ const updateFilterPolygon = (
   };
 };
 
+const updateFilterBBox = (
+  bbox: Feature<Polygon, GeoJsonProperties> | undefined
+): ActionType => {
+  return {
+    type: UPDATE_BBOX_FILTER_VARIABLE,
+    payload: { bbox: bbox } as ParameterState,
+  };
+};
+
 const updateImosOnly = (isImosOnly: boolean | undefined): ActionType => {
   return {
     type: UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE,
@@ -162,7 +194,7 @@ const updateZoom = (input: number | undefined): ActionType => {
 
 // Initial State
 const createInitialParameterState = (
-  withDefaultPolygon: boolean = true
+  withDefaultBBox: boolean = true
 ): ParameterState => {
   const state: ParameterState = {
     isImosOnlyDataset: false,
@@ -171,27 +203,8 @@ const createInitialParameterState = (
     zoom: MapDefaultConfig.ZOOM,
   };
 
-  if (withDefaultPolygon) {
-    // The default area now is Australia. When changing it, please make
-    // sure it matches the default centerLongitude, centerLatitude, and
-    // zoom level in the Map.tsx
-    state.polygon = {
-      type: "Feature",
-      bbox: [WEST_LON, SOUTH_LAT, EAST_LON, NORTH_LAT],
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [WEST_LON, SOUTH_LAT],
-            [EAST_LON, SOUTH_LAT],
-            [EAST_LON, NORTH_LAT],
-            [WEST_LON, NORTH_LAT],
-            [WEST_LON, SOUTH_LAT],
-          ],
-        ],
-      },
-      properties: {},
-    };
+  if (withDefaultBBox) {
+    state.bbox = DEFAULT_SEARCH_LOCATION;
   }
 
   return state;
@@ -235,6 +248,11 @@ const paramReducer = (
       return {
         ...state,
         polygon: action.payload.polygon,
+      };
+    case UPDATE_BBOX_FILTER_VARIABLE:
+      return {
+        ...state,
+        bbox: action.payload.bbox,
       };
     case UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE:
       return {
@@ -368,14 +386,14 @@ const unFlattenToParameterState = (input: string): ParameterState => {
     }
   }
 
-  // Special handle for polygon
-  if (Object.prototype.hasOwnProperty.call(result, "polygon")) {
-    // By default empty object will not be serialized, so when deserialize, we may miss some default empty value
+  // Special handle for bbox
+  if (Object.prototype.hasOwnProperty.call(result, "bbox")) {
+    // By default, empty object will not be serialized, so when de-serialize, we may miss some default empty value
     // in this case the polygon "properties" fields is missing, so we add it back by create an empty default object
     // then update all attributes with the same
-    result.polygon = {
+    result.bbox = {
       ...bboxPolygon([0, 0, 0, 0]),
-      ...result.polygon,
+      ...result.bbox,
     };
   }
   return result;
@@ -384,11 +402,13 @@ const unFlattenToParameterState = (input: string): ParameterState => {
 export default paramReducer;
 
 export {
+  DEFAULT_SEARCH_LOCATION,
   formatToUrlParam,
   unFlattenToParameterState,
   updateDateTimeFilterRange,
   updateSearchText,
   updateImosOnly,
+  updateFilterBBox,
   updateFilterPolygon,
   updateParameterVocabs,
   updatePlatform,

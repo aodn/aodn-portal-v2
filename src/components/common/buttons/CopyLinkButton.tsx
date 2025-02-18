@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { Button, Typography } from "@mui/material";
 import {
   border,
@@ -9,6 +9,7 @@ import {
   padding,
 } from "../../../styles/constants";
 import DoneIcon from "@mui/icons-material/Done";
+import useCopyToClipboard from "../../../hooks/useCopyToClipboard";
 
 const CopyLinkButton = ({
   index,
@@ -19,22 +20,14 @@ const CopyLinkButton = ({
   setClickedCopyLinkButtonIndex: Dispatch<SetStateAction<number[]>>;
   copyUrl: string;
 }) => {
-  const [isCopied, setIsCopied] = useState<boolean>(false);
-  const handleCopy = () => {
-    navigator.clipboard
-      .writeText(copyUrl)
-      .then(() => {
-        setIsCopied(true);
-        setClickedCopyLinkButtonIndex((prev) => [...prev, index]);
-      })
-      .catch((err) => {
-        setIsCopied(false);
-        console.error("Failed to copy text: ", err);
-      });
-  };
+  const { isCopied, copyToClipboard } = useCopyToClipboard({
+    onCopySuccess: () => {
+      setClickedCopyLinkButtonIndex((prev) => [...prev, index]);
+    },
+  });
   return (
     <Button
-      onClick={handleCopy}
+      onClick={() => copyToClipboard(copyUrl)}
       sx={{
         position: "relative",
         paddingX: padding.extraLarge,
