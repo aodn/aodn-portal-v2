@@ -12,6 +12,7 @@ import ConstraintList from "../../../../components/list/ConstraintList";
 import { detailPageDefault } from "../../../../components/common/constants";
 import { MODE } from "../../../../components/list/CommonDef";
 import SideCardContainer from "../side-cards/SideCardContainer";
+import { Typography } from "@mui/material";
 
 interface CitationPanelProps {
   mode?: MODE;
@@ -144,6 +145,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     case MODE.COMPACT:
       return (
         <SideCardContainer title="License">
+          <Typography>License</Typography>
           <LicenseList
             license={license ? license : ""}
             url={licenseUrl ? licenseUrl : ""}

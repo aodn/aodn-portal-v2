@@ -28,4 +28,4 @@ const detailPageDefault = {
   SUMMARY: "summary",
 };
 
-export { dateDefault, pageDefault, detailPageDefault };
+export { dateDefault, pageDefault, detailPageDefault, marineParkDefault };
