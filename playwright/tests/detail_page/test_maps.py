@@ -68,7 +68,9 @@ def test_selecting_date_range_adds_download_filter(
         '0015db7e-e684-7548-e053-08114f8cd4ad',
     ],
 )
-def test_spatial_map_click_zooms_detail_map(page_mock: Page, uuid: str) -> None:
+def test_spatial_map_click_zooms_detail_map(
+    desktop_page: Page, uuid: str
+) -> None:
     """
     Verifies that clicking within the Spatial Coverage map
     correctly zooms the detail page map to the selected area.
@@ -97,7 +99,7 @@ def test_spatial_map_click_zooms_detail_map(page_mock: Page, uuid: str) -> None:
             and abs(coord1['lat'] - coord2['lat']) <= tolerance
         )
 
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
     detail_page.wait_for_timeout(2000)
 
