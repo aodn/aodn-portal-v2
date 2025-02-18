@@ -1,4 +1,4 @@
-import { Box, Card, Divider, Typography } from "@mui/material";
+import { Card, Divider, Typography } from "@mui/material";
 import { FC, ReactNode } from "react";
 import {
   borderRadius,
@@ -19,24 +19,25 @@ const SideCardContainer: FC<SideCardContainerProps> = ({ children, title }) => {
         width: { xs: "100%", sm: "48.5%", md: "100%" },
       }}
     >
-      <Box
+      <Card
+        elevation={1}
         sx={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
+          borderRadius: borderRadius.small,
         }}
       >
         <Typography
           paddingY={padding.medium}
           fontSize="16px"
           fontWeight={fontWeight.bold}
+          align="center"
         >
           {title}
         </Typography>
         <Divider sx={{ width: "100%" }} />
-        {children}
-      </Box>
+      </Card>
+      {children}
     </Card>
   );
 };

@@ -145,7 +145,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     case MODE.COMPACT:
       return (
         <SideCardContainer title="License">
-          <Typography>License</Typography>
+          <Typography padding={1}>License</Typography>
           <LicenseList
             license={license ? license : ""}
             url={licenseUrl ? licenseUrl : ""}
