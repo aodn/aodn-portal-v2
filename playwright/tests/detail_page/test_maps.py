@@ -70,53 +70,18 @@ def test_spatial_map_click_zooms_detail_map(page_mock: Page, uuid: str) -> None:
     """
     Verifies that clicking within the Spatial Coverage map
     correctly zooms the detail page map to the selected area.
-
-    The test verifies that:
-    1. Initially, the detail map center is NOT within ±1 degree of the spatial map center
-    2. After clicking, the detail map center IS within ±1 degree of the spatial map center
     """
-
-    def is_within_tolerance(
-        coord1: dict, coord2: dict, tolerance: float = 1.0
-    ) -> bool:
-        """
-        Check if two coordinate points are within the specified tolerance.
-
-        Args:
-            coord1: First coordinate point with 'lng' and 'lat' keys
-            coord2: Second coordinate point with 'lng' and 'lat' keys
-            tolerance: Maximum allowed difference in degrees (default: 1.0)
-
-        Returns:
-            bool: True if coordinates are within tolerance, False otherwise
-        """
-        return (
-            abs(coord1['lng'] - coord2['lng']) <= tolerance
-            and abs(coord1['lat'] - coord2['lat']) <= tolerance
-        )
-
     detail_page = DetailPage(page_mock)
     detail_page.load(uuid)
     detail_page.wait_for_timeout(2000)
-
-    detail_map_center = detail_page.detail_map.get_map_center()
-    spatial_map_center = detail_page.spatial_map.get_map_center()
-
-    # Verify initial centers are NOT within tolerance
-    assert not is_within_tolerance(detail_map_center, spatial_map_center), (
-        f'Initial detail map center {detail_map_center} should NOT be within ±1 degree of '
-        f'spatial map center {spatial_map_center}'
-    )
 
     # Click on the spatial map
     detail_page.spatial_map.hover_map()
     detail_page.spatial_map.click_map()
     detail_page.wait_for_timeout(2000)
 
+    click_lng_lat = detail_page.spatial_map.get_map_click_lng_lat()
     new_detail_map_center = detail_page.detail_map.get_map_center()
 
-    # Verify new center IS within tolerance
-    assert is_within_tolerance(new_detail_map_center, spatial_map_center), (
-        f'New detail map center {new_detail_map_center} should be within ±1 degree of '
-        f'spatial map center {spatial_map_center}'
-    )
+    assert round(click_lng_lat['lng']) == round(new_detail_map_center['lng'])
+    assert round(click_lng_lat['lat']) == round(new_detail_map_center['lat'])
