@@ -2,7 +2,7 @@ from playwright.sync_api import Page
 
 from pages.base_page import BasePage
 from pages.components.tabs.about import AboutTab
-from pages.components.tabs.abstract import AbstractTab
+from pages.components.tabs.summary import SummaryTab
 from pages.components.tabs.associated_records import AssociatedRecordsTab
 from pages.components.tabs.citation import CitationTab
 from pages.components.tabs.global_attr import GlobalAttrTab
@@ -16,7 +16,7 @@ class TabContainerComponent(BasePage):
         self.page = page
 
         # Tabs
-        self.abstract = AbstractTab(page)
+        self.abstract = SummaryTab(page)
         self.about = AboutTab(page)
         self.links = LinksTab(page)
         self.lineage = LineageTab(page)
