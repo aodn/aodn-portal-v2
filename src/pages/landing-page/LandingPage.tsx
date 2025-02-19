@@ -1,5 +1,4 @@
 import { FC, useCallback } from "react";
-import { Box } from "@mui/material";
 import Layout from "../../components/layout/layout";
 import Banner from "./subpages/banner/Banner";
 import Searchbar from "../../components/search/Searchbar";
@@ -58,15 +57,7 @@ const LandingPage: FC = () => {
           paddingY: padding.double,
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <SmartPanel handleClickSmartCard={handleClickSmartCard} />
-        </Box>
+        <SmartPanel handleClickSmartCard={handleClickSmartCard} />
       </SectionContainer>
 
       {/*commented out the StoryBoardPanel for demo purposes*/}

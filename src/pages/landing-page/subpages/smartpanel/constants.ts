@@ -26,9 +26,9 @@ export const SMART_PANEL_GAP = 16;
 
 export const SMART_PANEL_ROWS = 2;
 
-const SMART_PANEL_COLS_DESKTOP = 10;
+const SMART_PANEL_COLS_DESKTOP = 10; // Change this number carefully, it will affect the fixed width of smart panel
 const SMART_PANEL_COLS_LAPTOP = 8;
-const SMART_PANEL_COLS_TABLET = 5;
+const SMART_PANEL_COLS_TABLET = 6;
 const SMART_PANEL_COLS_MOBILE = 3;
 
 export const SMART_CARD_ICON_BOX_SIZE = 90;

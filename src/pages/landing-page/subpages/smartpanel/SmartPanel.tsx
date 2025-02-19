@@ -40,7 +40,7 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
       {!isAboveDesktop && (
-        <Box pr={padding.medium}>
+        <Box sx={{ pr: { sm: padding.small } }}>
           <IconButton onClick={() => handleScroll(-SMART_PANEL_WIDTH / 3)}>
             <ArrowBackIosNewIcon
               sx={{
@@ -88,7 +88,7 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
         </Stack>
       </Box>
       {!isAboveDesktop && (
-        <Box pl={padding.medium}>
+        <Box sx={{ pl: { sm: padding.small } }}>
           <IconButton onClick={() => handleScroll(SMART_PANEL_WIDTH / 3)}>
             <ArrowForwardIosIcon
               sx={{

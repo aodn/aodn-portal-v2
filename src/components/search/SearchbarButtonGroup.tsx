@@ -189,7 +189,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
           shouldShrinkAllButtons
             ? false
             : shouldExpandAllButtons
-              ? true
+              ? false
               : activeButton === SearchbarButtonNames.Search
         }
         buttonSx={{
