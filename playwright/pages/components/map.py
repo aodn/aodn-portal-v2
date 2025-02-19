@@ -167,3 +167,10 @@ class Map(BasePage):
     def find_and_click_cluster(self) -> bool:
         """Find and click on a cluster on the map"""
         return execute_map_js(self.page, 'findAndClickCluster', self.map_id)
+
+    def get_map_click_lng_lat(self) -> dict:
+        """Get the lnglat of the last clicked point on the map"""
+        click_coordinate = execute_map_js(
+            self.page, 'getMapClickLngLat', self.map_id
+        )
+        return dict(click_coordinate)
