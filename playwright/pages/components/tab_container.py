@@ -15,6 +15,11 @@ class TabContainerComponent(BasePage):
     def __init__(self, page: Page):
         self.page = page
 
+        # locators
+        self.tabs_panel_container = self.page.get_by_test_id(
+            'tabs-panel-container'
+        )
+
         # Tabs
         self.abstract = AbstractTab(page)
         self.about = AboutTab(page)
@@ -26,7 +31,9 @@ class TabContainerComponent(BasePage):
         self.global_attr = GlobalAttrTab(page)
 
     def scroll_right(self) -> None:
-        self.page.get_by_test_id('KeyboardArrowRightIcon').click()
+        self.tabs_panel_container.hover()
+        self.page.mouse.wheel(500, 0)
 
     def scroll_left(self) -> None:
-        self.page.get_by_test_id('KeyboardArrowLeftIcon').click()
+        self.tabs_panel_container.hover()
+        self.page.mouse.wheel(-500, 0)
