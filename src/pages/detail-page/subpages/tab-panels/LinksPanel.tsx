@@ -18,7 +18,10 @@ interface LinksPanelProps {
   type?: TYPE;
 }
 
-const TITLE: Map<string, string> = new Map([["wms", "WMS/GIS Service Link"]]);
+const TITLE: Map<string, string> = new Map([
+  ["wms", "WMS Service Link"],
+  ["wfs", "WFS Service Link"],
+]);
 
 const createCompactLinks = (title: string, links: ILink[] | undefined) => {
   if (links && links.length > 0) {

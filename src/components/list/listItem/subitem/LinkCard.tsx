@@ -60,7 +60,7 @@ const LinkCard: FC<LinkCardProps> = ({
         )}
         <Grid item xs={setClickedCopyLinkButtonIndex ? 10 : 12}>
           <Grid container spacing={1} aria-label="link and title">
-            {icon && (
+            {icon && link.getIcon && (
               <Grid
                 item
                 xs={1}
@@ -79,7 +79,7 @@ const LinkCard: FC<LinkCardProps> = ({
                 />
               </Grid>
             )}
-            <Grid item>
+            <Grid item xs={11}>
               <Box>
                 <Link
                   href={link.href}

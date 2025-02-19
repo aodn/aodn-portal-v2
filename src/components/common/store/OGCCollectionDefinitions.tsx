@@ -26,7 +26,7 @@ export interface ILink {
   href: string;
   type: string;
   title: string;
-  getIcon: () => string;
+  getIcon?: () => string;
 }
 
 export interface IAddress {
