@@ -12,11 +12,13 @@ import ConstraintList from "../../../../components/list/ConstraintList";
 import { detailPageDefault } from "../../../../components/common/constants";
 import { MODE } from "../../../../components/list/CommonDef";
 import SideCardContainer from "../side-cards/SideCardContainer";
-import { Typography } from "@mui/material";
 
 interface CitationPanelProps {
   mode?: MODE;
 }
+
+const TITLE_LICENSE = "License";
+const TITLE_SUGGESTED_CITATION = "Suggested Citation";
 
 const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
   const context = useDetailPageContext();
@@ -111,7 +113,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
         ),
       },
       {
-        title: "License",
+        title: TITLE_LICENSE,
         component: (
           <LicenseList
             license={license ? license : ""}
@@ -121,7 +123,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
         ),
       },
       {
-        title: "Suggested Citation",
+        title: TITLE_SUGGESTED_CITATION,
         component: (
           <SuggestedCitationList suggestedCitation={suggestedCitation ?? ""} />
         ),
@@ -144,8 +146,11 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
   switch (mode) {
     case MODE.COMPACT:
       return (
-        <SideCardContainer title="License">
-          <Typography padding={1}>License</Typography>
+        <SideCardContainer title={TITLE_LICENSE}>
+          <SuggestedCitationList
+            suggestedCitation={suggestedCitation ?? ""}
+            mode={mode}
+          />
           <LicenseList
             license={license ? license : ""}
             url={licenseUrl ? licenseUrl : ""}
