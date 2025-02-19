@@ -7,7 +7,7 @@ import {
   STORYBOARD_VIDEO_WIDTH_LAPTOP,
   STORYBOARD_VIDEO_WIDTH_MOBILE,
   STORYBOARD_VIDEO_WIDTH_TABLET,
-} from "../../constants";
+} from "./constants";
 
 interface ButtonEvent {
   label: string;
