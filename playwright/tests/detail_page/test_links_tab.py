@@ -16,13 +16,13 @@ from pages.detail_page import DetailPage
     ],
 )
 def test_links_sections(
-    page_mock: Page,
+    responsive_page: Page,
     title: str,
     uuid: str,
     link_title: str,
     link_href: str,
 ) -> None:
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
@@ -34,5 +34,5 @@ def test_links_sections(
     expect(links.copy_link_button).to_be_visible()
 
     link = link_card.get_by_role('link', name=link_title)
-    expect(link).to_be_in_viewport()
+    expect(link).to_be_visible()
     assert link.get_attribute('href') == link_href

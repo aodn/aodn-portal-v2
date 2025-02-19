@@ -5,7 +5,7 @@ from pages.detail_page import DetailPage
 
 
 @pytest.mark.parametrize(
-    'title, uuid, cited_responsible_parties, license, suggested_citation, constranits',
+    'title, uuid, cited_responsible_parties, license, suggested_citation, constraints',
     [
         (
             'Integrated Marine Observing System (IMOS) - Location of assets',
@@ -18,15 +18,15 @@ from pages.detail_page import DetailPage
     ],
 )
 def test_citation_sections(
-    page_mock: Page,
+    responsive_page: Page,
     title: str,
     uuid: str,
     cited_responsible_parties: str,
     license: str,
     suggested_citation: str,
-    constranits: str,
+    constraints: str,
 ) -> None:
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
@@ -34,19 +34,19 @@ def test_citation_sections(
     citation = detail_page.tabs.citation
     citation.tab.click()
 
-    citation.constranits.click()
-    constranits_list = citation.get_constranits_list()
-    expect(constranits_list.get_by_text(constranits)).to_be_in_viewport()
+    citation.constraints.click()
+    constraints_list = citation.get_constraints_list()
+    expect(constraints_list.get_by_text(constraints)).to_be_visible()
 
     citation.suggested_citation.click()
     suggested_citation_list = citation.get_suggested_citation_list()
     expect(
         suggested_citation_list.get_by_text(suggested_citation)
-    ).to_be_in_viewport()
+    ).to_be_visible()
 
     citation.license.click()
     license_list = citation.get_license_list()
-    expect(license_list.get_by_text(license)).to_be_in_viewport()
+    expect(license_list.get_by_text(license)).to_be_visible()
 
     citation.cited_responsible_parties.click()
     cited_responsible_parties_list = (
@@ -54,4 +54,4 @@ def test_citation_sections(
     )
     expect(
         cited_responsible_parties_list.get_by_text(cited_responsible_parties)
-    ).to_be_in_viewport()
+    ).to_be_visible()

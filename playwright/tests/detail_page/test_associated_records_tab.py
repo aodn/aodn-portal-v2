@@ -20,7 +20,7 @@ from pages.detail_page import DetailPage
     ],
 )
 def test_associated_records_sections(
-    page_mock: Page,
+    responsive_page: Page,
     title: str,
     uuid: str,
     parent_record: str,
@@ -30,7 +30,7 @@ def test_associated_records_sections(
     child_records: str,
     child_records_value: str,
 ) -> None:
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
@@ -42,20 +42,16 @@ def test_associated_records_sections(
     detail_page.wait_for_timeout(200)
     detail_page.get_collapse_item_title(child_records).click()
     child_records_list = associated_records.get_child_records_list()
-    expect(
-        child_records_list.get_by_text(child_records_value)
-    ).to_be_in_viewport()
+    expect(child_records_list.get_by_text(child_records_value)).to_be_visible()
 
     associated_records.sibling_records.click()
     detail_page.get_collapse_item_title(sibling_records).click()
     sibling_records_list = associated_records.get_sibling_records_list()
     expect(
         sibling_records_list.get_by_text(sibling_records_value)
-    ).to_be_in_viewport()
+    ).to_be_visible()
 
     associated_records.parent_record.click()
     detail_page.get_collapse_item_title(parent_record).click()
     parent_record_list = associated_records.get_parent_record_list()
-    expect(
-        parent_record_list.get_by_text(parent_record_value)
-    ).to_be_in_viewport()
+    expect(parent_record_list.get_by_text(parent_record_value)).to_be_visible()
