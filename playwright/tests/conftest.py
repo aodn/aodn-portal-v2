@@ -1,8 +1,9 @@
-from typing import Generator
+from typing import Any, Callable, Generator
 
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Browser, BrowserContext, Page, Playwright
 
+from core.dataclasses.device_config import DeviceConfig
 from mocks.api.autocomplete import handle_search_autocomplete_api
 from mocks.api.categories import handle_categories_api
 from mocks.api.collection_detail import (
@@ -17,8 +18,22 @@ from mocks.api.collections import (
 from mocks.api_router import ApiRouter
 
 
-@pytest.fixture
-def page_mock(page: Page) -> Generator:
+def get_mobile_config(playwright: Playwright) -> DeviceConfig:
+    iphone_se = playwright.devices['iPhone SE']
+    return DeviceConfig(
+        is_mobile=True,
+        viewport={'width': 375, 'height': 667},
+        device_config=iphone_se,
+    )
+
+
+def get_desktop_config() -> DeviceConfig:
+    return DeviceConfig(
+        is_mobile=False, viewport={'width': 1920, 'height': 1080}
+    )
+
+
+def apply_mock(page: Page) -> None:
     api_router = ApiRouter(page)
     api_router.route_category(handle_categories_api)
     api_router.route_autocomplete(handle_search_autocomplete_api)
@@ -31,9 +46,69 @@ def page_mock(page: Page) -> Generator:
         handle_detail_api, handle_detail_item_api
     )
 
-    yield page
 
-    page.unroute_all()
+def setup_page(
+    playwright: Playwright, device_config: DeviceConfig
+) -> tuple[Browser, BrowserContext, Page]:
+    browser = playwright.chromium.launch()
+    context_kwargs = device_config.device_config or {}
+    context = browser.new_context(**context_kwargs)
+    if hasattr(context, 'is_mobile'):
+        context.is_mobile = device_config.is_mobile
+    if hasattr(context, 'viewport'):
+        context.viewport = device_config.viewport
+    page = context.new_page()
+    apply_mock(page)
+    return browser, context, page
+
+
+def create_page_fixture(
+    config_factory: Any,
+) -> Callable:
+    def _fixture(playwright: Playwright) -> Generator:
+        config = (
+            config_factory(playwright)
+            if 'playwright' in config_factory.__code__.co_varnames
+            else config_factory()
+        )
+        browser, context, page = setup_page(playwright, config)
+
+        yield page
+
+        page.unroute_all()
+        context.close()
+        browser.close()
+
+    return _fixture
+
+
+@pytest.fixture
+def desktop_page(playwright: Playwright) -> Generator:
+    """
+    Use the desktop_page fixture to run tests on desktop only
+    """
+    yield from create_page_fixture(get_desktop_config)(playwright)
+
+
+@pytest.fixture
+def mobile_page(playwright: Playwright) -> Generator:
+    """
+    Use the mobile_page fixture to run tests on mobile only
+    """
+    yield from create_page_fixture(get_mobile_config)(playwright)
+
+
+@pytest.fixture(params=['desktop', 'mobile'])
+def responsive_page(
+    request: pytest.FixtureRequest, playwright: Playwright
+) -> Generator:
+    """
+    Use the responsive_page fixture to run tests on both desktop and mobile
+    """
+    config_factory = (
+        get_desktop_config if request.param == 'desktop' else get_mobile_config
+    )
+    yield from create_page_fixture(config_factory)(playwright)
 
 
 ################################################################################

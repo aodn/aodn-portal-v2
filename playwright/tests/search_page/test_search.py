@@ -21,10 +21,10 @@ from pages.search_page import SearchPage
     ],
 )
 def test_basic_search(
-    page_mock: Page, search_text: str, category_name: str
+    responsive_page: Page, search_text: str, category_name: str
 ) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+    landing_page = LandingPage(responsive_page)
+    search_page = SearchPage(responsive_page)
 
     landing_page.load()
     landing_page.search.fill_search_text(search_text)
@@ -41,10 +41,12 @@ def test_basic_search(
     'sort_type',
     [SearchSortType.TITLE, SearchSortType.MODIFIED],
 )
-def test_search_result_sort(page_mock: Page, sort_type: SearchSortType) -> None:
-    api_router = ApiRouter(page=page_mock)
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
+def test_search_result_sort(
+    responsive_page: Page, sort_type: SearchSortType
+) -> None:
+    api_router = ApiRouter(page=responsive_page)
+    landing_page = LandingPage(responsive_page)
+    search_page = SearchPage(responsive_page)
 
     api_router.route_collection_all(
         handle_sort_by_relevance
@@ -64,7 +66,7 @@ def test_search_result_sort(page_mock: Page, sort_type: SearchSortType) -> None:
             handle_sort_by_modified,
         )
 
-    search_page.sort_button.click()
+    search_page.result_sort_button.click()
     search_page.click_text(sort_type.value, exact=True)
 
     search_page.wait_for_search_to_complete()
@@ -80,11 +82,11 @@ def test_search_result_sort(page_mock: Page, sort_type: SearchSortType) -> None:
     ],
 )
 def test_search_input_persistence_after_navigation(
-    page_mock: Page, search_text: str
+    responsive_page: Page, search_text: str
 ) -> None:
-    landing_page = LandingPage(page_mock)
-    search_page = SearchPage(page_mock)
-    detail_page = DetailPage(page_mock)
+    landing_page = LandingPage(responsive_page)
+    search_page = SearchPage(responsive_page)
+    detail_page = DetailPage(responsive_page)
 
     landing_page.load()
     landing_page.search.click_search_button()

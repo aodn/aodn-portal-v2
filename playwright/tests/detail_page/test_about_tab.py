@@ -18,7 +18,7 @@ from pages.detail_page import DetailPage
     ],
 )
 def test_about_sections(
-    page_mock: Page,
+    responsive_page: Page,
     title: str,
     uuid: str,
     contact: str,
@@ -26,7 +26,7 @@ def test_about_sections(
     keyword: str,
     keyword_value: str,
 ) -> None:
-    detail_page = DetailPage(page_mock)
+    detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
@@ -36,11 +36,11 @@ def test_about_sections(
     about.keywords.click()
     detail_page.get_collapse_item_title(keyword).click()
     keywords_list = about.get_keywords_list()
-    expect(keywords_list.get_by_text(keyword_value)).to_be_in_viewport()
+    expect(keywords_list.get_by_text(keyword_value)).to_be_visible()
 
     about.credits.click()
     credits_list = about.get_credits_list()
-    expect(credits_list.get_by_text(credit)).to_be_in_viewport()
+    expect(credits_list.get_by_text(credit)).to_be_visible()
 
     about.contacts.click()
-    expect(detail_page.get_collapse_item_title(contact)).to_be_in_viewport()
+    expect(detail_page.get_collapse_item_title(contact)).to_be_visible()

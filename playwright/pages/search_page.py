@@ -34,8 +34,8 @@ class SearchPage(BasePage):
         self.loading = self.result_list.get_by_test_id('loading-progress')
 
         # buttons
-        self.sort_button = page.get_by_text('Sort', exact=True)
-        self.view_button = page.get_by_text('View', exact=True)
+        self.result_sort_button = page.get_by_test_id('result-sort-button')
+        self.result_layout_button = page.get_by_test_id('result-layout-button')
         self.map_toggle_control_button = page.locator(
             '#map-toggle-control-button'
         )
