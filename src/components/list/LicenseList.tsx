@@ -4,6 +4,7 @@ import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
+import { fontWeight } from "../../styles/constants";
 
 interface LicenseListProps {
   license?: string;
@@ -54,7 +55,7 @@ const LicenseList: React.FC<LicenseListProps> = ({
     case MODE.COMPACT:
       return (
         <>
-          <Typography padding={1}>
+          <Typography padding={1} fontWeight={fontWeight.bold}>
             {title}
             {!licenseComponent ? (
               <NaList title={title ? title : ""} />

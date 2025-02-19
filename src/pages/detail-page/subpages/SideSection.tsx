@@ -10,6 +10,7 @@ import ThemesCard from "./side-cards/ThemesCard";
 import { useDetailPageContext } from "../context/detail-page-context";
 import CitationPanel from "./tab-panels/CitationPanel";
 import { MODE } from "../../../components/list/CommonDef";
+import LinksPanel, { TYPE } from "./tab-panels/LinksPanel";
 
 interface SideSectionProps extends SpatialCoverageCardProps {}
 
@@ -35,11 +36,12 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
       )}
       {!isCollectionNotFound && (
         <>
+          <TimePeriodCard />
+          <ThemesCard />
+          <LinksPanel mode={MODE.COMPACT} type={TYPE.DATA_ACCESS} />
           <SpatialCoverageCard
             onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
           />
-          <TimePeriodCard />
-          <ThemesCard />
           <CitationPanel mode={MODE.COMPACT} />
         </>
       )}

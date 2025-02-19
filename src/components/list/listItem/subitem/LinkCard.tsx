@@ -1,33 +1,40 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
 import { ILink as LinkType } from "../../../common/store/OGCCollectionDefinitions";
 import { Box, Grid, Link, Typography } from "@mui/material";
 import { color, fontColor, padding } from "../../../../styles/constants";
 import CopyLinkButton from "../../../common/buttons/CopyLinkButton";
-import linkIcon from "../../../../assets/icons/link.png";
 import { openInNewTab } from "../../../../utils/LinkUtils";
 
-const LinkCard = ({
+interface LinkCardProps {
+  icon?: boolean;
+  link: LinkType;
+  index: number;
+  clickedCopyLinkButtonIndex?: number[];
+  setClickedCopyLinkButtonIndex?: Dispatch<SetStateAction<number[]>>;
+}
+
+const LinkCard: FC<LinkCardProps> = ({
+  icon = true,
   link,
   index,
   clickedCopyLinkButtonIndex,
   setClickedCopyLinkButtonIndex,
-}: {
-  link: LinkType;
-  index: number;
-  clickedCopyLinkButtonIndex: number[];
-  setClickedCopyLinkButtonIndex: Dispatch<SetStateAction<number[]>>;
 }) => {
   const [isShowCopyLinkButton, setShowCopyLinkButton] =
     useState<boolean>(false);
-  const hasBeenCopied = clickedCopyLinkButtonIndex.includes(index);
+  const hasBeenCopied = clickedCopyLinkButtonIndex?.includes(index);
 
   return (
     <Box
-      onMouseEnter={() => setShowCopyLinkButton(true)}
-      onMouseLeave={() => setShowCopyLinkButton(false)}
+      onMouseEnter={() =>
+        setClickedCopyLinkButtonIndex && setShowCopyLinkButton(true)
+      }
+      onMouseLeave={() =>
+        setClickedCopyLinkButtonIndex && setShowCopyLinkButton(false)
+      }
       sx={{
         backgroundColor: "transparent",
-        padding: padding.large,
+        padding: padding.small,
         "&:hover": {
           backgroundColor: color.blue.light,
         },
@@ -35,48 +42,44 @@ const LinkCard = ({
       data-testid="links-card"
     >
       <Grid container>
-        <Grid item xs={2}>
-          <Box
-            sx={{
-              visibility:
-                isShowCopyLinkButton || hasBeenCopied ? "visible" : "hidden",
-            }}
-          >
-            <CopyLinkButton
-              index={index}
-              setClickedCopyLinkButtonIndex={setClickedCopyLinkButtonIndex}
-              copyUrl={link.href}
-            />
-          </Box>
-        </Grid>
-        <Grid item xs={10}>
-          <Grid container spacing={1} aria-label="link and title">
-            <Grid
-              item
-              xs={1}
+        {setClickedCopyLinkButtonIndex && (
+          <Grid item xs={2}>
+            <Box
               sx={{
-                display: "flex",
-                justifyContent: "end",
-                alignItems: "start",
+                visibility:
+                  isShowCopyLinkButton || hasBeenCopied ? "visible" : "hidden",
               }}
             >
-              <Box
+              <CopyLinkButton
+                index={index}
+                setClickedCopyLinkButtonIndex={setClickedCopyLinkButtonIndex}
+                copyUrl={link.href}
+              />
+            </Box>
+          </Grid>
+        )}
+        <Grid item xs={setClickedCopyLinkButtonIndex ? 10 : 12}>
+          <Grid container spacing={1} aria-label="link and title">
+            {icon && (
+              <Grid
+                item
+                xs={1}
                 sx={{
-                  width: "30%",
+                  display: "flex",
+                  justifyContent: "end",
+                  alignItems: "start",
                 }}
               >
-                <img
-                  src={linkIcon}
-                  alt=""
-                  style={{
-                    objectFit: "scale-down",
-                    width: "100%",
-                    height: "100%",
-                  }}
+                <Box
+                  component="img"
+                  width="22px"
+                  height="22px"
+                  src={link.getIcon()}
+                  alt={""}
                 />
-              </Box>
-            </Grid>
-            <Grid item xs={11}>
+              </Grid>
+            )}
+            <Grid item>
               <Box>
                 <Link
                   href={link.href}
@@ -90,14 +93,14 @@ const LinkCard = ({
                     color={fontColor.blue.medium}
                     sx={{
                       padding: 0,
-                      overflow: "hidden",
+                      overflowWrap: "break-word",
                       textOverflow: "ellipsis",
                       display: "-webkit-box",
                       WebkitLineClamp: "2",
                       WebkitBoxOrient: "vertical",
                     }}
                   >
-                    {link.title}
+                    {link.title.replace(/_/g, " ")}
                   </Typography>
                 </Link>
               </Box>

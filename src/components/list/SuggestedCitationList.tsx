@@ -5,6 +5,7 @@ import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
 import { Typography } from "@mui/material";
+import { fontWeight } from "../../styles/constants";
 
 interface SuggestedCitationListProps {
   suggestedCitation: string;
@@ -31,7 +32,7 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
     case MODE.COMPACT:
       return (
         <>
-          <Typography padding={1}>
+          <Typography padding={1} fontWeight={fontWeight.bold}>
             {title}
             {!suggestedCitation ? (
               <NaList title={title ? title : ""} />
