@@ -1,39 +1,30 @@
-import { FC, useCallback, useMemo, useRef } from "react";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
+import { FC, useCallback, useRef } from "react";
 import Box from "@mui/material/Box";
-import { IconButton } from "@mui/material";
+import { IconButton, Stack } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { color, gap, padding } from "../../../../styles/constants";
 import {
-  SMART_PANEL_CARD_SIZE,
+  SMART_CARDS,
   SMART_PANEL_GAP,
-  ITEM_DATA,
-  ItemType,
-  SCROLL_DISTANCE,
   SMART_PANEL_HEIGHT,
+  SMART_PANEL_CONTAINER_WIDTH_DESKTOP,
+  SMART_PANEL_CONTAINER_WIDTH_LAPTOP,
+  SMART_PANEL_CONTAINER_WIDTH_MOBILE,
+  SMART_PANEL_CONTAINER_WIDTH_TABLET,
   SMART_PANEL_WIDTH,
+  SCROLL_BUTTON_SIZE,
 } from "./constants";
-import {
-  calculateImageListWidth,
-  calculateTotalCols,
-  getItemCols,
-  getItemRows,
-} from "./utils";
-import SmallCard from "./components/SmallCard";
-import MediumCard from "./components/MediumCard";
-import LargeCard from "./components/LargeCard";
+import SmartCard from "./SmartCard";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 interface SmartPanelProps {
   handleClickSmartCard: (value: string) => void;
 }
 
 const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
+  const { isAboveDesktop } = useBreakpoint();
   const boxRef = useRef<HTMLDivElement>(null);
-
-  const imageListTotalCols = useMemo(() => calculateTotalCols(ITEM_DATA), []);
-  const imageListWidth = useMemo(() => calculateImageListWidth(ITEM_DATA), []);
 
   const handleScroll = useCallback(
     (scrollOffset: number) => {
@@ -48,28 +39,29 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
   );
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
-      <Box pr={padding.medium}>
-        <IconButton
-          onClick={() => handleScroll(-SCROLL_DISTANCE)}
-          sx={{
-            backgroundColor: color.white.twoTenTransparent,
-          }}
-        >
-          <ArrowBackIosNewIcon
-            sx={{
-              pr: gap.sm,
-              height: 20,
-              width: 20,
-              color: "#fff",
-            }}
-          />
-        </IconButton>
-      </Box>
-
+      {!isAboveDesktop && (
+        <Box pr={padding.medium}>
+          <IconButton onClick={() => handleScroll(-SMART_PANEL_WIDTH / 3)}>
+            <ArrowBackIosNewIcon
+              sx={{
+                pr: gap.sm,
+                height: SCROLL_BUTTON_SIZE,
+                width: SCROLL_BUTTON_SIZE,
+                color: color.gray.dark,
+              }}
+            />
+          </IconButton>
+        </Box>
+      )}
       <Box
         ref={boxRef}
         sx={{
-          width: SMART_PANEL_WIDTH,
+          width: {
+            xs: SMART_PANEL_CONTAINER_WIDTH_MOBILE,
+            sm: SMART_PANEL_CONTAINER_WIDTH_TABLET,
+            md: SMART_PANEL_CONTAINER_WIDTH_LAPTOP,
+            lg: SMART_PANEL_CONTAINER_WIDTH_DESKTOP,
+          },
           height: SMART_PANEL_HEIGHT,
           "&::-webkit-scrollbar": {
             display: "none",
@@ -80,63 +72,35 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
           overflowX: "scroll",
         }}
       >
-        <ImageList
-          sx={{
-            width: imageListWidth,
-            height: SMART_PANEL_HEIGHT,
-            m: 0,
-            p: 0,
-          }}
-          variant="quilted"
-          cols={imageListTotalCols}
-          rowHeight={SMART_PANEL_CARD_SIZE}
-          gap={SMART_PANEL_GAP}
+        <Stack
+          direction="row"
+          flexWrap="wrap"
+          gap={`${SMART_PANEL_GAP}px`}
+          width={SMART_PANEL_WIDTH + 2}
         >
-          {ITEM_DATA.map((item) => (
-            <ImageListItem
+          {SMART_CARDS.map((item) => (
+            <SmartCard
               key={item.title}
-              cols={getItemCols(item.type)}
-              rows={getItemRows(item.type)}
-              sx={{
-                width:
-                  item.type === ItemType.Small
-                    ? SMART_PANEL_CARD_SIZE
-                    : getItemCols(item.type) * SMART_PANEL_CARD_SIZE +
-                      SMART_PANEL_GAP,
-              }}
-            >
-              {item.type === "small" && (
-                <SmallCard
-                  cardData={item}
-                  handleClickSmartCard={handleClickSmartCard}
-                />
-              )}
-              {item.type === "medium" && (
-                <MediumCard
-                  cardData={item}
-                  handleClickSmartCard={handleClickSmartCard}
-                />
-              )}
-              {item.type === "large" && (
-                <LargeCard
-                  cardData={item}
-                  handleClickSmartCard={handleClickSmartCard}
-                />
-              )}
-            </ImageListItem>
+              cardData={item}
+              handleClickSmartCard={handleClickSmartCard}
+            />
           ))}
-        </ImageList>
+        </Stack>
       </Box>
-      <Box pl={padding.medium}>
-        <IconButton
-          onClick={() => handleScroll(SCROLL_DISTANCE)}
-          sx={{ backgroundColor: color.white.twoTenTransparent }}
-        >
-          <ArrowForwardIosIcon
-            sx={{ pl: gap.sm, height: 20, width: 20, color: "#fff" }}
-          />
-        </IconButton>
-      </Box>
+      {!isAboveDesktop && (
+        <Box pl={padding.medium}>
+          <IconButton onClick={() => handleScroll(SMART_PANEL_WIDTH / 3)}>
+            <ArrowForwardIosIcon
+              sx={{
+                pl: gap.sm,
+                height: SCROLL_BUTTON_SIZE,
+                width: SCROLL_BUTTON_SIZE,
+                color: color.gray.dark,
+              }}
+            />
+          </IconButton>
+        </Box>
+      )}
     </Box>
   );
 };

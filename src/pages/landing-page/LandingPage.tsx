@@ -3,17 +3,10 @@ import { Box } from "@mui/material";
 import Layout from "../../components/layout/layout";
 import Banner from "./subpages/banner/Banner";
 import Searchbar from "../../components/search/Searchbar";
-import SmartPanel from "./subpages/smartpanel/SmartPanel";
 import { color, padding } from "../../styles/constants";
 import Logos from "./subpages/logo-list/LogoList";
 import News from "./subpages/news/News";
 import SectionContainer from "../../components/layout/components/SectionContainer";
-import {
-  SMART_PANEL_CONTAINER_HEIGHT,
-  SMART_PANEL_CONTAINER_WIDTH_LAPTOP,
-  SMART_PANEL_CONTAINER_WIDTH_MOBILE,
-  SMART_PANEL_CONTAINER_WIDTH_TABLET,
-} from "./constants";
 import {
   updateDateTimeFilterRange,
   updateImosOnly,
@@ -23,7 +16,7 @@ import {
 } from "../../components/common/store/componentParamReducer";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
-import useBreakpoint from "../../hooks/useBreakpoint";
+import SmartPanel from "./subpages/smartpanel/SmartPanel";
 
 const LandingPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -70,21 +63,9 @@ const LandingPage: FC = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            height: "100%",
           }}
         >
-          <Box
-            sx={{
-              width: {
-                xs: SMART_PANEL_CONTAINER_WIDTH_MOBILE,
-                sm: SMART_PANEL_CONTAINER_WIDTH_TABLET,
-                md: SMART_PANEL_CONTAINER_WIDTH_LAPTOP,
-              },
-              height: SMART_PANEL_CONTAINER_HEIGHT,
-            }}
-          >
-            <SmartPanel handleClickSmartCard={handleClickSmartCard} />
-          </Box>
+          <SmartPanel handleClickSmartCard={handleClickSmartCard} />
         </Box>
       </SectionContainer>
 
