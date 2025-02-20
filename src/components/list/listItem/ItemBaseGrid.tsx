@@ -15,13 +15,13 @@ export const useHoverContext = () => {
 };
 const ItemBaseGrid: React.FC<GridProps> = (props) => {
   const theme = useTheme();
-  const [isOnHover, setisOnHover] = useState<boolean>(false);
+  const [isOnHover, setIsOnHover] = useState<boolean>(false);
   return (
     <HoverContext.Provider value={{ isOnHover }}>
       <Grid
         {...props}
-        onMouseEnter={() => setisOnHover(true)}
-        onMouseLeave={() => setisOnHover(false)}
+        onMouseEnter={() => setIsOnHover(true)}
+        onMouseLeave={() => setIsOnHover(false)}
         sx={{
           backgroundColor: isOnHover
             ? theme.palette.detail.listItemBGHover

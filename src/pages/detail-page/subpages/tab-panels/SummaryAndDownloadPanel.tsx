@@ -59,11 +59,11 @@ const getMinMaxDateStamps = (
   }
 };
 
-interface AbstractAndDownloadPanelProps {
+interface SummaryAndDownloadPanelProps {
   bbox?: LngLatBounds;
 }
 
-const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
+const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   bbox,
 }) => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
@@ -228,4 +228,4 @@ const AbstractAndDownloadPanel: FC<AbstractAndDownloadPanelProps> = ({
   );
 };
 
-export default AbstractAndDownloadPanel;
+export default SummaryAndDownloadPanel;

@@ -9,6 +9,7 @@ import {
 import _ from "lodash";
 import CreditList from "../../../../components/list/CreditList";
 import KeywordList from "../../../../components/list/KeywordList";
+import { detailPageDefault } from "../../../../components/common/constants";
 
 const AboutPanel = () => {
   const context = useDetailPageContext();
@@ -20,7 +21,9 @@ const AboutPanel = () => {
     () =>
       context.collection
         ?.getContacts()
-        ?.filter((contact: IContact) => contact.roles.includes("about")),
+        ?.filter((contact: IContact) =>
+          contact.roles.includes(detailPageDefault.ABOUT)
+        ),
     [context.collection]
   );
   const themes = useMemo(
