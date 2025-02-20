@@ -1,12 +1,14 @@
-import { ReactElement, useCallback, useMemo } from "react";
+import { ReactElement, ReactNode, useCallback, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Box,
+  Card,
   Grid,
   IconButton,
   Paper,
   SxProps,
   Typography,
+  useTheme,
 } from "@mui/material";
 import ReplyIcon from "@mui/icons-material/Reply";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
@@ -22,15 +24,23 @@ import useRedirectHome from "../../../hooks/useRedirectHome";
 import useCopyToClipboard from "../../../hooks/useCopyToClipboard";
 import { SEARCH_PAGE_REFERER } from "../../search-page/constants";
 import {
+  border,
   borderRadius,
+  color,
   fontColor,
   fontSize,
   fontWeight,
+  gap,
+  margin,
   padding,
 } from "../../../styles/constants";
 import ShareButtonMenu, {
   ShareMenuItem,
 } from "../../../components/menu/ShareButtonMenu";
+import DataUsageIcon from "@mui/icons-material/DataUsage";
+import dayjs from "dayjs";
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import { dateDefault } from "../../../components/common/constants";
 
 interface ButtonWithIcon {
   label: string;
@@ -38,6 +48,29 @@ interface ButtonWithIcon {
 }
 
 type ButtonName = "goBack" | "goToNext" | "goToPrevious";
+
+enum Status {
+  onGoing = "onGoing",
+  completed = "completed",
+}
+
+const RoundCard = ({ children, sx }: { children: ReactNode; sx: SxProps }) => {
+  return (
+    <Card
+      elevation={0}
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: borderRadius.medium,
+        padding: padding.extraSmall,
+        ...sx,
+      }}
+    >
+      {children}
+    </Card>
+  );
+};
 
 const buttons: Record<ButtonName, ButtonWithIcon> = {
   goBack: {
@@ -54,8 +87,66 @@ const buttons: Record<ButtonName, ButtonWithIcon> = {
   },
 };
 
+const renderCompletedStatus = () => (
+  <RoundCard
+    sx={{
+      border: `${border.xs} ${color.gray.extraLight}`,
+      backgroundColor: color.blue.extraLightSemiTransparent,
+    }}
+  >
+    <DoneAllIcon sx={{ fontSize: "18px" }} color="primary" />
+    <Typography
+      padding={0}
+      paddingLeft={padding.small}
+      color={color.blue.dark}
+      fontSize={fontSize.label}
+    >
+      Completed
+    </Typography>
+  </RoundCard>
+);
+
+const renderButton = (icon: ReactElement) => (
+  <Paper
+    elevation={3}
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: borderRadius.small,
+    }}
+  >
+    <IconButton>{icon}</IconButton>
+  </Paper>
+);
+
+// Render the go back button next to the header
+const renderNavigateButtons = (
+  isUnderLaptop: boolean,
+  clickHandler: () => void
+) => {
+  const style: SxProps = {
+    top: "5%",
+  };
+  if (isUnderLaptop) {
+    style.position = "absolute";
+    style.left = "-50px";
+  }
+  return (
+    <Box
+      aria-label="go-back button"
+      sx={style}
+      onClick={clickHandler}
+      data-testid="go-back-button"
+    >
+      {renderButton(buttons.goBack.icon)}
+    </Box>
+  );
+};
+
 const HeaderSection = () => {
   const location = useLocation();
+  const theme = useTheme();
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const { collection } = useDetailPageContext();
   const { isCopied, copyToClipboard, resetCopyState } = useCopyToClipboard();
@@ -63,8 +154,23 @@ const HeaderSection = () => {
   const redirectSearch = useRedirectSearch();
 
   const title = useMemo(() => collection?.title, [collection?.title]);
-
   const copyUrl = window.location.href;
+
+  const period: (string | null)[][] | undefined = collection?.extent?.temporal
+    .interval ?? [
+    ["", ""],
+    ["", ""],
+  ];
+
+  let startDate: string | undefined;
+  let endDate: string | undefined;
+  if (period && period[0][0]) {
+    startDate = dayjs(period[0][0]).format(dateDefault.DISPLAY_FORMAT);
+  }
+  if (period && period[0][1]) {
+    endDate = dayjs(period[0][1]).format(dateDefault.DISPLAY_FORMAT);
+  }
+
   const shareItems: ShareMenuItem[] = useMemo(
     () => [
       {
@@ -91,44 +197,116 @@ const HeaderSection = () => {
     [redirectHome, redirectSearch]
   );
 
-  const renderButton = useCallback((icon: ReactElement) => {
-    return (
-      <Paper
-        elevation={3}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: borderRadius.small,
-        }}
-      >
-        <IconButton>{icon}</IconButton>
-      </Paper>
-    );
-  }, []);
+  const renderOnGoingStatus = useCallback(
+    () => (
+      <RoundCard sx={{ border: `${border.xs} ${theme.palette.success.main}` }}>
+        <DataUsageIcon sx={{ fontSize: "16px" }} color="success" />
+        <Typography
+          padding={0}
+          paddingLeft={padding.small}
+          fontSize={fontSize.label}
+          color={theme.palette.success.main}
+        >
+          On Going
+        </Typography>
+      </RoundCard>
+    ),
+    [theme.palette.success.main]
+  );
 
-  // Render the go back button next to the header
-  const renderNavigateButtons = useCallback(
-    (isUnderLaptop: boolean, clickHandler: () => void) => {
-      const style: SxProps = {
-        top: "5%",
-      };
-      if (isUnderLaptop) {
-        style.position = "absolute";
-        style.left = "-50px";
-      }
+  const renderSubTitle = useCallback(
+    (
+      startDate: string,
+      endDate: string | undefined,
+      status: Status,
+      pace: string | undefined
+    ) => {
       return (
         <Box
-          aria-label="go-back button"
-          sx={style}
-          onClick={clickHandler}
-          data-testid="go-back-button"
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            fontSize: fontSize.label,
+            margin: `${margin.lg} ${margin.lg} 0`,
+            gap: gap.md,
+          }}
         >
-          {renderButton(buttons.goBack.icon)}
+          {pace && (
+            <>
+              <Box>
+                <RoundCard
+                  sx={{
+                    border: `${border.xs} ${theme.palette.success.main}`,
+                  }}
+                >
+                  <Typography
+                    padding={0}
+                    fontSize={fontSize.label}
+                    color={theme.palette.success.main}
+                  >
+                    {pace}
+                  </Typography>
+                </RoundCard>
+              </Box>
+            </>
+          )}
+          <Box sx={{ paddingLeft: padding.medium }}>Period:</Box>
+          <Box>
+            <RoundCard
+              sx={{
+                border: `${border.xs} ${color.gray.extraLight}`,
+                backgroundColor: color.blue.extraLightSemiTransparent,
+              }}
+            >
+              <Typography
+                padding={0}
+                paddingRight={padding.small}
+                fontSize={fontSize.label}
+              >
+                {startDate}
+              </Typography>
+              <KeyboardDoubleArrowRightIcon
+                sx={{
+                  fontSize: fontSize.label,
+                  color: color.gray.light,
+                }}
+              />
+            </RoundCard>
+            {endDate && (
+              <RoundCard
+                sx={{
+                  marginTop: margin.md,
+                  border: `${border.xs} ${color.gray.extraLight}`,
+                  backgroundColor: color.blue.extraLightSemiTransparent,
+                }}
+              >
+                <KeyboardDoubleArrowRightIcon
+                  sx={{
+                    fontSize: fontSize.label,
+                    color: color.gray.light,
+                  }}
+                />
+                <Typography
+                  padding={0}
+                  paddingLeft={padding.small}
+                  fontSize={fontSize.label}
+                >
+                  {endDate}
+                </Typography>
+              </RoundCard>
+            )}
+          </Box>
+          <Box>
+            {status &&
+              (status === Status.completed
+                ? renderCompletedStatus()
+                : renderOnGoingStatus())}
+          </Box>
         </Box>
       );
     },
-    [renderButton]
+    [renderOnGoingStatus, theme.palette.success.main]
   );
 
   return (
@@ -155,30 +333,46 @@ const HeaderSection = () => {
               alignItems: "center",
             }}
           >
-            {renderNavigateButtons(!isUnderLaptop, () =>
-              onGoBack(location.state?.referer)
-            )}
-            <Typography
-              aria-label="collection title"
-              fontSize={
-                isMobile
-                  ? fontSize.detailPageHeadingMobile
-                  : fontSize.detailPageHeading
-              }
-              fontWeight={fontWeight.bold}
-              color={fontColor.gray.dark}
-              sx={{
-                p: 0,
-                paddingX: padding.small,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: "2",
-                WebkitBoxOrient: "vertical",
-              }}
-            >
-              {title}
-            </Typography>
+            <Grid container>
+              <Grid item xs={isUnderLaptop ? 0 : 1}>
+                {renderNavigateButtons(!isUnderLaptop, () =>
+                  onGoBack(location.state?.referer)
+                )}
+              </Grid>
+              <Grid item xs={isUnderLaptop ? 10 : 12}>
+                <Typography
+                  aria-label="collection title"
+                  fontSize={
+                    isMobile
+                      ? fontSize.detailPageHeadingMobile
+                      : fontSize.detailPageHeading
+                  }
+                  fontWeight={fontWeight.bold}
+                  color={fontColor.gray.dark}
+                  sx={{
+                    p: 0,
+                    paddingX: padding.small,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: "2",
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {title}
+                </Typography>
+              </Grid>
+              <Grid item xs={isUnderLaptop ? 10 : 12}>
+                {startDate &&
+                  collection &&
+                  renderSubTitle(
+                    startDate,
+                    endDate,
+                    collection.getStatus() as Status,
+                    collection.getPace()
+                  )}
+              </Grid>
+            </Grid>
           </Grid>
           <Grid
             item
@@ -186,16 +380,15 @@ const HeaderSection = () => {
             sm={2}
             sx={{
               display: "flex",
-              justifyContent: "right",
-              alignItems: "center",
+              justifyContent: "flex-end",
+              alignItems: "flex-start",
             }}
           >
             {collection && (
               <OrganizationLogo
                 logo={collection.findIcon()}
                 sx={{
-                  width: "100%",
-                  height: "60px",
+                  height: isMobile ? "50px" : "80px",
                   paddingX: padding.extraSmall,
                 }}
                 defaultImageSrc={imosLogoWithTitle}
