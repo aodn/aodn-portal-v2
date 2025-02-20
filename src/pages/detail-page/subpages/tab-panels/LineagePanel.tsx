@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import NavigatablePanel from "./NavigatablePanel";
+import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import StatementList from "../../../../components/list/StatementList";
 
 const LineagePanel = () => {
@@ -9,7 +9,7 @@ const LineagePanel = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const lists = useMemo(
+  const lists: NavigatablePanelChild[] = useMemo(
     () => [
       {
         title: "Statement",

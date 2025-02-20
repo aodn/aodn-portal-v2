@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import ContactList from "../../../../components/list/ContactList";
-import NavigatablePanel from "./NavigatablePanel";
+import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import {
   IContact,
   ITheme,
@@ -59,7 +59,7 @@ const AboutPanel = () => {
     }
   }, [credits, aboutContacts, themes]);
 
-  const blocks = useMemo(
+  const blocks: NavigatablePanelChild[] = useMemo(
     () => [
       {
         title: "Contacts",

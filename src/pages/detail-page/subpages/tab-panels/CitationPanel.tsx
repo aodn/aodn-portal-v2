@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import NavigatablePanel from "./NavigatablePanel";
+import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import LicenseList from "../../../../components/list/LicenseList";
 import {
   MediaType,
@@ -102,7 +102,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     }
   }, [context.collection]);
 
-  const blocks = useMemo(
+  const blocks: NavigatablePanelChild[] = useMemo(
     () => [
       {
         title: "Cited Responsible Parties",
