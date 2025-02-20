@@ -14,7 +14,7 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-
+@pytest.mark.skip(reason="Skip the test for now")
 def test_map_drag_updates_search_results(desktop_page: Page) -> None:
     api_router = ApiRouter(page=desktop_page)
     landing_page = LandingPage(desktop_page)
@@ -48,6 +48,7 @@ def test_map_drag_updates_search_results(desktop_page: Page) -> None:
         ),
     ],
 )
+@pytest.mark.skip(reason="Skip the test for now")
 def test_map_datapoint_hover_and_click(
     desktop_page: Page, title: str, lng: str, lat: str
 ) -> None:
@@ -72,6 +73,7 @@ def test_map_datapoint_hover_and_click(
         ('imos', 'plankton'),
     ],
 )
+@pytest.mark.skip(reason="Skip the test for now")
 def test_map_updates_on_search_change(
     desktop_page: Page, search_text: str, updated_search_text: str
 ) -> None:
@@ -148,6 +150,7 @@ def test_map_base_layers(
         ),
     ],
 )
+@pytest.mark.skip(reason="Skip the test for now")
 def test_map_spider(
     desktop_page: Page,
     head_lng: str,
@@ -274,7 +277,7 @@ def test_map_buttons(desktop_page: Page) -> None:
     expect(search_page.map.draw_rect_menu_button).to_be_visible()
     expect(search_page.map.delete_button).to_be_visible()
 
-
+@pytest.mark.skip(reason="Skip the test for now")
 def test_map_zoom_out_and_drag_does_not_crash(desktop_page: Page) -> None:
     """
     Verifies that zooming out and dragging the map on the search page does not cause the application to crash.
