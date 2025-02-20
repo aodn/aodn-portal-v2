@@ -1,14 +1,20 @@
+import { FC } from "react";
 import { Box, Button, Icon, Typography } from "@mui/material";
 import EastIcon from "@mui/icons-material/East";
 import { fontSize, fontWeight, padding } from "../../../../../styles/constants";
 
-const ReadMoreButton = () => (
+interface ReadMoreButtonProps {
+  onClick: () => void;
+}
+
+const ReadMoreButton: FC<ReadMoreButtonProps> = ({ onClick }) => (
   <Button sx={{ padding: 0 }}>
     <Box
       display="flex"
       justifyContent="start"
       alignContent="center"
       paddingY={padding.small}
+      onClick={onClick}
     >
       <Typography
         color="#fff"
@@ -16,6 +22,7 @@ const ReadMoreButton = () => (
         fontWeight={fontWeight.extraLight}
         paddingTop={1}
         letterSpacing={1}
+        sx={{ ":hover": { fontWeight: fontWeight.light } }}
       >
         Read More
       </Typography>
