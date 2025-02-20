@@ -4,6 +4,7 @@ import {
   borderRadius,
   fontWeight,
   padding,
+  shadow,
 } from "../../../../styles/constants";
 interface SideCardContainerProps {
   children: ReactNode;
@@ -20,11 +21,11 @@ const SideCardContainer: FC<SideCardContainerProps> = ({ children, title }) => {
       }}
     >
       <Card
-        elevation={1}
         sx={{
           display: "flex",
           flexDirection: "column",
-          borderRadius: borderRadius.small,
+          borderRadius: 0,
+          boxShadow: shadow.bottom,
         }}
       >
         <Typography
