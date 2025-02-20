@@ -31,7 +31,7 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
     id: 3,
     image: news3,
     subheading: "Ships of Opportunity",
-    date: "01/01/2011",
+    date: "01/01/2011 >>",
     title: "Fisheries vessels real-time data collection",
     link: "https://portal.edge.aodn.org.au/details?uuid=0015db7e-e684-7548-e053-08114f8cd4ad&tab=abstract",
   },
