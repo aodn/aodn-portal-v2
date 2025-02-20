@@ -272,21 +272,7 @@ const HeaderSection = () => {
                   color: color.gray.light,
                 }}
               />
-            </RoundCard>
-            {endDate && (
-              <RoundCard
-                sx={{
-                  marginTop: margin.md,
-                  border: `${border.xs} ${color.gray.extraLight}`,
-                  backgroundColor: color.blue.extraLightSemiTransparent,
-                }}
-              >
-                <KeyboardDoubleArrowRightIcon
-                  sx={{
-                    fontSize: fontSize.label,
-                    color: color.gray.light,
-                  }}
-                />
+              {endDate && (
                 <Typography
                   padding={0}
                   paddingLeft={padding.small}
@@ -294,8 +280,8 @@ const HeaderSection = () => {
                 >
                   {endDate}
                 </Typography>
-              </RoundCard>
-            )}
+              )}
+            </RoundCard>
           </Box>
           <Box>
             {status &&
