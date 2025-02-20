@@ -159,6 +159,7 @@ const zIndex = {
 
 const shadow = {
   inner: "inset 1px 1px rgba(0, 0, 0, 0.1)",
+  bottom: "0 2px 2px 0 rgba(0, 0, 0, 0.1)",
 };
 
 export {

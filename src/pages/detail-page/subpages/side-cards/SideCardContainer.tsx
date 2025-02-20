@@ -1,9 +1,10 @@
-import { Box, Card, Divider, Typography } from "@mui/material";
+import { Card, Divider, Typography } from "@mui/material";
 import { FC, ReactNode } from "react";
 import {
   borderRadius,
   fontWeight,
   padding,
+  shadow,
 } from "../../../../styles/constants";
 interface SideCardContainerProps {
   children: ReactNode;
@@ -19,24 +20,25 @@ const SideCardContainer: FC<SideCardContainerProps> = ({ children, title }) => {
         width: { xs: "100%", sm: "48.5%", md: "100%" },
       }}
     >
-      <Box
+      <Card
         sx={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
+          borderRadius: 0,
+          boxShadow: shadow.bottom,
         }}
       >
         <Typography
           paddingY={padding.medium}
           fontSize="16px"
           fontWeight={fontWeight.bold}
+          align="center"
         >
           {title}
         </Typography>
         <Divider sx={{ width: "100%" }} />
-        {children}
-      </Box>
+      </Card>
+      {children}
     </Card>
   );
 };

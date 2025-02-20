@@ -15,6 +15,7 @@ import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
 import BookmarkButton from "../../bookmark/BookmarkButton";
 import { SEARCH_PAGE_REFERER } from "../../../pages/search-page/constants";
 import { TabNavigation } from "../../../hooks/useTabNavigation";
+import { detailPageDefault } from "../constants";
 
 interface BasicMapHoverTipProps {
   content?: string | undefined | null;
@@ -35,15 +36,30 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   sx,
 }) => {
   const onLinks = useCallback(
-    () => tabNavigation(collection.id, "links", SEARCH_PAGE_REFERER),
+    () =>
+      tabNavigation(
+        collection.id,
+        detailPageDefault.LINKS,
+        SEARCH_PAGE_REFERER
+      ),
     [collection.id, tabNavigation]
   );
   const onDownload = useCallback(
-    () => tabNavigation(collection.id, "abstract", "download-section"),
+    () =>
+      tabNavigation(
+        collection.id,
+        detailPageDefault.SUMMARY,
+        "download-section"
+      ),
     [collection.id, tabNavigation]
   );
   const onDetail = useCallback(
-    () => tabNavigation(collection.id, "abstract", SEARCH_PAGE_REFERER),
+    () =>
+      tabNavigation(
+        collection.id,
+        detailPageDefault.SUMMARY,
+        SEARCH_PAGE_REFERER
+      ),
     [collection.id, tabNavigation]
   );
 

@@ -11,24 +11,149 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { bboxPolygon } from "@turf/turf";
 
 import * as turf from "@turf/turf";
+import wmsIcon from "../../../assets/icons/wms.png";
+import wfsIcon from "../../../assets/icons/wfs.png";
+import linkIcon from "../../../assets/icons/link.png";
+
+// interfaces:
+export interface IKeyword {
+  title: string;
+  content: string[];
+}
+
+export interface ILink {
+  rel: string;
+  href: string;
+  type: string;
+  title: string;
+  getIcon?: () => string;
+}
+
+export interface IAddress {
+  delivery_point: string[];
+  city: string;
+  administrative_area: string;
+  postal_code: string;
+  country: string;
+}
+
+export interface IInfo {
+  value: string;
+  roles: string[];
+}
+
+export interface ITemporal {
+  start?: string;
+  end?: string;
+}
+
+export interface ICitation {
+  suggestedCitation?: string;
+  otherConstraints?: string[];
+  useLimitations?: string[];
+}
+
+export interface IContact {
+  name: string;
+  organization: string;
+  identifier: string;
+  position: string;
+  emails: string[];
+  addresses: IAddress[];
+  phones: IInfo[];
+  links: ILink[];
+  roles: string[];
+}
+
+export interface IConcept {
+  id: string;
+  url: string;
+}
+
+export interface ITheme {
+  scheme: string;
+  description: string;
+  title: string;
+  concepts: IConcept[];
+}
+
+export interface IAssociatedRecordGroup {
+  parent?: IAssociatedRecord;
+  children: IAssociatedRecord[];
+  siblings: IAssociatedRecord[];
+}
+
+export interface IAssociatedRecord {
+  uuid: string;
+  title: string;
+  abstract: string;
+}
+
+// Enums
+export enum RelationType {
+  SELF = "self",
+  LICENSE = "license",
+  PARENT = "parent",
+  SIBLING = "sibling",
+  CHILD = "child",
+  RELATED = "related",
+  DESCRIBEDBY = "describedby",
+  ICON = "icon",
+  PREVIEW = "preview",
+  WMS = "wms",
+  WFS = "wfs",
+}
+
+export enum MediaType {
+  TEXT_HTML = "text/html",
+  IMAGE_PNG = "image/png",
+}
+
+const getIcon = (href: string, rel: string) => {
+  switch (rel) {
+    case "wms":
+      return wmsIcon;
+
+    case "wfs":
+      return wfsIcon;
+
+    default:
+      if (href.includes("/wfs")) {
+        return wfsIcon;
+      }
+      return linkIcon;
+  }
+};
 
 // Please put all OGCCollection interfaces, types, or classes here.
-
 export class OGCCollection {
   private propValue?: SummariesProperties;
   private propExtent?: Spatial;
+  private propLinks?: Array<ILink>;
 
   readonly id: string = "undefined";
   readonly title?: string;
   readonly description?: string;
   readonly itemType?: string;
-  readonly links?: Array<ILink>;
 
   set extent(extents: any) {
     this.propExtent = new Spatial(this);
     this.propExtent.bbox = extents.spatial.bbox;
     this.propExtent.crs = extents.spatial.crs;
     this.propExtent.temporal = extents.temporal;
+  }
+
+  get links(): ILink[] | undefined {
+    return this.propLinks;
+  }
+
+  set links(links: ILink[] | undefined) {
+    this.propLinks = links?.map<ILink>((link) => {
+      return {
+        ...link,
+        getIcon: () => getIcon(link.href, link.rel),
+      };
+    });
   }
 
   get extent(): Spatial | undefined {
@@ -77,6 +202,10 @@ export class OGCCollection {
   getLicense = (): string | undefined => this.propValue?.license;
   getCreation = (): string | undefined => this.propValue?.creation;
   getRevision = (): string | undefined => this.propValue?.revision;
+  getDataAccessLinks = (): ILink[] | undefined =>
+    this.links?.filter(
+      (link) => link.rel === RelationType.WMS || link.rel === RelationType.WFS
+    );
   getDistributionLinks = (): ILink[] | undefined =>
     this.links?.filter((link) => link.rel === RelationType.RELATED);
   getMetadataUrl = (): string | undefined =>
@@ -203,95 +332,4 @@ export class OGCCollections {
       this._search_after
     );
   }
-}
-
-// interfaces:
-export interface IKeyword {
-  title: string;
-  content: string[];
-}
-
-export interface ILink {
-  rel: string;
-  href: string;
-  type: string;
-  title: string;
-}
-
-export interface IAddress {
-  delivery_point: string[];
-  city: string;
-  administrative_area: string;
-  postal_code: string;
-  country: string;
-}
-
-export interface IInfo {
-  value: string;
-  roles: string[];
-}
-
-export interface ITemporal {
-  start?: string;
-  end?: string;
-}
-
-export interface ICitation {
-  suggestedCitation?: string;
-  otherConstraints?: string[];
-  useLimitations?: string[];
-}
-
-export interface IContact {
-  name: string;
-  organization: string;
-  identifier: string;
-  position: string;
-  emails: string[];
-  addresses: IAddress[];
-  phones: IInfo[];
-  links: ILink[];
-  roles: string[];
-}
-
-export interface IConcept {
-  id: string;
-  url: string;
-}
-
-export interface ITheme {
-  scheme: string;
-  description: string;
-  title: string;
-  concepts: IConcept[];
-}
-
-export interface IAssociatedRecordGroup {
-  parent?: IAssociatedRecord;
-  children: IAssociatedRecord[];
-  siblings: IAssociatedRecord[];
-}
-
-export interface IAssociatedRecord {
-  uuid: string;
-  title: string;
-  abstract: string;
-}
-
-// Enums
-export enum RelationType {
-  SELF = "self",
-  LICENSE = "license",
-  PARENT = "parent",
-  SIBLING = "sibling",
-  CHILD = "child",
-  RELATED = "related",
-  DESCRIBEDBY = "describedby",
-  ICON = "icon",
-  PREVIEW = "preview",
-}
-
-export enum MediaType {
-  TEXT_HTML = "text/html",
-  IMAGE_PNG = "image/png",
 }

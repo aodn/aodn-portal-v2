@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, FC, SetStateAction } from "react";
 import { Button, Typography } from "@mui/material";
 import {
   border,
@@ -11,18 +11,21 @@ import {
 import DoneIcon from "@mui/icons-material/Done";
 import useCopyToClipboard from "../../../hooks/useCopyToClipboard";
 
-const CopyLinkButton = ({
+interface CopyLinkButtonProps {
+  index: number;
+  setClickedCopyLinkButtonIndex?: Dispatch<SetStateAction<number[]>>;
+  copyUrl: string;
+}
+
+const CopyLinkButton: FC<CopyLinkButtonProps> = ({
   index,
   setClickedCopyLinkButtonIndex,
   copyUrl,
-}: {
-  index: number;
-  setClickedCopyLinkButtonIndex: Dispatch<SetStateAction<number[]>>;
-  copyUrl: string;
 }) => {
   const { isCopied, copyToClipboard } = useCopyToClipboard({
     onCopySuccess: () => {
-      setClickedCopyLinkButtonIndex((prev) => [...prev, index]);
+      setClickedCopyLinkButtonIndex &&
+        setClickedCopyLinkButtonIndex((prev) => [...prev, index]);
     },
   });
   return (

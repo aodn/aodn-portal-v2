@@ -2,14 +2,25 @@ import { Grid, Link, Typography, useTheme } from "@mui/material";
 import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
+import { MODE } from "./CommonDef";
+import NaList from "./NaList";
+import { fontWeight } from "../../styles/constants";
 
 interface LicenseListProps {
-  license: string;
-  url: string;
-  graphic: string;
+  license?: string;
+  url?: string;
+  graphic?: string;
+  title?: string;
+  mode?: MODE;
 }
 
-const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
+const LicenseList: React.FC<LicenseListProps> = ({
+  license,
+  url,
+  graphic,
+  title = "License",
+  mode = MODE.NORMAL,
+}) => {
   const theme = useTheme();
   const licenseComponent = useMemo(() => {
     if (!license && !url && !graphic) {
@@ -39,12 +50,31 @@ const LicenseList: React.FC<LicenseListProps> = ({ license, url, graphic }) => {
       </ItemBaseGrid>
     );
   }, [graphic, license, theme.mp.md, url]);
-  return (
-    <ExpandableList
-      title={"License"}
-      childrenList={licenseComponent ? [licenseComponent] : []}
-    />
-  );
+
+  switch (mode) {
+    case MODE.COMPACT:
+      return (
+        <>
+          <Typography padding={1} fontWeight={fontWeight.bold}>
+            {title}
+            {!licenseComponent ? (
+              <NaList title={title ? title : ""} />
+            ) : (
+              licenseComponent
+            )}
+          </Typography>
+        </>
+      );
+
+    case MODE.NORMAL:
+    default:
+      return (
+        <ExpandableList
+          title={title}
+          childrenList={licenseComponent ? [licenseComponent] : []}
+        />
+      );
+  }
 };
 
 export default LicenseList;

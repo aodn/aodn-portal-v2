@@ -3,7 +3,7 @@ import LinksPanel from "./tab-panels/LinksPanel";
 import AboutPanel from "./tab-panels/AboutPanel";
 import MetadataInformationPanel from "./tab-panels/MetadataInformationPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
-import AbstractAndDownloadPanel from "./tab-panels/AbstractAndDownloadPanel";
+import SummaryAndDownloadPanel from "./tab-panels/SummaryAndDownloadPanel";
 import LineagePanel from "./tab-panels/LineagePanel";
 import AssociatedRecordsPanel from "./tab-panels/AssociatedRecordsPanel";
 import { Card, Grid } from "@mui/material";
@@ -13,44 +13,53 @@ import RecordNotFoundPanel from "./tab-panels/RecordNotFoundPanel";
 import TabsPanelContainer from "../../../components/common/tab/TabsPanelContainer";
 import { useLocation } from "react-router-dom";
 import { LngLatBounds } from "mapbox-gl";
+import { detailPageDefault } from "../../../components/common/constants";
 
 interface ContentSectionProps {
   mapFocusArea?: LngLatBounds;
 }
 
 const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
-  const abstractAndDownloadPanelTab = useMemo(
+  const summaryAndDownloadPanelTab = useMemo(
     () => ({
-      label: "Abstract",
-      value: "abstract",
-      component: <AbstractAndDownloadPanel bbox={mapFocusArea} />,
+      label: "Summary",
+      value: detailPageDefault.SUMMARY,
+      component: <SummaryAndDownloadPanel bbox={mapFocusArea} />,
     }),
     [mapFocusArea]
   );
 
   const aboutPanelTab = useMemo(
-    () => ({ label: "About", value: "about", component: <AboutPanel /> }),
+    () => ({
+      label: "About",
+      value: detailPageDefault.ABOUT,
+      component: <AboutPanel />,
+    }),
     []
   );
 
   const linksPanelTab = useMemo(
     () => ({
       label: "Links",
-      value: "links",
+      value: detailPageDefault.LINKS,
       component: <LinksPanel />,
     }),
     []
   );
 
   const lineagePanelTab = useMemo(
-    () => ({ label: "Lineage", value: "lineage", component: <LineagePanel /> }),
+    () => ({
+      label: "Lineage",
+      value: detailPageDefault.LINEAGE,
+      component: <LineagePanel />,
+    }),
     []
   );
 
   const metadataInformationPanelTab = useMemo(
     () => ({
       label: "Metadata Information",
-      value: "metadata information",
+      value: detailPageDefault.METADATA_INFORMATION,
       component: <MetadataInformationPanel />,
     }),
     []
@@ -59,7 +68,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
   const citationPanelTab = useMemo(
     () => ({
       label: "Citation",
-      value: "citation",
+      value: detailPageDefault.CITATION,
       component: <CitationPanel />,
     }),
     []
@@ -68,7 +77,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
   const associatedRecordsPanelTab = useMemo(
     () => ({
       label: "Associated Records",
-      value: "associated records",
+      value: detailPageDefault.ASSOCIATED_RECORDS,
       component: <AssociatedRecordsPanel />,
     }),
     []
@@ -76,7 +85,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
 
   const TABS = useMemo(
     () => [
-      abstractAndDownloadPanelTab,
+      summaryAndDownloadPanelTab,
       aboutPanelTab,
       linksPanelTab,
       lineagePanelTab,
@@ -86,7 +95,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     ],
     [
       aboutPanelTab,
-      abstractAndDownloadPanelTab,
+      summaryAndDownloadPanelTab,
       associatedRecordsPanelTab,
       citationPanelTab,
       lineagePanelTab,

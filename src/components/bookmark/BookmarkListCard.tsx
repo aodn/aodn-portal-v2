@@ -8,6 +8,7 @@ import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
 import { fontColor, fontSize, padding } from "../../styles/constants";
 import { SEARCH_PAGE_REFERER } from "../../pages/search-page/constants";
 import { TabNavigation } from "../../hooks/useTabNavigation";
+import { detailPageDefault } from "../common/constants";
 
 export interface BookmarkListCardType {
   dataset: OGCCollection;
@@ -29,12 +30,12 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
   const onDownload = () =>
     tabNavigation(
       dataset.id,
-      "abstract",
+      detailPageDefault.SUMMARY,
       SEARCH_PAGE_REFERER,
       "download-section"
     );
   const onDetail = () =>
-    tabNavigation(dataset.id, "abstract", SEARCH_PAGE_REFERER);
+    tabNavigation(dataset.id, detailPageDefault.SUMMARY, SEARCH_PAGE_REFERER);
 
   return (
     <Box flex={1} sx={{ ...sx }}>

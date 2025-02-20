@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel from "./NavigatablePanel";
 import LicenseList from "../../../../components/list/LicenseList";
@@ -9,8 +9,18 @@ import {
 import SuggestedCitationList from "../../../../components/list/SuggestedCitationList";
 import CitedResponsiblePartyList from "../../../../components/list/CitedResponsiblePartyList";
 import ConstraintList from "../../../../components/list/ConstraintList";
+import { detailPageDefault } from "../../../../components/common/constants";
+import { MODE } from "../../../../components/list/CommonDef";
+import SideCardContainer from "../side-cards/SideCardContainer";
 
-const CitationPanel = () => {
+interface CitationPanelProps {
+  mode?: MODE;
+}
+
+const TITLE_LICENSE = "License";
+const TITLE_SUGGESTED_CITATION = "Suggested Citation";
+
+const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
   const context = useDetailPageContext();
 
   const license = useMemo(
@@ -38,7 +48,9 @@ const CitationPanel = () => {
     () =>
       context.collection
         ?.getContacts()
-        ?.filter((contact) => contact.roles.includes("citation")),
+        ?.filter((contact) =>
+          contact.roles.includes(detailPageDefault.CITATION)
+        ),
     [context.collection]
   );
   const suggestedCitation = useMemo(
@@ -101,7 +113,7 @@ const CitationPanel = () => {
         ),
       },
       {
-        title: "License",
+        title: TITLE_LICENSE,
         component: (
           <LicenseList
             license={license ? license : ""}
@@ -111,7 +123,7 @@ const CitationPanel = () => {
         ),
       },
       {
-        title: "Suggested Citation",
+        title: TITLE_SUGGESTED_CITATION,
         component: (
           <SuggestedCitationList suggestedCitation={suggestedCitation ?? ""} />
         ),
@@ -131,7 +143,27 @@ const CitationPanel = () => {
     ]
   );
 
-  return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
+  switch (mode) {
+    case MODE.COMPACT:
+      return (
+        <SideCardContainer title={TITLE_LICENSE}>
+          <SuggestedCitationList
+            suggestedCitation={suggestedCitation ?? ""}
+            mode={mode}
+          />
+          <LicenseList
+            license={license ? license : ""}
+            url={licenseUrl ? licenseUrl : ""}
+            graphic={licenseGraphic ? licenseGraphic : ""}
+            mode={mode}
+          />
+        </SideCardContainer>
+      );
+
+    case MODE.NORMAL:
+    default:
+      return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
+  }
 };
 
 export default CitationPanel;

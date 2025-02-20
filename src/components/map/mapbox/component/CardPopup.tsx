@@ -28,6 +28,7 @@ import ResultCardButtonGroup from "../../../result/ResultCardButtonGroup";
 import { SEARCH_PAGE_REFERER } from "../../../../pages/search-page/constants";
 import BookmarkButton from "../../../bookmark/BookmarkButton";
 import { ResultCardButtonSize } from "../../../common/buttons/ResultCardButton";
+import { detailPageDefault } from "../../../common/constants";
 
 interface CardPopupProps {
   layerId: string;
@@ -53,12 +54,20 @@ const CardPopup: React.FC<CardPopupProps> = ({
   );
   const onDownload = useCallback(
     (collection: OGCCollection) =>
-      tabNavigation(collection.id, "abstract", "download-section"),
+      tabNavigation(
+        collection.id,
+        detailPageDefault.SUMMARY,
+        "download-section"
+      ),
     [tabNavigation]
   );
   const onDetail = useCallback(
     (collection: OGCCollection) =>
-      tabNavigation(collection.id, "abstract", SEARCH_PAGE_REFERER),
+      tabNavigation(
+        collection.id,
+        detailPageDefault.SUMMARY,
+        SEARCH_PAGE_REFERER
+      ),
     [tabNavigation]
   );
 
