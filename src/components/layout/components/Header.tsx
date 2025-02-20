@@ -1,7 +1,13 @@
 import { FC, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
-import { color, padding } from "../../../styles/constants";
+import {
+  border,
+  color,
+  padding,
+  shadow,
+  zIndex,
+} from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
 import HeaderMenu from "./HeaderMenu";
@@ -10,6 +16,7 @@ import Searchbar from "../../search/Searchbar";
 import {
   PAGE_CONTENT_MAX_WIDTH,
   PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+  SEARCHBAR_CONTENT_WIDTH,
 } from "../constant";
 import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
 import useBreakpoint from "../../../hooks/useBreakpoint";
@@ -18,20 +25,33 @@ const Header: FC = () => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const path = useLocation().pathname;
   const isSearchResultPage = path === pageDefault.search;
+  const isLandingPage = path === pageDefault.landing;
 
   const [shouldExpandSearchbar, setShouldExpandSearchbar] =
     useState<boolean>(false);
 
   return (
-    <Box>
+    <Box
+      sx={{
+        position: isLandingPage ? "sticky" : "unset",
+        top: 0,
+        zIndex: zIndex.header,
+        borderBottom: `${border.sm} ${color.gray.xxLight}`,
+        boxShadow: shadow.bottom,
+      }}
+    >
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: color.blue.xLight,
         }}
         contentAreaStyle={{
           alignItems: "end",
-          width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
-          maxWidth: isSearchResultPage ? "90%" : PAGE_CONTENT_MAX_WIDTH,
+          width: isSearchResultPage
+            ? SEARCHBAR_CONTENT_WIDTH
+            : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+          maxWidth: isSearchResultPage
+            ? SEARCHBAR_CONTENT_WIDTH
+            : PAGE_CONTENT_MAX_WIDTH,
         }}
       >
         <HeaderMenu />

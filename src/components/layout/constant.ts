@@ -8,7 +8,7 @@ Breakpoints as per UI design:
 */
 
 export const BREAKPOINT = {
-  MOBILE: 320,
+  MOBILE: 370,
   TABLET: 768,
   LAPTOP: 1280,
   DESKTOP: 1440,
@@ -16,9 +16,10 @@ export const BREAKPOINT = {
 };
 
 export const PAGE_CONTENT_MIN_WIDTH = BREAKPOINT.MOBILE;
-export const PAGE_CONTENT_MAX_WIDTH = BREAKPOINT.FOUR_K;
+export const PAGE_CONTENT_MAX_WIDTH = BREAKPOINT.DESKTOP;
 export const PAGE_CONTENT_WIDTH_ABOVE_LAPTOP = 0.8;
 export const PAGE_CONTENT_WIDTH_UNDER_LAPTOP = 0.95;
+export const SEARCHBAR_CONTENT_WIDTH = 0.9;
 
 export const AODN_SITE_LOGO_WIDTH = 50;
 export const AODN_SITE_LOGO_WIDTH_MOBILE = 35;

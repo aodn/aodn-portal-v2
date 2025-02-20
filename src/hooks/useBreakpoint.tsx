@@ -8,7 +8,7 @@ const useBreakpoint = () => {
     isLaptop: useMediaQuery(theme.breakpoints.between("md", "lg")),
     isDesktop: useMediaQuery(theme.breakpoints.between("lg", "xl")),
     is4K: useMediaQuery(theme.breakpoints.up("xl")),
-    isAboveLaptop: useMediaQuery(theme.breakpoints.up("md")),
+    isAboveDesktop: useMediaQuery(theme.breakpoints.up("lg")),
     isUnderLaptop: useMediaQuery(theme.breakpoints.down("md")),
   };
 };

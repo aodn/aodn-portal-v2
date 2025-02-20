@@ -27,6 +27,7 @@ interface SearchbarButtonGroupProps {
   handleClickButton: (button: SearchbarButtonNames) => void;
   shouldExpandAllButtons: boolean;
   shouldShrinkAllButtons?: boolean;
+  smallSize?: boolean;
   sx?: SxProps;
 }
 
@@ -89,6 +90,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   handleClickButton,
   shouldExpandAllButtons = false,
   shouldShrinkAllButtons = false,
+  smallSize = false,
   sx,
 }) => {
   const componentParams: ParameterState = getComponentState(store.getState());
@@ -150,6 +152,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
               ? true
               : activeButton === SearchbarButtonNames.Date
         }
+        smallSize={smallSize}
         data-testid="date-range-button"
       />
       <SearchbarExpandableButton
@@ -165,6 +168,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
               ? true
               : activeButton === SearchbarButtonNames.Location
         }
+        smallSize={smallSize}
         data-testid="location-button"
       />
       <SearchbarExpandableButton
@@ -179,6 +183,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
               ? true
               : activeButton === SearchbarButtonNames.Filter
         }
+        smallSize={smallSize}
         data-testid="filtersBtn"
       />
       <SearchbarExpandableButton
@@ -201,6 +206,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
             backgroundColor: color.brightBlue.dark,
           },
         }}
+        smallSize={smallSize}
         data-testid="search-button"
       />
     </Stack>

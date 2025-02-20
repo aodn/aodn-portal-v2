@@ -103,10 +103,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           },
           alignItems: "center",
           height: "100%",
-          border:
-            location.pathname === pageDefault.search
-              ? `${border.sm} ${color.brightBlue.semiTransparentDark}`
-              : "none",
+          border: `${border.sm} ${color.blue.dark}`,
           borderRadius: borderRadius.small,
           backgroundColor: { xs: "transparent", sm: "#fff" },
           paddingY: gap.md,
@@ -124,10 +121,11 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           pendingSearch={pendingSearch}
           activeButton={activeButton}
           handleClickButton={handleClickButton}
-          shouldExpandAllButtons={isMobile ? false : shouldExpandAllButtons}
+          shouldExpandAllButtons={shouldExpandAllButtons}
           shouldShrinkAllButtons={
             isMobile && location.pathname === pageDefault.search
           }
+          smallSize={isMobile}
           sx={{
             pr: gap.md,
             width:
