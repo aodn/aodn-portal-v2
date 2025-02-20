@@ -85,7 +85,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
             <CardHeader
               sx={{
                 height: "auto",
-                width: "90%",
+                width: "95%",
                 p: 0,
                 "& .MuiCardHeader-action": {
                   margin: 0,

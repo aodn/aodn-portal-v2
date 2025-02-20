@@ -5,6 +5,7 @@ import {
   borderRadius,
   color,
   fontColor,
+  fontSize,
   gap,
   padding,
 } from "../../styles/constants";
@@ -17,6 +18,7 @@ interface SearchbarExpandableButtonProps {
   badgeContent?: number;
   dotBadge?: boolean;
   buttonSx?: SxProps;
+  smallSize?: boolean;
   "data-testid"?: string | undefined;
 }
 
@@ -38,6 +40,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
   dotBadge,
   showText,
   buttonSx,
+  smallSize,
   "data-testid": testId,
 }) => {
   return (
@@ -54,6 +57,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
             marginRight: showText ? gap.md : 0,
             marginLeft: 0,
           },
+          fontSize: smallSize ? fontSize.label : fontSize.info,
           ...defaultButtonSx,
           ...buttonSx,
         }}
