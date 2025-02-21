@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import store from "../../../../../components/common/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
-import LinksPanel from "../LinksPanel";
+import DataAccessPanel from "../DataAccessPanel";
 
 describe("LinksPanel", async () => {
   const theme = AppTheme;
@@ -44,7 +44,7 @@ describe("LinksPanel", async () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <DetailPageProvider>
-            <LinksPanel />
+            <DataAccessPanel />
           </DetailPageProvider>
         </ThemeProvider>
       </Provider>

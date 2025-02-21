@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
-import LinksPanel from "./tab-panels/LinksPanel";
+import DataAccessPanel from "./tab-panels/DataAccessPanel";
 import AboutPanel from "./tab-panels/AboutPanel";
 import MetadataInformationPanel from "./tab-panels/MetadataInformationPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
@@ -38,11 +38,11 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     []
   );
 
-  const linksPanelTab = useMemo(
+  const dataAccessPanelTab = useMemo(
     () => ({
-      label: "Links",
-      value: detailPageDefault.LINKS,
-      component: <LinksPanel />,
+      label: "Data Access",
+      value: detailPageDefault.DATA_ACCESS,
+      component: <DataAccessPanel />,
     }),
     []
   );
@@ -86,8 +86,8 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
   const TABS = useMemo(
     () => [
       summaryAndDownloadPanelTab,
+      dataAccessPanelTab,
       aboutPanelTab,
-      linksPanelTab,
       lineagePanelTab,
       metadataInformationPanelTab,
       citationPanelTab,
@@ -99,7 +99,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
       associatedRecordsPanelTab,
       citationPanelTab,
       lineagePanelTab,
-      linksPanelTab,
+      dataAccessPanelTab,
       metadataInformationPanelTab,
     ]
   );

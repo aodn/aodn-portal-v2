@@ -1,19 +1,21 @@
-import { Paper, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import LinkCard from "../../../../components/list/listItem/subitem/LinkCard";
-import React, { FC, useState } from "react";
+import React, { FC, useMemo } from "react";
 import { MODE } from "../../../../components/list/CommonDef";
 import NaList from "../../../../components/list/NaList";
 import { ILink } from "../../../../components/common/store/OGCCollectionDefinitions";
 import SideCardContainer from "../side-cards/SideCardContainer";
 import { groupBy } from "../../../../utils/ObjectUtils";
 import { fontWeight } from "../../../../styles/constants";
+import DataAccessList from "../../../../components/list/DataAccessList";
+import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 
 export enum TYPE {
   DATA_ACCESS = "DATA_ACCESS",
 }
 
-interface LinksPanelProps {
+interface DataAccessPanelProps {
   mode?: MODE;
   type?: TYPE;
 }
@@ -23,7 +25,7 @@ const TITLE: Map<string, string> = new Map([
   ["wfs", "WFS Service Link"],
 ]);
 
-const createCompactLinks = (title: string, links: ILink[] | undefined) => {
+const createCompactPanel = (title: string, links: ILink[] | undefined) => {
   if (links && links.length > 0) {
     // Group links by type and display it in blocks
     const grouped: Record<string, ILink[]> = groupBy(links, "rel");
@@ -50,12 +52,21 @@ const createCompactLinks = (title: string, links: ILink[] | undefined) => {
   }
 };
 
-const LinksPanel: FC<LinksPanelProps> = ({ mode, type }) => {
+const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
   const { collection } = useDetailPageContext();
   const links: ILink[] | undefined = collection?.getDistributionLinks();
-  const [clickedCopyLinkButtonIndex, setClickedCopyLinkButtonIndex] = useState<
-    number[]
-  >([]);
+
+  const blocks: NavigatablePanelChild[] = useMemo(
+    () => [
+      {
+        title: "Data Access",
+        component: (
+          <DataAccessList dataAccessLinks={collection?.getDataAccessLinks()} />
+        ),
+      },
+    ],
+    [collection]
+  );
 
   if (links) {
     switch (mode) {
@@ -63,7 +74,7 @@ const LinksPanel: FC<LinksPanelProps> = ({ mode, type }) => {
         switch (type) {
           case TYPE.DATA_ACCESS:
           default:
-            return createCompactLinks(
+            return createCompactPanel(
               "Data Access",
               collection?.getDataAccessLinks()
             );
@@ -71,21 +82,9 @@ const LinksPanel: FC<LinksPanelProps> = ({ mode, type }) => {
 
       case MODE.NORMAL:
       default:
-        return (
-          <Paper elevation={0}>
-            {links.map((link: ILink, index: number) => (
-              <LinkCard
-                key={index}
-                index={index}
-                link={link}
-                clickedCopyLinkButtonIndex={clickedCopyLinkButtonIndex}
-                setClickedCopyLinkButtonIndex={setClickedCopyLinkButtonIndex}
-              />
-            ))}
-          </Paper>
-        );
+        return <NavigatablePanel childrenList={blocks} isLoading={false} />;
     }
   }
 };
 
-export default LinksPanel;
+export default DataAccessPanel;

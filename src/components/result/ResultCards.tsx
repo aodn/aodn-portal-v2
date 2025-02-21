@@ -220,7 +220,7 @@ const ResultCards: FC<ResultCardsProps> = ({
 
   const onClickLinks = useCallback(
     (uuid: string) =>
-      goToDetailPage(uuid, detailPageDefault.LINKS, SEARCH_PAGE_REFERER),
+      goToDetailPage(uuid, detailPageDefault.DATA_ACCESS, SEARCH_PAGE_REFERER),
     [goToDetailPage]
   );
 

@@ -42,22 +42,6 @@ const LinkCard: FC<LinkCardProps> = ({
       data-testid="links-card"
     >
       <Grid container>
-        {setClickedCopyLinkButtonIndex && (
-          <Grid item xs={2}>
-            <Box
-              sx={{
-                visibility:
-                  isShowCopyLinkButton || hasBeenCopied ? "visible" : "hidden",
-              }}
-            >
-              <CopyLinkButton
-                index={index}
-                setClickedCopyLinkButtonIndex={setClickedCopyLinkButtonIndex}
-                copyUrl={link.href}
-              />
-            </Box>
-          </Grid>
-        )}
         <Grid item xs={setClickedCopyLinkButtonIndex ? 10 : 12}>
           <Grid container spacing={1} aria-label="link and title">
             {icon && link.getIcon && (
@@ -107,6 +91,22 @@ const LinkCard: FC<LinkCardProps> = ({
             </Grid>
           </Grid>
         </Grid>
+        {setClickedCopyLinkButtonIndex && (
+          <Grid item xs={2}>
+            <Box
+              sx={{
+                visibility:
+                  isShowCopyLinkButton || hasBeenCopied ? "visible" : "hidden",
+              }}
+            >
+              <CopyLinkButton
+                index={index}
+                setClickedCopyLinkButtonIndex={setClickedCopyLinkButtonIndex}
+                copyUrl={link.href}
+              />
+            </Box>
+          </Grid>
+        )}
       </Grid>
     </Box>
   );

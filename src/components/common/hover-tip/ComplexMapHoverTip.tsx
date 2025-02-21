@@ -39,7 +39,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
     () =>
       tabNavigation(
         collection.id,
-        detailPageDefault.LINKS,
+        detailPageDefault.DATA_ACCESS,
         SEARCH_PAGE_REFERER
       ),
     [collection.id, tabNavigation]
