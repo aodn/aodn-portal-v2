@@ -8,7 +8,7 @@ Breakpoints as per UI design:
 */
 
 export const BREAKPOINT = {
-  MOBILE: 370,
+  MOBILE: 320,
   TABLET: 768,
   LAPTOP: 1280,
   DESKTOP: 1440,
