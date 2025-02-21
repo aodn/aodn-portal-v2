@@ -83,7 +83,9 @@ fetch(marineParkDefault.geojson)
     locationOptions.push(DEFAULT_LOCATION);
     locationOptions.push(...l);
   })
-  .catch((error) => console.error("Error fetching JSON:", error));
+  .catch((error) =>
+    console.error("Error fetching JSON, ok to ignore in vitest:", error)
+  );
 
 const LocationFilter: FC<LocationFilterProps> = () => {
   const dispatch = useAppDispatch();

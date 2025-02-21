@@ -188,6 +188,7 @@ export class OGCCollection {
   };
 
   // get properties
+  getPace = (): string | undefined => this.propValue?.pace;
   getStatus = (): string | undefined => this.propValue?.status;
   getCredits = (): string[] | undefined => this.propValue?.credits;
   getContacts = (): IContact[] | undefined => this.propValue?.contacts;
@@ -231,6 +232,7 @@ export class SummariesProperties {
   readonly creation?: string;
   readonly revision?: string;
   readonly centroid?: Array<Array<number>>;
+  readonly pace?: string;
 }
 
 export class Spatial {

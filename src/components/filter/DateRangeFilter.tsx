@@ -3,7 +3,6 @@ import dayjs, { Dayjs } from "dayjs";
 import {
   Box,
   Button,
-  Divider,
   FormControl,
   FormControlLabel,
   Grid,
@@ -345,7 +344,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
                   </Typography>
                   <PlainDatePicker
                     views={["year", "month", "day"]}
-                    format="DD/MM/YYYY"
+                    format={dateDefault.DISPLAY_FORMAT}
                     value={minDate}
                     minDate={initialMinDate}
                     maxDate={valueToDate(value[1])}
@@ -365,7 +364,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
                   </Typography>
                   <PlainDatePicker
                     views={["year", "month", "day"]}
-                    format="DD/MM/YYYY"
+                    format={dateDefault.DISPLAY_FORMAT}
                     value={maxDate}
                     minDate={valueToDate(value[0])}
                     maxDate={initialMaxDate}
@@ -411,7 +410,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
                     onChange={handleSliderChange}
                     valueLabelDisplay="auto"
                     valueLabelFormat={(value: number) =>
-                      valueToDate(value).format("DD/MM/YYYY")
+                      valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
                     }
                   />
                 </Box>
@@ -424,10 +423,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
                 alignItems="center"
               >
                 <Typography padding={0} fontSize={fontSize.label}>
-                  {initialMinDate.format("DD/MM/YYYY")}
+                  {initialMinDate.format(dateDefault.DISPLAY_FORMAT)}
                 </Typography>
                 <Typography padding={0} fontSize={fontSize.label}>
-                  {initialMaxDate.format("DD/MM/YYYY")}
+                  {initialMaxDate.format(dateDefault.DISPLAY_FORMAT)}
                 </Typography>
               </Grid>
             </Grid>
