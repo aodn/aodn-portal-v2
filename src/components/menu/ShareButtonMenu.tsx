@@ -7,10 +7,8 @@ import {
   Menu,
   MenuItem,
   Typography,
-  useTheme,
 } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
-import CloseIcon from "@mui/icons-material/Close";
 import {
   borderRadius,
   color,
@@ -30,11 +28,15 @@ export interface ShareMenuItem {
 
 interface ShareButtonProps {
   menuItems: ShareMenuItem[];
+  hideText?: boolean;
   onClose?: () => void;
 }
 
-const ShareButtonMenu: FC<ShareButtonProps> = ({ menuItems, onClose }) => {
-  const theme = useTheme();
+const ShareButtonMenu: FC<ShareButtonProps> = ({
+  menuItems,
+  hideText = false,
+  onClose,
+}) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -80,14 +82,16 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({ menuItems, onClose }) => {
         >
           <ShareIcon />
         </IconButton>
-        <Typography
-          fontSize={fontSize.icon}
-          color={isHovered || isOpen ? "#fff" : fontColor.blue.medium}
-          fontWeight={fontWeight.bold}
-          p={0}
-        >
-          Share
-        </Typography>
+        {!hideText && (
+          <Typography
+            fontSize={fontSize.icon}
+            color={isHovered || isOpen ? "#fff" : fontColor.blue.medium}
+            fontWeight={fontWeight.bold}
+            p={0}
+          >
+            Share
+          </Typography>
+        )}
       </Box>
       <Menu
         anchorEl={anchorEl}
@@ -106,7 +110,6 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({ menuItems, onClose }) => {
         sx={{
           width: "auto",
           "& .MuiPaper-root": {
-            backgroundColor: color.blue.xLight,
             borderRadius: borderRadius.small,
             marginTop: gap.md,
             minWidth: "200px",
@@ -117,30 +120,6 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({ menuItems, onClose }) => {
           },
         }}
       >
-        <Box
-          sx={{
-            bgcolor: "#fff",
-            borderRadius: `${borderRadius.small} ${borderRadius.small} 0 0`,
-            boxShadow: theme.shadows[6],
-            textAlign: "center",
-          }}
-        >
-          <Typography
-            padding={padding.small}
-            fontSize="16px"
-            fontWeight={fontWeight.medium}
-          >
-            Share
-          </Typography>
-          <Box position="absolute" top={gap.sm} right={gap.sm}>
-            <IconButton onClick={handleClose}>
-              <CloseIcon
-                sx={{ fontSize: fontSize.info, color: color.gray.light }}
-              />
-            </IconButton>
-          </Box>
-        </Box>
-
         {menuItems.map((item, index) => (
           <MenuItem key={index} onClick={item.handler}>
             <ListItemIcon>{item.icon}</ListItemIcon>

@@ -129,6 +129,7 @@ const color = {
   success: {
     main: "#4CAF50",
   },
+  pace: "#D7F4F2",
 };
 
 const border = {
