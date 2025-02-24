@@ -50,7 +50,10 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
   }, [contacts, theme.mp.md]);
 
   return (
-    <ExpandableList title="Metadata Contact" childrenList={metadataContacts} />
+    <ExpandableList
+      title="Contact of Data Owner"
+      childrenList={metadataContacts}
+    />
   );
 };
 

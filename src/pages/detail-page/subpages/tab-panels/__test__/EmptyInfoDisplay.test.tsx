@@ -24,6 +24,7 @@ describe("empty area display", async () => {
     vi.mock("react-router-dom", () => ({
       ...vi.importActual("react-router-dom"),
       useLocation: vi.fn(),
+      useNavigate: vi.fn(),
     }));
   });
 
@@ -56,10 +57,8 @@ describe("empty area display", async () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryByText("Keywords Not Found")).to.exist;
       expect(screen.queryByText("Contacts Not Found")).to.exist;
-      expect(screen.queryByText("Credits Not Found")).to.exist;
-      expect(screen.queryAllByText("N / A")).toHaveLength(3);
+      expect(screen.queryByText("Keywords Not Found")).to.exist;
     });
   });
 
@@ -83,15 +82,13 @@ describe("empty area display", async () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryAllByText("N / A")).toHaveLength(4);
-      expect(screen.queryByText("Metadata Contact Not Found")).to.exist;
       expect(screen.queryByText("Metadata Identifier Not Found")).to.exist;
       expect(screen.queryByText("Full Metadata Link Not Found")).to.exist;
       expect(screen.queryByText("Metadata Dates Not Found")).to.exist;
     });
   });
 
-  test("citation panel", async () => {
+  test("citation and usage panel", async () => {
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",
@@ -111,12 +108,13 @@ describe("empty area display", async () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryAllByText("N / A")).toHaveLength(4);
       expect(screen.queryByText("License Not Found")).to.exist;
       expect(screen.queryByText("Cited Responsible Parties Not Found")).to
         .exist;
       expect(screen.queryByText("Suggested Citation Not Found")).to.exist;
       expect(screen.queryByText("Constraints Not Found")).to.exist;
+      expect(screen.queryByText("Contact of Data Owner Not Found")).to.exist;
+      expect(screen.queryByText("Credits Not Found")).to.exist;
     });
   });
 

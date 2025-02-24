@@ -3,7 +3,6 @@ export const emptyAboutInfo = (json: any) => {
   try {
     jsonToResponse.properties.themes = [];
     jsonToResponse.properties.contacts = [];
-    jsonToResponse.properties.credits = [];
     return jsonToResponse;
   } catch (e) {
     console.error(e);
@@ -30,6 +29,7 @@ export const emptyCitationInfo = (json: any) => {
     jsonToResponse.properties.license = null;
     jsonToResponse.properties.citation = null;
     jsonToResponse.properties.contacts = [];
+    jsonToResponse.properties.credits = [];
     jsonToResponse.links = [];
     return jsonToResponse;
   } catch (e) {
