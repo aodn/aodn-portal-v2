@@ -57,6 +57,8 @@ const fontSize = {
   detailPageHeadingMobile: "14px",
   newsHeading: "40px",
   newsTitle: "20px",
+  slideCardTitle: "16px",
+  slideCardSubTitle: "14px",
   newsLabel: "16px",
   newsInfo: "14px",
   subscription: "14px",

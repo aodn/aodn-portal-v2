@@ -126,14 +126,16 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
         data: featureCollection,
       });
 
-      map?.loadImage("/images/legend1.png", (error, image) => {
-        if (error) {
-          throw error;
-        }
-        if (image) {
-          map?.addImage("legend1_img", image);
-        }
-      });
+      if (!map?.hasImage("legend1_img")) {
+        map?.loadImage("/images/legend1.png", (error, image) => {
+          if (error) {
+            throw error;
+          }
+          if (image) {
+            map?.addImage("legend1_img", image);
+          }
+        });
+      }
 
       map?.addLayer({
         id: clusterLayer,

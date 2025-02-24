@@ -10,7 +10,7 @@ import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
 import DataAccessPanel from "../DataAccessPanel";
 
-describe("LinksPanel", async () => {
+describe("DataAccessPanel", async () => {
   const theme = AppTheme;
   beforeAll(() => {
     server.listen();
@@ -20,6 +20,7 @@ describe("LinksPanel", async () => {
     vi.mock("react-router-dom", () => ({
       ...vi.importActual("react-router-dom"),
       useLocation: vi.fn(),
+      useNavigate: vi.fn(),
     }));
 
     vi.mocked(useLocation).mockReturnValue({
