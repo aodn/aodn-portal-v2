@@ -53,22 +53,11 @@ describe("MetadataInformationPanel", async () => {
   test("should render MetadataInformationPanel", async () => {
     // the panel is rendered
     await waitFor(() => {
-      expect(screen.queryAllByText("Metadata Contact")).toHaveLength(2);
+      expect(screen.queryAllByText("Metadata Identifier")).toHaveLength(2);
     });
 
     // the contact is rendered
     await waitFor(() => {
-      expect(
-        screen.queryByText("Australian Institute of Marine Science (AIMS)")
-      ).to.exist;
-      expect(screen.queryByText("PRIVATE MAIL BAG 3")).to.exist;
-      expect(screen.queryByText("TOWNSVILLE MAIL CENTRE")).to.exist;
-      expect(screen.queryByText("Queensland")).to.exist;
-      expect(screen.queryByText("4810")).to.exist;
-      expect(screen.queryByText("Australia")).to.exist;
-      expect(screen.queryByText("+61 7 4753 4444 (voice)")).to.exist;
-      expect(screen.queryByText("+61 7 4772 5852 (facsimile)")).to.exist;
-
       // medatada identifier is rendered
       expect(screen.queryByText("5fc91100-4ade-11dc-8f56-00008a07204e")).to
         .exist;

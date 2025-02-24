@@ -4,7 +4,7 @@ from pages.base_page import BasePage
 
 
 class CitationTab(BasePage):
-    TAB_NAME = 'Citation'
+    TAB_NAME = 'Citation and Usage'
     CITED_RESPONSIBLE_PARTIES = 'Cited Responsible Parties'
     LICENSE = 'License'
     SUGGESTED_CITATION = 'Suggested Citation'

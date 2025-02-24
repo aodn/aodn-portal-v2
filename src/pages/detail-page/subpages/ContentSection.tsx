@@ -75,7 +75,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
 
   const citationPanelTab: Tab = useMemo(
     () => ({
-      label: "Citation",
+      label: "Citation and Usage",
       value: detailPageDefault.CITATION,
       component: <CitationPanel />,
     }),
@@ -95,10 +95,10 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     () => [
       summaryAndDownloadPanelTab,
       dataAccessPanelTab,
+      citationPanelTab,
       aboutPanelTab,
       lineagePanelTab,
       metadataInformationPanelTab,
-      citationPanelTab,
       associatedRecordsPanelTab,
     ],
     [

@@ -12,6 +12,10 @@ import ConstraintList from "../../../../components/list/ConstraintList";
 import { detailPageDefault } from "../../../../components/common/constants";
 import { MODE } from "../../../../components/list/CommonDef";
 import SideCardContainer from "../side-cards/SideCardContainer";
+import useTabNavigation from "../../../../hooks/useTabNavigation";
+import { DETAIL_PAGE_REFERER } from "../../../search-page/constants";
+import MetadataContactList from "../../../../components/list/MetadataContactList";
+import CreditList from "../../../../components/list/CreditList";
 
 interface CitationPanelProps {
   mode?: MODE;
@@ -22,6 +26,7 @@ const TITLE_SUGGESTED_CITATION = "Suggested Citation";
 
 const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
   const context = useDetailPageContext();
+  const goToDetailPage = useTabNavigation();
 
   const license = useMemo(
     () => context.collection?.getLicense(),
@@ -92,6 +97,19 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     return constraintItems;
   }, [otherConstraints, useLimitations]);
 
+  const metadataContact = useMemo(
+    () =>
+      context.collection
+        ?.getContacts()
+        ?.filter((contact) => contact.roles.includes("metadata")),
+    [context.collection]
+  );
+
+  const credits = useMemo(
+    () => context.collection?.getCredits(),
+    [context.collection]
+  );
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -104,6 +122,12 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
 
   const blocks: NavigatablePanelChild[] = useMemo(
     () => [
+      {
+        title: TITLE_SUGGESTED_CITATION,
+        component: (
+          <SuggestedCitationList suggestedCitation={suggestedCitation ?? ""} />
+        ),
+      },
       {
         title: "Cited Responsible Parties",
         component: (
@@ -123,14 +147,20 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
         ),
       },
       {
-        title: TITLE_SUGGESTED_CITATION,
+        title: "Constraints",
+        component: <ConstraintList constraints={constraints} />,
+      },
+      {
+        title: "Contact of Data Owner",
         component: (
-          <SuggestedCitationList suggestedCitation={suggestedCitation ?? ""} />
+          <MetadataContactList
+            contacts={metadataContact ? metadataContact : []}
+          />
         ),
       },
       {
-        title: "Constraints",
-        component: <ConstraintList constraints={constraints} />,
+        title: "Credits",
+        component: <CreditList credits={credits ? credits : []} />,
       },
     ],
     [
@@ -140,29 +170,43 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       licenseGraphic,
       licenseUrl,
       suggestedCitation,
+      metadataContact,
+      credits,
     ]
   );
 
-  switch (mode) {
-    case MODE.COMPACT:
-      return (
-        <SideCardContainer title={TITLE_LICENSE}>
-          <SuggestedCitationList
-            suggestedCitation={suggestedCitation ?? ""}
-            mode={mode}
-          />
-          <LicenseList
-            license={license ? license : ""}
-            url={licenseUrl ? licenseUrl : ""}
-            graphic={licenseGraphic ? licenseGraphic : ""}
-            mode={mode}
-          />
-        </SideCardContainer>
-      );
+  if (context.collection) {
+    const collection = context.collection;
+    switch (mode) {
+      case MODE.COMPACT:
+        return (
+          <SideCardContainer
+            title={TITLE_LICENSE}
+            onClick={() =>
+              goToDetailPage(
+                collection.id,
+                detailPageDefault.CITATION,
+                DETAIL_PAGE_REFERER
+              )
+            }
+          >
+            <SuggestedCitationList
+              suggestedCitation={suggestedCitation ?? ""}
+              mode={mode}
+            />
+            <LicenseList
+              license={license ? license : ""}
+              url={licenseUrl ? licenseUrl : ""}
+              graphic={licenseGraphic ? licenseGraphic : ""}
+              mode={mode}
+            />
+          </SideCardContainer>
+        );
 
-    case MODE.NORMAL:
-    default:
-      return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
+      case MODE.NORMAL:
+      default:
+        return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
+    }
   }
 };
 
