@@ -27,7 +27,6 @@ import GeojsonLayer from "../layers/GeojsonLayer";
 import ResultCardButtonGroup from "../../../result/ResultCardButtonGroup";
 import { SEARCH_PAGE_REFERER } from "../../../../pages/search-page/constants";
 import BookmarkButton from "../../../bookmark/BookmarkButton";
-import { ResultCardButtonSize } from "../../../common/buttons/ResultCardButton";
 import { detailPageDefault } from "../../../common/constants";
 
 interface CardPopupProps {
@@ -87,6 +86,14 @@ const CardPopup: React.FC<CardPopupProps> = ({
   useEffect(() => {
     const onMouseClick = (ev: MapLayerMouseEvent): void => {
       if (ev.target && map && panel && panel.current) {
+        // Check if the layer exists before querying
+        const style = map.getStyle();
+        const layerExists = style.layers?.some((layer) => layer.id === layerId);
+        if (!layerExists) {
+          panel.current.style.visibility = "hidden";
+          return;
+        }
+
         // Convert click coordinates to point for feature querying
         const point = map.project(ev.lngLat);
         // Query features from the specified layer at the clicked point
@@ -244,7 +251,11 @@ const CardPopup: React.FC<CardPopupProps> = ({
               content={content}
               isGridView
               onLinks={() => onLinks(content)}
-              onDownload={() => onDownload(content)}
+              onDownload={
+                content.hasSummaryFeature()
+                  ? () => onDownload(content)
+                  : undefined
+              }
               onDetail={() => onDetail(content)}
             />
           )}
