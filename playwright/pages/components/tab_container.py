@@ -7,7 +7,7 @@ from pages.components.tabs.associated_records import AssociatedRecordsTab
 from pages.components.tabs.citation import CitationTab
 from pages.components.tabs.global_attr import GlobalAttrTab
 from pages.components.tabs.lineage import LineageTab
-from pages.components.tabs.links import LinksTab
+from pages.components.tabs.links import DataAccessTab
 from pages.components.tabs.metadata_info import MetadataInfoTab
 
 
@@ -22,8 +22,8 @@ class TabContainerComponent(BasePage):
 
         # Tabs
         self.abstract = SummaryTab(page)
+        self.links = DataAccessTab(page)
         self.about = AboutTab(page)
-        self.links = LinksTab(page)
         self.lineage = LineageTab(page)
         self.metadata_info = MetadataInfoTab(page)
         self.citation = CitationTab(page)
