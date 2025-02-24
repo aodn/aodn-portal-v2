@@ -212,11 +212,12 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         },
       });
 
-      // Change the cursor to a pointer for uncluster point
+      // Change the cursor to a pointer for cluster circle/uncluster point
       map?.on("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
-
-      // Change the cursor back to default when it leaves the unclustered points
+      map?.on("mouseenter", unclusterPointLayer, defaultMouseEnterEventHandler);
+      // Change the cursor back to default when it leaves the cluster circle/unclustered points
       map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
+      map?.on("mouseleave", unclusterPointLayer, defaultMouseLeaveEventHandler);
     };
 
     map?.once("load", createLayers);
@@ -227,8 +228,18 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
     return () => {
       map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
-      map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
+      map?.off(
+        "mouseenter",
+        unclusterPointLayer,
+        defaultMouseEnterEventHandler
+      );
 
+      map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
+      map?.off(
+        "mouseleave",
+        unclusterPointLayer,
+        defaultMouseLeaveEventHandler
+      );
       // Clean up resource when you click on the next spatial extents, map is
       // still working in this page.
       try {

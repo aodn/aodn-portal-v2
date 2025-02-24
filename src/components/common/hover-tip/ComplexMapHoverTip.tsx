@@ -111,7 +111,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
           content={collection}
           isGridView
           onLinks={onLinks}
-          onDownload={onDownload}
+          onDownload={collection.hasSummaryFeature() ? onDownload : undefined}
           onDetail={onDetail}
         />
         <Box>

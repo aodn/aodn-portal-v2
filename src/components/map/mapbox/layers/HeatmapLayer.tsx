@@ -23,6 +23,7 @@ import { FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
+import CardPopup from "../component/CardPopup";
 
 interface IHeatmapLayer {
   maxZoom: number;
@@ -330,6 +331,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   return (
     <>
       <MapPopup layerId={unClusterPointLayer} tabNavigation={tabNavigation} />
+      <CardPopup layerId={unClusterPointLayer} tabNavigation={tabNavigation} />
       <SpatialExtents
         layerId={unClusterPointLayer}
         selectedUuids={selectedUuids}

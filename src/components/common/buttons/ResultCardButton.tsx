@@ -71,7 +71,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
           padding={0}
           pl={padding.extraSmall}
           fontSize={config.size === "small" ? "12px" : "14px"}
-          color={config.color === "success" ? color.success.main : config.color}
+          color={config.color}
         >
           {text}
         </Typography>
