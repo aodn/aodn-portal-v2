@@ -29,7 +29,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
   onClickCard = () => {},
   onClickDetail = () => {},
   onClickLinks = () => {},
-  onClickDownload = undefined,
+  onClickDownload = () => {},
   selectedUuid,
   isSimplified = false,
   sx,
@@ -158,9 +158,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
               shouldHideText
               isGridView
               onLinks={() => onClickLinks(uuid)}
-              onDownload={
-                onClickDownload ? () => onClickDownload(uuid) : onClickDownload
-              }
+              onDownload={() => onClickDownload(uuid)}
               onDetail={() => onClickDetail(uuid)}
             />
           )}
