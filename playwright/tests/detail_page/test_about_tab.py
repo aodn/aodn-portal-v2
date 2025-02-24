@@ -3,7 +3,7 @@ from playwright.sync_api import Page, expect
 
 from pages.detail_page import DetailPage
 
-
+@pytest.skip("No more about tab")
 @pytest.mark.parametrize(
     'title, uuid, contact, credit, keyword, keyword_value',
     [

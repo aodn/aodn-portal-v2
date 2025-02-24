@@ -52,33 +52,26 @@ describe("AboutPanel", async () => {
 
   test("should render AboutPanel", async () => {
     // the panel is rendered
-    await waitFor(() => {
-      expect(screen.queryAllByText("Credits")).toHaveLength(2);
-    });
+    await waitFor(() =>
+      expect(screen.queryAllByText("Contacts")).toHaveLength(2)
+    );
 
     await waitFor(() => {
       // infomation is rendered
       expect(screen.queryByText("AODN Discovery Parameter Vocabulary")).to
         .exist;
+
       expect(
         screen.queryByText(
           "Australian Institute of Marine Science (AIMS) - Bainbridge, S"
         )
       ).to.exist;
+
       expect(
         screen.queryByText(
           "Australian Institute of Marine Science (AIMS) - Data Manager, AIMS Data Centre"
         )
       );
-      expect(
-        screen.queryByText(
-          "Australia’s Integrated Marine Observing System (IMOS) is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS). It is operated by a consortium of institutions as an unincorporated joint venture, with the University of Tasmania as Lead Agent."
-        )
-      ).to.exist;
-      expect(
-        screen.queryByText("Australian Institute of Marine Science (AIMS)")
-      ).to.exist;
-      expect(screen.queryByText("Bainbridge, Scott, Mr")).to.exist;
     });
   });
 });

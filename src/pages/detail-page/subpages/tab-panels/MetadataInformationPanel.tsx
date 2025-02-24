@@ -13,13 +13,6 @@ const MetadataInformationPanel = () => {
     () => context.collection?.id,
     [context.collection?.id]
   );
-  const metadataContact = useMemo(
-    () =>
-      context.collection
-        ?.getContacts()
-        ?.filter((contact) => contact.roles.includes("metadata")),
-    [context.collection]
-  );
 
   // TODO: for the creation and revision, geonetwork still have a confusion about the time zone.
   //  currently just make all time zone to be UTC (hard coded).
@@ -63,14 +56,6 @@ const MetadataInformationPanel = () => {
   const blocks: NavigatablePanelChild[] = useMemo(
     () => [
       {
-        title: "Metadata Contact",
-        component: (
-          <MetadataContactList
-            contacts={metadataContact ? metadataContact : []}
-          />
-        ),
-      },
-      {
         title: "Metadata Identifier",
         component: <MetadataIdentifierList identifier={metadataId ?? ""} />,
       },
@@ -83,7 +68,7 @@ const MetadataInformationPanel = () => {
         component: <MetadataDateList creation={creation} revision={revision} />,
       },
     ],
-    [creation, metadataContact, metadataId, metadataUrl, revision]
+    [creation, metadataId, metadataUrl, revision]
   );
   return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
 };

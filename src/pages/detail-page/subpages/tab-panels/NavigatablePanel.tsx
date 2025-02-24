@@ -1,8 +1,10 @@
 import { Box, CircularProgress, Grid } from "@mui/material";
 import React, {
+  MutableRefObject,
   ReactNode,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -37,12 +39,26 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
 }) => {
   const [scrollDistance, setScrollDistance] = useState<number | null>(null);
   const scrollableSectionRef = useRef<HTMLDivElement | null>(null);
-  const firstRef = useRef<HTMLDivElement | null>(null);
-  const secondRef = useRef<HTMLDivElement | null>(null);
-  const thirdRef = useRef<HTMLDivElement | null>(null);
-  const fourthRef = useRef<HTMLDivElement | null>(null);
   const basePointRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState(0);
+
+  const firstRef: MutableRefObject<HTMLDivElement | null> =
+    useRef<HTMLDivElement | null>(null);
+  const secondRef: MutableRefObject<HTMLDivElement | null> =
+    useRef<HTMLDivElement | null>(null);
+  const thirdRef: MutableRefObject<HTMLDivElement | null> =
+    useRef<HTMLDivElement | null>(null);
+  const fourthRef: MutableRefObject<HTMLDivElement | null> =
+    useRef<HTMLDivElement | null>(null);
+  const fifthRef: MutableRefObject<HTMLDivElement | null> =
+    useRef<HTMLDivElement | null>(null);
+  const sixthRef: MutableRefObject<HTMLDivElement | null> =
+    useRef<HTMLDivElement | null>(null);
+
+  const refs: MutableRefObject<HTMLDivElement | null>[] = useMemo(
+    () => [firstRef, secondRef, thirdRef, fourthRef, fifthRef, sixthRef],
+    []
+  );
 
   const [supplimentaryHeight, setSupplimentaryHeight] = useState(0);
 
@@ -66,18 +82,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     }, RESIZE_DELAY);
   }, []);
 
-  const getRefBy = useCallback((index: number) => {
-    switch (index) {
-      case 0:
-        return firstRef;
-      case 1:
-        return secondRef;
-      case 2:
-        return thirdRef;
-      case 3:
-        return fourthRef;
-    }
-  }, []);
+  const getRefBy = useCallback((index: number) => refs[index], [refs]);
 
   const debounceScrollHandler = useRef<_.DebouncedFunc<
     (number: any) => void
@@ -103,54 +108,39 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const isPositionInsideBlock = useCallback(
     (position: number, index: number): boolean => {
       // at the beginning, when refs are all null(not initialized yet), border the first one by default
-      if (
-        !firstRef.current &&
-        !secondRef.current &&
-        !thirdRef.current &&
-        !fourthRef.current
-      ) {
+      if (refs.some((ref) => !ref.current)) {
         return index === 0;
       }
 
       const fixedPosition = position + 10;
-      switch (index) {
-        case 0:
-          return (
-            fixedPosition <
-            (secondRef?.current?.offsetTop ? secondRef?.current?.offsetTop : 0)
-          );
-        case 1:
-          return (
-            fixedPosition >=
-              (secondRef?.current?.offsetTop
-                ? secondRef?.current?.offsetTop
-                : 0) &&
-            fixedPosition <
-              (thirdRef?.current?.offsetTop
-                ? thirdRef?.current?.offsetTop
-                : BIG_POSITION)
-          );
-        case 2:
-          return (
-            fixedPosition >=
-              (thirdRef?.current?.offsetTop
-                ? thirdRef?.current?.offsetTop
-                : 0) &&
-            fixedPosition <
-              (fourthRef?.current?.offsetTop
-                ? fourthRef?.current?.offsetTop
-                : BIG_POSITION)
-          );
-        case 3:
-          return (
-            fixedPosition >=
-            (fourthRef?.current?.offsetTop ? fourthRef?.current?.offsetTop : 0)
-          );
-        default:
-          return false;
+      if (index === 0) {
+        // Start case
+        const next = refs[1];
+        return (
+          next &&
+          fixedPosition <
+            (next?.current?.offsetTop ? next?.current?.offsetTop : 0)
+        );
+      } else if (index === refs.length - 1) {
+        // End case
+        const last = refs[refs.length - 1];
+        return (
+          last &&
+          fixedPosition >=
+            (last?.current?.offsetTop ? last?.current?.offsetTop : 0)
+        );
+      } else {
+        const self = refs[index];
+        const next = refs[index + 1];
+        return (
+          fixedPosition >=
+            (self?.current?.offsetTop ? self?.current?.offsetTop : 0) &&
+          fixedPosition <
+            (next?.current?.offsetTop ? next?.current?.offsetTop : BIG_POSITION)
+        );
       }
     },
-    []
+    [refs]
   );
 
   const onNavigate = useCallback(

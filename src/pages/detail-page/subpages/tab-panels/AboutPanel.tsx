@@ -7,16 +7,11 @@ import {
   ITheme,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import _ from "lodash";
-import CreditList from "../../../../components/list/CreditList";
 import KeywordList from "../../../../components/list/KeywordList";
 import { detailPageDefault } from "../../../../components/common/constants";
 
 const AboutPanel = () => {
   const context = useDetailPageContext();
-  const credits = useMemo(
-    () => context.collection?.getCredits(),
-    [context.collection]
-  );
   const aboutContacts = useMemo(
     () =>
       context.collection
@@ -52,12 +47,12 @@ const AboutPanel = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!credits || !aboutContacts || !themes) {
+    if (!aboutContacts || !themes) {
       setIsLoading(true);
     } else {
       setIsLoading(false);
     }
-  }, [credits, aboutContacts, themes]);
+  }, [aboutContacts, themes]);
 
   const blocks: NavigatablePanelChild[] = useMemo(
     () => [
@@ -68,15 +63,11 @@ const AboutPanel = () => {
         ),
       },
       {
-        title: "Credits",
-        component: <CreditList credits={credits ? credits : []} />,
-      },
-      {
         title: "Keywords",
         component: <KeywordList keywords={keywords} />,
       },
     ],
-    [aboutContacts, credits, keywords]
+    [aboutContacts, keywords]
   );
 
   return <NavigatablePanel childrenList={blocks} isLoading={isLoading} />;
