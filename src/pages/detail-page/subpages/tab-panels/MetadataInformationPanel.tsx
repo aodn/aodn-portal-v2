@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import NavigatablePanel from "./NavigatablePanel";
+import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import { convertDateFormat } from "../../../../utils/DateUtils";
 import MetadataUrlList from "../../../../components/list/MetadataUrlList";
 import MetadataContactList from "../../../../components/list/MetadataContactList";
@@ -60,7 +60,7 @@ const MetadataInformationPanel = () => {
     }
   }, [context.collection]);
 
-  const blocks = useMemo(
+  const blocks: NavigatablePanelChild[] = useMemo(
     () => [
       {
         title: "Metadata Contact",

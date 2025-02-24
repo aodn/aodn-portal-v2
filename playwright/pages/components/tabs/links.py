@@ -3,8 +3,8 @@ from playwright.sync_api import Page
 from pages.base_page import BasePage
 
 
-class LinksTab(BasePage):
-    TAB_NAME = 'Links'
+class DataAccessTab(BasePage):
+    TAB_NAME = 'Data Access'
 
     def __init__(self, page: Page):
         self.page = page

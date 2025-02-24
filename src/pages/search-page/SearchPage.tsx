@@ -363,9 +363,9 @@ const SearchPage = () => {
   useEffect(() => handleNavigation(), [handleNavigation]);
 
   useEffect(() => {
-    const bookmarkSelected = async (event: BookmarkEvent) => {
+    const bookmarkSelected = (event: BookmarkEvent) => {
       if (event.action === EVENT_BOOKMARK.EXPAND) {
-        await onClickResultCard(event.value);
+        onClickResultCard(event.value);
       }
     };
     on(EVENT_BOOKMARK.EXPAND, bookmarkSelected);

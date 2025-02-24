@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
-import LinksPanel from "./tab-panels/LinksPanel";
+import DataAccessPanel from "./tab-panels/DataAccessPanel";
 import AboutPanel from "./tab-panels/AboutPanel";
 import MetadataInformationPanel from "./tab-panels/MetadataInformationPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
@@ -10,7 +10,9 @@ import { Card, Grid } from "@mui/material";
 import { borderRadius } from "../../../styles/constants";
 import { useDetailPageContext } from "../context/detail-page-context";
 import RecordNotFoundPanel from "./tab-panels/RecordNotFoundPanel";
-import TabsPanelContainer from "../../../components/common/tab/TabsPanelContainer";
+import TabsPanelContainer, {
+  Tab,
+} from "../../../components/common/tab/TabsPanelContainer";
 import { useLocation } from "react-router-dom";
 import { LngLatBounds } from "mapbox-gl";
 import { detailPageDefault } from "../../../components/common/constants";
@@ -19,8 +21,14 @@ interface ContentSectionProps {
   mapFocusArea?: LngLatBounds;
 }
 
+const findTabIndex = (params: URLSearchParams, tabs: Tab[]) => {
+  const tabValue = params.get("tab");
+  const index = tabs.findIndex((tab) => tab.value === tabValue);
+  return index === -1 ? 0 : index;
+};
+
 const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
-  const summaryAndDownloadPanelTab = useMemo(
+  const summaryAndDownloadPanelTab: Tab = useMemo(
     () => ({
       label: "Summary",
       value: detailPageDefault.SUMMARY,
@@ -29,7 +37,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     [mapFocusArea]
   );
 
-  const aboutPanelTab = useMemo(
+  const aboutPanelTab: Tab = useMemo(
     () => ({
       label: "About",
       value: detailPageDefault.ABOUT,
@@ -38,16 +46,16 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     []
   );
 
-  const linksPanelTab = useMemo(
+  const dataAccessPanelTab: Tab = useMemo(
     () => ({
-      label: "Links",
-      value: detailPageDefault.LINKS,
-      component: <LinksPanel />,
+      label: "Data Access",
+      value: detailPageDefault.DATA_ACCESS,
+      component: <DataAccessPanel />,
     }),
     []
   );
 
-  const lineagePanelTab = useMemo(
+  const lineagePanelTab: Tab = useMemo(
     () => ({
       label: "Lineage",
       value: detailPageDefault.LINEAGE,
@@ -56,7 +64,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     []
   );
 
-  const metadataInformationPanelTab = useMemo(
+  const metadataInformationPanelTab: Tab = useMemo(
     () => ({
       label: "Metadata Information",
       value: detailPageDefault.METADATA_INFORMATION,
@@ -65,7 +73,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     []
   );
 
-  const citationPanelTab = useMemo(
+  const citationPanelTab: Tab = useMemo(
     () => ({
       label: "Citation",
       value: detailPageDefault.CITATION,
@@ -74,7 +82,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     []
   );
 
-  const associatedRecordsPanelTab = useMemo(
+  const associatedRecordsPanelTab: Tab = useMemo(
     () => ({
       label: "Associated Records",
       value: detailPageDefault.ASSOCIATED_RECORDS,
@@ -83,11 +91,11 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     []
   );
 
-  const TABS = useMemo(
+  const TABS: Tab[] = useMemo(
     () => [
       summaryAndDownloadPanelTab,
+      dataAccessPanelTab,
       aboutPanelTab,
-      linksPanelTab,
       lineagePanelTab,
       metadataInformationPanelTab,
       citationPanelTab,
@@ -99,7 +107,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
       associatedRecordsPanelTab,
       citationPanelTab,
       lineagePanelTab,
-      linksPanelTab,
+      dataAccessPanelTab,
       metadataInformationPanelTab,
     ]
   );
@@ -107,35 +115,26 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
   const location = useLocation();
   const { isCollectionNotFound } = useDetailPageContext();
 
-  const pathname = location.pathname;
-  const params = new URLSearchParams(location.search);
-  const uuid = params.get("uuid");
+  const params: URLSearchParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  );
 
-  const [tabValue, setTabValue] = useState<number>(() => {
-    const params = new URLSearchParams(location.search);
-
-    const tabValue = params.get("tab");
-    const index = TABS.findIndex((tab) => tab.value === tabValue);
-    return index === -1 ? 0 : index;
-  });
+  const [tabValue, setTabValue] = useState<number>(findTabIndex(params, TABS));
 
   const handleTabChange = useCallback(
     (newValue: number) => {
       // Update URL without navigating
-      const newUrl = `${pathname}?uuid=${uuid}&tab=${TABS[newValue].value}`;
+      const newUrl = `${location.pathname}?uuid=${params.get("uuid")}&tab=${TABS[newValue].value}`;
       window.history.pushState(null, "", newUrl);
     },
-    [TABS, pathname, uuid]
+    [TABS, location.pathname, params]
   );
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const tabValue = params.get("tab");
-    const index = TABS.findIndex((tab) => tab.value === tabValue);
-    if (index !== -1) {
-      setTabValue(index);
-    }
-  }, [TABS, location]);
+    const index = findTabIndex(params, TABS);
+    setTabValue(index);
+  }, [TABS, params]);
 
   // if no collection found, unfocus the tab
   useEffect(() => {

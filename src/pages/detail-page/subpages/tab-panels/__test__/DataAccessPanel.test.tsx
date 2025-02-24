@@ -8,9 +8,9 @@ import { useLocation } from "react-router-dom";
 import store from "../../../../../components/common/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
-import LinksPanel from "../LinksPanel";
+import DataAccessPanel from "../DataAccessPanel";
 
-describe("LinksPanel", async () => {
+describe("DataAccessPanel", async () => {
   const theme = AppTheme;
   beforeAll(() => {
     server.listen();
@@ -20,6 +20,7 @@ describe("LinksPanel", async () => {
     vi.mock("react-router-dom", () => ({
       ...vi.importActual("react-router-dom"),
       useLocation: vi.fn(),
+      useNavigate: vi.fn(),
     }));
 
     vi.mocked(useLocation).mockReturnValue({
@@ -44,7 +45,7 @@ describe("LinksPanel", async () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <DetailPageProvider>
-            <LinksPanel />
+            <DataAccessPanel />
           </DetailPageProvider>
         </ThemeProvider>
       </Provider>

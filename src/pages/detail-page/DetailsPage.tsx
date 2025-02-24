@@ -8,10 +8,8 @@ import ContentSection from "./subpages/ContentSection";
 import SectionContainer from "../../components/layout/components/SectionContainer";
 import { LngLatBounds, MapLayerMouseEvent } from "mapbox-gl";
 import { useCallback, useState } from "react";
-import useBreakpoint from "../../hooks/useBreakpoint";
 
 const DetailsPage = () => {
-  const { isUnderLaptop } = useBreakpoint();
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
   const onSpatialCoverageLayerClick = useCallback(
     (evt: MapLayerMouseEvent) => {

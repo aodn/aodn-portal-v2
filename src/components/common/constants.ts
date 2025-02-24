@@ -23,7 +23,7 @@ const detailPageDefault = {
   ABOUT: "about",
   ASSOCIATED_RECORDS: "associated records",
   CITATION: "citation",
-  LINKS: "links",
+  DATA_ACCESS: "data_access",
   LINEAGE: "lineage",
   METADATA_INFORMATION: "metadata information",
   SUMMARY: "summary",

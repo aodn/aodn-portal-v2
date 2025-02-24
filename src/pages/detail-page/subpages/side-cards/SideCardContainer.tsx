@@ -1,16 +1,22 @@
-import { Card, Divider, Typography } from "@mui/material";
 import { FC, ReactNode } from "react";
+import { Card, CardHeader, Divider, IconButton } from "@mui/material";
+import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import {
   borderRadius,
   fontWeight,
-  padding,
-  shadow,
+  fontSize,
 } from "../../../../styles/constants";
+
 interface SideCardContainerProps {
-  children: ReactNode;
   title: string;
+  onClick?: () => void;
+  children: ReactNode;
 }
-const SideCardContainer: FC<SideCardContainerProps> = ({ children, title }) => {
+const SideCardContainer: FC<SideCardContainerProps> = ({
+  children,
+  title,
+  onClick,
+}) => {
   return (
     <Card
       elevation={2}
@@ -20,24 +26,26 @@ const SideCardContainer: FC<SideCardContainerProps> = ({ children, title }) => {
         width: { xs: "100%", sm: "48.5%", md: "100%" },
       }}
     >
-      <Card
+      <CardHeader
+        title={title}
+        action={
+          onClick && (
+            <IconButton aria-label="settings" size="small" onClick={onClick}>
+              <ArrowOutwardIcon fontSize="small" />
+            </IconButton>
+          )
+        }
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: 0,
-          boxShadow: shadow.bottom,
+          "& .MuiCardHeader-title": {
+            fontSize: fontSize.slideCardTitle,
+            fontWeight: fontWeight.bold,
+            margin: "0", // No margins
+            padding: "0", // No padding
+            textAlign: "center", // Center the title text
+          },
         }}
-      >
-        <Typography
-          paddingY={padding.medium}
-          fontSize="16px"
-          fontWeight={fontWeight.bold}
-          align="center"
-        >
-          {title}
-        </Typography>
-        <Divider sx={{ width: "100%" }} />
-      </Card>
+      />
+      <Divider sx={{ width: "100%" }} />
       {children}
     </Card>
   );

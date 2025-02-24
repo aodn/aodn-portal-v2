@@ -107,6 +107,7 @@ export enum RelationType {
 export enum MediaType {
   TEXT_HTML = "text/html",
   IMAGE_PNG = "image/png",
+  PYTHON_NOTEBOOK = "application/x-ipynb+json",
 }
 
 const getIcon = (href: string, rel: string) => {
@@ -203,12 +204,18 @@ export class OGCCollection {
   getLicense = (): string | undefined => this.propValue?.license;
   getCreation = (): string | undefined => this.propValue?.creation;
   getRevision = (): string | undefined => this.propValue?.revision;
+  getPythonNotebook = (): ILink[] | undefined =>
+    this.links?.filter((link) => link.type === MediaType.PYTHON_NOTEBOOK);
   getDataAccessLinks = (): ILink[] | undefined =>
     this.links?.filter(
       (link) => link.rel === RelationType.WMS || link.rel === RelationType.WFS
     );
   getDistributionLinks = (): ILink[] | undefined =>
-    this.links?.filter((link) => link.rel === RelationType.RELATED);
+    this.links?.filter(
+      (link) =>
+        link.rel === RelationType.RELATED &&
+        link.type !== MediaType.PYTHON_NOTEBOOK
+    );
   getMetadataUrl = (): string | undefined =>
     this.links?.filter(
       (link) =>

@@ -21,8 +21,13 @@ const RESIZE_DELAY = 300;
 
 const DEBOUNCE_DELAY = 100;
 
+export interface NavigatablePanelChild {
+  title: string;
+  component: ReactNode;
+}
+
 interface NavigatablePanelProps {
-  childrenList: { title: string; component: ReactNode }[];
+  childrenList: NavigatablePanelChild[];
   isLoading: boolean;
 }
 

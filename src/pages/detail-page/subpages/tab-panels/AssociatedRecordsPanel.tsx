@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import {
   IAssociatedRecord,
@@ -7,7 +7,7 @@ import {
   RelationType,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import AssociatedRecordList from "../../../../components/list/AssociatedRecordList";
-import NavigatablePanel from "./NavigatablePanel";
+import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import { parseJson } from "../../../../utils/Helpers";
 
 const getUuid = (str: string) => {
@@ -70,7 +70,7 @@ const AssociatedRecordsPanel = () => {
     }
   }, [context.collection]);
 
-  const lists = useMemo(
+  const lists: NavigatablePanelChild[] = useMemo(
     () => [
       {
         title: "Parent Record",
