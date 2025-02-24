@@ -60,7 +60,7 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
             content={dataset}
             isGridView
             onLinks={onLinks}
-            onDownload={onDownload}
+            onDownload={dataset.hasSummaryFeature() ? onDownload : undefined}
             onDetail={onDetail}
           />
         </Box>
