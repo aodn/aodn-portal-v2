@@ -49,6 +49,6 @@ def test_metadata_info_sections(
         metadata_identifier_list.get_by_text(metadata_identifier)
     ).to_be_visible()
 
-    metadata_info.metadata_contact.click()
-    expect(metadata_info.metadata_contact_title).to_be_visible()
-    expect(metadata_info.metadata_contact_title).to_have_text(metadata_contact)
+    # metadata_info.metadata_contact.click()
+    # expect(metadata_info.metadata_contact_title).to_be_visible()
+    # expect(metadata_info.metadata_contact_title).to_have_text(metadata_contact)

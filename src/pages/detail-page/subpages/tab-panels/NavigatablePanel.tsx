@@ -1,10 +1,9 @@
 import { Box, CircularProgress, Grid } from "@mui/material";
 import React, {
-  MutableRefObject,
+  createRef,
   ReactNode,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -42,22 +41,11 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const basePointRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState(0);
 
-  const firstRef: MutableRefObject<HTMLDivElement | null> =
-    useRef<HTMLDivElement | null>(null);
-  const secondRef: MutableRefObject<HTMLDivElement | null> =
-    useRef<HTMLDivElement | null>(null);
-  const thirdRef: MutableRefObject<HTMLDivElement | null> =
-    useRef<HTMLDivElement | null>(null);
-  const fourthRef: MutableRefObject<HTMLDivElement | null> =
-    useRef<HTMLDivElement | null>(null);
-  const fifthRef: MutableRefObject<HTMLDivElement | null> =
-    useRef<HTMLDivElement | null>(null);
-  const sixthRef: MutableRefObject<HTMLDivElement | null> =
-    useRef<HTMLDivElement | null>(null);
-
-  const refs: MutableRefObject<HTMLDivElement | null>[] = useMemo(
-    () => [firstRef, secondRef, thirdRef, fourthRef, fifthRef, sixthRef],
-    []
+  // Create an array of refs with the same size as the items list
+  const refs = useRef(
+    Array(childrenList.length)
+      .fill(null)
+      .map(() => createRef<HTMLDivElement | null>())
   );
 
   const [supplimentaryHeight, setSupplimentaryHeight] = useState(0);
@@ -82,7 +70,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     }, RESIZE_DELAY);
   }, []);
 
-  const getRefBy = useCallback((index: number) => refs[index], [refs]);
+  const getRefBy = useCallback((index: number) => refs.current[index], [refs]);
 
   const debounceScrollHandler = useRef<_.DebouncedFunc<
     (number: any) => void
@@ -108,30 +96,30 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const isPositionInsideBlock = useCallback(
     (position: number, index: number): boolean => {
       // at the beginning, when refs are all null(not initialized yet), border the first one by default
-      if (refs.some((ref) => !ref.current)) {
+      if (refs.current.some((ref) => !ref.current)) {
         return index === 0;
       }
 
       const fixedPosition = position + 10;
       if (index === 0) {
         // Start case
-        const next = refs[1];
+        const next = refs.current[1];
         return (
           next &&
           fixedPosition <
             (next?.current?.offsetTop ? next?.current?.offsetTop : 0)
         );
-      } else if (index === refs.length - 1) {
+      } else if (index === refs.current.length - 1) {
         // End case
-        const last = refs[refs.length - 1];
+        const last = refs.current[refs.current.length - 1];
         return (
           last &&
           fixedPosition >=
             (last?.current?.offsetTop ? last?.current?.offsetTop : 0)
         );
       } else {
-        const self = refs[index];
-        const next = refs[index + 1];
+        const self = refs.current[index];
+        const next = refs.current[index + 1];
         return (
           fixedPosition >=
             (self?.current?.offsetTop ? self?.current?.offsetTop : 0) &&
