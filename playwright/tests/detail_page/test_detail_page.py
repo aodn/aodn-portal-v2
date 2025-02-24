@@ -32,7 +32,7 @@ def test_tab_panel_scroll(desktop_page: Page, title: str) -> None:
     detail_page.tabs.scroll_left()
     expect(detail_page.tabs.abstract.tab).to_be_in_viewport()
 
-
+@pytest.mark.skip("Credit moved to Citation and Usage tab")
 @pytest.mark.parametrize(
     'title, uuid, tab, not_found_item',
     [
@@ -55,7 +55,7 @@ def test_not_found_item(
     detail_page.click_tab(tab)
     expect(detail_page.get_not_found_element(not_found_item)).to_be_visible()
 
-
+@pytest.mark.skip("Contact moved to Citation and Usage tab")
 @pytest.mark.parametrize(
     'title, uuid, tab, contact_button, address, phone, link',
     [
