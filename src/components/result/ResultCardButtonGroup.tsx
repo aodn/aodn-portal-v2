@@ -90,7 +90,6 @@ const ButtonContainer: FC<ButtonContainerProps> = ({
     display="flex"
     justifyContent="space-between"
     alignItems="center"
-    height="100%"
     sx={{ ...sx }}
   >
     {children}
