@@ -20,12 +20,12 @@ const marineParkDefault = {
 };
 
 const detailPageDefault = {
-  ABOUT: "about",
-  ASSOCIATED_RECORDS: "associated records",
+  ADDITIONAL_INFO: "additional-info",
+  ASSOCIATED_RECORDS: "associated-records",
   CITATION: "citation",
-  DATA_ACCESS: "data_access",
+  DATA_ACCESS: "data-access",
   LINEAGE: "lineage",
-  METADATA_INFORMATION: "metadata information",
+  METADATA_INFORMATION: "metadata-information",
   SUMMARY: "summary",
 };
 

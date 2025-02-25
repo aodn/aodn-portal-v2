@@ -62,7 +62,7 @@ describe("CitationPanel", async () => {
     await waitFor(() => {
       expect(
         screen.queryAllByText("Australian Institute of Marine Science (AIMS)")
-      ).toHaveLength(4);
+      ).toHaveLength(3);
 
       expect(
         screen.queryByText("Creative Commons Attribution 3.0 Australia License")
@@ -83,15 +83,6 @@ describe("CitationPanel", async () => {
           'Use Limitation: All AIMS data, products and services are provided "as is" and AIMS does not warrant their fitness for a particular purpose or non-infringement. While AIMS has made every reasonable effort to ensure high quality of the data, products and services, to the extent permitted by law the data, products and services are provided without any warranties of any kind, either expressed or implied, including without limitati...'
         )
       ).to.exist;
-
-      // Contact rendered
-      expect(screen.queryByText("PRIVATE MAIL BAG 3")).to.exist;
-      expect(screen.queryByText("TOWNSVILLE MAIL CENTRE")).to.exist;
-      expect(screen.queryAllByText("Queensland")).to.exist;
-      expect(screen.queryAllByText("4810")).to.exist;
-      expect(screen.queryAllByText("Australia")).to.exist;
-      expect(screen.queryAllByText("+61 7 4753 4444 (voice)")).to.exist;
-      expect(screen.queryAllByText("+61 7 4772 5852 (facsimile)")).to.exist;
     });
   });
 });

@@ -1,10 +1,8 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import DataAccessPanel from "./tab-panels/DataAccessPanel";
-import AboutPanel from "./tab-panels/AboutPanel";
-import MetadataInformationPanel from "./tab-panels/MetadataInformationPanel";
+import AdditionalInfoPanel from "./tab-panels/AdditionalInfoPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
 import SummaryAndDownloadPanel from "./tab-panels/SummaryAndDownloadPanel";
-import LineagePanel from "./tab-panels/LineagePanel";
 import AssociatedRecordsPanel from "./tab-panels/AssociatedRecordsPanel";
 import { Card, Grid } from "@mui/material";
 import { borderRadius } from "../../../styles/constants";
@@ -37,11 +35,11 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     [mapFocusArea]
   );
 
-  const aboutPanelTab: Tab = useMemo(
+  const additionalInfoPanelTab: Tab = useMemo(
     () => ({
-      label: "About",
-      value: detailPageDefault.ABOUT,
-      component: <AboutPanel />,
+      label: "Additional Information",
+      value: detailPageDefault.ADDITIONAL_INFO,
+      component: <AdditionalInfoPanel />,
     }),
     []
   );
@@ -51,24 +49,6 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
       label: "Data Access",
       value: detailPageDefault.DATA_ACCESS,
       component: <DataAccessPanel />,
-    }),
-    []
-  );
-
-  const lineagePanelTab: Tab = useMemo(
-    () => ({
-      label: "Lineage",
-      value: detailPageDefault.LINEAGE,
-      component: <LineagePanel />,
-    }),
-    []
-  );
-
-  const metadataInformationPanelTab: Tab = useMemo(
-    () => ({
-      label: "Metadata Information",
-      value: detailPageDefault.METADATA_INFORMATION,
-      component: <MetadataInformationPanel />,
     }),
     []
   );
@@ -84,7 +64,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
 
   const associatedRecordsPanelTab: Tab = useMemo(
     () => ({
-      label: "Associated Records",
+      label: "Related Resources",
       value: detailPageDefault.ASSOCIATED_RECORDS,
       component: <AssociatedRecordsPanel />,
     }),
@@ -96,19 +76,15 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
       summaryAndDownloadPanelTab,
       dataAccessPanelTab,
       citationPanelTab,
-      aboutPanelTab,
-      lineagePanelTab,
-      metadataInformationPanelTab,
+      additionalInfoPanelTab,
       associatedRecordsPanelTab,
     ],
     [
-      aboutPanelTab,
+      additionalInfoPanelTab,
       summaryAndDownloadPanelTab,
       associatedRecordsPanelTab,
       citationPanelTab,
-      lineagePanelTab,
       dataAccessPanelTab,
-      metadataInformationPanelTab,
     ]
   );
 

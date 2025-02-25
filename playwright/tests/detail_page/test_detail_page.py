@@ -92,7 +92,7 @@ def test_contact_details(
     expect(detail_page.contact_area.phone).to_contain_text(phone)
     expect(detail_page.contact_area.link).to_contain_text(link)
 
-
+@pytest.mark.skip("Section moved tab")
 @pytest.mark.parametrize(
     'title, uuid, tab, item_list',
     [

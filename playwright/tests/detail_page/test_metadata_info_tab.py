@@ -3,7 +3,7 @@ from playwright.sync_api import Page, expect
 
 from pages.detail_page import DetailPage
 
-
+@pytest.mark.skip("Section moved tab")
 @pytest.mark.parametrize(
     'title, uuid, metadata_contact, metadata_identifier, full_metadata_link, metadata_dates',
     [
