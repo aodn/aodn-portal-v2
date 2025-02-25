@@ -4,10 +4,11 @@ import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import TextArea from "./listItem/subitem/TextArea";
 
 interface StatementListProps {
+  title?: string;
   statement: string;
 }
 
-const StatementList: React.FC<StatementListProps> = ({ statement }) => {
+const StatementList: React.FC<StatementListProps> = ({ title, statement }) => {
   const statementItem = (
     <ItemBaseGrid container key={statement}>
       <TextArea text={statement} />
@@ -17,7 +18,7 @@ const StatementList: React.FC<StatementListProps> = ({ statement }) => {
   return (
     <ExpandableList
       childrenList={statement ? [statementItem] : []}
-      title="Statement"
+      title={title}
     />
   );
 };
