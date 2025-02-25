@@ -4,7 +4,7 @@ from pages.base_page import BasePage
 
 
 class AssociatedRecordsTab(BasePage):
-    TAB_NAME = 'Associated Records'
+    TAB_NAME = 'Related Resources'
     PARENT_RECORD = 'Parent Record'
     SIBLING_RECORDS = 'Sibling Records'
     CHILD_RECORDS = 'Child Records'

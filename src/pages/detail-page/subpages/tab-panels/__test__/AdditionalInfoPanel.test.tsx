@@ -1,15 +1,15 @@
 import { afterAll, afterEach, beforeAll, expect, vi } from "vitest";
+import { server } from "../../../../../__mocks__/server";
+import { useLocation } from "react-router-dom";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import AppTheme from "../../../../../utils/AppTheme";
-import { Provider } from "react-redux";
 import store from "../../../../../components/common/store/store";
 import { ThemeProvider } from "@mui/material/styles";
 import { DetailPageProvider } from "../../../context/detail-page-provider";
-import { server } from "../../../../../__mocks__/server";
-import { useLocation } from "react-router-dom";
-import LineagePanel from "../LineagePanel";
+import { Provider } from "react-redux";
+import AdditionalInfoPanel from "../AdditionalInfoPanel";
 
-describe("LineagePanel", async () => {
+describe("Additional Info", async () => {
   const theme = AppTheme;
   beforeAll(() => {
     server.listen();
@@ -43,25 +43,40 @@ describe("LineagePanel", async () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <DetailPageProvider>
-            <LineagePanel />
+            <AdditionalInfoPanel />
           </DetailPageProvider>
         </ThemeProvider>
       </Provider>
     );
   });
 
-  test("should render MetadataInformationPanel", async () => {
+  test("should render Additional Info Panel", async () => {
     // the panel is rendered
     await waitFor(() => {
-      expect(screen.queryAllByText("Statement")).toHaveLength(1);
-    });
+      // infomation is rendered
+      expect(screen.queryByText("AODN Discovery Parameter Vocabulary")).to
+        .exist;
 
-    await waitFor(() => {
+      expect(
+        screen.queryByText(
+          "Australian Institute of Marine Science (AIMS) - Data Manager, AIMS Data Centre"
+        )
+      );
+      // Lineage
       expect(
         screen.queryByText(
           /Data from AIMS weather stations are subjected to two quality control processes./i
         )
       ).to.exist;
+
+      // Metadata Contact rendered
+      expect(screen.queryByText("PRIVATE MAIL BAG 3")).to.exist;
+      expect(screen.queryByText("TOWNSVILLE MAIL CENTRE")).to.exist;
+      expect(screen.queryAllByText("Queensland")).to.exist;
+      expect(screen.queryAllByText("4810")).to.exist;
+      expect(screen.queryAllByText("Australia")).to.exist;
+      expect(screen.queryAllByText("+61 7 4753 4444 (voice)")).to.exist;
+      expect(screen.queryAllByText("+61 7 4772 5852 (facsimile)")).to.exist;
     });
   });
 });

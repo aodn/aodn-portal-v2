@@ -7,10 +7,8 @@ import { DetailPageProvider } from "../../../context/detail-page-provider";
 import { useLocation } from "react-router-dom";
 import store from "../../../../../components/common/store/store";
 import { Provider } from "react-redux";
-import AboutPanel from "../AboutPanel";
-import MetadataInformationPanel from "../MetadataInformationPanel";
+import AdditionalInfoPanel from "../AdditionalInfoPanel";
 import CitationPanel from "../CitationPanel";
-import LineagePanel from "../LineagePanel";
 import AssociatedRecordsPanel from "../AssociatedRecordsPanel";
 
 describe("empty area display", async () => {
@@ -37,7 +35,7 @@ describe("empty area display", async () => {
     server.close();
   });
 
-  test("about panel", async () => {
+  test("additional info panel", async () => {
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",
@@ -50,41 +48,16 @@ describe("empty area display", async () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <DetailPageProvider>
-            <AboutPanel />
+            <AdditionalInfoPanel />
           </DetailPageProvider>
         </ThemeProvider>
       </Provider>
     );
 
     await waitFor(() => {
-      expect(screen.queryByText("Contacts Not Found")).to.exist;
       expect(screen.queryByText("Keywords Not Found")).to.exist;
-    });
-  });
-
-  test("metadata information panel", async () => {
-    vi.mocked(useLocation).mockReturnValue({
-      state: null,
-      hash: "111",
-      key: "default",
-      pathname: "/details",
-      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e" + "emptymetadata",
-    });
-
-    render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <DetailPageProvider>
-            <MetadataInformationPanel />
-          </DetailPageProvider>
-        </ThemeProvider>
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(screen.queryByText("Metadata Identifier Not Found")).to.exist;
-      expect(screen.queryByText("Full Metadata Link Not Found")).to.exist;
-      expect(screen.queryByText("Metadata Dates Not Found")).to.exist;
+      expect(screen.queryByText("Themes Not Found")).to.exist;
+      expect(screen.queryByText("Metadata Contact Not Found")).to.exist;
     });
   });
 
@@ -115,31 +88,6 @@ describe("empty area display", async () => {
       expect(screen.queryByText("Constraints Not Found")).to.exist;
       expect(screen.queryByText("Contact of Data Owner Not Found")).to.exist;
       expect(screen.queryByText("Credits Not Found")).to.exist;
-    });
-  });
-
-  test("lineage panel", async () => {
-    vi.mocked(useLocation).mockReturnValue({
-      state: null,
-      hash: "111",
-      key: "default",
-      pathname: "/details",
-      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e" + "emptylineage",
-    });
-
-    render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <DetailPageProvider>
-            <LineagePanel />
-          </DetailPageProvider>
-        </ThemeProvider>
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(screen.queryAllByText("N / A")).toHaveLength(1);
-      expect(screen.queryByText("Statement Not Found")).to.exist;
     });
   });
 
