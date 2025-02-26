@@ -3,6 +3,7 @@ import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import LicenseList from "../../../../components/list/LicenseList";
 import {
+  IContact,
   MediaType,
   RelationType,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
@@ -14,8 +15,8 @@ import { MODE } from "../../../../components/list/CommonDef";
 import SideCardContainer from "../side-cards/SideCardContainer";
 import useTabNavigation from "../../../../hooks/useTabNavigation";
 import { DETAIL_PAGE_REFERER } from "../../../search-page/constants";
-import MetadataContactList from "../../../../components/list/MetadataContactList";
 import CreditList from "../../../../components/list/CreditList";
+import ContactList from "../../../../components/list/ContactList";
 
 interface CitationPanelProps {
   mode?: MODE;
@@ -97,11 +98,13 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     return constraintItems;
   }, [otherConstraints, useLimitations]);
 
-  const metadataContact = useMemo(
+  const aboutContacts = useMemo(
     () =>
       context.collection
         ?.getContacts()
-        ?.filter((contact) => contact.roles.includes("metadata")),
+        ?.filter((contact: IContact) =>
+          contact.roles.includes(detailPageDefault.ADDITIONAL_INFO)
+        ),
     [context.collection]
   );
 
@@ -153,9 +156,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       {
         title: "Contact of Data Owner",
         component: (
-          <MetadataContactList
-            contacts={metadataContact ? metadataContact : []}
-          />
+          <ContactList contacts={aboutContacts ? aboutContacts : []} />
         ),
       },
       {
@@ -170,7 +171,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       licenseGraphic,
       licenseUrl,
       suggestedCitation,
-      metadataContact,
+      aboutContacts,
       credits,
     ]
   );
