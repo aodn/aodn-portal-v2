@@ -522,6 +522,8 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         <CardPopup
           layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
           tabNavigation={tabNavigation}
+          uniqueId="spider-diagram"
+          lazyloadMap
         />
       )}
       {spiderifiedCluster && (
