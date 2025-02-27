@@ -82,19 +82,19 @@ const AssociatedRecordsPanel = () => {
         ),
       },
       {
-        title: "Sibling Records",
+        title: "Associated Records",
         component: (
           <AssociatedRecordList
-            title={"Sibling Records"}
+            title="Associated Records"
             records={associatedRecords.siblings}
           />
         ),
       },
       {
-        title: "Child Records",
+        title: "Sub Records",
         component: (
           <AssociatedRecordList
-            title={"Child Records"}
+            title="Sub Records"
             records={associatedRecords.children}
           />
         ),

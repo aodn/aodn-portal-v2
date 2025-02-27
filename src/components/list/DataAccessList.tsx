@@ -60,7 +60,7 @@ const DataAccessList: FC<DataAccessListProps> = ({
 
   return dataAccessItems ? (
     <>
-      <ExpandableList childrenList={linksToDataItems} title="Links to Data" />
+      <ExpandableList childrenList={linksToDataItems} title="Links" />
       <ExpandableList childrenList={dataAccessItems} title="Data Access List" />
       <ExpandableList
         childrenList={pythonNotebookItems}
