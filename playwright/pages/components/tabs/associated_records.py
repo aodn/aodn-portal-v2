@@ -6,8 +6,8 @@ from pages.base_page import BasePage
 class AssociatedRecordsTab(BasePage):
     TAB_NAME = 'Related Resources'
     PARENT_RECORD = 'Parent Record'
-    SIBLING_RECORDS = 'Sibling Records'
-    CHILD_RECORDS = 'Child Records'
+    SIBLING_RECORDS = 'Associated Records'
+    CHILD_RECORDS = 'Sub Records'
 
     def __init__(self, page: Page):
         self.page = page

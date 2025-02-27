@@ -125,7 +125,7 @@ const DownloadCard = () => {
               color={fontColor.gray.medium}
               sx={{ padding: 0, marginRight: "10px" }}
             >
-              Download Subset
+              Data Selection
             </Typography>
           </Badge>
         </AccordionSummary>
