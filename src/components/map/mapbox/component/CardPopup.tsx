@@ -32,27 +32,19 @@ import { detailPageDefault } from "../../../common/constants";
 interface CardPopupProps {
   layerId: string;
   tabNavigation?: TabNavigation;
-  uniqueId?: string;
-  lazyloadMap?: boolean;
 }
+
+const mapContainerId = "card-popup-map-container";
 
 const CardPopup: React.FC<CardPopupProps> = ({
   layerId,
   tabNavigation = () => {},
-  uniqueId = "",
-  lazyloadMap = false,
 }) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
   const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
   const panel = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState<OGCCollection>(new OGCCollection());
-  const [mapInitialized, setMapInitialized] = useState(false);
-
-  const panelId = uniqueId ? `card-popup-${uniqueId}` : "card-popup";
-  const mapContainerId = uniqueId
-    ? `map-container-${uniqueId}`
-    : "card-popup-map";
 
   const onLinks = useCallback(
     (collection: OGCCollection) =>
@@ -91,15 +83,8 @@ const CardPopup: React.FC<CardPopupProps> = ({
     [dispatch]
   );
 
-  // Initialize map function - for lazyload map only
-  const initializeMap = useCallback(() => {
-    if (isTablet && !mapInitialized && lazyloadMap) {
-      setMapInitialized(true);
-    }
-  }, [isTablet, mapInitialized, lazyloadMap]);
-
   useEffect(() => {
-    const onMouseClick = (ev: MapLayerMouseEvent): void => {
+    const onMouseClick = (ev: any): void => {
       if (ev.target && map && panel && panel.current) {
         // Check if the layer exists before querying
         const style = map.getStyle();
@@ -114,7 +99,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
         // Query features from the specified layer at the clicked point
         const features = point
           ? map.queryRenderedFeatures(point, {
-              layers: [layerId],
+              layers: [ev.targetLayerId ?? layerId],
             })
           : [];
 
@@ -128,10 +113,6 @@ const CardPopup: React.FC<CardPopupProps> = ({
               collection && setContent(collection);
             });
             panel.current.style.visibility = "visible";
-            // Initialize map when content is loaded and popup becomes visible if it's lazyload map
-            if (lazyloadMap) {
-              initializeMap();
-            }
           } else {
             panel.current.style.visibility = "hidden";
           }
@@ -174,27 +155,11 @@ const CardPopup: React.FC<CardPopupProps> = ({
       map?.off("moveend", onMouseMoved);
       map?.off("sourcedata", onSourceChange);
     };
-  }, [
-    getCollectionData,
-    initializeMap,
-    lazyloadMap,
-    isUnderLaptop,
-    layerId,
-    map,
-  ]);
-
-  useEffect(() => {
-    // If it's lazyload map, reset initialization when unmounted
-    if (lazyloadMap) {
-      return () => {
-        setMapInitialized(false);
-      };
-    }
-  }, [lazyloadMap]);
+  }, [getCollectionData, isUnderLaptop, layerId, map]);
 
   return (
     <div
-      id={panelId}
+      id={"card-popup"}
       ref={panel}
       style={{
         display: "flex",
@@ -227,17 +192,15 @@ const CardPopup: React.FC<CardPopupProps> = ({
             id={mapContainerId}
             sx={{ position: "relative", height: "100%", width: "250px" }}
           >
-            {(!lazyloadMap || (lazyloadMap && mapInitialized)) && (
-              <Map
-                panelId={mapContainerId}
-                zoom={isUnderLaptop ? 1 : 2}
-                animate={false}
-              >
-                <Layers>
-                  <GeojsonLayer collection={content} />
-                </Layers>
-              </Map>
-            )}
+            <Map
+              panelId={mapContainerId}
+              zoom={isUnderLaptop ? 1 : 2}
+              animate={false}
+            >
+              <Layers>
+                <GeojsonLayer collection={content} />
+              </Layers>
+            </Map>
           </CardMedia>
         )}
         <CardContent

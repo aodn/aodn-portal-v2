@@ -162,12 +162,19 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
             ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
           ];
           onDatasetSelected(uuids);
+          const customEvent = {
+            ...ev,
+            targetLayerId: layerId,
+          };
+          // Fire a synthetic click event with the custom event
+          // This will be captured by CardPopup's event listeners so
+          map?.fire("click", customEvent);
         } else {
           onDatasetSelected([]);
         }
       }
     },
-    [onDatasetSelected]
+    [layerId, map, onDatasetSelected]
   );
 
   const onEmptySpaceClick = useCallback(

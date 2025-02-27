@@ -519,14 +519,6 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         />
       )}
       {spiderifiedCluster && (
-        <CardPopup
-          layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
-          tabNavigation={tabNavigation}
-          uniqueId="spider-diagram"
-          lazyloadMap
-        />
-      )}
-      {spiderifiedCluster && (
         <SpatialExtents
           layerId={getSpiderPinsLayerId(spiderifiedCluster.id)}
           addedLayerIds={[
