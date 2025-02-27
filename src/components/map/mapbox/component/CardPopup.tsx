@@ -84,7 +84,9 @@ const CardPopup: React.FC<CardPopupProps> = ({
   );
 
   useEffect(() => {
-    const onMouseClick = (ev: any): void => {
+    const onMouseClick = (
+      ev: MapLayerMouseEvent & { targetLayerId: string }
+    ): void => {
       if (ev.target && map && panel && panel.current) {
         // Check if the layer exists before querying
         const style = map.getStyle();
