@@ -114,8 +114,8 @@ describe("empty area display", async () => {
     await waitFor(() => {
       expect(screen.queryAllByText("N / A")).toHaveLength(3);
       expect(screen.queryByText("Parent Record Not Found")).to.exist;
-      expect(screen.queryByText("Sibling Records Not Found")).to.exist;
-      expect(screen.queryByText("Child Records Not Found")).to.exist;
+      expect(screen.queryByText("Associated Records Not Found")).to.exist;
+      expect(screen.queryByText("Sub Records Not Found")).to.exist;
     });
   });
 });
