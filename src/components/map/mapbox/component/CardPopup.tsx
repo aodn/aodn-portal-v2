@@ -27,7 +27,6 @@ import GeojsonLayer from "../layers/GeojsonLayer";
 import ResultCardButtonGroup from "../../../result/ResultCardButtonGroup";
 import { SEARCH_PAGE_REFERER } from "../../../../pages/search-page/constants";
 import BookmarkButton from "../../../bookmark/BookmarkButton";
-import { ResultCardButtonSize } from "../../../common/buttons/ResultCardButton";
 import { detailPageDefault } from "../../../common/constants";
 
 interface CardPopupProps {
@@ -35,7 +34,7 @@ interface CardPopupProps {
   tabNavigation?: TabNavigation;
 }
 
-const mapContainerId = "card-popup-map";
+const mapContainerId = "card-popup-map-container";
 
 const CardPopup: React.FC<CardPopupProps> = ({
   layerId,
@@ -85,14 +84,24 @@ const CardPopup: React.FC<CardPopupProps> = ({
   );
 
   useEffect(() => {
-    const onMouseClick = (ev: MapLayerMouseEvent): void => {
+    const onMouseClick = (
+      ev: MapLayerMouseEvent & { targetLayerId: string }
+    ): void => {
       if (ev.target && map && panel && panel.current) {
+        // Check if the layer exists before querying
+        const style = map.getStyle();
+        const layerExists = style.layers?.some((layer) => layer.id === layerId);
+        if (!layerExists) {
+          panel.current.style.visibility = "hidden";
+          return;
+        }
+
         // Convert click coordinates to point for feature querying
         const point = map.project(ev.lngLat);
         // Query features from the specified layer at the clicked point
         const features = point
           ? map.queryRenderedFeatures(point, {
-              layers: [layerId],
+              layers: [ev.targetLayerId ?? layerId],
             })
           : [];
 
@@ -182,11 +191,11 @@ const CardPopup: React.FC<CardPopupProps> = ({
         {isTablet && (
           <CardMedia
             component="div"
-            id={`${mapContainerId}`}
-            sx={{ height: "100%", width: "250px" }}
+            id={mapContainerId}
+            sx={{ position: "relative", height: "100%", width: "250px" }}
           >
             <Map
-              panelId={`${mapContainerId}`}
+              panelId={mapContainerId}
               zoom={isUnderLaptop ? 1 : 2}
               animate={false}
             >
@@ -244,7 +253,11 @@ const CardPopup: React.FC<CardPopupProps> = ({
               content={content}
               isGridView
               onLinks={() => onLinks(content)}
-              onDownload={() => onDownload(content)}
+              onDownload={
+                content.hasSummaryFeature()
+                  ? () => onDownload(content)
+                  : undefined
+              }
               onDetail={() => onDetail(content)}
             />
           )}

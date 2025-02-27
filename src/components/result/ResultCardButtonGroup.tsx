@@ -64,7 +64,10 @@ const renderStatusButton = (
       <ResultCardButton
         startIcon={DoubleArrowIcon}
         text={"On Going"}
-        resultCardButtonConfig={{ ...resultCardButtonConfig, color: "success" }}
+        resultCardButtonConfig={{
+          ...resultCardButtonConfig,
+          color: color.success.main,
+        }}
         shouldHideText={shouldHideText}
       />
     );
@@ -120,10 +123,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
             text={generateLinkText(links.length)}
             shouldHideText={shouldHideText}
             onClick={onLinks}
-            resultCardButtonConfig={{
-              ...resultCardButtonConfig,
-              color: links.length > 0 ? color.blue.dark : color.gray.light,
-            }}
+            resultCardButtonConfig={resultCardButtonConfig}
             disable={links.length === 0}
           />
         )}

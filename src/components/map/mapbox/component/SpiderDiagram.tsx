@@ -13,10 +13,14 @@ import { createRoot } from "react-dom/client";
 import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
 import MapPopup, { MapPopupRef } from "./MapPopup";
 import SpatialExtents from "./SpatialExtents";
-import { LayerBasicType } from "../layers/Layers";
+import {
+  defaultMouseEnterEventHandler,
+  LayerBasicType,
+} from "../layers/Layers";
 import { TestHelper } from "../../../common/test/helper";
 import { MapDefaultConfig } from "../constants";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
+import CardPopup from "./CardPopup";
 
 interface SpiderifiedClusterInfo {
   id: string;
@@ -475,6 +479,12 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
     map?.on("click", clusterLayer, onClusterClick);
     map?.on("click", onEmptySpaceClick);
     map?.on("zoomend", checkZoomAndUnspiderify);
+    spiderifiedCluster &&
+      map?.on(
+        "mouseenter",
+        getSpiderPinsLayerId(spiderifiedCluster.id),
+        defaultMouseEnterEventHandler
+      );
 
     return () => {
       // Important to free up resources, and must timeout to avoid race condition
@@ -483,6 +493,12 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       map?.off("click", clusterLayer, onClusterClick);
       map?.off("click", onEmptySpaceClick);
       map?.off("zoomend", checkZoomAndUnspiderify);
+      spiderifiedCluster &&
+        map?.off(
+          "mouseenter",
+          getSpiderPinsLayerId(spiderifiedCluster.id),
+          defaultMouseEnterEventHandler
+        );
     };
   }, [
     checkZoomAndUnspiderify,
@@ -491,6 +507,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
     onClusterClick,
     onEmptySpaceClick,
     spiderifyFromZoomLevel,
+    spiderifiedCluster,
   ]);
 
   return (
