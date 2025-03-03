@@ -48,7 +48,11 @@ const CardPopup: React.FC<CardPopupProps> = ({
 
   const onLinks = useCallback(
     (collection: OGCCollection) =>
-      tabNavigation(collection.id, "links", SEARCH_PAGE_REFERER),
+      tabNavigation(
+        collection.id,
+        detailPageDefault.DATA_ACCESS,
+        SEARCH_PAGE_REFERER
+      ),
     [tabNavigation]
   );
   const onDownload = useCallback(
