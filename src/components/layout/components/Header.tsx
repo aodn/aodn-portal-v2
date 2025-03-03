@@ -33,7 +33,7 @@ const Header: FC = () => {
   return (
     <Box
       sx={{
-        position: isLandingPage ? "sticky" : "unset",
+        position: "sticky",
         top: 0,
         zIndex: zIndex.header,
         borderBottom: `${border.sm} ${color.gray.xxLight}`,
@@ -93,7 +93,7 @@ const Header: FC = () => {
       </SectionContainer>
 
       {isSearchResultPage && isMobile && (
-        <Box p={padding.extraSmall} pt={0}>
+        <Box p={padding.extraSmall} pt={0} bgcolor="#fff">
           <Searchbar setShouldExpandSearchbar={setShouldExpandSearchbar} />
         </Box>
       )}
