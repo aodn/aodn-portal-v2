@@ -18,7 +18,7 @@ def test_show_all_and_less_description(
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
-    description = detail_page.get_by_test_id('expandable-text-area')
+    description = detail_page.description
 
     def get_description_length(text: Optional[str]) -> int:
         return len(text) if text is not None else 0

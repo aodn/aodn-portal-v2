@@ -66,7 +66,7 @@
             "title": "Website of the Australian Ocean Data Network (AODN)"
           }
         ],
-        "roles": ["distributor", "metadata"],
+        "roles": ["citation", "distributor", "metadata"],
         "phones": [
           {
             "value": "61 3 6226 7488",

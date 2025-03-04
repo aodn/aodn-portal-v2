@@ -28,41 +28,39 @@ def test_tab_panel_scroll(desktop_page: Page, title: str) -> None:
     expect(detail_page.page_title).to_have_text(title)
 
     detail_page.tabs.scroll_right()
-    expect(detail_page.tabs.associated_records.tab).to_be_in_viewport()
+    expect(detail_page.tabs.related_resources.tab).to_be_in_viewport()
     detail_page.tabs.scroll_left()
-    expect(detail_page.tabs.abstract.tab).to_be_in_viewport()
+    expect(detail_page.tabs.summary.tab).to_be_in_viewport()
 
-@pytest.mark.skip("Credit moved to Citation and Usage tab")
+
 @pytest.mark.parametrize(
-    'title, uuid, tab, not_found_item',
+    'title, uuid, not_found_item',
     [
         (
             'IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility',
             '0015db7e-e684-7548-e053-08114f8cd4ad',
-            'About',
-            'Credits',
+            'License',
         ),
     ],
 )
 def test_not_found_item(
-    responsive_page: Page, title: str, uuid: str, tab: str, not_found_item: str
+    responsive_page: Page, title: str, uuid: str, not_found_item: str
 ) -> None:
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
 
-    detail_page.click_tab(tab)
     expect(detail_page.get_not_found_element(not_found_item)).to_be_visible()
 
-@pytest.mark.skip("Contact moved to Citation and Usage tab")
+
 @pytest.mark.parametrize(
     'title, uuid, tab, contact_button, address, phone, link',
     [
         (
             'Integrated Marine Observing System (IMOS) - Location of assets',
             '1fba3a57-35f4-461b-8a0e-551af229714e',
-            'About',
+            'Citation and Usage',
             'Integrated Marine Observing System (IMOS)',
             'Private Bag 110',
             '61 3 6226 7488',
@@ -88,18 +86,18 @@ def test_contact_details(
     detail_page.click_tab(tab)
     detail_page.get_collapse_item_title(contact_button).click()
 
-    expect(detail_page.contact_area.address).to_contain_text(address)
-    expect(detail_page.contact_area.phone).to_contain_text(phone)
-    expect(detail_page.contact_area.link).to_contain_text(link)
+    expect(detail_page.contact_area.address.first).to_contain_text(address)
+    expect(detail_page.contact_area.phone.first).to_contain_text(phone)
+    expect(detail_page.contact_area.link.first).to_contain_text(link)
 
-@pytest.mark.skip("Section moved tab")
+
 @pytest.mark.parametrize(
     'title, uuid, tab, item_list',
     [
         (
             'IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility',
             '0015db7e-e684-7548-e053-08114f8cd4ad',
-            'About',
+            'Additional Information',
             'Keywords',
         ),
     ],
