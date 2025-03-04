@@ -14,7 +14,7 @@ import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail
 import { Position } from "geojson";
 import { MapLayerMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
-import { fitToBound } from "../../../../utils/mapUtils";
+import { fitToBound } from "../../../../utils/MapUtils";
 
 interface GeojsonLayerProps {
   // Vector tile layer should add to map
