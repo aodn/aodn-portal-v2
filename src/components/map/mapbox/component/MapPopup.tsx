@@ -73,7 +73,6 @@ const MapPopup: React.FC<MapPopupProps> = ({ layerId, tabNavigation }) => {
   const renderContentBox = useCallback(
     (
       collection: void | OGCCollection,
-      isUnderLaptop: boolean,
       onMouseLeave: MouseEventHandler<HTMLDivElement>
     ) => {
       if (!collection) {
@@ -178,9 +177,7 @@ const MapPopup: React.FC<MapPopupProps> = ({ layerId, tabNavigation }) => {
 
         const uuid = feature.properties?.uuid as string;
         getCollectionData(uuid).then((collection) => {
-          root.render(
-            renderContentBox(collection, isUnderLaptop, onPopupMouseLeave)
-          );
+          root.render(renderContentBox(collection, onPopupMouseLeave));
         });
       }
     };
