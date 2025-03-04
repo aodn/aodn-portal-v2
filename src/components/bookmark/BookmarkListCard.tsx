@@ -26,13 +26,14 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
   tabNavigation = () => {},
   sx,
 }) => {
-  const onLinks = () => tabNavigation(dataset.id, "links", SEARCH_PAGE_REFERER);
-  const onDownload = () =>
+  const onLinks = () =>
     tabNavigation(
       dataset.id,
       detailPageDefault.DATA_ACCESS,
       SEARCH_PAGE_REFERER
     );
+  const onDownload = () =>
+    tabNavigation(dataset.id, detailPageDefault.SUMMARY, SEARCH_PAGE_REFERER);
   const onDetail = () =>
     tabNavigation(dataset.id, detailPageDefault.SUMMARY, SEARCH_PAGE_REFERER);
 
