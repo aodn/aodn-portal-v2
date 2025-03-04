@@ -20,7 +20,7 @@ from pages.detail_page import DetailPage
         ),
     ],
 )
-def test_metadata_info_sections(
+def test_additional_information_sections(
     responsive_page: Page,
     title: str,
     uuid: str,
