@@ -19,9 +19,11 @@ class DetailPage(BasePage):
         self.spatial_map = Map(page, self.SPATIAL_MAP_ID)
         self.contact_area = ContactAreaComponent(page)
 
-        # Page locators
+        # -- Page locators --
+
         self.page_title = self.get_label(text='collection title')
         self.go_back_button = self.page.get_by_test_id('go-back-button')
+        self.description = self.page.get_by_test_id('expandable-text-area')
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')

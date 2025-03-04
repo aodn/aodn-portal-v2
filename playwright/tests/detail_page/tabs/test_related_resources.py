@@ -5,7 +5,7 @@ from pages.detail_page import DetailPage
 
 
 @pytest.mark.parametrize(
-    'title, uuid, parent_record, parent_record_value, sibling_records, sibling_records_value, child_records, child_records_value',
+    'title, uuid, parent_record, parent_record_value, associated_records, associated_records_value, sub_records, sub_records_value',
     [
         (
             'Integrated Marine Observing System (IMOS) - Location of assets',
@@ -19,39 +19,38 @@ from pages.detail_page import DetailPage
         ),
     ],
 )
-def test_associated_records_sections(
+def test_related_resources_sections(
     responsive_page: Page,
     title: str,
     uuid: str,
     parent_record: str,
     parent_record_value: str,
-    sibling_records: str,
-    sibling_records_value: str,
-    child_records: str,
-    child_records_value: str,
+    associated_records: str,
+    associated_records_value: str,
+    sub_records: str,
+    sub_records_value: str,
 ) -> None:
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
     detail_page.tabs.scroll_right()
-    associated_records = detail_page.tabs.associated_records
-    associated_records.tab.click()
+    related_resources = detail_page.tabs.related_resources
+    related_resources.tab.click()
 
-    associated_records.child_records.click()
-    detail_page.wait_for_timeout(200)
-    detail_page.get_collapse_item_title(child_records).click()
-    child_records_list = associated_records.get_child_records_list()
-    expect(child_records_list.get_by_text(child_records_value)).to_be_visible()
+    related_resources.sub_records.click()
+    detail_page.get_collapse_item_title(sub_records).click()
+    sub_records_list = related_resources.get_sub_records_list()
+    expect(sub_records_list.get_by_text(sub_records_value)).to_be_visible()
 
-    associated_records.sibling_records.click()
-    detail_page.get_collapse_item_title(sibling_records).click()
-    sibling_records_list = associated_records.get_sibling_records_list()
+    related_resources.associated_records.click()
+    detail_page.get_collapse_item_title(associated_records).click()
+    associated_records_list = related_resources.get_associated_records_list()
     expect(
-        sibling_records_list.get_by_text(sibling_records_value)
+        associated_records_list.get_by_text(associated_records_value)
     ).to_be_visible()
 
-    associated_records.parent_record.click()
+    related_resources.parent_record.click()
     detail_page.get_collapse_item_title(parent_record).click()
-    parent_record_list = associated_records.get_parent_record_list()
+    parent_record_list = related_resources.get_parent_record_list()
     expect(parent_record_list.get_by_text(parent_record_value)).to_be_visible()

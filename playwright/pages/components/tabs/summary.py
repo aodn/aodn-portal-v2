@@ -11,6 +11,3 @@ class SummaryTab(BasePage):
 
         # Page locators
         self.tab = self.get_tab(self.TAB_NAME)
-        self.map = page.get_by_label(self.TAB_NAME).get_by_label(
-            'Map', exact=True
-        )
