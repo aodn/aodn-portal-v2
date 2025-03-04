@@ -58,16 +58,15 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
 
       // before the last bbox snapshot has been taken, map will fit to current bounding box
       const bound = bboxes[index];
-      const m = map;
-      if (m) {
-        fitToBound(m, bound, {
+      if (map) {
+        fitToBound(map, bound, {
           animate: false,
           zoomOffset: index === 0 ? -1 : -1.5, // More zoom out for first photo (overview)
         });
 
-        m.once("idle", () => {
+        map.once("idle", () => {
           // get canvas and store in state photos[] after fitBounds completed
-          const canvas = m.getCanvas();
+          const canvas = map.getCanvas();
           canvas?.toBlob((blob) => {
             if (blob) {
               const url = URL.createObjectURL(blob);
