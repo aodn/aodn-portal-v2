@@ -12,8 +12,9 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
-import { LngLatBoundsLike, MapLayerMouseEvent } from "mapbox-gl";
+import { MapLayerMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
+import { fitToBound } from "../../../../utils/MapUtils";
 
 interface GeojsonLayerProps {
   // Vector tile layer should add to map
@@ -44,65 +45,53 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   const sourceId = `geojson-${containerId}-source-${collectionId}`;
   const layerId = `geojson-${containerId}-layer-${collectionId}`;
 
-  // Function to fit map to the overall bbox(bboxes[0])
-  const fitToOverallBbox = useCallback(
-    (bbox: Array<Position>) => {
-      const bound = bbox[0] as LngLatBoundsLike;
-      map?.fitBounds(bound, {
-        minZoom: map?.getMinZoom(),
-        maxZoom: map?.getMaxZoom(),
-        animate: animate,
-      });
-    },
-    [map, animate]
-  );
-
   // Function to take photo of the map for given bounding boxes
   const takePhoto = useCallback(
-    (bbox: Array<Position> | undefined, index: number) => {
-      if (!Array.isArray(bbox) || !setPhotos) return;
+    (bboxes: Array<Position> | undefined, index: number) => {
+      if (!Array.isArray(bboxes) || !setPhotos) return;
 
       // when it comes to the last index, map fitBound to the first bbox (the overall bbox)
-      if (bbox.length === index) {
-        fitToOverallBbox(bbox);
+      if (bboxes.length === index) {
+        fitToBound(map, bboxes[0], { animate });
         return;
       }
 
-      // before the last bbox snapshot has been taken (i.e. index < bboxes.length), map will fitBound to current bounding box (bboxes[index]) to get a snapshot once idle
-      const bound = bbox[index] as LngLatBoundsLike;
-      const box = bbox[index];
-      const m = map?.fitBounds(bound, {
-        maxZoom: index === 0 ? 2 : 5,
-        padding: 10,
-        animate: false,
-      });
-      m?.once("idle", () => {
-        // get canvas and store in state photos[] after fitBounds completed
-        const canvas = m?.getCanvas();
-        canvas?.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            setPhotos((prevPhotos) => [
-              ...prevPhotos,
-              {
-                bbox: box,
-                url: url,
-              },
-            ]);
-          } else {
-            console.error("Error creating blob from canvas");
-          }
-        }, "image/png");
-        // increase the index to loop
-        takePhoto(bbox, index + 1);
-      });
+      // before the last bbox snapshot has been taken, map will fit to current bounding box
+      const bound = bboxes[index];
+      if (map) {
+        fitToBound(map, bound, {
+          animate: false,
+          zoomOffset: index === 0 ? -1 : -1.5, // More zoom out for first photo (overview)
+        });
+
+        map.once("idle", () => {
+          // get canvas and store in state photos[] after fitBounds completed
+          const canvas = map.getCanvas();
+          canvas?.toBlob((blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              setPhotos((prevPhotos) => [
+                ...prevPhotos,
+                {
+                  bbox: bound,
+                  url: url,
+                },
+              ]);
+            } else {
+              console.error("Error creating blob from canvas");
+            }
+          }, "image/png");
+          // increase the index to loop
+          takePhoto(bboxes, index + 1);
+        });
+      }
     },
-    [fitToOverallBbox, map, setPhotos]
+    [map, animate, setPhotos]
   );
 
   const handleIdle = useCallback(
-    (bbox: Array<Position> | undefined) => {
-      if (bbox === undefined) return;
+    (bboxes: Array<Position> | undefined) => {
+      if (bboxes === undefined) return;
 
       // If Layer didn't receive the setPhoto as a prop, it means no need to take photos for every bbox, therefore just call fitToOverallBbox
       if (setPhotos) {
@@ -114,12 +103,17 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           return [];
         });
         // Call takePhoto with the bounding boxes and starts with the first bounding box (index set to 0)
-        takePhoto(bbox, 0);
+        takePhoto(bboxes, 0);
       } else {
-        fitToOverallBbox(bbox);
+        // Just fit to the overall extent (first bbox)
+        fitToBound(map, bboxes[0], {
+          animate,
+          // For map container with fixed 150px height, we need a bit more zoom out
+          zoomOffset: -1,
+        });
       }
     },
-    [fitToOverallBbox, setPhotos, takePhoto]
+    [animate, map, setPhotos, takePhoto]
   );
 
   const createLayer = useCallback(() => {
