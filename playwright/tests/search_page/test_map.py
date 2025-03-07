@@ -14,6 +14,7 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
+
 def test_map_drag_updates_search_results(desktop_page: Page) -> None:
     api_router = ApiRouter(page=desktop_page)
     landing_page = LandingPage(desktop_page)
@@ -272,6 +273,7 @@ def test_map_buttons(desktop_page: Page) -> None:
     expect(search_page.map.daterange_show_hide_menu_button).to_be_visible()
     expect(search_page.map.draw_rect_menu_button).to_be_visible()
     expect(search_page.map.delete_button).to_be_visible()
+
 
 def test_map_zoom_out_and_drag_does_not_crash(desktop_page: Page) -> None:
     """

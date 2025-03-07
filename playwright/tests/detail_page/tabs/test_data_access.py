@@ -26,12 +26,12 @@ def test_links_sections(
 
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
-    links = detail_page.tabs.links
-    links.tab.click()
+    data_access = detail_page.tabs.data_access
+    data_access.tab.click()
 
-    link_card = links.link_cards.first
+    link_card = data_access.link_cards.first
     link_card.hover()
-    expect(links.copy_link_button).to_be_visible()
+    expect(data_access.copy_link_button).to_be_visible()
 
     link = link_card.get_by_role('link', name=link_title)
     expect(link).to_be_visible()
