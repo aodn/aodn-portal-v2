@@ -32,6 +32,7 @@ interface InputWithSuggesterProps {
     event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
     isSearchbarFocused: boolean
   ) => void;
+  handleScrollToTop?: () => void;
   setPendingSearch?: React.Dispatch<React.SetStateAction<boolean>>;
   setActiveButton?: Dispatch<React.SetStateAction<SearchbarButtonNames>>;
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -67,6 +68,7 @@ enum OptionGroup {
  */
 const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
+  handleScrollToTop = () => {},
   setPendingSearch = () => {},
   setActiveButton = () => {},
   setShouldExpandSearchbar = () => {},
@@ -177,12 +179,18 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   );
 
   const handleSearchbarOpen = useCallback(() => {
+    handleScrollToTop();
     setActiveButton(SearchbarButtonNames.Search);
     setIsSearchbarActive(true);
     if (location.pathname === pageDefault.landing) {
       setShouldExpandAllButtons(false);
     }
-  }, [location.pathname, setActiveButton, setShouldExpandAllButtons]);
+  }, [
+    handleScrollToTop,
+    location.pathname,
+    setActiveButton,
+    setShouldExpandAllButtons,
+  ]);
 
   const handleSearchbarClose = useCallback(() => {
     setIsSearchbarActive(false);

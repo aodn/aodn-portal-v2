@@ -122,6 +122,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
       >
         <InputWithSuggester
           handleEnterPressed={handleEnterPressed}
+          handleScrollToTop={handleScrollToTop}
           setPendingSearch={setPendingSearch}
           setActiveButton={setActiveButton}
           setShouldExpandSearchbar={setShouldExpandSearchbar}
