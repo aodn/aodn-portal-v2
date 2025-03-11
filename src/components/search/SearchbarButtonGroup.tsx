@@ -27,7 +27,7 @@ interface SearchbarButtonGroupProps {
   handleClickButton: (button: SearchbarButtonNames) => void;
   shouldExpandAllButtons: boolean;
   shouldShrinkAllButtons?: boolean;
-  smallSize?: boolean;
+
   sx?: SxProps;
 }
 
@@ -90,7 +90,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   handleClickButton,
   shouldExpandAllButtons = false,
   shouldShrinkAllButtons = false,
-  smallSize = false,
+
   sx,
 }) => {
   const componentParams: ParameterState = getComponentState(store.getState());
@@ -137,6 +137,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       justifyContent="end"
       spacing={0.5}
       padding={gap.sm}
+      paddingLeft={gap.md}
       sx={sx}
     >
       <SearchbarExpandableButton
@@ -152,7 +153,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
               ? true
               : activeButton === SearchbarButtonNames.Date
         }
-        smallSize={smallSize}
+        containerSx={{ flex: 1 }}
         data-testid="date-range-button"
       />
       <SearchbarExpandableButton
@@ -168,7 +169,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
               ? true
               : activeButton === SearchbarButtonNames.Location
         }
-        smallSize={smallSize}
+        containerSx={{ flex: 1 }}
         data-testid="location-button"
       />
       <SearchbarExpandableButton
@@ -183,20 +184,14 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
               ? true
               : activeButton === SearchbarButtonNames.Filter
         }
-        smallSize={smallSize}
+        containerSx={{ flex: 1 }}
         data-testid="filtersBtn"
       />
       <SearchbarExpandableButton
         icon={<SearchIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Search)}
         onClick={handleSearchClick}
-        showText={
-          shouldShrinkAllButtons
-            ? false
-            : shouldExpandAllButtons
-              ? true
-              : activeButton === SearchbarButtonNames.Search
-        }
+        showText={false}
         buttonSx={{
           color: "#fff",
           fontWeight: fontWeight.light,
@@ -206,7 +201,6 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
             backgroundColor: color.brightBlue.dark,
           },
         }}
-        smallSize={smallSize}
         data-testid="search-button"
       />
     </Stack>

@@ -26,12 +26,14 @@ import { TEXT_FIELD_MIN_WIDTH } from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
     event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
     isSearchbarFocused: boolean
   ) => void;
+  handleScrollToTop?: () => void;
   setPendingSearch?: React.Dispatch<React.SetStateAction<boolean>>;
   setActiveButton?: Dispatch<React.SetStateAction<SearchbarButtonNames>>;
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -67,6 +69,7 @@ enum OptionGroup {
  */
 const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   handleEnterPressed = () => {},
+  handleScrollToTop = () => {},
   setPendingSearch = () => {},
   setActiveButton = () => {},
   setShouldExpandSearchbar = () => {},
@@ -74,9 +77,8 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   suggesterWidth = 0,
 }) => {
   const location = useLocation();
-
   const dispatch = useAppDispatch();
-
+  const { isMobile } = useBreakpoint();
   const [isSearchbarActive, setIsSearchbarActive] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
 
@@ -177,20 +179,27 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   );
 
   const handleSearchbarOpen = useCallback(() => {
+    handleScrollToTop();
     setActiveButton(SearchbarButtonNames.Search);
     setIsSearchbarActive(true);
-    if (location.pathname === pageDefault.landing) {
+    if (location.pathname === pageDefault.landing && !isMobile) {
       setShouldExpandAllButtons(false);
     }
-  }, [location.pathname, setActiveButton, setShouldExpandAllButtons]);
+  }, [
+    handleScrollToTop,
+    isMobile,
+    location.pathname,
+    setActiveButton,
+    setShouldExpandAllButtons,
+  ]);
 
   const handleSearchbarClose = useCallback(() => {
     setIsSearchbarActive(false);
-    if (location.pathname === pageDefault.landing) {
+    if (location.pathname === pageDefault.landing && !isMobile) {
       setShouldExpandAllButtons(true);
     }
     setOptions([]);
-  }, [location.pathname, setShouldExpandAllButtons]);
+  }, [isMobile, location.pathname, setShouldExpandAllButtons]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {

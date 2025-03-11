@@ -29,7 +29,6 @@ import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
 import { openInNewTab } from "../../../utils/LinkUtils";
 import { scrollToTop } from "../../../utils/ScrollUtils";
-import useBreakpoint from "../../../hooks/useBreakpoint";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../../common/constants";
 
@@ -47,10 +46,6 @@ const IconContainer: FC<IconContainerProps> = ({ children, sx }) => (
     {children}
   </Icon>
 );
-
-const handleBackToTop = () => {
-  scrollToTop();
-};
 
 const handleClickContactUs = () => {
   window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -74,7 +69,7 @@ const Footer: FC = () => {
           gap={{ xs: 2, sm: 0 }}
         >
           <AODNSiteLogo />
-          <Button onClick={handleBackToTop}>
+          <Button onClick={() => scrollToTop()}>
             <IconContainer>
               <NorthIcon
                 sx={{ color: color.gray.medium, fontSize: fontSize.info }}
