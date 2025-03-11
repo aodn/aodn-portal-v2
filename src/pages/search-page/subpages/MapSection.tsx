@@ -28,6 +28,7 @@ import BookmarkListMenu, {
   BookmarkListMenuBasicType,
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import UnclusterLayer from "../../../components/map/mapbox/layers/UnclusterLayer";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -49,6 +50,7 @@ const mapContainerId = "result-page-main-map";
 enum LayerName {
   Heatmap = "heatmap",
   Cluster = "cluster",
+  Uncluster = "uncluster",
 }
 const MapSection: React.FC<MapSectionProps> = ({
   showFullList,
@@ -69,6 +71,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
   );
+  console.log("current layer", selectedLayer);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const tabNavigation = useTabNavigation();
@@ -79,6 +82,16 @@ const MapSection: React.FC<MapSectionProps> = ({
         case LayerName.Heatmap:
           return (
             <HeatmapLayer
+              featureCollection={generateFeatureCollectionFrom(collections)}
+              selectedUuids={selectedUuids}
+              onClickMapPoint={onClickMapPoint}
+              tabNavigation={tabNavigation}
+            />
+          );
+
+        case LayerName.Uncluster:
+          return (
+            <UnclusterLayer
               featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
               onClickMapPoint={onClickMapPoint}
@@ -180,6 +193,11 @@ const MapSection: React.FC<MapSectionProps> = ({
                     id: LayerName.Heatmap,
                     name: capitalizeFirstLetter(LayerName.Heatmap),
                     default: selectedLayer === LayerName.Heatmap,
+                  },
+                  {
+                    id: LayerName.Uncluster,
+                    name: capitalizeFirstLetter(LayerName.Uncluster),
+                    default: selectedLayer === LayerName.Uncluster,
                   },
                 ]}
                 onEvent={(id: string) => setSelectedLayer(id)}
