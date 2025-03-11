@@ -26,6 +26,7 @@ import { TEXT_FIELD_MIN_WIDTH } from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -76,9 +77,8 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   suggesterWidth = 0,
 }) => {
   const location = useLocation();
-
   const dispatch = useAppDispatch();
-
+  const { isMobile } = useBreakpoint();
   const [isSearchbarActive, setIsSearchbarActive] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
 
@@ -182,11 +182,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     handleScrollToTop();
     setActiveButton(SearchbarButtonNames.Search);
     setIsSearchbarActive(true);
-    if (location.pathname === pageDefault.landing) {
+    if (location.pathname === pageDefault.landing && !isMobile) {
       setShouldExpandAllButtons(false);
     }
   }, [
     handleScrollToTop,
+    isMobile,
     location.pathname,
     setActiveButton,
     setShouldExpandAllButtons,
@@ -194,11 +195,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   const handleSearchbarClose = useCallback(() => {
     setIsSearchbarActive(false);
-    if (location.pathname === pageDefault.landing) {
+    if (location.pathname === pageDefault.landing && !isMobile) {
       setShouldExpandAllButtons(true);
     }
     setOptions([]);
-  }, [location.pathname, setShouldExpandAllButtons]);
+  }, [isMobile, location.pathname, setShouldExpandAllButtons]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {

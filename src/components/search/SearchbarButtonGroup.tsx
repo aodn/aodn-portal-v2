@@ -137,6 +137,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       justifyContent="end"
       spacing={0.5}
       padding={gap.sm}
+      paddingLeft={gap.md}
       sx={sx}
     >
       <SearchbarExpandableButton
