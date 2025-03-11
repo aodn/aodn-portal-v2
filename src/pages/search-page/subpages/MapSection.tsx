@@ -16,6 +16,7 @@ import Layers, {
 } from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
+import UnclusterLayer from "../../../components/map/mapbox/layers/UnclusterLayer";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
@@ -28,7 +29,6 @@ import BookmarkListMenu, {
   BookmarkListMenuBasicType,
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 import useBreakpoint from "../../../hooks/useBreakpoint";
-import UnclusterLayer from "../../../components/map/mapbox/layers/UnclusterLayer";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -71,7 +71,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
   );
-  console.log("current layer", selectedLayer);
+
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const tabNavigation = useTabNavigation();
