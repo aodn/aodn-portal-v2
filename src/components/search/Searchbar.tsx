@@ -18,6 +18,8 @@ import { pageDefault } from "../common/constants";
 import LocationFilter from "../filter/LocationFilter";
 import Filters from "../filter/Filters";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import useScrollToElement from "../../hooks/useScrollToElement";
+import { HEADER_HEIGHT } from "../layout/constant";
 
 interface SearchbarProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -38,6 +40,14 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
   const { ref, width: searchbarWidth } = useElementSize();
   const redirectSearch = useRedirectSearch();
+  const { scrollToElement } = useScrollToElement({
+    ref: boxRef,
+    offset: HEADER_HEIGHT + 5,
+  });
+
+  const handleScrollToTop = useCallback(() => {
+    scrollToElement();
+  }, [scrollToElement]);
 
   const handleEnterPressed = useCallback(
     (
@@ -57,6 +67,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
 
   const handleClickButton = useCallback(
     (button: SearchbarButtonNames) => {
+      handleScrollToTop();
       if (open) {
         // If clicking the same button that's currently active, just close the popup
         if (button === activeButton) {
@@ -76,7 +87,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
         setActiveButton(button);
       }
     },
-    [open, activeButton]
+    [handleScrollToTop, open, activeButton]
   );
 
   const handleClosePopup = useCallback(() => setOpen(false), [setOpen]);
@@ -111,6 +122,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
       >
         <InputWithSuggester
           handleEnterPressed={handleEnterPressed}
+          handleScrollToTop={handleScrollToTop}
           setPendingSearch={setPendingSearch}
           setActiveButton={setActiveButton}
           setShouldExpandSearchbar={setShouldExpandSearchbar}
@@ -125,7 +137,6 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           shouldShrinkAllButtons={
             isMobile && location.pathname === pageDefault.search
           }
-          smallSize={isMobile}
           sx={{
             pr: gap.md,
             width:

@@ -25,7 +25,6 @@ const Header: FC = () => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const path = useLocation().pathname;
   const isSearchResultPage = path === pageDefault.search;
-  const isLandingPage = path === pageDefault.landing;
 
   const [shouldExpandSearchbar, setShouldExpandSearchbar] =
     useState<boolean>(false);

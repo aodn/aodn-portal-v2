@@ -18,14 +18,17 @@ interface SearchbarExpandableButtonProps {
   badgeContent?: number;
   dotBadge?: boolean;
   buttonSx?: SxProps;
-  smallSize?: boolean;
+  containerSx?: SxProps;
+
   "data-testid"?: string | undefined;
 }
 
 const defaultButtonSx: SxProps = {
   height: "100%",
-  color: fontColor.blue.medium,
+  minHeight: "38px",
+  width: "100%",
   minWidth: "38px",
+  color: fontColor.blue.medium,
   paddingX: padding.small,
   backgroundColor: color.blue.xLight,
   borderRadius: borderRadius.small,
@@ -40,7 +43,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
   dotBadge,
   showText,
   buttonSx,
-  smallSize,
+  containerSx,
   "data-testid": testId,
 }) => {
   return (
@@ -48,7 +51,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
       badgeContent={badgeContent}
       variant={dotBadge ? "dot" : "standard"}
       position={Position.TopRight}
-      sx={{ padding: 0 }}
+      sx={{ padding: 0, ...containerSx }}
     >
       <Button
         fullWidth
@@ -57,7 +60,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
             marginRight: showText ? gap.md : 0,
             marginLeft: 0,
           },
-          fontSize: smallSize ? fontSize.label : fontSize.info,
+          fontSize: fontSize.info,
           ...defaultButtonSx,
           ...buttonSx,
         }}

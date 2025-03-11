@@ -41,9 +41,12 @@ export const enableScroll = () => {
  * // Scroll page to top with smooth animation
  * scrollToTop();
  */
-export const scrollToTop = (scrollBehavior: ScrollBehavior = "smooth") => {
+export const scrollToTop = (
+  top: number = 0,
+  scrollBehavior: ScrollBehavior = "smooth"
+) => {
   window.scrollTo({
-    top: 0,
+    top: top,
     behavior: scrollBehavior,
   });
 };
