@@ -16,6 +16,7 @@ import Layers, {
 } from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
+import UnclusterLayer from "../../../components/map/mapbox/layers/UnclusterLayer";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
@@ -49,6 +50,7 @@ const mapContainerId = "result-page-main-map";
 enum LayerName {
   Heatmap = "heatmap",
   Cluster = "cluster",
+  Uncluster = "uncluster",
 }
 const MapSection: React.FC<MapSectionProps> = ({
   showFullList,
@@ -69,6 +71,7 @@ const MapSection: React.FC<MapSectionProps> = ({
   const [selectedLayer, setSelectedLayer] = useState<string | null>(
     LayerName.Cluster
   );
+
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const tabNavigation = useTabNavigation();
@@ -79,6 +82,16 @@ const MapSection: React.FC<MapSectionProps> = ({
         case LayerName.Heatmap:
           return (
             <HeatmapLayer
+              featureCollection={generateFeatureCollectionFrom(collections)}
+              selectedUuids={selectedUuids}
+              onClickMapPoint={onClickMapPoint}
+              tabNavigation={tabNavigation}
+            />
+          );
+
+        case LayerName.Uncluster:
+          return (
+            <UnclusterLayer
               featureCollection={generateFeatureCollectionFrom(collections)}
               selectedUuids={selectedUuids}
               onClickMapPoint={onClickMapPoint}
@@ -180,6 +193,11 @@ const MapSection: React.FC<MapSectionProps> = ({
                     id: LayerName.Heatmap,
                     name: capitalizeFirstLetter(LayerName.Heatmap),
                     default: selectedLayer === LayerName.Heatmap,
+                  },
+                  {
+                    id: LayerName.Uncluster,
+                    name: capitalizeFirstLetter(LayerName.Uncluster),
+                    default: selectedLayer === LayerName.Uncluster,
                   },
                 ]}
                 onEvent={(id: string) => setSelectedLayer(id)}
