@@ -17,6 +17,11 @@ class Map(BasePage):
         load_map_js_functions(page)
 
         # Page locators
+        self.full_screen_toggle_button = self.get_by_id(
+            'map-toggle-control-button'
+        )
+        self.zoom_in_button = self.get_label('Zoom In')
+        self.zoom_out_button = self.get_label('Zoom Out')
         self.bookmarks_icon = page.get_by_test_id('BookmarksIcon')
         self.basemap_show_hide_menu = page.get_by_test_id('PublicIcon')
         self.layers_icon = page.get_by_test_id('LayersIcon')

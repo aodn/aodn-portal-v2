@@ -35,10 +35,11 @@ class SearchPage(BasePage):
 
         # buttons
         self.result_sort_button = page.get_by_test_id('result-sort-button')
-        self.result_layout_button = page.get_by_test_id('result-layout-button')
-        self.map_toggle_control_button = page.locator(
-            '#map-toggle-control-button'
-        )
+        self.result_view_button = page.get_by_test_id('result-layout-button')
+        self.list_and_map_view_button = self.get_text('List and Map')
+        self.grid_and_map_view_button = self.get_text('Grid and Map')
+        self.full_map_view_button = self.get_text('Full Map View')
+        self.full_list_view_button = self.get_text('Full List View')
         self.show_more_results = self.get_by_id(
             'result-card-load-more-btn'
         ).last
