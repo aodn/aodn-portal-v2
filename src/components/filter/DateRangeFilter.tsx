@@ -26,7 +26,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { dateDefault } from "../common/constants";
 import {
-  DataTimeFilterRange,
+  DateTimeFilterRange,
   updateDateTimeFilterRange,
 } from "../common/store/componentParamReducer";
 import { useAppDispatch } from "../common/store/hooks";
@@ -75,7 +75,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   const { dateTimeFilterRange } = getComponentState(store.getState());
 
   // Local state for date range
-  const [dateRange, setDateRange] = useState<DataTimeFilterRange>({});
+  const [dateRange, setDateRange] = useState<DateTimeFilterRange>({});
 
   // Local state for min/max date picker
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
@@ -184,7 +184,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   }, []);
 
   const handleApply = useCallback(
-    (dateRange: DataTimeFilterRange) => {
+    (dateRange: DateTimeFilterRange) => {
       if (dateRange) {
         dispatch(updateDateTimeFilterRange(dateRange));
       } else {

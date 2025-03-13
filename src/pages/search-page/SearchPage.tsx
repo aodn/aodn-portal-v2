@@ -16,7 +16,9 @@ import {
   ParameterState,
   unFlattenToParameterState,
   updateFilterBBox,
+  updateLayout,
   updateParameterStates,
+  updateSort,
   updateSortBy,
   updateZoom,
 } from "../../components/common/store/componentParamReducer";
@@ -32,7 +34,10 @@ import MapSection from "./subpages/MapSection";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
-import { useAppDispatch } from "../../components/common/store/hooks";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../components/common/store/hooks";
 import { pageDefault } from "../../components/common/constants";
 import { color, padding } from "../../styles/constants";
 import {
@@ -50,6 +55,7 @@ import {
   SEARCH_PAGE_REFERER,
 } from "./constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 
 const isLoading = (count: number): boolean => {
@@ -72,20 +78,22 @@ const SearchPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isUnderLaptop, isMobile } = useBreakpoint();
-
+  const redirectSearch = useRedirectSearch();
+  const { layout, sort: currentSort } = useAppSelector((state) => ({
+    layout: state.paramReducer.layout,
+    sort: state.paramReducer.sort,
+  }));
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
-  // State to store the layout that user selected
-  const [selectedLayout, setSelectedLayout] = useState<SearchResultLayoutEnum>(
-    SearchResultLayoutEnum.LIST
-  );
-  // CurrentLayout is used to remember last layout, which is SearchResultLayoutEnum exclude the value FULL_MAP
+  // CurrentLayout is used to remember last layout after change to full map view , which is SearchResultLayoutEnum exclude the value FULL_MAP
   const [currentLayout, setCurrentLayout] = useState<
     Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP> | undefined
-  >(undefined);
-  // State to store the sort option that user selected
-  const [currentSort, setCurrentSort] = useState<SortResultEnum | undefined>(
-    undefined
+  >(
+    layout
+      ? layout === SearchResultLayoutEnum.FULL_MAP
+        ? SearchResultLayoutEnum.LIST
+        : layout
+      : undefined
   );
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
@@ -112,13 +120,17 @@ const SearchPage = () => {
   // or LIST view by default if user hasn't chosen any view mode
   const onToggleDisplay = useCallback(
     (value: boolean) => {
-      setSelectedLayout(
-        value
-          ? SearchResultLayoutEnum.FULL_MAP
-          : currentLayout || SearchResultLayoutEnum.LIST
+      dispatch(
+        updateLayout(
+          value
+            ? SearchResultLayoutEnum.FULL_MAP
+            : currentLayout || SearchResultLayoutEnum.LIST
+        )
       );
+
+      redirectSearch(SEARCH_PAGE_REFERER, true, false);
     },
-    [currentLayout]
+    [currentLayout, dispatch, redirectSearch]
   );
 
   const doMapSearch = useCallback(async () => {
@@ -181,8 +193,8 @@ const SearchPage = () => {
       startOneLoadingThread,
       endOneLoadingThread,
       doMapSearch,
-      dispatch,
       navigate,
+      dispatch,
     ]
   );
 
@@ -235,6 +247,12 @@ const SearchPage = () => {
           )
         );
         setZoom(paramState.zoom);
+        paramState.layout &&
+          setCurrentLayout(
+            paramState.layout === SearchResultLayoutEnum.FULL_MAP
+              ? undefined
+              : paramState.layout
+          );
 
         doSearch();
       }
@@ -276,7 +294,8 @@ const SearchPage = () => {
 
   const onChangeSorting = useCallback(
     (sort: SortResultEnum) => {
-      setCurrentSort(sort);
+      dispatch(updateSort(sort));
+
       switch (sort) {
         case SortResultEnum.RELEVANT:
           dispatch(
@@ -317,12 +336,18 @@ const SearchPage = () => {
 
   const onChangeLayout = useCallback(
     (layout: SearchResultLayoutEnum) => {
-      setSelectedLayout(layout);
-      // If user select layout full map, just return so the last selected layout is not changed in currentLayout
-      if (layout === SearchResultLayoutEnum.FULL_MAP) return;
-      setCurrentLayout(layout);
+      dispatch(updateLayout(layout));
+      redirectSearch(SEARCH_PAGE_REFERER, true, false);
+
+      // If user select layout full map, just return the previous layout
+      setCurrentLayout((prev) => {
+        if (layout === SearchResultLayoutEnum.FULL_MAP) {
+          return prev;
+        }
+        return layout;
+      });
     },
-    [setCurrentLayout]
+    [dispatch, redirectSearch]
   );
 
   // Handler for click on map
@@ -386,7 +411,7 @@ const SearchPage = () => {
           width: "100%",
           height: {
             xs:
-              selectedLayout === SearchResultLayoutEnum.FULL_MAP
+              layout === SearchResultLayoutEnum.FULL_MAP
                 ? "auto"
                 : SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
             md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
@@ -396,25 +421,20 @@ const SearchPage = () => {
           bgcolor: color.blue.light,
         }}
         gap={
-          selectedLayout === SearchResultLayoutEnum.FULL_MAP || isUnderLaptop
-            ? 0
-            : 2
+          layout === SearchResultLayoutEnum.FULL_MAP || isUnderLaptop ? 0 : 2
         }
       >
         <Box
           sx={{
             flex: isUnderLaptop ? 1 : "none",
             width:
-              selectedLayout === SearchResultLayoutEnum.FULL_LIST
-                ? "100%"
-                : "auto",
-            height:
-              selectedLayout === SearchResultLayoutEnum.FULL_MAP ? 0 : "auto",
+              layout === SearchResultLayoutEnum.FULL_LIST ? "100%" : "auto",
+            height: layout === SearchResultLayoutEnum.FULL_MAP ? 0 : "auto",
           }}
         >
           <ResultSection
-            showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
-            showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}
+            showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
+            showFullList={layout === SearchResultLayoutEnum.FULL_LIST}
             onClickCard={onClickResultCard}
             selectedUuids={selectedUuids}
             currentSort={currentSort}
@@ -429,9 +449,9 @@ const SearchPage = () => {
           sx={{
             flex: isUnderLaptop ? "none" : 1,
             height: isUnderLaptop
-              ? selectedLayout === SearchResultLayoutEnum.FULL_LIST
+              ? layout === SearchResultLayoutEnum.FULL_LIST
                 ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST
-                : selectedLayout === SearchResultLayoutEnum.FULL_MAP
+                : layout === SearchResultLayoutEnum.FULL_MAP
                   ? isMobile
                     ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE
                     : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET
@@ -440,8 +460,8 @@ const SearchPage = () => {
           }}
         >
           <MapSection
-            showFullMap={selectedLayout === SearchResultLayoutEnum.FULL_MAP}
-            showFullList={selectedLayout === SearchResultLayoutEnum.FULL_LIST}
+            showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
+            showFullList={layout === SearchResultLayoutEnum.FULL_LIST}
             collections={layers}
             bbox={bbox}
             zoom={zoom}
