@@ -79,10 +79,8 @@ const SearchPage = () => {
   const dispatch = useAppDispatch();
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
-  const { layout, sort: currentSort } = useAppSelector((state) => ({
-    layout: state.paramReducer.layout,
-    sort: state.paramReducer.sort,
-  }));
+  const layout = useAppSelector((state) => state.paramReducer.layout);
+  const currentSort = useAppSelector((state) => state.paramReducer.sort);
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   // CurrentLayout is used to remember last layout after change to full map view , which is SearchResultLayoutEnum exclude the value FULL_MAP

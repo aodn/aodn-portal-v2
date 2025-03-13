@@ -9,8 +9,6 @@ import * as wellknown from "wellknown";
 import { Vocab } from "./store/componentParamReducer";
 import { DatasetFrequency } from "./store/searchReducer";
 import { bbox } from "@turf/turf";
-import { SortResultEnum } from "./buttons/ResultListSortButton";
-import { SearchResultLayoutEnum } from "./buttons/ResultListLayoutButton";
 
 // TODO: refactor this, naming like this is not ideal for readability,
 //  what are T, J, R, p, i , j, c, d, x, y, z, etc. actually mean?
