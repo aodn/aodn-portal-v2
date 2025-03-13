@@ -37,7 +37,16 @@ def pytest_runtest_makereport(item: Item, call: CallInfo[Any]) -> Any:
         try:
             page = None
             if hasattr(item, 'funcargs'):
-                page = item.funcargs.get('page')
+                # Look for any of the page fixtures
+                for page_fixture in [
+                    'page',
+                    'desktop_page',
+                    'mobile_page',
+                    'responsive_page',
+                ]:
+                    if page_fixture in item.funcargs:
+                        page = item.funcargs.get(page_fixture)
+                        break
             if page:
                 # Create screenshots directory if it doesn't exist
                 screenshots_dir = 'reports/screenshots'
