@@ -87,12 +87,15 @@ const SearchPage = () => {
   const [currentLayout, setCurrentLayout] = useState<
     Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP> | undefined
   >(
-    layout
-      ? layout === SearchResultLayoutEnum.FULL_MAP
-        ? SearchResultLayoutEnum.LIST
+    layout === SearchResultLayoutEnum.FULL_MAP
+      ? isUnderLaptop
+        ? SearchResultLayoutEnum.FULL_LIST
+        : undefined
+      : isUnderLaptop
+        ? SearchResultLayoutEnum.FULL_LIST
         : layout
-      : undefined
   );
+
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
@@ -122,13 +125,15 @@ const SearchPage = () => {
         updateLayout(
           value
             ? SearchResultLayoutEnum.FULL_MAP
-            : currentLayout || SearchResultLayoutEnum.LIST
+            : isUnderLaptop
+              ? SearchResultLayoutEnum.FULL_LIST
+              : currentLayout || SearchResultLayoutEnum.LIST
         )
       );
-
+      // Form param to url without navigate
       redirectSearch(SEARCH_PAGE_REFERER, true, false);
     },
-    [currentLayout, dispatch, redirectSearch]
+    [currentLayout, dispatch, isUnderLaptop, redirectSearch]
   );
 
   const doMapSearch = useCallback(async () => {
@@ -161,6 +166,15 @@ const SearchPage = () => {
         store.getState()
       );
 
+      setCurrentLayout(
+        componentParam.layout === SearchResultLayoutEnum.FULL_MAP
+          ? isUnderLaptop
+            ? SearchResultLayoutEnum.FULL_LIST
+            : undefined
+          : isUnderLaptop
+            ? SearchResultLayoutEnum.FULL_LIST
+            : componentParam.layout
+      );
       // Use standard param to get fields you need, record is stored in redux,
       // set page so that it returns fewer records
       const paramPaged = createSearchParamFrom(componentParam, {
@@ -193,6 +207,7 @@ const SearchPage = () => {
       doMapSearch,
       navigate,
       dispatch,
+      isUnderLaptop,
     ]
   );
 
@@ -245,17 +260,30 @@ const SearchPage = () => {
           )
         );
         setZoom(paramState.zoom);
-        paramState.layout &&
-          setCurrentLayout(
-            paramState.layout === SearchResultLayoutEnum.FULL_MAP
-              ? undefined
+        setCurrentLayout(
+          paramState.layout === SearchResultLayoutEnum.FULL_MAP
+            ? isUnderLaptop
+              ? SearchResultLayoutEnum.FULL_LIST
+              : undefined
+            : isUnderLaptop
+              ? SearchResultLayoutEnum.FULL_LIST
               : paramState.layout
-          );
+        );
+
+        if (
+          isUnderLaptop &&
+          paramState.layout !== SearchResultLayoutEnum.FULL_MAP
+        ) {
+          dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
+        }
 
         doSearch();
       }
     } else {
       if (location.state?.requireSearch) {
+        if (isUnderLaptop && layout !== SearchResultLayoutEnum.FULL_MAP) {
+          dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
+        }
         // Explicitly call search from navigation, so you just need search
         // but do not navigate again.
         doSearch(false);
@@ -265,6 +293,9 @@ const SearchPage = () => {
       // come from other page, the result list is good because we remember it
       // but the map need init again and therefore need to do a doMapSearch()
       else if (location.state?.referer !== SEARCH_PAGE_REFERER) {
+        if (isUnderLaptop && layout !== SearchResultLayoutEnum.FULL_MAP) {
+          dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
+        }
         const componentParam: ParameterState = getComponentState(
           store.getState()
         );
@@ -274,6 +305,15 @@ const SearchPage = () => {
           )
         );
         setZoom(componentParam.zoom);
+        setCurrentLayout(
+          layout === SearchResultLayoutEnum.FULL_MAP
+            ? isUnderLaptop
+              ? SearchResultLayoutEnum.FULL_LIST
+              : undefined
+            : isUnderLaptop
+              ? SearchResultLayoutEnum.FULL_LIST
+              : layout
+        );
 
         startOneLoadingThread();
         doMapSearch().finally(() => {
@@ -288,6 +328,8 @@ const SearchPage = () => {
     doMapSearch,
     startOneLoadingThread,
     endOneLoadingThread,
+    isUnderLaptop,
+    layout,
   ]);
 
   const onChangeSorting = useCallback(
@@ -335,6 +377,7 @@ const SearchPage = () => {
   const onChangeLayout = useCallback(
     (layout: SearchResultLayoutEnum) => {
       dispatch(updateLayout(layout));
+      // Form param to url without navigate
       redirectSearch(SEARCH_PAGE_REFERER, true, false);
 
       // If user select layout full map, just return the previous layout
