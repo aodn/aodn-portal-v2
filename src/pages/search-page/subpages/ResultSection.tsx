@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { useSelector } from "react-redux";
 import { Box, SxProps } from "@mui/material";
 import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
@@ -19,6 +19,7 @@ import BookmarkListButton, {
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import { SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH } from "../constants";
+import { useAppDispatch } from "../../../components/common/store/hooks";
 
 interface ResultSectionProps
   extends Partial<ResultPanelSimpleFilterType>,
@@ -47,13 +48,6 @@ const ResultSection: FC<ResultSectionProps> = ({
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     searchQueryResult
   );
-
-  // Switch default layout to full-list in small screens
-  useEffect(() => {
-    if (isUnderLaptop) {
-      onChangeLayout && onChangeLayout(SearchResultLayoutEnum.FULL_LIST);
-    }
-  }, [isUnderLaptop, onChangeLayout]);
 
   // Early return if it is full map view or no reduxContents
   if (showFullMap || !reduxContents) return null;
