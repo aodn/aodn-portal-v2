@@ -120,19 +120,22 @@ const SearchPage = () => {
   // or LIST view by default if user hasn't chosen any view mode
   const onToggleDisplay = useCallback(
     (value: boolean) => {
-      dispatch(
-        updateLayout(
-          value
-            ? SearchResultLayoutEnum.FULL_MAP
-            : isUnderLaptop
-              ? SearchResultLayoutEnum.FULL_LIST
-              : currentLayout || SearchResultLayoutEnum.LIST
-        )
-      );
+      setCurrentLayout((prev) => {
+        dispatch(
+          updateLayout(
+            value
+              ? SearchResultLayoutEnum.FULL_MAP
+              : isUnderLaptop
+                ? SearchResultLayoutEnum.FULL_LIST
+                : prev || SearchResultLayoutEnum.LIST
+          )
+        );
+        return prev;
+      });
       // Form param to url without navigate
       redirectSearch(SEARCH_PAGE_REFERER, true, false);
     },
-    [currentLayout, dispatch, isUnderLaptop, redirectSearch]
+    [dispatch, isUnderLaptop, redirectSearch]
   );
 
   const doMapSearch = useCallback(async () => {
@@ -414,15 +417,6 @@ const SearchPage = () => {
       // Form param to url without navigate
       redirectSearch(SEARCH_PAGE_REFERER, true, false);
       setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
-    } else {
-      // For big screen, since state currentLayout remember the last layout before change to full map
-      // So in this case we set it to undefined by default if user hasn't chosen any view mode
-      // or set it to the last layout remembered
-      setCurrentLayout(
-        !layout || layout === SearchResultLayoutEnum.FULL_MAP
-          ? undefined
-          : layout
-      );
     }
   }, [
     dispatch,
