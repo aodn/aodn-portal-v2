@@ -19,7 +19,6 @@ import BookmarkListButton, {
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import { SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH } from "../constants";
-import { useAppDispatch } from "../../../components/common/store/hooks";
 
 interface ResultSectionProps
   extends Partial<ResultPanelSimpleFilterType>,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
@@ -98,6 +98,14 @@ const SearchPage = () => {
       : undefined
   );
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
+
+  const paramState: ParameterState | undefined = useMemo(() => {
+    const param = location?.search.substring(1);
+    if (param !== null) {
+      return unFlattenToParameterState(param);
+    }
+    return undefined;
+  }, [location?.search]);
 
   const startOneLoadingThread = useCallback(() => {
     setLoadingThreadCount((prev) => prev + 1);
@@ -229,9 +237,8 @@ const SearchPage = () => {
   const handleNavigation = useCallback(() => {
     if (!location.state?.fromNavigate) {
       // The first char is ? in the search string, so we need to remove it.
-      const param = location?.search.substring(1);
-      if (param !== null) {
-        const paramState: ParameterState = unFlattenToParameterState(param);
+
+      if (paramState) {
         dispatch(updateParameterStates(paramState));
         // URL request, we need to adjust the map to the same area as mentioned
         // in the url
@@ -278,6 +285,7 @@ const SearchPage = () => {
     doMapSearch,
     startOneLoadingThread,
     endOneLoadingThread,
+    paramState,
   ]);
 
   const onChangeSorting = useCallback(
@@ -391,28 +399,39 @@ const SearchPage = () => {
 
   useEffect(() => {
     if (isUnderLaptop) {
-      const param = location?.search.substring(1);
-      if (param !== null) {
-        const paramState: ParameterState = unFlattenToParameterState(param);
-        if (
-          paramState.layout === SearchResultLayoutEnum.FULL_LIST ||
-          paramState.layout === SearchResultLayoutEnum.FULL_MAP
-        ) {
-          setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
-          return;
-        }
+      // For small screen, if the layout is not full map or full list, then we need to change it to full list
+      // State currentLayout remember the last layout before change to full map, so in this case we set it to full list by default
+      if (
+        paramState &&
+        (paramState.layout === SearchResultLayoutEnum.FULL_LIST ||
+          paramState.layout === SearchResultLayoutEnum.FULL_MAP)
+      ) {
+        setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
+        return;
       }
+      // Update redux state to full list
       dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
+      // Form param to url without navigate
       redirectSearch(SEARCH_PAGE_REFERER, true, false);
       setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
     } else {
+      // For big screen, since state currentLayout remember the last layout before change to full map
+      // So in this case we set it to undefined by default if user hasn't chosen any view mode
+      // or set it to the last layout remembered
       setCurrentLayout(
         !layout || layout === SearchResultLayoutEnum.FULL_MAP
           ? undefined
           : layout
       );
     }
-  }, [dispatch, isUnderLaptop, layout, location?.search, redirectSearch]);
+  }, [
+    dispatch,
+    isUnderLaptop,
+    layout,
+    location?.search,
+    redirectSearch,
+    paramState,
+  ]);
 
   return (
     <Layout>
