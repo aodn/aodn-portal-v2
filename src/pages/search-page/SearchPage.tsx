@@ -86,16 +86,7 @@ const SearchPage = () => {
   // CurrentLayout is used to remember last layout after change to full map view , which is SearchResultLayoutEnum exclude the value FULL_MAP
   const [currentLayout, setCurrentLayout] = useState<
     Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP> | undefined
-  >(
-    layout === SearchResultLayoutEnum.FULL_MAP
-      ? isUnderLaptop
-        ? SearchResultLayoutEnum.FULL_LIST
-        : undefined
-      : isUnderLaptop
-        ? SearchResultLayoutEnum.FULL_LIST
-        : layout
-  );
-
+  >(undefined);
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
@@ -166,15 +157,6 @@ const SearchPage = () => {
         store.getState()
       );
 
-      setCurrentLayout(
-        componentParam.layout === SearchResultLayoutEnum.FULL_MAP
-          ? isUnderLaptop
-            ? SearchResultLayoutEnum.FULL_LIST
-            : undefined
-          : isUnderLaptop
-            ? SearchResultLayoutEnum.FULL_LIST
-            : componentParam.layout
-      );
       // Use standard param to get fields you need, record is stored in redux,
       // set page so that it returns fewer records
       const paramPaged = createSearchParamFrom(componentParam, {
@@ -207,7 +189,6 @@ const SearchPage = () => {
       doMapSearch,
       navigate,
       dispatch,
-      isUnderLaptop,
     ]
   );
 
@@ -260,30 +241,11 @@ const SearchPage = () => {
           )
         );
         setZoom(paramState.zoom);
-        setCurrentLayout(
-          paramState.layout === SearchResultLayoutEnum.FULL_MAP
-            ? isUnderLaptop
-              ? SearchResultLayoutEnum.FULL_LIST
-              : undefined
-            : isUnderLaptop
-              ? SearchResultLayoutEnum.FULL_LIST
-              : paramState.layout
-        );
-
-        if (
-          isUnderLaptop &&
-          paramState.layout !== SearchResultLayoutEnum.FULL_MAP
-        ) {
-          dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
-        }
 
         doSearch();
       }
     } else {
       if (location.state?.requireSearch) {
-        if (isUnderLaptop && layout !== SearchResultLayoutEnum.FULL_MAP) {
-          dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
-        }
         // Explicitly call search from navigation, so you just need search
         // but do not navigate again.
         doSearch(false);
@@ -293,9 +255,6 @@ const SearchPage = () => {
       // come from other page, the result list is good because we remember it
       // but the map need init again and therefore need to do a doMapSearch()
       else if (location.state?.referer !== SEARCH_PAGE_REFERER) {
-        if (isUnderLaptop && layout !== SearchResultLayoutEnum.FULL_MAP) {
-          dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
-        }
         const componentParam: ParameterState = getComponentState(
           store.getState()
         );
@@ -305,15 +264,6 @@ const SearchPage = () => {
           )
         );
         setZoom(componentParam.zoom);
-        setCurrentLayout(
-          layout === SearchResultLayoutEnum.FULL_MAP
-            ? isUnderLaptop
-              ? SearchResultLayoutEnum.FULL_LIST
-              : undefined
-            : isUnderLaptop
-              ? SearchResultLayoutEnum.FULL_LIST
-              : layout
-        );
 
         startOneLoadingThread();
         doMapSearch().finally(() => {
@@ -328,8 +278,6 @@ const SearchPage = () => {
     doMapSearch,
     startOneLoadingThread,
     endOneLoadingThread,
-    isUnderLaptop,
-    layout,
   ]);
 
   const onChangeSorting = useCallback(
@@ -440,6 +388,31 @@ const SearchPage = () => {
       off(EVENT_BOOKMARK.EXPAND, bookmarkSelected);
     };
   }, [onClickResultCard]);
+
+  useEffect(() => {
+    if (isUnderLaptop) {
+      const param = location?.search.substring(1);
+      if (param !== null) {
+        const paramState: ParameterState = unFlattenToParameterState(param);
+        if (
+          paramState.layout === SearchResultLayoutEnum.FULL_LIST ||
+          paramState.layout === SearchResultLayoutEnum.FULL_MAP
+        ) {
+          setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
+          return;
+        }
+      }
+      dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
+      redirectSearch(SEARCH_PAGE_REFERER, true, false);
+      setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
+    } else {
+      setCurrentLayout(
+        !layout || layout === SearchResultLayoutEnum.FULL_MAP
+          ? undefined
+          : layout
+      );
+    }
+  }, [dispatch, isUnderLaptop, layout, location?.search, redirectSearch]);
 
   return (
     <Layout>
