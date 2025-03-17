@@ -87,6 +87,9 @@ const SearchPage = () => {
   const [currentLayout, setCurrentLayout] = useState<
     Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP> | undefined
   >(undefined);
+
+  console.log("currentLayout", currentLayout);
+  console.log("redux layout", layout);
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
@@ -417,6 +420,11 @@ const SearchPage = () => {
       // Form param to url without navigate
       redirectSearch(SEARCH_PAGE_REFERER, true, false);
       setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
+    } else {
+      if (paramState && paramState.layout !== SearchResultLayoutEnum.FULL_MAP) {
+        setCurrentLayout(paramState.layout);
+        return;
+      }
     }
   }, [
     dispatch,
