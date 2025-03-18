@@ -412,6 +412,7 @@ const SearchPage = () => {
           paramState.layout === SearchResultLayoutEnum.FULL_MAP)
       ) {
         setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
+        return;
       }
       // Update redux state to full list
       dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
@@ -422,6 +423,7 @@ const SearchPage = () => {
       // For big screens, if the layout is not full map, then we need to change it to the last layout before change to full map
       if (paramState && paramState.layout !== SearchResultLayoutEnum.FULL_MAP) {
         setCurrentLayout(paramState.layout);
+        return;
       }
     }
   }, [
