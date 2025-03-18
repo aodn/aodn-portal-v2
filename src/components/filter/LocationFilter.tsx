@@ -1,13 +1,20 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
 import {
   Box,
+  Button,
   FormControl,
   FormControlLabel,
   ListSubheader,
   Radio,
   RadioGroup,
 } from "@mui/material";
-import { fontFamily, fontSize, padding } from "../../styles/constants";
+import {
+  border,
+  color,
+  fontFamily,
+  fontSize,
+  padding,
+} from "../../styles/constants";
 import { marineParkDefault } from "../common/constants";
 import { Feature, FeatureCollection, Polygon } from "geojson";
 import _ from "lodash";
@@ -110,6 +117,11 @@ const LocationFilter: FC<LocationFilterProps> = () => {
     [dispatch]
   );
 
+  const handleClear = useCallback(() => {
+    dispatch(updateFilterPolygon(undefined));
+    setSelectedOption(DEFAULT_LOCATION.value);
+  }, [dispatch]);
+
   useEffect(() => {
     setSelectedOption((v) => {
       const n = findMatch(componentParam.polygon, locationOptions);
@@ -123,6 +135,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        flexDirection: "column",
         width: "100%",
         padding: padding.large,
       }}
@@ -151,6 +164,20 @@ const LocationFilter: FC<LocationFilterProps> = () => {
           ))}
         </RadioGroup>
       </FormControl>
+      <Button
+        onClick={handleClear}
+        sx={{
+          width: "100px",
+
+          border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+          "&:hover": {
+            border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+            backgroundColor: color.blue.darkSemiTransparent,
+          },
+        }}
+      >
+        Clear
+      </Button>
     </Box>
   );
 };

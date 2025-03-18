@@ -75,7 +75,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   const { dateTimeFilterRange } = getComponentState(store.getState());
 
   // Local state for date range
-  const [dateRange, setDateRange] = useState<DataTimeFilterRange>({});
+  // const [dateRange, setDateRange] = useState<DataTimeFilterRange>({});
 
   // Local state for min/max date picker
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
@@ -93,18 +93,23 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   );
 
   // Helper to sync date range when radio change
-  const updateDateRange = useCallback((startDate: Dayjs, endDate: Dayjs) => {
-    const newStart = dateToValue(startDate);
-    const newEnd = dateToValue(endDate);
+  const updateDateRange = useCallback(
+    (startDate: Dayjs, endDate: Dayjs) => {
+      const newStart = dateToValue(startDate);
+      const newEnd = dateToValue(endDate);
 
-    setMinDate(startDate);
-    setMaxDate(endDate);
-    setValue([newStart, newEnd]);
-    setDateRange({
-      start: newStart,
-      end: newEnd,
-    });
-  }, []);
+      setMinDate(startDate);
+      setMaxDate(endDate);
+      setValue([newStart, newEnd]);
+      dispatch(
+        updateDateTimeFilterRange({
+          start: newStart,
+          end: newEnd,
+        })
+      );
+    },
+    [dispatch]
+  );
 
   const handleRadioChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,12 +140,14 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
       setMinDate(dayjs(newStart));
       setMaxDate(dayjs(newEnd));
       setSelectedOption(DateRangeOptionValues.Custom);
-      setDateRange({
-        start: newStart,
-        end: newEnd,
-      });
+      dispatch(
+        updateDateTimeFilterRange({
+          start: newStart,
+          end: newEnd,
+        })
+      );
     },
-    []
+    [dispatch]
   );
 
   const handleMinDateChange = useCallback(
@@ -150,13 +157,15 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         setMinDate(newMinDate);
         setValue([newStart, value[1]]);
         setSelectedOption(DateRangeOptionValues.Custom);
-        setDateRange((preDateRange) => ({
-          ...preDateRange,
-          start: newStart,
-        }));
+        dispatch(
+          updateDateTimeFilterRange({
+            start: newStart,
+            end: dateTimeFilterRange?.end,
+          })
+        );
       }
     },
-    [maxDate, value]
+    [dateTimeFilterRange?.end, dispatch, maxDate, value]
   );
 
   const handleMaxDateChange = useCallback(
@@ -166,34 +175,36 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         setMaxDate(newMaxDate);
         setValue([value[0], newEnd]);
         setSelectedOption(DateRangeOptionValues.Custom);
-        setDateRange((preDateRange) => ({
-          ...preDateRange,
-          start: newEnd,
-        }));
+        dispatch(
+          updateDateTimeFilterRange({
+            start: dateTimeFilterRange?.start,
+            end: newEnd,
+          })
+        );
       }
     },
-    [minDate, value]
+    [dateTimeFilterRange?.start, dispatch, minDate, value]
   );
 
   const handleClear = useCallback(() => {
-    setDateRange({});
+    dispatch(updateDateTimeFilterRange({}));
     setMinDate(initialMinDate);
     setMaxDate(initialMaxDate);
     setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
     setSelectedOption(DateRangeOptionValues.Custom);
-  }, []);
+  }, [dispatch]);
 
-  const handleApply = useCallback(
-    (dateRange: DataTimeFilterRange) => {
-      if (dateRange) {
-        dispatch(updateDateTimeFilterRange(dateRange));
-      } else {
-        dispatch(updateDateTimeFilterRange({}));
-      }
-      handleClosePopup();
-    },
-    [dispatch, handleClosePopup]
-  );
+  // const handleApply = useCallback(
+  //   (dateRange: DataTimeFilterRange) => {
+  //     if (dateRange) {
+  //       dispatch(updateDateTimeFilterRange(dateRange));
+  //     } else {
+  //       dispatch(updateDateTimeFilterRange({}));
+  //     }
+  //     handleClosePopup();
+  //   },
+  //   [dispatch, handleClosePopup]
+  // );
 
   const handleClose = useCallback(() => {
     handleClear();
@@ -213,13 +224,13 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         dateTimeFilterRange.start ?? dateToValue(initialMinDate),
         dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
       ]);
-      setDateRange(dateTimeFilterRange);
+      // setDateRange(dateTimeFilterRange);
     } else {
       // Reset to initial state when dateTimeFilterRange is null or undefined
       setMinDate(initialMinDate);
       setMaxDate(initialMaxDate);
       setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
-      setDateRange({});
+      // setDateRange({});
     }
   }, [dateTimeFilterRange]);
 
@@ -443,7 +454,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
           pr={2}
           pb={2}
         >
-          <Button
+          {/* <Button
             onClick={() => handleApply(dateRange)}
             sx={{
               width: "100px",
@@ -455,7 +466,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
             }}
           >
             Apply
-          </Button>
+          </Button> */}
           <Button
             onClick={handleClear}
             sx={{
