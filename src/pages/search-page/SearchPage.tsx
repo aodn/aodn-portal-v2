@@ -88,8 +88,6 @@ const SearchPage = () => {
     Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP> | undefined
   >(undefined);
 
-  console.log("currentLayout", currentLayout);
-  console.log("redux layout", layout);
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
@@ -404,6 +402,7 @@ const SearchPage = () => {
   }, [onClickResultCard]);
 
   useEffect(() => {
+    // Check URL paramState instead of redux state because redux state is not updated before this useEffect
     if (isUnderLaptop) {
       // For small screen, if the layout is not full map or full list, then we need to change it to full list
       // State currentLayout remember the last layout before change to full map, so in this case we set it to full list by default
@@ -413,7 +412,6 @@ const SearchPage = () => {
           paramState.layout === SearchResultLayoutEnum.FULL_MAP)
       ) {
         setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
-        return;
       }
       // Update redux state to full list
       dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
@@ -421,9 +419,9 @@ const SearchPage = () => {
       redirectSearch(SEARCH_PAGE_REFERER, true, false);
       setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
     } else {
+      // For big screens, if the layout is not full map, then we need to change it to the last layout before change to full map
       if (paramState && paramState.layout !== SearchResultLayoutEnum.FULL_MAP) {
         setCurrentLayout(paramState.layout);
-        return;
       }
     }
   }, [
