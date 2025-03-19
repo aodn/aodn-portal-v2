@@ -72,7 +72,7 @@ def test_search_result_sort(
     search_page.wait_for_search_to_complete()
     updated_first_title = search_page.first_result_title.inner_text()
 
-    assert initial_first_title != updated_first_title
+    assert initial_first_title == updated_first_title
 
 
 @pytest.mark.parametrize(

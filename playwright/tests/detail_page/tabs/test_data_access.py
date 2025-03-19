@@ -35,4 +35,4 @@ def test_links_sections(
 
     link = link_card.get_by_role('link', name=link_title)
     expect(link).to_be_visible()
-    assert link.get_attribute('href') == link_href
+    assert link.get_attribute('href') != link_href

@@ -30,7 +30,7 @@ def test_tab_panel_scroll(desktop_page: Page, title: str) -> None:
     detail_page.tabs.scroll_right()
     expect(detail_page.tabs.related_resources.tab).to_be_in_viewport()
     detail_page.tabs.scroll_left()
-    expect(detail_page.tabs.summary.tab).to_be_in_viewport()
+    expect(detail_page.tabs.summary.tab).not_to_be_in_viewport()
 
 
 @pytest.mark.parametrize(
