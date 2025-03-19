@@ -25,12 +25,8 @@ import {
 } from "../../styles/constants";
 import CloseIcon from "@mui/icons-material/Close";
 import { dateDefault } from "../common/constants";
-import {
-  DataTimeFilterRange,
-  updateDateTimeFilterRange,
-} from "../common/store/componentParamReducer";
-import { useAppDispatch } from "../common/store/hooks";
-import store, { getComponentState } from "../common/store/store";
+import { updateDateTimeFilterRange } from "../common/store/componentParamReducer";
+import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import { OGCCollections } from "../common/store/OGCCollectionDefinitions";
 import { fetchResultNoStore } from "../common/store/searchReducer";
 import { cqlDefaultFilters } from "../common/cqlFilters";
@@ -72,11 +68,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
 
   // State from redux
-  const { dateTimeFilterRange } = getComponentState(store.getState());
-
-  // Local state for date range
-  // const [dateRange, setDateRange] = useState<DataTimeFilterRange>({});
-
+  const dateTimeFilterRange = useAppSelector(
+    (state) => state.paramReducer.dateTimeFilterRange
+  );
   // Local state for min/max date picker
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
   const [maxDate, setMaxDate] = useState<Dayjs>(initialMaxDate);
@@ -194,22 +188,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
     setSelectedOption(DateRangeOptionValues.Custom);
   }, [dispatch]);
 
-  // const handleApply = useCallback(
-  //   (dateRange: DataTimeFilterRange) => {
-  //     if (dateRange) {
-  //       dispatch(updateDateTimeFilterRange(dateRange));
-  //     } else {
-  //       dispatch(updateDateTimeFilterRange({}));
-  //     }
-  //     handleClosePopup();
-  //   },
-  //   [dispatch, handleClosePopup]
-  // );
-
   const handleClose = useCallback(() => {
-    handleClear();
     handleClosePopup();
-  }, [handleClear, handleClosePopup]);
+  }, [handleClosePopup]);
 
   // Listen to redux dateTimeFilterRange to initialize local states
   useEffect(() => {
@@ -224,13 +205,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         dateTimeFilterRange.start ?? dateToValue(initialMinDate),
         dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
       ]);
-      // setDateRange(dateTimeFilterRange);
     } else {
       // Reset to initial state when dateTimeFilterRange is null or undefined
       setMinDate(initialMinDate);
       setMaxDate(initialMaxDate);
       setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
-      // setDateRange({});
     }
   }, [dateTimeFilterRange]);
 
@@ -454,19 +433,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
           pr={2}
           pb={2}
         >
-          {/* <Button
-            onClick={() => handleApply(dateRange)}
-            sx={{
-              width: "100px",
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
-          >
-            Apply
-          </Button> */}
           <Button
             onClick={handleClear}
             sx={{

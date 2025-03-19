@@ -6,7 +6,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import PlaceIcon from "@mui/icons-material/Place";
 import { borderRadius, color, fontWeight, gap } from "../../styles/constants";
-import store, { getComponentState } from "../common/store/store";
+import { useAppSelector } from "../common/store/hooks";
 import {
   DEFAULT_SEARCH_LOCATION,
   ParameterState,
@@ -93,7 +93,9 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
 
   sx,
 }) => {
-  const componentParams: ParameterState = getComponentState(store.getState());
+  const componentParams: ParameterState = useAppSelector(
+    (state) => state.paramReducer
+  );
 
   const redirectSearch = useRedirectSearch();
 
