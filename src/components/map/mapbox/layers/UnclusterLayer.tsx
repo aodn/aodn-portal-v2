@@ -116,7 +116,12 @@ const UnclusterLayer: FC<UnclusterLayerProps> = ({
       map?.off("mouseleave", unclusterLayerId, defaultMouseLeaveEventHandler);
 
       try {
-        if (map?.getLayer(unclusterLayerId)) map?.removeLayer(unclusterLayerId);
+        if (map?.getLayer(unclusterLayerId)) {
+          map?.removeLayer(unclusterLayerId);
+        }
+        if (map?.getSource(unclusterSourceId)) {
+          map?.removeSource(unclusterSourceId);
+        }
       } catch (error) {
         // If source not found and throw exception then layer will not exist
         // TODO: handle error in ErrorBoundary
