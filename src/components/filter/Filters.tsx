@@ -18,7 +18,8 @@ import {
 } from "../common/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import CloseIcon from "@mui/icons-material/Close";
-import { border, color, gap } from "../../styles/constants";
+import ReplayIcon from "@mui/icons-material/Replay";
+import { color, fontSize, gap } from "../../styles/constants";
 import TabsPanelContainer, { Tab } from "../common/tab/TabsPanelContainer";
 import ThemeFilter from "./tab-filters/ThemeFilter";
 import PlatformFilter from "./tab-filters/PlatformFilter";
@@ -195,41 +196,38 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   return (
     <>
       <Box sx={{ position: "relative", width: "100%", ...sx }}>
-        <IconButton
-          onClick={handleClose}
+        <Box
           sx={{
             position: "absolute",
             top: gap.md,
             right: gap.md,
             zIndex: 1,
-            bgcolor: color.gray.extraLight,
           }}
         >
-          <CloseIcon />
-        </IconButton>
-        <TabsPanelContainer tabs={TABS} sx={{ color: color.blue.xLight }} />
-        <Box
-          display="flex"
-          justifyContent="end"
-          alignItems="center"
-          gap={2}
-          pr={2}
-          pb={2}
-        >
-          <Button
+          <IconButton
+            onClick={handleClearAll}
             sx={{
-              width: "100px",
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+              bgcolor: color.gray.extraLight,
               "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
+                bgcolor: color.blue.darkSemiTransparent,
               },
             }}
-            onClick={handleClearAll}
           >
-            Clear All
-          </Button>
+            <ReplayIcon sx={{ fontSize: fontSize.info }} />
+          </IconButton>
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              bgcolor: color.gray.extraLight,
+              "&:hover": {
+                bgcolor: color.blue.darkSemiTransparent,
+              },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: fontSize.info }} />
+          </IconButton>
         </Box>
+        <TabsPanelContainer tabs={TABS} sx={{ color: color.blue.xLight }} />
       </Box>
     </>
   );

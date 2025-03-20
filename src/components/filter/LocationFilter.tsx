@@ -1,18 +1,21 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
 import {
   Box,
-  Button,
   FormControl,
   FormControlLabel,
-  ListSubheader,
+  IconButton,
   Radio,
   RadioGroup,
+  Typography,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import ReplayIcon from "@mui/icons-material/Replay";
 import {
-  border,
   color,
   fontFamily,
   fontSize,
+  fontWeight,
+  gap,
   padding,
 } from "../../styles/constants";
 import { marineParkDefault } from "../common/constants";
@@ -32,7 +35,9 @@ interface LocationOptionType {
   geo?: FeatureCollection<Polygon>;
 }
 
-interface LocationFilterProps {}
+interface LocationFilterProps {
+  handleClosePopup: () => void;
+}
 
 const locationOptions: LocationOptionType[] = [];
 
@@ -94,7 +99,7 @@ fetch(marineParkDefault.geojson)
     console.error("Error fetching JSON, ok to ignore in vitest:", error)
   );
 
-const LocationFilter: FC<LocationFilterProps> = () => {
+const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
   const componentParam: ParameterState = getComponentState(store.getState());
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
@@ -122,6 +127,10 @@ const LocationFilter: FC<LocationFilterProps> = () => {
     setSelectedOption(DEFAULT_LOCATION.value);
   }, [dispatch]);
 
+  const handleClose = useCallback(() => {
+    handleClosePopup();
+  }, [handleClosePopup]);
+
   useEffect(() => {
     setSelectedOption((v) => {
       const n = findMatch(componentParam.polygon, locationOptions);
@@ -132,6 +141,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
   return (
     <Box
       sx={{
+        position: "relative",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -140,13 +150,50 @@ const LocationFilter: FC<LocationFilterProps> = () => {
         padding: padding.large,
       }}
     >
+      <Box
+        sx={{
+          position: "absolute",
+          top: gap.md,
+          right: gap.md,
+          zIndex: 2,
+        }}
+      >
+        <IconButton
+          onClick={handleClear}
+          sx={{
+            bgcolor: color.gray.extraLight,
+            "&:hover": {
+              bgcolor: color.blue.darkSemiTransparent,
+            },
+          }}
+        >
+          <ReplayIcon sx={{ fontSize: fontSize.info }} />
+        </IconButton>
+        <IconButton
+          onClick={handleClose}
+          sx={{
+            bgcolor: color.gray.extraLight,
+            "&:hover": {
+              bgcolor: color.blue.darkSemiTransparent,
+            },
+          }}
+        >
+          <CloseIcon sx={{ fontSize: fontSize.info }} />
+        </IconButton>
+      </Box>
+      <Typography
+        pt={padding.large}
+        fontSize={fontSize.info}
+        fontWeight={fontWeight.bold}
+      >
+        Australia Marine Parks
+      </Typography>
       <FormControl sx={{ maxHeight: "300px", overflowY: "scroll", flex: 1 }}>
         <RadioGroup
           defaultValue={locationOptions[0].value}
           value={selectedOption}
           onChange={handleRadioChange}
         >
-          <ListSubheader>Australia Marine Parks</ListSubheader>
           {locationOptions.map((item) => (
             <FormControlLabel
               value={item.value}
@@ -164,20 +211,6 @@ const LocationFilter: FC<LocationFilterProps> = () => {
           ))}
         </RadioGroup>
       </FormControl>
-      <Button
-        onClick={handleClear}
-        sx={{
-          width: "100px",
-
-          border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-          "&:hover": {
-            border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-            backgroundColor: color.blue.darkSemiTransparent,
-          },
-        }}
-      >
-        Clear
-      </Button>
     </Box>
   );
 };

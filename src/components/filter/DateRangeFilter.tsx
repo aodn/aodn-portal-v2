@@ -14,7 +14,6 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
-  border,
   color,
   fontColor,
   fontFamily,
@@ -24,6 +23,7 @@ import {
   padding,
 } from "../../styles/constants";
 import CloseIcon from "@mui/icons-material/Close";
+import ReplayIcon from "@mui/icons-material/Replay";
 import { dateDefault } from "../common/constants";
 import { updateDateTimeFilterRange } from "../common/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
@@ -249,17 +249,36 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Grid container position="relative">
-        <IconButton
-          onClick={handleClose}
+        <Box
           sx={{
             position: "absolute",
             top: gap.md,
             right: gap.md,
-            bgcolor: color.gray.extraLight,
           }}
         >
-          <CloseIcon />
-        </IconButton>
+          <IconButton
+            onClick={handleClear}
+            sx={{
+              bgcolor: color.gray.extraLight,
+              "&:hover": {
+                bgcolor: color.blue.darkSemiTransparent,
+              },
+            }}
+          >
+            <ReplayIcon sx={{ fontSize: fontSize.info }} />
+          </IconButton>
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              bgcolor: color.gray.extraLight,
+              "&:hover": {
+                bgcolor: color.blue.darkSemiTransparent,
+              },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: fontSize.info }} />
+          </IconButton>
+        </Box>
         <Grid
           item
           xs={isMobile || isTablet ? 12 : 2}
@@ -421,32 +440,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
               </Grid>
             </Grid>
           </Grid>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          display="flex"
-          flexDirection="row"
-          justifyContent="end"
-          alignItems="center"
-          gap={2}
-          pr={2}
-          pb={2}
-        >
-          <Button
-            onClick={handleClear}
-            sx={{
-              width: "100px",
-
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
-          >
-            Clear
-          </Button>
         </Grid>
       </Grid>
     </LocalizationProvider>
