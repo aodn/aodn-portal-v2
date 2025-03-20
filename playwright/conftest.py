@@ -6,6 +6,8 @@ import pytest
 from _pytest.nodes import Item
 from _pytest.runner import CallInfo
 
+from utils.trace_utils import get_valid_filename
+
 
 @pytest.fixture(scope='session', autouse=True)
 def change_test_dir(request: pytest.FixtureRequest) -> None:
@@ -53,7 +55,8 @@ def pytest_runtest_makereport(item: Item, call: CallInfo[Any]) -> Any:
 
                 # Generate unique screenshot filename
                 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                screenshot_name = f'failure_{item.name}_{timestamp}.png'
+                test_name = get_valid_filename(item.name)
+                screenshot_name = f'failure_{test_name}_{timestamp}.png'
                 screenshot_path = os.path.join(screenshots_dir, screenshot_name)
 
                 # Capture screenshot
