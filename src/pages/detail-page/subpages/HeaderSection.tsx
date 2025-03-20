@@ -1,6 +1,14 @@
 import { FC, ReactNode, useCallback, useMemo } from "react";
 import { useLocation } from "react-router-dom";
-import { Box, Grid, Paper, Stack, SxProps, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Paper,
+  Stack,
+  SxProps,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import ReplyIcon from "@mui/icons-material/Reply";
 import ContentCopy from "@mui/icons-material/ContentCopy";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
@@ -62,7 +70,11 @@ const HeaderButton: FC<HeaderButtonProps> = ({ children, onClick, sx }) => (
 );
 
 // Render the go back button next to the header
-const renderGoBackButton = (onClick: () => void) => {
+const renderGoBackButton = (onClick: () => void, referer: string) => {
+  const tip =
+    referer !== SEARCH_PAGE_REFERER
+      ? "Back to Home"
+      : "Return to search results";
   return (
     <Box
       aria-label="go-back button"
@@ -75,11 +87,13 @@ const renderGoBackButton = (onClick: () => void) => {
       data-testid="go-back-button"
     >
       <HeaderButton>
-        <ReplyIcon
-          sx={{
-            color: color.brightBlue.dark,
-          }}
-        />
+        <Tooltip title={tip} placement="top">
+          <ReplyIcon
+            sx={{
+              color: color.brightBlue.dark,
+            }}
+          />
+        </Tooltip>
       </HeaderButton>
     </Box>
   );
@@ -240,6 +254,10 @@ const HeaderSection = () => {
     [redirectHome, redirectSearch]
   );
 
+  const referer = useMemo(
+    () => location.state?.referer,
+    [location.state?.referer]
+  );
   return (
     <Box display="flex" flexDirection="row" gap={1} width="100%">
       <Paper
@@ -253,8 +271,7 @@ const HeaderSection = () => {
           flex: 1,
         }}
       >
-        {!isUnderLaptop &&
-          renderGoBackButton(() => onGoBack(location.state?.referer))}
+        {!isUnderLaptop && renderGoBackButton(() => onGoBack(referer), referer)}
         <Grid container spacing={1}>
           <Grid
             item
@@ -319,8 +336,7 @@ const HeaderSection = () => {
         </Grid>
       </Paper>
       <Box display="flex" flexDirection="column" gap={1}>
-        {isUnderLaptop &&
-          renderGoBackButton(() => onGoBack(location.state?.referer))}
+        {isUnderLaptop && renderGoBackButton(() => onGoBack(referer), referer)}
         <HeaderButton>
           <ShareButtonMenu
             menuItems={shareItems}
