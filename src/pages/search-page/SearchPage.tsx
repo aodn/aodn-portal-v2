@@ -120,11 +120,11 @@ const SearchPage = () => {
   // Else set the selected layout as the last layout remembered (stored in currentLayout)
   // or LIST view by default if user hasn't chosen any view mode
   const onToggleDisplay = useCallback(
-    (value: boolean) => {
+    (isFullMap: boolean) => {
       setCurrentLayout((prev) => {
         dispatch(
           updateLayout(
-            value
+            isFullMap
               ? SearchResultLayoutEnum.FULL_MAP
               : isUnderLaptop
                 ? SearchResultLayoutEnum.FULL_LIST
