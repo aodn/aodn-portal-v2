@@ -6,6 +6,8 @@ import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
 import { DatasetFrequency } from "./searchReducer";
 import { MapDefaultConfig } from "../../map/mapbox/constants";
+import { SearchResultLayoutEnum } from "../buttons/ResultListLayoutButton";
+import { SortResultEnum } from "../buttons/ResultListSortButton";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -22,6 +24,8 @@ const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
 const UPDATE_ZOOM_VARIABLE = "UPDATE_ZOOM_VARIABLE";
 // Contains cloud optimized data where download possible
 const UPDATE_HAS_DATA = "UPDATE_HAS_DATA";
+const UPDATE_SORT = "UPDATE_SORT";
+const UPDATE_LAYOUT = "UPDATE_LAYOUT";
 
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
   MapDefaultConfig.BBOX_ENDPOINTS;
@@ -47,7 +51,7 @@ const DEFAULT_SEARCH_LOCATION: Feature<Polygon> = {
   properties: {},
 };
 
-export interface DataTimeFilterRange {
+export interface DateTimeFilterRange {
   // Cannot use Date in Redux as it is non-serializable
   start?: number | undefined;
   end?: number | undefined;
@@ -58,13 +62,15 @@ export interface ParameterState {
   polygon?: Feature<Polygon>;
   isImosOnlyDataset?: boolean;
   hasCOData?: boolean;
-  dateTimeFilterRange?: DataTimeFilterRange;
+  dateTimeFilterRange?: DateTimeFilterRange;
   searchText?: string;
   parameterVocabs?: Array<Vocab>;
   platform?: Array<string>;
   updateFreq?: DatasetFrequency | undefined;
   sortby?: string;
   zoom?: number;
+  sort?: SortResultEnum;
+  layout?: SearchResultLayoutEnum;
 }
 // Function use to test an input value is of type Vocab
 const isVocabType = (value: any): value is Vocab =>
@@ -92,7 +98,7 @@ const updateParameterStates = (param: ParameterState): ActionType => {
   };
 };
 
-const updateDateTimeFilterRange = (range: DataTimeFilterRange): ActionType => {
+const updateDateTimeFilterRange = (range: DateTimeFilterRange): ActionType => {
   return {
     type: UPDATE_DATETIME_FILTER_VARIABLE,
     payload: { dateTimeFilterRange: range } as ParameterState,
@@ -192,6 +198,24 @@ const updateZoom = (input: number | undefined): ActionType => {
   };
 };
 
+const updateSort = (input: SortResultEnum): ActionType => {
+  return {
+    type: UPDATE_SORT,
+    payload: {
+      sort: input,
+    } as ParameterState,
+  };
+};
+
+const updateLayout = (input: SearchResultLayoutEnum): ActionType => {
+  return {
+    type: UPDATE_LAYOUT,
+    payload: {
+      layout: input,
+    } as ParameterState,
+  };
+};
+
 // Initial State
 const createInitialParameterState = (
   withDefaultBBox: boolean = true
@@ -273,6 +297,16 @@ const paramReducer = (
       return {
         ...state,
         zoom: action.payload.zoom,
+      };
+    case UPDATE_SORT:
+      return {
+        ...state,
+        sort: action.payload.sort,
+      };
+    case UPDATE_LAYOUT:
+      return {
+        ...state,
+        layout: action.payload.layout,
       };
     case UPDATE_PARAMETER_STATES:
       return {
@@ -417,4 +451,6 @@ export {
   updateUpdateFreq,
   updateZoom,
   updateHasData,
+  updateSort,
+  updateLayout,
 };
