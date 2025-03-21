@@ -27,9 +27,17 @@ interface SearchbarButtonGroupProps {
   handleClickButton: (button: SearchbarButtonNames) => void;
   shouldExpandAllButtons: boolean;
   shouldShrinkAllButtons?: boolean;
-
+  isPopupOpen: boolean;
   sx?: SxProps;
 }
+
+const buttonStyleOnDropdownOpen = {
+  color: "#fff",
+  backgroundColor: color.blue.dark,
+  "&:hover": {
+    backgroundColor: color.blue.dark,
+  },
+};
 
 const checkCount = ({
   filterObj,
@@ -90,7 +98,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   handleClickButton,
   shouldExpandAllButtons = false,
   shouldShrinkAllButtons = false,
-
+  isPopupOpen,
   sx,
 }) => {
   const componentParams: ParameterState = useAppSelector(
@@ -155,6 +163,11 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
               ? true
               : activeButton === SearchbarButtonNames.Date
         }
+        buttonSx={
+          isPopupOpen && activeButton === SearchbarButtonNames.Date
+            ? buttonStyleOnDropdownOpen
+            : {}
+        }
         containerSx={{ flex: 1 }}
         data-testid="date-range-button"
       />
@@ -170,6 +183,11 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
             : shouldExpandAllButtons
               ? true
               : activeButton === SearchbarButtonNames.Location
+        }
+        buttonSx={
+          isPopupOpen && activeButton === SearchbarButtonNames.Location
+            ? buttonStyleOnDropdownOpen
+            : {}
         }
         containerSx={{ flex: 1 }}
         data-testid="location-button"
@@ -187,6 +205,11 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
               : activeButton === SearchbarButtonNames.Filter
         }
         containerSx={{ flex: 1 }}
+        buttonSx={
+          isPopupOpen && activeButton === SearchbarButtonNames.Filter
+            ? buttonStyleOnDropdownOpen
+            : {}
+        }
         data-testid="filtersBtn"
       />
       <SearchbarExpandableButton

@@ -137,6 +137,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           shouldShrinkAllButtons={
             isMobile && location.pathname === pageDefault.search
           }
+          isPopupOpen={open}
           sx={{
             pr: gap.md,
             width:
