@@ -1,5 +1,7 @@
 import { FC, useCallback } from "react";
 import { Box, Stack, SxProps } from "@mui/material";
+import { useAppDispatch } from "../../common/store/hooks";
+import { updateImosOnly } from "../../common/store/componentParamReducer";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
@@ -66,14 +68,17 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
   setFilters,
   sx,
 }) => {
+  const dispatch = useAppDispatch();
   const handleChange = useCallback(
     (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
       setFilters((prevFilters) => ({
         ...prevFilters,
         organisation: newAlignment,
       }));
+      // TODO: for now there is only isImosOnly is in organisation button group, need to change ogcapi then change front end if add more organisations
+      dispatch(updateImosOnly(newAlignment.includes("imos")));
     },
-    [setFilters]
+    [dispatch, setFilters]
   );
 
   return (

@@ -137,6 +137,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           shouldShrinkAllButtons={
             isMobile && location.pathname === pageDefault.search
           }
+          isPopupOpen={open}
           sx={{
             pr: gap.md,
             width:
@@ -195,7 +196,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
                   <DateRangeFilter handleClosePopup={handleClosePopup} />
                 )}
                 {activeButton === SearchbarButtonNames.Location && (
-                  <LocationFilter />
+                  <LocationFilter handleClosePopup={handleClosePopup} />
                 )}
                 {activeButton === SearchbarButtonNames.Filter && (
                   <Filters handleClosePopup={handleClosePopup} />

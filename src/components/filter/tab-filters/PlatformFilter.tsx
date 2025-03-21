@@ -1,5 +1,7 @@
 import { FC, useCallback } from "react";
 import { Box, Stack, SxProps } from "@mui/material";
+import { useAppDispatch } from "../../common/store/hooks";
+import { updatePlatform } from "../../common/store/componentParamReducer";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
@@ -71,14 +73,16 @@ const PlatformFilter: FC<PlatformFilterProps> = ({
   setFilters,
   sx,
 }) => {
+  const dispatch = useAppDispatch();
   const handleChange = useCallback(
     (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
       setFilters((prevFilters) => ({
         ...prevFilters,
         platform: newAlignment,
       }));
+      dispatch(updatePlatform(newAlignment));
     },
-    [setFilters]
+    [dispatch, setFilters]
   );
 
   return (

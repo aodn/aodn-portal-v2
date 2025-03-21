@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { Box, Button, IconButton, SxProps } from "@mui/material";
 import {
   updateHasData,
   updateImosOnly,
@@ -15,17 +16,16 @@ import {
   updateUpdateFreq,
   Vocab,
 } from "../common/store/componentParamReducer";
-import store, { getComponentState } from "../common/store/store";
-import { Box, Button, IconButton, SxProps } from "@mui/material";
+import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import CloseIcon from "@mui/icons-material/Close";
-import { border, color, gap } from "../../styles/constants";
+import ReplayIcon from "@mui/icons-material/Replay";
+import { color, fontSize, gap } from "../../styles/constants";
 import TabsPanelContainer, { Tab } from "../common/tab/TabsPanelContainer";
 import ThemeFilter from "./tab-filters/ThemeFilter";
 import PlatformFilter from "./tab-filters/PlatformFilter";
 import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
 import { DatasetFrequency } from "../common/store/searchReducer";
-import { useAppDispatch } from "../common/store/hooks";
 import { IndexDataType } from "./FilterDefinition";
 
 enum FiltersTabs {
@@ -90,7 +90,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     updateFreq,
     isImosOnlyDataset,
     hasCOData,
-  } = getComponentState(store.getState());
+  } = useAppSelector((state) => state.paramReducer);
 
   const [filters, setFilters] = useState<Filters>({});
 
@@ -147,50 +147,18 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     ];
   }, [filters, setFilters]);
 
-  // TODO: implement other filters once ogcapi support them
-  const handleApply = useCallback(
-    (filters: Filters) => {
-      if (filters.parameterVocabs) {
-        dispatch(updateParameterVocabs(filters.parameterVocabs));
-      } else {
-        dispatch(updateParameterVocabs([]));
-      }
-      // TODO: isImosOnly is integrated in organisation button group, need to change ogcapi then change front end
-      if (filters.organisation?.includes("imos")) {
-        dispatch(updateImosOnly(true));
-      } else {
-        dispatch(updateImosOnly(false));
-      }
-
-      dispatch(
-        updateHasData(filters.dataIndexedType?.includes(IndexDataType.CLOUD))
-      );
-
-      if (filters.platform) {
-        dispatch(updatePlatform(filters.platform));
-      } else {
-        dispatch(updatePlatform([]));
-      }
-      // Since the ogcapi only accept single string for dataDeliveryFrequency, just update with the first item in the array.
-      // TODO: need to confirm if we need multiple selection
-      if (filters.dataDeliveryFrequency) {
-        dispatch(updateUpdateFreq(filters.dataDeliveryFrequency[0]));
-      } else {
-        dispatch(updateUpdateFreq(undefined));
-      }
-      handleClosePopup();
-    },
-    [dispatch, handleClosePopup]
-  );
-
   const handleClearAll = useCallback(() => {
     setFilters({});
-  }, [setFilters]);
+    dispatch(updateParameterVocabs([]));
+    dispatch(updateImosOnly(undefined));
+    dispatch(updateHasData(undefined));
+    dispatch(updatePlatform([]));
+    dispatch(updateUpdateFreq(undefined));
+  }, [dispatch]);
 
   const handleClose = useCallback(() => {
     handleClosePopup();
-    handleClearAll();
-  }, [handleClearAll, handleClosePopup]);
+  }, [handleClosePopup]);
 
   useEffect(() => {
     if (parameterVocabs) {
@@ -228,54 +196,38 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   return (
     <>
       <Box sx={{ position: "relative", width: "100%", ...sx }}>
-        <IconButton
-          onClick={handleClose}
+        <Box
           sx={{
             position: "absolute",
             top: gap.md,
             right: gap.md,
             zIndex: 1,
-            bgcolor: color.gray.extraLight,
           }}
         >
-          <CloseIcon />
-        </IconButton>
-        <TabsPanelContainer tabs={TABS} sx={{ color: color.blue.xLight }} />
-        <Box
-          display="flex"
-          justifyContent="end"
-          alignItems="center"
-          gap={2}
-          pr={2}
-          pb={2}
-        >
-          <Button
-            sx={{
-              width: "100px",
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
-            onClick={() => handleApply(filters)}
-          >
-            Apply All
-          </Button>
-          <Button
-            sx={{
-              width: "100px",
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
+          <IconButton
             onClick={handleClearAll}
+            sx={{
+              bgcolor: color.gray.extraLight,
+              "&:hover": {
+                bgcolor: color.blue.darkSemiTransparent,
+              },
+            }}
           >
-            Clear All
-          </Button>
+            <ReplayIcon sx={{ fontSize: fontSize.info }} />
+          </IconButton>
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              bgcolor: color.gray.extraLight,
+              "&:hover": {
+                bgcolor: color.blue.darkSemiTransparent,
+              },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: fontSize.info }} />
+          </IconButton>
         </Box>
+        <TabsPanelContainer tabs={TABS} sx={{ color: color.blue.xLight }} />
       </Box>
     </>
   );

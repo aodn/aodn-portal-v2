@@ -19,7 +19,6 @@ interface SearchbarExpandableButtonProps {
   dotBadge?: boolean;
   buttonSx?: SxProps;
   containerSx?: SxProps;
-
   "data-testid"?: string | undefined;
 }
 

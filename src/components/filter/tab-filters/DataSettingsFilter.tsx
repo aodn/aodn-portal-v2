@@ -1,5 +1,10 @@
 import { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
+import {
+  updateHasData,
+  updateUpdateFreq,
+} from "../../common/store/componentParamReducer";
+import { useAppDispatch } from "../../common/store/hooks";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
@@ -80,7 +85,9 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
   setFilters,
   sx,
 }) => {
-  // Update the local filter state for a specific category
+  const dispatch = useAppDispatch();
+
+  // Update the local filter state and redux for a specific category
   const handleChange = useCallback(
     (category: DataSettingsCategory) =>
       (
@@ -88,10 +95,14 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
         newAlignment: Array<DatasetFrequency> | Array<IndexDataType>
       ) => {
         if (category === DataSettingsCategory.dataDeliveryFrequency) {
+          const values = newAlignment as Array<DatasetFrequency>;
           setFilters((prevFilters) => ({
             ...prevFilters,
             dataDeliveryFrequency: newAlignment as Array<DatasetFrequency>,
           }));
+          // Since the ogcapi only accept single string for dataDeliveryFrequency, just update with the first item in the array.
+          // TODO: need to confirm if we need multiple selection
+          dispatch(updateUpdateFreq(values[0]));
         }
         if (category === DataSettingsCategory.dataDeliverMode) {
           setFilters((prevFilters) => ({
@@ -106,13 +117,15 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
           }));
         }
         if (category === DataSettingsCategory.dataIndexedType) {
+          const values = newAlignment as Array<IndexDataType>;
           setFilters((prevFilters) => ({
             ...prevFilters,
             dataIndexedType: newAlignment as Array<IndexDataType>,
           }));
+          dispatch(updateHasData(values?.includes(IndexDataType.CLOUD)));
         }
       },
-    [setFilters]
+    [dispatch, setFilters]
   );
 
   return (
