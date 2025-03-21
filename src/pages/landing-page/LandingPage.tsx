@@ -15,22 +15,22 @@ import {
 } from "../../components/common/store/componentParamReducer";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
-import SmartPanel from "./subpages/smartpanel/SmartPanel";
+import TopicsPanel from "./subpages/topics-panel/TopicsPanel";
 
 const LandingPage: FC = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
 
-  // This is a simple click smart card function that with update search input text and clear all the filters
+  // This is a simple click topic card function that with update search input text and clear all the filters
   // Can be change to a function-switcher if any other functions are designed in the future
-  const handleClickSmartCard = useCallback(
+  const handleClickTopicCard = useCallback(
     (value: string) => {
       dispatch(updateParameterVocabs([]));
       dispatch(updateDateTimeFilterRange({}));
       dispatch(updateImosOnly(false));
       dispatch(updateUpdateFreq(undefined));
       dispatch(updateSearchText(value));
-      redirectSearch("SmartPanel");
+      redirectSearch("TopicsPanel");
     },
     [dispatch, redirectSearch]
   );
@@ -57,7 +57,7 @@ const LandingPage: FC = () => {
           paddingY: padding.double,
         }}
       >
-        <SmartPanel handleClickSmartCard={handleClickSmartCard} />
+        <TopicsPanel handleClickTopicCard={handleClickTopicCard} />
       </SectionContainer>
 
       {/*commented out the StoryBoardPanel for demo purposes*/}

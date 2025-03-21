@@ -5,24 +5,24 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { color, gap, padding } from "../../../../styles/constants";
 import {
-  SMART_CARDS,
-  SMART_PANEL_GAP,
-  SMART_PANEL_HEIGHT,
-  SMART_PANEL_CONTAINER_WIDTH_DESKTOP,
-  SMART_PANEL_CONTAINER_WIDTH_LAPTOP,
-  SMART_PANEL_CONTAINER_WIDTH_MOBILE,
-  SMART_PANEL_CONTAINER_WIDTH_TABLET,
-  SMART_PANEL_WIDTH,
+  TOPICS_CARDS,
+  TOPICS_PANEL_GAP,
+  TOPICS_PANEL_HEIGHT,
+  TOPICS_PANEL_CONTAINER_WIDTH_DESKTOP,
+  TOPICS_PANEL_CONTAINER_WIDTH_LAPTOP,
+  TOPICS_PANEL_CONTAINER_WIDTH_MOBILE,
+  TOPICS_PANEL_CONTAINER_WIDTH_TABLET,
+  TOPICS_PANEL_WIDTH,
   SCROLL_BUTTON_SIZE,
 } from "./constants";
-import SmartCard from "./SmartCard";
+import TopicCard from "./TopicCard";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 
-interface SmartPanelProps {
-  handleClickSmartCard: (value: string) => void;
+interface TopicsPanelProps {
+  handleClickTopicCard: (value: string) => void;
 }
 
-const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
+const TopicsPanel: FC<TopicsPanelProps> = ({ handleClickTopicCard }) => {
   const { isAboveDesktop } = useBreakpoint();
   const boxRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +41,7 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
     <Box display="flex" justifyContent="space-between" alignItems="center">
       {!isAboveDesktop && (
         <Box sx={{ pr: { sm: padding.small } }}>
-          <IconButton onClick={() => handleScroll(-SMART_PANEL_WIDTH / 3)}>
+          <IconButton onClick={() => handleScroll(-TOPICS_PANEL_WIDTH / 3)}>
             <ArrowBackIosNewIcon
               sx={{
                 pr: gap.sm,
@@ -57,12 +57,12 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
         ref={boxRef}
         sx={{
           width: {
-            xs: SMART_PANEL_CONTAINER_WIDTH_MOBILE,
-            sm: SMART_PANEL_CONTAINER_WIDTH_TABLET,
-            md: SMART_PANEL_CONTAINER_WIDTH_LAPTOP,
-            lg: SMART_PANEL_CONTAINER_WIDTH_DESKTOP,
+            xs: TOPICS_PANEL_CONTAINER_WIDTH_MOBILE,
+            sm: TOPICS_PANEL_CONTAINER_WIDTH_TABLET,
+            md: TOPICS_PANEL_CONTAINER_WIDTH_LAPTOP,
+            lg: TOPICS_PANEL_CONTAINER_WIDTH_DESKTOP,
           },
-          height: SMART_PANEL_HEIGHT,
+          height: TOPICS_PANEL_HEIGHT,
           "&::-webkit-scrollbar": {
             display: "none",
           },
@@ -75,21 +75,21 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
         <Stack
           direction="row"
           flexWrap="wrap"
-          gap={`${SMART_PANEL_GAP}px`}
-          width={SMART_PANEL_WIDTH + 2}
+          gap={`${TOPICS_PANEL_GAP}px`}
+          width={TOPICS_PANEL_WIDTH + 2}
         >
-          {SMART_CARDS.map((item) => (
-            <SmartCard
+          {TOPICS_CARDS.map((item) => (
+            <TopicCard
               key={item.title}
               cardData={item}
-              handleClickSmartCard={handleClickSmartCard}
+              handleClickTopicCard={handleClickTopicCard}
             />
           ))}
         </Stack>
       </Box>
       {!isAboveDesktop && (
         <Box sx={{ pl: { sm: padding.small } }}>
-          <IconButton onClick={() => handleScroll(SMART_PANEL_WIDTH / 3)}>
+          <IconButton onClick={() => handleScroll(TOPICS_PANEL_WIDTH / 3)}>
             <ArrowForwardIosIcon
               sx={{
                 pl: gap.sm,
@@ -105,4 +105,4 @@ const SmartPanel: FC<SmartPanelProps> = ({ handleClickSmartCard }) => {
   );
 };
 
-export default SmartPanel;
+export default TopicsPanel;

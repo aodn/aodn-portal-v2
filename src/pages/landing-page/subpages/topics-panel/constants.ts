@@ -18,43 +18,43 @@ import iconTide from "@/assets/smartPanelIcons/icon_tide.png";
 import iconArgo from "@/assets/smartPanelIcons/icon_argo.png";
 import iconVessel from "@/assets/smartPanelIcons/icon_vessel.png";
 import iconGeoscientific from "@/assets/smartPanelIcons/icon_geoscientific.png";
-import { SmartCardType } from "./SmartCard";
+import { TopicCardType } from "./TopicCard";
 
 export const SCROLL_BUTTON_SIZE = 20;
 
-export const SMART_PANEL_GAP = 16;
+export const TOPICS_PANEL_GAP = 16;
 
-export const SMART_PANEL_ROWS = 2;
+export const TOPICS_PANEL_ROWS = 2;
 
-const SMART_PANEL_COLS_DESKTOP = 10; // Change this number carefully, it will affect the fixed width of smart panel
-const SMART_PANEL_COLS_LAPTOP = 8;
-const SMART_PANEL_COLS_TABLET = 6;
-const SMART_PANEL_COLS_MOBILE = 3;
+const TOPICS_PANEL_COLS_DESKTOP = 10; // Change this number carefully, it will affect the fixed width of smart panel
+const TOPICS_PANEL_COLS_LAPTOP = 8;
+const TOPICS_PANEL_COLS_TABLET = 6;
+const TOPICS_PANEL_COLS_MOBILE = 3;
 
-export const SMART_CARD_ICON_BOX_SIZE = 90;
-export const SMART_CARD_HEIGHT = 115;
+export const TOPICS_CARD_ICON_BOX_SIZE = 90;
+export const TOPICS_CARD_HEIGHT = 115;
 
-export const SMART_PANEL_HEIGHT =
-  SMART_CARD_HEIGHT * SMART_PANEL_ROWS +
-  SMART_PANEL_GAP * (SMART_PANEL_ROWS - 1);
-export const SMART_PANEL_WIDTH =
-  SMART_CARD_ICON_BOX_SIZE * SMART_PANEL_COLS_DESKTOP +
-  SMART_PANEL_GAP * (SMART_PANEL_COLS_DESKTOP - 1);
+export const TOPICS_PANEL_HEIGHT =
+  TOPICS_CARD_HEIGHT * TOPICS_PANEL_ROWS +
+  TOPICS_PANEL_GAP * (TOPICS_PANEL_ROWS - 1);
+export const TOPICS_PANEL_WIDTH =
+  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_DESKTOP +
+  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_DESKTOP - 1);
 
-export const SMART_PANEL_CONTAINER_WIDTH_DESKTOP =
-  SMART_CARD_ICON_BOX_SIZE * SMART_PANEL_COLS_DESKTOP +
-  SMART_PANEL_GAP * (SMART_PANEL_COLS_DESKTOP - 1);
-export const SMART_PANEL_CONTAINER_WIDTH_LAPTOP =
-  SMART_CARD_ICON_BOX_SIZE * SMART_PANEL_COLS_LAPTOP +
-  SMART_PANEL_GAP * (SMART_PANEL_COLS_LAPTOP - 1);
-export const SMART_PANEL_CONTAINER_WIDTH_TABLET =
-  SMART_CARD_ICON_BOX_SIZE * SMART_PANEL_COLS_TABLET +
-  SMART_PANEL_GAP * (SMART_PANEL_COLS_TABLET - 1);
-export const SMART_PANEL_CONTAINER_WIDTH_MOBILE =
-  SMART_CARD_ICON_BOX_SIZE * SMART_PANEL_COLS_MOBILE +
-  SMART_PANEL_GAP * (SMART_PANEL_COLS_MOBILE - 1);
+export const TOPICS_PANEL_CONTAINER_WIDTH_DESKTOP =
+  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_DESKTOP +
+  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_DESKTOP - 1);
+export const TOPICS_PANEL_CONTAINER_WIDTH_LAPTOP =
+  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_LAPTOP +
+  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_LAPTOP - 1);
+export const TOPICS_PANEL_CONTAINER_WIDTH_TABLET =
+  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_TABLET +
+  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_TABLET - 1);
+export const TOPICS_PANEL_CONTAINER_WIDTH_MOBILE =
+  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_MOBILE +
+  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_MOBILE - 1);
 
-export const SMART_CARDS: SmartCardType[] = [
+export const TOPICS_CARDS: TopicCardType[] = [
   {
     title: "All Topics",
     icon: iconAllTopics,
