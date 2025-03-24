@@ -14,7 +14,6 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
-  border,
   color,
   fontColor,
   fontFamily,
@@ -24,13 +23,10 @@ import {
   padding,
 } from "../../styles/constants";
 import CloseIcon from "@mui/icons-material/Close";
+import ReplayIcon from "@mui/icons-material/Replay";
 import { dateDefault } from "../common/constants";
-import {
-  DateTimeFilterRange,
-  updateDateTimeFilterRange,
-} from "../common/store/componentParamReducer";
-import { useAppDispatch } from "../common/store/hooks";
-import store, { getComponentState } from "../common/store/store";
+import { updateDateTimeFilterRange } from "../common/store/componentParamReducer";
+import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import { OGCCollections } from "../common/store/OGCCollectionDefinitions";
 import { fetchResultNoStore } from "../common/store/searchReducer";
 import { cqlDefaultFilters } from "../common/cqlFilters";
@@ -72,11 +68,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
 
   // State from redux
-  const { dateTimeFilterRange } = getComponentState(store.getState());
-
-  // Local state for date range
-  const [dateRange, setDateRange] = useState<DateTimeFilterRange>({});
-
+  const dateTimeFilterRange = useAppSelector(
+    (state) => state.paramReducer.dateTimeFilterRange
+  );
   // Local state for min/max date picker
   const [minDate, setMinDate] = useState<Dayjs>(initialMinDate);
   const [maxDate, setMaxDate] = useState<Dayjs>(initialMaxDate);
@@ -93,18 +87,23 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   );
 
   // Helper to sync date range when radio change
-  const updateDateRange = useCallback((startDate: Dayjs, endDate: Dayjs) => {
-    const newStart = dateToValue(startDate);
-    const newEnd = dateToValue(endDate);
+  const updateDateRange = useCallback(
+    (startDate: Dayjs, endDate: Dayjs) => {
+      const newStart = dateToValue(startDate);
+      const newEnd = dateToValue(endDate);
 
-    setMinDate(startDate);
-    setMaxDate(endDate);
-    setValue([newStart, newEnd]);
-    setDateRange({
-      start: newStart,
-      end: newEnd,
-    });
-  }, []);
+      setMinDate(startDate);
+      setMaxDate(endDate);
+      setValue([newStart, newEnd]);
+      dispatch(
+        updateDateTimeFilterRange({
+          start: newStart,
+          end: newEnd,
+        })
+      );
+    },
+    [dispatch]
+  );
 
   const handleRadioChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,12 +134,14 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
       setMinDate(dayjs(newStart));
       setMaxDate(dayjs(newEnd));
       setSelectedOption(DateRangeOptionValues.Custom);
-      setDateRange({
-        start: newStart,
-        end: newEnd,
-      });
+      dispatch(
+        updateDateTimeFilterRange({
+          start: newStart,
+          end: newEnd,
+        })
+      );
     },
-    []
+    [dispatch]
   );
 
   const handleMinDateChange = useCallback(
@@ -150,13 +151,15 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         setMinDate(newMinDate);
         setValue([newStart, value[1]]);
         setSelectedOption(DateRangeOptionValues.Custom);
-        setDateRange((preDateRange) => ({
-          ...preDateRange,
-          start: newStart,
-        }));
+        dispatch(
+          updateDateTimeFilterRange({
+            start: newStart,
+            end: dateTimeFilterRange?.end,
+          })
+        );
       }
     },
-    [maxDate, value]
+    [dateTimeFilterRange?.end, dispatch, maxDate, value]
   );
 
   const handleMaxDateChange = useCallback(
@@ -166,39 +169,28 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         setMaxDate(newMaxDate);
         setValue([value[0], newEnd]);
         setSelectedOption(DateRangeOptionValues.Custom);
-        setDateRange((preDateRange) => ({
-          ...preDateRange,
-          start: newEnd,
-        }));
+        dispatch(
+          updateDateTimeFilterRange({
+            start: dateTimeFilterRange?.start,
+            end: newEnd,
+          })
+        );
       }
     },
-    [minDate, value]
+    [dateTimeFilterRange?.start, dispatch, minDate, value]
   );
 
   const handleClear = useCallback(() => {
-    setDateRange({});
+    dispatch(updateDateTimeFilterRange({}));
     setMinDate(initialMinDate);
     setMaxDate(initialMaxDate);
     setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
     setSelectedOption(DateRangeOptionValues.Custom);
-  }, []);
-
-  const handleApply = useCallback(
-    (dateRange: DateTimeFilterRange) => {
-      if (dateRange) {
-        dispatch(updateDateTimeFilterRange(dateRange));
-      } else {
-        dispatch(updateDateTimeFilterRange({}));
-      }
-      handleClosePopup();
-    },
-    [dispatch, handleClosePopup]
-  );
+  }, [dispatch]);
 
   const handleClose = useCallback(() => {
-    handleClear();
     handleClosePopup();
-  }, [handleClear, handleClosePopup]);
+  }, [handleClosePopup]);
 
   // Listen to redux dateTimeFilterRange to initialize local states
   useEffect(() => {
@@ -213,13 +205,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         dateTimeFilterRange.start ?? dateToValue(initialMinDate),
         dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
       ]);
-      setDateRange(dateTimeFilterRange);
     } else {
       // Reset to initial state when dateTimeFilterRange is null or undefined
       setMinDate(initialMinDate);
       setMaxDate(initialMaxDate);
       setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
-      setDateRange({});
     }
   }, [dateTimeFilterRange]);
 
@@ -259,17 +249,36 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Grid container position="relative">
-        <IconButton
-          onClick={handleClose}
+        <Box
           sx={{
             position: "absolute",
             top: gap.md,
             right: gap.md,
-            bgcolor: color.gray.extraLight,
           }}
         >
-          <CloseIcon />
-        </IconButton>
+          <IconButton
+            onClick={handleClear}
+            sx={{
+              bgcolor: color.gray.extraLight,
+              "&:hover": {
+                bgcolor: color.blue.darkSemiTransparent,
+              },
+            }}
+          >
+            <ReplayIcon sx={{ fontSize: fontSize.info }} />
+          </IconButton>
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              bgcolor: color.gray.extraLight,
+              "&:hover": {
+                bgcolor: color.blue.darkSemiTransparent,
+              },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: fontSize.info }} />
+          </IconButton>
+        </Box>
         <Grid
           item
           xs={isMobile || isTablet ? 12 : 2}
@@ -431,45 +440,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
               </Grid>
             </Grid>
           </Grid>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          display="flex"
-          flexDirection="row"
-          justifyContent="end"
-          alignItems="center"
-          gap={2}
-          pr={2}
-          pb={2}
-        >
-          <Button
-            onClick={() => handleApply(dateRange)}
-            sx={{
-              width: "100px",
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
-          >
-            Apply
-          </Button>
-          <Button
-            onClick={handleClear}
-            sx={{
-              width: "100px",
-
-              border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-              "&:hover": {
-                border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-                backgroundColor: color.blue.darkSemiTransparent,
-              },
-            }}
-          >
-            Clear
-          </Button>
         </Grid>
       </Grid>
     </LocalizationProvider>

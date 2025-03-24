@@ -22,6 +22,7 @@ describe("SearchbarButtonGroup Component", () => {
     activeButton: SearchbarButtonNames.Filter,
     handleClickButton: mockHandleClickButton,
     shouldExpandAllButtons: false,
+    isPopupOpen: false,
   };
 
   beforeEach(() => {
