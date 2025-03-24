@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC } from "react";
 import Layout from "../../components/layout/layout";
 import Banner from "./subpages/banner/Banner";
 import Searchbar from "../../components/search/Searchbar";
@@ -6,35 +6,9 @@ import { color, padding } from "../../styles/constants";
 import Logos from "./subpages/logo-list/LogoList";
 import News from "./subpages/news/News";
 import SectionContainer from "../../components/layout/components/SectionContainer";
-import {
-  updateDateTimeFilterRange,
-  updateImosOnly,
-  updateParameterVocabs,
-  updateSearchText,
-  updateUpdateFreq,
-} from "../../components/common/store/componentParamReducer";
-import { useAppDispatch } from "../../components/common/store/hooks";
-import useRedirectSearch from "../../hooks/useRedirectSearch";
 import TopicsPanel from "./subpages/topics-panel/TopicsPanel";
 
 const LandingPage: FC = () => {
-  const dispatch = useAppDispatch();
-  const redirectSearch = useRedirectSearch();
-
-  // This is a simple click topic card function that with update search input text and clear all the filters
-  // Can be change to a function-switcher if any other functions are designed in the future
-  const handleClickTopicCard = useCallback(
-    (value: string) => {
-      dispatch(updateParameterVocabs([]));
-      dispatch(updateDateTimeFilterRange({}));
-      dispatch(updateImosOnly(false));
-      dispatch(updateUpdateFreq(undefined));
-      dispatch(updateSearchText(value));
-      redirectSearch("TopicsPanel");
-    },
-    [dispatch, redirectSearch]
-  );
-
   return (
     <Layout>
       <SectionContainer
@@ -57,7 +31,7 @@ const LandingPage: FC = () => {
           paddingY: padding.double,
         }}
       >
-        <TopicsPanel handleClickTopicCard={handleClickTopicCard} />
+        <TopicsPanel />
       </SectionContainer>
 
       {/*commented out the StoryBoardPanel for demo purposes*/}

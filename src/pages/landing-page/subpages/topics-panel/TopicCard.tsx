@@ -11,22 +11,31 @@ import { TOPICS_CARD_HEIGHT, TOPICS_CARD_ICON_BOX_SIZE } from "./constants";
 
 export interface TopicCardType {
   title: string;
+  icon: string;
   // Prop that determine if the click function on card is disabled or not
   disable: boolean;
-  icon: string;
+  // Prop that determine if the card should be hidden or not before "show more" is clicked
+  hide: boolean;
 }
 
 interface TopicCardProps {
   cardData: TopicCardType;
   handleClickTopicCard: (value: string) => void;
+  hide: boolean;
 }
 
-const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
+const TopicCard: FC<TopicCardProps> = ({
+  cardData,
+  handleClickTopicCard,
+  hide,
+}) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const handleClick = (value: string) => {
     if (!cardData.disable) handleClickTopicCard(value);
   };
+
+  if (hide) return null;
 
   return (
     <Box
@@ -63,10 +72,21 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
           }}
         />
       </Paper>
-      <Box width="100%" textAlign="center">
+      <Box
+        width={TOPICS_CARD_ICON_BOX_SIZE}
+        height={TOPICS_CARD_HEIGHT - TOPICS_CARD_ICON_BOX_SIZE}
+        textAlign="center"
+      >
         <Typography
           fontSize={fontSize.label}
           fontWeight={isHovered ? fontWeight.bold : fontWeight.medium}
+          sx={{
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: "2",
+            WebkitBoxOrient: "vertical",
+            wordBreak: "break-word",
+          }}
         >
           {cardData.title}
         </Typography>

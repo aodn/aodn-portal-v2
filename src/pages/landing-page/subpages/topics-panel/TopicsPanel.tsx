@@ -1,8 +1,11 @@
-import { FC, useCallback, useRef } from "react";
+import { FC, useCallback, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import { IconButton, Stack } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
+import { useAppDispatch } from "../../../../components/common/store/hooks";
+import useRedirectSearch from "../../../../hooks/useRedirectSearch";
 import { color, gap, padding } from "../../../../styles/constants";
 import {
   TOPICS_CARDS,
@@ -16,15 +19,44 @@ import {
   SCROLL_BUTTON_SIZE,
 } from "./constants";
 import TopicCard from "./TopicCard";
-import useBreakpoint from "../../../../hooks/useBreakpoint";
+import {
+  updateDateTimeFilterRange,
+  updateImosOnly,
+  updateParameterVocabs,
+  updateSearchText,
+  updateUpdateFreq,
+} from "../../../../components/common/store/componentParamReducer";
 
-interface TopicsPanelProps {
-  handleClickTopicCard: (value: string) => void;
-}
+interface TopicsPanelProps {}
 
-const TopicsPanel: FC<TopicsPanelProps> = ({ handleClickTopicCard }) => {
+const TopicsPanel: FC<TopicsPanelProps> = () => {
+  const dispatch = useAppDispatch();
+  const redirectSearch = useRedirectSearch();
   const { isAboveDesktop } = useBreakpoint();
   const boxRef = useRef<HTMLDivElement>(null);
+  const [shouldShowAll, setShouldShowAll] = useState<boolean>(false);
+
+  const handleClickShowMore = useCallback(() => {
+    setShouldShowAll((prev) => !prev);
+  }, [setShouldShowAll]);
+
+  // This is a simple click topic card function that with update search input text and clear all the filters
+  // Can be change to a function-switcher if any other functions are designed in the future
+  const handleClickTopicCard = useCallback(
+    (value: string) => {
+      if (value === TOPICS_CARDS[0].title) {
+        handleClickShowMore();
+      } else {
+        dispatch(updateParameterVocabs([]));
+        dispatch(updateDateTimeFilterRange({}));
+        dispatch(updateImosOnly(false));
+        dispatch(updateUpdateFreq(undefined));
+        dispatch(updateSearchText(value));
+        redirectSearch("TopicsPanel");
+      }
+    },
+    [dispatch, handleClickShowMore, redirectSearch]
+  );
 
   const handleScroll = useCallback(
     (scrollOffset: number) => {
@@ -37,6 +69,7 @@ const TopicsPanel: FC<TopicsPanelProps> = ({ handleClickTopicCard }) => {
     },
     [boxRef]
   );
+
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
       {!isAboveDesktop && (
@@ -83,6 +116,7 @@ const TopicsPanel: FC<TopicsPanelProps> = ({ handleClickTopicCard }) => {
               key={item.title}
               cardData={item}
               handleClickTopicCard={handleClickTopicCard}
+              hide={shouldShowAll ? false : item.hide}
             />
           ))}
         </Stack>
