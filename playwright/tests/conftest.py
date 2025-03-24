@@ -1,50 +1,13 @@
+import os
 from typing import Any, Callable, Generator
 
 import pytest
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright
 
 from core.dataclasses.device_config import DeviceConfig
-from mocks.api.autocomplete import handle_search_autocomplete_api
-from mocks.api.categories import handle_categories_api
-from mocks.api.collection_detail import (
-    handle_detail_api,
-    handle_detail_item_api,
-)
-from mocks.api.collections import (
-    handle_collections_all_api,
-    handle_collections_centroid_api,
-    handle_collections_popup_api,
-)
-from mocks.api_router import ApiRouter
-
-
-def get_mobile_config(playwright: Playwright) -> DeviceConfig:
-    iphone_se = playwright.devices['iPhone SE']
-    return DeviceConfig(
-        is_mobile=True,
-        viewport={'width': 375, 'height': 667},
-        device_config=iphone_se,
-    )
-
-
-def get_desktop_config() -> DeviceConfig:
-    return DeviceConfig(
-        is_mobile=False, viewport={'width': 1920, 'height': 1080}
-    )
-
-
-def apply_mock(page: Page) -> None:
-    api_router = ApiRouter(page)
-    api_router.route_category(handle_categories_api)
-    api_router.route_autocomplete(handle_search_autocomplete_api)
-    api_router.route_collection(
-        handle_collections_centroid_api,
-        handle_collections_all_api,
-        handle_collections_popup_api,
-    )
-    api_router.route_collection_detail(
-        handle_detail_api, handle_detail_item_api
-    )
+from core.factories.device_configs import get_desktop_config, get_mobile_config
+from mocks.apply import apply_mock
+from utils.trace_utils import get_trace_dir_path
 
 
 def setup_page(
@@ -65,7 +28,9 @@ def setup_page(
 def create_page_fixture(
     config_factory: Any,
 ) -> Callable:
-    def _fixture(playwright: Playwright) -> Generator:
+    def _fixture(
+        playwright: Playwright, request: pytest.FixtureRequest
+    ) -> Generator:
         config = (
             config_factory(playwright)
             if 'playwright' in config_factory.__code__.co_varnames
@@ -73,7 +38,29 @@ def create_page_fixture(
         )
         browser, context, page = setup_page(playwright, config)
 
+        tracing_mode = request.config.getoption('--tracing')
+
+        # Only start tracing if enabled
+        if tracing_mode != 'off':
+            context.tracing.start(
+                screenshots=True, snapshots=True, sources=True
+            )
+
         yield page
+
+        # After test execution, handle tracing based on mode
+        if tracing_mode != 'off':
+            trace_dir, filename = get_trace_dir_path(request.node.nodeid)
+
+            trace_path = os.path.join(trace_dir, filename)
+
+            if tracing_mode == 'on':
+                context.tracing.stop(path=trace_path)
+            elif (
+                tracing_mode == 'retain-on-failure'
+                and request.node.rep_call.failed
+            ):
+                context.tracing.stop(path=trace_path)
 
         page.unroute_all()
         context.close()
@@ -83,19 +70,23 @@ def create_page_fixture(
 
 
 @pytest.fixture
-def desktop_page(playwright: Playwright) -> Generator:
+def desktop_page(
+    playwright: Playwright, request: pytest.FixtureRequest
+) -> Generator:
     """
     Use the desktop_page fixture to run tests on desktop only
     """
-    yield from create_page_fixture(get_desktop_config)(playwright)
+    yield from create_page_fixture(get_desktop_config)(playwright, request)
 
 
 @pytest.fixture
-def mobile_page(playwright: Playwright) -> Generator:
+def mobile_page(
+    playwright: Playwright, request: pytest.FixtureRequest
+) -> Generator:
     """
     Use the mobile_page fixture to run tests on mobile only
     """
-    yield from create_page_fixture(get_mobile_config)(playwright)
+    yield from create_page_fixture(get_mobile_config)(playwright, request)
 
 
 @pytest.fixture(params=['desktop', 'mobile'])
@@ -108,18 +99,4 @@ def responsive_page(
     config_factory = (
         get_desktop_config if request.param == 'desktop' else get_mobile_config
     )
-    yield from create_page_fixture(config_factory)(playwright)
-
-
-################################################################################
-#  Uncomment the following fixtue and run test to record video for test runs.  #
-#  Recorded video will be saved in the 'videos' directory.                     #
-################################################################################
-# @pytest.fixture
-# def browser_context_args(browser_context_args):
-#     """Fixture to configure video recording"""
-#     return {
-#         **browser_context_args,
-#         'record_video_dir': 'videos',
-#         'record_video_size': {'width': 1280, 'height': 720},
-#     }
+    yield from create_page_fixture(config_factory)(playwright, request)
