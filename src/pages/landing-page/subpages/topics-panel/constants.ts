@@ -32,41 +32,21 @@ export const SCROLL_BUTTON_SIZE = 20;
 
 export const TOPICS_PANEL_GAP = 16;
 
-export const TOPICS_PANEL_ROWS = 2;
+export const TOPICS_PANEL_ROWS_DEFAULT = 2;
 
-const TOPICS_PANEL_COLS_DESKTOP = 9; // Change this number carefully, it will affect the fixed width of smart panel
-const TOPICS_PANEL_COLS_LAPTOP = 8;
-const TOPICS_PANEL_COLS_TABLET = 6;
-const TOPICS_PANEL_COLS_MOBILE = 3;
+export const TOPICS_PANEL_COLS_DESKTOP = 9; // Change this number carefully, it will affect the fixed width of smart panel
+export const TOPICS_PANEL_COLS_LAPTOP = 8;
+export const TOPICS_PANEL_COLS_TABLET = 6;
+export const TOPICS_PANEL_COLS_MOBILE = 3;
 
 export const TOPICS_CARD_ICON_BOX_SIZE = 90;
 export const TOPICS_CARD_HEIGHT = 136;
-
-export const TOPICS_PANEL_HEIGHT =
-  TOPICS_CARD_HEIGHT * TOPICS_PANEL_ROWS +
-  TOPICS_PANEL_GAP * (TOPICS_PANEL_ROWS - 1);
-export const TOPICS_PANEL_WIDTH =
-  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_DESKTOP +
-  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_DESKTOP - 1);
-
-export const TOPICS_PANEL_CONTAINER_WIDTH_DESKTOP =
-  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_DESKTOP +
-  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_DESKTOP - 1);
-export const TOPICS_PANEL_CONTAINER_WIDTH_LAPTOP =
-  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_LAPTOP +
-  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_LAPTOP - 1);
-export const TOPICS_PANEL_CONTAINER_WIDTH_TABLET =
-  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_TABLET +
-  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_TABLET - 1);
-export const TOPICS_PANEL_CONTAINER_WIDTH_MOBILE =
-  TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_MOBILE +
-  TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_MOBILE - 1);
 
 export const TOPICS_CARDS: TopicCardType[] = [
   {
     title: "All Topics",
     icon: iconAllTopics,
-    disable: true,
+    disable: false,
     hide: false,
   },
   {
@@ -126,13 +106,13 @@ export const TOPICS_CARDS: TopicCardType[] = [
   {
     title: "Currents",
     icon: iconCurrents,
-    disable: true,
+    disable: false,
     hide: false,
   },
   {
     title: "Water Quality",
     icon: iconWaterQuality,
-    disable: true,
+    disable: false,
     hide: false,
   },
   {

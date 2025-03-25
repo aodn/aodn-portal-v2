@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from "react";
+import { FC, useCallback, useMemo, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import { IconButton, Stack } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -6,16 +6,11 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import { useAppDispatch } from "../../../../components/common/store/hooks";
 import useRedirectSearch from "../../../../hooks/useRedirectSearch";
+import useTopicsPanelSize from "../../../../hooks/useTopicsPanelSize";
 import { color, gap, padding } from "../../../../styles/constants";
 import {
   TOPICS_CARDS,
   TOPICS_PANEL_GAP,
-  TOPICS_PANEL_HEIGHT,
-  TOPICS_PANEL_CONTAINER_WIDTH_DESKTOP,
-  TOPICS_PANEL_CONTAINER_WIDTH_LAPTOP,
-  TOPICS_PANEL_CONTAINER_WIDTH_MOBILE,
-  TOPICS_PANEL_CONTAINER_WIDTH_TABLET,
-  TOPICS_PANEL_WIDTH,
   SCROLL_BUTTON_SIZE,
 } from "./constants";
 import TopicCard from "./TopicCard";
@@ -33,19 +28,30 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
   const { isAboveDesktop } = useBreakpoint();
+  const {
+    showAllTopics,
+    setShowAllTopics,
+    getTopicsPanelHeight,
+    topicsPanelWidth,
+    topicsPanelContainerWidth,
+  } = useTopicsPanelSize({ topicCardsCount: TOPICS_CARDS.length });
   const boxRef = useRef<HTMLDivElement>(null);
-  const [shouldShowAll, setShouldShowAll] = useState<boolean>(false);
 
-  const handleClickShowMore = useCallback(() => {
-    setShouldShowAll((prev) => !prev);
-  }, [setShouldShowAll]);
+  const shouldShowArrowIcon = useMemo(
+    () => (isAboveDesktop ? false : showAllTopics ? false : true),
+    [isAboveDesktop, showAllTopics]
+  );
+
+  const handleClickShowAllTopics = useCallback(() => {
+    setShowAllTopics((prev) => !prev);
+  }, [setShowAllTopics]);
 
   // This is a simple click topic card function that with update search input text and clear all the filters
   // Can be change to a function-switcher if any other functions are designed in the future
   const handleClickTopicCard = useCallback(
     (value: string) => {
       if (value === TOPICS_CARDS[0].title) {
-        handleClickShowMore();
+        handleClickShowAllTopics();
       } else {
         dispatch(updateParameterVocabs([]));
         dispatch(updateDateTimeFilterRange({}));
@@ -55,7 +61,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         redirectSearch("TopicsPanel");
       }
     },
-    [dispatch, handleClickShowMore, redirectSearch]
+    [dispatch, handleClickShowAllTopics, redirectSearch]
   );
 
   const handleScroll = useCallback(
@@ -72,9 +78,13 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
 
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
-      {!isAboveDesktop && (
+      {shouldShowArrowIcon && (
         <Box sx={{ pr: { sm: padding.small } }}>
-          <IconButton onClick={() => handleScroll(-TOPICS_PANEL_WIDTH / 3)}>
+          <IconButton
+            onClick={() =>
+              handleScroll((-topicsPanelWidth - TOPICS_PANEL_GAP) / 3)
+            }
+          >
             <ArrowBackIosNewIcon
               sx={{
                 pr: gap.sm,
@@ -89,13 +99,8 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       <Box
         ref={boxRef}
         sx={{
-          width: {
-            xs: TOPICS_PANEL_CONTAINER_WIDTH_MOBILE,
-            sm: TOPICS_PANEL_CONTAINER_WIDTH_TABLET,
-            md: TOPICS_PANEL_CONTAINER_WIDTH_LAPTOP,
-            lg: TOPICS_PANEL_CONTAINER_WIDTH_DESKTOP,
-          },
-          height: TOPICS_PANEL_HEIGHT,
+          width: topicsPanelContainerWidth,
+          height: getTopicsPanelHeight(),
           "&::-webkit-scrollbar": {
             display: "none",
           },
@@ -109,21 +114,25 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
           direction="row"
           flexWrap="wrap"
           gap={`${TOPICS_PANEL_GAP}px`}
-          width={TOPICS_PANEL_WIDTH + 2}
+          width={showAllTopics ? topicsPanelContainerWidth : topicsPanelWidth}
         >
           {TOPICS_CARDS.map((item) => (
             <TopicCard
               key={item.title}
               cardData={item}
               handleClickTopicCard={handleClickTopicCard}
-              hide={shouldShowAll ? false : item.hide}
+              hide={showAllTopics ? false : item.hide}
             />
           ))}
         </Stack>
       </Box>
-      {!isAboveDesktop && (
+      {shouldShowArrowIcon && (
         <Box sx={{ pl: { sm: padding.small } }}>
-          <IconButton onClick={() => handleScroll(TOPICS_PANEL_WIDTH / 3)}>
+          <IconButton
+            onClick={() =>
+              handleScroll((topicsPanelWidth + TOPICS_PANEL_GAP) / 3)
+            }
+          >
             <ArrowForwardIosIcon
               sx={{
                 pl: gap.sm,
