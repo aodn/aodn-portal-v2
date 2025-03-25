@@ -12,8 +12,6 @@ import { TOPICS_CARD_HEIGHT, TOPICS_CARD_ICON_BOX_SIZE } from "./constants";
 export interface TopicCardType {
   title: string;
   icon: string;
-  // Prop that determine if the click function on card is disabled or not
-  disable: boolean;
   // Prop that determine if the card should be hidden or not before "show more" is clicked
   hide: boolean;
 }
@@ -32,7 +30,7 @@ const TopicCard: FC<TopicCardProps> = ({
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const handleClick = (value: string) => {
-    if (!cardData.disable) handleClickTopicCard(value);
+    handleClickTopicCard(value);
   };
 
   if (hide) return null;

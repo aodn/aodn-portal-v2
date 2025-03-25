@@ -12,6 +12,8 @@ import {
   TOPICS_CARDS,
   TOPICS_PANEL_GAP,
   SCROLL_BUTTON_SIZE,
+  ALL_TOPICS_CARD,
+  LESS_TOPICS_CARD,
 } from "./constants";
 import TopicCard from "./TopicCard";
 import {
@@ -42,27 +44,23 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
     [isAboveDesktop, showAllTopics]
   );
 
-  const handleClickShowAllTopics = useCallback(() => {
-    setShowAllTopics((prev) => !prev);
-  }, [setShowAllTopics]);
-
   // This is a simple click topic card function that with update search input text and clear all the filters
   // Can be change to a function-switcher if any other functions are designed in the future
   const handleClickTopicCard = useCallback(
     (value: string) => {
-      if (value === TOPICS_CARDS[0].title) {
-        handleClickShowAllTopics();
-      } else {
-        dispatch(updateParameterVocabs([]));
-        dispatch(updateDateTimeFilterRange({}));
-        dispatch(updateImosOnly(false));
-        dispatch(updateUpdateFreq(undefined));
-        dispatch(updateSearchText(value));
-        redirectSearch("TopicsPanel");
-      }
+      dispatch(updateParameterVocabs([]));
+      dispatch(updateDateTimeFilterRange({}));
+      dispatch(updateImosOnly(false));
+      dispatch(updateUpdateFreq(undefined));
+      dispatch(updateSearchText(value));
+      redirectSearch("TopicsPanel");
     },
-    [dispatch, handleClickShowAllTopics, redirectSearch]
+    [dispatch, redirectSearch]
   );
+
+  const handleClickAllTopicsCard = useCallback(() => {
+    setShowAllTopics((prev) => !prev);
+  }, [setShowAllTopics]);
 
   const handleScroll = useCallback(
     (scrollOffset: number) => {
@@ -116,6 +114,11 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
           gap={`${TOPICS_PANEL_GAP}px`}
           width={showAllTopics ? topicsPanelContainerWidth : topicsPanelWidth}
         >
+          <TopicCard
+            cardData={showAllTopics ? LESS_TOPICS_CARD : ALL_TOPICS_CARD}
+            handleClickTopicCard={handleClickAllTopicsCard}
+            hide={false}
+          />
           {TOPICS_CARDS.map((item) => (
             <TopicCard
               key={item.title}

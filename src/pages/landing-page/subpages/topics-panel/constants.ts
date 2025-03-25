@@ -1,5 +1,6 @@
 import iconTutorials from "@/assets/topics-panel-icons/icon_tutorials.png";
 import iconAllTopics from "@/assets/topics-panel-icons/icon_all_topics.png";
+import iconLessTopics from "@/assets/topics-panel-icons/icon_less_topics.png";
 import iconSatellite from "@/assets/topics-panel-icons/icon_satellite.png";
 import iconWaves from "@/assets/topics-panel-icons/icon_waves.png";
 import iconSeaTemperature from "@/assets/topics-panel-icons/icon_sea_temperature.png";
@@ -42,167 +43,147 @@ export const TOPICS_PANEL_COLS_MOBILE = 3;
 export const TOPICS_CARD_ICON_BOX_SIZE = 90;
 export const TOPICS_CARD_HEIGHT = 136;
 
+export const ALL_TOPICS_CARD: TopicCardType = {
+  title: "Show All",
+  icon: iconAllTopics,
+  hide: false,
+};
+
+export const LESS_TOPICS_CARD: TopicCardType = {
+  title: "Show Less",
+  icon: iconLessTopics,
+  hide: false,
+};
+
 export const TOPICS_CARDS: TopicCardType[] = [
-  {
-    title: "All Topics",
-    icon: iconAllTopics,
-    disable: false,
-    hide: false,
-  },
   {
     title: "Sea Temperature",
     icon: iconSeaTemperature,
-    disable: false,
     hide: false,
   },
   {
     title: "Moorings",
     icon: iconMoorings,
-    disable: false,
     hide: false,
   },
   {
     title: "Argo Floats",
     icon: iconArgoFloats,
-    disable: false,
     hide: false,
   },
   {
     title: "Gliders",
     icon: iconGliders,
-    disable: false,
     hide: false,
   },
   {
     title: "Satellite",
     icon: iconSatellite,
-    disable: false,
     hide: false,
   },
   {
     title: "Waves",
     icon: iconWaves,
-    disable: false,
     hide: false,
   },
   {
     title: "Vessels",
     icon: iconVessels,
-    disable: false,
     hide: false,
   },
   {
     title: "Animal Tracking",
     icon: iconAnimalTracking,
-    disable: false,
     hide: false,
   },
   {
     title: "Tutorials",
     icon: iconTutorials,
-    disable: true,
     hide: false,
   },
   {
     title: "Currents",
     icon: iconCurrents,
-    disable: false,
     hide: false,
   },
   {
     title: "Water Quality",
     icon: iconWaterQuality,
-    disable: false,
     hide: false,
   },
   {
     title: "Ocean Biota",
     icon: iconOceanBiota,
-    disable: false,
     hide: false,
   },
   {
     title: "Molecular",
     icon: iconMolecular,
-    disable: false,
     hide: false,
   },
   {
     title: "Weather & Climate",
     icon: iconWeatherClimate,
-    disable: false,
     hide: false,
   },
   {
     title: "Acidification",
     icon: iconAcidification,
-    disable: false,
     hide: false,
   },
   {
     title: "Ocean Chemistry",
     icon: iconOceanChemistry,
-    disable: false,
     hide: false,
   },
   {
     title: "Tides",
     icon: iconTide,
-    disable: false,
     hide: false,
   },
   {
     title: "Fisheries",
     icon: iconFisheries,
-    disable: false,
     hide: true,
   },
   {
     title: "Industry",
     icon: iconIndustry,
-    disable: false,
     hide: true,
   },
   {
     title: "Gridded Datasets",
     icon: iconGriddedDatasets,
-    disable: false,
     hide: true,
   },
   {
     title: "Ocean Physics",
     icon: iconOceanPhysics,
-    disable: false,
     hide: true,
   },
   {
     title: "Underwater Vehicles",
     icon: iconUnderwaterVehicles,
-    disable: false,
     hide: true,
   },
   {
     title: "Plankton",
     icon: iconPlankton,
-    disable: false,
     hide: true,
   },
   {
     title: "Ocean Color",
     icon: iconOceanColor,
-    disable: false,
     hide: true,
   },
   {
     title: "Benthic",
     icon: iconBenthic,
-    disable: false,
     hide: true,
   },
   {
     title: "Time Series Datasets",
     icon: iconTimeSeriesDatasets,
-    disable: false,
     hide: true,
   },
 ];
