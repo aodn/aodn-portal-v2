@@ -186,7 +186,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
           fontWeight={fontWeight.bold}
           color={fontColor.blue.dark}
         >
-          Data Available
+          Download Service Available
         </Typography>
         <StyledToggleButtonGroup
           value={filters.dataIndexedType}
