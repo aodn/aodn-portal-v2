@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useCallback, FC } from "react";
 import { Box, SxProps } from "@mui/material";
-import { Vocab } from "../../common/store/componentParamReducer";
+import {
+  updateParameterVocabs,
+  Vocab,
+} from "../../common/store/componentParamReducer";
 import { useAppDispatch } from "../../common/store/hooks";
 import { fetchParameterVocabsWithStore } from "../../common/store/searchReducer";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
@@ -25,8 +28,9 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
         ...prevFilter,
         parameterVocabs: selected,
       }));
+      dispatch(updateParameterVocabs(selected));
     },
-    [allVocabs, setFilters]
+    [allVocabs, dispatch, setFilters]
   );
 
   useEffect(() => {
