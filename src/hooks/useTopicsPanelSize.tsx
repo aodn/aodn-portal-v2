@@ -51,12 +51,12 @@ const useTopicsPanelSize = ({ topicCardsCount }: UseTopicsPanelSizeProps) => {
     );
   }, [calcRows, topicCardsCount]);
 
-  const topicsPanelWidth = useMemo(() => {
+  const getTopicsPanelWidth = useCallback(() => {
+    const totalCols = topicCardsCount / TOPICS_PANEL_ROWS_DEFAULT;
     return (
-      TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_DESKTOP +
-      TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_DESKTOP - 1)
+      TOPICS_CARD_ICON_BOX_SIZE * totalCols + TOPICS_PANEL_GAP * (totalCols - 1)
     );
-  }, []);
+  }, [topicCardsCount]);
 
   const topicsPanelContainerWidth = useMemo(() => {
     if (isMobile)
@@ -75,20 +75,23 @@ const useTopicsPanelSize = ({ topicCardsCount }: UseTopicsPanelSizeProps) => {
         TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_LAPTOP - 1)
       );
     if (isAboveDesktop) {
-      return topicsPanelWidth;
+      return (
+        TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_DESKTOP +
+        TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_DESKTOP - 1)
+      );
     }
 
     return (
       TOPICS_CARD_ICON_BOX_SIZE * TOPICS_PANEL_COLS_MOBILE +
       TOPICS_PANEL_GAP * (TOPICS_PANEL_COLS_MOBILE - 1)
     );
-  }, [isAboveDesktop, isLaptop, isMobile, isTablet, topicsPanelWidth]);
+  }, [isMobile, isTablet, isLaptop, isAboveDesktop]);
 
   return {
     showAllTopics,
     setShowAllTopics,
     getTopicsPanelHeight,
-    topicsPanelWidth,
+    getTopicsPanelWidth,
     topicsPanelContainerWidth,
   };
 };

@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useRef } from "react";
 import Box from "@mui/material/Box";
 import { IconButton, Stack } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -29,20 +29,14 @@ interface TopicsPanelProps {}
 const TopicsPanel: FC<TopicsPanelProps> = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
-  const { isAboveDesktop } = useBreakpoint();
   const {
     showAllTopics,
     setShowAllTopics,
     getTopicsPanelHeight,
-    topicsPanelWidth,
+    getTopicsPanelWidth,
     topicsPanelContainerWidth,
   } = useTopicsPanelSize({ topicCardsCount: TOPICS_CARDS.length });
   const boxRef = useRef<HTMLDivElement>(null);
-
-  const shouldShowArrowIcon = useMemo(
-    () => (isAboveDesktop ? false : showAllTopics ? false : true),
-    [isAboveDesktop, showAllTopics]
-  );
 
   // This is a simple click topic card function that with update search input text and clear all the filters
   // Can be change to a function-switcher if any other functions are designed in the future
@@ -76,11 +70,11 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
 
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
-      {shouldShowArrowIcon && (
+      {!showAllTopics && (
         <Box sx={{ pr: { sm: padding.small } }}>
           <IconButton
             onClick={() =>
-              handleScroll((-topicsPanelWidth - TOPICS_PANEL_GAP) / 3)
+              handleScroll((-getTopicsPanelWidth() - TOPICS_PANEL_GAP) / 3)
             }
           >
             <ArrowBackIosNewIcon
@@ -112,28 +106,28 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
           direction="row"
           flexWrap="wrap"
           gap={`${TOPICS_PANEL_GAP}px`}
-          width={showAllTopics ? topicsPanelContainerWidth : topicsPanelWidth}
+          width={
+            showAllTopics ? topicsPanelContainerWidth : getTopicsPanelWidth()
+          }
         >
           <TopicCard
             cardData={showAllTopics ? LESS_TOPICS_CARD : ALL_TOPICS_CARD}
             handleClickTopicCard={handleClickAllTopicsCard}
-            hide={false}
           />
           {TOPICS_CARDS.map((item) => (
             <TopicCard
               key={item.title}
               cardData={item}
               handleClickTopicCard={handleClickTopicCard}
-              hide={showAllTopics ? false : item.hide}
             />
           ))}
         </Stack>
       </Box>
-      {shouldShowArrowIcon && (
+      {!showAllTopics && (
         <Box sx={{ pl: { sm: padding.small } }}>
           <IconButton
             onClick={() =>
-              handleScroll((topicsPanelWidth + TOPICS_PANEL_GAP) / 3)
+              handleScroll((getTopicsPanelWidth() + TOPICS_PANEL_GAP) / 3)
             }
           >
             <ArrowForwardIosIcon

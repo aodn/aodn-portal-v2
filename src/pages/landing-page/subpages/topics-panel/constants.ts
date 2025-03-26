@@ -46,144 +46,116 @@ export const TOPICS_CARD_HEIGHT = 136;
 export const ALL_TOPICS_CARD: TopicCardType = {
   title: "Show All",
   icon: iconAllTopics,
-  hide: false,
 };
 
 export const LESS_TOPICS_CARD: TopicCardType = {
   title: "Show Less",
   icon: iconLessTopics,
-  hide: false,
 };
 
 export const TOPICS_CARDS: TopicCardType[] = [
   {
     title: "Sea Temperature",
     icon: iconSeaTemperature,
-    hide: false,
   },
   {
     title: "Moorings",
     icon: iconMoorings,
-    hide: false,
   },
   {
     title: "Argo Floats",
     icon: iconArgoFloats,
-    hide: false,
   },
   {
     title: "Gliders",
     icon: iconGliders,
-    hide: false,
   },
   {
     title: "Satellite",
     icon: iconSatellite,
-    hide: false,
   },
   {
     title: "Waves",
     icon: iconWaves,
-    hide: false,
   },
   {
     title: "Vessels",
     icon: iconVessels,
-    hide: false,
   },
   {
     title: "Animal Tracking",
     icon: iconAnimalTracking,
-    hide: false,
   },
   {
     title: "Tutorials",
     icon: iconTutorials,
-    hide: false,
   },
   {
     title: "Currents",
     icon: iconCurrents,
-    hide: false,
   },
   {
     title: "Water Quality",
     icon: iconWaterQuality,
-    hide: false,
   },
   {
     title: "Ocean Biota",
     icon: iconOceanBiota,
-    hide: false,
   },
   {
     title: "Molecular",
     icon: iconMolecular,
-    hide: false,
   },
   {
     title: "Weather & Climate",
     icon: iconWeatherClimate,
-    hide: false,
   },
   {
     title: "Acidification",
     icon: iconAcidification,
-    hide: false,
   },
   {
     title: "Ocean Chemistry",
     icon: iconOceanChemistry,
-    hide: false,
   },
   {
     title: "Tides",
     icon: iconTide,
-    hide: false,
   },
   {
     title: "Fisheries",
     icon: iconFisheries,
-    hide: true,
   },
   {
     title: "Industry",
     icon: iconIndustry,
-    hide: true,
   },
   {
     title: "Gridded Datasets",
     icon: iconGriddedDatasets,
-    hide: true,
   },
   {
     title: "Ocean Physics",
     icon: iconOceanPhysics,
-    hide: true,
   },
   {
     title: "Underwater Vehicles",
     icon: iconUnderwaterVehicles,
-    hide: true,
   },
   {
     title: "Plankton",
     icon: iconPlankton,
-    hide: true,
   },
   {
     title: "Ocean Color",
     icon: iconOceanColor,
-    hide: true,
   },
   {
     title: "Benthic",
     icon: iconBenthic,
-    hide: true,
   },
   {
     title: "Time Series Datasets",
     icon: iconTimeSeriesDatasets,
-    hide: true,
   },
 ];
