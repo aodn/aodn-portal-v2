@@ -13,4 +13,4 @@ class Routes:
         f'{PREFIX}/collections?properties=id,title,description&filter=id*'
     )
     COLLECTION_DETAIL = f'{PREFIX}/collections/*'
-    COLLECTION_DETAIL_ITEM = f'{PREFIX}/collections/*/items'
+    COLLECTION_DETAIL_ITEM = f'{PREFIX}/collections/*/items/summary'
