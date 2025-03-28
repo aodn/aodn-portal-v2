@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Box, Button, IconButton, SxProps } from "@mui/material";
+import { Box, IconButton, SxProps } from "@mui/material";
 import {
   updateHasData,
   updateImosOnly,
@@ -73,7 +73,8 @@ const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
       return !!(
         filters.dataDeliveryFrequency?.length ||
         filters.dataDeliveryMode?.length ||
-        filters.dataService?.length
+        filters.dataService?.length ||
+        filters.dataIndexedType?.length
       );
 
     default:
