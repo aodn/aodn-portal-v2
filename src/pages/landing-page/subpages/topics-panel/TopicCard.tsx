@@ -7,25 +7,23 @@ import {
   padding,
   shadow,
 } from "../../../../styles/constants";
-import { SMART_CARD_HEIGHT, SMART_CARD_ICON_BOX_SIZE } from "./constants";
+import { TOPICS_CARD_HEIGHT, TOPICS_CARD_ICON_BOX_SIZE } from "./constants";
 
-export interface SmartCardType {
+export interface TopicCardType {
   title: string;
-  // Prop that determine if the click function on card is disabled or not
-  disable: boolean;
   icon: string;
 }
 
-interface SmartCardProps {
-  cardData: SmartCardType;
-  handleClickSmartCard: (value: string) => void;
+interface TopicCardProps {
+  cardData: TopicCardType;
+  handleClickTopicCard: (value: string) => void;
 }
 
-const SmartCard: FC<SmartCardProps> = ({ cardData, handleClickSmartCard }) => {
+const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const handleClick = (value: string) => {
-    if (!cardData.disable) handleClickSmartCard(value);
+    handleClickTopicCard(value);
   };
 
   return (
@@ -35,7 +33,7 @@ const SmartCard: FC<SmartCardProps> = ({ cardData, handleClickSmartCard }) => {
       justifyContent="center"
       alignItems="center"
       borderRadius={borderRadius.small}
-      height={SMART_CARD_HEIGHT}
+      height={TOPICS_CARD_HEIGHT}
       sx={{
         cursor: "pointer",
       }}
@@ -45,8 +43,8 @@ const SmartCard: FC<SmartCardProps> = ({ cardData, handleClickSmartCard }) => {
     >
       <Paper
         sx={{
-          width: SMART_CARD_ICON_BOX_SIZE,
-          height: SMART_CARD_ICON_BOX_SIZE,
+          width: TOPICS_CARD_ICON_BOX_SIZE,
+          height: TOPICS_CARD_ICON_BOX_SIZE,
           padding: padding.medium,
           borderRadius: borderRadius.small,
           boxShadow: shadow.bottom,
@@ -63,10 +61,21 @@ const SmartCard: FC<SmartCardProps> = ({ cardData, handleClickSmartCard }) => {
           }}
         />
       </Paper>
-      <Box width="100%" textAlign="center">
+      <Box
+        width={TOPICS_CARD_ICON_BOX_SIZE}
+        height={TOPICS_CARD_HEIGHT - TOPICS_CARD_ICON_BOX_SIZE}
+        textAlign="center"
+      >
         <Typography
           fontSize={fontSize.label}
           fontWeight={isHovered ? fontWeight.bold : fontWeight.medium}
+          sx={{
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: "2",
+            WebkitBoxOrient: "vertical",
+            wordBreak: "break-word",
+          }}
         >
           {cardData.title}
         </Typography>
@@ -75,4 +84,4 @@ const SmartCard: FC<SmartCardProps> = ({ cardData, handleClickSmartCard }) => {
   );
 };
 
-export default SmartCard;
+export default TopicCard;
