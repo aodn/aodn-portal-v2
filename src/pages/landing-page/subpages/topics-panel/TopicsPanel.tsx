@@ -5,9 +5,7 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useAppDispatch } from "../../../../components/common/store/hooks";
 import useRedirectSearch from "../../../../hooks/useRedirectSearch";
-import useTopicsPanelSize, {
-  ScrollDirection,
-} from "../../../../hooks/useTopicsPanelSize";
+import useTopicsPanelSize from "../../../../hooks/useTopicsPanelSize";
 import { color, gap, padding } from "../../../../styles/constants";
 import {
   TOPICS_CARDS,
@@ -33,10 +31,9 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   const {
     showAllTopics,
     setShowAllTopics,
-    getTopicsPanelHeight,
-    getTopicsPanelWidth,
+    topicsPanelHeight,
+    topicsPanelWidth,
     topicsPanelContainerWidth,
-    getScrollDistance,
   } = useTopicsPanelSize({ topicCardsCount: TOPICS_CARDS.length + 1 });
   const boxRef = useRef<HTMLDivElement>(null);
 
@@ -74,11 +71,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
     <Box display="flex" justifyContent="space-between" alignItems="center">
       {!showAllTopics && (
         <Box sx={{ pr: { sm: padding.small } }}>
-          <IconButton
-            onClick={() =>
-              handleScroll(getScrollDistance(ScrollDirection.LEFT))
-            }
-          >
+          <IconButton onClick={() => handleScroll(-topicsPanelContainerWidth)}>
             <ArrowBackIosNewIcon
               sx={{
                 pr: gap.sm,
@@ -94,7 +87,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         ref={boxRef}
         sx={{
           width: topicsPanelContainerWidth,
-          height: getTopicsPanelHeight(),
+          height: topicsPanelHeight,
           "&::-webkit-scrollbar": {
             display: "none",
           },
@@ -108,9 +101,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
           direction="row"
           flexWrap="wrap"
           gap={`${TOPICS_PANEL_GAP}px`}
-          width={
-            showAllTopics ? topicsPanelContainerWidth : getTopicsPanelWidth()
-          }
+          width={showAllTopics ? topicsPanelContainerWidth : topicsPanelWidth}
         >
           <TopicCard
             cardData={showAllTopics ? LESS_TOPICS_CARD : ALL_TOPICS_CARD}
@@ -127,11 +118,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       </Box>
       {!showAllTopics && (
         <Box sx={{ pl: { sm: padding.small } }}>
-          <IconButton
-            onClick={() =>
-              handleScroll(getScrollDistance(ScrollDirection.RIGHT))
-            }
-          >
+          <IconButton onClick={() => handleScroll(topicsPanelContainerWidth)}>
             <ArrowForwardIosIcon
               sx={{
                 pl: gap.sm,
