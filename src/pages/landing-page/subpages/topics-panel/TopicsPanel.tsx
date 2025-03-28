@@ -3,10 +3,11 @@ import Box from "@mui/material/Box";
 import { IconButton, Stack } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import useBreakpoint from "../../../../hooks/useBreakpoint";
 import { useAppDispatch } from "../../../../components/common/store/hooks";
 import useRedirectSearch from "../../../../hooks/useRedirectSearch";
-import useTopicsPanelSize from "../../../../hooks/useTopicsPanelSize";
+import useTopicsPanelSize, {
+  ScrollDirection,
+} from "../../../../hooks/useTopicsPanelSize";
 import { color, gap, padding } from "../../../../styles/constants";
 import {
   TOPICS_CARDS,
@@ -35,7 +36,8 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
     getTopicsPanelHeight,
     getTopicsPanelWidth,
     topicsPanelContainerWidth,
-  } = useTopicsPanelSize({ topicCardsCount: TOPICS_CARDS.length });
+    getScrollDistance,
+  } = useTopicsPanelSize({ topicCardsCount: TOPICS_CARDS.length + 1 });
   const boxRef = useRef<HTMLDivElement>(null);
 
   // This is a simple click topic card function that with update search input text and clear all the filters
@@ -74,7 +76,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         <Box sx={{ pr: { sm: padding.small } }}>
           <IconButton
             onClick={() =>
-              handleScroll((-getTopicsPanelWidth() - TOPICS_PANEL_GAP) / 3)
+              handleScroll(getScrollDistance(ScrollDirection.LEFT))
             }
           >
             <ArrowBackIosNewIcon
@@ -127,7 +129,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         <Box sx={{ pl: { sm: padding.small } }}>
           <IconButton
             onClick={() =>
-              handleScroll((getTopicsPanelWidth() + TOPICS_PANEL_GAP) / 3)
+              handleScroll(getScrollDistance(ScrollDirection.RIGHT))
             }
           >
             <ArrowForwardIosIcon

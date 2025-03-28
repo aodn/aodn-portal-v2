@@ -11,6 +11,11 @@ import {
   TOPICS_PANEL_ROWS_DEFAULT,
 } from "../pages/landing-page/subpages/topics-panel/constants";
 
+export enum ScrollDirection {
+  LEFT = "LEFT",
+  RIGHT = "RIGHT",
+}
+
 interface UseTopicsPanelSizeProps {
   topicCardsCount: number;
 }
@@ -43,6 +48,11 @@ const useTopicsPanelSize = ({ topicCardsCount }: UseTopicsPanelSizeProps) => {
     [isAboveDesktop, isLaptop, isMobile, isTablet, showAllTopics]
   );
 
+  const totalCols = useMemo(
+    () => Math.ceil(topicCardsCount / TOPICS_PANEL_ROWS_DEFAULT),
+    [topicCardsCount]
+  );
+
   const getTopicsPanelHeight = useCallback(() => {
     const topicsPanelRows = calcRows(topicCardsCount);
     return (
@@ -52,11 +62,10 @@ const useTopicsPanelSize = ({ topicCardsCount }: UseTopicsPanelSizeProps) => {
   }, [calcRows, topicCardsCount]);
 
   const getTopicsPanelWidth = useCallback(() => {
-    const totalCols = topicCardsCount / TOPICS_PANEL_ROWS_DEFAULT;
     return (
       TOPICS_CARD_ICON_BOX_SIZE * totalCols + TOPICS_PANEL_GAP * (totalCols - 1)
     );
-  }, [topicCardsCount]);
+  }, [totalCols]);
 
   const topicsPanelContainerWidth = useMemo(() => {
     if (isMobile)
@@ -87,12 +96,48 @@ const useTopicsPanelSize = ({ topicCardsCount }: UseTopicsPanelSizeProps) => {
     );
   }, [isMobile, isTablet, isLaptop, isAboveDesktop]);
 
+  const getScrollDistance = useCallback(
+    (direction: ScrollDirection) => {
+      const scrollDistance = (cols: number) =>
+        TOPICS_CARD_ICON_BOX_SIZE * cols + TOPICS_PANEL_GAP * (cols - 1);
+
+      if (isMobile) {
+        return direction === ScrollDirection.LEFT
+          ? -scrollDistance(TOPICS_PANEL_COLS_MOBILE)
+          : scrollDistance(TOPICS_PANEL_COLS_MOBILE);
+      }
+
+      if (isTablet) {
+        return direction === ScrollDirection.LEFT
+          ? -scrollDistance(TOPICS_PANEL_COLS_TABLET)
+          : scrollDistance(TOPICS_PANEL_COLS_TABLET);
+      }
+
+      if (isLaptop) {
+        return direction === ScrollDirection.LEFT
+          ? -scrollDistance(TOPICS_PANEL_COLS_LAPTOP)
+          : scrollDistance(TOPICS_PANEL_COLS_LAPTOP);
+      }
+      if (isAboveDesktop) {
+        return direction === ScrollDirection.LEFT
+          ? -scrollDistance(TOPICS_PANEL_COLS_DESKTOP)
+          : scrollDistance(TOPICS_PANEL_COLS_DESKTOP);
+      }
+
+      return direction === ScrollDirection.LEFT
+        ? -getTopicsPanelWidth() / 3
+        : getTopicsPanelWidth() / 3;
+    },
+    [getTopicsPanelWidth, isAboveDesktop, isLaptop, isMobile, isTablet]
+  );
+
   return {
     showAllTopics,
     setShowAllTopics,
     getTopicsPanelHeight,
     getTopicsPanelWidth,
     topicsPanelContainerWidth,
+    getScrollDistance,
   };
 };
 
