@@ -154,7 +154,7 @@ def test_links_button_navigates_to_detail_links_tab(
     first_result = search_page.result_card_list.first
 
     first_result.hover()
-    first_result.get_by_label('Links').click()
+    first_result.get_by_label('Data Access').click()
     expect(detail_page.get_text(link_title)).to_be_visible()
 
 

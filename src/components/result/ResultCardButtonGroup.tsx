@@ -33,16 +33,6 @@ enum Status {
   Completed = "completed",
 }
 
-const generateLinkText = (linkLength: number) => {
-  if (linkLength === 0) {
-    return "No Links";
-  }
-  if (linkLength === 1) {
-    return "1 Link";
-  }
-  return `${linkLength} Links`;
-};
-
 const renderStatusButton = (
   shouldHideText: boolean,
   content: OGCCollection,
@@ -120,7 +110,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
         {links && (
           <ResultCardButton
             startIcon={LinkIcon}
-            text={generateLinkText(links.length)}
+            text={"Data Access"}
             shouldHideText={shouldHideText}
             onClick={onLinks}
             resultCardButtonConfig={resultCardButtonConfig}

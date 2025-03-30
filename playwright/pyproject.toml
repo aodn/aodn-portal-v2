@@ -3,9 +3,9 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pytest = "^8.0.0"
-pytest-playwright = "^0.4.4"
-playwright = "1.47.0"
+pytest = "^8.3.5"
+pytest-playwright = "^0.7.0"
+playwright = "^1.51.0"
 pytest-xdist = "^3.5.0"
 python-dotenv = "^1.0.1"
 dynaconf = "^3.2.4"
