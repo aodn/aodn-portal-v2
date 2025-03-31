@@ -2,7 +2,6 @@ import { FC, useCallback, useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import {
   Box,
-  Button,
   FormControl,
   FormControlLabel,
   Grid,
@@ -44,6 +43,9 @@ enum DateRangeOptionValues {
   LastTenYears = 10,
 }
 
+// Tolerance in days for matching predefined date ranges
+const TOLERANCE_DAYS = 3;
+
 interface DateRangeOption {
   label: string;
   value: DateRangeOptionValues;
@@ -77,8 +79,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
 
   // Local state for date-range-slider
   const [value, setValue] = useState<number[]>([
-    dateTimeFilterRange?.start ?? dateToValue(dayjs(dateDefault.min)),
-    dateTimeFilterRange?.end ?? dateToValue(dayjs(dateDefault.max)),
+    dateToValue(initialMinDate),
+    dateToValue(initialMaxDate),
   ]);
 
   // Local state for radio group
@@ -86,23 +88,39 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
     DateRangeOptionValues.Custom
   );
 
-  // Helper to sync date range when radio change
-  const updateDateRange = useCallback(
-    (startDate: Dayjs, endDate: Dayjs) => {
-      const newStart = dateToValue(startDate);
-      const newEnd = dateToValue(endDate);
+  // Helper to check if given star-end period falls in any of the radio group year-range options
+  const determineSelectedOption = useCallback(
+    (startDate: Dayjs, endDate: Dayjs): DateRangeOptionValues => {
+      // Only consider predefined ranges if the end date is today
+      const today = dayjs();
+      const isEndDateToday = endDate
+        .startOf("day")
+        .isSame(today.startOf("day"));
 
-      setMinDate(startDate);
-      setMaxDate(endDate);
-      setValue([newStart, newEnd]);
-      dispatch(
-        updateDateTimeFilterRange({
-          start: newStart,
-          end: newEnd,
-        })
-      );
+      if (!isEndDateToday) {
+        return DateRangeOptionValues.Custom;
+      }
+
+      // Calculate years difference between start date and today
+      const diffInYears = today.diff(startDate, "year", true);
+
+      // Convert tolerance days to years
+      const toleranceInYears = TOLERANCE_DAYS / 365;
+
+      // Find matching period option
+      for (const option of dateRangeOptions) {
+        if (option.value !== DateRangeOptionValues.Custom) {
+          const yearValue = option.value as number;
+          // Apply tolerance in year calculation
+          if (Math.abs(diffInYears - yearValue) < toleranceInYears) {
+            return option.value;
+          }
+        }
+      }
+
+      return DateRangeOptionValues.Custom;
     },
-    [dispatch]
+    []
   );
 
   const handleRadioChange = useCallback(
@@ -120,20 +138,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
       const today = dayjs();
       const startDate = today.subtract(years, "year");
 
-      updateDateRange(startDate, today);
-    },
-    [updateDateRange]
-  );
+      const newStart = dateToValue(startDate);
+      const newEnd = dateToValue(today);
 
-  const handleSliderChange = useCallback(
-    (_: Event, newValue: number | number[]): void => {
-      if (!Array.isArray(newValue)) return;
-      const [newStart, newEnd] = newValue;
-
-      setValue(newValue);
-      setMinDate(dayjs(newStart));
-      setMaxDate(dayjs(newEnd));
-      setSelectedOption(DateRangeOptionValues.Custom);
+      setMinDate(startDate);
+      setMaxDate(today);
+      setValue([newStart, newEnd]);
       dispatch(
         updateDateTimeFilterRange({
           start: newStart,
@@ -144,13 +154,34 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
     [dispatch]
   );
 
+  const handleSliderChange = useCallback(
+    (_: Event, newValue: number | number[]): void => {
+      if (!Array.isArray(newValue)) return;
+      const [newStart, newEnd] = newValue;
+      const newMinDate = valueToDate(newStart);
+      const newMaxDate = valueToDate(newEnd);
+
+      setValue(newValue);
+      setMinDate(newMinDate);
+      setMaxDate(newMaxDate);
+      setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
+      dispatch(
+        updateDateTimeFilterRange({
+          start: newStart,
+          end: newEnd,
+        })
+      );
+    },
+    [determineSelectedOption, dispatch]
+  );
+
   const handleMinDateChange = useCallback(
     (newMinDate: Dayjs | null) => {
       if (newMinDate && dateToValue(newMinDate) < dateToValue(maxDate)) {
         const newStart = dateToValue(newMinDate);
         setMinDate(newMinDate);
         setValue([newStart, value[1]]);
-        setSelectedOption(DateRangeOptionValues.Custom);
+        setSelectedOption(determineSelectedOption(newMinDate, maxDate));
         dispatch(
           updateDateTimeFilterRange({
             start: newStart,
@@ -159,7 +190,13 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         );
       }
     },
-    [dateTimeFilterRange?.end, dispatch, maxDate, value]
+    [
+      dateTimeFilterRange?.end,
+      determineSelectedOption,
+      dispatch,
+      maxDate,
+      value,
+    ]
   );
 
   const handleMaxDateChange = useCallback(
@@ -168,7 +205,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         const newEnd = dateToValue(newMaxDate);
         setMaxDate(newMaxDate);
         setValue([value[0], newEnd]);
-        setSelectedOption(DateRangeOptionValues.Custom);
+        setSelectedOption(determineSelectedOption(minDate, newMaxDate));
         dispatch(
           updateDateTimeFilterRange({
             start: dateTimeFilterRange?.start,
@@ -177,7 +214,13 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
         );
       }
     },
-    [dateTimeFilterRange?.start, dispatch, minDate, value]
+    [
+      dateTimeFilterRange?.start,
+      determineSelectedOption,
+      dispatch,
+      minDate,
+      value,
+    ]
   );
 
   const handleClear = useCallback(() => {
@@ -195,23 +238,28 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
   // Listen to redux dateTimeFilterRange to initialize local states
   useEffect(() => {
     if (dateTimeFilterRange) {
-      setMinDate(
-        valueToDate(dateTimeFilterRange.start ?? dateToValue(initialMinDate))
+      const newMinDate = valueToDate(
+        dateTimeFilterRange.start ?? dateToValue(initialMinDate)
       );
-      setMaxDate(
-        valueToDate(dateTimeFilterRange.end ?? dateToValue(initialMaxDate))
+      const newMaxDate = valueToDate(
+        dateTimeFilterRange.end ?? dateToValue(initialMaxDate)
       );
+
+      setMinDate(newMinDate);
+      setMaxDate(newMaxDate);
       setValue([
         dateTimeFilterRange.start ?? dateToValue(initialMinDate),
         dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
       ]);
+      setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
     } else {
       // Reset to initial state when dateTimeFilterRange is null or undefined
       setMinDate(initialMinDate);
       setMaxDate(initialMaxDate);
       setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
+      setSelectedOption(DateRangeOptionValues.Custom);
     }
-  }, [dateTimeFilterRange]);
+  }, [dateTimeFilterRange, determineSelectedOption]);
 
   // States below are used to store the imos-data ids and all datasets
   // they will be used in TimeRangeBarChart
