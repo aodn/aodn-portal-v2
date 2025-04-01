@@ -50,9 +50,9 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     Array<OGCCollection> | undefined
   >(state.items);
 
-  const [bookmarkTemporaryItem, setBookmarkTemporaryItem] = useState<
-    OGCCollection | undefined
-  >(state.temporaryItem);
+  const [_, setBookmarkTemporaryItem] = useState<OGCCollection | undefined>(
+    state.temporaryItem
+  );
 
   const [bookmarkExpandedItem, setBookmarkExpandedItem] = useState<
     OGCCollection | undefined
@@ -67,19 +67,20 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         // To prevent clicking on buttons in accordion title area to trigger the onClickAccordion
         if (hoverOnRemoveButton) return;
         store.dispatch(setExpandedItem(newExpanded ? item : undefined));
-        onDeselectDataset && onDeselectDataset();
+        onDeselectDataset?.();
       },
     [onDeselectDataset]
   );
 
-  const onClearAllBookmarks = () => {
+  const onClearAllBookmarks = useCallback(() => {
     store.dispatch(removeAllItems());
-    onDeselectDataset && onDeselectDataset();
-  };
+    onDeselectDataset?.();
+  }, [onDeselectDataset]);
 
   const onRemoveFromBookmarkList = useCallback(
     (item: OGCCollection) => {
-      if (item.id === bookmarkTemporaryItem?.id) {
+      const { temporaryItem, expandedItem } = getBookmarkList(store.getState());
+      if (item.id === temporaryItem?.id) {
         // If the item is a temporary item, just clear the temporary item
         store.dispatch(setTemporaryItem(undefined));
       } else {
@@ -87,101 +88,84 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         store.dispatch(removeItem(item.id));
       }
       // If the item is expanded, need to clear the bookmarkExpandedItem
-      store.dispatch(
-        setExpandedItem(
-          bookmarkExpandedItem?.id === item.id
-            ? undefined
-            : bookmarkExpandedItem
-        )
-      );
-      onDeselectDataset && onDeselectDataset();
+      if (expandedItem?.id === item.id) {
+        store.dispatch(setExpandedItem(undefined));
+      }
+      onDeselectDataset?.();
     },
-    [bookmarkExpandedItem, bookmarkTemporaryItem?.id, onDeselectDataset]
+    [onDeselectDataset]
   );
-
-  // Initialize bookmark list with local storage
-  useEffect(() => {
-    store.dispatch(initializeBookmarkList());
-  }, []);
 
   // Update accordion group list by listening bookmark items and bookmark temporary item
   useEffect(() => {
+    store.dispatch(initializeBookmarkList());
+
     const handler = (event: BookmarkEvent) => {
-      if (event.action === EVENT_BOOKMARK.INIT) {
-        setBookmarkItems(event.value);
-        setAccordionGroupItems(() => {
-          if (state.temporaryItem) {
-            return [state.temporaryItem, ...event.value];
-          }
-          return event.value;
+      const removeTemp = (currentId: string | undefined): void => {
+        setAccordionGroupItems((items) => {
+          // Only one temporary item so remove it first
+          const tempRemoved = items.filter((i) => i.id !== currentId);
+          return event.value ? [event.value, ...tempRemoved] : tempRemoved;
         });
-      }
+      };
 
-      if (event.action === EVENT_BOOKMARK.ADD) {
-        setBookmarkItems((items) =>
-          items ? [event.value, ...items] : [event.value]
-        );
-        // Only add temporary item if it's not already in items
-        setAccordionGroupItems((items) =>
-          items.some((i) => i?.id === event.id)
-            ? items
-            : [event.value, ...items]
-        );
-      }
-
-      if (event.action === EVENT_BOOKMARK.REMOVE) {
-        setBookmarkTemporaryItem((item) =>
-          item?.id === event.id ? undefined : item
-        );
-        setBookmarkItems((items) => items?.filter((i) => i.id !== event.id));
-        setAccordionGroupItems((items) =>
-          items?.filter((i) => i.id !== event.id)
-        );
-      }
-
-      if (event.action === EVENT_BOOKMARK.REMOVE_ALL) {
-        setBookmarkItems([]);
-        setAccordionGroupItems([]);
-        setBookmarkTemporaryItem(undefined);
-        setBookmarkExpandedItem(undefined);
-      }
-
-      if (event.action === EVENT_BOOKMARK.TEMP) {
-        const removeTemp = (currentId: string | undefined): void => {
-          setAccordionGroupItems((items) => {
-            // Only one temporary item so remove it first
-            const tempRemoved = items.filter((i) => i.id !== currentId);
-            return event.value ? [event.value, ...tempRemoved] : tempRemoved;
+      switch (event.action) {
+        case EVENT_BOOKMARK.INIT:
+          setBookmarkItems(event.value);
+          setAccordionGroupItems(() => {
+            const { temporaryItem } = getBookmarkList(store.getState());
+            return temporaryItem
+              ? [temporaryItem, ...event.value]
+              : event.value;
           });
-        };
+          break;
 
-        setBookmarkTemporaryItem((current) => {
-          removeTemp(current?.id);
-          return event.value;
-        });
-      }
+        case EVENT_BOOKMARK.ADD:
+          setBookmarkItems((items) =>
+            items ? [event.value, ...items] : [event.value]
+          );
+          // Only add temporary item if it's not already in items
+          setAccordionGroupItems((items) =>
+            items.some((i) => i?.id === event.id)
+              ? items
+              : [event.value, ...items]
+          );
+          break;
 
-      if (event.action === EVENT_BOOKMARK.EXPAND) {
-        setBookmarkExpandedItem(event.value);
+        case EVENT_BOOKMARK.REMOVE:
+          setBookmarkTemporaryItem((item) =>
+            item?.id === event.id ? undefined : item
+          );
+          setBookmarkItems((items) => items?.filter((i) => i.id !== event.id));
+          setAccordionGroupItems((items) =>
+            items?.filter((i) => i.id !== event.id)
+          );
+          break;
+
+        case EVENT_BOOKMARK.REMOVE_ALL:
+          setBookmarkItems([]);
+          setAccordionGroupItems([]);
+          setBookmarkTemporaryItem(undefined);
+          setBookmarkExpandedItem(undefined);
+          break;
+
+        case EVENT_BOOKMARK.TEMP:
+          setBookmarkTemporaryItem((current) => {
+            removeTemp(current?.id);
+            return event.value;
+          });
+          break;
+
+        case EVENT_BOOKMARK.EXPAND:
+          setBookmarkExpandedItem(event.value);
+          break;
       }
     };
 
-    on(EVENT_BOOKMARK.INIT, handler);
-    on(EVENT_BOOKMARK.ADD, handler);
-    on(EVENT_BOOKMARK.REMOVE, handler);
-    on(EVENT_BOOKMARK.REMOVE_ALL, handler);
-    on(EVENT_BOOKMARK.EXPAND, handler);
-    on(EVENT_BOOKMARK.TEMP, handler);
-
-    return () => {
-      off(EVENT_BOOKMARK.INIT, handler);
-      off(EVENT_BOOKMARK.ADD, handler);
-      off(EVENT_BOOKMARK.REMOVE, handler);
-      off(EVENT_BOOKMARK.REMOVE_ALL, handler);
-      off(EVENT_BOOKMARK.EXPAND, handler);
-      off(EVENT_BOOKMARK.TEMP, handler);
-    };
-  }, [state.temporaryItem]);
+    Object.values(EVENT_BOOKMARK).forEach((event) => on(event, handler));
+    return () =>
+      Object.values(EVENT_BOOKMARK).forEach((event) => off(event, handler));
+  }, []);
 
   return (
     <>
