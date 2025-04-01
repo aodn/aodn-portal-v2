@@ -42,13 +42,10 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   const state = getBookmarkList(store.getState());
 
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
-  const [accordionGroupItems, setAccordionGroupItems] = useState<
-    Array<OGCCollection>
-  >(state.items);
-
-  const [bookmarkItems, setBookmarkItems] = useState<
-    Array<OGCCollection> | undefined
-  >(state.items);
+  const [items, setItems] = useState<OGCCollection[]>(() => {
+    const { items, temporaryItem } = getBookmarkList(store.getState());
+    return temporaryItem ? [temporaryItem, ...items] : items;
+  });
 
   const [_, setBookmarkTemporaryItem] = useState<OGCCollection | undefined>(
     state.temporaryItem
@@ -101,8 +98,10 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     store.dispatch(initializeBookmarkList());
 
     const handler = (event: BookmarkEvent) => {
-      const removeTemp = (currentId: string | undefined): void => {
-        setAccordionGroupItems((items) => {
+      // Here we remove the old temp and add the new temp, this function only calls when
+      // a add temp event triggered
+      const updateTempInItems = (currentId: string | undefined): void => {
+        setItems((items) => {
           // Only one temporary item so remove it first
           const tempRemoved = items.filter((i) => i.id !== currentId);
           return event.value ? [event.value, ...tempRemoved] : tempRemoved;
@@ -111,8 +110,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
 
       switch (event.action) {
         case EVENT_BOOKMARK.INIT:
-          setBookmarkItems(event.value);
-          setAccordionGroupItems(() => {
+          setItems(() => {
             const { temporaryItem } = getBookmarkList(store.getState());
             return temporaryItem
               ? [temporaryItem, ...event.value]
@@ -121,11 +119,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
           break;
 
         case EVENT_BOOKMARK.ADD:
-          setBookmarkItems((items) =>
-            items ? [event.value, ...items] : [event.value]
-          );
-          // Only add temporary item if it's not already in items
-          setAccordionGroupItems((items) =>
+          setItems((items) =>
             items.some((i) => i?.id === event.id)
               ? items
               : [event.value, ...items]
@@ -136,22 +130,18 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
           setBookmarkTemporaryItem((item) =>
             item?.id === event.id ? undefined : item
           );
-          setBookmarkItems((items) => items?.filter((i) => i.id !== event.id));
-          setAccordionGroupItems((items) =>
-            items?.filter((i) => i.id !== event.id)
-          );
+          setItems((items) => items?.filter((i) => i.id !== event.id));
           break;
 
         case EVENT_BOOKMARK.REMOVE_ALL:
-          setBookmarkItems([]);
-          setAccordionGroupItems([]);
+          setItems([]);
           setBookmarkTemporaryItem(undefined);
           setBookmarkExpandedItem(undefined);
           break;
 
         case EVENT_BOOKMARK.TEMP:
           setBookmarkTemporaryItem((current) => {
-            removeTemp(current?.id);
+            updateTempInItems(current?.id);
             return event.value;
           });
           break;
@@ -171,74 +161,73 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     <>
       {!hideHead && (
         <BookmarkListHead
-          bookmarkCount={bookmarkItems?.length}
+          bookmarkCount={items?.length}
           onClearAllBookmarks={onClearAllBookmarks}
         />
       )}
 
-      {accordionGroupItems.length > 0 &&
-        accordionGroupItems.map((item) => (
-          <StyledAccordion
-            key={item.id}
-            expanded={bookmarkExpandedItem?.id === item.id}
-            onChange={handleChange(item, hoverOnButton)}
-          >
-            <StyledAccordionSummary>
+      {items.map((item) => (
+        <StyledAccordion
+          key={item.id}
+          expanded={bookmarkExpandedItem?.id === item.id}
+          onChange={handleChange(item, hoverOnButton)}
+        >
+          <StyledAccordionSummary>
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="space-between"
+              flexWrap="nowrap"
+              alignItems="center"
+              width="100%"
+            >
               <Box
-                display="flex"
-                flexDirection="row"
-                justifyContent="space-between"
-                flexWrap="nowrap"
-                alignItems="center"
-                width="100%"
+                onMouseEnter={() => setHoverOnButton(true)}
+                onMouseLeave={() => setHoverOnButton(false)}
               >
-                <Box
-                  onMouseEnter={() => setHoverOnButton(true)}
-                  onMouseLeave={() => setHoverOnButton(false)}
-                >
-                  <BookmarkButton dataset={item} />
-                </Box>
-
-                <Typography
-                  color={fontColor.gray.dark}
-                  fontSize={fontSize.label}
-                  fontWeight={fontWeight.bold}
-                  sx={{
-                    padding: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: "2",
-                    WebkitBoxOrient: "vertical",
-                  }}
-                >
-                  {item.title}
-                </Typography>
-                <Button
-                  sx={{
-                    minWidth: "15px",
-                    maxWidth: "15px",
-                    color: color.gray.dark,
-                    fontSize: fontSize.icon,
-                    fontWeight: fontWeight.bold,
-                    " &:hover": {
-                      color: color.blue.dark,
-                      fontSize: fontSize.info,
-                    },
-                  }}
-                  onClick={() => onRemoveFromBookmarkList(item)}
-                  onMouseEnter={() => setHoverOnButton(true)}
-                  onMouseLeave={() => setHoverOnButton(false)}
-                >
-                  X
-                </Button>
+                <BookmarkButton dataset={item} />
               </Box>
-            </StyledAccordionSummary>
-            <StyledAccordionDetails>
-              <BookmarkListCard dataset={item} tabNavigation={tabNavigation} />
-            </StyledAccordionDetails>
-          </StyledAccordion>
-        ))}
+
+              <Typography
+                color={fontColor.gray.dark}
+                fontSize={fontSize.label}
+                fontWeight={fontWeight.bold}
+                sx={{
+                  padding: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: "2",
+                  WebkitBoxOrient: "vertical",
+                }}
+              >
+                {item.title}
+              </Typography>
+              <Button
+                sx={{
+                  minWidth: "15px",
+                  maxWidth: "15px",
+                  color: color.gray.dark,
+                  fontSize: fontSize.icon,
+                  fontWeight: fontWeight.bold,
+                  " &:hover": {
+                    color: color.blue.dark,
+                    fontSize: fontSize.info,
+                  },
+                }}
+                onClick={() => onRemoveFromBookmarkList(item)}
+                onMouseEnter={() => setHoverOnButton(true)}
+                onMouseLeave={() => setHoverOnButton(false)}
+              >
+                X
+              </Button>
+            </Box>
+          </StyledAccordionSummary>
+          <StyledAccordionDetails>
+            <BookmarkListCard dataset={item} tabNavigation={tabNavigation} />
+          </StyledAccordionDetails>
+        </StyledAccordion>
+      ))}
     </>
   );
 };
