@@ -20,6 +20,11 @@ enum EVENT_BOOKMARK {
   EXPAND = "event-bookmark-expand",
   REMOVE_ALL = "event-bookmark-remove-all",
 }
+
+enum EVENT_CLIPBOARD {
+  COPY = "event-bookmark-copy",
+}
+
 // For those who use MenuControl, please extend you props with this interface
 // and the MenuControl will inject the map instance automatically for you
 // you can define your onEvent if you want
@@ -45,4 +50,9 @@ export interface BookmarkEvent {
   value: any;
 }
 
-export { EVENT_MAP, EVENT_MENU, EVENT_BOOKMARK };
+export interface ClipboardEvent {
+  action: string;
+  value: any;
+}
+
+export { EVENT_MAP, EVENT_MENU, EVENT_BOOKMARK, EVENT_CLIPBOARD };
