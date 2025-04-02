@@ -122,7 +122,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
           setItems((items) =>
             items.some((i) => i?.id === event.id)
               ? items
-              : [event.value, ...items]
+              : [...items, event.value]
           );
           break;
 

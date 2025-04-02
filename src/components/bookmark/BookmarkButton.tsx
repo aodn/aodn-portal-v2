@@ -43,35 +43,36 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({ dataset = undefined }) => {
         if (expandedItem?.id === item.id) {
           store.dispatch(setExpandedItem(undefined));
         }
-        setIsBookmarked(false);
       } else {
         if (temporaryItem && temporaryItem.id === item.id) {
           // If bookmark a temporary item, should clear temporaryItem then add to bookmark list
           store.dispatch(setTemporaryItem(undefined));
-          store.dispatch(addItem(item));
-        } else {
-          // Else add to bookmark list
-          store.dispatch(addItem(item));
         }
-        setIsBookmarked(true);
+        store.dispatch(addItem(item));
       }
+      setIsBookmarked(!isBookmarked);
     },
     [isBookmarked]
   );
 
   useEffect(() => {
     const handler = (event: BookmarkEvent) => {
-      if (event.id === dataset?.id) {
+      if (
+        event.id === dataset?.id ||
+        event.action === EVENT_BOOKMARK.REMOVE_ALL
+      ) {
         setIsBookmarked(event.action === EVENT_BOOKMARK.ADD);
       }
     };
 
     on(EVENT_BOOKMARK.ADD, handler);
     on(EVENT_BOOKMARK.REMOVE, handler);
+    on(EVENT_BOOKMARK.REMOVE_ALL, handler);
 
     return () => {
       off(EVENT_BOOKMARK.ADD, handler);
       off(EVENT_BOOKMARK.REMOVE, handler);
+      off(EVENT_BOOKMARK.REMOVE_ALL, handler);
     };
   }, [dataset?.id]);
 
