@@ -160,55 +160,58 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
                 >
-                  <Controls>
-                    <NavigationControl />
-                    <ScaleControl />
-                    <DisplayCoordinate />
-                    <MenuControl
-                      menu={
-                        <BaseMapSwitcher
-                          layers={[
-                            {
-                              id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
-                              name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
-                              label:
-                                StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-                              default: false,
-                            },
-                            {
-                              id: MapboxWorldLayersDef.WORLD.id,
-                              name: MapboxWorldLayersDef.WORLD.name,
-                              default: false,
-                            },
-                          ]}
-                        />
-                      }
-                    />
-                    <MenuControl
-                      menu={
-                        <DateRange
-                          minDate={minDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
-                          maxDate={maxDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
-                          getAndSetDownloadConditions={
-                            getAndSetDownloadConditions
-                          }
-                        />
-                      }
-                    />
-                    <MenuControl
-                      menu={
-                        <DrawRect
-                          getAndSetDownloadConditions={
-                            getAndSetDownloadConditions
-                          }
-                        />
-                      }
-                    />
-                  </Controls>
+                  {featureCollection?.features && (
+                    <Controls>
+                      <NavigationControl />
+                      <ScaleControl />
+                      <DisplayCoordinate />
+                      <MenuControl
+                        menu={
+                          <BaseMapSwitcher
+                            layers={[
+                              {
+                                id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
+                                name: StaticLayersDef.AUSTRALIA_MARINE_PARKS
+                                  .name,
+                                label:
+                                  StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
+                                default: false,
+                              },
+                              {
+                                id: MapboxWorldLayersDef.WORLD.id,
+                                name: MapboxWorldLayersDef.WORLD.name,
+                                default: false,
+                              },
+                            ]}
+                          />
+                        }
+                      />
+                      <MenuControl
+                        menu={
+                          <DateRange
+                            minDate={minDateStamp.format(
+                              dateDefault.SIMPLE_DATE_FORMAT
+                            )}
+                            maxDate={maxDateStamp.format(
+                              dateDefault.SIMPLE_DATE_FORMAT
+                            )}
+                            getAndSetDownloadConditions={
+                              getAndSetDownloadConditions
+                            }
+                          />
+                        }
+                      />
+                      <MenuControl
+                        menu={
+                          <DrawRect
+                            getAndSetDownloadConditions={
+                              getAndSetDownloadConditions
+                            }
+                          />
+                        }
+                      />
+                    </Controls>
+                  )}
                   <Layers>
                     <DetailSymbolLayer
                       featureCollection={filteredFeatureCollection}
