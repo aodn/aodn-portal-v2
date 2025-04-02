@@ -12,7 +12,6 @@ import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
-import _ from "lodash";
 
 interface DetailClusterSize {
   default?: number | string;
@@ -68,21 +67,6 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
   const { map } = useContext(MapContext);
 
   const layerId = useMemo(() => `co-layer-${map?.getContainer().id}`, [map]);
-
-  // TODO: still have bugs here, so i set default value to 2 to avoid the error
-  //  as a temporary solution.
-  //  The bug is: if querying featureCollection is slow, the maxCount will be the
-  //  default value 2, and the layer will not be rendered correctly (no opacity change).
-  //  Will fix it later as it is not a critical issue.
-  const maxCount = useMemo(() => {
-    const maxCountFeature = _.maxBy(
-      featureCollection.features,
-      (feature) => feature.properties?.count
-    );
-    return maxCountFeature && maxCountFeature.properties
-      ? maxCountFeature.properties.count
-      : 2;
-  }, [featureCollection.features]);
 
   const clusterSourceId = useMemo(() => `${layerId}-source`, [layerId]);
 
@@ -145,17 +129,6 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
           "icon-ignore-placement": true,
           "icon-anchor": "bottom",
         },
-        paint: {
-          "icon-opacity": [
-            "interpolate",
-            ["linear"],
-            ["get", "count"],
-            1, // Minimum count
-            0.5, //  minimum opacity
-            maxCount, // Maximum count
-            1, // maximum opacity
-          ],
-        },
       });
 
       map?.on("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
@@ -184,7 +157,6 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
     featureCollection,
     layerId,
     map,
-    maxCount,
     onSymbolClick,
   ]);
 
