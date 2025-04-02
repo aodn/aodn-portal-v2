@@ -22,9 +22,13 @@ import {
 
 export interface BookmarkButtonProps {
   dataset?: OGCCollection;
+  dataTestId?: string;
 }
 
-const BookmarkButton: FC<BookmarkButtonProps> = ({ dataset = undefined }) => {
+const BookmarkButton: FC<BookmarkButtonProps> = ({
+  dataset = undefined,
+  dataTestId = "bookmarkbutton",
+}) => {
   const [isBookmarked, setIsBookmarked] = useState<boolean>(() =>
     dataset ? checkIsBookmarked(store.getState(), dataset.id) : false
   );
@@ -90,15 +94,20 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({ dataset = undefined }) => {
               scale: "105%",
             },
           }}
+          data-testid={`${dataTestId}-iconbutton`}
         >
           {isBookmarked ? (
-            <BookmarkIcon sx={{ color: color.brightBlue.dark }} />
+            <BookmarkIcon
+              sx={{ color: color.brightBlue.dark }}
+              data-testid={`${dataTestId}-bookmarkicon`}
+            />
           ) : (
             <BookmarkBorderIcon
               sx={{
                 color: color.brightBlue.dark,
                 fontSize: "26px",
               }}
+              data-testid={`${dataTestId}-bookmarkbordericon`}
             />
           )}
         </IconButton>
