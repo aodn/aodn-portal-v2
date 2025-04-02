@@ -44,13 +44,12 @@ const getMinMaxDateStamps = (
     let maxDate = dayjs(dateDefault.min);
 
     featureCollection.features?.forEach((feature) => {
-      const start = dayjs(feature.properties?.date);
-      const end = dayjs(feature.properties?.date);
-      if (start.isBefore(minDate)) {
-        minDate = start;
+      const date = dayjs(feature.properties?.date);
+      if (date.isBefore(minDate)) {
+        minDate = date;
       }
-      if (end.isAfter(maxDate)) {
-        maxDate = end;
+      if (date.isAfter(maxDate)) {
+        maxDate = date;
       }
     });
     return [minDate, maxDate];
