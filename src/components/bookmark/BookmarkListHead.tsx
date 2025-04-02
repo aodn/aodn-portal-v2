@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { Box, Button, SxProps, Typography } from "@mui/material";
 import {
   color,
@@ -18,40 +18,40 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
   onClearAllBookmarks,
   sx,
 }) => {
+  const getTitle = useCallback(() => {
+    if (bookmarkCount === undefined || bookmarkCount === 0) {
+      return "Bookmark List";
+    }
+    return `${bookmarkCount} Bookmark(s)`;
+  }, [bookmarkCount]);
+
   return (
     <Box
-      position="relative"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      width="100%"
-      padding={padding.extraSmall}
-      sx={{ backgroundColor: color.blue.darkSemiTransparent, ...sx }}
+      sx={{
+        position: "relative",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        p: padding.extraSmall,
+        bgcolor: color.blue.darkSemiTransparent,
+        ...sx,
+      }}
       data-testid="bookmark-list-head"
     >
       <Typography
-        padding={0}
         fontSize={fontSize.info}
         color={fontColor.blue.dark}
         fontWeight={fontWeight.bold}
       >
-        {bookmarkCount
-          ? bookmarkCount === 0
-            ? "Bookmark List"
-            : bookmarkCount === 1
-              ? "1 Bookmark"
-              : `${bookmarkCount} Bookmarks`
-          : "Bookmark List"}
+        {getTitle()}
       </Typography>
       <Button
         sx={{ position: "absolute", right: 0, textTransform: "none" }}
         onClick={onClearAllBookmarks}
+        data-testid="bookmark-list-head-clearall"
       >
-        <Typography
-          fontSize={fontSize.label}
-          color={fontColor.blue.dark}
-          padding={0}
-        >
+        <Typography fontSize={fontSize.label} color={fontColor.blue.dark}>
           Clear
         </Typography>
       </Button>
