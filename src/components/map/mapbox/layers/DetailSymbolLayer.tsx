@@ -97,11 +97,7 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
         const htmlBuilder = new InnerHtmlBuilder()
           .addTitle("Data Records In This Area:")
           .addText("Data Record Count: " + features[0].properties?.count)
-          .addRange(
-            "Time Range",
-            features[0].properties?.startTime,
-            features[0].properties?.endTime
-          );
+          .addText("Year Month: " + features[0].properties?.date);
 
         new Popup()
           .setLngLat(event.lngLat)
