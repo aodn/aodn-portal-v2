@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import Map from "../map/mapbox/Map";
@@ -19,72 +19,65 @@ interface BookmarkListCardProps extends BookmarkListCardType {
   sx?: SxProps;
 }
 
-const mapContainerId = "bookmark-list-map";
-
 const BookmarkListCard: FC<BookmarkListCardProps> = ({
   dataset,
   tabNavigation = () => {},
   sx,
 }) => {
-  const onLinks = () =>
-    tabNavigation(
-      dataset.id,
-      detailPageDefault.DATA_ACCESS,
-      SEARCH_PAGE_REFERER
-    );
-  const onDownload = () =>
-    tabNavigation(dataset.id, detailPageDefault.SUMMARY, SEARCH_PAGE_REFERER);
-  const onDetail = () =>
-    tabNavigation(dataset.id, detailPageDefault.SUMMARY, SEARCH_PAGE_REFERER);
+  const mapContainerId = `bookmark-list-map-${dataset.id}`;
+  const handleNavigation = useCallback(
+    (tab: string) => () => tabNavigation(dataset.id, tab, SEARCH_PAGE_REFERER),
+    [dataset.id, tabNavigation]
+  );
 
   return (
-    <Box flex={1} sx={{ ...sx }}>
+    <Box sx={{ flex: 1, ...sx }}>
       <Stack direction="column" spacing={1}>
         <Box
           arial-label="map"
-          id={`${mapContainerId}-${dataset.id}`}
+          id={mapContainerId}
           sx={{
             width: "100%",
             height: "150px",
           }}
         >
-          <Map panelId={`${mapContainerId}-${dataset.id}`}>
+          <Map panelId={mapContainerId}>
             <Layers>
               <GeojsonLayer collection={dataset} animate={false} />
             </Layers>
           </Map>
         </Box>
 
-        <Box>
-          <ResultCardButtonGroup
-            content={dataset}
-            isGridView
-            onLinks={onLinks}
-            onDownload={dataset.hasSummaryFeature() ? onDownload : undefined}
-            onDetail={onDetail}
-          />
-        </Box>
+        <ResultCardButtonGroup
+          content={dataset}
+          isGridView
+          onLinks={handleNavigation(detailPageDefault.DATA_ACCESS)}
+          onDownload={
+            dataset.hasSummaryFeature()
+              ? handleNavigation(detailPageDefault.SUMMARY)
+              : undefined
+          }
+          onDetail={handleNavigation(detailPageDefault.SUMMARY)}
+        />
 
-        <Box onClick={() => {}}>
-          <Tooltip title="More detail..." placement="top">
-            <Typography
-              color={fontColor.gray.medium}
-              fontSize={fontSize.resultCardContent}
-              sx={{
-                padding: 0,
-                paddingX: padding.small,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: "5",
-                WebkitBoxOrient: "vertical",
-                wordBreak: "break-word",
-              }}
-            >
-              {dataset.description}
-            </Typography>
-          </Tooltip>
-        </Box>
+        <Tooltip title="More detail..." placement="top">
+          <Typography
+            color={fontColor.gray.medium}
+            fontSize={fontSize.resultCardContent}
+            sx={{
+              padding: 0,
+              paddingX: padding.small,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: "5",
+              WebkitBoxOrient: "vertical",
+              wordBreak: "break-word",
+            }}
+          >
+            {dataset.description}
+          </Typography>
+        </Tooltip>
       </Stack>
     </Box>
   );

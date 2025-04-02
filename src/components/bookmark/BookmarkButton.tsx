@@ -22,16 +22,15 @@ import {
 
 export interface BookmarkButtonProps {
   dataset?: OGCCollection;
+  dataTestId?: string;
 }
 
-const BookmarkButton: FC<BookmarkButtonProps> = ({ dataset = undefined }) => {
-  const {
-    items: bookmarkItems,
-    expandedItem: bookmarkExpandedItem,
-    temporaryItem: bookmarkTemporaryItem,
-  } = getBookmarkList(store.getState());
-  const [isBookmarked, setIsBookmarked] = useState<boolean | undefined>(
-    dataset && checkIsBookmarked(store.getState(), dataset.id)
+const BookmarkButton: FC<BookmarkButtonProps> = ({
+  dataset = undefined,
+  dataTestId = dataset ? dataset.id : "bookmarkbutton",
+}) => {
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(() =>
+    dataset ? checkIsBookmarked(store.getState(), dataset.id) : false
   );
 
   const onClickBookmark = useCallback(
@@ -39,80 +38,81 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({ dataset = undefined }) => {
       event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
       item: OGCCollection
     ) => {
+      const { expandedItem, temporaryItem } = getBookmarkList(store.getState());
+
       if (isBookmarked) {
         // If item is already bookmarked, remove it
         store.dispatch(removeItem(item.id));
         // If it's the expanded item, clear the expansion and selected uuid
-        if (bookmarkExpandedItem?.id === item.id) {
+        if (expandedItem?.id === item.id) {
           store.dispatch(setExpandedItem(undefined));
         }
-        setIsBookmarked(false);
       } else {
-        if (bookmarkTemporaryItem && bookmarkTemporaryItem.id === item.id) {
+        if (temporaryItem && temporaryItem.id === item.id) {
           // If bookmark a temporary item, should clear temporaryItem then add to bookmark list
           store.dispatch(setTemporaryItem(undefined));
-          store.dispatch(addItem(item));
-        } else {
-          // Else add to bookmark list
-          store.dispatch(addItem(item));
         }
-        setIsBookmarked(true);
+        store.dispatch(addItem(item));
       }
+      setIsBookmarked(!isBookmarked);
     },
-    [isBookmarked, bookmarkTemporaryItem, bookmarkExpandedItem]
+    [isBookmarked]
   );
 
   useEffect(() => {
-    if (dataset && bookmarkItems) {
-      setIsBookmarked(checkIsBookmarked(store.getState(), dataset.id));
-    }
-  }, [bookmarkItems, dataset]);
-
-  useEffect(() => {
     const handler = (event: BookmarkEvent) => {
-      if (event.id === dataset?.id) {
-        if (event.action === EVENT_BOOKMARK.ADD) {
-          setIsBookmarked(true);
-        } else if (event.action === EVENT_BOOKMARK.REMOVE)
-          setIsBookmarked(false);
+      if (
+        event.id === dataset?.id ||
+        event.action === EVENT_BOOKMARK.REMOVE_ALL
+      ) {
+        setIsBookmarked(event.action === EVENT_BOOKMARK.ADD);
       }
     };
 
     on(EVENT_BOOKMARK.ADD, handler);
     on(EVENT_BOOKMARK.REMOVE, handler);
+    on(EVENT_BOOKMARK.REMOVE_ALL, handler);
 
     return () => {
       off(EVENT_BOOKMARK.ADD, handler);
       off(EVENT_BOOKMARK.REMOVE, handler);
+      off(EVENT_BOOKMARK.REMOVE_ALL, handler);
     };
   }, [dataset?.id]);
 
   return (
-    <Tooltip
-      title={isBookmarked ? "Remove bookmark" : "Add bookmark"}
-      placement="top"
-    >
-      <IconButton
-        onClick={(event) => dataset && onClickBookmark(event, dataset)}
-        sx={{
-          padding: gap.sm,
-          ":hover": {
-            scale: "105%",
-          },
-        }}
+    dataset && (
+      <Tooltip
+        title={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+        placement="top"
       >
-        {isBookmarked ? (
-          <BookmarkIcon sx={{ color: color.brightBlue.dark }} />
-        ) : (
-          <BookmarkBorderIcon
-            sx={{
-              color: color.brightBlue.dark,
-              fontSize: "26px",
-            }}
-          />
-        )}
-      </IconButton>
-    </Tooltip>
+        <IconButton
+          onClick={(event) => onClickBookmark(event, dataset)}
+          sx={{
+            padding: gap.sm,
+            ":hover": {
+              scale: "105%",
+            },
+          }}
+          data-testid={`${dataTestId}-iconbutton`}
+        >
+          {isBookmarked ? (
+            <BookmarkIcon
+              sx={{ color: color.brightBlue.dark }}
+              data-testid={`${dataTestId}-bookmarkicon`}
+            />
+          ) : (
+            <BookmarkBorderIcon
+              sx={{
+                color: color.brightBlue.dark,
+                fontSize: "26px",
+              }}
+              data-testid={`${dataTestId}-bookmarkbordericon`}
+            />
+          )}
+        </IconButton>
+      </Tooltip>
+    )
   );
 };
 
