@@ -27,7 +27,7 @@ export interface BookmarkButtonProps {
 
 const BookmarkButton: FC<BookmarkButtonProps> = ({
   dataset = undefined,
-  dataTestId = "bookmarkbutton",
+  dataTestId = dataset ? dataset.id : "bookmarkbutton",
 }) => {
   const [isBookmarked, setIsBookmarked] = useState<boolean>(() =>
     dataset ? checkIsBookmarked(store.getState(), dataset.id) : false

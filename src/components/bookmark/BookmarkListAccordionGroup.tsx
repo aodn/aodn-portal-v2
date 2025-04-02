@@ -47,9 +47,9 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     return temporaryItem ? [temporaryItem, ...items] : items;
   });
 
-  const [_, setBookmarkTemporaryItem] = useState<OGCCollection | undefined>(
-    state.temporaryItem
-  );
+  const [bookmarkTemporaryItem, setBookmarkTemporaryItem] = useState<
+    OGCCollection | undefined
+  >(state.temporaryItem);
 
   const [bookmarkExpandedItem, setBookmarkExpandedItem] = useState<
     OGCCollection | undefined
@@ -161,7 +161,9 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     <>
       {!hideHead && (
         <BookmarkListHead
-          bookmarkCount={items?.length}
+          bookmarkCount={
+            bookmarkTemporaryItem ? items?.length - 1 : items?.length
+          }
           onClearAllBookmarks={onClearAllBookmarks}
         />
       )}

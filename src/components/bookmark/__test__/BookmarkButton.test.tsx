@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { vi, beforeEach, describe, expect } from "vitest";
+import { vi, beforeEach, describe, expect, afterAll } from "vitest";
 import store from "../../common/store/store";
 import { removeAllItems } from "../../common/store/bookmarkListReducer";
 import { OGCCollection } from "../../common/store/OGCCollectionDefinitions";
@@ -37,6 +37,10 @@ describe("BookmarkButton", () => {
   // Clear bookmark store value
   beforeEach(() => {
     store.dispatch(removeAllItems());
+  });
+
+  afterAll(() => {
+    vi.restoreAllMocks();
   });
 
   it("Bookmark click and store update correct", () => {

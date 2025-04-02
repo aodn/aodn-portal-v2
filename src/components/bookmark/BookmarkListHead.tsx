@@ -22,7 +22,7 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
     if (bookmarkCount === undefined || bookmarkCount === 0) {
       return "Bookmark List";
     }
-    return `${bookmarkCount} Bookmarks`;
+    return `${bookmarkCount} Bookmark(s)`;
   }, [bookmarkCount]);
 
   return (
@@ -49,6 +49,7 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
       <Button
         sx={{ position: "absolute", right: 0, textTransform: "none" }}
         onClick={onClearAllBookmarks}
+        data-testid="bookmark-list-head-clearall"
       >
         <Typography fontSize={fontSize.label} color={fontColor.blue.dark}>
           Clear
