@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback } from "react";
 import StyledResultCardButton from "./StyledResultCardButton";
 import TaskAltSharpIcon from "@mui/icons-material/TaskAltSharp";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
@@ -7,9 +7,9 @@ import { useTheme } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 
 interface DynamicResultCardButtonProps {
-  status?: string;
+  status?: "unknown" | "onGoing" | "completed";
   onClick: () => void;
-  isbordered?: string;
+  isBordered?: string;
 }
 
 interface ToolKit {
@@ -17,58 +17,49 @@ interface ToolKit {
   color: string;
   icon: React.ReactNode;
 }
+
 // currently only the data status button is dynamic. Please refactor if other buttons are dynamic
 const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
   status = "unknown",
   onClick,
-  isbordered = "true",
+  isBordered = "true",
 }) => {
   const theme = useTheme();
 
-  const onGoingKit: ToolKit = useMemo(
-    () => ({
-      text: "On Going",
-      color: theme.palette.success.main,
-      icon: <DoubleArrowIcon />,
-    }),
+  const tk = useCallback(
+    (status: string | undefined): ToolKit => {
+      const STATUS_MAP: Record<string, ToolKit> = {
+        onGoing: {
+          text: "On Going",
+          color: theme.palette.success.main,
+          icon: <DoubleArrowIcon />,
+        },
+        completed: {
+          text: "Completed",
+          color: theme.palette.primary.light,
+          icon: <TaskAltSharpIcon />,
+        },
+        unknown: {
+          text: "No Status",
+          color: alpha(theme.palette.info.dark, 0.8),
+          icon: <QuestionMarkIcon />,
+        },
+      };
+      return STATUS_MAP[status ? status : "unknown"];
+    },
     [theme]
   );
-
-  const completedKit: ToolKit = useMemo(
-    () => ({
-      text: "Completed",
-      color: theme.palette.primary.light,
-      icon: <TaskAltSharpIcon />,
-    }),
-    [theme]
-  );
-
-  const unknownKit: ToolKit = useMemo(
-    () => ({
-      text: "No Status",
-      color: alpha(theme.palette.info.dark, 0.8),
-      icon: <QuestionMarkIcon />,
-    }),
-    [theme]
-  );
-
-  let toolKit: ToolKit = unknownKit;
-  if (status?.toLowerCase().trim() === "ongoing") {
-    toolKit = onGoingKit;
-  } else if (status?.toLowerCase().trim() === "completed") {
-    toolKit = completedKit;
-  }
 
   return (
     <StyledResultCardButton
       size="small"
-      startIcon={toolKit.icon}
+      startIcon={tk(status).icon}
       onClick={onClick}
       disabled={onClick === undefined}
-      determinedcolor={toolKit.color}
-      isbordered={isbordered}
+      determinedcolor={tk(status).color}
+      isbordered={isBordered}
     >
-      {toolKit.text}
+      {tk(status).text}
     </StyledResultCardButton>
   );
 };

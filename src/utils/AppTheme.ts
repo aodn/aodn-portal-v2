@@ -28,7 +28,7 @@ declare module "@mui/material/styles" {
 
   interface ThemeOptions {
     border?: {
-      none?: string;
+      nil?: string;
       detailBtnLight?: string;
       detailSubtabBtn?: string;
       detailNa?: string;
@@ -132,7 +132,7 @@ const theme: ThemeOptions = {
   },
 
   border: {
-    none: "none",
+    nil: "none",
     detailBtnLight: "0.9px solid var(--Brand---secondary, #54BCEB)",
     detailSubtabBtn: " 1px solid var(--brand_dark-blue_80, #618CA5)",
     detailNa: "2px solid #52BDEC",
