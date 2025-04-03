@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { Box, Button, useTheme } from "@mui/material";
 import { color } from "../../../styles/constants";
 
@@ -9,36 +9,36 @@ interface DetailSubtabProps {
   isBordered: boolean;
 }
 
-const DetailSubtabBtn: React.FC<DetailSubtabProps> = ({
+const DetailSubtabBtn: FC<DetailSubtabProps> = ({
   id,
   title,
   onClick,
   isBordered,
 }) => {
   const theme = useTheme();
-
   const border = isBordered ? theme.border.detailSubtabBtn : theme.border.nil;
+
   return (
     <Box
-      display="flex"
-      justifyContent="flex-start"
       sx={{
+        display: "flex",
+        justifyContent: "flex-start",
         height: "45px",
         width: "160px",
-        marginX: theme.mp.lg,
+        mx: theme.mp.lg,
       }}
     >
       <Button
         id={id}
+        data-testid={id}
         sx={{
           width: "100%",
           border: border,
           "&:hover": {
             border: border,
-            backgroundColor: color.white.sixTenTransparent,
+            bgcolor: color.white.sixTenTransparent,
           },
           borderRadius: theme.borderRadius.sm,
-          justifyContent: "center",
           textAlign: "center",
           backgroundColor: "#fff",
         }}
