@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import DetailSubtabBtn from "../DetailSubtabBtn";
+import AppTheme from "../../../../utils/AppTheme";
+import { ThemeProvider } from "@mui/material/styles";
 
-describe("DetailSubtabBtn", () => {
+describe("DetailSubTabBtn", () => {
   const defaultProps = {
-    title: "Test Subtab",
+    id: "test",
+    title: "Test SubTab",
     onClick: vi.fn(),
     isBordered: false,
   };
@@ -14,29 +17,21 @@ describe("DetailSubtabBtn", () => {
   });
 
   it("renders correctly with default props", () => {
-    // render(
-    //   <DetailSubtabBtn {...defaultProps} id={"test"} title={"Test SubTab"} />
-    // );
-    //
-    // const box = screen.getByRole("box");
-    // expect(box).toBeInTheDocument();
-    // expect(box).toHaveStyle({
-    //   display: "flex",
-    //   justifyContent: "flex-start",
-    //   height: "45px",
-    //   width: "160px",
-    //   mx: "15px",
-    // });
-    //
-    // const button = screen.getByTestId("test");
-    // expect(button).toBeInTheDocument();
-    // expect(button).toHaveTextContent("Test SubTab");
-    // expect(button).toHaveStyle({
-    //   width: "100%",
-    //   border: "none", // theme.border.nil
-    //   borderRadius: "4px", // theme.borderRadius.sm
-    //   backgroundColor: "#fff",
-    //   textAlign: "center",
-    // });
+    render(
+      <ThemeProvider theme={AppTheme}>
+        <DetailSubtabBtn {...defaultProps} />
+      </ThemeProvider>
+    );
+
+    const button = screen.getByTestId("test");
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveTextContent("Test SubTab");
+    expect(button).toHaveStyle({
+      width: "100%",
+      backgroundColor: "#fff",
+      textAlign: "center",
+      border: "none", // theme.border.nil
+      borderRadius: "5px", // theme.borderRadius.sm
+    });
   });
 });
