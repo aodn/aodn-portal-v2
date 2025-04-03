@@ -29,7 +29,7 @@ const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
   const tk = useCallback(
     (status: string | undefined): ToolKit => {
       const STATUS_MAP: Record<string, ToolKit> = {
-        ongoing: {
+        onGoing: {
           text: "On Going",
           color: theme.palette.success.main,
           icon: <DoubleArrowIcon />,
@@ -45,7 +45,7 @@ const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
           icon: <QuestionMarkIcon />,
         },
       };
-      return STATUS_MAP[status ? status.toLowerCase().trim() : "unknown"];
+      return STATUS_MAP[status ? status : "unknown"];
     },
     [theme]
   );
