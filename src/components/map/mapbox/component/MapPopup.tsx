@@ -168,17 +168,21 @@ const MapPopup: React.FC<MapPopupProps> = ({ layerId, tabNavigation }) => {
           })
         );
 
-        // Set the popup's position and content, then add it to the map
-        // subscribe to close event to clean up resource.
-        popup
-          .setLngLat(coordinates as [number, number])
-          .setDOMContent(container)
-          .addTo(map);
-
         const uuid = feature.properties?.uuid as string;
-        getCollectionData(uuid).then((collection) => {
-          root.render(renderContentBox(collection, onPopupMouseLeave));
-        });
+        getCollectionData(uuid)
+          .then((collection) => {
+            root.render(renderContentBox(collection, onPopupMouseLeave));
+          })
+          .then(() => {
+            // Set the popup's position and content, then add it to the map
+            // subscribe to close event to clean up resource.
+            // Must show popup after data load, so that the position
+            // calculate correctly
+            popup
+              .setLngLat(coordinates as [number, number])
+              .setDOMContent(container)
+              .addTo(map);
+          });
       }
     };
 
