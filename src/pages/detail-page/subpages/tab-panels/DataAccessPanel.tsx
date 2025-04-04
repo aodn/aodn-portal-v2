@@ -1,7 +1,7 @@
+import { FC, useCallback, useMemo } from "react";
 import { Typography } from "@mui/material";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import LinkCard from "../../../../components/list/listItem/subitem/LinkCard";
-import React, { FC, useCallback, useMemo } from "react";
 import { MODE } from "../../../../components/list/CommonDef";
 import NaList from "../../../../components/list/NaList";
 import { ILink } from "../../../../components/common/store/OGCCollectionDefinitions";
@@ -59,13 +59,8 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                 {!item || item.length === 0 ? (
                   <NaList title={title ? title : ""} />
                 ) : (
-                  item.map((link: ILink, index: number) => (
-                    <LinkCard
-                      key={index}
-                      index={index}
-                      link={link}
-                      icon={false}
-                    />
+                  item.map((link: ILink) => (
+                    <LinkCard key={link.href} link={link} icon={false} />
                   ))
                 )}
               </Typography>

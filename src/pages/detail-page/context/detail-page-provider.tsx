@@ -16,6 +16,7 @@ import {
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import useCopyToClipboard from "../../../hooks/useCopyToClipboard";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -26,6 +27,16 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
 }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
+
+  const { copyToClipboard } = useCopyToClipboard();
+  const [clipboardText, setClipBoardText] = useState<string | undefined>(
+    undefined
+  );
+  const handleCopyToClipboard = (text: string) => {
+    setClipBoardText(text);
+    copyToClipboard(text);
+  };
+
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
@@ -126,6 +137,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setPhotoSelected,
         hasSnapshotsFinished,
         setHasSnapshotsFinished,
+        clipboardText,
+        handleCopyToClipboard,
       }}
     >
       {children}
