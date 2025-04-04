@@ -27,7 +27,7 @@ interface DateSliderProps {
   ) => void;
 }
 
-interface DateRangeControlProps extends ControlProps {
+interface DateRangeProps extends ControlProps {
   minDate: string;
   maxDate: string;
   getAndSetDownloadConditions: (
@@ -131,7 +131,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
 
 const MENU_ID = "daterange-show-hide-menu-button";
 
-const DateRange: React.FC<DateRangeControlProps> = ({
+const DateRange: React.FC<DateRangeProps> = ({
   minDate,
   maxDate,
   getAndSetDownloadConditions,
