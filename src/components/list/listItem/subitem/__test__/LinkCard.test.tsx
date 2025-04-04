@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import LinkCard from "../LinkCard";
 import { ILink } from "../../../../common/store/OGCCollectionDefinitions";
@@ -52,22 +52,27 @@ describe("LinkCard", () => {
 
     const user = userEvent.setup();
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
-    const copyButtonContainer = screen.getByTestId(
-      `copylinkbutton-container-${mockLink.href}`
-    );
-
-    expect(copyButtonContainer).toHaveStyle("visibility: hidden");
 
     // Hover on the card
     await user.hover(linkCard);
-    expect(copyButtonContainer).toHaveStyle("visibility: visible");
+    await waitFor(() => {
+      const copyButton = screen.queryByTestId(
+        `copylinkbutton-${mockLink.href}`
+      );
+      expect(copyButton).toBeInTheDocument();
+    });
 
     // Mouse leave
     await user.unhover(linkCard);
-    expect(copyButtonContainer).toHaveStyle("visibility: hidden");
+    await waitFor(() => {
+      const copyButton = screen.queryByTestId(
+        `copylinkbutton-${mockLink.href}`
+      );
+      expect(copyButton).not.toBeInTheDocument();
+    });
   });
 
-  it("shows copy button when link has been copied", () => {
+  it("shows copy button when link has been copied", async () => {
     vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
       clipboardText: mockLink.href,
       handleCopyToClipboard: mockHandleCopyToClipboard,
@@ -75,11 +80,13 @@ describe("LinkCard", () => {
 
     render(<LinkCard link={mockLink} />);
 
-    const copyButtonContainer = screen.getByTestId(
-      `copylinkbutton-container-${mockLink.href}`
-    );
-
-    expect(copyButtonContainer).toHaveStyle("visibility: visible");
+    // Wait for the button to be visible when clipboardText matches link.href
+    await waitFor(() => {
+      const copyButton = screen.queryByTestId(
+        `copylinkbutton-${mockLink.href}`
+      );
+      expect(copyButton).toBeInTheDocument();
+    });
   });
 
   it("calls openInNewTab when link is clicked", async () => {
@@ -88,8 +95,9 @@ describe("LinkCard", () => {
     const user = userEvent.setup();
     const link = screen.getByText("Test Link Title");
     await user.click(link);
-
-    expect(LinkUtils.openInNewTab).toHaveBeenCalledWith(mockLink.href);
+    await waitFor(() => {
+      expect(LinkUtils.openInNewTab).toHaveBeenCalledWith(mockLink.href);
+    });
   });
 
   it("calls handleCopyToClipboard with correct URL when copy button is clicked", async () => {
@@ -98,10 +106,17 @@ describe("LinkCard", () => {
     const user = userEvent.setup();
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
     await user.hover(linkCard);
+    await waitFor(() => {
+      const copyButton = screen.queryByTestId(
+        `copylinkbutton-${mockLink.href}`
+      );
+      expect(copyButton).toBeInTheDocument();
+    });
 
     const copyButton = screen.getByTestId(`copylinkbutton-${mockLink.href}`);
     await user.click(copyButton);
-
-    expect(mockHandleCopyToClipboard).toHaveBeenCalledWith(mockLink.href);
+    await waitFor(() => {
+      expect(mockHandleCopyToClipboard).toHaveBeenCalledWith(mockLink.href);
+    });
   });
 });

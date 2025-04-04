@@ -1,10 +1,9 @@
 import { FC } from "react";
-import { Button, Typography } from "@mui/material";
+import { Button, SxProps, Typography } from "@mui/material";
 import {
   border,
   borderRadius,
   color,
-  fontColor,
   fontSize,
   padding,
 } from "../../../styles/constants";
@@ -15,27 +14,29 @@ interface CopyLinkButtonProps {
   handleClick: (copyUrl: string) => void;
   hasBeenCopied?: boolean;
   copyUrl: string;
+  sx?: SxProps;
 }
 
 const CopyLinkButton: FC<CopyLinkButtonProps> = ({
   handleClick,
   hasBeenCopied = false,
   copyUrl,
+  sx,
 }) => {
   return (
     <Button
       onClick={() => handleClick(copyUrl)}
       data-testid={`copylinkbutton-${copyUrl}`}
       sx={{
-        position: "relative",
-        px: padding.extraLarge,
+        px: padding.medium,
         borderRadius: borderRadius.small,
-        bgcolor: hasBeenCopied ? color.blue.light : "#fff",
-        border: `${border.sm} ${color.blue.darkSemiTransparent}`,
+        bgcolor: "#fff",
+        border: `${border.xs} ${color.blue.darkSemiTransparent}`,
         "&:hover": {
-          border: `${border.sm} ${color.blue.dark}`,
-          backgroundColor: hasBeenCopied ? "transparent" : "#fff",
+          border: `${border.xs} ${color.blue.darkSemiTransparent}`,
+          backgroundColor: "#fff",
         },
+        ...sx,
       }}
     >
       {hasBeenCopied ? (
@@ -44,11 +45,11 @@ const CopyLinkButton: FC<CopyLinkButtonProps> = ({
         <ContentCopy fontSize="small" color="primary" />
       )}
       <Typography
-        sx={{ padding: 0 }}
+        sx={{ padding: 0, paddingLeft: padding.small }}
         fontSize={fontSize.label}
-        color={hasBeenCopied ? color.blue.dark : fontColor.gray.dark}
+        color={color.blue.dark}
       >
-        Copy Link
+        {hasBeenCopied ? "Link Copied" : "Copy Link"}
       </Typography>
     </Button>
   );
