@@ -9,7 +9,7 @@ import { alpha } from "@mui/material/styles";
 interface DynamicResultCardButtonProps {
   status?: "unknown" | "onGoing" | "completed";
   onClick: () => void;
-  isBordered?: string;
+  isBordered?: boolean;
 }
 
 interface ToolKit {
@@ -22,7 +22,7 @@ interface ToolKit {
 const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
   status = "unknown",
   onClick,
-  isBordered = "true",
+  isBordered = true,
 }) => {
   const theme = useTheme();
 
