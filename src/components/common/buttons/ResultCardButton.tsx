@@ -1,4 +1,4 @@
-import { ElementType, FC, isValidElement } from "react";
+import { ElementType, FC, isValidElement, ReactNode } from "react";
 import { Button, SxProps, Tooltip, Typography } from "@mui/material";
 import { color, padding } from "../../../styles/constants";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
@@ -14,15 +14,21 @@ export interface ResultCardButtonConfig {
 
 interface ResultCardButtonProps {
   onClick?: () => void;
-  startIcon?: ElementType;
+  startIcon?: ElementType | ReactNode;
   text?: string | null;
   resultCardButtonConfig?: ResultCardButtonConfig;
   sx?: SxProps;
   shouldHideText?: boolean;
-  disable?: boolean;
+  disabled?: boolean;
 }
 
-const defaultResultCardButtonConfig: ResultCardButtonConfig = {
+// Memoize font sizes for performance
+const fontSizes = {
+  [ResultCardButtonSize.SMALL]: { icon: "14px", text: "12px" },
+  [ResultCardButtonSize.MEDIUM]: { icon: "18px", text: "14px" },
+};
+
+const defaultConfig: ResultCardButtonConfig = {
   color: color.blue.dark,
   size: ResultCardButtonSize.SMALL,
 };
@@ -34,44 +40,47 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   resultCardButtonConfig,
   sx,
   shouldHideText = false,
-  disable = false,
+  disabled = false,
 }) => {
+  const config = mergeWithDefaults(defaultConfig, resultCardButtonConfig);
+  const size = config.size ?? ResultCardButtonSize.SMALL; // Fallback for safety
+  const hasText = text && !shouldHideText;
   const IconComponent = startIcon as ElementType;
-  const config = mergeWithDefaults(
-    defaultResultCardButtonConfig,
-    resultCardButtonConfig
-  );
 
   return (
     <Button
       onClick={onClick}
-      disabled={disable}
+      disabled={disabled}
       sx={{
         padding: padding.extraSmall,
         textTransform: "none",
-        opacity: disable ? 0.5 : 1,
+        opacity: disabled ? 0.5 : 1,
+        minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
         ...sx,
       }}
     >
-      {isValidElement(startIcon) ? (
-        startIcon
-      ) : (
-        <Tooltip title={text} placement="top">
-          <IconComponent
-            sx={{
-              color: config.color,
-              fontSize: config.size === "small" ? "14px" : "18px",
-            }}
-          />
-        </Tooltip>
-      )}
+      {startIcon &&
+        (isValidElement(startIcon) ? (
+          startIcon
+        ) : (
+          <Tooltip title={text || ""} placement="top">
+            {
+              // Need span to allow tooltip forwardRef()
+            }
+            <span>
+              <IconComponent
+                sx={{ color: config.color, fontSize: fontSizes[size].icon }}
+              />
+            </span>
+          </Tooltip>
+        ))}
 
-      {text && !shouldHideText && (
+      {hasText && (
         <Typography
-          padding={0}
           pl={padding.extraSmall}
-          fontSize={config.size === "small" ? "12px" : "14px"}
+          fontSize={fontSizes[size].text}
           color={config.color}
+          sx={{ padding: 0 }} // Inline to avoid unnecessary object creation
         >
           {text}
         </Typography>
