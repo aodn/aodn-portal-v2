@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page
 
 from pages.base_page import BasePage
 
@@ -16,7 +16,3 @@ class DataAccessTab(BasePage):
 
         # sections
         self.data_access_options = self.get_button(self.DATA_ACCESS_OPTIONS)
-
-        # other
-        self.link_cards = page.get_by_test_id('links-card')
-        self.copy_link_button = self.get_button('Copy Link')

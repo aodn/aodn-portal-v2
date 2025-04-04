@@ -1,6 +1,7 @@
-import { Dispatch, FC, SetStateAction, useState } from "react";
-import { ILink as LinkType } from "../../../common/store/OGCCollectionDefinitions";
+import { FC, useMemo, useState } from "react";
 import { Box, Grid, Link, Typography } from "@mui/material";
+import { ILink as LinkType } from "../../../common/store/OGCCollectionDefinitions";
+import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
 import { color, fontColor, padding } from "../../../../styles/constants";
 import CopyLinkButton from "../../../common/buttons/CopyLinkButton";
 import { openInNewTab } from "../../../../utils/LinkUtils";
@@ -8,30 +9,24 @@ import { openInNewTab } from "../../../../utils/LinkUtils";
 interface LinkCardProps {
   icon?: boolean;
   link: LinkType;
-  index: number;
-  clickedCopyLinkButtonIndex?: number[];
-  setClickedCopyLinkButtonIndex?: Dispatch<SetStateAction<number[]>>;
 }
 
-const LinkCard: FC<LinkCardProps> = ({
-  icon = true,
-  link,
-  index,
-  clickedCopyLinkButtonIndex,
-  setClickedCopyLinkButtonIndex,
-}) => {
-  const [isShowCopyLinkButton, setShowCopyLinkButton] =
-    useState<boolean>(false);
-  const hasBeenCopied = clickedCopyLinkButtonIndex?.includes(index);
+const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
+  const [hoverOnContainer, setHoverOnContainer] = useState<boolean>(false);
+  const { clipboardText, handleCopyToClipboard } = useDetailPageContext();
+  const hasBeenCopied = useMemo(
+    () => link.href === clipboardText,
+    [clipboardText, link.href]
+  );
+  const showCopyButton = useMemo(
+    () => hasBeenCopied || hoverOnContainer,
+    [hasBeenCopied, hoverOnContainer]
+  );
 
   return (
     <Box
-      onMouseEnter={() =>
-        setClickedCopyLinkButtonIndex && setShowCopyLinkButton(true)
-      }
-      onMouseLeave={() =>
-        setClickedCopyLinkButtonIndex && setShowCopyLinkButton(false)
-      }
+      onMouseEnter={() => setHoverOnContainer(true)}
+      onMouseLeave={() => setHoverOnContainer(false)}
       sx={{
         backgroundColor: "transparent",
         padding: padding.small,
@@ -39,10 +34,10 @@ const LinkCard: FC<LinkCardProps> = ({
           backgroundColor: color.blue.light,
         },
       }}
-      data-testid="links-card"
+      data-testid={`link-card-${link.href}`}
     >
       <Grid container>
-        <Grid item xs={setClickedCopyLinkButtonIndex ? 10 : 12}>
+        <Grid item xs={showCopyButton ? 10 : 12}>
           <Grid container spacing={1} aria-label="link and title">
             {icon && link.getIcon && (
               <Grid
@@ -91,22 +86,20 @@ const LinkCard: FC<LinkCardProps> = ({
             </Grid>
           </Grid>
         </Grid>
-        {setClickedCopyLinkButtonIndex && (
-          <Grid item xs={2}>
-            <Box
-              sx={{
-                visibility:
-                  isShowCopyLinkButton || hasBeenCopied ? "visible" : "hidden",
-              }}
-            >
-              <CopyLinkButton
-                index={index}
-                setClickedCopyLinkButtonIndex={setClickedCopyLinkButtonIndex}
-                copyUrl={link.href}
-              />
-            </Box>
-          </Grid>
-        )}
+        <Grid item xs={showCopyButton ? 2 : 0}>
+          <Box
+            sx={{
+              visibility: showCopyButton ? "visible" : "hidden",
+            }}
+            data-testid={`copylinkbutton-container-${link.href}`}
+          >
+            <CopyLinkButton
+              handleClick={handleCopyToClipboard}
+              hasBeenCopied={hasBeenCopied}
+              copyUrl={link.href}
+            />
+          </Box>
+        </Grid>
       </Grid>
     </Box>
   );

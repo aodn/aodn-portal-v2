@@ -18,7 +18,6 @@ import OrganizationLogo from "../../../components/logo/OrganizationLogo";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import useRedirectHome from "../../../hooks/useRedirectHome";
-import useCopyToClipboard from "../../../hooks/useCopyToClipboard";
 import { SEARCH_PAGE_REFERER } from "../../search-page/constants";
 import {
   border,
@@ -208,8 +207,8 @@ const renderSubTitle = (
 const HeaderSection = () => {
   const location = useLocation();
   const { isUnderLaptop, isMobile } = useBreakpoint();
-  const { collection } = useDetailPageContext();
-  const { isCopied, copyToClipboard, resetCopyState } = useCopyToClipboard();
+  const { collection, clipboardText, handleCopyToClipboard } =
+    useDetailPageContext();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
@@ -232,15 +231,16 @@ const HeaderSection = () => {
     () => [
       {
         name: "Copy Link",
-        icon: isCopied ? (
-          <DoneAllIcon fontSize="small" color="primary" />
-        ) : (
-          <ContentCopy fontSize="small" color="primary" />
-        ),
-        handler: () => copyToClipboard(copyUrl),
+        icon:
+          clipboardText === copyUrl ? (
+            <DoneAllIcon fontSize="small" color="primary" />
+          ) : (
+            <ContentCopy fontSize="small" color="primary" />
+          ),
+        handler: () => handleCopyToClipboard(copyUrl),
       },
     ],
-    [copyToClipboard, copyUrl, isCopied]
+    [clipboardText, copyUrl, handleCopyToClipboard]
   );
 
   const onGoBack = useCallback(
@@ -338,11 +338,7 @@ const HeaderSection = () => {
       <Box display="flex" flexDirection="column" gap={1}>
         {isUnderLaptop && renderGoBackButton(() => onGoBack(referer), referer)}
         <HeaderButton>
-          <ShareButtonMenu
-            menuItems={shareItems}
-            hideText={isMobile}
-            onClose={resetCopyState}
-          />
+          <ShareButtonMenu menuItems={shareItems} hideText={isMobile} />
         </HeaderButton>
       </Box>
     </Box>

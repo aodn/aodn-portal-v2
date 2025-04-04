@@ -29,9 +29,9 @@ def test_links_sections(
     data_access = detail_page.tabs.data_access
     data_access.tab.click()
 
-    link_card = data_access.link_cards.first
+    link_card = responsive_page.get_by_test_id(f"link-card-{link_href}")
     link_card.hover()
-    expect(data_access.copy_link_button).to_be_visible()
+    expect(responsive_page.get_by_test_id(f"copylinkbutton-{link_href}")).to_be_visible()
 
     link = link_card.get_by_role('link', name=link_title)
     expect(link).to_be_visible()
