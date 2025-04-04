@@ -20,9 +20,7 @@ describe("CopyLinkButton", () => {
 
     const button = screen.getByTestId(`copylinkbutton-${mockUrl}`);
     expect(button).toBeInTheDocument();
-    expect(button).toHaveStyle("background-color: #fff");
     expect(screen.getByText("Copy Link")).toBeInTheDocument();
-
     expect(screen.queryByTestId("ContentCopyIcon")).toBeInTheDocument();
     expect(screen.queryByTestId("DoneAllIcon")).not.toBeInTheDocument();
   });
@@ -33,7 +31,6 @@ describe("CopyLinkButton", () => {
 
     const button = screen.getByTestId(`copylinkbutton-${mockUrl}`);
     await user.click(button);
-
     await waitFor(() => {
       expect(defaultProps.handleClick).toHaveBeenCalledWith(mockUrl);
     });

@@ -106,14 +106,9 @@ describe("LinkCard", () => {
     const user = userEvent.setup();
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
     await user.hover(linkCard);
-    await waitFor(() => {
-      const copyButton = screen.queryByTestId(
-        `copylinkbutton-${mockLink.href}`
-      );
-      expect(copyButton).toBeInTheDocument();
-    });
-
-    const copyButton = screen.getByTestId(`copylinkbutton-${mockLink.href}`);
+    const copyButton = await screen.findByTestId(
+      `copylinkbutton-${mockLink.href}`
+    );
     await user.click(copyButton);
     await waitFor(() => {
       expect(mockHandleCopyToClipboard).toHaveBeenCalledWith(mockLink.href);
