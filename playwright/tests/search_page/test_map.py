@@ -66,7 +66,6 @@ def test_map_datapoint_hover_and_click(
     expect(search_page.first_result_title).to_have_text(title)
 
 
-@pytest.mark.skip("Skip as local test run ok, need fix")
 @pytest.mark.parametrize(
     'search_text, updated_search_text',
     [
@@ -94,7 +93,7 @@ def test_map_updates_on_search_change(
     )
     search_page.search.fill_search_text(updated_search_text)
     search_page.search.click_search_button()
-    search_page.wait_for_timeout(500)
+    search_page.wait_for_timeout(1000)
     updated_map_layers = search_page.map.get_map_layers()
 
     assert map_layers != updated_map_layers
