@@ -35,7 +35,7 @@ interface MapSectionProps
     Partial<LayerBasicType>,
     BookmarkListMenuBasicType,
     ToggleControlProps {
-  showFullMap: boolean;
+  isFullMap: boolean;
   showFullList: boolean;
   collections: OGCCollection[];
   sx?: SxProps<Theme>;
@@ -54,7 +54,7 @@ enum LayerName {
 }
 const MapSection: React.FC<MapSectionProps> = ({
   showFullList,
-  showFullMap,
+  isFullMap,
   bbox,
   zoom,
   onMapZoomOrMove,
@@ -137,7 +137,7 @@ const MapSection: React.FC<MapSectionProps> = ({
         <Controls>
           <ToggleControl
             onToggleClicked={onToggleClicked}
-            showFullMap={showFullMap}
+            isFullMap={isFullMap}
           />
           <NavigationControl visible={!isUnderLaptop} />
           <ScaleControl />
