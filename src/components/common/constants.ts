@@ -4,6 +4,7 @@ const dateDefault = {
   DATE_FORMAT: "YYYY-MM-DD",
   DISPLAY_FORMAT: "DD/MM/YYYY",
   SIMPLE_DATE_FORMAT: "MM-YYYY",
+  YEAR_MONTH_DATE_FORMAT: "YYYY-MM",
   min: new Date("01/01/1970"),
   max: new Date(),
 };
