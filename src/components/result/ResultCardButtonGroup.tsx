@@ -114,7 +114,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
             shouldHideText={shouldHideText}
             onClick={onLinks}
             resultCardButtonConfig={resultCardButtonConfig}
-            disable={links.length === 0}
+            disabled={links.length === 0}
           />
         )}
       </ButtonContainer>
@@ -123,7 +123,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={DownloadIcon}
           text="Download"
           shouldHideText={shouldHideText}
-          disable={onDownload === undefined}
+          disabled={onDownload === undefined}
           onClick={onDownload}
           resultCardButtonConfig={resultCardButtonConfig}
         />
@@ -133,7 +133,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
           startIcon={InfoIcon}
           text="More details"
           shouldHideText={shouldHideText}
-          disable={onDetail === undefined}
+          disabled={onDetail === undefined}
           onClick={onDetail}
           resultCardButtonConfig={resultCardButtonConfig}
         />
