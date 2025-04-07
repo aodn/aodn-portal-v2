@@ -11,6 +11,7 @@ import {
   Feature,
   Point,
   MultiPoint,
+  BBox,
 } from "geojson";
 import { MapMouseEvent, Popup, GeoJSONSource } from "mapbox-gl";
 import {
@@ -23,7 +24,13 @@ import MapContext from "../MapContext";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { MapDefaultConfig } from "../constants";
-import { bbox, hexGrid, pointsWithinPolygon } from "@turf/turf";
+import {
+  bbox,
+  hexGrid,
+  pointsWithinPolygon,
+  featureCollection,
+} from "@turf/turf";
+import _ from "lodash";
 
 interface DetailClusterSize {
   default?: number | string;
@@ -73,70 +80,46 @@ const config: DetailClusterConfig = {
   clusterCircleTextSize: 12,
 };
 
-// Sample input FeatureCollection
-const pointFeatureCollection: FeatureCollection<Point> = {
-  type: "FeatureCollection",
-  features: [
-    {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [143.7, -18.8],
-      },
-      properties: {
-        date: "2021-01",
-        count: 45,
-      },
-    },
-    {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [145.7, -38.8],
-      },
-      properties: {
-        date: "2021-02",
-        count: 30,
-      },
-    },
-    {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [158.4, -38.1],
-      },
-      properties: {
-        date: "2021-03",
-        count: 15,
-      },
-    },
-  ],
-};
-
 // Function to aggregate points into hexbins
 const aggregateToHexbins = (
-  points: FeatureCollection<Point | MultiPoint> = pointFeatureCollection
+  points: FeatureCollection<Point | MultiPoint>
 ): FeatureCollection<Polygon> => {
   // Calculate bounding box of points
   const bounds = bbox(points);
 
-  // Generate hexagonal grid (cellSide in degrees, adjust for scale)
-  const hexagons: FeatureCollection<Polygon> = hexGrid(bounds, 0.2, {
+  // Use a larger cellSide (e.g., 0.1 degrees ≈ 10km) to reduce hexagon count
+  const hexagons: FeatureCollection<Polygon> = hexGrid(bounds, 0.7, {
     units: "degrees",
   });
+
+  // Pre-compute point coordinates for slight optimization
+  const allPoints = featureCollection(points.features);
 
   // Aggregate points into hexagons
   const hexbinFeatures: Feature<Polygon>[] = hexagons.features
     .map((hex: Feature<Polygon>) => {
-      const pointsInHex = pointsWithinPolygon(points, hex);
-
-      if (pointsInHex.features.length > 0) {
-        console.log("pointsInHex", pointsInHex);
-      }
-      const count = pointsInHex.features.reduce(
-        (sum, feature) => sum + (feature.properties?.count || 0),
-        0
+      const hexBounds: BBox = bbox(hex);
+      // Lightweight bounding box pre-filter, it will make processing much faster than
+      // use the pointsWithPolygon directly
+      const candidatePoints = featureCollection(
+        allPoints.features.filter((point) => {
+          const [lon, lat] = point.geometry.coordinates as [number, number];
+          return (
+            lon >= hexBounds[0] &&
+            lon <= hexBounds[2] &&
+            lat >= hexBounds[1] &&
+            lat <= hexBounds[3]
+          );
+        })
       );
+
+      const pointsInHex = pointsWithinPolygon(candidatePoints, hex);
+
+      const count = _.sumBy(
+        pointsInHex.features,
+        (feature) => feature.properties?.count || 0
+      );
+
       const dates = pointsInHex.features
         .map((f) => f.properties?.date)
         .filter(Boolean)
@@ -153,13 +136,19 @@ const aggregateToHexbins = (
         },
       };
     })
-    .filter((hex) => hex.properties.count >= 0); // Only keep hexagons with points
+    .filter((hex) => hex.properties.count > 0); // Only keep hexagons with points
 
   return {
     type: "FeatureCollection",
     features: hexbinFeatures,
   };
 };
+
+const calculateCount = (hexData: FeatureCollection<Polygon>) =>
+  hexData.features.reduce(
+    (max, feature) => Math.max(max, feature.properties?.count || 0),
+    0
+  ) || 2; // Fallback to 2 if no counts
 
 const HexbinLayer: React.FC<LayerBasicType> = memo(
   ({
@@ -172,15 +161,6 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
     );
     const sourceId = useMemo(() => `${layerId}-source`, [layerId]);
     const hexbinLayer = useMemo(() => `${layerId}-hexagons`, [layerId]);
-
-    // Calculate max count for opacity scaling
-    const maxCount = useMemo(() => {
-      const maxFeature = featureCollection.features.reduce(
-        (max, feature) => Math.max(max, feature.properties?.count || 0),
-        0
-      );
-      return maxFeature || 2; // Fallback to 2 if no counts
-    }, [featureCollection.features]);
 
     const onHexbinClick = useCallback(
       (event: MapMouseEvent) => {
@@ -215,11 +195,12 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
 
         map.setMaxZoom(config.clusterMaxZoom);
 
+        const hexData = aggregateToHexbins(featureCollection);
+        const maxCount = calculateCount(hexData);
+
         map.addSource(sourceId, {
           type: "geojson",
-          data: aggregateToHexbins(),
-          // featureCollection as FeatureCollection<Point>
-          // ), // Assuming hexagonal polygons
+          data: hexData,
         });
 
         map.addLayer({
@@ -227,15 +208,15 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
           type: "fill",
           source: sourceId,
           paint: {
-            "fill-color": "#AAA",
+            "fill-color": "#CCC",
             "fill-opacity": [
               "interpolate",
               ["linear"],
               ["get", "count"],
               0, // Minimum count
-              0.1, // Minimum opacity
-              20, // Maximum count
-              0.8, // Maximum opacity
+              0.3, // Minimum opacity
+              maxCount, // Maximum count
+              0.95, // Maximum opacity
             ],
             "fill-outline-color": "#000",
           },
@@ -261,20 +242,28 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
           console.error("Error cleaning up hexbin layer:", error);
         }
       };
-    }, [
-      map,
-      sourceId,
-      hexbinLayer,
-      featureCollection,
-      maxCount,
-      onHexbinClick,
-    ]);
+    }, [map, sourceId, hexbinLayer, featureCollection, onHexbinClick]);
 
     // Update source data when featureCollection changes
     const updateSource = useCallback(() => {
       const source = map?.getSource(sourceId) as GeoJSONSource | undefined;
-      if (source) source.setData(aggregateToHexbins());
-    }, [map, sourceId]);
+      if (source) {
+        const hexData = aggregateToHexbins(featureCollection);
+        const maxCount = calculateCount(hexData);
+
+        source.setData(hexData);
+
+        map?.setPaintProperty(hexbinLayer, "fill-opacity", [
+          "interpolate",
+          ["linear"],
+          ["get", "count"],
+          0,
+          0.3,
+          maxCount,
+          0.95,
+        ]);
+      }
+    }, [featureCollection, hexbinLayer, map, sourceId]);
 
     useEffect(() => {
       updateSource();
