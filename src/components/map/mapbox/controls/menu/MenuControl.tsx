@@ -23,7 +23,7 @@ interface MenuControlProps {
 class MapControl implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
-  private readonly component: MapControlType;
+  private component: MapControlType;
   private height: string = "";
   private marginTop: string = "";
 
@@ -45,6 +45,10 @@ class MapControl implements IControl {
     if (this.root && this.container) {
       this.root.render(this.component);
     }
+  }
+  redraw(props: ControlProps) {
+    this.component = cloneElement(this.component, props);
+    this.render();
   }
 
   setVisible(visible: boolean): void {
@@ -133,6 +137,21 @@ const MenuControl: React.FC<MenuControlProps> = ({
     }
   }, [map, menu, visible, control]);
 
+  // to react the props changes
+  useEffect(() => {
+    if (control && map && menu) {
+      const newProps = { ...menu.props, map: map };
+      control.redraw(newProps);
+    }
+  }, [control, map, menu]);
+
+  useEffect(() => {
+    return () => {
+      if (control && map) {
+        control.onRemove(map);
+      }
+    };
+  }, [control, map]);
   return <React.Fragment />;
 };
 
