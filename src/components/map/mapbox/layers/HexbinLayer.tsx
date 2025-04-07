@@ -33,110 +33,90 @@ import {
 import _ from "lodash";
 
 interface DetailClusterSize {
-  default?: number | string;
-  medium: number | string;
-  large: number | string;
-  extra_large: number | string;
+  default: string;
 }
 
-interface DetailClusterConfig {
-  pointCountThresholds: DetailClusterSize;
+interface DetailHexbinConfig {
   clusterMaxZoom: number;
-  clusterRadius: number;
-  clusterCircleSize: DetailClusterSize;
-  clusterCircleColor: DetailClusterSize;
-  clusterCircleOpacity: number;
-  clusterCircleStrokeWidth: number;
-  clusterCircleStrokeColor: string;
-  clusterCircleTextSize: number;
+  clusterColor: DetailClusterSize;
+  clusterMinOpacity: number;
+  clusterMaxOpacity: number;
 }
 
-const config: DetailClusterConfig = {
-  // point count thresholds define the boundaries between different cluster sizes.
-  pointCountThresholds: {
-    medium: 10,
-    large: 15,
-    extra_large: 25,
-  },
+const config: DetailHexbinConfig = {
   clusterMaxZoom: MapDefaultConfig.MAX_ZOOM,
-  clusterRadius: 20,
-  // circle sizes define the radius(px) of the circles used to represent clusters on the map.
-  clusterCircleSize: {
-    default: 10,
-    medium: 15,
-    large: 20,
-    extra_large: 30,
-  },
   //cluster circle colors define the colors used for the circles representing clusters of different sizes.
-  clusterCircleColor: {
-    default: "#51bbd6",
-    medium: "#f1f075",
-    large: "#f28cb1",
-    extra_large: "#fe8cf1",
+  clusterColor: {
+    default: "#CCC",
   },
-  clusterCircleOpacity: 0.6,
-  clusterCircleStrokeWidth: 1,
-  clusterCircleStrokeColor: "#fff",
-  clusterCircleTextSize: 12,
+  clusterMinOpacity: 0.3,
+  clusterMaxOpacity: 0.9,
 };
 
 // Function to aggregate points into hexbins
 const aggregateToHexbins = (
   points: FeatureCollection<Point | MultiPoint>
 ): FeatureCollection<Polygon> => {
-  // Calculate bounding box of points
-  const bounds = bbox(points);
+  let hexbinFeatures: Feature<Polygon>[];
 
-  // Use a larger cellSide (e.g., 0.1 degrees ≈ 10km) to reduce hexagon count
-  const hexagons: FeatureCollection<Polygon> = hexGrid(bounds, 0.7, {
-    units: "degrees",
-  });
+  if (points.features.length === 0) {
+    // Default to nothing
+    hexbinFeatures = [];
+  } else {
+    // Calculate bounding box of points
+    const bounds = bbox(points);
 
-  // Pre-compute point coordinates for slight optimization
-  const allPoints = featureCollection(points.features);
+    // Use a larger cellSide (e.g., 0.1 degrees ≈ 10km) to reduce hexagon count
+    const hexagons: FeatureCollection<Polygon> = hexGrid(bounds, 40, {
+      units: "miles",
+    });
 
-  // Aggregate points into hexagons
-  const hexbinFeatures: Feature<Polygon>[] = hexagons.features
-    .map((hex: Feature<Polygon>) => {
-      const hexBounds: BBox = bbox(hex);
-      // Lightweight bounding box pre-filter, it will make processing much faster than
-      // use the pointsWithPolygon directly
-      const candidatePoints = featureCollection(
-        allPoints.features.filter((point) => {
-          const [lon, lat] = point.geometry.coordinates as [number, number];
-          return (
-            lon >= hexBounds[0] &&
-            lon <= hexBounds[2] &&
-            lat >= hexBounds[1] &&
-            lat <= hexBounds[3]
-          );
-        })
-      );
+    // Pre-compute point coordinates for slight optimization
+    const allPoints = featureCollection(points.features);
 
-      const pointsInHex = pointsWithinPolygon(candidatePoints, hex);
+    // Aggregate points into hexagons
+    hexbinFeatures = hexagons.features
+      .map((hex: Feature<Polygon>) => {
+        const hexBounds: BBox = bbox(hex);
+        // Lightweight bounding box pre-filter, it will make processing much faster than
+        // use the pointsWithPolygon directly
+        const candidatePoints = featureCollection(
+          allPoints.features.filter((point) => {
+            const [lon, lat] = point.geometry.coordinates as [number, number];
+            return (
+              lon >= hexBounds[0] &&
+              lon <= hexBounds[2] &&
+              lat >= hexBounds[1] &&
+              lat <= hexBounds[3]
+            );
+          })
+        );
 
-      const count = _.sumBy(
-        pointsInHex.features,
-        (feature) => feature.properties?.count || 0
-      );
+        const pointsInHex = pointsWithinPolygon(candidatePoints, hex);
 
-      const dates = pointsInHex.features
-        .map((f) => f.properties?.date)
-        .filter(Boolean)
-        .sort(); // Sort dates chronologically
+        const count = _.sumBy(
+          pointsInHex.features,
+          (feature) => feature.properties?.count || 0
+        );
 
-      return {
-        ...hex,
-        properties: {
-          count,
-          startTime: dates.length ? `${dates[0]}-01T00:00:00Z` : null, // Assuming YYYY-MM format, append day and time
-          endTime: dates.length
-            ? `${dates[dates.length - 1]}-01T23:59:59Z`
-            : null, // End of month
-        },
-      };
-    })
-    .filter((hex) => hex.properties.count > 0); // Only keep hexagons with points
+        const dates = pointsInHex.features
+          .map((f) => f.properties?.date)
+          .filter(Boolean)
+          .sort(); // Sort dates chronologically
+
+        return {
+          ...hex,
+          properties: {
+            count,
+            startTime: dates.length ? `${dates[0]}-01T00:00:00Z` : null, // Assuming YYYY-MM format, append day and time
+            endTime: dates.length
+              ? `${dates[dates.length - 1]}-01T23:59:59Z`
+              : null, // End of month
+          },
+        };
+      })
+      .filter((hex) => hex.properties.count > 0); // Only keep hexagons with points
+  }
 
   return {
     type: "FeatureCollection",
@@ -208,15 +188,15 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
           type: "fill",
           source: sourceId,
           paint: {
-            "fill-color": "#CCC",
+            "fill-color": config.clusterColor.default,
             "fill-opacity": [
               "interpolate",
               ["linear"],
               ["get", "count"],
               0, // Minimum count
-              0.3, // Minimum opacity
+              config.clusterMinOpacity, // Minimum opacity
               maxCount, // Maximum count
-              0.95, // Maximum opacity
+              config.clusterMaxOpacity, // Maximum opacity
             ],
             "fill-outline-color": "#000",
           },
@@ -258,9 +238,9 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
           ["linear"],
           ["get", "count"],
           0,
-          0.3,
+          config.clusterMinOpacity,
           maxCount,
-          0.95,
+          config.clusterMaxOpacity,
         ]);
       }
     }, [featureCollection, hexbinLayer, map, sourceId]);
