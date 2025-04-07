@@ -10,7 +10,6 @@ import Layers from "../../../../components/map/mapbox/layers/Layers";
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
-import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
@@ -25,6 +24,8 @@ import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
+import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
@@ -214,7 +215,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                   </Controls>
                   <Layers>
-                    <DetailSymbolLayer
+                    <HexbinLayer
                       featureCollection={filteredFeatureCollection}
                     />
                   </Layers>
