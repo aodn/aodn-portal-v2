@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from "react";
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -30,34 +30,6 @@ const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
 const TRUNCATE_COUNT_MOBILE = 200;
 
-// TODO: Add vitest
-const getMinMaxDateStamps = (
-  featureCollection: FeatureCollection<Point> | undefined
-) => {
-  if (
-    featureCollection &&
-    featureCollection.features &&
-    featureCollection.features.length > 0
-  ) {
-    // This default will trigger new value assign in the loop
-    let minDate = dayjs(dateDefault.max);
-    let maxDate = dayjs(dateDefault.min);
-
-    featureCollection.features?.forEach((feature) => {
-      const date = dayjs(feature.properties?.date);
-      if (date.isBefore(minDate)) {
-        minDate = date;
-      }
-      if (date.isAfter(maxDate)) {
-        maxDate = date;
-      }
-    });
-    return [minDate, maxDate];
-  } else {
-    return [dayjs(dateDefault.min), dayjs(dateDefault.max)];
-  }
-};
-
 interface SummaryAndDownloadPanelProps {
   bbox?: LngLatBounds;
 }
@@ -73,9 +45,40 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     getAndSetDownloadConditions,
   } = useDetailPageContext();
 
-  const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
+  const [minDateStamp, setMinDateStamp] = useState(dayjs(dateDefault.max));
+  const [maxDateStamp, setMaxDateStamp] = useState(dayjs(dateDefault.min));
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
+
+  const setMinMaxDateStamps = useCallback(
+    (featureCollection: FeatureCollection<Point> | undefined) => {
+      if (
+        featureCollection &&
+        featureCollection.features &&
+        featureCollection.features.length > 0
+      ) {
+        let minDate = minDateStamp;
+        let maxDate = maxDateStamp;
+
+        featureCollection.features?.forEach((feature) => {
+          const date = dayjs(feature.properties?.date);
+          if (date.isBefore(minDate)) {
+            minDate = date;
+          }
+          if (date.isAfter(maxDate)) {
+            maxDate = date;
+          }
+        });
+        setMinDateStamp(minDate);
+        setMaxDateStamp(maxDate);
+      }
+    },
+    [maxDateStamp, minDateStamp]
+  );
+
+  useEffect(() => {
+    setMinMaxDateStamps(featureCollection);
+  }, [featureCollection, setMinMaxDateStamps]);
 
   const filteredFeatureCollection = useMemo(() => {
     if (!featureCollection) {
@@ -159,58 +162,55 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
                 >
-                  {featureCollection?.features && (
-                    <Controls>
-                      <NavigationControl />
-                      <ScaleControl />
-                      <DisplayCoordinate />
-                      <MenuControl
-                        menu={
-                          <BaseMapSwitcher
-                            layers={[
-                              {
-                                id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
-                                name: StaticLayersDef.AUSTRALIA_MARINE_PARKS
-                                  .name,
-                                label:
-                                  StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-                                default: false,
-                              },
-                              {
-                                id: MapboxWorldLayersDef.WORLD.id,
-                                name: MapboxWorldLayersDef.WORLD.name,
-                                default: false,
-                              },
-                            ]}
-                          />
-                        }
-                      />
-                      <MenuControl
-                        menu={
-                          <DateRange
-                            minDate={minDateStamp.format(
-                              dateDefault.SIMPLE_DATE_FORMAT
-                            )}
-                            maxDate={maxDateStamp.format(
-                              dateDefault.SIMPLE_DATE_FORMAT
-                            )}
-                            getAndSetDownloadConditions={
-                              getAndSetDownloadConditions
-                            }
-                          />
-                        }
-                      />
-                      <MenuControl
-                        menu={
-                          <DrawRect
-                            getAndSetDownloadConditions={
-                              getAndSetDownloadConditions
-                            }
-                          />
-                        }
-                      />
-                    </Controls>
-                  )}
+                  <Controls>
+                    <NavigationControl />
+                    <ScaleControl />
+                    <DisplayCoordinate />
+                    <MenuControl
+                      menu={
+                        <BaseMapSwitcher
+                          layers={[
+                            {
+                              id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
+                              name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+                              label:
+                                StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
+                              default: false,
+                            },
+                            {
+                              id: MapboxWorldLayersDef.WORLD.id,
+                              name: MapboxWorldLayersDef.WORLD.name,
+                              default: false,
+                            },
+                          ]}
+                        />
+                      }
+                    />
+                    <MenuControl
+                      menu={
+                        <DateRange
+                          minDate={minDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
+                          maxDate={maxDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
+                          getAndSetDownloadConditions={
+                            getAndSetDownloadConditions
+                          }
+                        />
+                      }
+                    />
+                    <MenuControl
+                      menu={
+                        <DrawRect
+                          getAndSetDownloadConditions={
+                            getAndSetDownloadConditions
+                          }
+                        />
+                      }
+                    />
+                  </Controls>
                   <Layers>
                     <DetailSymbolLayer
                       featureCollection={filteredFeatureCollection}
