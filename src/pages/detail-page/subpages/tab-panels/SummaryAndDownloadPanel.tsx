@@ -25,6 +25,7 @@ import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import DateSlider from "../../../../components/map/mapbox/controls/menu/DateSlider";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
@@ -47,6 +48,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const [minDateStamp, setMinDateStamp] = useState(dayjs(dateDefault.max));
   const [maxDateStamp, setMaxDateStamp] = useState(dayjs(dateDefault.min));
+  const [isShowingDateSlider, setIsShowingDateSlider] = useState(false);
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
 
@@ -189,6 +191,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <MenuControl
                       menu={
                         <DateRange
+                          onClick={() => {
+                            setIsShowingDateSlider((prev) => !prev);
+                          }}
                           minDate={minDateStamp.format(
                             dateDefault.SIMPLE_DATE_FORMAT
                           )}
@@ -200,6 +205,23 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                           }
                         />
                       }
+                    />
+                    <MenuControl
+                      menu={
+                        <DateSlider
+                          minDate={minDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
+                          maxDate={maxDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
+                          getAndSetDownloadConditions={
+                            getAndSetDownloadConditions
+                          }
+                        />
+                      }
+                      position="bottom-right"
+                      visible={isShowingDateSlider}
                     />
                     <MenuControl
                       menu={
