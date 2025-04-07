@@ -206,23 +206,24 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         />
                       }
                     />
-                    <MenuControl
-                      menu={
-                        <DateSlider
-                          minDate={minDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
-                          maxDate={maxDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
-                          getAndSetDownloadConditions={
-                            getAndSetDownloadConditions
-                          }
-                        />
-                      }
-                      position="bottom-right"
-                      visible={isShowingDateSlider}
-                    />
+                    {isShowingDateSlider && (
+                      <MenuControl
+                        menu={
+                          <DateSlider
+                            minDate={minDateStamp.format(
+                              dateDefault.SIMPLE_DATE_FORMAT
+                            )}
+                            maxDate={maxDateStamp.format(
+                              dateDefault.SIMPLE_DATE_FORMAT
+                            )}
+                            getAndSetDownloadConditions={
+                              getAndSetDownloadConditions
+                            }
+                          />
+                        }
+                        position="bottom-right"
+                      />
+                    )}
                     <MenuControl
                       menu={
                         <DrawRect
