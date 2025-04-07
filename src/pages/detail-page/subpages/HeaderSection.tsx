@@ -207,8 +207,7 @@ const renderSubTitle = (
 const HeaderSection = () => {
   const location = useLocation();
   const { isUnderLaptop, isMobile } = useBreakpoint();
-  const { collection, clipboardText, handleCopyToClipboard } =
-    useDetailPageContext();
+  const { collection, checkIfCopied, copyToClipboard } = useDetailPageContext();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
@@ -227,20 +226,23 @@ const HeaderSection = () => {
   }
 
   const copyUrl = window.location.href;
+  const isCopied = useMemo(
+    () => checkIfCopied(copyUrl),
+    [checkIfCopied, copyUrl]
+  );
   const shareItems: ShareMenuItem[] = useMemo(
     () => [
       {
         name: "Copy Link",
-        icon:
-          clipboardText === copyUrl ? (
-            <DoneAllIcon fontSize="small" color="primary" />
-          ) : (
-            <ContentCopy fontSize="small" color="primary" />
-          ),
-        handler: () => handleCopyToClipboard(copyUrl),
+        icon: isCopied ? (
+          <DoneAllIcon fontSize="small" color="primary" />
+        ) : (
+          <ContentCopy fontSize="small" color="primary" />
+        ),
+        handler: () => copyToClipboard(copyUrl),
       },
     ],
-    [clipboardText, copyUrl, handleCopyToClipboard]
+    [isCopied, copyToClipboard, copyUrl]
   );
 
   const onGoBack = useCallback(

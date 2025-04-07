@@ -16,16 +16,16 @@ interface LinkCardProps {
 
 const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
   const [hoverOnContainer, setHoverOnContainer] = useState<boolean>(false);
-  const { clipboardText, handleCopyToClipboard } = useDetailPageContext();
-  const hasBeenCopied = useMemo(
-    () => link.href === clipboardText,
-    [clipboardText, link.href]
+  const { checkIfCopied, copyToClipboard } = useDetailPageContext();
+
+  const isCopied = useMemo(
+    () => checkIfCopied(link.href),
+    [checkIfCopied, link.href]
   );
   const showCopyButton = useMemo(
-    () => hasBeenCopied || hoverOnContainer,
-    [hasBeenCopied, hoverOnContainer]
+    () => isCopied || hoverOnContainer,
+    [hoverOnContainer, isCopied]
   );
-
   return (
     <Box
       onMouseEnter={() => setHoverOnContainer(true)}
@@ -88,8 +88,8 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
 
       {showCopyButton && (
         <CopyLinkButton
-          handleClick={handleCopyToClipboard}
-          hasBeenCopied={hasBeenCopied}
+          handleClick={copyToClipboard}
+          hasBeenCopied={isCopied}
           copyUrl={link.href}
           sx={{
             width: COPY_LINK_BUTTON_WIDTH,
