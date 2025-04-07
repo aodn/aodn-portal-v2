@@ -246,8 +246,6 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     assert map_zoom == new_map_zoom
 
 
-
-@pytest.mark.skip(reason="Skipping this test temporarily")
 def test_map_buttons(desktop_page: Page) -> None:
     """
     Ensures that the map buttons on both the search page and the detail page are displayed correctly.
