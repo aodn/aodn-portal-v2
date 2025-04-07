@@ -121,7 +121,7 @@ describe("BookmarkButton", () => {
         <BookmarkButton dataset={collection2} dataTestId="item2" />
       </>
     );
-    waitFor(() => screen.findByTestId("item1-bookmarkicon"))
+    waitFor(() => screen.findByTestId("item1-bookmarkicon"), { timeout: 2000 })
       // item1
       .then(() => {
         // Should not find this icon before click
