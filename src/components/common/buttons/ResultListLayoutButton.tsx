@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import GridAndMapIcon from "../../icon/GridAndMapIcon";
 import ListAndMapIcon from "../../icon/ListAndMapIcon";
 import FullMapViewIcon from "../../icon/FullMapViewIcon";
@@ -50,9 +50,14 @@ interface ResultListLayoutButtonProps<T>
 const ResultListLayoutButton: FC<
   ResultListLayoutButtonProps<SearchResultLayoutEnum>
 > = ({ onChangeLayout, currentLayout, isIconOnly, excludeOptions = [] }) => {
-  const filteredOptions = MAP_VIEW_SELECT.filter(
-    (option) => !excludeOptions.includes(option.value)
+  const filteredOptions = useMemo(
+    () =>
+      MAP_VIEW_SELECT.filter(
+        (option) => !excludeOptions.includes(option.value)
+      ),
+    [excludeOptions]
   );
+
   return (
     <IconSelect
       items={filteredOptions}
