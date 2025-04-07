@@ -23,14 +23,15 @@ describe("LinkCard", () => {
     getIcon: vi.fn().mockReturnValue("/test-icon.svg"),
   };
 
-  const mockHandleCopyToClipboard = vi.fn();
+  const mockCopyToClipboard = vi.fn();
+  const mockCheckIfCopied = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
-      clipboardText: undefined,
-      handleCopyToClipboard: mockHandleCopyToClipboard,
+      checkIfCopied: mockCheckIfCopied,
+      copyToClipboard: mockCopyToClipboard,
     } as any);
   });
 
@@ -44,17 +45,16 @@ describe("LinkCard", () => {
 
   it("shows copy button on hover when link has not been copied", async () => {
     vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
-      clipboardText: undefined,
-      handleCopyToClipboard: mockHandleCopyToClipboard,
+      checkIfCopied: mockCheckIfCopied.mockReturnValue(false),
+      copyToClipboard: mockCopyToClipboard,
     } as any);
 
     render(<LinkCard link={mockLink} />);
 
-    const user = userEvent.setup();
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
 
     // Hover on the card
-    await user.hover(linkCard);
+    await userEvent.hover(linkCard);
     await waitFor(() => {
       const copyButton = screen.queryByTestId(
         `copylinkbutton-${mockLink.href}`
@@ -63,7 +63,7 @@ describe("LinkCard", () => {
     });
 
     // Mouse leave
-    await user.unhover(linkCard);
+    await userEvent.unhover(linkCard);
     await waitFor(() => {
       const copyButton = screen.queryByTestId(
         `copylinkbutton-${mockLink.href}`
@@ -74,8 +74,8 @@ describe("LinkCard", () => {
 
   it("shows copy button when link has been copied", async () => {
     vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
-      clipboardText: mockLink.href,
-      handleCopyToClipboard: mockHandleCopyToClipboard,
+      checkIfCopied: mockCheckIfCopied.mockReturnValue(true),
+      copyToClipboard: mockCopyToClipboard,
     } as any);
 
     render(<LinkCard link={mockLink} />);
@@ -92,9 +92,8 @@ describe("LinkCard", () => {
   it("calls openInNewTab when link is clicked", async () => {
     render(<LinkCard link={mockLink} />);
 
-    const user = userEvent.setup();
     const link = screen.getByText("Test Link Title");
-    await user.click(link);
+    await userEvent.click(link);
     await waitFor(() => {
       expect(LinkUtils.openInNewTab).toHaveBeenCalledWith(mockLink.href);
     });
@@ -103,15 +102,14 @@ describe("LinkCard", () => {
   it("calls handleCopyToClipboard with correct URL when copy button is clicked", async () => {
     render(<LinkCard link={mockLink} />);
 
-    const user = userEvent.setup();
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
-    await user.hover(linkCard);
+    await userEvent.hover(linkCard);
     const copyButton = await screen.findByTestId(
       `copylinkbutton-${mockLink.href}`
     );
-    await user.click(copyButton);
+    await userEvent.click(copyButton);
     await waitFor(() => {
-      expect(mockHandleCopyToClipboard).toHaveBeenCalledWith(mockLink.href);
+      expect(mockCopyToClipboard).toHaveBeenCalledWith(mockLink.href);
     });
   });
 });
