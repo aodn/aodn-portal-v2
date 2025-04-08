@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import { ILink as LinkType } from "../../../common/store/OGCCollectionDefinitions";
 import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
@@ -19,13 +19,19 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
   const { checkIfCopied, copyToClipboard } = useDetailPageContext();
 
   const isCopied = useMemo(
-    () => checkIfCopied(link.href),
-    [checkIfCopied, link.href]
+    () => checkIfCopied(link.href, link.title),
+    [checkIfCopied, link.href, link.title]
   );
+
   const showCopyButton = useMemo(
     () => isCopied || hoverOnContainer,
     [hoverOnContainer, isCopied]
   );
+
+  const handleCopyLink = useCallback(async () => {
+    await copyToClipboard(link.href, link.title);
+  }, [copyToClipboard, link.href, link.title]);
+
   return (
     <Box
       onMouseEnter={() => setHoverOnContainer(true)}
@@ -88,7 +94,7 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
 
       {showCopyButton && (
         <CopyLinkButton
-          handleClick={copyToClipboard}
+          handleClick={handleCopyLink}
           hasBeenCopied={isCopied}
           copyUrl={link.href}
           sx={{

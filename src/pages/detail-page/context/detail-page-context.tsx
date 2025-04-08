@@ -31,8 +31,8 @@ interface DetailPageContextType {
   setPhotoSelected: Dispatch<SetStateAction<SpatialExtentPhoto | undefined>>;
   hasSnapshotsFinished: boolean;
   setHasSnapshotsFinished: Dispatch<SetStateAction<boolean>>;
-  checkIfCopied: (text: string) => boolean;
-  copyToClipboard: (text: string) => Promise<void>;
+  copyToClipboard: (text: string, referenceId?: string) => Promise<void>;
+  checkIfCopied: (text: string, referenceId?: string) => boolean;
 }
 
 const DetailPageContextDefault = {

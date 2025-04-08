@@ -1,47 +1,46 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 
 interface UseClipboardReturn {
-  clipboardText: string | undefined;
-  copyToClipboard: (text: string) => Promise<void>;
-  checkIfCopied: (text: string) => boolean;
+  copyToClipboard: (text: string, referenceId?: string) => Promise<void>;
+  checkIfCopied: (text: string, referenceId?: string) => boolean;
   clearClipboard: () => Promise<void>;
 }
 
 const useClipboard = (): UseClipboardReturn => {
-  const [clipboardText, setClipboardText] = useState<string | undefined>(
-    undefined
-  );
+  const [clipboard, setClipboard] = useState<string | undefined>(undefined);
 
   // Copy text to clipboard
-  const copyToClipboard = useCallback(async (text: string) => {
-    try {
-      await navigator.clipboard?.writeText(text);
-      setClipboardText(text);
-    } catch (error) {
-      console.error("Failed to copy text: ", error);
-    }
-  }, []);
+  const copyToClipboard = useCallback(
+    async (text: string, referenceId?: string) => {
+      try {
+        await navigator.clipboard?.writeText(text);
+        setClipboard(referenceId ? `${text}-${referenceId}` : text);
+      } catch (error) {
+        console.error("Failed to copy text: ", error);
+      }
+    },
+    []
+  );
 
   // Check if specific text is in clipboard
   const checkIfCopied = useCallback(
-    (text: string) => {
-      return clipboardText === text;
+    (text: string, referenceId?: string) => {
+      return clipboard === (referenceId ? `${text}-${referenceId}` : text);
     },
-    [clipboardText]
+    [clipboard]
   );
 
   // Clear clipboard
   const clearClipboard = useCallback(async () => {
     try {
       await navigator.clipboard?.writeText("");
-      setClipboardText(undefined);
+      setClipboard(undefined);
     } catch (error) {
       console.error("Failed to clear clipboard: ", error);
     }
   }, []);
 
   return {
-    clipboardText,
     copyToClipboard,
     checkIfCopied,
     clearClipboard,

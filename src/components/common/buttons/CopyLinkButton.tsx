@@ -11,7 +11,7 @@ import ContentCopy from "@mui/icons-material/ContentCopy";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 
 interface CopyLinkButtonProps {
-  handleClick: (copyUrl: string) => void;
+  handleClick: () => void;
   hasBeenCopied?: boolean;
   copyUrl: string;
   sx?: SxProps;
@@ -25,7 +25,7 @@ const CopyLinkButton: FC<CopyLinkButtonProps> = ({
 }) => {
   return (
     <Button
-      onClick={() => handleClick(copyUrl)}
+      onClick={handleClick}
       data-testid={`copylinkbutton-${copyUrl}`}
       sx={{
         px: padding.medium,
