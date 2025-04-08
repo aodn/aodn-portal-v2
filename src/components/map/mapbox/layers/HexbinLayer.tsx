@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useMemo,
   memo,
+  useRef,
 } from "react";
 import {
   FeatureCollection,
@@ -80,9 +81,10 @@ const createHexGrid = (
 // Function to aggregate points into HexBins
 const aggregateToHexBins = (
   points: FeatureCollection<Point | MultiPoint>
-): FeatureCollection<Polygon> => {
+): [number, FeatureCollection<Polygon>] => {
   let hexbinFeatures: Feature<Polygon>[];
-
+  let maxCount: number = 2;
+  console.time("MyComponent Execution");
   if (points.features.length === 0) {
     // Default to nothing
     hexbinFeatures = [];
@@ -91,10 +93,7 @@ const aggregateToHexBins = (
     const bounds = bbox(points);
 
     // Use a larger cellSide (e.g., 0.1 degrees ≈ 10km) to reduce hexagon count
-    const hexagons: FeatureCollection<Polygon> = createHexGrid(bounds, 50);
-
-    // Pre-compute point coordinates for slight optimization
-    const allPoints = featureCollection(points.features);
+    const hexagons: FeatureCollection<Polygon> = createHexGrid(bounds, 65);
 
     // Aggregate points into hexagons
     hexbinFeatures = hexagons.features
@@ -103,7 +102,7 @@ const aggregateToHexBins = (
         // Lightweight bounding box pre-filter, it will make processing much faster than
         // use the pointsWithPolygon directly
         const candidatePoints = featureCollection(
-          allPoints.features.filter((point) => {
+          points.features.filter((point) => {
             const [lon, lat] = point.geometry.coordinates as [number, number];
             return (
               lon >= hexBounds[0] &&
@@ -114,43 +113,48 @@ const aggregateToHexBins = (
           })
         );
 
-        const pointsInHex = pointsWithinPolygon(candidatePoints, hex);
+        if (candidatePoints.features.length > 1) {
+          // pointsWithinPolygon is very heavy weighted, run it unless we have some points
+          const pointsInHex = pointsWithinPolygon(candidatePoints, hex);
 
-        const count = _.sumBy(
-          pointsInHex.features,
-          (feature) => feature.properties?.count || 0
-        );
+          const count = _.sumBy(
+            pointsInHex.features,
+            (feature) => feature.properties?.count || 0
+          );
 
-        const dates = pointsInHex.features
-          .map((f) => f.properties?.date)
-          .filter(Boolean)
-          .sort(); // Sort dates chronologically
+          if (count > maxCount) {
+            maxCount = count;
+          }
 
-        return {
-          ...hex,
-          properties: {
-            count,
-            startTime: dates.length ? `${dates[0]}-01T00:00:00Z` : null, // Assuming YYYY-MM format, append day and time
-            endTime: dates.length
-              ? `${dates[dates.length - 1]}-01T23:59:59Z`
-              : null, // End of month
-          },
-        };
+          const dates = pointsInHex.features
+            .map((f) => f.properties?.date)
+            .filter(Boolean)
+            .sort(); // Sort dates chronologically
+
+          return {
+            ...hex,
+            properties: {
+              count,
+              startTime: dates.length ? `${dates[0]}-01T00:00:00Z` : null, // Assuming YYYY-MM format, append day and time
+              endTime: dates.length
+                ? `${dates[dates.length - 1]}-01T23:59:59Z`
+                : null, // End of month
+            },
+          };
+        }
       })
-      .filter((hex) => hex.properties.count > 0); // Only keep hexagons with points
+      .filter((hex) => hex && hex.properties.count > 0) as Feature<Polygon>[]; // Only keep hexagons with points
   }
+  console.timeEnd("MyComponent Execution");
 
-  return {
-    type: "FeatureCollection",
-    features: hexbinFeatures,
-  };
+  return [
+    maxCount,
+    {
+      type: "FeatureCollection",
+      features: hexbinFeatures,
+    },
+  ];
 };
-
-const calculateCount = (hexData: FeatureCollection<Polygon>) =>
-  hexData.features.reduce(
-    (max, feature) => Math.max(max, feature.properties?.count || 0),
-    0
-  ) || 2; // Fallback to 2 if no counts
 
 const HexbinLayer: React.FC<LayerBasicType> = memo(
   ({
@@ -163,6 +167,7 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
     );
     const sourceId = useMemo(() => `${layerId}-source`, [layerId]);
     const hexbinLayer = useMemo(() => `${layerId}-hexagons`, [layerId]);
+    const hexbinInitialized = useRef(false);
 
     const onHexbinClick = useCallback(
       (event: MapMouseEvent) => {
@@ -193,12 +198,17 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
       if (!map) return;
 
       const createHexbinLayer = () => {
-        if (map.getSource(sourceId)) return;
+        if (
+          map.getSource(sourceId) ||
+          hexbinInitialized.current ||
+          featureCollection?.features?.length == 0
+        )
+          return;
 
+        hexbinInitialized.current = true; // Mark as initialized
         map.setMaxZoom(config.clusterMaxZoom);
 
-        const hexData = aggregateToHexBins(featureCollection);
-        const maxCount = calculateCount(hexData);
+        const [maxCount, hexData] = aggregateToHexBins(featureCollection);
 
         map.addSource(sourceId, {
           type: "geojson",
@@ -228,15 +238,13 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
         map.on("mouseleave", hexbinLayer, defaultMouseLeaveEventHandler);
         map.on("click", hexbinLayer, onHexbinClick);
       };
-
       map.once("load", createHexbinLayer);
-      map.on("styledata", createHexbinLayer);
 
       return () => {
         map.off("mouseenter", hexbinLayer, defaultMouseEnterEventHandler);
         map.off("mouseleave", hexbinLayer, defaultMouseLeaveEventHandler);
         map.off("click", hexbinLayer, onHexbinClick);
-
+        hexbinInitialized.current = false;
         try {
           if (map.getLayer(hexbinLayer)) map.removeLayer(hexbinLayer);
           if (map.getSource(sourceId)) map.removeSource(sourceId);
@@ -251,8 +259,7 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
       const updateSource = () => {
         const source = map?.getSource(sourceId) as GeoJSONSource | undefined;
         if (source) {
-          const hexData = aggregateToHexBins(featureCollection);
-          const maxCount = calculateCount(hexData);
+          const [maxCount, hexData] = aggregateToHexBins(featureCollection);
 
           source.setData(hexData);
 
