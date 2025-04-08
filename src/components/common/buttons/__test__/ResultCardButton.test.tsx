@@ -82,7 +82,7 @@ describe("ResultCardButton", () => {
     render(<ResultCardButton sx={{ backgroundColor: "red" }} />);
     const button = screen.getByRole("button");
     expect(button).toHaveStyle("background-color: rgb(255, 0, 0)");
-    expect(button).toHaveStyle("padding: 6px");
+    expect(button).toHaveStyle("padding: 0px");
   });
 
   it("renders startIcon as a ComponentType with Tooltip and styling", () => {
