@@ -109,7 +109,10 @@ describe("LinkCard", () => {
     );
     await userEvent.click(copyButton);
     await waitFor(() => {
-      expect(mockCopyToClipboard).toHaveBeenCalledWith(mockLink.href);
+      expect(mockCopyToClipboard).toHaveBeenCalledWith(
+        mockLink.href,
+        mockLink.title
+      );
     });
   });
 });

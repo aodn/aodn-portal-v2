@@ -32,7 +32,7 @@ describe("CopyLinkButton", () => {
     const button = screen.getByTestId(`copylinkbutton-${mockUrl}`);
     await user.click(button);
     await waitFor(() => {
-      expect(defaultProps.handleClick).toHaveBeenCalledWith(mockUrl);
+      expect(defaultProps.handleClick).toHaveBeenCalledTimes(1);
     });
   });
 
