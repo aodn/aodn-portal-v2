@@ -53,6 +53,11 @@ const config: DetailHexbinConfig = {
   clusterMaxOpacity: 0.9,
 };
 
+const createHexGrid = (bounds: BBox, cellSize: number) =>
+  hexGrid(bounds, cellSize, {
+    units: "miles",
+  });
+
 // Function to aggregate points into hexbins
 const aggregateToHexbins = (
   points: FeatureCollection<Point | MultiPoint>
@@ -67,9 +72,7 @@ const aggregateToHexbins = (
     const bounds = bbox(points);
 
     // Use a larger cellSide (e.g., 0.1 degrees ≈ 10km) to reduce hexagon count
-    const hexagons: FeatureCollection<Polygon> = hexGrid(bounds, 40, {
-      units: "miles",
-    });
+    const hexagons: FeatureCollection<Polygon> = createHexGrid(bounds, 40);
 
     // Pre-compute point coordinates for slight optimization
     const allPoints = featureCollection(points.features);
@@ -259,4 +262,5 @@ const HexbinLayer: React.FC<LayerBasicType> = memo(
 
 HexbinLayer.displayName = "DetailSymbolLayer";
 
+export { createHexGrid };
 export default HexbinLayer;

@@ -28,7 +28,7 @@
     "@mui/x-charts": "^6.19.3",
     "@mui/x-date-pickers": "^6.19.3",
     "@reduxjs/toolkit": "^2.1.0",
-    "@turf/turf": "7.0.0",
+    "@turf/turf": "7.2.0",
     "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.0",
     "@types/mapbox__geo-viewport": "^0.5.3",
