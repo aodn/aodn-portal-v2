@@ -141,18 +141,9 @@ const MapPopup: React.FC<MapPopupProps> = memo(
         }
       };
 
-      const onPopupMouseLeave = (ev: React.MouseEvent<HTMLDivElement>) => {
-        const rect = popup.getElement().getBoundingClientRect();
-        if (
-          ev.clientX >= rect.left &&
-          ev.clientX <= rect.right &&
-          ev.clientY >= rect.top &&
-          ev.clientY <= rect.bottom
-        ) {
-          // Inside the popup, do nothing
-        } else {
-          popup.remove();
-        }
+      const onPopupMouseLeave = (_: React.MouseEvent<HTMLDivElement>) => {
+        // When mouse leave the box we remove the popup
+        popup.remove();
       };
 
       const onPointMouseEnter = (ev: MapLayerMouseEvent) => {
