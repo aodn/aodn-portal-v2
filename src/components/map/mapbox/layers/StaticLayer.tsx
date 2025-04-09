@@ -22,7 +22,7 @@ export interface StaticLayersProps {
 const StaticLayersDef = {
   AUSTRALIA_MARINE_PARKS: {
     id: "static-australia-marine-parks",
-    name: "Australia Marine Parks",
+    name: "Australian Marine Parks",
     label: "RESNAME",
   },
 };
@@ -124,7 +124,7 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, label, features }) => {
     <React.Fragment />
   );
 };
-// A shortcut for australia marine parks
+// A shortcut for australian marine parks
 const AustraliaMarineParkLayer: FC<Partial<StaticLayersProps>> = ({
   id = StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
   name = StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
