@@ -13,9 +13,9 @@ import {
   DownloadConditionType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
-
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import useClipboard from "../../../hooks/useClipboard";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -26,6 +26,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
 }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
+  const { checkIfCopied, copyToClipboard } = useClipboard();
+
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
@@ -126,6 +128,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setPhotoSelected,
         hasSnapshotsFinished,
         setHasSnapshotsFinished,
+        checkIfCopied,
+        copyToClipboard,
       }}
     >
       {children}

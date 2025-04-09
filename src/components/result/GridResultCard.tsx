@@ -142,14 +142,18 @@ const GridResultCard: FC<GridResultCardProps> = ({
         </Tooltip>
       </Stack>
       {(isSelectedDataset || showButtons) && (
-        <Stack direction="row" paddingX={padding.small}>
+        <Stack
+          direction="row"
+          width="100%"
+          paddingX={padding.small}
+          gap={gap.sm}
+        >
           <OrganizationLogo
             logo={findIcon()}
             sx={{
               width: "auto",
               maxWidth: "60px",
               height: "45px",
-              paddingRight: padding.extraSmall,
             }}
           />
           {!isSimplified && (
