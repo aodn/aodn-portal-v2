@@ -32,7 +32,6 @@ const on = (type: EVENT_BOOKMARK, handle: (event: BookmarkEvent) => void) =>
 const off = (type: EVENT_BOOKMARK, handle: (event: BookmarkEvent) => void) =>
   emitter.off(type, handle);
 
-// TODO: need to implement initial bookmark items list in the future by getting uuids array from browser storage and fetching collections
 const initialState: BookmarkListState = {
   items: [],
   temporaryItem: undefined,
@@ -45,7 +44,6 @@ const bookmarkListSlice = createSlice({
   reducers: {
     setItems: (state, action: PayloadAction<Array<OGCCollection>>) => {
       state.items = action.payload;
-      // saveBookmarkIdsToStorage(action.payload);
     },
     setTemporaryItem: (
       state,
@@ -140,6 +138,44 @@ export const {
 } = bookmarkListSlice.actions;
 
 export { on, off };
+
+// Helper to check if a collection has valid extent
+const checkExtent = (collection: OGCCollection) => {
+  if (!collection.extent) return false;
+  if (
+    !collection.extent.bbox ||
+    !Array.isArray(collection.extent.bbox) ||
+    collection.extent.bbox.length === 0
+  ) {
+    return false;
+  }
+  return collection.extent.bbox.some(
+    (box) => Array.isArray(box) && box.length === 4
+  );
+};
+
+export const checkExtentAndAdd = createAsyncThunk<
+  void,
+  OGCCollection,
+  { rejectValue: ErrorResponse; state: RootState; dispatch: AppDispatch }
+>("bookmarkList/checkExtentAndAdd", async (item: OGCCollection, thunkAPI) => {
+  const { dispatch } = thunkAPI;
+
+  const hasValidExtent = checkExtent(item);
+
+  if (hasValidExtent) {
+    dispatch(addItem(item));
+  } else {
+    await dispatch(fetchResultByUuidNoStore(item.id))
+      .unwrap()
+      .then((res: OGCCollection) => {
+        dispatch(addItem(res));
+      })
+      .catch((err: Error) => {
+        return thunkAPI.rejectWithValue(err as ErrorResponse);
+      });
+  }
+});
 
 // Thunk actions for async operations, avoid getState() where someone is calling the reducer
 export const fetchAndInsertTemporary = createAsyncThunk<

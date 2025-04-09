@@ -5,7 +5,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import { color, gap } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import {
-  addItem,
+  checkExtentAndAdd,
   checkIsBookmarked,
   getBookmarkList,
   off,
@@ -52,7 +52,7 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
           // If bookmark a temporary item, should clear temporaryItem then add to bookmark list
           store.dispatch(setTemporaryItem(undefined));
         }
-        store.dispatch(addItem(item));
+        store.dispatch(checkExtentAndAdd(item));
       }
       setIsBookmarked(!isBookmarked);
     },
