@@ -186,7 +186,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         fontSize={fontSize.info}
         fontWeight={fontWeight.bold}
       >
-        Australia Marine Parks
+        Australian Marine Parks
       </Typography>
       <FormControl sx={{ maxHeight: "300px", overflowY: "scroll", flex: 1 }}>
         <RadioGroup
