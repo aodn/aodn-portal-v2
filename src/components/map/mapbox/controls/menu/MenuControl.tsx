@@ -127,15 +127,14 @@ const MenuControl: React.FC<MenuControlProps> = ({
       }
       return prev;
     });
+  }, [map, menu, control]);
 
-    if (control) {
-      control.setVisible(visible);
-    }
-  }, [map, menu, visible, control]);
+  useEffect(() => {
+    control?.setVisible(visible);
+  }, [control, visible]);
 
-  return <React.Fragment />;
+  return null;
 };
 
-export default MenuControl;
-
 export { eventEmitter, leftPadding, rightPadding, MapControl };
+export default MenuControl;

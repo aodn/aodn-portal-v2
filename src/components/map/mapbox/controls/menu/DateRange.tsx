@@ -17,6 +17,7 @@ import useBreakpoint from "../../../../../hooks/useBreakpoint";
 import { color, fontSize, padding } from "../../../../../styles/constants";
 
 interface DateSliderProps {
+  visible?: boolean;
   currentMinDate: string | undefined;
   currentMaxDate: string | undefined;
   minDate: string;
@@ -42,6 +43,7 @@ const SLIDER_WIDTH_TABLET = 400;
 const SLIDER_WIDTH_MOBILE = 250;
 
 const DateSlider: React.FC<DateSliderProps> = ({
+  visible = false,
   currentMinDate,
   currentMaxDate,
   minDate,
@@ -74,22 +76,23 @@ const DateSlider: React.FC<DateSliderProps> = ({
   return (
     <Grid
       container
-      width={
-        isMobile
+      sx={{
+        display: visible ? "flex" : "none",
+        px: padding.small,
+        py: padding.extraSmall,
+        width: isMobile
           ? SLIDER_WIDTH_MOBILE
           : isTablet
             ? SLIDER_WIDTH_TABLET
-            : SLIDER_WIDTH_DEFAULT
-      }
+            : SLIDER_WIDTH_DEFAULT,
+      }}
       data-testid={COMPONENT_ID}
-      paddingY={padding.extraSmall}
-      paddingX={padding.small}
     >
       <Grid
         item
         xs={12}
         container
-        sx={{ paddingX: padding.medium, pt: padding.small }}
+        sx={{ px: padding.medium, pt: padding.small }}
       >
         <PlainSlider
           value={dateRangeStamp}
@@ -185,23 +188,22 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   );
 
   useEffect(() => {
-    if (isShowingSelector) {
-      const slider: MapControl = new MapControl(
-        (
-          <DateSlider
-            currentMinDate={currentMinDate}
-            currentMaxDate={currentMaxDate}
-            minDate={minDate}
-            maxDate={maxDate}
-            onDateRangeChange={onDateRangeChange}
-          />
-        )
-      );
-      map?.addControl(slider, "bottom-right");
-      return () => {
-        map?.removeControl(slider);
-      };
-    }
+    const slider: MapControl = new MapControl(
+      (
+        <DateSlider
+          visible={isShowingSelector}
+          currentMinDate={currentMinDate}
+          currentMaxDate={currentMaxDate}
+          minDate={minDate}
+          maxDate={maxDate}
+          onDateRangeChange={onDateRangeChange}
+        />
+      )
+    );
+    map?.addControl(slider, "bottom-right");
+    return () => {
+      map?.removeControl(slider);
+    };
   }, [
     currentMaxDate,
     currentMinDate,
