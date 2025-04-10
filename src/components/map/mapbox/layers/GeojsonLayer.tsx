@@ -36,8 +36,6 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   setPhotos,
   animate = true,
 }) => {
-  console.log("collection", collection);
-  console.log("extent", collection.extent);
   const { map } = useContext(MapContext);
   const [_, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);

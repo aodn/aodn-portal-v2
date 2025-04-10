@@ -26,7 +26,7 @@ import {
   on,
   off,
   setExpandedItem,
-  fetchAndInsertTemporary,
+  checkAndInsertTemporary,
 } from "../../components/common/store/bookmarkListReducer";
 import Layout from "../../components/layout/layout";
 import ResultSection from "./subpages/ResultSection";
@@ -362,7 +362,7 @@ const SearchPage = () => {
         // Since map point only store uuid in its feature, so need to fetch dataset here
         // Clicking a map dot or a result card will only add a temporary item in bookmark list, until the bookmark icon is clicked
         setSelectedUuids(uuids);
-        dispatch(fetchAndInsertTemporary(uuids[0]));
+        dispatch(checkAndInsertTemporary({ id: uuids[0] }));
       }
     },
     [dispatch]
@@ -372,7 +372,7 @@ const SearchPage = () => {
     (item: OGCCollection | undefined) => {
       if (item) {
         setSelectedUuids([item.id]);
-        dispatch(fetchAndInsertTemporary(item.id));
+        dispatch(checkAndInsertTemporary({ id: item.id, item }));
       }
     },
     [dispatch]
