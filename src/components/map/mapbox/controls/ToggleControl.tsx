@@ -8,12 +8,12 @@ import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 
 export interface ToggleControlProps {
-  showFullMap: boolean;
+  isFullMap: boolean;
   onToggleClicked?: (state: boolean) => void;
 }
 
 const ToggleButton: React.FC<ToggleControlProps> = ({
-  showFullMap,
+  isFullMap,
   onToggleClicked,
 }) => {
   return (
@@ -30,11 +30,11 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
       }}
       onClick={() => {
         if (onToggleClicked) {
-          onToggleClicked(!showFullMap);
+          onToggleClicked(!isFullMap);
         }
       }}
     >
-      {showFullMap ? (
+      {isFullMap ? (
         <CloseFullscreenIcon fontSize="small" />
       ) : (
         <FullscreenIcon fontSize="medium" />
@@ -52,11 +52,11 @@ class ToggleControlClass implements IControl {
     this.props = props;
   }
 
-  redraw(showFullMap: boolean) {
+  redraw(isFullMap: boolean) {
     this.root?.render(
       <ToggleButton
         onToggleClicked={this.props.onToggleClicked}
-        showFullMap={showFullMap}
+        isFullMap={isFullMap}
       />
     );
   }
@@ -65,7 +65,7 @@ class ToggleControlClass implements IControl {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
     this.root = createRoot(this.container!);
-    this.redraw(this.props.showFullMap);
+    this.redraw(this.props.isFullMap);
     return this.container;
   }
 
@@ -84,7 +84,7 @@ class ToggleControlClass implements IControl {
 }
 
 const ToggleControl = ({
-  showFullMap = false,
+  isFullMap = false,
   onToggleClicked = (v: boolean) => {},
 }: ToggleControlProps) => {
   const { map } = useContext(MapContext);
@@ -96,7 +96,7 @@ const ToggleControl = ({
     setControl((prev) => {
       if (!prev) {
         const n = new ToggleControlClass({
-          showFullMap: showFullMap,
+          isFullMap: isFullMap,
           onToggleClicked: onToggleClicked,
         });
         map?.addControl(n, "top-left");
@@ -104,9 +104,9 @@ const ToggleControl = ({
       }
       return prev;
     });
-  }, [map, showFullMap, onToggleClicked]);
+  }, [map, isFullMap, onToggleClicked]);
 
-  useEffect(() => control?.redraw(showFullMap), [showFullMap, control]);
+  useEffect(() => control?.redraw(isFullMap), [isFullMap, control]);
 
   return <React.Fragment />;
 };

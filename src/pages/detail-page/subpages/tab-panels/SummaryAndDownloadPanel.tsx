@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from "react";
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -25,39 +25,11 @@ import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import DateSlider from "../../../../components/map/mapbox/controls/menu/DateSlider";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
 const TRUNCATE_COUNT_MOBILE = 200;
-
-// TODO: Add vitest
-const getMinMaxDateStamps = (
-  featureCollection: FeatureCollection<Point> | undefined
-) => {
-  if (
-    featureCollection &&
-    featureCollection.features &&
-    featureCollection.features.length > 0
-  ) {
-    // This default will trigger new value assign in the loop
-    let minDate = dayjs(dateDefault.max);
-    let maxDate = dayjs(dateDefault.min);
-
-    featureCollection.features?.forEach((feature) => {
-      const start = dayjs(feature.properties?.startTime);
-      const end = dayjs(feature.properties?.endTime);
-      if (start.isBefore(minDate)) {
-        minDate = start;
-      }
-      if (end.isAfter(maxDate)) {
-        maxDate = end;
-      }
-    });
-    return [minDate, maxDate];
-  } else {
-    return [dayjs(dateDefault.min), dayjs(dateDefault.max)];
-  }
-};
 
 interface SummaryAndDownloadPanelProps {
   bbox?: LngLatBounds;
@@ -74,9 +46,41 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     getAndSetDownloadConditions,
   } = useDetailPageContext();
 
-  const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
+  const [minDateStamp, setMinDateStamp] = useState(dayjs(dateDefault.max));
+  const [maxDateStamp, setMaxDateStamp] = useState(dayjs(dateDefault.min));
+  const [isShowingDateSlider, setIsShowingDateSlider] = useState(false);
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
+
+  const setMinMaxDateStamps = useCallback(
+    (featureCollection: FeatureCollection<Point> | undefined) => {
+      if (
+        featureCollection &&
+        featureCollection.features &&
+        featureCollection.features.length > 0
+      ) {
+        let minDate = minDateStamp;
+        let maxDate = maxDateStamp;
+
+        featureCollection.features?.forEach((feature) => {
+          const date = dayjs(feature.properties?.date);
+          if (date.isBefore(minDate)) {
+            minDate = date;
+          }
+          if (date.isAfter(maxDate)) {
+            maxDate = date;
+          }
+        });
+        setMinDateStamp(minDate);
+        setMaxDateStamp(maxDate);
+      }
+    },
+    [maxDateStamp, minDateStamp]
+  );
+
+  useEffect(() => {
+    setMinMaxDateStamps(featureCollection);
+  }, [featureCollection, setMinMaxDateStamps]);
 
   const filteredFeatureCollection = useMemo(() => {
     if (!featureCollection) {
@@ -101,15 +105,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     );
 
     const filteredFeatures = featureCollection.features?.filter((feature) => {
-      const start = dayjs(
-        feature.properties?.startTime,
-        dateDefault.DATE_TIME_FORMAT
+      const date = dayjs(
+        feature.properties?.date,
+        dateDefault.YEAR_MONTH_DATE_FORMAT
       );
-      const end = dayjs(
-        feature.properties?.endTime,
-        dateDefault.DATE_TIME_FORMAT
-      );
-      return start.isBefore(conditionEnd) && end.isAfter(conditionStart);
+      return date.isBefore(conditionEnd) && date.isAfter(conditionStart);
     });
 
     return {
@@ -191,6 +191,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <MenuControl
                       menu={
                         <DateRange
+                          onClick={() => {
+                            setIsShowingDateSlider((prev) => !prev);
+                          }}
                           minDate={minDateStamp.format(
                             dateDefault.SIMPLE_DATE_FORMAT
                           )}
@@ -203,6 +206,24 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         />
                       }
                     />
+                    {isShowingDateSlider && (
+                      <MenuControl
+                        menu={
+                          <DateSlider
+                            minDate={minDateStamp.format(
+                              dateDefault.SIMPLE_DATE_FORMAT
+                            )}
+                            maxDate={maxDateStamp.format(
+                              dateDefault.SIMPLE_DATE_FORMAT
+                            )}
+                            getAndSetDownloadConditions={
+                              getAndSetDownloadConditions
+                            }
+                          />
+                        }
+                        position="bottom-right"
+                      />
+                    )}
                     <MenuControl
                       menu={
                         <DrawRect

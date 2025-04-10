@@ -18,6 +18,7 @@ const rightPadding = "15px";
 interface MenuControlProps {
   menu: MapControlType | null;
   visible?: boolean;
+  position?: "top-right" | "top-left" | "bottom-right" | "bottom-left";
 }
 
 class MapControl implements IControl {
@@ -107,6 +108,7 @@ class MapControl implements IControl {
 const MenuControl: React.FC<MenuControlProps> = ({
   menu,
   visible = true,
+  position = "top-right",
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
   const [control, setControl] = useState<MapControl | null>(null);
@@ -122,7 +124,7 @@ const MenuControl: React.FC<MenuControlProps> = ({
         const newControl = new MapControl(
           cloneElement<ControlProps>(menu, { map: map })
         );
-        map?.addControl(newControl, "top-right");
+        map?.addControl(newControl, position);
         return newControl;
       }
       return prev;
@@ -131,8 +133,15 @@ const MenuControl: React.FC<MenuControlProps> = ({
     if (control) {
       control.setVisible(visible);
     }
-  }, [map, menu, visible, control]);
+  }, [map, menu, visible, control, position]);
 
+  useEffect(() => {
+    return () => {
+      if (control && map) {
+        control.onRemove(map);
+      }
+    };
+  }, [control, map]);
   return <React.Fragment />;
 };
 

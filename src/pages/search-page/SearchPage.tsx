@@ -495,7 +495,7 @@ const SearchPage = () => {
           }}
         >
           <MapSection
-            showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
+            isFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
             showFullList={layout === SearchResultLayoutEnum.FULL_LIST}
             collections={layers}
             bbox={bbox}
