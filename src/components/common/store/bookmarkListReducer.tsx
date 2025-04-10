@@ -222,23 +222,32 @@ export const initializeBookmarkList = createAsyncThunk<
     const storedIds = loadBookmarkIdsFromStorage();
 
     if (storedIds.length > 0) {
-      const searchParams = {
-        filter: createFilterString(storedIds),
-      };
-
-      await dispatch(fetchResultNoStore(searchParams))
-        .unwrap()
-        .then((value: OGCCollections) => {
-          dispatch(setItems(value.collections));
-          // Emit INIT event after data is loaded
-          setTimeout(() => {
-            emitter.emit(EVENT_BOOKMARK.INIT, {
-              id: "",
-              action: EVENT_BOOKMARK.INIT,
-              value: value.collections,
-            });
-          }, 0.1);
+      const collections: OGCCollection[] = [];
+      // Create an array of promises for each ID fetch
+      const fetchPromises = storedIds.map(async (id) => {
+        await dispatch(fetchResultByUuidNoStore(id))
+          .unwrap()
+          .then((res: OGCCollection) => {
+            if (res) {
+              collections.push(res);
+            }
+          })
+          .catch((err: Error) => {
+            errorHandling(thunkAPI);
+          });
+      });
+      // Wait for all fetches to complete
+      await Promise.all(fetchPromises);
+      // Update the state with the fetched collections
+      dispatch(setItems(collections));
+      // Emit INIT event after data is loaded
+      setTimeout(() => {
+        emitter.emit(EVENT_BOOKMARK.INIT, {
+          id: "",
+          action: EVENT_BOOKMARK.INIT,
+          value: collections,
         });
+      }, 0.1);
     } else {
       // Even with no bookmarks, still emit INIT with empty array
       setTimeout(() => {
