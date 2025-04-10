@@ -26,6 +26,7 @@ class MapControl implements IControl {
   private readonly component: MapControlType;
   private height: string = "";
   private marginTop: string = "";
+  private additionalProps: Partial<ControlProps> = {}; // Store dynamic props separately
 
   // When the user clicks somewhere on the map, notify the MenuControl
   private readonly mapClickHandler: (event: MapMouseEvent) => void;
@@ -43,7 +44,11 @@ class MapControl implements IControl {
 
   private render() {
     if (this.root && this.container) {
-      this.root.render(this.component);
+      const updatedComponent = cloneElement(this.component, {
+        ...this.component.props,
+        ...this.additionalProps,
+      });
+      this.root.render(updatedComponent);
     }
   }
 
@@ -54,6 +59,12 @@ class MapControl implements IControl {
       this.container.style.height = visible ? this.height : "0px";
       this.container.style.marginTop = visible ? this.marginTop : "0px";
     }
+  }
+
+  // Method to update additional props
+  updateProps(newProps: Partial<ControlProps>) {
+    this.additionalProps = { ...this.additionalProps, ...newProps };
+    this.render();
   }
 
   onAdd(map: MapBox) {
@@ -128,6 +139,15 @@ const MenuControl: React.FC<MenuControlProps> = ({
       return prev;
     });
   }, [map, menu, control]);
+
+  useEffect(() => {
+    // Once the control set, you cannot change it, in case the props of menu update
+    // you can call the update function which clone the existing one and then
+    // apply the updated props to it.
+    if (menu?.props && control) {
+      control.updateProps(menu?.props);
+    }
+  }, [control, menu?.props]);
 
   useEffect(() => {
     control?.setVisible(visible);
