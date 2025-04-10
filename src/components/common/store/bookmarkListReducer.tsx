@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import EventEmitter from "events";
 import { AppDispatch, RootState } from "./store";
-import { fetchResultByUuidNoStore } from "./searchReducer";
-import { OGCCollection } from "./OGCCollectionDefinitions";
+import { fetchResultByUuidNoStore, fetchResultNoStore } from "./searchReducer";
+import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
@@ -13,6 +13,7 @@ import {
   saveBookmarkIdsToStorage,
 } from "../../../utils/StorageUtils";
 import { checkExtent } from "../../../utils/GeoJsonUtils";
+import { createFilterString } from "../../../utils/StringUtils";
 
 interface BookmarkListState {
   items: Array<OGCCollection>;
@@ -219,36 +220,27 @@ export const initializeBookmarkList = createAsyncThunk<
   const { dispatch } = thunkAPI;
 
   try {
-    // Load bookmark IDs from local storage
     const storedIds = loadBookmarkIdsFromStorage();
 
     if (storedIds.length > 0) {
-      const collections: OGCCollection[] = [];
-      // Create an array of promises for each ID fetch
-      const fetchPromises = storedIds.map(async (id) => {
-        await dispatch(fetchResultByUuidNoStore(id))
-          .unwrap()
-          .then((res: OGCCollection) => {
-            if (res) {
-              collections.push(res);
-            }
-          })
-          .catch((err: Error) => {
-            errorHandling(thunkAPI);
-          });
-      });
-      // Wait for all fetches to complete
-      await Promise.all(fetchPromises);
-      // Update the state with the fetched collections
-      dispatch(setItems(collections));
-      // Emit INIT event after data is loaded
-      setTimeout(() => {
-        emitter.emit(EVENT_BOOKMARK.INIT, {
-          id: "",
-          action: EVENT_BOOKMARK.INIT,
-          value: collections,
+      const searchParams = {
+        filter: createFilterString(storedIds),
+        properties: "id,title,description,status,links,assets_summary,bbox",
+      };
+
+      await dispatch(fetchResultNoStore(searchParams))
+        .unwrap()
+        .then((value: OGCCollections) => {
+          dispatch(setItems(value.collections));
+          // Emit INIT event after data is loaded
+          setTimeout(() => {
+            emitter.emit(EVENT_BOOKMARK.INIT, {
+              id: "",
+              action: EVENT_BOOKMARK.INIT,
+              value: value.collections,
+            });
+          }, 0.1);
         });
-      }, 0.1);
     } else {
       // Even with no bookmarks, still emit INIT with empty array
       setTimeout(() => {

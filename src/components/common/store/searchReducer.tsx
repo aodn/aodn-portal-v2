@@ -224,7 +224,7 @@ const fetchResultByUuidNoStore = createAsyncThunk<
   OGCCollection,
   string,
   { rejectValue: ErrorResponse }
->("search/fetchResultNoStore", async (id: string, thunkApi: any) =>
+>("search/fetchResultByUuidNoStore", async (id: string, thunkApi: any) =>
   axios
     .get<OGCCollection>(`/api/v1/ogc/collections/${id}`)
     .then((response) => Object.assign(new OGCCollection(), response.data))
