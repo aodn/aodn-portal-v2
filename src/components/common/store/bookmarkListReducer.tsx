@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import EventEmitter from "events";
 import { AppDispatch, RootState } from "./store";
-import { fetchResultByUuidNoStore, fetchResultNoStore } from "./searchReducer";
-import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
+import { fetchResultByUuidNoStore } from "./searchReducer";
+import { OGCCollection } from "./OGCCollectionDefinitions";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
@@ -12,7 +12,6 @@ import {
   loadBookmarkIdsFromStorage,
   saveBookmarkIdsToStorage,
 } from "../../../utils/StorageUtils";
-import { createFilterString } from "../../../utils/StringUtils";
 import { checkExtent } from "../../../utils/GeoJsonUtils";
 
 interface BookmarkListState {
@@ -218,7 +217,9 @@ export const initializeBookmarkList = createAsyncThunk<
   { rejectValue: ErrorResponse; state: RootState; dispatch: AppDispatch }
 >("bookmarkList/initialize", async (_, thunkAPI: any) => {
   const { dispatch } = thunkAPI;
+
   try {
+    // Load bookmark IDs from local storage
     const storedIds = loadBookmarkIdsFromStorage();
 
     if (storedIds.length > 0) {
