@@ -8,6 +8,7 @@ import {
   createSearchParamFrom,
   DEFAULT_SEARCH_MAP_SIZE,
   DEFAULT_SEARCH_PAGE_SIZE,
+  fetchResultByUuidNoStore,
   fetchResultNoStore,
   fetchResultWithStore,
 } from "../../components/common/store/searchReducer";
@@ -26,7 +27,7 @@ import {
   on,
   off,
   setExpandedItem,
-  checkAndInsertTemporary,
+  setTemporaryItem,
 } from "../../components/common/store/bookmarkListReducer";
 import Layout from "../../components/layout/layout";
 import ResultSection from "./subpages/ResultSection";
@@ -57,6 +58,7 @@ import {
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
+import { checkExtent } from "../../utils/GeoJsonUtils";
 
 const isLoading = (count: number): boolean => {
   if (count > 0) {
@@ -351,6 +353,26 @@ const SearchPage = () => {
     [dispatch, redirectSearch]
   );
 
+  // Helper to check if the item exists in items array or is already a temporary item and return it
+  const findTemporaryItemExisting = useCallback(
+    (id: string): OGCCollection | undefined => {
+      // Check if item exists in bookmark items array
+      const existingItem = store
+        .getState()
+        .bookmarkList.items.find((item: { id: string }) => item.id === id);
+      // Check if item is already a temporary item
+      const temporaryItem: OGCCollection | undefined =
+        store.getState().bookmarkList.temporaryItem;
+      const isTemporaryItem = temporaryItem?.id === id;
+      if (!!existingItem || isTemporaryItem) {
+        return existingItem || temporaryItem;
+      } else {
+        return undefined;
+      }
+    },
+    []
+  );
+
   // Handler for click on map
   const onClickMapPoint = useCallback(
     (uuids: Array<string>) => {
@@ -362,20 +384,50 @@ const SearchPage = () => {
         // Since map point only store uuid in its feature, so need to fetch dataset here
         // Clicking a map dot or a result card will only add a temporary item in bookmark list, until the bookmark icon is clicked
         setSelectedUuids(uuids);
-        dispatch(checkAndInsertTemporary({ id: uuids[0] }));
+
+        const temporaryItemExisting = findTemporaryItemExisting(uuids[0]);
+        if (temporaryItemExisting) {
+          // If the item exists in items array or is already a temporary item, just expand the item
+          dispatch(setExpandedItem(temporaryItemExisting));
+        } else {
+          dispatch(fetchResultByUuidNoStore(uuids[0]))
+            .unwrap()
+            .then((res: OGCCollection) => {
+              dispatch(setTemporaryItem(res));
+              dispatch(setExpandedItem(res));
+            });
+        }
       }
     },
-    [dispatch]
+    [dispatch, findTemporaryItemExisting]
   );
 
   const onClickResultCard = useCallback(
     (item: OGCCollection | undefined) => {
       if (item) {
         setSelectedUuids([item.id]);
-        dispatch(checkAndInsertTemporary({ id: item.id, item }));
+
+        const temporaryItemExisting = findTemporaryItemExisting(item.id);
+        if (temporaryItemExisting) {
+          // If the item exists in items array or is already a temporary item, just expand the item
+          dispatch(setExpandedItem(temporaryItemExisting));
+        } else {
+          if (checkExtent(item)) {
+            // If the item has a valid extent, add it directly
+            dispatch(setTemporaryItem(item));
+            dispatch(setExpandedItem(item));
+          } else {
+            dispatch(fetchResultByUuidNoStore(item.id))
+              .unwrap()
+              .then((res: OGCCollection) => {
+                dispatch(setTemporaryItem(res));
+                dispatch(setExpandedItem(res));
+              });
+          }
+        }
       }
     },
-    [dispatch]
+    [dispatch, findTemporaryItemExisting]
   );
 
   const onDeselectDataset = useCallback(() => {

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import EventEmitter from "events";
 import { AppDispatch, RootState } from "./store";
-import { fetchResultByUuidNoStore, fetchResultNoStore } from "./searchReducer";
+import { fetchResultNoStore } from "./searchReducer";
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
   BookmarkEvent,
@@ -12,7 +12,6 @@ import {
   loadBookmarkIdsFromStorage,
   saveBookmarkIdsToStorage,
 } from "../../../utils/StorageUtils";
-import { checkExtent } from "../../../utils/GeoJsonUtils";
 import { createFilterString } from "../../../utils/StringUtils";
 
 interface BookmarkListState {
@@ -140,75 +139,6 @@ export const {
 
 export { on, off };
 
-export const checkExtentAndAdd = createAsyncThunk<
-  void,
-  OGCCollection,
-  { rejectValue: ErrorResponse; state: RootState; dispatch: AppDispatch }
->("bookmarkList/checkExtentAndAdd", async (item, thunkAPI) => {
-  const { dispatch } = thunkAPI;
-
-  // Check if the item has a valid extent
-  const hasValidExtent = checkExtent(item);
-
-  if (hasValidExtent) {
-    // If the item has a valid extent, add it directly
-    dispatch(addItem(item));
-  } else {
-    // If the item does not have a valid extent, fetch it first
-    await dispatch(fetchResultByUuidNoStore(item.id))
-      .unwrap()
-      .then((res: OGCCollection) => {
-        dispatch(addItem(res));
-      })
-      .catch((err: Error) => {
-        errorHandling(thunkAPI);
-      });
-  }
-});
-
-// Thunk actions for async operations, avoid getState() where someone is calling the reducer
-export const checkAndInsertTemporary = createAsyncThunk<
-  void,
-  {
-    id: string;
-    item?: OGCCollection | undefined;
-  },
-  { rejectValue: ErrorResponse; state: RootState; dispatch: AppDispatch }
->("bookmarkList/checkAndInsertTemporary", async ({ id, item }, thunkAPI) => {
-  const { dispatch, getState } = thunkAPI;
-  const state = getState();
-  // Check if item exists in items array
-  const existingItem = state.bookmarkList.items.find(
-    (item: { id: string }) => item.id === id
-  );
-
-  // Check if item is already a temporary item
-  const isTemporaryItem = state.bookmarkList.temporaryItem?.id === id;
-
-  if (existingItem || isTemporaryItem) {
-    // If item exists in either place, just expand it
-    dispatch(setExpandedItem(existingItem || state.bookmarkList.temporaryItem));
-  } else {
-    // If item doesn't exist anywhere, set as temporary and expand it
-    if (item && checkExtent(item)) {
-      // If item is passed and has valid extent, use it directly
-      dispatch(setTemporaryItem(item));
-      dispatch(setExpandedItem(item));
-    } else {
-      // If no item passed or item doesn't have extent, fetch it first
-      await dispatch(fetchResultByUuidNoStore(id))
-        .unwrap()
-        .then((res: OGCCollection) => {
-          dispatch(setTemporaryItem(res));
-          dispatch(setExpandedItem(res));
-        })
-        .catch((err: Error) => {
-          errorHandling(thunkAPI);
-        });
-    }
-  }
-});
-
 // Thunk actions for initializing bookmarks from local storage
 export const initializeBookmarkList = createAsyncThunk<
   void,
@@ -223,6 +153,7 @@ export const initializeBookmarkList = createAsyncThunk<
     if (storedIds.length > 0) {
       const searchParams = {
         filter: createFilterString(storedIds),
+        // The properties need to include keyword "bbox" to ensure extents is returned
         properties: "id,title,description,status,links,assets_summary,bbox",
       };
 
