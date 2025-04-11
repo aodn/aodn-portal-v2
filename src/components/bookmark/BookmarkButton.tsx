@@ -4,7 +4,6 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { IconButton, Tooltip } from "@mui/material";
 import { color, gap } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import { fetchResultByUuidNoStore } from "../common/store/searchReducer";
 import {
   addItem,
   checkIsBookmarked,
@@ -20,7 +19,6 @@ import {
   BookmarkEvent,
   EVENT_BOOKMARK,
 } from "../map/mapbox/controls/menu/Definition";
-import { checkExtent } from "../../utils/GeoJsonUtils";
 
 export interface BookmarkButtonProps {
   dataset?: OGCCollection;
@@ -55,20 +53,7 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
           store.dispatch(setTemporaryItem(undefined));
         }
 
-        // Check if the item has a valid extent
-        const hasValidExtent = checkExtent(item);
-        if (hasValidExtent) {
-          // If the item has a valid extent, add it directly
-          store.dispatch(addItem(item));
-        } else {
-          // If the item does not have a valid extent, fetch it first
-          store
-            .dispatch(fetchResultByUuidNoStore(item.id))
-            .unwrap()
-            .then((res: OGCCollection) => {
-              store.dispatch(addItem(res));
-            });
-        }
+        store.dispatch(addItem(item));
       }
       setIsBookmarked(!isBookmarked);
     },

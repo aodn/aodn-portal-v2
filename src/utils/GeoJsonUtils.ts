@@ -68,18 +68,3 @@ export const combineBBoxesToMultiPolygon = (
     coordinates: polygons.map((polygon) => polygon.coordinates),
   };
 };
-
-// Check if a collection has valid extent
-export const checkExtent = (collection: OGCCollection) => {
-  if (!collection.extent) return false;
-  if (
-    !collection.extent.bbox ||
-    !Array.isArray(collection.extent.bbox) ||
-    collection.extent.bbox.length === 0
-  ) {
-    return false;
-  }
-  return collection.extent.bbox.some(
-    (box) => Array.isArray(box) && box.length === 4
-  );
-};

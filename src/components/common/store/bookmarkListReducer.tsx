@@ -153,8 +153,6 @@ export const initializeBookmarkList = createAsyncThunk<
     if (storedIds.length > 0) {
       const searchParams = {
         filter: createFilterString(storedIds),
-        // The properties need to include keyword "bbox" to ensure extents is returned
-        properties: "id,title,description,status,links,assets_summary,bbox",
       };
 
       await dispatch(fetchResultNoStore(searchParams))

@@ -58,7 +58,6 @@ import {
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
-import { checkExtent } from "../../utils/GeoJsonUtils";
 
 const isLoading = (count: number): boolean => {
   if (count > 0) {
@@ -412,18 +411,8 @@ const SearchPage = () => {
           // If the item exists in items array or is already a temporary item, just expand the item
           dispatch(setExpandedItem(temporaryItemExisting));
         } else {
-          if (checkExtent(item)) {
-            // If the item has a valid extent, add it directly
-            dispatch(setTemporaryItem(item));
-            dispatch(setExpandedItem(item));
-          } else {
-            dispatch(fetchResultByUuidNoStore(item.id))
-              .unwrap()
-              .then((res: OGCCollection) => {
-                dispatch(setTemporaryItem(res));
-                dispatch(setExpandedItem(res));
-              });
-          }
+          dispatch(setTemporaryItem(item));
+          dispatch(setExpandedItem(item));
         }
       }
     },
