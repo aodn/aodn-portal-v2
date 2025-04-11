@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import EventEmitter from "events";
 import { AppDispatch, RootState } from "./store";
-import { fetchResultByUuidNoStore, fetchResultNoStore } from "./searchReducer";
+import { fetchResultNoStore } from "./searchReducer";
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
   BookmarkEvent,
@@ -32,7 +32,6 @@ const on = (type: EVENT_BOOKMARK, handle: (event: BookmarkEvent) => void) =>
 const off = (type: EVENT_BOOKMARK, handle: (event: BookmarkEvent) => void) =>
   emitter.off(type, handle);
 
-// TODO: need to implement initial bookmark items list in the future by getting uuids array from browser storage and fetching collections
 const initialState: BookmarkListState = {
   items: [],
   temporaryItem: undefined,
@@ -45,7 +44,6 @@ const bookmarkListSlice = createSlice({
   reducers: {
     setItems: (state, action: PayloadAction<Array<OGCCollection>>) => {
       state.items = action.payload;
-      // saveBookmarkIdsToStorage(action.payload);
     },
     setTemporaryItem: (
       state,
@@ -141,39 +139,6 @@ export const {
 
 export { on, off };
 
-// Thunk actions for async operations, avoid getState() where someone is calling the reducer
-export const fetchAndInsertTemporary = createAsyncThunk<
-  void,
-  string,
-  { rejectValue: ErrorResponse; state: RootState; dispatch: AppDispatch }
->("bookmarkList/fetchAndInsertTemporary", async (id: string, thunkAPI: any) => {
-  const { dispatch, getState } = thunkAPI;
-  const state = getState();
-  // Check if item exists in items array
-  const existingItem = state.bookmarkList.items.find(
-    (item: { id: string }) => item.id === id
-  );
-
-  // Check if item is already a temporary item
-  const isTemporaryItem = state.bookmarkList.temporaryItem?.id === id;
-
-  if (existingItem || isTemporaryItem) {
-    // If item exists in either place, just expand it
-    dispatch(setExpandedItem(existingItem || state.bookmarkList.temporaryItem));
-  } else {
-    // If item doesn't exist anywhere, fetch it, set as temporary and expand
-    await dispatch(fetchResultByUuidNoStore(id))
-      .unwrap()
-      .then((res: OGCCollection) => {
-        dispatch(setTemporaryItem(res));
-        dispatch(setExpandedItem(res));
-      })
-      .catch((err: Error) => {
-        errorHandling(thunkAPI);
-      });
-  }
-});
-
 // Thunk actions for initializing bookmarks from local storage
 export const initializeBookmarkList = createAsyncThunk<
   void,
@@ -181,6 +146,7 @@ export const initializeBookmarkList = createAsyncThunk<
   { rejectValue: ErrorResponse; state: RootState; dispatch: AppDispatch }
 >("bookmarkList/initialize", async (_, thunkAPI: any) => {
   const { dispatch } = thunkAPI;
+
   try {
     const storedIds = loadBookmarkIdsFromStorage();
 

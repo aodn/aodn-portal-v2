@@ -52,6 +52,7 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
           // If bookmark a temporary item, should clear temporaryItem then add to bookmark list
           store.dispatch(setTemporaryItem(undefined));
         }
+
         store.dispatch(addItem(item));
       }
       setIsBookmarked(!isBookmarked);
