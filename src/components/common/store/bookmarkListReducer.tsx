@@ -190,23 +190,21 @@ export const checkAndInsertTemporary = createAsyncThunk<
     dispatch(setExpandedItem(existingItem || state.bookmarkList.temporaryItem));
   } else {
     // If item doesn't exist anywhere, set as temporary and expand it
-    if (item) {
-      // If item is passed, use it directly
-      if (checkExtent(item)) {
-        dispatch(setTemporaryItem(item));
-        dispatch(setExpandedItem(item));
-      } else {
-        // If item doesn't have extent, fetch it first
-        await dispatch(fetchResultByUuidNoStore(id))
-          .unwrap()
-          .then((res: OGCCollection) => {
-            dispatch(setTemporaryItem(res));
-            dispatch(setExpandedItem(res));
-          })
-          .catch((err: Error) => {
-            errorHandling(thunkAPI);
-          });
-      }
+    if (item && checkExtent(item)) {
+      // If item is passed and has valid extent, use it directly
+      dispatch(setTemporaryItem(item));
+      dispatch(setExpandedItem(item));
+    } else {
+      // If no item passed or item doesn't have extent, fetch it first
+      await dispatch(fetchResultByUuidNoStore(id))
+        .unwrap()
+        .then((res: OGCCollection) => {
+          dispatch(setTemporaryItem(res));
+          dispatch(setExpandedItem(res));
+        })
+        .catch((err: Error) => {
+          errorHandling(thunkAPI);
+        });
     }
   }
 });
