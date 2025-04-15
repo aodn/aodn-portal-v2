@@ -25,6 +25,7 @@ import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
@@ -155,6 +156,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   bbox={bbox}
                   animate={true}
                   panelId={mapContainerId}
+                  projection={"mercator"} // Hexbin support this project or globe only
                   announcement={
                     collection.hasSummaryFeature()
                       ? undefined
@@ -213,9 +215,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                   </Controls>
                   <Layers>
-                    <DetailSymbolLayer
-                      featureCollection={filteredFeatureCollection}
-                    />
+                    <HexbinLayer featureCollection={undefined} />
                   </Layers>
                 </Map>
               </Box>
