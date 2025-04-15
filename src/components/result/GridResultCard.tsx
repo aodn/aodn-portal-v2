@@ -120,6 +120,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
               display="flex"
               alignItems="center"
               arial-label="grid-list-card-title"
+              data-testid="grid-card-title"
             >
               <Typography
                 color={fontColor.gray.dark}

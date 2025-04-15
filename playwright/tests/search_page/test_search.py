@@ -67,7 +67,7 @@ def test_search_result_sort(
         )
 
     search_page.result_sort_button.click()
-    search_page.click_text(sort_type.value, exact=True)
+    search_page.click_text(sort_type.display_name, exact=True)
 
     search_page.wait_for_search_to_complete()
     updated_first_title = search_page.first_result_title.inner_text()

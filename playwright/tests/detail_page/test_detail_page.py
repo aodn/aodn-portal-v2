@@ -1,6 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
+from core.constants.devices import DesktopDevices
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
@@ -15,7 +16,7 @@ from pages.search_page import SearchPage
 def test_tab_panel_scroll(desktop_page: Page, title: str) -> None:
     # Precondition: Tab panel should have scroll buttons
     # Set a smaller browser window size to make the tabs scrollable
-    desktop_page.set_viewport_size({'width': 800, 'height': 800})
+    desktop_page.set_viewport_size(DesktopDevices.EXTRA_SMALL)
 
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)

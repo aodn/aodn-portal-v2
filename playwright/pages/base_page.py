@@ -21,6 +21,10 @@ class BasePage:
         # Delegate attribute lookup to the page object if not found in custom 'Page' classes
         return getattr(self.page, name)
 
+    def go_to_landing_page(self) -> None:
+        """Navigate to the landing page"""
+        self.page.get_by_test_id('imos-logo').first.click()
+
     def get_by_id(self, id: str) -> Locator:
         """Return a locator by id attribute"""
         return self.page.locator(f'#{id}')
