@@ -10,7 +10,6 @@ import {
   Typography,
 } from "@mui/material";
 import ReplyIcon from "@mui/icons-material/Reply";
-import ContentCopy from "@mui/icons-material/ContentCopy";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { useDetailPageContext } from "../context/detail-page-context";
 import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
@@ -28,9 +27,7 @@ import {
   fontWeight,
   padding,
 } from "../../../styles/constants";
-import ShareButtonMenu, {
-  ShareMenuItem,
-} from "../../../components/menu/ShareButtonMenu";
+import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
 import dayjs from "dayjs";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
@@ -211,6 +208,12 @@ const HeaderSection = () => {
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
+  const copyUrl = window.location.href;
+  const isCopied = useMemo(
+    () => checkIfCopied(copyUrl),
+    [checkIfCopied, copyUrl]
+  );
+
   const title = useMemo(() => collection?.title, [collection?.title]);
   const pace = useMemo(() => collection?.getPace(), [collection]);
   const status = useMemo(() => collection?.getStatus(), [collection]);
@@ -224,26 +227,6 @@ const HeaderSection = () => {
   if (period && period[0][1]) {
     endDate = dayjs(period[0][1]).format(dateDefault.DISPLAY_FORMAT);
   }
-
-  const copyUrl = window.location.href;
-  const isCopied = useMemo(
-    () => checkIfCopied(copyUrl),
-    [checkIfCopied, copyUrl]
-  );
-  const shareItems: ShareMenuItem[] = useMemo(
-    () => [
-      {
-        name: isCopied ? "Link Copied" : "Copy Link",
-        icon: isCopied ? (
-          <DoneAllIcon fontSize="small" color="primary" />
-        ) : (
-          <ContentCopy fontSize="small" color="primary" />
-        ),
-        handler: () => copyToClipboard(copyUrl),
-      },
-    ],
-    [isCopied, copyToClipboard, copyUrl]
-  );
 
   const onGoBack = useCallback(
     (referer: string) => {
@@ -340,7 +323,10 @@ const HeaderSection = () => {
       <Box display="flex" flexDirection="column" gap={1}>
         {isUnderLaptop && renderGoBackButton(() => onGoBack(referer), referer)}
         <HeaderButton>
-          <ShareButtonMenu menuItems={shareItems} hideText={isMobile} />
+          <ShareButtonMenu
+            copyLinkConfig={{ isCopied, copyToClipboard, copyUrl }}
+            hideText={isMobile}
+          />
         </HeaderButton>
       </Box>
     </Box>

@@ -1,7 +1,5 @@
-import { FC, useMemo } from "react";
-import { Box, Grid, Paper, Stack, SxProps, Typography } from "@mui/material";
-import ContentCopy from "@mui/icons-material/ContentCopy";
-import DoneAllIcon from "@mui/icons-material/DoneAll";
+import { FC } from "react";
+import { Paper, Stack, SxProps, Typography } from "@mui/material";
 import {
   border,
   borderRadius,
@@ -21,7 +19,7 @@ import ResultListSortButton, {
 import { ICON_SELECT_DEFAULT_HEIGHT } from "../common/dropdown/IconSelect";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useClipboard from "../../hooks/useClipboard";
-import ShareButtonMenu, { ShareMenuItem } from "../menu/ShareButtonMenu";
+import ShareButtonMenu from "../menu/ShareButtonMenu";
 
 export interface ResultPanelSimpleFilterType
   extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
@@ -31,7 +29,8 @@ export interface ResultPanelSimpleFilterType
   sx?: SxProps;
 }
 
-const RESULT_COUNT_INFO_WIDTH = 200;
+const RESULT_COUNT_INFO_WIDTH_MOBILE = 200;
+const RESULT_COUNT_INFO_WIDTH_TABLET = 220;
 
 interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 
@@ -52,24 +51,6 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   onChangeSorting,
 }) => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
-  const { checkIfCopied, copyToClipboard } = useClipboard();
-
-  const copyUrl = window.location.href;
-  const isCopied = checkIfCopied(copyUrl);
-  const shareItems: ShareMenuItem[] = useMemo(
-    () => [
-      {
-        name: isCopied ? "Link Copied" : "Copy Link",
-        icon: isCopied ? (
-          <DoneAllIcon fontSize="small" color="primary" />
-        ) : (
-          <ContentCopy fontSize="small" color="primary" />
-        ),
-        handler: () => copyToClipboard(copyUrl),
-      },
-    ],
-    [isCopied, copyToClipboard, copyUrl]
-  );
 
   return (
     <Stack sx={sx} direction="row" spacing={1} width="100%">
@@ -80,7 +61,10 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           justifyContent: "center",
           alignItems: "center",
           height: "100%",
-          width: RESULT_COUNT_INFO_WIDTH,
+          width: {
+            xs: RESULT_COUNT_INFO_WIDTH_MOBILE,
+            sm: RESULT_COUNT_INFO_WIDTH_TABLET,
+          },
           border: `${border.xs} ${color.blue.darkSemiTransparent}`,
           borderRadius: borderRadius.small,
           bgcolor: color.white.sixTenTransparent,
@@ -89,10 +73,12 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         data-testid="show-result-count"
       >
         <Typography
-          fontSize={fontSize.label}
           padding={0}
           lineHeight={`${ICON_SELECT_DEFAULT_HEIGHT}px`}
-          sx={{ whiteSpace: "nowrap" }}
+          sx={{
+            whiteSpace: "nowrap",
+            fontSize: { xs: fontSize.label, sm: fontSize.info },
+          }}
         >
           {renderShowingResultsText(total, count)}
         </Typography>
@@ -113,14 +99,15 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
               : []
           }
         />
-        <ShareButtonMenu
-          menuItems={shareItems}
-          hideText
-          sx={{
-            maxHeight: ICON_SELECT_DEFAULT_HEIGHT,
-            maxWidth: ICON_SELECT_DEFAULT_HEIGHT * 2,
-          }}
-        />
+        {isUnderLaptop && (
+          <ShareButtonMenu
+            hideText
+            sx={{
+              maxHeight: ICON_SELECT_DEFAULT_HEIGHT,
+              maxWidth: ICON_SELECT_DEFAULT_HEIGHT * 2,
+            }}
+          />
+        )}
       </Stack>
     </Stack>
   );

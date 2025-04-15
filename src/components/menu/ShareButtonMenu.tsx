@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useState } from "react";
+import { FC, ReactNode, useCallback, useMemo, useState } from "react";
 import {
   Box,
   IconButton,
@@ -19,22 +19,51 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
+import ContentCopy from "@mui/icons-material/ContentCopy";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
+import useClipboard from "../../hooks/useClipboard";
 
-export interface ShareMenuItem {
+interface ShareMenuItem {
   name: string;
   icon?: ReactNode;
   handler: (event: React.MouseEvent<HTMLElement>) => void;
 }
+
+interface CopyLinkConfig {
+  isCopied: boolean;
+  copyUrl: string;
+  copyToClipboard: (url: string) => void;
+}
+
+// This function generates the menu items for the Share button
+// Add more items to this array if needed
+// Add configuration for each item if needed
+const getItems = ({
+  isCopied,
+  copyUrl,
+  copyToClipboard,
+}: CopyLinkConfig): ShareMenuItem[] => [
+  {
+    name: isCopied ? "Link Copied" : "Copy Link",
+    icon: isCopied ? (
+      <DoneAllIcon fontSize="small" color="primary" />
+    ) : (
+      <ContentCopy fontSize="small" color="primary" />
+    ),
+    handler: () => copyToClipboard(copyUrl),
+  },
+];
+
 interface ShareButtonProps {
-  menuItems: ShareMenuItem[];
+  copyLinkConfig?: CopyLinkConfig;
   hideText?: boolean;
   onClose?: () => void;
   sx?: SxProps;
 }
 
 const ShareButtonMenu: FC<ShareButtonProps> = ({
-  menuItems,
+  copyLinkConfig,
   hideText = false,
   onClose,
   sx,
@@ -42,6 +71,23 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const {
+    checkIfCopied: checkIfCopiedDefault,
+    copyToClipboard: copyToClipboardDefault,
+  } = useClipboard();
+  const copyUrlDefault = window.location.href;
+  const isCopiedDefault = useMemo(
+    () => checkIfCopiedDefault(copyUrlDefault),
+    [checkIfCopiedDefault, copyUrlDefault]
+  );
+
+  // If no copyLinkConfig is provided, use default values/functions from useClipboard
+  const { isCopied, copyUrl, copyToClipboard } = copyLinkConfig || {
+    isCopied: isCopiedDefault,
+    copyUrl: copyUrlDefault,
+    copyToClipboard: copyToClipboardDefault,
+  };
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setIsOpen(true);
@@ -68,7 +114,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
           flexDirection: "column",
           height: "100%",
           width: "100%",
-          bgcolor: isHovered || isOpen ? color.blue.dark : "#fff",
+          bgcolor: isHovered || isOpen ? color.brightBlue.dark : "#fff",
           borderRadius: borderRadius.small,
           ":hover": { cursor: "pointer" },
           ...sx,
@@ -122,7 +168,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
           },
         }}
       >
-        {menuItems.map((item, index) => (
+        {getItems({ isCopied, copyUrl, copyToClipboard }).map((item, index) => (
           <MenuItem key={index} onClick={item.handler}>
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText>
