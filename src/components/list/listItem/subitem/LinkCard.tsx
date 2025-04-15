@@ -3,11 +3,10 @@ import { Box, Link, Typography } from "@mui/material";
 import { ILink as LinkType } from "../../../common/store/OGCCollectionDefinitions";
 import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
 import { color, fontColor, padding } from "../../../../styles/constants";
-import CopyLinkButton from "../../../common/buttons/CopyLinkButton";
 import { openInNewTab } from "../../../../utils/LinkUtils";
-
-const COPY_LINK_BUTTON_WIDTH = 140;
-const COPY_LINK_BUTTON_HEIGHT = 32;
+import CopyButton, {
+  COPY_BUTTON_HEIGHT,
+} from "../../../common/buttons/CopyButton";
 
 interface LinkCardProps {
   icon?: boolean;
@@ -66,7 +65,7 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
             alt={"link icon"}
           />
         )}
-        <Box sx={{ overflow: "hidden", minHeight: COPY_LINK_BUTTON_HEIGHT }}>
+        <Box sx={{ overflow: "hidden", minHeight: COPY_BUTTON_HEIGHT }}>
           <Link
             href={link.href}
             underline="hover"
@@ -93,13 +92,13 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
       </Box>
 
       {showCopyButton && (
-        <CopyLinkButton
+        <CopyButton
           handleClick={handleCopyLink}
           hasBeenCopied={isCopied}
-          copyUrl={link.href}
-          sx={{
-            width: COPY_LINK_BUTTON_WIDTH,
-            height: COPY_LINK_BUTTON_HEIGHT,
+          copyText={link.href}
+          copyButtonConfig={{
+            textBeforeCopy: "Copy Link",
+            textAfterCopy: "Link Copied",
           }}
         />
       )}

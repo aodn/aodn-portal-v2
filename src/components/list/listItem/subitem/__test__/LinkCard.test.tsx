@@ -56,18 +56,14 @@ describe("LinkCard", () => {
     // Hover on the card
     await userEvent.hover(linkCard);
     await waitFor(() => {
-      const copyButton = screen.queryByTestId(
-        `copylinkbutton-${mockLink.href}`
-      );
+      const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
       expect(copyButton).toBeInTheDocument();
     });
 
     // Mouse leave
     await userEvent.unhover(linkCard);
     await waitFor(() => {
-      const copyButton = screen.queryByTestId(
-        `copylinkbutton-${mockLink.href}`
-      );
+      const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
       expect(copyButton).not.toBeInTheDocument();
     });
   });
@@ -82,9 +78,7 @@ describe("LinkCard", () => {
 
     // Wait for the button to be visible when clipboardText matches link.href
     await waitFor(() => {
-      const copyButton = screen.queryByTestId(
-        `copylinkbutton-${mockLink.href}`
-      );
+      const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
       expect(copyButton).toBeInTheDocument();
     });
   });
@@ -105,7 +99,7 @@ describe("LinkCard", () => {
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
     await userEvent.hover(linkCard);
     const copyButton = await screen.findByTestId(
-      `copylinkbutton-${mockLink.href}`
+      `copy-button-${mockLink.href}`
     );
     await userEvent.click(copyButton);
     await waitFor(() => {

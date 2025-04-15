@@ -1,11 +1,13 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
-import { Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import { fontWeight } from "../../styles/constants";
+import CopyButton from "../common/buttons/CopyButton";
+import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 
 interface SuggestedCitationListProps {
   suggestedCitation: string;
@@ -18,14 +20,35 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
   title = "Suggested Citation",
   mode,
 }) => {
+  const { checkIfCopied, copyToClipboard } = useDetailPageContext();
+
+  const isCopied = useMemo(
+    () => checkIfCopied(suggestedCitation),
+    [checkIfCopied, suggestedCitation]
+  );
+  const handleCopy = useCallback(async () => {
+    await copyToClipboard(suggestedCitation);
+  }, [copyToClipboard, suggestedCitation]);
+
   const suggestedCitationItem = useMemo(
     () =>
       suggestedCitation ? (
         <ItemBaseGrid key={suggestedCitation}>
-          <ExpandableTextArea text={suggestedCitation} />
+          <Stack direction="column" alignItems="center" gap={1}>
+            <ExpandableTextArea text={suggestedCitation} />
+            <CopyButton
+              handleClick={handleCopy}
+              hasBeenCopied={isCopied}
+              copyText={suggestedCitation}
+              copyButtonConfig={{
+                textBeforeCopy: "Copy Citation",
+                textAfterCopy: "Citation Copied",
+              }}
+            />
+          </Stack>
         </ItemBaseGrid>
       ) : null,
-    [suggestedCitation]
+    [handleCopy, isCopied, suggestedCitation]
   );
 
   switch (mode) {

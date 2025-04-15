@@ -1,14 +1,18 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import CopyLinkButton from "../CopyLinkButton";
+import CopyButton from "../CopyButton";
 
 describe("CopyLinkButton", () => {
-  const mockUrl = "https://example.com/test";
+  const mockText = "mock-text-123";
   const defaultProps = {
     handleClick: vi.fn(),
     hasBeenCopied: false,
-    copyUrl: mockUrl,
+    copyText: mockText,
+    copyButtonConfig: {
+      textBeforeCopy: "Copy Link",
+      textAfterCopy: "Link Copied",
+    },
   };
 
   afterEach(() => {
@@ -16,9 +20,9 @@ describe("CopyLinkButton", () => {
   });
 
   it("renders correctly with initial state", () => {
-    render(<CopyLinkButton {...defaultProps} />);
+    render(<CopyButton {...defaultProps} />);
 
-    const button = screen.getByTestId(`copylinkbutton-${mockUrl}`);
+    const button = screen.getByTestId(`copy-button-${mockText}`);
     expect(button).toBeInTheDocument();
     expect(screen.getByText("Copy Link")).toBeInTheDocument();
     expect(screen.queryByTestId("ContentCopyIcon")).toBeInTheDocument();
@@ -27,9 +31,9 @@ describe("CopyLinkButton", () => {
 
   it("calls handleClick with correct URL when clicked", async () => {
     const user = userEvent.setup();
-    render(<CopyLinkButton {...defaultProps} />);
+    render(<CopyButton {...defaultProps} />);
 
-    const button = screen.getByTestId(`copylinkbutton-${mockUrl}`);
+    const button = screen.getByTestId(`copy-button-${mockText}`);
     await user.click(button);
     await waitFor(() => {
       expect(defaultProps.handleClick).toHaveBeenCalledTimes(1);
@@ -37,8 +41,9 @@ describe("CopyLinkButton", () => {
   });
 
   it("displays copied state when hasBeenCopied is true", () => {
-    render(<CopyLinkButton {...defaultProps} hasBeenCopied={true} />);
+    render(<CopyButton {...defaultProps} hasBeenCopied={true} />);
 
+    expect(screen.getByText("Link Copied")).toBeInTheDocument();
     expect(screen.queryByTestId("DoneAllIcon")).toBeInTheDocument();
     expect(screen.queryByTestId("ContentCopyIcon")).not.toBeInTheDocument();
   });
