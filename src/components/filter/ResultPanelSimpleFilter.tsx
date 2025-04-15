@@ -1,6 +1,14 @@
-import { FC } from "react";
-import { Grid, Paper, SxProps, Typography } from "@mui/material";
-import { border, borderRadius, color, fontSize } from "../../styles/constants";
+import { FC, useMemo } from "react";
+import { Box, Grid, Paper, Stack, SxProps, Typography } from "@mui/material";
+import ContentCopy from "@mui/icons-material/ContentCopy";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+import {
+  border,
+  borderRadius,
+  color,
+  fontSize,
+  padding,
+} from "../../styles/constants";
 import { formatNumber } from "../../utils/StringUtils";
 import ResultListLayoutButton, {
   ResultListLayoutButtonType,
@@ -12,6 +20,8 @@ import ResultListSortButton, {
 } from "../common/buttons/ResultListSortButton";
 import { ICON_SELECT_DEFAULT_HEIGHT } from "../common/dropdown/IconSelect";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import useClipboard from "../../hooks/useClipboard";
+import ShareButtonMenu, { ShareMenuItem } from "../menu/ShareButtonMenu";
 
 export interface ResultPanelSimpleFilterType
   extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
@@ -20,6 +30,8 @@ export interface ResultPanelSimpleFilterType
   total: number;
   sx?: SxProps;
 }
+
+const RESULT_COUNT_INFO_WIDTH = 200;
 
 interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 
@@ -38,54 +50,79 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   onChangeLayout,
   currentSort,
   onChangeSorting,
-  isIconOnly,
 }) => {
-  const { isUnderLaptop } = useBreakpoint();
+  const { isUnderLaptop, isMobile } = useBreakpoint();
+  const { checkIfCopied, copyToClipboard } = useClipboard();
+
+  const copyUrl = window.location.href;
+  const isCopied = checkIfCopied(copyUrl);
+  const shareItems: ShareMenuItem[] = useMemo(
+    () => [
+      {
+        name: isCopied ? "Link Copied" : "Copy Link",
+        icon: isCopied ? (
+          <DoneAllIcon fontSize="small" color="primary" />
+        ) : (
+          <ContentCopy fontSize="small" color="primary" />
+        ),
+        handler: () => copyToClipboard(copyUrl),
+      },
+    ],
+    [isCopied, copyToClipboard, copyUrl]
+  );
+
   return (
-    <Grid sx={sx} container justifyContent="center" spacing={1}>
-      <Grid item md={6} xs={8}>
-        <Paper
-          elevation={0}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-            border: `${border.xs} ${color.blue.darkSemiTransparent}`,
-            borderRadius: borderRadius.small,
-            bgcolor: color.white.sixTenTransparent,
-          }}
-          data-testid="show-result-count"
+    <Stack sx={sx} direction="row" spacing={1} width="100%">
+      <Paper
+        elevation={0}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+          width: RESULT_COUNT_INFO_WIDTH,
+          border: `${border.xs} ${color.blue.darkSemiTransparent}`,
+          borderRadius: borderRadius.small,
+          bgcolor: color.white.sixTenTransparent,
+          paddingX: padding.extraSmall,
+        }}
+        data-testid="show-result-count"
+      >
+        <Typography
+          fontSize={fontSize.label}
+          padding={0}
+          lineHeight={`${ICON_SELECT_DEFAULT_HEIGHT}px`}
+          sx={{ whiteSpace: "nowrap" }}
         >
-          <Typography
-            fontSize={fontSize.info}
-            padding={0}
-            lineHeight={`${ICON_SELECT_DEFAULT_HEIGHT}px`}
-          >
-            {renderShowingResultsText(total, count)}
-          </Typography>
-        </Paper>
-      </Grid>
-      <Grid item md={3} xs={2}>
+          {renderShowingResultsText(total, count)}
+        </Typography>
+      </Paper>
+      <Stack flexDirection="row" flex={1} gap={1} flexWrap="nowrap">
         <ResultListSortButton
           onChangeSorting={onChangeSorting}
           currentSort={currentSort}
-          isIconOnly={isIconOnly}
+          isIconOnly={isMobile}
         />
-      </Grid>
-      <Grid item md={3} xs={2}>
         <ResultListLayoutButton
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
-          isIconOnly={isIconOnly}
+          isIconOnly={isMobile}
           excludeOptions={
             isUnderLaptop
               ? [SearchResultLayoutEnum.GRID, SearchResultLayoutEnum.LIST]
               : []
           }
         />
-      </Grid>
-    </Grid>
+        <ShareButtonMenu
+          menuItems={shareItems}
+          hideText
+          sx={{
+            maxHeight: ICON_SELECT_DEFAULT_HEIGHT,
+            maxWidth: ICON_SELECT_DEFAULT_HEIGHT * 2,
+          }}
+        />
+      </Stack>
+    </Stack>
   );
 };
 

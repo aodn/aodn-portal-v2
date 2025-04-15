@@ -233,7 +233,7 @@ const HeaderSection = () => {
   const shareItems: ShareMenuItem[] = useMemo(
     () => [
       {
-        name: "Copy Link",
+        name: isCopied ? "Link Copied" : "Copy Link",
         icon: isCopied ? (
           <DoneAllIcon fontSize="small" color="primary" />
         ) : (

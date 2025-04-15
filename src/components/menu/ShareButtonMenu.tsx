@@ -6,6 +6,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  SxProps,
   Typography,
 } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
@@ -25,17 +26,18 @@ export interface ShareMenuItem {
   icon?: ReactNode;
   handler: (event: React.MouseEvent<HTMLElement>) => void;
 }
-
 interface ShareButtonProps {
   menuItems: ShareMenuItem[];
   hideText?: boolean;
   onClose?: () => void;
+  sx?: SxProps;
 }
 
 const ShareButtonMenu: FC<ShareButtonProps> = ({
   menuItems,
   hideText = false,
   onClose,
+  sx,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -56,20 +58,20 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
   return (
     <>
       <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        flexDirection="column"
-        height="100%"
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        bgcolor={isHovered || isOpen ? color.blue.dark : "#fff"}
-        borderRadius={borderRadius.small}
         sx={{
-          ":hover": {
-            cursor: "pointer",
-          },
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          height: "100%",
+          width: "100%",
+          bgcolor: isHovered || isOpen ? color.blue.dark : "#fff",
+          borderRadius: borderRadius.small,
+          ":hover": { cursor: "pointer" },
+          ...sx,
         }}
       >
         <IconButton
