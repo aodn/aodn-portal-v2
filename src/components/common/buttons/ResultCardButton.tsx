@@ -52,7 +52,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       sx={{
-        padding: padding.extraSmall,
+        p: 0,
         textTransform: "none",
         opacity: disabled ? 0.5 : 1,
         minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
@@ -77,10 +77,12 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
 
       {hasText && (
         <Typography
+          pt={0}
           pl={padding.extraSmall}
+          mt={-0.5}
           fontSize={fontSizes[size].text}
           color={config.color}
-          sx={{ padding: 0 }} // Inline to avoid unnecessary object creation
+          whiteSpace="nowrap"
         >
           {text}
         </Typography>

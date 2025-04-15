@@ -82,7 +82,7 @@ describe("ResultCardButton", () => {
     render(<ResultCardButton sx={{ backgroundColor: "red" }} />);
     const button = screen.getByRole("button");
     expect(button).toHaveStyle("background-color: rgb(255, 0, 0)");
-    expect(button).toHaveStyle("padding: 6px");
+    expect(button).toHaveStyle("padding: 0px");
   });
 
   it("renders startIcon as a ComponentType with Tooltip and styling", () => {
@@ -94,7 +94,7 @@ describe("ResultCardButton", () => {
     userEvent.hover(icon);
 
     // Query the tooltip content (MUI uses a div with role="tooltip" when visible)
-    waitFor(() => screen.findByRole("tooltip")).then(() => {
+    waitFor(() => screen.findByRole("tooltip"), { timeout: 2000 }).then(() => {
       console.log("Verify tooltip");
       const tooltip = screen.getByRole("tooltip");
       expect(tooltip).toHaveTextContent("Click me"); // Check content instead of title

@@ -52,7 +52,6 @@ const ShowMoreDetailBtn: FC<ShowMoreDetailButtonProps> = memo(
   }
 );
 
-// Set displayName to satisfy ESLint
 ShowMoreDetailBtn.displayName = "ShowMoreDetailBtn";
 
 export default ShowMoreDetailBtn;
