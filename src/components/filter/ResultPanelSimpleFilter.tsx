@@ -18,7 +18,6 @@ import ResultListSortButton, {
 } from "../common/buttons/ResultListSortButton";
 import { ICON_SELECT_DEFAULT_HEIGHT } from "../common/dropdown/IconSelect";
 import useBreakpoint from "../../hooks/useBreakpoint";
-import useClipboard from "../../hooks/useClipboard";
 import ShareButtonMenu from "../menu/ShareButtonMenu";
 
 export interface ResultPanelSimpleFilterType
@@ -53,7 +52,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   const { isUnderLaptop, isMobile } = useBreakpoint();
 
   return (
-    <Stack sx={sx} direction="row" spacing={1} width="100%">
+    <Stack sx={sx} direction="row" spacing={1} width="100%" flexWrap="nowrap">
       <Paper
         elevation={0}
         sx={{
