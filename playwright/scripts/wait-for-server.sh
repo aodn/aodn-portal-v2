@@ -2,11 +2,9 @@
 
 echo "Waiting for the web server to start"
 
-timeout=150
+timeout=110
 interval=1
 elapsed=0
-
-echo "BASE_URL is set to: $BASE_URL"
 
 while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' $BASE_URL)" != "200" && $elapsed -lt $timeout ]]; do
   sleep $interval
@@ -14,6 +12,7 @@ while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' $BASE_URL)" != "200" && $el
 done
 
 if [[ $elapsed -ge $timeout ]]; then
+  echo "BASE_URL is set to: $BASE_URL"
   echo "Server did not start within $timeout seconds."
   exit 1
 else
