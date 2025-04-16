@@ -40,6 +40,7 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
       data-testid="bookmark-list-head"
     >
       <Typography
+        p={0}
         fontSize={fontSize.info}
         color={fontColor.blue.dark}
         fontWeight={fontWeight.bold}
@@ -51,7 +52,7 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
         onClick={onClearAllBookmarks}
         data-testid="bookmark-list-head-clearall"
       >
-        <Typography fontSize={fontSize.label} color={fontColor.blue.dark}>
+        <Typography p={0} fontSize={fontSize.label} color={fontColor.blue.dark}>
           Clear
         </Typography>
       </Button>
