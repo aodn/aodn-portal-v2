@@ -4879,6 +4879,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/dompurify@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "@types/dompurify@npm:3.2.0"
+  dependencies:
+    dompurify: "npm:*"
+  checksum: 10c0/e83fec586ffbb1b43f7c8479f2a99c223814d240db912d53fb126aaeea52a4091deceeb75632b5d76004d88ef0fbf444984887b121dece6fa69f4172ed4b2b07
+  languageName: node
+  linkType: hard
+
 "@types/eslint@npm:^8.4.5":
   version: 8.56.10
   resolution: "@types/eslint@npm:8.56.10"
@@ -5899,6 +5908,7 @@ __metadata:
     "@testing-library/react": "npm:^14.3.1"
     "@testing-library/user-event": "npm:^14.5.2"
     "@turf/turf": "npm:7.0.0"
+    "@types/dompurify": "npm:^3.2.0"
     "@types/he": "npm:^1"
     "@types/jest": "npm:^29.5.12"
     "@types/lodash": "npm:^4.17.0"
@@ -7444,14 +7454,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:^3.0.9":
-  version: 3.1.5
-  resolution: "dompurify@npm:3.1.5"
-  checksum: 10c0/8227fb1328c02d94f823de8cd499fca5ee07051e03e6b52bce06b592348aeb6e56ea8e2a4b0a9cfaeac7d623e4b5a52e4326aedf72596a6c2510b88dfcf2a2b6
-  languageName: node
-  linkType: hard
-
-"dompurify@npm:^3.2.4":
+"dompurify@npm:*, dompurify@npm:^3.2.4":
   version: 3.2.5
   resolution: "dompurify@npm:3.2.5"
   dependencies:
@@ -7460,6 +7463,13 @@ __metadata:
     "@types/trusted-types":
       optional: true
   checksum: 10c0/b564167cc588933ad2d25c185296716bdd7124e9d2a75dac76efea831bb22d1230ce5205a1ab6ce4c1010bb32ac35f7a5cb2dd16c78cbf382111f1228362aa59
+  languageName: node
+  linkType: hard
+
+"dompurify@npm:^3.0.9":
+  version: 3.1.5
+  resolution: "dompurify@npm:3.1.5"
+  checksum: 10c0/8227fb1328c02d94f823de8cd499fca5ee07051e03e6b52bce06b592348aeb6e56ea8e2a4b0a9cfaeac7d623e4b5a52e4326aedf72596a6c2510b88dfcf2a2b6
   languageName: node
   linkType: hard
 
