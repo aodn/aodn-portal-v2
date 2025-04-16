@@ -58,6 +58,9 @@ export default ({ mode }) => {
         },
       },
     },
+    ...(mode !== "dev" && {
+      allowedHosts: ["localhost", "web"],
+    }),
     plugins: [
       react(),
       mode !== "test" &&
