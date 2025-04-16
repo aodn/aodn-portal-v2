@@ -5,11 +5,7 @@ import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import { Feature, FeatureCollection, Point } from "geojson";
-
-interface PointData {
-  longitude: number;
-  latitude: number;
-}
+import { ScatterplotLayer } from "deck.gl";
 
 // Generate 100 random points around San Francisco
 const generateRandomPoints = (
@@ -61,20 +57,20 @@ const HexbinMap: FC<LayerBasicType> = ({
       if (overlayRef.current) return;
 
       const hexagonLayer = new HexagonLayer<Feature<Point>>({
-        id: "map-hexagon-layer",
+        id: "mapbox-overlay-hexagon-layer",
         data: featureCollection.features,
         getPosition: (d: Feature<Point>) => {
           const coords = d.geometry.coordinates;
-          return [coords[0], coords[1]]; // [lng, lat]
+          return [Number(coords[0]), Number(coords[1])]; // [lng, lat]
         },
-        radius: 50,
         extruded: true,
-        elevationScale: 100,
-        elevationRange: [60, 1000],
+        elevationScale: 250,
+        elevationRange: [0, 1000],
         getColorValue: (point: Feature<Point>[]) => 1000,
         // getElevationValue: (points) => points.length,
         colorRange: [[255, 0, 0]], // Bright red,
-        opacity: 0.7,
+        opacity: 1,
+        pickable: true,
         gpuAggregation: true,
       });
 
@@ -83,8 +79,10 @@ const HexbinMap: FC<LayerBasicType> = ({
         interleaved: true,
       };
       const overlay = new MapboxOverlay(overlayProps);
-      map.addControl(overlay);
+      map.addControl(overlay, "top-left");
       overlayRef.current = overlay;
+
+      map?.triggerRepaint();
 
       console.log(
         "Mapbox layers:",
