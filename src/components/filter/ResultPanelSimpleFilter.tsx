@@ -1,6 +1,12 @@
 import { FC } from "react";
-import { Grid, Paper, SxProps, Typography } from "@mui/material";
-import { border, borderRadius, color, fontSize } from "../../styles/constants";
+import { Paper, Stack, SxProps, Typography } from "@mui/material";
+import {
+  border,
+  borderRadius,
+  color,
+  fontSize,
+  padding,
+} from "../../styles/constants";
 import { formatNumber } from "../../utils/StringUtils";
 import ResultListLayoutButton, {
   ResultListLayoutButtonType,
@@ -12,6 +18,7 @@ import ResultListSortButton, {
 } from "../common/buttons/ResultListSortButton";
 import { ICON_SELECT_DEFAULT_HEIGHT } from "../common/dropdown/IconSelect";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import ShareButtonMenu from "../menu/ShareButtonMenu";
 
 export interface ResultPanelSimpleFilterType
   extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
@@ -20,6 +27,9 @@ export interface ResultPanelSimpleFilterType
   total: number;
   sx?: SxProps;
 }
+
+const RESULT_COUNT_INFO_WIDTH_MOBILE = 200;
+const RESULT_COUNT_INFO_WIDTH_TABLET = 220;
 
 interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 
@@ -38,54 +48,67 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   onChangeLayout,
   currentSort,
   onChangeSorting,
-  isIconOnly,
 }) => {
-  const { isUnderLaptop } = useBreakpoint();
+  const { isUnderLaptop, isMobile } = useBreakpoint();
+
   return (
-    <Grid sx={sx} container justifyContent="center" spacing={1}>
-      <Grid item md={6} xs={8}>
-        <Paper
-          elevation={0}
+    <Stack sx={sx} direction="row" spacing={1} width="100%" flexWrap="nowrap">
+      <Paper
+        elevation={0}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+          width: {
+            xs: RESULT_COUNT_INFO_WIDTH_MOBILE,
+            sm: RESULT_COUNT_INFO_WIDTH_TABLET,
+          },
+          border: `${border.xs} ${color.blue.darkSemiTransparent}`,
+          borderRadius: borderRadius.small,
+          bgcolor: color.white.sixTenTransparent,
+          paddingX: padding.extraSmall,
+        }}
+        data-testid="show-result-count"
+      >
+        <Typography
+          padding={0}
+          lineHeight={`${ICON_SELECT_DEFAULT_HEIGHT}px`}
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-            border: `${border.xs} ${color.blue.darkSemiTransparent}`,
-            borderRadius: borderRadius.small,
-            bgcolor: color.white.sixTenTransparent,
+            whiteSpace: "nowrap",
+            fontSize: { xs: fontSize.label, sm: fontSize.info },
           }}
-          data-testid="show-result-count"
         >
-          <Typography
-            fontSize={fontSize.info}
-            padding={0}
-            lineHeight={`${ICON_SELECT_DEFAULT_HEIGHT}px`}
-          >
-            {renderShowingResultsText(total, count)}
-          </Typography>
-        </Paper>
-      </Grid>
-      <Grid item md={3} xs={2}>
+          {renderShowingResultsText(total, count)}
+        </Typography>
+      </Paper>
+      <Stack flexDirection="row" flex={1} gap={1} flexWrap="nowrap">
         <ResultListSortButton
           onChangeSorting={onChangeSorting}
           currentSort={currentSort}
-          isIconOnly={isIconOnly}
+          isIconOnly={isMobile}
         />
-      </Grid>
-      <Grid item md={3} xs={2}>
         <ResultListLayoutButton
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
-          isIconOnly={isIconOnly}
+          isIconOnly={isMobile}
           excludeOptions={
             isUnderLaptop
               ? [SearchResultLayoutEnum.GRID, SearchResultLayoutEnum.LIST]
               : []
           }
         />
-      </Grid>
-    </Grid>
+        {isUnderLaptop && (
+          <ShareButtonMenu
+            hideText
+            sx={{
+              maxHeight: ICON_SELECT_DEFAULT_HEIGHT,
+              maxWidth: ICON_SELECT_DEFAULT_HEIGHT * 2,
+            }}
+          />
+        )}
+      </Stack>
+    </Stack>
   );
 };
 
