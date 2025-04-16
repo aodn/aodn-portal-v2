@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 import AppTheme from "../../../utils/AppTheme";
 import SearchPage from "../SearchPage";
 import { BrowserRouter as Router } from "react-router-dom";
+import Layout from "../../../components/layout/layout";
 
 const theme = AppTheme;
 
@@ -76,7 +77,9 @@ describe("SearchPage", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Layout>
+              <SearchPage />
+            </Layout>
           </Router>
         </ThemeProvider>
       </Provider>
@@ -127,25 +130,25 @@ describe("SearchPage", () => {
 
   it("Change sort order load correct record", () => {
     const user = userEvent.setup();
-    const { findByTestId } = render(
+    const { findByTestId, getByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Layout>
+              <SearchPage />
+            </Layout>
           </Router>
         </ThemeProvider>
       </Provider>
     );
     // Pretend user enter wave and press two enter in search box
-    waitFor(() => findByTestId("input-with-suggester")).then(async () => {
-      const input = (await findByTestId(
-        "input-with-suggester"
-      )) as HTMLInputElement;
+    waitFor(() => findByTestId("input-with-suggester")).then(() => {
+      const input = getByTestId("input-with-suggester") as HTMLInputElement;
       userEvent.type(input, "imos");
       userEvent.type(input, "{enter}{enter}");
 
-      waitFor(() => expect(input.value).toEqual("imos")).then(async () => {
-        const list = await findByTestId("search-page-result-list");
+      waitFor(() => expect(input.value).toEqual("imos")).then(() => {
+        const list = getByTestId("search-page-result-list");
         expect(list).toBeDefined();
 
         // Find the last record in the first page
@@ -153,14 +156,14 @@ describe("SearchPage", () => {
           "result-card-c1344979-f701-0916-e044-00144f7bc0f4"
         );
         expect(record).toBeDefined();
-        const loadMore = (await document.getElementById(
+        const loadMore = document.getElementById(
           "result-card-load-more-btn"
-        )) as HTMLButtonElement;
+        ) as HTMLButtonElement;
 
         expect(loadMore).toBeDefined();
-        await user.click(loadMore);
+        user.click(loadMore);
         // Find the last record on second page
-        record = await document.getElementById(
+        record = document.getElementById(
           "result-card-ae70eb18-b1f0-4012-8d62-b03daf99f7f2"
         );
         expect(record).toBeDefined();
