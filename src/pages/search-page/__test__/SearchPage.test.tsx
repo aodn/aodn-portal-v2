@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, vi } from "vitest";
-import { queryByTestId, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { server } from "../../../__mocks__/server";
 import store from "../../../components/common/store/store";
@@ -81,6 +81,7 @@ describe("SearchPage", () => {
         </ThemeProvider>
       </Provider>
     );
+
     // Pretend user enter wave and press two enter in search box
     waitFor(() => findByTestId("input-with-suggester"), { timeout: 5000 }).then(
       () => {
