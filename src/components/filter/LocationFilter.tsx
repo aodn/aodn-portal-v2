@@ -59,48 +59,45 @@ const findMatch = (
   return o ? o.value : "none";
 };
 
-if (import.meta.env.MODE !== "test") {
-  // No need to fetch data in vitest
-  await fetch(marineParkDefault.geojson)
-    .then((response) => response.json())
-    .then((json: FeatureCollection<Polygon>) => {
-      // Regroup the Features by name and create a new array or FeatureCollection
-      const grouped = _.groupBy(
-        json.features,
-        (feature) => feature.properties?.RESNAME
-      );
-      return Object.values(grouped).map<FeatureCollection<Polygon>>(
-        (features) => ({
-          type: "FeatureCollection",
-          features: features as Feature<Polygon>[],
-        })
-      );
-    })
-    .then((values: Array<FeatureCollection<Polygon>>) => {
-      // Create the drop-down list items
-      const l = values
-        .map<LocationOptionType>((value) => {
-          // simplify the polygon here, otherwise too big of url for query
-          value.features[0] = simplify(value.features[0], {
-            tolerance: 0.01,
-            highQuality: false,
-          });
-          const option: LocationOptionType = {
-            label: value.features[0].properties?.RESNAME,
-            value: "" + value.features[0].properties?.OBJECTID,
-            geo: value,
-          };
-          return option;
-        })
-        .sort((a, b) => a.label.localeCompare(b.label));
+fetch(marineParkDefault.geojson)
+  .then((response) => response.json())
+  .then((json: FeatureCollection<Polygon>) => {
+    // Regroup the Features by name and create a new array or FeatureCollection
+    const grouped = _.groupBy(
+      json.features,
+      (feature) => feature.properties?.RESNAME
+    );
+    return Object.values(grouped).map<FeatureCollection<Polygon>>(
+      (features) => ({
+        type: "FeatureCollection",
+        features: features as Feature<Polygon>[],
+      })
+    );
+  })
+  .then((values: Array<FeatureCollection<Polygon>>) => {
+    // Create the drop-down list items
+    const l = values
+      .map<LocationOptionType>((value) => {
+        // simplify the polygon here, otherwise too big of url for query
+        value.features[0] = simplify(value.features[0], {
+          tolerance: 0.01,
+          highQuality: false,
+        });
+        const option: LocationOptionType = {
+          label: value.features[0].properties?.RESNAME,
+          value: "" + value.features[0].properties?.OBJECTID,
+          geo: value,
+        };
+        return option;
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
 
-      locationOptions.push(DEFAULT_LOCATION);
-      locationOptions.push(...l);
-    })
-    .catch((error) => {
-      console.error("Error fetching JSON:", error);
-    });
-}
+    locationOptions.push(DEFAULT_LOCATION);
+    locationOptions.push(...l);
+  })
+  .catch((error) => {
+    console.error("Error fetching JSON:", error);
+  });
 
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
