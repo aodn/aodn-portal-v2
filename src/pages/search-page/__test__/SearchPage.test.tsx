@@ -72,7 +72,7 @@ describe("SearchPage", () => {
 
   it("The list should be able to show in list / grid view", () => {
     const user = userEvent.setup();
-    const { findByTestId, getAllByTestId, getByTestId } = render(
+    const { getAllByTestId, getByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -83,7 +83,7 @@ describe("SearchPage", () => {
     );
 
     // Pretend user enter wave and press two enter in search box
-    waitFor(() => findByTestId("input-with-suggester"), { timeout: 5000 }).then(
+    waitFor(() => getByTestId("input-with-suggester"), { timeout: 5000 }).then(
       () => {
         const input = getByTestId("input-with-suggester") as any;
 
@@ -149,7 +149,7 @@ describe("SearchPage", () => {
         expect(list).toBeDefined();
 
         // Find the last record in the first page
-        let record = await document.getElementById(
+        let record = document.getElementById(
           "result-card-c1344979-f701-0916-e044-00144f7bc0f4"
         );
         expect(record).toBeDefined();
