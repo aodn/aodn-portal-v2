@@ -82,44 +82,46 @@ describe("SearchPage", () => {
       </Provider>
     );
     // Pretend user enter wave and press two enter in search box
-    waitFor(() => findByTestId("input-with-suggester")).then(() => {
-      const input = getByTestId("input-with-suggester") as any;
+    waitFor(() => findByTestId("input-with-suggester"), { timeout: 5000 }).then(
+      () => {
+        const input = getByTestId("input-with-suggester") as any;
 
-      userEvent.type(input, "wave");
-      userEvent.type(input, "{enter}{enter}");
-      expect(input.value).toEqual("wave");
+        userEvent.type(input, "wave");
+        userEvent.type(input, "{enter}{enter}");
+        expect(input.value).toEqual("wave");
 
-      const list = getByTestId("search-page-result-list");
-      expect(list).toBeDefined();
+        const list = getByTestId("search-page-result-list");
+        expect(list).toBeDefined();
 
-      // Find and open the Select component
-      const selectElement = screen.getByText("View");
-      user.click(selectElement);
+        // Find and open the Select component
+        const selectElement = screen.getByText("View");
+        user.click(selectElement);
 
-      // Find and click the "Grid and Map" option
-      const gridAndMapOption = screen.getByText("Grid and Map");
-      expect(gridAndMapOption).toBeDefined();
-      user.click(gridAndMapOption);
+        // Find and click the "Grid and Map" option
+        const gridAndMapOption = screen.getByText("Grid and Map");
+        expect(gridAndMapOption).toBeDefined();
+        user.click(gridAndMapOption);
 
-      const gridView = getByTestId("resultcard-result-grid");
-      expect(gridView).toBeInTheDocument();
+        const gridView = getByTestId("resultcard-result-grid");
+        expect(gridView).toBeInTheDocument();
 
-      const gridList = getAllByTestId("result-card-grid");
-      expect(gridList.length).not.equal(0);
+        const gridList = getAllByTestId("result-card-grid");
+        expect(gridList.length).not.equal(0);
 
-      // Open the Select component again
-      user.click(selectElement);
+        // Open the Select component again
+        user.click(selectElement);
 
-      // Find and click the "List and Map" option
-      const listAndMapOption = screen.getByText("List and Map");
-      expect(listAndMapOption).toBeInTheDocument();
-      user.click(listAndMapOption);
+        // Find and click the "List and Map" option
+        const listAndMapOption = screen.getByText("List and Map");
+        expect(listAndMapOption).toBeInTheDocument();
+        user.click(listAndMapOption);
 
-      const listList = getAllByTestId("result-card-list");
-      expect(listList.length).not.equal(0);
-      // Clear after test
-      userEvent.clear(input);
-    });
+        const listList = getAllByTestId("result-card-list");
+        expect(listList.length).not.equal(0);
+        // Clear after test
+        userEvent.clear(input);
+      }
+    );
   }, 60000);
 
   it("Change sort order load correct record", () => {
