@@ -11,8 +11,8 @@ while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' $BASE_URL)" != "200" && $el
   elapsed=$((elapsed + interval))
 done
 
+echo "BASE_URL is set to: $BASE_URL"
 if [[ $elapsed -ge $timeout ]]; then
-  echo "BASE_URL is set to: $BASE_URL"
   echo "Server did not start within $timeout seconds."
   exit 1
 else
