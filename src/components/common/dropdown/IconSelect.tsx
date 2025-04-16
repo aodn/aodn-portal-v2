@@ -62,10 +62,10 @@ const renderSelectValue = (
       justifyContent="center"
       alignItems="center"
       flexWrap="nowrap"
-      gap={1}
+      gap={isIconOnly ? 0 : 1}
     >
       {icon && (
-        <Box mr={margin.lg} mb={-1}>
+        <Box mr={isIconOnly ? 0 : margin.lg} mb={-1}>
           {typeof icon === "function"
             ? icon({ color, bgColor: iconBgColor })
             : icon}
@@ -163,7 +163,7 @@ const IconSelect = <T extends string | number = string>({
         open={isOpen}
         IconComponent={() => null}
         sx={{
-          padding: "0",
+          padding: 0,
           height: ICON_SELECT_DEFAULT_HEIGHT,
           border: `${border.xs} ${color.blue.darkSemiTransparent}`,
           borderRadius: borderRadius.small,
@@ -172,6 +172,11 @@ const IconSelect = <T extends string | number = string>({
             : color.white.sixTenTransparent,
           "& fieldset": {
             border: "none",
+          },
+          "& .MuiSelect-select": {
+            // Need to override paddingRight to remove the default padding
+            paddingRight: "0px !important",
+            padding: "8px",
           },
           ...sx,
         }}

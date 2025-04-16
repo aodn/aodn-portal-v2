@@ -95,9 +95,9 @@ fetch(marineParkDefault.geojson)
     locationOptions.push(DEFAULT_LOCATION);
     locationOptions.push(...l);
   })
-  .catch((error) =>
-    console.error("Error fetching JSON, ok to ignore in vitest:", error)
-  );
+  .catch((error) => {
+    console.error("Error fetching JSON:", error);
+  });
 
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
@@ -186,7 +186,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         fontSize={fontSize.info}
         fontWeight={fontWeight.bold}
       >
-        Australia Marine Parks
+        Australian Marine Parks
       </Typography>
       <FormControl sx={{ maxHeight: "300px", overflowY: "scroll", flex: 1 }}>
         <RadioGroup

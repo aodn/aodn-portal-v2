@@ -103,7 +103,7 @@ def test_map_updates_on_search_change(
     'layer_text, layer_type',
     [
         (
-            'Australia Marine Parks',
+            'Australian Marine Parks',
             LayerType.MARINE_PARKS,
         ),
         (

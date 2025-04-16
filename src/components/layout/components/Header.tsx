@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import {
   border,
+  borderRadius,
   color,
   padding,
   shadow,
@@ -20,6 +21,7 @@ import {
 } from "../constant";
 import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import ShareButtonMenu from "../../menu/ShareButtonMenu";
 
 const Header: FC = () => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
@@ -85,7 +87,17 @@ const Header: FC = () => {
             }
           >
             {!isMobile && (
-              <Searchbar setShouldExpandSearchbar={setShouldExpandSearchbar} />
+              <>
+                <Searchbar
+                  setShouldExpandSearchbar={setShouldExpandSearchbar}
+                />
+                {!isUnderLaptop && (
+                  <ShareButtonMenu
+                    hideText
+                    sx={{ maxWidth: "40px", borderRadius: borderRadius.circle }}
+                  />
+                )}
+              </>
             )}
           </Box>
         )}
