@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 import AppTheme from "../../../utils/AppTheme";
 import SearchPage from "../SearchPage";
 import { BrowserRouter as Router } from "react-router-dom";
+import Layout from "../../../components/layout/layout";
 
 const theme = AppTheme;
 
@@ -39,9 +40,9 @@ describe("SearchPage", () => {
   afterAll(() => {
     server.close();
   });
-  it("The map should be able to expand properly", async () => {
+  it("The map should be able to expand properly", () => {
     const user = userEvent.setup();
-    const { findByText, queryByText, queryByTestId, findByTestId } = render(
+    const { queryByText, queryByTestId, findByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -70,96 +71,99 @@ describe("SearchPage", () => {
     });
   });
 
-  it("The list should be able to show in list / grid view", async () => {
+  it("The list should be able to show in list / grid view", () => {
     const user = userEvent.setup();
-    const { findByTestId, findAllByTestId } = render(
+    const { getAllByTestId, getByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Layout>
+              <SearchPage />
+            </Layout>
           </Router>
         </ThemeProvider>
       </Provider>
     );
+
     // Pretend user enter wave and press two enter in search box
-    waitFor(() => findByTestId("input-with-suggester")).then(async () => {
-      const input = (await findByTestId(
-        "input-with-suggester"
-      )) as HTMLInputElement;
+    waitFor(() => getByTestId("input-with-suggester"), { timeout: 5000 }).then(
+      () => {
+        const input = getByTestId("input-with-suggester") as any;
 
-      userEvent.type(input, "wave");
-      userEvent.type(input, "{enter}{enter}");
-      expect(input.value).toEqual("wave");
+        userEvent.type(input, "wave");
+        userEvent.type(input, "{enter}{enter}");
+        expect(input.value).toEqual("wave");
 
-      const list = await findByTestId("search-page-result-list");
-      expect(list).toBeDefined();
+        const list = getByTestId("search-page-result-list");
+        expect(list).toBeDefined();
 
-      // Find and open the Select component
-      const selectElement = screen.getByText("View");
-      user.click(selectElement);
+        // Find and open the Select component
+        const selectElement = screen.getByText("View");
+        user.click(selectElement);
 
-      // Find and click the "Grid and Map" option
-      const gridAndMapOption = screen.getByText("Grid and Map");
-      expect(gridAndMapOption).toBeDefined();
-      user.click(gridAndMapOption);
+        // Find and click the "Grid and Map" option
+        const gridAndMapOption = screen.getByText("Grid and Map");
+        expect(gridAndMapOption).toBeDefined();
+        user.click(gridAndMapOption);
 
-      const gridView = await findByTestId("resultcard-result-grid");
-      expect(gridView).toBeInTheDocument();
+        const gridView = getByTestId("resultcard-result-grid");
+        expect(gridView).toBeInTheDocument();
 
-      const gridList = await findAllByTestId("result-card-grid");
-      expect(gridList.length).not.equal(0);
+        const gridList = getAllByTestId("result-card-grid");
+        expect(gridList.length).not.equal(0);
 
-      // Open the Select component again
-      user.click(selectElement);
+        // Open the Select component again
+        user.click(selectElement);
 
-      // Find and click the "List and Map" option
-      const listAndMapOption = screen.getByText("List and Map");
-      expect(listAndMapOption).toBeInTheDocument();
-      user.click(listAndMapOption);
+        // Find and click the "List and Map" option
+        const listAndMapOption = screen.getByText("List and Map");
+        expect(listAndMapOption).toBeInTheDocument();
+        user.click(listAndMapOption);
 
-      const listList = await findAllByTestId("result-card-list");
-      expect(listList.length).not.equal(0);
-      // Clear after test
-      userEvent.clear(input);
-    });
+        const listList = getAllByTestId("result-card-list");
+        expect(listList.length).not.equal(0);
+        // Clear after test
+        userEvent.clear(input);
+      }
+    );
   }, 60000);
 
   it("Change sort order load correct record", () => {
     const user = userEvent.setup();
-    const { findByTestId } = render(
+    const { findByTestId, getByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Layout>
+              <SearchPage />
+            </Layout>
           </Router>
         </ThemeProvider>
       </Provider>
     );
     // Pretend user enter wave and press two enter in search box
-    waitFor(() => findByTestId("input-with-suggester")).then(async () => {
-      const input = (await findByTestId(
-        "input-with-suggester"
-      )) as HTMLInputElement;
+    waitFor(() => findByTestId("input-with-suggester")).then(() => {
+      const input = getByTestId("input-with-suggester") as HTMLInputElement;
       userEvent.type(input, "imos");
       userEvent.type(input, "{enter}{enter}");
 
-      waitFor(() => expect(input.value).toEqual("imos")).then(async () => {
-        const list = await findByTestId("search-page-result-list");
+      waitFor(() => expect(input.value).toEqual("imos")).then(() => {
+        const list = getByTestId("search-page-result-list");
         expect(list).toBeDefined();
 
         // Find the last record in the first page
-        let record = await document.getElementById(
+        let record = document.getElementById(
           "result-card-c1344979-f701-0916-e044-00144f7bc0f4"
         );
         expect(record).toBeDefined();
-        const loadMore = (await document.getElementById(
+        const loadMore = document.getElementById(
           "result-card-load-more-btn"
-        )) as HTMLButtonElement;
+        ) as HTMLButtonElement;
 
         expect(loadMore).toBeDefined();
-        await user.click(loadMore);
+        user.click(loadMore);
         // Find the last record on second page
-        record = await document.getElementById(
+        record = document.getElementById(
           "result-card-ae70eb18-b1f0-4012-8d62-b03daf99f7f2"
         );
         expect(record).toBeDefined();

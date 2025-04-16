@@ -5,6 +5,7 @@ services:
       dockerfile: playwright/Dockerfile.web
     ports:
       - "5173:5173"
+    network_mode: host
     volumes:
       - ../:/app
       - /app/node_modules
@@ -16,7 +17,8 @@ services:
     depends_on:
       - web
     environment:
-      - BASE_URL=http://web:5173
+      - BASE_URL=http://localhost:5173
       - POETRY_VIRTUALENVS_CREATE=false
+    network_mode: host
     volumes:
       - ./:/app
