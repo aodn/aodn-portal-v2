@@ -57,10 +57,13 @@ export default ({ mode }) => {
           changeOrigin: true,
         },
       },
+      ...(mode !== "dev" && {
+        host: "0.0.0.0",
+        port: 5173,
+        strictPort: true,
+        allowedHosts: ["localhost", "web"],
+      }),
     },
-    ...(mode !== "dev" && {
-      allowedHosts: ["localhost", "web"],
-    }),
     plugins: [
       react(),
       mode !== "test" &&
