@@ -1,3 +1,19 @@
+"""
+Search Page Sort/View State Persistence Tests
+--------------------------------------------
+This file contains tests that verify the persistence of sort and view state settings
+across different user interactions and page navigations in the search functionality.
+
+See PR for details - https://github.com/aodn/aodn-portal-v2/pull/332
+
+Test coverage includes:
+- State persistence across page navigation
+- State persistence after map toggle
+- State persistence with URL sharing
+- View state handling during screen resize
+- View state handling for pasted URLs with different screen sizes
+"""
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -31,12 +47,13 @@ def test_sort_and_view_states_persist_across_page(
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
 
+    # Change the sort and view types
     search_page.result_sort_button.click()
     search_page.click_text(sort_type.display_name, exact=True)
-
     search_page.result_view_button.click()
     search_page.click_text(view_type.display_name, exact=True)
 
+    # Go to the landing page and return to check if the states persist
     search_page.go_to_landing_page()
     landing_page.search.click_search_button()
     expect(
@@ -46,6 +63,7 @@ def test_sort_and_view_states_persist_across_page(
         search_page.get_result_view_button(view_type.test_id)
     ).to_be_visible()
 
+    # Go to the detail page and return to check if the states persist
     search_page.first_result_title.click()
     detail_page.go_back_button.click()
     expect(
@@ -55,6 +73,7 @@ def test_sort_and_view_states_persist_across_page(
         search_page.get_result_view_button(view_type.test_id)
     ).to_be_visible()
 
+    # Select full map view and toggle to check if the states persist
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
     search_page.map_toggle_button.click()
