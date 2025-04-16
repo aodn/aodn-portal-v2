@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { LngLatBounds, Map, MapboxEvent, Projection, Style } from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -8,6 +8,13 @@ import { TestHelper } from "../../common/test/helper";
 import { MapDefaultConfig } from "./constants";
 import { Paper } from "@mui/material";
 import { padding } from "../../../styles/constants";
+
+// Define here to avoid repeat typing and accidentally changed value
+// due to typo.
+const ZOOM_START = "zoomstart";
+const ZOOM_END = "zoomend";
+const MOVE_START = "movestart";
+const MOVE_END = "moveend";
 
 export interface MapBasicType {
   centerLongitude?: number;
@@ -65,190 +72,199 @@ const defaultBbox = new LngLatBounds([
   NORTH_LAT,
 ]);
 
-const ReactMap = ({
-  panelId,
-  bbox = defaultBbox,
-  zoom = MapDefaultConfig.ZOOM,
-  minZoom = MapDefaultConfig.MIN_ZOOM,
-  maxZoom = MapDefaultConfig.MAX_ZOOM,
-  projection = MapDefaultConfig.PROJECTION,
-  animate = false,
-  announcement = undefined,
-  onZoomEvent,
-  onMoveEvent,
-  children,
-}: React.PropsWithChildren<MapProps>) => {
-  const [map, setMap] = useState<Map | null>(null);
-  const containerRef = useRef<HTMLElement | null>(null);
+const ReactMap = memo(
+  ({
+    panelId,
+    bbox = defaultBbox,
+    zoom = MapDefaultConfig.ZOOM,
+    minZoom = MapDefaultConfig.MIN_ZOOM,
+    maxZoom = MapDefaultConfig.MAX_ZOOM,
+    projection = MapDefaultConfig.PROJECTION,
+    animate = false,
+    announcement = undefined,
+    onZoomEvent,
+    onMoveEvent,
+    children,
+  }: React.PropsWithChildren<MapProps>) => {
+    const [map, setMap] = useState<Map | null>(null);
+    const containerRef = useRef<HTMLElement | null>(null);
 
-  // Debouce to make the map transit smoother
-  const debounceOnZoomEvent = useRef(
-    lodash.debounce(
-      useCallback(
-        async (
-          event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-        ) => onZoomEvent && onZoomEvent(event),
-        [onZoomEvent]
-      ),
-      MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
-    )
-  ).current;
+    // Debouce to make the map transit smoother
+    const debounceOnZoomEvent = useRef(
+      lodash.debounce(
+        useCallback(
+          async (
+            event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+          ) => onZoomEvent && onZoomEvent(event),
+          [onZoomEvent]
+        ),
+        MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
+      )
+    ).current;
 
-  const debounceOnMoveEvent = useRef(
-    lodash.debounce(
-      useCallback(
-        async (
-          event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-        ) => onMoveEvent && onMoveEvent(event),
-        [onMoveEvent]
-      ),
-      MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
-    )
-  ).current;
+    const debounceOnMoveEvent = useRef(
+      lodash.debounce(
+        useCallback(
+          async (
+            event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
+          ) => onMoveEvent && onMoveEvent(event),
+          [onMoveEvent]
+        ),
+        MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
+      )
+    ).current;
 
-  const initializeMap = useCallback(() => {
-    try {
-      // Check if container exists
-      containerRef.current = document.getElementById(panelId);
-      if (!containerRef.current) {
-        return null;
+    const initializeMap = useCallback(() => {
+      try {
+        // Check if container exists
+        containerRef.current = document.getElementById(panelId);
+        if (!containerRef.current) {
+          return null;
+        }
+
+        // Create new map instance
+        return new Map({
+          container: panelId,
+          accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
+          style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
+          minZoom: minZoom,
+          maxZoom: maxZoom,
+          testMode: import.meta.env.MODE === "dev",
+          attributionControl: false,
+          localIdeographFontFamily:
+            "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
+        });
+      } catch (err) {
+        console.log("Map initialization failed:", err);
       }
+    }, [panelId, minZoom, maxZoom]);
 
-      // Create new map instance
-      return new Map({
-        container: panelId,
-        accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
-        style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
-        minZoom: minZoom,
-        maxZoom: maxZoom,
-        testMode: import.meta.env.MODE === "dev",
-        attributionControl: false,
-        localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
-      });
-    } catch (err) {
-      console.log("Map initialization failed:", err);
-    }
-  }, [panelId, minZoom, maxZoom]);
+    useEffect(() => {
+      const setupMap = () => {
+        const map = initializeMap();
+        if (!map) return;
 
-  useEffect(() => {
-    const setupMap = () => {
-      const map = initializeMap();
-      if (!map) return;
+        map.setProjection(projection);
+        // Stop drag cause map to rotate.
+        map.dragRotate.disable();
 
-      map.setProjection(projection);
-      // Stop drag cause map to rotate.
-      map.dragRotate.disable();
+        // If exist fit the map to this area, this useful if url pass around and
+        // the bbox in the url is not the default area of the map
+        // Use same function to save processing
+        const cancelDebounce = () => debounceOnZoomEvent.cancel();
+        map.on(MOVE_START, cancelDebounce);
+        map.on(ZOOM_START, cancelDebounce);
 
-      // If exist fit the map to this area, this useful if url pass around and
-      // the bbox in the url is not the default area of the map
-      map.on("movestart", () => debounceOnZoomEvent.cancel());
-      map.on("zoomestart", () => debounceOnZoomEvent.cancel());
+        // Do not setup here, the useEffect block will setup it correctly, if you set it here
+        // you will get one extra data load which is of no use.
+        // map.on("zoomend", debounceOnZoomEvent);
+        // map.on("moveend", debounceOnMoveEvent);
 
-      // Do not setup here, the useEffect block will setup it correctly, if you set it here
-      // you will get one extra data load which is of no use.
-      // map.on("zoomend", debounceOnZoomEvent);
-      // map.on("moveend", debounceOnMoveEvent);
+        // Create a resize observer to the canvas so we know if its size have changed
+        // we need to redraw the map
+        const resizeObserver = new ResizeObserver((_) =>
+          // https://stackoverflow.com/questions/70533564/mapbox-gl-flickers-when-resizing-the-container-div
+          setTimeout(() => {
+            try {
+              map?.resize();
+            } catch (error: any) {
+              /* empty */
+            }
+          }, 0.1)
+        );
+        resizeObserver.observe(map.getContainer());
 
-      // Create a resize observer to the canvas so we know if its size have changed
-      // we need to redraw the map
-      const resizeObserver = new ResizeObserver((_) =>
-        // https://stackoverflow.com/questions/70533564/mapbox-gl-flickers-when-resizing-the-container-div
-        setTimeout(() => {
-          try {
-            map?.resize();
-          } catch (error: any) {
-            /* empty */
+        if (import.meta.env.MODE === "dev") {
+          //map.showPadding = true;
+          //map.showCollisionBoxes = true;
+        }
+
+        setMap(map);
+
+        return () => {
+          if (containerRef.current) {
+            resizeObserver.unobserve(containerRef.current);
           }
-        }, 0.1)
-      );
-      resizeObserver.observe(map.getContainer());
+          // We need this when the map destroy
+          map.off(ZOOM_END, debounceOnZoomEvent);
+          map.off(MOVE_END, debounceOnMoveEvent);
+          map.off(MOVE_START, cancelDebounce);
+          map.off(ZOOM_START, cancelDebounce);
+          map.remove();
+          setMap(null);
+        };
+      };
 
-      if (import.meta.env.MODE === "dev") {
-        //map.showPadding = true;
-        //map.showCollisionBoxes = true;
-      }
-
-      setMap(map);
+      const cleanup = setupMap();
 
       return () => {
-        if (containerRef.current) {
-          resizeObserver.unobserve(containerRef.current);
-        }
-        // We need this when the map destroy
-        map.off("zoomend", debounceOnZoomEvent);
-        map.off("moveend", debounceOnMoveEvent);
-        map.remove();
-        setMap(null);
+        cleanup?.();
       };
-    };
+    }, [initializeMap, projection, debounceOnZoomEvent, debounceOnMoveEvent]);
 
-    const cleanup = setupMap();
-
-    return () => {
-      cleanup?.();
-    };
-  }, [initializeMap, projection, debounceOnZoomEvent, debounceOnMoveEvent]);
-
-  useEffect(() => {
-    if (!map || !bbox || !containerRef.current?.isConnected) return;
-    // Turn off event to avoid looping
-    map.off("zoomend", debounceOnZoomEvent);
-    map.off("moveend", debounceOnMoveEvent);
-    // DO NOT use fitBounds(), it will cause the zoom and padding adjust so
-    // you end up map area drift.
-    if (animate) {
-      map.easeTo({
-        center: bbox.getCenter(),
-        zoom: zoom,
+    useEffect(() => {
+      if (!map || !bbox || !containerRef.current?.isConnected) return;
+      // Turn off event to avoid looping
+      map.off(ZOOM_END, debounceOnZoomEvent);
+      map.off(MOVE_END, debounceOnMoveEvent);
+      // DO NOT use fitBounds(), it will cause the zoom and padding adjust so
+      // you end up map area drift.
+      if (animate) {
+        map.easeTo({
+          center: bbox.getCenter(),
+          zoom: zoom,
+        });
+      } else {
+        map.jumpTo({
+          center: bbox.getCenter(),
+          zoom: zoom,
+        });
+      }
+      map.on("idle", () => {
+        map.on(ZOOM_END, debounceOnZoomEvent);
+        map.on(MOVE_END, debounceOnMoveEvent);
       });
-    } else {
-      map.jumpTo({
-        center: bbox.getCenter(),
-        zoom: zoom,
-      });
+    }, [bbox, zoom, map, debounceOnZoomEvent, debounceOnMoveEvent, animate]);
+
+    // Only render if map is initialized and container is still connected
+    if (!map || !containerRef.current?.isConnected) {
+      return null;
     }
-    map.on("idle", () => {
-      map.on("zoomend", debounceOnZoomEvent);
-      map.on("moveend", debounceOnMoveEvent);
-    });
-  }, [bbox, zoom, map, debounceOnZoomEvent, debounceOnMoveEvent, animate]);
 
-  // Only render if map is initialized and container is still connected
-  if (!map || !containerRef.current?.isConnected) {
-    return null;
-  }
-
-  return (
-    <MapContext.Provider value={{ map }}>
-      <Paper
-        data-testid="announcement-panel"
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          position: "absolute",
-          height: "100%",
-          width: "100%",
-          background: "transparent",
-          pointerEvents: announcement?.startsWith("model") ? undefined : "none",
-          visibility: announcement ? "visible" : "hidden",
-        }}
-      >
+    return (
+      <MapContext.Provider value={{ map }}>
         <Paper
+          data-testid="announcement-panel"
           sx={{
-            padding: padding.medium,
-            backgroundColor: "white",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "absolute",
+            height: "100%",
+            width: "100%",
+            background: "transparent",
+            pointerEvents: announcement?.startsWith("model")
+              ? undefined
+              : "none",
+            visibility: announcement ? "visible" : "hidden",
           }}
         >
-          {announcement?.replace(/^model:/, "")}
+          <Paper
+            sx={{
+              padding: padding.medium,
+              backgroundColor: "white",
+            }}
+          >
+            {announcement?.replace(/^model:/, "")}
+          </Paper>
         </Paper>
-      </Paper>
-      <TestHelper mapId={panelId} getMap={() => map} />
-      {children}
-    </MapContext.Provider>
-  );
-};
-
+        <TestHelper mapId={panelId} getMap={() => map} />
+        {children}
+      </MapContext.Provider>
+    );
+  }
+);
+ReactMap.displayName = "ReactMap";
 export default ReactMap;
 
 export { styles };

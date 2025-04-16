@@ -2,7 +2,7 @@
 
 echo "Waiting for the web server to start"
 
-timeout=180
+timeout=360
 interval=1
 elapsed=0
 

@@ -95,7 +95,8 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     properties:
       param.properties !== undefined
         ? param.properties
-        : "id,title,description,status,links,assets_summary",
+        : // Including the keyword "bbox" to ensure spatial extents is returned
+          "id,title,description,status,links,assets_summary,bbox",
   };
 
   if (param.text !== undefined && param.text.length !== 0) {
@@ -224,7 +225,7 @@ const fetchResultByUuidNoStore = createAsyncThunk<
   OGCCollection,
   string,
   { rejectValue: ErrorResponse }
->("search/fetchResultNoStore", async (id: string, thunkApi: any) =>
+>("search/fetchResultByUuidNoStore", async (id: string, thunkApi: any) =>
   axios
     .get<OGCCollection>(`/api/v1/ogc/collections/${id}`)
     .then((response) => Object.assign(new OGCCollection(), response.data))

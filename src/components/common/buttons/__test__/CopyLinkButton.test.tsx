@@ -25,13 +25,13 @@ describe("CopyLinkButton", () => {
     expect(screen.queryByTestId("DoneAllIcon")).not.toBeInTheDocument();
   });
 
-  it("calls handleClick with correct URL when clicked", async () => {
+  it("calls handleClick with correct URL when clicked", () => {
     const user = userEvent.setup();
     render(<CopyLinkButton {...defaultProps} />);
 
     const button = screen.getByTestId(`copylinkbutton-${mockUrl}`);
-    await user.click(button);
-    await waitFor(() => {
+    user.click(button);
+    waitFor(() => {
       expect(defaultProps.handleClick).toHaveBeenCalledTimes(1);
     });
   });
