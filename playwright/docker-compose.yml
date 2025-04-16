@@ -16,7 +16,7 @@ services:
     depends_on:
       - web
     environment:
-      - BASE_URL=http://localhost:5173
+      - BASE_URL=http://172.18.0.2:5173
       - POETRY_VIRTUALENVS_CREATE=false
     volumes:
       - ./:/app
