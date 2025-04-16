@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { queryByTestId, render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { server } from "../../../__mocks__/server";
 import store from "../../../components/common/store/store";
@@ -39,9 +39,9 @@ describe("SearchPage", () => {
   afterAll(() => {
     server.close();
   });
-  it("The map should be able to expand properly", async () => {
+  it("The map should be able to expand properly", () => {
     const user = userEvent.setup();
-    const { findByText, queryByText, queryByTestId, findByTestId } = render(
+    const { queryByText, queryByTestId, findByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -70,9 +70,9 @@ describe("SearchPage", () => {
     });
   });
 
-  it("The list should be able to show in list / grid view", async () => {
+  it("The list should be able to show in list / grid view", () => {
     const user = userEvent.setup();
-    const { findByTestId, findAllByTestId } = render(
+    const { findByTestId, getAllByTestId, getByTestId } = render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
@@ -82,16 +82,14 @@ describe("SearchPage", () => {
       </Provider>
     );
     // Pretend user enter wave and press two enter in search box
-    waitFor(() => findByTestId("input-with-suggester")).then(async () => {
-      const input = (await findByTestId(
-        "input-with-suggester"
-      )) as HTMLInputElement;
+    waitFor(() => findByTestId("input-with-suggester")).then(() => {
+      const input = getByTestId("input-with-suggester") as any;
 
       userEvent.type(input, "wave");
       userEvent.type(input, "{enter}{enter}");
       expect(input.value).toEqual("wave");
 
-      const list = await findByTestId("search-page-result-list");
+      const list = getByTestId("search-page-result-list");
       expect(list).toBeDefined();
 
       // Find and open the Select component
@@ -103,10 +101,10 @@ describe("SearchPage", () => {
       expect(gridAndMapOption).toBeDefined();
       user.click(gridAndMapOption);
 
-      const gridView = await findByTestId("resultcard-result-grid");
+      const gridView = getByTestId("resultcard-result-grid");
       expect(gridView).toBeInTheDocument();
 
-      const gridList = await findAllByTestId("result-card-grid");
+      const gridList = getAllByTestId("result-card-grid");
       expect(gridList.length).not.equal(0);
 
       // Open the Select component again
@@ -117,7 +115,7 @@ describe("SearchPage", () => {
       expect(listAndMapOption).toBeInTheDocument();
       user.click(listAndMapOption);
 
-      const listList = await findAllByTestId("result-card-list");
+      const listList = getAllByTestId("result-card-list");
       expect(listList.length).not.equal(0);
       // Clear after test
       userEvent.clear(input);
