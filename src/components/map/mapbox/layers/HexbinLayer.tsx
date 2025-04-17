@@ -1,11 +1,9 @@
 import React, { FC, useContext, useEffect, useRef } from "react";
-import { HexagonLayer, HexagonLayerProps } from "@deck.gl/aggregation-layers";
+import { HexagonLayer } from "@deck.gl/aggregation-layers";
 import { MapboxOverlay, MapboxOverlayProps } from "@deck.gl/mapbox";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
-import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import { Feature, FeatureCollection, Point } from "geojson";
-import { ScatterplotLayer } from "deck.gl";
 
 // Generate 100 random points around San Francisco
 const generateRandomPoints = (
@@ -63,6 +61,7 @@ const HexbinMap: FC<LayerBasicType> = ({
           const coords = d.geometry.coordinates;
           return [Number(coords[0]), Number(coords[1])]; // [lng, lat]
         },
+        radius: 100,
         extruded: true,
         elevationScale: 250,
         elevationRange: [0, 1000],
@@ -78,11 +77,10 @@ const HexbinMap: FC<LayerBasicType> = ({
         layers: [hexagonLayer],
         interleaved: true,
       };
-      const overlay = new MapboxOverlay(overlayProps);
-      map.addControl(overlay, "top-left");
-      overlayRef.current = overlay;
 
-      map?.triggerRepaint();
+      const overlay = new MapboxOverlay(overlayProps);
+      map.addControl(overlay);
+      overlayRef.current = overlay;
 
       console.log(
         "Mapbox layers:",
@@ -91,10 +89,10 @@ const HexbinMap: FC<LayerBasicType> = ({
     });
 
     return () => {
-      if (overlayRef.current) {
-        map?.removeControl(overlayRef.current);
-        overlayRef.current = null;
-      }
+      // if (overlayRef.current) {
+      //   map?.removeControl(overlayRef.current);
+      //   overlayRef.current = null;
+      // }
     };
   }, [featureCollection.features, map]);
 
