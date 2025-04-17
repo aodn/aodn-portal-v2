@@ -31,6 +31,7 @@ const AODNSiteLogo = () => {
         src={IMOS}
         alt="IMOS Logo"
         style={{ paddingRight: padding.medium }}
+        data-testid="imos-logo"
       />
       <Divider orientation="vertical" flexItem></Divider>
       <Typography
