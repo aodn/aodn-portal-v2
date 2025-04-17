@@ -56,18 +56,14 @@ describe("LinkCard", () => {
     // Hover on the card
     userEvent.hover(linkCard);
     waitFor(() => {
-      const copyButton = screen.queryByTestId(
-        `copylinkbutton-${mockLink.href}`
-      );
+      const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
       expect(copyButton).toBeInTheDocument();
     });
 
     // Mouse leave
     userEvent.unhover(linkCard);
     waitFor(() => {
-      const copyButton = screen.queryByTestId(
-        `copylinkbutton-${mockLink.href}`
-      );
+      const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
       expect(copyButton).not.toBeInTheDocument();
     });
   });
@@ -82,9 +78,7 @@ describe("LinkCard", () => {
 
     // Wait for the button to be visible when clipboardText matches link.href
     waitFor(() => {
-      const copyButton = screen.queryByTestId(
-        `copylinkbutton-${mockLink.href}`
-      );
+      const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
       expect(copyButton).toBeInTheDocument();
     });
   });
@@ -104,13 +98,20 @@ describe("LinkCard", () => {
 
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
     userEvent.hover(linkCard);
-    const copyButton = screen.getByTestId(`copylinkbutton-${mockLink.href}`);
-    userEvent.click(copyButton);
     waitFor(() => {
-      expect(mockCopyToClipboard).toHaveBeenCalledWith(
-        mockLink.href,
-        mockLink.title
-      );
-    });
+      const copyButton = screen.getByTestId(`copy-button-${mockLink.href}`);
+      return copyButton;
+    })
+      .then((copyButton) => {
+        userEvent.click(copyButton);
+      })
+      .then(() => {
+        waitFor(() => {
+          expect(mockCopyToClipboard).toHaveBeenCalledWith(
+            mockLink.href,
+            mockLink.title
+          );
+        });
+      });
   });
 });

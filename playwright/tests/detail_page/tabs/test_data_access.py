@@ -32,7 +32,7 @@ def test_links_sections(
     link_card = responsive_page.get_by_test_id(f'link-card-{link_href}')
     link_card.hover()
     expect(
-        responsive_page.get_by_test_id(f'copylinkbutton-{link_href}')
+        responsive_page.get_by_test_id(f'copy-button-{link_href}')
     ).to_be_visible()
 
     link = link_card.get_by_role('link', name=link_title)
