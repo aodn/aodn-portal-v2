@@ -4,6 +4,7 @@ import { MapboxOverlay, MapboxOverlayProps } from "@deck.gl/mapbox";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { Feature, FeatureCollection, Point } from "geojson";
+import { Box } from "@mui/material";
 
 // Generate 100 random points around San Francisco
 const generateRandomPoints = (
@@ -61,12 +62,12 @@ const HexbinMap: FC<LayerBasicType> = ({
           const coords = d.geometry.coordinates;
           return [Number(coords[0]), Number(coords[1])]; // [lng, lat]
         },
-        radius: 100,
+        radius: 10,
         extruded: true,
         elevationScale: 250,
         elevationRange: [0, 1000],
         getColorValue: (point: Feature<Point>[]) => 1000,
-        // getElevationValue: (points) => points.length,
+        getElevationValue: (points) => 500,
         colorRange: [[255, 0, 0]], // Bright red,
         opacity: 1,
         pickable: true,
@@ -96,7 +97,9 @@ const HexbinMap: FC<LayerBasicType> = ({
     };
   }, [featureCollection.features, map]);
 
-  return null;
+  return (
+    <Box sx={{ height: "100%", display: "block" }} data-testId={"HexbinMap"} />
+  );
 };
 
 export default HexbinMap;
