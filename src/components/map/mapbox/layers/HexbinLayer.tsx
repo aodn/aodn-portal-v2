@@ -6,8 +6,17 @@ import { Feature, Point } from "geojson";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { Popup } from "mapbox-gl";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
+import { Color } from "@deck.gl/core";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
+const COLOR_RANGE: Color[] = [
+  [255, 255, 178],
+  [254, 217, 118],
+  [254, 178, 76],
+  [253, 141, 60],
+  [240, 59, 32],
+  [189, 0, 38],
+];
 
 const HexbinMap: FC<LayerBasicType> = ({ featureCollection }) => {
   const { map } = useContext(MapContext);
@@ -33,11 +42,9 @@ const HexbinMap: FC<LayerBasicType> = ({ featureCollection }) => {
         // radius: 100000,
         // pickable: true,
         data: featureCollection.features,
-        getPosition: (d: Feature<Point>) => {
-          const coords = d.geometry.coordinates;
-          return [coords[0], coords[1]]; // [lng, lat]
-        },
-        getColorWeight: (point: Feature<Point>) => point?.properties?.count,
+        getPosition: ({ geometry: { coordinates } }) =>
+          coordinates as [number, number],
+        getColorWeight: ({ properties }) => properties?.count ?? 0,
         // If you enable gpuAggregation the picking info will give less info
         // due to the internal implementation. We do not see much diff in speed
         // without gpuAggregation
@@ -46,14 +53,7 @@ const HexbinMap: FC<LayerBasicType> = ({ featureCollection }) => {
         pickable: true,
         radius: 50000,
         opacity: 0.4,
-        colorRange: [
-          [255, 255, 178],
-          [254, 217, 118],
-          [254, 178, 76],
-          [253, 141, 60],
-          [240, 59, 32],
-          [189, 0, 38],
-        ],
+        colorRange: COLOR_RANGE,
         // getElevationValue: (v) => v.length,
       });
 
@@ -120,6 +120,10 @@ const HexbinMap: FC<LayerBasicType> = ({ featureCollection }) => {
     return () => {
       if (overlayRef.current) {
         map?.removeControl(overlayRef.current);
+        if (popupRef.current) {
+          popupRef.current.remove();
+          popupRef.current = null;
+        }
       }
     };
   }, [featureCollection, map]);
