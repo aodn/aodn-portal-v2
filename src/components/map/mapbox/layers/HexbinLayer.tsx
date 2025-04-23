@@ -1,10 +1,10 @@
-import { FC, useContext, useEffect, useRef } from "react";
+import { FC, useCallback, useContext, useEffect, useRef } from "react";
 import { HexagonLayer } from "@deck.gl/aggregation-layers";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
-import { Feature, Point } from "geojson";
+import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { MapboxOverlay } from "@deck.gl/mapbox";
-import { Popup } from "mapbox-gl";
+import { Map, Popup } from "mapbox-gl";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 import { Color } from "@deck.gl/core";
 
@@ -18,115 +18,135 @@ const COLOR_RANGE: Color[] = [
   [189, 0, 38],
 ];
 
+const createHexagonLayer = (
+  featureCollection: FeatureCollection<Point> | undefined
+) => {
+  if (featureCollection === undefined) return null;
+
+  return new HexagonLayer<Feature<Point>>({
+    id: MAPBOX_OVERLAY_HEXAGON_LAYER,
+    data: featureCollection.features,
+    getPosition: ({ geometry: { coordinates } }) =>
+      coordinates as [number, number],
+    getColorWeight: ({ properties }) => properties?.count ?? 0,
+    // If you enable gpuAggregation the picking info will give less info
+    // due to the internal implementation. We do not see much diff in speed
+    // without gpuAggregation
+    gpuAggregation: false,
+    extruded: false,
+    pickable: true,
+    radius: 50000,
+    opacity: 0.4,
+    colorRange: COLOR_RANGE,
+    // getElevationValue: (v) => v.length,
+  });
+};
+
 const HexbinMap: FC<LayerBasicType> = ({ featureCollection }) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>();
-  const overlayRef = useRef<MapboxOverlay>();
+  const overlayRef = useRef<MapboxOverlay | null>();
+
+  const createLayer = useCallback(
+    (
+      featureCollection:
+        | FeatureCollection<Point, GeoJsonProperties>
+        | undefined,
+      map: Map
+    ) => {
+      const l = createHexagonLayer(featureCollection);
+
+      return l === null
+        ? null
+        : new MapboxOverlay({
+            interleaved: true,
+            layers: [l],
+            onClick: (info) => {
+              if (info.picked && info.object) {
+                // Remove existing popup
+                if (popupRef.current) {
+                  popupRef.current.remove();
+                  popupRef.current = null;
+                }
+
+                // Create popup
+                popupRef.current = new Popup({
+                  closeButton: true,
+                  closeOnClick: false,
+                  maxWidth: "none",
+                  offset: [0, -5],
+                });
+
+                const points: Feature<Point>[] = info.object.points || [];
+
+                const smallestDate =
+                  points.reduce((smallest, point) => {
+                    const date = point.properties?.date;
+                    if (typeof date !== "string") return smallest;
+                    if (!smallest || date <= smallest) return date;
+                    return smallest;
+                  }, "") || "N/A";
+
+                const biggestDate =
+                  points.reduce((smallest, point) => {
+                    const date = point.properties?.date;
+                    if (typeof date !== "string") return smallest;
+                    if (!smallest || date > smallest) return date;
+                    return smallest;
+                  }, "") || "N/A";
+
+                const htmlBuilder = new InnerHtmlBuilder()
+                  .addTitle("Data Records In This Area:")
+                  .addText(
+                    "Data Record Count: " +
+                      points.reduce((sum, point) => {
+                        const val = point.properties?.count ?? 0;
+                        return sum + (typeof val === "number" ? val : 0);
+                      }, 0)
+                  )
+                  .addRange("Time Range", smallestDate, biggestDate);
+
+                popupRef.current
+                  .setLngLat(info.coordinate as [number, number])
+                  .setHTML(htmlBuilder.getHtml())
+                  .addTo(map);
+              }
+            },
+          });
+    },
+    []
+  );
 
   useEffect(() => {
     if (map === null) return;
 
     map?.once("load", () => {
-      if (featureCollection === undefined) return;
-
-      const hexagonLayer = new HexagonLayer<Feature<Point>>({
-        id: MAPBOX_OVERLAY_HEXAGON_LAYER,
-        // data: "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/sf-bike-parking.json",
-        //
-        // gpuAggregation: true,
-        // extruded: true,
-        // getPosition: (d: any) => d.COORDINATES,
-        // getColorWeight: (d: any) => d.SPACES,
-        // getElevationWeight: (d: any) => d.SPACES,
-        // elevationScale: 4,
-        // radius: 100000,
-        // pickable: true,
-        data: featureCollection.features,
-        getPosition: ({ geometry: { coordinates } }) =>
-          coordinates as [number, number],
-        getColorWeight: ({ properties }) => properties?.count ?? 0,
-        // If you enable gpuAggregation the picking info will give less info
-        // due to the internal implementation. We do not see much diff in speed
-        // without gpuAggregation
-        gpuAggregation: false,
-        extruded: false,
-        pickable: true,
-        radius: 50000,
-        opacity: 0.4,
-        colorRange: COLOR_RANGE,
-        // getElevationValue: (v) => v.length,
-      });
-
-      const overlay = new MapboxOverlay({
-        interleaved: true,
-        layers: [hexagonLayer],
-        onClick: (info) => {
-          if (info.picked && info.object) {
-            // Remove existing popup
-            if (popupRef.current) {
-              popupRef.current.remove();
-              popupRef.current = null;
-            }
-
-            // Create popup
-            popupRef.current = new Popup({
-              closeButton: true,
-              closeOnClick: false,
-              maxWidth: "none",
-              offset: [0, -5],
-            });
-
-            const points: Feature<Point>[] = info.object.points || [];
-
-            const smallestDate =
-              points.reduce((smallest, point) => {
-                const date = point.properties?.date;
-                if (typeof date !== "string") return smallest;
-                if (!smallest || date <= smallest) return date;
-                return smallest;
-              }, "") || "N/A";
-
-            const biggestDate =
-              points.reduce((smallest, point) => {
-                const date = point.properties?.date;
-                if (typeof date !== "string") return smallest;
-                if (!smallest || date > smallest) return date;
-                return smallest;
-              }, "") || "N/A";
-
-            const htmlBuilder = new InnerHtmlBuilder()
-              .addTitle("Data Records In This Area:")
-              .addText(
-                "Data Record Count: " +
-                  points.reduce((sum, point) => {
-                    const val = point.properties?.count ?? 0;
-                    return sum + (typeof val === "number" ? val : 0);
-                  }, 0)
-              )
-              .addRange("Time Range", smallestDate, biggestDate);
-
-            popupRef.current
-              .setLngLat(info.coordinate as [number, number])
-              .setHTML(htmlBuilder.getHtml())
-              .addTo(map);
-          }
-        },
-      });
-
-      overlayRef.current = overlay;
-      map?.addControl(overlay);
+      const overlay = createLayer(featureCollection, map);
+      if (overlay) {
+        overlayRef.current = overlay;
+        map?.addControl(overlay);
+      }
     });
-
-    return () => {
+    map?.once("unload", () => {
       if (overlayRef.current) {
         map?.removeControl(overlayRef.current);
+        overlayRef.current = null;
+
         if (popupRef.current) {
           popupRef.current.remove();
           popupRef.current = null;
         }
       }
-    };
-  }, [featureCollection, map]);
+    });
+  }, [createLayer, featureCollection, map]);
+
+  useEffect(() => {
+    // Update the data on change
+    if (overlayRef.current) {
+      const l = createHexagonLayer(featureCollection);
+      overlayRef.current.setProps({ layers: [l] });
+    }
+  }, [featureCollection]);
 
   return null;
 };
