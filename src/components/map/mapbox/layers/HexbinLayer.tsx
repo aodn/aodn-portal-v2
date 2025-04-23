@@ -35,8 +35,8 @@ const createHexagonLayer = (
     gpuAggregation: false,
     extruded: false,
     pickable: true,
-    radius: 50000,
-    opacity: 0.4,
+    radius: 15000, // Change hexagon size here
+    opacity: 0.3,
     colorRange: COLOR_RANGE,
     // getElevationValue: (v) => v.length,
   });
@@ -76,7 +76,7 @@ const HexbinMap: FC<LayerBasicType> = ({ featureCollection }) => {
                   maxWidth: "none",
                   offset: [0, -5],
                 });
-
+                // Set gpuAggregation to true will make points object disappear
                 const points: Feature<Point>[] = info.object.points || [];
 
                 const smallestDate =
