@@ -31,7 +31,6 @@ const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
 const TRUNCATE_COUNT_MOBILE = 200;
 
-// TODO: Add vitest
 const getMinMaxDateStamps = (
   featureCollection?: FeatureCollection<Point>
 ): [Dayjs, Dayjs] => {
@@ -49,10 +48,10 @@ const getMinMaxDateStamps = (
     const date = dayjs(dateStr);
     if (!date.isValid()) continue;
 
-    if (!minDate || date.isBefore(minDate)) {
+    if (!minDate || date.isBefore(minDate) || date.isSame(minDate)) {
       minDate = date;
     }
-    if (!maxDate || date.isAfter(maxDate)) {
+    if (!maxDate || date.isAfter(maxDate) || date.isSame(maxDate)) {
       maxDate = date;
     }
   }
@@ -229,4 +228,5 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
 };
 
+export { getMinMaxDateStamps };
 export default SummaryAndDownloadPanel;
