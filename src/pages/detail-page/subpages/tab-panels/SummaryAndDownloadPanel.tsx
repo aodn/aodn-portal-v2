@@ -10,7 +10,7 @@ import Layers from "../../../../components/map/mapbox/layers/Layers";
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
-import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
+// import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
@@ -215,7 +215,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                   </Controls>
                   <Layers>
-                    <HexbinLayer featureCollection={undefined} />
+                    <HexbinLayer
+                      featureCollection={filteredFeatureCollection}
+                    />
                   </Layers>
                 </Map>
               </Box>
