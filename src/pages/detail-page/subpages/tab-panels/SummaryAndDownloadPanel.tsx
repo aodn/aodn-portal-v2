@@ -101,15 +101,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     );
 
     const filteredFeatures = featureCollection.features?.filter((feature) => {
-      const start = dayjs(
-        feature.properties?.startTime,
-        dateDefault.DATE_TIME_FORMAT
+      const date = dayjs(
+        feature.properties?.date,
+        dateDefault.SIMPLE_Y_M_DATE_FORMAT
       );
-      const end = dayjs(
-        feature.properties?.endTime,
-        dateDefault.DATE_TIME_FORMAT
-      );
-      return start.isBefore(conditionEnd) && end.isAfter(conditionStart);
+      return date.isAfter(conditionStart) && date.isBefore(conditionEnd);
     });
 
     return {
