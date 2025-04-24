@@ -143,8 +143,8 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
   useEffect(() => {
     // Update the data on change
     if (overlayRef.current) {
-      const l = createHexagonLayer(featureCollection);
-      overlayRef.current.setProps({ layers: [l] });
+      const layer = createHexagonLayer(featureCollection);
+      overlayRef.current.setProps({ layers: [layer] });
     }
   }, [featureCollection]);
 
