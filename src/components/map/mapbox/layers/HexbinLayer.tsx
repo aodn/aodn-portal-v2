@@ -118,7 +118,7 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
   );
 
   useEffect(() => {
-    if (map === null) return;
+    if (map === null || overlayRef.current) return;
 
     map?.once("load", () => {
       const overlay = createLayer(featureCollection, map);
@@ -127,7 +127,7 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
         map?.addControl(overlay);
       }
     });
-    map?.once("unload", () => {
+    map?.once("remove", () => {
       if (overlayRef.current) {
         map?.removeControl(overlayRef.current);
         overlayRef.current = null;
