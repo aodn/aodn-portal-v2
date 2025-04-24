@@ -42,7 +42,7 @@ const createHexagonLayer = (
   });
 };
 
-const HexbinMap: FC<LayerBasicType> = ({ featureCollection }) => {
+const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>();
   const overlayRef = useRef<MapboxOverlay | null>();
@@ -54,13 +54,13 @@ const HexbinMap: FC<LayerBasicType> = ({ featureCollection }) => {
         | undefined,
       map: Map
     ) => {
-      const l = createHexagonLayer(featureCollection);
+      const layer = createHexagonLayer(featureCollection);
 
-      return l === null
+      return layer === null
         ? null
         : new MapboxOverlay({
             interleaved: true,
-            layers: [l],
+            layers: [layer],
             onClick: (info) => {
               if (info.picked && info.object) {
                 // Remove existing popup
@@ -151,4 +151,4 @@ const HexbinMap: FC<LayerBasicType> = ({ featureCollection }) => {
   return null;
 };
 
-export default HexbinMap;
+export default HexbinLayer;
