@@ -165,7 +165,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
         prev.forEach((p) => {
           const callback: IDownloadConditionCallback =
             p as IDownloadConditionCallback;
-          callback.removeCallback && callback.removeCallback();
+          callback.removeCallback?.();
         });
       } else {
         const dateRangeCondition = new DateRangeCondition(
