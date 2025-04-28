@@ -16,7 +16,7 @@ from pages.search_page import SearchPage
 def test_tab_panel_scroll(desktop_page: Page, title: str) -> None:
     # Precondition: Tab panel should have scroll buttons
     # Set a smaller browser window size to make the tabs scrollable
-    desktop_page.set_viewport_size(DesktopDevices.EXTRA_SMALL)
+    desktop_page.set_viewport_size(DesktopDevices.SMALL)
 
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)

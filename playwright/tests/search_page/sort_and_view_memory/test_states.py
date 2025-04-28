@@ -185,7 +185,7 @@ def test_view_states_for_screen_resize(
     search_page.result_view_button.click()
     search_page.click_text(view_type.display_name, exact=True)
 
-    desktop_page.set_viewport_size(DesktopDevices.EXTRA_SMALL)
+    desktop_page.set_viewport_size(DesktopDevices.SMALL)
     desktop_page.wait_for_timeout(500)  # Wait for the viewport to resize
 
     if view_type == SearchViewLayouts.MAP:
@@ -233,7 +233,7 @@ def test_view_states_for_paste_url_screen_resize(
     )
 
     new_search_page = SearchPage(new_page)
-    new_page.set_viewport_size(DesktopDevices.EXTRA_SMALL)
+    new_page.set_viewport_size(DesktopDevices.SMALL)
     new_search_page.goto(current_url)
     new_search_page.wait_for_search_to_complete()
 
