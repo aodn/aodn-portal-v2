@@ -156,7 +156,8 @@ const IconSelect = <T extends string | number = string>({
             ? selectedValue(value, isIconOnly)
             : defaultValue(isIconOnly)
         }
-        data-testid={testId}
+        id={testId}
+        data-testid={`${testId}${value ? `-${value}` : ""}`}
         onChange={handleOnChange}
         onOpen={handleOpen}
         onClose={handleClose}

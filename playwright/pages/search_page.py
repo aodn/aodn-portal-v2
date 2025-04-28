@@ -31,15 +31,17 @@ class SearchPage(BasePage):
         self.result_card_grid = page.get_by_test_id('result-card-grid')
         self.result_title = page.get_by_test_id('result-card-title')
         self.first_result_title = self.result_title.first
+        self.grid_result_title = page.get_by_test_id('grid-card-title')
         self.loading = self.result_list.get_by_test_id('loading-progress')
 
         # buttons
-        self.result_sort_button = page.get_by_test_id('result-sort-button')
-        self.result_view_button = page.get_by_test_id('result-layout-button')
+        self.result_sort_button = self.get_by_id('result-sort-button')
+        self.result_view_button = self.get_by_id('result-layout-button')
         self.list_and_map_view_button = self.get_text('List and Map')
         self.grid_and_map_view_button = self.get_text('Grid and Map')
         self.full_map_view_button = self.get_text('Full Map View')
         self.full_list_view_button = self.get_text('Full List View')
+        self.map_toggle_button = self.get_by_id('map-toggle-control-button')
         self.show_more_results = self.get_by_id(
             'result-card-load-more-btn'
         ).last
@@ -97,3 +99,11 @@ class SearchPage(BasePage):
     def get_show_result_count_text(self, count: int, total: int) -> str:
         """Returns result count text in the specific format"""
         return f'Showing 1 - {count} of {total} results'
+
+    def get_result_sort_button(self, text: str) -> Locator:
+        """Returns result sort button element by text"""
+        return self.page.get_by_test_id(f'result-sort-button-{text}')
+
+    def get_result_view_button(self, text: str) -> Locator:
+        """Returns result view button element by text"""
+        return self.page.get_by_test_id(f'result-layout-button-{text}')

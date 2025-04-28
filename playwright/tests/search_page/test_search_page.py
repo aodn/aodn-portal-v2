@@ -131,16 +131,16 @@ def test_show_more_results(
 
 
 @pytest.mark.parametrize(
-    'link_title',
+    'button_label, section_title',
     [
-        'Data Link',
+        ('Data Access', 'Links'),
     ],
 )
-def test_links_button_navigates_to_detail_links_tab(
-    desktop_page: Page, link_title: str
+def test_data_access_button_navigates_to_detail_page_data_access_tab(
+    desktop_page: Page, button_label: str, section_title: str
 ) -> None:
     """
-    Verifies that clicking the 'Links' button on a result card
+    Verifies that clicking the 'Data Access' button on a result card
     navigates to the detail page tab, where the 'Links' are listed.
     """
     landing_page = LandingPage(desktop_page)
@@ -154,8 +154,8 @@ def test_links_button_navigates_to_detail_links_tab(
     first_result = search_page.result_card_list.first
 
     first_result.hover()
-    first_result.get_by_label('Data Access').click()
-    expect(detail_page.get_text(link_title)).to_be_visible()
+    first_result.get_by_label(button_label).click()
+    expect(detail_page.get_tab_section(section_title)).to_be_visible()
 
 
 def test_view_options_on_mobile(mobile_page: Page) -> None:

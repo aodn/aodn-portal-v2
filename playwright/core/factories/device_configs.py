@@ -14,4 +14,4 @@ def get_mobile_config(playwright: Playwright) -> DeviceConfig:
 
 
 def get_desktop_config() -> DeviceConfig:
-    return DeviceConfig(is_mobile=False, viewport=DesktopDevices.STANDARD)
+    return DeviceConfig(is_mobile=False, viewport=DesktopDevices.EXTRA_LARGE)
