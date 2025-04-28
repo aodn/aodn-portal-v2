@@ -114,7 +114,10 @@ describe("TimeRangeBarChart", () => {
     const endMonth = new Date("2023-12-01"); // ~11 months
     expect(determineChartUnit(start, endMonth)).toBe(DividedBy.month);
 
-    const endYear = new Date("2025-01-01"); // 2 years
+    let endYear = new Date("2031-01-01"); // 8 years
+    expect(determineChartUnit(start, endYear)).toBe(DividedBy.month);
+
+    endYear = new Date("2032-01-01"); // 9 years
     expect(determineChartUnit(start, endYear)).toBe(DividedBy.year);
   });
 
