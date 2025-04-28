@@ -32,7 +32,7 @@ const determineChartUnit = (start: Date, end: Date) => {
   if (calculateDaysBetween(start, end) <= 100) {
     return DividedBy.day;
   }
-  if (calculateMonthBetween(start, end) <= 12) {
+  if (calculateMonthBetween(start, end) <= 100) {
     return DividedBy.month;
   }
   return DividedBy.year;
