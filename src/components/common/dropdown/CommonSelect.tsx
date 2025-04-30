@@ -5,7 +5,7 @@ import {
   SelectChangeEvent,
   SxProps,
 } from "@mui/material";
-import { FC, memo, useCallback, useState } from "react";
+import { FC, memo, ReactElement, useCallback, useState } from "react";
 import { IconProps } from "../../icon/types";
 import { useDetailPageContext } from "../../../pages/detail-page/context/detail-page-context";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
@@ -13,7 +13,7 @@ import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 export interface SelectItem<T = string> {
   value: T;
   label: string;
-  icon?: Element | FC<IconProps>;
+  icon?: ReactElement | FC<IconProps>;
 }
 export interface CommonSelectProps<T = string> {
   items: SelectItem<T>[];

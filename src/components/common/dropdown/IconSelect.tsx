@@ -9,6 +9,7 @@ import {
 import {
   FunctionComponent,
   isValidElement,
+  ReactElement,
   ReactNode,
   useCallback,
   useEffect,
@@ -41,7 +42,7 @@ const defaultColorConfig = {
   selectedBgColor: color.blue.dark,
 };
 
-interface IconSelectProps<T = string> extends CommonSelectProps<T> {
+export interface IconSelectProps<T = string> extends CommonSelectProps<T> {
   selectName: string;
   colorConfig?: IconSelectColorConfig;
   isIconOnly?: boolean;
@@ -58,7 +59,7 @@ const getSelectedItem = <T extends string | number>(
 
 // Function to render the icon wrapped in a Box
 const renderIcon = (
-  icon: Element | FunctionComponent<IconProps> | undefined,
+  icon: ReactElement | FunctionComponent<IconProps> | undefined,
   color: string,
   iconBgColor: string,
   isIconOnly?: boolean
@@ -84,7 +85,7 @@ const renderIcon = (
 };
 
 const renderSelectValue = (
-  icon: Element | FunctionComponent<IconProps> | undefined,
+  icon: ReactElement | FunctionComponent<IconProps> | undefined,
   label: string | undefined,
   color: string,
   iconBgColor: string,
@@ -111,6 +112,38 @@ const renderSelectValue = (
         </Typography>
       )}
     </Box>
+  );
+};
+
+const defaultValue = <T extends string | number = string>(
+  selectName: string,
+  items: SelectItem<T>[],
+  config: IconSelectColorConfig,
+  isIconOnly: boolean
+) => {
+  const defaultIcon = items[0].icon;
+  return renderSelectValue(
+    defaultIcon,
+    selectName,
+    config.defaultColor,
+    config.defaultBgColor,
+    isIconOnly
+  );
+};
+
+const selectedValue = <T extends string | number = string>(
+  value: T,
+  items: SelectItem<T>[],
+  config: IconSelectColorConfig,
+  isIconOnly: boolean
+) => {
+  const selectedIcon = getSelectedItem(value, items);
+  return renderSelectValue(
+    selectedIcon?.icon,
+    selectedIcon?.label,
+    config.selectedColor,
+    config.selectedBgColor,
+    isIconOnly
   );
 };
 
@@ -146,28 +179,6 @@ const IconSelect = <T extends string | number = string>({
 
   const config = mergeWithDefaults(defaultColorConfig, colorConfig);
 
-  const defaultValue = (isIconOnly: boolean) => {
-    const defaultIcon = items[0].icon;
-    return renderSelectValue(
-      defaultIcon,
-      selectName,
-      config.defaultColor,
-      config.defaultBgColor,
-      isIconOnly
-    );
-  };
-
-  const selectedValue = (value: T, isIconOnly: boolean) => {
-    const selectedIcon = getSelectedItem(value, items);
-    return renderSelectValue(
-      selectedIcon?.icon,
-      selectedIcon?.label,
-      config.selectedColor,
-      config.selectedBgColor,
-      isIconOnly
-    );
-  };
-
   useEffect(() => {
     if (value) setSelectedItem(value);
   }, [value]);
@@ -175,11 +186,11 @@ const IconSelect = <T extends string | number = string>({
   return (
     <FormControl fullWidth>
       <Select
-        value={selectedItem || items[0].value}
+        value={selectedItem || items[0]?.value}
         renderValue={(value) =>
           selectedItem
-            ? selectedValue(value, isIconOnly)
-            : defaultValue(isIconOnly)
+            ? selectedValue(value, items, config, isIconOnly)
+            : defaultValue(selectName, items, config, isIconOnly)
         }
         id={testId}
         data-testid={`${testId}${value ? `-${value}` : ""}`}
