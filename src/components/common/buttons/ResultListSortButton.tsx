@@ -51,7 +51,7 @@ const ResultListSortButton: FC<ResultListSortButtonProps<SortResultEnum>> = ({
   return (
     <IconSelect
       items={SORT_SELECT}
-      data-testid="result-sort-button"
+      dataTestId="result-sort-button"
       selectName="Sort"
       onSelectCallback={onChangeSorting}
       value={currentSort}

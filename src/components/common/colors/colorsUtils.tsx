@@ -1,8 +1,11 @@
 /**
  * Copy from here https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
  *
- * @param str
  * @returns
+ * @param s
+ * @param saturation
+ * @param lightness
+ * @param alpha
  */
 const stringToColor = (
   s: string,

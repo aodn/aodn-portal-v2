@@ -6,7 +6,15 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { FC, useCallback, useEffect, useState } from "react";
+import {
+  FunctionComponent,
+  isValidElement,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { CommonSelectProps, SelectItem } from "./CommonSelect";
 import {
   border,
@@ -34,7 +42,7 @@ const defaultColorConfig = {
   selectedBgColor: color.blue.dark,
 };
 
-interface IconSelectProps<T = string> extends CommonSelectProps<T> {
+export interface IconSelectProps<T = string> extends CommonSelectProps<T> {
   selectName: string;
   colorConfig?: IconSelectColorConfig;
   isIconOnly?: boolean;
@@ -49,8 +57,35 @@ const getSelectedItem = <T extends string | number>(
   return items.find((item) => item.value === value);
 };
 
+// Function to render the icon wrapped in a Box
+const renderIcon = (
+  icon: ReactElement | FunctionComponent<IconProps> | undefined,
+  color: string,
+  iconBgColor: string,
+  isIconOnly?: boolean
+): ReactNode => {
+  if (!icon) return null;
+
+  // Handle React Element
+  if (isValidElement(icon)) {
+    return (
+      <Box mr={isIconOnly ? 0 : margin.lg} mb={-1}>
+        {icon}
+      </Box>
+    );
+  }
+
+  // Handle FunctionComponent
+  const IconComponent = icon as FunctionComponent<IconProps>;
+  return (
+    <Box mr={isIconOnly ? 0 : margin.lg} mb={-1}>
+      <IconComponent color={color} bgColor={iconBgColor} />
+    </Box>
+  );
+};
+
 const renderSelectValue = (
-  icon: FC<IconProps> | JSX.Element | undefined | null,
+  icon: ReactElement | FunctionComponent<IconProps> | undefined,
   label: string | undefined,
   color: string,
   iconBgColor: string,
@@ -64,14 +99,7 @@ const renderSelectValue = (
       flexWrap="nowrap"
       gap={isIconOnly ? 0 : 1}
     >
-      {icon && (
-        <Box mr={isIconOnly ? 0 : margin.lg} mb={-1}>
-          {typeof icon === "function"
-            ? icon({ color, bgColor: iconBgColor })
-            : icon}
-        </Box>
-      )}
-
+      {renderIcon(icon, color, iconBgColor, isIconOnly)}
       {!isIconOnly && label && (
         <Typography
           padding={0}
@@ -87,13 +115,45 @@ const renderSelectValue = (
   );
 };
 
+const defaultValue = <T extends string | number = string>(
+  selectName: string,
+  items: SelectItem<T>[],
+  config: IconSelectColorConfig,
+  isIconOnly: boolean
+) => {
+  const defaultIcon = items[0].icon;
+  return renderSelectValue(
+    defaultIcon,
+    selectName,
+    config.defaultColor,
+    config.defaultBgColor,
+    isIconOnly
+  );
+};
+
+const selectedValue = <T extends string | number = string>(
+  value: T,
+  items: SelectItem<T>[],
+  config: IconSelectColorConfig,
+  isIconOnly: boolean
+) => {
+  const selectedIcon = getSelectedItem(value, items);
+  return renderSelectValue(
+    selectedIcon?.icon,
+    selectedIcon?.label,
+    config.selectedColor,
+    config.selectedBgColor,
+    isIconOnly
+  );
+};
+
 const IconSelect = <T extends string | number = string>({
   items,
   selectName,
   value,
   colorConfig,
   onSelectCallback,
-  "data-testid": testId,
+  dataTestId: testId,
   isIconOnly = false,
   sx,
 }: IconSelectProps<T>) => {
@@ -104,44 +164,20 @@ const IconSelect = <T extends string | number = string>({
     (event: SelectChangeEvent<T>) => {
       const selectedItem = event.target.value as T;
       setSelectedItem(selectedItem);
-      onSelectCallback && onSelectCallback(selectedItem);
+      onSelectCallback?.(selectedItem);
     },
     [onSelectCallback]
   );
 
-  const handleOpen = useCallback(() => {
-    setIsOpen(true);
-    disableScroll();
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setIsOpen(false);
-    enableScroll();
-  }, []);
+  const handleOpenState = useCallback(
+    (open: boolean) => () => {
+      open ? disableScroll() : enableScroll();
+      setIsOpen(open);
+    },
+    []
+  );
 
   const config = mergeWithDefaults(defaultColorConfig, colorConfig);
-
-  const defaultValue = (isIconOnly: boolean) => {
-    const defaultIcon = items[0].icon;
-    return renderSelectValue(
-      defaultIcon,
-      selectName,
-      config.defaultColor,
-      config.defaultBgColor,
-      isIconOnly
-    );
-  };
-
-  const selectedValue = (value: T, isIconOnly: boolean) => {
-    const selectedIcon = getSelectedItem(value, items);
-    return renderSelectValue(
-      selectedIcon?.icon,
-      selectedIcon?.label,
-      config.selectedColor,
-      config.selectedBgColor,
-      isIconOnly
-    );
-  };
 
   useEffect(() => {
     if (value) setSelectedItem(value);
@@ -150,17 +186,17 @@ const IconSelect = <T extends string | number = string>({
   return (
     <FormControl fullWidth>
       <Select
-        value={selectedItem || items[0].value}
+        value={selectedItem || items[0]?.value}
         renderValue={(value) =>
           selectedItem
-            ? selectedValue(value, isIconOnly)
-            : defaultValue(isIconOnly)
+            ? selectedValue(value, items, config, isIconOnly)
+            : defaultValue(selectName, items, config, isIconOnly)
         }
         id={testId}
         data-testid={`${testId}${value ? `-${value}` : ""}`}
         onChange={handleOnChange}
-        onOpen={handleOpen}
-        onClose={handleClose}
+        onOpen={handleOpenState(true)}
+        onClose={handleOpenState(false)}
         open={isOpen}
         IconComponent={() => null}
         sx={{
