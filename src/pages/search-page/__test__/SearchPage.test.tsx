@@ -16,7 +16,7 @@ import { SortResultEnum } from "../../../components/common/buttons/ResultListSor
 
 const theme = AppTheme;
 
-// Create mock functions for React Router hooks
+// Mock react-router-dom
 const mockLocation = {
   pathname: "/search",
   search: "",
@@ -24,8 +24,6 @@ const mockLocation = {
   state: null,
   key: "default",
 };
-
-// Mock react-router-dom
 const mockNavigate = vi.fn();
 vi.mock(import("react-router-dom"), async (importOriginal) => {
   const actual = await importOriginal();
@@ -42,6 +40,7 @@ vi.mock("../../hooks/useRedirectSearch", () => ({
   default: () => mockRedirectSearch,
 }));
 
+//Mock searchReducer
 vi.mock(
   "../../../components/common/store/searchReducer",
   async (importOriginal) => {
@@ -70,6 +69,7 @@ vi.mock(
 import SearchPage from "../SearchPage";
 import { BrowserRouter as Router } from "react-router-dom";
 
+// Mock the Map component to avoid map initialization
 vi.mock("../../../components/map/mapbox/Map", () => {
   return {
     default: function DummyMap() {
@@ -300,7 +300,7 @@ describe("SearchPage Basic", () => {
   it("Should update UI based on Redux state", () => {
     // Mock the initial Redux state
     store.dispatch(updateSort(SortResultEnum.POPULARITY));
-    store.dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
+    store.dispatch(updateLayout(SearchResultLayoutEnum.GRID));
 
     // Render the component with the mocked state
     render(
@@ -313,14 +313,21 @@ describe("SearchPage Basic", () => {
       </Provider>
     );
 
-    waitFor(() => screen.findByTestId("result-layout-button")).then(() => {
-      // Verify that the UI reflects the initial state
-      expect(screen.getByTestId("result-layout-button")).toHaveTextContent(
-        "Full List View"
-      );
-      expect(screen.getByTestId("result-sort-button")).toHaveTextContent(
-        "Popularity"
-      );
+    waitFor(() => {
+      const list = screen.findByTestId("search-page-result-grid");
+      return list;
+    }).then((list) => {
+      expect(list).toBeDefined();
+
+      waitFor(() => screen.findByTestId("result-layout-button")).then(() => {
+        // Verify that the UI reflects the initial state
+        expect(screen.getByTestId("result-layout-button")).toHaveTextContent(
+          "Grid and Map"
+        );
+        expect(screen.getByTestId("result-sort-button")).toHaveTextContent(
+          "Popularity"
+        );
+      });
     });
   });
 
@@ -343,12 +350,12 @@ describe("SearchPage Basic", () => {
       const selectElement = screen.getByTestId("result-layout-button");
       user.click(selectElement);
 
-      // Find and click the "List and Map" option
+      // Find and click the "Grid and Map" option
       const listAndMapOption = screen.getByText("Grid and Map");
       expect(listAndMapOption).toBeInTheDocument();
       user.click(listAndMapOption);
 
-      // Verify that redirectSearch was called with the correct parameters
+      // Verify that redirectSearch was called which ensure the URL is updated
       expect(mockRedirectSearch).toHaveBeenCalledOnce();
     });
   });
