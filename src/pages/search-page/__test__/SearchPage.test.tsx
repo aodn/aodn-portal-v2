@@ -166,7 +166,6 @@ describe("SearchPage Basic", () => {
 
       user.type(input, "wave");
       user.type(input, "{enter}");
-      // expect(input.value).toEqual("wave");
 
       waitFor(() => {
         const list = screen.findByTestId("search-page-result-list");
