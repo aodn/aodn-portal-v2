@@ -1,6 +1,12 @@
 import { Provider } from "react-redux";
 import { afterAll, beforeAll, describe, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "../../../utils/AppTheme";
@@ -13,7 +19,7 @@ import {
 import Layout from "../../../components/layout/layout";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
-
+import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";
 const theme = AppTheme;
 
 // Mock react-router-dom
@@ -34,40 +40,12 @@ vi.mock(import("react-router-dom"), async (importOriginal) => {
   };
 });
 
-// Mock the useRedirectSearch hook
 const mockRedirectSearch = vi.fn();
-vi.mock("../../hooks/useRedirectSearch", () => ({
-  default: () => mockRedirectSearch,
-}));
-
-//Mock searchReducer
-vi.mock(
-  "../../../components/common/store/searchReducer",
-  async (importOriginal) => {
-    const actual =
-      (await importOriginal()) as typeof import("../../../components/common/store/searchReducer");
-    return {
-      ...actual,
-      fetchResultWithStore: vi.fn(() => ({
-        type: "search/fetchResultWithStore",
-      })),
-      fetchResultNoStore: vi.fn(() => {
-        return {
-          type: "search/fetchResultNoStore",
-          payload: Promise.resolve({ collections: [] }),
-          unwrap: () => Promise.resolve({}),
-        };
-      }),
-      fetchResultByUuidNoStore: vi.fn(() => ({
-        unwrap: () => Promise.resolve({}),
-      })),
-    };
-  }
-);
 
 // Import the component and router after the mock is defined
 import SearchPage from "../SearchPage";
 import { BrowserRouter as Router } from "react-router-dom";
+import { SEARCH_PAGE_REFERER } from "../constants";
 
 // Mock the Map component to avoid map initialization
 vi.mock("../../../components/map/mapbox/Map", () => {
@@ -99,7 +77,28 @@ describe("SearchPage Basic", () => {
         }) => children({ width: 1280, height: 800 }), // Laptop dimensions
       };
     });
+
+    // Mock scrollIntoView with a Vitest mock function
+    window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
+    // Mock style property
+    Object.defineProperty(HTMLElement.prototype, "style", {
+      value: {
+        scrollMarginTop: "",
+        setProperty: vi.fn(),
+        removeProperty: vi.fn(),
+        getPropertyValue: vi.fn().mockReturnValue(""),
+      },
+      configurable: true,
+    });
+
     server.listen();
+  });
+
+  // Initialize redux, make list view and relevant sort as default
+  beforeEach(() => {
+    store.dispatch(updateLayout(SearchResultLayoutEnum.LIST));
+    store.dispatch(updateSort(SortResultEnum.RELEVANT));
   });
 
   afterEach(() => {
@@ -112,6 +111,7 @@ describe("SearchPage Basic", () => {
 
   it("The map should be able to expand properly", () => {
     const user = userEvent.setup();
+    store.dispatch(updateLayout(SearchResultLayoutEnum.LIST));
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -122,27 +122,40 @@ describe("SearchPage Basic", () => {
       </Provider>
     );
 
-    waitFor(() => screen.findByTestId("result-layout-button")).then(() => {
-      // Find and open the Select component
-      const selectElement = screen.queryByTestId(
-        "result-layout-button"
-      ) as HTMLButtonElement;
-      user.click(selectElement);
+    // Mock user input to trigger search
+    const input = screen.getByTestId("input-with-suggester");
+    user.type(input, "wave");
+    user.type(input, "{enter}");
 
-      // Find and click the "Full Map View" option
-      const fullMapViewOption = screen.queryByText(
-        "Full Map View"
-      ) as HTMLButtonElement;
-      user.click(fullMapViewOption);
+    return waitFor(() => screen.findByTestId("result-layout-button")).then(
+      (select) => {
+        expect(select).toBeInTheDocument();
+        // Need to find combobox which is the element bound with mouse down event in MUI Select
+        return waitFor(() => within(select).findByRole("combobox")).then(
+          (combobox) => {
+            // Open the dropdown
+            // Use fireEvent.mouseDown instead of userEvent.click since MUI Select only responds to mouseDown
+            fireEvent.mouseDown(combobox);
 
-      // Should not be there if full map view clicked
-      const list = screen.queryByTestId("search-page-result-list");
-      expect(list).not.toBeInTheDocument();
-    });
+            // Wait for the dropdown to open and click the "Full Map View" option
+            return waitFor(() => screen.findByText("Full Map View")).then(
+              (option) => {
+                fireEvent.click(option);
+
+                // Verify search-page-result-list should not be there if full map view clicked
+                const list = screen.queryByTestId("search-page-result-list");
+                expect(list).not.toBeInTheDocument();
+              }
+            );
+          }
+        );
+      }
+    );
   });
 
-  it("The list should be able to show in list / grid view", () => {
+  it("Can load correct record after click load more button", () => {
     const user = userEvent.setup();
+
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -155,106 +168,38 @@ describe("SearchPage Basic", () => {
       </Provider>
     );
 
-    // Pretend user enter wave and press one enter in search box
-    waitFor(() => {
-      const input = screen.findByTestId(
-        "input-with-suggester"
-      ) as unknown as HTMLInputElement;
-      return input;
-    }).then((input) => {
-      // const input = screen.getByTestId("input-with-suggester") as any;
+    return waitFor(() => screen.getAllByTestId("input-with-suggester")).then(
+      (inputs) => {
+        const input = inputs[0] as HTMLInputElement;
+        // Pretend user enter wave and press two enter in search box
+        user.type(input, "wave");
+        user.type(input, "{enter}");
 
-      user.type(input, "wave");
-      user.type(input, "{enter}");
+        return waitFor(() =>
+          screen.findByTestId("search-page-result-list")
+        ).then((list) => {
+          expect(list).toBeDefined();
 
-      waitFor(() => {
-        const list = screen.findByTestId("search-page-result-list");
-        return list;
-      }).then((list) => {
-        expect(list).toBeDefined();
+          // Find the last record in the first page
+          let record = document.getElementById(
+            "result-card-c1344979-f701-0916-e044-00144f7bc0f4"
+          );
+          expect(record).toBeDefined();
+          const loadMore = document.getElementById(
+            "result-card-load-more-btn"
+          ) as HTMLButtonElement;
 
-        // Find and open the Select component
-        const selectElement = screen.getByText("View");
-        user.click(selectElement);
-
-        // Find and click the "Grid and Map" option
-        const gridAndMapOption = screen.getByText("Grid and Map");
-        expect(gridAndMapOption).toBeDefined();
-        user.click(gridAndMapOption);
-
-        const gridView = screen.getByTestId("resultcard-result-grid");
-        expect(gridView).toBeInTheDocument();
-
-        const gridList = screen.getAllByTestId("result-card-grid");
-        expect(gridList.length).not.equal(0);
-
-        // Open the Select component again
-        user.click(selectElement);
-
-        // Find and click the "List and Map" option
-        const listAndMapOption = screen.getByText("List and Map");
-        expect(listAndMapOption).toBeInTheDocument();
-        user.click(listAndMapOption);
-
-        const listList = screen.getAllByTestId("result-card-list");
-        expect(listList.length).not.equal(0);
-        // Clear after test
-        userEvent.clear(input);
-      });
-    });
-  }, 60000);
-
-  it("Change sort order load correct record", () => {
-    const user = userEvent.setup();
-    render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <Layout>
-              <SearchPage />
-            </Layout>
-          </Router>
-        </ThemeProvider>
-      </Provider>
+          expect(loadMore).toBeDefined();
+          user.click(loadMore);
+          // Find the last record on second page
+          record = document.getElementById(
+            "result-card-ae70eb18-b1f0-4012-8d62-b03daf99f7f2"
+          );
+          expect(record).toBeDefined();
+        });
+      }
     );
-    // Pretend user enter wave and press two enter in search box
-    waitFor(() => {
-      const input = screen.findByTestId(
-        "input-with-suggester"
-      ) as unknown as HTMLInputElement;
-      return input;
-    }).then((input) => {
-      user.type(input, "imos");
-      user.type(input, "{enter}");
-
-      waitFor(() => {
-        const list = screen.getByTestId("search-page-result-list");
-        return list;
-      }).then((list) => {
-        expect(list).toBeDefined();
-
-        // Find the last record in the first page
-        let record = document.getElementById(
-          "result-card-c1344979-f701-0916-e044-00144f7bc0f4"
-        );
-        expect(record).toBeDefined();
-        const loadMore = document.getElementById(
-          "result-card-load-more-btn"
-        ) as HTMLButtonElement;
-
-        expect(loadMore).toBeDefined();
-        user.click(loadMore);
-        // Find the last record on second page
-        record = document.getElementById(
-          "result-card-ae70eb18-b1f0-4012-8d62-b03daf99f7f2"
-        );
-        expect(record).toBeDefined();
-
-        // Clear after test
-        user.clear(input);
-      });
-    });
-  }, 60000);
+  });
 
   // URL parameters to Redux state flow
   it("Should update Redux state based on URL parameters", () => {
@@ -297,11 +242,11 @@ describe("SearchPage Basic", () => {
 
   // Redux state to UI flow
   it("Should update UI based on Redux state", () => {
+    const user = userEvent.setup();
     // Mock the initial Redux state
     store.dispatch(updateSort(SortResultEnum.POPULARITY));
     store.dispatch(updateLayout(SearchResultLayoutEnum.GRID));
 
-    // Render the component with the mocked state
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -312,28 +257,36 @@ describe("SearchPage Basic", () => {
       </Provider>
     );
 
-    waitFor(() => {
-      const list = screen.findByTestId("search-page-result-grid");
-      return list;
-    }).then((list) => {
-      expect(list).toBeDefined();
+    // Mock user input to trigger search
+    const input = screen.getByTestId("input-with-suggester");
+    user.type(input, "wave");
+    user.type(input, "{enter}");
 
-      waitFor(() => screen.findByTestId("result-layout-button")).then(() => {
-        // Verify that the UI reflects the initial state
-        expect(screen.getByTestId("result-layout-button")).toHaveTextContent(
-          "Grid and Map"
-        );
-        expect(screen.getByTestId("result-sort-button")).toHaveTextContent(
-          "Popularity"
-        );
-      });
+    // Wait for the search results to load to find the resultcard grid
+    return waitFor(() => screen.findByTestId("resultcard-result-grid"), {
+      timeout: 5000,
+    }).then((gridList) => {
+      // Verify that the grid view is displayed
+      expect(gridList).toBeInTheDocument();
+
+      // Verify that the layout button UI reflects the correct state
+      expect(screen.getByTestId("result-layout-button-GRID")).toHaveTextContent(
+        "Grid and Map"
+      );
     });
   });
 
-  // Button click to URL parameters flow
+  // Button click to Redux and URL parameters flow
   it("Should call redirectSearch to update URL parameters when click view button to change layout", () => {
     const user = userEvent.setup();
-    // Render the component
+    // Mock the implementation of useRedirectSearch
+    vi.spyOn(useRedirectSearchModule, "default").mockImplementation(
+      () => mockRedirectSearch
+    );
+
+    // Mock the initial Redux state
+    store.dispatch(updateLayout(SearchResultLayoutEnum.GRID));
+
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -344,18 +297,40 @@ describe("SearchPage Basic", () => {
       </Provider>
     );
 
-    waitFor(() => screen.findByTestId("result-layout-button")).then(() => {
-      // Find and open the Select component
-      const selectElement = screen.getByTestId("result-layout-button");
-      user.click(selectElement);
+    // Mock user input to trigger search
+    const input = screen.getByTestId("input-with-suggester");
+    user.type(input, "wave");
+    user.type(input, "{enter}");
 
-      // Find and click the "Grid and Map" option
-      const listAndMapOption = screen.getByText("Grid and Map");
-      expect(listAndMapOption).toBeInTheDocument();
-      user.click(listAndMapOption);
+    return waitFor(() => screen.findByTestId("result-layout-button-GRID")).then(
+      (select) => {
+        expect(select).toBeInTheDocument();
 
-      // Verify that redirectSearch was called which ensure the URL is updated
-      expect(mockRedirectSearch).toHaveBeenCalledOnce();
-    });
+        return waitFor(() => within(select).findByRole("combobox")).then(
+          (combobox) => {
+            // Open the dropdown
+            fireEvent.mouseDown(combobox);
+
+            // Wait for the dropdown to open and click the "List and Map" option
+            return waitFor(() => screen.findByTestId("menuitem-LIST")).then(
+              (option) => {
+                fireEvent.click(option);
+
+                const updatedLayout = store.getState().paramReducer.layout;
+                // Verify that the layout was updated in Redux state
+                expect(updatedLayout).toBe(SearchResultLayoutEnum.LIST);
+
+                // Verify that redirectSearch was called with the correct parameters
+                expect(mockRedirectSearch).toHaveBeenCalledWith(
+                  SEARCH_PAGE_REFERER,
+                  true,
+                  false
+                );
+              }
+            );
+          }
+        );
+      }
+    );
   });
 });
