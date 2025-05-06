@@ -1,4 +1,11 @@
-import { Dispatch, FC, SetStateAction, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  memo,
+  SetStateAction,
+  useCallback,
+  useState,
+} from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import SliderLine from "./SliderLine";
 import depth_image from "@/assets/images/depth-selector.png";
@@ -54,47 +61,42 @@ const CONTAINER_HEIGHT = 250;
 
 const MAX_DEPTH = 3000;
 
+const formatLabel = (value: number) =>
+  `${value === -1 ? MAX_DEPTH : MAX_DEPTH - value}m`;
+
+const markStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: fontSize.label,
+  fontFamily: fontFamily.general,
+  fontWeight: fontWeight.medium,
+  color: fontColor.gray.medium,
+};
+
 /**
  * TODO: may need to be refactored to use theme. Currently, all colors are
  * referenced from the design document(in Figma).
  * Parameters including width, height etc. are all hard-coded. Will change in the future.
  * @constructor
  */
-const DepthSlider: FC<DepthSliderProps> = ({ filter, setFilter }) => {
+const DepthSlider: FC<DepthSliderProps> = memo(() => {
   // TODO: implement DepthFilter when backend supports this query
   const [sliderValues, setSliderValues] = useState<number[]>(DEFAULT_VALUES);
 
-  const handleSliderChange = (
-    _: Event,
-    newValue: number | number[],
-    activeThumb: number
-  ) => {
-    setSliderValues(Array.isArray(newValue) ? newValue : [newValue]);
-  };
-  const formatLabel = (value: number) => {
-    if (value === -1) {
-      return <Box>{`${MAX_DEPTH}m`}</Box>;
-    }
-    return <Box>{`${MAX_DEPTH - value}m`}</Box>;
-  };
+  const handleSliderChange = useCallback(
+    (_: Event, newValue: number | number[], activeThumb: number) => {
+      setSliderValues(Array.isArray(newValue) ? newValue : [newValue]);
+    },
+    []
+  );
 
   return (
     <Grid container direction={"row"}>
       <Grid item xs={2}>
         <Stack direction="column" justifyContent="space-between" height="100%">
           {DEPTH_MARKS.map((mark, index) => (
-            <Box
-              key={index}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: fontSize.label,
-                fontFamily: fontFamily.general,
-                fontWeight: fontWeight.medium,
-                color: fontColor.gray.medium,
-              }}
-            >
+            <Box key={index} sx={markStyle}>
               {mark.label}
             </Box>
           ))}
@@ -132,5 +134,6 @@ const DepthSlider: FC<DepthSliderProps> = ({ filter, setFilter }) => {
       </Grid>
     </Grid>
   );
-};
+});
+DepthSlider.displayName = "DepthSlider";
 export default DepthSlider;

@@ -1,8 +1,9 @@
 import { GlobalStyles } from "@mui/material";
 import { color } from "../../../styles/constants";
+import { memo } from "react";
 
 // TODO: firefox browser does not support webkit, need to find a way to fix
-const Scrollbar = () => (
+const Scrollbar = memo(() => (
   <GlobalStyles
     styles={{
       "*::-webkit-scrollbar": {
@@ -30,6 +31,6 @@ const Scrollbar = () => (
       },
     }}
   />
-);
-
+));
+Scrollbar.displayName = "ScrollBar";
 export default Scrollbar;
