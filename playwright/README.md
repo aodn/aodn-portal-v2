@@ -119,7 +119,7 @@ Example usage:
 pytest --tracing retain-on-failure
 ```
 
-#### GitHub Actions Workflow
+### GitHub Actions Workflow
 
 In CI runs, traces are automatically saved for failed tests.
 
@@ -130,7 +130,7 @@ In CI runs, traces are automatically saved for failed tests.
   - `reports/`: Contains the HTML test report.
   - `test-results/`: Contains trace files for failed tests, structured by folder just like the [`tests/`](./tests/) directory.
 
-#### How to Investigate Failed Tests
+### How to Investigate Failed Tests
 
 Refer to [this link](https://github.com/aodn/aodn-portal-v2/issues/374) that contains the details on how to investigate a failed test.
 
