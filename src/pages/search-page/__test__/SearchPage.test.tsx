@@ -78,8 +78,11 @@ describe("SearchPage Basic", () => {
       };
     });
 
-    // Mock scrollIntoView with a Vitest mock function
+    // Mock scrollIntoView
     window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
+    // Mock window.scrollTo
+    window.scrollTo = vi.fn();
 
     // Mock style property
     Object.defineProperty(HTMLElement.prototype, "style", {
@@ -111,7 +114,7 @@ describe("SearchPage Basic", () => {
 
   it("The map should be able to expand properly", () => {
     const user = userEvent.setup();
-    store.dispatch(updateLayout(SearchResultLayoutEnum.LIST));
+
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -160,17 +163,14 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <Layout>
-              <SearchPage />
-            </Layout>
+            <SearchPage />
           </Router>
         </ThemeProvider>
       </Provider>
     );
 
-    return waitFor(() => screen.getAllByTestId("input-with-suggester")).then(
-      (inputs) => {
-        const input = inputs[0] as HTMLInputElement;
+    return waitFor(() => screen.getByTestId("input-with-suggester")).then(
+      (input) => {
         // Pretend user enter wave and press two enter in search box
         user.type(input, "wave");
         user.type(input, "{enter}");
