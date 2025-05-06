@@ -85,7 +85,7 @@ const DepthSlider: FC<DepthSliderProps> = memo(() => {
   const [sliderValues, setSliderValues] = useState<number[]>(DEFAULT_VALUES);
 
   const handleSliderChange = useCallback(
-    (_: Event, newValue: number | number[], activeThumb: number) => {
+    (_: Event, newValue: number | number[]) => {
       setSliderValues(Array.isArray(newValue) ? newValue : [newValue]);
     },
     []
