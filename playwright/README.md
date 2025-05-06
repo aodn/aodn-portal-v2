@@ -95,10 +95,44 @@ To install `Conda`, please refer to the [official guide](https://conda.io/projec
    ```
    More configurable options can be found in the [official documentation](https://playwright.dev/python/docs/running-tests).
 
-## Test Report:
+## Test Results & Debugging Failed Tests
 
-Test reports are generated using [pytest-html](https://pytest-html.readthedocs.io/en/latest/). The generated report for the _latest_ test run will be stored inside the `/playwright/reports` directory.
-The link to view the traces: https://trace.playwright.dev/
+After a test run, two types of documentation are generated to help analyze results:
+
+1. **HTML Report**: A user-friendly summary of test outcomes.
+2. **Playwright Traces**: Detailed step-by-step traces for failed tests.
+
+### Local Development
+
+- **HTML Report**: Saved under the `reports` directory at the root of the playwright test framework project.
+- **Playwright Traces**: Saved under the `test-results` directory.
+
+To record traces during local test runs, use the `--tracing` option with `pytest`. Available options:
+
+- `on`: Record and save traces for every test.
+- `retain-on-failure`: Only save traces for failed tests.
+- `off`: Do not record trace. (default).
+
+Example usage:
+
+```bash
+pytest --tracing retain-on-failure
+```
+
+#### GitHub Actions Workflow
+
+In CI runs, traces are automatically saved for failed tests.
+
+- Navigate to the specific workflow run.
+- Scroll down to the **Artifacts** section.
+- Download the artifact named `test-report`.
+- After extracting the zip file:
+  - `reports/`: Contains the HTML test report.
+  - `test-results/`: Contains trace files for failed tests, structured by folder just like the [`tests/`](./tests/) directory.
+
+#### How to Investigate Failed Tests
+
+Refer to [this link](https://github.com/aodn/aodn-portal-v2/issues/374) that contains the details on how to investigate a failed test.
 
 ## Debug on VSCode
 
