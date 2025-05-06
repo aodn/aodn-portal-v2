@@ -199,6 +199,7 @@ const IconSelect = <T extends string | number = string>({
         onClose={handleOpenState(false)}
         open={isOpen}
         IconComponent={() => null}
+        MenuProps={{ disablePortal: true }}
         sx={{
           padding: 0,
           height: ICON_SELECT_DEFAULT_HEIGHT,
@@ -219,7 +220,11 @@ const IconSelect = <T extends string | number = string>({
         }}
       >
         {items.map((item) => (
-          <MenuItem key={item.value} value={item.value}>
+          <MenuItem
+            key={item.value}
+            value={item.value}
+            data-testid={`menuitem-${item.value}`}
+          >
             {renderSelectValue(
               item.icon,
               item.label,
