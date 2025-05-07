@@ -116,49 +116,49 @@ describe("AssociatedRecordsPanel", async () => {
     });
   });
 
-  it("should be able to show / hide more records", () => {
+  it("should be able to show / hide more records", async () => {
     const lowerRecordTitle =
       "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
 
-    return waitFor(() =>
-      screen.findByTestId("show-more-detail-btn-Sibling Records")
+    await waitFor(() =>
+      screen.findByTestId("show-more-detail-btn-Associated Records")
     ).then((showMoreRecordsBtn) => {
       expect(showMoreRecordsBtn).to.exist;
       expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
       userEvent.click(showMoreRecordsBtn!);
     });
 
-    // waitFor(
-    //   () => {
-    //     expect(screen.queryByTestId("show-less-detail-btn-Sibling Records")).to
-    //       .exist;
-    //
-    //     // final record should be shown now
-    //     expect(screen.queryByText(lowerRecordTitle)).to.exist;
-    //   },
-    //   { timeout: 5000 }
-    // );
-    //
-    // waitFor(
-    //   () => {
-    //     const showLessRecordsBtn = screen.queryByTestId(
-    //       "show-less-detail-btn-Sibling Records"
-    //     );
-    //     expect(showLessRecordsBtn).to.exist;
-    //     userEvent.click(showLessRecordsBtn!);
-    //   },
-    //   { timeout: 5000 }
-    // );
-    //
-    // waitFor(
-    //   () => {
-    //     expect(screen.queryByTestId("show-more-detail-btn-Sibling Records")).to
-    //       .exist;
-    //
-    //     // final record should be hidden again
-    //     expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
-    //   },
-    //   { timeout: 5000 }
-    // );
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("show-less-detail-btn-Associated Records"))
+          .exist;
+
+        // final record should be shown now
+        expect(screen.queryByText(lowerRecordTitle)).to.exist;
+      },
+      { timeout: 5000 }
+    );
+
+    await waitFor(
+      () => {
+        const showLessRecordsBtn = screen.queryByTestId(
+          "show-less-detail-btn-Associated Records"
+        );
+        expect(showLessRecordsBtn).to.exist;
+        userEvent.click(showLessRecordsBtn!);
+      },
+      { timeout: 5000 }
+    );
+
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("show-more-detail-btn-Associated Records"))
+          .exist;
+
+        // final record should be hidden again
+        expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
+      },
+      { timeout: 5000 }
+    );
   });
 });
