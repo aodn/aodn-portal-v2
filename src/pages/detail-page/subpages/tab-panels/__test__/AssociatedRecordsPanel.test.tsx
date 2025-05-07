@@ -72,31 +72,36 @@ describe("AssociatedRecordsPanel", async () => {
     });
   });
 
-  it("should open a new tab when clicking on a record abstract", async () => {
-    waitFor(
-      async () =>
-        await screen.findAllByText(
+  it("should open a new tab when clicking on a record abstract", () => {
+    return waitFor(
+      () =>
+        screen.findAllByText(
           "Northern Australia Automated Marine Weather and Oceanographic Stations"
         ),
       { timeout: 10000 }
     ).then(async () => {
-      const parentTitle = await screen.findByTestId(
-        "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
-      );
-      expect(parentTitle).to.exist;
+      return waitFor(() =>
+        screen.findByTestId(
+          "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
+        )
+      ).then((parentTitle) => {
+        expect(parentTitle).to.exist;
 
-      parentTitle && (await userEvent.click(parentTitle));
-      const parentAbstract = screen.queryByText(/weather stations have been/i);
-      expect(parentAbstract).to.exist;
+        parentTitle && userEvent.click(parentTitle);
+        const parentAbstract = screen.queryByText(
+          /weather stations have been/i
+        );
+        expect(parentAbstract).to.exist;
 
-      parentAbstract &&
-        userEvent.click(parentAbstract).then(() => {
-          expect(openSpy).toHaveBeenCalledWith(
-            "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
-            "_blank",
-            "noopener,noreferrer"
-          );
-        });
+        parentAbstract &&
+          userEvent.click(parentAbstract).then(() => {
+            expect(openSpy).toHaveBeenCalledWith(
+              "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
+              "_blank",
+              "noopener,noreferrer"
+            );
+          });
+      });
     });
   });
 
