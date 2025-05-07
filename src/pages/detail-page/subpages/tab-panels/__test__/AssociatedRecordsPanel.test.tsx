@@ -1,4 +1,12 @@
-import { afterAll, afterEach, beforeAll, describe, expect, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  MockInstance,
+  vi,
+} from "vitest";
 import { server } from "../../../../../__mocks__/server";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import AssociatedRecordsPanel from "../AssociatedRecordsPanel";
@@ -12,7 +20,7 @@ import { userEvent } from "@testing-library/user-event";
 
 describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
-  let openSpy: any;
+  let openSpy: MockInstance<Window["open"]>;
 
   beforeAll(() => {
     server.listen();
@@ -20,6 +28,14 @@ describe("AssociatedRecordsPanel", async () => {
 
   afterAll(() => {
     server.close();
+  });
+
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+    vi.restoreAllMocks();
+    // Restore the original implementation if needed
+    openSpy.mockRestore();
   });
 
   beforeEach(() => {
@@ -35,15 +51,7 @@ describe("AssociatedRecordsPanel", async () => {
       pathname: "/details",
       search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
     });
-  });
 
-  afterEach(() => {
-    cleanup();
-    server.resetHandlers();
-    vi.restoreAllMocks();
-  });
-
-  beforeEach(() => {
     openSpy = vi
       .spyOn(window, "open")
       .mockImplementation((url, target, features) => {
@@ -62,13 +70,8 @@ describe("AssociatedRecordsPanel", async () => {
     );
   });
 
-  afterEach(() => {
-    // Restore the original implementation if needed
-    openSpy.mockRestore();
-  });
-
   it("should render AssociatedRecordsPanel", () => {
-    waitFor(() => screen.findAllByText("Parent Record"), {
+    return waitFor(() => screen.findAllByText("Parent Record"), {
       timeout: 2000,
     }).then(() => {
       const parentRecordText = screen.queryAllByText("Parent Record");
@@ -77,54 +80,57 @@ describe("AssociatedRecordsPanel", async () => {
     });
   });
 
-  it("should open a new tab when clicking on a record abstract", async () => {
-    waitFor(
-      async () =>
-        await screen.findAllByText(
+  it("should open a new tab when clicking on a record abstract", () => {
+    return waitFor(
+      () =>
+        screen.findAllByText(
           "Northern Australia Automated Marine Weather and Oceanographic Stations"
         ),
       { timeout: 10000 }
-    ).then(async () => {
-      const parentTitle = await screen.findByTestId(
-        "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
-      );
-      expect(parentTitle).to.exist;
+    ).then(() => {
+      return waitFor(() =>
+        screen.findByTestId(
+          "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
+        )
+      ).then((parentTitle) => {
+        expect(parentTitle).to.exist;
 
-      parentTitle && (await userEvent.click(parentTitle));
-      const parentAbstract = screen.queryByText(/weather stations have been/i);
-      expect(parentAbstract).to.exist;
+        parentTitle && userEvent.click(parentTitle);
+        const parentAbstract = screen.queryByText(
+          /weather stations have been/i
+        );
+        expect(parentAbstract).to.exist;
 
-      parentAbstract &&
-        userEvent.click(parentAbstract).then(() => {
-          expect(openSpy).toHaveBeenCalledWith(
-            "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
-            "_blank",
-            "noopener,noreferrer"
+        if (parentAbstract) {
+          userEvent.click(parentAbstract);
+
+          return waitFor(() =>
+            expect(openSpy).toHaveBeenCalledWith(
+              "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
+              "_blank",
+              "noopener,noreferrer"
+            )
           );
-        });
+        }
+      });
     });
   });
 
-  it("should be able to show / hide more records", () => {
+  it("should be able to show / hide more records", async () => {
     const lowerRecordTitle =
       "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
 
-    waitFor(
-      () => {
-        const showMoreRecordsBtn = screen.queryByTestId(
-          "show-more-detail-btn-Sibling Records"
-        );
-        expect(showMoreRecordsBtn).to.exist;
-        // final record should be hiddren first
-        expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
-        userEvent.click(showMoreRecordsBtn!);
-      },
-      { timeout: 5000 }
-    );
+    await waitFor(() =>
+      screen.findByTestId("show-more-detail-btn-Associated Records")
+    ).then((showMoreRecordsBtn) => {
+      expect(showMoreRecordsBtn).to.exist;
+      expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
+      userEvent.click(showMoreRecordsBtn!);
+    });
 
-    waitFor(
+    await waitFor(
       () => {
-        expect(screen.queryByTestId("show-less-detail-btn-Sibling Records")).to
+        expect(screen.queryByTestId("show-less-detail-btn-Associated Records"))
           .exist;
 
         // final record should be shown now
@@ -133,10 +139,10 @@ describe("AssociatedRecordsPanel", async () => {
       { timeout: 5000 }
     );
 
-    waitFor(
+    await waitFor(
       () => {
         const showLessRecordsBtn = screen.queryByTestId(
-          "show-less-detail-btn-Sibling Records"
+          "show-less-detail-btn-Associated Records"
         );
         expect(showLessRecordsBtn).to.exist;
         userEvent.click(showLessRecordsBtn!);
@@ -144,9 +150,9 @@ describe("AssociatedRecordsPanel", async () => {
       { timeout: 5000 }
     );
 
-    waitFor(
+    await waitFor(
       () => {
-        expect(screen.queryByTestId("show-more-detail-btn-Sibling Records")).to
+        expect(screen.queryByTestId("show-more-detail-btn-Associated Records"))
           .exist;
 
         // final record should be hidden again

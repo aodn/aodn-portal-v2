@@ -43,12 +43,11 @@ describe("SearchbarButtonGroup Component", () => {
       const dateButton = screen.getByTestId("date-range-button");
       user.click(dateButton);
 
-      waitFor(() =>
+      return waitFor(() =>
         expect(mockHandleClickButton).toHaveBeenCalledWith(
           SearchbarButtonNames.Date
         )
-      );
-      expect(screen.getByText("Date")).toBeInTheDocument();
+      ).then(() => expect(screen.getByText("Date")).toBeInTheDocument());
     });
 
     it("should expand the button and show text when location button is clicked", () => {
@@ -64,12 +63,11 @@ describe("SearchbarButtonGroup Component", () => {
       const locationButton = screen.getByTestId("location-button");
       user.click(locationButton);
 
-      waitFor(() =>
+      return waitFor(() =>
         expect(mockHandleClickButton).toHaveBeenCalledWith(
           SearchbarButtonNames.Location
         )
-      );
-      expect(screen.getByText("Location")).toBeInTheDocument();
+      ).then(() => expect(screen.getByText("Location")).toBeInTheDocument());
     });
 
     it("should expand the button and show text when filter button is clicked", () => {
@@ -85,12 +83,11 @@ describe("SearchbarButtonGroup Component", () => {
       const filterButton = screen.getByTestId("filtersBtn");
       user.click(filterButton);
 
-      waitFor(() =>
+      return waitFor(() =>
         expect(mockHandleClickButton).toHaveBeenCalledWith(
           SearchbarButtonNames.Filter
         )
-      );
-      expect(screen.getByText("Filter")).toBeInTheDocument();
+      ).then(() => expect(screen.getByText("Filter")).toBeInTheDocument());
     });
 
     it("should handle switching between different popups", () => {
@@ -106,20 +103,22 @@ describe("SearchbarButtonGroup Component", () => {
       // Click date button first
       const dateButton = screen.getByTestId("date-range-button");
       user.click(dateButton);
-      waitFor(() =>
+
+      return waitFor(() =>
         expect(mockHandleClickButton).toHaveBeenCalledWith(
           SearchbarButtonNames.Date
         )
-      );
+      ).then(() => {
+        // Then click location button
+        const locationButton = screen.getByTestId("location-button");
+        user.click(locationButton);
 
-      // Then click location button
-      const locationButton = screen.getByTestId("location-button");
-      user.click(locationButton);
-      waitFor(() =>
-        expect(mockHandleClickButton).toHaveBeenCalledWith(
-          SearchbarButtonNames.Location
-        )
-      );
+        return waitFor(() =>
+          expect(mockHandleClickButton).toHaveBeenCalledWith(
+            SearchbarButtonNames.Location
+          )
+        );
+      });
     });
   });
 });
