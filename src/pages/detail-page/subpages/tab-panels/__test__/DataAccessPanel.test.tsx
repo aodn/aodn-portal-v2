@@ -59,8 +59,8 @@ describe("DataAccessPanel", async () => {
     expect(screen.queryAllByText("Data access via AODN Portal")).to.exist;
     expect(screen.queryAllByText("Data access via Programming API")).to.exist;
   });
-
-  test("should show COPY LINK button when on hover", () => {
+  // TODO: Test is false without return on waitFor
+  test("should show COPY LINK button when on hover", async () => {
     waitFor(() => screen.findByText("Data access using R"), {
       timeout: 5000,
     }).then(() => {

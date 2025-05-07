@@ -22,6 +22,14 @@ describe("AssociatedRecordsPanel", async () => {
     server.close();
   });
 
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+    vi.restoreAllMocks();
+    // Restore the original implementation if needed
+    openSpy.mockRestore();
+  });
+
   beforeEach(() => {
     vi.mock("react-router-dom", () => ({
       ...vi.importActual("react-router-dom"),
@@ -35,15 +43,7 @@ describe("AssociatedRecordsPanel", async () => {
       pathname: "/details",
       search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
     });
-  });
 
-  afterEach(() => {
-    cleanup();
-    server.resetHandlers();
-    vi.restoreAllMocks();
-  });
-
-  beforeEach(() => {
     openSpy = vi
       .spyOn(window, "open")
       .mockImplementation((url, target, features) => {
@@ -62,13 +62,8 @@ describe("AssociatedRecordsPanel", async () => {
     );
   });
 
-  afterEach(() => {
-    // Restore the original implementation if needed
-    openSpy.mockRestore();
-  });
-
   it("should render AssociatedRecordsPanel", () => {
-    waitFor(() => screen.findAllByText("Parent Record"), {
+    return waitFor(() => screen.findAllByText("Parent Record"), {
       timeout: 2000,
     }).then(() => {
       const parentRecordText = screen.queryAllByText("Parent Record");
