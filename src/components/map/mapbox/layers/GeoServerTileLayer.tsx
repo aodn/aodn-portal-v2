@@ -2,38 +2,70 @@ import { FC, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
+import { formatToUrl } from "../../../../utils/UrlUtils";
+
+interface TileUrlParams {
+  LAYERS: string[];
+  TRANSPARENT?: string;
+  VERSION?: string;
+  FORMAT?: string;
+  EXCEPTIONS?: string;
+  TILED?: string;
+  SERVICE?: string;
+  REQUEST?: string;
+  STYLES?: string;
+  QUERYABLE?: string;
+  SRS?: string;
+  BBOX?: string;
+  WIDTH?: number;
+  HEIGHT?: number;
+}
 
 interface GeoServerTileLayerConfig {
-  tileUrl: string;
+  tileUrlParams: TileUrlParams;
+  baseUrl: string;
   tileSize: number;
   minZoom: number;
   maxZoom: number;
   opacity: number;
 }
 
-interface GeoServerTileLayerProps extends LayerBasicType {
-  geoServerTileLayerConfig?: Partial<GeoServerTileLayerConfig>;
-}
+// Example url: "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256"
 
 const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
-  // TODO: this url is an example, replace with the actual URL
-  // which needs actual parameters for your GeoServer WMS service
-  tileUrl:
-    "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256", // example url
+  tileUrlParams: {
+    LAYERS: [],
+    TRANSPARENT: "TRUE",
+    VERSION: "1.1.1",
+    FORMAT: "image/png",
+    EXCEPTIONS: "application/vnd.ogc.se_xml",
+    TILED: "true",
+    SERVICE: "WMS",
+    REQUEST: "GetMap",
+    STYLES: "",
+    QUERYABLE: "true",
+    //Change the coordinate system from EPSG:4326 to EPSG:3857 (Web Mercator) which is what Mapbox GL expects for WMS tiles.
+    SRS: "EPSG:3857",
+    // Adapt to the Mapbox GL WMS Bbox format
+    BBOX: "{bbox-epsg-3857}",
+    WIDTH: 256,
+    HEIGHT: 256,
+  },
   tileSize: 256,
+  baseUrl: "/geowebcache/service/wms",
   minZoom: 0,
-  maxZoom: 22,
+  maxZoom: 20,
   opacity: 1.0,
 };
 
-const formatTileUrl = (layerName: string) =>
-  `/geowebcache/service/wms?LAYERS=${layerName}&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256`;
-
 // Helper functions to generate consistent IDs
-export const getLayerId = (id: string | undefined) =>
-  `geo-server-tile-layer-${id}`;
-export const getTileSourceId = (layerId: string) => `${layerId}-source`;
-export const getTileLayerId = (layerId: string) => `${layerId}-tile`;
+const getLayerId = (id: string | undefined) => `${id}-geo-server-tile-layer`;
+const getTileSourceId = (layerId: string) => `${layerId}-source`;
+const getTileLayerId = (layerId: string) => `${layerId}-tile`;
+
+interface GeoServerTileLayerProps extends LayerBasicType {
+  geoServerTileLayerConfig?: Partial<GeoServerTileLayerConfig>;
+}
 
 const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   geoServerTileLayerConfig,
@@ -48,7 +80,7 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   useEffect(() => {
     if (map === null) return;
 
-    const createLayers = () => {
+    const createLayers = async () => {
       // Check if source already exists to avoid duplicates
       if (map?.getSource(tileSourceId)) return;
 
@@ -57,22 +89,33 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
         geoServerTileLayerConfig
       );
 
-      // Add the WMS source following Mapbox's example
-      map?.addSource(tileSourceId, {
-        type: "raster",
-        tiles: [config.tileUrl],
-        tileSize: config.tileSize,
-        minzoom: config.minZoom,
-        maxzoom: config.maxZoom,
+      if (config.tileUrlParams.LAYERS.length === 0) return;
+
+      const tileUrl = formatToUrl<TileUrlParams>({
+        baseUrl: config.baseUrl,
+        params: config.tileUrlParams,
       });
 
-      // Add the raster layer
-      map?.addLayer({
-        id: tileLayer,
-        type: "raster",
-        source: tileSourceId,
-        paint: {},
-      });
+      try {
+        // Add the WMS source following Mapbox's example
+        map?.addSource(tileSourceId, {
+          type: "raster",
+          tiles: [tileUrl],
+          tileSize: config.tileSize,
+          minzoom: config.minZoom,
+          maxzoom: config.maxZoom,
+        });
+
+        // Add the raster layer
+        map?.addLayer({
+          id: tileLayer,
+          type: "raster",
+          source: tileSourceId,
+          paint: {},
+        });
+      } catch (error) {
+        console.log("Error adding layer or source:", error);
+      }
     };
 
     // Create layers when map loads
@@ -94,7 +137,8 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
           map?.removeSource(tileSourceId);
         }
       } catch (error) {
-        // TODO: handle error in ErrorBoundary
+        // TODO: handle error if needed
+        console.error("Error removing layer or source:", error);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

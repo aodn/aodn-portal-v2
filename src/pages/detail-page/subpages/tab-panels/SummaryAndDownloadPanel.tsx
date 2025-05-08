@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -139,17 +139,35 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     []
   );
 
+  const getWMSLayerNames = useCallback(() => {
+    const DataAccessLinks = collection?.getDataAccessLinks();
+
+    if (!DataAccessLinks || DataAccessLinks.length === 0) {
+      return [];
+    }
+
+    return DataAccessLinks.filter(
+      (link) => link.rel === "wms" && link.title
+    ).map((link) => link.title);
+  }, [collection]);
+
   // Function to create the appropriate layer based on selection
   const createPresentationLayer = useCallback(
     (id: string | null) => {
       switch (id) {
         case LayerName.GeoServer:
-          return <GeoServerTileLayer />;
+          return (
+            <GeoServerTileLayer
+              geoServerTileLayerConfig={{
+                tileUrlParams: { LAYERS: getWMSLayerNames() },
+              }}
+            />
+          );
         default:
           return <HexbinLayer featureCollection={filteredFeatureCollection} />;
       }
     },
-    [filteredFeatureCollection]
+    [filteredFeatureCollection, getWMSLayerNames]
   );
 
   return (
