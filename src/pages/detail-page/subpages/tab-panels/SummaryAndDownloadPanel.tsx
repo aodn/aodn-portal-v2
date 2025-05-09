@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -91,6 +91,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     collection?.hasSummaryFeature() ? LayerName.Hexbin : LayerName.GeoServer
   );
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
+  const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
@@ -151,6 +152,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     ).map((link) => link.title);
   }, [collection]);
 
+  const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
+    setIsWMSAvailable(isWMSAvailable);
+  }, []);
+
   // Function to create the appropriate layer based on selection
   const createPresentationLayer = useCallback(
     (id: string | null) => {
@@ -161,13 +166,14 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
               geoServerTileLayerConfig={{
                 tileUrlParams: { LAYERS: getWMSLayerNames() },
               }}
+              onWMSAvailabilityChange={onWMSAvailabilityChange}
             />
           );
         default:
           return <HexbinLayer featureCollection={filteredFeatureCollection} />;
       }
     },
-    [filteredFeatureCollection, getWMSLayerNames]
+    [filteredFeatureCollection, getWMSLayerNames, onWMSAvailabilityChange]
   );
 
   return (
@@ -206,7 +212,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       ? collection.hasSummaryFeature()
                         ? undefined
                         : "model:No data available"
-                      : undefined
+                      : isWMSAvailable
+                        ? undefined
+                        : "model:No GeoServer WMS data available"
                   }
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
@@ -249,30 +257,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                     <MenuControl
                       menu={
-                        <DateRange
-                          minDate={minDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
-                          maxDate={maxDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
-                          getAndSetDownloadConditions={
-                            getAndSetDownloadConditions
-                          }
-                        />
-                      }
-                    />
-                    <MenuControl
-                      menu={
-                        <DrawRect
-                          getAndSetDownloadConditions={
-                            getAndSetDownloadConditions
-                          }
-                        />
-                      }
-                    />
-                    <MenuControl
-                      menu={
                         <MapLayerSwitcher
                           layers={[
                             {
@@ -287,6 +271,32 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             },
                           ]}
                           onEvent={(id: string) => setSelectedLayer(id)}
+                        />
+                      }
+                    />
+                    <MenuControl
+                      visible={selectedLayer === LayerName.Hexbin}
+                      menu={
+                        <DateRange
+                          minDate={minDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
+                          maxDate={maxDateStamp.format(
+                            dateDefault.SIMPLE_DATE_FORMAT
+                          )}
+                          getAndSetDownloadConditions={
+                            getAndSetDownloadConditions
+                          }
+                        />
+                      }
+                    />
+                    <MenuControl
+                      visible={selectedLayer === LayerName.Hexbin}
+                      menu={
+                        <DrawRect
+                          getAndSetDownloadConditions={
+                            getAndSetDownloadConditions
+                          }
                         />
                       }
                     />

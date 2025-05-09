@@ -23,14 +23,14 @@ interface TileUrlParams {
 
 interface GeoServerTileLayerConfig {
   tileUrlParams: TileUrlParams;
-  baseUrl: string;
+  path: string;
   tileSize: number;
   minZoom: number;
   maxZoom: number;
   opacity: number;
 }
 
-// Example url: "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256"
+// Example url for mapbox wms resource: "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256"
 
 const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
   tileUrlParams: {
@@ -52,7 +52,7 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
     HEIGHT: 256,
   },
   tileSize: 256,
-  baseUrl: "/geowebcache/service/wms",
+  path: "/geowebcache/service/wms",
   minZoom: 0,
   maxZoom: 20,
   opacity: 1.0,
@@ -63,12 +63,49 @@ const getLayerId = (id: string | undefined) => `${id}-geo-server-tile-layer`;
 const getTileSourceId = (layerId: string) => `${layerId}-source`;
 const getTileLayerId = (layerId: string) => `${layerId}-tile`;
 
+const checkWMSAvailability = async (
+  path: string,
+  urlConfig: TileUrlParams,
+  onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
+): Promise<boolean> => {
+  if (urlConfig.LAYERS.length === 0) {
+    onWMSAvailabilityChange?.(false);
+    return false;
+  }
+
+  // Change back to EPSG:4326 for the availability check
+  const updateUrlConfig = {
+    ...urlConfig,
+    SRS: "EPSG:4326",
+    BBOX: "-180.0,-90.0,180.0,270.0",
+  };
+  const url = formatToUrl<TileUrlParams>({
+    baseUrl: path,
+    params: updateUrlConfig,
+  });
+  try {
+    // Perform a HEAD request to check if the WMS is available
+    const response = await fetch(url);
+    const isAvailable = response.ok;
+    onWMSAvailabilityChange?.(isAvailable);
+
+    return isAvailable;
+  } catch (error) {
+    console.error("Error checking WMS availability:", error);
+    onWMSAvailabilityChange?.(false);
+
+    return false;
+  }
+};
+
 interface GeoServerTileLayerProps extends LayerBasicType {
   geoServerTileLayerConfig?: Partial<GeoServerTileLayerConfig>;
+  onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
 }
 
 const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   geoServerTileLayerConfig,
+  onWMSAvailabilityChange,
 }: GeoServerTileLayerProps) => {
   const { map } = useContext(MapContext);
 
@@ -89,12 +126,19 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
         geoServerTileLayerConfig
       );
 
-      if (config.tileUrlParams.LAYERS.length === 0) return;
-
       const tileUrl = formatToUrl<TileUrlParams>({
-        baseUrl: config.baseUrl,
+        baseUrl: config.path,
         params: config.tileUrlParams,
       });
+
+      //Check WMS availability before adding the layer
+      const isWMSAvailable = await checkWMSAvailability(
+        config.path,
+        config.tileUrlParams,
+        onWMSAvailabilityChange
+      );
+
+      if (!isWMSAvailable) return;
 
       try {
         // Add the WMS source following Mapbox's example
@@ -137,7 +181,6 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
           map?.removeSource(tileSourceId);
         }
       } catch (error) {
-        // TODO: handle error if needed
         console.error("Error removing layer or source:", error);
       }
     };
