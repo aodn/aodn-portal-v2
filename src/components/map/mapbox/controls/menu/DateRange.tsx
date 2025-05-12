@@ -154,8 +154,13 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       dateRangeStamps: number | number[]
     ) => {
       const d = dateRangeStamps as number[];
-      const start = dayjs(d[0]).format(dateDefault.SIMPLE_DATE_FORMAT);
-      const end = dayjs(d[1]).format(dateDefault.SIMPLE_DATE_FORMAT);
+
+      // the day selection may be implemented in the future. Currently, just use below
+      // as temporary solution
+      const start = dayjs(d[0])
+        .startOf("month")
+        .format(dateDefault.DATE_FORMAT);
+      const end = dayjs(d[1]).endOf("month").format(dateDefault.DATE_FORMAT);
 
       if (minDate === start && maxDate === end) {
         const prev = getAndSetDownloadConditions(
