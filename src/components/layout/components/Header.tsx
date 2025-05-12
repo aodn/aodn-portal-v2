@@ -11,7 +11,7 @@ import {
 } from "../../../styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "./SectionContainer";
-import HeaderMenu from "./HeaderMenu";
+import HeaderMenu, { HeaderMenuStyle } from "./HeaderMenu";
 import { pageDefault } from "../../common/constants";
 import Searchbar from "../../search/Searchbar";
 import {
@@ -22,6 +22,7 @@ import {
 import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import ShareButtonMenu from "../../menu/ShareButtonMenu";
+import HeaderIconMenu from "./HeaderIconMenu";
 
 const Header: FC = () => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
@@ -55,7 +56,7 @@ const Header: FC = () => {
             : PAGE_CONTENT_MAX_WIDTH,
         }}
       >
-        <HeaderMenu />
+        <HeaderMenu menuStyle={HeaderMenuStyle.HOVER_MENU} />
       </SectionContainer>
 
       <SectionContainer
@@ -71,6 +72,7 @@ const Header: FC = () => {
         }}
       >
         <AODNSiteLogo />
+        {isMobile && <HeaderIconMenu />}
 
         {isSearchResultPage && (
           <Box

@@ -108,7 +108,7 @@ const color = {
     extraLightSemiTransparent: "rgba(231,242,255,0.5)",
     xLight: "#eaf1f6",
     light: "#E2ECF3",
-    medium: "#E7F2FF",
+    medium: "#C5D8E7",
     dark: "#618CA5",
     darkSemiTransparent: "rgba(97,140,165,0.5)",
     extraDark: "#182C3A",
