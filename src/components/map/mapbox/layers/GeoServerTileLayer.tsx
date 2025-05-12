@@ -83,9 +83,13 @@ const checkWMSAvailability = async (
     baseUrl: path,
     params: updateUrlConfig,
   });
+
   try {
     // Perform a HEAD request to check if the WMS is available
-    const response = await fetch(url);
+    // Only triggered when the layer is added to the map, won't be called in map movement/zoom
+    const response = await fetch(url, {
+      method: "HEAD",
+    });
     const isAvailable = response.ok;
     onWMSAvailabilityChange?.(isAvailable);
 
