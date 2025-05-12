@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -6,7 +6,9 @@ import Controls from "../../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
 import Map from "../../../../components/map/mapbox/Map";
-import Layers from "../../../../components/map/mapbox/layers/Layers";
+import Layers, {
+  createStaticLayers,
+} from "../../../../components/map/mapbox/layers/Layers";
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
@@ -26,10 +28,18 @@ import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
+import GeoServerTileLayer from "../../../../components/map/mapbox/layers/GeoServerTileLayer";
+import MapLayerSwitcher from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
 const TRUNCATE_COUNT_MOBILE = 200;
+
+enum LayerName {
+  Hexbin = "hexbin",
+  GeoServer = "geoServer",
+}
 
 const getMinMaxDateStamps = (
   featureCollection?: FeatureCollection<Point>
@@ -76,7 +86,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     downloadConditions,
     getAndSetDownloadConditions,
   } = useDetailPageContext();
-
+  // Add state for selected layer
+  const [selectedLayer, setSelectedLayer] = useState<string | null>(
+    collection?.hasSummaryFeature() ? LayerName.Hexbin : LayerName.GeoServer
+  );
+  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
+  const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
   const abstract = collection?.description ? collection.description : "";
   const mapContainerId = "map-detail-container-id";
@@ -125,6 +140,42 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     []
   );
 
+  const getWMSLayerNames = useCallback(() => {
+    const DataAccessLinks = collection?.getDataAccessLinks();
+
+    if (!DataAccessLinks || DataAccessLinks.length === 0) {
+      return [];
+    }
+
+    return DataAccessLinks.filter(
+      (link) => link.rel === "wms" && link.title
+    ).map((link) => link.title);
+  }, [collection]);
+
+  const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
+    setIsWMSAvailable(isWMSAvailable);
+  }, []);
+
+  // Function to create the appropriate layer based on selection
+  const createPresentationLayer = useCallback(
+    (id: string | null) => {
+      switch (id) {
+        case LayerName.GeoServer:
+          return (
+            <GeoServerTileLayer
+              geoServerTileLayerConfig={{
+                tileUrlParams: { LAYERS: getWMSLayerNames() },
+              }}
+              onWMSAvailabilityChange={onWMSAvailabilityChange}
+            />
+          );
+        default:
+          return <HexbinLayer featureCollection={filteredFeatureCollection} />;
+      }
+    },
+    [filteredFeatureCollection, getWMSLayerNames, onWMSAvailabilityChange]
+  );
+
   return (
     collection && (
       <Grid container>
@@ -153,13 +204,17 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
               >
                 <Map
                   bbox={bbox}
-                  animate={true}
+                  animate={false}
                   panelId={mapContainerId}
                   projection={"mercator"} // Hexbin support this project or globe only
                   announcement={
-                    collection.hasSummaryFeature()
-                      ? undefined
-                      : "model:No data available"
+                    selectedLayer === LayerName.Hexbin
+                      ? collection.hasSummaryFeature()
+                        ? undefined
+                        : "model:No data available"
+                      : isWMSAvailable
+                        ? undefined
+                        : "model:No GeoServer WMS data available"
                   }
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
@@ -185,10 +240,42 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                               default: false,
                             },
                           ]}
+                          onEvent={(target: EventTarget & HTMLInputElement) =>
+                            setStaticLayer((values) => {
+                              // Remove the item and add it back if selected
+                              const e = values?.filter(
+                                (i) => i !== target.value
+                              );
+                              if (target.checked) {
+                                e.push(target.value);
+                              }
+                              return [...e];
+                            })
+                          }
                         />
                       }
                     />
                     <MenuControl
+                      menu={
+                        <MapLayerSwitcher
+                          layers={[
+                            {
+                              id: LayerName.Hexbin,
+                              name: capitalizeFirstLetter(LayerName.Hexbin),
+                              default: selectedLayer === LayerName.Hexbin,
+                            },
+                            {
+                              id: LayerName.GeoServer,
+                              name: "GeoServer",
+                              default: selectedLayer === LayerName.GeoServer,
+                            },
+                          ]}
+                          onEvent={(id: string) => setSelectedLayer(id)}
+                        />
+                      }
+                    />
+                    <MenuControl
+                      visible={selectedLayer === LayerName.Hexbin}
                       menu={
                         <DateRange
                           minDate={minDateStamp.format(
@@ -204,6 +291,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }
                     />
                     <MenuControl
+                      visible={selectedLayer === LayerName.Hexbin}
                       menu={
                         <DrawRect
                           getAndSetDownloadConditions={
@@ -214,9 +302,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                   </Controls>
                   <Layers>
-                    <HexbinLayer
-                      featureCollection={filteredFeatureCollection}
-                    />
+                    {createPresentationLayer(selectedLayer)}
+                    {createStaticLayers(staticLayer)}
                   </Layers>
                 </Map>
               </Box>

@@ -118,26 +118,34 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
   );
 
   useEffect(() => {
-    if (map === null || overlayRef.current) return;
+    if (!map || overlayRef.current) return;
 
-    map?.once("load", () => {
+    const createHexbinLayer = () => {
       const overlay = createLayer(featureCollection, map);
       if (overlay) {
         overlayRef.current = overlay;
         map?.addControl(overlay);
       }
-    });
-    map?.once("remove", () => {
+    };
+
+    const cleanup = () => {
       if (overlayRef.current) {
         map?.removeControl(overlayRef.current);
         overlayRef.current = null;
-
         if (popupRef.current) {
           popupRef.current.remove();
           popupRef.current = null;
         }
       }
-    });
+    };
+
+    map?.once("load", createHexbinLayer);
+    map?.on("styledata", createHexbinLayer);
+
+    return () => {
+      map?.off("styledata", createHexbinLayer);
+      cleanup();
+    };
   }, [createLayer, featureCollection, map]);
 
   useEffect(() => {
