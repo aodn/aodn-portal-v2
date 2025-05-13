@@ -67,7 +67,7 @@ const Header: FC = () => {
           paddingY: padding.small,
         }}
         contentAreaStyle={{
-          flexDirection: "column",
+          flexDirection: isMobile ? "column" : "row",
           width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
           maxWidth: isSearchResultPage ? "90%" : PAGE_CONTENT_MAX_WIDTH,
         }}
