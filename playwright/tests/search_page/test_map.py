@@ -245,9 +245,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     assert map_center == new_map_center
     assert map_zoom == new_map_zoom
 
-@pytest.mark.skip(
-    reason='This test is skipped because of the new feature change.'
-)
+
 def test_map_buttons(desktop_page: Page) -> None:
     """
     Ensures that the map buttons on both the search page and the detail page are displayed correctly.
@@ -258,6 +256,7 @@ def test_map_buttons(desktop_page: Page) -> None:
     """
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)
+    detail_page = DetailPage(desktop_page)
 
     landing_page.load()
     landing_page.search.click_search_button()
@@ -271,10 +270,17 @@ def test_map_buttons(desktop_page: Page) -> None:
     search_page.first_result_title.click()
 
     # Check the visibility of detail page map buttons
-    expect(search_page.map.basemap_show_hide_menu).to_be_visible()
-    expect(search_page.map.daterange_show_hide_menu_button).to_be_visible()
-    expect(search_page.map.draw_rect_menu_button).to_be_visible()
-    expect(search_page.map.delete_button).to_be_visible()
+    expect(detail_page.detail_map.basemap_show_hide_menu).to_be_visible()
+    expect(detail_page.detail_map.layers_icon).to_be_visible()
+    expect(detail_page.detail_map.delete_button).to_be_visible()
+
+    # Select the Hexbin layer
+    detail_page.detail_map.layers_icon.click()
+    detail_page.detail_map.hexbin_layer.click()
+    expect(
+        detail_page.detail_map.daterange_show_hide_menu_button
+    ).to_be_visible()
+    expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
 
 
 def test_map_zoom_out_and_drag_does_not_crash(desktop_page: Page) -> None:

@@ -25,6 +25,7 @@ class Map(BasePage):
         self.bookmarks_icon = page.get_by_test_id('BookmarksIcon')
         self.basemap_show_hide_menu = page.get_by_test_id('PublicIcon')
         self.layers_icon = page.get_by_test_id('LayersIcon')
+        self.hexbin_layer = page.get_by_role('radio', name='Hexbin')
 
         self.daterange_show_hide_menu_button = page.get_by_test_id(
             'daterange-show-hide-menu-button'
