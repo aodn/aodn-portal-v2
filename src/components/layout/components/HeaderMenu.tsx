@@ -143,7 +143,7 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
 
   const renderHeaderAccordionMenu = () => {
     return HEADER_MENUS.map((menu, index) => (
-      <Accordion key={index}>
+      <Accordion key={index} data-testId="accordion-menu">
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography padding={0} color="#000" fontSize={fontSize.info}>
             {menu.menuName}
