@@ -28,7 +28,7 @@ const HeaderIconMenu: FC = () => {
   }, []);
 
   return (
-    <div>
+    <>
       <IconButton
         onClick={handleClick}
         sx={{
@@ -50,25 +50,30 @@ const HeaderIconMenu: FC = () => {
           "& .MuiPaper-root": {
             borderRadius: borderRadius.small,
             backgroundColor: color.blue.medium,
+            fontSize: fontSize.label,
             boxShadow: "none",
             "&::before": {
               display: "none",
             },
           },
+          "& .MuiAccordion-root.Mui-expanded": {
+            margin: 0,
+          },
+          "& .MuiMenu-list": {
+            padding: 0,
+          },
           "& .MuiMenuItem-root": {
             paddingLeft: padding.double,
-            color: "#000",
             backgroundColor: color.blue.light,
           },
           "& .MuiAccordionDetails-root": {
             padding: 0,
-            margin: 0,
           },
         }}
       >
         <HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />
       </Menu>
-    </div>
+    </>
   );
 };
 

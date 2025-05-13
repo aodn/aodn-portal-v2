@@ -17,6 +17,7 @@ import HoverMenu from "../../menu/HoverMenu";
 import {
   color,
   fontColor,
+  fontSize,
   fontWeight,
   gap,
   margin,
@@ -144,7 +145,7 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
     return HEADER_MENUS.map((menu, index) => (
       <Accordion key={index}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography padding={0} color="#000">
+          <Typography padding={0} color="#000" fontSize={fontSize.info}>
             {menu.menuName}
           </Typography>
         </AccordionSummary>
@@ -156,7 +157,9 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
                 item.handler(event);
               }}
             >
-              {item.name}
+              <Typography padding={0} color="#000" fontSize={fontSize.info}>
+                {item.name}
+              </Typography>
             </MenuItem>
           ))}
         </AccordionDetails>

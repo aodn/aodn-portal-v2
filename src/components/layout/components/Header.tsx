@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import {
   border,
   borderRadius,
@@ -42,22 +42,24 @@ const Header: FC = () => {
         boxShadow: shadow.bottom,
       }}
     >
-      <SectionContainer
-        sectionAreaStyle={{
-          backgroundColor: color.blue.xLight,
-        }}
-        contentAreaStyle={{
-          alignItems: "end",
-          width: isSearchResultPage
-            ? SEARCHBAR_CONTENT_WIDTH
-            : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
-          maxWidth: isSearchResultPage
-            ? SEARCHBAR_CONTENT_WIDTH
-            : PAGE_CONTENT_MAX_WIDTH,
-        }}
-      >
-        <HeaderMenu menuStyle={HeaderMenuStyle.HOVER_MENU} />
-      </SectionContainer>
+      {!isMobile && (
+        <SectionContainer
+          sectionAreaStyle={{
+            backgroundColor: color.blue.xLight,
+          }}
+          contentAreaStyle={{
+            alignItems: "end",
+            width: isSearchResultPage
+              ? SEARCHBAR_CONTENT_WIDTH
+              : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+            maxWidth: isSearchResultPage
+              ? SEARCHBAR_CONTENT_WIDTH
+              : PAGE_CONTENT_MAX_WIDTH,
+          }}
+        >
+          <HeaderMenu menuStyle={HeaderMenuStyle.HOVER_MENU} />
+        </SectionContainer>
+      )}
 
       <SectionContainer
         sectionAreaStyle={{
@@ -65,14 +67,20 @@ const Header: FC = () => {
           paddingY: padding.small,
         }}
         contentAreaStyle={{
-          flexDirection: "row",
-          justifyContent: "space-between",
+          flexDirection: "column",
           width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
           maxWidth: isSearchResultPage ? "90%" : PAGE_CONTENT_MAX_WIDTH,
         }}
       >
-        <AODNSiteLogo />
-        {isMobile && <HeaderIconMenu />}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          width="100%"
+        >
+          <AODNSiteLogo />
+          {isMobile && <HeaderIconMenu />}
+        </Stack>
 
         {isSearchResultPage && (
           <Box
