@@ -298,6 +298,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       options={options.flatMap((option) => option.text)}
       autoComplete
       includeInputInList
+      disablePortal
       onInputChange={handleInputChange}
       sx={{
         bgcolor: "#fff",
