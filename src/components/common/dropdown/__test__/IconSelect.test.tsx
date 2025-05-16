@@ -47,10 +47,6 @@ const defaultProps: IconSelectProps<string> = {
   onSelectCallback: vi.fn(),
 };
 
-// Setup mocks
-const mockDisableScroll = disableScroll as Mock;
-const mockEnableScroll = enableScroll as Mock;
-
 // Helper to render with ThemeProvider
 const renderWithTheme = (ui: React.ReactElement) => {
   return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>);
@@ -69,73 +65,64 @@ describe("IconSelect", () => {
     expect(screen.getByTestId("icon1")).toBeInTheDocument(); // Default icon
   });
 
-  it("renders all menu items with icons and labels", async () => {
+  it("renders all menu items with icons and labels", () => {
     renderWithTheme(<IconSelect {...defaultProps} />);
     const select = screen.getByTestId("icon-select");
 
     // MUI Select bind its click function to its child component role="combobox", so need to find combobox before implement user click
-    await waitFor(() => within(select).findByRole("combobox")).then(
-      (combobox) => {
-        fireEvent.mouseDown(combobox); // Open dropdown
-        items.forEach((item) => {
-          expect(screen.getByText(item.label)).toBeInTheDocument();
-          if (item.icon) {
-            expect(screen.getAllByTestId("icon1").length).toBe(2);
-          }
-        });
+    const combobox = within(select).getByRole("combobox");
+    // Open dropdown
+    fireEvent.mouseDown(combobox);
+
+    items.forEach((item) => {
+      expect(screen.getByText(item.label)).toBeInTheDocument();
+      if (item.icon) {
+        expect(screen.getAllByTestId("icon1").length).toBe(2);
       }
-    );
+    });
   });
 
   it("handles uncontrolled behavior correctly", () => {
     renderWithTheme(<IconSelect {...defaultProps} />);
-    const select = screen.getByTestId("icon-select");
 
-    return waitFor(() => within(select).findByRole("combobox")).then(
-      (combobox) => {
-        fireEvent.mouseDown(combobox);
-        const item2 = screen.getByText("Item 2");
-        fireEvent.click(item2);
-        return waitFor(() => {
-          expect(defaultProps.onSelectCallback).toHaveBeenCalledWith("item2");
-        }).then(() => {
-          expect(screen.getAllByText("Item 2").length).toBe(1);
-        });
-      }
-    );
+    // Open dropdown
+    const select = screen.getByTestId("icon-select");
+    const combobox = within(select).getByRole("combobox");
+    fireEvent.mouseDown(combobox);
+
+    // Select option "Item 2"
+    const item2 = screen.getByText("Item 2");
+    fireEvent.click(item2);
+
+    return waitFor(() => {
+      expect(defaultProps.onSelectCallback).toHaveBeenCalledWith("item2");
+    }).then(() => {
+      // Only one "Item 2" as the dropdown is closed after clicking option
+      expect(screen.getAllByText("Item 2").length).toBe(1);
+    });
   });
 
   it("handles controlled behavior correctly", () => {
-    const onSelectCallback = vi.fn();
     const { rerender } = renderWithTheme(
-      <IconSelect
-        {...defaultProps}
-        value="item1"
-        onSelectCallback={onSelectCallback}
-      />
+      <IconSelect {...defaultProps} value="item1" />
     );
-    const select = screen.getByTestId("icon-select-item1");
 
-    return waitFor(() => within(select).findByRole("combobox")).then(
-      (combobox) => {
-        fireEvent.mouseDown(combobox);
-        const item3 = screen.getByText("Item 3");
-        fireEvent.click(item3);
-        return waitFor(() => {
-          expect(onSelectCallback).toHaveBeenCalledWith("item3");
-        }).then(() => {
-          rerender(
-            <IconSelect
-              {...defaultProps}
-              value="item3"
-              onSelectCallback={onSelectCallback}
-            />
-          );
-          expect(screen.getByTestId("icon-select-item3")).toBeInTheDocument();
-          expect(screen.getByText("Item 3")).toBeInTheDocument();
-        });
-      }
-    );
+    // Open dropdown
+    const select = screen.getByTestId("icon-select-item1");
+    const combobox = within(select).getByRole("combobox");
+    fireEvent.mouseDown(combobox);
+
+    // Select option "Item 3"
+    const item3 = screen.getByText("Item 3");
+    fireEvent.click(item3);
+
+    return waitFor(() => {
+      expect(defaultProps.onSelectCallback).toHaveBeenCalledWith("item3");
+    }).then(() => {
+      rerender(<IconSelect {...defaultProps} value="item3" />);
+      expect(screen.getByTestId("icon-select-item3")).toBeInTheDocument();
+      expect(screen.getByText("Item 3")).toBeInTheDocument();
+    });
   });
 
   it("applies custom sx styles", () => {
@@ -158,13 +145,11 @@ describe("IconSelect", () => {
     expect(screen.queryByText("Test Select")).not.toBeInTheDocument();
 
     const select = screen.getByTestId("icon-select");
-    return waitFor(() => within(select).findByRole("combobox")).then(
-      (combobox) => {
-        expect(combobox).toBeInTheDocument();
-        fireEvent.mouseDown(combobox);
-        // Click the select showing no option available
-        expect(screen.queryAllByRole("option")).toHaveLength(0);
-      }
+    const combobox = within(select).getByRole("combobox");
+    fireEvent.mouseDown(combobox);
+
+    return waitFor(() =>
+      expect(screen.queryAllByRole("option")).toHaveLength(0)
     );
   });
 
@@ -188,16 +173,14 @@ describe("IconSelect", () => {
       <IconSelect {...defaultProps} colorConfig={customColorConfig} />
     );
     const select = screen.getByTestId("icon-select");
-    return waitFor(() => within(select).findByRole("combobox")).then(
-      (combobox) => {
-        fireEvent.mouseDown(combobox);
-        screen.debug();
-        const icon = screen.getByTestId("icon"); // IconComponent
-        expect(icon).toHaveStyle(
-          "fill: yellow; background-color: rgb(128, 128, 128);"
-        ); // displayColor for MenuItem
-      }
-    );
+    const combobox = within(select).getByRole("combobox");
+    fireEvent.mouseDown(combobox);
+
+    return waitFor(() => screen.getByTestId("icon")).then((icon) => {
+      expect(icon).toHaveStyle(
+        "fill: yellow; background-color: rgb(128, 128, 128);"
+      ); // display gray color for MenuItem
+    });
   });
 
   it("updates selectedItem when value prop changes", () => {
@@ -224,14 +207,13 @@ describe("IconSelect", () => {
       />
     );
     const select = screen.getByTestId("number-select");
+    const combobox = within(select).getByRole("combobox");
+    fireEvent.mouseDown(combobox);
 
-    return waitFor(() => within(select).findByRole("combobox")).then(
-      (combobox) => {
-        expect(combobox).toBeInTheDocument();
-        expect(screen.getByText("Number Select")).toBeInTheDocument();
-        fireEvent.mouseDown(combobox);
-        expect(screen.getByText("Two")).toBeInTheDocument();
-      }
-    );
+    return waitFor(() =>
+      expect(screen.getByText("Number Select")).toBeInTheDocument()
+    ).then(() => {
+      expect(screen.getByText("Two")).toBeInTheDocument();
+    });
   });
 });
