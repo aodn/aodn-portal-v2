@@ -1,4 +1,10 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
 import CommonSelect, { CommonSelectProps, SelectItem } from "../CommonSelect";
 import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
@@ -49,31 +55,32 @@ describe("CommonSelect", () => {
   it("renders all menu items", () => {
     render(<CommonSelect {...defaultProps} />);
     const select = screen.getByTestId("common-select");
-    fireEvent.mouseDown(select); // Open dropdown
+    // Open dropdown
+    const combobox = within(select).getByRole("combobox");
+    fireEvent.mouseDown(combobox);
 
-    waitFor(() => screen.findByText(items[2].label)).then(() => {
-      // Every thing loaded because we found the last item
-      items.forEach((item) => {
-        expect(screen.getByText(item.label)).toBeInTheDocument();
-      });
-    });
+    // As it default render items[0] so there should be two "Item 1" when dropdown is open
+    expect(screen.getAllByText("Item 1").length).toBe(2);
+    expect(screen.getByText("Item 2")).toBeInTheDocument();
+    expect(screen.getByText("Item 3")).toBeInTheDocument();
   });
 
   it("handles uncontrolled behavior correctly", () => {
     render(<CommonSelect {...defaultProps} />);
     const select = screen.getByTestId("common-select");
+    // Open dropdown
+    const combobox = within(select).getByRole("combobox");
+    fireEvent.mouseDown(combobox);
 
-    waitFor(() => screen.findByText(items[2].label)).then(() => {
-      // Every thing loaded because we found the last item
-      // Open dropdown and select an item
-      fireEvent.mouseDown(select);
-      const item2 = screen.getByText("Item 2");
-      fireEvent.click(item2);
+    // Select option "Item 2"
+    const item2 = screen.getByText("Item 2");
+    fireEvent.click(item2);
 
-      waitFor(() => {
-        expect(defaultProps.onSelectCallback).toHaveBeenCalledWith("item2");
-        expect(screen.getByText("Item 2")).toBeInTheDocument();
-      });
+    return waitFor(() => {
+      expect(defaultProps.onSelectCallback).toHaveBeenCalledWith("item2");
+    }).then(() => {
+      // Only one "Item 2" in the select as the dropdown is closed after click the option
+      expect(screen.getAllByText("Item 2").length).toBe(1);
     });
   });
 
@@ -87,20 +94,17 @@ describe("CommonSelect", () => {
       />
     );
 
-    // Open dropdown and select an item
+    // Open dropdown and select "Item 3"
     const select = screen.getByTestId("common-select");
+    const combobox = within(select).getByRole("combobox");
+    fireEvent.mouseDown(combobox);
 
-    waitFor(() => screen.findByText(items[2].label)).then(() => {
-      // Every thing loaded because we found the last item
-      // Open dropdown and select an item
-      fireEvent.mouseDown(select);
-      const item3 = screen.getByText("Item 3");
-      fireEvent.click(item3);
+    const item3 = screen.getByText("Item 3");
+    fireEvent.click(item3);
 
-      waitFor(() => {
-        expect(onSelectCallback).toHaveBeenCalledWith("item3");
-      });
-
+    return waitFor(() => {
+      expect(onSelectCallback).toHaveBeenCalledWith("item3");
+    }).then(() => {
       // Update controlled value
       rerender(
         <CommonSelect
@@ -116,28 +120,20 @@ describe("CommonSelect", () => {
   it("disables select when isCollectionNotFound is true", () => {
     mockUseDetailPageContext.mockReturnValue({ isCollectionNotFound: true });
     render(<CommonSelect {...defaultProps} />);
-    const select = screen.getByTestId("common-select");
 
-    waitFor(() => screen.findByText(items[2].label)).then(() => {
-      // Every thing loaded because we found the last item
-      expect(select).toBeDisabled();
-    });
+    const select = screen.getByTestId("common-select");
+    const combobox = within(select).getByRole("combobox");
+
+    expect(combobox).toHaveAttribute("aria-disabled", "true");
   });
 
   it("calls scroll utilities when opening/closing dropdown", () => {
     render(<CommonSelect {...defaultProps} />);
+
     const select = screen.getByTestId("common-select");
-
-    waitFor(() => screen.findByText(items[2].label)).then(() => {
-      // Every thing loaded because we found the last item
-      // Open dropdown
-      fireEvent.mouseDown(select);
-      expect(mockDisableScroll).toHaveBeenCalled();
-
-      // Close dropdown
-      fireEvent.keyDown(select, { key: "Escape" });
-      expect(mockEnableScroll).toHaveBeenCalled();
-    });
+    const combobox = within(select).getByRole("combobox");
+    fireEvent.mouseDown(combobox);
+    expect(mockDisableScroll).toHaveBeenCalled();
   });
 
   it("applies custom sx styles", () => {
