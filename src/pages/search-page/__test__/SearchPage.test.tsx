@@ -16,7 +16,6 @@ import {
   updateLayout,
   updateSort,
 } from "../../../components/common/store/componentParamReducer";
-import Layout from "../../../components/layout/layout";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";
