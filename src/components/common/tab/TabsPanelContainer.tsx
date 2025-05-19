@@ -99,7 +99,12 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
         ))}
       </StyledTabs>
       {tabs.map((tab, index) => (
-        <TabPanel key={index} value={value} index={index}>
+        <TabPanel
+          key={index}
+          value={value}
+          index={index}
+          data-testid={`tab-panel-${tab.label}`}
+        >
           {tab.component}
         </TabPanel>
       ))}

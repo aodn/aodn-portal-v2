@@ -38,6 +38,11 @@ describe("InputWithSuggester", () => {
   const mockSetShouldExpandAllButtons = vi.fn();
 
   beforeAll(() => {
+    // Mock scrollIntoView
+    window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
+    // Mock window.scrollTo
+    window.scrollTo = vi.fn();
     server.listen();
   });
 

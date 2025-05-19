@@ -191,6 +191,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
                   borderRadius: borderRadius.small,
                   bgcolor: "#fff",
                 }}
+                data-testid="searchbar-popup"
               >
                 {activeButton === SearchbarButtonNames.Date && (
                   <DateRangeFilter handleClosePopup={handleClosePopup} />
