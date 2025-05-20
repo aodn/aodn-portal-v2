@@ -86,7 +86,7 @@ describe("empty area display", async () => {
         .exist;
       expect(screen.queryByText("Suggested Citation Not Found")).to.exist;
       expect(screen.queryByText("Constraints Not Found")).to.exist;
-      expect(screen.queryByText("Contact of Data Owner Not Found")).to.exist;
+      expect(screen.queryByText("Data Contact Not Found")).to.exist;
       expect(screen.queryByText("Credits Not Found")).to.exist;
     });
   });

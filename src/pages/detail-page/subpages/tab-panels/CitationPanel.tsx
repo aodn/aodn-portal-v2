@@ -157,7 +157,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
         component: <ConstraintList constraints={constraints} />,
       },
       {
-        title: "Contact of Data Owner",
+        title: "Data Contact",
         component: (
           <ContactList contacts={aboutContacts ? aboutContacts : []} />
         ),
