@@ -57,9 +57,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     () =>
       context.collection
         ?.getContacts()
-        ?.filter((contact) =>
-          contact.roles.includes(detailPageDefault.CITATION)
-        ),
+        ?.filter((contact) => contact.roles.includes(contactRoles.CITATION)),
     [context.collection]
   );
   const suggestedCitation = useMemo(
