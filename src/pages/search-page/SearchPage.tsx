@@ -3,7 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
-import store, { getComponentState } from "../../components/common/store/store";
+import store, {
+  getComponentState,
+  searchQueryResult,
+} from "../../components/common/store/store";
 import {
   createSearchParamFrom,
   DEFAULT_SEARCH_MAP_SIZE,
@@ -102,6 +105,7 @@ const SearchPage = () => {
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
 
   const paramState: ParameterState | undefined = useMemo(() => {
+    // The first char is ? in the search string, so we need to remove it.
     const param = location?.search.substring(1);
     if (param !== null) {
       return unFlattenToParameterState(param);
@@ -164,7 +168,7 @@ const SearchPage = () => {
   }, [dispatch]);
 
   const doSearch = useCallback(
-    (needNavigate: boolean = true) => {
+    (needNavigate: boolean = false) => {
       startOneLoadingThread();
       const componentParam: ParameterState = getComponentState(
         store.getState()
@@ -241,8 +245,6 @@ const SearchPage = () => {
   // and content may not refresh
   const handleNavigation = useCallback(() => {
     if (!location.state?.fromNavigate) {
-      // The first char is ? in the search string, so we need to remove it.
-
       if (paramState) {
         dispatch(updateParameterStates(paramState));
         // URL request, we need to adjust the map to the same area as mentioned
@@ -260,13 +262,14 @@ const SearchPage = () => {
       if (location.state?.requireSearch) {
         // Explicitly call search from navigation, so you just need search
         // but do not navigate again.
-        doSearch(false);
+        doSearch();
       }
       // If it is navigated from this component, and no need to search, that
       // mean we already call doSearch() + doMapSearch(), however if you
       // come from other page, the result list is good because we remember it
       // but the map need init again and therefore need to do a doMapSearch()
       else if (location.state?.referer !== SEARCH_PAGE_REFERER) {
+        const reduxContents = searchQueryResult(store.getState());
         const componentParam: ParameterState = getComponentState(
           store.getState()
         );
@@ -277,10 +280,12 @@ const SearchPage = () => {
         );
         setZoom(componentParam.zoom);
 
-        startOneLoadingThread();
-        doMapSearch().finally(() => {
-          endOneLoadingThread();
-        });
+        if (reduxContents.result.total > 0) {
+          startOneLoadingThread();
+          doMapSearch().finally(() => endOneLoadingThread());
+        } else {
+          doSearch();
+        }
       }
     }
   }, [
