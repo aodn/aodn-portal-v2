@@ -30,4 +30,16 @@ const detailPageDefault = {
   SUMMARY: "summary",
 };
 
-export { dateDefault, pageDefault, detailPageDefault, marineParkDefault };
+const contactRoles = {
+  ABOUT: "about",
+  METADATA: "metadata",
+  CITATION: "citation",
+};
+
+export {
+  dateDefault,
+  pageDefault,
+  detailPageDefault,
+  marineParkDefault,
+  contactRoles,
+};
