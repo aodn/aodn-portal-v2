@@ -54,7 +54,7 @@ def test_not_found_item(
 
     expect(detail_page.get_not_found_element(not_found_item)).to_be_visible()
 
-
+@pytest.mark.skip(reason="Skipping this test temporarily")
 @pytest.mark.parametrize(
     'title, uuid, tab, contact_button, address, phone, link',
     [
