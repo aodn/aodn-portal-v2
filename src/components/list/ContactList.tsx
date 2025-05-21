@@ -28,7 +28,7 @@ const ContactList: React.FC<ContactListProps> = ({ contacts }) => {
 
   return (
     <ExpandableList
-      title={"Contact of Data Owner"}
+      title={"Data Contact"}
       childrenList={collapseComponents}
     ></ExpandableList>
   );

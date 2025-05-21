@@ -10,7 +10,10 @@ import {
 import SuggestedCitationList from "../../../../components/list/SuggestedCitationList";
 import CitedResponsiblePartyList from "../../../../components/list/CitedResponsiblePartyList";
 import ConstraintList from "../../../../components/list/ConstraintList";
-import { detailPageDefault } from "../../../../components/common/constants";
+import {
+  contactRoles,
+  detailPageDefault,
+} from "../../../../components/common/constants";
 import { MODE } from "../../../../components/list/CommonDef";
 import SideCardContainer from "../side-cards/SideCardContainer";
 import useTabNavigation from "../../../../hooks/useTabNavigation";
@@ -54,9 +57,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     () =>
       context.collection
         ?.getContacts()
-        ?.filter((contact) =>
-          contact.roles.includes(detailPageDefault.CITATION)
-        ),
+        ?.filter((contact) => contact.roles.includes(contactRoles.CITATION)),
     [context.collection]
   );
   const suggestedCitation = useMemo(
@@ -103,7 +104,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       context.collection
         ?.getContacts()
         ?.filter((contact: IContact) =>
-          contact.roles.includes(detailPageDefault.ADDITIONAL_INFO)
+          contact.roles.includes(contactRoles.ABOUT)
         ),
     [context.collection]
   );
@@ -154,7 +155,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
         component: <ConstraintList constraints={constraints} />,
       },
       {
-        title: "Contact of Data Owner",
+        title: "Data Contact",
         component: (
           <ContactList contacts={aboutContacts ? aboutContacts : []} />
         ),
