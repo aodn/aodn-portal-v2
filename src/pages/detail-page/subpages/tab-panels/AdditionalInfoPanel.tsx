@@ -104,7 +104,7 @@ const AdditionalInfoPanel = () => {
       },
       {
         title: "Themes",
-        component: <ThemeList title={"Themes"} />,
+        component: <ThemeList title={"Themes"} themes={themes ?? []} />,
       },
       {
         title: "Keywords",
@@ -133,6 +133,7 @@ const AdditionalInfoPanel = () => {
     ],
     [
       statement,
+      themes,
       keywords,
       metadataContact,
       metadataId,
