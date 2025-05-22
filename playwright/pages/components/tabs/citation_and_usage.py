@@ -24,7 +24,7 @@ class CitationAndUsageTab(BasePage):
         )
         self.license = self.get_button(self.LICENSE)
         self.constraints = self.get_button(self.CONSTRAINTS)
-        self.contact_of_data_owner = self.get_button(self.DATA_CONTACT)
+        self.data_contact = self.get_button(self.DATA_CONTACT)
         self.credits = self.get_button(self.CREDITS)
 
     def get_suggested_citation_list(self) -> Locator:
@@ -38,6 +38,9 @@ class CitationAndUsageTab(BasePage):
 
     def get_constraints_list(self) -> Locator:
         return self.get_collapse_list(self.CONSTRAINTS)
+
+    def get_data_contact_list(self) -> Locator:
+        return self.get_collapse_list(self.DATA_CONTACT)
 
     def get_credits_list(self) -> Locator:
         return self.get_collapse_list(self.CREDITS)
