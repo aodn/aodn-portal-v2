@@ -1,4 +1,12 @@
-import React, { Dispatch, FC, useCallback, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Box, Fade, Paper, Popper, ClickAwayListener } from "@mui/material";
 import InputWithSuggester from "./InputWithSuggester";
 import { border, borderRadius, color, gap } from "../../styles/constants";
@@ -20,6 +28,20 @@ import Filters from "../filter/Filters";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useScrollToElement from "../../hooks/useScrollToElement";
 import { HEADER_HEIGHT } from "../layout/constant";
+import {
+  ParameterState,
+  unFlattenToParameterState,
+  updateDateTimeFilterRange,
+  updateFilterPolygon,
+  updateHasData,
+  updateImosOnly,
+  updateParameterStates,
+  updateParameterVocabs,
+  updatePlatform,
+  updateSearchText,
+  updateUpdateFreq,
+} from "../common/store/componentParamReducer";
+import { useAppDispatch } from "../common/store/hooks";
 
 interface SearchbarProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -27,6 +49,7 @@ interface SearchbarProps {
 
 const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const { isMobile, isTablet } = useBreakpoint();
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -44,6 +67,15 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
     ref: boxRef,
     offset: HEADER_HEIGHT + 5,
   });
+  const paramState: ParameterState | undefined = useMemo(() => {
+    // The first char is ? in the search string, so we need to remove it.
+    const param = location?.search.substring(1);
+    console.log("substring location.search====", param);
+    if (param && param.length > 0) {
+      return unFlattenToParameterState(param);
+    }
+    return undefined;
+  }, [location?.search]);
 
   const handleScrollToTop = useCallback(() => {
     scrollToElement();
@@ -99,6 +131,32 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
     }
     setOpen(false);
   }, []);
+
+  useEffect(() => {
+    if (paramState) {
+      console.log("page====", location.pathname);
+      console.log("paramState====", paramState);
+      dispatch(updateParameterStates(paramState));
+    } else {
+      console.log("no paramState,clear all the filters====");
+      // clear filters
+      dispatch(updateParameterVocabs([]));
+      dispatch(updateImosOnly(undefined));
+      dispatch(updateHasData(undefined));
+      dispatch(updatePlatform([]));
+      dispatch(updateUpdateFreq(undefined));
+
+      // clear date range filter
+      dispatch(updateDateTimeFilterRange({}));
+
+      // clear location filter
+      dispatch(updateFilterPolygon(undefined));
+
+      // clear search text
+      dispatch(updateSearchText(""));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, paramState]);
 
   return (
     <Box width="100%" ref={boxRef}>
