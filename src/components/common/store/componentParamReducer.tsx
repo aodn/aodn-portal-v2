@@ -151,7 +151,7 @@ const updateHasData = (hasCOData: boolean | undefined): ActionType => {
   return {
     type: UPDATE_HAS_DATA,
     payload: {
-      hasCOData: hasCOData === undefined ? false : hasCOData,
+      hasCOData: hasCOData,
     } as ParameterState,
   };
 };

@@ -85,6 +85,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const searchInput = useSelector(
     (state: RootState) => state.paramReducer.searchText
   );
+  console.log("inputWithSuggester searchInput====", searchInput);
 
   const refreshOptions = useCallback(
     async (inputValue: string) => {
@@ -286,6 +287,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   return (
     <Autocomplete
       id="search"
+      key={searchInput === "" ? "empty" : searchInput}
       fullWidth
       freeSolo
       PopperComponent={CustomPopper}
