@@ -134,12 +134,11 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
 
   useEffect(() => {
     if (paramState) {
-      console.log("page====", location.pathname);
-      console.log("paramState====", paramState);
       dispatch(updateParameterStates(paramState));
     } else {
-      console.log("no paramState,clear all the filters====");
-      // clear filters
+      // clear common filters
+      // TODO: clear zoom or other redux state if you want zoom to be reset
+      // TODO: refactor code in componentParamReducer to use a single function to clear all searchbar filters
       dispatch(updateParameterVocabs([]));
       dispatch(updateImosOnly(undefined));
       dispatch(updateHasData(undefined));
@@ -155,7 +154,6 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
       // clear search text
       dispatch(updateSearchText(""));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, paramState]);
 
   return (

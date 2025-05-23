@@ -21,7 +21,6 @@ import {
   unFlattenToParameterState,
   updateFilterBBox,
   updateLayout,
-  updateParameterStates,
   updateSort,
   updateSortBy,
   updateZoom,
@@ -239,11 +238,9 @@ const SearchPage = () => {
     [dispatch, doSearch]
   );
 
+  // Set the local states bbox and zoom according to the url param state when the page is loaded
   useEffect(() => {
     if (paramState) {
-      // dispatch(updateParameterStates(paramState));
-      // URL request, we need to adjust the map to the same area as mentioned
-      // in the url
       setBbox(
         new LngLatBounds(
           paramState.bbox?.bbox as [number, number, number, number]
@@ -254,27 +251,38 @@ const SearchPage = () => {
   }, [dispatch, paramState]);
 
   const handleNavigation = useCallback(() => {
-    console.log("location.state====", location.state);
-
-    // Since Redux is always synced with URL in the effect above,
-    // we just need to decide whether to perform a search
-    if (!location.state?.fromNavigate) {
-      console.log("Direct URL access - performing searche====");
-      doSearch(false);
-    } else if (location.state?.requireSearch) {
-      console.log("Navigation requested searche====");
-      doSearch(false);
-    } else if (location.state?.referer !== SEARCH_PAGE_REFERER) {
-      console.log("Coming from another pagee====");
-      const reduxContents = searchQueryResult(store.getState());
+    const reduxContents = searchQueryResult(store.getState());
+    if (
+      location.state?.referer === SEARCH_PAGE_REFERER &&
+      location.state?.requireSearch === false
+    ) {
+      // If the referer is SEARCH_PAGE_REFERER, it means the user is interacting within the search page
+      // Meanwhile the state requireSearch is false, which means the user is not required to do a search. This happens when user just change the layout
+      // However the referer = SEARCH_PAGE_REFERER will be persist but redux will be cleared after user refresh the page, in this case we need to do a full search
+      // Therefore we need to check if the redux content is empty or not to decide whether to do a full search or no search
       if (reduxContents.result.total > 0) {
-        // Just update map
+        return;
+      } else {
+        doSearch(false);
+      }
+    } else if (
+      // If the referer is DetailPage, it means the user is coming from DetailPage
+      // As redux store has results content we just need to do a map search
+      // However when user refresh the page after back from DetailPage, the redux will be cleared, we need to do a full search
+      // Therefore we need to check if the redux content is empty or not to decide whether to do a full search or only map search
+      location.state?.referer === "HeaderSection" &&
+      location.state?.requireSearch === false
+    ) {
+      if (reduxContents.result.total > 0) {
         startOneLoadingThread();
         doMapSearch().finally(() => endOneLoadingThread());
       } else {
-        // No results, do full search
         doSearch(false);
       }
+    } else {
+      // In the other cases we need to do a full search
+      // This happens when user paste the url directly, navigate from landing page, change sort ...
+      doSearch(false);
     }
   }, [
     location,
@@ -283,65 +291,6 @@ const SearchPage = () => {
     startOneLoadingThread,
     endOneLoadingThread,
   ]);
-
-  // If this flag is set, that means it is call from within react
-  // and the search status already refresh and useSelector contains
-  // the correct values, else it is user paste the url directly
-  // and content may not refresh
-  // const handleNavigation = useCallback(() => {
-  //   if (!location.state?.fromNavigate) {
-  //     if (paramState) {
-  //       dispatch(updateParameterStates(paramState));
-  //       // URL request, we need to adjust the map to the same area as mentioned
-  //       // in the url
-  //       setBbox(
-  //         new LngLatBounds(
-  //           paramState.bbox?.bbox as [number, number, number, number]
-  //         )
-  //       );
-  //       setZoom(paramState.zoom);
-
-  //       doSearch();
-  //     }
-  //   } else {
-  //     if (location.state?.requireSearch) {
-  //       // Explicitly call search from navigation, so you just need search
-  //       // but do not navigate again.
-  //       doSearch();
-  //     }
-  //     // If it is navigated from this component, and no need to search, that
-  //     // mean we already call doSearch() + doMapSearch(), however if you
-  //     // come from other page, the result list is good because we remember it
-  //     // but the map need init again and therefore need to do a doMapSearch()
-  //     else if (location.state?.referer !== SEARCH_PAGE_REFERER) {
-  //       const reduxContents = searchQueryResult(store.getState());
-  //       const componentParam: ParameterState = getComponentState(
-  //         store.getState()
-  //       );
-  //       setBbox(
-  //         new LngLatBounds(
-  //           componentParam.bbox?.bbox as [number, number, number, number]
-  //         )
-  //       );
-  //       setZoom(componentParam.zoom);
-
-  //       if (reduxContents.result.total > 0) {
-  //         startOneLoadingThread();
-  //         doMapSearch().finally(() => endOneLoadingThread());
-  //       } else {
-  //         doSearch();
-  //       }
-  //     }
-  //   }
-  // }, [
-  //   location,
-  //   dispatch,
-  //   doSearch,
-  //   doMapSearch,
-  //   startOneLoadingThread,
-  //   endOneLoadingThread,
-  //   paramState,
-  // ]);
 
   const onChangeSorting = useCallback(
     (sort: SortResultEnum) => {

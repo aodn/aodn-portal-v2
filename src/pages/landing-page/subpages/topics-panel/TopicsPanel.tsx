@@ -72,6 +72,8 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   // Can be change to a function-switcher if any other functions are designed in the future
   const handleClickTopicCard = useCallback(
     (value: string) => {
+      // TODO: clear zoom or other redux state if you want zoom to be reset
+      // TODO: refactor code in componentParamReducer to use a single function to clear all searchbar filters
       // clear filters
       dispatch(updateParameterVocabs([]));
       dispatch(updateImosOnly(undefined));
