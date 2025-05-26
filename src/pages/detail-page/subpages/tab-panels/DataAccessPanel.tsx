@@ -11,8 +11,10 @@ import { fontWeight, fontSize } from "../../../../styles/constants";
 import DataAccessList from "../../../../components/list/DataAccessList";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import useTabNavigation from "../../../../hooks/useTabNavigation";
-import { detailPageDefault } from "../../../../components/common/constants";
-import { DETAIL_PAGE_REFERER } from "../../../search-page/constants";
+import {
+  detailPageDefault,
+  pageReferer,
+} from "../../../../components/common/constants";
 
 export enum TYPE {
   DATA_ACCESS = "DATA_ACCESS",
@@ -44,7 +46,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
               goToDetailPage(
                 uuid,
                 detailPageDefault.DATA_ACCESS,
-                DETAIL_PAGE_REFERER
+                pageReferer.DETAIL_PAGE_REFERER
               )
             }
           >

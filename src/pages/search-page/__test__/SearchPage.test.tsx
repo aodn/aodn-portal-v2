@@ -44,7 +44,7 @@ const mockRedirectSearch = vi.fn();
 // Import the component and router after the mock is defined
 import SearchPage from "../SearchPage";
 import { BrowserRouter as Router } from "react-router-dom";
-import { SEARCH_PAGE_REFERER } from "../constants";
+import { pageReferer } from "../../../components/common/constants";
 
 // Mock the Map component to avoid map initialization
 vi.mock("../../../components/map/mapbox/Map", () => {
@@ -321,7 +321,7 @@ describe("SearchPage Basic", () => {
 
                 // Verify that redirectSearch was called with the correct parameters
                 expect(mockRedirectSearch).toHaveBeenCalledWith(
-                  SEARCH_PAGE_REFERER,
+                  pageReferer.SEARCH_PAGE_REFERER,
                   true,
                   false
                 );

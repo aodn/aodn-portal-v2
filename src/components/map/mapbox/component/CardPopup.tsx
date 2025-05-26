@@ -25,9 +25,8 @@ import Map from "../Map";
 import Layers from "../layers/Layers";
 import GeojsonLayer from "../layers/GeojsonLayer";
 import ResultCardButtonGroup from "../../../result/ResultCardButtonGroup";
-import { SEARCH_PAGE_REFERER } from "../../../../pages/search-page/constants";
 import BookmarkButton from "../../../bookmark/BookmarkButton";
-import { detailPageDefault } from "../../../common/constants";
+import { detailPageDefault, pageReferer } from "../../../common/constants";
 
 interface CardPopupProps {
   layerId: string;
@@ -51,7 +50,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
       tabNavigation(
         collection.id,
         detailPageDefault.DATA_ACCESS,
-        SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER
       ),
     [tabNavigation]
   );
@@ -69,7 +68,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
       tabNavigation(
         collection.id,
         detailPageDefault.SUMMARY,
-        SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER
       ),
     [tabNavigation]
   );

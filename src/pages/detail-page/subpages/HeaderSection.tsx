@@ -17,7 +17,6 @@ import OrganizationLogo from "../../../components/logo/OrganizationLogo";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import useRedirectHome from "../../../hooks/useRedirectHome";
-import { SEARCH_PAGE_REFERER } from "../../search-page/constants";
 import {
   border,
   borderRadius,
@@ -31,7 +30,7 @@ import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
 import dayjs from "dayjs";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import { dateDefault } from "../../../components/common/constants";
+import { dateDefault, pageReferer } from "../../../components/common/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 
 enum Status {
@@ -68,7 +67,7 @@ const HeaderButton: FC<HeaderButtonProps> = ({ children, onClick, sx }) => (
 // Render the go back button next to the header
 const renderGoBackButton = (onClick: () => void, referer: string) => {
   const tip =
-    referer !== SEARCH_PAGE_REFERER
+    referer !== pageReferer.SEARCH_PAGE_REFERER
       ? "Back to Home"
       : "Return to search results";
   return (
@@ -230,10 +229,10 @@ const HeaderSection = () => {
 
   const onGoBack = useCallback(
     (referer: string) => {
-      if (referer !== SEARCH_PAGE_REFERER) {
-        redirectHome("HeaderSection", true);
+      if (referer !== pageReferer.SEARCH_PAGE_REFERER) {
+        redirectHome(pageReferer.DETAIL_PAGE_REFERER, true);
       } else {
-        redirectSearch("HeaderSection", true, false);
+        redirectSearch(pageReferer.DETAIL_PAGE_REFERER, true, false);
       }
     },
     [redirectHome, redirectSearch]

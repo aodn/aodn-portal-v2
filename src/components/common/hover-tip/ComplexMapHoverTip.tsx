@@ -13,9 +13,8 @@ import Map from "../../map/mapbox/Map";
 import Layers from "../../map/mapbox/layers/Layers";
 import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
 import BookmarkButton from "../../bookmark/BookmarkButton";
-import { SEARCH_PAGE_REFERER } from "../../../pages/search-page/constants";
 import { TabNavigation } from "../../../hooks/useTabNavigation";
-import { detailPageDefault } from "../constants";
+import { detailPageDefault, pageReferer } from "../constants";
 
 interface BasicMapHoverTipProps {
   content?: string | undefined | null;
@@ -40,7 +39,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
       tabNavigation(
         collection.id,
         detailPageDefault.DATA_ACCESS,
-        SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER
       ),
     [collection.id, tabNavigation]
   );
@@ -58,7 +57,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
       tabNavigation(
         collection.id,
         detailPageDefault.SUMMARY,
-        SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER
       ),
     [collection.id, tabNavigation]
   );

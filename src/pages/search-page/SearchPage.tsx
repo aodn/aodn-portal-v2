@@ -41,7 +41,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../components/common/store/hooks";
-import { pageDefault } from "../../components/common/constants";
+import { pageDefault, pageReferer } from "../../components/common/constants";
 import { color, padding } from "../../styles/constants";
 import {
   BookmarkEvent,
@@ -55,7 +55,6 @@ import {
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE,
-  SEARCH_PAGE_REFERER,
 } from "./constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
@@ -165,7 +164,7 @@ const SearchPage = () => {
                 state: {
                   fromNavigate: true,
                   requireSearch: false,
-                  referer: SEARCH_PAGE_REFERER,
+                  referer: pageReferer.SEARCH_PAGE_REFERER,
                 },
               }
             );
@@ -217,7 +216,7 @@ const SearchPage = () => {
   const handleNavigation = useCallback(() => {
     const reduxContents = getSearchQueryResult(store.getState());
     if (
-      location.state?.referer === SEARCH_PAGE_REFERER &&
+      location.state?.referer === pageReferer.SEARCH_PAGE_REFERER &&
       location.state?.requireSearch === false
     ) {
       // If the referer is SEARCH_PAGE_REFERER, it means the user is interacting with the search page
@@ -233,7 +232,7 @@ const SearchPage = () => {
       // If user navigate from DetailPage, as the redux store has results content already we just need to do a map search
       // However when user refresh the page, the redux will be cleared, we need to do a full search
       // Therefore we need to check if the redux content is empty or not to decide whether to do a full search or only map search
-      location.state?.referer === "HeaderSection" &&
+      location.state?.referer === pageReferer.DETAIL_PAGE_REFERER &&
       location.state?.requireSearch === false
     ) {
       if (reduxContents.result.total > 0) {
@@ -273,7 +272,7 @@ const SearchPage = () => {
         return prev;
       });
       // Form param to url without navigate
-      redirectSearch(SEARCH_PAGE_REFERER, true, false);
+      redirectSearch(pageReferer.SEARCH_PAGE_REFERER, true, false);
     },
     [dispatch, isUnderLaptop, redirectSearch]
   );
@@ -324,7 +323,7 @@ const SearchPage = () => {
     (layout: SearchResultLayoutEnum) => {
       dispatch(updateLayout(layout));
       // Form param to url without navigate
-      redirectSearch(SEARCH_PAGE_REFERER, true, false);
+      redirectSearch(pageReferer.SEARCH_PAGE_REFERER, true, false);
 
       // If user select layout full map, just return the previous layout
       setCurrentLayout((prev) => {
@@ -444,7 +443,7 @@ const SearchPage = () => {
       // Update redux state to full list
       dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
       // Form param to url without navigate
-      redirectSearch(SEARCH_PAGE_REFERER, true, false);
+      redirectSearch(pageReferer.SEARCH_PAGE_REFERER, true, false);
       setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
     } else {
       // For big screens, if the layout is not full map just update the local state according to the url param state

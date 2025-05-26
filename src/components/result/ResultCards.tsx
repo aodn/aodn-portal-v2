@@ -13,9 +13,8 @@ import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import useFetchData from "../../hooks/useFetchData";
 import useBreakpoint from "../../hooks/useBreakpoint";
-import { SEARCH_PAGE_REFERER } from "../../pages/search-page/constants";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
-import { detailPageDefault } from "../common/constants";
+import { detailPageDefault, pageReferer } from "../common/constants";
 
 export interface ResultCardBasicType {
   content?: OGCCollection;
@@ -202,7 +201,11 @@ const ResultCards: FC<ResultCardsProps> = ({
 
   const onClickDetail = useCallback(
     (uuid: string) =>
-      goToDetailPage(uuid, detailPageDefault.SUMMARY, SEARCH_PAGE_REFERER),
+      goToDetailPage(
+        uuid,
+        detailPageDefault.SUMMARY,
+        pageReferer.SEARCH_PAGE_REFERER
+      ),
     [goToDetailPage]
   );
 
@@ -211,7 +214,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       goToDetailPage(
         uuid,
         detailPageDefault.SUMMARY,
-        SEARCH_PAGE_REFERER,
+        pageReferer.SEARCH_PAGE_REFERER,
         "download-section"
       ),
     [goToDetailPage]
@@ -219,7 +222,11 @@ const ResultCards: FC<ResultCardsProps> = ({
 
   const onClickLinks = useCallback(
     (uuid: string) =>
-      goToDetailPage(uuid, detailPageDefault.DATA_ACCESS, SEARCH_PAGE_REFERER),
+      goToDetailPage(
+        uuid,
+        detailPageDefault.DATA_ACCESS,
+        pageReferer.SEARCH_PAGE_REFERER
+      ),
     [goToDetailPage]
   );
 
