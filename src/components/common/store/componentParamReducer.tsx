@@ -26,6 +26,7 @@ const UPDATE_ZOOM_VARIABLE = "UPDATE_ZOOM_VARIABLE";
 const UPDATE_HAS_DATA = "UPDATE_HAS_DATA";
 const UPDATE_SORT = "UPDATE_SORT";
 const UPDATE_LAYOUT = "UPDATE_LAYOUT";
+const CLEAR_COMPONENT_PARAM = "CLEAR_COMPONENT_PARAM";
 
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
   MapDefaultConfig.BBOX_ENDPOINTS;
@@ -216,6 +217,14 @@ const updateLayout = (input: SearchResultLayoutEnum): ActionType => {
   };
 };
 
+// Reset the component parameter to default value
+const clearComponentParam = (): ActionType => {
+  return {
+    type: CLEAR_COMPONENT_PARAM,
+    payload: createInitialParameterState(),
+  };
+};
+
 // Initial State
 const createInitialParameterState = (
   withDefaultBBox: boolean = true
@@ -312,6 +321,14 @@ const paramReducer = (
       return {
         ...state,
         ...action.payload,
+      };
+    case CLEAR_COMPONENT_PARAM:
+      return {
+        ...action.payload,
+        // For layout and sort, we want to keep them unchanged
+        layout: state.layout,
+        sort: state.sort,
+        sortby: state.sortby,
       };
     default:
       return state;
@@ -453,4 +470,5 @@ export {
   updateHasData,
   updateSort,
   updateLayout,
+  clearComponentParam,
 };

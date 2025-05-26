@@ -3,7 +3,7 @@ import { ParameterState } from "../components/common/store/componentParamReducer
 import store, {
   getComponentState,
   RootState,
-  searchQueryResult,
+  getSearchQueryResult,
 } from "../components/common/store/store";
 import {
   CollectionsQueryType,
@@ -17,7 +17,7 @@ import { useAppDispatch } from "../components/common/store/hooks";
 const useFetchData = () => {
   const dispatch = useAppDispatch();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
-    searchQueryResult
+    getSearchQueryResult
   );
   const componentParam: ParameterState = getComponentState(store.getState());
 

@@ -29,17 +29,10 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 import useScrollToElement from "../../hooks/useScrollToElement";
 import { HEADER_HEIGHT } from "../layout/constant";
 import {
+  clearComponentParam,
   ParameterState,
   unFlattenToParameterState,
-  updateDateTimeFilterRange,
-  updateFilterPolygon,
-  updateHasData,
-  updateImosOnly,
   updateParameterStates,
-  updateParameterVocabs,
-  updatePlatform,
-  updateSearchText,
-  updateUpdateFreq,
 } from "../common/store/componentParamReducer";
 import { useAppDispatch } from "../common/store/hooks";
 
@@ -67,10 +60,9 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
     ref: boxRef,
     offset: HEADER_HEIGHT + 5,
   });
-  const paramState: ParameterState | undefined = useMemo(() => {
+  const urlParamState: ParameterState | undefined = useMemo(() => {
     // The first char is ? in the search string, so we need to remove it.
-    const param = location?.search.substring(1);
-    console.log("substring location.search====", param);
+    const param = location?.search?.substring(1);
     if (param && param.length > 0) {
       return unFlattenToParameterState(param);
     }
@@ -133,28 +125,13 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   }, []);
 
   useEffect(() => {
-    if (paramState) {
-      dispatch(updateParameterStates(paramState));
+    if (urlParamState) {
+      dispatch(updateParameterStates(urlParamState));
     } else {
-      // clear common filters
-      // TODO: clear zoom or other redux state if you want zoom to be reset
-      // TODO: refactor code in componentParamReducer to use a single function to clear all searchbar filters
-      dispatch(updateParameterVocabs([]));
-      dispatch(updateImosOnly(undefined));
-      dispatch(updateHasData(undefined));
-      dispatch(updatePlatform([]));
-      dispatch(updateUpdateFreq(undefined));
-
-      // clear date range filter
-      dispatch(updateDateTimeFilterRange({}));
-
-      // clear location filter
-      dispatch(updateFilterPolygon(undefined));
-
-      // clear search text
-      dispatch(updateSearchText(""));
+      // If url param state is undefined, clear the component param state
+      dispatch(clearComponentParam());
     }
-  }, [dispatch, paramState]);
+  }, [dispatch, urlParamState]);
 
   return (
     <Box width="100%" ref={boxRef}>

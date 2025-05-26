@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
   getComponentState,
-  searchQueryResult,
+  getSearchQueryResult,
 } from "../../components/common/store/store";
 import {
   createSearchParamFrom,
@@ -90,7 +90,6 @@ const SearchPage = () => {
   const [currentLayout, setCurrentLayout] = useState<
     Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP> | undefined
   >(undefined);
-
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
@@ -103,10 +102,10 @@ const SearchPage = () => {
   );
   const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
 
-  const paramState: ParameterState | undefined = useMemo(() => {
+  const urlParamState: ParameterState | undefined = useMemo(() => {
     // The first char is ? in the search string, so we need to remove it.
-    const param = location?.search.substring(1);
-    if (param !== null) {
+    const param = location?.search?.substring(1);
+    if (param && param.length > 0) {
       return unFlattenToParameterState(param);
     }
     return undefined;
@@ -119,29 +118,6 @@ const SearchPage = () => {
   const endOneLoadingThread = useCallback(() => {
     setLoadingThreadCount((prev) => prev - 1);
   }, []);
-
-  // Value true meaning full map. So if true set the selected layout as full-map
-  // Else set the selected layout as the last layout remembered (stored in currentLayout)
-  // or LIST view by default if user hasn't chosen any view mode
-  const onToggleDisplay = useCallback(
-    (isFullMap: boolean) => {
-      setCurrentLayout((prev) => {
-        dispatch(
-          updateLayout(
-            isFullMap
-              ? SearchResultLayoutEnum.FULL_MAP
-              : isUnderLaptop
-                ? SearchResultLayoutEnum.FULL_LIST
-                : prev || SearchResultLayoutEnum.LIST
-          )
-        );
-        return prev;
-      });
-      // Form param to url without navigate
-      redirectSearch(SEARCH_PAGE_REFERER, true, false);
-    },
-    [dispatch, isUnderLaptop, redirectSearch]
-  );
 
   const doMapSearch = useCallback(async () => {
     const componentParam: ParameterState = getComponentState(store.getState());
@@ -231,34 +207,22 @@ const SearchPage = () => {
           setZoom(event.target.getZoom());
           dispatch(updateFilterBBox(bbox));
           dispatch(updateZoom(event.target.getZoom()));
-          doSearch();
+          doSearch(true);
         }
       }
     },
     [dispatch, doSearch]
   );
 
-  // Set the local states bbox and zoom according to the url param state when the page is loaded
-  useEffect(() => {
-    if (paramState) {
-      setBbox(
-        new LngLatBounds(
-          paramState.bbox?.bbox as [number, number, number, number]
-        )
-      );
-      setZoom(paramState.zoom);
-    }
-  }, [dispatch, paramState]);
-
   const handleNavigation = useCallback(() => {
-    const reduxContents = searchQueryResult(store.getState());
+    const reduxContents = getSearchQueryResult(store.getState());
     if (
       location.state?.referer === SEARCH_PAGE_REFERER &&
       location.state?.requireSearch === false
     ) {
-      // If the referer is SEARCH_PAGE_REFERER, it means the user is interacting within the search page
-      // Meanwhile the state requireSearch is false, which means the user is not required to do a search. This happens when user just change the layout
-      // However the referer = SEARCH_PAGE_REFERER will be persist but redux will be cleared after user refresh the page, in this case we need to do a full search
+      // If the referer is SEARCH_PAGE_REFERER, it means the user is interacting with the search page
+      // Meanwhile if the state requireSearch is false, it means the user is not required to do a search. This happens when user just change the layout
+      // However the referer = SEARCH_PAGE_REFERER and requireSearch = false will be persist but redux will be cleared when user refresh the page, so we need to do a full search
       // Therefore we need to check if the redux content is empty or not to decide whether to do a full search or no search
       if (reduxContents.result.total > 0) {
         return;
@@ -266,9 +230,8 @@ const SearchPage = () => {
         doSearch(false);
       }
     } else if (
-      // If the referer is DetailPage, it means the user is coming from DetailPage
-      // As redux store has results content we just need to do a map search
-      // However when user refresh the page after back from DetailPage, the redux will be cleared, we need to do a full search
+      // If user navigate from DetailPage, as the redux store has results content already we just need to do a map search
+      // However when user refresh the page, the redux will be cleared, we need to do a full search
       // Therefore we need to check if the redux content is empty or not to decide whether to do a full search or only map search
       location.state?.referer === "HeaderSection" &&
       location.state?.requireSearch === false
@@ -281,7 +244,7 @@ const SearchPage = () => {
       }
     } else {
       // In the other cases we need to do a full search
-      // This happens when user paste the url directly, navigate from landing page, change sort ...
+      // This including (but not limit): user paste the url directly, navigate from landing page, change sort ...
       doSearch(false);
     }
   }, [
@@ -291,6 +254,29 @@ const SearchPage = () => {
     startOneLoadingThread,
     endOneLoadingThread,
   ]);
+
+  // Value true meaning full map. So if true set the selected layout as full-map
+  // Else set the selected layout as the last layout remembered (stored in currentLayout)
+  // or LIST view by default if user hasn't chosen any view mode
+  const onToggleDisplay = useCallback(
+    (isFullMap: boolean) => {
+      setCurrentLayout((prev) => {
+        dispatch(
+          updateLayout(
+            isFullMap
+              ? SearchResultLayoutEnum.FULL_MAP
+              : isUnderLaptop
+                ? SearchResultLayoutEnum.FULL_LIST
+                : prev || SearchResultLayoutEnum.LIST
+          )
+        );
+        return prev;
+      });
+      // Form param to url without navigate
+      redirectSearch(SEARCH_PAGE_REFERER, true, false);
+    },
+    [dispatch, isUnderLaptop, redirectSearch]
+  );
 
   const onChangeSorting = useCallback(
     (sort: SortResultEnum) => {
@@ -441,15 +427,16 @@ const SearchPage = () => {
     };
   }, [onClickResultCard]);
 
+  // Set local states currentLayout according to the url param state and screen size when the page is loaded
   useEffect(() => {
     // Check URL paramState instead of redux state because redux state is not updated before this useEffect
     if (isUnderLaptop) {
       // For small screen, if the layout is not full map or full list, then we need to change it to full list
       // State currentLayout remember the last layout before change to full map, so in this case we set it to full list by default
       if (
-        paramState &&
-        (paramState.layout === SearchResultLayoutEnum.FULL_LIST ||
-          paramState.layout === SearchResultLayoutEnum.FULL_MAP)
+        urlParamState &&
+        (urlParamState.layout === SearchResultLayoutEnum.FULL_LIST ||
+          urlParamState.layout === SearchResultLayoutEnum.FULL_MAP)
       ) {
         setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
         return;
@@ -460,20 +447,28 @@ const SearchPage = () => {
       redirectSearch(SEARCH_PAGE_REFERER, true, false);
       setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
     } else {
-      // For big screens, if the layout is not full map, then we need to change it to the last layout before change to full map
-      if (paramState && paramState.layout !== SearchResultLayoutEnum.FULL_MAP) {
-        setCurrentLayout(paramState.layout);
+      // For big screens, if the layout is not full map just update the local state according to the url param state
+      if (
+        urlParamState &&
+        urlParamState.layout !== SearchResultLayoutEnum.FULL_MAP
+      ) {
+        setCurrentLayout(urlParamState.layout);
         return;
       }
     }
-  }, [
-    dispatch,
-    isUnderLaptop,
-    layout,
-    location?.search,
-    redirectSearch,
-    paramState,
-  ]);
+  }, [dispatch, isUnderLaptop, redirectSearch, urlParamState]);
+
+  // Set the local states bbox and zoom according to the url param state when the page is loaded
+  useEffect(() => {
+    if (urlParamState) {
+      setBbox(
+        new LngLatBounds(
+          urlParamState.bbox?.bbox as [number, number, number, number]
+        )
+      );
+      setZoom(urlParamState.zoom);
+    }
+  }, [dispatch, urlParamState]);
 
   return (
     <Layout>
