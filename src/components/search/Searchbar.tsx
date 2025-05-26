@@ -124,6 +124,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
     setOpen(false);
   }, []);
 
+  // Sync URL to Redux on initial load/navigation
   useEffect(() => {
     if (urlParamState) {
       dispatch(updateParameterStates(urlParamState));

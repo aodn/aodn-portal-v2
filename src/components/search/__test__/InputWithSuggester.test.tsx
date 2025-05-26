@@ -84,7 +84,7 @@ describe("InputWithSuggester", () => {
 
     // Wait for input value to be updated
     return waitFor(() => {
-      expect(input).toHaveValue("w");
+      expect(input).toHaveValue("wave");
     }).then(() => {
       // Wait for the suggester listbox to appear
       return waitFor(() => {

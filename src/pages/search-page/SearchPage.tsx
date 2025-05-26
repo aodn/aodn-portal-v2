@@ -226,7 +226,7 @@ const SearchPage = () => {
       if (reduxContents.result.total > 0) {
         return;
       } else {
-        doSearch(false);
+        doSearch();
       }
     } else if (
       // If user navigate from DetailPage, as the redux store has results content already we just need to do a map search
@@ -239,12 +239,12 @@ const SearchPage = () => {
         startOneLoadingThread();
         doMapSearch().finally(() => endOneLoadingThread());
       } else {
-        doSearch(false);
+        doSearch();
       }
     } else {
       // In the other cases we need to do a full search
       // This including (but not limit): user paste the url directly, navigate from landing page, change sort ...
-      doSearch(false);
+      doSearch();
     }
   }, [
     location,
@@ -314,7 +314,7 @@ const SearchPage = () => {
           break;
       }
 
-      doSearch();
+      doSearch(true);
     },
     [dispatch, doSearch]
   );
