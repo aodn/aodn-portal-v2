@@ -11,6 +11,7 @@ import MetadataIdentifierList from "../../../../components/list/MetadataIdentifi
 import MetadataUrlList from "../../../../components/list/MetadataUrlList";
 import MetadataDateList from "../../../../components/list/MetadataDateList";
 import { convertDateFormat } from "../../../../utils/DateUtils";
+import { contactRoles } from "../../../../components/common/constants";
 
 const AdditionalInfoPanel = () => {
   const context = useDetailPageContext();
@@ -19,7 +20,7 @@ const AdditionalInfoPanel = () => {
     () =>
       context.collection
         ?.getContacts()
-        ?.filter((contact) => contact.roles.includes("metadata")),
+        ?.filter((contact) => contact.roles.includes(contactRoles.METADATA)),
     [context.collection]
   );
 

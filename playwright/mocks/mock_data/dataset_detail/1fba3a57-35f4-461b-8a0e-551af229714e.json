@@ -33,7 +33,7 @@
             "title": "Website of the Australian Ocean Data Network (AODN)"
           }
         ],
-        "roles": ["pointOfContact", "about"],
+        "roles": ["pointOfContact"],
         "phones": [
           {
             "value": "61 3 6226 7488",
@@ -95,6 +95,39 @@
         "links": [],
         "roles": ["citation"],
         "phones": []
+      },
+      {
+        "name": "Edgar, Graham",
+        "organization": "Institute for Marine and Antarctic Studies (IMAS), University of Tasmania (UTAS)",
+        "position": "",
+        "emails": ["g.edgar@utas.edu.au", "reeflife.survey@utas.edu.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["IMAS - Taroona", "Private Bag 49"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://orcid.org/0000-0003-0833-9001",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID ID"
+          }
+        ],
+        "roles": ["principalInvestigator", "about"],
+        "phones": [
+          {
+            "value": "61 3 6227 7238",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6227 8035",
+            "roles": ["facsimile"]
+          }
+        ]
       }
     ],
     "license": "Creative Commons Attribution 4.0 International License",

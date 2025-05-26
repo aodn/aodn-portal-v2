@@ -36,10 +36,17 @@ const detailPageDefault = {
   SUMMARY: "summary",
 };
 
+const contactRoles = {
+  ABOUT: "about",
+  METADATA: "metadata",
+  CITATION: "citation",
+};
+
 export {
   dateDefault,
   pageDefault,
   pageReferer,
   detailPageDefault,
   marineParkDefault,
+  contactRoles,
 };

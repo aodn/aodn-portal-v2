@@ -5,7 +5,7 @@ from pages.detail_page import DetailPage
 
 
 @pytest.mark.parametrize(
-    'title, uuid, suggested_citation, cited_responsible_parties, license, constraints, credits',
+    'title, uuid, suggested_citation, cited_responsible_parties, license, constraints, data_contact, credits',
     [
         (
             'Integrated Marine Observing System (IMOS) - Location of assets',
@@ -14,6 +14,7 @@ from pages.detail_page import DetailPage
             'Department of Environment, Land, Water and Planning (DELWP), Victorian Government - Mazor, Tessa',
             'Creative Commons Attribution 4.0 International License',
             'Use Limitation',
+            'Institute for Marine and Antarctic Studies (IMAS), University of Tasmania (UTAS) - Edgar, Graham',
             'Australia’s Integrated Marine Observing System (IMOS) is enabled by',
         ),
     ],
@@ -26,6 +27,7 @@ def test_citation_and_usage_sections(
     cited_responsible_parties: str,
     license: str,
     constraints: str,
+    data_contact: str,
     credits: str,
 ) -> None:
     detail_page = DetailPage(responsive_page)
@@ -39,6 +41,10 @@ def test_citation_and_usage_sections(
     citation.credits.click()
     credits_list = citation.get_credits_list()
     expect(credits_list.get_by_text(credits)).to_be_visible()
+
+    citation.data_contact.click()
+    data_contact_list = citation.get_data_contact_list()
+    expect(data_contact_list.get_by_text(data_contact)).to_be_visible()
 
     citation.constraints.click()
     constraints_list = citation.get_constraints_list()
