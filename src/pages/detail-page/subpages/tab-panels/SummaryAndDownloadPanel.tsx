@@ -31,6 +31,7 @@ import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerTileLayer from "../../../../components/map/mapbox/layers/GeoServerTileLayer";
 import MapLayerSwitcher from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
+import { ensureHttps } from "../../../../utils/UrlUtils";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
@@ -142,14 +143,22 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const getWMSLayerNames = useCallback(() => {
     const DataAccessLinks = collection?.getDataAccessLinks();
-
     if (!DataAccessLinks || DataAccessLinks.length === 0) {
       return [];
     }
-
     return DataAccessLinks.filter(
       (link) => link.rel === "wms" && link.title
     ).map((link) => link.title);
+  }, [collection]);
+
+  const getWMSServer = useCallback(() => {
+    const DataAccessLinks = collection?.getDataAccessLinks();
+    if (!DataAccessLinks || DataAccessLinks.length === 0) {
+      return [];
+    }
+    return DataAccessLinks.filter(
+      (link) => link.rel === "wms" && link.href
+    ).map((link) => link.href);
   }, [collection]);
 
   const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
@@ -164,6 +173,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
           return (
             <GeoServerTileLayer
               geoServerTileLayerConfig={{
+                baseUrl: ensureHttps(getWMSServer()[0]),
                 tileUrlParams: { LAYERS: getWMSLayerNames() },
               }}
               onWMSAvailabilityChange={onWMSAvailabilityChange}
@@ -173,7 +183,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
           return <HexbinLayer featureCollection={filteredFeatureCollection} />;
       }
     },
-    [filteredFeatureCollection, getWMSLayerNames, onWMSAvailabilityChange]
+    [
+      filteredFeatureCollection,
+      getWMSLayerNames,
+      getWMSServer,
+      onWMSAvailabilityChange,
+    ]
   );
 
   return (

@@ -23,7 +23,7 @@ interface TileUrlParams {
 
 interface GeoServerTileLayerConfig {
   tileUrlParams: TileUrlParams;
-  path: string;
+  baseUrl: string;
   tileSize: number;
   minZoom: number;
   maxZoom: number;
@@ -52,7 +52,9 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
     HEIGHT: 256,
   },
   tileSize: 256,
-  path: "/geowebcache/service/wms",
+  // path: "/geowebcache/service/wms",
+  // baseUrl: "https://geoserver-123.aodn.org.au/geoserver/wms",
+  baseUrl: "",
   minZoom: 0,
   maxZoom: 20,
   opacity: 1.0,
@@ -63,43 +65,17 @@ const getLayerId = (id: string | undefined) => `${id}-geo-server-tile-layer`;
 const getTileSourceId = (layerId: string) => `${layerId}-source`;
 const getTileLayerId = (layerId: string) => `${layerId}-tile`;
 
-const checkWMSAvailability = async (
-  path: string,
+const checkWMSAvailability = (
+  baseUrl: string,
   urlConfig: TileUrlParams,
   onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
-): Promise<boolean> => {
-  if (urlConfig.LAYERS.length === 0) {
+): boolean => {
+  // TODO: Implement a proper WMS availability check, e.g., by making a request to the WMS endpoint
+  if (urlConfig.LAYERS.length === 0 || baseUrl === "") {
     onWMSAvailabilityChange?.(false);
     return false;
   }
-
-  // Change back to EPSG:4326 for the availability check
-  const updateUrlConfig = {
-    ...urlConfig,
-    SRS: "EPSG:4326",
-    BBOX: "-180.0,-90.0,180.0,270.0",
-  };
-  const url = formatToUrl<TileUrlParams>({
-    baseUrl: path,
-    params: updateUrlConfig,
-  });
-
-  try {
-    // Perform a HEAD request to check if the WMS is available
-    // Only triggered when the layer is added to the map, won't be called in map movement/zoom
-    const response = await fetch(url, {
-      method: "HEAD",
-    });
-    const isAvailable = response.ok;
-    onWMSAvailabilityChange?.(isAvailable);
-
-    return isAvailable;
-  } catch (error) {
-    console.error("Error checking WMS availability:", error);
-    onWMSAvailabilityChange?.(false);
-
-    return false;
-  }
+  return true;
 };
 
 interface GeoServerTileLayerProps extends LayerBasicType {
@@ -117,6 +93,16 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   const tileSourceId = useMemo(() => getTileSourceId(layerId), [layerId]);
   const tileLayer = useMemo(() => getTileLayerId(layerId), [layerId]);
 
+  const config = mergeWithDefaults(
+    defaultGeoServerTileLayerConfig,
+    geoServerTileLayerConfig
+  );
+
+  const tileUrl = formatToUrl<TileUrlParams>({
+    baseUrl: config.baseUrl,
+    params: config.tileUrlParams,
+  });
+
   // Add the tile layer to the map
   useEffect(() => {
     if (map === null) return;
@@ -125,19 +111,9 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
       // Check if source already exists to avoid duplicates
       if (map?.getSource(tileSourceId)) return;
 
-      const config = mergeWithDefaults(
-        defaultGeoServerTileLayerConfig,
-        geoServerTileLayerConfig
-      );
-
-      const tileUrl = formatToUrl<TileUrlParams>({
-        baseUrl: config.path,
-        params: config.tileUrlParams,
-      });
-
-      //Check WMS availability before adding the layer
-      const isWMSAvailable = await checkWMSAvailability(
-        config.path,
+      // Check WMS availability before adding the layer
+      const isWMSAvailable = checkWMSAvailability(
+        config.baseUrl,
         config.tileUrlParams,
         onWMSAvailabilityChange
       );
