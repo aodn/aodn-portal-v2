@@ -37,7 +37,14 @@ npm install -g corepack
 yarn install
 ```
 
-4. **Run dev mode:**
+4. **Setup environment configuration:**
+
+```bash
+# dev example
+cp .env.config.dev .env
+```
+
+5. **Run dev mode:**
 
 ```bash
 yarn dev
