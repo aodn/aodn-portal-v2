@@ -4,6 +4,7 @@ PREFIX = '*/**/api/v1/ogc'
 class Routes:
     CATEGORY = f'{PREFIX}/ext/parameter/categories'
     AUTOCOMPLETE = f'{PREFIX}/ext/autocomplete?*'
+    VOCABS = f'{PREFIX}/ext/parameter/vocabs'
     COLLECTION_CENTROID = f'{PREFIX}/collections?properties=id,centroid&*'
     COLLECTION_ALL = f'{PREFIX}/collections?properties=id,title,description,status,links,assets_summary,bbox&*'
     COLLECTION_POPUP = (

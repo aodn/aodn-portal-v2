@@ -42,6 +42,14 @@ class ApiRouter:
     ) -> None:
         self.unroute(Routes.AUTOCOMPLETE, handler_function)
 
+    def route_vocabs(self, handler_function: Callable) -> None:
+        self.route(Routes.VOCABS, handler_function)
+
+    def unroute_vocabs(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.VOCABS, handler_function)
+
     def route_collection(
         self,
         centroid_handler: Callable,
