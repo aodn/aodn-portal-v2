@@ -122,6 +122,7 @@ def test_sort_and_view_states_persist_after_map_toggle(
     'sort_type, view_type',
     [(SearchSortType.MODIFIED, SearchViewLayouts.FULL_LIST)],
 )
+
 def test_sort_and_view_states_persist_with_url(
     responsive_page: Page,
     sort_type: SearchSortType,

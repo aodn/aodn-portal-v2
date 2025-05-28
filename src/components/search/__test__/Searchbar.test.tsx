@@ -10,6 +10,7 @@ import { Provider } from "react-redux";
 import { describe, expect, it, vi } from "vitest";
 import store from "../../common/store/store";
 import {
+  clearComponentParam,
   updateHasData,
   updateImosOnly,
   updateParameterVocabs,
@@ -54,10 +55,11 @@ describe("Searchbar", () => {
     server.listen();
   });
 
-  beforeEach(() =>
+  beforeEach(() => {
     // Cleanup redux before each test
-    clearAllMock()
-  );
+    store.dispatch(clearComponentParam());
+    clearAllMock();
+  });
 
   afterEach(() => {
     cleanup();
@@ -262,14 +264,6 @@ describe("Searchbar", () => {
 
   // Redux to UI flow: make sure the searchbar states are updated correctly across pages given redux states
   it("should render correct badge number and selected parameter button given redux states", () => {
-    // Mock redux states
-    store.dispatch(
-      updateParameterVocabs([
-        PARAMETER_VOCABS[0].narrower[0],
-        PARAMETER_VOCABS[0].narrower[1],
-      ])
-    );
-
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -280,34 +274,44 @@ describe("Searchbar", () => {
       </Provider>
     );
 
+    // Mock redux states with mock data
+    store.dispatch(
+      updateParameterVocabs([
+        PARAMETER_VOCABS[0].narrower[0],
+        PARAMETER_VOCABS[0].narrower[1],
+      ])
+    );
+
     const filterButtonBadge = screen.getByTestId(
       "searchbar-button-badge-Filter"
     );
-    expect(filterButtonBadge).toBeInTheDocument();
-    expect(filterButtonBadge).toHaveTextContent("2");
 
-    screen.debug(filterButtonBadge);
+    // Check if the filter button badge is updated with the correct number of selected parameters
+    return waitFor(() => expect(filterButtonBadge).toHaveTextContent("2")).then(
+      () => {
+        // User click on the filter button
+        const filterButton = screen.getByTestId("filtersBtn");
+        userEvent.click(filterButton);
 
-    // User click on the filter button
-    const filterButton = screen.getByTestId("filtersBtn");
-    userEvent.click(filterButton);
+        // Wait for the filter popup to appear
+        return waitFor(() => screen.getByTestId("searchbar-popup")).then(() => {
+          const parameterPanel = screen.getByTestId("tab-panel-Parameters");
 
-    return waitFor(() => screen.getByTestId("searchbar-popup")).then(() => {
-      const parameterPanel = screen.getByTestId("tab-panel-Parameters");
+          // Get the parameter buttons "Air pressure" and "Visibility" which are selected
+          const parameterButton1 = within(parameterPanel).getByRole("button", {
+            name: PARAMETER_VOCABS[0].narrower[0].label,
+          });
+          const parameterButton2 = within(parameterPanel).getByRole("button", {
+            name: PARAMETER_VOCABS[0].narrower[1].label,
+          });
 
-      // Get the parameter buttons "Air pressure" and "Visibility" which are selected
-      const parameterButton1 = within(parameterPanel).getByRole("button", {
-        name: "Air pressure",
-      });
-      const parameterButton2 = within(parameterPanel).getByRole("button", {
-        name: "Visibility",
-      });
-
-      // Wait for the parameter buttons to be selected
-      return waitFor(() => {
-        expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
-        expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
-      });
-    });
+          // Wait for the parameter buttons to be selected
+          return waitFor(() => {
+            expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
+            expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
+          });
+        });
+      }
+    );
   });
 });

@@ -1,4 +1,12 @@
-import React, { Dispatch, FC, useCallback, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Box, Fade, Paper, Popper, ClickAwayListener } from "@mui/material";
 import InputWithSuggester from "./InputWithSuggester";
 import { border, borderRadius, color, gap } from "../../styles/constants";
@@ -20,6 +28,13 @@ import Filters from "../filter/Filters";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useScrollToElement from "../../hooks/useScrollToElement";
 import { HEADER_HEIGHT } from "../layout/constant";
+import {
+  clearComponentParam,
+  ParameterState,
+  unFlattenToParameterState,
+  updateParameterStates,
+} from "../common/store/componentParamReducer";
+import { useAppDispatch } from "../common/store/hooks";
 
 interface SearchbarProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -27,6 +42,7 @@ interface SearchbarProps {
 
 const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const { isMobile, isTablet } = useBreakpoint();
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -44,6 +60,14 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
     ref: boxRef,
     offset: HEADER_HEIGHT + 5,
   });
+  const urlParamState: ParameterState | undefined = useMemo(() => {
+    // The first char is ? in the search string, so we need to remove it.
+    const param = location?.search?.substring(1);
+    if (param && param.length > 0) {
+      return unFlattenToParameterState(param);
+    }
+    return undefined;
+  }, [location?.search]);
 
   const handleScrollToTop = useCallback(() => {
     scrollToElement();
@@ -99,6 +123,16 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
     }
     setOpen(false);
   }, []);
+
+  // Sync URL to Redux on initial load/navigation
+  useEffect(() => {
+    if (urlParamState) {
+      dispatch(updateParameterStates(urlParamState));
+    } else {
+      // If url param state is undefined, clear the component param state
+      dispatch(clearComponentParam());
+    }
+  }, [dispatch, urlParamState]);
 
   return (
     <Box width="100%" ref={boxRef}>

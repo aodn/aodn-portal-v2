@@ -29,11 +29,11 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export type AppStore = typeof store;
 
-const searchQueryResult = (state: RootState) =>
+const getSearchQueryResult = (state: RootState) =>
   state.searcher.collectionsQueryResult;
 
 const getComponentState = (state: RootState) => state.paramReducer;
 
-export { searchQueryResult, getComponentState };
+export { getSearchQueryResult, getComponentState };
 
 export default store;
