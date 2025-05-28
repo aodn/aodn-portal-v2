@@ -159,7 +159,7 @@ def assert_search_settings_persisted(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [('Last Year', 'Apollo', 'Carbon', 'Radar', 'IMOS', 'Delayed')],
 )
-def test_search_settings_persists_after_navigation(
+def test_search_state_retained_after_navigation(
     responsive_page: Page,
     date: str,
     location: str,
@@ -168,6 +168,14 @@ def test_search_settings_persists_after_navigation(
     filter_organisation: str,
     filter_data: str,
 ) -> None:
+    """
+    Verifies that selected search criteria persist across search execution and navigation.
+
+    The test simulates a user setting various search parameters (date, location, filters),
+    performing a search, and checks that the search settings are correctly applied in the search results page.
+    It then navigates to a result's detail page and back. It confirms that all search
+    settings remain intact throughout this process.
+    """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
     detail_page = DetailPage(responsive_page)
@@ -222,7 +230,7 @@ def test_search_settings_persists_after_navigation(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [('Last Year', 'Apollo', 'Carbon', 'Radar', 'IMOS', 'Delayed')],
 )
-def test_search_settings_persists_with_url(
+def test_search_state_persists_with_url(
     responsive_page: Page,
     date: str,
     location: str,
@@ -231,6 +239,14 @@ def test_search_settings_persists_with_url(
     filter_organisation: str,
     filter_data: str,
 ) -> None:
+    """
+    Verifies that selected search criteria persist when the search results URL is reused in a new browser context.
+
+    The test sets various search parameters, performs a search, and then opens the resulting URL
+    in a new tab (simulating link sharing or bookmarking). It confirms that the search state —
+    including date, location, and filter settings — is correctly restored when the page is reloaded
+    from the saved URL.
+    """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
 
