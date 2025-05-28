@@ -103,8 +103,15 @@ def test_search_input_persistence_after_navigation(
     expect(search_page.search.search_field).to_have_value(search_text)
 
 
+@pytest.mark.parametrize(
+    'date, location, filter',
+    [('Last Year', 'Australian Marine Parks', 'Parameters')],
+)
 def test_searchbar_popups(
     responsive_page: Page,
+    date: str,
+    location: str,
+    filter: str,
 ) -> None:
     landing_page = LandingPage(responsive_page)
 
@@ -114,20 +121,43 @@ def test_searchbar_popups(
     # Test clicking 'Date' button shows the date range selection popup
     landing_page.search.date_button.click()
     expect(searchbar_popup).to_be_visible()
-    expect(searchbar_popup).to_contain_text('Last Year')
+    expect(searchbar_popup).to_contain_text(date)
 
     # Test clicking 'Location' button shows the location selection popup
     landing_page.search.location_button.click()
     expect(searchbar_popup).to_be_visible()
-    expect(searchbar_popup).to_contain_text('Australian Marine Parks')
+    expect(searchbar_popup).to_contain_text(location)
 
-    # Test clicking 'Filter' button shows the location selection popup
+    # Test clicking 'Filter' button shows the filters selection popup
     landing_page.search.filter_button.click()
     expect(searchbar_popup).to_be_visible()
-    expect(searchbar_popup).to_contain_text('Parameters')
+    expect(searchbar_popup).to_contain_text(filter)
 
 
-def assert_search_settings_persisted(
+def set_search_state(
+    landing_page: LandingPage,
+    date: str,
+    location: str,
+    filter_parameter: str,
+    filter_platform: str,
+    filter_organisation: str,
+    filter_data: str,
+) -> None:
+    landing_page.search.date_button.click()
+    landing_page.get_text(date).click()
+    landing_page.search.location_button.click()
+    landing_page.get_text(location).click()
+    landing_page.search.filter_button.click()
+    landing_page.get_button(filter_parameter).click()
+    landing_page.search.filter_platform_tab.click()
+    landing_page.search.get_button(filter_platform).click()
+    landing_page.search.filter_organisation_tab.click()
+    landing_page.search.get_button(filter_organisation).click()
+    landing_page.search.filter_data_tab.click()
+    landing_page.search.get_button(filter_data).click()
+
+
+def assert_search_state_persisted(
     search_page: SearchPage,
     date: str,
     location: str,
@@ -159,7 +189,7 @@ def assert_search_settings_persisted(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [('Last Year', 'Apollo', 'Carbon', 'Radar', 'IMOS', 'Delayed')],
 )
-def test_search_state_retained_after_navigation(
+def test_search_state_persists_after_navigation(
     responsive_page: Page,
     date: str,
     location: str,
@@ -172,35 +202,33 @@ def test_search_state_retained_after_navigation(
     Verifies that selected search criteria persist across search execution and navigation.
 
     The test simulates a user setting various search parameters (date, location, filters),
-    performing a search, and checks that the search settings are correctly applied in the search results page.
+    performing a search, and checks that the search state are correctly applied in the search results page.
     It then navigates to a result's detail page and back. It confirms that all search
-    settings remain intact throughout this process.
+    state remain intact throughout this process.
     """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
     detail_page = DetailPage(responsive_page)
 
-    # Set search settings
     landing_page.load()
-    landing_page.search.date_button.click()
-    landing_page.get_text(date).click()
-    landing_page.search.location_button.click()
-    landing_page.get_text(location).click()
-    landing_page.search.filter_button.click()
-    landing_page.get_button(filter_parameter).click()
-    landing_page.search.filter_platform_tab.click()
-    landing_page.search.get_button(filter_platform).click()
-    landing_page.search.filter_organisation_tab.click()
-    landing_page.search.get_button(filter_organisation).click()
-    landing_page.search.filter_data_tab.click()
-    landing_page.search.get_button(filter_data).click()
+
+    # Set search state
+    set_search_state(
+        landing_page,
+        date,
+        location,
+        filter_parameter,
+        filter_platform,
+        filter_organisation,
+        filter_data,
+    )
 
     # Perform search
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
 
-    # Verify settings are applied
-    assert_search_settings_persisted(
+    # Verify state are applied
+    assert_search_state_persisted(
         search_page,
         date,
         location,
@@ -214,8 +242,8 @@ def test_search_state_retained_after_navigation(
     search_page.first_result_title.click()
     detail_page.go_back_button.click()
 
-    # Verify settings are still applied after navigation
-    assert_search_settings_persisted(
+    # Verify state are still applied after navigation
+    assert_search_state_persisted(
         search_page,
         date,
         location,
@@ -244,26 +272,24 @@ def test_search_state_persists_with_url(
 
     The test sets various search parameters, performs a search, and then opens the resulting URL
     in a new tab (simulating link sharing or bookmarking). It confirms that the search state —
-    including date, location, and filter settings — is correctly restored when the page is reloaded
+    including date, location, and filter state — is correctly restored when the page is reloaded
     from the saved URL.
     """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
 
-    # Set search settings
     landing_page.load()
-    landing_page.search.date_button.click()
-    landing_page.get_text(date).click()
-    landing_page.search.location_button.click()
-    landing_page.get_text(location).click()
-    landing_page.search.filter_button.click()
-    landing_page.get_button(filter_parameter).click()
-    landing_page.search.filter_platform_tab.click()
-    landing_page.search.get_button(filter_platform).click()
-    landing_page.search.filter_organisation_tab.click()
-    landing_page.search.get_button(filter_organisation).click()
-    landing_page.search.filter_data_tab.click()
-    landing_page.search.get_button(filter_data).click()
+
+    # Set search state
+    set_search_state(
+        landing_page,
+        date,
+        location,
+        filter_parameter,
+        filter_platform,
+        filter_organisation,
+        filter_data,
+    )
 
     # Perform search
     landing_page.search.click_search_button()
@@ -280,8 +306,8 @@ def test_search_state_persists_with_url(
     new_search_page.goto(current_url)
     new_search_page.wait_for_search_to_complete()
 
-    # Verify settings are applied
-    assert_search_settings_persisted(
+    # Verify state are applied
+    assert_search_state_persisted(
         new_search_page,
         date,
         location,
