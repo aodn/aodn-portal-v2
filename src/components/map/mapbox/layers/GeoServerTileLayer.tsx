@@ -3,6 +3,9 @@ import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import { formatToUrl } from "../../../../utils/UrlUtils";
+import { MapDefaultConfig } from "../constants";
+import { Position } from "geojson";
+import { fitToBound } from "../../../../utils/MapUtils";
 
 interface TileUrlParams {
   LAYERS: string[];
@@ -28,6 +31,7 @@ interface GeoServerTileLayerConfig {
   minZoom: number;
   maxZoom: number;
   opacity: number;
+  bbox: Position;
 }
 
 // Example url for mapbox wms resource: "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256"
@@ -51,12 +55,16 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
     WIDTH: 256,
     HEIGHT: 256,
   },
-  tileSize: 256,
-  // path: "/geowebcache/service/wms",
-  // baseUrl: "https://geoserver-123.aodn.org.au/geoserver/wms",
   baseUrl: "",
-  minZoom: 0,
-  maxZoom: 20,
+  tileSize: 256,
+  minZoom: MapDefaultConfig.MIN_ZOOM,
+  maxZoom: MapDefaultConfig.MAX_ZOOM,
+  bbox: [
+    MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
+    MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
+    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
+    MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
+  ],
   opacity: 1.0,
 };
 
@@ -70,7 +78,7 @@ const checkWMSAvailability = (
   urlConfig: TileUrlParams,
   onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
 ): boolean => {
-  // TODO: Implement a proper WMS availability check, e.g., by making a request to the WMS endpoint
+  // TODO: Implement a proper WMS availability check if needed, e.g., by making a request to the WMS endpoint
   if (urlConfig.LAYERS.length === 0 || baseUrl === "") {
     onWMSAvailabilityChange?.(false);
     return false;
@@ -103,6 +111,16 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     params: config.tileUrlParams,
   });
 
+  const isWMSAvailable = useMemo(
+    () =>
+      checkWMSAvailability(
+        config.baseUrl,
+        config.tileUrlParams,
+        onWMSAvailabilityChange
+      ),
+    [config.baseUrl, config.tileUrlParams, onWMSAvailabilityChange]
+  );
+
   // Add the tile layer to the map
   useEffect(() => {
     if (map === null) return;
@@ -112,39 +130,42 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
       if (map?.getSource(tileSourceId)) return;
 
       // Check WMS availability before adding the layer
-      const isWMSAvailable = checkWMSAvailability(
-        config.baseUrl,
-        config.tileUrlParams,
-        onWMSAvailabilityChange
-      );
 
-      if (!isWMSAvailable) return;
+      if (isWMSAvailable) {
+        try {
+          // Add the WMS source following Mapbox's example
+          map?.addSource(tileSourceId, {
+            type: "raster",
+            tiles: [tileUrl],
+            tileSize: config.tileSize,
+            minzoom: config.minZoom,
+            maxzoom: config.maxZoom,
+          });
 
-      try {
-        // Add the WMS source following Mapbox's example
-        map?.addSource(tileSourceId, {
-          type: "raster",
-          tiles: [tileUrl],
-          tileSize: config.tileSize,
-          minzoom: config.minZoom,
-          maxzoom: config.maxZoom,
-        });
-
-        // Add the raster layer
-        map?.addLayer({
-          id: tileLayer,
-          type: "raster",
-          source: tileSourceId,
-          paint: {},
-        });
-      } catch (error) {
-        console.log("Error adding layer or source:", error);
+          // Add the raster layer
+          map?.addLayer({
+            id: tileLayer,
+            type: "raster",
+            source: tileSourceId,
+            paint: {},
+          });
+        } catch (error) {
+          console.log("Error adding layer or source:", error);
+        }
       }
+    };
+
+    const handleIdle = () => {
+      if (!isWMSAvailable) return;
+      fitToBound(map, config.bbox, {
+        animate: true,
+        zoomOffset: 0.5,
+      });
     };
 
     // Create layers when map loads
     map?.once("load", createLayers);
-
+    map?.once("idle", handleIdle);
     // Re-add layers when map style changes
     map?.on("styledata", createLayers);
 
