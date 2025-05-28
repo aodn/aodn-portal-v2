@@ -50,6 +50,22 @@ class ApiRouter:
     ) -> None:
         self.unroute(Routes.VOCABS, handler_function)
 
+    def route_search_collections(
+        self,
+        temporal_handler: Callable,
+        provider_handler: Callable,
+    ) -> None:
+        self.route(Routes.COLLECTION_TEMPORAL, temporal_handler)
+        self.route(Routes.COLLECTION_PROVIDER, provider_handler)
+
+    def unroute_search_collections(
+        self,
+        temporal_handler: Optional[Callable] = None,
+        provider_handler: Optional[Callable] = None,
+    ) -> None:
+        self.unroute(Routes.COLLECTION_TEMPORAL, temporal_handler)
+        self.unroute(Routes.COLLECTION_PROVIDER, provider_handler)
+
     def route_collection(
         self,
         centroid_handler: Callable,

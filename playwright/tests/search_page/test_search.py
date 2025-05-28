@@ -2,17 +2,13 @@ import pytest
 from playwright.sync_api import Page, expect
 
 from core.enums.search_sort_type import SearchSortType
-from mocks.api.collections import (
-    handle_collections_all_api,
-    handle_collections_centroid_api,
-)
 from mocks.api.search_sort import (
     handle_sort_by_modified,
     handle_sort_by_relevance,
     handle_sort_by_title,
 )
-from mocks.api.vocabs import handle_vocabs_api
 from mocks.api_router import ApiRouter
+from mocks.apply import apply_mock
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
@@ -262,12 +258,7 @@ def test_search_settings_persists_with_url(
     new_page = responsive_page.context.new_page()
 
     # Add API mocking to the new page
-    api_router = ApiRouter(new_page)
-    api_router.route_vocabs(handle_vocabs_api)
-    api_router.route_collection(
-        handle_collections_centroid_api,
-        handle_collections_all_api,
-    )
+    apply_mock(new_page)
 
     new_search_page = SearchPage(new_page)
     new_search_page.goto(current_url)
