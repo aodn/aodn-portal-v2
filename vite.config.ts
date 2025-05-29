@@ -56,11 +56,6 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
-        "/geowebcache": {
-          target: "https://tilecache.aodn.org.au",
-          changeOrigin: true,
-          secure: false,
-        },
       },
     },
     plugins: [
