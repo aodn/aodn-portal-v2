@@ -81,10 +81,10 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const { isMobile } = useBreakpoint();
   const [isSearchbarActive, setIsSearchbarActive] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
-
   const searchInput = useSelector(
     (state: RootState) => state.paramReducer.searchText
   );
+  const [inputValue, setInputValue] = useState<string | undefined>(searchInput);
 
   const refreshOptions = useCallback(
     async (inputValue: string) => {
@@ -168,6 +168,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   const handleInputChange = useCallback(
     async (_: any, newInputValue: string) => {
+      setInputValue(newInputValue);
       dispatch(updateSearchText(newInputValue));
       if (newInputValue?.length > 0) {
         // wait for the debounced refresh to complete
@@ -219,6 +220,10 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       setShouldExpandSearchbar(false);
     }
   }, [isSearchbarActive, searchInput, setShouldExpandSearchbar]);
+
+  useEffect(() => {
+    setInputValue(searchInput);
+  }, [searchInput]);
 
   // Input suggester popper
   const CustomPopper = useCallback(
@@ -293,7 +298,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       open={isSearchbarActive}
       onOpen={handleSearchbarOpen}
       onClose={handleSearchbarClose}
-      value={searchInput}
+      value={inputValue}
       forcePopupIcon={false}
       options={options.flatMap((option) => option.text)}
       autoComplete

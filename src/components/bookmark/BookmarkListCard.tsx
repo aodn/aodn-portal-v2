@@ -6,9 +6,8 @@ import Layers from "../map/mapbox/layers/Layers";
 import GeojsonLayer from "../map/mapbox/layers/GeojsonLayer";
 import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
 import { fontColor, fontSize, padding } from "../../styles/constants";
-import { SEARCH_PAGE_REFERER } from "../../pages/search-page/constants";
 import { TabNavigation } from "../../hooks/useTabNavigation";
-import { detailPageDefault } from "../common/constants";
+import { detailPageDefault, pageReferer } from "../common/constants";
 
 export interface BookmarkListCardType {
   dataset: OGCCollection;
@@ -26,7 +25,8 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
 }) => {
   const mapContainerId = `bookmark-list-map-${dataset.id}`;
   const handleNavigation = useCallback(
-    (tab: string) => () => tabNavigation(dataset.id, tab, SEARCH_PAGE_REFERER),
+    (tab: string) => () =>
+      tabNavigation(dataset.id, tab, pageReferer.SEARCH_PAGE_REFERER),
     [dataset.id, tabNavigation]
   );
 

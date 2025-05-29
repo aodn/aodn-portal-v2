@@ -17,11 +17,8 @@ import {
 } from "./constants";
 import TopicCard from "./TopicCard";
 import {
-  updateDateTimeFilterRange,
-  updateImosOnly,
-  updateParameterVocabs,
+  clearComponentParam,
   updateSearchText,
-  updateUpdateFreq,
 } from "../../../../components/common/store/componentParamReducer";
 
 interface TopicsPanelProps {}
@@ -69,11 +66,11 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   // Can be change to a function-switcher if any other functions are designed in the future
   const handleClickTopicCard = useCallback(
     (value: string) => {
-      dispatch(updateParameterVocabs([]));
-      dispatch(updateDateTimeFilterRange({}));
-      dispatch(updateImosOnly(false));
-      dispatch(updateUpdateFreq(undefined));
+      // Clear the component states
+      dispatch(clearComponentParam());
+      // Then update search text with the selected topic value
       dispatch(updateSearchText(value));
+
       redirectSearch("TopicsPanel");
     },
     [dispatch, redirectSearch]

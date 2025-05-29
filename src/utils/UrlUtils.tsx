@@ -31,3 +31,32 @@ export const formatToUrl = <T extends Record<string, any>>({
 
   return `${baseUrl}?${queryParams}`;
 };
+
+/**
+ * Converts HTTP URLs to HTTPS
+ * @param {string} url - The URL to check and potentially convert
+ * @returns {string} - The URL with HTTPS protocol
+ */
+export const ensureHttps = (url: string): string => {
+  if (!url || typeof url !== "string") {
+    return "";
+  }
+
+  // Check if URL starts with http:// and convert to https://
+  if (url.toLowerCase().startsWith("http://")) {
+    return url.replace(/^http:\/\//i, "https://");
+  }
+
+  // If already HTTPS or protocol-relative, return as is
+  if (url.toLowerCase().startsWith("https://") || url.startsWith("//")) {
+    return url;
+  }
+
+  // If no protocol specified, assume HTTPS
+  if (!url.includes("://")) {
+    return "https://" + url;
+  }
+
+  // For other protocols (ftp, file, etc.), return as is
+  return url;
+};

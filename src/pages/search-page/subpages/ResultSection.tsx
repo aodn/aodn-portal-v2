@@ -10,7 +10,7 @@ import ResultCards, {
 } from "../../../components/result/ResultCards";
 import {
   RootState,
-  searchQueryResult,
+  getSearchQueryResult,
 } from "../../../components/common/store/store";
 import CircleLoader from "../../../components/loading/CircleLoader";
 import BookmarkListButton, {
@@ -45,7 +45,7 @@ const ResultSection: FC<ResultSectionProps> = ({
 }) => {
   const { isUnderLaptop } = useBreakpoint();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
-    searchQueryResult
+    getSearchQueryResult
   );
 
   // Early return if it is full map view or no reduxContents

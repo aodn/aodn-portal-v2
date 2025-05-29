@@ -31,6 +31,8 @@ import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerTileLayer from "../../../../components/map/mapbox/layers/GeoServerTileLayer";
 import MapLayerSwitcher from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
+import { ensureHttps } from "../../../../utils/UrlUtils";
+import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
@@ -140,17 +142,40 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     []
   );
 
-  const getWMSLayerNames = useCallback(() => {
+  const WMSLayerNames = useMemo(() => {
     const DataAccessLinks = collection?.getDataAccessLinks();
-
     if (!DataAccessLinks || DataAccessLinks.length === 0) {
       return [];
     }
-
     return DataAccessLinks.filter(
       (link) => link.rel === "wms" && link.title
     ).map((link) => link.title);
   }, [collection]);
+
+  // As WMSServer may be an array if there are multiple wms links, for now we only use the first one.
+  // TODO: This should be improved to handle multiple WMS layers and servers if needed.
+  const WMSServer = useMemo(() => {
+    const DataAccessLinks = collection?.getDataAccessLinks();
+    if (!DataAccessLinks || DataAccessLinks.length === 0) {
+      return [];
+    }
+    return DataAccessLinks.filter(
+      (link) => link.rel === "wms" && link.href
+    ).map((link) => link.href);
+  }, [collection]);
+
+  const overallBoundingBox = useMemo(() => {
+    const bbox = collection?.extent?.bbox[0];
+    if (!bbox || bbox.length < 4) {
+      return [
+        MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
+        MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
+        MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
+        MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
+      ];
+    }
+    return bbox;
+  }, [collection?.extent?.bbox]);
 
   const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
     setIsWMSAvailable(isWMSAvailable);
@@ -164,7 +189,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
           return (
             <GeoServerTileLayer
               geoServerTileLayerConfig={{
-                tileUrlParams: { LAYERS: getWMSLayerNames() },
+                baseUrl: ensureHttps(WMSServer[0]),
+                tileUrlParams: { LAYERS: WMSLayerNames },
+                bbox: overallBoundingBox,
               }}
               onWMSAvailabilityChange={onWMSAvailabilityChange}
             />
@@ -173,7 +200,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
           return <HexbinLayer featureCollection={filteredFeatureCollection} />;
       }
     },
-    [filteredFeatureCollection, getWMSLayerNames, onWMSAvailabilityChange]
+    [
+      WMSServer,
+      WMSLayerNames,
+      overallBoundingBox,
+      onWMSAvailabilityChange,
+      filteredFeatureCollection,
+    ]
   );
 
   return (

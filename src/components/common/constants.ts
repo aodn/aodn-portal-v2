@@ -16,6 +16,12 @@ const pageDefault = {
   landing: "/",
 };
 
+const pageReferer = {
+  LANDING_PAGE_REFERER: "LANDING_PAGE",
+  SEARCH_PAGE_REFERER: "SEARCH_PAGE",
+  DETAIL_PAGE_REFERER: "DETAIL_PAGE",
+};
+
 const marineParkDefault = {
   geojson: "./data/Australian_Marine_Parks_boundaries.json",
 };
@@ -39,6 +45,7 @@ const contactRoles = {
 export {
   dateDefault,
   pageDefault,
+  pageReferer,
   detailPageDefault,
   marineParkDefault,
   contactRoles,

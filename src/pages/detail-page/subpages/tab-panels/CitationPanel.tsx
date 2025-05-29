@@ -11,13 +11,13 @@ import SuggestedCitationList from "../../../../components/list/SuggestedCitation
 import CitedResponsiblePartyList from "../../../../components/list/CitedResponsiblePartyList";
 import ConstraintList from "../../../../components/list/ConstraintList";
 import {
-  contactRoles,
   detailPageDefault,
+  contactRoles,
+  pageReferer,
 } from "../../../../components/common/constants";
 import { MODE } from "../../../../components/list/CommonDef";
 import SideCardContainer from "../side-cards/SideCardContainer";
 import useTabNavigation from "../../../../hooks/useTabNavigation";
-import { DETAIL_PAGE_REFERER } from "../../../search-page/constants";
 import CreditList from "../../../../components/list/CreditList";
 import ContactList from "../../../../components/list/ContactList";
 
@@ -188,7 +188,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
               goToDetailPage(
                 collection.id,
                 detailPageDefault.CITATION,
-                DETAIL_PAGE_REFERER
+                pageReferer.DETAIL_PAGE_REFERER
               )
             }
           >
