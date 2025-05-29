@@ -356,6 +356,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({ handleClosePopup }) => {
                     control={<Radio />}
                     label={item.label}
                     key={item.value}
+                    data-testid={`radio-${item.label}`}
                     sx={{
                       ".MuiFormControlLabel-label": {
                         fontFamily: fontFamily.general,
