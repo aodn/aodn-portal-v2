@@ -13,7 +13,7 @@ import AssociatedRecordsPanel from "../AssociatedRecordsPanel";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "../../../../../utils/AppTheme";
 import { DetailPageProvider } from "../../../context/detail-page-provider";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import store from "../../../../../components/common/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
@@ -42,14 +42,19 @@ describe("AssociatedRecordsPanel", async () => {
     vi.mock("react-router-dom", () => ({
       ...vi.importActual("react-router-dom"),
       useLocation: vi.fn(),
+      useParams: vi.fn(),
     }));
 
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",
       key: "default",
-      pathname: "/details",
-      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
     });
 
     openSpy = vi
