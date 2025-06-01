@@ -27,7 +27,7 @@ const router = createBrowserRouter([
     children: [],
   },
   {
-    path: pageDefault.details,
+    path: `${pageDefault.details}/:uuid`,
     element: (
       <ErrorBoundary>
         <DetailsPage />
