@@ -13,7 +13,11 @@ import TabsPanelContainer, {
 } from "../../../components/common/tab/TabsPanelContainer";
 import { useLocation, useParams } from "react-router-dom";
 import { LngLatBounds } from "mapbox-gl";
-import { detailPageDefault } from "../../../components/common/constants";
+import {
+  detailPageDefault,
+  pageReferer,
+} from "../../../components/common/constants";
+import useTabNavigation from "../../../hooks/useTabNavigation";
 
 interface ContentSectionProps {
   mapFocusArea?: LngLatBounds;
@@ -27,6 +31,7 @@ const findTabIndex = (params: URLSearchParams, tabs: Tab[]) => {
 
 const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
   const { uuid } = useParams();
+  const tabNavigation = useTabNavigation();
   const summaryAndDownloadPanelTab: Tab = useMemo(
     () => ({
       label: "Summary",
@@ -101,11 +106,15 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
 
   const handleTabChange = useCallback(
     (newValue: number) => {
-      // Update URL without navigating
-      const newUrl = `${location.pathname}?${uuid}?tab=${TABS[newValue].value}`;
-      window.history.pushState(null, "", newUrl);
+      if (uuid) {
+        tabNavigation(
+          uuid,
+          TABS[newValue].value,
+          pageReferer.DETAIL_PAGE_REFERER
+        );
+      }
     },
-    [TABS, location.pathname, uuid]
+    [TABS, tabNavigation, uuid]
   );
 
   useEffect(() => {
