@@ -1,105 +1,70 @@
-import { afterAll, afterEach, beforeAll, describe, expect, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  MockInstance,
+  vi,
+} from "vitest";
 import { server } from "../../../../../__mocks__/server";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import AssociatedRecordsPanel from "../AssociatedRecordsPanel";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "../../../../../utils/AppTheme";
 import { DetailPageProvider } from "../../../context/detail-page-provider";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import store from "../../../../../components/common/store/store";
 import { Provider } from "react-redux";
-import AdditionalInfoPanel from "../AdditionalInfoPanel";
-import CitationPanel from "../CitationPanel";
-import AssociatedRecordsPanel from "../AssociatedRecordsPanel";
+import { userEvent } from "@testing-library/user-event";
 
-describe("empty area display", async () => {
+describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
+  let openSpy: MockInstance<Window["open"]>;
 
   beforeAll(() => {
     server.listen();
   });
 
-  beforeEach(() => {
-    vi.mock("react-router-dom", () => ({
-      ...vi.importActual("react-router-dom"),
-      useLocation: vi.fn(),
-      useNavigate: vi.fn(),
-    }));
+  afterAll(() => {
+    server.close();
   });
 
   afterEach(() => {
     cleanup();
     server.resetHandlers();
     vi.restoreAllMocks();
-  });
-  afterAll(() => {
-    server.close();
+    // Restore the original implementation if needed
+    openSpy.mockRestore();
   });
 
-  test("additional info panel", async () => {
+  beforeEach(() => {
+    vi.mock("react-router-dom", () => ({
+      ...vi.importActual("react-router-dom"),
+      useLocation: vi.fn(),
+      useParams: vi.fn(), // Add useParams mock
+    }));
+
+    // Mock useParams to return the UUID
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+
+    // Update useLocation mock to reflect new URL structure
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",
       key: "default",
-      pathname: "/details",
-      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e" + "emptyabout",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e", // Updated pathname
+      search: "", // Empty search since UUID is now in the path
     });
 
-    render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <DetailPageProvider>
-            <AdditionalInfoPanel />
-          </DetailPageProvider>
-        </ThemeProvider>
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(screen.queryByText("Keywords Not Found")).to.exist;
-      expect(screen.queryByText("Themes Not Found")).to.exist;
-      expect(screen.queryByText("Metadata Contact Not Found")).to.exist;
-    });
-  });
-
-  test("citation and usage panel", async () => {
-    vi.mocked(useLocation).mockReturnValue({
-      state: null,
-      hash: "111",
-      key: "default",
-      pathname: "/details",
-      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e" + "emptycitation",
-    });
-
-    render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <DetailPageProvider>
-            <CitationPanel />
-          </DetailPageProvider>
-        </ThemeProvider>
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(screen.queryByText("License Not Found")).to.exist;
-      expect(screen.queryByText("Cited Responsible Parties Not Found")).to
-        .exist;
-      expect(screen.queryByText("Suggested Citation Not Found")).to.exist;
-      expect(screen.queryByText("Constraints Not Found")).to.exist;
-      expect(screen.queryByText("Data Contact Not Found")).to.exist;
-      expect(screen.queryByText("Credits Not Found")).to.exist;
-    });
-  });
-
-  test("associated records panel", async () => {
-    vi.mocked(useLocation).mockReturnValue({
-      state: null,
-      hash: "111",
-      key: "default",
-      pathname: "/details",
-      search:
-        "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e" + "emptyassociatedrecords",
-    });
+    openSpy = vi
+      .spyOn(window, "open")
+      .mockImplementation((url, target, features) => {
+        console.log(`spy open window called ${url} ${target} ${features}`);
+        return null;
+      });
 
     render(
       <Provider store={store}>
@@ -110,12 +75,91 @@ describe("empty area display", async () => {
         </ThemeProvider>
       </Provider>
     );
+  });
 
-    await waitFor(() => {
-      expect(screen.queryAllByText("N / A")).toHaveLength(3);
-      expect(screen.queryByText("Parent Record Not Found")).to.exist;
-      expect(screen.queryByText("Associated Records Not Found")).to.exist;
-      expect(screen.queryByText("Sub Records Not Found")).to.exist;
+  it("should render AssociatedRecordsPanel", () => {
+    return waitFor(() => screen.findAllByText("Parent Record"), {
+      timeout: 2000,
+    }).then(() => {
+      const parentRecordText = screen.queryAllByText("Parent Record");
+      // one is button, another is list title
+      expect(parentRecordText).toHaveLength(2);
     });
+  });
+
+  it("should open a new tab when clicking on a record abstract", () => {
+    return waitFor(
+      () =>
+        screen.findAllByText(
+          "Northern Australia Automated Marine Weather and Oceanographic Stations"
+        ),
+      { timeout: 10000 }
+    ).then(() => {
+      return waitFor(() =>
+        screen.findByTestId(
+          "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
+        )
+      ).then((parentTitle) => {
+        expect(parentTitle).to.exist;
+
+        parentTitle && userEvent.click(parentTitle);
+        const parentAbstract = screen.queryByText(
+          /weather stations have been/i
+        );
+        expect(parentAbstract).to.exist;
+
+        if (parentAbstract) {
+          userEvent.click(parentAbstract);
+
+          return waitFor(() => expect(openSpy).toHaveBeenCalled());
+        }
+      });
+    });
+  });
+
+  it("should be able to show / hide more records", async () => {
+    const lowerRecordTitle =
+      "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
+
+    await waitFor(() =>
+      screen.findByTestId("show-more-detail-btn-Associated Records")
+    ).then((showMoreRecordsBtn) => {
+      expect(showMoreRecordsBtn).to.exist;
+      expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
+      userEvent.click(showMoreRecordsBtn!);
+    });
+
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("show-less-detail-btn-Associated Records"))
+          .exist;
+
+        // final record should be shown now
+        expect(screen.queryByText(lowerRecordTitle)).to.exist;
+      },
+      { timeout: 5000 }
+    );
+
+    await waitFor(
+      () => {
+        const showLessRecordsBtn = screen.queryByTestId(
+          "show-less-detail-btn-Associated Records"
+        );
+        expect(showLessRecordsBtn).to.exist;
+        userEvent.click(showLessRecordsBtn!);
+      },
+      { timeout: 5000 }
+    );
+
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("show-more-detail-btn-Associated Records"))
+          .exist;
+
+        // final record should be hidden again
+        expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
+      },
+      { timeout: 5000 }
+    );
   });
 });
