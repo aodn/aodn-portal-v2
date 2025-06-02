@@ -38,7 +38,10 @@ import {
   OGCCollection,
   OGCCollections,
 } from "../common/store/OGCCollectionDefinitions";
-import { fetchResultNoStore } from "../common/store/searchReducer";
+import {
+  fetchResultNoStore,
+  jsonToOGCCollections,
+} from "../common/store/searchReducer";
 import { cqlDefaultFilters } from "../common/cqlFilters";
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
@@ -270,7 +273,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
         })
       )
         .unwrap()
-        .then((value: OGCCollections) => {
+        .then((value: string) => {
           // Find all id of collection from imosOnly
           dispatch(
             fetchResultNoStore({
@@ -279,12 +282,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
             })
           )
             .unwrap()
-            .then((imosOnlyCollection: OGCCollections) => {
-              const ids = imosOnlyCollection.collections.map(
-                (value: OGCCollection) => value.id
-              );
+            .then((imosOnlyCollection: string) => {
+              const ids = jsonToOGCCollections(
+                imosOnlyCollection
+              ).collections.map((value: OGCCollection) => value.id);
               setImosDataIds(ids);
-              setTotalDataset(value);
+              setTotalDataset(jsonToOGCCollections(value));
             });
         });
     }, [dispatch]);

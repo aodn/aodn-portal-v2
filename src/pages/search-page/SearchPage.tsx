@@ -14,6 +14,7 @@ import {
   fetchResultByUuidNoStore,
   fetchResultNoStore,
   fetchResultWithStore,
+  jsonToOGCCollections,
 } from "../../components/common/store/searchReducer";
 import {
   formatToUrlParam,
@@ -129,7 +130,8 @@ const SearchPage = () => {
     const paramNonPaged = createSearchParamFrom(componentParam, {
       pagesize: DEFAULT_SEARCH_MAP_SIZE,
     });
-    const collections = await dispatch(
+
+    dispatch(
       // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
       // and ordered by uuid to avoid affecting cluster calculation
       fetchResultNoStore({
@@ -137,8 +139,11 @@ const SearchPage = () => {
         properties: "id,centroid",
         sortby: "id",
       })
-    ).unwrap();
-    setLayers(collections.collections);
+    )
+      .unwrap()
+      .then((collections: string) => {
+        setLayers(jsonToOGCCollections(collections).collections);
+      });
   }, [dispatch]);
 
   const doSearch = useCallback(
