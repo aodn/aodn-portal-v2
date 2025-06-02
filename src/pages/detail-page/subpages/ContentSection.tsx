@@ -11,7 +11,7 @@ import RecordNotFoundPanel from "./tab-panels/RecordNotFoundPanel";
 import TabsPanelContainer, {
   Tab,
 } from "../../../components/common/tab/TabsPanelContainer";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { LngLatBounds } from "mapbox-gl";
 import { detailPageDefault } from "../../../components/common/constants";
 
@@ -26,6 +26,7 @@ const findTabIndex = (params: URLSearchParams, tabs: Tab[]) => {
 };
 
 const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
+  const { uuid } = useParams();
   const summaryAndDownloadPanelTab: Tab = useMemo(
     () => ({
       label: "Summary",
@@ -101,10 +102,10 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
   const handleTabChange = useCallback(
     (newValue: number) => {
       // Update URL without navigating
-      const newUrl = `${location.pathname}?uuid=${params.get("uuid")}&tab=${TABS[newValue].value}`;
+      const newUrl = `${location.pathname}?${uuid}?tab=${TABS[newValue].value}`;
       window.history.pushState(null, "", newUrl);
     },
-    [TABS, location.pathname, params]
+    [TABS, location.pathname, uuid]
   );
 
   useEffect(() => {

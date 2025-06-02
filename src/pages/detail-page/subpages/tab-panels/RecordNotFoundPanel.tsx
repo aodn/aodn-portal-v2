@@ -1,9 +1,10 @@
 import { Grid, hexToRgb, Typography, useTheme } from "@mui/material";
 import { alpha } from "@mui/material/styles";
+import { useParams } from "react-router-dom";
 
 const RecordNotFoundPanel = () => {
   const theme = useTheme();
-  const uuid = new URLSearchParams(location.search).get("uuid");
+  const { uuid } = useParams();
   const border = theme.border.detailNa.replace(
     "#52BDEC",
     theme.palette.warning.main

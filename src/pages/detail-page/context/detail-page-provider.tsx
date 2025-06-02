@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import {
   fetchFeaturesByUuid,
@@ -25,9 +25,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   children,
 }) => {
   const location = useLocation();
+  const { uuid } = useParams();
   const dispatch = useAppDispatch();
   const { checkIfCopied, copyToClipboard } = useClipboard();
-
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
@@ -83,7 +83,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   }, [extentsLength, hasSnapshotsFinished, photos, photos.length]);
 
   useEffect(() => {
-    const uuid = new URLSearchParams(location.search).get("uuid");
     if (!uuid) return;
     dispatch(fetchResultByUuidNoStore(uuid))
       .unwrap()
@@ -96,17 +95,16 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
           setIsCollectionNotFound(true);
         }
       });
-  }, [dispatch, location.search]);
+  }, [dispatch, location.search, uuid]);
 
   useEffect(() => {
-    const uuid = new URLSearchParams(location.search).get("uuid");
     if (!uuid) return;
     dispatch(fetchFeaturesByUuid(uuid))
       .unwrap()
       .then((features) => {
         setFeatures(features);
       });
-  }, [dispatch, location.search]);
+  }, [dispatch, location.search, uuid]);
 
   return (
     <DetailPageContext.Provider

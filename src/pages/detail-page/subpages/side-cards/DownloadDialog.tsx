@@ -20,7 +20,7 @@ import {
   DatasetDownloadRequest,
   DownloadConditionType,
 } from "../../context/DownloadDefinitions";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useAppDispatch } from "../../../../components/common/store/hooks";
 import { processDatasetDownload } from "../../../../components/common/store/searchReducer";
 import {
@@ -37,6 +37,7 @@ const TIMEOUT_LIMIT = 8000;
 
 const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
   const location = useLocation();
+  const { uuid } = useParams();
   const dispatch = useAppDispatch();
   const { downloadConditions } = useDetailPageContext();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -99,7 +100,6 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
 
   const submitJob = useCallback(
     (email: string) => {
-      const uuid = new URLSearchParams(location.search).get("uuid");
       if (!uuid) {
         return;
       }
@@ -124,7 +124,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
           setIsProcessing(false);
         });
     },
-    [dateRange.end, dateRange.start, dispatch, location.search, multiPolygon]
+    [dateRange.end, dateRange.start, dispatch, multiPolygon, uuid]
   );
 
   return (

@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll, expect, vi } from "vitest";
 import { server } from "../../../../../__mocks__/server";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import AppTheme from "../../../../../utils/AppTheme";
 import store from "../../../../../components/common/store/store";
@@ -19,14 +19,19 @@ describe("Additional Info", async () => {
     vi.mock("react-router-dom", () => ({
       ...vi.importActual("react-router-dom"),
       useLocation: vi.fn(),
+      useParams: vi.fn(),
     }));
 
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",
       key: "default",
-      pathname: "/details",
-      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
     });
   });
 
