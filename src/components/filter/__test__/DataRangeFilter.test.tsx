@@ -13,6 +13,9 @@ import { dateToValue } from "../../../utils/DateUtils";
 import axios from "axios";
 import { responseIdTemporal, responseIdProvider } from "./canned";
 
+const initialMinDate: Dayjs = dayjs(dateDefault.min);
+const initialMaxDate: Dayjs = dayjs(dateDefault.max);
+
 // Mock Redux store
 const mockInitialState = {
   paramReducer: {
@@ -123,36 +126,58 @@ describe("DateRangeFilter", () => {
     );
   });
 
-  it.skip("updates date range when start date is changed via date picker", async () => {
+  it("updates date range when start date is changed via date picker", () => {
     renderComponent();
     const user = userEvent.setup();
+    const minDate = initialMinDate.format(dateDefault.DISPLAY_FORMAT);
 
-    const startDatePicker = screen.getByLabelText(/start date/i);
-    const newDate = dayjs("2020-01-01");
-    await user.type(startDatePicker, newDate.format("MM/DD/YYYY"));
+    return waitFor(() => screen.findByDisplayValue(minDate)).then(() => {
+      const startDatePicker = screen.getByDisplayValue(minDate);
+      user.click(startDatePicker);
 
-    expect(store.dispatch).toHaveBeenCalledWith(
-      updateDateTimeFilterRange({
-        start: dateToValue(newDate),
-        end: mockInitialState.paramReducer.dateTimeFilterRange.end,
-      })
-    );
+      const newDate = dayjs("2020-01-01");
+      const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
+      user.type(startDatePicker, newStringDate);
+
+      return waitFor(() => screen.findByDisplayValue(newStringDate)).then(() =>
+        expect(store.dispatch).toHaveBeenCalledWith(
+          updateDateTimeFilterRange({
+            start: dateToValue(newDate),
+            end: mockInitialState.paramReducer.dateTimeFilterRange.end,
+          })
+        )
+      );
+    });
   });
 
-  it.skip("updates date range when end date is changed via date picker", async () => {
+  it("updates date range when end date is changed via date picker", () => {
     renderComponent();
     const user = userEvent.setup();
+    const maxDate = initialMaxDate.format(dateDefault.DISPLAY_FORMAT);
 
-    const endDatePicker = screen.getByLabelText(/end date/i);
-    const newDate = dayjs("2025-01-01");
-    await user.type(endDatePicker, newDate.format("MM/DD/YYYY"));
+    return waitFor(() => screen.findByDisplayValue(maxDate)).then(() => {
+      const endDatePicker = screen.getByDisplayValue(maxDate);
+      user.click(endDatePicker);
 
-    expect(store.dispatch).toHaveBeenCalledWith(
-      updateDateTimeFilterRange({
-        start: mockInitialState.paramReducer.dateTimeFilterRange.start,
-        end: dateToValue(newDate),
-      })
-    );
+      const newDate = dayjs("2025-01-01");
+      const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
+      user.type(endDatePicker, newStringDate);
+
+      return waitFor(() => screen.findByDisplayValue(newStringDate)).then(() =>
+        expect(store.dispatch).toHaveBeenCalledWith(
+          updateDateTimeFilterRange({
+            start: mockInitialState.paramReducer.dateTimeFilterRange.start,
+            end: dateToValue(
+              newDate
+                .set("hour", 23)
+                .set("minute", 59)
+                .set("second", 59)
+                .set("millisecond", 0)
+            ),
+          })
+        )
+      );
+    });
   });
 
   it("resets date range when clear button is clicked", () => {
@@ -177,19 +202,21 @@ describe("DateRangeFilter", () => {
     return waitFor(() => expect(handleClosePopup).toHaveBeenCalled());
   });
 
-  it.skip("updates date range when slider is moved", async () => {
+  it.skip("updates date range when slider is moved", () => {
     renderComponent();
     const user = userEvent.setup();
 
-    const slider = screen.getByRole("slider");
-    await user.type(slider, "{arrowright}"); // Simulate slider movement
+    return waitFor(() => screen.findByRole("slider")).then(() => {
+      const slider = screen.getByRole("slider");
+      user.type(slider, "{arrowright}"); // Simulate slider movement
 
-    expect(store.dispatch).toHaveBeenCalledWith(
-      updateDateTimeFilterRange({
-        start: expect.any(Number),
-        end: expect.any(Number),
-      })
-    );
+      expect(store.dispatch).toHaveBeenCalledWith(
+        updateDateTimeFilterRange({
+          start: expect.any(Number),
+          end: expect.any(Number),
+        })
+      );
+    });
   });
 
   it.skip("renders TimeRangeBarChart with correct props", async () => {
