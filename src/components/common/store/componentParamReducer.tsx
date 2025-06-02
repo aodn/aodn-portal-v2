@@ -454,6 +454,7 @@ export default paramReducer;
 
 export {
   DEFAULT_SEARCH_LOCATION,
+  UPDATE_DATETIME_FILTER_VARIABLE,
   formatToUrlParam,
   unFlattenToParameterState,
   updateDateTimeFilterRange,
