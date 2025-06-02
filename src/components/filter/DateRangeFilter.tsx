@@ -192,7 +192,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
 
     const handleMinDateChange = useCallback(
       (newMinDate: Dayjs | null) => {
-        // For min date we always set to end of day time 00:00:00
+        // For min date we always set to start of day time 00:00:00
         const localMinDate = newMinDate
           ?.set("hour", 0)
           .set("minute", 0)
