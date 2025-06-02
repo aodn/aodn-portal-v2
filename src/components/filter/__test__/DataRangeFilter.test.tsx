@@ -126,17 +126,20 @@ describe("DateRangeFilter", () => {
     );
   });
 
-  it.skip("updates date range when start date is changed via date picker", () => {
+  it("updates date range when start date is changed via date picker", () => {
     renderComponent();
     const user = userEvent.setup();
     const minDate = initialMinDate.format(dateDefault.DISPLAY_FORMAT);
 
-    return waitFor(() => screen.findByText(minDate)).then(() => {
-      const startDatePicker = screen.getByText(minDate);
-      const newDate = dayjs("2020-01-01");
-      user.type(startDatePicker, newDate.format(dateDefault.DISPLAY_FORMAT));
+    return waitFor(() => screen.findByDisplayValue(minDate)).then(() => {
+      const startDatePicker = screen.getByDisplayValue(minDate);
+      user.click(startDatePicker);
 
-      return waitFor(() =>
+      const newDate = dayjs("2020-01-01");
+      const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
+      user.type(startDatePicker, newStringDate);
+
+      return waitFor(() => screen.findByDisplayValue(newStringDate)).then(() =>
         expect(store.dispatch).toHaveBeenCalledWith(
           updateDateTimeFilterRange({
             start: dateToValue(newDate),
@@ -147,20 +150,32 @@ describe("DateRangeFilter", () => {
     });
   });
 
-  it.skip("updates date range when end date is changed via date picker", () => {
+  it("updates date range when end date is changed via date picker", () => {
     renderComponent();
     const user = userEvent.setup();
+    const maxDate = initialMaxDate.format(dateDefault.DISPLAY_FORMAT);
 
-    return waitFor(() => screen.findAllByLabelText(/end date/i)).then(() => {
-      const endDatePicker = screen.getByLabelText(/end date/i);
+    return waitFor(() => screen.findByDisplayValue(maxDate)).then(() => {
+      const endDatePicker = screen.getByDisplayValue(maxDate);
+      user.click(endDatePicker);
+
       const newDate = dayjs("2025-01-01");
-      user.type(endDatePicker, newDate.format("MM/DD/YYYY"));
+      const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
+      user.type(endDatePicker, newStringDate);
 
-      expect(store.dispatch).toHaveBeenCalledWith(
-        updateDateTimeFilterRange({
-          start: mockInitialState.paramReducer.dateTimeFilterRange.start,
-          end: dateToValue(newDate),
-        })
+      return waitFor(() => screen.findByDisplayValue(newStringDate)).then(() =>
+        expect(store.dispatch).toHaveBeenCalledWith(
+          updateDateTimeFilterRange({
+            start: mockInitialState.paramReducer.dateTimeFilterRange.start,
+            end: dateToValue(
+              newDate
+                .set("hour", 23)
+                .set("minute", 59)
+                .set("second", 59)
+                .set("millisecond", 0)
+            ),
+          })
+        )
       );
     });
   });

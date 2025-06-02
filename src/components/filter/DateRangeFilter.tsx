@@ -192,10 +192,16 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
 
     const handleMinDateChange = useCallback(
       (newMinDate: Dayjs | null) => {
-        if (newMinDate && dateToValue(newMinDate) < dateToValue(maxDate)) {
-          const newStart = dateToValue(newMinDate);
+        // For min date we always set to end of day time 00:00:00
+        const localMinDate = newMinDate
+          ?.set("hour", 0)
+          .set("minute", 0)
+          .set("second", 0);
+
+        if (localMinDate && dateToValue(localMinDate) < dateToValue(maxDate)) {
+          const newStart = dateToValue(localMinDate);
           setValue([newStart, value[1]]);
-          setSelectedOption(determineSelectedOption(newMinDate, maxDate));
+          setSelectedOption(determineSelectedOption(localMinDate, maxDate));
           dispatch(
             updateDateTimeFilterRange({
               start: newStart,
@@ -215,10 +221,17 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
 
     const handleMaxDateChange = useCallback(
       (newMaxDate: Dayjs | null) => {
-        if (newMaxDate && dateToValue(newMaxDate) > dateToValue(minDate)) {
-          const newEnd = dateToValue(newMaxDate);
+        // For max date we always set to end of day time to 23:59:59
+        const localMaxDate = newMaxDate
+          ?.set("hour", 23)
+          .set("minute", 59)
+          .set("second", 59)
+          .set("millisecond", 0);
+
+        if (localMaxDate && dateToValue(localMaxDate) > dateToValue(minDate)) {
+          const newEnd = dateToValue(localMaxDate);
           setValue([value[0], newEnd]);
-          setSelectedOption(determineSelectedOption(minDate, newMaxDate));
+          setSelectedOption(determineSelectedOption(minDate, localMaxDate));
           dispatch(
             updateDateTimeFilterRange({
               start: dateTimeFilterRange?.start,
@@ -415,7 +428,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                       fontWeight={fontWeight.bold}
                       color={fontColor.blue.dark}
                     >
-                      End&nbsp;&nbsp;&nbsp;Date
+                      End&nbsp;Date
                     </Typography>
                     <PlainDatePicker
                       views={["year", "month", "day"]}
