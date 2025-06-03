@@ -111,6 +111,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   selectedUuids,
   onClickMapPoint: onDatasetSelected,
   tabNavigation,
+  preferCurrentCentroid = true,
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
@@ -309,7 +310,12 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
 
   const updateSource = useCallback(() => {
     setLastVisiblePoint((p) => {
-      const newData = findSuitableVisiblePoint(featureCollection, map, p);
+      const newData = findSuitableVisiblePoint(
+        featureCollection,
+        map,
+        p,
+        preferCurrentCentroid
+      );
       if (map?.getSource(heatmapSourceId)) {
         (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
       }
@@ -318,7 +324,13 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       }
       return newData;
     });
-  }, [featureCollection, map, heatmapSourceId, clusterSourceId]);
+  }, [
+    featureCollection,
+    map,
+    heatmapSourceId,
+    clusterSourceId,
+    preferCurrentCentroid,
+  ]);
 
   useEffect(() => {
     updateSource();

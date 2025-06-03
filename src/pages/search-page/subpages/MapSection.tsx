@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import { Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
@@ -31,6 +31,10 @@ import BookmarkListMenu, {
   BookmarkListMenuBasicType,
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import { ParameterState } from "../../../components/common/store/componentParamReducer";
+import store, {
+  getComponentState,
+} from "../../../components/common/store/store";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -62,6 +66,10 @@ const createPresentationLayers = (
   tabNavigation: TabNavigation,
   onClickMapPoint: ((uuids: Array<string>) => void) | undefined
 ) => {
+  // If user set polygon search area, that means user have strong preference
+  // and expect result within the area
+  const componentParam: ParameterState = getComponentState(store.getState());
+
   switch (id) {
     case LayerName.Heatmap:
       return (
@@ -70,6 +78,7 @@ const createPresentationLayers = (
           selectedUuids={selectedUuids}
           onClickMapPoint={onClickMapPoint}
           tabNavigation={tabNavigation}
+          preferCurrentCentroid={componentParam.polygon === undefined}
         />
       );
 
@@ -80,6 +89,7 @@ const createPresentationLayers = (
           selectedUuids={selectedUuids}
           onClickMapPoint={onClickMapPoint}
           tabNavigation={tabNavigation}
+          preferCurrentCentroid={componentParam.polygon === undefined}
         />
       );
 
@@ -90,6 +100,7 @@ const createPresentationLayers = (
           selectedUuids={selectedUuids}
           onClickMapPoint={onClickMapPoint}
           tabNavigation={tabNavigation}
+          preferCurrentCentroid={componentParam.polygon === undefined}
         />
       );
   }
