@@ -6,8 +6,6 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-# Skip the entire file
-pytestmark = pytest.mark.skip(reason="URL pattern changed, need to  fix test")
 
 @pytest.mark.parametrize(
     'title',

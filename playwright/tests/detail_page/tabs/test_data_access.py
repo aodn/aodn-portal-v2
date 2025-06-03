@@ -3,8 +3,6 @@ from playwright.sync_api import Page, expect
 
 from pages.detail_page import DetailPage
 
-# Skip the entire file
-pytestmark = pytest.mark.skip(reason="URL pattern changed, need to  fix test")
 
 @pytest.mark.parametrize(
     'title, uuid, link_title, link_href',
