@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import { Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
@@ -23,12 +23,18 @@ import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/Mapb
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
-import useTabNavigation from "../../../hooks/useTabNavigation";
+import useTabNavigation, {
+  TabNavigation,
+} from "../../../hooks/useTabNavigation";
 import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import BookmarkListMenu, {
   BookmarkListMenuBasicType,
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import { ParameterState } from "../../../components/common/store/componentParamReducer";
+import store, {
+  getComponentState,
+} from "../../../components/common/store/store";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -52,6 +58,54 @@ enum LayerName {
   Cluster = "cluster",
   Uncluster = "uncluster",
 }
+
+const createPresentationLayers = (
+  id: string | null,
+  collections: OGCCollection[],
+  selectedUuids: string[] | undefined,
+  tabNavigation: TabNavigation,
+  onClickMapPoint: ((uuids: Array<string>) => void) | undefined
+) => {
+  // If user set polygon search area, that means user have strong preference
+  // and expect result within the area
+  const componentParam: ParameterState = getComponentState(store.getState());
+
+  switch (id) {
+    case LayerName.Heatmap:
+      return (
+        <HeatmapLayer
+          featureCollection={generateFeatureCollectionFrom(collections)}
+          selectedUuids={selectedUuids}
+          onClickMapPoint={onClickMapPoint}
+          tabNavigation={tabNavigation}
+          preferCurrentCentroid={componentParam.polygon === undefined}
+        />
+      );
+
+    case LayerName.Uncluster:
+      return (
+        <UnclusterLayer
+          featureCollection={generateFeatureCollectionFrom(collections)}
+          selectedUuids={selectedUuids}
+          onClickMapPoint={onClickMapPoint}
+          tabNavigation={tabNavigation}
+          preferCurrentCentroid={componentParam.polygon === undefined}
+        />
+      );
+
+    default:
+      return (
+        <ClusterLayer
+          featureCollection={generateFeatureCollectionFrom(collections)}
+          selectedUuids={selectedUuids}
+          onClickMapPoint={onClickMapPoint}
+          tabNavigation={tabNavigation}
+          preferCurrentCentroid={componentParam.polygon === undefined}
+        />
+      );
+  }
+};
+
 const MapSection: React.FC<MapSectionProps> = ({
   showFullList,
   showFullMap,
@@ -75,43 +129,6 @@ const MapSection: React.FC<MapSectionProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const tabNavigation = useTabNavigation();
-
-  const createPresentationLayers = useCallback(
-    (id: string | null) => {
-      switch (id) {
-        case LayerName.Heatmap:
-          return (
-            <HeatmapLayer
-              featureCollection={generateFeatureCollectionFrom(collections)}
-              selectedUuids={selectedUuids}
-              onClickMapPoint={onClickMapPoint}
-              tabNavigation={tabNavigation}
-            />
-          );
-
-        case LayerName.Uncluster:
-          return (
-            <UnclusterLayer
-              featureCollection={generateFeatureCollectionFrom(collections)}
-              selectedUuids={selectedUuids}
-              onClickMapPoint={onClickMapPoint}
-              tabNavigation={tabNavigation}
-            />
-          );
-
-        default:
-          return (
-            <ClusterLayer
-              featureCollection={generateFeatureCollectionFrom(collections)}
-              selectedUuids={selectedUuids}
-              onClickMapPoint={onClickMapPoint}
-              tabNavigation={tabNavigation}
-            />
-          );
-      }
-    },
-    [collections, onClickMapPoint, selectedUuids, tabNavigation]
-  );
 
   // Early return if it is full list view
   if (showFullList) return null;
@@ -206,7 +223,13 @@ const MapSection: React.FC<MapSectionProps> = ({
           />
         </Controls>
         <Layers>
-          {createPresentationLayers(selectedLayer)}
+          {createPresentationLayers(
+            selectedLayer,
+            collections,
+            selectedUuids,
+            tabNavigation,
+            onClickMapPoint
+          )}
           {createStaticLayers(staticLayer)}
         </Layers>
       </Map>

@@ -103,6 +103,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   selectedUuids,
   onClickMapPoint: onDatasetSelected,
   tabNavigation,
+  preferCurrentCentroid = true,
   clusterLayerConfig,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
@@ -270,13 +271,18 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
       setLastVisiblePoint((p) => {
-        const newData = findSuitableVisiblePoint(featureCollection, map, p);
+        const newData = findSuitableVisiblePoint(
+          featureCollection,
+          map,
+          p,
+          preferCurrentCentroid
+        );
 
         (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
         return newData;
       });
     }
-  }, [map, clusterSourceId, featureCollection]);
+  }, [map, clusterSourceId, featureCollection, preferCurrentCentroid]);
 
   useEffect(() => {
     updateSource();

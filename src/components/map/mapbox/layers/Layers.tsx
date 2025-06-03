@@ -14,6 +14,10 @@ export interface LayerBasicType {
   // dataset that user selected from result list or map
   selectedUuids?: string[];
   tabNavigation?: TabNavigation;
+  // True to make the centroid more sticky, so that centroid will stay in current
+  // location even map drag. Centroid only move when it is absolute necessary like
+  // outside of viewport.
+  preferCurrentCentroid?: boolean;
 }
 // Use to create static layer on map, you need to add menu item to select those layers,
 // refer to map section
@@ -75,7 +79,8 @@ const isFeatureVisible = (
 const findSuitableVisiblePoint = (
   featureCollection: FeatureCollection<Point>,
   map: mapboxgl.Map | null | undefined = undefined,
-  currentVisibleCollection: FeatureCollection<Point> | undefined = undefined
+  currentVisibleCollection: FeatureCollection<Point> | undefined = undefined,
+  preferCurrentCentroid: boolean = true
 ): FeatureCollection<Point> => {
   const featureCollections: FeatureCollection<Point> = {
     type: "FeatureCollection",
@@ -117,8 +122,10 @@ const findSuitableVisiblePoint = (
     if (!uniqueFeatures.has(id)) {
       // Is this point visible in previous search? If yes then we prefer this
       // point over the most center point, this helps to reduce point change
-      // for the same visible record
-      const f = currentVisible?.find((o) => o.properties?.uuid === id);
+      // for the same visible record if preferCurrentCentroid is true
+      const f = preferCurrentCentroid
+        ? currentVisible?.find((o) => o.properties?.uuid === id)
+        : feature;
       uniqueFeatures.set(feature.properties?.uuid, f ? f : feature);
     }
   }
