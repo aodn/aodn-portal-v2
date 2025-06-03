@@ -54,6 +54,47 @@ enum LayerName {
   Cluster = "cluster",
   Uncluster = "uncluster",
 }
+
+const createPresentationLayers = (
+  id: string | null,
+  collections: OGCCollection[],
+  selectedUuids: string[] | undefined,
+  tabNavigation: TabNavigation,
+  onClickMapPoint: ((uuids: Array<string>) => void) | undefined
+) => {
+  switch (id) {
+    case LayerName.Heatmap:
+      return (
+        <HeatmapLayer
+          featureCollection={generateFeatureCollectionFrom(collections)}
+          selectedUuids={selectedUuids}
+          onClickMapPoint={onClickMapPoint}
+          tabNavigation={tabNavigation}
+        />
+      );
+
+    case LayerName.Uncluster:
+      return (
+        <UnclusterLayer
+          featureCollection={generateFeatureCollectionFrom(collections)}
+          selectedUuids={selectedUuids}
+          onClickMapPoint={onClickMapPoint}
+          tabNavigation={tabNavigation}
+        />
+      );
+
+    default:
+      return (
+        <ClusterLayer
+          featureCollection={generateFeatureCollectionFrom(collections)}
+          selectedUuids={selectedUuids}
+          onClickMapPoint={onClickMapPoint}
+          tabNavigation={tabNavigation}
+        />
+      );
+  }
+};
+
 const MapSection: React.FC<MapSectionProps> = ({
   showFullList,
   showFullMap,
@@ -77,49 +118,6 @@ const MapSection: React.FC<MapSectionProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
 
   const tabNavigation = useTabNavigation();
-
-  const createPresentationLayers = useCallback(
-    (
-      id: string | null,
-      collections: OGCCollection[],
-      selectedUuids: string[] | undefined,
-      tabNavigation: TabNavigation,
-      onClickMapPoint: ((uuids: Array<string>) => void) | undefined
-    ) => {
-      switch (id) {
-        case LayerName.Heatmap:
-          return (
-            <HeatmapLayer
-              featureCollection={generateFeatureCollectionFrom(collections)}
-              selectedUuids={selectedUuids}
-              onClickMapPoint={onClickMapPoint}
-              tabNavigation={tabNavigation}
-            />
-          );
-
-        case LayerName.Uncluster:
-          return (
-            <UnclusterLayer
-              featureCollection={generateFeatureCollectionFrom(collections)}
-              selectedUuids={selectedUuids}
-              onClickMapPoint={onClickMapPoint}
-              tabNavigation={tabNavigation}
-            />
-          );
-
-        default:
-          return (
-            <ClusterLayer
-              featureCollection={generateFeatureCollectionFrom(collections)}
-              selectedUuids={selectedUuids}
-              onClickMapPoint={onClickMapPoint}
-              tabNavigation={tabNavigation}
-            />
-          );
-      }
-    },
-    []
-  );
 
   // Early return if it is full list view
   if (showFullList) return null;
