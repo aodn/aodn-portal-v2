@@ -33,7 +33,7 @@ class DetailPage(BasePage):
 
     def load(self, uuid: str) -> None:
         """Load the detail page for the given uuid"""
-        url = f'{settings.baseURL}/details?uuid={uuid}'
+        url = f'{settings.baseURL}/details/{uuid}'
         self.page.goto(url, wait_until='domcontentloaded')
 
     def get_tab_section(self, title: str) -> Locator:
