@@ -54,6 +54,7 @@ const UnclusterLayer: FC<UnclusterLayerProps> = ({
   selectedUuids,
   onClickMapPoint: onDatasetSelected,
   tabNavigation,
+  preferCurrentCentroid = true,
   unclusterLayerConfig,
 }: UnclusterLayerProps) => {
   const { map } = useContext(MapContext);
@@ -135,13 +136,18 @@ const UnclusterLayer: FC<UnclusterLayerProps> = ({
   const updateSource = useCallback(() => {
     if (map?.getSource(unclusterSourceId)) {
       setLastVisiblePoint((p) => {
-        const newData = findSuitableVisiblePoint(featureCollection, map, p);
+        const newData = findSuitableVisiblePoint(
+          featureCollection,
+          map,
+          p,
+          preferCurrentCentroid
+        );
 
         (map?.getSource(unclusterSourceId) as GeoJSONSource).setData(newData);
         return newData;
       });
     }
-  }, [map, unclusterSourceId, featureCollection]);
+  }, [map, unclusterSourceId, featureCollection, preferCurrentCentroid]);
 
   useEffect(() => {
     updateSource();

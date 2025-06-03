@@ -113,11 +113,11 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
   }
 
   return axios
-    .get<OGCCollections>("/api/v1/ogc/collections", {
+    .get<string>("/api/v1/ogc/collections", {
       params: p,
       timeout: TIMEOUT,
     })
-    .then((response) => jsonToOGCCollections(response.data))
+    .then((response) => response.data)
     .catch((error: Error | AxiosError | ErrorResponse) => {
       if (axios.isAxiosError(error) && error.response) {
         return thunkApi.rejectWithValue(
@@ -207,10 +207,11 @@ const fetchResultWithStore = createAsyncThunk<
 >("search/fetchResultWithStore", searchResult);
 /**
  * Trunk for async action and update searcher, limited return properties to reduce load time,
- * default it, title,description. This one do not attach extraReducer
+ * default it, title,description. This one do not attach extraReducer and must return string due to redux expect
+ * payload to be string. The caller need to call the jsonToCollections to convert it to OGCCollections class instance
  */
 const fetchResultNoStore = createAsyncThunk<
-  OGCCollections,
+  string,
   SearchParameters,
   { rejectValue: ErrorResponse }
 >("search/fetchResultNoStore", searchResult);
@@ -277,11 +278,15 @@ const searcher = createSlice({
   extraReducers(builder) {
     builder
       .addCase(fetchResultWithStore.fulfilled, (state, action) => {
-        state.collectionsQueryResult.result = action.payload;
+        state.collectionsQueryResult.result = jsonToOGCCollections(
+          // payload must be serializable aka no class method, so we need to defer class creation until here
+          action.payload
+        );
         state.collectionsQueryResult.query = action.meta.arg;
       })
       .addCase(fetchResultAppendStore.fulfilled, (state, action) => {
-        const new_collections = action.payload;
+        // payload must be serializable aka no class method, so we need to defer class creation until here
+        const new_collections = jsonToOGCCollections(action.payload);
         // Create a new instance so in case people need to use useState it signal an update
         state.collectionsQueryResult.result =
           state.collectionsQueryResult.result.clone();
@@ -445,6 +450,7 @@ export {
   fetchFeaturesByUuid,
   fetchParameterVocabsWithStore,
   processDatasetDownload,
+  jsonToOGCCollections,
 };
 
 export default searcher.reducer;

@@ -2,6 +2,7 @@ import React, { FC, useCallback, useContext, useEffect } from "react";
 import MapContext from "../MapContext";
 import {
   fetchResultNoStore,
+  jsonToOGCCollections,
   SearchParameters,
 } from "../../../common/store/searchReducer";
 import { MapLayerMouseEvent } from "mapbox-gl";
@@ -46,7 +47,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
 
       return dispatch(fetchResultNoStore(param))
         .unwrap()
-        .then((value: OGCCollections) => value.collections[0])
+        .then((value: string) => jsonToOGCCollections(value).collections[0])
         .catch((error: any) => {
           console.error("Error fetching collection data:", error);
           // TODO: handle error in ErrorBoundary

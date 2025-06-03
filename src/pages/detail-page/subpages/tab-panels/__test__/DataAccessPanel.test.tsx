@@ -4,7 +4,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "../../../../../utils/AppTheme";
 import { DetailPageProvider } from "../../../context/detail-page-provider";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import store from "../../../../../components/common/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
@@ -20,6 +20,7 @@ describe("DataAccessPanel", async () => {
     vi.mock("react-router-dom", () => ({
       ...vi.importActual("react-router-dom"),
       useLocation: vi.fn(),
+      useParams: vi.fn(),
       useNavigate: vi.fn(),
     }));
 
@@ -27,9 +28,15 @@ describe("DataAccessPanel", async () => {
       state: null,
       hash: "111",
       key: "default",
-      pathname: "/details",
-      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
     });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+
+    vi.mocked(useNavigate).mockReturnValue(vi.fn());
   });
 
   afterEach(() => {

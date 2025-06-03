@@ -6,7 +6,7 @@ import store from "../../../../../components/common/store/store";
 import { ThemeProvider } from "@mui/material/styles";
 import { DetailPageProvider } from "../../../context/detail-page-provider";
 import { server } from "../../../../../__mocks__/server";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CitationPanel from "../CitationPanel";
 
 describe("CitationPanel", async () => {
@@ -19,6 +19,7 @@ describe("CitationPanel", async () => {
     vi.mock("react-router-dom", () => ({
       ...vi.importActual("react-router-dom"),
       useLocation: vi.fn(),
+      useParams: vi.fn(),
       useNavigate: vi.fn(),
     }));
 
@@ -26,9 +27,15 @@ describe("CitationPanel", async () => {
       state: null,
       hash: "111",
       key: "default",
-      pathname: "/details",
-      search: "?uuid=5fc91100-4ade-11dc-8f56-00008a07204e",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
     });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+
+    vi.mocked(useNavigate).mockReturnValue(vi.fn());
   });
 
   afterEach(() => {
