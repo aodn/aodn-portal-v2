@@ -23,7 +23,9 @@ import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/Mapb
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
-import useTabNavigation from "../../../hooks/useTabNavigation";
+import useTabNavigation, {
+  TabNavigation,
+} from "../../../hooks/useTabNavigation";
 import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import BookmarkListMenu, {
   BookmarkListMenuBasicType,
@@ -77,7 +79,13 @@ const MapSection: React.FC<MapSectionProps> = ({
   const tabNavigation = useTabNavigation();
 
   const createPresentationLayers = useCallback(
-    (id: string | null) => {
+    (
+      id: string | null,
+      collections: OGCCollection[],
+      selectedUuids: string[] | undefined,
+      tabNavigation: TabNavigation,
+      onClickMapPoint: ((uuids: Array<string>) => void) | undefined
+    ) => {
       switch (id) {
         case LayerName.Heatmap:
           return (
@@ -110,7 +118,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           );
       }
     },
-    [collections, onClickMapPoint, selectedUuids, tabNavigation]
+    []
   );
 
   // Early return if it is full list view
@@ -206,7 +214,13 @@ const MapSection: React.FC<MapSectionProps> = ({
           />
         </Controls>
         <Layers>
-          {createPresentationLayers(selectedLayer)}
+          {createPresentationLayers(
+            selectedLayer,
+            collections,
+            selectedUuids,
+            tabNavigation,
+            onClickMapPoint
+          )}
           {createStaticLayers(staticLayer)}
         </Layers>
       </Map>
