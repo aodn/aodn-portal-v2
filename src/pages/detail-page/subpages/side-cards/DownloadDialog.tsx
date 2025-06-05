@@ -115,6 +115,12 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({ open, setOpen }) => {
           end_date: dateRange.end,
           multi_polygon: multiPolygon,
         },
+        outputs: {},
+        subscriber: {
+          successUri: "place_holder",
+          inProgressUri: "place_holder",
+          failedUri: "place_holder",
+        },
       };
 
       dispatch(processDatasetDownload(request))

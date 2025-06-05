@@ -23,6 +23,12 @@ export interface DatasetDownloadRequest {
     end_date: string;
     multi_polygon: MultiPolygon;
   };
+  outputs: object;
+  subscriber: {
+    successUri: string;
+    inProgressUri: string;
+    failedUri: string;
+  };
 }
 
 export class DateRangeCondition
