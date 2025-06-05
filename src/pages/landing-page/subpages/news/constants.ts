@@ -17,7 +17,7 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
     subheading: "Satellite Remote Sensing",
     date: "01/01/2008 >>",
     title: "Satellite Altimetry Calibration and Validation",
-    link: "https://portal.edge.aodn.org.au/details?uuid=78d588ed-79dd-47e2-b806-d39025194e7e&tab=abstract",
+    link: "https://portal.edge.aodn.org.au/details/78d588ed-79dd-47e2-b806-d39025194e7e?tab=summary",
   },
   {
     id: 2,
@@ -25,7 +25,7 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
     subheading: "Coastal Wave Buoys",
     date: "14/01/2018 >>",
     title: " Wave buoys Observations - Australia - near real-time",
-    link: "https://portal.edge.aodn.org.au/details?uuid=b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc&tab=abstract",
+    link: "https://portal.edge.aodn.org.au/details/b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc?tab=summary",
   },
   {
     id: 3,
@@ -33,6 +33,6 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
     subheading: "Ships of Opportunity",
     date: "01/01/2011 >>",
     title: "Fisheries vessels real-time data collection",
-    link: "https://portal.edge.aodn.org.au/details?uuid=0015db7e-e684-7548-e053-08114f8cd4ad&tab=abstract",
+    link: "https://portal.edge.aodn.org.au/details/0015db7e-e684-7548-e053-08114f8cd4ad?tab=summary",
   },
 ];
