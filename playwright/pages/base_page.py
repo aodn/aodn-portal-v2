@@ -77,6 +77,12 @@ class BasePage:
         """Click on the given heading"""
         self.get_heading(text).click()
 
+    def get_radio_input(self, text: str) -> Locator:
+        """Return the radio input element based on the visible label text"""
+        return self.page.locator(
+            f'[data-testid="radio-{text}"] input[type="radio"]'
+        )
+
     def get_collapse_list(self, item_list: str) -> Locator:
         """Returns collapse list container element"""
         return self.page.get_by_test_id(f'collapse-list-{item_list}')
