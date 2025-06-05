@@ -73,6 +73,7 @@ const fontSize = {
 
 const fontFamily = {
   general: "Noto Sans",
+  openSans: '"Open Sans", sans-serif',
 };
 
 const fontWeight = {
@@ -170,6 +171,11 @@ const shadow = {
   bottom: "0 2px 2px 0 rgba(0, 0, 0, 0.1)",
 };
 
+const lineHeight = {
+  body: "22px",
+  heading: "26px",
+};
+
 export {
   gap,
   margin,
@@ -184,4 +190,5 @@ export {
   filterList,
   zIndex,
   shadow,
+  lineHeight,
 };
