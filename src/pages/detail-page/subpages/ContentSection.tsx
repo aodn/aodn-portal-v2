@@ -29,69 +29,53 @@ const findTabIndex = (params: URLSearchParams, tabs: Tab[]) => {
   return index === -1 ? 0 : index;
 };
 
+const additionalInfoPanelTab: Tab = {
+  label: "Additional Information",
+  value: detailPageDefault.ADDITIONAL_INFO,
+  component: <AdditionalInfoPanel />,
+};
+
+const citationPanelTab: Tab = {
+  label: "Citation and Usage",
+  value: detailPageDefault.CITATION,
+  component: <CitationPanel />,
+};
+
+const dataAccessPanelTab: Tab = {
+  label: "Data Access",
+  value: detailPageDefault.DATA_ACCESS,
+  component: <DataAccessPanel />,
+};
+
+const associatedRecordsPanelTab: Tab = {
+  label: "Related Resources",
+  value: detailPageDefault.ASSOCIATED_RECORDS,
+  component: <AssociatedRecordsPanel />,
+};
+
+const summaryAndDownloadPanelTab = (
+  mapFocusArea: LngLatBounds | undefined
+): Tab => {
+  return {
+    label: "Summary",
+    value: detailPageDefault.SUMMARY,
+    component: <SummaryAndDownloadPanel bbox={mapFocusArea} />,
+  };
+};
+
 const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
   const { uuid } = useParams();
   const tabNavigation = useTabNavigation();
-  const summaryAndDownloadPanelTab: Tab = useMemo(
-    () => ({
-      label: "Summary",
-      value: detailPageDefault.SUMMARY,
-      component: <SummaryAndDownloadPanel bbox={mapFocusArea} />,
-    }),
-    [mapFocusArea]
-  );
-
-  const additionalInfoPanelTab: Tab = useMemo(
-    () => ({
-      label: "Additional Information",
-      value: detailPageDefault.ADDITIONAL_INFO,
-      component: <AdditionalInfoPanel />,
-    }),
-    []
-  );
-
-  const dataAccessPanelTab: Tab = useMemo(
-    () => ({
-      label: "Data Access",
-      value: detailPageDefault.DATA_ACCESS,
-      component: <DataAccessPanel />,
-    }),
-    []
-  );
-
-  const citationPanelTab: Tab = useMemo(
-    () => ({
-      label: "Citation and Usage",
-      value: detailPageDefault.CITATION,
-      component: <CitationPanel />,
-    }),
-    []
-  );
-
-  const associatedRecordsPanelTab: Tab = useMemo(
-    () => ({
-      label: "Related Resources",
-      value: detailPageDefault.ASSOCIATED_RECORDS,
-      component: <AssociatedRecordsPanel />,
-    }),
-    []
-  );
 
   const TABS: Tab[] = useMemo(
     () => [
-      summaryAndDownloadPanelTab,
+      summaryAndDownloadPanelTab(mapFocusArea),
       dataAccessPanelTab,
       citationPanelTab,
       additionalInfoPanelTab,
       associatedRecordsPanelTab,
     ],
-    [
-      additionalInfoPanelTab,
-      summaryAndDownloadPanelTab,
-      associatedRecordsPanelTab,
-      citationPanelTab,
-      dataAccessPanelTab,
-    ]
+    [mapFocusArea]
   );
 
   const location = useLocation();
