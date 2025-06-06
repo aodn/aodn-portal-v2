@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useMemo } from "react";
+import { FC, useContext, useEffect, useMemo, useRef } from "react";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
@@ -96,14 +96,16 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   onWMSAvailabilityChange,
 }: GeoServerTileLayerProps) => {
   const { map } = useContext(MapContext);
+  const tileLayerIdRef = useRef<string | null>(null);
+  const tileSourceIdRef = useRef<string | null>(null);
 
-  const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
-  const tileSourceId = useMemo(() => getTileSourceId(layerId), [layerId]);
-  const tileLayer = useMemo(() => getTileLayerId(layerId), [layerId]);
-
-  const config = mergeWithDefaults(
-    defaultGeoServerTileLayerConfig,
-    geoServerTileLayerConfig
+  const config = useMemo(
+    () =>
+      mergeWithDefaults(
+        defaultGeoServerTileLayerConfig,
+        geoServerTileLayerConfig
+      ),
+    [geoServerTileLayerConfig]
   );
 
   const tileUrl = formatToUrl<TileUrlParams>({
@@ -123,70 +125,89 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
 
   // Add the tile layer to the map
   useEffect(() => {
-    if (map === null) return;
+    if (map === null || map === undefined) return;
 
-    const createLayers = async () => {
-      // Check if source already exists to avoid duplicates
-      if (map?.getSource(tileSourceId)) return;
-
+    const createLayers = () => {
       // Check WMS availability before adding the layer
-
       if (isWMSAvailable) {
-        try {
-          // Add the WMS source following Mapbox's example
-          map?.addSource(tileSourceId, {
+        const layerId = getLayerId(map.getContainer().id);
+        tileLayerIdRef.current = getTileLayerId(layerId);
+        tileSourceIdRef.current = getTileSourceId(layerId);
+
+        // Add the WMS source following Mapbox's example
+        if (!map?.getSource(tileSourceIdRef.current)) {
+          map?.addSource(tileSourceIdRef.current, {
             type: "raster",
             tiles: [tileUrl],
             tileSize: config.tileSize,
             minzoom: config.minZoom,
             maxzoom: config.maxZoom,
           });
+        }
 
-          // Add the raster layer
+        // Add the raster layer
+        if (!map?.getLayer(tileLayerIdRef.current)) {
           map?.addLayer({
-            id: tileLayer,
+            id: tileLayerIdRef.current,
             type: "raster",
-            source: tileSourceId,
+            source: tileSourceIdRef.current,
             paint: {},
           });
-        } catch (error) {
-          console.log("Error adding layer or source:", error);
         }
+
+        const handleIdle = () => {
+          if (!isWMSAvailable) return;
+          fitToBound(map, config.bbox, {
+            animate: true,
+            zoomOffset: 0.5,
+          });
+        };
+        map?.once("idle", handleIdle);
+        // Re-add layers when map style changes
+        map?.on("styledata", createLayers);
       }
     };
 
-    const handleIdle = () => {
-      if (!isWMSAvailable) return;
-      fitToBound(map, config.bbox, {
-        animate: true,
-        zoomOffset: 0.5,
-      });
+    const cleanUp = () => {
+      if (map === null || map === undefined) return;
+
+      map?.off("styledata", createLayers);
+
+      // Important to check this because the map may be unloading and when you try
+      // to access getLayer or similar function, the style will be undefined and throw
+      // exception
+      if (isWMSAvailable && map?.isStyleLoaded()) {
+        if (tileLayerIdRef.current && map?.getLayer(tileLayerIdRef.current)) {
+          map?.removeLayer(tileLayerIdRef.current);
+          tileLayerIdRef.current = null;
+        }
+
+        if (
+          tileSourceIdRef.current &&
+          map?.getSource(tileSourceIdRef.current)
+        ) {
+          map?.removeSource(tileSourceIdRef.current);
+          tileSourceIdRef.current = null;
+        }
+      }
     };
 
     // Create layers when map loads
     map?.once("load", createLayers);
-    map?.once("idle", handleIdle);
-    // Re-add layers when map style changes
-    map?.on("styledata", createLayers);
 
     // Cleanup function
     return () => {
-      try {
-        map?.off("styledata", createLayers);
-
-        if (map?.getLayer(tileLayer)) {
-          map?.removeLayer(tileLayer);
-        }
-
-        if (map?.getSource(tileSourceId)) {
-          map?.removeSource(tileSourceId);
-        }
-      } catch (error) {
-        console.error("Error removing layer or source:", error);
-      }
+      cleanUp();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map]);
+  }, [
+    config.bbox,
+    config.maxZoom,
+    config.minZoom,
+    config.tileSize,
+    isWMSAvailable,
+    map,
+    tileUrl,
+  ]);
 
   return null;
 };

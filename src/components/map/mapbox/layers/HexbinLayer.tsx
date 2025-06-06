@@ -128,8 +128,12 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
       }
     };
 
-    const cleanup = () => {
-      if (overlayRef.current) {
+    map?.once("load", createHexbinLayer);
+    map?.on("styledata", createHexbinLayer);
+
+    return () => {
+      map?.off("styledata", createHexbinLayer);
+      if (overlayRef.current && map?.isStyleLoaded()) {
         map?.removeControl(overlayRef.current);
         overlayRef.current = null;
         if (popupRef.current) {
@@ -137,14 +141,6 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
           popupRef.current = null;
         }
       }
-    };
-
-    map?.once("load", createHexbinLayer);
-    map?.on("styledata", createHexbinLayer);
-
-    return () => {
-      map?.off("styledata", createHexbinLayer);
-      cleanup();
     };
   }, [createLayer, featureCollection, map]);
 
