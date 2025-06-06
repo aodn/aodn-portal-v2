@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useMemo, useRef } from "react";
+import { FC, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
@@ -96,8 +96,6 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   onWMSAvailabilityChange,
 }: GeoServerTileLayerProps) => {
   const { map } = useContext(MapContext);
-  const tileLayerIdRef = useRef<string | null>(null);
-  const tileSourceIdRef = useRef<string | null>(null);
 
   const config = useMemo(
     () =>
@@ -108,10 +106,14 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     [geoServerTileLayerConfig]
   );
 
-  const tileUrl = formatToUrl<TileUrlParams>({
-    baseUrl: config.baseUrl,
-    params: config.tileUrlParams,
-  });
+  const tileUrl = useMemo(
+    () =>
+      formatToUrl<TileUrlParams>({
+        baseUrl: config.baseUrl,
+        params: config.tileUrlParams,
+      }),
+    [config.baseUrl, config.tileUrlParams]
+  );
 
   const isWMSAvailable = useMemo(
     () =>
@@ -127,16 +129,16 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   useEffect(() => {
     if (map === null || map === undefined) return;
 
+    const layerId = getLayerId(map.getContainer().id);
+    const titleLayerId = getTileLayerId(layerId);
+    const sourceLayerId = getTileSourceId(layerId);
+
     const createLayers = () => {
       // Check WMS availability before adding the layer
       if (isWMSAvailable) {
-        const layerId = getLayerId(map.getContainer().id);
-        tileLayerIdRef.current = getTileLayerId(layerId);
-        tileSourceIdRef.current = getTileSourceId(layerId);
-
         // Add the WMS source following Mapbox's example
-        if (!map?.getSource(tileSourceIdRef.current)) {
-          map?.addSource(tileSourceIdRef.current, {
+        if (!map?.getSource(sourceLayerId)) {
+          map?.addSource(sourceLayerId, {
             type: "raster",
             tiles: [tileUrl],
             tileSize: config.tileSize,
@@ -146,11 +148,11 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
         }
 
         // Add the raster layer
-        if (!map?.getLayer(tileLayerIdRef.current)) {
+        if (!map?.getLayer(titleLayerId)) {
           map?.addLayer({
-            id: tileLayerIdRef.current,
+            id: titleLayerId,
             type: "raster",
-            source: tileSourceIdRef.current,
+            source: sourceLayerId,
             paint: {},
           });
         }
@@ -177,17 +179,12 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
       // to access getLayer or similar function, the style will be undefined and throw
       // exception
       if (isWMSAvailable && map?.isStyleLoaded()) {
-        if (tileLayerIdRef.current && map?.getLayer(tileLayerIdRef.current)) {
-          map?.removeLayer(tileLayerIdRef.current);
-          tileLayerIdRef.current = null;
+        if (titleLayerId && map?.getLayer(titleLayerId)) {
+          map?.removeLayer(titleLayerId);
         }
 
-        if (
-          tileSourceIdRef.current &&
-          map?.getSource(tileSourceIdRef.current)
-        ) {
-          map?.removeSource(tileSourceIdRef.current);
-          tileSourceIdRef.current = null;
+        if (sourceLayerId && map?.getSource(sourceLayerId)) {
+          map?.removeSource(sourceLayerId);
         }
       }
     };
