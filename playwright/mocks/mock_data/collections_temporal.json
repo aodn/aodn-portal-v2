@@ -1,0 +1,5359 @@
+{
+  "links": [],
+  "collections": [
+    {
+      "properties": {},
+      "id": "0145df96-3847-474b-8b63-a66f0e03ff54",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2023-01-22T13:00:00.000+00:00", null],
+            ["2023-01-22T13:00:00.000+00:00", "2023-01-23T12:59:59.000+00:00"],
+            [null, null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "04abc909-d691-435e-a50f-3d22ae875fb6",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-05-14T14:00:00.000+00:00", "2015-05-26T13:59:59.000+00:00"],
+            ["2015-05-14T14:00:00.000+00:00", "2015-05-26T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "06b09398-d3d0-47dc-a54a-a745319fbece",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-03-26T06:00:00.000+00:00", "2019-11-30T12:59:59.000+00:00"],
+            ["2007-03-26T06:00:00.000+00:00", "2019-11-30T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1045cb37-d0de-4596-8e5f-c9e77df44742",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-04-09T14:00:00.000+00:00", "2019-04-22T13:59:59.000+00:00"],
+            ["2019-04-09T14:00:00.000+00:00", "2019-04-22T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "105dc69b-a00f-0eba-e053-08114f8c131d",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-01-28T13:00:00.000+00:00", "2015-02-18T12:59:59.000+00:00"],
+            ["2015-01-28T13:00:00.000+00:00", "2015-02-18T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1160f9f9-c2b1-027f-e053-08114f8c709e",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-03-19T13:00:00.000+00:00", "2015-03-29T12:59:59.000+00:00"],
+            ["2015-03-19T13:00:00.000+00:00", "2015-03-29T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "13409b16-ec19-6348-e053-08114f8c4e79",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-03-19T13:00:00.000+00:00", "2015-03-29T12:59:59.000+00:00"],
+            ["2015-03-19T13:00:00.000+00:00", "2015-03-29T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1880cd63-d0f9-42e0-b073-7082527945f2",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-10-18T13:00:00.000+00:00", "2019-12-17T12:59:59.000+00:00"],
+            ["2019-10-18T13:00:00.000+00:00", "2019-12-17T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "198384050",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1984-01-16T13:00:00.000+00:00", "1984-02-07T12:59:59.000+00:00"],
+            ["1984-01-16T13:00:00.000+00:00", "1984-02-07T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "198485050",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1985-01-03T13:00:00.000+00:00", "1985-04-15T13:59:59.000+00:00"],
+            ["1985-01-03T13:00:00.000+00:00", "1985-04-15T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "198990072",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1990-05-06T14:00:00.000+00:00", "1990-07-04T13:59:59.000+00:00"],
+            ["1990-05-06T14:00:00.000+00:00", "1990-07-04T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "199091060",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1991-01-02T13:00:00.000+00:00", "1991-03-20T12:59:59.000+00:00"],
+            ["1991-01-02T13:00:00.000+00:00", "1991-03-20T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "199293010",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1992-10-23T13:00:00.000+00:00", "1992-11-23T12:59:59.000+00:00"],
+            ["1992-10-23T13:00:00.000+00:00", "1992-11-23T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "199394010",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1993-08-06T14:00:00.000+00:00", "1993-10-09T12:59:59.000+00:00"],
+            ["1993-08-06T14:00:00.000+00:00", "1993-10-09T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "199394020",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1993-10-11T13:00:00.000+00:00", "1993-11-17T12:59:59.000+00:00"],
+            ["1993-10-11T13:00:00.000+00:00", "1993-11-17T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "199697020",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1996-09-25T14:00:00.000+00:00", "1996-11-24T12:59:59.000+00:00"],
+            ["1996-09-25T14:00:00.000+00:00", "1996-11-24T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "199900010",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1999-07-12T14:00:00.000+00:00", "1999-09-06T13:59:59.000+00:00"],
+            ["1999-07-12T14:00:00.000+00:00", "1999-09-06T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1af29b87-9fec-4da3-9c95-6203a5387f47",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2017-03-05T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2017-03-05T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "200607030",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-01-14T13:00:00.000+00:00", "2007-02-19T12:59:59.000+00:00"],
+            ["2007-01-14T13:00:00.000+00:00", "2007-02-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "2696d428-82a3-426d-8f79-9bd3b168cf59",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-12-21T13:00:00.000+00:00", "2018-12-23T12:59:59.000+00:00"],
+            ["2018-12-21T13:00:00.000+00:00", "2018-12-23T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "2a69093d-4878-4c62-bb34-e8f1f3ab204d",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-04-27T14:00:00.000+00:00", "2019-05-08T13:59:59.000+00:00"],
+            ["2019-04-27T14:00:00.000+00:00", "2019-05-08T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "2c516bf2-2420-44c1-8412-a0f70bb077aa",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-01-17T13:00:00.000+00:00", "2019-03-04T12:59:59.000+00:00"],
+            ["2019-01-17T13:00:00.000+00:00", "2019-03-04T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "2f90fb64-bf72-48ac-a5b0-04e46d628e27",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-12-26T13:00:00.000+00:00", "2019-01-10T12:59:59.000+00:00"],
+            ["2018-12-26T13:00:00.000+00:00", "2019-01-10T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "357415da-3f17-4a68-bbe2-196e1c8bbb00",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2020-01-09T13:00:00.000+00:00", "2020-03-06T12:59:59.000+00:00"],
+            ["2020-01-09T13:00:00.000+00:00", "2020-03-06T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "399c246c-1162-4630-842f-383e0d5138ef",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-11-22T13:00:00.000+00:00", "2018-12-19T12:59:59.000+00:00"],
+            ["2018-11-22T13:00:00.000+00:00", "2018-12-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "3ae1afb1-bfd3-4fbd-9d0b-e8740cad8afc",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-09-10T14:00:00.000+00:00", "2018-10-08T12:59:59.000+00:00"],
+            ["2018-09-10T14:00:00.000+00:00", "2018-10-08T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "3db27b9c-0b65-45f4-b78a-12d508e1bc00",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-10-03T14:00:00.000+00:00", "2019-10-14T12:59:59.000+00:00"],
+            ["2019-10-03T14:00:00.000+00:00", "2019-10-14T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "4073e9e7-dafa-4fa4-b6ad-1c5b9837bb81",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-08-19T14:00:00.000+00:00", "2018-08-24T13:59:59.000+00:00"],
+            ["2018-08-19T14:00:00.000+00:00", "2018-08-24T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "43a4200a-a9b6-4e63-b5e3-9947ef527c67",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2020-03-12T13:00:00.000+00:00", "2020-03-19T12:59:59.000+00:00"],
+            ["2020-03-12T13:00:00.000+00:00", "2020-03-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "4750a2f7-7c43-4a67-88a3-1f80b2e8bfa1",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2023-10-08T13:00:00.000+00:00", "2023-11-02T12:59:59.000+00:00"],
+            ["2023-10-08T13:00:00.000+00:00", "2023-11-02T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "48cf3cb9-caa9-4633-9baa-8bba3c4d904a",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1992-03-09T13:00:00.000+00:00", null],
+            ["1992-03-09T13:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "4ac6bf81-cd37-4611-8da8-4d5ae5e2bda3",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-01-09T05:00:00.000+00:00", null],
+            ["2014-01-09T05:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "4c52d610-75fd-414d-908d-de8b82159535",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-09-08T14:00:00.000+00:00", "2019-09-29T13:59:59.000+00:00"],
+            ["2019-09-08T14:00:00.000+00:00", "2019-09-29T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "4f919dd3-7b20-4401-a8e5-363cc45e3185",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-04-05T14:00:00.000+00:00", "2018-04-14T13:59:59.000+00:00"],
+            ["2018-04-05T14:00:00.000+00:00", "2018-04-14T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "52be7c04-c8ee-4d00-823d-4b48f84c6872",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-03-13T13:00:00.000+00:00", "2019-04-03T12:59:59.000+00:00"],
+            ["2019-03-13T13:00:00.000+00:00", "2019-04-03T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "54158abf-7d02-4e66-8529-48ba6e286d63",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-10-03T14:00:00.000+00:00", "2019-10-14T12:59:59.000+00:00"],
+            ["2019-10-03T14:00:00.000+00:00", "2019-10-14T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "5ed6bb3a-ee6d-4fc2-8918-51d3d867cb07",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-05-13T14:00:00.000+00:00", "2018-05-21T13:59:59.000+00:00"],
+            ["2018-05-13T14:00:00.000+00:00", "2018-05-21T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "611ae479-24d5-4650-8c14-108706cf4d38",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2023-01-24T13:00:00.000+00:00", "2023-03-02T12:59:59.000+00:00"],
+            ["2023-01-24T13:00:00.000+00:00", "2023-03-02T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "6410e1be-54ce-4735-80cc-fed387d6e9ae",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-09-23T14:00:00.000+00:00", "2017-10-08T12:59:59.000+00:00"],
+            ["2017-09-23T14:00:00.000+00:00", "2017-10-08T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "643384d6-13ba-4291-9998-f74afa217125",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-06-14T14:00:00.000+00:00", "2019-06-20T13:59:59.000+00:00"],
+            ["2019-06-14T14:00:00.000+00:00", "2019-06-20T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "64d50449-efa8-45b4-ac56-4a2186fb73eb",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2024-03-08T13:00:00.000+00:00", "2024-03-20T12:59:59.000+00:00"],
+            ["2024-03-08T13:00:00.000+00:00", "2024-03-20T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "6a513fe9-fed7-4ed0-a35a-4b23e8ed172f",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2023-11-14T13:00:00.000+00:00", "2023-12-20T12:59:59.000+00:00"],
+            ["2023-11-14T13:00:00.000+00:00", "2023-12-20T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "6bed374a-3e86-4bbb-b8d1-a6bf8e2fa183",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2005-05-05T14:00:00.000+00:00", "2005-10-20T12:59:59.000+00:00"],
+            ["2005-05-05T14:00:00.000+00:00", "2005-10-20T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "6ee51085-2add-4dd2-81df-96df2e6d4d4b",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-06-09T14:00:00.000+00:00", "2021-06-23T13:59:59.000+00:00"],
+            ["2021-06-09T14:00:00.000+00:00", "2021-06-23T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "70f148b1-7040-4fad-944a-456413c95472",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-10-12T13:00:00.000+00:00", "2023-12-05T12:59:59.000+00:00"],
+            ["2018-10-12T13:00:00.000+00:00", "2023-12-05T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "76d3642e-d27d-405b-b9af-02bdb3645ba1",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2009-05-31T14:00:00.000+00:00", null],
+            ["2009-05-31T14:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "772d90eb-00b3-4a90-b36a-f08198afe2dd",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-09-27T14:00:00.000+00:00", "2016-10-24T12:59:59.000+00:00"],
+            ["2016-09-27T14:00:00.000+00:00", "2016-10-24T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "831b4113-8b50-4aa9-b8f7-2a902c3478b2",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-05-07T14:00:00.000+00:00", "2021-06-03T13:59:59.000+00:00"],
+            ["2021-05-07T14:00:00.000+00:00", "2021-06-03T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "888d9f49-5d19-49fb-96cd-b26b94bcc2ee",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2020-08-26T14:00:00.000+00:00", "2020-09-12T13:59:59.000+00:00"],
+            ["2020-08-26T14:00:00.000+00:00", "2020-09-12T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "8986ce62-e406-4835-9684-30dee7fd16ac",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-08-05T14:00:00.000+00:00", "2019-09-02T13:59:59.000+00:00"],
+            ["2019-08-05T14:00:00.000+00:00", "2019-09-02T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "8f02038a-bab0-4c41-adc3-b107830b54d0",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-07-19T14:00:00.000+00:00", "2019-08-02T13:59:59.000+00:00"],
+            ["2019-07-19T14:00:00.000+00:00", "2019-08-02T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "9117b865-35b5-441a-b4a9-34b418ebeb9f",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2020-12-04T13:00:00.000+00:00", "2020-01-16T12:59:59.000+00:00"],
+            ["2020-12-04T13:00:00.000+00:00", "2020-01-16T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "9ddc6c88-9572-4659-9fd1-055b1d3ad3af",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-01-28T13:00:00.000+00:00", "2021-03-24T12:59:59.000+00:00"],
+            ["2021-01-28T13:00:00.000+00:00", "2021-03-24T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "9ea3ba1b-2eb3-4394-9b23-f0323b29ecdd",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-04-18T14:00:00.000+00:00", "2018-05-10T13:59:59.000+00:00"],
+            ["2018-04-18T14:00:00.000+00:00", "2018-05-10T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "9efa25cd-4da4-47b5-9385-45e3cbd11705",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1992-03-09T13:00:00.000+00:00", null],
+            ["1992-03-09T13:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "9f16351d-eec1-4223-a761-c711ebb9c7d9",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2009-08-05T14:00:00.000+00:00", "2011-03-06T12:59:59.000+00:00"],
+            ["2009-08-05T14:00:00.000+00:00", "2011-03-06T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "9f93208d-6287-4b74-b802-e92c0b2e66db",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-10-18T13:00:00.000+00:00", "2019-12-17T12:59:59.000+00:00"],
+            ["2019-10-18T13:00:00.000+00:00", "2019-12-17T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AADC-00099",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1990-05-31T14:00:00.000+00:00", "2023-01-31T12:59:59.000+00:00"],
+            ["1990-05-31T14:00:00.000+00:00", "2023-01-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAD_Hydroacoustics_data_All",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1990-05-03T14:00:00.000+00:00", null],
+            ["1990-05-03T14:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_2691_Clark_et_al_2016",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1998-12-31T13:00:00.000+00:00", "2006-12-12T12:59:59.000+00:00"],
+            ["1998-12-31T13:00:00.000+00:00", "2006-12-12T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_2926",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-09-29T14:00:00.000+00:00", "2013-03-31T12:59:59.000+00:00"],
+            ["2007-09-29T14:00:00.000+00:00", "2013-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_3051_amphipod_sequences",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2002-01-31T13:00:00.000+00:00", "2010-01-31T12:59:59.000+00:00"],
+            ["2002-01-31T13:00:00.000+00:00", "2004-01-31T12:59:59.000+00:00"],
+            ["2006-12-31T13:00:00.000+00:00", "2010-01-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_3051_urchin_genetics",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-11-12T13:00:00.000+00:00", "2010-02-25T12:59:59.000+00:00"],
+            ["2006-11-12T13:00:00.000+00:00", "2006-12-14T12:59:59.000+00:00"],
+            ["2009-01-13T13:00:00.000+00:00", "2009-01-29T12:59:59.000+00:00"],
+            ["2009-11-11T13:00:00.000+00:00", "2010-02-22T12:59:59.000+00:00"],
+            ["2010-01-26T13:00:00.000+00:00", "2010-02-25T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_3054_09_10_ecotox",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2010-01-19T13:00:00.000+00:00", "2010-06-02T13:59:59.000+00:00"],
+            ["2010-01-19T13:00:00.000+00:00", "2010-06-02T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_3054_zooplankton",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2010-12-17T13:00:00.000+00:00", "2011-03-24T12:59:59.000+00:00"],
+            ["2010-12-17T13:00:00.000+00:00", "2011-03-24T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_3132",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2010-04-01T13:00:00.000+00:00", "2010-04-12T13:59:59.000+00:00"],
+            ["2010-04-01T13:00:00.000+00:00", "2010-04-12T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_3134",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2009-09-29T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"],
+            ["2009-09-29T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_3134_urchins_climate_change",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2011-11-30T13:00:00.000+00:00", "2012-03-15T12:59:59.000+00:00"],
+            ["2011-11-30T13:00:00.000+00:00", "2012-02-28T12:59:59.000+00:00"],
+            ["2011-12-31T13:00:00.000+00:00", "2012-03-15T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_3214",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2011-09-30T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"],
+            ["2011-09-30T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_3227_predicted_habitat",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1989-12-31T13:00:00.000+00:00", "2010-12-31T12:59:59.000+00:00"],
+            ["1989-12-31T13:00:00.000+00:00", "2010-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4026_Metadata_Molecular_Data",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-11-18T13:00:00.000+00:00", "2014-12-07T12:59:59.000+00:00"],
+            ["2014-11-18T13:00:00.000+00:00", "2014-12-07T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4026_Microscopy",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-11-18T13:00:00.000+00:00", "2014-12-07T12:59:59.000+00:00"],
+            ["2014-11-18T13:00:00.000+00:00", "2014-12-07T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4026_Microscopy_Multivariate_Statistics_Rcode",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-11-18T13:00:00.000+00:00", "2014-12-07T12:59:59.000+00:00"],
+            ["2014-11-18T13:00:00.000+00:00", "2014-12-07T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4026_Pigments_CHEMTAX",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-06-30T14:00:00.000+00:00", "2015-06-30T13:59:59.000+00:00"],
+            ["2008-06-30T14:00:00.000+00:00", "2015-06-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4026_Silicification_CO2",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-11-18T13:00:00.000+00:00", "2018-06-30T13:59:59.000+00:00"],
+            ["2014-11-18T13:00:00.000+00:00", "2015-01-14T12:59:59.000+00:00"],
+            ["2017-05-31T14:00:00.000+00:00", "2018-06-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4050_SWARM",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-02-07T13:00:00.000+00:00", "2006-02-27T12:59:59.000+00:00"],
+            ["2006-02-07T13:00:00.000+00:00", "2006-02-27T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4051_biogeochemistry",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-09-25T14:00:00.000+00:00", "2012-10-29T12:59:59.000+00:00"],
+            ["2012-09-25T14:00:00.000+00:00", "2012-10-29T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4078_Diatom_Images",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1999-03-31T14:00:00.000+00:00", "2004-06-30T13:59:59.000+00:00"],
+            ["1999-03-31T14:00:00.000+00:00", "2004-06-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4078_diatoms_biogenic_flux",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2001-11-29T13:00:00.000+00:00", "2002-09-29T13:59:59.000+00:00"],
+            ["2001-11-29T13:00:00.000+00:00", "2002-09-29T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4078_diatoms_biogenic_flux_subantarctic",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1997-08-31T14:00:00.000+00:00", "2007-10-31T12:59:59.000+00:00"],
+            ["1999-06-30T14:00:00.000+00:00", "2001-10-31T12:59:59.000+00:00"],
+            ["1997-08-31T14:00:00.000+00:00", "2007-10-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4100_MI_marine_CuZnCd",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-03-31T13:00:00.000+00:00", "2015-04-30T13:59:59.000+00:00"],
+            ["2012-03-31T13:00:00.000+00:00", "2015-04-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4102_AcousticEventLog2013",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2013-01-30T13:00:00.000+00:00", "2013-03-16T12:59:59.000+00:00"],
+            ["2013-01-30T13:00:00.000+00:00", "2013-03-16T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4102_SonobuoyAudio2015",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-01-28T13:00:00.000+00:00", "2015-03-11T12:59:59.000+00:00"],
+            ["2015-01-28T13:00:00.000+00:00", "2015-03-11T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4102_SonobuoyData2012",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-01-06T13:00:00.000+00:00", "2012-03-30T12:59:59.000+00:00"],
+            ["2012-01-06T13:00:00.000+00:00", "2012-03-30T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4102_SonobuoyData2017",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-21T13:00:00.000+00:00", "2017-03-18T12:59:59.000+00:00"],
+            ["2017-01-21T13:00:00.000+00:00", "2017-03-18T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4102_Visobs2012",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-01-11T13:00:00.000+00:00", "2012-03-30T12:59:59.000+00:00"],
+            ["2012-01-11T13:00:00.000+00:00", "2012-01-25T12:59:59.000+00:00"],
+            ["2012-03-12T13:00:00.000+00:00", "2012-03-30T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4116_4528_Coastal_Exposure",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1978-12-31T13:00:00.000+00:00", "2020-12-31T12:59:59.000+00:00"],
+            ["1978-12-31T13:00:00.000+00:00", "2020-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4127_Respiration_chambers",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-01-26T13:00:00.000+00:00", "2015-02-23T12:59:59.000+00:00"],
+            ["2015-01-26T13:00:00.000+00:00", "2015-02-23T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4127_Sediment_pigment_data",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-11-30T13:00:00.000+00:00", "2015-03-01T12:59:59.000+00:00"],
+            ["2014-11-30T13:00:00.000+00:00", "2015-03-01T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4127_antFOCE_Biofilms_Eukaryotes",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-12-27T13:00:00.000+00:00", "2015-03-04T12:59:59.000+00:00"],
+            ["2014-12-27T13:00:00.000+00:00", "2015-03-04T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4142_Microgastropods_Toxicity_Dispersants",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2013-07-31T14:00:00.000+00:00", "2014-05-31T13:59:59.000+00:00"],
+            ["2013-07-31T14:00:00.000+00:00", "2014-05-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4142_Nemertean_Toxicity_Dispersants",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-01-02T13:00:00.000+00:00", "2015-03-02T12:59:59.000+00:00"],
+            ["2014-01-02T13:00:00.000+00:00", "2015-03-02T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4142_Paramoera_walkeri_dispersant_fuel_toxicity",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-01-29T13:00:00.000+00:00", "2014-07-09T13:59:59.000+00:00"],
+            ["2014-01-29T13:00:00.000+00:00", "2014-07-09T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4142_Polychaete_Toxicity_Dispersants",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-07-18T14:00:00.000+00:00", "2014-09-02T13:59:59.000+00:00"],
+            ["2014-07-18T14:00:00.000+00:00", "2014-09-02T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4177_Abatus_Morphology_Davis_2012_13",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2013-01-02T13:00:00.000+00:00", "2013-01-17T12:59:59.000+00:00"],
+            ["2013-01-02T13:00:00.000+00:00", "2013-01-17T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4177_Rock_Cod_Wastewater",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-11-30T13:00:00.000+00:00", "2013-02-28T12:59:59.000+00:00"],
+            ["2012-11-30T13:00:00.000+00:00", "2013-02-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4180_Marine-sediment-contaminants_Casey_1997-2015",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1996-12-31T13:00:00.000+00:00", "2015-02-19T12:59:59.000+00:00"],
+            ["1996-12-31T13:00:00.000+00:00", "2015-02-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4180_TV-LTM1415_SedimentChemistry",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-01-13T13:00:00.000+00:00", "2015-02-19T12:59:59.000+00:00"],
+            ["2015-01-13T13:00:00.000+00:00", "2015-02-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4289_marine_ice",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-09-30T14:00:00.000+00:00", "2022-11-30T12:59:59.000+00:00"],
+            ["2018-09-30T14:00:00.000+00:00", "2022-11-30T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4291_AAV2_201617_sea_ice",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-12-17T13:00:00.000+00:00", "2017-01-13T12:59:59.000+00:00"],
+            ["2016-12-17T13:00:00.000+00:00", "2017-01-13T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4298_Davis2015_Sea_Ice_Bio_Optics",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-11-17T13:00:00.000+00:00", "2017-12-03T12:59:59.000+00:00"],
+            ["2015-11-17T13:00:00.000+00:00", "2017-12-03T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4313_Larval_Fish_Bycatch_ID",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-06-30T14:00:00.000+00:00", "2018-06-30T13:59:59.000+00:00"],
+            ["2014-06-30T14:00:00.000+00:00", "2018-06-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4326_microalga_toxicity",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-04-30T14:00:00.000+00:00", "2016-02-29T12:59:59.000+00:00"],
+            ["2015-04-30T14:00:00.000+00:00", "2016-02-29T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4333_IN2017_V01_C022_KC11_Diatom_Data",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2017-03-05T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2017-03-05T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4333_IN2017_V01_Multicore_Diatom_Data",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2024-12-01T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2024-12-01T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4333_IN2017_V01_Radiolarian_Data",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2017-03-05T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2017-03-05T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4344_K-AXIS_Science_Event_Log_Scanned",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-01-10T13:00:00.000+00:00", "2016-02-19T12:59:59.000+00:00"],
+            ["2016-01-10T13:00:00.000+00:00", "2016-02-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4344_K-AXIS_Science_Event_Log_UW_LatLon",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-01-10T13:00:00.000+00:00", "2016-02-19T12:59:59.000+00:00"],
+            ["2016-01-10T13:00:00.000+00:00", "2016-02-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4344_K-AXIS_Science_Event_Log_nonQC",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-01-10T13:00:00.000+00:00", "2016-02-19T12:59:59.000+00:00"],
+            ["2016-01-10T13:00:00.000+00:00", "2016-02-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4347_Sea_Ice_Model_Configurations",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2014-06-30T14:00:00.000+00:00", "2016-06-30T13:59:59.000+00:00"],
+            ["2014-06-30T14:00:00.000+00:00", "2016-06-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4355_U-Pb-Hf_Bruce_Naturaliste",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2015-12-31T13:00:00.000+00:00", "2020-01-31T12:59:59.000+00:00"],
+            ["2015-12-31T13:00:00.000+00:00", "2020-01-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4392_Davis_Satellite_Bathymetry",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-01-17T13:00:00.000+00:00", "2012-01-18T12:59:59.000+00:00"],
+            ["2012-01-17T13:00:00.000+00:00", "2012-01-18T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4392_Mawson_Satellite_Bathymetry",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-28T13:00:00.000+00:00", "2017-01-29T12:59:59.000+00:00"],
+            ["2017-01-28T13:00:00.000+00:00", "2017-01-29T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419_Nd_isotopes_SW",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419_REE_Leach_sediment",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419_REE_SW",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2020-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2020-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419_Th_U_isotopes_sediment",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419_Th_isotopes_SW",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2020-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2020-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419_Trace_elements_Bulk_sediment",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419_Trace_elements_detrital_sediment_MC",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419__REE_Detrital_sediment",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419_stable_isotopes_sediment",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4431_CAMMPCAN_GEOS_Chem_Model_AA_2017-18",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-10-28T13:00:00.000+00:00", "2018-03-26T12:59:59.000+00:00"],
+            ["2017-10-28T13:00:00.000+00:00", "2018-03-26T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4434_ACE_HOSM",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-21T13:00:00.000+00:00", "2017-03-18T12:59:59.000+00:00"],
+            ["2017-01-21T13:00:00.000+00:00", "2017-03-18T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4434_ACE_WAMOS",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-11-18T13:00:00.000+00:00", "2017-03-19T12:59:59.000+00:00"],
+            ["2016-11-18T13:00:00.000+00:00", "2017-03-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4518_MacRobertson_Land_Adelie_Penguins",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1991-09-30T14:00:00.000+00:00", "2019-03-31T12:59:59.000+00:00"],
+            ["1991-09-30T14:00:00.000+00:00", "2019-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4528_ICESat-2-wave-attenuation-tracks",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-01-31T13:00:00.000+00:00", "2019-12-31T12:59:59.000+00:00"],
+            ["2019-01-31T13:00:00.000+00:00", "2019-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4567_TG_deepening_Wind_2023",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-06-30T14:00:00.000+00:00", "2023-06-30T13:59:59.000+00:00"],
+            ["2019-06-30T14:00:00.000+00:00", "2023-06-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4593_Motion_2021_Casey",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-08-30T14:00:00.000+00:00", "2021-10-05T12:59:59.000+00:00"],
+            ["2021-08-30T14:00:00.000+00:00", "2021-10-05T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4600_EastAus_humpback_satellite_tracking_data",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-10-23T13:00:00.000+00:00", "2011-07-27T13:59:59.000+00:00"],
+            ["2008-10-23T13:00:00.000+00:00", "2011-07-27T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4600_Projectile_flight",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-06-30T14:00:00.000+00:00", "2024-06-30T13:59:59.000+00:00"],
+            ["2019-06-30T14:00:00.000+00:00", "2024-06-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4629_HPSeis_23-24",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2023-12-15T13:00:00.000+00:00", "2023-12-26T12:59:59.000+00:00"],
+            ["2023-12-15T13:00:00.000+00:00", "2023-12-26T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4635_organic_carbon_pack_ice_1989_2019",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1989-09-16T14:00:00.000+00:00", "2019-03-31T12:59:59.000+00:00"],
+            ["1989-09-16T14:00:00.000+00:00", "2019-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4636_KACTAS_KAOS_KRILL",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2001-01-13T13:00:00.000+00:00", "2003-02-01T12:59:59.000+00:00"],
+            ["2001-01-13T13:00:00.000+00:00", "2001-01-21T12:59:59.000+00:00"],
+            ["2003-01-15T13:00:00.000+00:00", "2003-02-01T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_5097_DAP_Acoustic_Mooring",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-07-21T14:00:00.000+00:00", "2022-02-08T12:59:59.000+00:00"],
+            ["2021-07-21T14:00:00.000+00:00", "2022-02-08T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_5097_DAP_Current_Profiling",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-09-15T14:00:00.000+00:00", "2021-12-20T12:59:59.000+00:00"],
+            ["2021-09-15T14:00:00.000+00:00", "2021-12-20T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1044",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2000-09-29T13:00:00.000+00:00", "2001-03-31T13:59:59.000+00:00"],
+            ["2000-09-29T13:00:00.000+00:00", "2001-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1132",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1997-09-30T14:00:00.000+00:00", "2000-11-29T12:59:59.000+00:00"],
+            ["1997-09-30T14:00:00.000+00:00", "2000-11-29T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1132-1",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2002-05-28T14:00:00.000+00:00", "2002-12-11T12:59:59.000+00:00"],
+            ["2002-05-28T14:00:00.000+00:00", "2002-12-11T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1144",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1999-09-30T14:00:00.000+00:00", "2002-04-01T13:59:59.000+00:00"],
+            ["1999-09-30T14:00:00.000+00:00", "2002-04-01T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1148_Weddells",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2000-10-26T13:00:00.000+00:00", "2003-01-15T12:59:59.000+00:00"],
+            ["2000-10-26T13:00:00.000+00:00", "2000-12-10T12:59:59.000+00:00"],
+            ["2001-10-24T13:00:00.000+00:00", "2001-12-05T12:59:59.000+00:00"],
+            ["2002-10-24T13:00:00.000+00:00", "2003-01-15T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1166",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2000-10-31T13:00:00.000+00:00", "2000-11-30T12:59:59.000+00:00"],
+            ["2000-10-31T13:00:00.000+00:00", "2000-11-30T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1189_Report",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1999-06-30T14:00:00.000+00:00", "2012-06-30T13:59:59.000+00:00"],
+            ["1999-06-30T14:00:00.000+00:00", "2012-06-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1189_benthic_database",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1986-01-25T13:00:00.000+00:00", "2006-02-23T12:59:59.000+00:00"],
+            ["1986-01-25T13:00:00.000+00:00", "2006-02-23T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1302",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2001-11-19T13:00:00.000+00:00", "2010-03-31T12:59:59.000+00:00"],
+            ["2001-11-19T13:00:00.000+00:00", "2001-12-11T12:59:59.000+00:00"],
+            ["2008-09-29T14:00:00.000+00:00", "2010-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1307",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2003-09-25T14:00:00.000+00:00", "2010-03-31T12:59:59.000+00:00"],
+            ["2003-09-25T14:00:00.000+00:00", "2010-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_132",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1987-10-17T14:00:00.000+00:00", "1992-03-31T13:59:59.000+00:00"],
+            ["1987-10-17T14:00:00.000+00:00", "1988-03-02T12:59:59.000+00:00"],
+            ["1991-09-29T14:00:00.000+00:00", "1992-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1328",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2002-10-28T13:00:00.000+00:00", "2005-02-28T12:59:59.000+00:00"],
+            ["2002-10-28T13:00:00.000+00:00", "2005-02-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_1343_phytoplankton",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2001-10-29T13:00:00.000+00:00", "2001-12-14T12:59:59.000+00:00"],
+            ["2001-10-29T13:00:00.000+00:00", "2001-12-14T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2122",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1992-11-12T13:00:00.000+00:00", "2010-12-31T12:59:59.000+00:00"],
+            ["1992-11-12T13:00:00.000+00:00", "2010-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2122-5",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1997-11-30T13:00:00.000+00:00", "1997-12-08T12:59:59.000+00:00"],
+            ["1997-11-30T13:00:00.000+00:00", "1997-12-08T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2184",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1997-10-31T13:00:00.000+00:00", "1998-12-10T12:59:59.000+00:00"],
+            ["1997-10-31T13:00:00.000+00:00", "1998-12-10T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2208_seabirds",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1980-12-31T13:00:00.000+00:00", "2005-12-31T12:59:59.000+00:00"],
+            ["1980-12-31T13:00:00.000+00:00", "2005-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2210_94",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1994-10-31T13:00:00.000+00:00", "1994-12-31T12:59:59.000+00:00"],
+            ["1994-10-31T13:00:00.000+00:00", "1994-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_229",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1990-05-03T14:00:00.000+00:00", "1996-03-31T13:59:59.000+00:00"],
+            ["1990-05-03T14:00:00.000+00:00", "1996-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2300",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2003-09-29T14:00:00.000+00:00", "2005-03-31T13:59:59.000+00:00"],
+            ["2003-09-29T14:00:00.000+00:00", "2005-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2337",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2002-09-29T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"],
+            ["2002-09-29T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2357",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2003-12-15T13:00:00.000+00:00", "2004-01-18T12:59:59.000+00:00"],
+            ["2003-12-15T13:00:00.000+00:00", "2004-01-18T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2393",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2003-09-29T14:00:00.000+00:00", "2005-03-31T13:59:59.000+00:00"],
+            ["2003-09-29T14:00:00.000+00:00", "2005-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2409",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2003-01-31T13:00:00.000+00:00", "2009-03-31T12:59:59.000+00:00"],
+            ["2003-01-31T13:00:00.000+00:00", "2009-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2500",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2004-11-30T13:00:00.000+00:00", null],
+            ["2004-11-30T13:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2534_winter_sea_ice",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2010-09-04T14:00:00.000+00:00", "2014-08-31T13:59:59.000+00:00"],
+            ["2010-09-04T14:00:00.000+00:00", "2014-08-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2590",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2001-01-30T13:00:00.000+00:00", "2004-02-27T12:59:59.000+00:00"],
+            ["2001-01-30T13:00:00.000+00:00", "2004-02-27T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2677",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2005-09-30T14:00:00.000+00:00", "2006-03-31T12:59:59.000+00:00"],
+            ["2005-09-30T14:00:00.000+00:00", "2006-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2683",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2005-09-30T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"],
+            ["2005-09-30T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2720_filtration",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-01-19T13:00:00.000+00:00", "2007-02-19T12:59:59.000+00:00"],
+            ["2007-01-19T13:00:00.000+00:00", "2007-02-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2792",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-09-30T14:00:00.000+00:00", "2009-03-31T12:59:59.000+00:00"],
+            ["2007-09-30T14:00:00.000+00:00", "2009-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2794",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-09-30T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"],
+            ["2006-09-30T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2901_RAASTI",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-09-03T14:00:00.000+00:00", "2007-10-17T12:59:59.000+00:00"],
+            ["2007-09-03T14:00:00.000+00:00", "2007-10-17T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2914",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2010-03-24T13:00:00.000+00:00", "2010-03-25T12:59:59.000+00:00"],
+            ["2010-03-24T13:00:00.000+00:00", "2010-03-25T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2915_Hydrocarbon_Degradation",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-09-29T14:00:00.000+00:00", "2010-03-31T12:59:59.000+00:00"],
+            ["2007-09-29T14:00:00.000+00:00", "2010-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2940",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-09-29T14:00:00.000+00:00", "2011-03-31T12:59:59.000+00:00"],
+            ["2007-09-29T14:00:00.000+00:00", "2011-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_2941_Aerial_Data",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-01-13T13:00:00.000+00:00", "2010-02-03T12:59:59.000+00:00"],
+            ["2008-01-13T13:00:00.000+00:00", "2010-02-03T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_3010",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-08-31T14:00:00.000+00:00", "2011-03-31T12:59:59.000+00:00"],
+            ["2008-08-31T14:00:00.000+00:00", "2011-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_3024",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-09-29T14:00:00.000+00:00", "2011-03-31T12:59:59.000+00:00"],
+            ["2008-09-29T14:00:00.000+00:00", "2011-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_3026",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-09-10T14:00:00.000+00:00", "2010-03-31T12:59:59.000+00:00"],
+            ["2007-09-10T14:00:00.000+00:00", "2010-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_3046",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-09-29T14:00:00.000+00:00", "2011-03-31T12:59:59.000+00:00"],
+            ["2008-09-29T14:00:00.000+00:00", "2011-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_472_Hunt",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2001-11-01T13:00:00.000+00:00", "2002-03-11T12:59:59.000+00:00"],
+            ["2001-11-01T13:00:00.000+00:00", "2002-03-11T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_492",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1982-09-29T14:00:00.000+00:00", "1995-03-31T13:59:59.000+00:00"],
+            ["1982-09-29T14:00:00.000+00:00", "1995-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_874",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1993-12-31T13:00:00.000+00:00", "1998-03-31T13:59:59.000+00:00"],
+            ["1993-12-31T13:00:00.000+00:00", "1998-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASAC_875",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1995-09-30T14:00:00.000+00:00", "1995-12-31T12:59:59.000+00:00"],
+            ["1995-09-30T14:00:00.000+00:00", "1995-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ASPECT_2007_2013",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-09-30T14:00:00.000+00:00", "2013-03-31T12:59:59.000+00:00"],
+            ["2007-09-30T14:00:00.000+00:00", "2013-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BEPSII_2023_Fast_Ice_Nutrients",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1997-01-17T13:00:00.000+00:00", "2021-01-01T12:59:59.000+00:00"],
+            ["1997-01-17T13:00:00.000+00:00", "2021-01-01T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BIOREGIONALISATION_SOUTHERN_OCEAN_RESOURCES",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1984-12-31T13:00:00.000+00:00", "2006-10-31T12:59:59.000+00:00"],
+            ["1984-12-31T13:00:00.000+00:00", "2006-10-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-WEST_12kHZ_Bathy_Data",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-01T13:00:00.000+00:00", "2006-03-12T12:59:59.000+00:00"],
+            ["2006-01-01T13:00:00.000+00:00", "2006-03-12T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_ACS",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-16T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"],
+            ["2006-01-16T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_ADCP",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2005-12-30T13:00:00.000+00:00", "2006-03-03T12:59:59.000+00:00"],
+            ["2005-12-30T13:00:00.000+00:00", "2006-03-03T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_ASAC_40_AA0506V3",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-09T13:00:00.000+00:00", "2006-02-27T12:59:59.000+00:00"],
+            ["2006-01-09T13:00:00.000+00:00", "2006-02-27T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_Appendicularians",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-09T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"],
+            ["2006-01-09T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_CTD_RMT",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-16T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"],
+            ["2006-01-16T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_Cetaceans",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-01T13:00:00.000+00:00", "2006-03-12T12:59:59.000+00:00"],
+            ["2006-01-01T13:00:00.000+00:00", "2006-03-12T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_LADCP",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-10T13:00:00.000+00:00", "2006-03-03T12:59:59.000+00:00"],
+            ["2006-01-10T13:00:00.000+00:00", "2006-03-03T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_RMT_krill",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-16T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"],
+            ["2006-01-16T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_mm_acoustics",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-03T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"],
+            ["2006-01-03T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_particulates",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-08T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"],
+            ["2006-01-08T13:00:00.000+00:00", "2006-02-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_primary_productivity",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-18T13:00:00.000+00:00", "2006-02-27T12:59:59.000+00:00"],
+            ["2006-01-18T13:00:00.000+00:00", "2006-02-27T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE-West_zooplankton",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-16T13:00:00.000+00:00", "2006-03-03T12:59:59.000+00:00"],
+            ["2006-01-16T13:00:00.000+00:00", "2006-03-03T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "BROKE_Fish_Zooplankton_RM8",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1996-01-18T13:00:00.000+00:00", "1996-03-31T13:59:59.000+00:00"],
+            ["1996-01-18T13:00:00.000+00:00", "1996-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "CEAMARC_CASO_200708_V3_EVENTS",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-12-15T13:00:00.000+00:00", "2008-01-27T12:59:59.000+00:00"],
+            ["2007-12-15T13:00:00.000+00:00", "2008-01-27T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "DMS_DMSP_Antarctica_Snow_Ice_Seawater_DataCollation",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1991-12-31T13:00:00.000+00:00", "2017-12-31T12:59:59.000+00:00"],
+            ["1991-12-31T13:00:00.000+00:00", "2017-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Davis_2010_Aerial_Photography_November",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2010-10-13T13:00:00.000+00:00", "2010-11-20T12:59:59.000+00:00"],
+            ["2010-10-13T13:00:00.000+00:00", "2010-11-20T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Davis_biology_report_1982",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1981-12-04T13:00:00.000+00:00", "1982-12-16T12:59:59.000+00:00"],
+            ["1981-12-04T13:00:00.000+00:00", "1982-12-16T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Davis_multibeam_grids",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2010-01-24T13:00:00.000+00:00", "2010-03-29T12:59:59.000+00:00"],
+            ["2010-01-24T13:00:00.000+00:00", "2010-03-29T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Diatoms_long_core",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1998-08-31T14:00:00.000+00:00", "1998-12-31T12:59:59.000+00:00"],
+            ["1998-08-31T14:00:00.000+00:00", "1998-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Diatoms_short_cores",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1998-08-31T14:00:00.000+00:00", "1999-03-31T13:59:59.000+00:00"],
+            ["1998-08-31T14:00:00.000+00:00", "1999-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Diatoms_sre2",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1997-08-31T14:00:00.000+00:00", "1999-03-31T13:59:59.000+00:00"],
+            ["1997-08-31T14:00:00.000+00:00", "1999-03-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Ecotoxicology",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2007-09-29T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"],
+            ["2007-09-29T14:00:00.000+00:00", "2012-03-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Heard_Island_Report_1987_1988",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1987-09-17T14:00:00.000+00:00", "1988-03-02T12:59:59.000+00:00"],
+            ["1987-09-17T14:00:00.000+00:00", "1988-03-02T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Heard_Island_Report_1992",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1992-01-22T13:00:00.000+00:00", "1993-03-17T12:59:59.000+00:00"],
+            ["1992-01-22T13:00:00.000+00:00", "1993-03-17T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "IPAB",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1994-12-31T13:00:00.000+00:00", "1998-07-31T13:59:59.000+00:00"],
+            ["1994-12-31T13:00:00.000+00:00", "1998-07-31T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Krill_Technical_Reports",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1994-01-25T13:00:00.000+00:00", "2005-12-19T12:59:59.000+00:00"],
+            ["1994-01-25T13:00:00.000+00:00", "2005-12-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Krill_growth_rates",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1993-03-10T13:00:00.000+00:00", "2003-03-17T12:59:59.000+00:00"],
+            ["1993-03-10T13:00:00.000+00:00", "2003-03-17T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "LGP",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1988-12-31T13:00:00.000+00:00", "2009-12-31T12:59:59.000+00:00"],
+            ["1988-12-31T13:00:00.000+00:00", "2009-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Light_Tipping_Points",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1997-12-31T13:00:00.000+00:00", "2008-12-31T12:59:59.000+00:00"],
+            ["1997-12-31T13:00:00.000+00:00", "2008-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Nella_Dan_V7_198485",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1985-02-08T13:00:00.000+00:00", "1985-03-17T13:59:59.000+00:00"],
+            ["1985-02-08T13:00:00.000+00:00", "1985-03-17T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Prydz_Bay_Foraminiferida",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1981-12-31T13:00:00.000+00:00", "1997-12-31T12:59:59.000+00:00"],
+            ["1981-12-31T13:00:00.000+00:00", "1997-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SAM_influences_phytoplankton_community_composition",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2002-10-19T13:00:00.000+00:00", "2013-01-26T12:59:59.000+00:00"],
+            ["2002-10-19T13:00:00.000+00:00", "2013-01-26T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Boundary_Layer_Met",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-09-26T14:00:00.000+00:00", "2012-10-21T12:59:59.000+00:00"],
+            ["2012-09-26T14:00:00.000+00:00", "2012-10-21T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Fluid_Permeability",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-09-25T14:00:00.000+00:00", "2012-10-28T12:59:59.000+00:00"],
+            ["2012-09-25T14:00:00.000+00:00", "2012-09-26T13:59:59.000+00:00"],
+            ["2012-10-02T14:00:00.000+00:00", "2012-10-03T13:59:59.000+00:00"],
+            ["2012-10-05T14:00:00.000+00:00", "2012-10-06T13:59:59.000+00:00"],
+            ["2012-10-12T13:00:00.000+00:00", "2012-10-13T12:59:59.000+00:00"],
+            ["2012-10-18T13:00:00.000+00:00", "2012-10-19T12:59:59.000+00:00"],
+            ["2012-10-27T13:00:00.000+00:00", "2012-10-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Ice_CTD",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-10-03T14:00:00.000+00:00", "2012-11-04T12:59:59.000+00:00"],
+            ["2012-10-03T14:00:00.000+00:00", "2012-11-04T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Ice_Conductivity",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-10-05T14:00:00.000+00:00", "2012-10-28T12:59:59.000+00:00"],
+            ["2012-10-05T14:00:00.000+00:00", "2012-10-06T13:59:59.000+00:00"],
+            ["2012-10-12T13:00:00.000+00:00", "2012-10-13T12:59:59.000+00:00"],
+            ["2012-10-18T13:00:00.000+00:00", "2012-10-19T12:59:59.000+00:00"],
+            ["2012-10-27T13:00:00.000+00:00", "2012-10-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_MAX-DOAS",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-09-13T14:00:00.000+00:00", "2012-11-05T12:59:59.000+00:00"],
+            ["2012-09-13T14:00:00.000+00:00", "2012-11-05T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Stable_Isotopes_NO3",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-09-24T14:00:00.000+00:00", "2012-11-01T12:59:59.000+00:00"],
+            ["2012-09-24T14:00:00.000+00:00", "2012-11-01T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Stable_Isotopes_Sterols",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-09-24T14:00:00.000+00:00", "2012-11-01T12:59:59.000+00:00"],
+            ["2012-09-24T14:00:00.000+00:00", "2012-11-01T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Waveguide",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-10-13T13:00:00.000+00:00", "2012-10-31T12:59:59.000+00:00"],
+            ["2012-10-13T13:00:00.000+00:00", "2012-10-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Waves",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-09-22T14:00:00.000+00:00", "2012-11-02T12:59:59.000+00:00"],
+            ["2012-09-22T14:00:00.000+00:00", "2012-11-02T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SOE_adelie_demog",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1991-12-31T13:00:00.000+00:00", "1999-12-31T12:59:59.000+00:00"],
+            ["1991-12-31T13:00:00.000+00:00", "1999-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SOE_elephant_seals",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1985-10-14T14:00:00.000+00:00", null],
+            ["1985-10-14T14:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SOE_tourist",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1986-12-31T13:00:00.000+00:00", "2005-07-01T13:59:59.000+00:00"],
+            ["1986-12-31T13:00:00.000+00:00", "2005-07-01T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "TNE_8A_acidification_microbes",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-12-29T13:00:00.000+00:00", "2009-02-19T12:59:59.000+00:00"],
+            ["2008-12-29T13:00:00.000+00:00", "2009-02-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "VMS_Bathy_Processing",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-12-07T13:00:00.000+00:00", "2011-02-06T12:59:59.000+00:00"],
+            ["2006-12-07T13:00:00.000+00:00", "2011-02-06T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "a16bb6f7-95fd-41ed-9e7e-491c213ce337",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-05-27T14:00:00.000+00:00", "2018-06-08T13:59:59.000+00:00"],
+            ["2018-05-27T14:00:00.000+00:00", "2018-06-08T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "a54ba84c-8c81-492a-a065-19f1a8476161",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-10-15T13:00:00.000+00:00", "2018-11-16T12:59:59.000+00:00"],
+            ["2018-10-15T13:00:00.000+00:00", "2018-11-16T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "a6287ffe-5223-483c-881a-2615e1402b58",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-12-06T13:00:00.000+00:00", "2017-12-12T12:59:59.000+00:00"],
+            ["2017-12-06T13:00:00.000+00:00", "2017-12-12T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "a6722d0b-c11a-4395-aa8b-50f25dccf7d9",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-11-13T13:00:00.000+00:00", "2017-11-26T12:59:59.000+00:00"],
+            ["2017-11-13T13:00:00.000+00:00", "2017-11-26T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "au0201",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2002-10-12T13:00:00.000+00:00", "2002-11-18T12:59:59.000+00:00"],
+            ["2002-10-12T13:00:00.000+00:00", "2002-11-18T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "au0806_CASO_CTD",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-03-21T13:00:00.000+00:00", "2008-04-17T13:59:59.000+00:00"],
+            ["2008-03-21T13:00:00.000+00:00", "2008-04-17T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "b2548767-514f-4a31-b65e-36bb894382d5",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-12-23T13:00:00.000+00:00", null],
+            ["2019-12-23T13:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "b273fafa-03d6-4fc2-9acf-39d8c06581e5",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1992-03-09T13:00:00.000+00:00", null],
+            ["1992-03-09T13:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "b4cc9cb3-6282-41a2-99ee-5238826a9095",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-08-19T14:00:00.000+00:00", "2017-08-23T13:59:59.000+00:00"],
+            ["2017-08-19T14:00:00.000+00:00", "2017-08-23T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "b4e8f50b-ecd5-4815-b34c-f20e208015a5",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2022-05-03T14:00:00.000+00:00", "2022-05-15T13:59:59.000+00:00"],
+            ["2022-05-03T14:00:00.000+00:00", "2022-05-15T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "b8b1a0f1-53cf-4ae8-818d-ef3eaaeb3bba",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2017-03-05T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2017-03-05T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "bb666e08-d575-45f3-a4a4-327757042c8a",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2023-11-14T13:00:00.000+00:00", "2023-12-20T12:59:59.000+00:00"],
+            ["2023-11-14T13:00:00.000+00:00", "2023-12-20T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "bc6e10a6-4dda-41c0-8639-5c96411efc5a",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2004-01-24T13:38:00.000+00:00", "2016-03-04T20:08:00.000+00:00"],
+            ["2004-01-24T13:38:00.000+00:00", "2016-03-04T20:08:00.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "c1344979-f701-0916-e044-00144f7bc0f4",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-05-31T14:00:00.000+00:00", null],
+            ["2008-05-31T14:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "c1344e70-480e-0993-e044-00144f7bc0f4",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-05-31T14:00:00.000+00:00", null],
+            ["2008-05-31T14:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "c13451a9-7cfe-091c-e044-00144f7bc0f4",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-08-31T14:00:00.000+00:00", null],
+            ["2008-08-31T14:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "c3047376-9a10-4973-a62e-99afb66f6dc6",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-05-07T14:00:00.000+00:00", "2021-06-03T13:59:59.000+00:00"],
+            ["2021-05-07T14:00:00.000+00:00", "2021-06-03T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "c5b6340a-bbc2-4b0c-85ef-83aab49f42ac",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2009-03-01T04:29:00.000+00:00", "2009-03-31T04:29:00.000+00:00"],
+            ["2009-03-01T04:29:00.000+00:00", "2009-03-31T04:29:00.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ca7cf2ea-3ac7-4cce-9143-ebba0a99683e",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-08-29T14:00:00.000+00:00", "2018-08-09T13:59:59.000+00:00"],
+            ["2018-08-29T14:00:00.000+00:00", "2018-08-09T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "cac618c1-2b70-4a29-85f5-e8a6c81d19f7",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2018-01-10T13:00:00.000+00:00", "2018-02-22T12:59:59.000+00:00"],
+            ["2018-01-10T13:00:00.000+00:00", "2018-02-22T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ccbb668e-dbe6-4f4b-9ea2-fcaf0eb23aca",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-05-13T14:00:00.000+00:00", "2019-06-14T13:59:59.000+00:00"],
+            ["2019-05-13T14:00:00.000+00:00", "2019-06-14T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "199192060",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1992-01-08T13:00:00.000+00:00", "1992-03-27T12:59:59.000+00:00"],
+            ["1992-01-08T13:00:00.000+00:00", "1992-03-27T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "40b06369-a920-422a-928d-bc9227a4ed0b",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-04-13T14:00:00.000+00:00", "2021-04-28T13:59:59.000+00:00"],
+            ["2021-04-13T14:00:00.000+00:00", "2021-04-28T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "453a8da0-73c7-4656-b99c-d8594f5da79e",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-06-09T14:00:00.000+00:00", "2021-06-23T13:59:59.000+00:00"],
+            ["2021-06-09T14:00:00.000+00:00", "2021-06-23T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "572b1d3c-f20b-41d1-a456-7a28a12937b0",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2023-06-26T14:00:00.000+00:00", "2023-07-29T13:59:59.000+00:00"],
+            ["2023-06-26T14:00:00.000+00:00", "2023-07-29T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "7e7b1232-bd4a-4337-9ed9-d374ba718b76",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2023-03-23T13:00:00.000+00:00", "2023-04-30T13:59:59.000+00:00"],
+            ["2023-03-23T13:00:00.000+00:00", "2023-04-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4101_RPA_ops_summ",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-01-24T13:00:00.000+00:00", "2019-03-25T12:59:59.000+00:00"],
+            ["2019-01-24T13:00:00.000+00:00", "2019-03-25T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4102_sonobuoyDeploymentLog2013",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2013-01-30T13:00:00.000+00:00", "2013-03-15T12:59:59.000+00:00"],
+            ["2013-01-30T13:00:00.000+00:00", "2013-03-15T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4326_Microalgae_Metal_Toxicity",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-12-31T13:00:00.000+00:00", "2018-04-30T13:59:59.000+00:00"],
+            ["2016-12-31T13:00:00.000+00:00", "2018-04-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4331_4344_SIA",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-01-22T13:00:00.000+00:00", "2016-02-19T12:59:59.000+00:00"],
+            ["2016-01-22T13:00:00.000+00:00", "2016-02-19T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4344_au1603_CTD_version27sep2017",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-01-21T13:00:00.000+00:00", "2016-02-16T12:59:59.000+00:00"],
+            ["2016-01-21T13:00:00.000+00:00", "2016-02-16T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4419_Trace_elements_Leach_sediment_MC",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"],
+            ["2017-01-13T13:00:00.000+00:00", "2021-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "ECA032",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-01-11T13:00:00.000+00:00", "2006-02-27T12:59:59.000+00:00"],
+            ["2006-01-11T13:00:00.000+00:00", "2006-02-27T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "HIMI_Benthic_Invertebrates_2003_2008",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2003-04-28T14:00:00.000+00:00", "2008-06-30T13:59:59.000+00:00"],
+            ["2003-04-28T14:00:00.000+00:00", "2003-05-10T13:59:59.000+00:00"],
+            ["2007-06-23T14:00:00.000+00:00", "2007-07-30T13:59:59.000+00:00"],
+            ["2008-05-30T14:00:00.000+00:00", "2008-06-30T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "Heard_86-87_Report",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1986-11-15T13:00:00.000+00:00", "1987-01-21T12:59:59.000+00:00"],
+            ["1986-11-15T13:00:00.000+00:00", "1987-01-21T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Snowfall",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-09-16T14:00:00.000+00:00", "2012-11-09T12:59:59.000+00:00"],
+            ["2012-09-16T14:00:00.000+00:00", "2012-11-09T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SIPEX_II_Underway_Snowfall",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2012-09-16T14:00:00.000+00:00", "2012-11-09T12:59:59.000+00:00"],
+            ["2012-09-16T14:00:00.000+00:00", "2012-11-09T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SOE_fur_seals",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1989-12-31T13:00:00.000+00:00", "1999-12-31T12:59:59.000+00:00"],
+            ["1989-12-31T13:00:00.000+00:00", "1999-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "SOE_ship_fuel",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1990-04-30T14:00:00.000+00:00", "2003-10-31T12:59:59.000+00:00"],
+            ["1990-04-30T14:00:00.000+00:00", "2003-10-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "a73907b7-3686-4dcf-8a1d-7efc4e5ffc05",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2006-02-19T13:00:00.000+00:00", null],
+            ["2006-02-19T13:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "b0b52390-d9ac-43ac-8c20-75724331e6c1",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2023-11-14T13:00:00.000+00:00", "2023-12-20T12:59:59.000+00:00"],
+            ["2023-11-14T13:00:00.000+00:00", "2023-12-20T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "c13451a9-7cfc-091c-e044-00144f7bc0f4",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-08-31T14:00:00.000+00:00", null],
+            ["2008-08-31T14:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "199798060",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1998-02-27T13:00:00.000+00:00", "1998-04-01T13:59:59.000+00:00"],
+            ["1998-02-27T13:00:00.000+00:00", "1998-04-01T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1d8a96c6-3650-4115-9801-11e89ac45819",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2017-03-15T13:00:00.000+00:00", "2015-03-27T12:59:59.000+00:00"],
+            ["2017-03-15T13:00:00.000+00:00", "2015-03-27T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "4a15ef59-003b-456b-bbc8-1f618d382615",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2022-08-14T14:00:00.000+00:00", "2022-09-07T13:59:59.000+00:00"],
+            ["2022-08-14T14:00:00.000+00:00", "2022-09-07T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "58385b0e-a195-475d-8ad0-703bb53ef822",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2021-05-07T14:00:00.000+00:00", "2021-06-03T13:59:59.000+00:00"],
+            ["2021-05-07T14:00:00.000+00:00", "2021-06-03T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "64cdc7f9-cede-4625-bb8e-f704dacb6a8f",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-03-13T13:00:00.000+00:00", "2019-04-04T12:59:59.000+00:00"],
+            ["2019-03-13T13:00:00.000+00:00", "2019-04-04T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "65ef46c1-60da-4f95-a0a1-4d7d348e2af4",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-04-26T14:00:00.000+00:00", "2016-06-28T13:59:59.000+00:00"],
+            ["2016-04-26T14:00:00.000+00:00", "2016-06-28T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4088_Oblique_Aerial_Photos",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2008-12-31T13:00:00.000+00:00", "2017-12-31T12:59:59.000+00:00"],
+            ["2008-12-31T13:00:00.000+00:00", "2017-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "AAS_4102_longTermAcousticRecordings",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2013-01-22T13:00:00.000+00:00", "2022-12-31T12:59:59.000+00:00"],
+            ["2013-01-22T13:00:00.000+00:00", "2022-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "cacc1303-5652-44ee-997d-6c3b36018f72",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1991-06-30T14:00:00.000+00:00", null],
+            ["1991-06-30T14:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0478852b-27ad-48dc-833f-ae93920ce73e",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-01-28T13:00:00.000+00:00", null],
+            ["2019-01-28T13:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "5a20d372-1400-494a-b593-9673e6207d0b",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-02-04T13:00:00.000+00:00", "2019-02-07T12:59:59.000+00:00"],
+            ["2019-02-04T13:00:00.000+00:00", "2019-02-07T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "6e50b554-1ea7-43f7-9a13-c26a3c2f5505",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2004-12-31T13:00:00.000+00:00", "2022-01-01T12:59:59.000+00:00"],
+            ["2004-12-31T13:00:00.000+00:00", "2022-01-01T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "a9e264df-985c-4c76-ad22-9b132104295b",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1998-12-31T13:00:00.000+00:00", "2006-12-31T12:59:59.000+00:00"],
+            ["1998-12-31T13:00:00.000+00:00", "2006-12-31T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "aaaca7e7-760b-44ce-be08-838d530ab348",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2020-03-31T13:00:00.000+00:00", null],
+            ["2020-03-31T13:00:00.000+00:00", null]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "b9de64e0-55df-11dc-8d3c-00008a07204e",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["1989-08-28T14:00:00.000+00:00", "1990-02-24T12:59:59.000+00:00"],
+            ["1989-08-28T14:00:00.000+00:00", "1990-02-24T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1c5a8630-1a27-47c1-be31-6931dba920b7",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2009-07-25T14:00:00.000+00:00", "2009-08-05T13:59:59.000+00:00"],
+            ["2009-07-25T14:00:00.000+00:00", "2009-08-05T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "32bd4139-ad9f-4b74-8281-df4ed4e67af1",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-10-31T13:00:00.000+00:00", "2022-01-12T12:59:59.000+00:00"],
+            ["2019-10-31T13:00:00.000+00:00", "2022-01-12T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "41108fe5-9a28-45d4-83c8-dcbaa6471fed",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2016-01-19T13:00:00.000+00:00", "2016-01-28T12:59:59.000+00:00"],
+            ["2016-01-19T13:00:00.000+00:00", "2016-01-28T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "7d249b28-2a21-4692-9e58-52894929caa5",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2004-12-31T13:00:00.000+00:00", "2020-12-01T12:59:59.000+00:00"],
+            ["2004-12-31T13:00:00.000+00:00", "2020-12-01T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0e7289c6-f3f3-4f00-bed5-7851e12b9c8b",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2005-10-10T13:00:00.000+00:00", "2006-01-09T12:59:59.000+00:00"],
+            ["2005-10-10T13:00:00.000+00:00", "2006-01-09T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "5f95b64d-6b48-42ab-af8a-407d620fc027",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2013-09-30T14:00:00.000+00:00", "2014-11-30T12:59:59.000+00:00"],
+            ["2013-09-30T14:00:00.000+00:00", "2014-11-30T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "301ba411-9d1f-44e3-b2b4-cf7809dd996f",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2009-04-28T14:00:00.000+00:00", "2022-12-30T12:59:59.000+00:00"],
+            ["2009-04-28T14:00:00.000+00:00", "2022-12-30T12:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "c0d4b54b-f392-4e68-bf57-28626e32ce52",
+      "links": [],
+      "extent": {
+        "spatial": {
+          "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        },
+        "temporal": {
+          "interval": [
+            ["2019-05-19T14:00:00.000+00:00", "2019-05-26T13:59:59.000+00:00"],
+            ["2019-05-19T14:00:00.000+00:00", "2019-05-26T13:59:59.000+00:00"]
+          ],
+          "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+        }
+      },
+      "itemType": "Collection"
+    }
+  ],
+  "total": 296,
+  "search_after": ["1.0", "51", "c0d4b54b-f392-4e68-bf57-28626e32ce52"]
+}

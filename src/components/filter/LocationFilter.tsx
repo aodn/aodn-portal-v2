@@ -200,6 +200,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
               control={<Radio />}
               label={item.label}
               key={item.value}
+              data-testid={`radio-${item.label}`}
               sx={{
                 ".MuiFormControlLabel-label": {
                   fontFamily: fontFamily.general,
