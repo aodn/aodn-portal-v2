@@ -5,10 +5,55 @@ import {
   removeAllItems,
   addItem,
   setTemporaryItem,
+  setItems,
 } from "../../common/store/bookmarkListReducer";
 import { OGCCollection } from "../../common/store/OGCCollectionDefinitions";
 import BookmarkListAccordionGroup from "../BookmarkListAccordionGroup";
 import { userEvent } from "@testing-library/user-event";
+import { server } from "../../../__mocks__/server";
+import * as bookmarkListReducer from "../../common/store/bookmarkListReducer";
+// Mock the OGCCollection item
+const item1 = {
+  id: "ba9110f1-072c-4d15-8328-2091be983991",
+  index: "1",
+  itemType: "Collection",
+  links: [],
+  properties: {},
+};
+
+const item2 = {
+  id: "ca9110f1-072c-4d15-8328-2091be983998",
+  index: "2",
+  itemType: "Collection",
+  links: [],
+  properties: {},
+};
+
+const item3 = {
+  id: "item3",
+  index: "3",
+  itemType: "Collection",
+  links: [],
+  properties: {},
+};
+
+const collection1: OGCCollection = Object.assign(new OGCCollection(), item1);
+const collection2: OGCCollection = Object.assign(new OGCCollection(), item2);
+const collection3: OGCCollection = Object.assign(new OGCCollection(), item3);
+
+// const mockInitializeBookmarkList = vi.fn();
+
+// // Mock the bookmarkListReducer to use the mocked initializeBookmarkList
+// // This is to avoid the API call during initialization and get a bunch of unexpected bookmark items
+// vi.mock("../../common/store/bookmarkListReducer", async () => {
+//   const actual = await vi.importActual(
+//     "../../common/store/bookmarkListReducer"
+//   );
+//   return {
+//     ...actual,
+//     initializeBookmarkList: mockInitializeBookmarkList,
+//   };
+// });
 
 // Mock the local store, so that bookmarkListReducer save value to Record instead of the window store
 const localStorageMock = (() => {
@@ -38,9 +83,22 @@ Object.defineProperty(window, "localStorage", {
 });
 
 describe("Bookmark List Accordion Group", () => {
+  let mockInitialize: any;
+
+  beforeAll(() => {
+    server.listen();
+    // Spy on the function after import
+    mockInitialize = vi.spyOn(bookmarkListReducer, "initializeBookmarkList");
+  });
   // Clear bookmark store value
   beforeEach(() => {
     store.dispatch(removeAllItems());
+    // Set default mock implementation
+    mockInitialize.mockImplementation(() => ({
+      type: "bookmarkList/initialize/mocked",
+      payload: undefined,
+      unwrap: () => Promise.resolve(undefined),
+    }));
   });
 
   afterEach(() => {
@@ -49,35 +107,8 @@ describe("Bookmark List Accordion Group", () => {
 
   afterAll(() => {
     vi.restoreAllMocks();
+    server.close();
   });
-
-  const item1 = {
-    id: "ba9110f1-072c-4d15-8328-2091be983991",
-    index: "1",
-    itemType: "Collection",
-    links: [],
-    properties: {},
-  };
-
-  const item2 = {
-    id: "ca9110f1-072c-4d15-8328-2091be983998",
-    index: "2",
-    itemType: "Collection",
-    links: [],
-    properties: {},
-  };
-
-  const item3 = {
-    id: "item3",
-    index: "3",
-    itemType: "Collection",
-    links: [],
-    properties: {},
-  };
-
-  const collection1: OGCCollection = Object.assign(new OGCCollection(), item1);
-  const collection2: OGCCollection = Object.assign(new OGCCollection(), item2);
-  const collection3: OGCCollection = Object.assign(new OGCCollection(), item3);
 
   it("renders nothing bookmark list header correct", () => {
     render(<BookmarkListAccordionGroup />);
@@ -102,11 +133,15 @@ describe("Bookmark List Accordion Group", () => {
     render(<BookmarkListAccordionGroup />);
     expect(screen.getByText("2 Bookmark(s)")).toBeInTheDocument();
 
+    const clearAllButton = screen.getByTestId("bookmark-list-head-clearall");
+    expect(clearAllButton).toBeInTheDocument();
+
     // Click the clear all button
-    waitFor(() => screen.findByText("bookmark-list-head-clearall")).then(() => {
-      const button = screen.getByTestId("bookmark-list-head-clearall");
-      userEvent.click(button);
-      expect(screen.getByText("Bookmark List")).toBeInTheDocument();
+    userEvent.click(clearAllButton);
+
+    return waitFor(() =>
+      expect(screen.getByText("Bookmark List")).toBeInTheDocument()
+    ).then(() => {
       expect(store.getState().bookmarkList.temporaryItem).toBeUndefined();
     });
   });
@@ -130,13 +165,17 @@ describe("Bookmark List Accordion Group", () => {
     // Temp item is not count in the bookmark list so the total is still 2
     expect(screen.getByText("2 Bookmark(s)")).toBeInTheDocument();
 
-    waitFor(() => screen.findByTestId("item3-iconbutton")).then(() => {
-      // Now if you click the bookmark button of the temp record it will become bookmark record
-      const button = screen.getByTestId("item3-iconbutton");
-      userEvent.click(button);
+    return waitFor(() => screen.getByTestId("item3-iconbutton")).then(
+      (button) => {
+        // Now if you click the bookmark button of the temp record it will become bookmark record
+        userEvent.click(button);
 
-      expect(store.getState().bookmarkList.temporaryItem).toBeUndefined();
-      expect(screen.getByText("3 Bookmark(s)")).toBeInTheDocument();
-    });
+        return waitFor(() =>
+          expect(store.getState().bookmarkList.temporaryItem).toBeUndefined()
+        ).then(() => {
+          expect(screen.getByText("3 Bookmark(s)")).toBeInTheDocument();
+        });
+      }
+    );
   });
 });
