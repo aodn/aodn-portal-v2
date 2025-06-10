@@ -238,41 +238,35 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setIsWMSAvailable(isWMSAvailable);
   }, []);
 
-  // Function to create the appropriate layer based on selection
-  const createPresentationLayer = useCallback(
-    (id: string | null) => {
-      switch (id) {
-        case LayerName.GeoServer:
-          return (
-            <GeoServerTileLayer
-              geoServerTileLayerConfig={{
-                baseUrl: ensureHttps(getWMSServer(collection)[0]),
-                tileUrlParams: { LAYERS: getWMSLayerNames(collection) },
-                bbox: overallBoundingBox,
-              }}
-              onWMSAvailabilityChange={onWMSAvailabilityChange}
+  // Function to create the appropriate layer based on selection,
+  // cannot warp with useCallback because this not returns a new instance
+  // of layer on each call
+  const createPresentationLayer = (id: string | null) => {
+    switch (id) {
+      case LayerName.GeoServer:
+        return (
+          <GeoServerTileLayer
+            geoServerTileLayerConfig={{
+              baseUrl: ensureHttps(getWMSServer(collection)[0]),
+              tileUrlParams: { LAYERS: getWMSLayerNames(collection) },
+              bbox: overallBoundingBox,
+            }}
+            onWMSAvailabilityChange={onWMSAvailabilityChange}
+          />
+        );
+      case LayerName.Hexbin:
+        return (
+          filteredFeatureCollection && (
+            <HexbinLayer
+              key="hexbinlayer"
+              featureCollection={filteredFeatureCollection}
             />
-          );
-        case LayerName.Hexbin:
-          return (
-            filteredFeatureCollection && (
-              <HexbinLayer
-                key="hexbinlayer"
-                featureCollection={filteredFeatureCollection}
-              />
-            )
-          );
-        default:
-          return null;
-      }
-    },
-    [
-      collection,
-      overallBoundingBox,
-      onWMSAvailabilityChange,
-      filteredFeatureCollection,
-    ]
-  );
+          )
+        );
+      default:
+        return null;
+    }
+  };
 
   const handleBaseMapSwitch = useCallback(
     (target: EventTarget & HTMLInputElement) =>

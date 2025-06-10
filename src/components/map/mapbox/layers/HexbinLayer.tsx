@@ -127,7 +127,6 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
     };
 
     const cleanup = () => {
-      map.off("remove", cleanup);
       if (overlayRef.current && map?.isStyleLoaded()) {
         map?.removeControl(overlayRef.current);
         overlayRef.current = undefined;
@@ -138,10 +137,9 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
       }
     };
 
-    setTimeout(() => {
+    map?.once("idle", () => {
       createHexbinLayer();
-      map?.once("remove", () => cleanup());
-    }, 500);
+    });
 
     return () => {
       cleanup();
