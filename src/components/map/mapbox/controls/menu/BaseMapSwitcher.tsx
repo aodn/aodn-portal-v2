@@ -26,14 +26,16 @@ import blue from "../../../../common/colors/blue";
 import { borderRadius, fontSize } from "../../../../../styles/constants";
 import { MapDefaultConfig } from "../../constants";
 
+export interface BaseMapSwitcherLayer {
+  id: string;
+  name: string;
+  label?: string;
+  default?: boolean;
+}
+
 interface BaseMapSwitcherProps extends ControlProps {
   // Static layer to be added to the switch
-  layers: Array<{
-    id: string;
-    name: string;
-    label?: string;
-    default?: boolean;
-  }>;
+  layers: Array<BaseMapSwitcherLayer>;
 }
 
 const MENU_ID = "basemap-show-hide-menu-button";

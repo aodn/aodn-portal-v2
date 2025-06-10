@@ -17,15 +17,13 @@ const COLOR_RANGE: Color[] = [
   [240, 59, 32],
   [189, 0, 38],
 ];
-
+// If featureCollection is undefined, create an empty layer
 const createHexagonLayer = (
   featureCollection: FeatureCollection<Point> | undefined
 ) => {
-  if (featureCollection === undefined) return null;
-
   return new HexagonLayer<Feature<Point>>({
     id: MAPBOX_OVERLAY_HEXAGON_LAYER,
-    data: featureCollection.features,
+    data: featureCollection?.features,
     getPosition: ({ geometry: { coordinates } }) =>
       coordinates as [number, number],
     getColorWeight: ({ properties }) => properties?.count ?? 0,
@@ -55,100 +53,107 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
       map: Map
     ) => {
       const layer = createHexagonLayer(featureCollection);
+      return new MapboxOverlay({
+        interleaved: true,
+        layers: [layer],
+        onClick: (info) => {
+          if (info.picked && info.object) {
+            // Remove existing popup
+            if (popupRef.current) {
+              popupRef.current.remove();
+              popupRef.current = null;
+            }
 
-      return layer === null
-        ? null
-        : new MapboxOverlay({
-            interleaved: true,
-            layers: [layer],
-            onClick: (info) => {
-              if (info.picked && info.object) {
-                // Remove existing popup
-                if (popupRef.current) {
-                  popupRef.current.remove();
-                  popupRef.current = null;
-                }
+            // Create popup
+            popupRef.current = new Popup({
+              closeButton: true,
+              closeOnClick: false,
+              maxWidth: "none",
+              offset: [0, -5],
+            });
+            // Set gpuAggregation to true will make points object disappear
+            const points: Feature<Point>[] = info.object.points || [];
 
-                // Create popup
-                popupRef.current = new Popup({
-                  closeButton: true,
-                  closeOnClick: false,
-                  maxWidth: "none",
-                  offset: [0, -5],
-                });
-                // Set gpuAggregation to true will make points object disappear
-                const points: Feature<Point>[] = info.object.points || [];
+            const smallestDate =
+              points.reduce((smallest, point) => {
+                const date = point.properties?.date;
+                if (typeof date !== "string") return smallest;
+                if (!smallest || date <= smallest) return date;
+                return smallest;
+              }, "") || "N/A";
 
-                const smallestDate =
-                  points.reduce((smallest, point) => {
-                    const date = point.properties?.date;
-                    if (typeof date !== "string") return smallest;
-                    if (!smallest || date <= smallest) return date;
-                    return smallest;
-                  }, "") || "N/A";
+            const biggestDate =
+              points.reduce((smallest, point) => {
+                const date = point.properties?.date;
+                if (typeof date !== "string") return smallest;
+                if (!smallest || date > smallest) return date;
+                return smallest;
+              }, "") || "N/A";
 
-                const biggestDate =
-                  points.reduce((smallest, point) => {
-                    const date = point.properties?.date;
-                    if (typeof date !== "string") return smallest;
-                    if (!smallest || date > smallest) return date;
-                    return smallest;
-                  }, "") || "N/A";
+            const htmlBuilder = new InnerHtmlBuilder()
+              .addTitle("Data Records In This Area:")
+              .addText(
+                "Data Record Count: " +
+                  points.reduce((sum, point) => {
+                    const val = point.properties?.count ?? 0;
+                    return sum + (typeof val === "number" ? val : 0);
+                  }, 0)
+              )
+              .addRange("Time Range", smallestDate, biggestDate);
 
-                const htmlBuilder = new InnerHtmlBuilder()
-                  .addTitle("Data Records In This Area:")
-                  .addText(
-                    "Data Record Count: " +
-                      points.reduce((sum, point) => {
-                        const val = point.properties?.count ?? 0;
-                        return sum + (typeof val === "number" ? val : 0);
-                      }, 0)
-                  )
-                  .addRange("Time Range", smallestDate, biggestDate);
-
-                popupRef.current
-                  .setLngLat(info.coordinate as [number, number])
-                  .setHTML(htmlBuilder.getHtml())
-                  .addTo(map);
-              }
-            },
-          });
+            popupRef.current
+              .setLngLat(info.coordinate as [number, number])
+              .setHTML(htmlBuilder.getHtml())
+              .addTo(map);
+          }
+        },
+      });
     },
     []
   );
 
   useEffect(() => {
-    if (!map || overlayRef.current) return;
+    if (!map || overlayRef.current !== undefined) return;
 
     const createHexbinLayer = () => {
-      const overlay = createLayer(featureCollection, map);
-      if (overlay) {
-        overlayRef.current = overlay;
-        map?.addControl(overlay);
+      if (!overlayRef.current) {
+        // Just create skeleton of the layer, data update later
+        const overlay = createLayer(featureCollection, map);
+        if (overlay) {
+          overlayRef.current = overlay;
+          map?.addControl(overlay);
+        }
       }
     };
 
-    map?.once("load", createHexbinLayer);
-    map?.on("styledata", createHexbinLayer);
-
-    return () => {
-      map?.off("styledata", createHexbinLayer);
+    const cleanup = () => {
+      map.off("remove", cleanup);
       if (overlayRef.current && map?.isStyleLoaded()) {
         map?.removeControl(overlayRef.current);
-        overlayRef.current = null;
+        overlayRef.current = undefined;
         if (popupRef.current) {
           popupRef.current.remove();
           popupRef.current = null;
         }
       }
     };
+
+    setTimeout(() => {
+      createHexbinLayer();
+      map?.once("remove", () => cleanup());
+    }, 500);
+
+    return () => {
+      cleanup();
+    };
   }, [createLayer, featureCollection, map]);
 
   useEffect(() => {
     // Update the data on change
-    if (overlayRef.current) {
-      const layer = createHexagonLayer(featureCollection);
-      overlayRef.current.setProps({ layers: [layer] });
+    if (featureCollection && overlayRef.current) {
+      overlayRef.current?.setProps({
+        layers: [createHexagonLayer(featureCollection)],
+      });
     }
   }, [featureCollection]);
 

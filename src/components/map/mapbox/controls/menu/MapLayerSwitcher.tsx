@@ -22,12 +22,17 @@ import grey from "../../../../common/colors/grey";
 import blue from "../../../../common/colors/blue";
 import { borderRadius, fontSize } from "../../../../../styles/constants";
 
+export interface LayerSwitcherLayer {
+  id: string;
+  name: string;
+  default?: boolean;
+}
+
 interface LayerSwitcherProps extends ControlProps {
-  layers: Array<{ id: string; name: string; default?: boolean }>;
+  layers: Array<LayerSwitcherLayer>;
 }
 
 const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
-  map,
   layers,
   onEvent,
 }) => {
