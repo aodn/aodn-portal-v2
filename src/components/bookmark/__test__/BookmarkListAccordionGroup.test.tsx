@@ -12,6 +12,8 @@ import BookmarkListAccordionGroup from "../BookmarkListAccordionGroup";
 import { userEvent } from "@testing-library/user-event";
 import { server } from "../../../__mocks__/server";
 import * as bookmarkListReducer from "../../common/store/bookmarkListReducer";
+import { COLLECTIONS_WAVE } from "../../../__mocks__/data/COLLECTIONS_WAVE";
+
 // Mock the OGCCollection item
 const item1 = {
   id: "ba9110f1-072c-4d15-8328-2091be983991",
@@ -40,20 +42,6 @@ const item3 = {
 const collection1: OGCCollection = Object.assign(new OGCCollection(), item1);
 const collection2: OGCCollection = Object.assign(new OGCCollection(), item2);
 const collection3: OGCCollection = Object.assign(new OGCCollection(), item3);
-
-// const mockInitializeBookmarkList = vi.fn();
-
-// // Mock the bookmarkListReducer to use the mocked initializeBookmarkList
-// // This is to avoid the API call during initialization and get a bunch of unexpected bookmark items
-// vi.mock("../../common/store/bookmarkListReducer", async () => {
-//   const actual = await vi.importActual(
-//     "../../common/store/bookmarkListReducer"
-//   );
-//   return {
-//     ...actual,
-//     initializeBookmarkList: mockInitializeBookmarkList,
-//   };
-// });
 
 // Mock the local store, so that bookmarkListReducer save value to Record instead of the window store
 const localStorageMock = (() => {
@@ -87,18 +75,14 @@ describe("Bookmark List Accordion Group", () => {
 
   beforeAll(() => {
     server.listen();
-    // Spy on the function after import
     mockInitialize = vi.spyOn(bookmarkListReducer, "initializeBookmarkList");
   });
-  // Clear bookmark store value
+
   beforeEach(() => {
+    // Clear bookmark store value
     store.dispatch(removeAllItems());
-    // Set default mock implementation
-    mockInitialize.mockImplementation(() => ({
-      type: "bookmarkList/initialize/mocked",
-      payload: undefined,
-      unwrap: () => Promise.resolve(undefined),
-    }));
+    // Mock bookmark initialization to avoid the API call during initialization and get a bunch of unexpected bookmark items
+    mockInitialize.mockImplementation(() => vi.fn);
   });
 
   afterEach(() => {
@@ -176,6 +160,43 @@ describe("Bookmark List Accordion Group", () => {
           expect(screen.getByText("3 Bookmark(s)")).toBeInTheDocument();
         });
       }
+    );
+  });
+
+  it("initializes with correct items from initialization", async () => {
+    // Mock initialization core function - setItems to update redux with 3 bookmark items
+    store.dispatch(setItems([collection1, collection2, collection3]));
+
+    render(<BookmarkListAccordionGroup />);
+
+    await waitFor(() => {
+      expect(screen.getByText("3 Bookmark(s)")).toBeInTheDocument();
+    });
+  });
+
+  it("initializes with items from server response", async () => {
+    mockInitialize.mockRestore();
+    // Setup localStorage with bookmark IDs using the correct key
+    const bookmarkIds = [collection1.id, collection2.id];
+
+    // Mock localStorage to return these IDs with the correct key
+    localStorageMock.getItem.mockImplementation((key: string) => {
+      if (key === "bookmark-list") {
+        return JSON.stringify(bookmarkIds);
+      }
+      return null;
+    });
+
+    render(<BookmarkListAccordionGroup />);
+
+    const mockHttpResponseLength = COLLECTIONS_WAVE.collections.length;
+
+    // Wait for the async initialization to complete and server response
+    // As the mock server return fixed mock data array, so the total bookmarks should be that array's length
+    await waitFor(() =>
+      expect(
+        screen.getByText(`${mockHttpResponseLength} Bookmark(s)`)
+      ).toBeInTheDocument()
     );
   });
 });
