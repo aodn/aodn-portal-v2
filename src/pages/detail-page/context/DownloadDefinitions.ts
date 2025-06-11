@@ -22,11 +22,10 @@ export interface DatasetDownloadRequest {
     start_date: string;
     end_date: string;
     multi_polygon: MultiPolygon;
-    // TODO: will support form submition later. currently only for frontend
     data_usage?: {
       purposes: string[];
       sectors: string[];
-      allow_contact: boolean;
+      allow_contact: boolean | null;
     };
   };
 }

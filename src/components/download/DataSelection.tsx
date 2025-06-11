@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { Box } from "@mui/material";
+import { Box, SxProps } from "@mui/material";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 import BBoxConditionBox from "../box/BBoxConditionBox";
 import DateRangeConditionBox from "../box/DateRangeConditionBox";
@@ -13,7 +13,7 @@ import {
 
 interface DataSelectionComponentProps {
   gap?: number;
-  sx?: any;
+  sx?: SxProps;
 }
 
 /**
@@ -42,9 +42,9 @@ const DataSelection: React.FC<DataSelectionComponentProps> = ({
   }, [downloadConditions]);
 
   const handleRemove = useCallback(
-    (c: IDownloadConditionCallback & IDownloadCondition) => {
-      c.removeCallback && c.removeCallback();
-      removeDownloadCondition(c);
+    (condition: IDownloadConditionCallback & IDownloadCondition) => {
+      condition.removeCallback && condition.removeCallback();
+      removeDownloadCondition(condition);
     },
     [removeDownloadCondition]
   );

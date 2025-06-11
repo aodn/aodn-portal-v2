@@ -53,8 +53,8 @@ const DownloadCard = () => {
   return (
     <Stack direction="column">
       <DownloadDialog
-        open={downloadDialogOpen}
-        setOpen={setDownloadDialogOpen}
+        isOpen={downloadDialogOpen}
+        setIsOpen={setDownloadDialogOpen}
       />
       <Stack sx={{ padding: padding.medium }} spacing={2}>
         <CommonSelect items={options} sx={selectSxProps} />

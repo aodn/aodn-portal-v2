@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Box,
   Checkbox,
@@ -10,10 +10,35 @@ import {
 } from "@mui/material";
 import { fontColor } from "../../styles/constants";
 
+const FORM_CONFIG = {
+  title: "Data Usage Information (optional)",
+
+  purpose: {
+    title: "a. For what purpose do you intend to use the data?",
+    options: [
+      "Education",
+      "Scientific research",
+      "Industry operations",
+      "Recreational",
+    ],
+  },
+
+  sector: {
+    title: "b. If not recreational - what sector do you work for?",
+    options: ["Academic", "Industry", "Government", "Other"],
+  },
+
+  contact: {
+    title:
+      "c. Do you consent to being contacted by IMOS to further understand your data needs and the use of our products and services?",
+    options: ["Yes", "No"],
+  },
+};
+
 export interface DataUsageInformation {
   purposes: string[];
   sectors: string[];
-  allowContact: boolean | null;
+  allow_contact: boolean | null;
 }
 
 interface DataUsageFormProps {
@@ -27,59 +52,80 @@ const DataUsageForm: React.FC<DataUsageFormProps> = ({
   dataUsage,
   setDataUsage,
 }) => {
-  const handlePurposeChange = (purpose: string, checked: boolean) => {
-    const newPurposes = checked
-      ? [...dataUsage.purposes, purpose]
-      : dataUsage.purposes.filter((p) => p !== purpose);
-    setDataUsage({ ...dataUsage, purposes: newPurposes });
-  };
+  const handlePurposeChange = useCallback(
+    (purpose: string, checked: boolean) => {
+      (
+        setDataUsage as React.Dispatch<
+          React.SetStateAction<DataUsageInformation>
+        >
+      )((prev) => ({
+        ...prev,
+        purposes: checked
+          ? [...prev.purposes, purpose]
+          : prev.purposes.filter((p) => p !== purpose),
+      }));
+    },
+    [setDataUsage]
+  );
 
-  const handleSectorChange = (sector: string, checked: boolean) => {
-    const newSectors = checked
-      ? [...dataUsage.sectors, sector]
-      : dataUsage.sectors.filter((s) => s !== sector);
-    setDataUsage({ ...dataUsage, sectors: newSectors });
-  };
+  const handleSectorChange = useCallback(
+    (sector: string, checked: boolean) => {
+      (
+        setDataUsage as React.Dispatch<
+          React.SetStateAction<DataUsageInformation>
+        >
+      )((prev) => ({
+        ...prev,
+        sectors: checked
+          ? [...prev.sectors, sector]
+          : prev.sectors.filter((s) => s !== sector),
+      }));
+    },
+    [setDataUsage]
+  );
 
-  const handleContactChange = (value: boolean) => {
-    const newValue = dataUsage.allowContact === value ? null : value;
-    setDataUsage({ ...dataUsage, allowContact: newValue });
-  };
+  const handleContactChange = useCallback(
+    (value: boolean) => {
+      (
+        setDataUsage as React.Dispatch<
+          React.SetStateAction<DataUsageInformation>
+        >
+      )((prev) => ({
+        ...prev,
+        allow_contact: prev.allow_contact === value ? null : value,
+      }));
+    },
+    [setDataUsage]
+  );
 
   return (
     <Box sx={{ mt: 3 }}>
-      <Typography variant="h6" sx={{ mb: 3 }}>
-        Data Usage Information (optional)
+      <Typography variant="h6" sx={{ mb: 2, mt: 6 }}>
+        {FORM_CONFIG.title}
       </Typography>
 
-      {/* Purpose of data use */}
-      <FormControl component="fieldset" sx={{ ml: 2, mb: 3, width: "100%" }}>
+      <FormControl component="fieldset" sx={{ ml: 2, mb: 2, width: "100%" }}>
         <FormLabel
           component="legend"
           sx={{
-            fontSize: isMobile ? "0.875rem" : "1rem",
+            fontSize: "0.875rem",
             color: fontColor.gray.dark,
-            mb: 2,
+            mb: 1,
             fontWeight: 500,
           }}
         >
-          a. For what purpose do you intend to use the data?
+          {FORM_CONFIG.purpose.title}
         </FormLabel>
         <FormGroup
           sx={{
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
             flexWrap: isMobile ? "nowrap" : "wrap",
-            gap: isMobile ? 1 : 2,
+            gap: 1,
             alignItems: "flex-start",
           }}
         >
-          {[
-            "Education",
-            "Scientific research",
-            "Industry operations",
-            "Recreational",
-          ].map((purpose) => (
+          {FORM_CONFIG.purpose.options.map((purpose) => (
             <FormControlLabel
               key={purpose}
               control={
@@ -125,29 +171,28 @@ const DataUsageForm: React.FC<DataUsageFormProps> = ({
         </FormGroup>
       </FormControl>
 
-      {/* Work sector */}
-      <FormControl component="fieldset" sx={{ ml: 2, mb: 3, width: "100%" }}>
+      <FormControl component="fieldset" sx={{ ml: 2, mb: 2, width: "100%" }}>
         <FormLabel
           component="legend"
           sx={{
-            fontSize: isMobile ? "0.875rem" : "1rem",
+            fontSize: "0.875rem",
             color: fontColor.gray.dark,
-            mb: 2,
+            mb: 1,
             fontWeight: 500,
           }}
         >
-          b. If not recreational - what sector do you work for?
+          {FORM_CONFIG.sector.title}
         </FormLabel>
         <FormGroup
           sx={{
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
             flexWrap: isMobile ? "nowrap" : "wrap",
-            gap: isMobile ? 1 : 2,
+            gap: 1,
             alignItems: "flex-start",
           }}
         >
-          {["Academic", "Industry", "Government", "Other"].map((sector) => (
+          {FORM_CONFIG.sector.options.map((sector) => (
             <FormControlLabel
               key={sector}
               control={
@@ -191,27 +236,25 @@ const DataUsageForm: React.FC<DataUsageFormProps> = ({
         </FormGroup>
       </FormControl>
 
-      {/* Contact consent */}
       <FormControl component="fieldset" sx={{ ml: 2, width: "100%" }}>
         <FormLabel
           component="legend"
           sx={{
-            fontSize: isMobile ? "0.875rem" : "1rem",
+            fontSize: "0.875rem",
             color: fontColor.gray.dark,
-            mb: 2,
+            mb: 1,
             fontWeight: 500,
             lineHeight: 1.4,
           }}
         >
-          c. Do you consent to being contacted by IMOS to further understand
-          your data needs and the use of our products and services?
+          {FORM_CONFIG.contact.title}
         </FormLabel>
         <FormGroup>
           <Box
             sx={{
               display: "flex",
               flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? 1 : 3,
+              gap: isMobile ? 1 : 2,
               alignItems: "flex-start",
             }}
           >
@@ -219,7 +262,7 @@ const DataUsageForm: React.FC<DataUsageFormProps> = ({
               control={
                 <Checkbox
                   size="small"
-                  checked={dataUsage.allowContact === true}
+                  checked={dataUsage.allow_contact === true}
                   onChange={() => handleContactChange(true)}
                   sx={{
                     padding: "4px 8px",
@@ -238,7 +281,7 @@ const DataUsageForm: React.FC<DataUsageFormProps> = ({
                     padding: 0,
                   }}
                 >
-                  Yes
+                  {FORM_CONFIG.contact.options[0]}
                 </Typography>
               }
               sx={{
@@ -256,7 +299,7 @@ const DataUsageForm: React.FC<DataUsageFormProps> = ({
               control={
                 <Checkbox
                   size="small"
-                  checked={dataUsage.allowContact === false}
+                  checked={dataUsage.allow_contact === false}
                   onChange={() => handleContactChange(false)}
                   sx={{
                     padding: "4px 8px",
@@ -275,7 +318,7 @@ const DataUsageForm: React.FC<DataUsageFormProps> = ({
                     padding: 0,
                   }}
                 >
-                  No
+                  {FORM_CONFIG.contact.options[1]}
                 </Typography>
               }
               sx={{

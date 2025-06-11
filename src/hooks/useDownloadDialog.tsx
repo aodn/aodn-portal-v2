@@ -1,0 +1,390 @@
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  SetStateAction,
+} from "react";
+import { useParams } from "react-router-dom";
+import { useAppDispatch } from "../components/common/store/hooks";
+import { DataUsageInformation } from "../components/download/DataUsageForm";
+import { useDetailPageContext } from "../pages/detail-page/context/detail-page-context";
+import {
+  getDateConditionFrom,
+  getMultiPolygonFrom,
+} from "../utils/DownloadConditionUtils";
+import { DatasetDownloadRequest } from "../pages/detail-page/context/DownloadDefinitions";
+import { processDatasetDownload } from "../components/common/store/searchReducer";
+
+interface SnackbarState {
+  open: boolean;
+  message: string;
+  severity: "error" | "warning" | "info" | "success";
+}
+
+const TIMEOUT_LIMIT = 8000;
+
+export const useDownloadDialog = (
+  isOpen: boolean,
+  setIsOpen: (isOpen: boolean) => void
+) => {
+  // ================== DEPENDENCIES & CONTEXT ==================
+  const { uuid } = useParams<{ uuid: string }>();
+  const dispatch = useAppDispatch();
+  const { downloadConditions } = useDetailPageContext();
+
+  // ================== STATE MANAGEMENT ==================
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const [activeStep, setActiveStep] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [dataUsage, setDataUsage] = useState<DataUsageInformation>({
+    purposes: [],
+    sectors: [],
+    allow_contact: null,
+  });
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
+    open: false,
+    message: "",
+    severity: "error",
+  });
+
+  // ================== VALIDATION HELPERS ==================
+  const showValidationError = (message: string) => {
+    setSnackbar({
+      open: true,
+      message,
+      severity: "error",
+    });
+  };
+
+  const validateEmail = useCallback((emailValue: string): boolean => {
+    if (!emailValue.trim()) {
+      showValidationError("Please enter your email address");
+      emailInputRef.current?.focus();
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailValue)) {
+      showValidationError("Please enter a valid email address");
+      emailInputRef.current?.focus();
+      return false;
+    }
+
+    return true;
+  }, []);
+
+  // ================== COMPUTED VALUES ==================
+  const hasDownloadConditions = useMemo(() => {
+    return downloadConditions && downloadConditions.length > 0;
+  }, [downloadConditions]);
+
+  const dateRange = useMemo(
+    () => getDateConditionFrom(downloadConditions),
+    [downloadConditions]
+  );
+
+  const multiPolygon = useMemo(
+    () => getMultiPolygonFrom(downloadConditions),
+    [downloadConditions]
+  );
+
+  // ================== INITIALIZATION & PERSISTENCE ==================
+  // Initialize email input field value
+  useEffect(() => {
+    if (emailInputRef.current && email) {
+      emailInputRef.current.value = email;
+    }
+  }, [email, activeStep]);
+
+  // Load saved data when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      setActiveStep(0);
+      setProcessingStatus("");
+
+      // Restore saved email
+      const savedEmail = localStorage.getItem("download_dialog_email") || "";
+      setEmail(savedEmail);
+      if (emailInputRef.current) {
+        emailInputRef.current.value = savedEmail;
+      }
+
+      // Restore saved data usage preferences
+      const savedDataUsage = localStorage.getItem("download_dialog_dataUsage");
+      if (savedDataUsage) {
+        try {
+          setDataUsage(JSON.parse(savedDataUsage));
+        } catch (e) {
+          setDataUsage({
+            purposes: [],
+            sectors: [],
+            allow_contact: null,
+          });
+        }
+      } else {
+        setDataUsage({
+          purposes: [],
+          sectors: [],
+          allow_contact: null,
+        });
+      }
+    }
+  }, [isOpen]);
+
+  // Handle processing timeout
+  useEffect(() => {
+    if (isProcessing) {
+      const timer = setTimeout(() => {
+        setProcessingStatus("408");
+        setIsProcessing(false);
+      }, TIMEOUT_LIMIT);
+      return () => clearTimeout(timer);
+    }
+  }, [isProcessing]);
+
+  // ================== DIALOG MANAGEMENT ==================
+  // Close dialog and reset all state
+  const handleIsClose = useCallback(() => {
+    setProcessingStatus("");
+    setActiveStep(0);
+    setEmail("");
+    setDataUsage({
+      purposes: [],
+      sectors: [],
+      allow_contact: null,
+    });
+    setIsProcessing(false);
+    localStorage.removeItem("download_dialog_email");
+    localStorage.removeItem("download_dialog_dataUsage");
+    setIsOpen(false);
+  }, [setIsOpen]);
+
+  // ================== STEP NAVIGATION ==================
+  // Handle step changes with validation
+  const handleStepChange = useCallback(
+    (targetStep: number) => {
+      const currentEmailValue = emailInputRef.current?.value?.trim() || "";
+
+      // Validate email when moving forward from step 0
+      if (activeStep === 0 && targetStep > 0) {
+        if (!validateEmail(currentEmailValue)) {
+          return;
+        }
+
+        setEmail(currentEmailValue);
+        localStorage.setItem("download_dialog_email", currentEmailValue);
+      }
+
+      // Save email when staying on step 0
+      if (activeStep === 0 && targetStep === 0 && currentEmailValue) {
+        setEmail(currentEmailValue);
+        localStorage.setItem("download_dialog_email", currentEmailValue);
+      }
+
+      setActiveStep(targetStep);
+
+      // Restore email input value when returning to step 0
+      if (targetStep === 0) {
+        setTimeout(() => {
+          const savedEmail =
+            localStorage.getItem("download_dialog_email") || email;
+          if (emailInputRef.current && savedEmail) {
+            emailInputRef.current.value = savedEmail;
+          }
+        }, 0);
+      }
+    },
+    [activeStep, email, validateEmail]
+  );
+
+  const handleStepClick = useCallback(
+    (step: number) => {
+      handleStepChange(step);
+    },
+    [handleStepChange]
+  );
+
+  // ================== DATA USAGE MANAGEMENT ==================
+  // Handle data usage form changes with persistence
+  const handleDataUsageChange = useCallback(
+    (newDataUsage: DataUsageInformation) => {
+      const currentEmail =
+        email ||
+        emailInputRef.current?.value ||
+        localStorage.getItem("download_dialog_email") ||
+        "";
+
+      setDataUsage(newDataUsage);
+
+      // Save both data usage and email to localStorage
+      Promise.resolve().then(() => {
+        localStorage.setItem(
+          "download_dialog_dataUsage",
+          JSON.stringify(newDataUsage)
+        );
+
+        if (currentEmail) {
+          localStorage.setItem("download_dialog_email", currentEmail);
+          if (
+            emailInputRef.current &&
+            emailInputRef.current.value !== currentEmail
+          ) {
+            emailInputRef.current.value = currentEmail;
+          }
+          if (email !== currentEmail) {
+            setEmail(currentEmail);
+          }
+        }
+      });
+    },
+    [email, setDataUsage]
+  );
+
+  // ================== DOWNLOAD REQUEST PROCESSING ==================
+  // Submit download job to backend
+  const submitJob = useCallback(
+    (email: string) => {
+      if (!uuid) {
+        setIsProcessing(false);
+        return;
+      }
+
+      const normalizedEmail = email.toLowerCase();
+
+      const request: DatasetDownloadRequest = {
+        inputs: {
+          uuid: uuid,
+          recipient: normalizedEmail,
+          start_date: dateRange.start,
+          end_date: dateRange.end,
+          multi_polygon: multiPolygon,
+          data_usage: dataUsage,
+        },
+      };
+
+      dispatch(processDatasetDownload(request))
+        .unwrap()
+        .then((response: { status: { message: SetStateAction<string> } }) => {
+          if (response && response.status && response.status.message) {
+            setProcessingStatus(response.status.message);
+          } else {
+            setProcessingStatus("200");
+          }
+          setIsProcessing(false);
+
+          // Clear saved data after successful submission
+          localStorage.removeItem("download_dialog_email");
+          localStorage.removeItem("download_dialog_dataUsage");
+        })
+        .catch(
+          (error: {
+            response: { status: { toString: () => SetStateAction<string> } };
+          }) => {
+            if (error && error.response && error.response.status) {
+              setProcessingStatus(error.response.status.toString());
+            } else {
+              setProcessingStatus("500");
+            }
+            setIsProcessing(false);
+          }
+        );
+    },
+    [dateRange.end, dateRange.start, dispatch, multiPolygon, uuid, dataUsage]
+  );
+
+  // ================== FORM SUBMISSION HANDLERS ==================
+  // Handle form submission (step 2)
+  const handleFormSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      setIsProcessing(true);
+      const formData = new FormData(event.currentTarget);
+      const formJson = Object.fromEntries((formData as any).entries());
+      const emailFromForm = formJson.email;
+
+      if (emailFromForm) {
+        submitJob(emailFromForm);
+      } else {
+        setIsProcessing(false);
+      }
+    },
+    [submitJob]
+  );
+
+  // Handle stepper button clicks
+  const handleStepperButtonClick = useCallback(() => {
+    if (activeStep === 0) {
+      // Step 0: Move to next step
+      handleStepChange(1);
+    } else {
+      // Step 1: Submit the form
+      const emailToSubmit = emailInputRef.current?.value?.trim() || email;
+
+      if (!validateEmail(emailToSubmit)) {
+        return;
+      }
+
+      if (!uuid) {
+        showValidationError("Dataset UUID is missing");
+        return;
+      }
+
+      setIsProcessing(true);
+      submitJob(emailToSubmit);
+    }
+  }, [activeStep, email, handleStepChange, submitJob, uuid, validateEmail]);
+
+  // ================== UI HELPERS ==================
+  // Get processing status message for display
+  const getProcessStatusText = useCallback((): string => {
+    if (processingStatus === "") {
+      return "";
+    }
+    if (/^5\d{2}$/.test(processingStatus)) {
+      return "Failed! Please try again later";
+    }
+    if (/^2\d{2}$/.test(processingStatus)) {
+      return "Succeeded! An email will be sent to you shortly";
+    }
+    if (processingStatus === "408") {
+      return "Request timeout! Please try again later";
+    }
+    if (/^4\d{2}$/.test(processingStatus)) {
+      return "Failed! Please try again later";
+    }
+    return "Something went wrong";
+  }, [processingStatus]);
+
+  // Get button title based on current step
+  const getStepperButtonTitle = useCallback(() => {
+    if (activeStep === 0) {
+      return "Next";
+    } else {
+      return "I understand, process download";
+    }
+  }, [activeStep]);
+
+  return {
+    emailInputRef,
+    activeStep,
+    isProcessing,
+    processingStatus,
+    email,
+    dataUsage,
+    snackbar,
+    hasDownloadConditions,
+    handleIsClose,
+    handleStepClick,
+    handleStepperButtonClick,
+    handleDataUsageChange,
+    handleFormSubmit,
+    getProcessStatusText,
+    getStepperButtonTitle,
+    setSnackbar,
+  };
+};

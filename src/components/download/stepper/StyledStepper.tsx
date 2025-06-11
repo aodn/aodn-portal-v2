@@ -62,8 +62,6 @@ const StyledStepper: FC<StyledStepperProps> = ({
         gap: gap.lg,
         flexShrink: 0,
         mx: "auto",
-        mt: 1,
-        px: 2,
         "& .MuiStepConnector-root": {
           top: "12px",
           left: "calc(-50% + 12px)",
@@ -71,9 +69,6 @@ const StyledStepper: FC<StyledStepperProps> = ({
           zIndex: 0,
         },
         "& .MuiStepConnector-line": {
-          borderColor: color.gray.extraLight,
-          borderTopWidth: "1px",
-          borderStyle: "solid",
           flex: "1 0 0",
         },
         "& .MuiStepConnector-active .MuiStepConnector-line": {
@@ -109,8 +104,8 @@ const StyledStepper: FC<StyledStepperProps> = ({
               StepIconComponent={() => (
                 <Box
                   sx={{
-                    width: padding.double,
-                    height: padding.double,
+                    width: "28.8px",
+                    height: "28.8px",
                     flexShrink: 0,
                     borderRadius: borderRadius.circle,
                     display: "flex",
@@ -152,9 +147,9 @@ const StyledStepper: FC<StyledStepperProps> = ({
                   color: "rgba(0, 0, 0, 0.87)",
                   fontFeatureSettings: "'liga' off, 'clig' off",
                   fontFamily: "Roboto",
-                  fontSize: "16.8px",
+                  fontSize: "16px",
                   fontStyle: "normal",
-                  fontWeight: isActive ? 500 : 500,
+                  fontWeight: 500,
                   lineHeight: "157%",
                   letterSpacing: "0.12px",
                   cursor: onStepClick ? "pointer" : "default",
