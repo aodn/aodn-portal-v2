@@ -28,6 +28,12 @@ export interface DatasetDownloadRequest {
       allow_contact: boolean | null;
     };
   };
+  outputs: object;
+  subscriber: {
+    successUri: string;
+    inProgressUri: string;
+    failedUri: string;
+  };
 }
 
 export class DateRangeCondition

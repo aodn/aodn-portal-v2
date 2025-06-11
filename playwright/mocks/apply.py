@@ -11,6 +11,11 @@ from mocks.api.collections import (
     handle_collections_centroid_api,
     handle_collections_popup_api,
 )
+from mocks.api.search_collections import (
+    handle_provider_api,
+    handle_temporal_api,
+)
+from mocks.api.vocabs import handle_vocabs_api
 from mocks.api_router import ApiRouter
 
 
@@ -18,6 +23,10 @@ def apply_mock(page: Page) -> None:
     api_router = ApiRouter(page)
     api_router.route_category(handle_categories_api)
     api_router.route_autocomplete(handle_search_autocomplete_api)
+    api_router.route_vocabs(handle_vocabs_api)
+    api_router.route_search_collections(
+        handle_temporal_api, handle_provider_api
+    )
     api_router.route_collection(
         handle_collections_centroid_api,
         handle_collections_all_api,

@@ -264,6 +264,12 @@ export const useDownloadDialog = (
           multi_polygon: multiPolygon,
           data_usage: dataUsage,
         },
+        outputs: {},
+        subscriber: {
+          successUri: "place_holder",
+          inProgressUri: "place_holder",
+          failedUri: "place_holder",
+        },
       };
 
       dispatch(processDatasetDownload(request))
