@@ -1,11 +1,4 @@
-import {
-  useState,
-  useRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  SetStateAction,
-} from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch } from "../components/common/store/hooks";
 import { DataUsageInformation } from "../components/download/DataUsageForm";
@@ -17,13 +10,27 @@ import {
 import { DatasetDownloadRequest } from "../pages/detail-page/context/DownloadDefinitions";
 import { processDatasetDownload } from "../components/common/store/searchReducer";
 
+// ================== CONSTANTS ==================
+const STATUS_CODES = {
+  TIMEOUT: "408",
+  SERVER_ERROR: "500",
+  SUCCESS: "200",
+} as const;
+
+const STATUS_MESSAGES = {
+  TIMEOUT: "Request timeout! Please try again later",
+  SERVER_ERROR: "Server error! Please try again later",
+  SUCCESS: "Success! Email will be sent shortly",
+  DATASET_ERROR: "Dataset unavailable! Please try again later",
+} as const;
+
+const TIMEOUT_LIMIT = 8000;
+
 interface SnackbarState {
   open: boolean;
   message: string;
   severity: "error" | "warning" | "info" | "success";
 }
-
-const TIMEOUT_LIMIT = 8000;
 
 export const useDownloadDialog = (
   isOpen: boolean,
@@ -38,6 +45,7 @@ export const useDownloadDialog = (
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [dataUsage, setDataUsage] = useState<DataUsageInformation>({
@@ -60,7 +68,7 @@ export const useDownloadDialog = (
     });
   };
 
-  const validateEmail = useCallback((emailValue: string): boolean => {
+  const isEmailValid = useCallback((emailValue: string): boolean => {
     if (!emailValue.trim()) {
       showValidationError("Please enter your email address");
       emailInputRef.current?.focus();
@@ -105,6 +113,7 @@ export const useDownloadDialog = (
     if (isOpen) {
       setActiveStep(0);
       setProcessingStatus("");
+      setIsSuccess(false);
 
       // Restore saved email
       const savedEmail = localStorage.getItem("download_dialog_email") || "";
@@ -139,7 +148,7 @@ export const useDownloadDialog = (
   useEffect(() => {
     if (isProcessing) {
       const timer = setTimeout(() => {
-        setProcessingStatus("408");
+        setProcessingStatus(STATUS_CODES.TIMEOUT);
         setIsProcessing(false);
       }, TIMEOUT_LIMIT);
       return () => clearTimeout(timer);
@@ -149,6 +158,7 @@ export const useDownloadDialog = (
   // ================== DIALOG MANAGEMENT ==================
   // Close dialog and reset all state
   const handleIsClose = useCallback(() => {
+    setIsSuccess(false);
     setProcessingStatus("");
     setActiveStep(0);
     setEmail("");
@@ -171,7 +181,7 @@ export const useDownloadDialog = (
 
       // Validate email when moving forward from step 0
       if (activeStep === 0 && targetStep > 0) {
-        if (!validateEmail(currentEmailValue)) {
+        if (!isEmailValid(currentEmailValue)) {
           return;
         }
 
@@ -198,7 +208,7 @@ export const useDownloadDialog = (
         }, 0);
       }
     },
-    [activeStep, email, validateEmail]
+    [activeStep, email, isEmailValid]
   );
 
   const handleStepClick = useCallback(
@@ -274,26 +284,31 @@ export const useDownloadDialog = (
 
       dispatch(processDatasetDownload(request))
         .unwrap()
-        .then((response: { status: { message: SetStateAction<string> } }) => {
-          if (response && response.status && response.status.message) {
-            setProcessingStatus(response.status.message);
+        .then((response: { status: { message: string } }) => {
+          if (response?.status?.message) {
+            const statusCode = response.status.message;
+            setProcessingStatus(statusCode);
+
+            // Only 2xx status codes are considered successful
+            if (/^2\d{2}$/.test(statusCode)) {
+              setIsSuccess(true);
+              // Clear saved data after successful submission
+              localStorage.removeItem("download_dialog_email");
+              localStorage.removeItem("download_dialog_dataUsage");
+            }
           } else {
-            setProcessingStatus("200");
+            console.log("Processing time out.");
+            setProcessingStatus(STATUS_CODES.TIMEOUT);
           }
           setIsProcessing(false);
-
-          // Clear saved data after successful submission
-          localStorage.removeItem("download_dialog_email");
-          localStorage.removeItem("download_dialog_dataUsage");
         })
         .catch(
-          (error: {
-            response: { status: { toString: () => SetStateAction<string> } };
-          }) => {
-            if (error && error.response && error.response.status) {
+          (error: { response: { status: { toString: () => string } } }) => {
+            if (error?.response?.status) {
               setProcessingStatus(error.response.status.toString());
             } else {
-              setProcessingStatus("500");
+              console.log("Internal server error.");
+              setProcessingStatus(STATUS_CODES.SERVER_ERROR);
             }
             setIsProcessing(false);
           }
@@ -324,44 +339,46 @@ export const useDownloadDialog = (
 
   // Handle stepper button clicks
   const handleStepperButtonClick = useCallback(() => {
+    // Step 0: Navigate to license agreement
     if (activeStep === 0) {
-      // Step 0: Move to next step
       handleStepChange(1);
-    } else {
-      // Step 1: Submit the form
-      const emailToSubmit = emailInputRef.current?.value?.trim() || email;
-
-      if (!validateEmail(emailToSubmit)) {
-        return;
-      }
-
-      if (!uuid) {
-        showValidationError("Dataset UUID is missing");
-        return;
-      }
-
-      setIsProcessing(true);
-      submitJob(emailToSubmit);
+      return;
     }
-  }, [activeStep, email, handleStepChange, submitJob, uuid, validateEmail]);
+
+    // Step 1: Submit download request
+    const emailToSubmit = emailInputRef.current?.value?.trim() || email;
+
+    if (!isEmailValid(emailToSubmit)) {
+      return;
+    }
+
+    if (!uuid) {
+      showValidationError("Dataset UUID is missing");
+      return;
+    }
+
+    setIsProcessing(true);
+    submitJob(emailToSubmit);
+  }, [activeStep, email, handleStepChange, submitJob, uuid, isEmailValid]);
 
   // ================== UI HELPERS ==================
   // Get processing status message for display
   const getProcessStatusText = useCallback((): string => {
-    if (processingStatus === "") {
-      return "";
+    if (!processingStatus) return "";
+
+    if (processingStatus === STATUS_CODES.TIMEOUT) {
+      return STATUS_MESSAGES.TIMEOUT;
     }
     if (/^5\d{2}$/.test(processingStatus)) {
-      return "Failed! Please try again later";
+      return STATUS_MESSAGES.SERVER_ERROR;
     }
     if (/^2\d{2}$/.test(processingStatus)) {
-      return "Succeeded! An email will be sent to you shortly";
-    }
-    if (processingStatus === "408") {
-      return "Request timeout! Please try again later";
+      return STATUS_MESSAGES.SUCCESS;
     }
     if (/^4\d{2}$/.test(processingStatus)) {
-      return "Failed! Please try again later";
+      return processingStatus === "400"
+        ? STATUS_MESSAGES.DATASET_ERROR
+        : "Request failed! Please try again later";
     }
     return "Something went wrong";
   }, [processingStatus]);
@@ -379,6 +396,7 @@ export const useDownloadDialog = (
     emailInputRef,
     activeStep,
     isProcessing,
+    isSuccess,
     processingStatus,
     email,
     dataUsage,

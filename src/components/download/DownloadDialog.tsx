@@ -156,6 +156,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
     emailInputRef,
     activeStep,
     isProcessing,
+    isSuccess,
     processingStatus,
     email,
     dataUsage,
@@ -306,7 +307,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
           <StepperButton
             title={getStepperButtonTitle()}
             onClick={handleStepperButtonClick}
-            disabled={isProcessing}
+            disabled={isProcessing || isSuccess}
           />
           {isProcessing && (
             <CircularProgress
