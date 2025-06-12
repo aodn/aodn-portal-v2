@@ -120,6 +120,19 @@ const getWMSLayerNames = (collection: OGCCollection | undefined) => {
   );
 };
 
+const overallBoundingBox = (collection: OGCCollection) => {
+  const bbox = collection?.extent?.bbox[0];
+  if (!bbox || bbox.length < 4) {
+    return [
+      MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
+      MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
+      MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
+      MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
+    ];
+  }
+  return bbox;
+};
+
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   bbox,
 }) => {
@@ -131,15 +144,15 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     getAndSetDownloadConditions,
   } = useDetailPageContext();
 
-  // Need to init with null as collection can be undefined when it entered this component.
-  const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
+  // Need to init with null as collection value can be undefined when it entered this component.
+  const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(null);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
   const abstract = collection?.description ? collection.description : "";
 
-  const mapLayerConfig = useMemo((): LayerSwitcherLayer[] => {
-    const layers: LayerSwitcherLayer[] = [];
+  const mapLayerConfig = useMemo((): LayerSwitcherLayer<LayerName>[] => {
+    const layers: LayerSwitcherLayer<LayerName>[] = [];
 
     if (collection) {
       const isSupportHexbin = collection?.hasSummaryFeature() === true;
@@ -157,15 +170,15 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         default: !isSupportHexbin,
       });
       // Init the layer with values here taking the default
-      setSelectedLayer((v) => {
+      setSelectedLayer((v: LayerName | null): LayerName | null => {
         if (v) {
           return v;
         } else {
           // Not init before, make it the same as the default value of this config
-          const layer: LayerSwitcherLayer | undefined = layers.find(
+          const layer: LayerSwitcherLayer<LayerName> | undefined = layers.find(
             (l) => l.default
           );
-          return layer != undefined ? layer.id : null;
+          return layer != null ? layer.id : null;
         }
       });
     }
@@ -217,56 +230,14 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
 
   const handleGeoLayerChange = useCallback(
-    (id: string) => setSelectedLayer(id),
+    (id: LayerName) =>
+      setSelectedLayer((v: LayerName | null) => (v !== id ? id : v)),
     []
   );
-
-  const overallBoundingBox = useMemo(() => {
-    const bbox = collection?.extent?.bbox[0];
-    if (!bbox || bbox.length < 4) {
-      return [
-        MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
-        MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
-        MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
-        MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
-      ];
-    }
-    return bbox;
-  }, [collection?.extent?.bbox]);
 
   const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
     setIsWMSAvailable(isWMSAvailable);
   }, []);
-
-  // Function to create the appropriate layer based on selection,
-  // cannot warp with useCallback because this not returns a new instance
-  // of layer on each call
-  const createPresentationLayer = (id: string | null) => {
-    switch (id) {
-      case LayerName.GeoServer:
-        return (
-          <GeoServerTileLayer
-            geoServerTileLayerConfig={{
-              baseUrl: ensureHttps(getWMSServer(collection)[0]),
-              tileUrlParams: { LAYERS: getWMSLayerNames(collection) },
-              bbox: overallBoundingBox,
-            }}
-            onWMSAvailabilityChange={onWMSAvailabilityChange}
-          />
-        );
-      case LayerName.Hexbin:
-        return (
-          filteredFeatureCollection && (
-            <HexbinLayer
-              key="hexbinlayer"
-              featureCollection={filteredFeatureCollection}
-            />
-          )
-        );
-      default:
-        return null;
-    }
-  };
 
   const handleBaseMapSwitch = useCallback(
     (target: EventTarget & HTMLInputElement) =>
@@ -372,8 +343,20 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                   </Controls>
                   <Layers>
-                    {createPresentationLayer(selectedLayer)}
                     {createStaticLayers(staticLayer)}
+                    <GeoServerTileLayer
+                      geoServerTileLayerConfig={{
+                        baseUrl: ensureHttps(getWMSServer(collection)[0]),
+                        tileUrlParams: { LAYERS: getWMSLayerNames(collection) },
+                        bbox: overallBoundingBox(collection),
+                      }}
+                      onWMSAvailabilityChange={onWMSAvailabilityChange}
+                      visible={selectedLayer === LayerName.GeoServer}
+                    />
+                    <HexbinLayer
+                      featureCollection={filteredFeatureCollection}
+                      visible={selectedLayer === LayerName.Hexbin}
+                    />
                   </Layers>
                 </Map>
               </Box>

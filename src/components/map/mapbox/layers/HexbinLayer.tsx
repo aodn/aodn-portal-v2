@@ -19,7 +19,8 @@ const COLOR_RANGE: Color[] = [
 ];
 // If featureCollection is undefined, create an empty layer
 const createHexagonLayer = (
-  featureCollection: FeatureCollection<Point> | undefined
+  featureCollection: FeatureCollection<Point> | undefined,
+  visible: boolean | undefined
 ) => {
   return new HexagonLayer<Feature<Point>>({
     id: MAPBOX_OVERLAY_HEXAGON_LAYER,
@@ -33,6 +34,7 @@ const createHexagonLayer = (
     gpuAggregation: false,
     extruded: false,
     pickable: true,
+    visible: visible,
     radius: 15000, // Change hexagon size here
     opacity: 0.3,
     colorRange: COLOR_RANGE,
@@ -40,7 +42,7 @@ const createHexagonLayer = (
   });
 };
 
-const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
+const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>();
   const overlayRef = useRef<MapboxOverlay | null>();
@@ -52,7 +54,7 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
         | undefined,
       map: Map
     ) => {
-      const layer = createHexagonLayer(featureCollection);
+      const layer = createHexagonLayer(featureCollection, false);
       return new MapboxOverlay({
         interleaved: true,
         layers: [layer],
@@ -150,10 +152,10 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection }) => {
     // Update the data on change
     if (featureCollection && overlayRef.current) {
       overlayRef.current?.setProps({
-        layers: [createHexagonLayer(featureCollection)],
+        layers: [createHexagonLayer(featureCollection, visible)],
       });
     }
-  }, [featureCollection]);
+  }, [featureCollection, visible]);
 
   return null;
 };

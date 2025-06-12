@@ -34,6 +34,11 @@ interface GeoServerTileLayerConfig {
   bbox: Position;
 }
 
+interface GeoServerTileLayerProps extends LayerBasicType {
+  geoServerTileLayerConfig?: Partial<GeoServerTileLayerConfig>;
+  onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
+}
+
 // Example url for mapbox wms resource: "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256"
 
 const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
@@ -86,56 +91,39 @@ const checkWMSAvailability = (
   return true;
 };
 
-interface GeoServerTileLayerProps extends LayerBasicType {
-  geoServerTileLayerConfig?: Partial<GeoServerTileLayerConfig>;
-  onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
-}
-
 const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   geoServerTileLayerConfig,
   onWMSAvailabilityChange,
+  visible,
 }: GeoServerTileLayerProps) => {
   const { map } = useContext(MapContext);
 
-  const config = useMemo(
-    () =>
-      mergeWithDefaults(
-        defaultGeoServerTileLayerConfig,
-        geoServerTileLayerConfig
-      ),
-    [geoServerTileLayerConfig]
-  );
+  const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
+  const titleLayerId = useMemo(() => getTileLayerId(layerId), [layerId]);
+  const sourceLayerId = useMemo(() => getTileSourceId(layerId), [layerId]);
 
-  const tileUrl = useMemo(
-    () =>
-      formatToUrl<TileUrlParams>({
-        baseUrl: config.baseUrl,
-        params: config.tileUrlParams,
-      }),
-    [config.baseUrl, config.tileUrlParams]
-  );
+  const [config, tileUrl, isWMSAvailable] = useMemo(() => {
+    const config = mergeWithDefaults(
+      defaultGeoServerTileLayerConfig,
+      geoServerTileLayerConfig
+    );
+    const tileUrl = formatToUrl<TileUrlParams>({
+      baseUrl: config.baseUrl,
+      params: config.tileUrlParams,
+    });
+    const isWMSAvailable = checkWMSAvailability(
+      config.baseUrl,
+      config.tileUrlParams,
+      onWMSAvailabilityChange
+    );
+    return [config, tileUrl, isWMSAvailable];
+  }, [geoServerTileLayerConfig, onWMSAvailabilityChange]);
 
-  const isWMSAvailable = useMemo(
-    () =>
-      checkWMSAvailability(
-        config.baseUrl,
-        config.tileUrlParams,
-        onWMSAvailabilityChange
-      ),
-    [config.baseUrl, config.tileUrlParams, onWMSAvailabilityChange]
-  );
-
-  // Add the tile layer to the map
   useEffect(() => {
     if (map === null || map === undefined) return;
 
-    const layerId = getLayerId(map.getContainer().id);
-    const titleLayerId = getTileLayerId(layerId);
-    const sourceLayerId = getTileSourceId(layerId);
-
-    const createLayers = () => {
-      // Check WMS availability before adding the layer
-      if (isWMSAvailable) {
+    const createSource = () => {
+      if (isWMSAvailable && !map?.isSourceLoaded(sourceLayerId)) {
         // Add the WMS source following Mapbox's example
         if (!map?.getSource(sourceLayerId)) {
           map?.addSource(sourceLayerId, {
@@ -146,7 +134,35 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
             maxzoom: config.maxZoom,
           });
         }
+      }
+    };
 
+    createSource();
+
+    return () => {
+      if (map?.isSourceLoaded(sourceLayerId)) {
+        if (sourceLayerId && map?.getSource(sourceLayerId)) {
+          map?.removeSource(sourceLayerId);
+        }
+      }
+    };
+  }, [
+    config.maxZoom,
+    config.minZoom,
+    config.tileSize,
+    isWMSAvailable,
+    map,
+    sourceLayerId,
+    tileUrl,
+  ]);
+
+  // Add the tile layer to the map
+  useEffect(() => {
+    if (map === null || map === undefined) return;
+
+    const createLayers = () => {
+      // Check WMS availability before adding the layer
+      if (isWMSAvailable && map?.isStyleLoaded()) {
         // Add the raster layer
         if (!map?.getLayer(titleLayerId)) {
           map?.addLayer({
@@ -154,19 +170,22 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
             type: "raster",
             source: sourceLayerId,
             paint: {},
+            layout: {
+              visibility: visible ? "visible" : "none", // Start invisible to avoid rendering delays
+            },
           });
-        }
 
-        const handleIdle = () => {
-          if (!isWMSAvailable) return;
-          fitToBound(map, config.bbox, {
-            animate: true,
-            zoomOffset: 0.5,
-          });
-        };
-        map?.once("idle", handleIdle);
-        // Re-add layers when map style changes
-        map?.on("styledata", createLayers);
+          // Handle only if new layer added
+          const handleIdle = () => {
+            if (!isWMSAvailable) return;
+            fitToBound(map, config.bbox, {
+              animate: true,
+              zoomOffset: 0.5,
+            });
+          };
+
+          visible && map?.once("idle", handleIdle);
+        }
       }
     };
 
@@ -174,36 +193,33 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
       if (map === null || map === undefined) return;
 
       map?.off("styledata", createLayers);
-
       // Important to check this because the map may be unloading and when you try
       // to access getLayer or similar function, the style will be undefined and throw
       // exception
-      if (isWMSAvailable && map?.isStyleLoaded()) {
+      if (map?.isStyleLoaded()) {
         if (titleLayerId && map?.getLayer(titleLayerId)) {
           map?.removeLayer(titleLayerId);
-        }
-
-        if (sourceLayerId && map?.getSource(sourceLayerId)) {
-          map?.removeSource(sourceLayerId);
         }
       }
     };
 
-    // Create layers when map loads
-    map?.once("load", createLayers);
+    // Must use idle because the map already loaded if this is not
+    // the default layer
+    map?.once("idle", createLayers);
+    map?.on("styledata", createLayers);
 
     // Cleanup function
     return () => {
-      cleanUp();
+      map?.once("idle", cleanUp);
     };
   }, [
     config.bbox,
-    config.maxZoom,
-    config.minZoom,
-    config.tileSize,
     isWMSAvailable,
     map,
+    sourceLayerId,
     tileUrl,
+    titleLayerId,
+    visible,
   ]);
 
   return null;

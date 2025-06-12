@@ -18,6 +18,7 @@ export interface LayerBasicType {
   // location even map drag. Centroid only move when it is absolute necessary like
   // outside of viewport.
   preferCurrentCentroid?: boolean;
+  visible?: boolean;
 }
 // Use to create static layer on map, you need to add menu item to select those layers,
 // refer to map section

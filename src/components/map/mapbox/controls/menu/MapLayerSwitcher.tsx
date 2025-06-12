@@ -22,8 +22,8 @@ import grey from "../../../../common/colors/grey";
 import blue from "../../../../common/colors/blue";
 import { borderRadius, fontSize } from "../../../../../styles/constants";
 
-export interface LayerSwitcherLayer {
-  id: string;
+export interface LayerSwitcherLayer<T = string> {
+  id: T;
   name: string;
   default?: boolean;
 }
