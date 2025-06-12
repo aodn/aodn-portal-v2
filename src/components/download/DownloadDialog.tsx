@@ -129,6 +129,7 @@ const DialogHeader: React.FC<{
         </Typography>
         <IconButton
           onClick={onClose}
+          aria-label="Close dialog"
           sx={{
             position: "absolute",
             right: 0,
