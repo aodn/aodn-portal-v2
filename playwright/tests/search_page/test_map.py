@@ -276,11 +276,11 @@ def test_map_buttons(desktop_page: Page) -> None:
 
     # Select the Hexbin layer
     detail_page.detail_map.layers_icon.click()
-    detail_page.detail_map.hexbin_layer.click()
+    detail_page.detail_map.geoserver_layer.click()
     expect(
         detail_page.detail_map.daterange_show_hide_menu_button
-    ).to_be_visible()
-    expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
+    ).not_to_be_visible()
+    expect(detail_page.detail_map.draw_rect_menu_button).not_to_be_visible()
 
 
 def test_map_zoom_out_and_drag_does_not_crash(desktop_page: Page) -> None:

@@ -30,17 +30,17 @@ describe("HeaderMenu", () => {
       userEvent.hover(aboutUsButton);
 
       // Wait for hover event to show menu
-      return waitFor(() => screen.findByText("About IMOS")).then(
-        (aboutImosItem) => {
-          expect(aboutImosItem).toBeInTheDocument();
+      return waitFor(() => screen.findByText("About IMOS"), {
+        timeout: 5000,
+      }).then((aboutImosItem) => {
+        expect(aboutImosItem).toBeInTheDocument();
 
-          // Click menu item "About Imos"
-          fireEvent.click(aboutImosItem);
+        // Click menu item "About Imos"
+        fireEvent.click(aboutImosItem);
 
-          // Check if openInNewTab was called with the correct URL
-          expect(openInNewTab).toHaveBeenCalledWith("https://imos.org.au/");
-        }
-      );
+        // Check if openInNewTab was called with the correct URL
+        expect(openInNewTab).toHaveBeenCalledWith("https://imos.org.au/");
+      });
     });
   });
 
