@@ -22,6 +22,11 @@ export interface DatasetDownloadRequest {
     start_date: string;
     end_date: string;
     multi_polygon: MultiPolygon;
+    data_usage?: {
+      purposes: string[];
+      sectors: string[];
+      allow_contact: boolean | null;
+    };
   };
   outputs: object;
   subscriber: {

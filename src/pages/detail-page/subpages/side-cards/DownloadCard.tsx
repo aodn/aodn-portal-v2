@@ -3,7 +3,6 @@ import {
   AccordionDetails,
   AccordionSummary,
   Badge,
-  Box,
   Button,
   Divider,
   Stack,
@@ -22,16 +21,8 @@ import PlainAccordion from "../../../../components/common/accordion/PlainAccordi
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
 import { useDetailPageContext } from "../../context/detail-page-context";
-import BBoxConditionBox from "../../../../components/box/BBoxConditionBox";
-import {
-  BBoxCondition,
-  DownloadConditionType,
-  DateRangeCondition,
-  IDownloadCondition,
-  IDownloadConditionCallback,
-} from "../../context/DownloadDefinitions";
-import DateRangeConditionBox from "../../../../components/box/DateRangeConditionBox";
-import DownloadDialog from "./DownloadDialog";
+import DownloadDialog from "../../../../components/download/DownloadDialog";
+import DataSelection from "../../../../components/download/DataSelection";
 
 const options = [
   // { label: "NetCDFs", value: "NetCDFs" },
@@ -41,23 +32,8 @@ const options = [
 const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const { downloadConditions, isCollectionNotFound, removeDownloadCondition } =
-    useDetailPageContext();
+  const { downloadConditions, isCollectionNotFound } = useDetailPageContext();
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
-
-  const bboxConditions: BBoxCondition[] = useMemo(() => {
-    const bboxConditions = downloadConditions.filter(
-      (condition) => condition.type === DownloadConditionType.BBOX
-    );
-    return bboxConditions as BBoxCondition[];
-  }, [downloadConditions]);
-
-  const dateRangeCondition: DateRangeCondition[] = useMemo(() => {
-    const timeRangeConditions = downloadConditions.filter(
-      (condition) => condition.type === DownloadConditionType.DATE_RANGE
-    );
-    return timeRangeConditions as DateRangeCondition[];
-  }, [downloadConditions]);
 
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
@@ -74,19 +50,11 @@ const DownloadCard = () => {
     [theme]
   );
 
-  const handleRemove = useCallback(
-    (c: IDownloadConditionCallback & IDownloadCondition) => {
-      c.removeCallback && c.removeCallback();
-      removeDownloadCondition(c);
-    },
-    [removeDownloadCondition]
-  );
-
   return (
     <Stack direction="column">
       <DownloadDialog
-        open={downloadDialogOpen}
-        setOpen={setDownloadDialogOpen}
+        isOpen={downloadDialogOpen}
+        setIsOpen={setDownloadDialogOpen}
       />
       <Stack sx={{ padding: padding.medium }} spacing={2}>
         <CommonSelect items={options} sx={selectSxProps} />
@@ -130,26 +98,7 @@ const DownloadCard = () => {
           </Badge>
         </AccordionSummary>
         <AccordionDetails>
-          <Box gap={2}>
-            {bboxConditions.map((bboxCondition, index) => {
-              return (
-                <BBoxConditionBox
-                  key={index}
-                  bboxCondition={bboxCondition}
-                  onRemove={() => handleRemove(bboxCondition)}
-                />
-              );
-            })}
-            {dateRangeCondition.map((dateRangeCondition, index) => {
-              return (
-                <DateRangeConditionBox
-                  key={index}
-                  dateRangeCondition={dateRangeCondition}
-                  onRemove={() => handleRemove(dateRangeCondition)}
-                />
-              );
-            })}
-          </Box>
+          <DataSelection />
         </AccordionDetails>
       </PlainAccordion>
     </Stack>
