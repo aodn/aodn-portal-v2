@@ -344,6 +344,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   </Controls>
                   <Layers>
                     {createStaticLayers(staticLayer)}
+                    {
+                      // Put the two later here so that they all init the same time
+                      // GeoServerLayer is heavy to load, so we can load it
+                      // but hide it with visible = false
+                    }
                     <GeoServerTileLayer
                       geoServerTileLayerConfig={{
                         baseUrl: ensureHttps(getWMSServer(collection)[0]),

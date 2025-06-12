@@ -119,25 +119,23 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     return [config, tileUrl, isWMSAvailable];
   }, [geoServerTileLayerConfig, onWMSAvailabilityChange]);
 
+  // Create a source should be in different useEffect so that the source
+  // does not unload and reloads each time, which is very time-consuming
   useEffect(() => {
     if (map === null || map === undefined) return;
 
-    const createSource = () => {
-      if (isWMSAvailable && !map?.isSourceLoaded(sourceLayerId)) {
-        // Add the WMS source following Mapbox's example
-        if (!map?.getSource(sourceLayerId)) {
-          map?.addSource(sourceLayerId, {
-            type: "raster",
-            tiles: [tileUrl],
-            tileSize: config.tileSize,
-            minzoom: config.minZoom,
-            maxzoom: config.maxZoom,
-          });
-        }
+    if (isWMSAvailable && !map?.isSourceLoaded(sourceLayerId)) {
+      // Add the WMS source following Mapbox's example
+      if (!map?.getSource(sourceLayerId)) {
+        map?.addSource(sourceLayerId, {
+          type: "raster",
+          tiles: [tileUrl],
+          tileSize: config.tileSize,
+          minzoom: config.minZoom,
+          maxzoom: config.maxZoom,
+        });
       }
-    };
-
-    createSource();
+    }
 
     return () => {
       if (map?.isSourceLoaded(sourceLayerId)) {

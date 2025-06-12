@@ -2,7 +2,7 @@ import { FC, useCallback, useContext, useEffect, useRef } from "react";
 import { HexagonLayer } from "@deck.gl/aggregation-layers";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
-import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
+import { Feature, FeatureCollection, Point } from "geojson";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { Map, Popup } from "mapbox-gl";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
@@ -48,16 +48,10 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
   const overlayRef = useRef<MapboxOverlay | null>();
 
   const createLayer = useCallback(
-    (
-      featureCollection:
-        | FeatureCollection<Point, GeoJsonProperties>
-        | undefined,
-      map: Map
-    ) => {
-      const layer = createHexagonLayer(featureCollection, false);
-      return new MapboxOverlay({
+    (map: Map) =>
+      new MapboxOverlay({
         interleaved: true,
-        layers: [layer],
+        layers: [],
         onClick: (info) => {
           if (info.picked && info.object) {
             // Remove existing popup
@@ -109,8 +103,7 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
               .addTo(map);
           }
         },
-      });
-    },
+      }),
     []
   );
 
@@ -120,7 +113,7 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
     const createHexbinLayer = () => {
       if (!overlayRef.current) {
         // Just create skeleton of the layer, data update later
-        const overlay = createLayer(featureCollection, map);
+        const overlay = createLayer(map);
         if (overlay) {
           overlayRef.current = overlay;
           map?.addControl(overlay);
@@ -139,9 +132,7 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
       }
     };
 
-    map?.once("idle", () => {
-      createHexbinLayer();
-    });
+    createHexbinLayer();
 
     return () => {
       cleanup();
