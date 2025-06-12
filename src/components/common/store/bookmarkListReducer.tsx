@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import EventEmitter from "events";
 import { AppDispatch, RootState } from "./store";
-import { fetchResultNoStore } from "./searchReducer";
-import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
+import { fetchResultNoStore, jsonToOGCCollections } from "./searchReducer";
+import { OGCCollection } from "./OGCCollectionDefinitions";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
@@ -157,14 +157,15 @@ export const initializeBookmarkList = createAsyncThunk<
 
       await dispatch(fetchResultNoStore(searchParams))
         .unwrap()
-        .then((value: OGCCollections) => {
-          dispatch(setItems(value.collections));
+        .then((value: string) => {
+          const collections = jsonToOGCCollections(value).collections;
+          dispatch(setItems(collections));
           // Emit INIT event after data is loaded
           setTimeout(() => {
             emitter.emit(EVENT_BOOKMARK.INIT, {
               id: "",
               action: EVENT_BOOKMARK.INIT,
-              value: value.collections,
+              value: collections,
             });
           }, 0.1);
         });
