@@ -297,8 +297,8 @@ export const useDownloadDialog = (
               localStorage.removeItem("download_dialog_dataUsage");
             }
           } else {
-            console.log("Processing time out.");
-            setProcessingStatus(STATUS_CODES.TIMEOUT);
+            console.log("Internal server error.");
+            setProcessingStatus(STATUS_CODES.SERVER_ERROR);
           }
           setIsProcessing(false);
         })
