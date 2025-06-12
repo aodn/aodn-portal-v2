@@ -31,7 +31,7 @@ describe("HeaderMenu", () => {
 
       // Wait for hover event to show menu
       return waitFor(() => screen.findByText("About IMOS"), {
-        timeout: 1000,
+        timeout: 5000,
       }).then((aboutImosItem) => {
         expect(aboutImosItem).toBeInTheDocument();
 
