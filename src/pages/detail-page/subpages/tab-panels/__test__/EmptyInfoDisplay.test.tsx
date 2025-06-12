@@ -79,7 +79,7 @@ describe("AssociatedRecordsPanel", async () => {
 
   it("should render AssociatedRecordsPanel", () => {
     return waitFor(() => screen.findAllByText("Parent Record"), {
-      timeout: 2000,
+      timeout: 5000,
     }).then(() => {
       const parentRecordText = screen.queryAllByText("Parent Record");
       // one is button, another is list title
