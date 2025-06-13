@@ -26,7 +26,7 @@ import {
   DownloadConditionType,
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
-import { FeatureCollection, Point } from "geojson";
+import { FeatureCollection, Point, Position } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
@@ -120,9 +120,11 @@ const getWMSLayerNames = (collection: OGCCollection | undefined) => {
   );
 };
 
-const overallBoundingBox = (collection: OGCCollection) => {
-  const bbox = collection?.extent?.bbox[0];
-  if (!bbox || bbox.length < 4) {
+const overallBoundingBox = (
+  collection: OGCCollection | undefined
+): Position | undefined => {
+  const bbox = collection?.extent?.bbox;
+  if (!bbox || !bbox[0] || bbox[0].length !== 4) {
     return [
       MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
       MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
@@ -130,7 +132,7 @@ const overallBoundingBox = (collection: OGCCollection) => {
       MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
     ];
   }
-  return bbox;
+  return bbox[0];
 };
 
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
@@ -373,5 +375,5 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
 };
 
-export { getMinMaxDateStamps };
+export { getMinMaxDateStamps, overallBoundingBox };
 export default SummaryAndDownloadPanel;

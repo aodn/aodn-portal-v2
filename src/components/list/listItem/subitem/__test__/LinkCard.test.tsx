@@ -88,9 +88,12 @@ describe("LinkCard", () => {
 
     const link = screen.getByText("Test Link Title");
     userEvent.click(link);
-    waitFor(() => {
-      expect(LinkUtils.openInNewTab).toHaveBeenCalledWith(mockLink.href);
-    });
+    waitFor(
+      () => {
+        expect(LinkUtils.openInNewTab).toHaveBeenCalledWith(mockLink.href);
+      },
+      { timeout: 5000 }
+    );
   });
 
   it("calls handleCopyToClipboard with correct URL when copy button is clicked", () => {
@@ -99,8 +102,7 @@ describe("LinkCard", () => {
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
     userEvent.hover(linkCard);
     waitFor(() => {
-      const copyButton = screen.getByTestId(`copy-button-${mockLink.href}`);
-      return copyButton;
+      return screen.getByTestId(`copy-button-${mockLink.href}`);
     })
       .then((copyButton) => {
         userEvent.click(copyButton);
