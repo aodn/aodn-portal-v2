@@ -54,39 +54,53 @@ describe("BookmarkButton", () => {
     const collection: OGCCollection = Object.assign(new OGCCollection(), item);
 
     render(<BookmarkButton dataset={collection} />);
-    waitFor(() => screen.findByTestId("bookmarkbutton-bookmarkicon")).then(
-      () => {
-        // Should not find this icon before click
+    return waitFor(() =>
+      screen.findByTestId("ba9110f1-072c-4d15-8328-2091be983991-iconbutton")
+    ).then(() => {
+      // Should not find this icon before click
+      expect(
+        store.getState().bookmarkList.items.find((i) => i.id === item.id)
+      ).toBeFalsy();
+      expect(
+        screen.queryByTestId(
+          "ba9110f1-072c-4d15-8328-2091be983991-bookmarkicon"
+        )
+      ).toBeNull();
+
+      // Click the button should trigger the bookmark state change
+      const button = screen.getByTestId(
+        "ba9110f1-072c-4d15-8328-2091be983991-iconbutton"
+      );
+      userEvent.click(button);
+      // Icon changed
+      expect(
+        screen.getByTestId(
+          "ba9110f1-072c-4d15-8328-2091be983991-bookmarkbordericon"
+        )
+      ).toBeInTheDocument();
+
+      // The store should store the id of this item
+      return waitFor(() =>
         expect(
           store.getState().bookmarkList.items.find((i) => i.id === item.id)
-        ).toBeFalsy();
-        expect(
-          screen.getByTestId("bookmarkbutton-bookmarkbordericon")
-        ).not.toBeInTheDocument();
-
-        // Click the button should trigger the bookmark state change
-        const button = screen.getByTestId("bookmarkbutton-iconbutton");
-        userEvent.click(button);
-        // Icon changed
-        expect(
-          screen.getByTestId("bookmarkbutton-bookmarkbordericon")
-        ).toBeInTheDocument();
-
-        // The store should store the id of this item
-        expect(
-          store.getState().bookmarkList.items.find((i) => i.id === item.id)
-        ).toBeTruthy();
-
+        ).toBeTruthy()
+      ).then(() => {
         // Click button again reset the status
         userEvent.click(button);
-        expect(
-          store.getState().bookmarkList.items.find((i) => i.id === item.id)
-        ).toBeFalsy();
-        expect(
-          screen.getByTestId("bookmarkbutton-bookmarkicon")
-        ).toBeInTheDocument();
-      }
-    );
+
+        return waitFor(() =>
+          expect(
+            store.getState().bookmarkList.items.find((i) => i.id === item.id)
+          ).toBeFalsy()
+        ).then(() => {
+          expect(
+            screen.queryByTestId(
+              "ba9110f1-072c-4d15-8328-2091be983991-bookmarkicon"
+            )
+          ).toBeNull();
+        });
+      });
+    });
   });
 
   it("Verify remove_all event", async () => {
