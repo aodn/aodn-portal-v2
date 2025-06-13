@@ -139,8 +139,8 @@ export class OGCCollection {
 
   set extent(extents: any) {
     this.propExtent = new Spatial(this);
-    this.propExtent.bbox = extents.spatial.bbox;
-    this.propExtent.crs = extents.spatial.crs;
+    this.propExtent.bbox = extents.spatial ? extents.spatial.bbox : undefined;
+    this.propExtent.crs = extents.spatial ? extents.spatial.crs : undefined;
     this.propExtent.temporal = extents.temporal;
   }
 
