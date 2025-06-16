@@ -12,7 +12,7 @@ import Layers, {
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
-// import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
+import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import BaseMapSwitcher, {
@@ -47,6 +47,7 @@ const mapContainerId = "map-detail-container-id";
 enum LayerName {
   Hexbin = "hexbin",
   GeoServer = "geoServer",
+  Symbol = "symbol",
 }
 
 interface SummaryAndDownloadPanelProps {
@@ -171,6 +172,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         name: "GeoServer",
         default: !isSupportHexbin,
       });
+
+      layers.push({
+        id: LayerName.Symbol,
+        name: "Symbol",
+        default: false,
+      });
+
       // Init the layer with values here taking the default
       setSelectedLayer((v: LayerName | null): LayerName | null => {
         if (v) {
@@ -347,7 +355,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   <Layers>
                     {createStaticLayers(staticLayer)}
                     {
-                      // Put the two later here so that they all init the same time
+                      // Put the first two later here so that they all init the same time
                       // GeoServerLayer is heavy to load, so we can load it
                       // but hide it with visible = false
                     }
@@ -364,6 +372,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       featureCollection={filteredFeatureCollection}
                       visible={selectedLayer === LayerName.Hexbin}
                     />
+                    {selectedLayer === LayerName.Symbol && (
+                      <DetailSymbolLayer
+                        featureCollection={filteredFeatureCollection}
+                      />
+                    )}
                   </Layers>
                 </Map>
               </Box>
