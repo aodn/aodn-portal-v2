@@ -256,11 +256,11 @@ export class Spatial {
     this.parent = ogcCollection;
   }
   /**
-   * Create a GeoJSON FeatureCollection from the bounding boxes and points
+   * Create a GeoJSON FeatureCollection from the bounding boxes and points value.
    * @param start - The index to start from, from spec, the first is the overall bounding box
    * @returns - The geojson feature collection
    */
-  getGeojsonExtents = (start: number): FeatureCollection => {
+  getGeojsonFromBBox = (start: number): FeatureCollection => {
     const featureCollections: FeatureCollection = {
       type: "FeatureCollection",
       features: new Array<Feature<Geometry, GeoJsonProperties>>(),

@@ -98,9 +98,12 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
 }: GeoServerTileLayerProps) => {
   const { map } = useContext(MapContext);
 
-  const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
-  const titleLayerId = useMemo(() => getTileLayerId(layerId), [layerId]);
-  const sourceLayerId = useMemo(() => getTileSourceId(layerId), [layerId]);
+  const [titleLayerId, sourceLayerId] = useMemo(() => {
+    const layerId = getLayerId(map?.getContainer().id);
+    const titleLayerId = getTileLayerId(layerId);
+    const sourceLayerId = getTileSourceId(layerId);
+    return [layerId, titleLayerId, sourceLayerId];
+  }, [map]);
 
   const [config, tileUrl, isWMSAvailable] = useMemo(() => {
     const config = mergeWithDefaults(
@@ -119,48 +122,28 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     return [config, tileUrl, isWMSAvailable];
   }, [geoServerTileLayerConfig, onWMSAvailabilityChange]);
 
-  // Create a source should be in different useEffect so that the source
-  // does not unload and reloads each time, which is very time-consuming
-  useEffect(() => {
-    if (map === null || map === undefined) return;
-
-    if (isWMSAvailable && !map?.isSourceLoaded(sourceLayerId)) {
-      // Add the WMS source following Mapbox's example
-      if (!map?.getSource(sourceLayerId)) {
-        map?.addSource(sourceLayerId, {
-          type: "raster",
-          tiles: [tileUrl],
-          tileSize: config.tileSize,
-          minzoom: config.minZoom,
-          maxzoom: config.maxZoom,
-        });
-      }
-    }
-
-    return () => {
-      if (map?.isSourceLoaded(sourceLayerId)) {
-        if (sourceLayerId && map?.getSource(sourceLayerId)) {
-          map?.removeSource(sourceLayerId);
-        }
-      }
-    };
-  }, [
-    config.maxZoom,
-    config.minZoom,
-    config.tileSize,
-    isWMSAvailable,
-    map,
-    sourceLayerId,
-    tileUrl,
-  ]);
-
   // Add the tile layer to the map
   useEffect(() => {
     if (map === null || map === undefined) return;
 
-    const createLayers = () => {
+    const createSource = () => {
+      if (isWMSAvailable && !map?.isSourceLoaded(sourceLayerId)) {
+        // Add the WMS source following Mapbox's example
+        if (!map?.getSource(sourceLayerId)) {
+          map?.addSource(sourceLayerId, {
+            type: "raster",
+            tiles: [tileUrl],
+            tileSize: config.tileSize,
+            minzoom: config.minZoom,
+            maxzoom: config.maxZoom,
+          });
+        }
+      }
+    };
+
+    const createLayers = (layoutVisible: undefined | boolean) => {
       // Check WMS availability before adding the layer
-      if (isWMSAvailable && map?.isStyleLoaded()) {
+      if (isWMSAvailable) {
         // Add the raster layer
         if (!map?.getLayer(titleLayerId)) {
           map?.addLayer({
@@ -169,7 +152,7 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
             source: sourceLayerId,
             paint: {},
             layout: {
-              visibility: visible ? "visible" : "none", // Start invisible to avoid rendering delays
+              visibility: layoutVisible ? "visible" : "none",
             },
           });
 
@@ -182,15 +165,26 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
             });
           };
 
-          visible && map?.once("idle", handleIdle);
+          layoutVisible && map?.once("idle", handleIdle);
         }
+      }
+    };
+
+    const createLayersOnStyleChange = () => {
+      createSource();
+      createLayers(visible);
+    };
+
+    const createLayersOnInit = () => {
+      if (map?.isStyleLoaded()) {
+        createSource();
+        createLayers(visible);
       }
     };
 
     const cleanUp = () => {
       if (map === null || map === undefined) return;
-
-      map?.off("styledata", createLayers);
+      map?.off("styledata", createLayersOnStyleChange);
       // Important to check this because the map may be unloading and when you try
       // to access getLayer or similar function, the style will be undefined and throw
       // exception
@@ -199,12 +193,17 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
           map?.removeLayer(titleLayerId);
         }
       }
+      if (map?.isSourceLoaded(sourceLayerId)) {
+        if (sourceLayerId && map?.getSource(sourceLayerId)) {
+          map?.removeSource(sourceLayerId);
+        }
+      }
     };
 
     // Must use idle because the map already loaded if this is not
     // the default layer
-    map?.once("idle", createLayers);
-    map?.on("styledata", createLayers);
+    map?.once("idle", createLayersOnInit);
+    map?.on("styledata", createLayersOnStyleChange);
 
     // Cleanup function
     return () => {
@@ -212,6 +211,9 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     };
   }, [
     config.bbox,
+    config.maxZoom,
+    config.minZoom,
+    config.tileSize,
     isWMSAvailable,
     map,
     sourceLayerId,

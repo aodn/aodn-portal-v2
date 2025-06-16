@@ -126,7 +126,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     map?.addSource(sourceId, {
       type: "geojson",
       // Use a URL for the value for the `data` property.
-      data: extent?.getGeojsonExtents(1),
+      data: extent?.getGeojsonFromBBox(1),
     });
 
     map?.addLayer({
