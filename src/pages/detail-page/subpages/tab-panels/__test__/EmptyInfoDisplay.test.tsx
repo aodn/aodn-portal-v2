@@ -110,7 +110,6 @@ describe("AssociatedRecordsPanel", async () => {
 
         if (parentAbstract) {
           userEvent.click(parentAbstract);
-
           return waitFor(() => expect(openSpy).toHaveBeenCalled());
         }
       });

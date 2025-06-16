@@ -30,7 +30,7 @@ export const generateFeatureCollectionFrom = (
       // Do calculation base on extents bounding box, this is old way of doing things
       // for backward compatable
       // We skip the first one which is the overall bounding box, then add the remaining
-      collection.extent?.getGeojsonExtents(1).features.forEach((i) =>
+      collection.extent?.getGeojsonFromBBox(1).features.forEach((i) =>
         featureCollections.features.push({
           ...turf.centerOfMass(i.geometry),
           // Add the id so we can reference it easily
