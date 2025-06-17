@@ -117,6 +117,7 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
     if (map === null) return;
 
     const createLayers = () => {
+      if (!map || !map.getStyle()) return;
       if (map?.getSource(clusterSourceId)) return;
 
       map?.setMaxZoom(config.clusterMaxZoom);
@@ -174,10 +175,18 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
       map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
       map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
       map?.off("click", clusterLayer, onSymbolClick);
+      map?.off("styledata", createLayers);
+      map?.off("load", createLayers);
 
       try {
-        if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
-        if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
+        if (map && map.getStyle()) {
+          if (map.getLayer(clusterLayer)) {
+            map.removeLayer(clusterLayer);
+          }
+          if (map.getSource(clusterSourceId)) {
+            map.removeSource(clusterSourceId);
+          }
+        }
       } catch (error) {
         // Handle error
       }
