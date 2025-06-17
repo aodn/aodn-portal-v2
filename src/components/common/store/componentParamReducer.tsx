@@ -231,6 +231,7 @@ const createInitialParameterState = (
 ): ParameterState => {
   const state: ParameterState = {
     isImosOnlyDataset: false,
+    hasCOData: false,
     dateTimeFilterRange: {},
     searchText: "",
     zoom: MapDefaultConfig.ZOOM,
