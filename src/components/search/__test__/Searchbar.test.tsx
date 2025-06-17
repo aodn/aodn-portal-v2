@@ -34,13 +34,23 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
   default: () => ({ isMobile: false }),
 }));
 
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+const mockLocation = {
+  pathname: "/",
+  search: "",
+  hash: "",
+  state: null,
+  key: "default",
+};
+
+// Mock react-router-dom with the mutable location
+vi.mock(import("react-router-dom"), async (importOriginal) => {
+  const actual = await importOriginal();
   return {
     ...actual,
-    useLocation: () => ({ pathname: "/" }),
+    useLocation: () => mockLocation,
   };
 });
+
 import { BrowserRouter as Router } from "react-router-dom";
 import Searchbar from "../Searchbar";
 import { PARAMETER_VOCABS } from "../../../__mocks__/data/PARAMETER_VOCABS";
@@ -56,6 +66,10 @@ describe("Searchbar", () => {
   });
 
   beforeEach(() => {
+    // Reset mock location to default before each test
+    mockLocation.pathname = "/";
+    mockLocation.search = "";
+
     // Cleanup redux before each test
     store.dispatch(clearComponentParam());
     clearAllMock();
@@ -64,6 +78,7 @@ describe("Searchbar", () => {
   afterEach(() => {
     cleanup();
     server.resetHandlers();
+    vi.clearAllMocks();
   });
 
   afterAll(() => {
@@ -313,5 +328,43 @@ describe("Searchbar", () => {
         });
       }
     );
+  });
+
+  // URL to Redux flow: make sure the searchbar states are updated correctly from URL parameters
+  it("should handle URL with bbox parameters correctly", () => {
+    mockLocation.pathname = "/search";
+    mockLocation.search =
+      "?isImosOnlyDataset=false&zoom=3.5&bbox.type=Feature&bbox.bbox.0=104&bbox.bbox.1=-43&bbox.bbox.2=163&bbox.bbox.3=-8&bbox.geometry.type=Polygon&bbox.geometry.coordinates.0.0.0=104&bbox.geometry.coordinates.0.0.1=-43&bbox.geometry.coordinates.0.1.0=163&bbox.geometry.coordinates.0.1.1=-43&bbox.geometry.coordinates.0.2.0=163&bbox.geometry.coordinates.0.2.1=-8&bbox.geometry.coordinates.0.3.0=104&bbox.geometry.coordinates.0.3.1=-8&bbox.geometry.coordinates.0.4.0=104&bbox.geometry.coordinates.0.4.1=-43&hasCOData=false";
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Searchbar />
+          </Router>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    return waitFor(() => {
+      const state = store.getState();
+      const paramReducer = state.paramReducer;
+
+      // Verify boolean conversion works in complex URL
+      expect(paramReducer.hasCOData).toBe(false);
+      expect(typeof paramReducer.hasCOData).toBe("boolean");
+      expect(paramReducer.isImosOnlyDataset).toBe(false);
+      expect(typeof paramReducer.isImosOnlyDataset).toBe("boolean");
+
+      // Verify bbox is properly reconstructed
+      expect(paramReducer.bbox).toBeDefined();
+      expect(paramReducer.bbox?.type).toBe("Feature");
+      expect(paramReducer.bbox?.geometry.type).toBe("Polygon");
+      expect(paramReducer.bbox?.bbox).toEqual([104, -43, 163, -8]);
+
+      // Verify numeric values
+      expect(paramReducer.zoom).toBe(3.5);
+      expect(typeof paramReducer.zoom).toBe("number");
+    });
   });
 });
