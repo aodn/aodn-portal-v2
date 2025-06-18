@@ -178,7 +178,9 @@ export class OGCCollection {
     const target = this.links?.find(
       (l) => l.type === "image" && l.rel === RelationType.PREVIEW
     );
-    return target !== undefined ? target.href : default_thumbnail;
+    return target !== undefined && target.href.length > 0
+      ? target.href
+      : default_thumbnail;
   };
   // Locate the logo from the links array
   findIcon = (): string | undefined => {
