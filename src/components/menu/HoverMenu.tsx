@@ -58,7 +58,7 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
           onKeyDown={handleListKeyDown}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
-          data-testId="hover-menu"
+          data-testid="hover-menu"
         >
           {menu.items.map((item, index) => (
             <MenuItem
@@ -72,7 +72,7 @@ const HoverMenu: React.FC<HoverMenuProps> = ({ menu }) => {
                 bgcolor: "transparent",
                 ":hover": { bgcolor: color.blue.xLight },
               }}
-              data-testId={`hover-menu-item-${item.name}`}
+              data-testid={`hover-menu-item-${item.name}`}
             >
               {item.name}
             </MenuItem>
