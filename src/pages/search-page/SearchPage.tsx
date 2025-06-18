@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
-import { bboxPolygon, booleanEqual } from "@turf/turf";
+import { bbox as turfBbox, bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
   getComponentState,
   getSearchQueryResult,
@@ -15,6 +15,7 @@ import {
   fetchResultNoStore,
   fetchResultWithStore,
   jsonToOGCCollections,
+  SearchParameters,
 } from "../../components/common/store/searchReducer";
 import {
   formatToUrlParam,
@@ -127,9 +128,12 @@ const SearchPage = () => {
     // and by default we will include record without spatial extents so that BBOX
     // will not exclude record without spatial extents however for map search
     // it is ok to exclude it because it isn't show on map anyway
-    const paramNonPaged = createSearchParamFrom(componentParam, {
-      pagesize: DEFAULT_SEARCH_MAP_SIZE,
-    });
+    const paramNonPaged: SearchParameters = createSearchParamFrom(
+      componentParam,
+      {
+        pagesize: DEFAULT_SEARCH_MAP_SIZE,
+      }
+    );
 
     dispatch(
       // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
@@ -162,6 +166,18 @@ const SearchPage = () => {
       dispatch(fetchResultWithStore(paramPaged));
       doMapSearch()
         .then(() => {
+          if (componentParam.polygon) {
+            // If user set the polygon, then we zoom to that area by setting the bbox
+            const bbox = turfBbox(componentParam.polygon);
+            setBbox(
+              new LngLatBounds(
+                [bbox[0], bbox[1]], // Southwest corner: [minX, minY]
+                [bbox[2], bbox[3]] // Northeast corner: [maxX, maxY]
+              )
+            );
+            setZoom(6);
+          }
+
           if (needNavigate) {
             navigate(
               pageDefault.search + "?" + formatToUrlParam(componentParam),
