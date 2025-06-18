@@ -119,20 +119,28 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     FeatureCollection<Point> | undefined
   >(undefined);
 
-  const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
+  const [
+    heatmapSourceId,
+    clusterSourceId,
+    heatmapLayer,
+    clusterLayer,
+    unClusterPointLayer,
+  ] = useMemo(() => {
+    const layerId = getLayerId(map?.getContainer().id);
+    const heatmapSourceId = getHeatmapSourceId(layerId);
+    const clusterSourceId = getClusterSourceId(layerId);
+    const heatmapLayer = getHeatmapLayerId(layerId);
+    const clusterLayer = getClusterCircleLayerId(layerId);
+    const unClusterPointLayer = getUnclusterPointLayerId(layerId);
 
-  const heatmapSourceId = useMemo(() => getHeatmapSourceId(layerId), [layerId]);
-  const clusterSourceId = useMemo(() => getClusterSourceId(layerId), [layerId]);
-
-  const heatmapLayer = useMemo(() => getHeatmapLayerId(layerId), [layerId]);
-  const clusterLayer = useMemo(
-    () => getClusterCircleLayerId(layerId),
-    [layerId]
-  );
-  const unClusterPointLayer = useMemo(
-    () => getUnclusterPointLayerId(layerId),
-    [layerId]
-  );
+    return [
+      heatmapSourceId,
+      clusterSourceId,
+      heatmapLayer,
+      clusterLayer,
+      unClusterPointLayer,
+    ];
+  }, [map]);
 
   // This is use to render the heatmap and add event handle to circles
   useEffect(() => {
@@ -291,7 +299,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       );
       map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
-      try {
+      if (map?.isStyleLoaded()) {
         if (map?.getLayer(heatmapLayer)) map?.removeLayer(heatmapLayer);
         if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
         if (map?.getLayer(unClusterPointLayer))
@@ -299,8 +307,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         if (map?.getLayer("cluster-count")) map?.removeLayer("cluster-count");
         if (map?.getSource(heatmapSourceId)) map?.removeSource(heatmapSourceId);
         if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
-      } catch (e) {
-        // OK to ignore if no layer then no source as well
       }
     };
     // Make sure map is the only dependency so that it will not trigger twice run

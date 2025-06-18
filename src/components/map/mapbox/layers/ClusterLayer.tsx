@@ -111,16 +111,14 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
     FeatureCollection<Point> | undefined
   >(undefined);
 
-  const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
-
-  const clusterSourceId = useMemo(() => getClusterSourceId(layerId), [layerId]);
-
-  const clusterLayer = useMemo(() => getClusterLayerId(layerId), [layerId]);
-
-  const unclusterPointLayer = useMemo(
-    () => getUnclusterPointId(layerId),
-    [layerId]
-  );
+  const [layerId, clusterSourceId, clusterLayer, unclusterPointLayer] =
+    useMemo(() => {
+      const layerId = getLayerId(map?.getContainer().id);
+      const clusterSourceId = getClusterSourceId(layerId);
+      const clusterLayer = getClusterLayerId(layerId);
+      const unclusterPointLayer = getUnclusterPointId(layerId);
+      return [layerId, clusterSourceId, clusterLayer, unclusterPointLayer];
+    }, [map]);
 
   // This is used to render the cluster circle and add event handle to circles
   useEffect(() => {
@@ -243,8 +241,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       );
       // Clean up resource when you click on the next spatial extents, map is
       // still working in this page.
-      try {
-        // Remove layers first
+      if (map?.isStyleLoaded()) {
         if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
 
         if (map?.getLayer(`${layerId}-cluster-count`))
@@ -258,9 +255,6 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
         // Then remove the source
         if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
-      } catch (error) {
-        // If source not found and throw exception then layer will not exist
-        // TODO: handle error in ErrorBoundary
       }
     };
     // Make sure map is the only dependency so that it will not trigger twice run
