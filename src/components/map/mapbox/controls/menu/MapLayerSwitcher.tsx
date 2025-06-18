@@ -5,7 +5,13 @@ import {
   EVENT_MENU,
   MenuClickedEvent,
 } from "./Definition";
-import { eventEmitter, leftPadding, rightPadding } from "./MenuControl";
+import {
+  bottomPadding,
+  eventEmitter,
+  leftPadding,
+  rightPadding,
+  topPadding,
+} from "./MenuControl";
 import {
   Box,
   Typography,
@@ -17,10 +23,16 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import LayersIcon from "@mui/icons-material/Layers";
 import grey from "../../../../common/colors/grey";
-import blue from "../../../../common/colors/blue";
-import { borderRadius, fontSize } from "../../../../../styles/constants";
+import {
+  borderRadius,
+  color,
+  fontColor,
+  fontFamily,
+  fontSize,
+  fontWeight,
+} from "../../../../../styles/constants";
+import { SearchStyleIcon } from "../../../../../assets/map/search_style";
 
 export interface LayerSwitcherLayer<T = string> {
   id: T;
@@ -75,9 +87,18 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
         id="layer-show-hide-menu-button"
         ref={anchorRef}
         onClick={handleToggle}
-        sx={{ paddingTop: "3px !important" }}
+        sx={{
+          padding: "6px !important",
+          backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
+          color: open ? "white" : color.gray.dark,
+          "& svg": {
+            width: 24,
+            height: 24,
+            fill: "currentColor",
+          },
+        }}
       >
-        <LayersIcon />
+        <SearchStyleIcon />
       </IconButton>
       <Popper
         id="layer-popper-id"
@@ -90,7 +111,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 10], // This applies an offset of 10px downward
+              offset: [-132, 14], // This applies an offset of 10px downward
             },
           },
         ]}
@@ -106,23 +127,34 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
             borderRadius: borderRadius["menu"],
             backgroundColor: grey["resultCard"],
             zIndex: 1,
+            minWidth: "260px",
           }}
         >
           <Typography
             sx={{
-              backgroundColor: "white",
+              backgroundColor: color.blue.medium,
               borderRadius: borderRadius["menuTop"],
               fontSize: fontSize["mapMenuItem"],
-              paddingTop: "7px",
-              paddingBottom: "7px",
-              paddingLeft: leftPadding,
-              fontWeight: "bold",
+              color: fontColor.gray.extraDark,
+              fontWeight: fontWeight.bold,
+              fontFamily: fontFamily.openSans,
+              minHeight: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Layers
+            Search Style
           </Typography>
           <Divider />
-          <Box sx={{ paddingLeft: leftPadding, paddingRight: rightPadding }}>
+          <Box
+            sx={{
+              paddingLeft: leftPadding,
+              paddingRight: rightPadding,
+              paddingTop: topPadding,
+              paddingBottom: bottomPadding,
+            }}
+          >
             <FormControl component="fieldset">
               <RadioGroup
                 value={currentLayer}
@@ -139,18 +171,30 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
                       <Radio
                         checked={currentLayer === l.id}
                         sx={{
+                          padding: "6px",
                           "& .MuiSvgIcon-root": {
                             fontSize: fontSize["mapMenuSubItem"],
                           },
                           "&.Mui-checked": {
-                            color: blue["imosLightBlue"],
+                            color: fontColor.blue.dark,
+                          },
+                          "&:not(.Mui-checked)": {
+                            color: fontColor.gray.medium,
                           },
                         }}
                       />
                     }
                     label={
-                      <Typography sx={{ fontSize: fontSize["mapMenuSubItem"] }}>
-                        {l.name}
+                      <Typography
+                        sx={{
+                          fontSize: fontSize.info,
+                          color: fontColor.gray.extraDark,
+                          fontFamily: fontFamily.openSans,
+                          fontWeight: fontWeight.regular,
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        {"Centre points (" + l.name + ")"}
                       </Typography>
                     }
                   />

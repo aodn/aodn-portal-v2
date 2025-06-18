@@ -22,7 +22,6 @@ import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLay
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
-import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation, {
   TabNavigation,
 } from "../../../hooks/useTabNavigation";
@@ -35,6 +34,7 @@ import { ParameterState } from "../../../components/common/store/componentParamR
 import store, {
   getComponentState,
 } from "../../../components/common/store/store";
+import ReferenceLayerSwitcher from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -54,9 +54,9 @@ interface MapSectionProps
 const mapContainerId = "result-page-main-map";
 
 enum LayerName {
+  Cluster = "clustered",
+  Uncluster = "unclustered",
   Heatmap = "heatmap",
-  Cluster = "cluster",
-  Uncluster = "uncluster",
 }
 
 const createPresentationLayers = (
@@ -140,6 +140,41 @@ const MapSection: React.FC<MapSectionProps> = ({
         position: "relative",
         height: "100%",
         width: "100%",
+        "& .mapboxgl-ctrl-top-right": {
+          borderRadius: "6px",
+          background: "#FFF",
+          boxShadow: "4px 4px 4px 0px rgba(0, 0, 0, 0.10)",
+          width: "42px",
+          height: "174px",
+          flexShrink: 0,
+          margin: "10px",
+          paddingX: "3px",
+
+          display: "flex",
+          flexDirection: "column",
+
+          "& .mapboxgl-ctrl": {
+            marginY: "3px !important",
+            paddingBottom: "1px !important",
+            border: "none !important",
+            boxShadow: "none !important",
+            borderRadius: "0 !important",
+
+            "&:last-child": {
+              marginBottom: 0,
+            },
+
+            "& button": {
+              border: "none !important",
+              outline: "none !important",
+              boxShadow: "none !important",
+              height: "36px !important",
+              borderRadius: "6px !important",
+              width: "auto !important",
+              minWidth: "36px !important",
+            },
+          },
+        },
         ...sx,
       }}
     >
@@ -159,6 +194,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           <NavigationControl visible={!isUnderLaptop} />
           <ScaleControl />
           <DisplayCoordinate />
+
           <MenuControl
             visible={!isUnderLaptop}
             menu={
@@ -168,9 +204,10 @@ const MapSection: React.FC<MapSectionProps> = ({
               />
             }
           />
+          <MenuControl menu={<BaseMapSwitcher />} />
           <MenuControl
             menu={
-              <BaseMapSwitcher
+              <ReferenceLayerSwitcher
                 layers={[
                   {
                     id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
@@ -203,18 +240,18 @@ const MapSection: React.FC<MapSectionProps> = ({
                 layers={[
                   {
                     id: LayerName.Cluster,
-                    name: capitalizeFirstLetter(LayerName.Cluster),
+                    name: LayerName.Cluster,
                     default: selectedLayer === LayerName.Cluster,
                   },
                   {
-                    id: LayerName.Heatmap,
-                    name: capitalizeFirstLetter(LayerName.Heatmap),
-                    default: selectedLayer === LayerName.Heatmap,
+                    id: LayerName.Uncluster,
+                    name: LayerName.Uncluster,
+                    default: selectedLayer === LayerName.Uncluster,
                   },
                   {
-                    id: LayerName.Uncluster,
-                    name: capitalizeFirstLetter(LayerName.Uncluster),
-                    default: selectedLayer === LayerName.Uncluster,
+                    id: LayerName.Heatmap,
+                    name: LayerName.Heatmap,
+                    default: selectedLayer === LayerName.Heatmap,
                   },
                 ]}
                 onEvent={(id: string) => setSelectedLayer(id)}

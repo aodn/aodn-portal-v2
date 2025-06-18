@@ -5,14 +5,13 @@ import {
   EVENT_MENU,
   MenuClickedEvent,
 } from "./Definition";
-import { styles as mapStyles } from "../../Map";
 import {
   Box,
   Typography,
-  Radio,
-  RadioGroup,
   FormControlLabel,
+  Checkbox,
   FormControl,
+  FormGroup,
   IconButton,
   Popper,
   Divider,
@@ -33,25 +32,24 @@ import {
   fontSize,
   fontWeight,
 } from "../../../../../styles/constants";
-import { MapDefaultConfig } from "../../constants";
-import { BaseLayerIcon } from "../../../../../assets/map/base_layer";
+import { BaseMapSwitcherLayer } from "./BaseMapSwitcher";
+import { ReferenceLayerIcon } from "../../../../../assets/map/ref_layer";
 
-export interface BaseMapSwitcherLayer {
-  id: string;
-  name: string;
-  label?: string;
-  default?: boolean;
+interface ReferenceLayerSwitcherProps extends ControlProps {
+  // Static layer to be added to the switch
+  layers: Array<BaseMapSwitcherLayer>;
 }
 
-interface BaseMapSwitcherProps extends ControlProps {}
+const MENU_ID = "reference-show-hide-menu-button";
 
-const MENU_ID = "basemap-show-hide-menu-button";
-
-const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
-  const [currentStyle, setCurrentStyle] = useState<string>(
-    mapStyles[MapDefaultConfig.DEFAULT_STYLE].id
-  );
+const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
+  layers,
+  onEvent,
+}) => {
   // Must init the map so that it will not throw error indicate uncontrol to control component
+  const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(
+    new Map(layers?.map((i) => [i.id, !!i.default]))
+  );
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
 
@@ -59,22 +57,18 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
     setOpen((prevOpen) => !prevOpen);
   }, [setOpen]);
 
-  const updateCurrentStyle = useCallback(
-    (id: string) => {
-      const target = mapStyles.find((e) => e.id === id);
-      if (target) {
-        map?.setStyle(target.style);
-        setCurrentStyle(id);
-      }
-    },
-    [map]
-  );
+  const toggleOverlay = useCallback((layerId: string, visible: boolean) => {
+    setOverlaysChecked((values) => {
+      values.set(layerId, visible);
+      return new Map(values);
+    });
+  }, []);
 
   useEffect(() => {
     // Handle event when other control clicked, this component should close
     // the menu
     const handleEvent = (evt: MenuClickedEvent) => {
-      if (evt.component.type !== BaseMapSwitcher) {
+      if (evt.component.type !== ReferenceLayerSwitcher) {
         setOpen(false);
       }
     };
@@ -95,7 +89,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
   return (
     <>
       <IconButton
-        aria-label="basemap-show-hide-menu"
+        aria-label="reference-show-hide-menu"
         id={MENU_ID}
         data-testid={MENU_ID}
         ref={anchorRef}
@@ -111,10 +105,10 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
           },
         }}
       >
-        <BaseLayerIcon />
+        <ReferenceLayerIcon />
       </IconButton>
       <Popper
-        id="basemap-popper-id"
+        id="reference-popper-id"
         open={open}
         anchorEl={anchorRef.current}
         role={undefined}
@@ -124,7 +118,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
           {
             name: "offset",
             options: {
-              offset: [-45, 14], // This applies an offset of 10px downward
+              offset: [-88, 14], // This applies an offset of 10px downward
             },
           },
         ]}
@@ -157,7 +151,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
               justifyContent: "center",
             }}
           >
-            Map Base Layers
+            Reference Layers
           </Typography>
           <Divider />
           <Box
@@ -169,20 +163,15 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
             }}
           >
             <FormControl component="fieldset">
-              <RadioGroup
-                value={currentStyle}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  updateCurrentStyle(e.target.value)
-                }
-              >
-                {mapStyles.map((style) => (
+              <FormGroup>
+                {layers?.map((ol) => (
                   <FormControlLabel
-                    key={style.name}
-                    value={style.id}
+                    key={"fc-" + ol.id}
                     control={
-                      <Radio
+                      <Checkbox
+                        id={"cb-" + ol.id}
                         sx={{
-                          paddingY: "6px",
+                          padding: "6px",
                           "& .MuiSvgIcon-root": {
                             fontSize: fontSize["mapMenuSubItem"],
                           },
@@ -193,6 +182,12 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
                             color: fontColor.gray.medium,
                           },
                         }}
+                        checked={overlaysChecked.get(ol.id)}
+                        onChange={(e) => {
+                          toggleOverlay(ol.id, e.target.checked);
+                          onEvent && onEvent(e.target);
+                        }}
+                        value={ol.id}
                       />
                     }
                     label={
@@ -205,12 +200,12 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
                           letterSpacing: "0.5px",
                         }}
                       >
-                        {style.name}
+                        {ol.name}
                       </Typography>
                     }
                   />
                 ))}
-              </RadioGroup>
+              </FormGroup>
             </FormControl>
           </Box>
         </Box>
@@ -221,4 +216,4 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
 
 export { MENU_ID };
 
-export default BaseMapSwitcher;
+export default ReferenceLayerSwitcher;

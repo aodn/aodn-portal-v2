@@ -12,8 +12,10 @@ import {
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
-const leftPadding = "15px";
+const leftPadding = "22px";
 const rightPadding = "15px";
+const topPadding = "8px";
+const bottomPadding = "10px";
 
 interface MenuControlProps {
   menu: MapControlType | null;
@@ -156,5 +158,12 @@ const MenuControl: React.FC<MenuControlProps> = ({
   return null;
 };
 
-export { eventEmitter, leftPadding, rightPadding, MapControl };
+export {
+  eventEmitter,
+  leftPadding,
+  rightPadding,
+  topPadding,
+  bottomPadding,
+  MapControl,
+};
 export default MenuControl;

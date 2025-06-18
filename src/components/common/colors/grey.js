@@ -7,7 +7,7 @@ const grey = {
   contentTabPanel: "#F1F1F1",
   search: "#ECECEC",
   searchButtonText: "#74797D",
-  resultCard: "#ECECEC",
+  resultCard: "#ffff",
   resultCardNumber: "#74797D",
   filterGroup: "#ECECEC",
   filterGroupItem: "white",
