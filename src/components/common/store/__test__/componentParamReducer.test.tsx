@@ -96,6 +96,7 @@ describe("Component Reducer Function Test", () => {
   it("Verify unFlattenToParameterState", () => {
     const sample1: ParameterState = {
       isImosOnlyDataset: false,
+      hasCOData: false,
       dateTimeFilterRange: {},
       searchText: "",
       zoom: MapDefaultConfig.ZOOM,
@@ -108,6 +109,7 @@ describe("Component Reducer Function Test", () => {
     // Only label get export, other fields in category are volatile.
     const sample4: ParameterState = {
       isImosOnlyDataset: false,
+      hasCOData: false,
       dateTimeFilterRange: {
         start: 12345,
         end: 45697,
@@ -130,6 +132,7 @@ describe("Component Reducer Function Test", () => {
 
     const sample5: ParameterState = {
       isImosOnlyDataset: false,
+      hasCOData: false,
       dateTimeFilterRange: {
         start: 12345,
         end: 45697,
