@@ -4,7 +4,6 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -18,7 +17,7 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import { FC, useState } from "react";
+import { FC, SyntheticEvent, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
@@ -188,6 +187,18 @@ const ListResultCard: FC<ListResultCardProps> = ({
                       width: "100%",
                       height: "100%",
                       objectFit: "contain",
+                    }}
+                    onError={(e: SyntheticEvent<HTMLImageElement, Event>) => {
+                      e.preventDefault();
+                      // This is a special case where the src is a valid url,
+                      // but the url is not reachable, then we fallback to use the
+                      // default thumbnail, and in this case like above we should hide
+                      // the thumbnail
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        e.currentTarget.src = default_thumbnail;
+                        parent.style.display = "none";
+                      }
                     }}
                   />
                 </Box>

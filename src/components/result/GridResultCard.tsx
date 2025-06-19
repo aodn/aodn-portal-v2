@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, SyntheticEvent, useState } from "react";
 import {
   Box,
   Card,
@@ -21,6 +21,7 @@ import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
+import default_thumbnail from "@/assets/images/default-thumbnail.png";
 
 interface GridResultCardProps extends ResultCardBasicType {}
 
@@ -91,6 +92,10 @@ const GridResultCard: FC<GridResultCardProps> = ({
               objectFit: "fill",
               width: "100%",
               height: "auto",
+            }}
+            onError={(e: SyntheticEvent<HTMLImageElement, Event>) => {
+              e.preventDefault();
+              e.currentTarget.src = default_thumbnail;
             }}
           />
         </Box>
