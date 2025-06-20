@@ -1,0 +1,31 @@
+export const mapSectionStyles = {
+  position: "relative",
+  height: "100%",
+  width: "100%",
+  "& .mapboxgl-ctrl-top-right": {
+    borderRadius: "6px",
+    background: "#FFF",
+    boxShadow: "4px 4px 4px 0px rgba(0, 0, 0, 0.10)",
+    width: "46px",
+    minHeight: "174px",
+    margin: "10px",
+    display: "flex",
+    flexDirection: "column",
+    "& .mapboxgl-ctrl.mapboxgl-ctrl": {
+      marginY: 0.4,
+      border: "none",
+      boxShadow: "none",
+      width: "100%",
+      display: "flex",
+      justifyContent: "center",
+      "& button": {
+        height: "40px",
+        borderRadius: "6px",
+        minWidth: "40px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      },
+    },
+  },
+};

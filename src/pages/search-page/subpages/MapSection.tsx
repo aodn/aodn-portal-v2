@@ -22,7 +22,6 @@ import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLay
 import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
-import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation, {
   TabNavigation,
 } from "../../../hooks/useTabNavigation";
@@ -35,6 +34,8 @@ import { ParameterState } from "../../../components/common/store/componentParamR
 import store, {
   getComponentState,
 } from "../../../components/common/store/store";
+import ReferenceLayerSwitcher from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
+import { mapSectionStyles } from "../../../components/map/mapbox/styles/custom";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -54,9 +55,9 @@ interface MapSectionProps
 const mapContainerId = "result-page-main-map";
 
 enum LayerName {
-  Heatmap = "heatmap",
-  Cluster = "cluster",
-  Uncluster = "uncluster",
+  Cluster = "Centre points (clustered)",
+  Uncluster = "Centre point (unclustered)",
+  Heatmap = "Centre point (heatmap)",
 }
 
 const createPresentationLayers = (
@@ -136,12 +137,12 @@ const MapSection: React.FC<MapSectionProps> = ({
   return (
     <Paper
       id={mapContainerId}
-      sx={{
-        position: "relative",
-        height: "100%",
-        width: "100%",
-        ...sx,
-      }}
+      sx={
+        {
+          ...mapSectionStyles,
+          ...sx,
+        } as SxProps<Theme>
+      }
     >
       <Map
         panelId={mapContainerId}
@@ -159,6 +160,7 @@ const MapSection: React.FC<MapSectionProps> = ({
           <NavigationControl visible={!isUnderLaptop} />
           <ScaleControl />
           <DisplayCoordinate />
+
           <MenuControl
             visible={!isUnderLaptop}
             menu={
@@ -168,9 +170,10 @@ const MapSection: React.FC<MapSectionProps> = ({
               />
             }
           />
+          <MenuControl menu={<BaseMapSwitcher />} />
           <MenuControl
             menu={
-              <BaseMapSwitcher
+              <ReferenceLayerSwitcher
                 layers={[
                   {
                     id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
@@ -203,18 +206,18 @@ const MapSection: React.FC<MapSectionProps> = ({
                 layers={[
                   {
                     id: LayerName.Cluster,
-                    name: capitalizeFirstLetter(LayerName.Cluster),
+                    name: LayerName.Cluster,
                     default: selectedLayer === LayerName.Cluster,
                   },
                   {
-                    id: LayerName.Heatmap,
-                    name: capitalizeFirstLetter(LayerName.Heatmap),
-                    default: selectedLayer === LayerName.Heatmap,
+                    id: LayerName.Uncluster,
+                    name: LayerName.Uncluster,
+                    default: selectedLayer === LayerName.Uncluster,
                   },
                   {
-                    id: LayerName.Uncluster,
-                    name: capitalizeFirstLetter(LayerName.Uncluster),
-                    default: selectedLayer === LayerName.Uncluster,
+                    id: LayerName.Heatmap,
+                    name: LayerName.Heatmap,
+                    default: selectedLayer === LayerName.Heatmap,
                   },
                 ]}
                 onEvent={(id: string) => setSelectedLayer(id)}
