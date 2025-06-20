@@ -51,17 +51,12 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
       <IconButton
         aria-label="bookmark-list-button"
         id="bookmark-list-button"
+        data-testid="bookmark-list-button"
         ref={anchorRef}
         onClick={() => setOpen((prev) => !prev)}
         sx={{
-          padding: "6px !important",
           backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
           color: open ? "white" : color.gray.dark,
-          "& svg": {
-            width: 24,
-            height: 24,
-            fill: "currentColor",
-          },
         }}
       >
         <BookmarkIcon />
@@ -77,7 +72,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 14],
+              offset: [0, 10],
             },
           },
         ]}

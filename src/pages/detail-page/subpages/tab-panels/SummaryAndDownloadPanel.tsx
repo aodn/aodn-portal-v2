@@ -9,15 +9,11 @@ import Map from "../../../../components/map/mapbox/Map";
 import Layers, {
   createStaticLayers,
 } from "../../../../components/map/mapbox/layers/Layers";
-import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
-import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
-import BaseMapSwitcher, {
-  BaseMapSwitcherLayer,
-} from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
+import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../../components/map/mapbox/controls/menu/DateRange";
 import dayjs, { Dayjs } from "dayjs";
@@ -53,20 +49,6 @@ enum LayerName {
 interface SummaryAndDownloadPanelProps {
   bbox?: LngLatBounds;
 }
-
-const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
-  {
-    id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
-    name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
-    label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-    default: false,
-  },
-  {
-    id: MapboxWorldLayersDef.WORLD.id,
-    name: MapboxWorldLayersDef.WORLD.name,
-    default: false,
-  },
-];
 
 const getMinMaxDateStamps = (
   featureCollection?: FeatureCollection<Point>
@@ -310,12 +292,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <ScaleControl />
                     <DisplayCoordinate />
                     <MenuControl
-                      menu={
-                        <BaseMapSwitcher
-                          layers={staticBaseLayerConfig}
-                          onEvent={handleBaseMapSwitch}
-                        />
-                      }
+                      menu={<BaseMapSwitcher onEvent={handleBaseMapSwitch} />}
                     />
                     <MenuControl
                       menu={

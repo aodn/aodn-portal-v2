@@ -95,14 +95,8 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
         ref={anchorRef}
         onClick={handleToggle}
         sx={{
-          padding: "6px !important",
           backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
           color: open ? "white" : color.gray.dark,
-          "& svg": {
-            width: 24,
-            height: 24,
-            fill: "currentColor",
-          },
         }}
       >
         <ReferenceLayerIcon />
@@ -118,7 +112,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
           {
             name: "offset",
             options: {
-              offset: [-88, 14], // This applies an offset of 10px downward
+              offset: [0, 10], // This applies an offset of 14px downward
             },
           },
         ]}

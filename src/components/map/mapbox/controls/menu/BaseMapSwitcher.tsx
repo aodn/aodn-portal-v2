@@ -101,14 +101,8 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
         ref={anchorRef}
         onClick={handleToggle}
         sx={{
-          padding: "6px !important",
           backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
           color: open ? "white" : color.gray.dark,
-          "& svg": {
-            width: 24,
-            height: 24,
-            fill: "currentColor",
-          },
         }}
       >
         <BaseLayerIcon />
@@ -124,7 +118,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
           {
             name: "offset",
             options: {
-              offset: [-45, 14], // This applies an offset of 10px downward
+              offset: [0, 10], // This applies an offset of 10px downward
             },
           },
         ]}

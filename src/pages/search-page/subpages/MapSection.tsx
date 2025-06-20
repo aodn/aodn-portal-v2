@@ -35,6 +35,7 @@ import store, {
   getComponentState,
 } from "../../../components/common/store/store";
 import ReferenceLayerSwitcher from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
+import { mapSectionStyles } from "../../../components/map/mapbox/styles/custom";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -54,9 +55,9 @@ interface MapSectionProps
 const mapContainerId = "result-page-main-map";
 
 enum LayerName {
-  Cluster = "clustered",
-  Uncluster = "unclustered",
-  Heatmap = "heatmap",
+  Cluster = "Centre points (clustered)",
+  Uncluster = "Centre point (unclustered)",
+  Heatmap = "Centre point (heatmap)",
 }
 
 const createPresentationLayers = (
@@ -136,47 +137,12 @@ const MapSection: React.FC<MapSectionProps> = ({
   return (
     <Paper
       id={mapContainerId}
-      sx={{
-        position: "relative",
-        height: "100%",
-        width: "100%",
-        "& .mapboxgl-ctrl-top-right": {
-          borderRadius: "6px",
-          background: "#FFF",
-          boxShadow: "4px 4px 4px 0px rgba(0, 0, 0, 0.10)",
-          width: "42px",
-          height: "174px",
-          flexShrink: 0,
-          margin: "10px",
-          paddingX: "3px",
-
-          display: "flex",
-          flexDirection: "column",
-
-          "& .mapboxgl-ctrl": {
-            marginY: "3px !important",
-            paddingBottom: "1px !important",
-            border: "none !important",
-            boxShadow: "none !important",
-            borderRadius: "0 !important",
-
-            "&:last-child": {
-              marginBottom: 0,
-            },
-
-            "& button": {
-              border: "none !important",
-              outline: "none !important",
-              boxShadow: "none !important",
-              height: "36px !important",
-              borderRadius: "6px !important",
-              width: "auto !important",
-              minWidth: "36px !important",
-            },
-          },
-        },
-        ...sx,
-      }}
+      sx={
+        {
+          ...mapSectionStyles,
+          ...sx,
+        } as SxProps<Theme>
+      }
     >
       <Map
         panelId={mapContainerId}

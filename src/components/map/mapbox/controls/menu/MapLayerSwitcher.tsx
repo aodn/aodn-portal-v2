@@ -88,14 +88,8 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
         ref={anchorRef}
         onClick={handleToggle}
         sx={{
-          padding: "6px !important",
           backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
           color: open ? "white" : color.gray.dark,
-          "& svg": {
-            width: 24,
-            height: 24,
-            fill: "currentColor",
-          },
         }}
       >
         <SearchStyleIcon />
@@ -111,7 +105,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
           {
             name: "offset",
             options: {
-              offset: [-132, 14], // This applies an offset of 10px downward
+              offset: [0, 10], // This applies an offset of 14px downward
             },
           },
         ]}
@@ -194,7 +188,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
                           letterSpacing: "0.5px",
                         }}
                       >
-                        {"Centre points (" + l.name + ")"}
+                        {l.name}
                       </Typography>
                     }
                   />
