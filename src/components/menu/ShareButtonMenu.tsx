@@ -107,6 +107,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        data-testid="share-button"
         sx={{
           display: "flex",
           justifyContent: "center",
@@ -169,7 +170,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
         }}
       >
         {getItems({ isCopied, copyUrl, copyToClipboard }).map((item, index) => (
-          <MenuItem key={index} onClick={item.handler}>
+          <MenuItem key={index} onClick={item.handler} data-testid="copy-link">
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText>
               <Typography

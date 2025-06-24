@@ -97,3 +97,36 @@ def test_spatial_map_click_zooms_detail_map(
 
     assert round(click_lng_lat['lng']) == round(new_detail_map_center['lng'])
     assert round(click_lng_lat['lat']) == round(new_detail_map_center['lat'])
+
+
+@pytest.mark.parametrize(
+    'uuid',
+    [
+        '1fba3a57-35f4-461b-8a0e-551af229714e',
+    ],
+)
+def test_geoserver_wms_data_not_available(
+    responsive_page: Page, uuid: str
+) -> None:
+    detail_page = DetailPage(responsive_page)
+
+    detail_page.load(uuid)
+    expect(
+        detail_page.get_text('No GeoServer WMS data available')
+    ).to_be_visible()
+
+
+@pytest.mark.parametrize(
+    'uuid',
+    [
+        'b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc',
+    ],
+)
+def test_geoserver_wms_data_available(responsive_page: Page, uuid: str) -> None:
+    detail_page = DetailPage(responsive_page)
+
+    detail_page.load(uuid)
+    detail_page.wait_for_timeout(2000)
+    expect(
+        detail_page.get_text('No GeoServer WMS data available')
+    ).not_to_be_visible()

@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs, urlparse
+
 from playwright.sync_api import Locator, Page
 
 from config import settings
@@ -24,6 +26,8 @@ class DetailPage(BasePage):
         self.page_title = self.get_label(text='collection title')
         self.go_back_button = self.page.get_by_test_id('go-back-button')
         self.description = self.page.get_by_test_id('expandable-text-area')
+        self.share_button = self.page.get_by_test_id('share-button')
+        self.copy_link = self.page.get_by_test_id('copy-link')
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')
@@ -49,3 +53,19 @@ class DetailPage(BasePage):
 
     def click_show_less(self, item_list: str) -> None:
         self.page.get_by_test_id(f'show-less-detail-btn-{item_list}').click()
+
+    def get_shared_link(self) -> str:
+        """Returns the shared link from the copy link button"""
+        self.page.context.grant_permissions(
+            ['clipboard-write', 'clipboard-read']
+        )
+        self.share_button.click()
+        self.copy_link.click()
+        return self.page.evaluate('() => navigator.clipboard.readText()')
+
+    def get_tab_name_from_url(self) -> str:
+        """Extracts the tab name from the current URL"""
+        current_url = self.page.url
+        parsed_url = urlparse(current_url)
+        query_params = parse_qs(parsed_url.query)
+        return query_params.get('tab', [''])[0]
