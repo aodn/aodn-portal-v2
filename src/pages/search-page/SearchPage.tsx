@@ -166,18 +166,6 @@ const SearchPage = () => {
       dispatch(fetchResultWithStore(paramPaged));
       doMapSearch()
         .then(() => {
-          if (componentParam.polygon) {
-            // If user set the polygon, then we zoom to that area by setting the bbox
-            const bbox = turfBbox(componentParam.polygon);
-            setBbox(
-              new LngLatBounds(
-                [bbox[0], bbox[1]], // Southwest corner: [minX, minY]
-                [bbox[2], bbox[3]] // Northeast corner: [maxX, maxY]
-              )
-            );
-            setZoom(6);
-          }
-
           if (needNavigate) {
             navigate(
               pageDefault.search + "?" + formatToUrlParam(componentParam),
@@ -189,6 +177,22 @@ const SearchPage = () => {
                 },
               }
             );
+          } else {
+            if (componentParam.polygon) {
+              // If user set the polygon, then we zoom to that area by setting the bbox
+              const bbox = turfBbox(componentParam.polygon);
+              const polygon = bboxPolygon(bbox);
+              setBbox(
+                new LngLatBounds(
+                  [bbox[0], bbox[1]], // Southwest corner: [minX, minY]
+                  [bbox[2], bbox[3]] // Northeast corner: [maxX, maxY]
+                )
+              );
+              dispatch(updateFilterBBox(polygon));
+
+              setZoom(6);
+              dispatch(updateZoom(6));
+            }
           }
         })
         .finally(() => {
