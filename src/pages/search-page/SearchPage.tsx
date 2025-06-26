@@ -146,7 +146,22 @@ const SearchPage = () => {
     )
       .unwrap()
       .then((collections: string) => {
-        setLayers(jsonToOGCCollections(collections).collections);
+        // This check is need due to user scan move the map around when the search
+        // is still in progress, the store have the latest map bbox so we can check
+        // if the constant we store matches the bbox, if not then we know map
+        // moved and results isn't valid
+        if (
+          booleanEqual(
+            componentParam.bbox!,
+            getComponentState(store.getState()).bbox!
+          )
+        ) {
+          // Avoid flict
+          setTimeout(
+            () => setLayers(jsonToOGCCollections(collections).collections),
+            200
+          );
+        }
       });
   }, [dispatch]);
 
@@ -175,22 +190,6 @@ const SearchPage = () => {
               },
             }
           );
-        } else {
-          if (componentParam.polygon) {
-            // If user set the polygon, then we zoom to that area by setting the bbox
-            const bbox = turfBbox(componentParam.polygon);
-            const polygon = bboxPolygon(bbox);
-            setBbox(
-              new LngLatBounds(
-                [bbox[0], bbox[1]], // Southwest corner: [minX, minY]
-                [bbox[2], bbox[3]] // Northeast corner: [maxX, maxY]
-              )
-            );
-            dispatch(updateFilterBBox(polygon));
-
-            setZoom(6);
-            dispatch(updateZoom(6));
-          }
         }
       });
     },
