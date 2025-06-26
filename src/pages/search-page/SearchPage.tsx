@@ -152,7 +152,6 @@ const SearchPage = () => {
 
   const doSearch = useCallback(
     (needNavigate: boolean = false) => {
-      startOneLoadingThread();
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -164,44 +163,38 @@ const SearchPage = () => {
       });
 
       dispatch(fetchResultWithStore(paramPaged));
-      doMapSearch()
-        .then(() => {
+      doMapSearch().then(() => {
+        if (needNavigate) {
+          navigate(
+            pageDefault.search + "?" + formatToUrlParam(componentParam),
+            {
+              state: {
+                fromNavigate: true,
+                requireSearch: false,
+                referer: pageReferer.SEARCH_PAGE_REFERER,
+              },
+            }
+          );
+        } else {
           if (componentParam.polygon) {
             // If user set the polygon, then we zoom to that area by setting the bbox
             const bbox = turfBbox(componentParam.polygon);
+            const polygon = bboxPolygon(bbox);
             setBbox(
               new LngLatBounds(
                 [bbox[0], bbox[1]], // Southwest corner: [minX, minY]
                 [bbox[2], bbox[3]] // Northeast corner: [maxX, maxY]
               )
             );
-            setZoom(6);
-          }
+            dispatch(updateFilterBBox(polygon));
 
-          if (needNavigate) {
-            navigate(
-              pageDefault.search + "?" + formatToUrlParam(componentParam),
-              {
-                state: {
-                  fromNavigate: true,
-                  requireSearch: false,
-                  referer: pageReferer.SEARCH_PAGE_REFERER,
-                },
-              }
-            );
+            setZoom(6);
+            dispatch(updateZoom(6));
           }
-        })
-        .finally(() => {
-          endOneLoadingThread();
-        });
+        }
+      });
     },
-    [
-      startOneLoadingThread,
-      dispatch,
-      doMapSearch,
-      navigate,
-      endOneLoadingThread,
-    ]
+    [dispatch, doMapSearch, navigate]
   );
 
   // The result will be changed based on the zoomed area, that is only
