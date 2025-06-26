@@ -80,7 +80,7 @@ fetch(marineParkDefault.geojson)
       .map<LocationOptionType>((value) => {
         // simplify the polygon here, otherwise too big of url for query
         value.features[0] = simplify(value.features[0], {
-          tolerance: 0.01,
+          tolerance: 0.05,
           highQuality: false,
         });
         const option: LocationOptionType = {

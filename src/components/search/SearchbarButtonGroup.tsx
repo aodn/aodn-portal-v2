@@ -112,30 +112,21 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
     if (!pendingSearch) redirectSearch("ComplexTextSearch");
   }, [handleClickButton, pendingSearch, redirectSearch]);
 
-  const dateCount = useMemo(
-    () =>
+  const [dateCount, areaCount, filterCount] = useMemo(
+    () => [
       checkCount({
         filterObj: componentParams,
         type: SearchbarButtonNames.Date,
       }),
-    [componentParams]
-  );
-
-  const areaCount = useMemo(
-    () =>
       checkCount({
         filterObj: componentParams,
         type: SearchbarButtonNames.Location,
       }),
-    [componentParams]
-  );
-
-  const filterCount = useMemo(
-    () =>
       checkCount({
         filterObj: componentParams,
         type: SearchbarButtonNames.Filter,
       }),
+    ],
     [componentParams]
   );
 
