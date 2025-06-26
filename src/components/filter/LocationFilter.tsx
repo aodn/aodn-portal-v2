@@ -23,11 +23,14 @@ import { Feature, FeatureCollection, Polygon } from "geojson";
 import _ from "lodash";
 import {
   ParameterState,
+  updateFilterBBox,
   updateFilterPolygon,
+  updateZoom,
 } from "../common/store/componentParamReducer";
 import { useAppDispatch } from "../common/store/hooks";
 import store, { getComponentState } from "../common/store/store";
-import { simplify, booleanEqual } from "@turf/turf";
+import { simplify, booleanEqual, bbox, bboxPolygon } from "@turf/turf";
+import { MapDefaultConfig } from "../map/mapbox/constants";
 
 interface LocationOptionType {
   value: string;
@@ -112,7 +115,17 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       const l = locationOptions?.find((o) => o.value === event.target.value);
       if (l && l.geo?.features) {
         // The marineParkDefault is a boundary json so only 1 feature found.
-        dispatch(updateFilterPolygon(l.geo.features[0]));
+        const area = l.geo.features[0];
+        dispatch(updateFilterPolygon(area));
+        // Set focus to that area by moving the bbox of the map
+        // if users selected filter by particular area.
+        const areaBbox = bbox(area);
+        dispatch(updateFilterBBox(bboxPolygon(areaBbox)));
+        dispatch(
+          updateZoom(
+            (MapDefaultConfig.MIN_ZOOM + MapDefaultConfig.MAX_ZOOM) / 2
+          )
+        );
         setSelectedOption(event.target.value);
       } else {
         dispatch(updateFilterPolygon(undefined));

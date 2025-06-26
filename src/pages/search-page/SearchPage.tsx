@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
-import { bbox as turfBbox, bboxPolygon, booleanEqual } from "@turf/turf";
+import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
   getComponentState,
   getSearchQueryResult,
@@ -62,21 +62,6 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 
-const isLoading = (count: number): boolean => {
-  if (count > 0) {
-    return true;
-  }
-  if (count === 0) {
-    // a 0.5s late finish loading is useful to improve the stability of the system
-    setTimeout(() => false, 500);
-  }
-  if (count < 0) {
-    // TODO: use beffer handling to replace this
-    throw new Error("Loading counter is negative");
-  }
-  return false;
-};
-
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -101,8 +86,6 @@ const SearchPage = () => {
         : MapDefaultConfig.ZOOM_TABLET
       : undefined
   );
-  const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
-
   const urlParamState: ParameterState | undefined = useMemo(() => {
     // The first char is ? in the search string, so we need to remove it.
     const param = location?.search?.substring(1);
@@ -112,17 +95,8 @@ const SearchPage = () => {
     return undefined;
   }, [location?.search]);
 
-  const startOneLoadingThread = useCallback(() => {
-    setLoadingThreadCount((prev) => prev + 1);
-  }, []);
-
-  const endOneLoadingThread = useCallback(() => {
-    setLoadingThreadCount((prev) => prev - 1);
-  }, []);
-
   const doMapSearch = useCallback(async () => {
     const componentParam: ParameterState = getComponentState(store.getState());
-
     // Use a different parameter so that it returns id and bbox only and do not store the values,
     // we cannot add page because we want to show all record on map
     // and by default we will include record without spatial extents so that BBOX
@@ -134,7 +108,6 @@ const SearchPage = () => {
         pagesize: DEFAULT_SEARCH_MAP_SIZE,
       }
     );
-
     dispatch(
       // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
       // and ordered by uuid to avoid affecting cluster calculation
@@ -150,17 +123,13 @@ const SearchPage = () => {
         // is still in progress, the store have the latest map bbox so we can check
         // if the constant we store matches the bbox, if not then we know map
         // moved and results isn't valid
+        const current = getComponentState(store.getState())?.bbox;
         if (
-          booleanEqual(
-            componentParam.bbox!,
-            getComponentState(store.getState()).bbox!
-          )
+          componentParam.bbox !== undefined &&
+          current !== undefined &&
+          booleanEqual(componentParam.bbox, current)
         ) {
-          // Avoid flict
-          setTimeout(
-            () => setLayers(jsonToOGCCollections(collections).collections),
-            200
-          );
+          setLayers(jsonToOGCCollections(collections).collections);
         }
       });
   }, [dispatch]);
@@ -249,8 +218,7 @@ const SearchPage = () => {
       location.state?.requireSearch === false
     ) {
       if (reduxContents.result.total > 0) {
-        startOneLoadingThread();
-        doMapSearch().finally(() => endOneLoadingThread());
+        doMapSearch().finally();
       } else {
         doSearch();
       }
@@ -259,13 +227,7 @@ const SearchPage = () => {
       // This including (but not limit): user paste the url directly, navigate from landing page, change sort ...
       doSearch();
     }
-  }, [
-    location,
-    doSearch,
-    doMapSearch,
-    startOneLoadingThread,
-    endOneLoadingThread,
-  ]);
+  }, [location, doSearch, doMapSearch]);
 
   // Value true meaning full map. So if true set the selected layout as full-map
   // Else set the selected layout as the last layout remembered (stored in currentLayout)
@@ -524,7 +486,7 @@ const SearchPage = () => {
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
             onDeselectDataset={onDeselectDataset}
-            isLoading={isLoading(loadingThreadCount)}
+            isLoading={false}
           />
         </Box>
         <Box
@@ -551,7 +513,7 @@ const SearchPage = () => {
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}
             onClickMapPoint={onClickMapPoint}
-            isLoading={isLoading(loadingThreadCount)}
+            isLoading={false}
             onDeselectDataset={onDeselectDataset}
           />
         </Box>
