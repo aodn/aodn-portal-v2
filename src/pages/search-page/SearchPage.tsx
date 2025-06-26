@@ -119,7 +119,7 @@ const SearchPage = () => {
     )
       .unwrap()
       .then((collections: string) => {
-        // This check is need due to user scan move the map around when the search
+        // This check is need due to user can move the map around when the search
         // is still in progress, the store have the latest map bbox so we can check
         // if the constant we store matches the bbox, if not then we know map
         // moved and results isn't valid
