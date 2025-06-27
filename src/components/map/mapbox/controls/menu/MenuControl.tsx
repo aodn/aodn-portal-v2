@@ -16,6 +16,7 @@ import {
   EVENT_MENU,
   MapControlType,
 } from "./Definition";
+import { Box, SxProps, Theme } from "@mui/material";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
@@ -24,6 +25,7 @@ const rightPadding = "15px";
 
 interface MenuControlProps {
   menu: MapControlType | null;
+  sx?: SxProps<Theme>;
   visible?: boolean;
 }
 
@@ -122,6 +124,7 @@ class MapControl implements IControl {
 // test all control on map in different page !!
 const MenuControl: React.FC<MenuControlProps> = ({
   menu,
+  sx,
   visible = true,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
@@ -161,9 +164,10 @@ const MenuControl: React.FC<MenuControlProps> = ({
   }, [control, visible]);
 
   return (
-    <div
+    <Box
       ref={containerRef}
-      className="mapboxgl-ctrl mapboxgl-ctrl-group custom-map-control"
+      className="mapboxgl-ctrl mapboxgl-ctrl-group"
+      sx={sx}
     />
   );
 };
