@@ -1,4 +1,11 @@
-import React, { cloneElement, useContext, useEffect, useState } from "react";
+import React, {
+  cloneElement,
+  RefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../../MapContext";
 import { Map as MapBox, IControl, MapMouseEvent } from "mapbox-gl";
@@ -21,7 +28,7 @@ interface MenuControlProps {
 }
 
 class MapControl implements IControl {
-  private container: HTMLDivElement | null = null;
+  private container: HTMLDivElement;
   private root: Root | null = null;
   private readonly component: MapControlType;
   private height: string = "";
@@ -32,8 +39,9 @@ class MapControl implements IControl {
   private readonly mapClickHandler: (event: MapMouseEvent) => void;
   private readonly mapMoveStartHandler: (event: MapMouseEvent) => void;
 
-  constructor(component: MapControlType) {
+  constructor(component: MapControlType, container: HTMLDivElement) {
     this.component = component;
+    this.container = container; // Use provided container
 
     // Handlers for map events
     this.mapClickHandler = (event: MapMouseEvent) =>
@@ -68,8 +76,6 @@ class MapControl implements IControl {
   }
 
   onAdd(map: MapBox) {
-    this.container = document.createElement("div");
-    this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
     this.container.addEventListener("click", (event: MouseEvent) =>
       this.onClickHandler(event, this.component)
     );
@@ -96,7 +102,6 @@ class MapControl implements IControl {
         map?.off("click", this.mapClickHandler);
         map?.off("movestart", this.mapMoveStartHandler);
         this.container?.parentNode?.removeChild(this.container);
-        this.container = null;
         this.root?.unmount();
       });
     }
@@ -120,6 +125,7 @@ const MenuControl: React.FC<MenuControlProps> = ({
   visible = true,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
+  const containerRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   const [control, setControl] = useState<MapControl | null>(null);
 
   // Creation effect
@@ -127,18 +133,19 @@ const MenuControl: React.FC<MenuControlProps> = ({
     if (!map || !menu) return;
 
     setControl((prev) => {
-      if (!prev) {
+      if (!prev && containerRef && containerRef.current) {
         // !!Must use cloneElement, to inject the map to the argument, so you
         // can get it in the ControlProps
         const newControl = new MapControl(
-          cloneElement<ControlProps>(menu, { map: map })
+          cloneElement<ControlProps>(menu, { map: map }),
+          containerRef.current
         );
         map?.addControl(newControl, "top-right");
         return newControl;
       }
       return prev;
     });
-  }, [map, menu, control]);
+  }, [map, menu, control, containerRef]);
 
   useEffect(() => {
     // Once the control set, you cannot change it, in case the props of menu update
@@ -153,7 +160,12 @@ const MenuControl: React.FC<MenuControlProps> = ({
     control?.setVisible(visible);
   }, [control, visible]);
 
-  return null;
+  return (
+    <div
+      ref={containerRef}
+      className="mapboxgl-ctrl mapboxgl-ctrl-group custom-map-control"
+    />
+  );
 };
 
 export { eventEmitter, leftPadding, rightPadding, MapControl };
