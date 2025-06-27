@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { MapboxEvent as MapEvent } from "mapbox-gl";
 import { Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
@@ -96,60 +96,56 @@ const createPresentationLayers = (
   }
 };
 
-const MapSection: React.FC<MapSectionProps> = ({
-  showFullList,
-  showFullMap,
-  bbox,
-  zoom,
-  onMapZoomOrMove,
-  onToggleClicked,
-  onClickMapPoint,
-  collections,
-  sx,
-  selectedUuids,
-  isLoading,
-  onDeselectDataset,
-}) => {
-  const { isUnderLaptop } = useBreakpoint();
+const MapSection: React.FC<MapSectionProps> = memo(
+  ({
+    showFullList,
+    showFullMap,
+    bbox,
+    zoom,
+    onMapZoomOrMove,
+    onToggleClicked,
+    onClickMapPoint,
+    collections,
+    sx,
+    selectedUuids,
+    isLoading,
+    onDeselectDataset,
+  }: MapSectionProps) => {
+    const { isUnderLaptop } = useBreakpoint();
 
-  const [selectedLayer, setSelectedLayer] = useState<string | null>(
-    LayerName.Cluster
-  );
-
-  const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
-
-  const tabNavigation = useTabNavigation();
-
-  // Early return if it is full list view
-  if (showFullList) return null;
-
-  return (
-    <Paper
-      id={mapContainerId}
-      sx={{
-        position: "relative",
-        height: "100%",
-        width: "100%",
-        ...sx,
-      }}
-    >
-      <Map
-        panelId={mapContainerId}
-        bbox={bbox}
-        zoom={zoom}
-        announcement={isLoading ? "Searching..." : undefined}
-        onZoomEvent={onMapZoomOrMove}
-        onMoveEvent={onMapZoomOrMove}
+    const [selectedLayer, setSelectedLayer] = useState<string | null>(
+      LayerName.Cluster
+    );
+    const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
+    const tabNavigation = useTabNavigation();
+    // Early return if it is full list view
+    if (showFullList) return null;
+    return (
+      <Paper
+        id={mapContainerId}
+        sx={{
+          position: "relative",
+          height: "100%",
+          width: "100%",
+          ...sx,
+        }}
       >
-        <Controls>
-          <ToggleControl
-            onToggleClicked={onToggleClicked}
-            showFullMap={showFullMap}
-          />
-          <NavigationControl visible={!isUnderLaptop} />
-          <ScaleControl />
-          <DisplayCoordinate />
-          <MenuControlGroup data-testid={"control-group-testing"}>
+        <Map
+          panelId={mapContainerId}
+          bbox={bbox}
+          zoom={zoom}
+          announcement={isLoading ? "Searching..." : undefined}
+          onZoomEvent={onMapZoomOrMove}
+          onMoveEvent={onMapZoomOrMove}
+        >
+          <Controls>
+            <ToggleControl
+              onToggleClicked={onToggleClicked}
+              showFullMap={showFullMap}
+            />
+            <NavigationControl visible={!isUnderLaptop} />
+            <ScaleControl />
+            <DisplayCoordinate />
             <MenuControl
               visible={!isUnderLaptop}
               menu={
@@ -212,21 +208,23 @@ const MapSection: React.FC<MapSectionProps> = ({
                 />
               }
             />
-          </MenuControlGroup>
-        </Controls>
-        <Layers>
-          {createPresentationLayers(
-            selectedLayer,
-            collections,
-            selectedUuids,
-            tabNavigation,
-            onClickMapPoint
-          )}
-          {createStaticLayers(staticLayer)}
-        </Layers>
-      </Map>
-    </Paper>
-  );
-};
+          </Controls>
+          <Layers>
+            {createPresentationLayers(
+              selectedLayer,
+              collections,
+              selectedUuids,
+              tabNavigation,
+              onClickMapPoint
+            )}
+            {createStaticLayers(staticLayer)}
+          </Layers>
+        </Map>
+      </Paper>
+    );
+  }
+);
+
+MapSection.displayName = "MapSection";
 
 export default MapSection;

@@ -22,7 +22,7 @@ import {
 } from "./constants";
 import DateRangeFilter from "../filter/DateRangeFilter";
 import { useLocation } from "react-router-dom";
-import { pageDefault } from "../common/constants";
+import { pageDefault, pageReferer } from "../common/constants";
 import LocationFilter from "../filter/LocationFilter";
 import Filters from "../filter/Filters";
 import useBreakpoint from "../../hooks/useBreakpoint";
@@ -83,7 +83,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
       // considering the debounce (300ms) and fetchSuggesterOptions(quite fast according to experience with edge) is not very long
       // we may implement this later if gap is too big
       if (event.key === "Enter" && !isSearchbarFocused && !pendingSearch) {
-        redirectSearch("ComplexTextSearch");
+        redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
       }
     },
     [pendingSearch, redirectSearch]
