@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import timeRange from "../../../../../assets/images/time-range.png";
 import {
   DateRangeCondition,
@@ -7,8 +7,7 @@ import {
   IDownloadConditionCallback,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
-import { Grid, IconButton, Typography } from "@mui/material";
-import { MapControl } from "./MenuControl";
+import { Grid, IconButton, Popper, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
 import PlainSlider from "../../../../common/slider/PlainSlider";
@@ -43,7 +42,6 @@ const SLIDER_WIDTH_TABLET = 400;
 const SLIDER_WIDTH_MOBILE = 250;
 
 const DateSlider: React.FC<DateSliderProps> = ({
-  visible = false,
   currentMinDate,
   currentMaxDate,
   minDate,
@@ -77,7 +75,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
     <Grid
       container
       sx={{
-        display: visible ? "flex" : "none",
+        backgroundColor: "lightgray",
+        display: "flex",
         px: padding.small,
         py: padding.extraSmall,
         width: isMobile
@@ -138,9 +137,9 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   minDate,
   maxDate,
   getAndSetDownloadConditions,
-  map,
 }) => {
-  const [isShowingSelector, setIsShowingSelector] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const anchorRef = useRef(null);
   const [currentMinDate, setCurrentMinDate] = useState<string | undefined>(
     undefined
   );
@@ -187,40 +186,48 @@ const DateRange: React.FC<DateRangeControlProps> = ({
     [maxDate, minDate, getAndSetDownloadConditions]
   );
 
-  useEffect(() => {
-    const slider: MapControl = new MapControl(
-      (
+  return (
+    <>
+      <IconButton
+        data-testid={MENU_ID}
+        ref={anchorRef}
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <img alt="" src={timeRange} />
+      </IconButton>
+      <Popper
+        open={open}
+        anchorEl={anchorRef.current}
+        placement="bottom-end"
+        disablePortal
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: [0, 350], // Add 16px vertical padding from bottom edge
+            },
+          },
+          {
+            name: "preventOverflow",
+            options: {
+              boundariesElement: "viewport", // Constrain to viewport or container
+            },
+          },
+          {
+            name: "flip",
+            enabled: false, // Prevent flipping to keep at bottom
+          },
+        ]}
+      >
         <DateSlider
-          visible={isShowingSelector}
           currentMinDate={currentMinDate}
           currentMaxDate={currentMaxDate}
           minDate={minDate}
           maxDate={maxDate}
           onDateRangeChange={onDateRangeChange}
         />
-      )
-    );
-    map?.addControl(slider, "bottom-right");
-    return () => {
-      map?.removeControl(slider);
-    };
-  }, [
-    currentMaxDate,
-    currentMinDate,
-    isShowingSelector,
-    map,
-    maxDate,
-    minDate,
-    onDateRangeChange,
-  ]);
-
-  return (
-    <IconButton
-      data-testid={MENU_ID}
-      onClick={() => setIsShowingSelector((prev) => !prev)}
-    >
-      <img alt="" src={timeRange} />
-    </IconButton>
+      </Popper>
+    </>
   );
 };
 

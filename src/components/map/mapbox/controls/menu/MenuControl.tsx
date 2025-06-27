@@ -25,6 +25,7 @@ const rightPadding = "15px";
 
 interface MenuControlProps {
   menu: MapControlType | null;
+  position?: "bottom-right" | "top-right";
   sx?: SxProps<Theme>;
   visible?: boolean;
 }
@@ -124,6 +125,7 @@ class MapControl implements IControl {
 // test all control on map in different page !!
 const MenuControl: React.FC<MenuControlProps> = ({
   menu,
+  position = "top-right",
   sx,
   visible = true,
 }: MenuControlProps) => {
@@ -143,12 +145,12 @@ const MenuControl: React.FC<MenuControlProps> = ({
           cloneElement<ControlProps>(menu, { map: map }),
           containerRef.current
         );
-        map?.addControl(newControl, "top-right");
+        map?.addControl(newControl, position);
         return newControl;
       }
       return prev;
     });
-  }, [map, menu, control, containerRef]);
+  }, [map, menu, control, containerRef, position]);
 
   useEffect(() => {
     // Once the control set, you cannot change it, in case the props of menu update
