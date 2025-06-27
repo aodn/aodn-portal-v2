@@ -6,7 +6,6 @@ import {
   SearchParameters,
 } from "../../../common/store/searchReducer";
 import { MapLayerMouseEvent } from "mapbox-gl";
-import { OGCCollections } from "../../../common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 
 interface SpatialExtentsProps {
@@ -154,10 +153,15 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   }, [selectedUuids, layerId, getCollectionData, map]);
 
   const onPointClick = useCallback(
-    (ev: MapLayerMouseEvent): void => {
-      ev.preventDefault();
+    (ev: Partial<MapLayerMouseEvent & { from: string }>): void => {
+      if (ev && typeof ev.preventDefault === "function") {
+        ev.preventDefault();
+      }
       // Make sure even same id under same area will be set once.
-      if (onDatasetSelected) {
+      if (
+        onDatasetSelected &&
+        (ev.from === undefined || ev.from !== "spatialExtentsPointClick")
+      ) {
         if (ev.features) {
           const uuids = [
             ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
@@ -166,6 +170,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           const customEvent = {
             ...ev,
             targetLayerId: layerId,
+            from: "spatialExtentsPointClick", // Avoid infinite loop
           };
           // Fire a synthetic click event with the custom event
           // This will be captured by CardPopup's event listeners so

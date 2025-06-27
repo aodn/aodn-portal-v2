@@ -219,7 +219,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       map?.on("mouseleave", unclusterPointLayer, defaultMouseLeaveEventHandler);
     };
 
-    map?.once("load", createLayers);
+    map?.once("idle", createLayers);
 
     // When user change the map style, for example change base map, all layer will be removed
     // as per mapbox design, we need to listen to that even and add back the layer
