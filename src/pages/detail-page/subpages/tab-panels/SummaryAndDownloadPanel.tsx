@@ -173,11 +173,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         default: !isSupportHexbin,
       });
 
-      layers.push({
-        id: LayerName.Symbol,
-        name: "Symbol",
-        default: false,
-      });
+      if (isSupportHexbin) {
+        layers.push({
+          id: LayerName.Symbol,
+          name: "Symbol",
+          default: true,
+        });
+      }
 
       // Init the layer with values here taking the default
       setSelectedLayer((v: LayerName | null): LayerName | null => {
