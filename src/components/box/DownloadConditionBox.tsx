@@ -8,6 +8,7 @@ import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
 import BBOX_IMG from "../../assets/icons/bbox.png";
 import TIME_RANGE_IMG from "../../assets/images/time-range.png";
 import CloseIcon from "@mui/icons-material/Close";
+import AppTheme from "../../utils/AppTheme";
 
 interface DownloadConditionBoxProps
   extends IDownloadCondition,
@@ -74,10 +75,11 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
         <Grid item xs={12}>
           <Typography
             sx={{
-              color: "#7194AB",
-              fontSize: "12px",
-              fontWeight: "400",
-              lineHeight: "8px",
+              color: "#090C02",
+              fontSize: "14px",
+              fontStyle: "normal",
+              fontWeight: 400,
+              lineHeight: "22px",
               padding: 0,
             }}
           >
