@@ -28,6 +28,7 @@ interface MenuControlProps {
   position?: "bottom-right" | "top-right";
   sx?: SxProps<Theme>;
   visible?: boolean;
+  className?: string;
 }
 
 class MapControl implements IControl {
@@ -128,6 +129,7 @@ const MenuControl: React.FC<MenuControlProps> = ({
   position = "top-right",
   sx,
   visible = true,
+  className,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
   const containerRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
@@ -168,7 +170,7 @@ const MenuControl: React.FC<MenuControlProps> = ({
   return (
     <Box
       ref={containerRef}
-      className="mapboxgl-ctrl mapboxgl-ctrl-group"
+      className={`mapboxgl-ctrl mapboxgl-ctrl-group ${className || ""}`}
       sx={sx}
     />
   );
