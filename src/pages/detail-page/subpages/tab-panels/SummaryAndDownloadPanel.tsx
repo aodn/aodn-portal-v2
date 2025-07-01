@@ -165,18 +165,18 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
           name: capitalizeFirstLetter(LayerName.Hexbin),
           default: true,
         });
+
+        layers.push({
+          id: LayerName.Symbol,
+          name: capitalizeFirstLetter(LayerName.Symbol),
+          default: true,
+        });
       }
 
       layers.push({
         id: LayerName.GeoServer,
-        name: "GeoServer",
+        name: capitalizeFirstLetter(LayerName.GeoServer),
         default: !isSupportHexbin,
-      });
-
-      layers.push({
-        id: LayerName.Symbol,
-        name: "Symbol",
-        default: false,
       });
 
       // Init the layer with values here taking the default
