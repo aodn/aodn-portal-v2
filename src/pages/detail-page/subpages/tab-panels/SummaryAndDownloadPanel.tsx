@@ -326,7 +326,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }
                     />
                     <MenuControl
-                      visible={selectedLayer === LayerName.Hexbin}
+                      visible={
+                        selectedLayer === LayerName.Hexbin ||
+                        selectedLayer === LayerName.Symbol
+                      }
                       menu={
                         <DateRange
                           minDate={minDateStamp.format(
@@ -342,7 +345,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }
                     />
                     <MenuControl
-                      visible={selectedLayer === LayerName.Hexbin}
+                      visible={
+                        selectedLayer === LayerName.Hexbin ||
+                        selectedLayer === LayerName.Symbol
+                      }
                       menu={
                         <DrawRect
                           getAndSetDownloadConditions={
