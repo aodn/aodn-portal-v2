@@ -20,33 +20,45 @@ const AODNSiteLogo = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        " &:hover": {
-          cursor: "pointer",
-        },
       }}
-      onClick={() => redirectHome("AODNSiteLogo", true)}
     >
-      <img
-        height={isMobile ? AODN_SITE_LOGO_WIDTH_MOBILE : AODN_SITE_LOGO_WIDTH}
-        src={IMOS}
-        alt="IMOS Logo"
-        style={{ paddingRight: padding.medium }}
-        data-testid="imos-logo"
-      />
-      <Divider orientation="vertical" flexItem></Divider>
-      <Typography
-        textAlign="left"
-        fontSize={
-          isMobile ? fontSize.AODNSiteLogoTextMobile : fontSize.AODNSiteLogoText
-        }
-        fontWeight={fontWeight.medium}
-        color={fontColor.blue.dark}
-        padding={0}
-        paddingLeft={padding.medium}
+      <Box
+        sx={{
+          cursor: "pointer",
+        }}
+        onClick={() => window.open("https://imos.org.au/", "_blank")}
       >
-        Australian Ocean <br />
-        Data Network
-      </Typography>
+        <img
+          height={isMobile ? AODN_SITE_LOGO_WIDTH_MOBILE : AODN_SITE_LOGO_WIDTH}
+          src={IMOS}
+          alt="IMOS Logo"
+          style={{ paddingRight: padding.medium }}
+          data-testid="imos-logo"
+        />
+      </Box>
+      <Divider orientation="vertical" flexItem></Divider>
+      <Box
+        sx={{
+          cursor: "pointer",
+        }}
+        onClick={() => redirectHome("AODNSiteLogo", true)}
+      >
+        <Typography
+          textAlign="left"
+          fontSize={
+            isMobile
+              ? fontSize.AODNSiteLogoTextMobile
+              : fontSize.AODNSiteLogoText
+          }
+          fontWeight={fontWeight.medium}
+          color={fontColor.blue.dark}
+          padding={0}
+          paddingLeft={padding.medium}
+        >
+          Australian Ocean <br />
+          Data Network
+        </Typography>
+      </Box>
     </Box>
   );
 };
