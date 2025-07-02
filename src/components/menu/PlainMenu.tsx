@@ -36,6 +36,14 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
     enableScroll();
   }, []);
 
+  const handleMenuItemClick = useCallback(
+    (item: MenuItem) => (event: React.MouseEvent<HTMLElement>) => {
+      item.handler(event);
+      handleClose();
+    },
+    [handleClose]
+  );
+
   return (
     <div>
       <Button
@@ -53,7 +61,7 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
       {menu.items.length > 0 && (
         <StyledMenu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
           {menu.items.map((item, index) => (
-            <MenuItem onClick={handleClose} key={index}>
+            <MenuItem onClick={handleMenuItemClick(item)} key={index}>
               {item.name}
             </MenuItem>
           ))}
