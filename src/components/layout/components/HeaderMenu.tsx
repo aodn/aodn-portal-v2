@@ -131,7 +131,7 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
         direction="row"
         justifyContent="center"
         alignItems="center"
-        spacing={4}
+        spacing={2}
       >
         {HEADER_MENUS.map((menu, index) => (
           <PlainMenu menu={menu} key={index} />

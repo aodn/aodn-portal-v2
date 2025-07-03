@@ -19,6 +19,18 @@ const StyledMenu = styled((props: MenuProps) => (
       vertical: "top",
       horizontal: "left",
     }}
+    sx={{
+      "& .MuiMenuItem-root": {
+        minWidth: "140px",
+        color: "#090C02",
+        fontSize: "16px",
+        fontWeight: 400,
+        lineHeight: "24px",
+        "&:hover": {
+          backgroundColor: color.blue.light,
+        },
+      },
+    }}
     {...props}
   />
 ))(() => ({

@@ -2,7 +2,6 @@ import { FC, useCallback, useState } from "react";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { fontColor, fontSize } from "../../styles/constants";
 import StyledMenu from "./StyledMenu";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 
@@ -52,8 +51,9 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
         sx={{
           backgroundColor: "transparent",
           border: "none",
-          color: fontColor.blue.dark,
-          fontSize: fontSize.label,
+          color: "#090C02",
+          fontSize: "16px",
+          fontWeight: 400,
         }}
       >
         {menu.menuName}
