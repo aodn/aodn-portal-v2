@@ -152,7 +152,7 @@ const renderSubTitle = (
   status: string | undefined
 ) => (
   <Stack flexDirection="row" flexWrap="wrap" gap={1}>
-    {pace && (
+    {pace && pace.toLowerCase() !== "other" && status !== Status.completed && (
       <RoundCard
         sx={{
           bgcolor: color.pace,
