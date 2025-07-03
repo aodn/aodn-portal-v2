@@ -7,6 +7,7 @@ import {
   padding,
 } from "../../../styles/constants";
 import useRedirectHome from "../../../hooks/useRedirectHome";
+import { openInNewTab } from "../../../utils/LinkUtils";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import { AODN_SITE_LOGO_WIDTH, AODN_SITE_LOGO_WIDTH_MOBILE } from "../constant";
 
@@ -26,7 +27,7 @@ const AODNSiteLogo = () => {
         sx={{
           cursor: "pointer",
         }}
-        onClick={() => window.open("https://imos.org.au/", "_blank")}
+        onClick={() => openInNewTab("https://imos.org.au/")}
       >
         <img
           height={isMobile ? AODN_SITE_LOGO_WIDTH_MOBILE : AODN_SITE_LOGO_WIDTH}
