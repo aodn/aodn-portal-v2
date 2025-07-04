@@ -31,6 +31,7 @@ import BookmarkListMenu, {
   BookmarkListMenuBasicType,
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import MenuControlGroup from "../../../components/map/mapbox/controls/menu/MenuControlGroup";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -145,68 +146,70 @@ const MapSection: React.FC<MapSectionProps> = memo(
             <NavigationControl visible={!isUnderLaptop} />
             <ScaleControl />
             <DisplayCoordinate />
-            <MenuControl
-              visible={!isUnderLaptop}
-              menu={
-                <BookmarkListMenu
-                  onDeselectDataset={onDeselectDataset}
-                  tabNavigation={tabNavigation}
-                />
-              }
-            />
-            <MenuControl
-              menu={
-                <BaseMapSwitcher
-                  layers={[
-                    {
-                      id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
-                      name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
-                      label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-                      default: false,
-                    },
-                    {
-                      id: MapboxWorldLayersDef.WORLD.id,
-                      name: MapboxWorldLayersDef.WORLD.name,
-                      default: false,
-                    },
-                  ]}
-                  onEvent={(target: EventTarget & HTMLInputElement) =>
-                    setStaticLayer((values) => {
-                      // Remove the item and add it back if selected
-                      const e = values?.filter((i) => i !== target.value);
-                      if (target.checked) {
-                        e.push(target.value);
-                      }
-                      return [...e];
-                    })
-                  }
-                />
-              }
-            />
-            <MenuControl
-              menu={
-                <MapLayerSwitcher
-                  layers={[
-                    {
-                      id: LayerName.Cluster,
-                      name: capitalizeFirstLetter(LayerName.Cluster),
-                      default: selectedLayer === LayerName.Cluster,
-                    },
-                    {
-                      id: LayerName.Heatmap,
-                      name: capitalizeFirstLetter(LayerName.Heatmap),
-                      default: selectedLayer === LayerName.Heatmap,
-                    },
-                    {
-                      id: LayerName.Uncluster,
-                      name: capitalizeFirstLetter(LayerName.Uncluster),
-                      default: selectedLayer === LayerName.Uncluster,
-                    },
-                  ]}
-                  onEvent={(id: string) => setSelectedLayer(id)}
-                />
-              }
-            />
+            <MenuControlGroup>
+              <MenuControl
+                visible={!isUnderLaptop}
+                menu={
+                  <BookmarkListMenu
+                    onDeselectDataset={onDeselectDataset}
+                    tabNavigation={tabNavigation}
+                  />
+                }
+              />
+              <MenuControl
+                menu={
+                  <BaseMapSwitcher
+                    layers={[
+                      {
+                        id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
+                        name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+                        label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
+                        default: false,
+                      },
+                      {
+                        id: MapboxWorldLayersDef.WORLD.id,
+                        name: MapboxWorldLayersDef.WORLD.name,
+                        default: false,
+                      },
+                    ]}
+                    onEvent={(target: EventTarget & HTMLInputElement) =>
+                      setStaticLayer((values) => {
+                        // Remove the item and add it back if selected
+                        const e = values?.filter((i) => i !== target.value);
+                        if (target.checked) {
+                          e.push(target.value);
+                        }
+                        return [...e];
+                      })
+                    }
+                  />
+                }
+              />
+              <MenuControl
+                menu={
+                  <MapLayerSwitcher
+                    layers={[
+                      {
+                        id: LayerName.Cluster,
+                        name: capitalizeFirstLetter(LayerName.Cluster),
+                        default: selectedLayer === LayerName.Cluster,
+                      },
+                      {
+                        id: LayerName.Heatmap,
+                        name: capitalizeFirstLetter(LayerName.Heatmap),
+                        default: selectedLayer === LayerName.Heatmap,
+                      },
+                      {
+                        id: LayerName.Uncluster,
+                        name: capitalizeFirstLetter(LayerName.Uncluster),
+                        default: selectedLayer === LayerName.Uncluster,
+                      },
+                    ]}
+                    onEvent={(id: string) => setSelectedLayer(id)}
+                  />
+                }
+              />
+            </MenuControlGroup>
           </Controls>
           <Layers>
             {createPresentationLayers(
