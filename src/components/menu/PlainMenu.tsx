@@ -2,7 +2,6 @@ import { FC, useCallback, useState } from "react";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { fontColor, fontSize } from "../../styles/constants";
 import StyledMenu from "./StyledMenu";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 
@@ -36,6 +35,14 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
     enableScroll();
   }, []);
 
+  const handleMenuItemClick = useCallback(
+    (item: MenuItem) => (event: React.MouseEvent<HTMLElement>) => {
+      item.handler(event);
+      handleClose();
+    },
+    [handleClose]
+  );
+
   return (
     <div>
       <Button
@@ -44,8 +51,9 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
         sx={{
           backgroundColor: "transparent",
           border: "none",
-          color: fontColor.blue.dark,
-          fontSize: fontSize.label,
+          color: "#090C02",
+          fontSize: "16px",
+          fontWeight: 400,
         }}
       >
         {menu.menuName}
@@ -53,7 +61,7 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
       {menu.items.length > 0 && (
         <StyledMenu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
           {menu.items.map((item, index) => (
-            <MenuItem onClick={handleClose} key={index}>
+            <MenuItem onClick={handleMenuItemClick(item)} key={index}>
               {item.name}
             </MenuItem>
           ))}

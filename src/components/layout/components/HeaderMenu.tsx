@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { type Menu } from "../../menu/PlainMenu";
+import PlainMenu, { type Menu } from "../../menu/PlainMenu";
 import {
   Accordion,
   AccordionDetails,
@@ -13,7 +13,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import HoverMenu from "../../menu/HoverMenu";
 import {
   color,
   fontColor,
@@ -27,7 +26,7 @@ import { openInNewTab } from "../../../utils/LinkUtils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export enum HeaderMenuStyle {
-  HOVER_MENU = "HOVER",
+  DROPDOWN_MENU = "DROPDOWN",
   ACCORDION_MENU = "ACCORDION",
 }
 interface HeaderMenuProps {
@@ -126,16 +125,16 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
     },
   ];
 
-  const renderHeaderHoverMenu = () => {
+  const renderHeaderDropdownMenu = () => {
     return (
       <Stack
         direction="row"
         justifyContent="center"
         alignItems="center"
-        spacing={4}
+        spacing={2}
       >
         {HEADER_MENUS.map((menu, index) => (
-          <HoverMenu menu={menu} key={index} />
+          <PlainMenu menu={menu} key={index} />
         ))}
       </Stack>
     );
@@ -169,7 +168,8 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
 
   return (
     <>
-      {menuStyle === HeaderMenuStyle.HOVER_MENU && renderHeaderHoverMenu()}
+      {menuStyle === HeaderMenuStyle.DROPDOWN_MENU &&
+        renderHeaderDropdownMenu()}
       {menuStyle === HeaderMenuStyle.ACCORDION_MENU &&
         renderHeaderAccordionMenu()}
       <DisclaimerDialog

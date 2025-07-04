@@ -7,6 +7,7 @@ import {
   padding,
 } from "../../../styles/constants";
 import useRedirectHome from "../../../hooks/useRedirectHome";
+import { openInNewTab } from "../../../utils/LinkUtils";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import { AODN_SITE_LOGO_WIDTH, AODN_SITE_LOGO_WIDTH_MOBILE } from "../constant";
 
@@ -20,33 +21,45 @@ const AODNSiteLogo = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        " &:hover": {
-          cursor: "pointer",
-        },
       }}
-      onClick={() => redirectHome("AODNSiteLogo", true)}
     >
-      <img
-        height={isMobile ? AODN_SITE_LOGO_WIDTH_MOBILE : AODN_SITE_LOGO_WIDTH}
-        src={IMOS}
-        alt="IMOS Logo"
-        style={{ paddingRight: padding.medium }}
-        data-testid="imos-logo"
-      />
-      <Divider orientation="vertical" flexItem></Divider>
-      <Typography
-        textAlign="left"
-        fontSize={
-          isMobile ? fontSize.AODNSiteLogoTextMobile : fontSize.AODNSiteLogoText
-        }
-        fontWeight={fontWeight.medium}
-        color={fontColor.blue.dark}
-        padding={0}
-        paddingLeft={padding.medium}
+      <Box
+        sx={{
+          cursor: "pointer",
+        }}
+        onClick={() => openInNewTab("https://imos.org.au/")}
       >
-        Australian Ocean <br />
-        Data Network
-      </Typography>
+        <img
+          height={isMobile ? AODN_SITE_LOGO_WIDTH_MOBILE : AODN_SITE_LOGO_WIDTH}
+          src={IMOS}
+          alt="IMOS Logo"
+          style={{ paddingRight: padding.medium }}
+          data-testid="imos-logo"
+        />
+      </Box>
+      <Divider orientation="vertical" flexItem></Divider>
+      <Box
+        sx={{
+          cursor: "pointer",
+        }}
+        onClick={() => redirectHome("AODNSiteLogo", true)}
+      >
+        <Typography
+          textAlign="left"
+          fontSize={
+            isMobile
+              ? fontSize.AODNSiteLogoTextMobile
+              : fontSize.AODNSiteLogoText
+          }
+          fontWeight={fontWeight.medium}
+          color={fontColor.blue.dark}
+          padding={0}
+          paddingLeft={padding.medium}
+        >
+          Australian Ocean <br />
+          Data Network
+        </Typography>
+      </Box>
     </Box>
   );
 };

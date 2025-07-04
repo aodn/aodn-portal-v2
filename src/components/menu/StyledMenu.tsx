@@ -19,21 +19,29 @@ const StyledMenu = styled((props: MenuProps) => (
       vertical: "top",
       horizontal: "left",
     }}
+    sx={{
+      "& .MuiMenuItem-root": {
+        minWidth: "180px",
+        color: "#090C02",
+        fontSize: "1rem",
+        fontWeight: 400,
+        lineHeight: "24px",
+        "&:hover": {
+          backgroundColor: color.blue.light,
+        },
+      },
+    }}
     {...props}
   />
 ))(() => ({
   "& .MuiPaper-root": {
     backgroundColor: "#fff",
-    border: `${border.xs} ${color.blue.dark}`,
+    border: `${border.xs} #3B6E8F`,
     borderRadius: borderRadius.small,
-    marginTop: gap.md,
-    minWidth: "100px",
+    gap: "12px",
 
     "& .MuiMenu-list": {
-      padding: "4px 0",
-    },
-    "& .MuiMenuItem-root": {
-      fontSize: fontSize.label,
+      padding: "10px 0",
     },
   },
 }));
