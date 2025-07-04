@@ -152,17 +152,19 @@ const renderSubTitle = (
   status: string | undefined
 ) => (
   <Stack flexDirection="row" flexWrap="wrap" gap={1}>
-    {pace && pace.toLowerCase() !== "other" && status !== Status.completed && (
-      <RoundCard
-        sx={{
-          bgcolor: color.pace,
-        }}
-      >
-        <Typography padding={0} fontSize={fontSize.label}>
-          {capitalizeFirstLetter(pace)}
-        </Typography>
-      </RoundCard>
-    )}
+    {pace &&
+      pace.toLowerCase() !== "other" &&
+      !(pace.toLowerCase() === "completed" && status === Status.completed) && (
+        <RoundCard
+          sx={{
+            bgcolor: color.pace,
+          }}
+        >
+          <Typography padding={0} fontSize={fontSize.label}>
+            {capitalizeFirstLetter(pace)}
+          </Typography>
+        </RoundCard>
+      )}
     {startDate && (
       <RoundCard
         sx={{
