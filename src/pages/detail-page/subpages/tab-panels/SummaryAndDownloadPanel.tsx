@@ -15,9 +15,7 @@ import ExpandableTextArea from "../../../../components/list/listItem/subitem/Exp
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
-import BaseMapSwitcher, {
-  BaseMapSwitcherLayer,
-} from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
+import { BaseMapSwitcherLayer } from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../../components/map/mapbox/controls/menu/DateRange";
 import dayjs, { Dayjs } from "dayjs";
@@ -38,6 +36,7 @@ import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
+import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
@@ -311,7 +310,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <DisplayCoordinate />
                     <MenuControl
                       menu={
-                        <BaseMapSwitcher
+                        <ReferenceLayerSwitcher
                           layers={staticBaseLayerConfig}
                           onEvent={handleBaseMapSwitch}
                         />
