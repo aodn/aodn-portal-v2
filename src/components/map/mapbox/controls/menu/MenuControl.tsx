@@ -20,10 +20,10 @@ import { Box, SxProps, Theme } from "@mui/material";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
-const leftPadding = "24px";
+const leftPadding = "20px";
 const rightPadding = "15px";
 const topPadding = "10px";
-const bottomPadding = "12px";
+const bottomPadding = "14px";
 
 interface MenuControlProps {
   menu: MapControlType | null;

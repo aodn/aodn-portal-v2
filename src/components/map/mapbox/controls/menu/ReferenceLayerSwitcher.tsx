@@ -134,7 +134,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
             borderRadius: borderRadius["menu"],
             backgroundColor: grey["resultCard"],
             zIndex: 1,
-            minWidth: "260px",
+            width: "260px",
           }}
         >
           <Typography
@@ -163,7 +163,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
             }}
           >
             <FormControl component="fieldset">
-              <FormGroup sx={{ gap: 0.1 }}>
+              <FormGroup sx={{ gap: 0.5 }}>
                 {layers?.map((ol) => (
                   <FormControlLabel
                     key={"fc-" + ol.id}

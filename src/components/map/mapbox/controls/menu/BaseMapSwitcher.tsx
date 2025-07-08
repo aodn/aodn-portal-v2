@@ -5,7 +5,6 @@ import {
   EVENT_MENU,
   MenuClickedEvent,
 } from "./Definition";
-import PublicIcon from "@mui/icons-material/Public";
 import { styles as mapStyles } from "../../Map";
 import {
   Box,
@@ -21,8 +20,14 @@ import {
 import { eventEmitter, leftPadding, rightPadding } from "./MenuControl";
 import grey from "../../../../common/colors/grey";
 import blue from "../../../../common/colors/blue";
-import { borderRadius, fontSize } from "../../../../../styles/constants";
+import {
+  borderRadius,
+  color,
+  fontColor,
+  fontSize,
+} from "../../../../../styles/constants";
 import { MapDefaultConfig } from "../../constants";
+import { BaseLayerIcon } from "../../../../../assets/map/base_layer";
 
 export interface BaseMapSwitcherLayer {
   id: string;
@@ -87,9 +92,18 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
         data-testid={MENU_ID}
         ref={anchorRef}
         onClick={handleToggle}
-        sx={{ paddingTop: "2px !important" }}
+        sx={{
+          backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
+          color: open ? "white" : color.gray.dark,
+          minWidth: "40px",
+          height: "40px !important",
+          borderRadius: "6px !important",
+          display: "flex !important",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        <PublicIcon />
+        <BaseLayerIcon />
       </IconButton>
       <Popper
         id="basemap-popper-id"

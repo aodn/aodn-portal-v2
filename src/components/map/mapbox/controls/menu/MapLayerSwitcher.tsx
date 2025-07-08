@@ -17,10 +17,15 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import LayersIcon from "@mui/icons-material/Layers";
 import grey from "../../../../common/colors/grey";
 import blue from "../../../../common/colors/blue";
-import { borderRadius, fontSize } from "../../../../../styles/constants";
+import {
+  borderRadius,
+  color,
+  fontColor,
+  fontSize,
+} from "../../../../../styles/constants";
+import { SearchStyleIcon } from "../../../../../assets/map/search_style";
 
 export interface LayerSwitcherLayer<T = string> {
   id: T;
@@ -75,9 +80,18 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
         id="layer-show-hide-menu-button"
         ref={anchorRef}
         onClick={handleToggle}
-        sx={{ paddingTop: "3px !important" }}
+        sx={{
+          backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
+          color: open ? "white" : color.gray.dark,
+          minWidth: "40px",
+          height: "40px !important",
+          borderRadius: "6px !important",
+          display: "flex !important",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        <LayersIcon />
+        <SearchStyleIcon />
       </IconButton>
       <Popper
         id="layer-popper-id"
