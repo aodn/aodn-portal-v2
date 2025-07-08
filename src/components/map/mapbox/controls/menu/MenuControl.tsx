@@ -129,7 +129,7 @@ class MapControl implements IControl {
 const MenuControl: React.FC<MenuControlProps> = ({
   menu,
   position = "top-right",
-  sx,
+  sx = { borderRadius: "8px" },
   visible = true,
   className,
 }: MenuControlProps) => {

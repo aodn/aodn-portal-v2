@@ -17,25 +17,18 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import {
-  bottomPadding,
-  eventEmitter,
-  leftPadding,
-  rightPadding,
-  topPadding,
-} from "./MenuControl";
-import grey from "../../../../common/colors/grey";
-import blue from "../../../../common/colors/blue";
-import {
-  borderRadius,
-  color,
-  fontColor,
-  fontFamily,
-  fontSize,
-  fontWeight,
-} from "../../../../../styles/constants";
+import { eventEmitter } from "./MenuControl";
 import { MapDefaultConfig } from "../../constants";
 import { BaseLayerIcon } from "../../../../../assets/map/base_layer";
+import {
+  formControlLabelSx,
+  switcherIconButtonSx,
+  switcherMenuBoxSx,
+  switcherMenuContentBoxSx,
+  switcherMenuContentIconSx,
+  switcherMenuContentLabelTypographySx,
+  switcherTitleTypographySx,
+} from "./MenuControlGroup";
 
 export interface BaseMapSwitcherLayer {
   id: string;
@@ -100,16 +93,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
         data-testid={MENU_ID}
         ref={anchorRef}
         onClick={handleToggle}
-        sx={{
-          backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
-          color: open ? "white" : color.gray.dark,
-          minWidth: "40px",
-          height: "40px !important",
-          borderRadius: "6px !important",
-          display: "flex !important",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        sx={switcherIconButtonSx(open)}
       >
         <BaseLayerIcon />
       </IconButton>
@@ -132,42 +116,12 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
         {
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
-        <Box
-          sx={{
-            color: grey["mapMenuText"],
-            display: "inline-block",
-            whiteSpace: "nowrap",
-            borderRadius: borderRadius["menu"],
-            backgroundColor: grey["resultCard"],
-            zIndex: 1,
-            width: "260px",
-          }}
-        >
-          <Typography
-            sx={{
-              backgroundColor: color.blue.medium,
-              borderRadius: borderRadius["menuTop"],
-              fontSize: "16px",
-              color: "#090C02",
-              fontWeight: fontWeight.regular,
-              fontFamily: fontFamily.openSans,
-              minHeight: "40px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+        <Box sx={switcherMenuBoxSx}>
+          <Typography sx={switcherTitleTypographySx}>
             Map Base Layers
           </Typography>
           <Divider />
-          <Box
-            sx={{
-              paddingLeft: leftPadding,
-              paddingRight: rightPadding,
-              paddingTop: topPadding,
-              paddingBottom: bottomPadding,
-            }}
-          >
+          <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">
               <RadioGroup
                 value={currentStyle}
@@ -179,34 +133,10 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
                   <FormControlLabel
                     key={style.name}
                     value={style.id}
-                    sx={{ gap: 0.4 }}
-                    control={
-                      <Radio
-                        sx={{
-                          padding: "6px",
-                          "& .MuiSvgIcon-root": {
-                            fontSize: "20px",
-                          },
-                          "&.Mui-checked": {
-                            color: fontColor.blue.dark,
-                          },
-                          "&:not(.Mui-checked)": {
-                            color: fontColor.gray.medium,
-                          },
-                        }}
-                      />
-                    }
+                    sx={formControlLabelSx}
+                    control={<Radio sx={switcherMenuContentIconSx} />}
                     label={
-                      <Typography
-                        sx={{
-                          fontSize: fontSize.info,
-                          color: "#090C02",
-                          fontFamily: fontFamily.openSans,
-                          fontWeight: fontWeight.regular,
-                          letterSpacing: "0.5px",
-                          lineHeight: "22px",
-                        }}
-                      >
+                      <Typography sx={switcherMenuContentLabelTypographySx}>
                         {style.name}
                       </Typography>
                     }

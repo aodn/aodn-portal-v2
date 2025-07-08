@@ -16,24 +16,18 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import {
-  bottomPadding,
-  eventEmitter,
-  leftPadding,
-  rightPadding,
-  topPadding,
-} from "./MenuControl";
-import grey from "../../../../common/colors/grey";
-import {
-  borderRadius,
-  color,
-  fontColor,
-  fontFamily,
-  fontSize,
-  fontWeight,
-} from "../../../../../styles/constants";
+import { eventEmitter } from "./MenuControl";
 import { BaseMapSwitcherLayer } from "./BaseMapSwitcher";
 import { ReferenceLayerIcon } from "../../../../../assets/map/ref_layer";
+import {
+  formControlLabelSx,
+  switcherIconButtonSx,
+  switcherMenuBoxSx,
+  switcherMenuContentBoxSx,
+  switcherMenuContentIconSx,
+  switcherMenuContentLabelTypographySx,
+  switcherTitleTypographySx,
+} from "./MenuControlGroup";
 
 interface ReferenceLayerSwitcherProps extends ControlProps {
   // Static layer to be added to the switch
@@ -94,16 +88,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
         data-testid={MENU_ID}
         ref={anchorRef}
         onClick={handleToggle}
-        sx={{
-          backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
-          color: open ? "white" : color.gray.dark,
-          minWidth: "40px",
-          height: "40px !important",
-          borderRadius: "6px !important",
-          display: "flex !important",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        sx={switcherIconButtonSx(open)}
       >
         <ReferenceLayerIcon />
       </IconButton>
@@ -126,63 +111,22 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
         {
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
-        <Box
-          sx={{
-            color: grey["mapMenuText"],
-            display: "inline-block",
-            whiteSpace: "nowrap",
-            borderRadius: borderRadius["menu"],
-            backgroundColor: grey["resultCard"],
-            zIndex: 1,
-            width: "260px",
-          }}
-        >
-          <Typography
-            sx={{
-              backgroundColor: color.blue.medium,
-              borderRadius: borderRadius["menuTop"],
-              fontSize: "16px",
-              color: "#090C02",
-              fontWeight: fontWeight.regular,
-              fontFamily: fontFamily.openSans,
-              minHeight: "40px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+        <Box sx={switcherMenuBoxSx}>
+          <Typography sx={switcherTitleTypographySx}>
             Reference Layers
           </Typography>
           <Divider />
-          <Box
-            sx={{
-              paddingLeft: leftPadding,
-              paddingRight: rightPadding,
-              paddingTop: topPadding,
-              paddingBottom: bottomPadding,
-            }}
-          >
+          <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">
               <FormGroup>
                 {layers?.map((ol) => (
                   <FormControlLabel
                     key={"fc-" + ol.id}
-                    sx={{ gap: 0.4 }}
+                    sx={formControlLabelSx}
                     control={
                       <Checkbox
                         id={"cb-" + ol.id}
-                        sx={{
-                          padding: "6px",
-                          "& .MuiSvgIcon-root": {
-                            fontSize: "20px",
-                          },
-                          "&.Mui-checked": {
-                            color: fontColor.blue.dark,
-                          },
-                          "&:not(.Mui-checked)": {
-                            color: fontColor.gray.medium,
-                          },
-                        }}
+                        sx={switcherMenuContentIconSx}
                         checked={overlaysChecked.get(ol.id)}
                         onChange={(e) => {
                           toggleOverlay(ol.id, e.target.checked);
@@ -192,16 +136,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
                       />
                     }
                     label={
-                      <Typography
-                        sx={{
-                          fontSize: fontSize.info,
-                          color: "#090C02",
-                          fontFamily: fontFamily.openSans,
-                          fontWeight: fontWeight.regular,
-                          letterSpacing: "0.5px",
-                          lineHeight: "22px",
-                        }}
-                      >
+                      <Typography sx={switcherMenuContentLabelTypographySx}>
                         {ol.name}
                       </Typography>
                     }

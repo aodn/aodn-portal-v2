@@ -147,16 +147,16 @@ const MapSection: React.FC<MapSectionProps> = memo(
             <NavigationControl visible={!isUnderLaptop} />
             <ScaleControl />
             <DisplayCoordinate />
-            <MenuControl
-              visible={!isUnderLaptop}
-              menu={
-                <BookmarkListMenu
-                  onDeselectDataset={onDeselectDataset}
-                  tabNavigation={tabNavigation}
-                />
-              }
-            />
             <MenuControlGroup>
+              <MenuControl
+                visible={!isUnderLaptop}
+                menu={
+                  <BookmarkListMenu
+                    onDeselectDataset={onDeselectDataset}
+                    tabNavigation={tabNavigation}
+                  />
+                }
+              />
               <MenuControl menu={<BaseMapSwitcher />} />
               <MenuControl
                 menu={
@@ -187,31 +187,31 @@ const MapSection: React.FC<MapSectionProps> = memo(
                   />
                 }
               />
+              <MenuControl
+                menu={
+                  <MapLayerSwitcher
+                    layers={[
+                      {
+                        id: LayerName.Cluster,
+                        name: capitalizeFirstLetter(LayerName.Cluster),
+                        default: selectedLayer === LayerName.Cluster,
+                      },
+                      {
+                        id: LayerName.Uncluster,
+                        name: capitalizeFirstLetter(LayerName.Uncluster),
+                        default: selectedLayer === LayerName.Uncluster,
+                      },
+                      {
+                        id: LayerName.Heatmap,
+                        name: capitalizeFirstLetter(LayerName.Heatmap),
+                        default: selectedLayer === LayerName.Heatmap,
+                      },
+                    ]}
+                    onEvent={(id: string) => setSelectedLayer(id)}
+                  />
+                }
+              />
             </MenuControlGroup>
-            <MenuControl
-              menu={
-                <MapLayerSwitcher
-                  layers={[
-                    {
-                      id: LayerName.Cluster,
-                      name: capitalizeFirstLetter(LayerName.Cluster),
-                      default: selectedLayer === LayerName.Cluster,
-                    },
-                    {
-                      id: LayerName.Uncluster,
-                      name: capitalizeFirstLetter(LayerName.Uncluster),
-                      default: selectedLayer === LayerName.Uncluster,
-                    },
-                    {
-                      id: LayerName.Heatmap,
-                      name: capitalizeFirstLetter(LayerName.Heatmap),
-                      default: selectedLayer === LayerName.Heatmap,
-                    },
-                  ]}
-                  onEvent={(id: string) => setSelectedLayer(id)}
-                />
-              }
-            />
           </Controls>
           <Layers>
             {createPresentationLayers(

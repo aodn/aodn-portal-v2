@@ -15,7 +15,9 @@ import ExpandableTextArea from "../../../../components/list/listItem/subitem/Exp
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
-import { BaseMapSwitcherLayer } from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
+import BaseMapSwitcher, {
+  BaseMapSwitcherLayer,
+} from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../../components/map/mapbox/controls/menu/DateRange";
 import dayjs, { Dayjs } from "dayjs";
@@ -308,6 +310,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <NavigationControl />
                     <ScaleControl />
                     <DisplayCoordinate />
+                    <MenuControl menu={<BaseMapSwitcher />} />
                     <MenuControl
                       menu={
                         <ReferenceLayerSwitcher
