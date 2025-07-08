@@ -24,14 +24,22 @@ interface MenuControlGroupProps {
 }
 
 export const switcherIconButtonSx = (open: boolean) => ({
-  backgroundColor: `${open ? fontColor.blue.dark : "transparent"} !important`,
-  color: open ? "white" : color.gray.dark,
-  minWidth: "40px",
-  height: "40px !important",
-  borderRadius: "6px !important",
-  display: "flex !important",
-  alignItems: "center",
-  justifyContent: "center",
+  "&.MuiIconButton-root.MuiIconButton-root": {
+    backgroundColor: `${open ? fontColor.blue.dark : "transparent"}`,
+    color: open ? "white" : color.gray.dark,
+    minWidth: "40px",
+    height: "40px",
+    borderRadius: "6px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    "&:hover": {
+      backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
+    },
+    "&.Mui-focusVisible": {
+      backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
+    },
+  },
 });
 
 export const switcherTitleTypographySx = {
