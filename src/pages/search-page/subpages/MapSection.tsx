@@ -52,9 +52,9 @@ interface MapSectionProps
 const mapContainerId = "result-page-main-map";
 
 enum LayerName {
-  Heatmap = "heatmap",
-  Cluster = "cluster",
-  Uncluster = "uncluster",
+  Heatmap = "centre points (heatmap)",
+  Cluster = "centre points (clustered)",
+  Uncluster = "centre points (unclustered)",
 }
 
 const createPresentationLayers = (
