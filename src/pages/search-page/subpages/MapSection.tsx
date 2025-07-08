@@ -197,14 +197,14 @@ const MapSection: React.FC<MapSectionProps> = memo(
                         default: selectedLayer === LayerName.Cluster,
                       },
                       {
-                        id: LayerName.Heatmap,
-                        name: capitalizeFirstLetter(LayerName.Heatmap),
-                        default: selectedLayer === LayerName.Heatmap,
-                      },
-                      {
                         id: LayerName.Uncluster,
                         name: capitalizeFirstLetter(LayerName.Uncluster),
                         default: selectedLayer === LayerName.Uncluster,
+                      },
+                      {
+                        id: LayerName.Heatmap,
+                        name: capitalizeFirstLetter(LayerName.Heatmap),
+                        default: selectedLayer === LayerName.Heatmap,
                       },
                     ]}
                     onEvent={(id: string) => setSelectedLayer(id)}

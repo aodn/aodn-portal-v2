@@ -17,14 +17,22 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import { eventEmitter, leftPadding, rightPadding } from "./MenuControl";
+import {
+  bottomPadding,
+  eventEmitter,
+  leftPadding,
+  rightPadding,
+  topPadding,
+} from "./MenuControl";
 import grey from "../../../../common/colors/grey";
 import blue from "../../../../common/colors/blue";
 import {
   borderRadius,
   color,
   fontColor,
+  fontFamily,
   fontSize,
+  fontWeight,
 } from "../../../../../styles/constants";
 import { MapDefaultConfig } from "../../constants";
 import { BaseLayerIcon } from "../../../../../assets/map/base_layer";
@@ -132,23 +140,34 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
             borderRadius: borderRadius["menu"],
             backgroundColor: grey["resultCard"],
             zIndex: 1,
+            width: "260px",
           }}
         >
           <Typography
             sx={{
-              backgroundColor: "white",
+              backgroundColor: color.blue.medium,
               borderRadius: borderRadius["menuTop"],
-              fontSize: fontSize["mapMenuItem"],
-              paddingTop: "7px",
-              paddingBottom: "7px",
-              paddingLeft: leftPadding,
-              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#090C02",
+              fontWeight: fontWeight.regular,
+              fontFamily: fontFamily.openSans,
+              minHeight: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             Map Base Layers
           </Typography>
           <Divider />
-          <Box sx={{ paddingLeft: leftPadding, paddingRight: rightPadding }}>
+          <Box
+            sx={{
+              paddingLeft: leftPadding,
+              paddingRight: rightPadding,
+              paddingTop: topPadding,
+              paddingBottom: bottomPadding,
+            }}
+          >
             <FormControl component="fieldset">
               <RadioGroup
                 value={currentStyle}
@@ -160,20 +179,34 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
                   <FormControlLabel
                     key={style.name}
                     value={style.id}
+                    sx={{ gap: 0.4 }}
                     control={
                       <Radio
                         sx={{
+                          padding: "6px",
                           "& .MuiSvgIcon-root": {
-                            fontSize: fontSize["mapMenuSubItem"],
+                            fontSize: "20px",
                           },
                           "&.Mui-checked": {
-                            color: blue["imosLightBlue"],
+                            color: fontColor.blue.dark,
+                          },
+                          "&:not(.Mui-checked)": {
+                            color: fontColor.gray.medium,
                           },
                         }}
                       />
                     }
                     label={
-                      <Typography sx={{ fontSize: fontSize["mapMenuSubItem"] }}>
+                      <Typography
+                        sx={{
+                          fontSize: fontSize.info,
+                          color: "#090C02",
+                          fontFamily: fontFamily.openSans,
+                          fontWeight: fontWeight.regular,
+                          letterSpacing: "0.5px",
+                          lineHeight: "22px",
+                        }}
+                      >
                         {style.name}
                       </Typography>
                     }

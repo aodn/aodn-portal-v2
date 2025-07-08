@@ -5,7 +5,13 @@ import {
   EVENT_MENU,
   MenuClickedEvent,
 } from "./Definition";
-import { eventEmitter, leftPadding, rightPadding } from "./MenuControl";
+import {
+  bottomPadding,
+  eventEmitter,
+  leftPadding,
+  rightPadding,
+  topPadding,
+} from "./MenuControl";
 import {
   Box,
   Typography,
@@ -18,12 +24,13 @@ import {
   Divider,
 } from "@mui/material";
 import grey from "../../../../common/colors/grey";
-import blue from "../../../../common/colors/blue";
 import {
   borderRadius,
   color,
   fontColor,
+  fontFamily,
   fontSize,
+  fontWeight,
 } from "../../../../../styles/constants";
 import { SearchStyleIcon } from "../../../../../assets/map/search_style";
 
@@ -120,23 +127,34 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
             borderRadius: borderRadius["menu"],
             backgroundColor: grey["resultCard"],
             zIndex: 1,
+            width: "260px",
           }}
         >
           <Typography
             sx={{
-              backgroundColor: "white",
+              backgroundColor: color.blue.medium,
               borderRadius: borderRadius["menuTop"],
-              fontSize: fontSize["mapMenuItem"],
-              paddingTop: "7px",
-              paddingBottom: "7px",
-              paddingLeft: leftPadding,
-              fontWeight: "bold",
+              fontSize: "16px",
+              color: "#090C02",
+              fontWeight: fontWeight.regular,
+              fontFamily: fontFamily.openSans,
+              minHeight: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Layers
+            Search Style
           </Typography>
           <Divider />
-          <Box sx={{ paddingLeft: leftPadding, paddingRight: rightPadding }}>
+          <Box
+            sx={{
+              paddingLeft: leftPadding,
+              paddingRight: rightPadding,
+              paddingTop: topPadding,
+              paddingBottom: bottomPadding,
+            }}
+          >
             <FormControl component="fieldset">
               <RadioGroup
                 value={currentLayer}
@@ -149,21 +167,35 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
                   <FormControlLabel
                     key={l.name}
                     value={l.id}
+                    sx={{ gap: 0.4 }}
                     control={
                       <Radio
                         checked={currentLayer === l.id}
                         sx={{
+                          padding: "6px",
                           "& .MuiSvgIcon-root": {
-                            fontSize: fontSize["mapMenuSubItem"],
+                            fontSize: "20px",
                           },
                           "&.Mui-checked": {
-                            color: blue["imosLightBlue"],
+                            color: fontColor.blue.dark,
+                          },
+                          "&:not(.Mui-checked)": {
+                            color: fontColor.gray.medium,
                           },
                         }}
                       />
                     }
                     label={
-                      <Typography sx={{ fontSize: fontSize["mapMenuSubItem"] }}>
+                      <Typography
+                        sx={{
+                          fontSize: fontSize.info,
+                          color: "#090C02",
+                          fontFamily: fontFamily.openSans,
+                          fontWeight: fontWeight.regular,
+                          letterSpacing: "0.5px",
+                          lineHeight: "22px",
+                        }}
+                      >
                         {l.name}
                       </Typography>
                     }

@@ -163,7 +163,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
             }}
           >
             <FormControl component="fieldset">
-              <FormGroup sx={{ gap: 0.5 }}>
+              <FormGroup>
                 {layers?.map((ol) => (
                   <FormControlLabel
                     key={"fc-" + ol.id}
