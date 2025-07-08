@@ -20,8 +20,10 @@ import { Box, SxProps, Theme } from "@mui/material";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
-const leftPadding = "15px";
+const leftPadding = "24px";
 const rightPadding = "15px";
+const topPadding = "10px";
+const bottomPadding = "12px";
 
 interface MenuControlProps {
   menu: MapControlType | null;
@@ -176,5 +178,12 @@ const MenuControl: React.FC<MenuControlProps> = ({
   );
 };
 
-export { eventEmitter, leftPadding, rightPadding, MapControl };
+export {
+  eventEmitter,
+  leftPadding,
+  rightPadding,
+  topPadding,
+  bottomPadding,
+  MapControl,
+};
 export default MenuControl;

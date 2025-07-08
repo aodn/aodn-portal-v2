@@ -13,9 +13,7 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
-  Checkbox,
   FormControl,
-  FormGroup,
   IconButton,
   Popper,
   Divider,
@@ -33,24 +31,13 @@ export interface BaseMapSwitcherLayer {
   default?: boolean;
 }
 
-interface BaseMapSwitcherProps extends ControlProps {
-  // Static layer to be added to the switch
-  layers: Array<BaseMapSwitcherLayer>;
-}
+interface BaseMapSwitcherProps extends ControlProps {}
 
 const MENU_ID = "basemap-show-hide-menu-button";
 
-const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
-  map,
-  layers,
-  onEvent,
-}) => {
+const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
   const [currentStyle, setCurrentStyle] = useState<string>(
     mapStyles[MapDefaultConfig.DEFAULT_STYLE].id
-  );
-  // Must init the map so that it will not throw error indicate uncontrol to control component
-  const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(
-    new Map(layers?.map((i) => [i.id, !!i.default]))
   );
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -69,13 +56,6 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
     },
     [map]
   );
-
-  const toggleOverlay = useCallback((layerId: string, visible: boolean) => {
-    setOverlaysChecked((values) => {
-      values.set(layerId, visible);
-      return new Map(values);
-    });
-  }, []);
 
   useEffect(() => {
     // Handle event when other control clicked, this component should close
@@ -186,40 +166,6 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({
                   />
                 ))}
               </RadioGroup>
-            </FormControl>
-            <Divider />
-            <FormControl component="fieldset">
-              <FormGroup>
-                {layers?.map((ol) => (
-                  <FormControlLabel
-                    key={"fc-" + ol.id}
-                    control={
-                      <Checkbox
-                        id={"cb-" + ol.id}
-                        sx={{
-                          "& .MuiSvgIcon-root": {
-                            fontSize: fontSize["mapMenuSubItem"],
-                          },
-                          "&.Mui-checked": {
-                            color: blue["imosLightBlue"],
-                          },
-                        }}
-                        checked={overlaysChecked.get(ol.id)}
-                        onChange={(e) => {
-                          toggleOverlay(ol.id, e.target.checked);
-                          onEvent && onEvent(e.target);
-                        }}
-                        value={ol.id}
-                      />
-                    }
-                    label={
-                      <Typography sx={{ fontSize: fontSize["mapMenuSubItem"] }}>
-                        {ol.name}
-                      </Typography>
-                    }
-                  />
-                ))}
-              </FormGroup>
             </FormControl>
           </Box>
         </Box>

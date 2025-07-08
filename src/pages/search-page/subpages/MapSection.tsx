@@ -32,6 +32,7 @@ import BookmarkListMenu, {
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import MenuControlGroup from "../../../components/map/mapbox/controls/menu/MenuControlGroup";
+import ReferenceLayerSwitcher from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -156,9 +157,10 @@ const MapSection: React.FC<MapSectionProps> = memo(
                   />
                 }
               />
+              <MenuControl menu={<BaseMapSwitcher />} />
               <MenuControl
                 menu={
-                  <BaseMapSwitcher
+                  <ReferenceLayerSwitcher
                     layers={[
                       {
                         id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
