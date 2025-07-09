@@ -206,7 +206,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 350], // Add 16px vertical padding from bottom edge
+              offset: [0, 270], // Add 16px vertical padding from bottom edge
             },
           },
           {
