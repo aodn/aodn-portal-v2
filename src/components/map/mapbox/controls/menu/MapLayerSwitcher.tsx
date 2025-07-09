@@ -5,7 +5,16 @@ import {
   EVENT_MENU,
   MenuClickedEvent,
 } from "./Definition";
-import { eventEmitter } from "./MenuControl";
+import {
+  eventEmitter,
+  formControlLabelSx,
+  switcherIconButtonSx,
+  switcherMenuBoxSx,
+  switcherMenuContentBoxSx,
+  switcherMenuContentIconSx,
+  switcherMenuContentLabelTypographySx,
+  switcherTitleTypographySx,
+} from "./MenuControl";
 import {
   Box,
   Typography,
@@ -18,15 +27,6 @@ import {
   Divider,
 } from "@mui/material";
 import { SearchStyleIcon } from "../../../../../assets/map/search_style";
-import {
-  formControlLabelSx,
-  switcherIconButtonSx,
-  switcherMenuBoxSx,
-  switcherMenuContentBoxSx,
-  switcherMenuContentIconSx,
-  switcherMenuContentLabelTypographySx,
-  switcherTitleTypographySx,
-} from "./MenuControlGroup";
 
 export interface LayerSwitcherLayer<T = string> {
   id: T;

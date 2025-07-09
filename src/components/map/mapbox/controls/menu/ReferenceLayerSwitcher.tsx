@@ -16,10 +16,8 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import { eventEmitter } from "./MenuControl";
-import { BaseMapSwitcherLayer } from "./BaseMapSwitcher";
-import { ReferenceLayerIcon } from "../../../../../assets/map/ref_layer";
 import {
+  eventEmitter,
   formControlLabelSx,
   switcherIconButtonSx,
   switcherMenuBoxSx,
@@ -27,7 +25,9 @@ import {
   switcherMenuContentIconSx,
   switcherMenuContentLabelTypographySx,
   switcherTitleTypographySx,
-} from "./MenuControlGroup";
+} from "./MenuControl";
+import { BaseMapSwitcherLayer } from "./BaseMapSwitcher";
+import { ReferenceLayerIcon } from "../../../../../assets/map/ref_layer";
 
 interface ReferenceLayerSwitcherProps extends ControlProps {
   // Static layer to be added to the switch

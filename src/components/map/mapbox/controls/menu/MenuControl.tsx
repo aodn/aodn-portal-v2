@@ -17,13 +17,92 @@ import {
   MapControlType,
 } from "./Definition";
 import { Box, SxProps, Theme } from "@mui/material";
+import {
+  borderRadius,
+  color,
+  fontColor,
+  fontFamily,
+  fontSize,
+  fontWeight,
+} from "../../../../../styles/constants";
+import grey from "../../../../common/colors/grey";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
-const leftPadding = "20px";
-const rightPadding = "15px";
-const topPadding = "10px";
-const bottomPadding = "14px";
+export const switcherIconButtonSx = (open: boolean) => ({
+  "&.MuiIconButton-root.MuiIconButton-root": {
+    backgroundColor: `${open ? fontColor.blue.dark : "transparent"}`,
+    color: open ? "white" : color.gray.dark,
+    minWidth: "40px",
+    height: "40px",
+    borderRadius: "6px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    "&:hover": {
+      backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
+    },
+    "&.Mui-focusVisible": {
+      backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
+    },
+  },
+});
+
+export const switcherTitleTypographySx = {
+  backgroundColor: color.blue.medium,
+  borderRadius: borderRadius["menuTop"],
+  fontSize: "16px",
+  color: "#090C02",
+  fontWeight: fontWeight.regular,
+  fontFamily: fontFamily.openSans,
+  minHeight: "40px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+export const switcherMenuBoxSx = {
+  color: grey["mapMenuText"],
+  display: "inline-block",
+  whiteSpace: "nowrap",
+  borderRadius: borderRadius["menu"],
+  backgroundColor: grey["resultCard"],
+  zIndex: 1,
+  width: "260px",
+};
+
+export const switcherMenuContentBoxSx = {
+  paddingTop: "10px",
+  paddingBottom: "14px",
+  paddingLeft: "20px",
+  paddingRight: "15px",
+};
+
+export const formControlLabelSx = {
+  gap: 0.4,
+};
+
+export const switcherMenuContentIconSx = {
+  padding: "6px",
+  "& .MuiSvgIcon-root": {
+    fontSize: "20px",
+  },
+  "&.Mui-checked": {
+    color: fontColor.blue.dark,
+  },
+  "&:not(.Mui-checked)": {
+    color: fontColor.gray.medium,
+  },
+};
+
+export const switcherMenuContentLabelTypographySx = {
+  fontSize: fontSize.info,
+  color: "#090C02",
+  fontFamily: fontFamily.openSans,
+  fontWeight: fontWeight.regular,
+  letterSpacing: "0.5px",
+  lineHeight: "22px",
+};
 
 interface MenuControlProps {
   menu: MapControlType | null;
@@ -178,12 +257,5 @@ const MenuControl: React.FC<MenuControlProps> = ({
   );
 };
 
-export {
-  eventEmitter,
-  leftPadding,
-  rightPadding,
-  topPadding,
-  bottomPadding,
-  MapControl,
-};
+export { eventEmitter, MapControl };
 export default MenuControl;

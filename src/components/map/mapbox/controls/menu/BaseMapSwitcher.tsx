@@ -17,10 +17,8 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import { eventEmitter } from "./MenuControl";
-import { MapDefaultConfig } from "../../constants";
-import { BaseLayerIcon } from "../../../../../assets/map/base_layer";
 import {
+  eventEmitter,
   formControlLabelSx,
   switcherIconButtonSx,
   switcherMenuBoxSx,
@@ -28,7 +26,9 @@ import {
   switcherMenuContentIconSx,
   switcherMenuContentLabelTypographySx,
   switcherTitleTypographySx,
-} from "./MenuControlGroup";
+} from "./MenuControl";
+import { MapDefaultConfig } from "../../constants";
+import { BaseLayerIcon } from "../../../../../assets/map/base_layer";
 
 export interface BaseMapSwitcherLayer {
   id: string;
@@ -150,7 +150,5 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
     </>
   );
 };
-
-export { MENU_ID };
 
 export default BaseMapSwitcher;

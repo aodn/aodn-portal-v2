@@ -2,13 +2,12 @@ import { FC, useRef, useEffect, useState } from "react";
 import { Box, IconButton, Popper } from "@mui/material";
 import { ControlProps, EVENT_MENU, MenuClickedEvent } from "./Definition";
 import { borderRadius } from "../../../../../styles/constants";
-import { eventEmitter } from "./MenuControl";
+import { eventEmitter, switcherIconButtonSx } from "./MenuControl";
 import BookmarkListAccordionGroup, {
   BookmarkListAccordionGroupBasicType,
 } from "../../../../bookmark/BookmarkListAccordionGroup";
 import { BOOKMARK_LIST_WIDTH_MAP } from "../../../../result/constants";
 import { BookmarkIcon } from "../../../../../assets/map/bookmark";
-import { switcherIconButtonSx } from "./MenuControlGroup";
 
 export interface BookmarkListMenuBasicType
   extends ControlProps,
