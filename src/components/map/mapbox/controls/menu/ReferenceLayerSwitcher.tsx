@@ -151,6 +151,4 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
   );
 };
 
-export { MENU_ID };
-
 export default ReferenceLayerSwitcher;
