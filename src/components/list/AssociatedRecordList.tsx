@@ -12,13 +12,6 @@ interface AssociatedRecordListProps {
   records: IAssociatedRecord[];
 }
 
-const openRecord = (uuid: string) => {
-  const searchParams = new URLSearchParams();
-  searchParams.append("uuid", uuid);
-  const url = pageDefault.details + "?" + searchParams.toString();
-  openInNewTab(url);
-};
-
 const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
   title,
   records,
@@ -29,13 +22,17 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> = ({
       components.push(
         <ItemBaseGrid key={index}>
           <CollapseAssociatedRecordItem
-            titleAction={() => openRecord(record.uuid)}
+            titleAction={() =>
+              openInNewTab(`${pageDefault.details}/${record.uuid}`)
+            }
             title={`${record.title}`}
           >
             <ExpandableTextArea
               text={record.abstract}
               isClickable
-              onClick={() => openRecord(record.uuid)}
+              onClick={() =>
+                openInNewTab(`${pageDefault.details}/${record.uuid}`)
+              }
             />
           </CollapseAssociatedRecordItem>
         </ItemBaseGrid>
