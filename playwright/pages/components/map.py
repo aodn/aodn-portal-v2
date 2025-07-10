@@ -22,9 +22,11 @@ class Map(BasePage):
         )
         self.zoom_in_button = self.get_label('Zoom In')
         self.zoom_out_button = self.get_label('Zoom Out')
+        # todo search page map right-top icon changed causing playwright error
         self.bookmarks_icon = page.get_by_test_id('BookmarksIcon')
         self.basemap_show_hide_menu = page.get_by_test_id('PublicIcon')
         self.layers_icon = page.get_by_test_id('LayersIcon')
+        # end todo
         self.hexbin_layer = page.get_by_role('radio', name='Hexbin')
         self.geoserver_layer = page.get_by_role('radio', name='GeoServer')
 

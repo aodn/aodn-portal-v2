@@ -38,6 +38,7 @@ import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
+import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
@@ -309,9 +310,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <NavigationControl />
                     <ScaleControl />
                     <DisplayCoordinate />
+                    <MenuControl menu={<BaseMapSwitcher />} />
                     <MenuControl
                       menu={
-                        <BaseMapSwitcher
+                        <ReferenceLayerSwitcher
                           layers={staticBaseLayerConfig}
                           onEvent={handleBaseMapSwitch}
                         />

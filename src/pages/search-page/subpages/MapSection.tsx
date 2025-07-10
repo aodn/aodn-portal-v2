@@ -32,6 +32,7 @@ import BookmarkListMenu, {
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import MenuControlGroup from "../../../components/map/mapbox/controls/menu/MenuControlGroup";
+import ReferenceLayerSwitcher from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
@@ -51,9 +52,9 @@ interface MapSectionProps
 const mapContainerId = "result-page-main-map";
 
 enum LayerName {
-  Heatmap = "heatmap",
-  Cluster = "cluster",
-  Uncluster = "uncluster",
+  Heatmap = "centre points (heatmap)",
+  Cluster = "centre points (clustered)",
+  Uncluster = "centre points (unclustered)",
 }
 
 const createPresentationLayers = (
@@ -156,9 +157,10 @@ const MapSection: React.FC<MapSectionProps> = memo(
                   />
                 }
               />
+              <MenuControl menu={<BaseMapSwitcher />} />
               <MenuControl
                 menu={
-                  <BaseMapSwitcher
+                  <ReferenceLayerSwitcher
                     layers={[
                       {
                         id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
@@ -195,14 +197,14 @@ const MapSection: React.FC<MapSectionProps> = memo(
                         default: selectedLayer === LayerName.Cluster,
                       },
                       {
-                        id: LayerName.Heatmap,
-                        name: capitalizeFirstLetter(LayerName.Heatmap),
-                        default: selectedLayer === LayerName.Heatmap,
-                      },
-                      {
                         id: LayerName.Uncluster,
                         name: capitalizeFirstLetter(LayerName.Uncluster),
                         default: selectedLayer === LayerName.Uncluster,
+                      },
+                      {
+                        id: LayerName.Heatmap,
+                        name: capitalizeFirstLetter(LayerName.Heatmap),
+                        default: selectedLayer === LayerName.Heatmap,
                       },
                     ]}
                     onEvent={(id: string) => setSelectedLayer(id)}

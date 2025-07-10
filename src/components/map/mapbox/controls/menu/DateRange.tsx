@@ -1,5 +1,4 @@
 import React, { useCallback, useRef, useState } from "react";
-import timeRange from "../../../../../assets/images/time-range.png";
 import {
   DateRangeCondition,
   DownloadConditionType,
@@ -14,6 +13,8 @@ import PlainSlider from "../../../../common/slider/PlainSlider";
 import { dateDefault } from "../../../../common/constants";
 import useBreakpoint from "../../../../../hooks/useBreakpoint";
 import { color, fontSize, padding } from "../../../../../styles/constants";
+import { TimeRangeIcon } from "../../../../../assets/map/time_range";
+import { switcherIconButtonSx } from "./MenuControl";
 
 interface DateSliderProps {
   visible?: boolean;
@@ -192,8 +193,9 @@ const DateRange: React.FC<DateRangeControlProps> = ({
         data-testid={MENU_ID}
         ref={anchorRef}
         onClick={() => setOpen((prev) => !prev)}
+        sx={switcherIconButtonSx(open)}
       >
-        <img alt="" src={timeRange} />
+        <TimeRangeIcon />
       </IconButton>
       <Popper
         open={open}
@@ -204,7 +206,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 350], // Add 16px vertical padding from bottom edge
+              offset: [0, 270], // Add 16px vertical padding from bottom edge
             },
           },
           {
@@ -230,7 +232,5 @@ const DateRange: React.FC<DateRangeControlProps> = ({
     </>
   );
 };
-
-export { MENU_ID, COMPONENT_ID };
 
 export default DateRange;

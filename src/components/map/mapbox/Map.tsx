@@ -42,22 +42,22 @@ interface MapProps extends MapBasicType {}
 const styles = [
   {
     id: "1",
-    name: "Street map (MapBox)",
+    name: "Street map",
     style: "mapbox://styles/mapbox/streets-v12",
   },
   {
     id: "2",
-    name: "Topographic map (MapBox)",
+    name: "Topographic map ",
     style: "mapbox://styles/mapbox/outdoors-v12",
   },
   {
     id: "3",
-    name: "Satellite map (MapBox)",
+    name: "Satellite map",
     style: "mapbox://styles/mapbox/satellite-v9",
   },
   {
     id: "4",
-    name: "ESRI World Imagery (ArcGIS)",
+    name: "World Imagery",
     style: ERSIWorldImagery as Style,
   },
   // Add more styles as needed
