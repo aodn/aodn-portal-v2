@@ -145,11 +145,16 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   }, [handleClosePopup]);
 
   useEffect(() => {
-    setSelectedOption((v) => {
-      const n = findMatch(componentParam.polygon, locationOptions);
-      return v === n ? v : n;
+    setSelectedOption((prevOption) => {
+      const matchedLocation = findMatch(
+        componentParam.polygon,
+        locationOptions
+      );
+      return prevOption === matchedLocation ? prevOption : matchedLocation;
     });
   }, [componentParam.polygon]);
+
+  if (locationOptions.length === 0) return null;
 
   return (
     <Box
@@ -201,7 +206,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       >
         Australian Marine Parks
       </Typography>
-      <FormControl sx={{ maxHeight: "300px", overflowY: "scroll", flex: 1 }}>
+      <FormControl sx={{ maxHeight: "300px", overflowY: "auto", flex: 1 }}>
         <RadioGroup
           defaultValue={locationOptions[0].value}
           value={selectedOption}
