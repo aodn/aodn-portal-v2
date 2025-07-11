@@ -301,7 +301,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         : "model:No data available"
                       : isWMSAvailable
                         ? undefined
-                        : "model:No GeoServer WMS data available"
+                        : "model: Map preview not available" // No GeoServer WMS data available
                   }
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}

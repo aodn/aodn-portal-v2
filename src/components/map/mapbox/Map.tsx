@@ -252,7 +252,30 @@ const ReactMap = memo(
           <Paper
             sx={{
               padding: padding.medium,
-              backgroundColor: "white",
+              backgroundColor: "rgba(255, 255, 255, 0.70)",
+              border: "1px solid #8C8C8C",
+              borderRadius: "6px",
+              backdropFilter: "blur(10px)",
+              flexShrink: 0,
+              width: {
+                xs: "280px",
+                sm: "350px",
+                md: "480px",
+              },
+              height: {
+                xs: "56px",
+                sm: "60px",
+                md: "64px",
+              },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#090C02",
+              textAlign: "center",
+              fontSize: "16px",
+              fontStyle: "normal",
+              fontWeight: 500,
+              lineHeight: "14px",
             }}
           >
             {announcement?.replace(/^model:/, "")}

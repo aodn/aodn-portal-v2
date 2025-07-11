@@ -9,6 +9,7 @@ import { useDetailPageContext } from "../context/detail-page-context";
 import DataAccessPanel, { TYPE } from "./tab-panels/DataAccessPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
 import { MODE } from "../../../components/list/CommonDef";
+import DownloadServiceCard from "./side-cards/DownloadServiceCard";
 
 interface SideSectionProps extends SpatialCoverageCardProps {}
 
@@ -21,7 +22,7 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
       gap={2}
       flexWrap="wrap"
     >
-      {collection?.hasSummaryFeature() && (
+      {collection?.hasSummaryFeature() ? (
         <Card
           sx={{
             backgroundColor: "#fff",
@@ -31,6 +32,8 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
         >
           <DownloadCard />
         </Card>
+      ) : (
+        <DownloadServiceCard />
       )}
       {!isCollectionNotFound && (
         <>
