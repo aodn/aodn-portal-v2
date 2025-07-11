@@ -1,4 +1,5 @@
 import { Typography, Box, Button } from "@mui/material";
+import { DownloadNotAvailableIcon } from "../../../../assets/icons/download_not_available";
 
 const DownloadServiceCard = () => {
   return (
@@ -59,6 +60,7 @@ const DownloadServiceCard = () => {
         variant="contained"
         disableElevation
         sx={{
+          gap: 1,
           borderRadius: "6px",
           background: "#8C8C8C",
           width: "90%",
@@ -78,6 +80,7 @@ const DownloadServiceCard = () => {
         }}
         aria-label="Download data - currently unavailable"
       >
+        <DownloadNotAvailableIcon />
         Download
       </Button>
     </Box>
