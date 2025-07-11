@@ -27,7 +27,7 @@ import LocationFilter from "../filter/LocationFilter";
 import Filters from "../filter/Filters";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useScrollToElement from "../../hooks/useScrollToElement";
-import { HEADER_HEIGHT } from "../layout/constant";
+import { HEADER_HEIGHT, HEADER_HEIGHT_MOBILE } from "../layout/constant";
 import {
   clearComponentParam,
   ParameterState,
@@ -58,7 +58,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const redirectSearch = useRedirectSearch();
   const { scrollToElement } = useScrollToElement({
     ref: boxRef,
-    offset: HEADER_HEIGHT + 5,
+    offset: (isMobile ? HEADER_HEIGHT_MOBILE : HEADER_HEIGHT) + 5,
   });
   const urlParamState: ParameterState | undefined = useMemo(() => {
     // The first char is ? in the search string, so we need to remove it.

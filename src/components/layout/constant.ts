@@ -24,4 +24,5 @@ export const SEARCHBAR_CONTENT_WIDTH = 0.9;
 export const AODN_SITE_LOGO_WIDTH = 50;
 export const AODN_SITE_LOGO_WIDTH_MOBILE = 35;
 
-export const HEADER_HEIGHT = 105;
+export const HEADER_HEIGHT = 120;
+export const HEADER_HEIGHT_MOBILE = 65;
