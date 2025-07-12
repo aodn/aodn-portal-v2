@@ -45,7 +45,7 @@ const SideCardContainer: FC<SideCardContainerProps> = ({
           },
         }}
       />
-      <Divider sx={{ width: "100%" }} />
+      <Divider sx={{ width: "100%" }} component={"div"} />
       {children}
     </Card>
   );

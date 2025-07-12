@@ -127,7 +127,7 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     if (map === null || map === undefined) return;
 
     const createSource = () => {
-      if (isWMSAvailable && !map?.isSourceLoaded(sourceLayerId)) {
+      if (isWMSAvailable) {
         // Add the WMS source following Mapbox's example
         if (!map?.getSource(sourceLayerId)) {
           map?.addSource(sourceLayerId, {
@@ -191,11 +191,6 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
       if (map?.isStyleLoaded()) {
         if (titleLayerId && map?.getLayer(titleLayerId)) {
           map?.removeLayer(titleLayerId);
-        }
-      }
-      if (map?.isSourceLoaded(sourceLayerId)) {
-        if (sourceLayerId && map?.getSource(sourceLayerId)) {
-          map?.removeSource(sourceLayerId);
         }
       }
     };

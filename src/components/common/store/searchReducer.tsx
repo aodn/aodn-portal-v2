@@ -90,7 +90,10 @@ const initialState: ObjectValue = {
 /**
  Define search functions
  */
-const searchResult = async (param: SearchParameters, thunkApi: any) => {
+const searchResult = async (
+  param: SearchParameters & { signal?: AbortSignal },
+  thunkApi: any
+) => {
   const p: OGCSearchParameters = {
     properties:
       param.properties !== undefined
@@ -116,6 +119,7 @@ const searchResult = async (param: SearchParameters, thunkApi: any) => {
     .get<string>("/api/v1/ogc/collections", {
       params: p,
       timeout: TIMEOUT,
+      signal: param.signal || thunkApi.signal,
     })
     .then((response) => response.data)
     .catch((error: Error | AxiosError | ErrorResponse) => {
