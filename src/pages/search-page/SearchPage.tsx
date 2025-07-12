@@ -87,7 +87,9 @@ const SearchPage = () => {
       : undefined
   );
   // Add these refs outside the functions, e.g., in the component body
-  const listSearchAbortRef = useRef<AbortController | null>(null);
+  const listSearchAbortRef = useRef<{
+    abort: (reason?: string) => void;
+  } | null>(null);
   const mapSearchAbortRef = useRef<AbortController | null>(null);
   const urlParamState: ParameterState | undefined = useMemo(() => {
     // The first char is ? in the search string, so we need to remove it.
@@ -160,7 +162,7 @@ const SearchPage = () => {
             );
           }
         })
-        .catch((error) => {
+        .catch(() => {
           // console.log("doSearchMap signal abort");
         });
     },
@@ -176,20 +178,15 @@ const SearchPage = () => {
       if (listSearchAbortRef.current) {
         listSearchAbortRef.current.abort();
       }
-      listSearchAbortRef.current = new AbortController();
 
       // Use standard param to get fields you need, record is stored in redux,
       // set page so that it returns fewer records
       const paramPaged = createSearchParamFrom(componentParam, {
         pagesize: DEFAULT_SEARCH_PAGE_SIZE,
       });
-
-      const paramPagedWithSignal = {
-        ...paramPaged,
-        signal: listSearchAbortRef.current.signal,
-      };
-
-      dispatch(fetchResultWithStore(paramPagedWithSignal));
+      // The return implicit contains a AbortController due to use of signal in
+      // axios call
+      listSearchAbortRef.current = dispatch(fetchResultWithStore(paramPaged));
       doMapSearch(needNavigate)?.finally(() => {});
     },
     [dispatch, doMapSearch]
@@ -407,7 +404,7 @@ const SearchPage = () => {
         location.state?.requireSearch === false
       ) {
         if (reduxContents.result.total > 0) {
-          doMapSearch();
+          doMapSearch()?.finally(() => {});
         } else {
           doListSearch();
         }
