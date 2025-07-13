@@ -61,8 +61,8 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                 {!item || item.length === 0 ? (
                   <NaList title={title ? title : ""} />
                 ) : (
-                  item.map((link: ILink) => (
-                    <LinkCard key={link.href} link={link} icon={false} />
+                  item.map((link: ILink, index: number) => (
+                    <LinkCard key={`ch-${index}`} link={link} icon={false} />
                   ))
                 )}
               </Typography>
