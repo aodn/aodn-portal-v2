@@ -96,7 +96,7 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
             ),
         },
         {
-          name: "Contact Us Email",
+          name: "Contact Us",
           handler: () => openInNewTab("mailto:info@aodn.org.au"),
         },
       ],
