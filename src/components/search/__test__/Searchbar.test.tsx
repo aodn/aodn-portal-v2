@@ -20,6 +20,7 @@ import {
 import { server } from "../../../__mocks__/server";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "../../../utils/AppTheme";
+import { compressToEncodedURIComponent } from "lz-string";
 
 const theme = AppTheme;
 const clearAllMock = () => {
@@ -334,7 +335,10 @@ describe("Searchbar", () => {
   it("should handle URL with bbox parameters correctly", () => {
     mockLocation.pathname = "/search";
     mockLocation.search =
-      "?isImosOnlyDataset=false&zoom=3.5&bbox.type=Feature&bbox.bbox.0=104&bbox.bbox.1=-43&bbox.bbox.2=163&bbox.bbox.3=-8&bbox.geometry.type=Polygon&bbox.geometry.coordinates.0.0.0=104&bbox.geometry.coordinates.0.0.1=-43&bbox.geometry.coordinates.0.1.0=163&bbox.geometry.coordinates.0.1.1=-43&bbox.geometry.coordinates.0.2.0=163&bbox.geometry.coordinates.0.2.1=-8&bbox.geometry.coordinates.0.3.0=104&bbox.geometry.coordinates.0.3.1=-8&bbox.geometry.coordinates.0.4.0=104&bbox.geometry.coordinates.0.4.1=-43&hasCOData=false";
+      "?" +
+      compressToEncodedURIComponent(
+        "isImosOnlyDataset=false&zoom=3.5&bbox.type=Feature&bbox.bbox.0=104&bbox.bbox.1=-43&bbox.bbox.2=163&bbox.bbox.3=-8&bbox.geometry.type=Polygon&bbox.geometry.coordinates.0.0.0=104&bbox.geometry.coordinates.0.0.1=-43&bbox.geometry.coordinates.0.1.0=163&bbox.geometry.coordinates.0.1.1=-43&bbox.geometry.coordinates.0.2.0=163&bbox.geometry.coordinates.0.2.1=-8&bbox.geometry.coordinates.0.3.0=104&bbox.geometry.coordinates.0.3.1=-8&bbox.geometry.coordinates.0.4.0=104&bbox.geometry.coordinates.0.4.1=-43&hasCOData=false"
+      );
 
     render(
       <Provider store={store}>
