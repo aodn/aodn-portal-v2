@@ -8,6 +8,10 @@ import { DatasetFrequency } from "./searchReducer";
 import { MapDefaultConfig } from "../../map/mapbox/constants";
 import { SearchResultLayoutEnum } from "../buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../buttons/ResultListSortButton";
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -158,10 +162,17 @@ const updateHasData = (hasCOData: boolean | undefined): ActionType => {
 };
 
 const updateParameterVocabs = (input: Array<Vocab>): ActionType => {
+  // We only need to store label, the other is not needed and will create a massive
+  // url.
+  const mappedInput = input.map((v) => {
+    return {
+      label: v.label,
+    };
+  });
   return {
     type: UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE,
     payload: {
-      parameterVocabs: input,
+      parameterVocabs: mappedInput,
     } as ParameterState,
   };
 };
@@ -384,7 +395,7 @@ const formatToUrlParam = (param: ParameterState) => {
       }
     }
   }
-  return parts.join("&");
+  return compressToEncodedURIComponent(parts.join("&"));
 };
 
 const parseQueryString = (queryString: string) => {
@@ -405,7 +416,7 @@ const parseQueryString = (queryString: string) => {
 // Convert the url parameter back to ParameterState, check test case for more details
 const unFlattenToParameterState = (input: string): ParameterState => {
   const result = createInitialParameterState(false);
-  const flatObject = parseQueryString(input);
+  const flatObject = parseQueryString(decompressFromEncodedURIComponent(input));
 
   for (const key in flatObject) {
     if (Object.prototype.hasOwnProperty.call(flatObject, key)) {
