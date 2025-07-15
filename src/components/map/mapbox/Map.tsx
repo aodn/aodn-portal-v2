@@ -42,22 +42,22 @@ interface MapProps extends MapBasicType {}
 const styles = [
   {
     id: "1",
-    name: "Street map (MapBox)",
+    name: "Street map",
     style: "mapbox://styles/mapbox/streets-v12",
   },
   {
     id: "2",
-    name: "Topographic map (MapBox)",
+    name: "Topographic map ",
     style: "mapbox://styles/mapbox/outdoors-v12",
   },
   {
     id: "3",
-    name: "Satellite map (MapBox)",
+    name: "Satellite map",
     style: "mapbox://styles/mapbox/satellite-v9",
   },
   {
     id: "4",
-    name: "ESRI World Imagery (ArcGIS)",
+    name: "World Imagery",
     style: ERSIWorldImagery as Style,
   },
   // Add more styles as needed
@@ -252,7 +252,30 @@ const ReactMap = memo(
           <Paper
             sx={{
               padding: padding.medium,
-              backgroundColor: "white",
+              backgroundColor: "rgba(255, 255, 255, 0.70)",
+              border: "1px solid #8C8C8C",
+              borderRadius: "6px",
+              backdropFilter: "blur(10px)",
+              flexShrink: 0,
+              width: {
+                xs: "280px",
+                sm: "350px",
+                md: "480px",
+              },
+              height: {
+                xs: "56px",
+                sm: "60px",
+                md: "64px",
+              },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#090C02",
+              textAlign: "center",
+              fontSize: "16px",
+              fontStyle: "normal",
+              fontWeight: 500,
+              lineHeight: "14px",
             }}
           >
             {announcement?.replace(/^model:/, "")}

@@ -289,10 +289,10 @@ export class Spatial {
 }
 
 export class OGCCollections {
-  private _total: number;
+  private readonly _total: number;
   private _search_after: Array<string>;
   private _collections: Array<OGCCollection>;
-  private _links: Array<ILink>;
+  private readonly _links: Array<ILink>;
 
   constructor(
     collections: Array<OGCCollection> = new Array<OGCCollection>(),
@@ -300,10 +300,18 @@ export class OGCCollections {
     total: number = 0,
     search_after: Array<string> = new Array<string>()
   ) {
-    this._collections = collections;
-    this._links = links;
+    // Make sure a new array is created instead of using the
+    // ref from the existing object
+    this._collections = new Array<OGCCollection>();
+    this._collections.push(...collections);
+
+    this._links = new Array<ILink>();
+    this._links.push(...links);
+
+    this._search_after = new Array<string>();
+    this._search_after.push(...search_after);
+
     this._total = total;
-    this._search_after = search_after;
   }
 
   get search_after() {
@@ -336,11 +344,13 @@ export class OGCCollections {
   }
 
   clone() {
+    // Need to create a new array, otherwise we will reuse
+    // the array and merge call will wrong
     return new OGCCollections(
-      this._collections,
-      this._links,
-      this._total,
-      this._search_after
+      this.collections,
+      this.links,
+      this.total,
+      this.search_after
     );
   }
 }

@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
-import { bbox as turfBbox, bboxPolygon, booleanEqual } from "@turf/turf";
+import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
   getComponentState,
   getSearchQueryResult,
@@ -62,21 +62,6 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 
-const isLoading = (count: number): boolean => {
-  if (count > 0) {
-    return true;
-  }
-  if (count === 0) {
-    // a 0.5s late finish loading is useful to improve the stability of the system
-    setTimeout(() => false, 500);
-  }
-  if (count < 0) {
-    // TODO: use beffer handling to replace this
-    throw new Error("Loading counter is negative");
-  }
-  return false;
-};
-
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -101,8 +86,11 @@ const SearchPage = () => {
         : MapDefaultConfig.ZOOM_TABLET
       : undefined
   );
-  const [loadingThreadCount, setLoadingThreadCount] = useState<number>(0);
-
+  // Add these refs outside the functions, e.g., in the component body
+  const listSearchAbortRef = useRef<{
+    abort: (reason?: string) => void;
+  } | null>(null);
+  const mapSearchAbortRef = useRef<AbortController | null>(null);
   const urlParamState: ParameterState | undefined = useMemo(() => {
     // The first char is ? in the search string, so we need to remove it.
     const param = location?.search?.substring(1);
@@ -112,72 +100,55 @@ const SearchPage = () => {
     return undefined;
   }, [location?.search]);
 
-  const startOneLoadingThread = useCallback(() => {
-    setLoadingThreadCount((prev) => prev + 1);
-  }, []);
-
-  const endOneLoadingThread = useCallback(() => {
-    setLoadingThreadCount((prev) => prev - 1);
-  }, []);
-
-  const doMapSearch = useCallback(async () => {
-    const componentParam: ParameterState = getComponentState(store.getState());
-
-    // Use a different parameter so that it returns id and bbox only and do not store the values,
-    // we cannot add page because we want to show all record on map
-    // and by default we will include record without spatial extents so that BBOX
-    // will not exclude record without spatial extents however for map search
-    // it is ok to exclude it because it isn't show on map anyway
-    const paramNonPaged: SearchParameters = createSearchParamFrom(
-      componentParam,
-      {
-        pagesize: DEFAULT_SEARCH_MAP_SIZE,
-      }
-    );
-
-    dispatch(
-      // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
-      // and ordered by uuid to avoid affecting cluster calculation
-      fetchResultNoStore({
-        ...paramNonPaged,
-        properties: "id,centroid",
-        sortby: "id",
-      })
-    )
-      .unwrap()
-      .then((collections: string) => {
-        setLayers(jsonToOGCCollections(collections).collections);
-      });
-  }, [dispatch]);
-
-  const doSearch = useCallback(
-    (needNavigate: boolean = false) => {
-      startOneLoadingThread();
+  const doMapSearch = useCallback(
+    async (needNavigate: boolean = false) => {
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
+      // Use a different parameter so that it returns id and bbox only and do not store the values,
+      // we cannot add page because we want to show all record on map
+      // and by default we will include record without spatial extents so that BBOX
+      // will not exclude record without spatial extents however for map search
+      // it is ok to exclude it because it isn't show on map anyway
+      // Abort any ongoing search if exists
+      if (mapSearchAbortRef.current) {
+        mapSearchAbortRef.current.abort();
+      }
+      const controller = new AbortController();
+      mapSearchAbortRef.current = controller;
 
-      // Use standard param to get fields you need, record is stored in redux,
-      // set page so that it returns fewer records
-      const paramPaged = createSearchParamFrom(componentParam, {
-        pagesize: DEFAULT_SEARCH_PAGE_SIZE,
-      });
-
-      dispatch(fetchResultWithStore(paramPaged));
-      doMapSearch()
-        .then(() => {
-          if (componentParam.polygon) {
-            // If user set the polygon, then we zoom to that area by setting the bbox
-            const bbox = turfBbox(componentParam.polygon);
-            setBbox(
-              new LngLatBounds(
-                [bbox[0], bbox[1]], // Southwest corner: [minX, minY]
-                [bbox[2], bbox[3]] // Northeast corner: [maxX, maxY]
-              )
-            );
-            setZoom(6);
+      const paramNonPaged: SearchParameters = createSearchParamFrom(
+        componentParam,
+        {
+          pagesize: DEFAULT_SEARCH_MAP_SIZE,
+        }
+      );
+      dispatch(
+        // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+        // and ordered by uuid to avoid affecting cluster calculation
+        fetchResultNoStore({
+          ...paramNonPaged,
+          properties: "id,centroid",
+          sortby: "id",
+          signal: controller.signal,
+        } as SearchParameters & { signal: AbortSignal })
+      )
+        .unwrap()
+        .then((collections: string) => {
+          // This check is need due to user can move the map around when the search
+          // is still in progress, the store have the latest map bbox so we can check
+          // if the constant we store matches the bbox, if not then we know map
+          // moved and results isn't valid
+          const current = getComponentState(store.getState())?.bbox;
+          if (
+            componentParam.bbox !== undefined &&
+            current !== undefined &&
+            booleanEqual(componentParam.bbox, current)
+          ) {
+            setLayers(jsonToOGCCollections(collections).collections);
           }
-
+        })
+        .then(() => {
           if (needNavigate) {
             navigate(
               pageDefault.search + "?" + formatToUrlParam(componentParam),
@@ -191,17 +162,34 @@ const SearchPage = () => {
             );
           }
         })
-        .finally(() => {
-          endOneLoadingThread();
+        .catch(() => {
+          // console.log("doSearchMap signal abort");
         });
     },
-    [
-      startOneLoadingThread,
-      dispatch,
-      doMapSearch,
-      navigate,
-      endOneLoadingThread,
-    ]
+    [dispatch, navigate]
+  );
+
+  const doListSearch = useCallback(
+    (needNavigate: boolean = false) => {
+      const componentParam: ParameterState = getComponentState(
+        store.getState()
+      );
+
+      if (listSearchAbortRef.current) {
+        listSearchAbortRef.current.abort();
+      }
+
+      // Use standard param to get fields you need, record is stored in redux,
+      // set page so that it returns fewer records
+      const paramPaged = createSearchParamFrom(componentParam, {
+        pagesize: DEFAULT_SEARCH_PAGE_SIZE,
+      });
+      // The return implicit contains a AbortController due to use of signal in
+      // axios call
+      listSearchAbortRef.current = dispatch(fetchResultWithStore(paramPaged));
+      doMapSearch(needNavigate)?.finally(() => {});
+    },
+    [dispatch, doMapSearch]
   );
 
   // The result will be changed based on the zoomed area, that is only
@@ -223,57 +211,17 @@ const SearchPage = () => {
         // due to some redraw, so in here we check if the polygon really
         // changed, if not then there is no need to do anything
         if (componentParam.bbox && !booleanEqual(componentParam.bbox, bbox)) {
-          setBbox(bounds);
-          setZoom(event.target.getZoom());
+          // These two lines cause flick on map move, why we need that two line?
+          //setBbox(bounds);
+          //setZoom(event.target.getZoom());
           dispatch(updateFilterBBox(bbox));
           dispatch(updateZoom(event.target.getZoom()));
-          doSearch(true);
+          doListSearch(true);
         }
       }
     },
-    [dispatch, doSearch]
+    [dispatch, doListSearch]
   );
-
-  const handleNavigation = useCallback(() => {
-    const reduxContents = getSearchQueryResult(store.getState());
-    if (
-      location.state?.referer === pageReferer.SEARCH_PAGE_REFERER &&
-      location.state?.requireSearch === false
-    ) {
-      // If the referer is SEARCH_PAGE_REFERER, it means the user is interacting with the search page
-      // Meanwhile if the state requireSearch is false, it means the user is not required to do a search. This happens when user just change the layout
-      // However the referer = SEARCH_PAGE_REFERER and requireSearch = false will be persist but redux will be cleared when user refresh the page, so we need to do a full search
-      // Therefore we need to check if the redux content is empty or not to decide whether to do a full search or no search
-      if (reduxContents.result.total > 0) {
-        return;
-      } else {
-        doSearch();
-      }
-    } else if (
-      // If user navigate from DetailPage, as the redux store has results content already we just need to do a map search
-      // However when user refresh the page, the redux will be cleared, we need to do a full search
-      // Therefore we need to check if the redux content is empty or not to decide whether to do a full search or only map search
-      location.state?.referer === pageReferer.DETAIL_PAGE_REFERER &&
-      location.state?.requireSearch === false
-    ) {
-      if (reduxContents.result.total > 0) {
-        startOneLoadingThread();
-        doMapSearch().finally(() => endOneLoadingThread());
-      } else {
-        doSearch();
-      }
-    } else {
-      // In the other cases we need to do a full search
-      // This including (but not limit): user paste the url directly, navigate from landing page, change sort ...
-      doSearch();
-    }
-  }, [
-    location,
-    doSearch,
-    doMapSearch,
-    startOneLoadingThread,
-    endOneLoadingThread,
-  ]);
 
   // Value true meaning full map. So if true set the selected layout as full-map
   // Else set the selected layout as the last layout remembered (stored in currentLayout)
@@ -335,9 +283,9 @@ const SearchPage = () => {
           break;
       }
 
-      doSearch(true);
+      return doListSearch(true);
     },
-    [dispatch, doSearch]
+    [dispatch, doListSearch]
   );
 
   const onChangeLayout = useCallback(
@@ -432,7 +380,56 @@ const SearchPage = () => {
   // which is ok.
   // TODO: Optimize call if possible, this happens when navigate from page
   // to this page.
-  useEffect(() => handleNavigation(), [handleNavigation]);
+  useEffect(() => {
+    const handleNavigation = () => {
+      const reduxContents = getSearchQueryResult(store.getState());
+      if (
+        location.state?.referer === pageReferer.SEARCH_PAGE_REFERER &&
+        location.state?.requireSearch === false
+      ) {
+        // If the referer is SEARCH_PAGE_REFERER, it means the user is interacting with the search page
+        // Meanwhile if the state requireSearch is false, it means the user is not required to do a search. This happens when user just change the layout
+        // However the referer = SEARCH_PAGE_REFERER and requireSearch = false will be persist but redux will be cleared when user refresh the page, so we need to do a full search
+        // Therefore we need to check if the redux content is empty or not to decide whether to do a full search or no search
+        if (reduxContents.result.total > 0) {
+          return;
+        } else {
+          doListSearch();
+        }
+      } else if (
+        // If user navigate from DetailPage, as the redux store has results content already we just need to do a map search
+        // However when user refresh the page, the redux will be cleared, we need to do a full search
+        // Therefore we need to check if the redux content is empty or not to decide whether to do a full search or only map search
+        location.state?.referer === pageReferer.DETAIL_PAGE_REFERER &&
+        location.state?.requireSearch === false
+      ) {
+        if (reduxContents.result.total > 0) {
+          doMapSearch()?.finally(() => {});
+        } else {
+          doListSearch();
+        }
+      } else {
+        // In the other cases we need to do a full search
+        // This including (but not limit): user paste the url directly, navigate from landing page, change sort ...
+        doListSearch();
+      }
+    };
+
+    handleNavigation();
+
+    return () => {
+      // If page unmounted, cancel any running search
+      mapSearchAbortRef.current?.abort();
+      mapSearchAbortRef.current = null;
+      listSearchAbortRef.current?.abort();
+      listSearchAbortRef.current = null;
+    };
+  }, [
+    doListSearch,
+    doMapSearch,
+    location.state?.referer,
+    location.state?.requireSearch,
+  ]);
 
   useEffect(() => {
     const bookmarkSelected = (event: BookmarkEvent) => {
@@ -532,7 +529,7 @@ const SearchPage = () => {
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
             onDeselectDataset={onDeselectDataset}
-            isLoading={isLoading(loadingThreadCount)}
+            isLoading={false}
           />
         </Box>
         <Box
@@ -559,7 +556,7 @@ const SearchPage = () => {
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}
             onClickMapPoint={onClickMapPoint}
-            isLoading={isLoading(loadingThreadCount)}
+            isLoading={false}
             onDeselectDataset={onDeselectDataset}
           />
         </Box>

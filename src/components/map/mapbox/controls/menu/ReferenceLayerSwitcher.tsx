@@ -1,10 +1,21 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   ControlProps,
   EVENT_MAP,
   EVENT_MENU,
   MenuClickedEvent,
 } from "./Definition";
+import {
+  Box,
+  Typography,
+  FormControlLabel,
+  Checkbox,
+  FormControl,
+  FormGroup,
+  IconButton,
+  Popper,
+  Divider,
+} from "@mui/material";
 import {
   eventEmitter,
   formControlLabelSx,
@@ -15,48 +26,43 @@ import {
   switcherMenuContentLabelTypographySx,
   switcherTitleTypographySx,
 } from "./MenuControl";
-import {
-  Box,
-  Typography,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  IconButton,
-  Popper,
-  Divider,
-} from "@mui/material";
-import { SearchStyleIcon } from "../../../../../assets/map/search_style";
+import { BaseMapSwitcherLayer } from "./BaseMapSwitcher";
+import { ReferenceLayerIcon } from "../../../../../assets/map/ref_layer";
 
-export interface LayerSwitcherLayer<T = string> {
-  id: T;
-  name: string;
-  default?: boolean;
+interface ReferenceLayerSwitcherProps extends ControlProps {
+  // Static layer to be added to the switch
+  layers: Array<BaseMapSwitcherLayer>;
 }
 
-interface LayerSwitcherProps extends ControlProps {
-  layers: Array<LayerSwitcherLayer>;
-}
+const MENU_ID = "reference-show-hide-menu-button";
 
-const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
+const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
   layers,
   onEvent,
 }) => {
+  // Must init the map so that it will not throw error indicate uncontrol to control component
+  const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(
+    new Map(layers?.map((i) => [i.id, !!i.default]))
+  );
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [currentLayer, setCurrentLayer] = useState<string | undefined>(
-    layers.find((i) => i.default)?.id
-  );
 
   const handleToggle = useCallback(() => {
     setOpen((prevOpen) => !prevOpen);
   }, [setOpen]);
 
+  const toggleOverlay = useCallback((layerId: string, visible: boolean) => {
+    setOverlaysChecked((values) => {
+      values.set(layerId, visible);
+      return new Map(values);
+    });
+  }, []);
+
   useEffect(() => {
     // Handle event when other control clicked, this component should close
     // the menu
     const handleEvent = (evt: MenuClickedEvent) => {
-      if (evt.component.type !== MapLayerSwitcher) {
+      if (evt.component.type !== ReferenceLayerSwitcher) {
         setOpen(false);
       }
     };
@@ -77,16 +83,17 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   return (
     <>
       <IconButton
-        aria-label="layer-show-hide-menu"
-        id="layer-show-hide-menu-button"
+        aria-label="reference-show-hide-menu"
+        id={MENU_ID}
+        data-testid={MENU_ID}
         ref={anchorRef}
         onClick={handleToggle}
         sx={switcherIconButtonSx(open)}
       >
-        <SearchStyleIcon />
+        <ReferenceLayerIcon />
       </IconButton>
       <Popper
-        id="layer-popper-id"
+        id="reference-popper-id"
         open={open}
         anchorEl={anchorRef.current}
         role={undefined}
@@ -96,7 +103,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 10], // This applies an offset of 10px downward
+              offset: [0, 10], // This applies an offset of 14px downward
             },
           },
         ]}
@@ -105,36 +112,37 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
         <Box sx={switcherMenuBoxSx}>
-          <Typography sx={switcherTitleTypographySx}>Search Style</Typography>
+          <Typography sx={switcherTitleTypographySx}>
+            Reference Layers
+          </Typography>
           <Divider />
           <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">
-              <RadioGroup
-                value={currentLayer}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setCurrentLayer(e.target.value);
-                  if (onEvent) onEvent(e.target.value);
-                }}
-              >
-                {layers.map((l) => (
+              <FormGroup>
+                {layers?.map((ol) => (
                   <FormControlLabel
-                    key={l.name}
-                    value={l.id}
+                    key={"fc-" + ol.id}
                     sx={formControlLabelSx}
                     control={
-                      <Radio
-                        checked={currentLayer === l.id}
+                      <Checkbox
+                        id={"cb-" + ol.id}
                         sx={switcherMenuContentIconSx}
+                        checked={overlaysChecked.get(ol.id)}
+                        onChange={(e) => {
+                          toggleOverlay(ol.id, e.target.checked);
+                          onEvent && onEvent(e.target);
+                        }}
+                        value={ol.id}
                       />
                     }
                     label={
                       <Typography sx={switcherMenuContentLabelTypographySx}>
-                        {l.name}
+                        {ol.name}
                       </Typography>
                     }
                   />
                 ))}
-              </RadioGroup>
+              </FormGroup>
             </FormControl>
           </Box>
         </Box>
@@ -143,4 +151,4 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   );
 };
 
-export default MapLayerSwitcher;
+export default ReferenceLayerSwitcher;

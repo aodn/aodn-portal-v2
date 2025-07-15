@@ -45,6 +45,7 @@ const mockRedirectSearch = vi.fn();
 import SearchPage from "../SearchPage";
 import { BrowserRouter as Router } from "react-router-dom";
 import { pageReferer } from "../../../components/common/constants";
+import { compressToEncodedURIComponent } from "lz-string";
 
 // Mock the Map component to avoid map initialization
 vi.mock("../../../components/map/mapbox/Map", () => {
@@ -203,7 +204,8 @@ describe("SearchPage Basic", () => {
   // URL parameters to Redux state flow
   it("Should update Redux state based on URL parameters", () => {
     // Mock URL parameters for this test
-    mockLocation.search = "?layout=GRID&sort=POPULARITY";
+    mockLocation.search =
+      "?" + compressToEncodedURIComponent("layout=GRID&sort=POPULARITY");
 
     // Spy on store.dispatch to verify actions
     const dispatchSpy = vi.spyOn(store, "dispatch");

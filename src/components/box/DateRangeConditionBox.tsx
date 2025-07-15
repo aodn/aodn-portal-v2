@@ -28,10 +28,11 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
     >
       <Typography
         sx={{
-          color: "#7194AB",
-          fontSize: "12px",
-          fontWeight: "400",
-          lineHeight: "8px",
+          color: "#090C02",
+          fontSize: "14px",
+          fontStyle: "normal",
+          fontWeight: 400,
+          lineHeight: "22px",
           padding: 0,
         }}
         data-testid="date-range-condition-box"

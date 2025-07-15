@@ -38,6 +38,7 @@ import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
+import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 
 const TRUNCATE_COUNT = 800;
 const TRUNCATE_COUNT_TABLET = 500;
@@ -165,18 +166,18 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
           name: capitalizeFirstLetter(LayerName.Hexbin),
           default: true,
         });
+
+        layers.push({
+          id: LayerName.Symbol,
+          name: capitalizeFirstLetter(LayerName.Symbol),
+          default: true,
+        });
       }
 
       layers.push({
         id: LayerName.GeoServer,
-        name: "GeoServer",
+        name: capitalizeFirstLetter(LayerName.GeoServer),
         default: !isSupportHexbin,
-      });
-
-      layers.push({
-        id: LayerName.Symbol,
-        name: "Symbol",
-        default: false,
       });
 
       // Init the layer with values here taking the default
@@ -300,7 +301,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         : "model:No data available"
                       : isWMSAvailable
                         ? undefined
-                        : "model:No GeoServer WMS data available"
+                        : "model: Map preview not available" // No GeoServer WMS data available
                   }
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
@@ -309,9 +310,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <NavigationControl />
                     <ScaleControl />
                     <DisplayCoordinate />
+                    <MenuControl menu={<BaseMapSwitcher />} />
                     <MenuControl
                       menu={
-                        <BaseMapSwitcher
+                        <ReferenceLayerSwitcher
                           layers={staticBaseLayerConfig}
                           onEvent={handleBaseMapSwitch}
                         />
@@ -326,7 +328,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }
                     />
                     <MenuControl
-                      visible={selectedLayer === LayerName.Hexbin}
+                      visible={
+                        selectedLayer === LayerName.Hexbin ||
+                        selectedLayer === LayerName.Symbol
+                      }
                       menu={
                         <DateRange
                           minDate={minDateStamp.format(
@@ -342,7 +347,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }
                     />
                     <MenuControl
-                      visible={selectedLayer === LayerName.Hexbin}
+                      visible={
+                        selectedLayer === LayerName.Hexbin ||
+                        selectedLayer === LayerName.Symbol
+                      }
                       menu={
                         <DrawRect
                           getAndSetDownloadConditions={

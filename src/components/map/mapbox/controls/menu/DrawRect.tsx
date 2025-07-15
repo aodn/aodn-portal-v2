@@ -18,9 +18,11 @@ import {
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import _ from "lodash";
 import { IconButton } from "@mui/material";
-import BBoxIcon from "../../../../icon/BBoxIcon";
 import DrawRectangle from "./DrawRectangle";
 import { ControlProps } from "./Definition";
+import { BboxSelectionIcon } from "../../../../../assets/map/bbox_selection";
+import { switcherIconButtonSx } from "./MenuControl";
+import { color } from "../../../../../styles/constants";
 
 interface DrawControlProps extends ControlProps {
   getAndSetDownloadConditions: (
@@ -76,6 +78,31 @@ const DrawRect: React.FC<DrawControlProps> = ({
     };
   }, [handleClickOutside, open]);
 
+  // Sync button state with actual draw mode
+  useEffect(() => {
+    const modePollingInterval = setInterval(() => {
+      const currentMode = mapDraw.getMode();
+      const isDrawingMode = currentMode === "draw_rectangle";
+      setOpen(isDrawingMode);
+    }, 100);
+    return () => clearInterval(modePollingInterval);
+  }, [mapDraw]);
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = `
+    .mapboxgl-ctrl-group .mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_trash {
+      width: 40px;
+      height: 40px;
+    }
+  `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   useEffect(() => {
     if (map) {
       // This function also handle delete, the reason is draw.delete works on the highlighted draw item on map
@@ -121,13 +148,11 @@ const DrawRect: React.FC<DrawControlProps> = ({
       data-testid={MENU_ID}
       ref={anchorRef}
       onClick={() => mapDraw.changeMode("draw_rectangle")}
-      sx={{ paddingTop: "3px !important" }}
+      sx={switcherIconButtonSx(open)}
     >
-      <BBoxIcon />
+      <BboxSelectionIcon />
     </IconButton>
   );
 };
-
-export { MENU_ID };
 
 export default DrawRect;

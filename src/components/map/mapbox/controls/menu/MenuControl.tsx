@@ -1,4 +1,11 @@
-import React, { cloneElement, useContext, useEffect, useState } from "react";
+import React, {
+  cloneElement,
+  RefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../../MapContext";
 import { Map as MapBox, IControl, MapMouseEvent } from "mapbox-gl";
@@ -9,19 +16,104 @@ import {
   EVENT_MENU,
   MapControlType,
 } from "./Definition";
+import { Box, SxProps, Theme } from "@mui/material";
+import {
+  borderRadius,
+  color,
+  fontColor,
+  fontFamily,
+  fontSize,
+  fontWeight,
+} from "../../../../../styles/constants";
+import grey from "../../../../common/colors/grey";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
-const leftPadding = "15px";
-const rightPadding = "15px";
+export const switcherIconButtonSx = (open: boolean) => ({
+  "&.MuiIconButton-root.MuiIconButton-root": {
+    backgroundColor: `${open ? fontColor.blue.dark : "transparent"}`,
+    color: open ? "white" : color.gray.dark,
+    minWidth: "40px",
+    height: "40px",
+    borderRadius: "6px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    "&:hover": {
+      backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
+    },
+    "&.Mui-focusVisible": {
+      backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
+    },
+  },
+});
+
+export const switcherTitleTypographySx = {
+  backgroundColor: color.blue.medium,
+  borderRadius: borderRadius["menuTop"],
+  fontSize: "16px",
+  color: "#090C02",
+  fontWeight: fontWeight.regular,
+  fontFamily: fontFamily.openSans,
+  minHeight: "40px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+export const switcherMenuBoxSx = {
+  color: grey["mapMenuText"],
+  display: "inline-block",
+  whiteSpace: "nowrap",
+  borderRadius: borderRadius["menu"],
+  backgroundColor: grey["resultCard"],
+  zIndex: 1,
+  width: "260px",
+};
+
+export const switcherMenuContentBoxSx = {
+  paddingTop: "10px",
+  paddingBottom: "14px",
+  paddingLeft: "20px",
+  paddingRight: "15px",
+};
+
+export const formControlLabelSx = {
+  gap: 0.4,
+};
+
+export const switcherMenuContentIconSx = {
+  padding: "6px",
+  "& .MuiSvgIcon-root": {
+    fontSize: "20px",
+  },
+  "&.Mui-checked": {
+    color: fontColor.blue.dark,
+  },
+  "&:not(.Mui-checked)": {
+    color: fontColor.gray.medium,
+  },
+};
+
+export const switcherMenuContentLabelTypographySx = {
+  fontSize: fontSize.info,
+  color: "#090C02",
+  fontFamily: fontFamily.openSans,
+  fontWeight: fontWeight.regular,
+  letterSpacing: "0.5px",
+  lineHeight: "22px",
+};
 
 interface MenuControlProps {
   menu: MapControlType | null;
+  position?: "bottom-right" | "top-right";
+  sx?: SxProps<Theme>;
   visible?: boolean;
+  className?: string;
 }
 
 class MapControl implements IControl {
-  private container: HTMLDivElement | null = null;
+  private container: HTMLDivElement;
   private root: Root | null = null;
   private readonly component: MapControlType;
   private height: string = "";
@@ -32,8 +124,9 @@ class MapControl implements IControl {
   private readonly mapClickHandler: (event: MapMouseEvent) => void;
   private readonly mapMoveStartHandler: (event: MapMouseEvent) => void;
 
-  constructor(component: MapControlType) {
+  constructor(component: MapControlType, container: HTMLDivElement) {
     this.component = component;
+    this.container = container; // Use provided container
 
     // Handlers for map events
     this.mapClickHandler = (event: MapMouseEvent) =>
@@ -68,8 +161,6 @@ class MapControl implements IControl {
   }
 
   onAdd(map: MapBox) {
-    this.container = document.createElement("div");
-    this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
     this.container.addEventListener("click", (event: MouseEvent) =>
       this.onClickHandler(event, this.component)
     );
@@ -96,7 +187,6 @@ class MapControl implements IControl {
         map?.off("click", this.mapClickHandler);
         map?.off("movestart", this.mapMoveStartHandler);
         this.container?.parentNode?.removeChild(this.container);
-        this.container = null;
         this.root?.unmount();
       });
     }
@@ -117,9 +207,13 @@ class MapControl implements IControl {
 // test all control on map in different page !!
 const MenuControl: React.FC<MenuControlProps> = ({
   menu,
+  position = "top-right",
+  sx = { borderRadius: "8px" },
   visible = true,
+  className,
 }: MenuControlProps) => {
   const { map } = useContext(MapContext);
+  const containerRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   const [control, setControl] = useState<MapControl | null>(null);
 
   // Creation effect
@@ -127,18 +221,19 @@ const MenuControl: React.FC<MenuControlProps> = ({
     if (!map || !menu) return;
 
     setControl((prev) => {
-      if (!prev) {
+      if (!prev && containerRef && containerRef.current) {
         // !!Must use cloneElement, to inject the map to the argument, so you
         // can get it in the ControlProps
         const newControl = new MapControl(
-          cloneElement<ControlProps>(menu, { map: map })
+          cloneElement<ControlProps>(menu, { map: map }),
+          containerRef.current
         );
-        map?.addControl(newControl, "top-right");
+        map?.addControl(newControl, position);
         return newControl;
       }
       return prev;
     });
-  }, [map, menu, control]);
+  }, [map, menu, control, containerRef, position]);
 
   useEffect(() => {
     // Once the control set, you cannot change it, in case the props of menu update
@@ -153,8 +248,14 @@ const MenuControl: React.FC<MenuControlProps> = ({
     control?.setVisible(visible);
   }, [control, visible]);
 
-  return null;
+  return (
+    <Box
+      ref={containerRef}
+      className={`mapboxgl-ctrl mapboxgl-ctrl-group ${className || ""}`}
+      sx={sx}
+    />
+  );
 };
 
-export { eventEmitter, leftPadding, rightPadding, MapControl };
+export { eventEmitter, MapControl };
 export default MenuControl;

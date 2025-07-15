@@ -14,6 +14,7 @@ import {
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { booleanEqual } from "@turf/boolean-equal";
+import { pageReferer } from "../common/constants";
 
 export enum SearchbarButtonNames {
   Search = "search",
@@ -109,33 +110,26 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
 
   const handleSearchClick = useCallback(() => {
     handleClickButton(SearchbarButtonNames.Search);
-    if (!pendingSearch) redirectSearch("ComplexTextSearch");
+    if (!pendingSearch) {
+      redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+    }
   }, [handleClickButton, pendingSearch, redirectSearch]);
 
-  const dateCount = useMemo(
-    () =>
+  const [dateCount, areaCount, filterCount] = useMemo(
+    () => [
       checkCount({
         filterObj: componentParams,
         type: SearchbarButtonNames.Date,
       }),
-    [componentParams]
-  );
-
-  const areaCount = useMemo(
-    () =>
       checkCount({
         filterObj: componentParams,
         type: SearchbarButtonNames.Location,
       }),
-    [componentParams]
-  );
-
-  const filterCount = useMemo(
-    () =>
       checkCount({
         filterObj: componentParams,
         type: SearchbarButtonNames.Filter,
       }),
+    ],
     [componentParams]
   );
 

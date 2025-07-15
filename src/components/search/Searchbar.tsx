@@ -22,12 +22,12 @@ import {
 } from "./constants";
 import DateRangeFilter from "../filter/DateRangeFilter";
 import { useLocation } from "react-router-dom";
-import { pageDefault } from "../common/constants";
+import { pageDefault, pageReferer } from "../common/constants";
 import LocationFilter from "../filter/LocationFilter";
 import Filters from "../filter/Filters";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useScrollToElement from "../../hooks/useScrollToElement";
-import { HEADER_HEIGHT } from "../layout/constant";
+import { HEADER_HEIGHT, HEADER_HEIGHT_MOBILE } from "../layout/constant";
 import {
   clearComponentParam,
   ParameterState,
@@ -58,7 +58,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const redirectSearch = useRedirectSearch();
   const { scrollToElement } = useScrollToElement({
     ref: boxRef,
-    offset: HEADER_HEIGHT + 5,
+    offset: (isMobile ? HEADER_HEIGHT_MOBILE : HEADER_HEIGHT) + 5,
   });
   const urlParamState: ParameterState | undefined = useMemo(() => {
     // The first char is ? in the search string, so we need to remove it.
@@ -83,7 +83,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
       // considering the debounce (300ms) and fetchSuggesterOptions(quite fast according to experience with edge) is not very long
       // we may implement this later if gap is too big
       if (event.key === "Enter" && !isSearchbarFocused && !pendingSearch) {
-        redirectSearch("ComplexTextSearch");
+        redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
       }
     },
     [pendingSearch, redirectSearch]

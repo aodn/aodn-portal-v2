@@ -111,7 +111,7 @@ describe("AssociatedRecordsPanel", async () => {
 
           return waitFor(() =>
             expect(openSpy).toHaveBeenCalledWith(
-              "/details?uuid=0887cb5b-b443-4e08-a169-038208109466",
+              "/details/0887cb5b-b443-4e08-a169-038208109466",
               "_blank",
               "noopener,noreferrer"
             )

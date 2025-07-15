@@ -57,7 +57,7 @@ const Header: FC = () => {
               : PAGE_CONTENT_MAX_WIDTH,
           }}
         >
-          <HeaderMenu menuStyle={HeaderMenuStyle.HOVER_MENU} />
+          <HeaderMenu menuStyle={HeaderMenuStyle.DROPDOWN_MENU} />
         </SectionContainer>
       )}
 
