@@ -13,8 +13,8 @@ from pages.search_page import SearchPage
     'date, location, filter_parameters, filter_platforms, filter_organisation, filter_data, filter_data_download',
     [
         (
-            'Last Year',
-            'Apollo',
+            'Last 5 Years',
+            'Arafura',
             ['Carbon', 'Air Quality'],
             ['Radar', 'Vessel'],
             'IMOS',
