@@ -341,7 +341,6 @@ export class OGCCollections {
   merge(collections: OGCCollections) {
     this.collections = this.collections.concat(collections.collections);
     this.search_after = collections.search_after;
-    console.log("Concat", collections);
   }
 
   clone() {
