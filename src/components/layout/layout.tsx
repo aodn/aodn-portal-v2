@@ -1,3 +1,4 @@
+import React from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 // TODO: Temp works but need to check user locale on date time format
@@ -10,14 +11,12 @@ interface LayoutProps {}
 
 const Layout = ({ children }: React.PropsWithChildren<LayoutProps>) => {
   return (
-    <div>
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
-        <ScrollToTop />
-        <Header />
-        <main>{children}</main>
-        <Footer />
-      </LocalizationProvider>
-    </div>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
+      <ScrollToTop />
+      <Header />
+      <main>{children}</main>
+      <Footer />
+    </LocalizationProvider>
   );
 };
 

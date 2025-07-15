@@ -292,9 +292,10 @@ const searcher = createSlice({
         // payload must be serializable aka no class method, so we need to defer class creation until here
         const new_collections = jsonToOGCCollections(action.payload);
         // Create a new instance so in case people need to use useState it signal an update
-        state.collectionsQueryResult.result =
-          state.collectionsQueryResult.result.clone();
-        state.collectionsQueryResult.result.merge(new_collections);
+        const collections = state.collectionsQueryResult.result.clone();
+        collections.merge(new_collections);
+
+        state.collectionsQueryResult.result = collections;
         state.collectionsQueryResult.query = action.meta.arg;
       })
       .addCase(fetchParameterVocabsWithStore.fulfilled, (state, action) => {
