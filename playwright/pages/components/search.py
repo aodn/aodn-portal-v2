@@ -101,14 +101,14 @@ class SearchComponent(BasePage):
         self.get_radio_input(location).click()
 
         self.filter_button.click()
-        if type(filter_parameter) is str:
+        if isinstance(filter_parameter, str):
             self.get_button(filter_parameter, exact=False).click()
         else:
             for parameter in filter_parameter:
                 self.get_button(parameter, exact=False).click()
 
         self.filter_platform_tab.click()
-        if type(filter_platform) is str:
+        if isinstance(filter_platform, str):
             self.get_button(filter_platform).click()
         else:
             for platform in filter_platform:
