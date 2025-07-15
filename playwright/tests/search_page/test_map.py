@@ -237,7 +237,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     map_zoom = search_page.map.get_map_zoom()
 
     search_page.first_result_title.click()
-    detail_page.go_back_button.click()
+    detail_page.return_button.click()
 
     new_map_center = search_page.map.get_map_center()
     new_map_zoom = search_page.map.get_map_zoom()

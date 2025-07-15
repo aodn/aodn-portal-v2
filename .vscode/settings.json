@@ -5,6 +5,7 @@
   "python.testing.pytestArgs": [
     "playwright/tests",
     "--rootdir=playwright",
+    "-s",
     "-c /dev/null" /* ignore configfile: pytest.ini */
   ]
 }

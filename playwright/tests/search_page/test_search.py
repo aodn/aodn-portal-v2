@@ -98,7 +98,7 @@ def test_search_input_persistence_after_navigation(
     search_page.wait_for_search_to_complete()
 
     search_page.first_result_title.click()
-    detail_page.go_back_button.click()
+    detail_page.return_button.click()
 
     expect(search_page.search.search_field).to_have_value(search_text)
 
@@ -134,57 +134,6 @@ def test_searchbar_popups(
     expect(searchbar_popup).to_contain_text(filter)
 
 
-def set_search_state(
-    landing_page: LandingPage,
-    date: str,
-    location: str,
-    filter_parameter: str,
-    filter_platform: str,
-    filter_organisation: str,
-    filter_data: str,
-) -> None:
-    landing_page.search.date_button.click()
-    landing_page.get_text(date).click()
-    landing_page.search.location_button.click()
-    landing_page.get_text(location).click()
-    landing_page.search.filter_button.click()
-    landing_page.get_button(filter_parameter).click()
-    landing_page.search.filter_platform_tab.click()
-    landing_page.search.get_button(filter_platform).click()
-    landing_page.search.filter_organisation_tab.click()
-    landing_page.search.get_button(filter_organisation).click()
-    landing_page.search.filter_data_tab.click()
-    landing_page.search.get_button(filter_data).click()
-
-
-def assert_search_state_persisted(
-    search_page: SearchPage,
-    date: str,
-    location: str,
-    filter_parameter: str,
-    filter_platform: str,
-    filter_organisation: str,
-    filter_data: str,
-) -> None:
-    search_page.search.date_button.click()
-    expect(search_page.search.searchbar_popup).to_be_visible()
-    expect(search_page.get_radio_input(date)).to_be_checked()
-
-    search_page.search.location_button.click()
-    expect(search_page.search.searchbar_popup).to_be_visible()
-    expect(search_page.get_radio_input(location)).to_be_checked()
-
-    search_page.search.filter_button.click()
-    search_page.search.assert_toggle_button_pressed(filter_parameter)
-    search_page.search.filter_platform_tab.click()
-    search_page.search.assert_toggle_button_pressed(filter_platform)
-    search_page.search.filter_organisation_tab.click()
-    search_page.search.assert_toggle_button_pressed(filter_organisation)
-    search_page.search.filter_data_tab.click()
-    search_page.search.assert_toggle_button_pressed(filter_data)
-    search_page.search.filter_button.click()  # close the popup
-
-
 @pytest.mark.parametrize(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [('Last Year', 'Apollo', 'Carbon', 'Radar', 'IMOS', 'Delayed')],
@@ -213,8 +162,7 @@ def test_search_state_persists_after_navigation(
     landing_page.load()
 
     # Set search state
-    set_search_state(
-        landing_page,
+    landing_page.search.set_search_state(
         date,
         location,
         filter_parameter,
@@ -228,8 +176,7 @@ def test_search_state_persists_after_navigation(
     search_page.wait_for_search_to_complete()
 
     # Verify state are applied
-    assert_search_state_persisted(
-        search_page,
+    search_page.search.assert_search_state_persisted(
         date,
         location,
         filter_parameter,
@@ -240,11 +187,10 @@ def test_search_state_persists_after_navigation(
 
     # Navigate to detail page and back
     search_page.first_result_title.click()
-    detail_page.go_back_button.click()
+    detail_page.return_button.click()
 
     # Verify state are still applied after navigation
-    assert_search_state_persisted(
-        search_page,
+    search_page.search.assert_search_state_persisted(
         date,
         location,
         filter_parameter,
@@ -281,8 +227,7 @@ def test_search_state_persists_with_url(
     landing_page.load()
 
     # Set search state
-    set_search_state(
-        landing_page,
+    landing_page.search.set_search_state(
         date,
         location,
         filter_parameter,
@@ -307,8 +252,7 @@ def test_search_state_persists_with_url(
     new_search_page.wait_for_search_to_complete()
 
     # Verify state are applied
-    assert_search_state_persisted(
-        new_search_page,
+    new_search_page.search.assert_search_state_persisted(
         date,
         location,
         filter_parameter,
