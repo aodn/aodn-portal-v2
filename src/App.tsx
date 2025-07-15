@@ -10,15 +10,13 @@ import GlobalLoader from "./components/loading/GlobalLoader";
 
 const app = () => {
   return (
-    <div>
-      <ThemeProvider theme={AppTheme}>
-        <CssBaseline />
-        <Scrollbar />
-        <GlobalLoader>
-          <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
-        </GlobalLoader>
-      </ThemeProvider>
-    </div>
+    <ThemeProvider theme={AppTheme}>
+      <CssBaseline />
+      <Scrollbar />
+      <GlobalLoader>
+        <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
+      </GlobalLoader>
+    </ThemeProvider>
   );
 };
 
