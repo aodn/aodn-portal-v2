@@ -10,7 +10,7 @@ import { useCallback, useMemo } from "react";
 import CopyButton from "../../components/common/buttons/CopyButton";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 import { ContentCopy } from "@mui/icons-material";
-import { ContentCopyIcon } from "../../assets/icons/content_copy";
+import { ContentCopyIcon } from "../../assets/icons/download/content_copy";
 
 const LicenseContent = () => {
   const { checkIfCopied, copyToClipboard } = useDetailPageContext();
