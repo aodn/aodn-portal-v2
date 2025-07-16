@@ -108,7 +108,16 @@ const getWMSServer = (collection: OGCCollection | undefined) => {
     return [];
   }
   return DataAccessLinks.filter((link) => link.rel === "wms" && link.href).map(
-    (link) => link.href
+    (link) => {
+      if (link.href.includes("//geoserver-123.aodn.org.au/geoserver/wms")) {
+        console.info("Use geowebcache to instead geoserver-123");
+        return link.href.replace(
+          "//geoserver-123.aodn.org.au/geoserver/wms",
+          "//geoserver-static.aodn.org.au/geoserver/gwc/service/wms"
+        );
+      }
+      return link.href;
+    }
   );
 };
 
