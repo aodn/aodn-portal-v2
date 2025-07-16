@@ -53,35 +53,24 @@ export const useDownloadDialog = (
     sectors: [],
     allow_contact: null,
   });
-  const [snackbar, setSnackbar] = useState<SnackbarState>({
-    open: false,
-    message: "",
-    severity: "error",
-  });
+  const [emailError, setEmailError] = useState<string>("");
 
   // ================== VALIDATION HELPERS ==================
-  const showValidationError = (message: string) => {
-    setSnackbar({
-      open: true,
-      message,
-      severity: "error",
-    });
-  };
-
   const isEmailValid = useCallback((emailValue: string): boolean => {
     if (!emailValue.trim()) {
-      showValidationError("Please enter your email address");
+      setEmailError("Please enter your email address");
       emailInputRef.current?.focus();
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailValue)) {
-      showValidationError("Please enter a valid email address");
+      setEmailError("Please enter a valid email address");
       emailInputRef.current?.focus();
       return false;
     }
 
+    setEmailError("");
     return true;
   }, []);
 
@@ -318,6 +307,16 @@ export const useDownloadDialog = (
   );
 
   // ================== FORM SUBMISSION HANDLERS ==================
+  // Handle email input
+  const handleClearEmail = useCallback(() => {
+    setEmail("");
+    setEmailError("");
+    if (emailInputRef.current) {
+      emailInputRef.current.value = "";
+    }
+    localStorage.removeItem("download_dialog_email");
+  }, []);
+
   // Handle form submission (step 2)
   const handleFormSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -349,11 +348,6 @@ export const useDownloadDialog = (
     const emailToSubmit = emailInputRef.current?.value?.trim() || email;
 
     if (!isEmailValid(emailToSubmit)) {
-      return;
-    }
-
-    if (!uuid) {
-      showValidationError("Dataset UUID is missing");
       return;
     }
 
@@ -399,16 +393,17 @@ export const useDownloadDialog = (
     isSuccess,
     processingStatus,
     email,
+    emailError,
     dataUsage,
-    snackbar,
     hasDownloadConditions,
     handleIsClose,
     handleStepClick,
     handleStepperButtonClick,
     handleDataUsageChange,
+    handleClearEmail,
     handleFormSubmit,
     getProcessStatusText,
     getStepperButtonTitle,
-    setSnackbar,
+    setEmailError,
   };
 };

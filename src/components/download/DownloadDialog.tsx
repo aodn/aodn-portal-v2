@@ -26,7 +26,6 @@ import StepperButton from "./stepper/StepperButton";
 import StyledStepper from "./stepper/StyledStepper";
 import DataSelection from "./DataSelection";
 import LicenseContent from "./LicenseContent";
-import { ValidationSnackbar } from "./ValidationSnackbar";
 import { useDownloadDialog } from "../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
 
@@ -160,17 +159,18 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
     isSuccess,
     processingStatus,
     email,
+    emailError,
     dataUsage,
-    snackbar,
     hasDownloadConditions,
     handleIsClose,
     handleStepClick,
     handleStepperButtonClick,
     handleDataUsageChange,
+    handleClearEmail,
     handleFormSubmit,
     getProcessStatusText,
     getStepperButtonTitle,
-    setSnackbar,
+    setEmailError,
   } = useDownloadDialog(isOpen, setIsOpen);
 
   const renderStepContent = () => {
@@ -208,8 +208,11 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
             <EmailInputStep
               isMobile={isMobile}
               emailInputRef={emailInputRef}
+              email={email}
               dataUsage={dataUsage}
               onDataUsageChange={handleDataUsageChange}
+              emailError={emailError}
+              onClearEmail={handleClearEmail}
             />
             <ProcessingStatus
               processingStatus={processingStatus}
@@ -325,12 +328,6 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
           )}
         </Box>
       </DialogActions>
-
-      <ValidationSnackbar
-        snackbar={snackbar}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-        isMobile={isMobile}
-      />
     </Dialog>
   );
 };

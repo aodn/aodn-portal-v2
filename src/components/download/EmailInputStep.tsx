@@ -1,20 +1,35 @@
 import React from "react";
-import { Box, Typography, TextField } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import DataUsageForm, { DataUsageInformation } from "./DataUsageForm";
 import { fontColor } from "../../styles/constants";
+import rc8Theme from "../../styles/themeRC8";
+import { InformationIcon } from "../../assets/icons/download/information";
+import { ClearIcon } from "@mui/x-date-pickers/icons";
 
 interface EmailInputStepProps {
   isMobile: boolean;
   emailInputRef: React.RefObject<HTMLInputElement>;
+  emailError?: string;
+  email: string;
   dataUsage: DataUsageInformation;
   onDataUsageChange: (newDataUsage: DataUsageInformation) => void;
+  onClearEmail: () => void;
 }
 
 const EmailInputStep: React.FC<EmailInputStepProps> = ({
   isMobile,
   emailInputRef,
+  emailError,
+  email,
   dataUsage,
   onDataUsageChange,
+  onClearEmail,
 }) => {
   return (
     <Box sx={{ pl: isMobile ? 1 : 2 }}>
@@ -28,8 +43,30 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
         placeholder="example@email.com"
         type="email"
         fullWidth
-        variant="standard"
+        variant={emailError ? "outlined" : "standard"}
         inputRef={emailInputRef}
+        error={!!emailError}
+        InputProps={{
+          endAdornment: emailError ? (
+            <InputAdornment position="end" sx={{ m: 1 }}>
+              <InformationIcon
+                color={rc8Theme.palette.error.main}
+                height={30}
+                width={30}
+              />
+            </InputAdornment>
+          ) : email ? (
+            <InputAdornment position="end" sx={{ m: 1 }}>
+              <IconButton
+                onClick={onClearEmail}
+                size="small"
+                sx={{ padding: "4px" }}
+              >
+                <ClearIcon sx={{ fontSize: "18px", color: "#666" }} />
+              </IconButton>
+            </InputAdornment>
+          ) : undefined,
+        }}
         sx={{
           mt: 0.5,
           mb: 2,
@@ -65,6 +102,17 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
           },
         }}
       />
+
+      {emailError && (
+        <Typography
+          variant="body1Medium"
+          sx={{
+            color: rc8Theme.palette.error.main,
+          }}
+        >
+          {emailError}
+        </Typography>
+      )}
 
       <Box sx={{ ml: 2, my: 1 }}>
         <Typography
