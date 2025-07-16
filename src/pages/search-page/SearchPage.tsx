@@ -376,6 +376,14 @@ const SearchPage = () => {
     setSelectedUuids([]);
   }, []);
 
+  const cancelAllLoading = useCallback(() => {
+    // If page unmounted, cancel any running search
+    mapSearchAbortRef.current?.abort();
+    mapSearchAbortRef.current = null;
+    listSearchAbortRef.current?.abort();
+    listSearchAbortRef.current = null;
+  }, []);
+
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
   // TODO: Optimize call if possible, this happens when navigate from page
@@ -418,13 +426,10 @@ const SearchPage = () => {
     handleNavigation();
 
     return () => {
-      // If page unmounted, cancel any running search
-      mapSearchAbortRef.current?.abort();
-      mapSearchAbortRef.current = null;
-      listSearchAbortRef.current?.abort();
-      listSearchAbortRef.current = null;
+      cancelAllLoading();
     };
   }, [
+    cancelAllLoading,
     doListSearch,
     doMapSearch,
     location.state?.referer,
@@ -529,7 +534,7 @@ const SearchPage = () => {
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
             onDeselectDataset={onDeselectDataset}
-            isLoading={false}
+            cancelLoading={() => cancelAllLoading()}
           />
         </Box>
         <Box
