@@ -20,7 +20,7 @@ const STATUS_CODES = {
 const STATUS_MESSAGES = {
   TIMEOUT: "Request timeout! Please try again later",
   SERVER_ERROR: "Server error! Please try again later",
-  SUCCESS: "Success! Email will be sent shortly",
+  SUCCESS: "Download email will be sent shortly.",
   DATASET_ERROR: "Dataset unavailable! Please try again later",
 } as const;
 

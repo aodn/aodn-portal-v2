@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Box,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -22,12 +21,12 @@ import {
   padding,
 } from "../../styles/constants";
 import AppTheme from "../../utils/AppTheme";
-import StepperButton from "./stepper/StepperButton";
 import StyledStepper from "./stepper/StyledStepper";
 import DataSelection from "./DataSelection";
 import LicenseContent from "./LicenseContent";
 import { useDownloadDialog } from "../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
+import ActionButton from "./ActionButtons";
 
 interface DownloadDialogProps {
   isOpen: boolean;
@@ -56,30 +55,6 @@ const LicenseStep: React.FC<{
         value={email || emailInputRef.current?.value || ""}
       />
       <LicenseContent />
-    </Box>
-  );
-};
-
-const ProcessingStatus: React.FC<{
-  processingStatus: string;
-  isMobile: boolean;
-  getProcessStatusText: () => string;
-}> = ({ processingStatus, isMobile, getProcessStatusText }) => {
-  if (!processingStatus) return null;
-
-  return (
-    <Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
-      <Typography
-        variant="body1"
-        sx={{
-          fontSize: isMobile ? "0.875rem" : "1rem",
-          color: processingStatus.startsWith("2")
-            ? "success.main"
-            : "error.main",
-        }}
-      >
-        {getProcessStatusText()}
-      </Typography>
     </Box>
   );
 };
@@ -214,11 +189,6 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
               emailError={emailError}
               onClearEmail={handleClearEmail}
             />
-            <ProcessingStatus
-              processingStatus={processingStatus}
-              isMobile={isMobile}
-              getProcessStatusText={getProcessStatusText}
-            />
           </Box>
         </Box>
       );
@@ -227,11 +197,6 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
     return (
       <Box sx={{ flex: 1 }}>
         <LicenseStep email={email} emailInputRef={emailInputRef} />
-        <ProcessingStatus
-          processingStatus={processingStatus}
-          isMobile={isMobile}
-          getProcessStatusText={getProcessStatusText}
-        />
       </Box>
     );
   };
@@ -307,26 +272,14 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
           flexShrink: 0,
         }}
       >
-        <Box sx={{ position: "relative" }}>
-          <StepperButton
-            title={getStepperButtonTitle()}
-            onClick={handleStepperButtonClick}
-            disabled={isProcessing || isSuccess}
-          />
-          {isProcessing && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                marginTop: "-12px",
-                marginLeft: "-12px",
-                color: "#2E7D9A",
-              }}
-            />
-          )}
-        </Box>
+        <ActionButton
+          isSuccess={isSuccess}
+          isProcessing={isProcessing}
+          processingStatus={processingStatus}
+          getStepperButtonTitle={getStepperButtonTitle}
+          getProcessStatusText={getProcessStatusText}
+          handleStepperButtonClick={handleStepperButtonClick}
+        />
       </DialogActions>
     </Dialog>
   );
