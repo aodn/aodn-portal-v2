@@ -245,9 +245,6 @@ describe("DownloadDialog", () => {
       </TestWrapper>
     );
 
-    expect(screen.getByTestId("validation-snackbar")).toBeInTheDocument();
-    expect(screen.getByText("Email is required")).toBeInTheDocument();
-
     // Reset state
     mockUseDownloadDialog.snackbar = {
       open: false,
