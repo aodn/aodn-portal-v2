@@ -100,7 +100,10 @@ def test_map_updates_on_search_change(
 
     assert map_layers != updated_map_layers
 
-@pytest.mark.xfail(reason="PublicIcon element not found - UI issue") # todo search page map right-top icon changed causing playwright error
+
+@pytest.mark.xfail(
+    reason='PublicIcon element not found - UI issue'
+)  # todo search page map right-top icon changed causing playwright error
 @pytest.mark.parametrize(
     'layer_text, layer_type',
     [
@@ -239,7 +242,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     map_zoom = search_page.map.get_map_zoom()
 
     search_page.first_result_title.click()
-    detail_page.go_back_button.click()
+    detail_page.return_button.click()
 
     new_map_center = search_page.map.get_map_center()
     new_map_zoom = search_page.map.get_map_zoom()
@@ -247,7 +250,10 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     assert are_coordinates_equal(map_center, new_map_center)
     assert are_value_equal(map_zoom, new_map_zoom)
 
-@pytest.mark.xfail(reason="BookmarksIcon element not found - UI issue") # todo search page map right-top icon changed causing playwright error
+
+@pytest.mark.xfail(
+    reason='BookmarksIcon element not found - UI issue'
+)  # todo search page map right-top icon changed causing playwright error
 def test_map_buttons(desktop_page: Page) -> None:
     """
     Ensures that the map buttons on both the search page and the detail page are displayed correctly.

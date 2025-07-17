@@ -65,7 +65,7 @@ def test_sort_and_view_states_persist_across_page(
 
     # Go to the detail page and return to check if the states persist
     search_page.first_result_title.click()
-    detail_page.go_back_button.click()
+    detail_page.return_button.click()
     expect(
         search_page.get_result_sort_button(sort_type.test_id)
     ).to_be_visible()

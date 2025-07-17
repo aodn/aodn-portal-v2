@@ -25,6 +25,10 @@ class BasePage:
         """Navigate to the landing page"""
         self.page.get_by_test_id('imos-logo').first.click()
 
+    def get_current_url(self) -> str:
+        """Get the current page URL"""
+        return self.page.url
+
     def get_by_id(self, id: str) -> Locator:
         """Return a locator by id attribute"""
         return self.page.locator(f'#{id}')

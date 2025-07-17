@@ -79,7 +79,7 @@ const renderGoBackButton = (onClick: () => void, referer: string) => {
         top: { xs: "unset", md: "5%" },
       }}
       onClick={onClick}
-      data-testid="go-back-button"
+      data-testid="return-button"
     >
       <HeaderButton>
         <Tooltip title={tip} placement="top">
