@@ -36,6 +36,7 @@ export const DialogHeader = ({ onClose }: DialogHeaderProps) => {
             color: rc8Theme.palette.text2,
           }}
         >
+          {/* todo: svg update */}
           <CancelIcon height={20} width={20} />
         </IconButton>
       </Box>

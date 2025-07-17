@@ -32,7 +32,7 @@ export const designTokensRC8 = {
     variants: {
       // Slogan styles - Size: 64, Line Height: 96
       slogan1: {
-        fontFamily: "Poppins, sans-serif",
+        // fontFamily: "Poppins, sans-serif", // TODO
         fontSize: "64px",
         fontWeight: 500,
         lineHeight: "96px",
@@ -40,7 +40,7 @@ export const designTokensRC8 = {
       },
       // Slogan styles - Size: 48, Line Height: 72
       slogan2: {
-        fontFamily: "Poppins, sans-serif",
+        // fontFamily: "Poppins, sans-serif", // TODO
         fontSize: "48px",
         fontWeight: 275,
         lineHeight: "72px",
@@ -49,7 +49,7 @@ export const designTokensRC8 = {
 
       // Heading styles - Size: 40, Line Height: 48
       heading1: {
-        fontFamily: "Poppins, sans-serif",
+        // fontFamily: "Poppins, sans-serif", // TODO
         fontSize: "40px",
         fontWeight: 500,
         lineHeight: "48px",
@@ -57,7 +57,7 @@ export const designTokensRC8 = {
       },
       // Heading styles - Size: 24, Line Height: 36
       heading2: {
-        fontFamily: "Poppins, sans-serif",
+        // fontFamily: "Poppins, sans-serif", // TODO
         fontSize: "24px",
         fontWeight: 500,
         lineHeight: "36px",
@@ -65,7 +65,7 @@ export const designTokensRC8 = {
       },
       // Heading styles - Size: 20, Line Height: 30
       heading3: {
-        fontFamily: "Poppins, sans-serif",
+        // fontFamily: "Poppins, sans-serif", // TODO
         fontSize: "20px",
         fontWeight: 500,
         lineHeight: "30px",
@@ -73,7 +73,7 @@ export const designTokensRC8 = {
       },
       // Heading styles - Size: 16, Line Height: 22
       heading4: {
-        fontFamily: "Poppins, sans-serif",
+        // fontFamily: "Poppins, sans-serif", // TODO
         fontSize: "16px",
         fontWeight: 500,
         lineHeight: "22px",
@@ -82,7 +82,7 @@ export const designTokensRC8 = {
 
       // Title styles - Size: 16, Line Height: 26
       title1Medium: {
-        fontFamily: "Open Sans, sans-serif",
+        // fontFamily: "Open Sans, sans-serif", // TODO
         fontSize: "16px",
         fontWeight: 400,
         lineHeight: "26px",
@@ -90,7 +90,7 @@ export const designTokensRC8 = {
       },
       // Title styles - Size: 16, Line Height: 26
       title2Regular: {
-        fontFamily: "Open Sans, sans-serif",
+        // fontFamily: "Open Sans, sans-serif", // TODO
         fontSize: "16px",
         fontWeight: 400,
         lineHeight: "26px",
@@ -99,7 +99,7 @@ export const designTokensRC8 = {
 
       // Body styles - Size: 14, Line Height: 22
       body1Medium: {
-        fontFamily: "Open Sans, sans-serif",
+        // fontFamily: "Open Sans, sans-serif", // TODO
         fontSize: "14px",
         fontWeight: 400,
         lineHeight: "22px",
@@ -107,7 +107,7 @@ export const designTokensRC8 = {
       },
       // Body styles - Size: 14, Line Height: 22
       body2Regular: {
-        fontFamily: "Open Sans, sans-serif",
+        // fontFamily: "Open Sans, sans-serif", // TODO
         fontSize: "14px",
         fontWeight: 400,
         lineHeight: "22px",
@@ -115,7 +115,7 @@ export const designTokensRC8 = {
       },
       // Body styles - Size: 13, Line Height: 20
       body3Small: {
-        fontFamily: "Open Sans, sans-serif",
+        // fontFamily: "Open Sans, sans-serif", // TODO
         fontSize: "13px",
         fontWeight: 400,
         lineHeight: "20px",
