@@ -3,7 +3,7 @@
  * @param  Object containing baseUrl and params
  * @returns A formatted URL string
  */
-export const formatToUrl = <T extends Record<string, any>>({
+const formatToUrl = <T extends Record<string, any>>({
   baseUrl,
   params,
 }: {
@@ -37,7 +37,7 @@ export const formatToUrl = <T extends Record<string, any>>({
  * @param {string} url - The URL to check and potentially convert
  * @returns {string} - The URL with HTTPS protocol
  */
-export const ensureHttps = (url: string): string => {
+const ensureHttps = (url: string): string => {
   if (!url || typeof url !== "string") {
     return "";
   }
@@ -60,3 +60,13 @@ export const ensureHttps = (url: string): string => {
   // For other protocols (ftp, file, etc.), return as is
   return url;
 };
+
+const encodeParam = (url: string): string => {
+  return url;
+};
+
+const decodeParam = (url: string): string => {
+  return url;
+};
+
+export { formatToUrl, ensureHttps, encodeParam, decodeParam };

@@ -6294,7 +6294,6 @@ __metadata:
     husky: "npm:^9.1.1"
     lint-staged: "npm:^15.2.2"
     lodash: "npm:^4.17.21"
-    lz-string: "npm:1.5.0"
     mapbox-gl: "npm:3.4.0"
     mapbox-gl-draw-rectangle-mode: "npm:^1.0.4"
     media-typer: "npm:^1.1.0"
@@ -10911,7 +10910,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lz-string@npm:1.5.0, lz-string@npm:^1.5.0":
+"lz-string@npm:^1.5.0":
   version: 1.5.0
   resolution: "lz-string@npm:1.5.0"
   bin:
