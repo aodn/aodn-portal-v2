@@ -61,6 +61,7 @@ import {
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
+import _ from "lodash";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -90,6 +91,10 @@ const SearchPage = () => {
     abort: (reason?: string) => void;
   } | null>(null);
   const mapSearchAbortRef = useRef<AbortController | null>(null);
+  const debounceHistoryUpdateRef = useRef<_.DebouncedFunc<
+    (url: string) => void
+  > | null>(null);
+
   const urlParamState: ParameterState | undefined = useMemo(() => {
     // The first char is ? in the search string, so we need to remove it.
     const param = location?.search?.substring(1);
@@ -149,25 +154,10 @@ const SearchPage = () => {
         })
         .then(() => {
           if (needNavigate && !controller.signal.aborted) {
-            const pathname = window.location.pathname;
-
-            if (pathname.includes(pageDefault.search)) {
-              // Just need to update URL if we still remain on search page
-              // if users click too fast, the search is not complete nor cancelled,
-              // but we already on different page, so we do not need to update
-              // status
-              window.history.replaceState(
-                {
-                  state: {
-                    fromNavigate: true,
-                    requireSearch: false,
-                    referer: pageReferer.SEARCH_PAGE_REFERER,
-                  },
-                },
-                "",
-                pageDefault.search + "?" + formatToUrlParam(componentParam)
-              );
-            }
+            debounceHistoryUpdateRef?.current?.cancel();
+            debounceHistoryUpdateRef?.current?.(
+              pageDefault.search + "?" + formatToUrlParam(componentParam)
+            );
           }
         })
         .catch(() => {
@@ -429,6 +419,28 @@ const SearchPage = () => {
         doListSearch();
       }
     };
+    // This is use to avoid update called too many times in short period that
+    // hurt the performace
+    debounceHistoryUpdateRef.current = _.debounce((url: string) => {
+      const pathname = window.location.pathname;
+      if (pathname.includes(pageDefault.search)) {
+        // Just need to update URL if we still remain on search page
+        // if users click too fast, the search is not complete nor cancelled,
+        // but we already on different page, so we do not need to update
+        // status
+        window.history.replaceState(
+          {
+            state: {
+              fromNavigate: true,
+              requireSearch: false,
+              referer: pageReferer.SEARCH_PAGE_REFERER,
+            },
+          },
+          "",
+          url
+        );
+      }
+    }, 300);
 
     handleNavigation();
 
