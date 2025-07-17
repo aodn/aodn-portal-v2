@@ -32,7 +32,7 @@ const options = [
 const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const { downloadConditions, isCollectionNotFound } = useDetailPageContext();
+  const { downloadConditions } = useDetailPageContext();
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
 
   const onDownload = useCallback(() => {
@@ -59,11 +59,8 @@ const DownloadCard = () => {
       <Stack sx={{ padding: padding.medium }} spacing={2}>
         <CommonSelect items={options} sx={selectSxProps} />
         <Button
-          disabled={isCollectionNotFound}
           sx={{
-            backgroundColor: isCollectionNotFound
-              ? "lightGrey"
-              : theme.palette.primary.main,
+            backgroundColor: theme.palette.primary.main,
             borderRadius: borderRadius.small,
             ":hover": {
               backgroundColor: theme.palette.primary.main,
@@ -83,7 +80,6 @@ const DownloadCard = () => {
         onChange={() => setAccordionExpanded((prevState) => !prevState)}
       >
         <AccordionSummary
-          disabled={isCollectionNotFound}
           sx={{ paddingX: padding.medium }}
           expandIcon={<ExpandMoreIcon />}
         >
