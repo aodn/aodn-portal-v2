@@ -9,7 +9,7 @@ import {
   useMediaQuery,
   Divider,
 } from "@mui/material";
-import StyledStepper from "./stepper/StyledStepper";
+import StyledStepper from "./stepper/DialogStepper";
 import DataSelection from "./DataSelection";
 import LicenseContent from "./LicenseContent";
 import { useDownloadDialog } from "../../hooks/useDownloadDialog";
