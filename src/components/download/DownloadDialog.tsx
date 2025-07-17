@@ -9,13 +9,13 @@ import {
   useMediaQuery,
   Divider,
 } from "@mui/material";
-import StyledStepper from "./stepper/DialogStepper";
 import DataSelection from "./DataSelection";
 import LicenseContent from "./LicenseContent";
 import { useDownloadDialog } from "../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
 import ActionButton from "./ActionButtons";
 import { DialogHeader } from "./DialogHeader";
+import DialogStepper from "./stepper/DialogStepper";
 
 interface DownloadDialogProps {
   isOpen: boolean;
@@ -169,7 +169,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
           zIndex: 1,
         }}
       >
-        <StyledStepper
+        <DialogStepper
           steps={steps}
           activeStep={activeStep}
           onStepClick={handleStepClick}

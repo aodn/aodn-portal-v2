@@ -33,6 +33,7 @@ export const designTokensRC8 = {
       // Slogan styles - Size: 64, Line Height: 96
       slogan1: {
         // fontFamily: "Poppins, sans-serif", // TODO
+        fontFamily: "Roboto",
         fontSize: "64px",
         fontWeight: 500,
         lineHeight: "96px",
@@ -41,6 +42,7 @@ export const designTokensRC8 = {
       // Slogan styles - Size: 48, Line Height: 72
       slogan2: {
         // fontFamily: "Poppins, sans-serif", // TODO
+        fontFamily: "Roboto",
         fontSize: "48px",
         fontWeight: 275,
         lineHeight: "72px",
@@ -50,6 +52,7 @@ export const designTokensRC8 = {
       // Heading styles - Size: 40, Line Height: 48
       heading1: {
         // fontFamily: "Poppins, sans-serif", // TODO
+        fontFamily: "Roboto",
         fontSize: "40px",
         fontWeight: 500,
         lineHeight: "48px",
@@ -58,6 +61,7 @@ export const designTokensRC8 = {
       // Heading styles - Size: 24, Line Height: 36
       heading2: {
         // fontFamily: "Poppins, sans-serif", // TODO
+        fontFamily: "Roboto",
         fontSize: "24px",
         fontWeight: 500,
         lineHeight: "36px",
@@ -66,6 +70,7 @@ export const designTokensRC8 = {
       // Heading styles - Size: 20, Line Height: 30
       heading3: {
         // fontFamily: "Poppins, sans-serif", // TODO
+        fontFamily: "Roboto",
         fontSize: "20px",
         fontWeight: 500,
         lineHeight: "30px",
@@ -74,6 +79,7 @@ export const designTokensRC8 = {
       // Heading styles - Size: 16, Line Height: 22
       heading4: {
         // fontFamily: "Poppins, sans-serif", // TODO
+        fontFamily: "Roboto",
         fontSize: "16px",
         fontWeight: 500,
         lineHeight: "22px",

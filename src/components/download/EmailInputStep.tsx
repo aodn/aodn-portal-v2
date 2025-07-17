@@ -33,7 +33,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
 }) => {
   return (
     <Box sx={{ pl: isMobile ? 1 : 2 }}>
-      <Typography variant="h6">Your Email Address</Typography>
+      <Typography variant="title1Medium">Email Address</Typography>
 
       <TextField
         required

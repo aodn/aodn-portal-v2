@@ -81,7 +81,7 @@ const DialogStepper: FC<DialogStepperProps> = ({
     return (
       <Box
         sx={{
-          typography: "title1medium",
+          typography: "title1Medium",
           width: "28px",
           height: "28px",
           borderRadius: "50%",
@@ -114,17 +114,7 @@ const DialogStepper: FC<DialogStepperProps> = ({
       return null;
     }
 
-    return (
-      <Typography
-        variant="heading4"
-        sx={{
-          // TODO: RC8 design update not complete yet, temporarily not using new fonts
-          fontFamily: "Roboto",
-        }}
-      >
-        {step.label}
-      </Typography>
-    );
+    return <Typography variant="heading4">{step.label}</Typography>;
   };
 
   return (
