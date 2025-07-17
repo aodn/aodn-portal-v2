@@ -103,13 +103,13 @@ const getMinMaxDateStamps = (
 // As WMSServer may be an array if there are multiple wms links, for now we only use the first one.
 // TODO: This should be improved to handle multiple WMS layers and servers if needed.
 const getWMSServer = (collection: OGCCollection | undefined) => {
-  const DataAccessLinks = collection?.getDataAccessLinks();
-  if (!DataAccessLinks || DataAccessLinks.length === 0) {
+  const dataAccessLinks = collection?.getDataAccessLinks();
+  if (!dataAccessLinks || dataAccessLinks.length === 0) {
     return [];
   }
-  return DataAccessLinks.filter((link) => link.rel === "wms" && link.href).map(
-    (link) => link.href
-  );
+  return dataAccessLinks
+    .filter((link) => link.rel === "wms" && link.href)
+    .map((link) => link.href);
 };
 
 const getWMSLayerNames = (collection: OGCCollection | undefined) => {
