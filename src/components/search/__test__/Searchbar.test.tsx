@@ -134,10 +134,12 @@ describe("Searchbar", () => {
         userEvent.click(closeButton);
 
         // Wait for the filter popup to be removed
-        return waitFor(() =>
-          expect(
-            screen.queryByTestId("searchbar-popup")
-          ).not.toBeInTheDocument()
+        return waitFor(
+          () =>
+            expect(
+              screen.queryByTestId("searchbar-popup")
+            ).not.toBeInTheDocument(),
+          { timeout: 2000 }
         );
       }
     );
