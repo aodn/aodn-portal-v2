@@ -244,7 +244,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     new_map_center = search_page.map.get_map_center()
     new_map_zoom = search_page.map.get_map_zoom()
 
-    assert map_center == new_map_center
+    assert are_coordinates_equal(map_center, new_map_center)
     assert are_coordinates_equal(map_zoom, new_map_zoom)
 
 @pytest.mark.xfail(reason="BookmarksIcon element not found - UI issue") # todo search page map right-top icon changed causing playwright error
