@@ -4,29 +4,18 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
-  IconButton,
   Typography,
   useTheme,
   useMediaQuery,
   Divider,
 } from "@mui/material";
-import { Close as CloseIcon } from "@mui/icons-material";
-import {
-  fontColor,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  margin,
-  padding,
-} from "../../styles/constants";
-import AppTheme from "../../utils/AppTheme";
 import StyledStepper from "./stepper/StyledStepper";
 import DataSelection from "./DataSelection";
 import LicenseContent from "./LicenseContent";
 import { useDownloadDialog } from "../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
 import ActionButton from "./ActionButtons";
+import { DialogHeader } from "./DialogHeader";
 
 interface DownloadDialogProps {
   isOpen: boolean;
@@ -59,67 +48,6 @@ const LicenseStep: React.FC<{
   );
 };
 
-const DialogHeader: React.FC<{
-  onClose: () => void;
-}> = ({ onClose }) => {
-  return (
-    <DialogTitle
-      sx={{
-        position: "relative",
-        boxShadow: "0px 1.8px 10px 0px rgba(0, 0, 0, 0.15)",
-        height: "48px",
-        flexShrink: 0,
-        paddingTop: 1,
-        paddingBottom: 0.5,
-        marginBottom: 2,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        sx={{ position: "relative", width: "100%", height: "100%" }}
-      >
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{
-            color: AppTheme.palette.primary.main,
-            textAlign: "center",
-            textShadow: "0px 0px 5.074px #FFF",
-            fontFamily: fontFamily.openSans,
-            fontSize: fontSize.detailPageHeading,
-            fontStyle: "normal",
-            fontWeight: fontWeight.bold,
-            lineHeight: "24.356px",
-            padding: padding.nil,
-            margin: margin.nil,
-          }}
-        >
-          Dataset Download
-        </Typography>
-        <IconButton
-          onClick={onClose}
-          aria-label="Close dialog"
-          sx={{
-            position: "absolute",
-            right: 0,
-            color: fontColor.gray.medium,
-            "&:hover": {
-              backgroundColor: "rgba(0,0,0,0.04)",
-            },
-          }}
-        >
-          <CloseIcon sx={{ fontSize: "1.3rem" }} />
-        </IconButton>
-      </Box>
-    </DialogTitle>
-  );
-};
-
 const DownloadDialog: React.FC<DownloadDialogProps> = ({
   isOpen,
   setIsOpen,
@@ -145,7 +73,6 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
     handleFormSubmit,
     getProcessStatusText,
     getStepperButtonTitle,
-    setEmailError,
   } = useDownloadDialog(isOpen, setIsOpen);
 
   const renderStepContent = () => {

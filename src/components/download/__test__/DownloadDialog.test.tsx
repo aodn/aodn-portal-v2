@@ -177,7 +177,7 @@ describe("DownloadDialog", () => {
     );
 
     // Find the close button by looking for the CloseIcon
-    const closeButton = screen.getByTestId("CloseIcon").closest("button");
+    const closeButton = screen.getByTestId("CancelIcon").closest("button");
     expect(closeButton).toBeInTheDocument();
 
     fireEvent.click(closeButton!);
