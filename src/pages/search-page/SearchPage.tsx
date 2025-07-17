@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
@@ -64,7 +64,6 @@ import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 
 const SearchPage = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
@@ -149,28 +148,37 @@ const SearchPage = () => {
           }
         })
         .then(() => {
-          if (needNavigate) {
-            navigate(
-              pageDefault.search + "?" + formatToUrlParam(componentParam),
-              {
-                state: {
-                  fromNavigate: true,
-                  requireSearch: false,
-                  referer: pageReferer.SEARCH_PAGE_REFERER,
+          if (needNavigate && !controller.signal.aborted) {
+            const pathname = window.location.pathname;
+
+            if (pathname.includes(pageDefault.search)) {
+              // Just need to update URL if we still remain on search page
+              // if users click too fast, the search is not complete nor cancelled,
+              // but we already on different page, so we do not need to update
+              // status
+              window.history.replaceState(
+                {
+                  state: {
+                    fromNavigate: true,
+                    requireSearch: false,
+                    referer: pageReferer.SEARCH_PAGE_REFERER,
+                  },
                 },
-              }
-            );
+                "",
+                pageDefault.search + "?" + formatToUrlParam(componentParam)
+              );
+            }
           }
         })
         .catch(() => {
           // console.log("doSearchMap signal abort");
         });
     },
-    [dispatch, navigate]
+    [dispatch]
   );
 
   const doListSearch = useCallback(
-    (needNavigate: boolean = false) => {
+    async (needNavigate: boolean = false) => {
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -187,7 +195,7 @@ const SearchPage = () => {
       // The return implicit contains a AbortController due to use of signal in
       // axios call
       listSearchAbortRef.current = dispatch(fetchResultWithStore(paramPaged));
-      doMapSearch(needNavigate)?.finally(() => {});
+      await doMapSearch(needNavigate);
     },
     [dispatch, doMapSearch]
   );
@@ -376,6 +384,13 @@ const SearchPage = () => {
     setSelectedUuids([]);
   }, []);
 
+  const cancelAllSearch = useCallback(() => {
+    mapSearchAbortRef.current?.abort();
+    mapSearchAbortRef.current = null;
+    listSearchAbortRef.current?.abort();
+    listSearchAbortRef.current = null;
+  }, []);
+
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
   // TODO: Optimize call if possible, this happens when navigate from page
@@ -418,13 +433,10 @@ const SearchPage = () => {
     handleNavigation();
 
     return () => {
-      // If page unmounted, cancel any running search
-      mapSearchAbortRef.current?.abort();
-      mapSearchAbortRef.current = null;
-      listSearchAbortRef.current?.abort();
-      listSearchAbortRef.current = null;
+      cancelAllSearch();
     };
   }, [
+    cancelAllSearch,
     doListSearch,
     doMapSearch,
     location.state?.referer,
@@ -529,7 +541,7 @@ const SearchPage = () => {
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
             onDeselectDataset={onDeselectDataset}
-            isLoading={false}
+            cancelLoading={cancelAllSearch}
           />
         </Box>
         <Box
