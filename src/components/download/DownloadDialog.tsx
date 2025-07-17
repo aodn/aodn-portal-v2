@@ -73,6 +73,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
     handleFormSubmit,
     getProcessStatusText,
     getStepperButtonTitle,
+    setEmailError,
   } = useDownloadDialog(isOpen, setIsOpen);
 
   const renderStepContent = () => {
@@ -115,6 +116,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
               onDataUsageChange={handleDataUsageChange}
               emailError={emailError}
               onClearEmail={handleClearEmail}
+              setEmailError={setEmailError}
             />
           </Box>
         </Box>

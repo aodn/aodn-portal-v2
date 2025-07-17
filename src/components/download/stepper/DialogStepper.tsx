@@ -82,6 +82,7 @@ const DialogStepper: FC<DialogStepperProps> = ({
       <Box
         sx={{
           typography: "title1Medium",
+          fontWeight: 500,
           width: "28px",
           height: "28px",
           borderRadius: "50%",

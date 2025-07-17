@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -7,128 +7,177 @@ import {
   IconButton,
 } from "@mui/material";
 import DataUsageForm, { DataUsageInformation } from "./DataUsageForm";
-import { fontColor } from "../../styles/constants";
 import rc8Theme from "../../styles/themeRC8";
 import { InformationIcon } from "../../assets/icons/download/information";
-import { ClearIcon } from "@mui/x-date-pickers/icons";
+import { ClearIcon } from "../../assets/icons/download/clear";
 
 interface EmailInputStepProps {
   isMobile: boolean;
   emailInputRef: React.RefObject<HTMLInputElement>;
-  emailError?: string;
   email: string;
+  emailError?: string;
   dataUsage: DataUsageInformation;
-  onDataUsageChange: (newDataUsage: DataUsageInformation) => void;
+  onDataUsageChange: (dataUsage: DataUsageInformation) => void;
   onClearEmail: () => void;
+  setEmailError: (error: string) => void;
 }
+
+const EMAIL_VALIDATION_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const textFieldStyles = {
+  container: { my: "8px" },
+  inputRoot: {
+    height: "42px",
+    backgroundColor: rc8Theme.palette.primary5,
+    opacity: 0.7,
+    borderRadius: "4px",
+    "&:before, &:hover:not(.Mui-disabled):before, &:after": {
+      borderBottom: `1px solid ${rc8Theme.palette.grey700}`,
+    },
+  },
+  input: {
+    height: "42px",
+    pl: "20px",
+    mb: "8px",
+    boxSizing: "border-box",
+  },
+};
+
+const adornmentStyles = {
+  wrapper: { m: 1, mb: "16px" },
+  clearButton: {
+    padding: "4px",
+    backgroundColor: rc8Theme.palette.primary5,
+  },
+};
 
 const EmailInputStep: React.FC<EmailInputStepProps> = ({
   isMobile,
   emailInputRef,
-  emailError,
   email,
+  emailError,
   dataUsage,
   onDataUsageChange,
   onClearEmail,
+  setEmailError,
 }) => {
+  const [inputValue, setInputValue] = useState(email);
+
+  useEffect(() => {
+    setInputValue(email);
+  }, [email]);
+
+  const emailHasValue = inputValue.trim().length > 0;
+  const emailHasError = !!emailError;
+  const shouldShowClearButton = emailHasValue && !emailHasError;
+
+  const updateEmailValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
+    setInputValue(newValue);
+
+    if (emailHasError && newValue.trim()) {
+      const isValidEmailFormat = EMAIL_VALIDATION_REGEX.test(newValue.trim());
+      if (isValidEmailFormat) {
+        setEmailError("");
+      }
+    }
+  };
+
+  const handleClearEmail = () => {
+    setInputValue("");
+    onClearEmail();
+  };
+
+  const createErrorAdornment = () => (
+    <InputAdornment position="end" sx={adornmentStyles.wrapper}>
+      <InformationIcon
+        color={rc8Theme.palette.error.main}
+        height={30}
+        width={30}
+      />
+    </InputAdornment>
+  );
+
+  const createClearAdornment = () => (
+    <InputAdornment position="end" sx={adornmentStyles.wrapper}>
+      <IconButton
+        onClick={handleClearEmail}
+        size="small"
+        sx={adornmentStyles.clearButton}
+        aria-label="Clear email address"
+      >
+        <ClearIcon />
+      </IconButton>
+    </InputAdornment>
+  );
+
+  const getInputEndAdornment = () => {
+    if (emailHasError) return createErrorAdornment();
+    if (shouldShowClearButton) return createClearAdornment();
+    return undefined;
+  };
+
+  const EmailTextField = () => (
+    <TextField
+      required
+      id="email"
+      name="email"
+      label="Email Address"
+      placeholder="example@email.com"
+      type="email"
+      fullWidth
+      variant={emailHasError ? "outlined" : "standard"}
+      inputRef={emailInputRef}
+      error={emailHasError}
+      onChange={updateEmailValue}
+      InputProps={{
+        endAdornment: getInputEndAdornment(),
+      }}
+      sx={{
+        ...textFieldStyles.container,
+        "& .MuiInputBase-root": textFieldStyles.inputRoot,
+        "& .MuiInputBase-root.MuiInput-root .MuiInputBase-input": {
+          ...textFieldStyles.input,
+          ...rc8Theme.typography.title2Regular,
+        },
+      }}
+    />
+  );
+
+  const ErrorMessage = () => {
+    if (!emailHasError) return null;
+
+    return (
+      <Typography
+        variant="body1Medium"
+        sx={{
+          color: rc8Theme.palette.error.main,
+          pl: "20px",
+        }}
+      >
+        {emailError}
+      </Typography>
+    );
+  };
+
+  const DownloadInstructions = () => (
+    <Box sx={{ ml: "20px", my: "8px" }}>
+      <Typography variant="body2Regular">
+        Processing dataset download may take some time. It is varied by the size
+        of the dataset, the selected conditions, and the server load (may take
+        several seconds to several hours or even more). Please provide your
+        email address to receive the download link and necessary information.
+      </Typography>
+    </Box>
+  );
+
   return (
     <Box sx={{ pl: isMobile ? 1 : 2 }}>
       <Typography variant="title1Medium">Email Address</Typography>
 
-      <TextField
-        required
-        id="email"
-        name="email"
-        label="Email Address"
-        placeholder="example@email.com"
-        type="email"
-        fullWidth
-        variant={emailError ? "outlined" : "standard"}
-        inputRef={emailInputRef}
-        error={!!emailError}
-        InputProps={{
-          endAdornment: emailError ? (
-            <InputAdornment position="end" sx={{ m: 1 }}>
-              <InformationIcon
-                color={rc8Theme.palette.error.main}
-                height={30}
-                width={30}
-              />
-            </InputAdornment>
-          ) : email ? (
-            <InputAdornment position="end" sx={{ m: 1 }}>
-              <IconButton
-                onClick={onClearEmail}
-                size="small"
-                sx={{ padding: "4px" }}
-              >
-                <ClearIcon sx={{ fontSize: "18px", color: "#666" }} />
-              </IconButton>
-            </InputAdornment>
-          ) : undefined,
-        }}
-        sx={{
-          mt: 0.5,
-          mb: 2,
-          height: "41px",
-          flexShrink: 0,
-          "& .MuiInputBase-root": {
-            height: "41px",
-            backgroundColor: "#E5EEF5",
-            opacity: 0.7,
-            borderRadius: 0,
-            "&:before": {
-              borderBottom: "1px solid #595959",
-            },
-            "&:hover:not(.Mui-disabled):before": {
-              borderBottom: "1px solid #595959",
-            },
-            "&:after": {
-              borderBottom: "2px solid #595959",
-            },
-          },
-          "& .MuiInputBase-input": {
-            fontSize: isMobile ? "0.875rem" : "1rem",
-            backgroundColor: "#E5EEF5",
-            padding: "8px 12px",
-            height: "calc(41px - 16px)",
-            boxSizing: "border-box",
-          },
-          "& .MuiInputLabel-root": {
-            fontSize: isMobile ? "0.875rem" : "1rem",
-            "&.Mui-focused": {
-              color: "#595959",
-            },
-          },
-        }}
-      />
-
-      {emailError && (
-        <Typography
-          variant="body1Medium"
-          sx={{
-            color: rc8Theme.palette.error.main,
-          }}
-        >
-          {emailError}
-        </Typography>
-      )}
-
-      <Box sx={{ ml: 2, my: 1 }}>
-        <Typography
-          variant="body2"
-          sx={{
-            color: fontColor.gray.dark,
-            lineHeight: isMobile ? 1.4 : 1.5,
-          }}
-        >
-          Processing dataset download may take some time. It is varied by the
-          size of the dataset, the selected conditions, and the server load (may
-          take several seconds to several hours or even more). Please provide
-          your email address to receive the download link and necessary
-          information.
-        </Typography>
-      </Box>
+      <EmailTextField />
+      <ErrorMessage />
+      <DownloadInstructions />
 
       <DataUsageForm
         isMobile={isMobile}
