@@ -1,5 +1,6 @@
 import {
   FormControl,
+  FormLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -19,6 +20,7 @@ export interface CommonSelectProps<T = string> {
   items: SelectItem<T>[];
   // Once value is provided, the component is controllable
   value?: T | null;
+  label?: string;
   onSelectCallback?: (value: T) => void;
   dataTestId?: string;
   sx?: SxProps;
@@ -40,6 +42,7 @@ const DEFAULT_SELECT_STYLE: SxProps = {
 const CommonSelect: FC<CommonSelectProps> = memo(
   ({
     items,
+    label,
     onSelectCallback,
     dataTestId = "common-select",
     sx,
@@ -68,6 +71,7 @@ const CommonSelect: FC<CommonSelectProps> = memo(
 
     return (
       <FormControl fullWidth data-testid={dataTestId}>
+        {label && <FormLabel>{label}</FormLabel>}
         <Select
           value={selectedItem}
           onOpen={handleOpenState(true)}
