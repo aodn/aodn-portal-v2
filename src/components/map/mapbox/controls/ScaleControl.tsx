@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
-import { ScaleControl as MapboxScaleControl } from "mapbox-gl";
+import {
+  ScaleControl as MapboxScaleControl,
+  ScaleControlOptions,
+} from "mapbox-gl";
 
 export type Unit = string;
 
-interface ScaleControlProps {
-  maxWidth?: number;
-  unit?: Unit;
-}
+interface ScaleControlProps extends ScaleControlOptions {}
 
 const ScaleControl = ({
   maxWidth = 80,

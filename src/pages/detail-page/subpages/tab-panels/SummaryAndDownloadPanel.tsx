@@ -14,7 +14,7 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
-import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
+import { LngLatBounds, MapEvent } from "mapbox-gl";
 import BaseMapSwitcher, {
   BaseMapSwitcherLayer,
 } from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
@@ -232,13 +232,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     };
   }, [downloadConditions, featureCollection]);
 
-  const handleMapChange = useCallback(
-    (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
-      // implement later
-      console.log("Map change event", event);
-    },
-    []
-  );
+  const handleMapChange = useCallback((event: MapEvent | undefined) => {
+    // implement later
+    console.log("Map change event", event);
+  }, []);
 
   const handleGeoLayerChange = useCallback(
     (id: LayerName) =>

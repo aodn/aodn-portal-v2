@@ -1,5 +1,11 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-import { LngLatBounds, Map, MapboxEvent, Projection, Style } from "mapbox-gl";
+import {
+  LngLatBounds,
+  Map,
+  MapEvent,
+  ProjectionSpecification,
+  StyleSpecification,
+} from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
@@ -25,14 +31,10 @@ export interface MapBasicType {
   maxZoom?: number;
   panelId: string;
   animate?: boolean;
-  projection?: Projection | string;
+  projection?: ProjectionSpecification | string;
   announcement?: string;
-  onZoomEvent?: (
-    event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-  ) => void;
-  onMoveEvent?: (
-    event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-  ) => void;
+  onZoomEvent?: (event: MapEvent | undefined) => void;
+  onMoveEvent?: (event: MapEvent | undefined) => void;
 }
 
 interface MapProps extends MapBasicType {}
@@ -58,7 +60,7 @@ const styles = [
   {
     id: "4",
     name: "World Imagery",
-    style: ERSIWorldImagery as Style,
+    style: ERSIWorldImagery as StyleSpecification,
   },
   // Add more styles as needed
 ];
@@ -93,9 +95,7 @@ const ReactMap = memo(
     const debounceOnZoomEvent = useRef(
       lodash.debounce(
         useCallback(
-          async (
-            event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-          ) => onZoomEvent && onZoomEvent(event),
+          async (event: MapEvent | undefined) => onZoomEvent?.(event),
           [onZoomEvent]
         ),
         MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
@@ -105,9 +105,7 @@ const ReactMap = memo(
     const debounceOnMoveEvent = useRef(
       lodash.debounce(
         useCallback(
-          async (
-            event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-          ) => onMoveEvent && onMoveEvent(event),
+          async (event: MapEvent | undefined) => onMoveEvent?.(event),
           [onMoveEvent]
         ),
         MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE

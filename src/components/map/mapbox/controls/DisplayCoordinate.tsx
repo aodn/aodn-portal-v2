@@ -1,7 +1,8 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import MapContext from "../MapContext";
 
 import { zIndex } from "../../../../styles/constants";
+import { MapMouseEvent } from "mapbox-gl";
 
 const DisplayCoordinate = () => {
   const { map } = useContext(MapContext);
@@ -9,7 +10,7 @@ const DisplayCoordinate = () => {
 
   useEffect(() => {
     if (map) {
-      const handle = (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
+      const handle = (e: MapMouseEvent) => {
         if (ref.current) {
           ref.current.innerHTML =
             JSON.stringify(e.point) + " " + JSON.stringify(e.lngLat.wrap());

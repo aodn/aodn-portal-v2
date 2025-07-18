@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
+import { LngLatBounds, MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
@@ -217,13 +217,15 @@ const SearchPage = () => {
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
-    (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
-      if (event.type === "zoomend" || event.type === "moveend") {
+    (event: MapEvent | undefined) => {
+      if (event?.type === "zoomend" || event?.type === "moveend") {
         const componentParam: ParameterState = getComponentState(
           store.getState()
         );
 
-        const bounds = event.target.getBounds();
+        const bounds = event?.target.getBounds();
+        if (bounds == null) return;
+
         const ne = bounds.getNorthEast(); // NorthEast corner
         const sw = bounds.getSouthWest(); // SouthWest corner
         // Note order: longitude, latitude.2

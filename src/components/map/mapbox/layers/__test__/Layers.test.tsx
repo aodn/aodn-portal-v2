@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { FeatureCollection, Point } from "geojson";
 import { findSuitableVisiblePoint } from "../Layers";
-import { LngLatBounds, Map } from "mapbox-gl";
+import { Map as Mapbox } from "mapbox-gl";
 
 // Define the test
 describe("findMostVisiblePoint", () => {
@@ -73,7 +73,7 @@ describe("findMostVisiblePoint", () => {
     };
 
     // Create a mock map object
-    const map = new Map();
+    const map = new Mapbox({ container: "container " });
 
     // Call the function with mock inputs
     const result = findSuitableVisiblePoint(featureCollection, map);
