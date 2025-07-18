@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../../MapContext";
-import { Map as MapBox, IControl, MapMouseEvent } from "mapbox-gl";
+import { Map as MapBox, IControl, MapMouseEvent, MapEvent } from "mapbox-gl";
 import EventEmitter from "events";
 import {
   ControlProps,
@@ -122,7 +122,7 @@ class MapControl implements IControl {
 
   // When the user clicks somewhere on the map, notify the MenuControl
   private readonly mapClickHandler: (event: MapMouseEvent) => void;
-  private readonly mapMoveStartHandler: (event: MapMouseEvent) => void;
+  private readonly mapMoveStartHandler: (event: MapEvent) => void;
 
   constructor(component: MapControlType, container: HTMLDivElement) {
     this.component = component;
@@ -131,7 +131,7 @@ class MapControl implements IControl {
     // Handlers for map events
     this.mapClickHandler = (event: MapMouseEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP.CLICKED);
-    this.mapMoveStartHandler = (event: MapMouseEvent) =>
+    this.mapMoveStartHandler = (event: MapEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP.MOVE_START);
   }
 
@@ -193,7 +193,7 @@ class MapControl implements IControl {
   }
 
   onClickHandler(
-    event: MouseEvent | MapMouseEvent,
+    event: MouseEvent | MapEvent,
     component: MapControlType | undefined,
     type: string = EVENT_MENU.CLICKED
   ) {

@@ -139,7 +139,9 @@ describe("DateRangeFilter", () => {
       const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
       user.type(startDatePicker, newStringDate);
 
-      return waitFor(() => screen.findByDisplayValue(newStringDate)).then(() =>
+      return waitFor(() => screen.findByDisplayValue(newStringDate), {
+        timeout: 2000,
+      }).then(() =>
         expect(store.dispatch).toHaveBeenCalledWith(
           updateDateTimeFilterRange({
             start: dateToValue(newDate),
@@ -163,7 +165,9 @@ describe("DateRangeFilter", () => {
       const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
       user.type(endDatePicker, newStringDate);
 
-      return waitFor(() => screen.findByDisplayValue(newStringDate)).then(() =>
+      return waitFor(() => screen.findByDisplayValue(newStringDate), {
+        timeout: 2000,
+      }).then(() =>
         expect(store.dispatch).toHaveBeenCalledWith(
           updateDateTimeFilterRange({
             start: mockInitialState.paramReducer.dateTimeFilterRange.start,

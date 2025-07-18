@@ -4,9 +4,9 @@ import {
   unFlattenToParameterState,
   ParameterState,
 } from "../componentParamReducer";
-import { decompressFromEncodedURIComponent } from "lz-string";
 import { bboxPolygon } from "@turf/turf";
 import { MapDefaultConfig } from "../../../map/mapbox/constants";
+import { decodeParam } from "../../../../utils/UrlUtils";
 
 describe("Component Reducer Function Test", () => {
   it("Verify formatToUrlParam", () => {
@@ -16,9 +16,7 @@ describe("Component Reducer Function Test", () => {
       searchText: "",
     };
 
-    const answer1: string = decompressFromEncodedURIComponent(
-      formatToUrlParam(sample1)
-    );
+    const answer1: string = decodeParam(formatToUrlParam(sample1));
     expect(answer1).toEqual("isImosOnlyDataset=false");
 
     const sample2: ParameterState = {
@@ -27,9 +25,7 @@ describe("Component Reducer Function Test", () => {
       searchText: "This is test",
     };
 
-    const answer2: string = decompressFromEncodedURIComponent(
-      formatToUrlParam(sample2)
-    );
+    const answer2: string = decodeParam(formatToUrlParam(sample2));
     expect(answer2).toEqual(
       "isImosOnlyDataset=false&searchText=This%20is%20test"
     );
@@ -42,9 +38,7 @@ describe("Component Reducer Function Test", () => {
       searchText: "This is test",
     };
 
-    const answer3: string = decompressFromEncodedURIComponent(
-      formatToUrlParam(sample3)
-    );
+    const answer3: string = decodeParam(formatToUrlParam(sample3));
     expect(answer3).toEqual(
       "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&searchText=This%20is%20test"
     );
@@ -68,9 +62,7 @@ describe("Component Reducer Function Test", () => {
       ],
     };
 
-    const answer4: string = decompressFromEncodedURIComponent(
-      formatToUrlParam(sample4)
-    );
+    const answer4: string = decodeParam(formatToUrlParam(sample4));
     expect(answer4).toEqual(
       "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&parameterVocabs.0.label=cat1&parameterVocabs.1.label=cat1"
     );
@@ -95,9 +87,7 @@ describe("Component Reducer Function Test", () => {
       polygon: bboxPolygon([10, 20, -10.1, -20.0]),
     };
 
-    const answer5: string = decompressFromEncodedURIComponent(
-      formatToUrlParam(sample5)
-    );
+    const answer5: string = decodeParam(formatToUrlParam(sample5));
     expect(answer5).toEqual(
       "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&parameterVocabs.0.label=cat1&parameterVocabs.1.label=cat2&polygon.type=Feature&polygon.bbox.0=10&polygon.bbox.1=20&polygon.bbox.2=-10.1&polygon.bbox.3=-20&polygon.geometry.type=Polygon&polygon.geometry.coordinates.0.0.0=10&polygon.geometry.coordinates.0.0.1=20&polygon.geometry.coordinates.0.1.0=-10.1&polygon.geometry.coordinates.0.1.1=20&polygon.geometry.coordinates.0.2.0=-10.1&polygon.geometry.coordinates.0.2.1=-20&polygon.geometry.coordinates.0.3.0=10&polygon.geometry.coordinates.0.3.1=-20&polygon.geometry.coordinates.0.4.0=10&polygon.geometry.coordinates.0.4.1=20"
     );
