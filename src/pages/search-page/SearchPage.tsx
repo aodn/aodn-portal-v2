@@ -150,6 +150,15 @@ const SearchPage = () => {
           pagesize: DEFAULT_SEARCH_MAP_SIZE,
         }
       );
+      // Update URL earlier as map take time to search, so user may copy incorrect URL during
+      // search
+      if (needNavigate) {
+        debounceHistoryUpdateRef?.current?.cancel();
+        debounceHistoryUpdateRef?.current?.(
+          pageDefault.search + "?" + formatToUrlParam(componentParam)
+        );
+      }
+
       dispatch(
         // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
         // and ordered by uuid to avoid affecting cluster calculation
@@ -173,14 +182,6 @@ const SearchPage = () => {
             booleanEqual(componentParam.bbox, current)
           ) {
             setLayers(jsonToOGCCollections(collections).collections);
-          }
-        })
-        .then(() => {
-          if (needNavigate && !controller.signal.aborted) {
-            debounceHistoryUpdateRef?.current?.cancel();
-            debounceHistoryUpdateRef?.current?.(
-              pageDefault.search + "?" + formatToUrlParam(componentParam)
-            );
           }
         })
         .catch(() => {
