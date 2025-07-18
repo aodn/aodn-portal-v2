@@ -175,6 +175,7 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
           steps={steps}
           activeStep={activeStep}
           onStepClick={handleStepClick}
+          testId="dialog-stepper"
         />
       </Box>
 

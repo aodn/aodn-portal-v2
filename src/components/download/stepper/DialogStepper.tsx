@@ -21,6 +21,7 @@ interface DialogStepperProps {
   activeStep: number;
   onStepClick?: (step: number) => void;
   sx?: object;
+  testId?: string;
 }
 
 const DialogStepper: FC<DialogStepperProps> = ({
@@ -28,6 +29,7 @@ const DialogStepper: FC<DialogStepperProps> = ({
   activeStep,
   onStepClick,
   sx = {},
+  testId = "dialog-stepper",
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -121,6 +123,7 @@ const DialogStepper: FC<DialogStepperProps> = ({
   return (
     <Stepper
       activeStep={activeStep}
+      data-testid={testId}
       sx={{
         width: isMobile ? "auto" : "640px",
         minWidth: isMobile ? "200px" : "640px",

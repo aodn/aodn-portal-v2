@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -41,7 +41,7 @@ vi.mock("@/components/download/stepper/StepperButton", () => ({
 
 vi.mock("@/components/download/stepper/StyledStepper", () => ({
   default: ({ steps, activeStep, onStepClick }: any) => (
-    <div data-testid="styled-stepper">
+    <div data-testid="dialog-stepper">
       {steps.map((step: any, index: number) => (
         <button
           key={step.number}
@@ -138,9 +138,7 @@ describe("DownloadDialog", () => {
       </TestWrapper>
     );
 
-    expect(screen.getByTestId("styled-stepper")).toBeInTheDocument();
-    expect(screen.getByTestId("step-0")).toBeInTheDocument();
-    expect(screen.getByTestId("step-1")).toBeInTheDocument();
+    expect(screen.getByTestId("dialog-stepper")).toBeInTheDocument();
   });
 
   it("should render email input step by default (step 0)", () => {

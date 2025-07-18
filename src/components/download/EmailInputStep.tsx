@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -61,19 +61,17 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
   onClearEmail,
   setEmailError,
 }) => {
-  const [inputValue, setInputValue] = useState(email);
+  const getCurrentInputValue = () => {
+    return emailInputRef.current?.value || "";
+  };
 
-  useEffect(() => {
-    setInputValue(email);
-  }, [email]);
-
-  const emailHasValue = inputValue.trim().length > 0;
+  const emailHasValue =
+    getCurrentInputValue().trim().length > 0 || email.trim().length > 0;
   const emailHasError = !!emailError;
   const shouldShowClearButton = emailHasValue && !emailHasError;
 
   const updateEmailValue = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
-    setInputValue(newValue);
 
     if (emailHasError && newValue.trim()) {
       const isValidEmailFormat = EMAIL_VALIDATION_REGEX.test(newValue.trim());
@@ -84,7 +82,9 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
   };
 
   const handleClearEmail = () => {
-    setInputValue("");
+    if (emailInputRef.current) {
+      emailInputRef.current.value = "";
+    }
     onClearEmail();
   };
 
@@ -130,6 +130,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
       inputRef={emailInputRef}
       error={emailHasError}
       onChange={updateEmailValue}
+      defaultValue={email}
       InputProps={{
         endAdornment: getInputEndAdornment(),
       }}

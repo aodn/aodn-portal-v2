@@ -26,12 +26,6 @@ const STATUS_MESSAGES = {
 
 const TIMEOUT_LIMIT = 8000;
 
-interface SnackbarState {
-  open: boolean;
-  message: string;
-  severity: "error" | "warning" | "info" | "success";
-}
-
 export const useDownloadDialog = (
   isOpen: boolean,
   setIsOpen: (isOpen: boolean) => void
