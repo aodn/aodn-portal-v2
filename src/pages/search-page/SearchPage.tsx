@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
@@ -65,6 +65,7 @@ import _ from "lodash";
 
 const SearchPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
@@ -99,23 +100,20 @@ const SearchPage = () => {
     _.debounce((url: string) => {
       const pathname = window.location.pathname;
       if (pathname.includes(pageDefault.search)) {
-        // Just need to update URL if we still remain on search page
-        // if users click too fast, the search is not complete nor cancelled,
-        // but we already on different page, so we do not need to update
-        // status
-        window.history.replaceState(
-          {
-            state: {
-              fromNavigate: true,
-              requireSearch: false,
-              referer: pageReferer.SEARCH_PAGE_REFERER,
-            },
+        // Must use navigator, otherwise useLocation will not work, we
+        // add a debounce here to avoid user click too fast where
+        // search is still happens and user click to other page
+        // causing URL incorrect
+        navigate(url, {
+          replace: true, // Must use replace to avoid page move back
+          state: {
+            fromNavigate: true,
+            requireSearch: false,
+            referer: pageReferer.SEARCH_PAGE_REFERER,
           },
-          "",
-          url
-        );
+        });
       }
-    }, 500)
+    }, 200)
   );
 
   const urlParamState: ParameterState | undefined = useMemo(() => {
