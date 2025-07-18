@@ -73,120 +73,130 @@
     "themes": [
       {
         "scheme": "dataSource",
-        "description": "",
-        "title": "CSIRO Source List",
         "concepts": [
           {
             "id": "Ship: Investigator (RV)",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:309"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:309",
+            "description": "",
+            "title": "CSIRO Source List"
           }
         ]
       },
       {
         "scheme": "discipline",
-        "description": "",
-        "title": "CSIRO Areas Of Interest",
         "concepts": [
           {
             "id": "Marine National Facility",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:cmarAOI&id=urn:marlin.csiro.au:keywords:cmarAOI:concept:3208"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:cmarAOI&id=urn:marlin.csiro.au:keywords:cmarAOI:concept:3208",
+            "description": "",
+            "title": "CSIRO Areas Of Interest"
           }
         ]
       },
       {
         "scheme": "survey",
-        "description": "",
-        "title": "CSIRO Survey List",
         "concepts": [
           {
             "id": "Research Voyage: IN2019_V06",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2228"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:2228",
+            "description": "",
+            "title": "CSIRO Survey List"
           }
         ]
       },
       {
         "scheme": "theme",
-        "description": "",
-        "title": "GCMD Keywords",
         "concepts": [
           {
             "id": "Earth Science | Oceans | Bathymetry/Seafloor Topography",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/c16bda61-353b-4668-af2f-bbb98785b6fa"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/c16bda61-353b-4668-af2f-bbb98785b6fa",
+            "description": "",
+            "title": "GCMD Keywords"
           }
         ]
       },
       {
         "scheme": "place",
-        "description": "",
-        "title": "AODN Geographic Extent Names",
         "concepts": [
           {
             "id": "Coastal Waters (Australia) | Northern Territory Coast, NT",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1003"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1003",
+            "description": "",
+            "title": "AODN Geographic Extent Names"
           },
           {
             "id": "Regional Seas | Arafura Sea",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:7"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:7",
+            "description": "",
+            "title": "AODN Geographic Extent Names"
           },
           {
             "id": "Coastal Cities / Towns (Australia) | Darwin, NT",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:110"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:110",
+            "description": "",
+            "title": "AODN Geographic Extent Names"
           },
           {
             "id": "Regional Seas | Timor Sea",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:24"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:24",
+            "description": "",
+            "title": "AODN Geographic Extent Names"
           }
         ]
       },
       {
         "scheme": "equipment",
-        "description": "",
-        "title": "CSIRO Equipment",
         "concepts": [
           {
             "id": "Multibeam Echosounder - EM710",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:142"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:142",
+            "description": "",
+            "title": "CSIRO Equipment"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords (DataParameter)",
         "concepts": [
           {
             "id": "Sea-floor depth below surface of the water body",
-            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/574"
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/574",
+            "description": "",
+            "title": "Keywords (DataParameter)"
           },
           {
             "id": "Sea-floor surface hardness",
-            "url": "N/A"
+            "url": "N/A",
+            "description": "",
+            "title": "Keywords (DataParameter)"
           },
           {
             "id": "Density of the water body",
-            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/401"
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/401",
+            "description": "",
+            "title": "Keywords (DataParameter)"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords (Instrument)",
         "concepts": [
           {
             "id": "multi-beam echosounders",
-            "url": "http://vocab.nerc.ac.uk/collection/L05/current/157"
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/157",
+            "description": "",
+            "title": "Keywords (Instrument)"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords (Platform)",
         "concepts": [
           {
             "id": "research vessel",
-            "url": "http://vocab.nerc.ac.uk/collection/L06/current/31"
+            "url": "http://vocab.nerc.ac.uk/collection/L06/current/31",
+            "description": "",
+            "title": "Keywords (Platform)"
           }
         ]
       }

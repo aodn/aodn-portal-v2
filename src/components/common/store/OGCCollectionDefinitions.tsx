@@ -68,13 +68,15 @@ export interface IContact {
 export interface IConcept {
   id: string;
   url: string;
+  description: string;
+  title: string;
 }
 
 export interface ITheme {
   scheme: string;
+  concepts: IConcept[];
   description: string;
   title: string;
-  concepts: IConcept[];
 }
 
 export interface IAssociatedRecordGroup {

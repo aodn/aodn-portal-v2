@@ -2,22 +2,21 @@ import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import TextArea from "./listItem/subitem/TextArea";
-import { ITheme } from "../common/store/OGCCollectionDefinitions";
 import NaList from "./NaList";
 
 interface ThemeListProps {
   title: string;
-  themes?: ITheme[];
+  themes: string[];
 }
 
-const ThemeList: React.FC<ThemeListProps> = ({ title, themes = [] }) => {
+const ThemeList: React.FC<ThemeListProps> = ({ title, themes }) => {
   const statementItem = useMemo(
     () => (
       <ItemBaseGrid container key={"theme-list-container-key"}>
         {themes.length !== 0 ? (
-          themes.map((theme: ITheme) => (
-            <TextArea key={theme.title} text={theme.title} />
-          ))
+          themes.map((theme: string) => {
+            return <TextArea key={theme} text={theme} />;
+          })
         ) : (
           <NaList title={title}></NaList>
         )}
