@@ -13,9 +13,9 @@ import DataSelection from "./DataSelection";
 import LicenseContent from "./LicenseContent";
 import { useDownloadDialog } from "../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
-import ActionButton from "./ActionButtons";
 import { DialogHeader } from "./DialogHeader";
 import DialogStepper from "./stepper/DialogStepper";
+import StepperButton from "./stepper/StepperButton";
 
 interface DownloadDialogProps {
   isOpen: boolean;
@@ -75,6 +75,22 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
     getStepperButtonTitle,
     setEmailError,
   } = useDownloadDialog(isOpen, setIsOpen);
+
+  const getButtonStatus = () => {
+    const isFailure = processingStatus && !processingStatus.startsWith("2");
+    if (isSuccess) return "completed";
+    if (isFailure) return "error";
+    if (isProcessing) return "loading";
+    return "default";
+  };
+
+  const getDisplayText = () => {
+    const isFailure = processingStatus && !processingStatus.startsWith("2");
+    if (isSuccess || isFailure) {
+      return getProcessStatusText();
+    }
+    return getStepperButtonTitle();
+  };
 
   const renderStepContent = () => {
     if (activeStep === 0) {
@@ -202,13 +218,12 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
           flexShrink: 0,
         }}
       >
-        <ActionButton
-          isSuccess={isSuccess}
-          isProcessing={isProcessing}
-          processingStatus={processingStatus}
-          getStepperButtonTitle={getStepperButtonTitle}
-          getProcessStatusText={getProcessStatusText}
-          handleStepperButtonClick={handleStepperButtonClick}
+        <StepperButton
+          title={getStepperButtonTitle()}
+          statusText={getDisplayText()}
+          onClick={handleStepperButtonClick}
+          disabled={isProcessing || !!emailError}
+          status={getButtonStatus()}
         />
       </DialogActions>
     </Dialog>
