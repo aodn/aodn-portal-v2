@@ -8,333 +8,303 @@ import {
   FormLabel,
   Typography,
 } from "@mui/material";
-import { fontColor } from "../../styles/constants";
+import rc8Theme from "../../styles/themeRC8";
 
+interface FormFieldConfig {
+  key: string;
+  title: string;
+  type: "multi-select" | "yes-no" | "single-select";
+  options: string[];
+  required?: boolean;
+}
+
+// Configuration - modify this to change the entire form
 const FORM_CONFIG = {
   title: "Data Usage Information (optional)",
-
-  purpose: {
-    title: "a. For what purpose do you intend to use the data?",
-    options: [
-      "Education",
-      "Scientific research",
-      "Industry operations",
-      "Recreational",
-    ],
-  },
-
-  sector: {
-    title: "b. If not recreational - what sector do you work for?",
-    options: ["Academic", "Industry", "Government", "Other"],
-  },
-
-  contact: {
-    title:
-      "c. Do you consent to being contacted by IMOS to further understand your data needs and the use of our products and services?",
-    options: ["Yes", "No"],
-  },
+  fields: [
+    {
+      key: "purposes",
+      title: "a. For what purpose do you intend to use the data?",
+      type: "multi-select",
+      options: [
+        "Education",
+        "Scientific research",
+        "Industry operations",
+        "Recreational",
+      ],
+      required: false,
+    },
+    {
+      key: "sectors",
+      title: "b. If not recreational - what sector do you work for?",
+      type: "multi-select",
+      options: ["Academic", "Industry", "Government", "Other"],
+      required: false,
+    },
+    {
+      key: "allow_contact",
+      title:
+        "c. Do you consent to being contacted by IMOS to further understand your data needs and the use of our products and services?",
+      type: "yes-no",
+      options: ["Yes", "No"],
+      required: false,
+    },
+    // Add new fields here and they'll automatically appear
+    // {
+    //   key: "experience_level",
+    //   title: "d. What is your experience level with oceanographic data?",
+    //   type: "single-select",
+    //   options: ["Beginner", "Intermediate", "Advanced", "Expert"],
+    //   required: true,
+    // },
+  ] as FormFieldConfig[],
 };
 
+// most fields are string arrays, except yes-no which is boolean
 export interface DataUsageInformation {
   purposes: string[];
   sectors: string[];
   allow_contact: boolean | null;
+  // Add new fields here as needed
+  // experience_level?: string[];
 }
 
 interface DataUsageFormProps {
   isMobile: boolean;
   dataUsage: DataUsageInformation;
-  setDataUsage: (usage: DataUsageInformation) => void;
+  setDataUsage: (dataUsage: DataUsageInformation) => void;
 }
+
+const commonStyles = {
+  formControl: {
+    ml: 2,
+    mb: "16px",
+    width: "100%",
+  },
+  formLabel: {
+    ...rc8Theme.typography.body2Regular,
+    color: rc8Theme.palette.text2,
+    mb: "8px",
+  },
+  checkbox: {
+    padding: "4px 14px",
+  },
+  labelText: {
+    ...rc8Theme.typography.body2Regular,
+    color: rc8Theme.palette.text2,
+    padding: 0,
+  },
+  formControlLabel: (isMobile: boolean) => ({
+    margin: 0,
+    display: "flex",
+    alignItems: "center",
+    width: isMobile ? "100%" : "auto",
+    minWidth: isMobile ? "auto" : "fit-content",
+    "& .MuiFormControlLabel-label": {
+      paddingLeft: "8px",
+      flex: isMobile ? 1 : "none",
+    },
+  }),
+  formGroup: (isMobile: boolean) => ({
+    display: "flex",
+    flexDirection: isMobile ? "column" : "row",
+    flexWrap: isMobile ? "nowrap" : "wrap",
+    gap: 1,
+    alignItems: "flex-start",
+  }),
+};
+
+// Type-safe field renderer function signature
+type FieldRenderer = (
+  field: FormFieldConfig,
+  dataUsage: DataUsageInformation,
+  onChange: (
+    fieldKey: string,
+    value: string | boolean | string[],
+    isChecked?: boolean
+  ) => void,
+  isMobile: boolean
+) => React.ReactNode[];
+
+// Field type renderers dictionary
+const fieldRenderers: Record<FormFieldConfig["type"], FieldRenderer> = {
+  "multi-select": (field, dataUsage, onChange, isMobile) => {
+    const multiSelectValues =
+      (dataUsage[field.key as keyof DataUsageInformation] as string[]) || [];
+    return field.options.map((option) => (
+      <FormControlLabel
+        key={option}
+        control={
+          <Checkbox
+            size="small"
+            checked={multiSelectValues.includes(option)}
+            onChange={(e) => onChange(field.key, option, e.target.checked)}
+            sx={commonStyles.checkbox}
+          />
+        }
+        label={<Typography sx={commonStyles.labelText}>{option}</Typography>}
+        sx={commonStyles.formControlLabel(isMobile)}
+      />
+    ));
+  },
+
+  "single-select": (field, dataUsage, onChange, isMobile) => {
+    const singleSelectValue = dataUsage[
+      field.key as keyof DataUsageInformation
+    ] as string[];
+    return field.options.map((option) => (
+      <FormControlLabel
+        key={option}
+        control={
+          <Checkbox
+            size="small"
+            checked={singleSelectValue?.includes(option) || false}
+            onChange={(e) => {
+              // For single select, clear others and set this one
+              onChange(field.key, e.target.checked ? [option] : []);
+            }}
+            sx={commonStyles.checkbox}
+          />
+        }
+        label={<Typography sx={commonStyles.labelText}>{option}</Typography>}
+        sx={commonStyles.formControlLabel(isMobile)}
+      />
+    ));
+  },
+
+  "yes-no": (field, dataUsage, onChange, isMobile) => {
+    const yesNoValue = dataUsage[field.key as keyof DataUsageInformation] as
+      | boolean
+      | null;
+    return field.options.map((option, index) => {
+      const boolValue = index === 0; // First option is true, second is false
+      return (
+        <FormControlLabel
+          key={option}
+          control={
+            <Checkbox
+              size="small"
+              checked={yesNoValue === boolValue}
+              onChange={() => onChange(field.key, boolValue)}
+              sx={commonStyles.checkbox}
+            />
+          }
+          label={<Typography sx={commonStyles.labelText}>{option}</Typography>}
+          sx={commonStyles.formControlLabel(isMobile)}
+        />
+      );
+    });
+  },
+};
+
+// Generic field renderer
+const FieldRenderer: React.FC<{
+  field: FormFieldConfig;
+  dataUsage: DataUsageInformation;
+  onChange: (
+    fieldKey: string,
+    value: string | boolean | string[],
+    isChecked?: boolean
+  ) => void;
+  isMobile: boolean;
+}> = ({ field, dataUsage, onChange, isMobile }) => {
+  const renderOptions = () => {
+    const renderer = fieldRenderers[field.type];
+    return renderer ? renderer(field, dataUsage, onChange, isMobile) : null;
+  };
+
+  return (
+    <FormControl component="fieldset" sx={commonStyles.formControl}>
+      <FormLabel component="legend" sx={commonStyles.formLabel}>
+        {field.title}
+        {field.required && <span style={{ color: "red" }}> *</span>}
+      </FormLabel>
+      <FormGroup sx={commonStyles.formGroup(isMobile)}>
+        {renderOptions()}
+      </FormGroup>
+    </FormControl>
+  );
+};
+
+// Type-safe field change handler function signature
+type FieldChangeHandler = (
+  prev: DataUsageInformation,
+  fieldKey: string,
+  value: string | boolean | string[],
+  isChecked?: boolean
+) => string[] | boolean | null;
+
+// Field change handlers dictionary
+const fieldChangeHandlers: Record<FormFieldConfig["type"], FieldChangeHandler> =
+  {
+    "multi-select": (prev, fieldKey, value, isChecked) => {
+      const currentArray =
+        (prev[fieldKey as keyof DataUsageInformation] as string[]) || [];
+      const stringValue = value as string;
+      return isChecked
+        ? [...currentArray, stringValue]
+        : currentArray.filter((item) => item !== stringValue);
+    },
+
+    "single-select": (prev, fieldKey, value) => {
+      return value as string[];
+    },
+
+    "yes-no": (prev, fieldKey, value) => {
+      const currentBoolValue = prev[fieldKey as keyof DataUsageInformation] as
+        | boolean
+        | null;
+      const boolValue = value as boolean;
+      return currentBoolValue === boolValue ? null : boolValue;
+    },
+  };
 
 const DataUsageForm: React.FC<DataUsageFormProps> = ({
   isMobile,
   dataUsage,
   setDataUsage,
 }) => {
-  const handlePurposeChange = useCallback(
-    (purpose: string, checked: boolean) => {
-      (
-        setDataUsage as React.Dispatch<
-          React.SetStateAction<DataUsageInformation>
-        >
-      )((prev) => ({
-        ...prev,
-        purposes: checked
-          ? [...prev.purposes, purpose]
-          : prev.purposes.filter((p) => p !== purpose),
-      }));
-    },
-    [setDataUsage]
-  );
+  // Universal change handler that works for all field types
+  const handleFieldChange = useCallback(
+    (
+      fieldKey: string,
+      value: string | boolean | string[],
+      isChecked?: boolean
+    ) => {
+      const updatedDataUsage = (() => {
+        const field = FORM_CONFIG.fields.find((f) => f.key === fieldKey);
+        if (!field) return dataUsage;
 
-  const handleSectorChange = useCallback(
-    (sector: string, checked: boolean) => {
-      (
-        setDataUsage as React.Dispatch<
-          React.SetStateAction<DataUsageInformation>
-        >
-      )((prev) => ({
-        ...prev,
-        sectors: checked
-          ? [...prev.sectors, sector]
-          : prev.sectors.filter((s) => s !== sector),
-      }));
-    },
-    [setDataUsage]
-  );
+        const handler = fieldChangeHandlers[field.type];
+        const newValue = handler
+          ? handler(dataUsage, fieldKey, value, isChecked)
+          : value;
 
-  const handleContactChange = useCallback(
-    (value: boolean) => {
-      (
-        setDataUsage as React.Dispatch<
-          React.SetStateAction<DataUsageInformation>
-        >
-      )((prev) => ({
-        ...prev,
-        allow_contact: prev.allow_contact === value ? null : value,
-      }));
+        return {
+          ...dataUsage,
+          [fieldKey]: newValue,
+        } as DataUsageInformation;
+      })();
+
+      setDataUsage(updatedDataUsage);
     },
-    [setDataUsage]
+    [dataUsage, setDataUsage]
   );
 
   return (
-    <Box sx={{ mt: 3 }}>
-      <Typography variant="h6" sx={{ mb: 2, mt: 6 }}>
-        {FORM_CONFIG.title}
-      </Typography>
-
-      <FormControl component="fieldset" sx={{ ml: 2, mb: 2, width: "100%" }}>
-        <FormLabel
-          component="legend"
-          sx={{
-            fontSize: "0.875rem",
-            color: fontColor.gray.dark,
-            mb: 1,
-            fontWeight: 500,
-          }}
-        >
-          {FORM_CONFIG.purpose.title}
-        </FormLabel>
-        <FormGroup
-          sx={{
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            flexWrap: isMobile ? "nowrap" : "wrap",
-            gap: 1,
-            alignItems: "flex-start",
-          }}
-        >
-          {FORM_CONFIG.purpose.options.map((purpose) => (
-            <FormControlLabel
-              key={purpose}
-              control={
-                <Checkbox
-                  size="small"
-                  checked={dataUsage.purposes.includes(purpose)}
-                  onChange={(e) =>
-                    handlePurposeChange(purpose, e.target.checked)
-                  }
-                  sx={{
-                    padding: "4px 8px",
-                    "&.Mui-checked": {
-                      color: "#1976d2",
-                    },
-                  }}
-                />
-              }
-              label={
-                <Typography
-                  sx={{
-                    fontSize: isMobile ? "0.875rem" : "0.9rem",
-                    lineHeight: 1.4,
-                    color: fontColor.gray.dark,
-                    padding: 0,
-                  }}
-                >
-                  {purpose}
-                </Typography>
-              }
-              sx={{
-                margin: 0,
-                display: "flex",
-                alignItems: "center",
-                width: isMobile ? "100%" : "auto",
-                minWidth: isMobile ? "auto" : "fit-content",
-                "& .MuiFormControlLabel-label": {
-                  paddingLeft: "8px",
-                  flex: isMobile ? 1 : "none",
-                },
-              }}
-            />
-          ))}
-        </FormGroup>
-      </FormControl>
-
-      <FormControl component="fieldset" sx={{ ml: 2, mb: 2, width: "100%" }}>
-        <FormLabel
-          component="legend"
-          sx={{
-            fontSize: "0.875rem",
-            color: fontColor.gray.dark,
-            mb: 1,
-            fontWeight: 500,
-          }}
-        >
-          {FORM_CONFIG.sector.title}
-        </FormLabel>
-        <FormGroup
-          sx={{
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            flexWrap: isMobile ? "nowrap" : "wrap",
-            gap: 1,
-            alignItems: "flex-start",
-          }}
-        >
-          {FORM_CONFIG.sector.options.map((sector) => (
-            <FormControlLabel
-              key={sector}
-              control={
-                <Checkbox
-                  size="small"
-                  checked={dataUsage.sectors.includes(sector)}
-                  onChange={(e) => handleSectorChange(sector, e.target.checked)}
-                  sx={{
-                    padding: "4px 8px",
-                    "&.Mui-checked": {
-                      color: "#1976d2",
-                    },
-                  }}
-                />
-              }
-              label={
-                <Typography
-                  sx={{
-                    fontSize: isMobile ? "0.875rem" : "0.9rem",
-                    lineHeight: 1.4,
-                    color: fontColor.gray.dark,
-                    padding: 0,
-                  }}
-                >
-                  {sector}
-                </Typography>
-              }
-              sx={{
-                margin: 0,
-                display: "flex",
-                alignItems: "center",
-                width: isMobile ? "100%" : "auto",
-                minWidth: isMobile ? "auto" : "fit-content",
-                "& .MuiFormControlLabel-label": {
-                  paddingLeft: "8px",
-                  flex: isMobile ? 1 : "none",
-                },
-              }}
-            />
-          ))}
-        </FormGroup>
-      </FormControl>
-
-      <FormControl component="fieldset" sx={{ ml: 2, width: "100%" }}>
-        <FormLabel
-          component="legend"
-          sx={{
-            fontSize: "0.875rem",
-            color: fontColor.gray.dark,
-            mb: 1,
-            fontWeight: 500,
-            lineHeight: 1.4,
-          }}
-        >
-          {FORM_CONFIG.contact.title}
-        </FormLabel>
-        <FormGroup>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? 1 : 2,
-              alignItems: "flex-start",
-            }}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={dataUsage.allow_contact === true}
-                  onChange={() => handleContactChange(true)}
-                  sx={{
-                    padding: "4px 8px",
-                    "&.Mui-checked": {
-                      color: "#1976d2",
-                    },
-                  }}
-                />
-              }
-              label={
-                <Typography
-                  sx={{
-                    fontSize: isMobile ? "0.875rem" : "0.9rem",
-                    lineHeight: 1.4,
-                    color: fontColor.gray.dark,
-                    padding: 0,
-                  }}
-                >
-                  {FORM_CONFIG.contact.options[0]}
-                </Typography>
-              }
-              sx={{
-                margin: 0,
-                display: "flex",
-                alignItems: "center",
-                width: isMobile ? "100%" : "auto",
-                "& .MuiFormControlLabel-label": {
-                  paddingLeft: "8px",
-                  flex: isMobile ? 1 : "none",
-                },
-              }}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={dataUsage.allow_contact === false}
-                  onChange={() => handleContactChange(false)}
-                  sx={{
-                    padding: "4px 8px",
-                    "&.Mui-checked": {
-                      color: "#1976d2",
-                    },
-                  }}
-                />
-              }
-              label={
-                <Typography
-                  sx={{
-                    fontSize: isMobile ? "0.875rem" : "0.9rem",
-                    lineHeight: 1.4,
-                    color: fontColor.gray.dark,
-                    padding: 0,
-                  }}
-                >
-                  {FORM_CONFIG.contact.options[1]}
-                </Typography>
-              }
-              sx={{
-                margin: 0,
-                display: "flex",
-                alignItems: "center",
-                width: isMobile ? "100%" : "auto",
-                "& .MuiFormControlLabel-label": {
-                  paddingLeft: "8px",
-                  flex: isMobile ? 1 : "none",
-                },
-              }}
-            />
-          </Box>
-        </FormGroup>
-      </FormControl>
+    <Box sx={{ mt: "24px" }}>
+      <Typography variant="title1Medium">{FORM_CONFIG.title}</Typography>
+      <Box sx={{ mt: "16px" }}>
+        {FORM_CONFIG.fields.map((field) => (
+          <FieldRenderer
+            key={field.key}
+            field={field}
+            dataUsage={dataUsage}
+            onChange={handleFieldChange}
+            isMobile={isMobile}
+          />
+        ))}
+      </Box>
     </Box>
   );
 };

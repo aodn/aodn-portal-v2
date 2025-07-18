@@ -153,7 +153,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
         variant="body1Medium"
         sx={{
           color: rc8Theme.palette.error.main,
-          pl: "20px",
+          px: "20px",
         }}
       >
         {emailError}
@@ -162,7 +162,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
   };
 
   const DownloadInstructions = () => (
-    <Box sx={{ ml: "20px", my: "8px" }}>
+    <Box sx={{ mx: "20px", my: "8px" }}>
       <Typography variant="body2Regular">
         Processing dataset download may take some time. It is varied by the size
         of the dataset, the selected conditions, and the server load (may take
