@@ -190,7 +190,7 @@ const SearchPage = () => {
   );
 
   const doListSearch = useCallback(
-    async (needNavigate: boolean = false) => {
+    (needNavigate: boolean = false) => {
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -207,7 +207,9 @@ const SearchPage = () => {
       // The return implicit contains a AbortController due to use of signal in
       // axios call
       listSearchAbortRef.current = dispatch(fetchResultWithStore(paramPaged));
-      await doMapSearch(needNavigate);
+      doMapSearch(needNavigate).finally(
+        () => (mapSearchAbortRef.current = null)
+      );
     },
     [dispatch, doMapSearch]
   );
