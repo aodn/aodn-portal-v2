@@ -1,16 +1,9 @@
 import { Box, Typography } from "@mui/material";
-import {
-  fontSize,
-  fontFamily,
-  fontWeight,
-  fontColor,
-  lineHeight,
-} from "../../styles/constants";
 import { useCallback, useMemo } from "react";
 import CopyButton from "../../components/common/buttons/CopyButton";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
-import { ContentCopy } from "@mui/icons-material";
 import { ContentCopyIcon } from "../../assets/icons/download/content_copy";
+import rc8Theme from "../../styles/themeRC8";
 
 const LicenseContent = () => {
   const { checkIfCopied, copyToClipboard } = useDetailPageContext();
@@ -33,25 +26,20 @@ const LicenseContent = () => {
   }, [copyToClipboard, citationText]);
 
   const commonBodyStyles = {
-    color: fontColor.gray.dark,
-    fontFamily: fontFamily.openSans,
-    fontSize: fontSize.info,
-    lineHeight: lineHeight.body,
+    color: rc8Theme.palette.text2,
+    display: "block",
   };
 
   const headingStyles = {
-    color: fontColor.gray.extraDark,
-    fontFamily: fontFamily.openSans,
-    fontWeight: fontWeight.bold,
-    lineHeight: lineHeight.heading,
+    color: rc8Theme.palette.text1,
+    display: "block",
     mb: "12px",
   };
 
   return (
-    <>
+    <Box sx={{ mx: "20px" }}>
       <Typography
-        variant="h6"
-        gutterBottom
+        variant="title1Medium"
         sx={{
           ...headingStyles,
         }}
@@ -61,13 +49,7 @@ const LicenseContent = () => {
 
       <Box sx={{ display: "flex", alignItems: "flex-start" }}>
         <Box sx={{ mr: 2, flex: 1 }}>
-          <Typography
-            variant="body2"
-            sx={{
-              ...commonBodyStyles,
-              mb: 0.5,
-            }}
-          >
+          <Typography variant="body2Regular" sx={commonBodyStyles}>
             Creative Commons Attribution 4.0 International License
           </Typography>
           <Box
@@ -77,7 +59,7 @@ const LicenseContent = () => {
             rel="noopener noreferrer"
             sx={{
               ...commonBodyStyles,
-              color: fontColor.blue.medium, // Override the common color
+              color: rc8Theme.palette.primary1,
               textDecoration: "none",
               display: "block",
               "&:hover": {
@@ -93,15 +75,14 @@ const LicenseContent = () => {
           src="https://licensebuttons.net/l/by/4.0/88x31.png"
           alt="Creative Commons License"
           sx={{
-            width: "88px",
-            height: "31px",
-            flexShrink: 0,
+            width: "120px",
+            height: "42px",
           }}
         />
       </Box>
 
       <Typography
-        variant="h6"
+        variant="title1Medium"
         gutterBottom
         sx={{
           ...headingStyles,
@@ -112,10 +93,10 @@ const LicenseContent = () => {
       </Typography>
 
       <Typography
-        variant="body2"
+        variant="body2Regular"
         sx={{
           ...commonBodyStyles,
-          mb: 2,
+          mb: "24px",
         }}
       >
         Any users of IMOS data are required to clearly acknowledge the source of
@@ -127,23 +108,23 @@ const LicenseContent = () => {
         &apos;credit&apos; in the metadata record).
       </Typography>
 
-      <Typography variant="body2" sx={commonBodyStyles}>
+      <Typography variant="body2Regular" sx={commonBodyStyles}>
         If using data from the Ningaloo (TAN100) mooring, please add to the
         citation - &quot;Department of Jobs, Tourism, Science and Innovation
         (DJTSI), Western Australian Government&quot;.
       </Typography>
 
-      <Typography variant="body2" sx={commonBodyStyles}>
+      <Typography variant="body2Regular" sx={commonBodyStyles}>
         If using data from the Ocean Reference Station 65m (ORS065) mooring,
         please add to the citation - &quot;Sydney Water Corporation&quot;.
       </Typography>
 
-      <Typography variant="body2" sx={commonBodyStyles}>
+      <Typography variant="body2Regular" sx={commonBodyStyles}>
         Data, products and services from IMOS are provided &quot;as is&quot;
         without any warranty as to fitness for a particular purpose.
       </Typography>
 
-      <Typography variant="body2" sx={commonBodyStyles}>
+      <Typography variant="body2Regular" sx={commonBodyStyles}>
         By using this data you are accepting the license agreement and terms
         specified above. You accept all risks and responsibility for losses,
         damages, costs and other consequences resulting directly or indirectly
@@ -155,12 +136,12 @@ const LicenseContent = () => {
           display: "flex",
           alignItems: "center",
           gap: 1,
-          mt: "24px",
+          mt: "18px",
           mb: "12px",
         }}
       >
         <Typography
-          variant="h6"
+          variant="title1Medium"
           sx={{
             ...headingStyles,
             mb: 0,
@@ -174,7 +155,9 @@ const LicenseContent = () => {
           hasBeenCopied={isCopied}
           copyText={citationText}
           copyButtonConfig={{
-            iconBeforeCopy: <ContentCopyIcon />,
+            iconBeforeCopy: (
+              <ContentCopyIcon color={rc8Theme.palette.primary1} />
+            ),
             textBeforeCopy: "",
             textAfterCopy: "",
           }}
@@ -183,9 +166,9 @@ const LicenseContent = () => {
             "&:hover": {
               border: "none",
             },
-            width: "32px",
-            minWidth: "32px",
-            height: "32px",
+            width: "30px",
+            minWidth: "30px",
+            height: "30px",
             px: 0,
             display: "flex",
             alignItems: "center",
@@ -198,11 +181,14 @@ const LicenseContent = () => {
       </Box>
 
       <Box>
-        <Typography variant="body2" sx={commonBodyStyles}>
+        <Typography
+          variant="body2Regular"
+          sx={{ color: rc8Theme.palette.text1 }}
+        >
           {citationText}
         </Typography>
       </Box>
-    </>
+    </Box>
   );
 };
 

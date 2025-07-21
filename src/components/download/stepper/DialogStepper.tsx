@@ -1,4 +1,3 @@
-import { FC } from "react";
 import {
   Box,
   Step,
@@ -24,13 +23,13 @@ interface DialogStepperProps {
   testId?: string;
 }
 
-const DialogStepper: FC<DialogStepperProps> = ({
+const DialogStepper = ({
   steps,
   activeStep,
   onStepClick,
   sx = {},
   testId = "dialog-stepper",
-}) => {
+}: DialogStepperProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -54,7 +53,10 @@ const DialogStepper: FC<DialogStepperProps> = ({
 
   // Get background color for step icon
   const getIconBackgroundColor = (isActive: boolean, isCompleted: boolean) => {
-    if (isCompleted || isActive) {
+    if (isCompleted) {
+      return rc8Theme.palette.secondary1;
+    }
+    if (isActive) {
       return rc8Theme.palette.primary1;
     }
     return rc8Theme.palette.grey300;
@@ -100,7 +102,7 @@ const DialogStepper: FC<DialogStepperProps> = ({
         }}
       >
         {isCompleted ? (
-          <CheckIcon sx={{ fontSize: 14, color: "white" }} />
+          <CheckIcon sx={{ fontSize: 22, color: "white" }} />
         ) : (
           step.number
         )}
