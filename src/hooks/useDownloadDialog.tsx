@@ -1,4 +1,11 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  FormEvent,
+} from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch } from "../components/common/store/hooks";
 import { DataUsageInformation } from "../components/download/DataUsageForm";
@@ -313,11 +320,11 @@ export const useDownloadDialog = (
 
   // Handle form submission (step 2)
   const handleFormSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
+    (event: FormEvent) => {
       event.preventDefault();
 
       setIsProcessing(true);
-      const formData = new FormData(event.currentTarget);
+      const formData = new FormData(event.currentTarget as HTMLFormElement);
       const formJson = Object.fromEntries((formData as any).entries());
       const emailFromForm = formJson.email;
 
@@ -347,7 +354,7 @@ export const useDownloadDialog = (
 
     setIsProcessing(true);
     submitJob(emailToSubmit);
-  }, [activeStep, email, handleStepChange, submitJob, uuid, isEmailValid]);
+  }, [activeStep, email, handleStepChange, submitJob, isEmailValid]);
 
   // ================== UI HELPERS ==================
   // Get processing status message for display
