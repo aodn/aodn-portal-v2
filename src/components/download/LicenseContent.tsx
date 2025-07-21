@@ -47,8 +47,20 @@ const LicenseContent = () => {
         Licence
       </Typography>
 
-      <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-        <Box sx={{ mr: 2, flex: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "flex-start",
+          flexDirection: { xs: "column", sm: "row" },
+          gap: { xs: 2, sm: 0 },
+        }}
+      >
+        <Box
+          sx={{
+            mr: { xs: 0, sm: 2 },
+            flex: 1,
+          }}
+        >
           <Typography variant="body2Regular" sx={commonBodyStyles}>
             Creative Commons Attribution 4.0 International License
           </Typography>
@@ -77,6 +89,7 @@ const LicenseContent = () => {
           sx={{
             width: "120px",
             height: "42px",
+            alignSelf: { xs: "flex-start", sm: "auto" },
           }}
         />
       </Box>
@@ -86,7 +99,7 @@ const LicenseContent = () => {
         gutterBottom
         sx={{
           ...headingStyles,
-          mt: "24px",
+          mt: "20px",
         }}
       >
         Usage Constraints
@@ -96,7 +109,7 @@ const LicenseContent = () => {
         variant="body2Regular"
         sx={{
           ...commonBodyStyles,
-          mb: "24px",
+          mb: "22px",
         }}
       >
         Any users of IMOS data are required to clearly acknowledge the source of
@@ -136,7 +149,7 @@ const LicenseContent = () => {
           display: "flex",
           alignItems: "center",
           gap: 1,
-          mt: "18px",
+          mt: "20px",
           mb: "12px",
         }}
       >
