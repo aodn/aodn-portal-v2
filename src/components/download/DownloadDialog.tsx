@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Dialog,
@@ -32,26 +31,7 @@ const steps: Step[] = [
   { number: 2, label: "Usage limitation and licenses" },
 ];
 
-const LicenseStep: React.FC<{
-  email: string;
-  emailInputRef: React.RefObject<HTMLInputElement>;
-}> = ({ email, emailInputRef }) => {
-  return (
-    <Box sx={{ flex: 1 }}>
-      <input
-        type="hidden"
-        name="email"
-        value={email || emailInputRef.current?.value || ""}
-      />
-      <LicenseContent />
-    </Box>
-  );
-};
-
-const DownloadDialog: React.FC<DownloadDialogProps> = ({
-  isOpen,
-  setIsOpen,
-}) => {
+const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -141,7 +121,14 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
 
     return (
       <Box sx={{ flex: 1 }}>
-        <LicenseStep email={email} emailInputRef={emailInputRef} />
+        <Box sx={{ flex: 1 }}>
+          <input
+            type="hidden"
+            name="email"
+            value={email || emailInputRef.current?.value || ""}
+          />
+          <LicenseContent />
+        </Box>
       </Box>
     );
   };

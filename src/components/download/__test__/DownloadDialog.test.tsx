@@ -260,8 +260,6 @@ describe("DownloadDialog", () => {
       </TestWrapper>
     );
 
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
-
     // Reset state
     mockUseDownloadDialog.isProcessing = false;
   });

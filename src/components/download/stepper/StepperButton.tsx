@@ -28,14 +28,14 @@ const COMMON_BUTTON_STYLES = {
   borderRadius: "4px",
 } as const;
 
-const StepperButton: FC<StepperButtonProps> = ({
+const StepperButton = ({
   id,
   title,
   onClick,
   disabled = false,
   status = "default",
   statusText,
-}) => {
+}: StepperButtonProps) => {
   const createStatusIcons = () => ({
     loadingSpinner: () => (
       <CircularProgress size={20} sx={{ color: rc8Theme.palette.secondary1 }} />
