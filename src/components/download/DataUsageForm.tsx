@@ -49,14 +49,6 @@ const FORM_CONFIG = {
       options: ["Yes", "No"],
       required: false,
     },
-    // Add new fields here and they'll automatically appear
-    // {
-    //   key: "experience_level",
-    //   title: "d. What is your experience level with oceanographic data?",
-    //   type: "single-select",
-    //   options: ["Beginner", "Intermediate", "Advanced", "Expert"],
-    //   required: true,
-    // },
   ] as FormFieldConfig[],
 };
 
@@ -65,8 +57,6 @@ export interface DataUsageInformation {
   purposes: string[];
   sectors: string[];
   allow_contact: boolean | null;
-  // Add new fields here as needed
-  // experience_level?: string[];
 }
 
 interface DataUsageFormProps {
@@ -87,7 +77,7 @@ const commonStyles = {
     mb: "8px",
   },
   checkbox: {
-    padding: "4px 14px",
+    padding: "4px 10px",
   },
   labelText: {
     ...rc8Theme.typography.body2Regular,
@@ -114,21 +104,18 @@ const commonStyles = {
   }),
 };
 
-// Type-safe field renderer function signature
-type FieldRenderer = (
-  field: FormFieldConfig,
-  dataUsage: DataUsageInformation,
-  onChange: (
-    fieldKey: string,
-    value: string | boolean | string[],
-    isChecked?: boolean
-  ) => void,
-  isMobile: boolean
-) => React.ReactNode[];
-
 // Field type renderers dictionary
-const fieldRenderers: Record<FormFieldConfig["type"], FieldRenderer> = {
-  "multi-select": (field, dataUsage, onChange, isMobile) => {
+const fieldRenderers = {
+  "multi-select": (
+    field: FormFieldConfig,
+    dataUsage: DataUsageInformation,
+    onChange: (
+      fieldKey: string,
+      value: string | boolean | string[],
+      isChecked?: boolean
+    ) => void,
+    isMobile: boolean
+  ) => {
     const multiSelectValues =
       (dataUsage[field.key as keyof DataUsageInformation] as string[]) || [];
     return field.options.map((option) => (
@@ -148,7 +135,16 @@ const fieldRenderers: Record<FormFieldConfig["type"], FieldRenderer> = {
     ));
   },
 
-  "single-select": (field, dataUsage, onChange, isMobile) => {
+  "single-select": (
+    field: FormFieldConfig,
+    dataUsage: DataUsageInformation,
+    onChange: (
+      fieldKey: string,
+      value: string | boolean | string[],
+      isChecked?: boolean
+    ) => void,
+    isMobile: boolean
+  ) => {
     const singleSelectValue = dataUsage[
       field.key as keyof DataUsageInformation
     ] as string[];
@@ -172,7 +168,16 @@ const fieldRenderers: Record<FormFieldConfig["type"], FieldRenderer> = {
     ));
   },
 
-  "yes-no": (field, dataUsage, onChange, isMobile) => {
+  "yes-no": (
+    field: FormFieldConfig,
+    dataUsage: DataUsageInformation,
+    onChange: (
+      fieldKey: string,
+      value: string | boolean | string[],
+      isChecked?: boolean
+    ) => void,
+    isMobile: boolean
+  ) => {
     const yesNoValue = dataUsage[field.key as keyof DataUsageInformation] as
       | boolean
       | null;
@@ -197,8 +202,7 @@ const fieldRenderers: Record<FormFieldConfig["type"], FieldRenderer> = {
   },
 };
 
-// Generic field renderer
-const FieldRenderer: React.FC<{
+interface FieldRendererProps {
   field: FormFieldConfig;
   dataUsage: DataUsageInformation;
   onChange: (
@@ -207,10 +211,18 @@ const FieldRenderer: React.FC<{
     isChecked?: boolean
   ) => void;
   isMobile: boolean;
-}> = ({ field, dataUsage, onChange, isMobile }) => {
-  const renderOptions = () => {
+}
+
+// Generic field renderer component with proper typing
+function FieldRendererComponent({
+  field,
+  dataUsage,
+  onChange,
+  isMobile,
+}: FieldRendererProps): React.JSX.Element {
+  const renderOptions = (): React.ReactNode[] => {
     const renderer = fieldRenderers[field.type];
-    return renderer ? renderer(field, dataUsage, onChange, isMobile) : null;
+    return renderer ? renderer(field, dataUsage, onChange, isMobile) : [];
   };
 
   return (
@@ -224,46 +236,50 @@ const FieldRenderer: React.FC<{
       </FormGroup>
     </FormControl>
   );
-};
-
-// Type-safe field change handler function signature
-type FieldChangeHandler = (
-  prev: DataUsageInformation,
-  fieldKey: string,
-  value: string | boolean | string[],
-  isChecked?: boolean
-) => string[] | boolean | null;
+}
 
 // Field change handlers dictionary
-const fieldChangeHandlers: Record<FormFieldConfig["type"], FieldChangeHandler> =
-  {
-    "multi-select": (prev, fieldKey, value, isChecked) => {
-      const currentArray =
-        (prev[fieldKey as keyof DataUsageInformation] as string[]) || [];
-      const stringValue = value as string;
-      return isChecked
-        ? [...currentArray, stringValue]
-        : currentArray.filter((item) => item !== stringValue);
-    },
+const fieldChangeHandlers = {
+  "multi-select": (
+    prev: DataUsageInformation,
+    fieldKey: string,
+    value: string | boolean | string[],
+    isChecked?: boolean
+  ) => {
+    const currentArray =
+      (prev[fieldKey as keyof DataUsageInformation] as string[]) || [];
+    const stringValue = value as string;
+    return isChecked
+      ? [...currentArray, stringValue]
+      : currentArray.filter((item) => item !== stringValue);
+  },
 
-    "single-select": (prev, fieldKey, value) => {
-      return value as string[];
-    },
+  "single-select": (
+    prev: DataUsageInformation,
+    fieldKey: string,
+    value: string | boolean | string[]
+  ) => {
+    return value as string[];
+  },
 
-    "yes-no": (prev, fieldKey, value) => {
-      const currentBoolValue = prev[fieldKey as keyof DataUsageInformation] as
-        | boolean
-        | null;
-      const boolValue = value as boolean;
-      return currentBoolValue === boolValue ? null : boolValue;
-    },
-  };
+  "yes-no": (
+    prev: DataUsageInformation,
+    fieldKey: string,
+    value: string | boolean | string[]
+  ) => {
+    const currentBoolValue = prev[fieldKey as keyof DataUsageInformation] as
+      | boolean
+      | null;
+    const boolValue = value as boolean;
+    return currentBoolValue === boolValue ? null : boolValue;
+  },
+};
 
-const DataUsageForm: React.FC<DataUsageFormProps> = ({
+function DataUsageForm({
   isMobile,
   dataUsage,
   setDataUsage,
-}) => {
+}: DataUsageFormProps): React.JSX.Element {
   // Universal change handler that works for all field types
   const handleFieldChange = useCallback(
     (
@@ -296,7 +312,7 @@ const DataUsageForm: React.FC<DataUsageFormProps> = ({
       <Typography variant="title1Medium">{FORM_CONFIG.title}</Typography>
       <Box sx={{ mt: "16px" }}>
         {FORM_CONFIG.fields.map((field) => (
-          <FieldRenderer
+          <FieldRendererComponent
             key={field.key}
             field={field}
             dataUsage={dataUsage}
@@ -307,6 +323,6 @@ const DataUsageForm: React.FC<DataUsageFormProps> = ({
       </Box>
     </Box>
   );
-};
+}
 
 export default DataUsageForm;
