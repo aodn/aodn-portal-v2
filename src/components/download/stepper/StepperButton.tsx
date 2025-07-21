@@ -1,9 +1,8 @@
-import { FC } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
-import { Cancel as CancelIcon } from "@mui/icons-material";
 import rc8Theme from "../../../styles/themeRC8";
 import { SuccessIcon } from "../../../assets/icons/download/success";
+import { CancelIcon } from "../../../assets/icons/download/cancel";
 
 type ButtonStatus = "default" | "loading" | "completed" | "error";
 
@@ -43,11 +42,7 @@ const StepperButton = ({
 
     successCheckmark: () => <SuccessIcon />,
 
-    errorCross: () => (
-      <CancelIcon
-        sx={{ color: rc8Theme.palette.error.main, fontSize: "20px" }}
-      />
-    ),
+    errorCross: () => <CancelIcon color={rc8Theme.palette.error.main} />,
 
     nextArrow: (shouldBeDisabled: boolean) => (
       <DoubleArrowIcon
