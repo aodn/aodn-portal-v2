@@ -77,10 +77,10 @@ const applyGeoWebCacheIfPossible = (baseUrl: string, param: TileUrlParams) => {
   if (baseUrl.includes("geoserver-123.aodn.org.au/geoserver/wms")) {
     // We can rewrite value so that it use internal cache server
     return {
-      baseUrl: "https://tilecache.aodn.org.au/geowebcache/service/wms",
+      baseUrl: "/geowebcache/service/wms",
       params: {
         ...param,
-        SRS: "EPSG:900913", // This is same as "EPSG:3857", but tile server use a old name
+        SRS: "EPSG:900913", // This is same as "EPSG:3857", but tile server use a old name, mapbox must use 3857
         //BBOX: "{bbox-epsg-900913}",
       },
     };

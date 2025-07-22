@@ -56,6 +56,10 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
+        "/geowebcache/service/wms": {
+          target: "https://tilecache.aodn.org.au/geowebcache/service/wms",
+          changeOrigin: true,
+        },
       },
     },
     plugins: [
