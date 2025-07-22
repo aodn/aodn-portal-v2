@@ -79,153 +79,163 @@
     "themes": [
       {
         "scheme": "theme",
-        "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
-        "title": "GCMD Keywords",
         "concepts": [
           {
             "id": "Earth Science | Oceans | Ocean Pressure | Water Pressure",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/dd025312-0d27-44e0-ae05-7cfcc1aa17f0"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/dd025312-0d27-44e0-ae05-7cfcc1aa17f0",
+            "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+            "title": "GCMD Keywords"
           },
           {
             "id": "Earth Science | Oceans | Ocean Temperature | Water Temperature",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/46206e8c-8def-406f-9e62-da4e74633a58"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/46206e8c-8def-406f-9e62-da4e74633a58",
+            "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+            "title": "GCMD Keywords"
           },
           {
             "id": "Earth Science | Oceans | Salinity/Density | Salinity",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/7e95b5fc-1d58-431a-af36-948b29fa870d"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/7e95b5fc-1d58-431a-af36-948b29fa870d",
+            "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+            "title": "GCMD Keywords"
           }
         ]
       },
       {
         "scheme": "equipment",
-        "description": "",
-        "title": "CSIRO Equipment",
         "concepts": [
           {
             "id": "CTDs (Conductivity-Temperature-Depth Profilers)",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:33"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:33",
+            "description": "",
+            "title": "CSIRO Equipment"
           }
         ]
       },
       {
         "scheme": "place",
-        "description": "AODN GEN",
-        "title": "AODN Geographic Extent Names",
         "concepts": [
           {
             "id": "Global / Oceans | East Indian Ocean",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1020"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1020",
+            "description": "AODN GEN",
+            "title": "AODN Geographic Extent Names"
           }
         ]
       },
       {
         "scheme": "discipline",
-        "description": "Marlin Areas of Interest Thesaurus",
-        "title": "CSIRO Areas Of Interest",
         "concepts": [
           {
             "id": "Marine National Facility",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:cmarAOI&id=urn:marlin.csiro.au:keywords:cmarAOI:concept:3208"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:cmarAOI&id=urn:marlin.csiro.au:keywords:cmarAOI:concept:3208",
+            "description": "Marlin Areas of Interest Thesaurus",
+            "title": "CSIRO Areas Of Interest"
           }
         ]
       },
       {
         "scheme": "survey",
-        "description": "MarLIN Survey Register",
-        "title": "CSIRO Survey List",
         "concepts": [
           {
             "id": "Research Voyage: FR 08/95",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:109"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:109",
+            "description": "MarLIN Survey Register",
+            "title": "CSIRO Survey List"
           }
         ]
       },
       {
         "scheme": "project",
-        "description": "MarLIN Project Register",
-        "title": "CSIRO Project List",
         "concepts": [
           {
             "id": "Climate Change 1989-1997",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:1533"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:1533",
+            "description": "MarLIN Project Register",
+            "title": "CSIRO Project List"
           }
         ]
       },
       {
         "scheme": "project",
-        "description": "MarLIN Global Project Codes Register",
-        "title": "CSIRO Global Project List",
         "concepts": [
           {
             "id": "World Ocean Circulation Experiment",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:globalprojectregister&id=urn:marlin.csiro.au:globalprojectregister:concept:9"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:globalprojectregister&id=urn:marlin.csiro.au:globalprojectregister:concept:9",
+            "description": "MarLIN Global Project Codes Register",
+            "title": "CSIRO Global Project List"
           }
         ]
       },
       {
         "scheme": "discipline",
-        "description": "MarLIN Standard Datatypes Thesaurus",
-        "title": "CSIRO Standard Data Types",
         "concepts": [
           {
             "id": "Vessel Data: CTD",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:standardDataType&id=urn:marlin.csiro.au:keywords:standardDataType:concept:3511"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:standardDataType&id=urn:marlin.csiro.au:keywords:standardDataType:concept:3511",
+            "description": "MarLIN Standard Datatypes Thesaurus",
+            "title": "CSIRO Standard Data Types"
           }
         ]
       },
       {
         "scheme": "dataSource",
-        "description": "MarLIN Source Register",
-        "title": "CSIRO Source List",
         "concepts": [
           {
             "id": "Ship: Franklin",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:5"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:5",
+            "description": "MarLIN Source Register",
+            "title": "CSIRO Source List"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords (DataParameter)",
         "concepts": [
           {
             "id": "Practical salinity of the water body",
-            "url": "http://vocab.nerc.ac.uk/collection/P01/current/PSLTZZ01"
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/PSLTZZ01",
+            "description": "",
+            "title": "Keywords (DataParameter)"
           },
           {
             "id": "Temperature of the water body",
-            "url": "http://vocab.nerc.ac.uk/collection/P01/current/TEMPPR01"
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/TEMPPR01",
+            "description": "",
+            "title": "Keywords (DataParameter)"
           },
           {
             "id": "Pressure (measured variable) in the water body exerted by overlying sea water and any medium above it",
-            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/565"
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/565",
+            "description": "",
+            "title": "Keywords (DataParameter)"
           },
           {
             "id": "Pressure (measured variable) in the water body exerted by overlying sea water only",
-            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/566"
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/566",
+            "description": "",
+            "title": "Keywords (DataParameter)"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords (Instrument)",
         "concepts": [
           {
             "id": "CTD",
-            "url": "http://vocab.nerc.ac.uk/collection/L05/current/130"
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/130",
+            "description": "",
+            "title": "Keywords (Instrument)"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords (Platform)",
         "concepts": [
           {
             "id": "research vessel",
-            "url": "http://vocab.nerc.ac.uk/collection/L06/current/31"
+            "url": "http://vocab.nerc.ac.uk/collection/L06/current/31",
+            "description": "",
+            "title": "Keywords (Platform)"
           }
         ]
       }

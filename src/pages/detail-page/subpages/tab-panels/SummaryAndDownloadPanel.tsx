@@ -14,7 +14,7 @@ import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/M
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
-import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
+import { LngLatBounds, MapEvent } from "mapbox-gl";
 import BaseMapSwitcher, {
   BaseMapSwitcherLayer,
 } from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
@@ -103,13 +103,13 @@ const getMinMaxDateStamps = (
 // As WMSServer may be an array if there are multiple wms links, for now we only use the first one.
 // TODO: This should be improved to handle multiple WMS layers and servers if needed.
 const getWMSServer = (collection: OGCCollection | undefined) => {
-  const DataAccessLinks = collection?.getDataAccessLinks();
-  if (!DataAccessLinks || DataAccessLinks.length === 0) {
+  const dataAccessLinks = collection?.getDataAccessLinks();
+  if (!dataAccessLinks || dataAccessLinks.length === 0) {
     return [];
   }
-  return DataAccessLinks.filter((link) => link.rel === "wms" && link.href).map(
-    (link) => link.href
-  );
+  return dataAccessLinks
+    .filter((link) => link.rel === "wms" && link.href)
+    .map((link) => link.href);
 };
 
 const getWMSLayerNames = (collection: OGCCollection | undefined) => {
@@ -232,13 +232,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     };
   }, [downloadConditions, featureCollection]);
 
-  const handleMapChange = useCallback(
-    (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
-      // implement later
-      console.log("Map change event", event);
-    },
-    []
-  );
+  const handleMapChange = useCallback((event: MapEvent | undefined) => {
+    // implement later
+    console.log("Map change event", event);
+  }, []);
 
   const handleGeoLayerChange = useCallback(
     (id: LayerName) =>

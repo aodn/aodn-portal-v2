@@ -8,7 +8,11 @@ import {
 } from "react";
 import MapContext from "../MapContext";
 
-import { Expression, GeoJSONSource, StyleFunction } from "mapbox-gl";
+import {
+  ExpressionSpecification,
+  GeoJSONSource,
+  PropertyValueSpecification,
+} from "mapbox-gl";
 import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
@@ -27,14 +31,14 @@ import CardPopup from "../component/CardPopup";
 
 interface IHeatmapLayer {
   maxZoom: number;
-  weight: number | StyleFunction | Expression;
-  color: string | StyleFunction | Expression;
-  radius: number | StyleFunction | Expression;
+  weight: number | PropertyValueSpecification<number> | ExpressionSpecification;
+  color: ExpressionSpecification;
+  radius: number | PropertyValueSpecification<number> | ExpressionSpecification;
 }
 
 interface HeatmapCircle {
-  radius: number | StyleFunction | Expression;
-  color: string | StyleFunction | Expression;
+  radius: number | PropertyValueSpecification<number> | ExpressionSpecification;
+  color: string;
   strokeColor: string;
   strokeWidth: number;
 }
@@ -85,13 +89,13 @@ const defaultHeatmapConfig: HeatmapConfig = {
       "#ffba78",
       1,
       "#ffa86b",
-    ],
+    ] as ExpressionSpecification,
     radius: {
       stops: [
         [11, 15],
         [15, 20],
       ],
-    },
+    } as PropertyValueSpecification<number>,
   },
 };
 
@@ -195,7 +199,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
                 [config.layer.maxZoom - 4, 1],
                 [config.layer.maxZoom, 3],
               ],
-            } as StyleFunction,
+            } as PropertyValueSpecification<number>,
             // assign color values be applied to points depending on their density
             "heatmap-color": config.layer.color,
             // increase radius as zoom increases
@@ -207,7 +211,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
                 [config.layer.maxZoom - 1, 1],
                 [config.layer.maxZoom, 0],
               ],
-            } as StyleFunction,
+            } as unknown as PropertyValueSpecification<number>,
           },
         });
       }

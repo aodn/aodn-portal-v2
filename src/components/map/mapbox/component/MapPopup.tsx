@@ -8,7 +8,7 @@ import React, {
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
 import { Box, Card, CardContent, CircularProgress } from "@mui/material";
-import { MapboxEvent, MapLayerMouseEvent, Popup } from "mapbox-gl";
+import { MapEvent, MapMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Feature, Point } from "geojson";
 import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
@@ -124,20 +124,23 @@ const MapPopup: React.FC<MapPopupProps> = memo(
       const container = document.createElement("div");
       const root = createRoot(container);
 
-      const onPointMouseLeave = (event: MapLayerMouseEvent) => {
-        const rect = popup.getElement().getBoundingClientRect();
-        // Use event.originalEvent.clientX / clientY for screen coordinates
-        const mouseX = event.originalEvent.clientX;
-        const mouseY = event.originalEvent.clientY;
-        if (
-          mouseX >= rect.left &&
-          mouseX <= rect.right &&
-          mouseY >= rect.top &&
-          mouseY <= rect.bottom
-        ) {
-          // Inside the popup, do nothing
-        } else {
-          popup.remove();
+      const onPointMouseLeave = (event: MapMouseEvent) => {
+        const element = popup.getElement();
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          // Use event.originalEvent.clientX / clientY for screen coordinates
+          const mouseX = event.originalEvent.clientX;
+          const mouseY = event.originalEvent.clientY;
+          if (
+            mouseX >= rect.left &&
+            mouseX <= rect.right &&
+            mouseY >= rect.top &&
+            mouseY <= rect.bottom
+          ) {
+            // Inside the popup, do nothing
+          } else {
+            popup.remove();
+          }
         }
       };
 
@@ -146,7 +149,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
         popup.remove();
       };
 
-      const onPointMouseEnter = (ev: MapLayerMouseEvent) => {
+      const onPointMouseEnter = (ev: MapMouseEvent) => {
         if (!ev.target || !map) return;
 
         ev.target.getCanvas().style.cursor = "pointer";
@@ -187,9 +190,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
         }
       };
 
-      const onMapMoveEndOrClick = (
-        _: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-      ) => {
+      const onMapMoveEndOrClick = (_: MapEvent | undefined) => {
         popup.remove();
       };
 

@@ -1,5 +1,5 @@
 import React, { memo, useState } from "react";
-import { MapboxEvent as MapEvent } from "mapbox-gl";
+import { MapEvent } from "mapbox-gl";
 import { Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
@@ -43,9 +43,7 @@ interface MapSectionProps
   showFullList: boolean;
   collections: OGCCollection[];
   sx?: SxProps<Theme>;
-  onMapZoomOrMove: (
-    event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-  ) => void;
+  onMapZoomOrMove: (event: MapEvent | undefined) => void;
   isLoading: boolean;
 }
 

@@ -1,13 +1,10 @@
-import { FC } from "react";
-import { Button, useTheme } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
-import {
-  color,
-  fontSize,
-  fontFamily,
-  fontWeight,
-  gap,
-} from "../../../styles/constants";
+import rc8Theme from "../../../styles/themeRC8";
+import { SuccessIcon } from "../../../assets/icons/download/success";
+import { CancelIcon } from "../../../assets/icons/download/cancel";
+
+type ButtonStatus = "default" | "loading" | "completed" | "error";
 
 interface StepperButtonProps {
   id?: string;
@@ -15,65 +12,133 @@ interface StepperButtonProps {
   onClick: () => void;
   disabled?: boolean;
   fullWidth?: boolean;
+  status?: ButtonStatus;
+  statusText?: string;
 }
 
-const StepperButton: FC<StepperButtonProps> = ({
+// Base button styles shared across all states
+const COMMON_BUTTON_STYLES = {
+  ...rc8Theme.typography.title1Medium,
+  color: rc8Theme.palette.text1,
+  height: "40px",
+  gap: "10px",
+  px: "46px",
+  mx: "10px",
+  borderRadius: "4px",
+} as const;
+
+const StepperButton = ({
   id,
   title,
   onClick,
   disabled = false,
-  fullWidth = false,
-}) => {
-  const theme = useTheme();
+  status = "default",
+  statusText,
+}: StepperButtonProps) => {
+  const createStatusIcons = () => ({
+    loadingSpinner: () => (
+      <CircularProgress size={20} sx={{ color: rc8Theme.palette.secondary1 }} />
+    ),
+
+    successCheckmark: () => <SuccessIcon />,
+
+    errorCross: () => <CancelIcon color={rc8Theme.palette.error.main} />,
+
+    nextArrow: (shouldBeDisabled: boolean) => (
+      <DoubleArrowIcon
+        sx={{
+          color: shouldBeDisabled
+            ? rc8Theme.palette.grey500
+            : rc8Theme.palette.secondary1,
+          width: "23px",
+          height: "23px",
+        }}
+      />
+    ),
+  });
+
+  const createDefaultStateStyles = () => {
+    const isCurrentlyDisabled = disabled;
+
+    return {
+      color: rc8Theme.palette.text1,
+      border: isCurrentlyDisabled
+        ? `1px solid ${rc8Theme.palette.grey500}`
+        : `1px solid ${rc8Theme.palette.secondary1}`,
+      "&:hover": {
+        border: isCurrentlyDisabled
+          ? `1px solid ${rc8Theme.palette.grey500}`
+          : `2px solid ${rc8Theme.palette.secondary1}`,
+      },
+      "&:disabled": {
+        border: `1px solid ${rc8Theme.palette.grey500}`,
+        color: rc8Theme.palette.text1,
+      },
+    };
+  };
+
+  const createNonDefaultStateStyles = () => ({
+    color: rc8Theme.palette.text1,
+    border: `1px solid ${rc8Theme.palette.grey500}`,
+    "&:hover": {
+      border: `1px solid ${rc8Theme.palette.grey500}`,
+    },
+    "&:disabled": {
+      border: `1px solid ${rc8Theme.palette.grey500}`,
+      color: rc8Theme.palette.text1,
+    },
+  });
+
+  // Maps each status to its complete UI configuration
+  const STATUS_TO_UI_CONFIG = {
+    loading: {
+      startIcon: createStatusIcons().loadingSpinner(),
+      endIcon: null,
+      styles: createNonDefaultStateStyles(),
+      shouldDisableButton: true,
+    },
+
+    completed: {
+      startIcon: createStatusIcons().successCheckmark(),
+      endIcon: null,
+      styles: createNonDefaultStateStyles(),
+      shouldDisableButton: true,
+    },
+
+    error: {
+      startIcon: createStatusIcons().errorCross(),
+      endIcon: null,
+      styles: createNonDefaultStateStyles(),
+      shouldDisableButton: false,
+    },
+
+    default: {
+      startIcon: null,
+      endIcon: createStatusIcons().nextArrow(disabled),
+      styles: createDefaultStateStyles(),
+      shouldDisableButton: disabled,
+    },
+  } as const;
+
+  const { startIcon, endIcon, styles, shouldDisableButton } =
+    STATUS_TO_UI_CONFIG[status];
+
+  const displayText = statusText || title;
 
   return (
     <Button
       id={id}
       data-testid={id}
-      disabled={disabled}
-      endIcon={
-        <DoubleArrowIcon
-          sx={{
-            color: theme.palette.primary.light,
-            width: "23px",
-            height: "23px",
-          }}
-        />
-      }
+      disabled={shouldDisableButton}
+      startIcon={startIcon}
+      endIcon={endIcon}
       sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "40px",
-        width: fullWidth ? "100%" : "auto",
-        gap: gap.lg,
-        px: "32px",
-        mx: gap.xlg,
-        border: `1px solid ${theme.palette.primary.light}`,
-        backgroundColor: theme.palette.common.white,
-        color: color.gray.dark,
-        "&:hover": {
-          border: `2px solid ${theme.palette.primary.light}`,
-          bgcolor: color.white.sixTenTransparent,
-        },
-        "&:disabled": {
-          backgroundColor: theme.palette.action.disabledBackground,
-          color: theme.palette.action.disabled,
-          border: `2px solid ${theme.palette.action.disabled}`,
-          opacity: 0.6,
-        },
-        borderRadius: theme.borderRadius?.sm || "5px",
-        textAlign: "center",
-        textTransform: "none",
-        fontWeight: fontWeight.regular,
-        fontSize: fontSize.slideCardTitle,
-        fontFamily: fontFamily.openSans,
-        lineHeight: "22px",
-        transition: "all 0.2s ease-in-out",
+        ...COMMON_BUTTON_STYLES,
+        ...styles,
       }}
       onClick={onClick}
     >
-      {title}
+      {displayText}
     </Button>
   );
 };

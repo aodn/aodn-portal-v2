@@ -12,7 +12,6 @@ import {
   RootState,
   getSearchQueryResult,
 } from "../../../components/common/store/store";
-import CircleLoader from "../../../components/loading/CircleLoader";
 import BookmarkListButton, {
   BookmarkListButtonBasicType,
 } from "../../../components/result/BookmarkListButton";
@@ -26,7 +25,7 @@ interface ResultSectionProps
     BookmarkListButtonBasicType {
   showFullMap: boolean;
   showFullList: boolean;
-  isLoading: boolean;
+  cancelLoading: () => void;
   sx?: SxProps;
 }
 
@@ -34,14 +33,14 @@ const ResultSection: FC<ResultSectionProps> = ({
   showFullList,
   showFullMap,
   currentLayout,
-  onChangeLayout,
   currentSort,
-  onChangeSorting,
-  onClickCard,
   selectedUuids,
-  onDeselectDataset,
-  isLoading,
+  cancelLoading,
   sx,
+  onChangeSorting,
+  onChangeLayout,
+  onClickCard,
+  onDeselectDataset,
 }) => {
   const { isUnderLaptop } = useBreakpoint();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
@@ -67,7 +66,6 @@ const ResultSection: FC<ResultSectionProps> = ({
       gap={1}
       data-testid="search-page-result-list"
     >
-      <CircleLoader isLoading={isLoading} />
       <Box
         sx={{
           display: "flex",
@@ -96,6 +94,9 @@ const ResultSection: FC<ResultSectionProps> = ({
           layout={currentLayout}
           contents={reduxContents}
           onClickCard={onClickCard}
+          onClickDetail={cancelLoading}
+          onClickLinks={cancelLoading}
+          onClickDownload={cancelLoading}
           selectedUuids={selectedUuids}
         />
       </Box>

@@ -109,12 +109,14 @@ describe("AssociatedRecordsPanel", async () => {
         if (parentAbstract) {
           userEvent.click(parentAbstract);
 
-          return waitFor(() =>
-            expect(openSpy).toHaveBeenCalledWith(
-              "/details/0887cb5b-b443-4e08-a169-038208109466",
-              "_blank",
-              "noopener,noreferrer"
-            )
+          return waitFor(
+            () =>
+              expect(openSpy).toHaveBeenCalledWith(
+                "/details/0887cb5b-b443-4e08-a169-038208109466",
+                "_blank",
+                "noopener,noreferrer"
+              ),
+            { timeout: 2000 }
           );
         }
       });

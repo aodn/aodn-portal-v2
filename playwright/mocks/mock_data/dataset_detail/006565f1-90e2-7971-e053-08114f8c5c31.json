@@ -67,80 +67,92 @@
     "themes": [
       {
         "scheme": "theme",
-        "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
-        "title": "GCMD Keywords",
         "concepts": [
           {
             "id": "Earth Science | Oceans | Ocean Pressure | Water Pressure",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/dd025312-0d27-44e0-ae05-7cfcc1aa17f0"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/dd025312-0d27-44e0-ae05-7cfcc1aa17f0",
+            "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+            "title": "GCMD Keywords"
           },
           {
             "id": "Earth Science | Oceans | Ocean Temperature | Sea Surface Temperature",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/bd24a9a9-7d52-4c29-b2a0-6cefd216ae78"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/bd24a9a9-7d52-4c29-b2a0-6cefd216ae78",
+            "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+            "title": "GCMD Keywords"
           },
           {
             "id": "Earth Science | Oceans | Ocean Temperature | Water Temperature",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/46206e8c-8def-406f-9e62-da4e74633a58"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/46206e8c-8def-406f-9e62-da4e74633a58",
+            "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+            "title": "GCMD Keywords"
           },
           {
             "id": "Earth Science | Oceans | Salinity/Density | Salinity",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/7e95b5fc-1d58-431a-af36-948b29fa870d"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/7e95b5fc-1d58-431a-af36-948b29fa870d",
+            "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+            "title": "GCMD Keywords"
           }
         ]
       },
       {
         "scheme": "place",
-        "description": "AODN GEN",
-        "title": "AODN Geographic Extent Names",
         "concepts": [
           {
             "id": "Coastal Waters (Australia) | West Australia Coast, WA",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1015"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1015",
+            "description": "AODN GEN",
+            "title": "AODN Geographic Extent Names"
           },
           {
             "id": "Global / Oceans | Indian Ocean",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:4"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:4",
+            "description": "AODN GEN",
+            "title": "AODN Geographic Extent Names"
           },
           {
             "id": "Marine Features (Australia) | Australian North West Shelf, WA",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:65"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:65",
+            "description": "AODN GEN",
+            "title": "AODN Geographic Extent Names"
           },
           {
             "id": "Marine Features (Australia) | Gulf of Carpentaria, NT/QLD",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:83"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:83",
+            "description": "AODN GEN",
+            "title": "AODN Geographic Extent Names"
           }
         ]
       },
       {
         "scheme": "survey",
-        "description": "MarLIN Survey Register",
-        "title": "CSIRO Survey List",
         "concepts": [
           {
             "id": "Research Voyage: FR 10/87",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:26"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:26",
+            "description": "MarLIN Survey Register",
+            "title": "CSIRO Survey List"
           }
         ]
       },
       {
         "scheme": "project",
-        "description": "MarLIN Project Register",
-        "title": "CSIRO Project List",
         "concepts": [
           {
             "id": "Marine Inorganic Chemistry 1985-1989",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:1529"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:1529",
+            "description": "MarLIN Project Register",
+            "title": "CSIRO Project List"
           }
         ]
       },
       {
         "scheme": "dataSource",
-        "description": "MarLIN Source Register",
-        "title": "CSIRO Source List",
         "concepts": [
           {
             "id": "Ship: Franklin",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:5"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:5",
+            "description": "MarLIN Source Register",
+            "title": "CSIRO Source List"
           }
         ]
       }

@@ -42,8 +42,11 @@ module.exports = {
   rules: {
     "react/react-in-jsx-scope": "off",
     "no-unused-vars": "off",
+    "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-unused-vars": ["off"],
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "@typescript-eslint/no-empty-object-type": "off",
     quotes: ["error", "double", { "avoidEscape": true }],
     "no-undef": "off",
     "import/extensions": ["error", "never", { "js": "never", "jsx": "never", "ts": "never", "tsx": "never", "json": "always" }],

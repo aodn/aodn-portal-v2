@@ -8,10 +8,7 @@ import { DatasetFrequency } from "./searchReducer";
 import { MapDefaultConfig } from "../../map/mapbox/constants";
 import { SearchResultLayoutEnum } from "../buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../buttons/ResultListSortButton";
-import {
-  compressToEncodedURIComponent,
-  decompressFromEncodedURIComponent,
-} from "lz-string";
+import { decodeParam, encodeParam } from "../../../utils/UrlUtils";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
@@ -395,7 +392,7 @@ const formatToUrlParam = (param: ParameterState) => {
       }
     }
   }
-  return compressToEncodedURIComponent(parts.join("&"));
+  return encodeParam(parts.join("&"));
 };
 
 const parseQueryString = (queryString: string) => {
@@ -416,7 +413,7 @@ const parseQueryString = (queryString: string) => {
 // Convert the url parameter back to ParameterState, check test case for more details
 const unFlattenToParameterState = (input: string): ParameterState => {
   const result = createInitialParameterState(false);
-  const flatObject = parseQueryString(decompressFromEncodedURIComponent(input));
+  const flatObject = parseQueryString(decodeParam(input));
 
   for (const key in flatObject) {
     if (Object.prototype.hasOwnProperty.call(flatObject, key)) {

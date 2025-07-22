@@ -1,4 +1,11 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  FormEvent,
+} from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch } from "../components/common/store/hooks";
 import { DataUsageInformation } from "../components/download/DataUsageForm";
@@ -20,17 +27,11 @@ const STATUS_CODES = {
 const STATUS_MESSAGES = {
   TIMEOUT: "Request timeout! Please try again later",
   SERVER_ERROR: "Server error! Please try again later",
-  SUCCESS: "Success! Email will be sent shortly",
+  SUCCESS: "Download email will be sent shortly.",
   DATASET_ERROR: "Dataset unavailable! Please try again later",
 } as const;
 
 const TIMEOUT_LIMIT = 8000;
-
-interface SnackbarState {
-  open: boolean;
-  message: string;
-  severity: "error" | "warning" | "info" | "success";
-}
 
 export const useDownloadDialog = (
   isOpen: boolean,
@@ -53,35 +54,24 @@ export const useDownloadDialog = (
     sectors: [],
     allow_contact: null,
   });
-  const [snackbar, setSnackbar] = useState<SnackbarState>({
-    open: false,
-    message: "",
-    severity: "error",
-  });
+  const [emailError, setEmailError] = useState<string>("");
 
   // ================== VALIDATION HELPERS ==================
-  const showValidationError = (message: string) => {
-    setSnackbar({
-      open: true,
-      message,
-      severity: "error",
-    });
-  };
-
   const isEmailValid = useCallback((emailValue: string): boolean => {
     if (!emailValue.trim()) {
-      showValidationError("Please enter your email address");
+      setEmailError("Please enter your email address");
       emailInputRef.current?.focus();
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailValue)) {
-      showValidationError("Please enter a valid email address");
+      setEmailError("Please enter a valid email address");
       emailInputRef.current?.focus();
       return false;
     }
 
+    setEmailError("");
     return true;
   }, []);
 
@@ -318,13 +308,23 @@ export const useDownloadDialog = (
   );
 
   // ================== FORM SUBMISSION HANDLERS ==================
+  // Handle email input
+  const handleClearEmail = useCallback(() => {
+    setEmail("");
+    setEmailError("");
+    if (emailInputRef.current) {
+      emailInputRef.current.value = "";
+    }
+    localStorage.removeItem("download_dialog_email");
+  }, []);
+
   // Handle form submission (step 2)
   const handleFormSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
+    (event: FormEvent) => {
       event.preventDefault();
 
       setIsProcessing(true);
-      const formData = new FormData(event.currentTarget);
+      const formData = new FormData(event.currentTarget as HTMLFormElement);
       const formJson = Object.fromEntries((formData as any).entries());
       const emailFromForm = formJson.email;
 
@@ -352,14 +352,9 @@ export const useDownloadDialog = (
       return;
     }
 
-    if (!uuid) {
-      showValidationError("Dataset UUID is missing");
-      return;
-    }
-
     setIsProcessing(true);
     submitJob(emailToSubmit);
-  }, [activeStep, email, handleStepChange, submitJob, uuid, isEmailValid]);
+  }, [activeStep, email, handleStepChange, submitJob, isEmailValid]);
 
   // ================== UI HELPERS ==================
   // Get processing status message for display
@@ -399,16 +394,17 @@ export const useDownloadDialog = (
     isSuccess,
     processingStatus,
     email,
+    emailError,
     dataUsage,
-    snackbar,
     hasDownloadConditions,
     handleIsClose,
     handleStepClick,
     handleStepperButtonClick,
     handleDataUsageChange,
+    handleClearEmail,
     handleFormSubmit,
     getProcessStatusText,
     getStepperButtonTitle,
-    setSnackbar,
+    setEmailError,
   };
 };

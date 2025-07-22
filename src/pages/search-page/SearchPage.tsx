@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { LngLatBounds, MapboxEvent as MapEvent } from "mapbox-gl";
+import { LngLatBounds, MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
@@ -61,6 +61,7 @@ import {
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
+import _ from "lodash";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -91,6 +92,30 @@ const SearchPage = () => {
     abort: (reason?: string) => void;
   } | null>(null);
   const mapSearchAbortRef = useRef<AbortController | null>(null);
+  // This is use to avoid update called too many times in short period that
+  // hurt the performace
+  const debounceHistoryUpdateRef = useRef<_.DebouncedFunc<
+    (url: string) => void
+  > | null>(
+    _.debounce((url: string) => {
+      const pathname = window.location.pathname;
+      if (pathname.includes(pageDefault.search)) {
+        // Must use navigator, otherwise useLocation will not work, we
+        // add a debounce here to avoid user click too fast where
+        // search is still happens and user click to other page
+        // causing URL incorrect
+        navigate(url, {
+          replace: true, // Must use replace to avoid page move back
+          state: {
+            fromNavigate: true,
+            requireSearch: false,
+            referer: pageReferer.SEARCH_PAGE_REFERER,
+          },
+        });
+      }
+    }, 200)
+  );
+
   const urlParamState: ParameterState | undefined = useMemo(() => {
     // The first char is ? in the search string, so we need to remove it.
     const param = location?.search?.substring(1);
@@ -123,6 +148,15 @@ const SearchPage = () => {
           pagesize: DEFAULT_SEARCH_MAP_SIZE,
         }
       );
+      // Update URL earlier as map take time to search, so user may copy incorrect URL during
+      // search
+      if (needNavigate) {
+        debounceHistoryUpdateRef?.current?.cancel();
+        debounceHistoryUpdateRef?.current?.(
+          pageDefault.search + "?" + formatToUrlParam(componentParam)
+        );
+      }
+
       dispatch(
         // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
         // and ordered by uuid to avoid affecting cluster calculation
@@ -148,25 +182,11 @@ const SearchPage = () => {
             setLayers(jsonToOGCCollections(collections).collections);
           }
         })
-        .then(() => {
-          if (needNavigate) {
-            navigate(
-              pageDefault.search + "?" + formatToUrlParam(componentParam),
-              {
-                state: {
-                  fromNavigate: true,
-                  requireSearch: false,
-                  referer: pageReferer.SEARCH_PAGE_REFERER,
-                },
-              }
-            );
-          }
-        })
         .catch(() => {
           // console.log("doSearchMap signal abort");
         });
     },
-    [dispatch, navigate]
+    [dispatch]
   );
 
   const doListSearch = useCallback(
@@ -187,7 +207,9 @@ const SearchPage = () => {
       // The return implicit contains a AbortController due to use of signal in
       // axios call
       listSearchAbortRef.current = dispatch(fetchResultWithStore(paramPaged));
-      doMapSearch(needNavigate)?.finally(() => {});
+      doMapSearch(needNavigate).finally(
+        () => (mapSearchAbortRef.current = null)
+      );
     },
     [dispatch, doMapSearch]
   );
@@ -195,13 +217,15 @@ const SearchPage = () => {
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
-    (event: MapEvent<MouseEvent | WheelEvent | TouchEvent | undefined>) => {
-      if (event.type === "zoomend" || event.type === "moveend") {
+    (event: MapEvent | undefined) => {
+      if (event?.type === "zoomend" || event?.type === "moveend") {
         const componentParam: ParameterState = getComponentState(
           store.getState()
         );
 
-        const bounds = event.target.getBounds();
+        const bounds = event?.target.getBounds();
+        if (bounds == null) return;
+
         const ne = bounds.getNorthEast(); // NorthEast corner
         const sw = bounds.getSouthWest(); // SouthWest corner
         // Note order: longitude, latitude.2
@@ -376,6 +400,13 @@ const SearchPage = () => {
     setSelectedUuids([]);
   }, []);
 
+  const cancelAllSearch = useCallback(() => {
+    mapSearchAbortRef.current?.abort();
+    mapSearchAbortRef.current = null;
+    listSearchAbortRef.current?.abort();
+    listSearchAbortRef.current = null;
+  }, []);
+
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
   // TODO: Optimize call if possible, this happens when navigate from page
@@ -414,17 +445,13 @@ const SearchPage = () => {
         doListSearch();
       }
     };
-
     handleNavigation();
 
     return () => {
-      // If page unmounted, cancel any running search
-      mapSearchAbortRef.current?.abort();
-      mapSearchAbortRef.current = null;
-      listSearchAbortRef.current?.abort();
-      listSearchAbortRef.current = null;
+      cancelAllSearch();
     };
   }, [
+    cancelAllSearch,
     doListSearch,
     doMapSearch,
     location.state?.referer,
@@ -529,7 +556,7 @@ const SearchPage = () => {
             currentLayout={currentLayout}
             onChangeLayout={onChangeLayout}
             onDeselectDataset={onDeselectDataset}
-            isLoading={false}
+            cancelLoading={cancelAllSearch}
           />
         </Box>
         <Box
