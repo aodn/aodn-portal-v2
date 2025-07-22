@@ -1371,23 +1371,31 @@
     "themes": [
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords (Theme)",
         "concepts": [
           {
-            "id": "geomorphometry"
+            "id": "geomorphometry",
+            "description": "",
+            "title": "Keywords (Theme)"
           },
           {
-            "id": "geomorphology"
+            "id": "geomorphology",
+            "description": "",
+            "title": "Keywords (Theme)"
           },
           {
-            "id": "seafloor features"
+            "id": "seafloor features",
+            "description": "",
+            "title": "Keywords (Theme)"
           },
           {
-            "id": "mapping"
+            "id": "mapping",
+            "description": "",
+            "title": "Keywords (Theme)"
           },
           {
-            "id": "seafloor morphology"
+            "id": "seafloor morphology",
+            "description": "",
+            "title": "Keywords (Theme)"
           }
         ]
       },
