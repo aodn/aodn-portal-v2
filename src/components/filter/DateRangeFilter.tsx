@@ -401,7 +401,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                   width="100%"
                   gap={2}
                 >
-                  <Box display="flex" alignItems="center">
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    data-testid="start-date-picker"
+                  >
                     <Typography
                       padding={0}
                       paddingRight={padding.large}
@@ -421,7 +425,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                       slotProps={DEFAULT_DATE_PICKER_SLOT}
                     />
                   </Box>
-                  <Box display="flex" alignItems="center">
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    data-testid="end-date-picker"
+                  >
                     <Typography
                       padding={0}
                       paddingRight={padding.large}
