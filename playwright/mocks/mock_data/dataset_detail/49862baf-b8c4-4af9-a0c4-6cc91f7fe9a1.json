@@ -43,86 +43,90 @@
     "themes": [
       {
         "scheme": "theme",
-        "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
-        "title": "GCMD Keywords",
         "concepts": [
           {
             "id": "Earth Science | Oceans | Ocean Acoustics | Acoustic Reflectivity",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/6a583047-6023-4b6a-ab25-b72529721a8c"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/6a583047-6023-4b6a-ab25-b72529721a8c",
+            "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+            "title": "GCMD Keywords"
           },
           {
             "id": "Earth Science | Oceans | Ocean Acoustics | Acoustic Scattering",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/b4a924bb-0d42-4169-bad7-3856f69f0c4a"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=external.theme.gcmd_keywords&id=http://gcmdservices.gsfc.nasa.gov/kms/concept/b4a924bb-0d42-4169-bad7-3856f69f0c4a",
+            "description": "Olsen, L.M., G. Major, K. Shein, J. Scialdone, S. Ritz, T. Stevens, M. Morahan, A. Aleman, R. Vogel, S. Leicester, H. Weir, M. Meaux, S. Grebas, C.Solomon, M. Holland, T. Northcutt, R. A. Restrepo, R. Bilodeau, 2013. NASA/Global Change Master Directory (GCMD) Earth Science Keywords. Version 8.0.0.0.0",
+            "title": "GCMD Keywords"
           }
         ]
       },
       {
         "scheme": "equipment",
-        "description": "",
-        "title": "CSIRO Equipment",
         "concepts": [
           {
             "id": "Acoustic Equipment/Echosounders",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:1"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.equipment.urn:marlin.csiro.au:Equipment&id=urn:marlin.csiro.au:Equipment:concept:1",
+            "description": "",
+            "title": "CSIRO Equipment"
           }
         ]
       },
       {
         "scheme": "place",
-        "description": "AODN GEN",
-        "title": "AODN Geographic Extent Names",
         "concepts": [
           {
             "id": "Coastal Waters (Australia) | West Australia Coast, WA",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1015"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:1015",
+            "description": "AODN GEN",
+            "title": "AODN Geographic Extent Names"
           },
           {
             "id": "Marine Features (Australia) | Australian North West Shelf, WA",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:65"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.place.urn:aodn.org.au:geographicextents&id=urn:aodn.org.au:geographicextents:concept:65",
+            "description": "AODN GEN",
+            "title": "AODN Geographic Extent Names"
           }
         ]
       },
       {
         "scheme": "survey",
-        "description": "MarLIN Survey Register",
-        "title": "CSIRO Survey List",
         "concepts": [
           {
             "id": "Research Voyage: SS 08/95",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:203"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.survey.urn:marlin.csiro.au:surveyregister&id=urn:marlin.csiro.au:surveyregister:concept:203",
+            "description": "MarLIN Survey Register",
+            "title": "CSIRO Survey List"
           }
         ]
       },
       {
         "scheme": "project",
-        "description": "MarLIN Project Register",
-        "title": "CSIRO Project List",
         "concepts": [
           {
             "id": "North West Shelf Demersal Marine Resources Study (1982-1992)",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:171"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.project.urn:marlin.csiro.au:projectregister&id=urn:marlin.csiro.au:projectregister:concept:171",
+            "description": "MarLIN Project Register",
+            "title": "CSIRO Project List"
           }
         ]
       },
       {
         "scheme": "discipline",
-        "description": "MarLIN Standard Datatypes Thesaurus",
-        "title": "CSIRO Standard Data Types",
         "concepts": [
           {
             "id": "Vessel Data: Acoustics (Fisheries)",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:standardDataType&id=urn:marlin.csiro.au:keywords:standardDataType:concept:3520"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.discipline.urn:marlin.csiro.au:keywords:standardDataType&id=urn:marlin.csiro.au:keywords:standardDataType:concept:3520",
+            "description": "MarLIN Standard Datatypes Thesaurus",
+            "title": "CSIRO Standard Data Types"
           }
         ]
       },
       {
         "scheme": "dataSource",
-        "description": "MarLIN Source Register",
-        "title": "CSIRO Source List",
         "concepts": [
           {
             "id": "Ship: Southern Surveyor",
-            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:8"
+            "url": "https://marlin.csiro.au/geonetwork/srv/eng/xml.keyword.get?thesaurus=register.dataSource.urn:marlin.csiro.au:sourceregister&id=urn:marlin.csiro.au:sourceregister:concept:8",
+            "description": "MarLIN Source Register",
+            "title": "CSIRO Source List"
           }
         ]
       }

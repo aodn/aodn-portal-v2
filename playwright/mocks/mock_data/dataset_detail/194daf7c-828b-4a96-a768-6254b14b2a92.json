@@ -75,61 +75,61 @@
     "themes": [
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords (Theme)",
         "concepts": [
           {
-            "id": "marine"
+            "id": "marine",
+            "description": "",
+            "title": "Keywords (Theme)"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords (Taxon)",
         "concepts": [
           {
-            "id": "Infauna"
+            "id": "Infauna",
+            "description": "",
+            "title": "Keywords (Taxon)"
           }
         ]
       },
       {
         "scheme": "discipline",
-        "description": "",
-        "title": "Australian and New Zealand Standard Research Classification: Fields of Research",
         "concepts": [
           {
-            "id": "Earth Sciences"
+            "id": "Earth Sciences",
+            "description": "",
+            "title": "Australian and New Zealand Standard Research Classification: Fields of Research"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords",
         "concepts": [
           {
-            "id": "National Environmental Science Program"
+            "id": "National Environmental Science Program",
+            "description": "",
+            "title": "Keywords"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "Keywords",
         "concepts": [
           {
-            "id": "Marine Biodiversity Hub"
+            "id": "Marine Biodiversity Hub",
+            "description": "",
+            "title": "Keywords"
           }
         ]
       },
       {
         "scheme": "",
-        "description": "",
-        "title": "",
         "concepts": [
           {
-            "id": "Published_External"
+            "id": "Published_External",
+            "description": "",
+            "title": ""
           }
         ]
       }

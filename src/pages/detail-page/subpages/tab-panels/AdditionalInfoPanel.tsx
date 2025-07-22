@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
-import { ITheme } from "../../../../components/common/store/OGCCollectionDefinitions";
 import _ from "lodash";
 import KeywordList from "../../../../components/list/KeywordList";
 import StatementList from "../../../../components/list/StatementList";
@@ -70,9 +69,23 @@ const AdditionalInfoPanel = () => {
   const keywords: { title: string; content: string[] }[] = useMemo(() => {
     // getting keywords from themes
     const keywordItems: { title: string; content: string[] }[] = [];
-    themes?.forEach((theme: ITheme) => {
+    themes?.forEach((theme) => {
+      // if no concepts, it is not considered as a keyword
+      if (!theme.concepts || theme.concepts.length === 0) {
+        return;
+      }
+
+      // if scheme is "categories", it is not a keyword
+      if (theme.scheme === "Categories") {
+        return;
+      }
+
+      // According to current implementation, concepts belong to one theme
+      // share the same title & description. The reason that making every concept
+      // has the same title is to obey the STAC collection standard (theme extension).
+      const title = theme.concepts?.[0].title;
       keywordItems.push({
-        title: theme.title,
+        title: title,
         content: theme.concepts.map(
           (concept) => ` \u00A0 \u2022 ${concept.id}`
         ),
@@ -83,6 +96,15 @@ const AdditionalInfoPanel = () => {
     return _.sortBy(keywordItems, (item) => {
       return item.title ? item.title : "\uffff";
     });
+  }, [themes]);
+
+  const categories = useMemo(() => {
+    for (const theme of themes ?? []) {
+      if (theme.scheme === "Categories") {
+        return theme.concepts.map((concept) => concept.id);
+      }
+    }
+    return [];
   }, [themes]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -105,7 +127,7 @@ const AdditionalInfoPanel = () => {
       },
       {
         title: "Themes",
-        component: <ThemeList title={"Themes"} />,
+        component: <ThemeList title={"Themes"} themes={categories ?? []} />,
       },
       {
         title: "Keywords",
@@ -134,6 +156,7 @@ const AdditionalInfoPanel = () => {
     ],
     [
       statement,
+      categories,
       keywords,
       metadataContact,
       metadataId,

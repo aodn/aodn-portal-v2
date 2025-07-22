@@ -7,6 +7,7 @@ export const DownloadNotAvailableIcon = () => (
     width="22"
     height="22"
     fill="currentColor"
+    data-testid="DownloadNotAvailableIcon"
   >
     <g>
       <path d="M38,31.29v1.55c-.31,1.2-1.14,2.09-2.42,2.18H4.3c-1.2-.16-2-1.05-2.28-2.18.04-.49-.06-1.07,0-1.55.15-1.15,1.27-2.17,2.43-2.25h30.99c1.21,0,2.41,1.05,2.56,2.25Z" />
