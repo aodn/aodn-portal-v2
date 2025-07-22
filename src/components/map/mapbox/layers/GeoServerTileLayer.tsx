@@ -73,6 +73,25 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
   opacity: 1.0,
 };
 
+const applyGeoWebCacheIfPossible = (baseUrl: string, param: TileUrlParams) => {
+  if (baseUrl.includes("geoserver-123.aodn.org.au/geoserver/wms")) {
+    // We can rewrite value so that it use internal cache server
+    return {
+      baseUrl: "https://tilecache.aodn.org.au/geowebcache/service/wms",
+      params: {
+        ...param,
+        SRS: "EPSG:900913", // This is same as "EPSG:3857", but tile server use a old name
+        //BBOX: "{bbox-epsg-900913}",
+      },
+    };
+  } else {
+    return {
+      baseUrl: baseUrl,
+      params: param,
+    };
+  }
+};
+
 // Helper functions to generate consistent IDs
 const getLayerId = (id: string | undefined) => `${id}-geo-server-tile-layer`;
 const getTileSourceId = (layerId: string) => `${layerId}-source`;
@@ -110,10 +129,9 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
       defaultGeoServerTileLayerConfig,
       geoServerTileLayerConfig
     );
-    const tileUrl = formatToUrl<TileUrlParams>({
-      baseUrl: config.baseUrl,
-      params: config.tileUrlParams,
-    });
+    const tileUrl = formatToUrl<TileUrlParams>(
+      applyGeoWebCacheIfPossible(config.baseUrl, config.tileUrlParams)
+    );
     const isWMSAvailable = checkWMSAvailability(
       config.baseUrl,
       config.tileUrlParams,
