@@ -14,6 +14,16 @@ from pages.search_page import SearchPage
     ],
 )
 def test_tab_panel_scroll(desktop_page: Page, title: str) -> None:
+    """
+    Verifies that the tab panel on the detail page supports scrolling to navigate
+    between tabs when the browser window is resized to a smaller viewport,
+    causing tabs to overflow.
+
+    The test loads a dataset on the detail page, scrolls right to confirm the
+    'Related Resources' tab becomes visible, and scrolls left to confirm the
+    'Summary' tab becomes visible, ensuring the UI's tab panel scrolling
+    functionality works as intended.
+    """
     # Precondition: Tab panel should have scroll buttons
     # Set a smaller browser window size to make the tabs scrollable
     desktop_page.set_viewport_size(DesktopDevices.SMALL)
@@ -47,6 +57,15 @@ def test_tab_panel_scroll(desktop_page: Page, title: str) -> None:
 def test_not_found_item(
     responsive_page: Page, title: str, uuid: str, not_found_item: str
 ) -> None:
+    """
+    Validates that the detail page correctly displays a not found message for
+    a specific data category when the dataset lacks that information.
+
+    The test loads a dataset on the detail page, verifies the page title matches
+    the expected dataset title, and checks that the specified not found item
+    (e.g., 'License') is visible, ensuring the UI accurately indicates
+    missing data for the dataset.
+    """
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
@@ -79,6 +98,15 @@ def test_contact_details(
     phone: str,
     link: str,
 ) -> None:
+    """
+    Verifies that the detail page accurately displays contact details for a
+    dataset within the specified tab.
+
+    The test loads a dataset on the detail page, navigates to the designated
+    tab, expands the contact section, and checks that the address, phone
+    number, and link fields contain the expected values, ensuring the
+    UI correctly presents all contact information.
+    """
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
@@ -106,6 +134,10 @@ def test_contact_details(
 def test_show_more_and_less_list_items(
     responsive_page: Page, title: str, uuid: str, tab: str, item_list: str
 ) -> None:
+    """
+    Validates that the 'Show More' and 'Show Less' buttons on the detail page
+    correctly expand and collapse a list of items when the list exceeds five entries.
+    """
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
@@ -132,6 +164,10 @@ def test_show_more_and_less_list_items(
     ],
 )
 def test_dropdown_scroll(responsive_page: Page, uuid: str) -> None:
+    """
+    Verifies that the page's scroll functionality is disabled when a dropdown
+    element is open and re-enabled after the dropdown is closed.
+    """
     detail_page = DetailPage(responsive_page)
     detail_page.load(uuid)
     # The Download Card with a dropdown
