@@ -1,34 +1,20 @@
-import React from "react";
 import {
   Box,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
-  IconButton,
   Typography,
   useTheme,
   useMediaQuery,
   Divider,
 } from "@mui/material";
-import { Close as CloseIcon } from "@mui/icons-material";
-import {
-  fontColor,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  margin,
-  padding,
-} from "../../styles/constants";
-import AppTheme from "../../utils/AppTheme";
-import StepperButton from "./stepper/StepperButton";
-import StyledStepper from "./stepper/StyledStepper";
 import DataSelection from "./DataSelection";
 import LicenseContent from "./LicenseContent";
-import { ValidationSnackbar } from "./ValidationSnackbar";
 import { useDownloadDialog } from "../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
+import { DialogHeader } from "./DialogHeader";
+import DialogStepper from "./stepper/DialogStepper";
+import StepperButton from "./stepper/StepperButton";
 
 interface DownloadDialogProps {
   isOpen: boolean;
@@ -45,111 +31,7 @@ const steps: Step[] = [
   { number: 2, label: "Usage limitation and licenses" },
 ];
 
-const LicenseStep: React.FC<{
-  email: string;
-  emailInputRef: React.RefObject<HTMLInputElement>;
-}> = ({ email, emailInputRef }) => {
-  return (
-    <Box sx={{ flex: 1 }}>
-      <input
-        type="hidden"
-        name="email"
-        value={email || emailInputRef.current?.value || ""}
-      />
-      <LicenseContent />
-    </Box>
-  );
-};
-
-const ProcessingStatus: React.FC<{
-  processingStatus: string;
-  isMobile: boolean;
-  getProcessStatusText: () => string;
-}> = ({ processingStatus, isMobile, getProcessStatusText }) => {
-  if (!processingStatus) return null;
-
-  return (
-    <Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
-      <Typography
-        variant="body1"
-        sx={{
-          fontSize: isMobile ? "0.875rem" : "1rem",
-          color: processingStatus.startsWith("2")
-            ? "success.main"
-            : "error.main",
-        }}
-      >
-        {getProcessStatusText()}
-      </Typography>
-    </Box>
-  );
-};
-
-const DialogHeader: React.FC<{
-  onClose: () => void;
-}> = ({ onClose }) => {
-  return (
-    <DialogTitle
-      sx={{
-        position: "relative",
-        boxShadow: "0px 1.8px 10px 0px rgba(0, 0, 0, 0.15)",
-        height: "48px",
-        flexShrink: 0,
-        paddingTop: 1,
-        paddingBottom: 0.5,
-        marginBottom: 2,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        sx={{ position: "relative", width: "100%", height: "100%" }}
-      >
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{
-            color: AppTheme.palette.primary.main,
-            textAlign: "center",
-            textShadow: "0px 0px 5.074px #FFF",
-            fontFamily: fontFamily.openSans,
-            fontSize: fontSize.detailPageHeading,
-            fontStyle: "normal",
-            fontWeight: fontWeight.bold,
-            lineHeight: "24.356px",
-            padding: padding.nil,
-            margin: margin.nil,
-          }}
-        >
-          Dataset Download
-        </Typography>
-        <IconButton
-          onClick={onClose}
-          aria-label="Close dialog"
-          sx={{
-            position: "absolute",
-            right: 0,
-            color: fontColor.gray.medium,
-            "&:hover": {
-              backgroundColor: "rgba(0,0,0,0.04)",
-            },
-          }}
-        >
-          <CloseIcon sx={{ fontSize: "1.3rem" }} />
-        </IconButton>
-      </Box>
-    </DialogTitle>
-  );
-};
-
-const DownloadDialog: React.FC<DownloadDialogProps> = ({
-  isOpen,
-  setIsOpen,
-}) => {
+const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -160,18 +42,35 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
     isSuccess,
     processingStatus,
     email,
+    emailError,
     dataUsage,
-    snackbar,
     hasDownloadConditions,
     handleIsClose,
     handleStepClick,
     handleStepperButtonClick,
     handleDataUsageChange,
+    handleClearEmail,
     handleFormSubmit,
     getProcessStatusText,
     getStepperButtonTitle,
-    setSnackbar,
+    setEmailError,
   } = useDownloadDialog(isOpen, setIsOpen);
+
+  const getButtonStatus = () => {
+    const isFailure = processingStatus && !processingStatus.startsWith("2");
+    if (isSuccess) return "completed";
+    if (isFailure) return "error";
+    if (isProcessing) return "loading";
+    return "default";
+  };
+
+  const getDisplayText = () => {
+    const isFailure = processingStatus && !processingStatus.startsWith("2");
+    if (isSuccess || isFailure) {
+      return getProcessStatusText();
+    }
+    return getStepperButtonTitle();
+  };
 
   const renderStepContent = () => {
     if (activeStep === 0) {
@@ -208,13 +107,12 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
             <EmailInputStep
               isMobile={isMobile}
               emailInputRef={emailInputRef}
+              email={email}
               dataUsage={dataUsage}
               onDataUsageChange={handleDataUsageChange}
-            />
-            <ProcessingStatus
-              processingStatus={processingStatus}
-              isMobile={isMobile}
-              getProcessStatusText={getProcessStatusText}
+              emailError={emailError}
+              onClearEmail={handleClearEmail}
+              setEmailError={setEmailError}
             />
           </Box>
         </Box>
@@ -223,12 +121,14 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
 
     return (
       <Box sx={{ flex: 1 }}>
-        <LicenseStep email={email} emailInputRef={emailInputRef} />
-        <ProcessingStatus
-          processingStatus={processingStatus}
-          isMobile={isMobile}
-          getProcessStatusText={getProcessStatusText}
-        />
+        <Box sx={{ flex: 1 }}>
+          <input
+            type="hidden"
+            name="email"
+            value={email || emailInputRef.current?.value || ""}
+          />
+          <LicenseContent />
+        </Box>
       </Box>
     );
   };
@@ -274,10 +174,11 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
           zIndex: 1,
         }}
       >
-        <StyledStepper
+        <DialogStepper
           steps={steps}
           activeStep={activeStep}
           onStepClick={handleStepClick}
+          testId="dialog-stepper"
         />
       </Box>
 
@@ -304,33 +205,14 @@ const DownloadDialog: React.FC<DownloadDialogProps> = ({
           flexShrink: 0,
         }}
       >
-        <Box sx={{ position: "relative" }}>
-          <StepperButton
-            title={getStepperButtonTitle()}
-            onClick={handleStepperButtonClick}
-            disabled={isProcessing || isSuccess}
-          />
-          {isProcessing && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                marginTop: "-12px",
-                marginLeft: "-12px",
-                color: "#2E7D9A",
-              }}
-            />
-          )}
-        </Box>
+        <StepperButton
+          title={getStepperButtonTitle()}
+          statusText={getDisplayText()}
+          onClick={handleStepperButtonClick}
+          disabled={isProcessing || !!emailError}
+          status={getButtonStatus()}
+        />
       </DialogActions>
-
-      <ValidationSnackbar
-        snackbar={snackbar}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-        isMobile={isMobile}
-      />
     </Dialog>
   );
 };

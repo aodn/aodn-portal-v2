@@ -1,5 +1,5 @@
 import { Typography, Box, Button } from "@mui/material";
-import { DownloadNotAvailableIcon } from "../../../../assets/icons/download_not_available";
+import { DownloadNotAvailableIcon } from "../../../../assets/icons/download/download_not_available";
 
 const DownloadServiceCard = () => {
   return (
