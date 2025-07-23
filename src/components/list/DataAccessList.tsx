@@ -35,6 +35,7 @@ const DataAccessList: FC<DataAccessListProps> = ({
     </ItemBaseGrid>
   ));
 
+  //TODO: Remove this when python notebooks are no longer used
   const pythonNotebookItems = pythonNotebookLinks.map(
     (link: ILink, index: number) => (
       <ItemBaseGrid key={index}>

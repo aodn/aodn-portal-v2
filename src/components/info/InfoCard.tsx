@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Card, Paper, Typography } from "@mui/material";
+import { Card, Paper, Typography, useTheme } from "@mui/material";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
 
 interface InfoCardProps {
@@ -9,6 +9,7 @@ interface InfoCardProps {
 }
 
 const InfoCard: FC<InfoCardProps> = ({ infoContent, status, children }) => {
+  const theme = useTheme();
   return (
     <Card
       elevation={1}
@@ -26,22 +27,33 @@ const InfoCard: FC<InfoCardProps> = ({ infoContent, status, children }) => {
       <Paper
         elevation={0}
         sx={{
-          width: "6px",
+          width: "6px", // Fixed width as per design
           height: "100%",
           backgroundColor:
             status === InfoStatusType.ERROR
-              ? "red"
+              ? theme.palette.error.main
               : status === InfoStatusType.WARNING
-                ? "orange"
-                : "blue",
+                ? theme.palette.warning.main
+                : theme.palette.info.main,
         }}
       />
       {infoContent && (
         <Card elevation={0} sx={{ flex: 1 }}>
-          <Typography variant="h6" sx={{ padding: 2 }}>
+          <Typography
+            variant="heading4"
+            sx={{
+              display: "block",
+              padding: 2,
+              color: theme.palette.text1,
+              textAlign: "center",
+            }}
+          >
             {infoContent.title}
           </Typography>
-          <Typography variant="body2" sx={{ padding: 2, paddingTop: 0 }}>
+          <Typography
+            variant="body2Regular"
+            sx={{ display: "block", padding: 2, paddingTop: 0 }}
+          >
             {infoContent.body}
           </Typography>
         </Card>

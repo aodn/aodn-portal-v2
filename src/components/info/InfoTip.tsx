@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Card, IconButton, Paper, Popover, Typography } from "@mui/material";
+import { IconButton, Popover, useTheme } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
 import InfoCard from "./InfoCard";
@@ -9,6 +9,7 @@ interface InfoTipProps {
   infoContent?: InfoContentType;
 }
 const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
+  const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -26,7 +27,7 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
   const open = Boolean(anchorEl);
   return (
     <>
-      <IconButton onClick={handleClick}>
+      <IconButton onClick={handleClick} sx={{ color: theme.palette.info.main }}>
         <InfoIcon />
       </IconButton>
       <Popover

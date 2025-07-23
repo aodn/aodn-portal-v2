@@ -213,21 +213,11 @@ export class OGCCollection {
   getLicense = (): string | undefined => this.propValue?.license;
   getCreation = (): string | undefined => this.propValue?.creation;
   getRevision = (): string | undefined => this.propValue?.revision;
-  getPythonNotebook = (): ILink[] | undefined =>
-    this.links?.filter((link) => link.type === MediaType.PYTHON_NOTEBOOK);
-  getDistributionLinks = (): ILink[] | undefined =>
-    this.links?.filter(
-      (link) =>
-        link.rel === RelationType.RELATED &&
-        link.type !== MediaType.PYTHON_NOTEBOOK
-    );
   getMetadataUrl = (): string | undefined =>
     this.links?.filter(
       (link) =>
         link.type === "text/html" && link.rel === RelationType.DESCRIBEDBY
     )?.[0]?.href;
-  // A feature call summary is provided if you do cloud optimized data download
-  hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
   // Get links by AI group
   getLinksByAIGroup = (group: string): ILink[] | undefined => {
     const result = this.links?.filter((link) => link["ai:group"] === group);
@@ -244,6 +234,8 @@ export class OGCCollection {
   // Get all links that have an ai:group field
   getAllAIGroupedLinks = (): ILink[] | undefined =>
     this.links?.filter((link) => link["ai:group"] !== undefined);
+  // A feature call summary is provided if you do cloud optimized data download
+  hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
 }
 
 export class SummariesProperties {
