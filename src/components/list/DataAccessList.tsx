@@ -12,6 +12,11 @@ interface DataAccessListProps {
   otherLinks?: ILink[];
 }
 
+const INFO_TIP_CONTENT = {
+  title: "Information",
+  body: "All efforts have been taken to logically group the links found in the metadata record. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
+};
+
 const DataAccessList: FC<DataAccessListProps> = ({
   dataAccessLinks = [],
   documentLinks = [],
@@ -55,14 +60,31 @@ const DataAccessList: FC<DataAccessListProps> = ({
 
   return (
     <>
-      <ExpandableList childrenList={dataAccessItems} title="Data" />
-      <ExpandableList childrenList={documentItems} title="Documents" />
+      <ExpandableList
+        childrenList={dataAccessItems}
+        navigatable={false}
+        title="Data"
+        info={INFO_TIP_CONTENT}
+      />
+      <ExpandableList
+        childrenList={documentItems}
+        navigatable={false}
+        title="Documents"
+        info={INFO_TIP_CONTENT}
+      />
       {/* comment out python notebook links for now as it is not used */}
       {/* <ExpandableList
         childrenList={pythonNotebookItems}
+        navigatable={false}
         title="Code Tutorials"
+        info={INFO_TIP_CONTENT}
       /> */}
-      <ExpandableList childrenList={otherItems} title="Other" />
+      <ExpandableList
+        childrenList={otherItems}
+        navigatable={false}
+        title="Other"
+        info={INFO_TIP_CONTENT}
+      />
     </>
   );
 };
