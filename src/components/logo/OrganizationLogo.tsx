@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Box, CardMedia, SxProps } from "@mui/material";
 import defaultLogo from "@/assets/logos/default-logo.png";
 
@@ -13,6 +13,8 @@ const OrganizationLogo: FC<OrganizationLogoProps> = ({
   defaultImageSrc = defaultLogo,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null | undefined>(logo);
+  // Make sure logo update if value changed
+  useEffect(() => setImageSrc(logo), [logo]);
 
   return (
     <Box sx={{ width: "100%", height: "100%", ...sx }}>

@@ -32,6 +32,16 @@ def test_additional_information_sections(
     full_metadata_link: str,
     metadata_dates: str,
 ) -> None:
+    """
+    Verifies that the 'Additional Information' tab correctly scrolls to and
+    displays the corresponding section's content when a section title
+    is clicked from the tab's navigation panel.
+
+    The test ensures that clicking each section title in the tab's navigation panel
+    triggers the tab to scroll to the associated section area and accurately
+    shows the relevant data for that section, confirming the UI's navigation
+    and content display functionality works as intended.
+    """
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
