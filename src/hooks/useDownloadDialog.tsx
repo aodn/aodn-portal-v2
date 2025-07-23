@@ -59,14 +59,14 @@ export const useDownloadDialog = (
   // ================== VALIDATION HELPERS ==================
   const isEmailValid = useCallback((emailValue: string): boolean => {
     if (!emailValue.trim()) {
-      setEmailError("Please enter your email address");
+      setEmailError("Please enter your email address.");
       emailInputRef.current?.focus();
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailValue)) {
-      setEmailError("Please enter a valid email address");
+      setEmailError("Please enter a valid email address.");
       emailInputRef.current?.focus();
       return false;
     }
