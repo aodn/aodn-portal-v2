@@ -26,6 +26,7 @@ export interface ILink {
   href: string;
   type: string;
   title: string;
+  "ai:group"?: string;
   getIcon?: () => string;
 }
 
@@ -112,6 +113,13 @@ export enum MediaType {
   PYTHON_NOTEBOOK = "application/x-ipynb+json",
 }
 
+export enum AIGroup {
+  DATA_ACCESS = "Data Access",
+  DOCUMENT = "Document",
+  PYTHON_NOTEBOOK = "Python Notebook",
+  OTHER = "Other",
+}
+
 const getIcon = (href: string, rel: string) => {
   switch (rel) {
     case "wms":
@@ -152,10 +160,7 @@ export class OGCCollection {
 
   set links(links: ILink[] | undefined) {
     this.propLinks = links?.map<ILink>((link) => {
-      return {
-        ...link,
-        getIcon: () => getIcon(link.href, link.rel),
-      };
+      return { ...link, getIcon: () => getIcon(link.href, link.rel) };
     });
   }
 
@@ -210,10 +215,6 @@ export class OGCCollection {
   getRevision = (): string | undefined => this.propValue?.revision;
   getPythonNotebook = (): ILink[] | undefined =>
     this.links?.filter((link) => link.type === MediaType.PYTHON_NOTEBOOK);
-  getDataAccessLinks = (): ILink[] | undefined =>
-    this.links?.filter(
-      (link) => link.rel === RelationType.WMS || link.rel === RelationType.WFS
-    );
   getDistributionLinks = (): ILink[] | undefined =>
     this.links?.filter(
       (link) =>
@@ -227,6 +228,22 @@ export class OGCCollection {
     )?.[0]?.href;
   // A feature call summary is provided if you do cloud optimized data download
   hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
+  // Get links by AI group
+  getLinksByAIGroup = (group: string): ILink[] | undefined => {
+    const result = this.links?.filter((link) => link["ai:group"] === group);
+    return result?.length ? result : undefined;
+  };
+  getDataAccessLinks = (): ILink[] | undefined =>
+    this.getLinksByAIGroup(AIGroup.DATA_ACCESS);
+  getDocumentLinks = (): ILink[] | undefined =>
+    this.getLinksByAIGroup(AIGroup.DOCUMENT);
+  getPythonNotebookLinks = (): ILink[] | undefined =>
+    this.getLinksByAIGroup(AIGroup.PYTHON_NOTEBOOK);
+  getOtherLinks = (): ILink[] | undefined =>
+    this.getLinksByAIGroup(AIGroup.OTHER);
+  // Get all links that have an ai:group field
+  getAllAIGroupedLinks = (): ILink[] | undefined =>
+    this.links?.filter((link) => link["ai:group"] !== undefined);
 }
 
 export class SummariesProperties {
@@ -250,10 +267,9 @@ export class Spatial {
   private parent: OGCCollection;
 
   bbox: Array<Position> = [];
-  temporal: {
-    interval: Array<Array<string | null>>;
-    trs?: string;
-  } = { interval: [[]] };
+  temporal: { interval: Array<Array<string | null>>; trs?: string } = {
+    interval: [[]],
+  };
   crs: string = "";
 
   constructor(ogcCollection: OGCCollection) {

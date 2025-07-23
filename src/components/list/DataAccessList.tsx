@@ -6,47 +6,64 @@ import LinkCard from "./listItem/subitem/LinkCard";
 import NaList from "./NaList";
 
 interface DataAccessListProps {
-  linksToData?: ILink[];
   dataAccessLinks?: ILink[];
-  pythonNotebook?: ILink[];
+  documentLinks?: ILink[];
+  pythonNotebookLinks?: ILink[];
+  otherLinks?: ILink[];
 }
 
 const DataAccessList: FC<DataAccessListProps> = ({
-  linksToData = [],
   dataAccessLinks = [],
-  pythonNotebook = [],
+  documentLinks = [],
+  pythonNotebookLinks = [],
+  otherLinks = [],
 }) => {
-  const pythonNotebookItems = pythonNotebook.map(
+  const dataAccessItems = dataAccessLinks.map((link: ILink, index: number) => (
+    <ItemBaseGrid key={index}>
+      <LinkCard key={index} link={link} />
+    </ItemBaseGrid>
+  ));
+
+  const documentItems = documentLinks.map((link: ILink, index: number) => (
+    <ItemBaseGrid key={index}>
+      <LinkCard key={index} link={link} />
+    </ItemBaseGrid>
+  ));
+
+  const pythonNotebookItems = pythonNotebookLinks.map(
     (link: ILink, index: number) => (
-      <ItemBaseGrid key={index} sx={{}}>
+      <ItemBaseGrid key={index}>
         <LinkCard key={index} link={link} />
       </ItemBaseGrid>
     )
   );
 
-  const linksToDataItems = linksToData.map((link: ILink, index: number) => (
-    <ItemBaseGrid key={index} sx={{}}>
+  const otherItems = otherLinks.map((link: ILink, index: number) => (
+    <ItemBaseGrid key={index}>
       <LinkCard key={index} link={link} />
     </ItemBaseGrid>
   ));
 
-  const dataAccessItems = dataAccessLinks.map((link: ILink, index: number) => (
-    <ItemBaseGrid key={index} sx={{}}>
-      <LinkCard key={index} link={link} />
-    </ItemBaseGrid>
-  ));
+  if (
+    dataAccessLinks.length === 0 &&
+    documentLinks.length === 0 &&
+    pythonNotebookLinks.length === 0 &&
+    otherLinks.length === 0
+  ) {
+    return <NaList title={"Data Access"} />;
+  }
 
-  return dataAccessItems ? (
+  return (
     <>
-      <ExpandableList childrenList={linksToDataItems} title="Links" />
-      <ExpandableList childrenList={dataAccessItems} title="Data Access List" />
-      <ExpandableList
+      <ExpandableList childrenList={dataAccessItems} title="Data" />
+      <ExpandableList childrenList={documentItems} title="Documents" />
+      {/* comment out python notebook links for now as it is not used */}
+      {/* <ExpandableList
         childrenList={pythonNotebookItems}
-        title="Python Notebook"
-      />
+        title="Code Tutorials"
+      /> */}
+      <ExpandableList childrenList={otherItems} title="Other" />
     </>
-  ) : (
-    <NaList title={"Data Access"} />
   );
 };
 
