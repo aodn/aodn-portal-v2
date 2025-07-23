@@ -30,6 +30,16 @@ def test_citation_and_usage_sections(
     data_contact: str,
     credits: str,
 ) -> None:
+    """
+    Verifies that the 'Citation and Usage' tab correctly scrolls to and
+    displays the corresponding section's content when a section title
+    is clicked from the tab's navigation panel.
+
+    The test ensures that clicking each section title in the tab's navigation panel
+    triggers the tab to scroll to the associated section area and accurately
+    shows the relevant data for that section, confirming the UI's navigation
+    and content display functionality works as intended.
+    """
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)

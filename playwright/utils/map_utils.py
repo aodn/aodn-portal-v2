@@ -1,4 +1,6 @@
-def are_coordinates_equal(coord1: dict, coord2: dict, tolerance: float = 1e-6) -> bool:
+def are_coordinates_equal(
+    coord1: dict, coord2: dict, tolerance: float = 1e-6
+) -> bool:
     """
     Compare two lat/lng coordinate dictionaries with a tolerance.
 
@@ -11,9 +13,10 @@ def are_coordinates_equal(coord1: dict, coord2: dict, tolerance: float = 1e-6) -
         bool: True if coordinates are equal within tolerance, False otherwise
     """
     return (
-            abs(coord1['lat'] - coord2['lat']) < tolerance and
-            abs(coord1['lng'] - coord2['lng']) < tolerance
+        abs(coord1['lat'] - coord2['lat']) < tolerance
+        and abs(coord1['lng'] - coord2['lng']) < tolerance
     )
+
 
 def are_value_equal(v1: float, v2: float, tolerance: float = 1e-6) -> bool:
     """
