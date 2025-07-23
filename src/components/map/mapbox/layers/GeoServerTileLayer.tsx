@@ -72,7 +72,9 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
   ],
   opacity: 1.0,
 };
-
+// This function is specific for IMOS server geoserver-123
+// we can speed up the query by calling the cache server we own.
+// A proxy setup to redirect the call on firewall level
 const applyGeoWebCacheIfPossible = (baseUrl: string, param: TileUrlParams) => {
   if (baseUrl.includes("geoserver-123.aodn.org.au/geoserver/wms")) {
     // We can rewrite value so that it use internal cache server
