@@ -133,7 +133,7 @@ def test_show_more_results(
 @pytest.mark.parametrize(
     'button_label, section_title',
     [
-        ('Data Access', 'Links'),
+        ('Data Access', 'Data'),
     ],
 )
 def test_data_access_button_navigates_to_detail_page_data_access_tab(
@@ -141,7 +141,7 @@ def test_data_access_button_navigates_to_detail_page_data_access_tab(
 ) -> None:
     """
     Verifies that clicking the 'Data Access' button on a result card
-    navigates to the detail page tab, where the 'Links' are listed.
+    navigates to the detail page tab, where the 'Data' are listed.
     """
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)
