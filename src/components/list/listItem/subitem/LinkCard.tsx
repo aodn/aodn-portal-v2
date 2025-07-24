@@ -60,10 +60,10 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
               component="img"
               width={
                 link.rel === "wfs"
-                  ? "27px"
+                  ? "27px" // Fixed WFS icon size as per design
                   : link.rel === "wms"
-                    ? "22px"
-                    : "16px"
+                    ? "22px" // Fixed WMS icon size as per design
+                    : "16px" // Fixed Link icon size as per design
               }
               height={
                 link.rel === "wfs"
@@ -93,7 +93,8 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
             }}
           >
             <Typography
-              color={fontColor.blue.medium}
+              variant="title1Medium"
+              color={rc8Theme.palette.primary.main}
               sx={{
                 padding: 0,
                 overflowWrap: "break-word",

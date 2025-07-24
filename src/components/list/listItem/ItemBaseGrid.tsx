@@ -25,7 +25,7 @@ const ItemBaseGrid: React.FC<GridProps> = (props) => {
         onMouseLeave={() => setIsOnHover(false)}
         sx={{
           backgroundColor: isOnHover
-            ? theme.palette.detail.listItemBGHover
+            ? rc8Theme.palette.primary5
             : rc8Theme.palette.primary6,
           margin: theme.mp.sm,
           borderRadius: theme.borderRadius.sm,
