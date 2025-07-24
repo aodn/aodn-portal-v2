@@ -1,6 +1,7 @@
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import React from "react";
 import NoSuchDataIcon from "../../../icon/NoSuchDataIcon";
+import { fontWeight } from "../../../../styles/constants";
 
 interface NaAreaProps {
   title: string;
@@ -14,7 +15,7 @@ const NaArea: React.FC<NaAreaProps> = ({ title }) => {
         <NoSuchDataIcon />
       </Box>
       <Typography variant="detailContent">
-        <b>{title} Not Found </b>
+        <Box fontWeight={fontWeight.extraBold}>{title} Not Found </Box>
       </Typography>
     </Grid>
   );
