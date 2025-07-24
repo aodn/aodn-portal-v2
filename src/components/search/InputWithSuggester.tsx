@@ -60,6 +60,7 @@ enum OptionGroup {
  * do as the below nullable props.
  * @param handleEnterPressed handle the event when users press the ENTER on keyboard.
  * have default empty implementation. Can be overridden.
+ * @param handleScrollToTop
  * @param setPendingSearch
  * @param setActiveButton
  * @param setShouldExpandSearchbar
@@ -104,14 +105,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             );
             const platform = new Set<string>(data.suggested_platform_vocabs);
 
-            // Get the intersection of parameterVocabSuggestions and phrasesSuggestions
-            // const commonSuggestions = [...parameterVocabSuggestions].filter(
-            //   (item) => {
-            //     return phrasesSuggestions.has(item);
-            //   }
-            // );
-
-            // Create array of all unique suggestions
+            // Create an array of all unique suggestions
             const allSuggestions = new Set([
               ...organization,
               ...parameter,
@@ -125,7 +119,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               inputValue
             );
 
-            // Create sorted options array
+            // Create a sorted options array
             const options: OptionType[] = sortedSuggestions.map(
               (suggestion) => {
                 if (organization.has(suggestion)) {
