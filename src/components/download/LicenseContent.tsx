@@ -37,7 +37,7 @@ const LicenseContent = () => {
   };
 
   return (
-    <Box sx={{ mx: "20px" }}>
+    <Box sx={{ mx: "6px" }}>
       <Typography
         variant="title1Medium"
         sx={{
@@ -93,56 +93,6 @@ const LicenseContent = () => {
           }}
         />
       </Box>
-
-      <Typography
-        variant="title1Medium"
-        gutterBottom
-        sx={{
-          ...headingStyles,
-          mt: "20px",
-        }}
-      >
-        Usage Constraints
-      </Typography>
-
-      <Typography
-        variant="body2Regular"
-        sx={{
-          ...commonBodyStyles,
-          mb: "22px",
-        }}
-      >
-        Any users of IMOS data are required to clearly acknowledge the source of
-        the material derived from IMOS in the format: &quot;Data was sourced
-        from Australia&apos;s Integrated Marine Observing System (IMOS) - IMOS
-        is enabled by the National Collaborative Research Infrastructure
-        strategy (NCRIS).&quot; If relevant, also credit other organisations
-        involved in collection of this particular datastream (as listed in
-        &apos;credit&apos; in the metadata record).
-      </Typography>
-
-      <Typography variant="body2Regular" sx={commonBodyStyles}>
-        If using data from the Ningaloo (TAN100) mooring, please add to the
-        citation - &quot;Department of Jobs, Tourism, Science and Innovation
-        (DJTSI), Western Australian Government&quot;.
-      </Typography>
-
-      <Typography variant="body2Regular" sx={commonBodyStyles}>
-        If using data from the Ocean Reference Station 65m (ORS065) mooring,
-        please add to the citation - &quot;Sydney Water Corporation&quot;.
-      </Typography>
-
-      <Typography variant="body2Regular" sx={commonBodyStyles}>
-        Data, products and services from IMOS are provided &quot;as is&quot;
-        without any warranty as to fitness for a particular purpose.
-      </Typography>
-
-      <Typography variant="body2Regular" sx={commonBodyStyles}>
-        By using this data you are accepting the license agreement and terms
-        specified above. You accept all risks and responsibility for losses,
-        damages, costs and other consequences resulting directly or indirectly
-        from using this site and any information or material available from it.
-      </Typography>
 
       <Box
         sx={{
@@ -201,6 +151,56 @@ const LicenseContent = () => {
           {citationText}
         </Typography>
       </Box>
+
+      <Typography
+        variant="title1Medium"
+        gutterBottom
+        sx={{
+          ...headingStyles,
+          mt: "28px",
+        }}
+      >
+        Usage Constraints
+      </Typography>
+
+      <Typography
+        variant="body2Regular"
+        sx={{
+          ...commonBodyStyles,
+          mb: "22px",
+        }}
+      >
+        Any users of IMOS data are required to clearly acknowledge the source of
+        the material derived from IMOS in the format: &quot;Data was sourced
+        from Australia&apos;s Integrated Marine Observing System (IMOS) - IMOS
+        is enabled by the National Collaborative Research Infrastructure
+        strategy (NCRIS).&quot; If relevant, also credit other organisations
+        involved in collection of this particular datastream (as listed in
+        &apos;credit&apos; in the metadata record).
+      </Typography>
+
+      <Typography variant="body2Regular" sx={commonBodyStyles}>
+        If using data from the Ningaloo (TAN100) mooring, please add to the
+        citation - &quot;Department of Jobs, Tourism, Science and Innovation
+        (DJTSI), Western Australian Government&quot;.
+      </Typography>
+
+      <Typography variant="body2Regular" sx={commonBodyStyles}>
+        If using data from the Ocean Reference Station 65m (ORS065) mooring,
+        please add to the citation - &quot;Sydney Water Corporation&quot;.
+      </Typography>
+
+      <Typography variant="body2Regular" sx={commonBodyStyles}>
+        Data, products and services from IMOS are provided &quot;as is&quot;
+        without any warranty as to fitness for a particular purpose.
+      </Typography>
+
+      <Typography variant="body2Regular" sx={commonBodyStyles}>
+        By using this data you are accepting the license agreement and terms
+        specified above. You accept all risks and responsibility for losses,
+        damages, costs and other consequences resulting directly or indirectly
+        from using this site and any information or material available from it.
+      </Typography>
     </Box>
   );
 };

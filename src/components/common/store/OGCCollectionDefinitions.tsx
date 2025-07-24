@@ -11,8 +11,8 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { bboxPolygon } from "@turf/turf";
 
 import * as turf from "@turf/turf";
-import wmsIcon from "../../../assets/icons/wms.png";
-import wfsIcon from "../../../assets/icons/wfs.png";
+import wmsIcon from "../../../assets/icons/wms-icon.png";
+import wfsIcon from "../../../assets/icons/wfs-icon.png";
 import linkIcon from "../../../assets/icons/link.png";
 
 // interfaces:

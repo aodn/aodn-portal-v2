@@ -214,25 +214,29 @@
       "href": "https://www.marine.csiro.au/data/gsm/gsm_extract.cfm?survey=IN2019_V06&instrument=EM122",
       "rel": "related",
       "type": "text/html",
-      "title": "Geophysical Survey and Mapping website information for this data set"
+      "title": "Geophysical Survey and Mapping website information for this data set",
+      "ai:group": "Other"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=309",
       "rel": "related",
       "type": "text/html",
-      "title": "RV Investigator survey information"
+      "title": "RV Investigator survey information",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "MNF home page"
+      "title": "MNF home page",
+      "ai:group": "Other"
     },
     {
       "href": "https://www.marine.csiro.au/data/gsm/get_report.cfm?survey=in2019_v06",
       "rel": "related",
       "type": "text/html",
-      "title": "Geophysical Survey and Mapping acquisition report"
+      "title": "Geophysical Survey and Mapping acquisition report",
+      "ai:group": "Document"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

@@ -333,61 +333,71 @@
       "href": "https://www.cmar.csiro.au/geoserver/wms?&CQL_FILTER=SURVEY_NAME%20%3D%20%27SS199508%27",
       "rel": "wms",
       "type": "",
-      "title": "cmar:CATCH_HEADER_AODN_VIEW"
+      "title": "cmar:CATCH_HEADER_AODN_VIEW",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://www.marine.csiro.au/datacentre/projects/BioData/PDFs/BOX_AB2009_1426/BOX_AB2009_1426_index.htm",
-      "rel": "related",
+      "rel": "data",
       "type": "",
-      "title": "Stored Media List (CSIRO internal use only)"
+      "title": "Stored Media List (CSIRO internal use only)",
+      "ai:group": "Document"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=SS199508&data_type=catch",
-      "rel": "related",
+      "rel": "data",
       "type": "",
-      "title": "Data Link"
+      "title": "Data Link",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link"
+      "title": "Data Link",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=18",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link"
+      "title": "Documentation Link",
+      "ai:group": "Document"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=19",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link"
+      "title": "Documentation Link",
+      "ai:group": "Document"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=20",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link"
+      "title": "Documentation Link",
+      "ai:group": "Document"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link"
+      "title": "Documentation Link",
+      "ai:group": "Document"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=21",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link"
+      "title": "Documentation Link",
+      "ai:group": "Document"
     },
     {
       "href": "https://creativecommons.org/licenses/by/4.0/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link"
+      "title": "Documentation Link",
+      "ai:group": "Document"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

@@ -14,6 +14,8 @@
  * @version RC8
  */
 
+import { shadow } from "./constants";
+
 export const designTokensRC8 = {
   version: "rc8",
 
@@ -78,8 +80,8 @@ export const designTokensRC8 = {
       },
       // Heading styles - Size: 16, Line Height: 22
       heading4: {
-        // fontFamily: "Poppins, sans-serif", // TODO
-        fontFamily: "Roboto",
+        fontFamily: "Poppins, sans-serif",
+        // fontFamily: "Roboto",
         fontSize: "16px",
         fontWeight: 500,
         lineHeight: "22px",
@@ -113,7 +115,7 @@ export const designTokensRC8 = {
       },
       // Body styles - Size: 14, Line Height: 22
       body2Regular: {
-        // fontFamily: "Open Sans, sans-serif", // TODO
+        fontFamily: "Open Sans, sans-serif",
         fontSize: "14px",
         fontWeight: 400,
         lineHeight: "22px",
@@ -192,6 +194,10 @@ export const designTokensRC8 = {
       tag1: "#D7F4F2",
       tag2: "#F6F0ED",
     },
+  },
+
+  shadow: {
+    dropShadow: "1px 1px 6px rgba(0, 0, 0, 0.25)",
   },
 };
 

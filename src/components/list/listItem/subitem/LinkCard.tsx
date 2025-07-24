@@ -7,6 +7,7 @@ import { openInNewTab } from "../../../../utils/LinkUtils";
 import CopyButton, {
   COPY_BUTTON_HEIGHT,
 } from "../../../common/buttons/CopyButton";
+import rc8Theme from "../../../../styles/themeRC8";
 
 interface LinkCardProps {
   icon?: boolean;
@@ -42,9 +43,6 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
         alignItems: "center",
         backgroundColor: "transparent",
         padding: padding.small,
-        "&:hover": {
-          backgroundColor: color.blue.light,
-        },
         gap: 1,
       }}
       data-testid={`link-card-${link.href}`}
@@ -57,15 +55,35 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
         aria-label="link and title"
       >
         {icon && link.getIcon && (
-          <Box
-            component="img"
-            width="16px"
-            height="16px"
-            src={link.getIcon()}
-            alt={"link icon"}
-          />
+          <Box display="flex" alignItems="center">
+            <Box
+              component="img"
+              width={
+                link.rel === "wfs"
+                  ? "27px"
+                  : link.rel === "wms"
+                    ? "22px"
+                    : "16px"
+              }
+              height={
+                link.rel === "wfs"
+                  ? "30px"
+                  : link.rel === "wms"
+                    ? "28px"
+                    : "16px"
+              }
+              src={link.getIcon()}
+              alt={"link icon"}
+            />
+          </Box>
         )}
-        <Box sx={{ overflow: "hidden", minHeight: COPY_BUTTON_HEIGHT }}>
+        <Box
+          sx={{
+            overflow: "hidden",
+            minHeight: COPY_BUTTON_HEIGHT,
+            alignContent: "center",
+          }}
+        >
           <Link
             href={link.href}
             underline="hover"

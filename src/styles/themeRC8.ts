@@ -1,75 +1,103 @@
 import { createTheme, ThemeOptions } from "@mui/material/styles";
-import { designTokensRC8 } from "./designTokensRC8";
+import { designTokensRC8 as designTokens } from "./designTokensRC8";
 
 // Type definitions are in rc8ThemeTypes.ts to extend Material-UI theme interfaces
 
 const rc8ThemeOptions: ThemeOptions = {
-  designTokens: designTokensRC8,
+  designTokens: designTokens,
 
   typography: {
     fontFamily: [
-      designTokensRC8.typography.fontFamily.poppins,
-      designTokensRC8.typography.fontFamily.openSans,
+      designTokens.typography.fontFamily.poppins,
+      designTokens.typography.fontFamily.openSans,
     ].join(","),
 
-    slogan1: designTokensRC8.typography.variants.slogan1,
-    slogan2: designTokensRC8.typography.variants.slogan2,
-    heading1: designTokensRC8.typography.variants.heading1,
-    heading2: designTokensRC8.typography.variants.heading2,
-    heading3: designTokensRC8.typography.variants.heading3,
-    heading4: designTokensRC8.typography.variants.heading4,
-    title1Medium: designTokensRC8.typography.variants.title1Medium,
-    title2Regular: designTokensRC8.typography.variants.title2Regular,
-    body1Medium: designTokensRC8.typography.variants.body1Medium,
-    body2Regular: designTokensRC8.typography.variants.body2Regular,
-    body3Small: designTokensRC8.typography.variants.body3Small,
+    slogan1: designTokens.typography.variants.slogan1,
+    slogan2: designTokens.typography.variants.slogan2,
+    heading1: designTokens.typography.variants.heading1,
+    heading2: designTokens.typography.variants.heading2,
+    heading3: designTokens.typography.variants.heading3,
+    heading4: designTokens.typography.variants.heading4,
+    title1Medium: designTokens.typography.variants.title1Medium,
+    title2Regular: designTokens.typography.variants.title2Regular,
+    body1Medium: designTokens.typography.variants.body1Medium,
+    body2Regular: designTokens.typography.variants.body2Regular,
+    body3Small: designTokens.typography.variants.body3Small,
   },
 
   palette: {
     // MUI system colors using RC8 tokens
     primary: {
-      main: designTokensRC8.colours.product.primary1,
+      main: designTokens.colours.product.primary1,
     },
     secondary: {
-      main: designTokensRC8.colours.product.secondary1,
+      main: designTokens.colours.product.secondary1,
     },
     success: {
-      main: designTokensRC8.colours.system.complete,
+      main: designTokens.colours.system.complete,
     },
     warning: {
-      main: designTokensRC8.colours.system.warning,
+      main: designTokens.colours.system.warning,
     },
     error: {
-      main: designTokensRC8.colours.system.error,
+      main: designTokens.colours.system.error,
     },
     info: {
-      main: designTokensRC8.colours.system.info,
+      main: designTokens.colours.system.info,
     },
 
     // RC8 custom colors
-    text1: designTokensRC8.colours.text.text1,
-    text2: designTokensRC8.colours.text.text2,
-    text3: designTokensRC8.colours.text.text3,
-    rc8Background: designTokensRC8.colours.background.background,
-    grey100: designTokensRC8.colours.grey.grey100,
-    grey300: designTokensRC8.colours.grey.grey300,
-    grey500: designTokensRC8.colours.grey.grey500,
-    grey600: designTokensRC8.colours.grey.grey600,
-    grey700: designTokensRC8.colours.grey.grey700,
-    primary1: designTokensRC8.colours.product.primary1,
-    primary2: designTokensRC8.colours.product.primary2,
-    primary3: designTokensRC8.colours.product.primary3,
-    primary4: designTokensRC8.colours.product.primary4,
-    primary5: designTokensRC8.colours.product.primary5,
-    primary6: designTokensRC8.colours.product.primary6,
-    secondary1: designTokensRC8.colours.product.secondary1,
-    neutral1: designTokensRC8.colours.product.neutral1,
-    neutral2: designTokensRC8.colours.product.neutral2,
-    neutral3: designTokensRC8.colours.product.neutral3,
-    neutral4: designTokensRC8.colours.product.neutral4,
-    tag1: designTokensRC8.colours.product.tag1,
-    tag2: designTokensRC8.colours.product.tag2,
+    text1: designTokens.colours.text.text1,
+    text2: designTokens.colours.text.text2,
+    text3: designTokens.colours.text.text3,
+    rc8Background: designTokens.colours.background.background,
+    grey100: designTokens.colours.grey.grey100,
+    grey300: designTokens.colours.grey.grey300,
+    grey500: designTokens.colours.grey.grey500,
+    grey600: designTokens.colours.grey.grey600,
+    grey700: designTokens.colours.grey.grey700,
+    primary1: designTokens.colours.product.primary1,
+    primary2: designTokens.colours.product.primary2,
+    primary3: designTokens.colours.product.primary3,
+    primary4: designTokens.colours.product.primary4,
+    primary5: designTokens.colours.product.primary5,
+    primary6: designTokens.colours.product.primary6,
+    secondary1: designTokens.colours.product.secondary1,
+    neutral1: designTokens.colours.product.neutral1,
+    neutral2: designTokens.colours.product.neutral2,
+    neutral3: designTokens.colours.product.neutral3,
+    neutral4: designTokens.colours.product.neutral4,
+    tag1: designTokens.colours.product.tag1,
+    tag2: designTokens.colours.product.tag2,
   },
+
+  shadows: [
+    "none",
+    designTokens.shadow.dropShadow, // dropdown shadow
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+  ],
 
   // TODO: Add custom RC8 theme properties
 

@@ -1,5 +1,6 @@
 import { Grid, GridProps, useTheme } from "@mui/material";
 import React, { createContext, useContext, useState } from "react";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface HoverContextProps {
   isOnHover: boolean;
@@ -25,7 +26,7 @@ const ItemBaseGrid: React.FC<GridProps> = (props) => {
         sx={{
           backgroundColor: isOnHover
             ? theme.palette.detail.listItemBGHover
-            : theme.palette.detail.listItemBG,
+            : rc8Theme.palette.primary6,
           margin: theme.mp.sm,
           borderRadius: theme.borderRadius.sm,
           width: "95%",

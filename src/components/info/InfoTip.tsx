@@ -1,47 +1,59 @@
-import { FC, useState } from "react";
-import { IconButton, Popover, useTheme } from "@mui/material";
+import { FC, useCallback, useRef, useState } from "react";
+import { IconButton, Popover } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
 import InfoCard from "./InfoCard";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
+import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
+import rc8Theme from "../../styles/themeRC8";
 
 interface InfoTipProps {
   infoContent?: InfoContentType;
 }
 const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
-  const theme = useTheme();
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const [open, setOpen] = useState(false);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const handleClick = useCallback((_: React.MouseEvent<HTMLButtonElement>) => {
+    setOpen(true);
+    disableScroll();
+  }, []);
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    enableScroll();
+  }, []);
 
-  const handleClosePopover = () => {
-    handleClose();
-  };
-
-  const open = Boolean(anchorEl);
   return (
     <>
-      <IconButton onClick={handleClick} sx={{ color: theme.palette.info.main }}>
+      <IconButton
+        ref={buttonRef}
+        onClick={handleClick}
+        sx={{ color: rc8Theme.palette.info.main }}
+      >
         <InfoIcon />
       </IconButton>
       <Popover
         open={open}
-        anchorEl={anchorEl}
+        anchorEl={buttonRef.current}
         onClose={handleClose}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "left",
         }}
       >
-        <InfoCard status={InfoStatusType.INFO} infoContent={infoContent}>
+        <InfoCard
+          status={InfoStatusType.INFO}
+          infoContent={infoContent}
+          sx={{
+            width: "310px", // Fixed width as per design
+            height: "190px", // Fixed Height as per design
+
+            boxShadow: rc8Theme.shadows[1],
+          }}
+        >
           <IconButton
-            onClick={handleClosePopover}
+            onClick={handleClose}
             style={{ position: "absolute", top: 8, right: 8 }}
           >
             <CloseIcon />
