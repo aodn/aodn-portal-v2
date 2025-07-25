@@ -218,6 +218,20 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
       const scrollPosition = event.currentTarget.scrollTop;
       debounceScrollHandler?.current?.(scrollPosition);
+      // This is use to update the selectedIndex if user scroll up the childlist
+      // panel
+      let newIndex = 0;
+      let minDiff = Infinity;
+      contentRefs.current.forEach((ref, idx) => {
+        if (ref.current) {
+          const diff = Math.abs(ref.current.offsetTop - scrollPosition);
+          if (diff < minDiff) {
+            minDiff = diff;
+            newIndex = idx;
+          }
+        }
+      });
+      setSelectedIndex(newIndex);
     },
     []
   );
