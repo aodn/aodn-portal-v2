@@ -11,7 +11,7 @@ from pages.detail_page import DetailPage
             'IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility',
             '0015db7e-e684-7548-e053-08114f8cd4ad',
             'Data Link',
-            'https://thredds.aodn.org.au/thredds/catalog/IMOS/SOOP/SOOP-BA/catalog.html',
+            'https://imos.org.au/facilities/shipsofopportunity',
         ),
     ],
 )

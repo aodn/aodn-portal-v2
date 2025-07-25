@@ -3,14 +3,20 @@ import React, { ReactNode, useState } from "react";
 import ShowMoreDetailBtn from "../common/buttons/ShowMoreDetailBtn";
 import NaList from "./NaList";
 import EndpointedDiamondIcon from "../icon/EndpointedDiamondIcon";
+import { InfoContentType } from "../info/InfoDefinition";
+import InfoTip from "../info/InfoTip";
 
 interface ExpandableListProps {
   title?: string;
+  info?: InfoContentType;
+  navigatable?: boolean;
   childrenList: ReactNode[];
 }
 
 const ExpandableList: React.FC<ExpandableListProps> = ({
   title,
+  info,
+  navigatable = true,
   childrenList = [],
 }) => {
   const theme = useTheme();
@@ -20,9 +26,11 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
     <Grid container sx={{ marginTop: theme.mp.md }}>
       {title !== "Statement" && (
         <Grid item md={12} display="flex" alignItems="center">
-          <Box display="flex" justifyContent="center" alignItems="center">
-            <EndpointedDiamondIcon />
-          </Box>
+          {navigatable && (
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <EndpointedDiamondIcon />
+            </Box>
+          )}
           <Typography
             display="inline"
             variant="detailTitle"
@@ -33,6 +41,11 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
           >
             {title}
           </Typography>
+          {info && (
+            <Box sx={{ marginLeft: theme.mp.sm }}>
+              <InfoTip infoContent={info} />
+            </Box>
+          )}
         </Grid>
       )}
 

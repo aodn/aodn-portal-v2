@@ -11,61 +11,66 @@
       "links": [
         {
           "href": "http://imos.org.au/nationalmooringnetwork.html",
-          "rel": "self",
+          "rel": "related",
           "type": "text/html",
-          "title": "ANMN page on IMOS website"
+          "title": "ANMN page on IMOS website",
+          "ai:group": "Other"
         },
         {
           "href": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANMN/catalog.html",
-          "rel": "self",
+          "rel": "related",
           "type": "text/html",
-          "title": "NetCDF files via THREDDS catalog"
+          "title": "NetCDF files via THREDDS catalog",
+          "ai:group": "Data Access"
         },
         {
           "href": "https://portal.aodn.org.au/search?uuid=7e13b5f3-4a70-4e31-9e95-335efa491c5c",
-          "rel": "self",
+          "rel": "related",
           "type": "text/html",
           "title": "View and download data though the AODN Portal"
         },
         {
           "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
-          "rel": "self",
+          "rel": "wms",
           "type": "",
-          "title": "imos:anmn_ts_timeseries_map"
+          "title": "imos:anmn_ts_timeseries_map",
+          "ai:group": "Data Access"
         },
         {
           "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
-          "rel": "self",
+          "rel": "wfs",
           "type": "",
-          "title": "anmn_ts_timeseries_data"
+          "title": "anmn_ts_timeseries_data",
+          "ai:group": "Data Access"
         },
         {
           "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
-          "rel": "self",
+          "rel": "related",
           "type": "text/html",
-          "title": "OGC WFS help documentation"
+          "title": "OGC WFS help documentation",
+          "ai:group": "Document"
         },
         {
           "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
-          "rel": "self",
+          "rel": "IMOS:AGGREGATION--bodaac",
           "type": "",
           "title": "anmn_ts_timeseries_map#file_url"
         },
         {
           "href": "https://help.aodn.org.au/web-services/ncurllist-service/",
-          "rel": "self",
+          "rel": "related",
           "type": "text/html",
           "title": "ncUrlList help documentation"
         },
         {
-          "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/dbee258b-8730-4072-96d4-2818a69a4afd.png",
+          "href": "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/harvesting/IMOS_colour_logo.png",
           "rel": "icon",
           "type": "image/png",
           "title": "Suggest icon for dataset"
         },
         {
           "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/7e13b5f3-4a70-4e31-9e95-335efa491c5c",
-          "rel": "self",
+          "rel": "describedby",
           "type": "text/html",
           "title": "Full metadata link"
         },

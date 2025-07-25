@@ -98,7 +98,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   onDetail = undefined,
   resultCardButtonConfig,
 }) => {
-  const links = content.getDistributionLinks();
+  const links = content.getAllAIGroupedLinks();
 
   if (!content) return;
   return (
