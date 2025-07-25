@@ -35,10 +35,17 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
   const goToDetailPage = useTabNavigation();
 
   const createCompactPanel = useCallback(
-    (uuid: string | undefined, title: string, links: ILink[] | undefined) => {
-      if (uuid && links && links.length > 0) {
+    (
+      uuid: string | undefined,
+      title: string,
+      dataAccessLinks: ILink[] | undefined
+    ) => {
+      if (uuid && dataAccessLinks && dataAccessLinks.length > 0) {
         // Group links by type and display it in blocks
-        const grouped: Record<string, ILink[]> = groupBy(links, "rel");
+        const grouped: Record<string, ILink[]> = groupBy(
+          dataAccessLinks,
+          "rel"
+        );
         return (
           <SideCardContainer
             title={title}
@@ -80,9 +87,10 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
         title: "Data Access Options",
         component: (
           <DataAccessList
-            linksToData={collection?.getDistributionLinks()}
             dataAccessLinks={collection?.getDataAccessLinks()}
-            pythonNotebook={collection?.getPythonNotebook()}
+            documentLinks={collection?.getDocumentLinks()}
+            pythonNotebookLinks={collection?.getPythonNotebookLinks()}
+            otherLinks={collection?.getOtherLinks()}
           />
         ),
       },

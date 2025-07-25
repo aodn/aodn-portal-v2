@@ -68,22 +68,21 @@ describe("DataAccessPanel", async () => {
   });
   // TODO: Test is false without return on waitFor
   test("should show COPY LINK button when on hover", () => {
-    return waitFor(() => screen.findByText("Data access using R"), {
-      timeout: 5000,
-    }).then(() => {
-      const link = screen.queryByText("Data access using R");
-      expect(link).to.exist;
+    return waitFor(() => screen.findByText("Data access using R")).then(
+      (link) => {
+        expect(link).to.exist;
 
-      userEvent.hover(link!);
+        userEvent.hover(link!);
 
-      return waitFor(() => screen.findAllByText("Copy Link"), {
-        timeout: 5000,
-      }).then((copyBtns) => {
-        const visibleCount = copyBtns.filter(
-          (btn) => getComputedStyle(btn).visibility === "visible"
-        ).length;
-        expect(visibleCount).toBe(1);
-      });
-    });
+        return waitFor(() => screen.findAllByText("Copy Link"), {
+          timeout: 5000,
+        }).then((copyBtns) => {
+          const visibleCount = copyBtns.filter(
+            (btn) => getComputedStyle(btn).visibility === "visible"
+          ).length;
+          expect(visibleCount).toBe(1);
+        });
+      }
+    );
   });
 });

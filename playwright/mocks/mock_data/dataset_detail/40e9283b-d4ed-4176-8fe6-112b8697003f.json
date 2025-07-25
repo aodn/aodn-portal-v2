@@ -1523,45 +1523,52 @@
   "links": [
     {
       "href": "https://data.imas.utas.edu.au/attachments/AMP_bathymetry_derivatives/geomorph",
-      "rel": "related",
+      "rel": "data",
       "type": "",
-      "title": "DATA ACCESS - geomorphometry classification Geotiffs"
+      "title": "DATA ACCESS - geomorphometry classification Geotiffs",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://data.imas.utas.edu.au/attachments/AMP_bathymetry_derivatives/hillshade/geomorph/",
-      "rel": "related",
+      "rel": "data",
       "type": "",
-      "title": "DATA ACCESS - hillshade for geomorphometry Geotiffs (to use as backdrop)"
+      "title": "DATA ACCESS - hillshade for geomorphometry Geotiffs (to use as backdrop)",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://doi.org/10.3389/fmars.2023.1302108",
-      "rel": "related",
+      "rel": "WWW:LINK-1.0-http--publication",
       "type": "",
-      "title": "ASSOCIATED PUBLICATION - Geomorphometric maps of Australia’s Marine Park estate and their role in improving the integrated monitoring and management of marine ecosystems"
+      "title": "ASSOCIATED PUBLICATION - Geomorphometric maps of Australia’s Marine Park estate and their role in improving the integrated monitoring and management of marine ecosystems",
+      "ai:group": "Other"
     },
     {
       "href": "https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/fb451be4-9de1-4bc2-8fd6-0f285f90916f",
       "rel": "related",
       "type": "text/html",
-      "title": "RELATED DATA - bathymetry mosaics of AMPs (source data)"
+      "title": "RELATED DATA - bathymetry mosaics of AMPs (source data)",
+      "ai:group": "Other"
     },
     {
       "href": "https://github.com/jacquomo/Geomorphmetry_SeamapAus",
-      "rel": "related",
+      "rel": "WWW:LINK-1.0-http--readme",
       "type": "",
-      "title": ""
+      "title": "",
+      "ai:group": "Other"
     },
     {
       "href": "https://seamapaustralia.org/map/#57ab9851-4906-4338-a34d-a1a05971db61",
-      "rel": "related",
+      "rel": "WWW:LINK-1.0-http--portal",
       "type": "",
-      "title": ""
+      "title": "",
+      "ai:group": "Other"
     },
     {
       "href": "https://geoserver.imas.utas.edu.au/geoserver/wms",
       "rel": "wms",
       "type": "",
-      "title": "seamap:geomorph_AMP_grp"
+      "title": "seamap:geomorph_AMP_grp",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/1bb8f09c-99d6-431f-b902-4d3e4cef02df.png",

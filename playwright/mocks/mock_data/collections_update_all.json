@@ -13,13 +13,15 @@
           "href": "https://geoserver.imas.utas.edu.au/geoserver/seamap/wfs?version=1.0.0&request=GetFeature&typeName=SeamapAus_VIC_statewide_habitats_2023&outputFormat=SHAPE-ZIP",
           "rel": "wfs",
           "type": "",
-          "title": "SHAPE-ZIP"
+          "title": "SHAPE-ZIP",
+          "ai:group": "Data Access"
         },
         {
           "href": "https://geoserver.imas.utas.edu.au/geoserver/seamap/wms",
           "rel": "wms",
           "type": "",
-          "title": "seamap:SeamapAus_VIC_statewide_habitats_2023"
+          "title": "seamap:SeamapAus_VIC_statewide_habitats_2023",
+          "ai:group": "Data Access"
         },
         {
           "href": "https://metashare.maps.vic.gov.au/geonetwork/srv/api/records/2b7471bd-523a-5d66-b805-abc8ad650c50",

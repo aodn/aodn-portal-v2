@@ -237,31 +237,36 @@
       "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link"
+      "title": "Data Link",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://marlin.csiro.au/geonetwork/srv/eng/catalog.search#/metadata/5e9ea5c7-f86d-425a-b641-7768c3896e6f",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link"
+      "title": "Data Link",
+      "ai:group": "Other"
     },
     {
       "href": "https://www.marine.csiro.au/data/requests/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link"
+      "title": "Documentation Link",
+      "ai:group": "Document"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link"
+      "title": "Documentation Link",
+      "ai:group": "Document"
     },
     {
       "href": "https://creativecommons.org/licenses/by/4.0/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link"
+      "title": "Documentation Link",
+      "ai:group": "Document"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

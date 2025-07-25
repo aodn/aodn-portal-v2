@@ -59,6 +59,7 @@ describe("OGCCollection", () => {
           href: "http://example.com/wms",
           type: "application/xml",
           title: "WMS Link",
+          "ai:group": "Data Access",
           getIcon: () => "mocked-wms-icon.png",
         },
       ];
@@ -101,6 +102,7 @@ describe("OGCCollection", () => {
           href: "http://example.com/wms",
           type: "application/xml",
           title: "WMS Link",
+          "ai:group": "Data Access",
           getIcon: () => "mocked-wms-icon.png",
         },
       ];
@@ -130,6 +132,61 @@ describe("OGCCollection", () => {
 
       const result = collection.findIcon();
       expect(result).toBe("http://example.com/icon1.png");
+    });
+
+    it("should filter links by AI group correctly", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        {
+          rel: "related",
+          href: "http://example.com/data",
+          type: "text/html",
+          title: "Data Link",
+          "ai:group": "Data Access",
+          getIcon: () => "mocked-link-icon.png",
+        },
+        {
+          rel: "related",
+          href: "http://example.com/doc",
+          type: "text/html",
+          title: "Document Link",
+          "ai:group": "Document",
+          getIcon: () => "mocked-link-icon.png",
+        },
+        {
+          rel: "related",
+          href: "http://example.com/other",
+          type: "text/html",
+          title: "Other Link",
+          getIcon: () => "mocked-link-icon.png",
+        },
+      ];
+
+      const dataAccessLinks = collection.getDataAccessLinks();
+      const documentLinks = collection.getDocumentLinks();
+      const otherLinks = collection.getOtherLinks();
+
+      expect(dataAccessLinks).toHaveLength(1);
+      expect(dataAccessLinks?.[0].title).toBe("Data Link");
+      expect(documentLinks).toHaveLength(1);
+      expect(documentLinks?.[0].title).toBe("Document Link");
+      expect(otherLinks).toBeUndefined();
+    });
+
+    it("should return undefined when no links match the AI group", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        {
+          rel: "related",
+          href: "http://example.com/test",
+          type: "text/html",
+          title: "Test Link",
+          getIcon: () => "mocked-link-icon.png",
+        },
+      ];
+
+      const dataAccessLinks = collection.getDataAccessLinks();
+      expect(dataAccessLinks).toBeUndefined();
     });
   });
 });

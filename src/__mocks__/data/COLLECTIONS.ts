@@ -306,15 +306,17 @@ const NORMAL_COLLECTION = {
   links: [
     {
       href: "https://docs.ropensci.org/dataaimsr/",
-      rel: "related",
+      rel: "wfs",
       type: "",
       title: "Data access using R",
+      "ai:group": "Data Access",
     },
     {
       href: "https://weather.aims.gov.au/#/station/4",
       rel: "related",
       type: "",
       title: "Marine Weather Observations for Davies Reef",
+      "ai:group": "Document",
     },
     {
       href: "https://portal.aodn.org.au/search?uuid=0887cb5b-b443-4e08-a169-038208109466",
