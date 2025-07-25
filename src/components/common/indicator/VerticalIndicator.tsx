@@ -2,7 +2,7 @@ import React, { FC, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 
 interface VerticalIndicatorProps {
-  width?: number;
+  diamondSize?: number;
   index?: number;
   itemRefs: React.MutableRefObject<
     Array<React.RefObject<HTMLDivElement | null>>
@@ -10,7 +10,7 @@ interface VerticalIndicatorProps {
 }
 
 const VerticalIndicator: FC<VerticalIndicatorProps> = ({
-  width = 20,
+  diamondSize = 20,
   index = 0,
   itemRefs,
 }) => {
@@ -74,31 +74,38 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
   }, [itemRefs, index]);
 
   // Diamond height is equal to width (20px by default)
-  const diamondCenterOffset = width / 2;
+  const diamondCenterOffset = diamondSize / 2;
 
   return (
     <Box
       ref={containerRef}
-      sx={{ position: "relative", width: `${width}px`, height: `${height}px` }}
+      sx={{
+        position: "relative",
+        width: `${diamondSize}px`,
+        height: `${height}px`,
+      }}
     >
       <svg
-        width={width}
+        width={diamondSize}
         height={height}
         style={{ position: "absolute", left: 0 }}
       >
         {/* Full vertical line */}
         <line
-          x1={width / 2}
+          x1={diamondSize / 2}
           y1={0}
-          x2={width / 2}
+          x2={diamondSize / 2}
           y2={height}
           stroke="#bdbdbd"
           strokeWidth="2"
         />
         {/* Diamond positioned with center at activeY */}
-        <g transform={`translate(0, ${activeY - diamondCenterOffset})`}>
+        <g
+          transform={`translate(0, ${activeY - diamondCenterOffset})`}
+          style={{ transition: "transform 0.2s ease" }}
+        >
           <polygon
-            points={`${width / 2},0 0,${width / 2} ${width / 2},${width} ${width},${width / 2}`}
+            points={`${diamondSize / 2},0 0,${diamondSize / 2} ${diamondSize / 2},${diamondSize} ${diamondSize},${diamondSize / 2}`}
             fill="#607d8b"
           />
         </g>

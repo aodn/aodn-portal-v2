@@ -40,6 +40,10 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const [position, setPosition] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
+  const debounceScrollHandler = useRef<_.DebouncedFunc<
+    (number: any) => void
+  > | null>(null);
+
   // Create an array of refs with the same size as the menu list which is the size of childrenList
   const menuRefs = useRef(
     Array(childrenList.length)
@@ -81,26 +85,27 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     [contentRefs]
   );
 
-  const debounceScrollHandler = useRef<_.DebouncedFunc<
-    (number: any) => void
-  > | null>(null);
-
   useEffect(() => {
     debounceScrollHandler.current = _.debounce((scrollPosition: number) => {
-      setPosition(scrollPosition);
-      const differenceInPosition = scrollPosition - position;
-      if (differenceInPosition < 0) {
-        laybackDeductSize(differenceInPosition);
-      }
+      setPosition((prevPosition) => {
+        const difference = scrollPosition - prevPosition;
+        if (difference < 0) {
+          laybackDeductSize(difference);
+        }
+        return scrollPosition;
+      });
     }, DEBOUNCE_DELAY);
 
     return () => debounceScrollHandler.current?.cancel();
-  }, [laybackDeductSize, position]);
+  }, [laybackDeductSize]);
 
-  const handleScroll = (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
-    const scrollPosition = event.currentTarget.scrollTop;
-    debounceScrollHandler?.current?.(scrollPosition);
-  };
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      const scrollPosition = event.currentTarget.scrollTop;
+      debounceScrollHandler?.current?.(scrollPosition);
+    },
+    []
+  );
 
   const onNavigate = useCallback(
     (index: number) => {
