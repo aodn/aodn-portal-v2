@@ -10,6 +10,7 @@ import { pageDefault } from "../common/constants";
 interface AssociatedRecordListProps {
   title: string;
   records: IAssociatedRecord[];
+  selected?: boolean;
 }
 
 const openRecord = (uuid: string) => {
@@ -18,7 +19,7 @@ const openRecord = (uuid: string) => {
 
 const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
   memo<AssociatedRecordListProps>(
-    ({ title, records }: AssociatedRecordListProps) => {
+    ({ title, records, selected = false }: AssociatedRecordListProps) => {
       const collapseComponents: ReactNode[] = useMemo(() => {
         const components: ReactNode[] = [];
         records?.map((record, index) => {
@@ -40,7 +41,13 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
         return components;
       }, [records]);
 
-      return <ExpandableList title={title} childrenList={collapseComponents} />;
+      return (
+        <ExpandableList
+          selected={selected}
+          title={title}
+          childrenList={collapseComponents}
+        />
+      );
     }
   );
 

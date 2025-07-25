@@ -11,6 +11,7 @@ interface LicenseListProps {
   url?: string;
   graphic?: string;
   title?: string;
+  selected?: boolean;
   mode?: MODE;
 }
 
@@ -19,6 +20,7 @@ const LicenseList: React.FC<LicenseListProps> = ({
   url,
   graphic,
   title = "License",
+  selected = false,
   mode = MODE.NORMAL,
 }) => {
   const theme = useTheme();
@@ -70,6 +72,7 @@ const LicenseList: React.FC<LicenseListProps> = ({
     default:
       return (
         <ExpandableList
+          selected={selected}
           title={title}
           childrenList={licenseComponent ? [licenseComponent] : []}
         />

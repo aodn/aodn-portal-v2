@@ -260,7 +260,6 @@ const ResultCards: FC<ResultCardsProps> = ({
       <DetailSubtabBtn
         id="result-card-load-more-btn"
         title="Show more results"
-        isBordered={false}
         onClick={loadMoreResults}
       />
     );
