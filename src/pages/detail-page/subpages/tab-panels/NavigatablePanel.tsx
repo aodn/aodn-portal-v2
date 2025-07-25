@@ -17,7 +17,7 @@ const PANEL_VISIBLE_HEIGHT = 1480;
 
 // the delay milliseconds for resizing the panel after scrolling. May change in
 // the future if users feel it is too slow / too fast.
-const RESIZE_DELAY = 300;
+const RESIZE_DELAY = 100;
 
 const DEBOUNCE_DELAY = 100;
 
@@ -209,15 +209,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         }
         return scrollPosition;
       });
-    }, DEBOUNCE_DELAY);
 
-    return () => debounceScrollHandler.current?.cancel();
-  }, [laybackDeductSize]);
-
-  const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
-      const scrollPosition = event.currentTarget.scrollTop;
-      debounceScrollHandler?.current?.(scrollPosition);
       // This is use to update the selectedIndex if user scroll up the childlist
       // panel
       let newIndex = 0;
@@ -232,6 +224,15 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         }
       });
       setSelectedIndex(newIndex);
+    }, DEBOUNCE_DELAY);
+
+    return () => debounceScrollHandler.current?.cancel();
+  }, [laybackDeductSize]);
+
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      const scrollPosition = event.currentTarget.scrollTop;
+      debounceScrollHandler?.current?.(scrollPosition);
     },
     []
   );
