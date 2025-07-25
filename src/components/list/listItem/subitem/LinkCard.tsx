@@ -59,14 +59,14 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
             <Box
               component="img"
               width={
-                link.rel === "wfs"
+                link.rel === "wfs" || link.href.includes("/wfs")
                   ? "27px" // Fixed WFS icon size as per design
                   : link.rel === "wms"
                     ? "22px" // Fixed WMS icon size as per design
                     : "16px" // Fixed Link icon size as per design
               }
               height={
-                link.rel === "wfs"
+                link.rel === "wfs" || link.href.includes("/wfs")
                   ? "30px"
                   : link.rel === "wms"
                     ? "28px"

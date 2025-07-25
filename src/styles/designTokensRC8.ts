@@ -195,10 +195,6 @@ export const designTokensRC8 = {
       tag2: "#F6F0ED",
     },
   },
-
-  shadow: {
-    dropShadow: "1px 1px 6px rgba(0, 0, 0, 0.25)",
-  },
 };
 
 // Convenience exports

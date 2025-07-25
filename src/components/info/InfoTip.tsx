@@ -34,6 +34,7 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
         <InfoIcon />
       </IconButton>
       <Popover
+        elevation={2}
         open={open}
         anchorEl={buttonRef.current}
         onClose={handleClose}
@@ -48,8 +49,6 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
           sx={{
             width: "310px", // Fixed width as per design
             height: "190px", // Fixed Height as per design
-
-            boxShadow: rc8Theme.shadows[1],
           }}
         >
           <IconButton

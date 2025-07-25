@@ -71,34 +71,6 @@ const rc8ThemeOptions: ThemeOptions = {
     tag2: designTokens.colours.product.tag2,
   },
 
-  shadows: [
-    "none",
-    designTokens.shadow.dropShadow, // dropdown shadow
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-  ],
-
   // TODO: Add custom RC8 theme properties
 
   // TODO: rc8Spacing - custom spacing tokens
