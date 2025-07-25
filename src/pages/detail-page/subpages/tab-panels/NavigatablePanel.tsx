@@ -7,11 +7,9 @@ import React, {
   useRef,
   useState,
 } from "react";
-import DetailSubtabBtn from "../../../../components/common/buttons/DetailSubtabBtn";
 import _ from "lodash";
-
-// a big number which is obviously bigger than all possible positions
-const BIG_POSITION = 99999;
+import DetailSubtabBtn from "../../../../components/common/buttons/DetailSubtabBtn";
+import VerticalIndicator from "../../../../components/common/indicator/VerticalIndicator";
 
 // the visible height of the navigatable panel. May change according to the design
 const PANEL_VISIBLE_HEIGHT = 1480;
@@ -40,15 +38,23 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const scrollableSectionRef = useRef<HTMLDivElement | null>(null);
   const basePointRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
-  // Create an array of refs with the same size as the items list
-  const refs = useRef(
+  // Create an array of refs with the same size as the menu list which is the size of childrenList
+  const menuRefs = useRef(
+    Array(childrenList.length)
+      .fill(null)
+      .map(() => createRef<HTMLDivElement>())
+  );
+
+  // Create an array of refs with the same size as the item list which is size of childrenList
+  const contentRefs = useRef(
     Array(childrenList.length)
       .fill(null)
       .map(() => createRef<HTMLDivElement | null>())
   );
 
-  const [supplimentaryHeight, setSupplimentaryHeight] = useState(0);
+  const [supplementaryHeight, setSupplementaryHeight] = useState(0);
 
   useEffect(() => {
     if (!scrollDistance) {
@@ -64,13 +70,16 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   // For better scrolling animation, resizing happens after scrolling
   const laybackDeductSize = useCallback((toReSize: number) => {
     setTimeout(() => {
-      setSupplimentaryHeight((prevHeight) =>
+      setSupplementaryHeight((prevHeight) =>
         prevHeight + toReSize > 0 ? prevHeight + toReSize : 0
       );
     }, RESIZE_DELAY);
   }, []);
 
-  const getRefBy = useCallback((index: number) => refs.current[index], [refs]);
+  const getRefBy = useCallback(
+    (index: number) => contentRefs.current[index],
+    [contentRefs]
+  );
 
   const debounceScrollHandler = useRef<_.DebouncedFunc<
     (number: any) => void
@@ -93,62 +102,27 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     debounceScrollHandler?.current?.(scrollPosition);
   };
 
-  const isPositionInsideBlock = useCallback(
-    (position: number, index: number): boolean => {
-      // at the beginning, when refs are all null(not initialized yet), border the first one by default
-      if (refs.current.some((ref) => !ref.current)) {
-        return index === 0;
-      }
-
-      const fixedPosition = position + 10;
-      if (index === 0) {
-        // Start case
-        const next = refs.current[1];
-        return (
-          next &&
-          fixedPosition <
-            (next?.current?.offsetTop ? next?.current?.offsetTop : 0)
-        );
-      } else if (index === refs.current.length - 1) {
-        // End case
-        const last = refs.current[refs.current.length - 1];
-        return (
-          last &&
-          fixedPosition >=
-            (last?.current?.offsetTop ? last?.current?.offsetTop : 0)
-        );
-      } else {
-        const self = refs.current[index];
-        const next = refs.current[index + 1];
-        return (
-          fixedPosition >=
-            (self?.current?.offsetTop ? self?.current?.offsetTop : 0) &&
-          fixedPosition <
-            (next?.current?.offsetTop ? next?.current?.offsetTop : BIG_POSITION)
-        );
-      }
-    },
-    [refs]
-  );
-
   const onNavigate = useCallback(
     (index: number) => {
       return () => {
+        setSelectedIndex(index);
+
         const ref = getRefBy(index);
-        if (!scrollableSectionRef.current || !ref?.current) return;
-        const targetPosition = ref.current.offsetTop;
+        if (scrollableSectionRef.current && ref?.current) {
+          const targetPosition = ref.current.offsetTop;
 
-        // Calculate the needed height to scroll to the target position
-        const bottomHeight = basePointRef.current
-          ? basePointRef.current.offsetTop
-          : 0;
-        const neededHeight =
-          targetPosition - (bottomHeight - PANEL_VISIBLE_HEIGHT);
+          // Calculate the needed height to scroll to the target position
+          const bottomHeight = basePointRef.current
+            ? basePointRef.current.offsetTop
+            : 0;
+          const neededHeight =
+            targetPosition - (bottomHeight - PANEL_VISIBLE_HEIGHT);
 
-        if (neededHeight >= 0) {
-          setSupplimentaryHeight((prevHeight) => prevHeight + neededHeight);
+          if (neededHeight >= 0) {
+            setSupplementaryHeight((prevHeight) => prevHeight + neededHeight);
+          }
+          setScrollDistance(targetPosition);
         }
-        setScrollDistance(targetPosition);
       };
     },
     [getRefBy]
@@ -168,18 +142,27 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     </Grid>
   ) : (
     <Grid container>
-      <Grid item container md={3}>
-        <Grid item md={11}>
-          {childrenList.map((child, index) => {
-            return (
-              <DetailSubtabBtn
-                key={index}
-                title={child.title}
-                isBordered={isPositionInsideBlock(position, index)}
-                onClick={onNavigate(index)}
-              />
-            );
-          })}
+      <Grid item container md={3} direction="row">
+        <Grid
+          container
+          wrap="nowrap"
+          direction="row" // Ensure buttons stack horizontal
+        >
+          <Grid item md={1}>
+            <VerticalIndicator index={selectedIndex} itemRefs={menuRefs} />
+          </Grid>
+          <Grid item>
+            {childrenList.map((child, index) => {
+              return (
+                <DetailSubtabBtn
+                  key={index}
+                  title={child.title}
+                  onClick={onNavigate(index)}
+                  ref={menuRefs.current[index]}
+                />
+              );
+            })}
+          </Grid>
         </Grid>
         <Grid item md={1} />
       </Grid>
@@ -199,7 +182,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
             </Box>
           );
         })}
-        <Box sx={{ height: `${supplimentaryHeight}px` }} />
+        <Box sx={{ height: `${supplementaryHeight}px` }} />
         <Box ref={basePointRef} />
       </Grid>
     </Grid>

@@ -2114,7 +2114,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/icons-material@npm:^5.15.10":
+"@mui/icons-material@npm:^5.18.0":
   version: 5.18.0
   resolution: "@mui/icons-material@npm:5.18.0"
   dependencies:
@@ -2130,7 +2130,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/material@npm:^5.16.7":
+"@mui/material@npm:^5.18.0":
   version: 5.18.0
   resolution: "@mui/material@npm:5.18.0"
   dependencies:
@@ -2202,7 +2202,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/system@npm:^5.16.7, @mui/system@npm:^5.18.0":
+"@mui/system@npm:^5.18.0":
   version: 5.18.0
   resolution: "@mui/system@npm:5.18.0"
   dependencies:
@@ -6150,9 +6150,9 @@ __metadata:
     "@luma.gl/shadertools": "npm:^9.0.17"
     "@mapbox/geo-viewport": "npm:^0.5.0"
     "@mapbox/mapbox-gl-draw": "npm:^1.4.3"
-    "@mui/icons-material": "npm:^5.15.10"
-    "@mui/material": "npm:^5.16.7"
-    "@mui/system": "npm:^5.16.7"
+    "@mui/icons-material": "npm:^5.18.0"
+    "@mui/material": "npm:^5.18.0"
+    "@mui/system": "npm:^5.18.0"
     "@mui/x-charts": "npm:^6.19.3"
     "@mui/x-date-pickers": "npm:^6.19.3"
     "@reduxjs/toolkit": "npm:^2.1.0"
