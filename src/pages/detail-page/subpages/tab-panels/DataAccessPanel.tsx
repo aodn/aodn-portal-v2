@@ -101,7 +101,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
           <DocumentList
             {...props}
             title={"Document"}
-            dataAccessLinks={collection?.getDocumentLinks()}
+            documentLinks={collection?.getDocumentLinks()}
           />
         ),
       },

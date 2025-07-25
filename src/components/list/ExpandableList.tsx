@@ -11,7 +11,7 @@ interface ExpandableListProps {
   info?: InfoContentType;
   navigatable?: boolean;
   selected?: boolean;
-  childrenList: ReactNode[];
+  childrenList?: ReactNode[];
 }
 
 const ExpandableList: React.FC<ExpandableListProps> = ({

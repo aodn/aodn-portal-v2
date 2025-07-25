@@ -7,7 +7,7 @@ import NaList from "./NaList";
 interface ThemeListProps {
   title: string;
   themes: string[];
-  selected: boolean;
+  selected?: boolean;
 }
 
 const ThemeList: React.FC<ThemeListProps> = ({

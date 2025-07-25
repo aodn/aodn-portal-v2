@@ -5,7 +5,7 @@ import { ILink } from "../common/store/OGCCollectionDefinitions";
 import LinkCard from "./listItem/subitem/LinkCard";
 
 interface DataListProps {
-  dataAccessLinks: ILink[];
+  dataAccessLinks?: ILink[];
   title?: string;
   selected?: boolean;
 }

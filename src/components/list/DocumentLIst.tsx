@@ -6,7 +6,7 @@ import LinkCard from "./listItem/subitem/LinkCard";
 
 interface DocumentListProps {
   title: string;
-  documentLinks: ILink[];
+  documentLinks?: ILink[];
   selected?: boolean;
 }
 

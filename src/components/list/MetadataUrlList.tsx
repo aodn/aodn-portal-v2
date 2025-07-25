@@ -5,7 +5,7 @@ import ItemBaseGrid from "./listItem/ItemBaseGrid";
 
 interface MetadataUrlListProps {
   url: string;
-  selected: boolean;
+  selected?: boolean;
 }
 
 const MetadataUrlList: React.FC<MetadataUrlListProps> = ({

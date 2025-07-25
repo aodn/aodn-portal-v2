@@ -11,7 +11,7 @@ const INFO_TIP_CONTENT = {
 
 interface OtherItemListProps {
   title?: string;
-  otherLinks: ILink[];
+  otherLinks?: ILink[];
   selected?: boolean;
 }
 
