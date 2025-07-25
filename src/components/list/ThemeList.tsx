@@ -7,9 +7,14 @@ import NaList from "./NaList";
 interface ThemeListProps {
   title: string;
   themes: string[];
+  selected: boolean;
 }
 
-const ThemeList: React.FC<ThemeListProps> = ({ title, themes }) => {
+const ThemeList: React.FC<ThemeListProps> = ({
+  title,
+  themes,
+  selected = false,
+}) => {
   const statementItem = useMemo(
     () => (
       <ItemBaseGrid container key={"theme-list-container-key"}>
@@ -25,7 +30,13 @@ const ThemeList: React.FC<ThemeListProps> = ({ title, themes }) => {
     [themes, title]
   );
 
-  return <ExpandableList childrenList={[statementItem]} title={title} />;
+  return (
+    <ExpandableList
+      selected={selected}
+      childrenList={[statementItem]}
+      title={title}
+    />
+  );
 };
 
 export default ThemeList;

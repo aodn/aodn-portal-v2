@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid } from "@mui/material";
+import { Box, CircularProgress, Grid, useTheme } from "@mui/material";
 import React, {
   createRef,
   FC,
@@ -23,7 +23,7 @@ const DEBOUNCE_DELAY = 100;
 
 export interface NavigatablePanelChild {
   title: string;
-  component: ReactNode;
+  component: (props: Record<string, any>) => ReactNode;
 }
 
 interface NavigatablePanelProps {
@@ -40,13 +40,14 @@ interface VerticalIndicatorProps {
 }
 
 const VerticalIndicator: FC<VerticalIndicatorProps> = ({
-  diamondSize = 20,
+  diamondSize = 17,
   index = 0,
   itemRefs,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number>(0);
   const [activeY, setActiveY] = useState<number>(0);
+  const theme = useTheme();
 
   useLayoutEffect(() => {
     // Dynamic calculate the true height given all the itemRefs
@@ -126,7 +127,7 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
           y1={0}
           x2={diamondSize / 2}
           y2={height}
-          stroke="#bdbdbd"
+          stroke={theme.palette.grey500}
           strokeWidth="2"
         />
         {/* Diamond positioned with center at activeY */}
@@ -136,7 +137,7 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
         >
           <polygon
             points={`${diamondSize / 2},0 0,${diamondSize / 2} ${diamondSize / 2},${diamondSize} ${diamondSize},${diamondSize / 2}`}
-            fill="#607d8b"
+            fill={theme.palette.primary.main}
           />
         </g>
       </svg>
@@ -185,7 +186,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     setScrollDistance(null);
   }, [scrollDistance]);
 
-  // For better scrolling animation, resizing happens after scrolling
+  // For better-scrolling animation, resizing happens after scrolling
   const laybackDeductSize = useCallback((toReSize: number) => {
     setTimeout(() => {
       setSupplementaryHeight((prevHeight) =>
@@ -230,7 +231,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         if (scrollableSectionRef.current && ref?.current) {
           const targetPosition = ref.current.offsetTop;
 
-          // Calculate the needed height to scroll to the target position
+          // Calculate the necessary height to scroll to the target position
           const bottomHeight = basePointRef.current
             ? basePointRef.current.offsetTop
             : 0;
@@ -294,10 +295,9 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         position="relative"
       >
         {childrenList.map((child, index) => {
-          const ref = getRefBy(index);
           return (
-            <Box key={index} ref={ref}>
-              {child.component}
+            <Box key={index} ref={getRefBy(index)}>
+              {child.component({ selected: selectedIndex === index })}
             </Box>
           );
         })}

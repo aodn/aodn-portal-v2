@@ -121,37 +121,56 @@ const AdditionalInfoPanel = () => {
     () => [
       {
         title: "Lineage",
-        component: (
-          <StatementList statement={statement ?? ""} title={"Lineage"} />
+        component: (props: Record<string, any>) => (
+          <StatementList
+            {...props}
+            statement={statement ?? ""}
+            title={"Lineage"}
+          />
         ),
       },
       {
         title: "Themes",
-        component: <ThemeList title={"Themes"} themes={categories ?? []} />,
+        component: (props: Record<string, any>) => (
+          <ThemeList {...props} title={"Themes"} themes={categories ?? []} />
+        ),
       },
       {
         title: "Keywords",
-        component: <KeywordList keywords={keywords} />,
+        component: (props: Record<string, any>) => (
+          <KeywordList {...props} keywords={keywords} />
+        ),
       },
       {
         title: "Metadata Contact",
-        component: (
+        component: (props: Record<string, any>) => (
           <MetadataContactList
+            {...props}
             contacts={metadataContact ? metadataContact : []}
           />
         ),
       },
       {
         title: "Metadata Identifier",
-        component: <MetadataIdentifierList identifier={metadataId ?? ""} />,
+        component: (props: Record<string, any>) => (
+          <MetadataIdentifierList {...props} identifier={metadataId ?? ""} />
+        ),
       },
       {
         title: "Full Metadata Link",
-        component: <MetadataUrlList url={metadataUrl ? metadataUrl : ""} />,
+        component: (props: Record<string, any>) => (
+          <MetadataUrlList {...props} url={metadataUrl ? metadataUrl : ""} />
+        ),
       },
       {
         title: "Metadata Dates",
-        component: <MetadataDateList creation={creation} revision={revision} />,
+        component: (props: Record<string, any>) => (
+          <MetadataDateList
+            {...props}
+            creation={creation}
+            revision={revision}
+          />
+        ),
       },
     ],
     [

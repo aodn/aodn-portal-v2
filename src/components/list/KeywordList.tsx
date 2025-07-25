@@ -6,9 +6,13 @@ import ExpandableList from "./ExpandableList";
 
 interface KeywordListProps {
   keywords: IKeyword[];
+  selected?: boolean;
 }
 
-const KeywordList: React.FC<KeywordListProps> = ({ keywords }) => {
+const KeywordList: React.FC<KeywordListProps> = ({
+  keywords,
+  selected = false,
+}) => {
   const generateKeywordCollaseItem = (keyword: IKeyword, index: number) => {
     return (
       <CollapseItem title={keyword.title} key={index}>
@@ -25,7 +29,13 @@ const KeywordList: React.FC<KeywordListProps> = ({ keywords }) => {
     generateKeywordCollaseItem(keyword, index)
   );
 
-  return <ExpandableList childrenList={keywordItems} title={"Keywords"} />;
+  return (
+    <ExpandableList
+      selected={selected}
+      childrenList={keywordItems}
+      title={"Keywords"}
+    />
+  );
 };
 
 export default KeywordList;

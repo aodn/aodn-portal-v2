@@ -10,6 +10,7 @@ interface ExpandableListProps {
   title?: string;
   info?: InfoContentType;
   navigatable?: boolean;
+  selected?: boolean;
   childrenList: ReactNode[];
 }
 
@@ -17,6 +18,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
   title,
   info,
   navigatable = true,
+  selected = false,
   childrenList = [],
 }) => {
   const theme = useTheme();
@@ -28,14 +30,14 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
         <Grid item md={12} display="flex" alignItems="center">
           {navigatable && (
             <Box display="flex" justifyContent="center" alignItems="center">
-              <EndpointedDiamondIcon />
+              <EndpointedDiamondIcon isHighlighted={selected} />
             </Box>
           )}
           <Typography
             display="inline"
-            variant="detailTitle"
+            variant="heading4"
             sx={{
-              marginLeft: theme.mp.sm,
+              marginLeft: theme.mp.md,
             }}
             data-testid={`detail-sub-section-${title}`}
           >

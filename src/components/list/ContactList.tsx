@@ -6,9 +6,13 @@ import CollapseContactItem from "./listItem/CollapseContactItem";
 
 interface ContactListProps {
   contacts: IContact[];
+  selected?: boolean;
 }
 
-const ContactList: React.FC<ContactListProps> = ({ contacts }) => {
+const ContactList: React.FC<ContactListProps> = ({
+  contacts,
+  selected = false,
+}) => {
   const collapseComponents: ReactNode[] = useMemo(
     () =>
       contacts?.map((contact, index) => {
@@ -28,6 +32,7 @@ const ContactList: React.FC<ContactListProps> = ({ contacts }) => {
 
   return (
     <ExpandableList
+      selected={selected}
       title={"Data Contact"}
       childrenList={collapseComponents}
     ></ExpandableList>
