@@ -182,6 +182,8 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
           }
         }
       });
+      // Must do the set index here otherwise you get multiple update
+      // the navigate will trigger scroll, so we end up here
       setSelectedIndex(newIndex);
     },
     []
@@ -190,8 +192,6 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const onNavigate = useCallback(
     (index: number) => {
       return () => {
-        setSelectedIndex(index);
-
         const ref = getRefBy(index);
         const bpRef = basePointRef.current;
         const ssRef = scrollableSectionRef.current;
