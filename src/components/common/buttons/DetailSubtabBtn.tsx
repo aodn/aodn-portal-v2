@@ -1,5 +1,5 @@
 import { ForwardedRef, forwardRef } from "react";
-import { Box, Button, useTheme } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { color } from "../../../styles/constants";
 
 interface DetailSubtabProps {
@@ -37,7 +37,7 @@ const DetailSubtabBtn = forwardRef<HTMLDivElement | null, DetailSubtabProps>(
           }}
           onClick={onClick}
         >
-          {title}
+          <Typography variant="body1Medium">{title}</Typography>
         </Button>
       </Box>
     );
