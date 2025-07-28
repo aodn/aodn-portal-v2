@@ -126,7 +126,7 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
         {/* Diamond positioned with center at activeY */}
         <g
           transform={`translate(0, ${activeY - diamondCenterOffset})`}
-          style={{ transition: "transform 0.2s ease" }}
+          style={{ transition: "transform 0.1s ease" }}
         >
           <polygon
             points={`${diamondSize / 2},0 0,${diamondSize / 2} ${diamondSize / 2},${diamondSize} ${diamondSize},${diamondSize / 2}`}
