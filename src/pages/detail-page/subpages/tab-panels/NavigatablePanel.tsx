@@ -244,6 +244,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         const ref = getRefBy(index);
         if (scrollableSectionRef.current && ref?.current) {
           const targetPosition = ref.current.offsetTop;
+          setScrollDistance(() => targetPosition);
 
           // Calculate the necessary height to scroll to the target position
           const bottomHeight = basePointRef.current
@@ -255,7 +256,6 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
           if (neededHeight >= 0) {
             setSupplementaryHeight((prevHeight) => prevHeight + neededHeight);
           }
-          setScrollDistance(targetPosition);
         }
       };
     },
