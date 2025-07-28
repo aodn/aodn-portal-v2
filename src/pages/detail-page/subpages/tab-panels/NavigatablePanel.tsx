@@ -9,16 +9,10 @@ import React, {
   useRef,
   useState,
 } from "react";
-import _ from "lodash";
 import DetailSubtabBtn from "../../../../components/common/buttons/DetailSubtabBtn";
 
 // the visible height of the navigatable panel. May change according to the design
 const PANEL_VISIBLE_HEIGHT = 1480;
-
-// the delay milliseconds for resizing the panel after scrolling. Do
-// not change this number as you will see indicator panel out sync
-const RESIZE_DELAY = 50;
-const DEBOUNCE_DELAY = RESIZE_DELAY;
 
 export interface NavigatablePanelChild {
   title: string;
@@ -148,15 +142,9 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   childrenList,
   isLoading,
 }) => {
-  const [scrollDistance, setScrollDistance] = useState<number | null>(null);
   const scrollableSectionRef = useRef<HTMLDivElement | null>(null);
   const basePointRef = useRef<HTMLDivElement | null>(null);
-  const [position, setPosition] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-
-  const debounceScrollHandler = useRef<_.DebouncedFunc<
-    (number: any) => void
-  > | null>(null);
 
   // Create an array of refs with the same size as the menu list which is the size of childrenList
   const menuRefs = useRef(
@@ -172,45 +160,17 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       .map(() => createRef<HTMLDivElement | null>())
   );
 
-  const [supplementaryHeight, setSupplementaryHeight] = useState(0);
-
-  useEffect(() => {
-    if (!scrollDistance) {
-      return;
-    }
-    scrollableSectionRef.current?.scroll({
-      top: scrollDistance,
-      behavior: "smooth",
-    });
-    setScrollDistance(null);
-  }, [scrollDistance]);
-
-  // For better-scrolling animation, resizing happens after scrolling
-  const laybackDeductSize = useCallback((toReSize: number) => {
-    setTimeout(() => {
-      setSupplementaryHeight((prevHeight) =>
-        prevHeight + toReSize > 0 ? prevHeight + toReSize : 0
-      );
-    }, RESIZE_DELAY);
-  }, []);
-
   const getRefBy = useCallback(
     (index: number) => contentRefs.current[index],
     [contentRefs]
   );
 
-  useEffect(() => {
-    debounceScrollHandler.current = _.debounce((scrollPosition: number) => {
-      setPosition((prevPosition) => {
-        const difference = scrollPosition - prevPosition;
-        if (difference < 0) {
-          laybackDeductSize(difference);
-        }
-        return scrollPosition;
-      });
-
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // This is use to update the selectedIndex if user scroll up the childlist
       // panel
+      const scrollPosition = event.currentTarget.scrollTop;
+
       let newIndex = 0;
       let minDiff = Infinity;
       contentRefs.current.forEach((ref, idx) => {
@@ -223,15 +183,6 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         }
       });
       setSelectedIndex(newIndex);
-    }, DEBOUNCE_DELAY);
-
-    return () => debounceScrollHandler.current?.cancel();
-  }, [laybackDeductSize]);
-
-  const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
-      const scrollPosition = event.currentTarget.scrollTop;
-      debounceScrollHandler?.current?.(scrollPosition);
     },
     []
   );
@@ -242,20 +193,18 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         setSelectedIndex(index);
 
         const ref = getRefBy(index);
-        if (scrollableSectionRef.current && ref?.current) {
-          const targetPosition = ref.current.offsetTop;
-          setScrollDistance(() => targetPosition);
+        const bpRef = basePointRef.current;
+        const ssRef = scrollableSectionRef.current;
 
-          // Calculate the necessary height to scroll to the target position
-          const bottomHeight = basePointRef.current
-            ? basePointRef.current.offsetTop
-            : 0;
-          const neededHeight =
-            targetPosition - (bottomHeight - PANEL_VISIBLE_HEIGHT);
-
-          if (neededHeight >= 0) {
-            setSupplementaryHeight((prevHeight) => prevHeight + neededHeight);
-          }
+        if (ssRef && bpRef && ref?.current) {
+          const distance = ref.current.offsetTop;
+          // Add height to the base item if needed to make the pane scrollable
+          // then scroll to top
+          bpRef.style.paddingTop = `${ssRef.clientHeight - ref.current.clientHeight}px`;
+          ssRef.scroll({
+            top: distance,
+            behavior: "smooth",
+          });
         }
       };
     },
@@ -315,7 +264,6 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
             </Box>
           );
         })}
-        <Box sx={{ height: `${supplementaryHeight}px` }} />
         <Box ref={basePointRef} />
       </Grid>
     </Grid>
