@@ -15,11 +15,10 @@ import DetailSubtabBtn from "../../../../components/common/buttons/DetailSubtabB
 // the visible height of the navigatable panel. May change according to the design
 const PANEL_VISIBLE_HEIGHT = 1480;
 
-// the delay milliseconds for resizing the panel after scrolling. May change in
-// the future if users feel it is too slow / too fast.
-const RESIZE_DELAY = 100;
-
-const DEBOUNCE_DELAY = 100;
+// the delay milliseconds for resizing the panel after scrolling. Do
+// not change this number as you will see indicator panel out sync
+const RESIZE_DELAY = 50;
+const DEBOUNCE_DELAY = RESIZE_DELAY;
 
 export interface NavigatablePanelChild {
   title: string;
