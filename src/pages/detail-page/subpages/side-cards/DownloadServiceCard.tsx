@@ -1,11 +1,11 @@
 import { Typography, Button, Box } from "@mui/material";
 import { DownloadNotAvailableIcon } from "../../../../assets/icons/download/download_not_available";
-import BaseSideCard from "./BaseSIdeCard";
 import rc8Theme from "../../../../styles/themeRC8";
+import SideCardContainer from "./SideCardContainer";
 
 const DownloadServiceCard = () => {
   return (
-    <BaseSideCard title="Download Service">
+    <SideCardContainer title="Download Service">
       <Box
         sx={{
           borderRadius: "6px",
@@ -51,7 +51,7 @@ const DownloadServiceCard = () => {
         <DownloadNotAvailableIcon />
         Download
       </Button>
-    </BaseSideCard>
+    </SideCardContainer>
   );
 };
 
