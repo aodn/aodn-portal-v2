@@ -5,9 +5,13 @@ import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 
 interface ConstraintListProps {
   constraints: { title: string; content: string[] }[];
+  selected?: boolean;
 }
 
-const ConstraintList: React.FC<ConstraintListProps> = ({ constraints }) => {
+const ConstraintList: React.FC<ConstraintListProps> = ({
+  constraints,
+  selected = false,
+}) => {
   const generateConstraintCollaseItem = (
     constraint: {
       title: string;
@@ -29,7 +33,11 @@ const ConstraintList: React.FC<ConstraintListProps> = ({ constraints }) => {
   );
 
   return (
-    <ExpandableList childrenList={constraintItems} title={"Constraints"} />
+    <ExpandableList
+      selected={selected}
+      childrenList={constraintItems}
+      title={"Constraints"}
+    />
   );
 };
 

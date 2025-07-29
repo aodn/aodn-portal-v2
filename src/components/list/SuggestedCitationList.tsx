@@ -12,12 +12,14 @@ import { useDetailPageContext } from "../../pages/detail-page/context/detail-pag
 interface SuggestedCitationListProps {
   suggestedCitation: string;
   title?: string;
+  selected?: boolean;
   mode?: MODE;
 }
 
 const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
   suggestedCitation,
   title = "Suggested Citation",
+  selected = false,
   mode,
 }) => {
   const { checkIfCopied, copyToClipboard } = useDetailPageContext();
@@ -71,6 +73,7 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
       return (
         <ExpandableList
           title={title}
+          selected={selected}
           childrenList={suggestedCitation ? [suggestedCitationItem] : []}
         />
       );

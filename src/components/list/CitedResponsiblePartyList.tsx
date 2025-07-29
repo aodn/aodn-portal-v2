@@ -6,10 +6,12 @@ import ExpandableList from "./ExpandableList";
 
 interface CitedResponsiblePartyListProps {
   responsibleParties: IContact[];
+  selected?: boolean;
 }
 
 const CitedResponsiblePartyList: React.FC<CitedResponsiblePartyListProps> = ({
   responsibleParties,
+  selected = false,
 }) => {
   const collapseComponents: ReactNode[] = useMemo(
     () =>
@@ -30,6 +32,7 @@ const CitedResponsiblePartyList: React.FC<CitedResponsiblePartyListProps> = ({
 
   return (
     <ExpandableList
+      selected={selected}
       title={"Cited Responsible Parties"}
       childrenList={collapseComponents}
     ></ExpandableList>

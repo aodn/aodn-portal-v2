@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react";
+import React, { FC, useCallback, useMemo } from "react";
 import { Typography } from "@mui/material";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import LinkCard from "../../../../components/list/listItem/subitem/LinkCard";
@@ -8,13 +8,15 @@ import { ILink } from "../../../../components/common/store/OGCCollectionDefiniti
 import SideCardContainer from "../side-cards/SideCardContainer";
 import { groupBy } from "../../../../utils/ObjectUtils";
 import { fontWeight, fontSize } from "../../../../styles/constants";
-import DataAccessList from "../../../../components/list/DataAccessList";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import useTabNavigation from "../../../../hooks/useTabNavigation";
 import {
   detailPageDefault,
   pageReferer,
 } from "../../../../components/common/constants";
+import DataList from "../../../../components/list/DataList";
+import DocumentList from "../../../../components/list/DocumentLIst";
+import OtherItemList from "../../../../components/list/OtherItemList";
 
 export enum TYPE {
   DATA_ACCESS = "DATA_ACCESS",
@@ -84,12 +86,31 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
   const blocks: NavigatablePanelChild[] = useMemo(
     () => [
       {
-        title: "Data Access Options",
-        component: (
-          <DataAccessList
+        title: "Data",
+        component: (props: Record<string, any>) => (
+          <DataList
+            {...props}
+            title={"Data"}
             dataAccessLinks={collection?.getDataAccessLinks()}
+          />
+        ),
+      },
+      {
+        title: "Document",
+        component: (props: Record<string, any>) => (
+          <DocumentList
+            {...props}
+            title={"Document"}
             documentLinks={collection?.getDocumentLinks()}
-            pythonNotebookLinks={collection?.getPythonNotebookLinks()}
+          />
+        ),
+      },
+      {
+        title: "Other",
+        component: (props: Record<string, any>) => (
+          <OtherItemList
+            {...props}
+            title={"Other"}
             otherLinks={collection?.getOtherLinks()}
           />
         ),
