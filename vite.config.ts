@@ -70,10 +70,11 @@ export default ({ mode }) => {
       terserOptions: {
         mangle: {
           keep_fnames: true, // Preserve function names
-          reserved: ["transform", "points", "style"], // Protect SVG attributes
+          reserved: ["transform", "points", "style", "fill", "stroke"], // Protect SVG attributes
         },
         keep: {
           classNames: true, // Preserve class names for CSS-in-JS
+          keep_fnames: true, // Ensure function names are not mangled
         },
       },
     },
