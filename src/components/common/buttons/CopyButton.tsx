@@ -1,18 +1,12 @@
 import { FC, ReactNode } from "react";
 import { Button, SxProps, Typography } from "@mui/material";
-import {
-  border,
-  borderRadius,
-  color,
-  fontSize,
-  padding,
-} from "../../../styles/constants";
-import ContentCopy from "@mui/icons-material/ContentCopy";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
+import rc8Theme from "../../../styles/themeRC8";
+import { ContentCopyIcon } from "../../../assets/icons/download/content_copy";
 
-export const COPY_BUTTON_WIDTH = 150;
-export const COPY_BUTTON_HEIGHT = 32;
+export const COPY_BUTTON_WIDTH = "160px";
+export const COPY_BUTTON_HEIGHT = "40px";
 
 interface CopyButtonConfig {
   iconBeforeCopy?: ReactNode;
@@ -22,7 +16,7 @@ interface CopyButtonConfig {
 }
 
 const COPY_BUTTON_CONFIG_DEFAULT: CopyButtonConfig = {
-  iconBeforeCopy: <ContentCopy fontSize="small" color="primary" />,
+  iconBeforeCopy: <ContentCopyIcon height={24} width={24} />,
   iconAfterCopy: <DoneAllIcon fontSize="small" color="primary" />,
   textBeforeCopy: "Copy",
   textAfterCopy: "Is Copied",
@@ -53,12 +47,11 @@ const CopyButton: FC<CopyButtonProps> = ({
       sx={{
         width: COPY_BUTTON_WIDTH,
         height: COPY_BUTTON_HEIGHT,
-        px: padding.medium,
-        borderRadius: borderRadius.small,
+        borderRadius: "6px",
         bgcolor: "#fff",
-        border: `${border.xs} ${color.blue.darkSemiTransparent}`,
+        border: `1px solid ${rc8Theme.palette.primary1}`,
         "&:hover": {
-          border: `${border.xs} ${color.blue.darkSemiTransparent}`,
+          border: `2px solid ${rc8Theme.palette.primary1}`,
           backgroundColor: "#fff",
         },
         ...sx,
@@ -66,9 +59,8 @@ const CopyButton: FC<CopyButtonProps> = ({
     >
       {hasBeenCopied ? iconAfterCopy : iconBeforeCopy}
       <Typography
-        sx={{ padding: 0, paddingLeft: padding.small }}
-        fontSize={fontSize.label}
-        color={color.blue.dark}
+        variant="body1Medium"
+        sx={{ color: rc8Theme.palette.text2, pl: "12px" }}
       >
         {hasBeenCopied ? textAfterCopy : textBeforeCopy}
       </Typography>
