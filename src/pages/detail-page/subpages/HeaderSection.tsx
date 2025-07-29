@@ -209,7 +209,15 @@ const HeaderSection = () => {
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
-  const copyUrl = window.location.href;
+  // Generate share URL with UTM parameters for Google Analytics tracking
+  // Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
+  const copyUrl = useMemo(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("utm_source", "portal"); // Track source as 'portal'
+    url.searchParams.set("utm_medium", "share_link"); // Track medium as 'share_link'
+    return url.toString();
+  }, []);
+
   const isCopied = useMemo(
     () => checkIfCopied(copyUrl),
     [checkIfCopied, copyUrl]
