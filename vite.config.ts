@@ -66,13 +66,6 @@ export default ({ mode }) => {
     ],
     build: {
       outDir: "dist",
-      minify: "terser",
-      terserOptions: {
-        mangle: {
-          keep_fnames: true, // Preserve function names
-          reserved: ["transform", "points", "style", "fill", "stroke"], // Protect SVG attributes
-        },
-      },
     },
     test: {
       globals: true,
