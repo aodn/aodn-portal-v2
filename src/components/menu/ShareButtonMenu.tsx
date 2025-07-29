@@ -76,7 +76,14 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
     checkIfCopied: checkIfCopiedDefault,
     copyToClipboard: copyToClipboardDefault,
   } = useClipboard();
-  const copyUrlDefault = window.location.href;
+  // Generate share URL with UTM parameters for Google Analytics tracking
+  // Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
+  const copyUrlDefault = useMemo(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("utm_source", "portal"); // Track source as 'portal'
+    url.searchParams.set("utm_medium", "share_link"); // Track medium as 'share_link'
+    return url.toString();
+  }, []);
   const isCopiedDefault = useMemo(
     () => checkIfCopiedDefault(copyUrlDefault),
     [checkIfCopiedDefault, copyUrlDefault]

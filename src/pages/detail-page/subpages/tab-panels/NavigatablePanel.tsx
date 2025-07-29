@@ -59,10 +59,11 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
 
     // Add resize observers to each item ref to handle size changes
     const resizeObservers: ResizeObserver[] = [];
+    // Must use timer here because we need to wait for DOM calculation
+    // to get the height of each component.
+    const timer = setTimeout(updateHeight, 10);
 
     if (itemRefs) {
-      updateHeight(); // Initial height update
-
       itemRefs.current.forEach((ref) => {
         if (ref.current) {
           const observer = new ResizeObserver(updateHeight);
@@ -73,6 +74,7 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
     }
 
     return () => {
+      clearTimeout(timer);
       resizeObservers.forEach((observer) => observer.disconnect()); // Cleanup on unmount
     };
   }, [itemRefs]);
@@ -99,6 +101,8 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
 
   // Diamond height is equal to width (20px by default)
   const diamondCenterOffset = diamondSize / 2;
+  const grey500 = theme.palette.grey500;
+  const main = theme.palette.primary.main;
 
   return (
     <Box
@@ -120,7 +124,7 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
           y1={0}
           x2={diamondSize / 2}
           y2={height}
-          stroke={theme.palette.grey500}
+          stroke={grey500}
           strokeWidth="2"
         />
         {/* Diamond positioned with center at activeY */}
@@ -130,7 +134,7 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
         >
           <polygon
             points={`${diamondSize / 2},0 0,${diamondSize / 2} ${diamondSize / 2},${diamondSize} ${diamondSize},${diamondSize / 2}`}
-            fill={theme.palette.primary.main}
+            fill={main}
           />
         </g>
       </svg>
