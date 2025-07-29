@@ -1,5 +1,11 @@
 import { FC, ReactNode } from "react";
-import { Box, Typography, IconButton } from "@mui/material";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import rc8Theme from "../../../../styles/themeRC8";
 
@@ -23,19 +29,40 @@ const SideCardContainer: FC<SideCardContainerProps> = ({
   const ariaLabel = title.toLowerCase() + " section";
 
   return (
-    <Box
+    <Card
       sx={{
         borderRadius: "5px",
         background: "#FFF",
         width: { xs: "100%", sm: "48.5%", md: "100%" },
+        boxShadow: "none",
       }}
       component="section"
       role="region"
       aria-labelledby={titleId}
       aria-label={ariaLabel}
     >
-      {/* Card Title Header */}
-      <Box
+      <CardHeader
+        title={
+          <Typography
+            variant="heading4"
+            id={titleId}
+            sx={{ color: rc8Theme.palette.text2 }}
+          >
+            {title}
+          </Typography>
+        }
+        action={
+          onClick && (
+            <IconButton
+              aria-label="open external"
+              size="small"
+              onClick={onClick}
+              sx={{ color: rc8Theme.palette.text2 }}
+            >
+              <ArrowOutwardIcon fontSize="small" />
+            </IconButton>
+          )
+        }
         sx={{
           height: "40px",
           borderRadius: "6px 6px 0px 0px",
@@ -44,48 +71,44 @@ const SideCardContainer: FC<SideCardContainerProps> = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          padding: "0 16px",
           position: "relative",
+          "& .MuiCardHeader-content": {
+            flex: 1,
+            textAlign: "center",
+            margin: 0,
+            // Ensure title stays centered regardless of action button
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "calc(100% - 64px)",
+          },
+          "& .MuiCardHeader-action": {
+            alignSelf: "center",
+            margin: 0,
+            position: "absolute",
+            right: "8px",
+            zIndex: 1,
+          },
         }}
-      >
-        <Typography
-          variant="heading4"
-          id={titleId}
-          sx={{ color: rc8Theme.palette.text2 }}
-        >
-          {title}
-        </Typography>
+      />
 
-        {/* Action button positioned absolutely to the right */}
-        {onClick && (
-          <IconButton
-            aria-label="open external"
-            size="small"
-            onClick={onClick}
-            sx={{
-              position: "absolute",
-              right: "8px",
-              color: rc8Theme.palette.text2,
-            }}
-          >
-            <ArrowOutwardIcon fontSize="small" />
-          </IconButton>
-        )}
-      </Box>
-
-      {/* Card Content */}
-      <Box
+      <CardContent
         sx={{
           px,
           py,
           display: "flex",
           flexDirection: "column",
+          "&:last-child": {
+            paddingBottom: py,
+          },
         }}
         role="status"
         aria-live="polite"
       >
         {children}
-      </Box>
-    </Box>
+      </CardContent>
+    </Card>
   );
 };
 
