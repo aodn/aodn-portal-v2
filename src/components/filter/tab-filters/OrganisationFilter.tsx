@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import React, { FC, useCallback } from "react";
 import { Box, Stack, SxProps } from "@mui/material";
 import { useAppDispatch } from "../../common/store/hooks";
 import { updateDatasetGroup } from "../../common/store/componentParamReducer";
@@ -75,8 +75,8 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
         ...prevFilters,
         organisation: newAlignment,
       }));
-      // TODO: for now there is only isImosOnly is in organisation button group, need to change ogcapi then change front end if add more organisations
-      dispatch(updateDatasetGroup(newAlignment.includes("imos")));
+      // Assume single selection for now.
+      dispatch(updateDatasetGroup(newAlignment[0]));
     },
     [dispatch, setFilters]
   );
