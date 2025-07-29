@@ -10,7 +10,7 @@ import {
 import { Box, IconButton, SxProps } from "@mui/material";
 import {
   updateHasData,
-  updateImosOnly,
+  updateDatasetGroup,
   updateParameterVocabs,
   updatePlatform,
   updateUpdateFreq,
@@ -85,13 +85,8 @@ const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
 const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   const dispatch = useAppDispatch();
 
-  const {
-    parameterVocabs,
-    platform,
-    updateFreq,
-    isImosOnlyDataset,
-    hasCOData,
-  } = useAppSelector((state) => state.paramReducer);
+  const { parameterVocabs, platform, updateFreq, datasetGroup, hasCOData } =
+    useAppSelector((state) => state.paramReducer);
 
   const [filters, setFilters] = useState<Filters>({});
 
@@ -151,7 +146,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   const handleClearAll = useCallback(() => {
     setFilters({});
     dispatch(updateParameterVocabs([]));
-    dispatch(updateImosOnly(undefined));
+    dispatch(updateDatasetGroup(undefined));
     dispatch(updateHasData(undefined));
     dispatch(updatePlatform([]));
     dispatch(updateUpdateFreq(undefined));
@@ -180,10 +175,10 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         dataDeliveryFrequency: [updateFreq],
       }));
     }
-    if (isImosOnlyDataset) {
+    if (datasetGroup) {
       setFilters((prevFilters) => ({
         ...prevFilters,
-        organisation: ["imos"],
+        organisation: [datasetGroup],
       }));
     }
     if (hasCOData) {
@@ -192,7 +187,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         dataIndexedType: [IndexDataType.CLOUD],
       }));
     }
-  }, [hasCOData, isImosOnlyDataset, parameterVocabs, platform, updateFreq]);
+  }, [hasCOData, datasetGroup, parameterVocabs, platform, updateFreq]);
 
   return (
     <>

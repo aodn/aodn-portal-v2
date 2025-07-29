@@ -37,7 +37,6 @@ const IconContainer: FC<IconContainerProps> = ({ icon, label, imgUrl, sx }) => {
           style={{
             objectFit: "scale-down",
             width: "60%",
-            height: "60%",
           }}
         />
       )}
