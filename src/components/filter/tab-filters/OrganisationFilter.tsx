@@ -13,6 +13,10 @@ import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButton
 // import InternationalIcon from "../../icon/organisation/InternationalIcon";
 // import NonGovernmentIcon from "../../icon/organisation/NonGovernmentIcon";
 import IMOSIcon from "../../icon/organisation/IMOSIcon";
+import AustraliaAntarcticProgramIcon from "../../icon/organisation/AustraliaAntarcticProgramIcon";
+import AIMSIcon from "../../icon/organisation/AIMSIcon";
+import CSIROIcon from "../../icon/organisation/CSIROIcon";
+import IMASIcon from "../../icon/organisation/IMASIcon";
 
 interface OrganisationFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -25,6 +29,26 @@ const ORGANISATION = [
     value: "imos",
     label: "IMOS",
     icon: <IMOSIcon />,
+  },
+  {
+    value: "aims",
+    label: "AIMS",
+    icon: <AIMSIcon />,
+  },
+  {
+    value: "australian_antarctic_division",
+    label: "AAD",
+    icon: <AustraliaAntarcticProgramIcon />,
+  },
+  {
+    value: "csiro oceans and atmosphere",
+    label: "CSIRO",
+    icon: <CSIROIcon />,
+  },
+  {
+    value: "imas",
+    label: "IMAS",
+    icon: <IMASIcon />,
   },
   // {
   //   value: "Australian-Universities",
