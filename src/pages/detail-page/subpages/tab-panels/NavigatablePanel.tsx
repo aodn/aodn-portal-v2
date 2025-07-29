@@ -256,10 +256,15 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         sx={{ height: PANEL_VISIBLE_HEIGHT + "px", overflowY: "auto" }}
         onScroll={handleScroll}
         position="relative"
+        data-testid="scrollable-section"
       >
         {childrenList.map((child, index) => {
           return (
-            <Box key={index} ref={getRefBy(index)}>
+            <Box
+              key={index}
+              ref={getRefBy(index)}
+              data-testid={`section-box-${index + 1}`} // Add test ID for parent Box
+            >
               {child.component({ selected: selectedIndex === index })}
             </Box>
           );
