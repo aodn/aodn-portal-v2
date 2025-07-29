@@ -57,7 +57,7 @@ const checkCount = ({
         : 0;
 
     case SearchbarButtonNames.Filter:
-      if (filterObj.isImosOnlyDataset === true) {
+      if (filterObj.datasetGroup !== undefined) {
         count++;
       }
 

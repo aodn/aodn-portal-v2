@@ -12,7 +12,7 @@ import store from "../../common/store/store";
 import {
   clearComponentParam,
   updateHasData,
-  updateImosOnly,
+  updateDatasetGroup,
   updateParameterVocabs,
   updatePlatform,
   updateUpdateFreq,
@@ -24,7 +24,7 @@ import AppTheme from "../../../utils/AppTheme";
 const theme = AppTheme;
 const clearAllMock = () => {
   store.dispatch(updateParameterVocabs([]));
-  store.dispatch(updateImosOnly(undefined));
+  store.dispatch(updateDatasetGroup(undefined));
   store.dispatch(updateHasData(undefined));
   store.dispatch(updatePlatform([]));
   store.dispatch(updateUpdateFreq(undefined));
@@ -339,7 +339,7 @@ describe("Searchbar", () => {
     mockLocation.search =
       "?" +
       encodeParam(
-        "isImosOnlyDataset=false&zoom=3.5&bbox.type=Feature&bbox.bbox.0=104&bbox.bbox.1=-43&bbox.bbox.2=163&bbox.bbox.3=-8&bbox.geometry.type=Polygon&bbox.geometry.coordinates.0.0.0=104&bbox.geometry.coordinates.0.0.1=-43&bbox.geometry.coordinates.0.1.0=163&bbox.geometry.coordinates.0.1.1=-43&bbox.geometry.coordinates.0.2.0=163&bbox.geometry.coordinates.0.2.1=-8&bbox.geometry.coordinates.0.3.0=104&bbox.geometry.coordinates.0.3.1=-8&bbox.geometry.coordinates.0.4.0=104&bbox.geometry.coordinates.0.4.1=-43&hasCOData=false"
+        "datasetGroup='imos'&zoom=3.5&bbox.type=Feature&bbox.bbox.0=104&bbox.bbox.1=-43&bbox.bbox.2=163&bbox.bbox.3=-8&bbox.geometry.type=Polygon&bbox.geometry.coordinates.0.0.0=104&bbox.geometry.coordinates.0.0.1=-43&bbox.geometry.coordinates.0.1.0=163&bbox.geometry.coordinates.0.1.1=-43&bbox.geometry.coordinates.0.2.0=163&bbox.geometry.coordinates.0.2.1=-8&bbox.geometry.coordinates.0.3.0=104&bbox.geometry.coordinates.0.3.1=-8&bbox.geometry.coordinates.0.4.0=104&bbox.geometry.coordinates.0.4.1=-43&hasCOData=false"
       );
 
     render(
@@ -359,8 +359,8 @@ describe("Searchbar", () => {
       // Verify boolean conversion works in complex URL
       expect(paramReducer.hasCOData).toBe(false);
       expect(typeof paramReducer.hasCOData).toBe("boolean");
-      expect(paramReducer.isImosOnlyDataset).toBe(false);
-      expect(typeof paramReducer.isImosOnlyDataset).toBe("boolean");
+      expect(paramReducer?.datasetGroup).toBe("imos");
+      expect(typeof paramReducer.datasetGroup).toBe("string");
 
       // Verify bbox is properly reconstructed
       expect(paramReducer.bbox).toBeDefined();

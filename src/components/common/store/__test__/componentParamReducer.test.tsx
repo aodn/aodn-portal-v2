@@ -11,27 +11,25 @@ import { decodeParam } from "../../../../utils/UrlUtils";
 describe("Component Reducer Function Test", () => {
   it("Verify formatToUrlParam", () => {
     const sample1: ParameterState = {
-      isImosOnlyDataset: false,
+      datasetGroup: undefined,
       dateTimeFilterRange: {},
       searchText: "",
     };
 
     const answer1: string = decodeParam(formatToUrlParam(sample1));
-    expect(answer1).toEqual("isImosOnlyDataset=false");
+    expect(answer1).toEqual("datasetGroup='imos'");
 
     const sample2: ParameterState = {
-      isImosOnlyDataset: false,
+      datasetGroup: "imos",
       dateTimeFilterRange: {},
       searchText: "This is test",
     };
 
     const answer2: string = decodeParam(formatToUrlParam(sample2));
-    expect(answer2).toEqual(
-      "isImosOnlyDataset=false&searchText=This%20is%20test"
-    );
+    expect(answer2).toEqual("datasetGroup='imos'&searchText=This%20is%20test");
 
     const sample3: ParameterState = {
-      isImosOnlyDataset: false,
+      datasetGroup: "imos",
       dateTimeFilterRange: {
         start: 12345,
       },
@@ -40,11 +38,11 @@ describe("Component Reducer Function Test", () => {
 
     const answer3: string = decodeParam(formatToUrlParam(sample3));
     expect(answer3).toEqual(
-      "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&searchText=This%20is%20test"
+      "datasetGroup='imos'&dateTimeFilterRange.start=12345&searchText=This%20is%20test"
     );
 
     const sample4: ParameterState = {
-      isImosOnlyDataset: false,
+      datasetGroup: "imos",
       dateTimeFilterRange: {
         start: 12345,
         end: 45697,
@@ -64,11 +62,11 @@ describe("Component Reducer Function Test", () => {
 
     const answer4: string = decodeParam(formatToUrlParam(sample4));
     expect(answer4).toEqual(
-      "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&parameterVocabs.0.label=cat1&parameterVocabs.1.label=cat1"
+      "datasetGroup='imos'&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&parameterVocabs.0.label=cat1&parameterVocabs.1.label=cat1"
     );
 
     const sample5: ParameterState = {
-      isImosOnlyDataset: false,
+      datasetGroup: "imos",
       dateTimeFilterRange: {
         start: 12345,
         end: 45697,
@@ -89,13 +87,13 @@ describe("Component Reducer Function Test", () => {
 
     const answer5: string = decodeParam(formatToUrlParam(sample5));
     expect(answer5).toEqual(
-      "isImosOnlyDataset=false&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&parameterVocabs.0.label=cat1&parameterVocabs.1.label=cat2&polygon.type=Feature&polygon.bbox.0=10&polygon.bbox.1=20&polygon.bbox.2=-10.1&polygon.bbox.3=-20&polygon.geometry.type=Polygon&polygon.geometry.coordinates.0.0.0=10&polygon.geometry.coordinates.0.0.1=20&polygon.geometry.coordinates.0.1.0=-10.1&polygon.geometry.coordinates.0.1.1=20&polygon.geometry.coordinates.0.2.0=-10.1&polygon.geometry.coordinates.0.2.1=-20&polygon.geometry.coordinates.0.3.0=10&polygon.geometry.coordinates.0.3.1=-20&polygon.geometry.coordinates.0.4.0=10&polygon.geometry.coordinates.0.4.1=20"
+      "datasetGroup='imos'&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&parameterVocabs.0.label=cat1&parameterVocabs.1.label=cat2&polygon.type=Feature&polygon.bbox.0=10&polygon.bbox.1=20&polygon.bbox.2=-10.1&polygon.bbox.3=-20&polygon.geometry.type=Polygon&polygon.geometry.coordinates.0.0.0=10&polygon.geometry.coordinates.0.0.1=20&polygon.geometry.coordinates.0.1.0=-10.1&polygon.geometry.coordinates.0.1.1=20&polygon.geometry.coordinates.0.2.0=-10.1&polygon.geometry.coordinates.0.2.1=-20&polygon.geometry.coordinates.0.3.0=10&polygon.geometry.coordinates.0.3.1=-20&polygon.geometry.coordinates.0.4.0=10&polygon.geometry.coordinates.0.4.1=20"
     );
   });
 
   it("Verify unFlattenToParameterState", () => {
     const sample1: ParameterState = {
-      isImosOnlyDataset: false,
+      datasetGroup: "imos",
       hasCOData: false,
       dateTimeFilterRange: {},
       searchText: "",
@@ -108,7 +106,7 @@ describe("Component Reducer Function Test", () => {
 
     // Only label get export, other fields in category are volatile.
     const sample4: ParameterState = {
-      isImosOnlyDataset: false,
+      datasetGroup: "imos",
       hasCOData: false,
       dateTimeFilterRange: {
         start: 12345,
@@ -131,7 +129,7 @@ describe("Component Reducer Function Test", () => {
     expect(objAnswer4).toEqual(sample4);
 
     const sample5: ParameterState = {
-      isImosOnlyDataset: false,
+      datasetGroup: "imos",
       hasCOData: false,
       dateTimeFilterRange: {
         start: 12345,

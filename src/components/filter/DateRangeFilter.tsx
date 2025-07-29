@@ -42,7 +42,7 @@ import {
   fetchResultNoStore,
   jsonToOGCCollections,
 } from "../common/store/searchReducer";
-import { cqlDefaultFilters } from "../common/cqlFilters";
+import { cqlDefaultFilters, DatasetGroup } from "../common/cqlFilters";
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
@@ -291,7 +291,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
           dispatch(
             fetchResultNoStore({
               properties: "id,providers",
-              filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")} AND ${cqlDefaultFilters.get("IMOS_ONLY")}`,
+              filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")} AND ${(cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup)("imos")}`,
             })
           )
             .unwrap()

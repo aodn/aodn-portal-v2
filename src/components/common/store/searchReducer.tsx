@@ -371,7 +371,7 @@ const createSearchParamFrom = (
     );
   }
 
-  if (i.isImosOnlyDataset) {
+  if (i.datasetGroup) {
     p.filter = appendFilter(
       p.filter,
       cqlDefaultFilters.get("IMOS_ONLY") as string

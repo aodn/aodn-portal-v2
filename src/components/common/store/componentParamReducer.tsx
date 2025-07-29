@@ -13,8 +13,8 @@ import { decodeParam, encodeParam } from "../../../utils/UrlUtils";
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
 const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = "UPDATE_SEARCH_TEXT_FILTER_VARIABLE";
-const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
-  "UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE";
+const UPDATE_DATASET_GROUP_FILTER_VARIABLE =
+  "UPDATE_DATASET_GROUP_FILTER_VARIABLE";
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
 const UPDATE_BBOX_FILTER_VARIABLE = "UPDATE_BBOX_FILTER_VARIABLE";
 const UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE =
@@ -62,7 +62,7 @@ export interface DateTimeFilterRange {
 export interface ParameterState {
   bbox?: Feature<Polygon>;
   polygon?: Feature<Polygon>;
-  isImosOnlyDataset?: boolean;
+  datasetGroup?: string;
   hasCOData?: boolean;
   dateTimeFilterRange?: DateTimeFilterRange;
   searchText?: string;
@@ -140,11 +140,11 @@ const updateFilterBBox = (
   };
 };
 
-const updateImosOnly = (isImosOnly: boolean | undefined): ActionType => {
+const updateDatasetGroup = (name: string | undefined): ActionType => {
   return {
-    type: UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE,
+    type: UPDATE_DATASET_GROUP_FILTER_VARIABLE,
     payload: {
-      isImosOnlyDataset: isImosOnly === undefined ? false : isImosOnly,
+      datasetGroup: name,
     } as ParameterState,
   };
 };
@@ -238,7 +238,7 @@ const createInitialParameterState = (
   withDefaultBBox: boolean = true
 ): ParameterState => {
   const state: ParameterState = {
-    isImosOnlyDataset: false,
+    datasetGroup: undefined,
     hasCOData: false,
     dateTimeFilterRange: {},
     searchText: "",
@@ -271,10 +271,10 @@ const paramReducer = (
         ...state,
         searchText: action.payload.searchText,
       };
-    case UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE:
+    case UPDATE_DATASET_GROUP_FILTER_VARIABLE:
       return {
         ...state,
-        isImosOnlyDataset: action.payload.isImosOnlyDataset,
+        datasetGroup: action.payload.datasetGroup,
       };
     case UPDATE_HAS_DATA:
       return {
@@ -468,7 +468,7 @@ export {
   unFlattenToParameterState,
   updateDateTimeFilterRange,
   updateSearchText,
-  updateImosOnly,
+  updateDatasetGroup,
   updateFilterBBox,
   updateFilterPolygon,
   updateParameterVocabs,
