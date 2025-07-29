@@ -94,13 +94,13 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const handleChange = useCallback(
-    (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        organisation: newAlignment,
-      }));
+    (_: React.MouseEvent<HTMLElement>, newAlignment: string) => {
+      setFilters((current) => {
+        current.organisation = [newAlignment];
+        return current;
+      });
       // Assume single selection for now.
-      dispatch(updateDatasetGroup(newAlignment[0]));
+      dispatch(updateDatasetGroup(newAlignment));
     },
     [dispatch, setFilters]
   );
@@ -109,23 +109,20 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
     <>
       <Box sx={{ ...sx }}>
         <StyledToggleButtonGroup
-          value={filters.organisation}
+          exclusive
+          value={filters.organisation?.[0]}
           onChange={handleChange}
         >
-          {ORGANISATION.map((item) => (
-            <StyledToggleButton
-              value={item.value}
-              key={item.value}
-              aria-label={item.label}
-            >
+          {ORGANISATION.map(({ value, label, icon }) => (
+            <StyledToggleButton value={value} key={value} aria-label={label}>
               <Stack
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
                 direction="column"
               >
-                {item.icon && item.icon}
-                {item.label}
+                {icon && icon}
+                {label}
               </Stack>
             </StyledToggleButton>
           ))}

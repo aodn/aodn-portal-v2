@@ -178,7 +178,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     if (datasetGroup) {
       setFilters((prevFilters) => ({
         ...prevFilters,
-        organisation: ["imos"],
+        organisation: [datasetGroup],
       }));
     }
     if (hasCOData) {
