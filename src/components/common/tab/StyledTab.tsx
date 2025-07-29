@@ -30,7 +30,7 @@ const StyledTab = styled((props: StyledTabProps) => {
           py: 0,
           px: "24px",
           my: "20px",
-          mr: "12px",
+          mx: "6px",
         }}
       />
     </StyledBadge>
