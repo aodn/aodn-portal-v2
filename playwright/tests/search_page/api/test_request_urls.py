@@ -4,6 +4,7 @@ import pytest
 from playwright.sync_api import Page
 
 from core.dataclasses.search_filter import SearchFilterConfig
+from core.enums.data_settings_filter import DataSettingsFilter
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
@@ -18,7 +19,7 @@ from pages.search_page import SearchPage
             ['Carbon', 'Air Quality'],
             ['Radar', 'Vessel'],
             'IMOS',
-            'Delayed',
+            DataSettingsFilter.DELAYED,
             'Yes',
         )
     ],
@@ -30,7 +31,7 @@ def test_search_api_request_urls_across_page(
     filter_parameters: List[str],
     filter_platforms: List[str],
     filter_organisation: str,
-    filter_data: str,
+    filter_data: DataSettingsFilter,
     filter_data_download: str,
 ) -> None:
     """
@@ -60,24 +61,23 @@ def test_search_api_request_urls_across_page(
         filter_data,
         filter_data_download,
     )
-
-    # Perform search and capture the API URL
-    (
-        api_url_collection,
-        api_url_centroid,
-    ) = landing_page.search.perform_search_and_get_api_url()
     start_date, end_date = search_page.search.get_date_range()
     # Define expected search filters
     expected_filters = SearchFilterConfig(
         date_time_start=start_date,
         date_time_end=end_date,
-        location_name=location,
+        location_intersects=search_page.map.get_selected_location_intersects(),
         parameter_vocab_labels=filter_parameters,
         platform_vocab_labels=filter_platforms,
         dataset_provider=filter_organisation,
-        update_frequency=filter_data,
+        update_frequency=filter_data._value,
         download_service_available=filter_data_download is not None,
     )
+
+    # Perform search and capture the API URL
+    api_url_result = landing_page.search.perform_search_and_get_api_url()
+    api_url_collection, api_url_centroid = api_url_result
+
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters
     )
@@ -87,21 +87,21 @@ def test_search_api_request_urls_across_page(
 
     # Reset filters
     search_page.search.reset_all_filters()
-    (
-        api_url_collection,
-        api_url_centroid,
-    ) = landing_page.search.perform_search_and_get_api_url()
     # Define expected search filters after reset
     expected_filters_reset = SearchFilterConfig(
         date_time_start=None,
         date_time_end=None,
-        location_name=None,
+        location_intersects=None,
         parameter_vocab_labels=None,
         platform_vocab_labels=None,
         dataset_provider=None,
         update_frequency=None,
         download_service_available=False,
     )
+
+    api_url_result = landing_page.search.perform_search_and_get_api_url()
+    api_url_collection, api_url_centroid = api_url_result
+
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters_reset
     )
@@ -126,7 +126,7 @@ def test_search_api_request_urls_across_page(
             ['Carbon', 'Water Pressure'],
             ['Radar', 'Float'],
             'IMOS',
-            'Delayed',
+            DataSettingsFilter.DELAYED,
             'Yes',
         )
     ],
@@ -138,7 +138,7 @@ def test_search_api_request_urls_after_map_state_change(
     filter_parameters: List[str],
     filter_platforms: List[str],
     filter_organisation: str,
-    filter_data: str,
+    filter_data: DataSettingsFilter,
     filter_data_download: str,
 ) -> None:
     """
@@ -166,24 +166,23 @@ def test_search_api_request_urls_after_map_state_change(
         filter_data,
         filter_data_download,
     )
-
-    # Perform search and capture the API URL
-    (
-        api_url_collection,
-        api_url_centroid,
-    ) = landing_page.search.perform_search_and_get_api_url()
     start_date, end_date = search_page.search.get_date_range()
     # Define expected search filters
     expected_filters = SearchFilterConfig(
         date_time_start=start_date,
         date_time_end=end_date,
-        location_name=location,
+        location_intersects=search_page.map.get_selected_location_intersects(),
         parameter_vocab_labels=filter_parameters,
         platform_vocab_labels=filter_platforms,
         dataset_provider=filter_organisation,
-        update_frequency=filter_data,
+        update_frequency=filter_data._value,
         download_service_available=filter_data_download is not None,
     )
+
+    # Perform search and capture the API URL
+    api_url_result = landing_page.search.perform_search_and_get_api_url()
+    api_url_collection, api_url_centroid = api_url_result
+
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters
     )
@@ -193,21 +192,21 @@ def test_search_api_request_urls_after_map_state_change(
 
     # Reset filters
     search_page.search.reset_all_filters()
-    (
-        api_url_collection,
-        api_url_centroid,
-    ) = landing_page.search.perform_search_and_get_api_url()
     # Define expected search filters after reset
     expected_filters_reset = SearchFilterConfig(
         date_time_start=None,
         date_time_end=None,
-        location_name=None,
+        location_intersects=None,
         parameter_vocab_labels=None,
         platform_vocab_labels=None,
         dataset_provider=None,
         update_frequency=None,
         download_service_available=False,
     )
+
+    api_url_result = landing_page.search.perform_search_and_get_api_url()
+    api_url_collection, api_url_centroid = api_url_result
+
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters_reset
     )
@@ -226,4 +225,125 @@ def test_search_api_request_urls_after_map_state_change(
     )
     search_page.validate_search_parameters_in_url(
         api_url_centroid, expected_filters_reset
+    )
+
+
+@pytest.mark.parametrize(
+    'date, location, parameters, platforms, organisation, data, data_download, '
+    'updated_date, updated_location, updated_parameters, '
+    'updated_platforms, updated_organisation, updated_data, updated_data_download',
+    [
+        (
+            'Last 5 Years',
+            'Arafura',
+            ['Carbon', 'Air Quality'],
+            ['Radar'],
+            'IMOS',
+            DataSettingsFilter.DELAYED,
+            'Yes',
+            'Last Year',
+            'Jervis',
+            ['Oxygen'],
+            ['Glider', 'Vessel'],
+            'IMOS',
+            DataSettingsFilter.DELAYED,
+            'Yes',
+        )
+    ],
+)
+def test_search_api_request_urls_reflect_parameter_updates(
+    responsive_page: Page,
+    date: str,
+    location: str,
+    parameters: List[str],
+    platforms: List[str],
+    organisation: str,
+    data: DataSettingsFilter,
+    data_download: str,
+    updated_date: str,
+    updated_location: str,
+    updated_parameters: List[str],
+    updated_platforms: List[str],
+    updated_organisation: str,
+    updated_data: DataSettingsFilter,
+    updated_data_download: str,
+) -> None:
+    """
+    Verifies that search API request URLs update correctly when search parameters are changed.
+
+    The test sets initial search parameters, performs a search, and captures the API request URLs.
+    It then updates the search parameters, performs another search, and asserts that the new API
+    request URLs reflect the updated search parameters.
+    """
+    landing_page = LandingPage(responsive_page)
+    search_page = SearchPage(responsive_page)
+
+    landing_page.load()
+
+    # Set search state
+    landing_page.search.set_search_state(
+        date,
+        location,
+        parameters,
+        platforms,
+        organisation,
+        data,
+        data_download,
+    )
+    start_date, end_date = search_page.search.get_date_range()
+    # Define expected search filters
+    expected_filters = SearchFilterConfig(
+        date_time_start=start_date,
+        date_time_end=end_date,
+        location_intersects=search_page.map.get_selected_location_intersects(),
+        parameter_vocab_labels=parameters,
+        platform_vocab_labels=platforms,
+        dataset_provider=organisation,
+        update_frequency=data._value,
+        download_service_available=data_download is not None,
+    )
+
+    # Perform search and capture the API URL
+    api_url_result = landing_page.search.perform_search_and_get_api_url()
+    api_url_collection, api_url_centroid = api_url_result
+
+    search_page.validate_search_parameters_in_url(
+        api_url_collection, expected_filters
+    )
+    search_page.validate_search_parameters_in_url(
+        api_url_centroid, expected_filters
+    )
+
+    # Update search state
+    landing_page.search.set_search_state(
+        updated_date,
+        updated_location,
+        updated_parameters,
+        updated_platforms,
+        updated_organisation,
+        updated_data,
+        updated_data_download,
+    )
+    start_date, end_date = search_page.search.get_date_range()
+    # Define expected search filters
+    expected_updated_filters = SearchFilterConfig(
+        date_time_start=start_date,
+        date_time_end=end_date,
+        location_intersects=search_page.map.get_selected_location_intersects(),
+        parameter_vocab_labels=updated_parameters,
+        platform_vocab_labels=updated_platforms,
+        dataset_provider=None,
+        update_frequency=None,
+        download_service_available=False,
+    )
+
+    # Perform search and capture the API URL
+    api_url_result = landing_page.search.perform_search_and_get_api_url()
+    api_url_collection, api_url_centroid = api_url_result
+
+    search_page.validate_search_parameters_in_url(
+        api_url_collection, expected_updated_filters
+    )
+    search_page.validate_search_parameters_in_url(
+        api_url_centroid, expected_updated_filters
     )

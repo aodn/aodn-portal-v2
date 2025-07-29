@@ -1,6 +1,6 @@
 window.__map_functions = {
-  getTestProps: function (mapId) {
-    return window.testProps[mapId];
+  getTestProps: function (id) {
+    return window.testProps[id];
   },
   getMap: function (mapId) {
     return this.getTestProps(mapId).getMap();
@@ -95,5 +95,8 @@ window.__map_functions = {
   },
   getMapClickLngLat: function (mapId) {
     return this.getTestProps(mapId).getMapClickLngLat();
+  },
+  getSelectedLocationIntersects: function (propId) {
+    return this.getTestProps(propId).getSelectedLocationIntersects();
   },
 };

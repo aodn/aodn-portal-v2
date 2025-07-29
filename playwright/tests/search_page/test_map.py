@@ -67,7 +67,9 @@ def test_map_datapoint_hover_and_click(
     expect(search_page.first_result_title).to_have_text(title)
 
 
-@pytest.mark.xfail(reason="No idea why it fail, no comment on what it is doing and why it expect different layer")
+@pytest.mark.xfail(
+    reason='No idea why it fail, no comment on what it is doing and why it expect different layer'
+)
 @pytest.mark.parametrize(
     'search_text, updated_search_text',
     [
@@ -221,7 +223,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
     new_map_center = new_search_page.map.get_map_center()
     new_map_zoom = new_search_page.map.get_map_zoom()
 
-    assert are_coordinates_equal(map_center,new_map_center);
+    assert are_coordinates_equal(map_center, new_map_center)
     assert map_zoom == new_map_zoom
 
 

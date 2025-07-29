@@ -11,7 +11,7 @@ class SearchFilterConfig:
     date_time_end: Optional[str] = None
 
     # Spatial filter
-    location_name: Optional[str] = None
+    location_intersects: Optional[str] = None
 
     # Parameter filters
     parameter_vocab_labels: Optional[List[str]] = None

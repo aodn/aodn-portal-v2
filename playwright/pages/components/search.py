@@ -1,8 +1,10 @@
 from typing import List, Tuple
 from urllib.parse import unquote_plus
 
-from playwright.sync_api import Page, expect
+import pytest
+from playwright.sync_api import Page, TimeoutError, expect
 
+from core.enums.data_settings_filter import DataSettingsFilter
 from mocks.routes import Routes
 from pages.base_page import BasePage
 
@@ -39,30 +41,35 @@ class SearchComponent(BasePage):
         Perform a search by clicking the search button and return the API URL's
         used for the search.
         """
-        with (
-            self.page.expect_request(
-                Routes.COLLECTION_ALL
-            ) as collections_request_info,
-            self.page.expect_request(
-                Routes.COLLECTION_CENTROID
-            ) as centroid_request_info,
-        ):
-            self.click_search_button()
-            self.page.wait_for_timeout(1000)
+        try:
+            with (
+                self.page.expect_request(
+                    Routes.COLLECTION_ALL
+                ) as collections_request_info,
+                self.page.expect_request(
+                    Routes.COLLECTION_CENTROID
+                ) as centroid_request_info,
+            ):
+                self.click_search_button()
 
-        collections_request = collections_request_info.value
-        centroid_request = centroid_request_info.value
+            collections_request = collections_request_info.value
+            centroid_request = centroid_request_info.value
 
-        return (
-            unquote_plus(collections_request.url),
-            unquote_plus(centroid_request.url),
-        )
+            return (
+                unquote_plus(collections_request.url),
+                unquote_plus(centroid_request.url),
+            )
+        except TimeoutError:
+            pytest.fail(
+                'API URL not found within the timeout, search did not trigger successfully.'
+            )
 
     def get_date_range(self) -> Tuple[str, str]:
         """
         Get the date range from the date range picker.
         """
         self.date_button.click()
+        self.wait_for_timeout(500)  # wait for values to load
         start_date = (
             self.start_date_picker.locator('input').get_attribute('value') or ''
         )
@@ -86,7 +93,7 @@ class SearchComponent(BasePage):
         filter_parameter: str | List[str],
         filter_platform: str | List[str],
         filter_organisation: str,
-        filter_data: str,
+        filter_data: DataSettingsFilter,
         filter_data_download: str = '',
     ) -> None:
         """
@@ -118,7 +125,7 @@ class SearchComponent(BasePage):
         self.get_button(filter_organisation).click()
 
         self.filter_data_tab.click()
-        self.get_button(filter_data).click()
+        self.get_button(filter_data.label).click()
         if filter_data_download != '':
             self.get_button(filter_data_download).click()
 
@@ -129,7 +136,7 @@ class SearchComponent(BasePage):
         filter_parameter: str,
         filter_platform: str,
         filter_organisation: str,
-        filter_data: str,
+        filter_data: DataSettingsFilter,
     ) -> None:
         self.date_button.click()
         expect(self.searchbar_popup).to_be_visible()
@@ -146,7 +153,7 @@ class SearchComponent(BasePage):
         self.filter_organisation_tab.click()
         self.assert_toggle_button_pressed(filter_organisation)
         self.filter_data_tab.click()
-        self.assert_toggle_button_pressed(filter_data)
+        self.assert_toggle_button_pressed(filter_data.label)
         self.filter_button.click()  # close the popup
 
     def reset_all_filters(self) -> None:

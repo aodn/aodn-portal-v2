@@ -1,6 +1,7 @@
 from urllib.parse import unquote_plus
 
-from playwright.sync_api import Locator, Page
+import pytest
+from playwright.sync_api import Locator, Page, TimeoutError
 
 from config import settings
 from mocks.routes import Routes
@@ -41,13 +42,17 @@ class DetailPage(BasePage):
 
     def return_and_get_api_request_url(self) -> str:
         """Return to the previous page and return the API URL used for the request."""
-        with self.page.expect_request(
-            Routes.COLLECTION_CENTROID
-        ) as request_info:
-            self.return_button.click()
-            self.page.wait_for_timeout(500)
-        request = request_info.value
-        return unquote_plus(request.url)
+        try:
+            with self.page.expect_request(
+                Routes.COLLECTION_CENTROID
+            ) as request_info:
+                self.return_button.click()
+            request = request_info.value
+            return unquote_plus(request.url)
+        except TimeoutError:
+            pytest.fail(
+                'API URL not found within the timeout, search did not trigger successfully.'
+            )
 
     def get_tab_section(self, title: str) -> Locator:
         """Returns tab section title element"""

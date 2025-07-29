@@ -279,7 +279,7 @@ const ReactMap = memo(
             {announcement?.replace(/^model:/, "")}
           </Paper>
         </Paper>
-        <TestHelper mapId={panelId} getMap={() => map} />
+        <TestHelper id={panelId} getMap={() => map} />
         {children}
       </MapContext.Provider>
     );

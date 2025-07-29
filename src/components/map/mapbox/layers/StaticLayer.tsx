@@ -112,7 +112,7 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, label, features }) => {
 
   return id === StaticLayersDef.AUSTRALIA_MARINE_PARKS.id ? (
     <TestHelper
-      mapId={map?.getContainer().id || ""}
+      id={map?.getContainer().id || ""}
       getAUMarineParksLayer={() => layerId}
     />
   ) : (

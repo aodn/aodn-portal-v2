@@ -1,6 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
+from core.enums.data_settings_filter import DataSettingsFilter
 from core.enums.search_sort_type import SearchSortType
 from mocks.api.search_sort import (
     handle_sort_by_modified,
@@ -136,7 +137,16 @@ def test_searchbar_popups(
 
 @pytest.mark.parametrize(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
-    [('Last Year', 'Apollo', 'Carbon', 'Radar', 'IMOS', 'Delayed')],
+    [
+        (
+            'Last Year',
+            'Apollo',
+            'Carbon',
+            'Radar',
+            'IMOS',
+            DataSettingsFilter.DELAYED,
+        )
+    ],
 )
 def test_search_state_persists_after_navigation(
     responsive_page: Page,
@@ -145,7 +155,7 @@ def test_search_state_persists_after_navigation(
     filter_parameter: str,
     filter_platform: str,
     filter_organisation: str,
-    filter_data: str,
+    filter_data: DataSettingsFilter,
 ) -> None:
     """
     Verifies that selected search criteria persist across search execution and navigation.
@@ -202,7 +212,16 @@ def test_search_state_persists_after_navigation(
 
 @pytest.mark.parametrize(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
-    [('Last Year', 'Apollo', 'Carbon', 'Radar', 'IMOS', 'Delayed')],
+    [
+        (
+            'Last Year',
+            'Apollo',
+            'Carbon',
+            'Radar',
+            'IMOS',
+            DataSettingsFilter.DELAYED,
+        )
+    ],
 )
 def test_search_state_persists_with_url(
     responsive_page: Page,
@@ -211,7 +230,7 @@ def test_search_state_persists_with_url(
     filter_parameter: str,
     filter_platform: str,
     filter_organisation: str,
-    filter_data: str,
+    filter_data: DataSettingsFilter,
 ) -> None:
     """
     Verifies that selected search criteria persist when the search results URL is reused in a new browser context.

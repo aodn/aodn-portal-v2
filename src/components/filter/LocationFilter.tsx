@@ -31,6 +31,8 @@ import { useAppDispatch } from "../common/store/hooks";
 import store, { getComponentState } from "../common/store/store";
 import { simplify, booleanEqual, bbox, bboxPolygon } from "@turf/turf";
 import { MapDefaultConfig } from "../map/mapbox/constants";
+import { TestHelper } from "../common/test/helper";
+import { cqlDefaultFilters, PolygonOperation } from "../common/cqlFilters";
 
 interface LocationOptionType {
   value: string;
@@ -230,6 +232,19 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
           ))}
         </RadioGroup>
       </FormControl>
+      <TestHelper
+        id="selected-location"
+        getSelectedLocationIntersects={() => {
+          const selectedLocation = locationOptions?.find(
+            (o) => o.value === selectedOption
+          );
+          const area = selectedLocation?.geo?.features[0];
+          const funcIntersectPolygon = cqlDefaultFilters.get(
+            "INTERSECT_POLYGON"
+          ) as PolygonOperation;
+          return area ? funcIntersectPolygon(area) : undefined;
+        }}
+      />
     </Box>
   );
 };

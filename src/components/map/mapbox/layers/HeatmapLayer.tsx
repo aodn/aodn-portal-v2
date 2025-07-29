@@ -368,7 +368,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         tabNavigation={tabNavigation}
       />
       <TestHelper
-        mapId={map?.getContainer().id || ""}
+        id={map?.getContainer().id || ""}
         getHeatmapLayer={() => heatmapLayer}
       />
     </>

@@ -2,7 +2,6 @@ import re
 
 from core.constants.search_filters import SearchFilterParams
 from services.validators.search_url_filters.base_validator import BaseValidator
-from utils.json_utils import load_json_data
 
 
 class IntersectsValidator(BaseValidator):
@@ -17,10 +16,8 @@ class IntersectsValidator(BaseValidator):
 
     def validate(self) -> tuple[str, bool]:
         key = SearchFilterParams.INTERSECTS
-        if self.config.location_name:
-            expected_value = self.get_intersects_value_from_mapping(
-                self.config.location_name
-            )
+        if self.config.location_intersects:
+            expected_value = self.config.location_intersects.lower()
         else:
             expression = SearchFilterParams.INTERSECTS
             return key, not self.contains_expression(expression)
@@ -28,24 +25,6 @@ class IntersectsValidator(BaseValidator):
         actual_value = self.get_intersects_value_from_url()
 
         return key, actual_value == expected_value
-
-    def get_intersects_value_from_mapping(self, name: str) -> str | None:
-        """
-        Look up the intersects value for the given location name from a JSON mapping file.
-
-        Args:
-            name (str): The location name configured in the search filter.
-
-        Returns:
-            str | None: The expected intersects value in lowercase, or None if not found.
-        """
-        mapping = load_json_data(
-            'Australian_Marine_Parks_name_boundaries_mapping.json'
-        )
-        for item in mapping:
-            if item['key'] == name:
-                return item['Value'].lower()
-        return None
 
     def get_intersects_value_from_url(self) -> str | None:
         """

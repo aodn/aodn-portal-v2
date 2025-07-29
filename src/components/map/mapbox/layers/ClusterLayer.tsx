@@ -304,7 +304,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         tabNavigation={tabNavigation}
       />
       <TestHelper
-        mapId={map?.getContainer().id || ""}
+        id={map?.getContainer().id || ""}
         getHeatmapLayer={() => clusterLayer}
       />
     </>
