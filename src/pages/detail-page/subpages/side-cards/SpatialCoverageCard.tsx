@@ -6,6 +6,7 @@ import Layers from "../../../../components/map/mapbox/layers/Layers";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import { FC, useCallback } from "react";
 import { Popup, MapLayerMouseEvent } from "mapbox-gl";
+import BaseSideCard from "./BaseSIdeCard";
 
 export interface SpatialCoverageCardProps {
   onSpatialCoverageLayerClick?: (event: MapLayerMouseEvent) => void;
@@ -41,7 +42,7 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
 
   return (
     collection?.extent?.bbox && (
-      <SideCardContainer title="Spatial Coverage">
+      <BaseSideCard title="Spatial Coverage" px={0} py={0}>
         <Box
           arial-label="map"
           id={mapContainerId}
@@ -63,7 +64,7 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
             </Layers>
           </Map>
         </Box>
-      </SideCardContainer>
+      </BaseSideCard>
     )
   );
 };

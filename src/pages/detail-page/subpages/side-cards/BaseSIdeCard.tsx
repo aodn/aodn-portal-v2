@@ -5,9 +5,16 @@ import rc8Theme from "../../../../styles/themeRC8";
 interface BaseSideCardProps {
   title: string;
   children: ReactNode;
+  px?: string | number;
+  py?: string | number;
 }
 
-const BaseSideCard = ({ title, children }: BaseSideCardProps) => {
+const BaseSideCard = ({
+  title,
+  children,
+  px = "16px",
+  py = "22px",
+}: BaseSideCardProps) => {
   // Auto-generate titleId and ariaLabel from title
   const titleId = title.toLowerCase().replace(/\s+/g, "-") + "-heading";
   const ariaLabel = title.toLowerCase() + " section";
@@ -47,8 +54,8 @@ const BaseSideCard = ({ title, children }: BaseSideCardProps) => {
       {/* Card Content */}
       <Box
         sx={{
-          px: "16px",
-          py: "22px",
+          px,
+          py,
           display: "flex",
           flexDirection: "column",
         }}
