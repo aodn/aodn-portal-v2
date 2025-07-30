@@ -24,12 +24,13 @@ export interface ResultPanelSimpleFilterType
 
 interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 
+//todo: confirm text
 const renderShowingResultsText = (total: number, count: number) =>
   total === 0
-    ? "No result found"
+    ? "No results found"
     : total === 1
-      ? "Showing 1 of total 1 result"
-      : `Showing 1 - ${count} of ${formatNumber(total)} results`;
+      ? "1 of 1 result"
+      : `${count} of ${formatNumber(total)} results`;
 
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   count,
@@ -59,12 +60,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         }}
         data-testid="show-result-count"
       >
-        <Typography
-          variant="title2Regular"
-          sx={{
-            whiteSpace: "nowrap",
-          }}
-        >
+        <Typography variant="title2Regular">
           {renderShowingResultsText(total, count)}
         </Typography>
       </Paper>
