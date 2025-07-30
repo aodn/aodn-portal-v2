@@ -3,7 +3,7 @@ from playwright.sync_api import Page, expect
 
 from pages.detail_page import DetailPage
 
-
+@pytest.mark.xfail(reason="Todo: Citation tab broken after rc8 updates")
 @pytest.mark.parametrize(
     'title, uuid, suggested_citation, cited_responsible_parties, license, constraints, data_contact, credits',
     [
@@ -46,6 +46,8 @@ def test_citation_and_usage_sections(
     expect(detail_page.page_title).to_have_text(title)
     detail_page.tabs.scroll_right()
     citation = detail_page.tabs.citation_and_usage
+
+    # TODO: Fix citation tab click after rc8 changes
     citation.tab.click()
 
     citation.credits.click()

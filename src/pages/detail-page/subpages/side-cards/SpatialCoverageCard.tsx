@@ -41,7 +41,7 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
 
   return (
     collection?.extent?.bbox && (
-      <SideCardContainer title="Spatial Coverage">
+      <SideCardContainer title="Spatial Coverage" px={0} py={0}>
         <Box
           arial-label="map"
           id={mapContainerId}

@@ -62,7 +62,7 @@ describe("CitationPanel", async () => {
   test("should render CitationPanel", async () => {
     // the panel is rendered
     await waitFor(() => {
-      expect(screen.queryAllByText("License")).toHaveLength(2);
+      expect(screen.queryAllByText(/Citation/)).toHaveLength(4);
     });
 
     // the information is rendered

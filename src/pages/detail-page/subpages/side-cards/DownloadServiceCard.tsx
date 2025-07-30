@@ -1,54 +1,28 @@
-import { Typography, Box, Button } from "@mui/material";
+import { Typography, Button, Box } from "@mui/material";
 import { DownloadNotAvailableIcon } from "../../../../assets/icons/download/download_not_available";
+import rc8Theme from "../../../../styles/themeRC8";
+import SideCardContainer from "./SideCardContainer";
 
 const DownloadServiceCard = () => {
   return (
-    <Box
-      sx={{
-        minHeight: "222px",
-        flexShrink: 0,
-        borderRadius: "5px",
-        background: "#FFF",
-      }}
-      component="section"
-      role="region"
-      aria-labelledby="download-heading"
-    >
-      <Box
-        sx={{
-          height: "40px",
-          borderRadius: "6px 6px 0px 0px",
-          background: "#FFF",
-          boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.10)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography
-          variant="h6"
-          id="download-heading"
-          sx={{ color: "#3C3C3C", fontWeight: 500 }}
-        >
-          Download Service
-        </Typography>
-      </Box>
-
+    <SideCardContainer title="Download Service">
       <Box
         sx={{
           borderRadius: "6px",
-          border: "1px solid #8C8C8C",
+          border: `1px solid ${rc8Theme.palette.grey600}`,
           background: "#FFF",
           padding: "16px",
-          margin: "16px",
+          marginBottom: "22px",
         }}
-        role="status"
-        aria-live="polite"
       >
         <Typography
-          variant="body2"
-          textAlign="center"
-          sx={{ lineHeight: "22px", fontSize: "14px", color: "#3C3C3C" }}
+          variant="body2Regular"
+          sx={{
+            color: rc8Theme.palette.text2,
+            textAlign: "center",
+            width: "100%",
+            display: "block",
+          }}
         >
           Data download via this method is not currently available. Please see
           other data access options below.
@@ -60,22 +34,16 @@ const DownloadServiceCard = () => {
         variant="contained"
         disableElevation
         sx={{
-          gap: 1,
-          borderRadius: "6px",
-          background: "#8C8C8C",
-          width: "90%",
+          width: "100%",
           height: "38px",
-          margin: "0 16px 16px 16px",
-          fontSize: "16px",
-          fontWeight: 400,
+          background: rc8Theme.palette.grey600,
+          borderRadius: "6px",
+          gap: 1,
+          ...rc8Theme.typography.body1Medium,
           "&:disabled": {
-            background: "#8C8C8C",
+            background: rc8Theme.palette.grey600,
             color: "white",
             cursor: "not-allowed",
-          },
-          "&:focus": {
-            outline: "2px solid #0066CC",
-            outlineOffset: "2px",
           },
         }}
         aria-label="Download data - currently unavailable"
@@ -83,7 +51,7 @@ const DownloadServiceCard = () => {
         <DownloadNotAvailableIcon />
         Download
       </Button>
-    </Box>
+    </SideCardContainer>
   );
 };
 

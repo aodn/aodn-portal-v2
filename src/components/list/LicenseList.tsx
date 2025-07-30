@@ -4,7 +4,7 @@ import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
-import { fontWeight } from "../../styles/constants";
+import rc8Theme from "../../styles/themeRC8";
 
 interface LicenseListProps {
   license?: string;
@@ -29,11 +29,20 @@ const LicenseList: React.FC<LicenseListProps> = ({
       return null;
     }
     return (
-      <ItemBaseGrid container key="licenseList">
+      <ItemBaseGrid
+        container
+        key="licenseList"
+        disableHover={mode === MODE.COMPACT}
+      >
         <Grid container item md={12}>
           {license && (
             <Grid item md={12}>
-              <Typography variant="detailContent">{license}</Typography>
+              <Typography
+                variant="body2Regular"
+                sx={{ color: rc8Theme.palette.text1 }}
+              >
+                {license}
+              </Typography>
             </Grid>
           )}
           {url && (
@@ -51,13 +60,16 @@ const LicenseList: React.FC<LicenseListProps> = ({
         </Grid>
       </ItemBaseGrid>
     );
-  }, [graphic, license, theme.mp.md, url]);
+  }, [graphic, license, theme.mp.md, url, mode]);
 
   switch (mode) {
     case MODE.COMPACT:
       return (
         <>
-          <Typography padding={1} fontWeight={fontWeight.bold}>
+          <Typography
+            variant="title1Medium"
+            sx={{ color: rc8Theme.palette.text1 }}
+          >
             {title}
             {!licenseComponent ? (
               <NaList title={title ? title : ""} />

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import LicenseList from "../../../../components/list/LicenseList";
@@ -25,7 +25,7 @@ interface CitationPanelProps {
   mode?: MODE;
 }
 
-const TITLE_LICENSE = "License";
+const TITLE_LICENSE = "Citation";
 const TITLE_SUGGESTED_CITATION = "Suggested Citation";
 
 const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
@@ -198,6 +198,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
                 pageReferer.DETAIL_PAGE_REFERER
               )
             }
+            py={"16px"}
           >
             <SuggestedCitationList
               suggestedCitation={suggestedCitation ?? ""}

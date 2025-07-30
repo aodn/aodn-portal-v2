@@ -6,6 +6,7 @@ import {
   truncateText,
   enrichHTML,
 } from "../../../../utils/StringUtils";
+import rc8Theme from "../../../../styles/themeRC8";
 
 interface ExpandableTextAreaProps {
   text: string;
@@ -37,9 +38,10 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
     <TextAreaBaseGrid>
       <Grid item md={12}>
         <Typography
-          variant="detailContent"
+          variant="body2Regular"
           whiteSpace="pre-wrap"
           sx={{
+            color: rc8Theme.palette.text1,
             textAlign: "left",
             ...(isClickable && {
               "&:hover": {
