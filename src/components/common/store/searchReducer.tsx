@@ -414,9 +414,7 @@ const createSearchParamFrom = (
   }
 
   if (i.bbox) {
-    const f = cqlDefaultFilters.get(
-      i.polygon ? "BBOX_POLYGON" : "BBOX_POLYGON_OR_EMPTY_EXTENTS"
-    ) as PolygonOperation;
+    const f = cqlDefaultFilters.get("BBOX_POLYGON") as PolygonOperation;
     p.filter = appendFilter(p.filter, f(i.bbox));
   }
 
