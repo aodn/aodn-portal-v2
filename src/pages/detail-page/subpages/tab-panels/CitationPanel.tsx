@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import LicenseList from "../../../../components/list/LicenseList";

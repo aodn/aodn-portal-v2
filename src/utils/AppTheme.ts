@@ -13,13 +13,13 @@
  *
  * MIGRATION PHASES:
  *
- * Phase 1 (CURRENT): Legacy + RC8 Integration
+ * Phase 1: Legacy + RC8 Integration
  * - AppTheme.ts: Spreads rc8Theme as base, legacy configs override
  * - All existing components continue to work unchanged
  * - RC8 features available for new development
  * - Usage: import AppTheme from "./utils/AppTheme"
  *
- * Phase 2: Component Migration
+ * Phase 2 (CURRENT): Component Migration
  * - Gradually replace legacy styles with RC8 equivalents:
  *   ❌ <Typography variant="detailTitle">
  *   ✅ <Typography variant="heading4">
