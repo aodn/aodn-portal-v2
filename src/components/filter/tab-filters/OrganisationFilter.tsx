@@ -96,11 +96,14 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
   const handleChange = useCallback(
     (_: React.MouseEvent<HTMLElement>, newAlignment: string) => {
       setFilters((current) => {
-        current.organisation = [newAlignment];
+        current.organisation =
+          newAlignment !== null ? [newAlignment] : undefined;
         return current;
       });
       // Assume single selection for now.
-      dispatch(updateDatasetGroup(newAlignment));
+      dispatch(
+        updateDatasetGroup(newAlignment !== null ? newAlignment : undefined)
+      );
     },
     [dispatch, setFilters]
   );
