@@ -196,7 +196,17 @@ const IconSelect = <T extends string | number = string>({
         onClose={handleOpenState(false)}
         open={isOpen}
         IconComponent={() => null}
-        MenuProps={{ disablePortal: true }}
+        MenuProps={{
+          disablePortal: true,
+          sx: {
+            "& .MuiPaper-root": {
+              marginTop: "6px",
+              borderRadius: "6px",
+              border: `0.5px solid ${rc8Theme.palette.primary1}`,
+              boxShadow: "0 2px 2px 0 rgba(0, 0, 0, 0.15)",
+            },
+          },
+        }}
         sx={{
           padding: 0,
           height: ICON_SELECT_DEFAULT_HEIGHT,

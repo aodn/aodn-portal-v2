@@ -51,6 +51,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          overflow: "hidden",
           height: "40px",
           border: `0.5px solid ${rc8Theme.palette.grey500}`,
           borderRadius: "6px",
@@ -60,7 +61,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         }}
         data-testid="show-result-count"
       >
-        <Typography variant="title2Regular">
+        <Typography variant="title2Regular" whiteSpace="nowrap">
           {renderShowingResultsText(total, count)}
         </Typography>
       </Paper>
