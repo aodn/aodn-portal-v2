@@ -5,7 +5,7 @@ import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import rc8Theme from "../../../styles/themeRC8";
 import { ContentCopyIcon } from "../../../assets/icons/download/content_copy";
 
-export const COPY_BUTTON_WIDTH = "160px";
+export const COPY_BUTTON_WIDTH = "166px";
 export const COPY_BUTTON_HEIGHT = "40px";
 
 interface CopyButtonConfig {
