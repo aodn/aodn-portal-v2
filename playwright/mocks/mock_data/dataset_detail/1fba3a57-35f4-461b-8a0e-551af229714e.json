@@ -234,39 +234,45 @@
     },
     {
       "href": "http://imos.org.au",
-      "rel": "self",
+      "rel": "related",
       "type": "text/html",
-      "title": "IMOS website"
+      "title": "IMOS website",
+      "ai:group": "Other"
     },
     {
       "href": "https://portal.aodn.org.au",
-      "rel": "self",
+      "rel": "related",
       "type": "text/html",
-      "title": "AODN Portal"
+      "title": "AODN Portal",
+      "ai:group": "Other"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
-      "rel": "self",
+      "rel": "wms",
       "type": "",
-      "title": "imos:asset_map"
+      "title": "imos:asset_map",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://portal.aodn.org.au/search?uuid=1fba3a57-35f4-461b-8a0e-551af229714e",
-      "rel": "self",
+      "rel": "related",
       "type": "text/html",
-      "title": "View though the AODN Portal"
+      "title": "View though the AODN Portal",
+      "ai:group": "Other"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
-      "rel": "self",
+      "rel": "wfs",
       "type": "",
-      "title": "imos:asset_map"
+      "title": "imos:asset_map",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
-      "rel": "self",
+      "rel": "related",
       "type": "text/html",
-      "title": "OGC WFS help documentation"
+      "title": "OGC WFS help documentation",
+      "ai:group": "Document"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/dbee258b-8730-4072-96d4-2818a69a4afd.png",

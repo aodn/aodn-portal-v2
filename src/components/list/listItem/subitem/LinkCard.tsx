@@ -7,6 +7,7 @@ import { openInNewTab } from "../../../../utils/LinkUtils";
 import CopyButton, {
   COPY_BUTTON_HEIGHT,
 } from "../../../common/buttons/CopyButton";
+import rc8Theme from "../../../../styles/themeRC8";
 
 interface LinkCardProps {
   icon?: boolean;
@@ -42,9 +43,6 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
         alignItems: "center",
         backgroundColor: "transparent",
         padding: padding.small,
-        "&:hover": {
-          backgroundColor: color.blue.light,
-        },
         gap: 1,
       }}
       data-testid={`link-card-${link.href}`}
@@ -57,15 +55,35 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
         aria-label="link and title"
       >
         {icon && link.getIcon && (
-          <Box
-            component="img"
-            width="16px"
-            height="16px"
-            src={link.getIcon()}
-            alt={"link icon"}
-          />
+          <Box display="flex" alignItems="center">
+            <Box
+              component="img"
+              width={
+                link.rel === "wfs" || link.href.includes("/wfs")
+                  ? "27px" // Fixed WFS icon size as per design
+                  : link.rel === "wms"
+                    ? "22px" // Fixed WMS icon size as per design
+                    : "16px" // Fixed Link icon size as per design
+              }
+              height={
+                link.rel === "wfs" || link.href.includes("/wfs")
+                  ? "30px"
+                  : link.rel === "wms"
+                    ? "28px"
+                    : "16px"
+              }
+              src={link.getIcon()}
+              alt={"link icon"}
+            />
+          </Box>
         )}
-        <Box sx={{ overflow: "hidden", minHeight: COPY_BUTTON_HEIGHT }}>
+        <Box
+          sx={{
+            overflow: "hidden",
+            minHeight: COPY_BUTTON_HEIGHT,
+            alignContent: "center",
+          }}
+        >
           <Link
             href={link.href}
             underline="hover"
@@ -75,7 +93,8 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
             }}
           >
             <Typography
-              color={fontColor.blue.medium}
+              variant="title1Medium"
+              color={rc8Theme.palette.primary.main}
               sx={{
                 padding: 0,
                 overflowWrap: "break-word",

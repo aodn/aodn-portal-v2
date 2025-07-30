@@ -440,8 +440,8 @@ const SearchPage = () => {
           doListSearch();
         }
       } else {
-        // In the other cases we need to do a full search
-        // This including (but not limit): user paste the url directly, navigate from landing page, change sort ...
+        // In other cases, we need to do a full search
+        // This including (but not limit): user pastes the url directly, navigate from landing page, change sort ...
         doListSearch();
       }
     };
@@ -450,13 +450,9 @@ const SearchPage = () => {
     return () => {
       cancelAllSearch();
     };
-  }, [
-    cancelAllSearch,
-    doListSearch,
-    doMapSearch,
-    location.state?.referer,
-    location.state?.requireSearch,
-  ]);
+    // Must use location.state as the value inside can be the same reference, and hence will not trigger execution
+    // the state object will be different each time.
+  }, [cancelAllSearch, doListSearch, doMapSearch, location.state]);
 
   useEffect(() => {
     const bookmarkSelected = (event: BookmarkEvent) => {

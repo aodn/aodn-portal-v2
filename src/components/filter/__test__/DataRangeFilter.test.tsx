@@ -73,7 +73,7 @@ describe("DateRangeFilter", () => {
         url === "/api/v1/ogc/collections" &&
         config?.params?.properties === "id,providers" &&
         config?.params?.filter ===
-          "temporal after 1970-01-01T00:00:00Z AND dataset_provider='IMOS'"
+          "temporal after 1970-01-01T00:00:00Z AND dataset_group='imos'"
       ) {
         return Promise.resolve({ data: responseIdProvider });
       }

@@ -6,11 +6,13 @@ import { Grid, Typography, useTheme } from "@mui/material";
 interface MetadataDateListProps {
   creation?: string;
   revision?: string;
+  selected?: boolean;
 }
 
 const MetadataDateList: React.FC<MetadataDateListProps> = ({
   creation,
   revision,
+  selected = false,
 }) => {
   const theme = useTheme();
   const metadataDateItem =
@@ -38,6 +40,7 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
 
   return (
     <ExpandableList
+      selected={selected}
       childrenList={metadataDateItem ? [metadataDateItem] : []}
       title="Metadata Dates"
     />

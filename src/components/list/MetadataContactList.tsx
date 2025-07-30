@@ -8,10 +8,12 @@ import ItemBaseGrid from "./listItem/ItemBaseGrid";
 
 interface MetadataContactListProps {
   contacts: IContact[];
+  selected?: boolean;
 }
 
 const MetadataContactList: React.FC<MetadataContactListProps> = ({
   contacts,
+  selected = false,
 }) => {
   const theme = useTheme();
   const metadataContacts: ReactNode[] = useMemo(() => {
@@ -50,7 +52,11 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
   }, [contacts, theme.mp.md]);
 
   return (
-    <ExpandableList title="Metadata Contact" childrenList={metadataContacts} />
+    <ExpandableList
+      selected={selected}
+      title="Metadata Contact"
+      childrenList={metadataContacts}
+    />
   );
 };
 

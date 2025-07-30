@@ -4,6 +4,7 @@ import { ParameterState, Vocab } from "./componentParamReducer";
 
 import {
   cqlDefaultFilters,
+  DatasetGroup,
   IsNotNull,
   ParameterVocabsIn,
   PlatformFilter,
@@ -371,11 +372,9 @@ const createSearchParamFrom = (
     );
   }
 
-  if (i.isImosOnlyDataset) {
-    p.filter = appendFilter(
-      p.filter,
-      cqlDefaultFilters.get("IMOS_ONLY") as string
-    );
+  if (i.datasetGroup) {
+    const f = cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup;
+    p.filter = appendFilter(p.filter, f(i.datasetGroup));
   }
 
   if (i.hasCOData) {

@@ -25,6 +25,16 @@ from pages.search_page import SearchPage
 def test_basic_search(
     responsive_page: Page, search_text: str, category_name: str
 ) -> None:
+    """
+    Validates that performing a basic search with a selected category from the
+    autocomplete options updates the search field and displays relevant results.
+
+    The test loads the landing page, enters a search term, verifies the specified
+    category appears in the autocomplete options, selects the category, initiates
+    the search, and confirms that the search field reflects the selected category
+    and the first result title is visible, ensuring the UI's search and category
+    selection functionality works correctly.
+    """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
 
@@ -46,6 +56,15 @@ def test_basic_search(
 def test_search_result_sort(
     responsive_page: Page, sort_type: SearchSortType
 ) -> None:
+    """
+    Validates that changing the sort type of search results updates the displayed results.
+
+    The test performs an initial search with default relevance sorting, captures
+    the first result title, then changes the sort type (e.g., by title or
+    modified date) using mocked API responses to simulate different
+    sorting outcomes, and verifies that the first result title
+    changes, ensuring the UI shows the updated results.
+    """
     api_router = ApiRouter(page=responsive_page)
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
@@ -86,6 +105,15 @@ def test_search_result_sort(
 def test_search_input_persistence_after_navigation(
     responsive_page: Page, search_text: str
 ) -> None:
+    """
+    Verifies that the search input text persists after navigating to a detail
+    page and returning to the search page.
+
+    The test enters a search term, performs a search, navigates to a detail page,
+    and returns to the search page, confirming that the search field retains the
+    original search text, ensuring the UI correctly preserves the search input
+    across page navigation.
+    """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
     detail_page = DetailPage(responsive_page)

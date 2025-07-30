@@ -13,31 +13,36 @@
           "href": "https://www.cmar.csiro.au/geoserver/wms?&CQL_FILTER=SURVEY_NAME%20%3D%20%27RACH198408%27",
           "rel": "wms",
           "type": "",
-          "title": "cmar:CATCH_HEADER_AODN_VIEW"
+          "title": "cmar:CATCH_HEADER_AODN_VIEW",
+          "ai:group": "Data Access"
         },
         {
           "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=877",
-          "rel": "related",
+          "rel": "data",
           "type": "",
-          "title": "Cruise Plan (pdf)"
+          "title": "Cruise Plan (pdf)",
+          "ai:group": "Data Access"
         },
         {
           "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=878",
-          "rel": "related",
+          "rel": "data",
           "type": "",
-          "title": "Cruise Summary (pdf)"
+          "title": "Cruise Summary (pdf)",
+          "ai:group": "Data Access"
         },
         {
           "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=RACH198408&data_type=catch",
-          "rel": "related",
+          "rel": "data",
           "type": "",
-          "title": "Data Link"
+          "title": "Data Link",
+          "ai:group": "Data Access"
         },
         {
           "href": "https://creativecommons.org/licenses/by/4.0/",
           "rel": "related",
           "type": "text/html",
-          "title": "Documentation Link"
+          "title": "Documentation Link",
+          "ai:group": "Document"
         },
         {
           "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

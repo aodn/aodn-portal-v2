@@ -24,12 +24,8 @@ def test_drawing_shape_adds_download_filter(
     detail_page.load(uuid)
     detail_page.wait_for_timeout(1000)
 
-    # Select the Hexbin layer
-    detail_page.detail_map.layers_icon.click()
-    detail_page.detail_map.hexbin_layer.click()
-    detail_page.detail_map.draw_rect_menu_button.click()
-
     # Draw a rectangle on the map
+    detail_page.detail_map.draw_rect_menu_button.click()
     detail_page.detail_map.hover_map()
     detail_page.detail_map.click_map()
     x, y = detail_page.detail_map.calculate_mouse_coordinates(
@@ -65,9 +61,7 @@ def test_selecting_date_range_adds_download_filter(
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
 
-    # Select the Hexbin layer
-    detail_page.detail_map.layers_icon.click()
-    detail_page.detail_map.hexbin_layer.click()
+    # Select date range show/hide menu
     detail_page.detail_map.daterange_show_hide_menu_button.click()
 
     # Select a date range using the slider

@@ -6,7 +6,7 @@ const paramLookup: Map<string, string> = new Map<string, string>([
   ["bbox.geometry.type", "B2"],
   ["bbox.geometry.coordinates", "B3"],
   ["bbox.type", "B4"],
-  ["isImosOnlyDataset", "I1"],
+  ["datasetGroup", "I1"],
   ["hasCOData", "I2"],
   ["polygon.geometry.coordinates", "P1"],
   ["polygon.geometry.type", "P2"],
