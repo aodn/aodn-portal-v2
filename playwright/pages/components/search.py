@@ -4,14 +4,18 @@ from urllib.parse import unquote_plus
 import pytest
 from playwright.sync_api import Page, TimeoutError, expect
 
-from core.enums.data_settings_filter import DataSettingsFilter
 from mocks.routes import Routes
 from pages.base_page import BasePage
+from pages.js_scripts.js_utils import (
+    execute_common_js,
+    load_common_js_functions,
+)
 
 
 class SearchComponent(BasePage):
     def __init__(self, page: Page):
         self.page = page
+        load_common_js_functions(self.page)
 
         # Page locators
         self.search_field = page.get_by_test_id('input-with-suggester')
@@ -51,6 +55,7 @@ class SearchComponent(BasePage):
                 ) as centroid_request_info,
             ):
                 self.click_search_button()
+                self.wait_for_timeout(1000)
 
             collections_request = collections_request_info.value
             centroid_request = centroid_request_info.value
@@ -79,6 +84,12 @@ class SearchComponent(BasePage):
         self.date_button.click()  # close the date picker
         return start_date, end_date
 
+    def get_selected_location_intersects(self) -> str:
+        """Get the intersects value of the selected location"""
+        return execute_common_js(
+            self.page, 'getSelectedLocationIntersects', 'selected-location'
+        )
+
     def assert_toggle_button_pressed(
         self, name: str, pressed: bool = True
     ) -> None:
@@ -93,7 +104,7 @@ class SearchComponent(BasePage):
         filter_parameter: str | List[str],
         filter_platform: str | List[str],
         filter_organisation: str,
-        filter_data: DataSettingsFilter,
+        filter_data: str,
         filter_data_download: str = '',
     ) -> None:
         """
@@ -125,7 +136,7 @@ class SearchComponent(BasePage):
         self.get_button(filter_organisation).click()
 
         self.filter_data_tab.click()
-        self.get_button(filter_data.label).click()
+        self.get_button(filter_data).click()
         if filter_data_download != '':
             self.get_button(filter_data_download).click()
 
@@ -136,7 +147,7 @@ class SearchComponent(BasePage):
         filter_parameter: str,
         filter_platform: str,
         filter_organisation: str,
-        filter_data: DataSettingsFilter,
+        filter_data: str,
     ) -> None:
         self.date_button.click()
         expect(self.searchbar_popup).to_be_visible()
@@ -153,7 +164,7 @@ class SearchComponent(BasePage):
         self.filter_organisation_tab.click()
         self.assert_toggle_button_pressed(filter_organisation)
         self.filter_data_tab.click()
-        self.assert_toggle_button_pressed(filter_data.label)
+        self.assert_toggle_button_pressed(filter_data)
         self.filter_button.click()  # close the popup
 
     def reset_all_filters(self) -> None:

@@ -5,8 +5,8 @@ from services.validators.search_url_filters.assets_summary_validator import (
     AssetsSummaryValidator,
 )
 from services.validators.search_url_filters.base_validator import BaseValidator
-from services.validators.search_url_filters.dataset_provider_validator import (
-    DatasetProviderValidator,
+from services.validators.search_url_filters.dataset_group_validator import (
+    DatasetGroupValidator,
 )
 from services.validators.search_url_filters.date_range_validator import (
     DateRangeValidator,
@@ -31,7 +31,7 @@ class SearchFilterValidatorFactory:
         url: str, config: SearchFilterConfig
     ) -> List[BaseValidator]:
         validators: List[BaseValidator] = []
-        validators.append(DatasetProviderValidator(url, config))
+        validators.append(DatasetGroupValidator(url, config))
         validators.append(AssetsSummaryValidator(url, config))
         validators.append(UpdateFrequencyValidator(url, config))
         validators.append(DateRangeValidator(url, config))

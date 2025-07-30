@@ -47,6 +47,7 @@ class DetailPage(BasePage):
                 Routes.COLLECTION_CENTROID
             ) as request_info:
                 self.return_button.click()
+                self.wait_for_timeout(500)
             request = request_info.value
             return unquote_plus(request.url)
         except TimeoutError:

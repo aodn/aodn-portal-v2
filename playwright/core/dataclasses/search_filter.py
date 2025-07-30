@@ -19,8 +19,8 @@ class SearchFilterConfig:
     # Platform filters
     platform_vocab_labels: Optional[List[str]] = None
 
-    # Organization/Provider filter
-    dataset_provider: Optional[str] = None
+    # Organization filter
+    dataset_organisation: Optional[str] = None
 
     # Update frequency filter
     update_frequency: Optional[str] = None

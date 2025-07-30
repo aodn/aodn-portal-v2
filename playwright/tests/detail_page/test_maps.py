@@ -4,9 +4,6 @@ from playwright.sync_api import Page, expect
 from pages.detail_page import DetailPage
 
 
-@pytest.mark.xfail(
-    reason='LayersIcon element not found - UI issue'
-)  # todo search page map right-top icon changed causing playwright error
 @pytest.mark.parametrize(
     'uuid',
     [
@@ -42,9 +39,6 @@ def test_drawing_shape_adds_download_filter(
     expect(detail_page.bbox_condition_box).not_to_be_visible()
 
 
-@pytest.mark.xfail(
-    reason='LayersIcon element not found - UI issue'
-)  # todo search page map right-top icon changed causing playwright error
 @pytest.mark.parametrize(
     'uuid',
     [

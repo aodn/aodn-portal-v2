@@ -96,7 +96,4 @@ window.__map_functions = {
   getMapClickLngLat: function (mapId) {
     return this.getTestProps(mapId).getMapClickLngLat();
   },
-  getSelectedLocationIntersects: function (propId) {
-    return this.getTestProps(propId).getSelectedLocationIntersects();
-  },
 };

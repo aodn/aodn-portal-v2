@@ -6,12 +6,10 @@ from services.validators.search_url_filters.base_validator import BaseValidator
 
 class IntersectsValidator(BaseValidator):
     """
-    Validates that the URL filter correctly includes the expected spatial INTERSECTS expression
-    based on the configured location name.
+    Validates that the URL filter correctly includes the expected spatial INTERSECTS expression.
 
-    If `location_name` is provided, checks that the URL contains the corresponding
-    intersects value loaded from a JSON mapping. Otherwise, ensures that
-    the INTERSECTS expression is not present in the URL.
+    If location_intersects is provided, checks that the URL contains the expected intersects value.
+    Otherwise, ensures that the INTERSECTS expression is not present in the URL.
     """
 
     def validate(self) -> tuple[str, bool]:

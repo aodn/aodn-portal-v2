@@ -186,9 +186,3 @@ class Map(BasePage):
             self.page, 'getMapClickLngLat', self.map_id
         )
         return dict(click_coordinate)
-
-    def get_selected_location_intersects(self) -> str:
-        """Get the intersects value of the selected location"""
-        return execute_map_js(
-            self.page, 'getSelectedLocationIntersects', 'selected-location'
-        )

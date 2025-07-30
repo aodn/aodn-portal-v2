@@ -206,7 +206,7 @@ def test_search_state_persists_after_navigation(
         filter_parameter,
         filter_platform,
         filter_organisation,
-        filter_data,
+        filter_data.label,
     )
 
     # Perform search
@@ -220,7 +220,7 @@ def test_search_state_persists_after_navigation(
         filter_parameter,
         filter_platform,
         filter_organisation,
-        filter_data,
+        filter_data.label,
     )
 
     # Navigate to detail page and back
@@ -234,7 +234,7 @@ def test_search_state_persists_after_navigation(
         filter_parameter,
         filter_platform,
         filter_organisation,
-        filter_data,
+        filter_data.label,
     )
 
 
@@ -280,7 +280,7 @@ def test_search_state_persists_with_url(
         filter_parameter,
         filter_platform,
         filter_organisation,
-        filter_data,
+        filter_data.label,
     )
 
     # Perform search
@@ -305,5 +305,5 @@ def test_search_state_persists_with_url(
         filter_parameter,
         filter_platform,
         filter_organisation,
-        filter_data,
+        filter_data.label,
     )
