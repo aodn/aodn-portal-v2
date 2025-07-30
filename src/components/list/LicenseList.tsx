@@ -60,7 +60,7 @@ const LicenseList: React.FC<LicenseListProps> = ({
         </Grid>
       </ItemBaseGrid>
     );
-  }, [graphic, license, theme.mp.md, url]);
+  }, [graphic, license, theme.mp.md, url, mode]);
 
   switch (mode) {
     case MODE.COMPACT:
