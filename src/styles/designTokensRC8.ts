@@ -92,7 +92,7 @@ export const designTokensRC8 = {
       title1Medium: {
         // fontFamily: "Open Sans, sans-serif", // TODO
         fontSize: "16px",
-        fontWeight: 400,
+        fontWeight: 500,
         lineHeight: "26px",
         color: "#000",
       },

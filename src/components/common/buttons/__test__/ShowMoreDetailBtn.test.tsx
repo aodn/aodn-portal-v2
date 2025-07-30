@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import ShowMoreDetailBtn from "../ShowMoreDetailBtn";
+import rc8Theme from "../../../../styles/themeRC8";
 
 // Mock the icons
 vi.mock("../../../icon/PlusIcon", () => ({
@@ -99,11 +100,14 @@ describe("ShowMoreDetailBtn", () => {
     );
     const button = screen.getByRole("button");
     const grid = button.parentElement; // Grid is the parent
-    expect(grid).toHaveStyle("padding: 16px");
-    expect(button).toHaveStyle("border: 1px solid #ccc");
-    expect(button).toHaveStyle("border-radius: 4px");
-    expect(button).toHaveStyle("display: flex");
-    expect(button).toHaveStyle("gap: 9px");
+    expect(grid).toHaveStyle("display: flex");
+    expect(grid).toHaveStyle("justify-content: center");
+    expect(grid).toHaveStyle("align-items: center");
+    expect(button).toHaveStyle(
+      `border: 1px solid ${rc8Theme.palette.primary1}`
+    );
+    expect(button).toHaveStyle("border-radius: 10px");
+    expect(button).toHaveStyle("width: 160px");
   });
 
   it("does not re-render unnecessarily when props are unchanged", () => {
