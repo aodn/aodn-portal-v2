@@ -58,6 +58,8 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                 pageReferer.DETAIL_PAGE_REFERER
               )
             }
+            px={"10px"}
+            py={"16px"}
           >
             {Object.entries(grouped).map(([key, item]: [string, ILink[]]) => (
               <Typography

@@ -26,6 +26,7 @@ import {
 import LogoContainer from "./components/LogoContainer";
 import Logo from "./components/Logo";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import rc8Theme from "../../../../styles/themeRC8";
 
 const LogoList: FC = () => {
   const { isMobile } = useBreakpoint();
@@ -158,14 +159,7 @@ const LogoList: FC = () => {
             </LogoContainer>
           </Grid>
           <Grid item xs={12}>
-            <Typography
-              p={0}
-              px={1}
-              fontWeight={fontWeight.regular}
-              fontSize={fontSize.label}
-              textAlign={{ xs: "center", sm: "left" }}
-              lineHeight={2}
-            >
+            <Typography variant="title1Medium" color={rc8Theme.palette.text2}>
               IMOS thanks the many other organisations who partner with IMOS,
               providing co-investment, funding and operational support,
               including investment from the Tasmanian, Western Australian and

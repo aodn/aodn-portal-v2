@@ -1,13 +1,6 @@
 import { styled, Tab, TabProps } from "@mui/material";
-import {
-  border,
-  borderRadius,
-  color,
-  fontColor,
-  fontWeight,
-  margin,
-} from "../../../styles/constants";
 import StyledBadge, { Position } from "../badge/StyledBadge";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface StyledTabProps extends TabProps {
   showBadge?: boolean;
@@ -19,7 +12,7 @@ const StyledTab = styled((props: StyledTabProps) => {
   const {
     showBadge = false,
     badgePosition = Position.TopRight,
-    badgeColor = color.brightBlue.dark,
+    badgeColor = rc8Theme.palette.secondary1,
     ...tabProps
   } = props;
 
@@ -30,21 +23,29 @@ const StyledTab = styled((props: StyledTabProps) => {
       badgeColor={badgeColor}
       invisible={!showBadge}
     >
-      <Tab {...tabProps} sx={{ margin: `${margin.xlg} ${margin.lg}` }} />
+      <Tab
+        {...tabProps}
+        sx={{
+          ...rc8Theme.typography.title1Medium,
+          py: 0,
+          px: "24px",
+          my: "20px",
+          mx: "6px",
+        }}
+      />
     </StyledBadge>
   );
 })(() => ({
   textTransform: "none",
-  fontWeight: fontWeight.regular,
-  color: fontColor.gray.dark,
-  border: `${border.xs}  ${color.tabPanel.tabOnFocused}`,
-  borderRadius: borderRadius.xxlg,
+  color: rc8Theme.palette.text1,
+  border: `1px solid  ${rc8Theme.palette.primary2}`,
+  borderRadius: "40px",
   "&.Mui-selected": {
     color: "#fff",
-    backgroundColor: color.tabPanel.tabOnFocused,
+    backgroundColor: rc8Theme.palette.primary2,
   },
   " &:hover": {
-    backgroundColor: color.tabPanel.tabOnHover,
+    backgroundColor: rc8Theme.palette.primary2,
     color: "#fff",
   },
 }));

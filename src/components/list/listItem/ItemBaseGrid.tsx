@@ -14,23 +14,38 @@ export const useHoverContext = () => {
   }
   return context;
 };
-const ItemBaseGrid: React.FC<GridProps> = (props) => {
+
+interface ItemBaseGridProps extends GridProps {
+  disableHover?: boolean;
+}
+
+const ItemBaseGrid: React.FC<ItemBaseGridProps> = ({
+  disableHover = false,
+  ...props
+}) => {
   const theme = useTheme();
   const [isOnHover, setIsOnHover] = useState<boolean>(false);
+
+  // Determine background color
+  // Disable hover when in tab panels
+  const getBackgroundColor = () => {
+    if (disableHover) return "transparent";
+    return isOnHover ? rc8Theme.palette.primary5 : rc8Theme.palette.primary6;
+  };
+
   return (
     <HoverContext.Provider value={{ isOnHover }}>
       <Grid
         {...props}
-        onMouseEnter={() => setIsOnHover(true)}
-        onMouseLeave={() => setIsOnHover(false)}
+        onMouseEnter={disableHover ? undefined : () => setIsOnHover(true)}
+        onMouseLeave={disableHover ? undefined : () => setIsOnHover(false)}
         sx={{
-          backgroundColor: isOnHover
-            ? rc8Theme.palette.primary5
-            : rc8Theme.palette.primary6,
-          margin: theme.mp.sm,
+          backgroundColor: getBackgroundColor(),
+          mx: disableHover ? 0 : theme.mp.sm,
+          my: disableHover ? "14px" : theme.mp.sm,
           borderRadius: theme.borderRadius.sm,
           width: "95%",
-          padding: `${theme.mp.sm} ${theme.mp.xlg}`,
+          padding: disableHover ? 0 : `${theme.mp.sm} ${theme.mp.xlg}`,
         }}
       >
         {props.children}
