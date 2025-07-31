@@ -1,6 +1,8 @@
 import { FC, useCallback, useMemo, useState } from "react";
 import {
+  Alert,
   Button,
+  CircularProgress,
   Divider,
   Snackbar,
   Stack,
@@ -17,7 +19,7 @@ import CommonSelect, {
   SelectItem,
 } from "../../../../components/common/dropdown/CommonSelect";
 import { ILink } from "../../../../components/common/store/OGCCollectionDefinitions";
-import { formatToUrl } from "../../../../utils/UrlUtils";
+import axios from "axios";
 
 // TODO: options should fetch from wfs server
 const options = [
@@ -46,9 +48,10 @@ enum DownloadStatus {
 
 interface DownloadWFSCardProps {
   WFSLinks: ILink[];
+  uuid?: string;
 }
 
-const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks }) => {
+const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
   const theme = useTheme();
   const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
     WFSLinks[0]?.title
@@ -79,38 +82,73 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks }) => {
     },
     [setSelectedDataItem]
   );
+  const handleDownload = useCallback(
+    async (selectedDataItem: string | undefined) => {
+      setDownloadingStatus(DownloadStatus.IN_PROGRESS);
+      setSnackbarOpen(true);
+      const selectedLink = WFSLinks.find(
+        (link) => link.title === selectedDataItem
+      );
+      if (!selectedLink?.title || !uuid) {
+        console.error("UUID or layer name is not provided for download");
+        setDownloadingStatus(DownloadStatus.ERROR);
+        return;
+      }
+      try {
+        const response = await axios.post(
+          "/api/v1/ogc/processes/downloadWfs/execution",
+          {
+            inputs: {
+              uuid: uuid,
+              recipient: "",
+              layer_name: selectedLink.title,
+            },
+          },
+          { responseType: "blob" }
+        );
 
-  const handleDownload = useCallback((value: string | undefined) => {
-    setDownloadingStatus(DownloadStatus.IN_PROGRESS);
-    setSnackbarOpen(true);
-    console.log("Download initiated for WFS data", value);
-    if (!value) {
-      console.error("No data selected for download");
-      return;
-    }
-    const url = formatToUrl({
-      baseUrl: WFSBaseUrl,
-      params: {
-        ...WFSParam,
-        typeName: `imos:${value}`,
-      },
-    });
-    try {
-      // Direct download - let the browser handle it
-      window.open(url, "_blank");
+        // Handle successful response
+        downloadFile(response.data, generateFileName(selectedLink.title));
 
-      // Alternative approach:
-      // window.location.href = url;
+        setDownloadingStatus(DownloadStatus.COMPLETED);
+        setSnackbarOpen(true);
+        return response.data;
+      } catch (error) {
+        // Handle error
+        setDownloadingStatus(DownloadStatus.ERROR);
+        setSnackbarOpen(true);
+        console.error("Download request failed:", error);
+        throw error;
+      }
+    },
+    [WFSLinks, uuid]
+  );
 
-      console.log("Download initiated successfully");
-    } catch (err) {
-      setDownloadingStatus(DownloadStatus.ERROR);
-      console.log("Download error", err);
-    } finally {
-      setSnackbarOpen(false);
-      setDownloadingStatus(DownloadStatus.COMPLETED);
-    }
-  }, []);
+  // Helper function to generate appropriate filename
+  const generateFileName = (layerName: string) => {
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
+    const sanitizedLayerName = layerName.replace(/[^a-z0-9]/gi, "_");
+    return `${sanitizedLayerName}_${timestamp}.csv`;
+  };
+
+  // Helper function to handle file download
+  const downloadFile = (blob: Blob, filename: string) => {
+    // Create blob URL
+    const url = window.URL.createObjectURL(blob);
+
+    // Create temporary anchor element
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+
+    // Append to body, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up blob URL to free memory
+    window.URL.revokeObjectURL(url);
+  };
 
   const selectSxProps = useMemo(
     () => ({
@@ -154,11 +192,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks }) => {
           }}
           onClick={() => handleDownload(selectedDataItem)}
         >
-          <Typography padding={0} color="#fff">
-            {downloadingStatus === DownloadStatus.IN_PROGRESS
-              ? "Downloading in progress"
-              : "Download WFS Data"}
-          </Typography>
+          {downloadingStatus === DownloadStatus.IN_PROGRESS ? (
+            <CircularProgress size="24px" sx={{ color: "#fff" }} />
+          ) : (
+            <Typography padding={0} color="#fff">
+              Download WFS Data
+            </Typography>
+          )}
         </Button>
       </Stack>
       <Divider sx={{ width: "100%" }} />
@@ -189,9 +229,24 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks }) => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackbarOpen}
+        autoHideDuration={5000}
         onClose={() => setSnackbarOpen(false)}
-        message={downloadingStatus}
-      />
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={
+            downloadingStatus === DownloadStatus.ERROR
+              ? "error"
+              : downloadingStatus === DownloadStatus.IN_PROGRESS
+                ? "info"
+                : "success"
+          }
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {downloadingStatus}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 };
