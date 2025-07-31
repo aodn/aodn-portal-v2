@@ -3,6 +3,8 @@ import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import TextArea from "./listItem/subitem/TextArea";
 import NaList from "./NaList";
+import { borderRadius, gap } from "../../styles/constants";
+import { useTheme } from "@mui/material";
 
 interface ThemeListProps {
   title: string;
@@ -15,19 +17,40 @@ const ThemeList: React.FC<ThemeListProps> = ({
   themes,
   selected = false,
 }) => {
+  const theme = useTheme();
+
   const statementItem = useMemo(
     () => (
-      <ItemBaseGrid container key={"theme-list-container-key"}>
+      <ItemBaseGrid
+        container
+        direction="row"
+        key={"theme-list-container-key"}
+        gap={1.25}
+      >
         {themes.length !== 0 ? (
-          themes.map((theme: string) => {
-            return <TextArea key={theme} text={theme} />;
+          themes.map((item: string) => {
+            return (
+              <TextArea
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyItems: "center",
+                  backgroundColor: theme.palette.common.white,
+                  padding: "8px 13.2px",
+                  gap: gap.xlg,
+                  borderRadius: borderRadius.small,
+                }}
+                key={item}
+                text={item}
+              />
+            );
           })
         ) : (
           <NaList title={title}></NaList>
         )}
       </ItemBaseGrid>
     ),
-    [themes, title]
+    [theme.palette.common.white, themes, title]
   );
 
   return (

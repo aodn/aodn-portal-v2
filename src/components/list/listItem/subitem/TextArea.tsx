@@ -1,15 +1,16 @@
 import React from "react";
-import { Typography } from "@mui/material";
-import TextAreaBaseGrid from "./TextAreaBaseGrid";
+import { SxProps, Theme, Typography } from "@mui/material";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
+import TextAreaBaseGrid from "./TextAreaBaseGrid";
 
 interface TextAreaProps {
   text: string;
+  sx?: SxProps<Theme>;
 }
 
-const TextArea: React.FC<TextAreaProps> = ({ text }) => {
+const TextArea: React.FC<TextAreaProps> = ({ text, sx }: TextAreaProps) => {
   return (
-    <TextAreaBaseGrid>
+    <TextAreaBaseGrid sx={sx}>
       <Typography variant="detailContent">
         {decodeHtmlEntities(text)}
       </Typography>

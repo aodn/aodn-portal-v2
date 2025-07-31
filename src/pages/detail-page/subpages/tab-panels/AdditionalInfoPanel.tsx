@@ -15,60 +15,50 @@ import { contactRoles } from "../../../../components/common/constants";
 const AdditionalInfoPanel = () => {
   const context = useDetailPageContext();
 
-  const metadataContact = useMemo(
-    () =>
-      context.collection
-        ?.getContacts()
-        ?.filter((contact) => contact.roles.includes(contactRoles.METADATA)),
-    [context.collection]
-  );
+  const [
+    metadataContact,
+    themes,
+    statement,
+    metadataId,
+    creation,
+    revision,
+    categories,
+    metadataUrl,
+    keywords,
+  ] = useMemo(() => {
+    const metadataContact = context.collection
+      ?.getContacts()
+      ?.filter((contact) => contact.roles.includes(contactRoles.METADATA));
 
-  const themes = useMemo(
-    () => context.collection?.getThemes(),
-    [context.collection]
-  );
+    const themes = context.collection?.getThemes();
 
-  const statement = useMemo(
-    () => context.collection?.getStatement(),
-    [context.collection]
-  );
-  // TODO: for the creation and revision, geonetwork still have a confusion about the time zone.
-  //  currently just make all time zone to be UTC (hard coded).
-  //  Should be resolved in the future when the geonetwork is clarified.
-  const creation = useMemo(() => {
-    const creation = context.collection?.getCreation();
-    if (creation) {
-      return convertDateFormat(creation);
-    }
-    return "";
-  }, [context.collection]);
+    const statement = context.collection?.getStatement();
 
-  const metadataId = useMemo(
-    () => context.collection?.id,
-    [context.collection?.id]
-  );
+    const metadataId = context.collection?.id;
 
-  const revision = useMemo(() => {
-    const revision = context.collection?.getRevision();
-    if (revision) {
-      return convertDateFormat(revision);
-    }
-    return "";
-  }, [context.collection]);
+    const t = context.collection?.getRevision();
+    const revision = t ? convertDateFormat(t) : "";
 
-  const metadataUrl = useMemo(() => {
-    if (context.collection) {
-      const metadataLink = context.collection.getMetadataUrl();
-      if (metadataLink) {
-        return metadataLink;
+    // TODO: for the creation and revision, geonetwork still have a confusion about the time zone.
+    //  currently just make all time zone to be UTC (hard coded).
+    //  Should be resolved in the future when the geonetwork is clarified.
+    const c = context.collection?.getCreation();
+    const creation = c ? convertDateFormat(c) : "";
+
+    let categories: Array<string> = [];
+    for (const theme of themes ?? []) {
+      if (theme.scheme === "Categories") {
+        categories = theme.concepts.map((concept) => concept.id);
       }
-      return "";
     }
-  }, [context.collection]);
 
-  const keywords: { title: string; content: string[] }[] = useMemo(() => {
-    // getting keywords from themes
-    const keywordItems: { title: string; content: string[] }[] = [];
+    let metadataUrl = undefined;
+    if (context.collection) {
+      const ml = context.collection.getMetadataUrl();
+      metadataUrl = ml ? ml : "";
+    }
+
+    let keywords: { title: string; content: string[] }[] = [];
     themes?.forEach((theme) => {
       // if no concepts, it is not considered as a keyword
       if (!theme.concepts || theme.concepts.length === 0) {
@@ -84,7 +74,7 @@ const AdditionalInfoPanel = () => {
       // share the same title & description. The reason that making every concept
       // has the same title is to obey the STAC collection standard (theme extension).
       const title = theme.concepts?.[0].title;
-      keywordItems.push({
+      keywords.push({
         title: title,
         content: theme.concepts.map(
           (concept) => ` \u00A0 \u2022 ${concept.id}`
@@ -92,20 +82,22 @@ const AdditionalInfoPanel = () => {
       });
     });
 
-    // reorder them according to the title alphabetically
-    return _.sortBy(keywordItems, (item) => {
+    keywords = _.sortBy(keywords, (item) => {
       return item.title ? item.title : "\uffff";
     });
-  }, [themes]);
 
-  const categories = useMemo(() => {
-    for (const theme of themes ?? []) {
-      if (theme.scheme === "Categories") {
-        return theme.concepts.map((concept) => concept.id);
-      }
-    }
-    return [];
-  }, [themes]);
+    return [
+      metadataContact,
+      themes,
+      statement,
+      metadataId,
+      creation,
+      revision,
+      categories,
+      metadataUrl,
+      keywords,
+    ];
+  }, [context.collection]);
 
   const [isLoading, setIsLoading] = useState(true);
 

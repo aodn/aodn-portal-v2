@@ -1,4 +1,4 @@
-import { Grid, GridProps, useTheme } from "@mui/material";
+import { Grid, GridProps, SxProps, Theme, useTheme } from "@mui/material";
 import React, { createContext, useContext, useState } from "react";
 import rc8Theme from "../../../styles/themeRC8";
 
@@ -17,12 +17,15 @@ export const useHoverContext = () => {
 
 interface ItemBaseGridProps extends GridProps {
   disableHover?: boolean;
+  sx?: SxProps<Theme>;
 }
 
-const ItemBaseGrid: React.FC<ItemBaseGridProps> = ({
+const ItemBaseGrid = ({
   disableHover = false,
+  children,
+  sx,
   ...props
-}) => {
+}: React.PropsWithChildren<ItemBaseGridProps>) => {
   const theme = useTheme();
   const [isOnHover, setIsOnHover] = useState<boolean>(false);
 
@@ -36,7 +39,6 @@ const ItemBaseGrid: React.FC<ItemBaseGridProps> = ({
   return (
     <HoverContext.Provider value={{ isOnHover }}>
       <Grid
-        {...props}
         onMouseEnter={disableHover ? undefined : () => setIsOnHover(true)}
         onMouseLeave={disableHover ? undefined : () => setIsOnHover(false)}
         sx={{
@@ -46,9 +48,11 @@ const ItemBaseGrid: React.FC<ItemBaseGridProps> = ({
           borderRadius: theme.borderRadius.sm,
           width: "95%",
           padding: disableHover ? 0 : `${theme.mp.sm} ${theme.mp.xlg}`,
+          ...sx,
         }}
+        {...props}
       >
-        {props.children}
+        {children}
       </Grid>
     </HoverContext.Provider>
   );
