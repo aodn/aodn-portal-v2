@@ -24,6 +24,7 @@ import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { LIST_CARD_TITLE_HEIGHT } from "./constants";
+import rc8Theme from "../../styles/themeRC8";
 
 interface ListResultCardProps extends ResultCardBasicType {}
 
@@ -93,13 +94,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
               title={
                 <Typography
                   onClick={() => onClickDetail(uuid)}
-                  color={fontColor.gray.dark}
-                  fontSize={
-                    isSimplified
-                      ? fontSize.resultCardTitleUnderLaptop
-                      : fontSize.resultCardTitle
-                  }
-                  fontWeight={fontWeight.bold}
+                  variant="title1Medium"
+                  color={rc8Theme.palette.text1}
                   title={title}
                   padding={0}
                   sx={{
@@ -145,13 +141,9 @@ const ListResultCard: FC<ListResultCardProps> = ({
             >
               <Box sx={{ flex: 1 }}>
                 <Typography
+                  variant="body3Small"
+                  color={rc8Theme.palette.text2}
                   arial-label="result-list-card-content"
-                  color={fontColor.gray.medium}
-                  fontSize={
-                    isSimplified
-                      ? fontSize.resultCardContentUnderLaptop
-                      : fontSize.resultCardContent
-                  }
                   onClick={() =>
                     isSimplified ? onClickDetail(uuid) : onClickCard(content)
                   }

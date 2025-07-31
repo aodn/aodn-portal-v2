@@ -22,6 +22,7 @@ import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
+import rc8Theme from "../../styles/themeRC8";
 
 interface GridResultCardProps extends ResultCardBasicType {}
 
@@ -128,9 +129,8 @@ const GridResultCard: FC<GridResultCardProps> = ({
               data-testid="grid-card-title"
             >
               <Typography
-                color={fontColor.gray.dark}
-                fontSize={fontSize.resultCardContent}
-                fontWeight={fontWeight.medium}
+                variant="title1Medium"
+                color={rc8Theme.palette.text1}
                 sx={{
                   padding: 0,
                   overflow: "hidden",
