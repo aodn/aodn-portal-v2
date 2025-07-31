@@ -20,6 +20,7 @@ import {
   clearComponentParam,
   updateSearchText,
 } from "../../../../components/common/store/componentParamReducer";
+import rc8Theme from "../../../../styles/themeRC8";
 
 interface TopicsPanelProps {}
 
@@ -107,17 +108,24 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
       {!showAllTopics && (
-        <Box sx={{ pr: { sm: padding.small } }}>
+        <Box sx={{ pr: "26px" }}>
           <IconButton
             onClick={() => handleScroll(-topicsPanelContainerWidth)}
             disabled={isLeftDisabled}
+            sx={{
+              visibility: isLeftDisabled ? "hidden" : "visible",
+              bgcolor: "#FFF",
+              borderRadius: "50%",
+              height: "44px",
+              width: "44px",
+            }}
           >
             <ArrowBackIosNewIcon
               sx={{
                 pr: gap.sm,
                 height: SCROLL_BUTTON_SIZE,
                 width: SCROLL_BUTTON_SIZE,
-                color: isLeftDisabled ? color.gray.extraLight : color.gray.dark,
+                color: rc8Theme.palette.grey700,
               }}
             />
           </IconButton>
@@ -159,19 +167,24 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         </Stack>
       </Box>
       {!showAllTopics && (
-        <Box sx={{ pl: { sm: padding.small } }}>
+        <Box sx={{ pl: "26px" }}>
           <IconButton
             onClick={() => handleScroll(topicsPanelContainerWidth)}
             disabled={isRightDisabled}
+            sx={{
+              visibility: isRightDisabled ? "hidden" : "visible",
+              bgcolor: "#FFF",
+              borderRadius: "50%",
+              height: "44px",
+              width: "44px",
+            }}
           >
             <ArrowForwardIosIcon
               sx={{
                 pl: gap.sm,
                 height: SCROLL_BUTTON_SIZE,
                 width: SCROLL_BUTTON_SIZE,
-                color: isRightDisabled
-                  ? color.gray.extraLight
-                  : color.gray.dark,
+                color: rc8Theme.palette.grey700,
               }}
             />
           </IconButton>
