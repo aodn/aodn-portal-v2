@@ -2,6 +2,7 @@ import { ElementType, FC, isValidElement, ReactNode } from "react";
 import { Button, SxProps, Tooltip, Typography } from "@mui/material";
 import { color, padding } from "../../../styles/constants";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
+import rc8Theme from "../../../styles/themeRC8";
 
 export enum ResultCardButtonSize {
   SMALL = "small",
@@ -80,8 +81,8 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
           pt={0}
           pl={padding.extraSmall}
           mt={-0.5}
-          fontSize={fontSizes[size].text}
-          color={config.color}
+          variant="body2Regular"
+          color={rc8Theme.palette.text1}
           whiteSpace="nowrap"
         >
           {text}

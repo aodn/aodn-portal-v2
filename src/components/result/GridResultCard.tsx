@@ -11,9 +11,6 @@ import {
   border,
   borderRadius,
   color,
-  fontColor,
-  fontSize,
-  fontWeight,
   gap,
   padding,
 } from "../../styles/constants";
