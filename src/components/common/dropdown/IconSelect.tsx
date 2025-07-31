@@ -96,13 +96,17 @@ const renderSelectValue = (
     >
       {renderIcon(icon, color, iconBgColor, isIconOnly)}
       {!isIconOnly && label && (
-        <Box width="100%" textAlign="center">
+        <Box flex={1} minWidth={0} overflow="hidden" textAlign="center">
           <Typography
             variant="title2Regular"
             color={color}
-            overflow="hidden"
-            textOverflow="ellipsis"
-            whiteSpace="nowrap"
+            sx={{
+              width: "100%",
+              display: "block",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
           >
             {label}
           </Typography>

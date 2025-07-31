@@ -24,13 +24,12 @@ export interface ResultPanelSimpleFilterType
 
 interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 
-//todo: confirm text
 const renderShowingResultsText = (total: number, count: number) =>
   total === 0
     ? "No results found"
     : total === 1
-      ? "1 of 1 result"
-      : `${count} of ${formatNumber(total)} results`;
+      ? "Showing 1 of 1 result"
+      : `Showing 1 - ${count} of ${formatNumber(total)} results`;
 
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   count,
@@ -58,6 +57,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           bgcolor: rc8Theme.palette.primary6,
           px: "20px",
           py: "10px",
+          flexShrink: 0,
         }}
         data-testid="show-result-count"
       >
@@ -65,7 +65,13 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           {renderShowingResultsText(total, count)}
         </Typography>
       </Paper>
-      <Stack flexDirection="row" flex={1} gap={1} flexWrap="nowrap">
+      <Stack
+        flexDirection="row"
+        flex={1}
+        gap={1}
+        flexWrap="nowrap"
+        minWidth={0}
+      >
         <ResultListSortButton
           onChangeSorting={onChangeSorting}
           currentSort={currentSort}
