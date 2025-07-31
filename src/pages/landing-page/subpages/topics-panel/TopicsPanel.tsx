@@ -7,7 +7,7 @@ import { useAppDispatch } from "../../../../components/common/store/hooks";
 import useRedirectSearch from "../../../../hooks/useRedirectSearch";
 import useTopicsPanelSize from "../../../../hooks/useTopicsPanelSize";
 import { useDebounce } from "../../../../hooks/useDebounce";
-import { color, gap, padding } from "../../../../styles/constants";
+import { gap } from "../../../../styles/constants";
 import {
   TOPICS_CARDS,
   TOPICS_PANEL_GAP,
