@@ -1,6 +1,10 @@
-from playwright.sync_api import Locator, Page
+from urllib.parse import unquote_plus
+
+import pytest
+from playwright.sync_api import Locator, Page, TimeoutError
 
 from config import settings
+from mocks.routes import Routes
 from pages.base_page import BasePage
 from pages.components.contact_area import ContactAreaComponent
 from pages.components.map import Map
@@ -22,7 +26,7 @@ class DetailPage(BasePage):
         # -- Page locators --
 
         self.page_title = self.get_label(text='collection title')
-        self.go_back_button = self.page.get_by_test_id('go-back-button')
+        self.return_button = self.page.get_by_test_id('return-button')
         self.description = self.page.get_by_test_id('expandable-text-area')
 
         # download condition boxes
@@ -35,6 +39,21 @@ class DetailPage(BasePage):
         """Load the detail page for the given uuid"""
         url = f'{settings.baseURL}/details/{uuid}'
         self.page.goto(url, wait_until='domcontentloaded')
+
+    def return_and_get_api_request_url(self) -> str:
+        """Return to the previous page and return the API URL used for the request."""
+        try:
+            with self.page.expect_request(
+                Routes.COLLECTION_CENTROID
+            ) as request_info:
+                self.return_button.click()
+                self.wait_for_timeout(500)
+            request = request_info.value
+            return unquote_plus(request.url)
+        except TimeoutError:
+            pytest.fail(
+                'API URL not found within the timeout, search did not trigger successfully.'
+            )
 
     def get_tab_section(self, title: str) -> Locator:
         """Returns tab section title element"""

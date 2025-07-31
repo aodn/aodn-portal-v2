@@ -94,7 +94,7 @@ const MapboxWorldLayer: FC = () => {
 
   return (
     <TestHelper
-      mapId={map?.getContainer().id || ""}
+      id={map?.getContainer().id || ""}
       getWorldBoundariesLayer={() => layerId}
     />
   );
