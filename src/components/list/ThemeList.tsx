@@ -25,7 +25,7 @@ const ThemeList: React.FC<ThemeListProps> = ({
         container
         direction="row"
         key={"theme-list-container-key"}
-        gap={1}
+        gap={1.25}
       >
         {themes.length !== 0 ? (
           themes.map((item: string) => {
