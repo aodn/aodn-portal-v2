@@ -47,7 +47,7 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
             width: "100%",
           }}
         >
-          <DownloadWFSCard WFSLinks={WFSLinks} />
+          <DownloadWFSCard WFSLinks={WFSLinks} uuid={collection?.id} />
         </Card>
       ) : (
         <DownloadServiceCard />
