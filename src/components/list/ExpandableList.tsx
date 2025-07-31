@@ -5,6 +5,7 @@ import NaList from "./NaList";
 import EndpointedDiamondIcon from "../icon/EndpointedDiamondIcon";
 import { InfoContentType } from "../info/InfoDefinition";
 import InfoTip from "../info/InfoTip";
+import rc8Theme from "../../styles/themeRC8";
 
 interface ExpandableListProps {
   title?: string;
@@ -36,6 +37,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
           <Typography
             display="inline"
             variant="heading4"
+            color={rc8Theme.palette.text2}
             sx={{
               marginLeft: theme.mp.md,
             }}
