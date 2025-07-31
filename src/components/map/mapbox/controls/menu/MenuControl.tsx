@@ -123,6 +123,7 @@ class MapControl implements IControl {
   // When the user clicks somewhere on the map, notify the MenuControl
   private readonly mapClickHandler: (event: MapMouseEvent) => void;
   private readonly mapMoveStartHandler: (event: MapEvent) => void;
+  private readonly mouseClickHandler: (event: MouseEvent) => void;
 
   constructor(component: MapControlType, container: HTMLDivElement) {
     this.component = component;
@@ -133,6 +134,8 @@ class MapControl implements IControl {
       this.onClickHandler(event, undefined, EVENT_MAP.CLICKED);
     this.mapMoveStartHandler = (event: MapEvent) =>
       this.onClickHandler(event, undefined, EVENT_MAP.MOVE_START);
+    this.mouseClickHandler = (event: MouseEvent) =>
+      this.onClickHandler(event, this.component);
   }
 
   private render() {
@@ -161,9 +164,7 @@ class MapControl implements IControl {
   }
 
   onAdd(map: MapBox) {
-    this.container.addEventListener("click", (event: MouseEvent) =>
-      this.onClickHandler(event, this.component)
-    );
+    this.container.addEventListener("click", this.mouseClickHandler);
 
     // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#updates-to-client-rendering-apis
     // according to document, you need "!" at the end of container
@@ -186,6 +187,7 @@ class MapControl implements IControl {
       setTimeout(() => {
         map?.off("click", this.mapClickHandler);
         map?.off("movestart", this.mapMoveStartHandler);
+        this.container?.removeEventListener("click", this.mouseClickHandler);
         this.container?.parentNode?.removeChild(this.container);
         this.root?.unmount();
       });
