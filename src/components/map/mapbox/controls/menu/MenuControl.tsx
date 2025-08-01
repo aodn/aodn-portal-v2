@@ -15,8 +15,9 @@ import {
   EVENT_MAP,
   EVENT_MENU,
   MapControlType,
+  MenuControlType,
 } from "./Definition";
-import { Box, SxProps, Theme } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   borderRadius,
   color,
@@ -104,12 +105,8 @@ export const switcherMenuContentLabelTypographySx = {
   lineHeight: "22px",
 };
 
-interface MenuControlProps {
+interface MenuControlProps extends MenuControlType {
   menu: MapControlType | null;
-  position?: "bottom-right" | "top-right";
-  sx?: SxProps<Theme>;
-  visible?: boolean;
-  className?: string;
 }
 
 class MapControl implements IControl {
