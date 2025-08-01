@@ -1,6 +1,7 @@
 import { ForwardedRef, forwardRef } from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { color } from "../../../styles/constants";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface DetailSubtabProps {
   id?: string;
@@ -37,7 +38,9 @@ const DetailSubtabBtn = forwardRef<HTMLDivElement | null, DetailSubtabProps>(
           }}
           onClick={onClick}
         >
-          <Typography variant="body1Medium">{title}</Typography>
+          <Typography variant="body1Medium" color={rc8Theme.palette.text1}>
+            {title}
+          </Typography>
         </Button>
       </Box>
     );
