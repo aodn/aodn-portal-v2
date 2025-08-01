@@ -1,12 +1,6 @@
 import { FC, useCallback } from "react";
 import { Box, Button, SxProps, Typography } from "@mui/material";
-import {
-  color,
-  fontColor,
-  fontSize,
-  fontWeight,
-  padding,
-} from "../../styles/constants";
+import rc8Theme from "../../styles/themeRC8";
 
 interface BookmarkListHeadProps {
   bookmarkCount: number | undefined;
@@ -33,18 +27,12 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
-        p: padding.extraSmall,
-        bgcolor: color.blue.darkSemiTransparent,
+        bgcolor: rc8Theme.palette.primary4,
         ...sx,
       }}
       data-testid="bookmark-list-head"
     >
-      <Typography
-        p={0}
-        fontSize={fontSize.info}
-        color={fontColor.blue.dark}
-        fontWeight={fontWeight.bold}
-      >
+      <Typography variant="title2Regular" color={rc8Theme.palette.text1}>
         {getTitle()}
       </Typography>
       <Button
@@ -52,7 +40,11 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
         onClick={onClearAllBookmarks}
         data-testid="bookmark-list-head-clearall"
       >
-        <Typography p={0} fontSize={fontSize.label} color={fontColor.blue.dark}>
+        <Typography
+          variant="body1Medium"
+          color={rc8Theme.palette.text1}
+          pr="18px"
+        >
           Clear
         </Typography>
       </Button>
