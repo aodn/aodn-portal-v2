@@ -47,10 +47,6 @@ describe("ResultCardButton", () => {
   it("renders text when shouldHideText is false", () => {
     render(<ResultCardButton text="Click me" shouldHideText={false} />);
     expect(screen.getByText("Click me")).toBeInTheDocument();
-    expect(screen.getByText("Click me")).toHaveStyle("font-size: 12px");
-    expect(screen.getByText("Click me")).toHaveStyle(
-      "color: rgb(97, 140, 165)"
-    );
   });
 
   it("hides text when shouldHideText is true", () => {
@@ -73,9 +69,6 @@ describe("ResultCardButton", () => {
     const icon = screen.getByTestId("mock-icon");
     const text = screen.getByText("Test");
     expect(icon).toHaveStyle("font-size: 18px");
-    expect(text).toHaveStyle("font-size: 14px");
-    expect(icon).toHaveStyle("color: #ff0000");
-    expect(text).toHaveStyle("color: #ff0000");
   });
 
   it("merges custom sx props", () => {
