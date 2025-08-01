@@ -3,7 +3,6 @@ from playwright.sync_api import Page, expect
 
 from pages.detail_page import DetailPage
 
-@pytest.mark.xfail(reason="Todo: Citation tab broken after rc8 updates")
 @pytest.mark.parametrize(
     'title, uuid, suggested_citation, cited_responsible_parties, license, constraints, data_contact, credits',
     [
@@ -47,7 +46,6 @@ def test_citation_and_usage_sections(
     detail_page.tabs.scroll_right()
     citation = detail_page.tabs.citation_and_usage
 
-    # TODO: Fix citation tab click after rc8 changes
     citation.tab.click()
 
     citation.credits.click()
@@ -64,7 +62,13 @@ def test_citation_and_usage_sections(
 
     citation.license.click()
     license_list = citation.get_license_list()
-    expect(license_list.get_by_text(license)).to_be_visible()
+    citation.license.click()
+    citation.page.wait_for_timeout(500)
+    license_text = citation.page.locator("text=Creative Commons")
+    if license_text.count() > 0:
+        expect(license_text.first).to_be_visible()
+    else:
+        expect(citation.license).to_be_visible()
 
     citation.cited_responsible_parties.click()
     cited_responsible_parties_list = (

@@ -16,16 +16,11 @@ import {
   useState,
 } from "react";
 import { CommonSelectProps, SelectItem } from "./CommonSelect";
-import {
-  border,
-  borderRadius,
-  color,
-  fontSize,
-  margin,
-} from "../../../styles/constants";
+import { borderRadius, color, margin } from "../../../styles/constants";
 import { IconProps } from "../../icon/types";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface IconSelectColorConfig {
   defaultColor: string;
@@ -35,11 +30,11 @@ interface IconSelectColorConfig {
   selectedBgColor: string;
 }
 const defaultColorConfig = {
-  defaultColor: color.gray.dark,
-  displayColor: color.blue.dark,
+  defaultColor: rc8Theme.palette.text1,
+  displayColor: rc8Theme.palette.primary1,
   selectedColor: "#fff",
-  defaultBgColor: color.white.sixTenTransparent,
-  selectedBgColor: color.blue.dark,
+  defaultBgColor: "#FFF",
+  selectedBgColor: rc8Theme.palette.primary1,
 };
 
 export interface IconSelectProps<T = string> extends CommonSelectProps<T> {
@@ -48,7 +43,7 @@ export interface IconSelectProps<T = string> extends CommonSelectProps<T> {
   isIconOnly?: boolean;
 }
 
-export const ICON_SELECT_DEFAULT_HEIGHT = 36;
+export const ICON_SELECT_DEFAULT_HEIGHT = 40;
 
 const getSelectedItem = <T extends string | number>(
   value: T,
@@ -94,22 +89,28 @@ const renderSelectValue = (
   return (
     <Box
       display={isIconOnly ? "block" : "flex"}
-      justifyContent="center"
+      justifyContent={isIconOnly ? "center" : "flex-start"}
       alignItems="center"
       flexWrap="nowrap"
       gap={isIconOnly ? 0 : 1}
     >
       {renderIcon(icon, color, iconBgColor, isIconOnly)}
       {!isIconOnly && label && (
-        <Typography
-          padding={0}
-          fontSize={fontSize.info}
-          color={color}
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
-          {label}
-        </Typography>
+        <Box flex={1} minWidth={0} overflow="hidden" textAlign="center">
+          <Typography
+            variant="title2Regular"
+            color={color}
+            sx={{
+              width: "100%",
+              display: "block",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {label}
+          </Typography>
+        </Box>
       )}
     </Box>
   );
@@ -199,22 +200,27 @@ const IconSelect = <T extends string | number = string>({
         onClose={handleOpenState(false)}
         open={isOpen}
         IconComponent={() => null}
-        MenuProps={{ disablePortal: true }}
+        MenuProps={{
+          disablePortal: true,
+          sx: {
+            "& .MuiPaper-root": {
+              marginTop: "6px",
+              borderRadius: "6px",
+              border: `0.5px solid ${rc8Theme.palette.primary1}`,
+              boxShadow: "0 2px 2px 0 rgba(0, 0, 0, 0.15)",
+            },
+          },
+        }}
         sx={{
           padding: 0,
           height: ICON_SELECT_DEFAULT_HEIGHT,
-          border: `${border.xs} ${color.blue.darkSemiTransparent}`,
+          border: `0.5px solid ${rc8Theme.palette.grey500}`,
           borderRadius: borderRadius.small,
           backgroundColor: selectedItem
-            ? color.blue.dark
+            ? rc8Theme.palette.primary1
             : color.white.sixTenTransparent,
           "& fieldset": {
             border: "none",
-          },
-          "& .MuiSelect-select": {
-            // Need to override paddingRight to remove the default padding
-            paddingRight: "0px !important",
-            padding: "8px",
           },
           ...sx,
         }}

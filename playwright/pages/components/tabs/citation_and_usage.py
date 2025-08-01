@@ -7,7 +7,7 @@ class CitationAndUsageTab(BasePage):
     TAB_NAME = 'Citation and Usage'
     SUGGESTED_CITATION = 'Suggested Citation'
     CITED_RESPONSIBLE_PARTIES = 'Cited Responsible Parties'
-    LICENSE = 'License'
+    LICENSE = 'Citation'
     CONSTRAINTS = 'Constraints'
     DATA_CONTACT = 'Data Contact'
     CREDITS = 'Credits'
