@@ -71,11 +71,11 @@ List of primary dependencies:
 - `vite.config.ts` for Vite build tool configuration
 - `tsconfig.json` for TypeScript configuration
 - `docker-compose` and `dockerfile` for Docker configuration
-- `AppThene.ts` for css theme
+- `AppTheme.ts` for css theme
 
 ## Styles
 
-We are using [material ui](https://mui.com/material-ui/) and our configuration theme file it's in `AppThene.ts`
+We are using [material ui](https://mui.com/material-ui/) and our configuration theme file it's in `AppTheme.ts`
 
 ## Automated UI tests
 

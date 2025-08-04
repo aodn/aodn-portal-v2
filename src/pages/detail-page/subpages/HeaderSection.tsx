@@ -21,9 +21,7 @@ import {
   border,
   borderRadius,
   color,
-  fontColor,
   fontSize,
-  fontWeight,
   padding,
 } from "../../../styles/constants";
 import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";

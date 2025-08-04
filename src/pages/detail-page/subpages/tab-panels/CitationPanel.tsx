@@ -25,7 +25,7 @@ interface CitationPanelProps {
   mode?: MODE;
 }
 
-const TITLE_LICENSE = "Citation";
+const TITLE_LICENSE = "License";
 const TITLE_SUGGESTED_CITATION = "Suggested Citation";
 
 const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
@@ -190,7 +190,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       case MODE.COMPACT:
         return (
           <SideCardContainer
-            title={TITLE_LICENSE}
+            title={"Citation"}
             onClick={() =>
               goToDetailPage(
                 collection.id,
