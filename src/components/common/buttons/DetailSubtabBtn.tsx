@@ -1,6 +1,5 @@
 import { ForwardedRef, forwardRef } from "react";
-import { Box, Button, Typography, useTheme } from "@mui/material";
-import { color } from "../../../styles/constants";
+import { Box, Button, Typography } from "@mui/material";
 import rc8Theme from "../../../styles/themeRC8";
 
 interface DetailSubtabProps {
@@ -11,34 +10,32 @@ interface DetailSubtabProps {
 
 const DetailSubtabBtn = forwardRef<HTMLDivElement | null, DetailSubtabProps>(
   ({ id, title, onClick }, ref: ForwardedRef<HTMLDivElement>) => {
-    const theme = useTheme();
-
     return (
       <Box
         ref={ref} // Must set ref to be the container ref
-        sx={{
-          display: "flex",
-          justifyContent: "flex-start",
-          height: "45px",
-          width: "160px",
-          mx: theme.mp.lg,
-        }}
       >
         <Button
           id={id}
           data-testid={id}
+          onClick={onClick}
           sx={{
+            justifyContent: "flex-start",
             width: "100%",
             "&:hover": {
-              bgcolor: color.white.sixTenTransparent,
+              bgcolor: "transparent",
             },
-            borderRadius: theme.borderRadius.sm,
-            textAlign: "center",
             backgroundColor: "#fff",
+            ml: "8px",
           }}
-          onClick={onClick}
         >
-          <Typography variant="body1Medium" color={rc8Theme.palette.text1}>
+          <Typography
+            sx={{
+              ...rc8Theme.typography.body1Medium,
+              color: rc8Theme.palette.text1,
+              pb: "7px",
+              pl: "2px",
+            }}
+          >
             {title}
           </Typography>
         </Button>
