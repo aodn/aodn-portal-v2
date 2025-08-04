@@ -22,6 +22,34 @@ export enum TYPE {
   DATA_ACCESS = "DATA_ACCESS",
 }
 
+const OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE =
+  "Access to Jupyter notebook to query Cloud Optimised converted dataset";
+const PYTHON_NOTEBOOK_EXAMPLE_LINK = "Python notebook Example";
+
+// Only find optimized Python notebook links if they exist, otherwise fall back to example links
+const getOptimizedPythonNotebookLinks = (
+  links: ILink[] | undefined
+): ILink[] | undefined => {
+  if (!links) return undefined;
+
+  // First, try to find optimized Python notebook links
+  const optimizedLinks = links.filter(
+    (link) => link.title === OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE
+  );
+
+  // If found, return them
+  if (optimizedLinks.length > 0) {
+    return optimizedLinks;
+  }
+
+  // Otherwise, fall back to example links
+  const exampleLinks = links.filter(
+    (link) => link.title === PYTHON_NOTEBOOK_EXAMPLE_LINK
+  );
+
+  return exampleLinks.length > 0 ? exampleLinks : undefined;
+};
+
 interface DataAccessPanelProps {
   mode?: MODE;
   type?: TYPE;
@@ -104,6 +132,18 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
             {...props}
             title={"Document"}
             documentLinks={collection?.getDocumentLinks()}
+          />
+        ),
+      },
+      {
+        title: "Code Tutorials",
+        component: (props: Record<string, any>) => (
+          <DocumentList
+            {...props}
+            title={"Code Tutorials"}
+            documentLinks={getOptimizedPythonNotebookLinks(
+              collection?.getPythonNotebookLinks()
+            )}
           />
         ),
       },
