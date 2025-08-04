@@ -55,13 +55,17 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           border: `0.5px solid ${rc8Theme.palette.grey500}`,
           borderRadius: "6px",
           bgcolor: rc8Theme.palette.primary6,
-          px: "20px",
+          px: isMobile ? "4px" : "20px",
           py: "10px",
           flexShrink: 0,
         }}
         data-testid="show-result-count"
       >
-        <Typography variant="title2Regular" whiteSpace="nowrap">
+        <Typography
+          variant="title2Regular"
+          whiteSpace="nowrap"
+          sx={{ fontSize: isMobile ? "12px" : "16px" }}
+        >
           {renderShowingResultsText(total, count)}
         </Typography>
       </Paper>
