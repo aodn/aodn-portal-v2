@@ -26,9 +26,9 @@ interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 
 const renderShowingResultsText = (total: number, count: number) =>
   total === 0
-    ? "No results found"
+    ? "No result found"
     : total === 1
-      ? "Showing 1 of 1 result"
+      ? "Showing 1 of total 1 result"
       : `Showing 1 - ${count} of ${formatNumber(total)} results`;
 
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
