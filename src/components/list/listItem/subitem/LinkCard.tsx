@@ -42,7 +42,6 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
         justifyContent: "space-between",
         alignItems: "center",
         backgroundColor: "transparent",
-        padding: padding.small,
         gap: 1,
       }}
       data-testid={`link-card-${link.href}`}
@@ -51,7 +50,7 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
         flex={1}
         display="flex"
         flexDirection="row"
-        gap={1}
+        gap={2}
         aria-label="link and title"
       >
         {icon && link.getIcon && (

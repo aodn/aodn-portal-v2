@@ -1,7 +1,8 @@
 import { FC } from "react";
-import { Paper, SxProps, Typography } from "@mui/material";
+import { Link, Paper, SxProps, Typography } from "@mui/material";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
 import rc8Theme from "../../styles/themeRC8";
+import { COMBINED_LINK_REGEX, isEmail, isUrl } from "../../utils/StringUtils";
 
 interface InfoCardProps {
   infoContent?: InfoContentType;
@@ -11,6 +12,51 @@ interface InfoCardProps {
 }
 
 const InfoCard: FC<InfoCardProps> = ({ infoContent, status, children, sx }) => {
+  // Function to detect and convert emails and URLs to clickable links
+  const renderTextWithLinks = (text: string) => {
+    const parts = text.split(COMBINED_LINK_REGEX);
+
+    return parts.map((part, index) => {
+      // Check if part is an email
+      if (isEmail(part)) {
+        return (
+          <Link
+            key={index}
+            href={`mailto:${part}`}
+            color="primary"
+            underline="hover"
+            sx={{
+              color: rc8Theme.palette.primary.main,
+            }}
+          >
+            {part}
+          </Link>
+        );
+      }
+
+      // Check if part is a URL
+      if (isUrl(part)) {
+        return (
+          <Link
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            color="primary"
+            underline="hover"
+            sx={{
+              color: rc8Theme.palette.primary.main,
+            }}
+          >
+            {part}
+          </Link>
+        );
+      }
+
+      return part;
+    });
+  };
+
   return (
     <Paper
       sx={{
@@ -51,10 +97,11 @@ const InfoCard: FC<InfoCardProps> = ({ infoContent, status, children, sx }) => {
             {infoContent.title}
           </Typography>
           <Typography
+            component="div"
             variant="body2Regular"
             sx={{ display: "block", padding: 2, paddingTop: 0 }}
           >
-            {infoContent.body}
+            {renderTextWithLinks(infoContent.body)}
           </Typography>
         </Paper>
       )}
