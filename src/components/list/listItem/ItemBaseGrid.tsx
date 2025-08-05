@@ -47,7 +47,7 @@ const ItemBaseGrid = ({
           my: disableHover ? "14px" : theme.mp.sm,
           borderRadius: theme.borderRadius.sm,
           width: "95%",
-          padding: disableHover ? 0 : `${theme.mp.sm} ${theme.mp.xlg}`,
+          padding: disableHover ? 0 : "9px 15px",
           ...sx,
         }}
         {...props}
