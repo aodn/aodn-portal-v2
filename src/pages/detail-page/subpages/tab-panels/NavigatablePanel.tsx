@@ -121,11 +121,11 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
         {/* Full vertical line */}
         <line
           x1={diamondSize / 2}
-          y1={0}
+          y1={diamondSize / 2}
           x2={diamondSize / 2}
-          y2={height}
+          y2={height - diamondSize / 2}
           stroke={grey500}
-          strokeWidth="2"
+          strokeWidth="1"
         />
         {/* Diamond positioned with center at activeY */}
         <g
