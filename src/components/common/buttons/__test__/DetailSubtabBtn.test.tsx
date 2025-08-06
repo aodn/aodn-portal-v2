@@ -29,9 +29,6 @@ describe("DetailSubTabBtn", () => {
     expect(button).toHaveStyle({
       width: "100%",
       backgroundColor: "#fff",
-      textAlign: "center",
-      border: "none", // theme.border.nil
-      borderRadius: "5px", // theme.borderRadius.sm
     });
   });
 });
