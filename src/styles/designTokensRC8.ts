@@ -14,7 +14,7 @@
  * @version RC8
  */
 
-import { shadow } from "./constants";
+import { FONT_FAMILIES } from "./fontsRC8";
 
 export const designTokensRC8 = {
   version: "rc8",
@@ -25,63 +25,58 @@ export const designTokensRC8 = {
   // ===========================
   typography: {
     // Typeface
-    fontFamily: {
-      poppins: "Poppins, sans-serif", // https://fonts.google.com/specimen/Poppins?query=poppins
-      openSans: "Open Sans, sans-serif", // https://fonts.google.com/specimen/Open+Sans
-    },
+    fontFamily: FONT_FAMILIES,
 
     // Hierarchy
     variants: {
       // Slogan styles - Size: 64, Line Height: 96
       slogan1: {
-        // fontFamily: "Poppins, sans-serif", // TODO
-        fontFamily: "Roboto",
+        fontFamily: FONT_FAMILIES.poppins,
         fontSize: "64px",
         fontWeight: 500,
         lineHeight: "96px",
         color: "#000",
       },
+
       // Slogan styles - Size: 48, Line Height: 72
       slogan2: {
-        // fontFamily: "Poppins, sans-serif", // TODO
-        fontFamily: "Roboto",
+        fontFamily: FONT_FAMILIES.poppins,
         fontSize: "48px",
-        fontWeight: 275,
+        fontWeight: 300,
         lineHeight: "72px",
         color: "#000",
       },
 
       // Heading styles - Size: 40, Line Height: 48
       heading1: {
-        // fontFamily: "Poppins, sans-serif", // TODO
-        fontFamily: "Roboto",
+        fontFamily: FONT_FAMILIES.poppins,
         fontSize: "40px",
         fontWeight: 500,
         lineHeight: "48px",
         color: "#000",
       },
+
       // Heading styles - Size: 24, Line Height: 36
       heading2: {
-        // fontFamily: "Poppins, sans-serif", // TODO
-        fontFamily: "Roboto",
+        fontFamily: FONT_FAMILIES.poppins,
         fontSize: "24px",
         fontWeight: 500,
         lineHeight: "36px",
         color: "#000",
       },
+
       // Heading styles - Size: 20, Line Height: 30
       heading3: {
-        // fontFamily: "Poppins, sans-serif", // TODO
-        fontFamily: "Roboto",
+        fontFamily: FONT_FAMILIES.poppins,
         fontSize: "20px",
         fontWeight: 500,
         lineHeight: "30px",
         color: "#000",
       },
+
       // Heading styles - Size: 16, Line Height: 22
       heading4: {
-        fontFamily: "Poppins, sans-serif",
-        // fontFamily: "Roboto",
+        fontFamily: FONT_FAMILIES.poppins,
         fontSize: "16px",
         fontWeight: 500,
         lineHeight: "22px",
@@ -90,15 +85,16 @@ export const designTokensRC8 = {
 
       // Title styles - Size: 16, Line Height: 26
       title1Medium: {
-        // fontFamily: "Open Sans, sans-serif", // TODO
+        fontFamily: FONT_FAMILIES.openSans,
         fontSize: "16px",
-        fontWeight: 500,
+        fontWeight: 400,
         lineHeight: "26px",
         color: "#000",
       },
+
       // Title styles - Size: 16, Line Height: 26
       title2Regular: {
-        // fontFamily: "Open Sans, sans-serif", // TODO
+        fontFamily: FONT_FAMILIES.openSans,
         fontSize: "16px",
         fontWeight: 400,
         lineHeight: "26px",
@@ -107,23 +103,25 @@ export const designTokensRC8 = {
 
       // Body styles - Size: 14, Line Height: 22
       body1Medium: {
-        // fontFamily: "Open Sans, sans-serif", // TODO
+        fontFamily: FONT_FAMILIES.openSans,
         fontSize: "14px",
         fontWeight: 400,
         lineHeight: "22px",
         color: "#000",
       },
+
       // Body styles - Size: 14, Line Height: 22
       body2Regular: {
-        fontFamily: "Open Sans, sans-serif",
+        fontFamily: FONT_FAMILIES.openSans,
         fontSize: "14px",
         fontWeight: 400,
         lineHeight: "22px",
         color: "#000",
       },
+
       // Body styles - Size: 13, Line Height: 20
       body3Small: {
-        // fontFamily: "Open Sans, sans-serif", // TODO
+        fontFamily: FONT_FAMILIES.openSans,
         fontSize: "13px",
         fontWeight: 400,
         lineHeight: "20px",
