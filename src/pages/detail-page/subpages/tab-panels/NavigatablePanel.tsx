@@ -241,19 +241,12 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
           <Grid item>
             {childrenList.map((child, index) => {
               return (
-                <Box
+                <DetailSubtabBtn
                   key={index}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <DetailSubtabBtn
-                    title={child.title}
-                    onClick={onNavigate(index)}
-                    ref={menuRefs.current[index]}
-                  />
-                </Box>
+                  title={child.title}
+                  onClick={onNavigate(index)}
+                  ref={menuRefs.current[index]}
+                />
               );
             })}
           </Grid>

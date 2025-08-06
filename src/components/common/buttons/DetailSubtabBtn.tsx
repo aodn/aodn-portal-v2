@@ -19,20 +19,20 @@ const DetailSubtabBtn = forwardRef<HTMLDivElement | null, DetailSubtabProps>(
           data-testid={id}
           onClick={onClick}
           sx={{
-            justifyContent: "flex-start",
             width: "100%",
+            backgroundColor: "#fff",
+            justifyContent: "flex-start",
             "&:hover": {
               bgcolor: "transparent",
             },
-            backgroundColor: "#fff",
-            ml: "8px",
           }}
         >
           <Typography
             sx={{
               ...rc8Theme.typography.body1Medium,
               color: rc8Theme.palette.text1,
-              pb: "7px",
+              textAlign: "left",
+              pb: "6px",
               pl: "2px",
             }}
           >
