@@ -15,6 +15,9 @@ import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { booleanEqual } from "@turf/boolean-equal";
 import { pageReferer } from "../common/constants";
+import { DateIcon } from "../../assets/icons/search/date";
+import { LocationIcon } from "../../assets/icons/search/location";
+import { FilterIcon } from "../../assets/icons/search/filter";
 
 export enum SearchbarButtonNames {
   Search = "search",
@@ -145,7 +148,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       sx={sx}
     >
       <SearchbarExpandableButton
-        icon={<DateRangeIcon />}
+        icon={<DateIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Date)}
         badgeContent={dateCount}
         dotBadge
@@ -166,7 +169,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         data-testid="date-range-button"
       />
       <SearchbarExpandableButton
-        icon={<PlaceIcon />}
+        icon={<LocationIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Location)}
         badgeContent={areaCount}
         dotBadge
@@ -187,7 +190,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         data-testid="location-button"
       />
       <SearchbarExpandableButton
-        icon={<Tune />}
+        icon={<FilterIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Filter)}
         badgeContent={filterCount}
         onClick={() => handleClickButton(SearchbarButtonNames.Filter)}
