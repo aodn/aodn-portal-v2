@@ -10,6 +10,7 @@ import { borderRadius, padding } from "../../../styles/constants";
 import StyledTabs from "./StyledTabs";
 import StyledTab from "./StyledTab";
 import { SxProps } from "@mui/system";
+import rc8Theme from "../../../styles/themeRC8";
 
 export interface Tab {
   label: string;
@@ -77,7 +78,6 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   return (
     <Box
       sx={{
-        borderRadius: borderRadius.small,
         ...sx,
       }}
     >
@@ -86,6 +86,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
         onChange={handleChange}
         aria-label="tabsPanelContainer"
         data-testid="tabs-panel-container"
+        sx={{ px: "28px" }}
       >
         {tabs.map((tab, index) => (
           <StyledTab

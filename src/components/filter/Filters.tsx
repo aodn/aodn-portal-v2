@@ -129,7 +129,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         showBadge: checkBadge(filters, FiltersTabs.Organisation),
       },
       {
-        label: "Data",
+        label: "Data Settings",
         value: FiltersTabs.DataSettings,
         component: (
           <DataSettingsFilter
@@ -223,7 +223,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
             <CloseIcon sx={{ fontSize: fontSize.info }} />
           </IconButton>
         </Box>
-        <TabsPanelContainer tabs={TABS} sx={{ color: color.blue.xLight }} />
+        <TabsPanelContainer tabs={TABS} />
       </Box>
     </>
   );
