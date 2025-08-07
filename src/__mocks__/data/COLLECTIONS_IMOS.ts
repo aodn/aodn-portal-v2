@@ -82,18 +82,21 @@ export const COLLECTIONS_IMOS_PAGE1 = {
           rel: "related",
           type: "text/html",
           title: "IMOS website",
+          "ai:group": "Other",
         },
         {
           href: "https://catalogue-imos.aodn.org.au/",
           rel: "related",
           type: "text/html",
           title: "IMOS metadata catalogue",
+          "ai:group": "Other",
         },
         {
           href: "https://portal.aodn.org.au/",
           rel: "related",
           type: "text/html",
           title: "AODN Portal",
+          "ai:group": "Other",
         },
         {
           href: "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/d53ae40c-0378-49be-bf93-baa3a10e980f.png",

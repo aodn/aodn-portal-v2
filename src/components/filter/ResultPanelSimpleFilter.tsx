@@ -1,12 +1,5 @@
 import { FC } from "react";
 import { Paper, Stack, SxProps, Typography } from "@mui/material";
-import {
-  border,
-  borderRadius,
-  color,
-  fontSize,
-  padding,
-} from "../../styles/constants";
 import { formatNumber } from "../../utils/StringUtils";
 import ResultListLayoutButton, {
   ResultListLayoutButtonType,
@@ -19,6 +12,7 @@ import ResultListSortButton, {
 import { ICON_SELECT_DEFAULT_HEIGHT } from "../common/dropdown/IconSelect";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import ShareButtonMenu from "../menu/ShareButtonMenu";
+import rc8Theme from "../../styles/themeRC8";
 
 export interface ResultPanelSimpleFilterType
   extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
@@ -27,9 +21,6 @@ export interface ResultPanelSimpleFilterType
   total: number;
   sx?: SxProps;
 }
-
-const RESULT_COUNT_INFO_WIDTH_MOBILE = 200;
-const RESULT_COUNT_INFO_WIDTH_TABLET = 220;
 
 interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 
@@ -59,30 +50,32 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "100%",
-          width: {
-            xs: RESULT_COUNT_INFO_WIDTH_MOBILE,
-            sm: RESULT_COUNT_INFO_WIDTH_TABLET,
-          },
-          border: `${border.xs} ${color.blue.darkSemiTransparent}`,
-          borderRadius: borderRadius.small,
-          bgcolor: color.white.sixTenTransparent,
-          paddingX: padding.extraSmall,
+          overflow: "hidden",
+          height: "40px",
+          border: `0.5px solid ${rc8Theme.palette.grey500}`,
+          borderRadius: "6px",
+          bgcolor: rc8Theme.palette.primary6,
+          px: isMobile ? "4px" : "20px",
+          py: "10px",
+          flexShrink: 0,
         }}
         data-testid="show-result-count"
       >
         <Typography
-          padding={0}
-          lineHeight={`${ICON_SELECT_DEFAULT_HEIGHT}px`}
-          sx={{
-            whiteSpace: "nowrap",
-            fontSize: { xs: fontSize.label, sm: fontSize.info },
-          }}
+          variant="title2Regular"
+          whiteSpace="nowrap"
+          sx={{ fontSize: isMobile ? "12px" : "16px" }}
         >
           {renderShowingResultsText(total, count)}
         </Typography>
       </Paper>
-      <Stack flexDirection="row" flex={1} gap={1} flexWrap="nowrap">
+      <Stack
+        flexDirection="row"
+        flex={1}
+        gap={1}
+        flexWrap="nowrap"
+        minWidth={0}
+      >
         <ResultListSortButton
           onChangeSorting={onChangeSorting}
           currentSort={currentSort}

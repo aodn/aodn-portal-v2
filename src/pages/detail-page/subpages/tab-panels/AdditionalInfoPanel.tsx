@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
-import { ITheme } from "../../../../components/common/store/OGCCollectionDefinitions";
 import _ from "lodash";
 import KeywordList from "../../../../components/list/KeywordList";
 import StatementList from "../../../../components/list/StatementList";
@@ -16,74 +15,89 @@ import { contactRoles } from "../../../../components/common/constants";
 const AdditionalInfoPanel = () => {
   const context = useDetailPageContext();
 
-  const metadataContact = useMemo(
-    () =>
-      context.collection
-        ?.getContacts()
-        ?.filter((contact) => contact.roles.includes(contactRoles.METADATA)),
-    [context.collection]
-  );
+  const [
+    metadataContact,
+    themes,
+    statement,
+    metadataId,
+    creation,
+    revision,
+    categories,
+    metadataUrl,
+    keywords,
+  ] = useMemo(() => {
+    const metadataContact = context.collection
+      ?.getContacts()
+      ?.filter((contact) => contact.roles.includes(contactRoles.METADATA));
 
-  const themes = useMemo(
-    () => context.collection?.getThemes(),
-    [context.collection]
-  );
+    const themes = context.collection?.getThemes();
 
-  const statement = useMemo(
-    () => context.collection?.getStatement(),
-    [context.collection]
-  );
-  // TODO: for the creation and revision, geonetwork still have a confusion about the time zone.
-  //  currently just make all time zone to be UTC (hard coded).
-  //  Should be resolved in the future when the geonetwork is clarified.
-  const creation = useMemo(() => {
-    const creation = context.collection?.getCreation();
-    if (creation) {
-      return convertDateFormat(creation);
-    }
-    return "";
-  }, [context.collection]);
+    const statement = context.collection?.getStatement();
 
-  const metadataId = useMemo(
-    () => context.collection?.id,
-    [context.collection?.id]
-  );
+    const metadataId = context.collection?.id;
 
-  const revision = useMemo(() => {
-    const revision = context.collection?.getRevision();
-    if (revision) {
-      return convertDateFormat(revision);
-    }
-    return "";
-  }, [context.collection]);
+    const t = context.collection?.getRevision();
+    const revision = t ? convertDateFormat(t) : "";
 
-  const metadataUrl = useMemo(() => {
-    if (context.collection) {
-      const metadataLink = context.collection.getMetadataUrl();
-      if (metadataLink) {
-        return metadataLink;
+    // TODO: for the creation and revision, geonetwork still have a confusion about the time zone.
+    //  currently just make all time zone to be UTC (hard coded).
+    //  Should be resolved in the future when the geonetwork is clarified.
+    const c = context.collection?.getCreation();
+    const creation = c ? convertDateFormat(c) : "";
+
+    let categories: Array<string> = [];
+    for (const theme of themes ?? []) {
+      if (theme.scheme === "Categories") {
+        categories = theme.concepts.map((concept) => concept.id);
       }
-      return "";
     }
-  }, [context.collection]);
 
-  const keywords: { title: string; content: string[] }[] = useMemo(() => {
-    // getting keywords from themes
-    const keywordItems: { title: string; content: string[] }[] = [];
-    themes?.forEach((theme: ITheme) => {
-      keywordItems.push({
-        title: theme.title,
+    let metadataUrl = undefined;
+    if (context.collection) {
+      const ml = context.collection.getMetadataUrl();
+      metadataUrl = ml ? ml : "";
+    }
+
+    let keywords: { title: string; content: string[] }[] = [];
+    themes?.forEach((theme) => {
+      // if no concepts, it is not considered as a keyword
+      if (!theme.concepts || theme.concepts.length === 0) {
+        return;
+      }
+
+      // if scheme is "categories", it is not a keyword
+      if (theme.scheme === "Categories") {
+        return;
+      }
+
+      // According to current implementation, concepts belong to one theme
+      // share the same title & description. The reason that making every concept
+      // has the same title is to obey the STAC collection standard (theme extension).
+      const title = theme.concepts?.[0].title;
+      keywords.push({
+        title: title,
         content: theme.concepts.map(
           (concept) => ` \u00A0 \u2022 ${concept.id}`
         ),
       });
     });
 
-    // reorder them according to the title alphabetically
-    return _.sortBy(keywordItems, (item) => {
+    keywords = _.sortBy(keywords, (item) => {
       return item.title ? item.title : "\uffff";
     });
-  }, [themes]);
+
+    return [
+      metadataContact,
+      themes,
+      statement,
+      metadataId,
+      creation,
+      revision,
+      categories,
+      metadataUrl,
+      keywords,
+    ];
+  }, [context.collection]);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -99,41 +113,61 @@ const AdditionalInfoPanel = () => {
     () => [
       {
         title: "Lineage",
-        component: (
-          <StatementList statement={statement ?? ""} title={"Lineage"} />
+        component: (props: Record<string, any>) => (
+          <StatementList
+            {...props}
+            statement={statement ?? ""}
+            title={"Lineage"}
+          />
         ),
       },
       {
         title: "Themes",
-        component: <ThemeList title={"Themes"} />,
+        component: (props: Record<string, any>) => (
+          <ThemeList {...props} title={"Themes"} themes={categories ?? []} />
+        ),
       },
       {
         title: "Keywords",
-        component: <KeywordList keywords={keywords} />,
+        component: (props: Record<string, any>) => (
+          <KeywordList {...props} keywords={keywords} />
+        ),
       },
       {
         title: "Metadata Contact",
-        component: (
+        component: (props: Record<string, any>) => (
           <MetadataContactList
+            {...props}
             contacts={metadataContact ? metadataContact : []}
           />
         ),
       },
       {
         title: "Metadata Identifier",
-        component: <MetadataIdentifierList identifier={metadataId ?? ""} />,
+        component: (props: Record<string, any>) => (
+          <MetadataIdentifierList {...props} identifier={metadataId ?? ""} />
+        ),
       },
       {
         title: "Full Metadata Link",
-        component: <MetadataUrlList url={metadataUrl ? metadataUrl : ""} />,
+        component: (props: Record<string, any>) => (
+          <MetadataUrlList {...props} url={metadataUrl ? metadataUrl : ""} />
+        ),
       },
       {
         title: "Metadata Dates",
-        component: <MetadataDateList creation={creation} revision={revision} />,
+        component: (props: Record<string, any>) => (
+          <MetadataDateList
+            {...props}
+            creation={creation}
+            revision={revision}
+          />
+        ),
       },
     ],
     [
       statement,
+      categories,
       keywords,
       metadataContact,
       metadataId,

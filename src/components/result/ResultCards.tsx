@@ -42,7 +42,10 @@ export interface ResultCardsType {
     | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
     | undefined;
   contents: CollectionsQueryType;
-  onClickCard: ((item: OGCCollection | undefined) => void) | undefined;
+  onClickCard?: ((item: OGCCollection | undefined) => void) | undefined;
+  onClickDetail?: ((uuid: string | undefined) => void) | undefined;
+  onClickDownload?: ((uuid: string | undefined) => void) | undefined;
+  onClickLinks?: ((uuid: string | undefined) => void) | undefined;
   selectedUuids: string[] | undefined;
 }
 interface ResultCardsProps extends ResultCardsType {
@@ -170,6 +173,9 @@ const ResultCards: FC<ResultCardsProps> = ({
   layout,
   contents,
   onClickCard,
+  onClickDetail,
+  onClickLinks,
+  onClickDownload,
   sx,
   selectedUuids,
 }) => {
@@ -194,40 +200,48 @@ const ResultCards: FC<ResultCardsProps> = ({
 
   const total = useMemo(() => contents.result.total, [contents.result.total]);
 
-  const selectedUuid = useMemo(
-    () => selectedUuids && selectedUuids[0],
-    [selectedUuids]
+  const selectedUuid = useMemo(() => selectedUuids?.[0], [selectedUuids]);
+
+  const onClickBtnCard = useCallback(
+    (item: OGCCollection | undefined) => onClickCard?.(item),
+    [onClickCard]
   );
 
-  const onClickDetail = useCallback(
-    (uuid: string) =>
+  const onClickBtnDetail = useCallback(
+    (uuid: string) => {
+      onClickDetail?.(uuid);
       goToDetailPage(
         uuid,
         detailPageDefault.SUMMARY,
         pageReferer.SEARCH_PAGE_REFERER
-      ),
-    [goToDetailPage]
+      );
+    },
+    [goToDetailPage, onClickDetail]
   );
 
-  const onClickDownload = useCallback(
-    (uuid: string) =>
+  const onClickBtnDownload = useCallback(
+    (uuid: string) => {
+      onClickDownload?.(uuid);
       goToDetailPage(
         uuid,
         detailPageDefault.SUMMARY,
         pageReferer.SEARCH_PAGE_REFERER,
         "download-section"
-      ),
-    [goToDetailPage]
+      );
+    },
+    [goToDetailPage, onClickDownload]
   );
 
-  const onClickLinks = useCallback(
-    (uuid: string) =>
+  const onClickBtnLinks = useCallback(
+    (uuid: string) => {
+      onClickLinks?.(uuid);
       goToDetailPage(
         uuid,
         detailPageDefault.DATA_ACCESS,
         pageReferer.SEARCH_PAGE_REFERER
-      ),
-    [goToDetailPage]
+      );
+    },
+    [goToDetailPage, onClickLinks]
   );
 
   // Fetching more data for full list view if the initial records less than 20
@@ -246,7 +260,6 @@ const ResultCards: FC<ResultCardsProps> = ({
       <DetailSubtabBtn
         id="result-card-load-more-btn"
         title="Show more results"
-        isBordered={false}
         onClick={loadMoreResults}
       />
     );
@@ -262,10 +275,10 @@ const ResultCards: FC<ResultCardsProps> = ({
       count,
       total,
       renderLoadMoreButton,
-      onClickCard,
-      onClickDetail,
-      onClickLinks,
-      onClickDownload,
+      onClickCard: onClickBtnCard,
+      onClickDetail: onClickBtnDetail,
+      onClickLinks: onClickBtnLinks,
+      onClickDownload: onClickBtnDownload,
       selectedUuid,
       layout: SearchResultLayoutEnum.FULL_LIST,
       isSimplified: isUnderLaptop,
@@ -278,10 +291,10 @@ const ResultCards: FC<ResultCardsProps> = ({
       count,
       total,
       renderLoadMoreButton,
-      onClickCard,
-      onClickDetail,
-      onClickLinks,
-      onClickDownload,
+      onClickCard: onClickBtnCard,
+      onClickDetail: onClickBtnDetail,
+      onClickLinks: onClickBtnLinks,
+      onClickDownload: onClickBtnDownload,
       selectedUuid,
       layout: SearchResultLayoutEnum.GRID,
       isSimplified: isUnderLaptop,
@@ -294,10 +307,10 @@ const ResultCards: FC<ResultCardsProps> = ({
       count,
       total,
       renderLoadMoreButton,
-      onClickCard,
-      onClickDetail,
-      onClickLinks,
-      onClickDownload,
+      onClickCard: onClickBtnCard,
+      onClickDetail: onClickBtnDetail,
+      onClickLinks: onClickBtnLinks,
+      onClickDownload: onClickBtnDownload,
       selectedUuid,
       layout: SearchResultLayoutEnum.LIST,
       isSimplified: isUnderLaptop,

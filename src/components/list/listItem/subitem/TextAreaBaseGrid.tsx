@@ -1,19 +1,21 @@
 import React from "react";
-import { Grid, GridProps, useTheme } from "@mui/material";
+import { Grid, GridProps, SxProps, Theme, useTheme } from "@mui/material";
 interface TextAreaGridProps extends GridProps {
-  children: React.ReactNode;
+  sx?: SxProps<Theme>;
 }
-const TextAreaBaseGrid: React.FC<TextAreaGridProps> = ({
+
+const TextAreaBaseGrid = ({
   children,
+  sx,
   ...props
-}) => {
+}: React.PropsWithChildren<TextAreaGridProps>) => {
   const theme = useTheme();
   return (
     <Grid
       item
-      md={12}
       sx={{
-        marginTop: theme.mp.sm,
+        my: theme.mp.sm,
+        ...sx,
       }}
       {...props}
     >

@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react";
+import React, { FC, useCallback, useMemo } from "react";
 import { Typography } from "@mui/material";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import LinkCard from "../../../../components/list/listItem/subitem/LinkCard";
@@ -8,17 +8,47 @@ import { ILink } from "../../../../components/common/store/OGCCollectionDefiniti
 import SideCardContainer from "../side-cards/SideCardContainer";
 import { groupBy } from "../../../../utils/ObjectUtils";
 import { fontWeight, fontSize } from "../../../../styles/constants";
-import DataAccessList from "../../../../components/list/DataAccessList";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import useTabNavigation from "../../../../hooks/useTabNavigation";
 import {
   detailPageDefault,
   pageReferer,
 } from "../../../../components/common/constants";
+import DataList from "../../../../components/list/DataList";
+import DocumentList from "../../../../components/list/DocumentLIst";
+import OtherItemList from "../../../../components/list/OtherItemList";
 
 export enum TYPE {
   DATA_ACCESS = "DATA_ACCESS",
 }
+
+const OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE =
+  "Access to Jupyter notebook to query Cloud Optimised converted dataset";
+const PYTHON_NOTEBOOK_EXAMPLE_LINK = "Python notebook Example";
+
+// Only find optimized Python notebook links if they exist, otherwise fall back to example links
+const getOptimizedPythonNotebookLinks = (
+  links: ILink[] | undefined
+): ILink[] | undefined => {
+  if (!links) return undefined;
+
+  // First, try to find optimized Python notebook links
+  const optimizedLinks = links.filter(
+    (link) => link.title === OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE
+  );
+
+  // If found, return them
+  if (optimizedLinks.length > 0) {
+    return optimizedLinks;
+  }
+
+  // Otherwise, fall back to example links
+  const exampleLinks = links.filter(
+    (link) => link.title === PYTHON_NOTEBOOK_EXAMPLE_LINK
+  );
+
+  return exampleLinks.length > 0 ? exampleLinks : undefined;
+};
 
 interface DataAccessPanelProps {
   mode?: MODE;
@@ -35,10 +65,17 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
   const goToDetailPage = useTabNavigation();
 
   const createCompactPanel = useCallback(
-    (uuid: string | undefined, title: string, links: ILink[] | undefined) => {
-      if (uuid && links && links.length > 0) {
+    (
+      uuid: string | undefined,
+      title: string,
+      dataAccessLinks: ILink[] | undefined
+    ) => {
+      if (uuid && dataAccessLinks && dataAccessLinks.length > 0) {
         // Group links by type and display it in blocks
-        const grouped: Record<string, ILink[]> = groupBy(links, "rel");
+        const grouped: Record<string, ILink[]> = groupBy(
+          dataAccessLinks,
+          "rel"
+        );
         return (
           <SideCardContainer
             title={title}
@@ -49,6 +86,8 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                 pageReferer.DETAIL_PAGE_REFERER
               )
             }
+            px={"10px"}
+            py={"16px"}
           >
             {Object.entries(grouped).map(([key, item]: [string, ILink[]]) => (
               <Typography
@@ -61,8 +100,8 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                 {!item || item.length === 0 ? (
                   <NaList title={title ? title : ""} />
                 ) : (
-                  item.map((link: ILink) => (
-                    <LinkCard key={link.href} link={link} icon={false} />
+                  item.map((link: ILink, index: number) => (
+                    <LinkCard key={`ch-${index}`} link={link} icon={false} />
                   ))
                 )}
               </Typography>
@@ -77,12 +116,44 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
   const blocks: NavigatablePanelChild[] = useMemo(
     () => [
       {
-        title: "Data Access Options",
-        component: (
-          <DataAccessList
-            linksToData={collection?.getDistributionLinks()}
+        title: "Data",
+        component: (props: Record<string, any>) => (
+          <DataList
+            {...props}
+            title={"Data"}
             dataAccessLinks={collection?.getDataAccessLinks()}
-            pythonNotebook={collection?.getPythonNotebook()}
+          />
+        ),
+      },
+      {
+        title: "Document",
+        component: (props: Record<string, any>) => (
+          <DocumentList
+            {...props}
+            title={"Document"}
+            documentLinks={collection?.getDocumentLinks()}
+          />
+        ),
+      },
+      {
+        title: "Code Tutorials",
+        component: (props: Record<string, any>) => (
+          <DocumentList
+            {...props}
+            title={"Code Tutorials"}
+            documentLinks={getOptimizedPythonNotebookLinks(
+              collection?.getPythonNotebookLinks()
+            )}
+          />
+        ),
+      },
+      {
+        title: "Other",
+        component: (props: Record<string, any>) => (
+          <OtherItemList
+            {...props}
+            title={"Other"}
+            otherLinks={collection?.getOtherLinks()}
           />
         ),
       },

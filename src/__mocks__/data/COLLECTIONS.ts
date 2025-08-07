@@ -199,70 +199,94 @@ const NORMAL_COLLECTION = {
     themes: [
       {
         scheme: "",
-        description: "",
-        title: "",
         concepts: [
           {
             id: "surface_downwelling_photosynthetic_radiative_flux_in_air",
+            description: "",
+            title: "",
           },
         ],
       },
       {
         scheme: "theme",
-        description: "",
-        title: "AODN Discovery Parameter Vocabulary",
         concepts: [
           {
             id: "Depth of observation or sample collection",
             url: "user contributed",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Practical salinity of the water body",
             url: "http://vocab.nerc.ac.uk/collection/P01/current/PSLTZZ01",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Precipitation rate (liquid water equivalent) in the atmosphere",
             url: "http://vocab.aodn.org.au/def/discovery_parameter/entity/94",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Thickness of precipitation amount (liquid water equivalent) in the atmosphere",
             url: "http://vocab.aodn.org.au/def/discovery_parameter/entity/386",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Pressure (measured variable) in the water body exerted by overlying sea water only",
             url: "http://vocab.aodn.org.au/def/discovery_parameter/entity/566",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Temperature of the atmosphere",
             url: "http://vocab.nerc.ac.uk/collection/P01/current/CTMPZZ01",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Relative humidity of the atmosphere",
             url: "http://vocab.nerc.ac.uk/collection/P01/current/CRELZZ01",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Wind from direction in the atmosphere",
             url: "http://vocab.nerc.ac.uk/collection/P01/current/EWDAZZ01",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Wind speed in the atmosphere",
             url: "http://vocab.nerc.ac.uk/collection/P01/current/ESSAZZ01",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Specific electrical conductivity of the water body",
             url: "http://vocab.aodn.org.au/def/discovery_parameter/entity/730",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Temperature of the water body",
             url: "http://vocab.nerc.ac.uk/collection/P01/current/TEMPPR01",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Pressure (measured variable) exerted by the atmosphere",
             url: "http://vocab.nerc.ac.uk/collection/P01/current/CAPHZZ01",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
           {
             id: "Precipitation duration (liquid water equivalent) in the atmosphere",
             url: "http://vocab.aodn.org.au/def/discovery_parameter/entity/405",
+            description: "",
+            title: "AODN Discovery Parameter Vocabulary",
           },
         ],
       },
@@ -282,15 +306,17 @@ const NORMAL_COLLECTION = {
   links: [
     {
       href: "https://docs.ropensci.org/dataaimsr/",
-      rel: "related",
+      rel: "wfs",
       type: "",
       title: "Data access using R",
+      "ai:group": "Data Access",
     },
     {
       href: "https://weather.aims.gov.au/#/station/4",
       rel: "related",
       type: "",
       title: "Marine Weather Observations for Davies Reef",
+      "ai:group": "Document",
     },
     {
       href: "https://portal.aodn.org.au/search?uuid=0887cb5b-b443-4e08-a169-038208109466",

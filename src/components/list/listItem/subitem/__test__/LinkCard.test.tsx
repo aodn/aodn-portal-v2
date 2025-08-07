@@ -55,16 +55,16 @@ describe("LinkCard", () => {
 
     // Hover on the card
     userEvent.hover(linkCard);
-    waitFor(() => {
+    return waitFor(() => {
       const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
       expect(copyButton).toBeInTheDocument();
-    });
-
-    // Mouse leave
-    userEvent.unhover(linkCard);
-    waitFor(() => {
-      const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
-      expect(copyButton).not.toBeInTheDocument();
+    }).then(() => {
+      // Mouse leave
+      userEvent.unhover(linkCard);
+      return waitFor(() => {
+        const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
+        expect(copyButton).not.toBeInTheDocument();
+      });
     });
   });
 
@@ -77,7 +77,7 @@ describe("LinkCard", () => {
     render(<LinkCard link={mockLink} />);
 
     // Wait for the button to be visible when clipboardText matches link.href
-    waitFor(() => {
+    return waitFor(() => {
       const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
       expect(copyButton).toBeInTheDocument();
     });
@@ -88,7 +88,7 @@ describe("LinkCard", () => {
 
     const link = screen.getByText("Test Link Title");
     userEvent.click(link);
-    waitFor(
+    return waitFor(
       () => {
         expect(LinkUtils.openInNewTab).toHaveBeenCalledWith(mockLink.href);
       },
@@ -101,14 +101,14 @@ describe("LinkCard", () => {
 
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
     userEvent.hover(linkCard);
-    waitFor(() => {
+    return waitFor(() => {
       return screen.getByTestId(`copy-button-${mockLink.href}`);
     })
       .then((copyButton) => {
         userEvent.click(copyButton);
       })
       .then(() => {
-        waitFor(() => {
+        return waitFor(() => {
           expect(mockCopyToClipboard).toHaveBeenCalledWith(
             mockLink.href,
             mockLink.title

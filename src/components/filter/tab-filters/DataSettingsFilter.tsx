@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import React, { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
 import {
   updateHasData,
@@ -92,28 +92,29 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
     (category: DataSettingsCategory) =>
       (
         _: React.MouseEvent<HTMLElement>,
-        newAlignment: Array<DatasetFrequency> | Array<IndexDataType>
+        newAlignment: DatasetFrequency | Array<IndexDataType> | Array<string>
       ) => {
         if (category === DataSettingsCategory.dataDeliveryFrequency) {
-          const values = newAlignment as Array<DatasetFrequency>;
+          const value = newAlignment as DatasetFrequency;
           setFilters((prevFilters) => ({
             ...prevFilters,
-            dataDeliveryFrequency: newAlignment as Array<DatasetFrequency>,
+            dataDeliveryFrequency:
+              value === null
+                ? undefined
+                : ([newAlignment] as Array<DatasetFrequency>),
           }));
-          // Since the ogcapi only accept single string for dataDeliveryFrequency, just update with the first item in the array.
-          // TODO: need to confirm if we need multiple selection
-          dispatch(updateUpdateFreq(values[0]));
+          dispatch(updateUpdateFreq(value === null ? undefined : value));
         }
         if (category === DataSettingsCategory.dataDeliverMode) {
           setFilters((prevFilters) => ({
             ...prevFilters,
-            dataDeliveryMode: newAlignment,
+            dataDeliveryMode: newAlignment as Array<string>,
           }));
         }
         if (category === DataSettingsCategory.dataService) {
           setFilters((prevFilters) => ({
             ...prevFilters,
-            dataService: newAlignment,
+            dataService: newAlignment as Array<string>,
           }));
         }
         if (category === DataSettingsCategory.dataIndexedType) {
@@ -165,7 +166,8 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
           Data Delivery Frequency
         </Typography>
         <StyledToggleButtonGroup
-          value={filters.dataDeliveryFrequency}
+          exclusive={true}
+          value={filters.dataDeliveryFrequency?.[0]}
           onChange={handleChange(DataSettingsCategory.dataDeliveryFrequency)}
         >
           {DATA_SETTINGS.dataDeliveryFrequency.map((item) => (

@@ -22,9 +22,14 @@ class Map(BasePage):
         )
         self.zoom_in_button = self.get_label('Zoom In')
         self.zoom_out_button = self.get_label('Zoom Out')
-        self.bookmarks_icon = page.get_by_test_id('BookmarksIcon')
-        self.basemap_show_hide_menu = page.get_by_test_id('PublicIcon')
-        self.layers_icon = page.get_by_test_id('LayersIcon')
+        self.bookmarks_icon = self.get_by_id('bookmark-list-button')
+        self.basemap_show_hide_menu = page.get_by_test_id(
+            'basemap-show-hide-menu-button'
+        )
+        self.reference_layer_menu = page.get_by_test_id(
+            'reference-show-hide-menu-button'
+        )
+        self.layers_menu = self.get_by_id('layer-show-hide-menu-button')
         self.hexbin_layer = page.get_by_role('radio', name='Hexbin')
         self.geoserver_layer = page.get_by_role('radio', name='GeoServer')
 

@@ -27,21 +27,16 @@ const StaticLayersDef = {
   },
 };
 
-const StaticLayer: FC<StaticLayersProps> = ({ id, name, label, features }) => {
+const StaticLayer: FC<StaticLayersProps> = ({ id, label, features }) => {
   const { map } = useContext(MapContext);
   const [_, setCreated] = useState<boolean>(false);
-  const sourceId = useMemo(
-    () => `static-geojson-${map?.getContainer().id}-source-${id}`,
-    [id, map]
-  );
-  const layerId = useMemo(
-    () => `static-geojson-${map?.getContainer().id}-layer-${id}`,
-    [id, map]
-  );
-  const layerLabelId = useMemo(
-    () => `static-geojson-${map?.getContainer().id}-label-${id}`,
-    [id, map]
-  );
+
+  const [sourceId, layerId, layerLabelId] = useMemo(() => {
+    const sourceId = `static-geojson-${map?.getContainer().id}-source-${id}`;
+    const layerId = `static-geojson-${map?.getContainer().id}-layer-${id}`;
+    const layerLabelId = `static-geojson-${map?.getContainer().id}-label-${id}`;
+    return [sourceId, layerId, layerLabelId];
+  }, [id, map]);
 
   const createLayer = useCallback(() => {
     if (map?.getSource(sourceId)) return true;
@@ -117,7 +112,7 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, name, label, features }) => {
 
   return id === StaticLayersDef.AUSTRALIA_MARINE_PARKS.id ? (
     <TestHelper
-      mapId={map?.getContainer().id || ""}
+      id={map?.getContainer().id || ""}
       getAUMarineParksLayer={() => layerId}
     />
   ) : (

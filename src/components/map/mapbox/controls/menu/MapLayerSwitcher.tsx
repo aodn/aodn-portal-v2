@@ -5,7 +5,16 @@ import {
   EVENT_MENU,
   MenuClickedEvent,
 } from "./Definition";
-import { eventEmitter, leftPadding, rightPadding } from "./MenuControl";
+import {
+  eventEmitter,
+  formControlLabelSx,
+  switcherIconButtonSx,
+  switcherMenuBoxSx,
+  switcherMenuContentBoxSx,
+  switcherMenuContentIconSx,
+  switcherMenuContentLabelTypographySx,
+  switcherTitleTypographySx,
+} from "./MenuControl";
 import {
   Box,
   Typography,
@@ -17,10 +26,7 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import LayersIcon from "@mui/icons-material/Layers";
-import grey from "../../../../common/colors/grey";
-import blue from "../../../../common/colors/blue";
-import { borderRadius, fontSize } from "../../../../../styles/constants";
+import { SearchStyleIcon } from "../../../../../assets/map/search_style";
 
 export interface LayerSwitcherLayer<T = string> {
   id: T;
@@ -75,9 +81,9 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
         id="layer-show-hide-menu-button"
         ref={anchorRef}
         onClick={handleToggle}
-        sx={{ paddingTop: "3px !important" }}
+        sx={switcherIconButtonSx(open)}
       >
-        <LayersIcon />
+        <SearchStyleIcon />
       </IconButton>
       <Popper
         id="layer-popper-id"
@@ -98,31 +104,10 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
         {
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
-        <Box
-          sx={{
-            color: grey["mapMenuText"],
-            display: "inline-block",
-            whiteSpace: "nowrap",
-            borderRadius: borderRadius["menu"],
-            backgroundColor: grey["resultCard"],
-            zIndex: 1,
-          }}
-        >
-          <Typography
-            sx={{
-              backgroundColor: "white",
-              borderRadius: borderRadius["menuTop"],
-              fontSize: fontSize["mapMenuItem"],
-              paddingTop: "7px",
-              paddingBottom: "7px",
-              paddingLeft: leftPadding,
-              fontWeight: "bold",
-            }}
-          >
-            Layers
-          </Typography>
+        <Box sx={switcherMenuBoxSx}>
+          <Typography sx={switcherTitleTypographySx}>Search Style</Typography>
           <Divider />
-          <Box sx={{ paddingLeft: leftPadding, paddingRight: rightPadding }}>
+          <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">
               <RadioGroup
                 value={currentLayer}
@@ -135,21 +120,15 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
                   <FormControlLabel
                     key={l.name}
                     value={l.id}
+                    sx={formControlLabelSx}
                     control={
                       <Radio
                         checked={currentLayer === l.id}
-                        sx={{
-                          "& .MuiSvgIcon-root": {
-                            fontSize: fontSize["mapMenuSubItem"],
-                          },
-                          "&.Mui-checked": {
-                            color: blue["imosLightBlue"],
-                          },
-                        }}
+                        sx={switcherMenuContentIconSx}
                       />
                     }
                     label={
-                      <Typography sx={{ fontSize: fontSize["mapMenuSubItem"] }}>
+                      <Typography sx={switcherMenuContentLabelTypographySx}>
                         {l.name}
                       </Typography>
                     }

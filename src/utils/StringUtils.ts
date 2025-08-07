@@ -66,3 +66,27 @@ export const createFilterString = (uuids: Array<string>): string => {
   }
   return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
 };
+
+// Regex patterns for link detection
+export const EMAIL_REGEX =
+  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+export const URL_REGEX =
+  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g;
+export const COMBINED_LINK_REGEX =
+  /(https?:\/\/[^\s]+|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)/g;
+
+// Utility functions for validation
+export const isEmail = (text: string): boolean => {
+  return EMAIL_REGEX.test(text);
+};
+
+export const isUrl = (text: string): boolean => {
+  return URL_REGEX.test(text);
+};
+
+// Helper to detect what type of link a string contains
+export const getLinkType = (text: string): "email" | "url" | "text" => {
+  if (isEmail(text)) return "email";
+  if (isUrl(text)) return "url";
+  return "text";
+};

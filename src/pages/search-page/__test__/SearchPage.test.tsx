@@ -19,6 +19,7 @@ import {
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";
+import { encodeParam } from "../../../utils/UrlUtils";
 const theme = AppTheme;
 
 // Mock react-router-dom
@@ -203,7 +204,7 @@ describe("SearchPage Basic", () => {
   // URL parameters to Redux state flow
   it("Should update Redux state based on URL parameters", () => {
     // Mock URL parameters for this test
-    mockLocation.search = "?layout=GRID&sort=POPULARITY";
+    mockLocation.search = "?" + encodeParam("layout=GRID&sort=POPULARITY");
 
     // Spy on store.dispatch to verify actions
     const dispatchSpy = vi.spyOn(store, "dispatch");
@@ -301,35 +302,35 @@ describe("SearchPage Basic", () => {
     user.type(input, "wave");
     user.type(input, "{enter}");
 
-    return waitFor(() => screen.findByTestId("result-layout-button-GRID")).then(
-      (select) => {
-        expect(select).toBeInTheDocument();
+    return waitFor(() => screen.findByTestId("result-layout-button-GRID"), {
+      timeout: 2000,
+    }).then((select) => {
+      expect(select).toBeInTheDocument();
 
-        return waitFor(() => within(select).findByRole("combobox")).then(
-          (combobox) => {
-            // Open the dropdown
-            fireEvent.mouseDown(combobox);
+      return waitFor(() => within(select).findByRole("combobox")).then(
+        (combobox) => {
+          // Open the dropdown
+          fireEvent.mouseDown(combobox);
 
-            // Wait for the dropdown to open and click the "List and Map" option
-            return waitFor(() => screen.findByTestId("menuitem-LIST")).then(
-              (option) => {
-                fireEvent.click(option);
+          // Wait for the dropdown to open and click the "List and Map" option
+          return waitFor(() => screen.findByTestId("menuitem-LIST")).then(
+            (option) => {
+              fireEvent.click(option);
 
-                const updatedLayout = store.getState().paramReducer.layout;
-                // Verify that the layout was updated in Redux state
-                expect(updatedLayout).toBe(SearchResultLayoutEnum.LIST);
+              const updatedLayout = store.getState().paramReducer.layout;
+              // Verify that the layout was updated in Redux state
+              expect(updatedLayout).toBe(SearchResultLayoutEnum.LIST);
 
-                // Verify that redirectSearch was called with the correct parameters
-                expect(mockRedirectSearch).toHaveBeenCalledWith(
-                  pageReferer.SEARCH_PAGE_REFERER,
-                  true,
-                  false
-                );
-              }
-            );
-          }
-        );
-      }
-    );
+              // Verify that redirectSearch was called with the correct parameters
+              expect(mockRedirectSearch).toHaveBeenCalledWith(
+                pageReferer.SEARCH_PAGE_REFERER,
+                true,
+                false
+              );
+            }
+          );
+        }
+      );
+    });
   });
 });

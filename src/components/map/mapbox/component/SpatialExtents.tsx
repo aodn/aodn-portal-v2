@@ -5,8 +5,7 @@ import {
   jsonToOGCCollections,
   SearchParameters,
 } from "../../../common/store/searchReducer";
-import { MapLayerMouseEvent } from "mapbox-gl";
-import { OGCCollections } from "../../../common/store/OGCCollectionDefinitions";
+import { MapMouseEvent } from "mapbox-gl";
 import { useAppDispatch } from "../../../common/store/hooks";
 
 interface SpatialExtentsProps {
@@ -154,10 +153,15 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   }, [selectedUuids, layerId, getCollectionData, map]);
 
   const onPointClick = useCallback(
-    (ev: MapLayerMouseEvent): void => {
-      ev.preventDefault();
+    (ev: Partial<MapMouseEvent & { from: string }>): void => {
+      if (ev && typeof ev.preventDefault === "function") {
+        ev.preventDefault();
+      }
       // Make sure even same id under same area will be set once.
-      if (onDatasetSelected) {
+      if (
+        onDatasetSelected &&
+        (ev.from === undefined || ev.from !== "spatialExtentsPointClick")
+      ) {
         if (ev.features) {
           const uuids = [
             ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
@@ -166,10 +170,11 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           const customEvent = {
             ...ev,
             targetLayerId: layerId,
+            from: "spatialExtentsPointClick", // Avoid infinite loop
           };
           // Fire a synthetic click event with the custom event
           // This will be captured by CardPopup's event listeners so
-          map?.fire("click", customEvent);
+          map?.fire("click", customEvent as any as MapMouseEvent);
         } else {
           onDatasetSelected([]);
         }
@@ -179,7 +184,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   );
 
   const onEmptySpaceClick = useCallback(
-    (ev: MapLayerMouseEvent, layerIds: string[]) => {
+    (ev: MapMouseEvent, layerIds: string[]) => {
       const point = map?.project(ev.lngLat);
 
       // Query for features at the clicked point, but only in the addedLayerIds
@@ -199,7 +204,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   );
 
   useEffect(() => {
-    const e = (ev: MapLayerMouseEvent) => onEmptySpaceClick(ev, addedLayerIds);
+    const e = (ev: MapMouseEvent) => onEmptySpaceClick(ev, addedLayerIds);
 
     map?.on("click", layerId, onPointClick);
     map?.on("click", e);

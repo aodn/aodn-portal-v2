@@ -1,13 +1,13 @@
 import { FC, useRef, useEffect, useState } from "react";
 import { Box, IconButton, Popper } from "@mui/material";
-import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { ControlProps, EVENT_MENU, MenuClickedEvent } from "./Definition";
 import { borderRadius } from "../../../../../styles/constants";
-import { eventEmitter } from "./MenuControl";
+import { eventEmitter, switcherIconButtonSx } from "./MenuControl";
 import BookmarkListAccordionGroup, {
   BookmarkListAccordionGroupBasicType,
 } from "../../../../bookmark/BookmarkListAccordionGroup";
 import { BOOKMARK_LIST_WIDTH_MAP } from "../../../../result/constants";
+import { BookmarkIcon } from "../../../../../assets/map/bookmark";
 
 export interface BookmarkListMenuBasicType
   extends ControlProps,
@@ -49,9 +49,9 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
         id="bookmark-list-button"
         ref={anchorRef}
         onClick={() => setOpen((prev) => !prev)}
-        sx={{ paddingTop: "3px !important" }}
+        sx={switcherIconButtonSx(open)}
       >
-        <BookmarksIcon />
+        <BookmarkIcon />
       </IconButton>
       <Popper
         id="bookmark-list"

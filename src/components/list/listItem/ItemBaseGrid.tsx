@@ -1,5 +1,6 @@
-import { Grid, GridProps, useTheme } from "@mui/material";
+import { Grid, GridProps, SxProps, Theme, useTheme } from "@mui/material";
 import React, { createContext, useContext, useState } from "react";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface HoverContextProps {
   isOnHover: boolean;
@@ -13,26 +14,45 @@ export const useHoverContext = () => {
   }
   return context;
 };
-const ItemBaseGrid: React.FC<GridProps> = (props) => {
+
+interface ItemBaseGridProps extends GridProps {
+  disableHover?: boolean;
+  sx?: SxProps<Theme>;
+}
+
+const ItemBaseGrid = ({
+  disableHover = false,
+  children,
+  sx,
+  ...props
+}: React.PropsWithChildren<ItemBaseGridProps>) => {
   const theme = useTheme();
   const [isOnHover, setIsOnHover] = useState<boolean>(false);
+
+  // Determine background color
+  // Disable hover when in tab panels
+  const getBackgroundColor = () => {
+    if (disableHover) return "transparent";
+    return isOnHover ? rc8Theme.palette.primary5 : rc8Theme.palette.primary6;
+  };
+
   return (
     <HoverContext.Provider value={{ isOnHover }}>
       <Grid
-        {...props}
-        onMouseEnter={() => setIsOnHover(true)}
-        onMouseLeave={() => setIsOnHover(false)}
+        onMouseEnter={disableHover ? undefined : () => setIsOnHover(true)}
+        onMouseLeave={disableHover ? undefined : () => setIsOnHover(false)}
         sx={{
-          backgroundColor: isOnHover
-            ? theme.palette.detail.listItemBGHover
-            : theme.palette.detail.listItemBG,
-          margin: theme.mp.sm,
+          backgroundColor: getBackgroundColor(),
+          mx: disableHover ? 0 : theme.mp.sm,
+          my: disableHover ? "14px" : theme.mp.sm,
           borderRadius: theme.borderRadius.sm,
           width: "95%",
-          padding: `${theme.mp.sm} ${theme.mp.xlg}`,
+          padding: disableHover ? 0 : "9px 15px",
+          ...sx,
         }}
+        {...props}
       >
-        {props.children}
+        {children}
       </Grid>
     </HoverContext.Provider>
   );

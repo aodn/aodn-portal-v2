@@ -72,6 +72,27 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
   ],
   opacity: 1.0,
 };
+// This function is specific for IMOS server geoserver-123
+// we can speed up the query by calling the cache server we own.
+// A proxy setup to redirect the call on firewall level
+const applyGeoWebCacheIfPossible = (baseUrl: string, param: TileUrlParams) => {
+  if (baseUrl.includes("geoserver-123.aodn.org.au/geoserver/wms")) {
+    // We can rewrite value so that it use internal cache server
+    return {
+      baseUrl: "/geowebcache/service/wms",
+      params: {
+        ...param,
+        SRS: "EPSG:900913", // This is same as "EPSG:3857", but tile server use a old name, mapbox must use 3857
+        //BBOX: "{bbox-epsg-900913}",
+      },
+    };
+  } else {
+    return {
+      baseUrl: baseUrl,
+      params: param,
+    };
+  }
+};
 
 // Helper functions to generate consistent IDs
 const getLayerId = (id: string | undefined) => `${id}-geo-server-tile-layer`;
@@ -110,10 +131,9 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
       defaultGeoServerTileLayerConfig,
       geoServerTileLayerConfig
     );
-    const tileUrl = formatToUrl<TileUrlParams>({
-      baseUrl: config.baseUrl,
-      params: config.tileUrlParams,
-    });
+    const tileUrl = formatToUrl<TileUrlParams>(
+      applyGeoWebCacheIfPossible(config.baseUrl, config.tileUrlParams)
+    );
     const isWMSAvailable = checkWMSAvailability(
       config.baseUrl,
       config.tileUrlParams,
@@ -127,7 +147,7 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     if (map === null || map === undefined) return;
 
     const createSource = () => {
-      if (isWMSAvailable && !map?.isSourceLoaded(sourceLayerId)) {
+      if (isWMSAvailable) {
         // Add the WMS source following Mapbox's example
         if (!map?.getSource(sourceLayerId)) {
           map?.addSource(sourceLayerId, {
@@ -191,11 +211,6 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
       if (map?.isStyleLoaded()) {
         if (titleLayerId && map?.getLayer(titleLayerId)) {
           map?.removeLayer(titleLayerId);
-        }
-      }
-      if (map?.isSourceLoaded(sourceLayerId)) {
-        if (sourceLayerId && map?.getSource(sourceLayerId)) {
-          map?.removeSource(sourceLayerId);
         }
       }
     };

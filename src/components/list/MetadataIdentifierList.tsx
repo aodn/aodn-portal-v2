@@ -5,10 +5,12 @@ import ItemBaseGrid from "./listItem/ItemBaseGrid";
 
 interface MetadataIdentifierListProps {
   identifier: string;
+  selected?: boolean;
 }
 
 const MetadataIdentifierList: React.FC<MetadataIdentifierListProps> = ({
   identifier,
+  selected = false,
 }) => {
   const metadataIdentiferItem = (
     <ItemBaseGrid container key={identifier}>
@@ -18,6 +20,7 @@ const MetadataIdentifierList: React.FC<MetadataIdentifierListProps> = ({
 
   return (
     <ExpandableList
+      selected={selected}
       childrenList={identifier ? [metadataIdentiferItem] : []}
       title="Metadata Identifier"
     />

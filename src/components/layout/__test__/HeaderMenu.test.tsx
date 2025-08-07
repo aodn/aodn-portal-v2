@@ -13,34 +13,36 @@ describe("HeaderMenu", () => {
     vi.clearAllMocks();
   });
 
-  describe("HOVER_MENU style", () => {
-    it("renders hover menu when HOVER_MENU style is provided", () => {
-      render(<HeaderMenu menuStyle={HeaderMenuStyle.HOVER_MENU} />);
+  describe("DROPDOWN_MENU style", () => {
+    it("renders dropdown menu when DROPDOWN_MENU style is provided", () => {
+      render(<HeaderMenu menuStyle={HeaderMenuStyle.DROPDOWN_MENU} />);
 
-      // Should have two hover menus (About Us, Resources)
+      // Should have two dropdown menus (About Us, Resources)
       expect(screen.getByText("About Us")).toBeInTheDocument();
       expect(screen.getByText("Resources")).toBeInTheDocument();
     });
 
-    it("calls openInNewTab when an About Us item is clicked", () => {
-      render(<HeaderMenu menuStyle={HeaderMenuStyle.HOVER_MENU} />);
+    it("calls openInNewTab when an About Us item is clicked", async () => {
+      const user = userEvent.setup();
+      render(<HeaderMenu menuStyle={HeaderMenuStyle.DROPDOWN_MENU} />);
 
-      // Find menu button "About Us"
+      // Find and click the "About Us" button to open dropdown
       const aboutUsButton = screen.getByText("About Us");
-      userEvent.hover(aboutUsButton);
+      await user.click(aboutUsButton);
 
-      // Wait for hover event to show menu
-      return waitFor(() => screen.findByText("About IMOS"), {
-        timeout: 5000,
-      }).then((aboutImosItem) => {
-        expect(aboutImosItem).toBeInTheDocument();
+      // Wait for dropdown menu to appear and find "About IMOS" item
+      const aboutImosItem = await waitFor(
+        () => screen.findByText("About IMOS"),
+        { timeout: 5000 }
+      );
 
-        // Click menu item "About Imos"
-        fireEvent.click(aboutImosItem);
+      expect(aboutImosItem).toBeInTheDocument();
 
-        // Check if openInNewTab was called with the correct URL
-        expect(openInNewTab).toHaveBeenCalledWith("https://imos.org.au/");
-      });
+      // Click the "About IMOS" menu item
+      await user.click(aboutImosItem);
+
+      // Check if openInNewTab was called with the correct URL
+      expect(openInNewTab).toHaveBeenCalledWith("https://imos.org.au/");
     });
   });
 

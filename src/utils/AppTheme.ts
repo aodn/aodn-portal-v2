@@ -1,4 +1,55 @@
+/**
+ * AppTheme.ts - Legacy Theme with RC8 Integration
+ *
+ * MIGRATION PLAN:
+ *
+ * CURRENT FILES:
+ * ├── src/
+ * │   ├── styles/
+ * │   │   ├── designTokensRC8.ts     (✅ New - RC8 design tokens from Figma)
+ * │   │   └── theme.ts               (✅ New - Clean RC8 theme implementation)
+ * │   └── utils/
+ * │       └── AppTheme.ts            (📝 Current file - Legacy + RC8 integration)
+ *
+ * MIGRATION PHASES:
+ *
+ * Phase 1: Legacy + RC8 Integration
+ * - AppTheme.ts: Spreads rc8Theme as base, legacy configs override
+ * - All existing components continue to work unchanged
+ * - RC8 features available for new development
+ * - Usage: import AppTheme from "./utils/AppTheme"
+ *
+ * Phase 2 (CURRENT): Component Migration
+ * - Gradually replace legacy styles with RC8 equivalents:
+ *   ❌ <Typography variant="detailTitle">
+ *   ✅ <Typography variant="heading4">
+ *   ❌ sx={{ color: theme.palette.detail.text }}
+ *   ✅ sx={{ color: theme.palette.text1 }}
+ *   ❌ sx={{ padding: theme.mp.md }}
+ *   ✅ sx={{ padding: theme.rc8Spacing.md }}
+ *
+ * Phase 3: Complete Migration
+ * - Delete utils/AppTheme.ts file
+ * - Update App.tsx: import theme from "./styles/theme"
+ * - Remove legacy type declarations from styles/theme.ts
+ * - Clean RC8-only theme system
+ *
+ * LEGACY FEATURES (to be removed after migration):
+ * - theme.border.* (detailBtnLight, detailSubtabBtn, detailNa)
+ * - theme.mp.* (nil, xs, sm, md, lg, xlg, xxlg)
+ * - theme.borderRadius.* (sm, md, lg, xlg, xxlg)
+ * - theme.palette.detail.*
+ * - Typography variants: detailTitle, detailContent
+ *
+ * RC8 FEATURES (new):
+ * - theme.designTokens.* (complete RC8 design system)
+ * - Typography variants: slogan1, slogan2, heading1-4, title1Medium, etc.
+ * - Palette: primary1-6, secondary1, text1-3, grey100-700, etc.
+ * - Future: rc8Spacing, rc8Breakpoints, rc8Elevation, rc8BorderRadius
+ */
+
 import { createTheme, ThemeOptions } from "@mui/material/styles";
+import rc8Theme from "../styles/themeRC8";
 
 declare module "@mui/material/styles" {
   interface Theme {
@@ -94,7 +145,11 @@ declare module "@mui/material/Typography/Typography" {
 }
 
 const theme: ThemeOptions = {
+  // RC8 theme as foundation (provides designTokens, RC8 typography, RC8 palette)
+  ...rc8Theme,
+
   palette: {
+    ...rc8Theme.palette, // Include all RC8 colors (primary1, text1, etc.)
     detail: {
       text: "#5B5B5B",
       listItemBG: "#F2F6F9",
@@ -167,6 +222,8 @@ const theme: ThemeOptions = {
   },
 
   typography: {
+    // TODO: RC8 design update not complete yet, temporarily not using new fonts
+    ...rc8Theme.typography, // Include all RC8 variants (heading1, slogan1, etc.)
     fontFamily: [
       "Lexend",
       "Helvetica Neue",

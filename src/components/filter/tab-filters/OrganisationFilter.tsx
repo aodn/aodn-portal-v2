@@ -1,7 +1,7 @@
-import { FC, useCallback } from "react";
+import React, { FC, useCallback } from "react";
 import { Box, Stack, SxProps } from "@mui/material";
 import { useAppDispatch } from "../../common/store/hooks";
-import { updateImosOnly } from "../../common/store/componentParamReducer";
+import { updateDatasetGroup } from "../../common/store/componentParamReducer";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
@@ -13,6 +13,10 @@ import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButton
 // import InternationalIcon from "../../icon/organisation/InternationalIcon";
 // import NonGovernmentIcon from "../../icon/organisation/NonGovernmentIcon";
 import IMOSIcon from "../../icon/organisation/IMOSIcon";
+import AustraliaAntarcticProgramIcon from "../../icon/organisation/AustraliaAntarcticProgramIcon";
+import AIMSIcon from "../../icon/organisation/AIMSIcon";
+import CSIROIcon from "../../icon/organisation/CSIROIcon";
+import IMASIcon from "../../icon/organisation/IMASIcon";
 
 interface OrganisationFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -25,6 +29,26 @@ const ORGANISATION = [
     value: "imos",
     label: "IMOS",
     icon: <IMOSIcon />,
+  },
+  {
+    value: "aims",
+    label: "AIMS",
+    icon: <AIMSIcon />,
+  },
+  {
+    value: "australian_antarctic_division",
+    label: "AAD",
+    icon: <AustraliaAntarcticProgramIcon />,
+  },
+  {
+    value: "csiro oceans and atmosphere",
+    label: "CSIRO",
+    icon: <CSIROIcon />,
+  },
+  {
+    value: "imas",
+    label: "IMAS",
+    icon: <IMASIcon />,
   },
   // {
   //   value: "Australian-Universities",
@@ -70,13 +94,16 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const handleChange = useCallback(
-    (_: React.MouseEvent<HTMLElement>, newAlignment: string[]) => {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        organisation: newAlignment,
-      }));
-      // TODO: for now there is only isImosOnly is in organisation button group, need to change ogcapi then change front end if add more organisations
-      dispatch(updateImosOnly(newAlignment.includes("imos")));
+    (_: React.MouseEvent<HTMLElement>, newAlignment: string) => {
+      setFilters((current) => {
+        current.organisation =
+          newAlignment !== null ? [newAlignment] : undefined;
+        return current;
+      });
+      // Assume single selection for now.
+      dispatch(
+        updateDatasetGroup(newAlignment !== null ? newAlignment : undefined)
+      );
     },
     [dispatch, setFilters]
   );
@@ -85,23 +112,20 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
     <>
       <Box sx={{ ...sx }}>
         <StyledToggleButtonGroup
-          value={filters.organisation}
+          exclusive
+          value={filters.organisation?.[0]}
           onChange={handleChange}
         >
-          {ORGANISATION.map((item) => (
-            <StyledToggleButton
-              value={item.value}
-              key={item.value}
-              aria-label={item.label}
-            >
+          {ORGANISATION.map(({ value, label, icon }) => (
+            <StyledToggleButton value={value} key={value} aria-label={label}>
               <Stack
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
                 direction="column"
               >
-                {item.icon && item.icon}
-                {item.label}
+                {icon && icon}
+                {label}
               </Stack>
             </StyledToggleButton>
           ))}

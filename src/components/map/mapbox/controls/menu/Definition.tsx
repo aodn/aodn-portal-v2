@@ -1,5 +1,6 @@
 import React from "react";
 import { Map as MapBox } from "mapbox-gl";
+import { SxProps, Theme } from "@mui/material";
 
 enum EVENT_MENU {
   CLICKED = "event-menu-clicked",
@@ -37,6 +38,13 @@ export type MapControlType = React.ReactElement<
   ControlProps,
   string | React.JSXElementConstructor<any>
 >;
+
+export interface MenuControlType {
+  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
+  sx?: SxProps<Theme>;
+  visible?: boolean;
+  className?: string;
+}
 
 export interface MenuClickedEvent {
   event: MouseEvent;

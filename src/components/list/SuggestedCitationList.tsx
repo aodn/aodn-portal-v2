@@ -5,19 +5,21 @@ import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
 import { Stack, Typography } from "@mui/material";
-import { fontWeight } from "../../styles/constants";
 import CopyButton from "../common/buttons/CopyButton";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
+import rc8Theme from "../../styles/themeRC8";
 
 interface SuggestedCitationListProps {
   suggestedCitation: string;
   title?: string;
+  selected?: boolean;
   mode?: MODE;
 }
 
 const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
   suggestedCitation,
   title = "Suggested Citation",
+  selected = false,
   mode,
 }) => {
   const { checkIfCopied, copyToClipboard } = useDetailPageContext();
@@ -33,7 +35,10 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
   const suggestedCitationItem = useMemo(
     () =>
       suggestedCitation ? (
-        <ItemBaseGrid key={suggestedCitation}>
+        <ItemBaseGrid
+          key={suggestedCitation}
+          disableHover={mode === MODE.COMPACT}
+        >
           <Stack direction="column" alignItems="center" gap={1}>
             <ExpandableTextArea text={suggestedCitation} />
             <CopyButton
@@ -48,14 +53,17 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
           </Stack>
         </ItemBaseGrid>
       ) : null,
-    [handleCopy, isCopied, suggestedCitation]
+    [handleCopy, isCopied, suggestedCitation, mode]
   );
 
   switch (mode) {
     case MODE.COMPACT:
       return (
         <>
-          <Typography padding={1} fontWeight={fontWeight.bold}>
+          <Typography
+            variant="title1Medium"
+            sx={{ color: rc8Theme.palette.text1 }}
+          >
             {title}
             {!suggestedCitation ? (
               <NaList title={title ? title : ""} />
@@ -71,6 +79,7 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
       return (
         <ExpandableList
           title={title}
+          selected={selected}
           childrenList={suggestedCitation ? [suggestedCitationItem] : []}
         />
       );

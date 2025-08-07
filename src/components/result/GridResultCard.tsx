@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, SyntheticEvent, useState } from "react";
 import {
   Box,
   Card,
@@ -11,9 +11,6 @@ import {
   border,
   borderRadius,
   color,
-  fontColor,
-  fontSize,
-  fontWeight,
   gap,
   padding,
 } from "../../styles/constants";
@@ -21,6 +18,8 @@ import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
+import default_thumbnail from "@/assets/images/default-thumbnail.png";
+import rc8Theme from "../../styles/themeRC8";
 
 interface GridResultCardProps extends ResultCardBasicType {}
 
@@ -92,6 +91,10 @@ const GridResultCard: FC<GridResultCardProps> = ({
               width: "100%",
               height: "auto",
             }}
+            onError={(e: SyntheticEvent<HTMLImageElement, Event>) => {
+              e.preventDefault();
+              e.currentTarget.src = default_thumbnail;
+            }}
           />
         </Box>
       </CardActionArea>
@@ -123,9 +126,8 @@ const GridResultCard: FC<GridResultCardProps> = ({
               data-testid="grid-card-title"
             >
               <Typography
-                color={fontColor.gray.dark}
-                fontSize={fontSize.resultCardContent}
-                fontWeight={fontWeight.medium}
+                variant="title1Medium"
+                color={rc8Theme.palette.text1}
                 sx={{
                   padding: 0,
                   overflow: "hidden",

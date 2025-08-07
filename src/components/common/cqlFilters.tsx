@@ -26,6 +26,7 @@ export type ParameterVocabsIn = SingleArgumentFunction<
   string | undefined
 >;
 export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
+export type DatasetGroup = SingleArgumentFunction<string, string>;
 export type PlatformFilter = SingleArgumentFunction<Array<string>, string>;
 export type IsNotNull = SingleArgumentFunction<string, string>;
 export type FilterTypes =
@@ -42,6 +43,9 @@ const funcIsNotNull: IsNotNull = (field: string) => `(${field} IS NOT NULL)`;
 
 const funcUpdateFrequency: UpdateFrequency = (freq: DatasetFrequency) =>
   `update_frequency='${freq}'`;
+
+const funcUpdateDatasetGroup: DatasetGroup = (name: string) =>
+  `dataset_group='${name}'`;
 
 const funcTemporalAfter: TemporalAfterOrBefore = (s: number) =>
   `temporal AFTER ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}`;
@@ -103,7 +107,7 @@ const funcTemporalBetween: TemporalDuring = (s: number, e: number) =>
 const cqlDefaultFilters = new Map<string, FilterTypes>();
 cqlDefaultFilters
   .set("PARAMETER_VOCABS_IN", funcParameterVocabs)
-  .set("IMOS_ONLY", "dataset_provider='IMOS'")
+  .set("DATASET_GROUP", funcUpdateDatasetGroup)
   .set("ALL_TIME_RANGE", "temporal after 1970-01-01T00:00:00Z")
   .set("BETWEEN_TIME_RANGE", funcTemporalBetween)
   .set("AFTER_TIME", funcTemporalAfter)

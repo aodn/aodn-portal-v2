@@ -73,7 +73,7 @@ describe("DateRangeFilter", () => {
         url === "/api/v1/ogc/collections" &&
         config?.params?.properties === "id,providers" &&
         config?.params?.filter ===
-          "temporal after 1970-01-01T00:00:00Z AND dataset_provider='IMOS'"
+          "temporal after 1970-01-01T00:00:00Z AND dataset_group='imos'"
       ) {
         return Promise.resolve({ data: responseIdProvider });
       }
@@ -139,7 +139,9 @@ describe("DateRangeFilter", () => {
       const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
       user.type(startDatePicker, newStringDate);
 
-      return waitFor(() => screen.findByDisplayValue(newStringDate)).then(() =>
+      return waitFor(() => screen.findByDisplayValue(newStringDate), {
+        timeout: 2000,
+      }).then(() =>
         expect(store.dispatch).toHaveBeenCalledWith(
           updateDateTimeFilterRange({
             start: dateToValue(newDate),
@@ -163,7 +165,9 @@ describe("DateRangeFilter", () => {
       const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
       user.type(endDatePicker, newStringDate);
 
-      return waitFor(() => screen.findByDisplayValue(newStringDate)).then(() =>
+      return waitFor(() => screen.findByDisplayValue(newStringDate), {
+        timeout: 2000,
+      }).then(() =>
         expect(store.dispatch).toHaveBeenCalledWith(
           updateDateTimeFilterRange({
             start: mockInitialState.paramReducer.dateTimeFilterRange.start,

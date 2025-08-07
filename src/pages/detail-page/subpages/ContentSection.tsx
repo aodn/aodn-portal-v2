@@ -94,7 +94,8 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
         tabNavigation(
           uuid,
           TABS[newValue].value,
-          pageReferer.DETAIL_PAGE_REFERER
+          // Use search page referer here to make sure the user can navigate back to the search page
+          pageReferer.SEARCH_PAGE_REFERER
         );
       }
     },

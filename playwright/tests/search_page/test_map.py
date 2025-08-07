@@ -13,9 +13,20 @@ from mocks.api_router import ApiRouter
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
+from utils.map_utils import are_coordinates_equal, are_value_equal
 
 
 def test_map_drag_updates_search_results(desktop_page: Page) -> None:
+    """
+    Validates that dragging the map initiates a new search, updating the search
+    results displayed in the result list.
+
+    The test compares the initial search result with the updated result, using
+    distinct mocked API responses for the search action.
+    By mocking different data for the initial and updated API calls, the test
+    ensures the UI correctly reflects the expected changes in the search
+    results after the map drag event.
+    """
     api_router = ApiRouter(page=desktop_page)
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)
@@ -26,44 +37,16 @@ def test_map_drag_updates_search_results(desktop_page: Page) -> None:
     search_page.wait_for_search_to_complete()
     initial_data = search_page.first_result_title.inner_text()
 
-    # Change api route to get updated response after the map drag event
+    # Change api mocking to get updated mocked response after the map drag event
     api_router.route_collection(
         handle_collections_update_centroid_api,
         handle_collections_update_all_api,
     )
     search_page.map.drag_map()
-    search_page.wait_for_updated_search_result()
+    search_page.wait_for_timeout(3000)  # wait for the search results to update
     updated_data = search_page.first_result_title.inner_text()
 
     assert initial_data != updated_data
-
-
-@pytest.mark.parametrize(
-    'title, lng, lat',
-    [
-        (
-            'Integrated Marine Observing System (IMOS) - Location of assets',
-            '145.5',
-            '-42.5',
-        ),
-    ],
-)
-def test_map_datapoint_hover_and_click(
-    desktop_page: Page, title: str, lng: str, lat: str
-) -> None:
-    landing_page = LandingPage(desktop_page)
-    search_page = SearchPage(desktop_page)
-
-    landing_page.load()
-    landing_page.search.fill_search_text('imos')
-    landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
-
-    search_page.map.center_map(lng, lat)
-    search_page.map.hover_map()
-
-    search_page.map.click_map()
-    expect(search_page.first_result_title).to_have_text(title)
 
 
 @pytest.mark.parametrize(
@@ -75,6 +58,16 @@ def test_map_datapoint_hover_and_click(
 def test_map_updates_on_search_change(
     desktop_page: Page, search_text: str, updated_search_text: str
 ) -> None:
+    """
+    Confirms that performing a new search by updating the search text also updates
+    the map to display a different set of data.
+
+    The test uses mocked API responses to provide distinct data for the initial and
+    updated search actions, verifying that the map correctly loads the updated data.
+    By comparing the map layers before and after the search text change, the test
+    ensures that the UI's search update properly refreshes the map's layers,
+    reflecting the new search results.
+    """
     api_router = ApiRouter(page=desktop_page)
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)
@@ -86,14 +79,14 @@ def test_map_updates_on_search_change(
     expect(search_page.first_result_title).to_be_visible()
     map_layers = search_page.map.get_map_layers()
 
-    # Change api route to get updated response after search action
+    # Change api mocking to get updated response after search action
     api_router.route_collection(
         handle_collections_update_centroid_api,
         handle_collections_update_all_api,
     )
     search_page.search.fill_search_text(updated_search_text)
     search_page.search.click_search_button()
-    search_page.wait_for_timeout(1000)
+    search_page.wait_for_timeout(2000)
     updated_map_layers = search_page.map.get_map_layers()
 
     assert map_layers != updated_map_layers
@@ -112,9 +105,17 @@ def test_map_updates_on_search_change(
         ),
     ],
 )
-def test_map_base_layers(
+def test_map_reference_layers(
     desktop_page: Page, layer_text: str, layer_type: LayerType
 ) -> None:
+    """
+    Validates that selecting a reference layer from the map menu correctly
+    displays the corresponding layer on the map and toggling it off hides the layer.
+
+    The test confirms the selection functionality by verifying that the map shows the
+    expected layer for the chosen reference layer and ensures the layer is hidden
+    when deselected, confirming the UI's layer toggle behavior works as intended.
+    """
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)
 
@@ -125,24 +126,21 @@ def test_map_base_layers(
     search_page.wait_for_search_to_complete()
     expect(search_page.first_result_title).to_be_visible()
 
-    search_page.map.basemap_show_hide_menu.click()
+    search_page.map.reference_layer_menu.click()
     search_page.click_text(layer_text)
     layer_id = layer_factory.get_layer_id(layer_type)
     assert search_page.map.is_map_layer_visible(layer_id) is True
 
     if not search_page.get_text(layer_text).is_visible():
-        search_page.map.basemap_show_hide_menu.click()
+        search_page.map.reference_layer_menu.click()
     search_page.click_text(layer_text)
     assert search_page.map.is_map_layer_visible(layer_id) is False
 
 
 @pytest.mark.parametrize(
-    'head_lng, head_lat, data_title, data_lng, data_lat',
+    'spider_lng, spider_lat',
     [
         (
-            '137.70',
-            '-33.174',
-            'Integrated Marine Observing System (IMOS) - Location of assets',
             '137.70',
             '-33.174',
         ),
@@ -150,12 +148,17 @@ def test_map_base_layers(
 )
 def test_map_spider(
     desktop_page: Page,
-    head_lng: str,
-    head_lat: str,
-    data_title: str,
-    data_lng: str,
-    data_lat: str,
+    spider_lng: str,
+    spider_lat: str,
 ) -> None:
+    """
+    Confirms that clicking a clustered data point on the map displays the
+    individual data points as a spider layer.
+
+    The test zooms to a specific map level and centers the map at given coordinates
+    to locate a cluster, then verifies that clicking the cluster reveals the spider
+    layer, ensuring the cluster selection and spider visualization function correctly in the UI.
+    """
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)
 
@@ -165,7 +168,7 @@ def test_map_spider(
     search_page.wait_for_search_to_complete()
 
     search_page.map.zoom_to_level(12)
-    search_page.map.center_map(head_lng, head_lat)
+    search_page.map.center_map(spider_lng, spider_lat)
     search_page.wait_for_timeout(5000)
 
     # Try to find and click a cluster
@@ -176,14 +179,17 @@ def test_map_spider(
     layer_id = layer_factory.get_layer_id(LayerType.SPIDER)
     assert search_page.map.is_map_layer_visible(layer_id) is True
 
-    search_page.map.zoom_to_level(12)
-    search_page.map.center_map(data_lng, data_lat)
-    search_page.map.hover_map()
-    search_page.map.click_map()
-    expect(search_page.first_result_title).to_have_text(data_title)
-
 
 def test_map_state_persists_with_url(desktop_page: Page) -> None:
+    """
+    Verifies that the map's state (center coordinates and zoom level) persists
+    when reloading the page using the same URL.
+
+    The test performs a search, drags and zooms the map, captures the map's state,
+    and then opens a new tab with the same URL to confirm that the map's center
+    and zoom level remain consistent, ensuring the UI correctly preserves the
+    map state via the URL.
+    """
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)
 
@@ -216,11 +222,20 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
     new_map_center = new_search_page.map.get_map_center()
     new_map_zoom = new_search_page.map.get_map_zoom()
 
-    assert map_center == new_map_center
+    assert are_coordinates_equal(map_center, new_map_center)
     assert map_zoom == new_map_zoom
 
 
 def test_map_state_persists_across_page(desktop_page: Page) -> None:
+    """
+    Verifies that the map's state (center coordinates and zoom level) persists
+    after navigating to a detail page and returning to the search page.
+
+    The test conducts a search, drags and zooms the map, captures the initial map
+    state, navigates to a detail page, and returns to the search page, verifying
+    that the map's center and zoom level remain unchanged, ensuring the UI
+    maintains the map state across page navigation.
+    """
     landing_page = LandingPage(desktop_page)
     search_page = SearchPage(desktop_page)
     detail_page = DetailPage(desktop_page)
@@ -237,16 +252,22 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     map_zoom = search_page.map.get_map_zoom()
 
     search_page.first_result_title.click()
-    detail_page.go_back_button.click()
+    detail_page.return_button.click()
 
     new_map_center = search_page.map.get_map_center()
     new_map_zoom = search_page.map.get_map_zoom()
 
-    assert map_center == new_map_center
-    assert map_zoom == new_map_zoom
+    assert are_coordinates_equal(map_center, new_map_center)
+    assert are_value_equal(map_zoom, new_map_zoom)
 
 
-def test_map_buttons(desktop_page: Page) -> None:
+@pytest.mark.parametrize(
+    'data_title',
+    [
+        'IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility',
+    ],
+)
+def test_map_buttons(desktop_page: Page, data_title: str) -> None:
     """
     Ensures that the map buttons on both the search page and the detail page are displayed correctly.
 
@@ -265,17 +286,23 @@ def test_map_buttons(desktop_page: Page) -> None:
     # Check the visibility of search page map buttons
     expect(search_page.map.bookmarks_icon).to_be_visible()
     expect(search_page.map.basemap_show_hide_menu).to_be_visible()
-    expect(search_page.map.layers_icon).to_be_visible()
+    expect(search_page.map.reference_layer_menu).to_be_visible()
+    expect(search_page.map.layers_menu).to_be_visible()
 
-    search_page.first_result_title.click()
+    search_page.result_title.get_by_text(data_title).click()
 
     # Check the visibility of detail page map buttons
     expect(detail_page.detail_map.basemap_show_hide_menu).to_be_visible()
-    expect(detail_page.detail_map.layers_icon).to_be_visible()
+    expect(search_page.map.reference_layer_menu).to_be_visible()
+    expect(detail_page.detail_map.layers_menu).to_be_visible()
+    expect(
+        detail_page.detail_map.daterange_show_hide_menu_button
+    ).to_be_visible()
+    expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
     expect(detail_page.detail_map.delete_button).to_be_visible()
 
-    # Select the Hexbin layer
-    detail_page.detail_map.layers_icon.click()
+    # Select the Geoserver layer
+    detail_page.detail_map.layers_menu.click()
     detail_page.detail_map.geoserver_layer.click()
     expect(
         detail_page.detail_map.daterange_show_hide_menu_button

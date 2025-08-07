@@ -20,7 +20,6 @@ import {
 import { TestHelper } from "../../../common/test/helper";
 import { MapDefaultConfig } from "../constants";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
-import CardPopup from "./CardPopup";
 
 interface SpiderifiedClusterInfo {
   id: string;
@@ -411,7 +410,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
 
           // Store the clicked cluster info
           source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-            if (err) return;
+            if (err || !zoom) return;
             spiderify(
               coordinate,
               datasets,
@@ -423,7 +422,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
         });
       } else {
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-          if (err) return;
+          if (err || !zoom) return;
 
           // If the next expansion zoom is larger than map default max zoom level, then no need to zoom in, just spiderify the cluster
           if (zoom >= MapDefaultConfig.MAX_ZOOM) {
@@ -531,7 +530,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       )}
       {spiderifiedCluster && (
         <TestHelper
-          mapId={map?.getContainer().id || ""}
+          id={map?.getContainer().id || ""}
           getSpiderLayer={() => getSpiderPinsLayerId(spiderifiedCluster.id)}
         />
       )}

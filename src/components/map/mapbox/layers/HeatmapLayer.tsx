@@ -8,7 +8,11 @@ import {
 } from "react";
 import MapContext from "../MapContext";
 
-import { Expression, GeoJSONSource, StyleFunction } from "mapbox-gl";
+import {
+  ExpressionSpecification,
+  GeoJSONSource,
+  PropertyValueSpecification,
+} from "mapbox-gl";
 import {
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
@@ -27,14 +31,14 @@ import CardPopup from "../component/CardPopup";
 
 interface IHeatmapLayer {
   maxZoom: number;
-  weight: number | StyleFunction | Expression;
-  color: string | StyleFunction | Expression;
-  radius: number | StyleFunction | Expression;
+  weight: number | PropertyValueSpecification<number> | ExpressionSpecification;
+  color: ExpressionSpecification;
+  radius: number | PropertyValueSpecification<number> | ExpressionSpecification;
 }
 
 interface HeatmapCircle {
-  radius: number | StyleFunction | Expression;
-  color: string | StyleFunction | Expression;
+  radius: number | PropertyValueSpecification<number> | ExpressionSpecification;
+  color: string;
   strokeColor: string;
   strokeWidth: number;
 }
@@ -85,13 +89,13 @@ const defaultHeatmapConfig: HeatmapConfig = {
       "#ffba78",
       1,
       "#ffa86b",
-    ],
+    ] as ExpressionSpecification,
     radius: {
       stops: [
         [11, 15],
         [15, 20],
       ],
-    },
+    } as PropertyValueSpecification<number>,
   },
 };
 
@@ -119,20 +123,28 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
     FeatureCollection<Point> | undefined
   >(undefined);
 
-  const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
+  const [
+    heatmapSourceId,
+    clusterSourceId,
+    heatmapLayer,
+    clusterLayer,
+    unClusterPointLayer,
+  ] = useMemo(() => {
+    const layerId = getLayerId(map?.getContainer().id);
+    const heatmapSourceId = getHeatmapSourceId(layerId);
+    const clusterSourceId = getClusterSourceId(layerId);
+    const heatmapLayer = getHeatmapLayerId(layerId);
+    const clusterLayer = getClusterCircleLayerId(layerId);
+    const unClusterPointLayer = getUnclusterPointLayerId(layerId);
 
-  const heatmapSourceId = useMemo(() => getHeatmapSourceId(layerId), [layerId]);
-  const clusterSourceId = useMemo(() => getClusterSourceId(layerId), [layerId]);
-
-  const heatmapLayer = useMemo(() => getHeatmapLayerId(layerId), [layerId]);
-  const clusterLayer = useMemo(
-    () => getClusterCircleLayerId(layerId),
-    [layerId]
-  );
-  const unClusterPointLayer = useMemo(
-    () => getUnclusterPointLayerId(layerId),
-    [layerId]
-  );
+    return [
+      heatmapSourceId,
+      clusterSourceId,
+      heatmapLayer,
+      clusterLayer,
+      unClusterPointLayer,
+    ];
+  }, [map]);
 
   // This is use to render the heatmap and add event handle to circles
   useEffect(() => {
@@ -187,7 +199,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
                 [config.layer.maxZoom - 4, 1],
                 [config.layer.maxZoom, 3],
               ],
-            } as StyleFunction,
+            } as PropertyValueSpecification<number>,
             // assign color values be applied to points depending on their density
             "heatmap-color": config.layer.color,
             // increase radius as zoom increases
@@ -199,7 +211,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
                 [config.layer.maxZoom - 1, 1],
                 [config.layer.maxZoom, 0],
               ],
-            } as StyleFunction,
+            } as unknown as PropertyValueSpecification<number>,
           },
         });
       }
@@ -271,7 +283,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       map?.on("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
     };
 
-    map?.once("load", createLayers);
+    map?.once("idle", createLayers);
 
     // When user change the map style, for example change base map, all layer will be removed
     // as per mapbox design, we need to listen to that even and add back the layer
@@ -291,7 +303,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
       );
       map?.off("mouseleave", clusterLayer, defaultMouseLeaveEventHandler);
 
-      try {
+      if (map?.isStyleLoaded()) {
         if (map?.getLayer(heatmapLayer)) map?.removeLayer(heatmapLayer);
         if (map?.getLayer(clusterLayer)) map?.removeLayer(clusterLayer);
         if (map?.getLayer(unClusterPointLayer))
@@ -299,8 +311,6 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         if (map?.getLayer("cluster-count")) map?.removeLayer("cluster-count");
         if (map?.getSource(heatmapSourceId)) map?.removeSource(heatmapSourceId);
         if (map?.getSource(clusterSourceId)) map?.removeSource(clusterSourceId);
-      } catch (e) {
-        // OK to ignore if no layer then no source as well
       }
     };
     // Make sure map is the only dependency so that it will not trigger twice run
@@ -358,7 +368,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         tabNavigation={tabNavigation}
       />
       <TestHelper
-        mapId={map?.getContainer().id || ""}
+        id={map?.getContainer().id || ""}
         getHeatmapLayer={() => heatmapLayer}
       />
     </>

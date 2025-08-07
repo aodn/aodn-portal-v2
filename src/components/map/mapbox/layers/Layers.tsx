@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
-import { LngLatBounds, MapMouseEvent, LngLat } from "mapbox-gl";
+import { LngLatBounds, MapMouseEvent, LngLat, Map as Mapbox } from "mapbox-gl";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 import * as turf from "@turf/turf";
@@ -79,24 +79,25 @@ const isFeatureVisible = (
 // Function to determine the most "visible" point
 const findSuitableVisiblePoint = (
   featureCollection: FeatureCollection<Point>,
-  map: mapboxgl.Map | null | undefined = undefined,
+  map: Mapbox | null | undefined = undefined,
   currentVisibleCollection: FeatureCollection<Point> | undefined = undefined,
   preferCurrentCentroid: boolean = true
 ): FeatureCollection<Point> => {
   const featureCollections: FeatureCollection<Point> = {
     type: "FeatureCollection",
-    features: new Array<Feature<Point, GeoJsonProperties>>(),
+    features: new Array<Feature<Point>>(),
   };
   if (!map) return featureCollection;
 
-  const bounds: LngLatBounds = map.getBounds();
+  const bounds: LngLatBounds | null = map.getBounds();
+
   // Filter the points that are visible
   const visibleFeatures = featureCollection.features.filter((feature) =>
-    isFeatureVisible(feature, bounds)
+    isFeatureVisible(feature, bounds!)
   );
   // After map move some currentVisible point no longer visible.
   const currentVisible = currentVisibleCollection?.features.filter((feature) =>
-    isFeatureVisible(feature, bounds)
+    isFeatureVisible(feature, bounds!)
   );
 
   if (visibleFeatures.length === 0) return featureCollections;

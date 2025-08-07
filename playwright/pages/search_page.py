@@ -1,5 +1,9 @@
 from playwright.sync_api import Locator, Page, TimeoutError
 
+from core.dataclasses.search_filter import SearchFilterConfig
+from core.factories.search_filter_validator_factory import (
+    SearchFilterValidatorFactory,
+)
 from mocks.api.collections import (
     handle_collections_show_more_api,
 )
@@ -70,12 +74,6 @@ class SearchPage(BasePage):
             # assume the search is complete and ignore the exception.
             pass
 
-    def wait_for_updated_search_result(self) -> None:
-        """Wait until the second search result is detached"""
-        selector = 'div[data-testid="result-card-list"]'
-        first_result = self.page.locator(selector).all()[1]
-        first_result.wait_for(state='detached', timeout=5000)
-
     def click_dataset(self, title: str) -> None:
         """Click on the given dataset title"""
         self.result_title.filter(has_text=title).first.click()
@@ -107,3 +105,21 @@ class SearchPage(BasePage):
     def get_result_view_button(self, text: str) -> Locator:
         """Returns result view button element by text"""
         return self.page.get_by_test_id(f'result-layout-button-{text}')
+
+    def validate_search_parameters_in_url(
+        self, url: str, expected_filters: SearchFilterConfig
+    ) -> None:
+        """
+        Validate that the search parameters are correctly reflected in the URL
+
+        Args:
+            expected_filters: SearchFilterConfig containing expected parameter values
+
+        Returns:
+            Dictionary with parameter names as keys and validation results as values
+        """
+        validation_results = SearchFilterValidatorFactory.validate(
+            url, expected_filters
+        )
+        for param_name, is_valid in validation_results.items():
+            assert is_valid, f"Parameter '{param_name}' is not correctly reflected in Request URL: {url}"

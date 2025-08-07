@@ -2,31 +2,64 @@ import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import TextArea from "./listItem/subitem/TextArea";
-import { ITheme } from "../common/store/OGCCollectionDefinitions";
 import NaList from "./NaList";
+import { borderRadius, gap } from "../../styles/constants";
+import { useTheme } from "@mui/material";
 
 interface ThemeListProps {
   title: string;
-  themes?: ITheme[];
+  themes: string[];
+  selected?: boolean;
 }
 
-const ThemeList: React.FC<ThemeListProps> = ({ title, themes = [] }) => {
+const ThemeList: React.FC<ThemeListProps> = ({
+  title,
+  themes,
+  selected = false,
+}) => {
+  const theme = useTheme();
+
   const statementItem = useMemo(
     () => (
-      <ItemBaseGrid container key={"theme-list-container-key"}>
+      <ItemBaseGrid
+        container
+        direction="row"
+        key={"theme-list-container-key"}
+        gap={1.25}
+      >
         {themes.length !== 0 ? (
-          themes.map((theme: ITheme) => (
-            <TextArea key={theme.title} text={theme.title} />
-          ))
+          themes.map((item: string) => {
+            return (
+              <TextArea
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyItems: "center",
+                  backgroundColor: theme.palette.common.white,
+                  padding: "8px 13.2px",
+                  gap: gap.xlg,
+                  borderRadius: borderRadius.small,
+                }}
+                key={item}
+                text={item}
+              />
+            );
+          })
         ) : (
           <NaList title={title}></NaList>
         )}
       </ItemBaseGrid>
     ),
-    [themes, title]
+    [theme.palette.common.white, themes, title]
   );
 
-  return <ExpandableList childrenList={[statementItem]} title={title} />;
+  return (
+    <ExpandableList
+      selected={selected}
+      childrenList={[statementItem]}
+      title={title}
+    />
+  );
 };
 
 export default ThemeList;

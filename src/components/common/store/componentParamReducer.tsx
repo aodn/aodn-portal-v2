@@ -8,12 +8,13 @@ import { DatasetFrequency } from "./searchReducer";
 import { MapDefaultConfig } from "../../map/mapbox/constants";
 import { SearchResultLayoutEnum } from "../buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../buttons/ResultListSortButton";
+import { decodeParam, encodeParam } from "../../../utils/UrlUtils";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";
 const UPDATE_SEARCH_TEXT_FILTER_VARIABLE = "UPDATE_SEARCH_TEXT_FILTER_VARIABLE";
-const UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE =
-  "UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE";
+const UPDATE_DATASET_GROUP_FILTER_VARIABLE =
+  "UPDATE_DATASET_GROUP_FILTER_VARIABLE";
 const UPDATE_POLYGON_FILTER_VARIABLE = "UPDATE_POLYGON_FILTER_VARIABLE";
 const UPDATE_BBOX_FILTER_VARIABLE = "UPDATE_BBOX_FILTER_VARIABLE";
 const UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE =
@@ -61,7 +62,7 @@ export interface DateTimeFilterRange {
 export interface ParameterState {
   bbox?: Feature<Polygon>;
   polygon?: Feature<Polygon>;
-  isImosOnlyDataset?: boolean;
+  datasetGroup?: string;
   hasCOData?: boolean;
   dateTimeFilterRange?: DateTimeFilterRange;
   searchText?: string;
@@ -139,11 +140,11 @@ const updateFilterBBox = (
   };
 };
 
-const updateImosOnly = (isImosOnly: boolean | undefined): ActionType => {
+const updateDatasetGroup = (name: string | undefined): ActionType => {
   return {
-    type: UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE,
+    type: UPDATE_DATASET_GROUP_FILTER_VARIABLE,
     payload: {
-      isImosOnlyDataset: isImosOnly === undefined ? false : isImosOnly,
+      datasetGroup: name,
     } as ParameterState,
   };
 };
@@ -158,10 +159,17 @@ const updateHasData = (hasCOData: boolean | undefined): ActionType => {
 };
 
 const updateParameterVocabs = (input: Array<Vocab>): ActionType => {
+  // We only need to store label, the other is not needed and will create a massive
+  // url.
+  const mappedInput = input.map((v) => {
+    return {
+      label: v.label,
+    };
+  });
   return {
     type: UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE,
     payload: {
-      parameterVocabs: input,
+      parameterVocabs: mappedInput,
     } as ParameterState,
   };
 };
@@ -230,7 +238,8 @@ const createInitialParameterState = (
   withDefaultBBox: boolean = true
 ): ParameterState => {
   const state: ParameterState = {
-    isImosOnlyDataset: false,
+    datasetGroup: undefined,
+    hasCOData: false,
     dateTimeFilterRange: {},
     searchText: "",
     zoom: MapDefaultConfig.ZOOM,
@@ -262,10 +271,10 @@ const paramReducer = (
         ...state,
         searchText: action.payload.searchText,
       };
-    case UPDATE_IMOS_ONLY_DATASET_FILTER_VARIABLE:
+    case UPDATE_DATASET_GROUP_FILTER_VARIABLE:
       return {
         ...state,
-        isImosOnlyDataset: action.payload.isImosOnlyDataset,
+        datasetGroup: action.payload.datasetGroup,
       };
     case UPDATE_HAS_DATA:
       return {
@@ -383,7 +392,7 @@ const formatToUrlParam = (param: ParameterState) => {
       }
     }
   }
-  return parts.join("&");
+  return encodeParam(parts.join("&"));
 };
 
 const parseQueryString = (queryString: string) => {
@@ -404,7 +413,7 @@ const parseQueryString = (queryString: string) => {
 // Convert the url parameter back to ParameterState, check test case for more details
 const unFlattenToParameterState = (input: string): ParameterState => {
   const result = createInitialParameterState(false);
-  const flatObject = parseQueryString(input);
+  const flatObject = parseQueryString(decodeParam(input));
 
   for (const key in flatObject) {
     if (Object.prototype.hasOwnProperty.call(flatObject, key)) {
@@ -459,7 +468,7 @@ export {
   unFlattenToParameterState,
   updateDateTimeFilterRange,
   updateSearchText,
-  updateImosOnly,
+  updateDatasetGroup,
   updateFilterBBox,
   updateFilterPolygon,
   updateParameterVocabs,

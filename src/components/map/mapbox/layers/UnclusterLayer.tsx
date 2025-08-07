@@ -62,15 +62,12 @@ const UnclusterLayer: FC<UnclusterLayerProps> = ({
     FeatureCollection<Point> | undefined
   >(undefined);
 
-  const layerId = useMemo(() => getLayerId(map?.getContainer().id), [map]);
-  const unclusterSourceId = useMemo(
-    () => getUnclusterSourceId(layerId),
-    [layerId]
-  );
-  const unclusterLayerId = useMemo(
-    () => getUnclusterLayerId(layerId),
-    [layerId]
-  );
+  const [unclusterSourceId, unclusterLayerId] = useMemo(() => {
+    const layerId = getLayerId(map?.getContainer().id);
+    const unclusterSourceId = getUnclusterSourceId(layerId);
+    const unclusterLayerId = getUnclusterLayerId(layerId);
+    return [unclusterSourceId, unclusterLayerId];
+  }, [map]);
 
   useEffect(() => {
     if (map === null) return;

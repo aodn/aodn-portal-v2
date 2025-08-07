@@ -1,5 +1,11 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-import { LngLatBounds, Map, MapboxEvent, Projection, Style } from "mapbox-gl";
+import {
+  LngLatBounds,
+  Map,
+  MapEvent,
+  ProjectionSpecification,
+  StyleSpecification,
+} from "mapbox-gl";
 import MapContext from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
@@ -25,14 +31,10 @@ export interface MapBasicType {
   maxZoom?: number;
   panelId: string;
   animate?: boolean;
-  projection?: Projection | string;
+  projection?: ProjectionSpecification | string;
   announcement?: string;
-  onZoomEvent?: (
-    event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-  ) => void;
-  onMoveEvent?: (
-    event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-  ) => void;
+  onZoomEvent?: (event: MapEvent | undefined) => void;
+  onMoveEvent?: (event: MapEvent | undefined) => void;
 }
 
 interface MapProps extends MapBasicType {}
@@ -42,23 +44,23 @@ interface MapProps extends MapBasicType {}
 const styles = [
   {
     id: "1",
-    name: "Street map (MapBox)",
+    name: "Street map",
     style: "mapbox://styles/mapbox/streets-v12",
   },
   {
     id: "2",
-    name: "Topographic map (MapBox)",
+    name: "Topographic map ",
     style: "mapbox://styles/mapbox/outdoors-v12",
   },
   {
     id: "3",
-    name: "Satellite map (MapBox)",
+    name: "Satellite map",
     style: "mapbox://styles/mapbox/satellite-v9",
   },
   {
     id: "4",
-    name: "ESRI World Imagery (ArcGIS)",
-    style: ERSIWorldImagery as Style,
+    name: "World Imagery",
+    style: ERSIWorldImagery as StyleSpecification,
   },
   // Add more styles as needed
 ];
@@ -93,9 +95,7 @@ const ReactMap = memo(
     const debounceOnZoomEvent = useRef(
       lodash.debounce(
         useCallback(
-          async (
-            event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-          ) => onZoomEvent && onZoomEvent(event),
+          async (event: MapEvent | undefined) => onZoomEvent?.(event),
           [onZoomEvent]
         ),
         MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
@@ -105,9 +105,7 @@ const ReactMap = memo(
     const debounceOnMoveEvent = useRef(
       lodash.debounce(
         useCallback(
-          async (
-            event: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-          ) => onMoveEvent && onMoveEvent(event),
+          async (event: MapEvent | undefined) => onMoveEvent?.(event),
           [onMoveEvent]
         ),
         MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
@@ -252,13 +250,36 @@ const ReactMap = memo(
           <Paper
             sx={{
               padding: padding.medium,
-              backgroundColor: "white",
+              backgroundColor: "rgba(255, 255, 255, 0.70)",
+              border: "1px solid #8C8C8C",
+              borderRadius: "6px",
+              backdropFilter: "blur(10px)",
+              flexShrink: 0,
+              width: {
+                xs: "280px",
+                sm: "350px",
+                md: "480px",
+              },
+              height: {
+                xs: "56px",
+                sm: "60px",
+                md: "64px",
+              },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#090C02",
+              textAlign: "center",
+              fontSize: "16px",
+              fontStyle: "normal",
+              fontWeight: 500,
+              lineHeight: "14px",
             }}
           >
             {announcement?.replace(/^model:/, "")}
           </Paper>
         </Paper>
-        <TestHelper mapId={panelId} getMap={() => map} />
+        <TestHelper id={panelId} getMap={() => map} />
         {children}
       </MapContext.Provider>
     );

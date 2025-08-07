@@ -20,10 +20,11 @@ const pageReferer = {
   LANDING_PAGE_REFERER: "LANDING_PAGE",
   SEARCH_PAGE_REFERER: "SEARCH_PAGE",
   DETAIL_PAGE_REFERER: "DETAIL_PAGE",
+  COMPONENT_COMPLEX_TEXT_REFERER: "COMPONENT_COMPLEX_TEXT_REFER",
 };
 
 const marineParkDefault = {
-  geojson: "./data/Australian_Marine_Parks_boundaries.json",
+  geojson: "/data/Australian_Marine_Parks_boundaries.json",
 };
 
 const detailPageDefault = {

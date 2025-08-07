@@ -21,9 +21,7 @@ import {
   border,
   borderRadius,
   color,
-  fontColor,
   fontSize,
-  fontWeight,
   padding,
 } from "../../../styles/constants";
 import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
@@ -32,6 +30,7 @@ import dayjs from "dayjs";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import { dateDefault, pageReferer } from "../../../components/common/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
+import rc8Theme from "../../../styles/themeRC8";
 
 enum Status {
   onGoing = "onGoing",
@@ -79,7 +78,7 @@ const renderGoBackButton = (onClick: () => void, referer: string) => {
         top: { xs: "unset", md: "5%" },
       }}
       onClick={onClick}
-      data-testid="go-back-button"
+      data-testid="return-button"
     >
       <HeaderButton>
         <Tooltip title={tip} placement="top">
@@ -137,8 +136,8 @@ const renderCompletedStatus = () => (
     <Typography
       padding={0}
       paddingX={padding.extraSmall}
-      color={color.blue.dark}
-      fontSize={fontSize.label}
+      variant="title1Medium"
+      color={rc8Theme.palette.text1}
     >
       Completed
     </Typography>
@@ -152,17 +151,23 @@ const renderSubTitle = (
   status: string | undefined
 ) => (
   <Stack flexDirection="row" flexWrap="wrap" gap={1}>
-    {pace && (
-      <RoundCard
-        sx={{
-          bgcolor: color.pace,
-        }}
-      >
-        <Typography padding={0} fontSize={fontSize.label}>
-          {capitalizeFirstLetter(pace)}
-        </Typography>
-      </RoundCard>
-    )}
+    {pace &&
+      pace.toLowerCase() !== "other" &&
+      !(pace.toLowerCase() === "completed" && status === Status.completed) && (
+        <RoundCard
+          sx={{
+            bgcolor: color.pace,
+          }}
+        >
+          <Typography
+            padding={0}
+            variant="title1Medium"
+            color={rc8Theme.palette.text1}
+          >
+            {capitalizeFirstLetter(pace)}
+          </Typography>
+        </RoundCard>
+      )}
     {startDate && (
       <RoundCard
         sx={{
@@ -173,7 +178,8 @@ const renderSubTitle = (
         <Typography
           padding={0}
           paddingRight={padding.small}
-          fontSize={fontSize.label}
+          variant="title1Medium"
+          color={rc8Theme.palette.text1}
         >
           {startDate}
         </Typography>
@@ -187,7 +193,8 @@ const renderSubTitle = (
           <Typography
             padding={0}
             paddingLeft={padding.small}
-            fontSize={fontSize.label}
+            variant="title1Medium"
+            color={rc8Theme.palette.text1}
           >
             {endDate}
           </Typography>
@@ -207,7 +214,15 @@ const HeaderSection = () => {
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
-  const copyUrl = window.location.href;
+  // Generate share URL with UTM parameters for Google Analytics tracking
+  // Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
+  const copyUrl = useMemo(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("utm_source", "portal"); // Track source as 'portal'
+    url.searchParams.set("utm_medium", "share_link"); // Track medium as 'share_link'
+    return url.toString();
+  }, []);
+
   const isCopied = useMemo(
     () => checkIfCopied(copyUrl),
     [checkIfCopied, copyUrl]
@@ -270,14 +285,9 @@ const HeaderSection = () => {
             gap={isMobile ? 0 : 1}
           >
             <Typography
+              variant="heading3"
               aria-label="collection title"
-              fontSize={
-                isMobile
-                  ? fontSize.detailPageHeadingMobile
-                  : fontSize.detailPageHeading
-              }
-              fontWeight={fontWeight.bold}
-              color={fontColor.gray.dark}
+              color={rc8Theme.palette.text2}
               sx={{
                 p: 0,
                 overflow: "hidden",

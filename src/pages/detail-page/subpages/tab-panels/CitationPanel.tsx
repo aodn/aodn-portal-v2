@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import LicenseList from "../../../../components/list/LicenseList";
@@ -29,60 +29,53 @@ const TITLE_LICENSE = "License";
 const TITLE_SUGGESTED_CITATION = "Suggested Citation";
 
 const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
-  const context = useDetailPageContext();
+  const { collection } = useDetailPageContext();
   const goToDetailPage = useTabNavigation();
 
-  const license = useMemo(
-    () => context.collection?.getLicense(),
-    [context.collection]
-  );
+  const [
+    license,
+    licenseUrl,
+    licenseGraphic,
+    citationContacts,
+    suggestedCitation,
+    constraints,
+    aboutContacts,
+    credits,
+  ] = useMemo(() => {
+    const license = collection?.getLicense();
 
-  const licenseUrl = useMemo(() => {
-    return context.collection?.links?.find((link) => {
+    const licenseUrl = collection?.links?.find((link) => {
       return (
         link.rel === RelationType.LICENSE && link.type === MediaType.TEXT_HTML
       );
     })?.href;
-  }, [context.collection?.links]);
 
-  const licenseGraphic = useMemo(() => {
-    return context.collection?.links?.find((link) => {
+    const licenseGraphic = collection?.links?.find((link) => {
       return (
         link.rel === RelationType.LICENSE && link.type === MediaType.IMAGE_PNG
       );
     })?.href;
-  }, [context.collection?.links]);
 
-  const citationContacts = useMemo(
-    () =>
-      context.collection
-        ?.getContacts()
-        ?.filter((contact) => contact.roles.includes(contactRoles.CITATION)),
-    [context.collection]
-  );
-  const suggestedCitation = useMemo(
-    () => context.collection?.getCitation()?.suggestedCitation,
-    [context.collection]
-  );
-  const otherConstraints = useMemo(
-    () =>
-      context.collection?.getCitation()?.otherConstraints?.filter(
+    const citationContacts = collection
+      ?.getContacts()
+      ?.filter((contact) => contact.roles.includes(contactRoles.CITATION));
+
+    const suggestedCitation = collection?.getCitation()?.suggestedCitation;
+
+    const otherConstraints = collection
+      ?.getCitation()
+      ?.otherConstraints?.filter(
         // Some organizations put license in "other constraints".
         // So if a constraint is considered as license by es-indexer,
         // we should not show it in "other constraints".
         (cons) => cons.toLowerCase().trim() !== license?.toLowerCase().trim()
-      ),
-    [context.collection, license]
-  );
-  const useLimitations = useMemo(
-    () => context.collection?.getCitation()?.useLimitations,
-    [context.collection]
-  );
+      );
 
-  const constraints = useMemo(() => {
-    const constraintItems: { title: string; content: string[] }[] = [];
+    const useLimitations = collection?.getCitation()?.useLimitations;
+
+    const constraints: { title: string; content: string[] }[] = [];
     useLimitations?.forEach((limitation) => {
-      constraintItems.push({
+      constraints.push({
         title: "Use Limitation",
         content: [limitation],
       });
@@ -91,59 +84,67 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       if (!constraint) {
         return;
       }
-      constraintItems.push({
+      constraints.push({
         title: "Other Constraint",
         content: [constraint],
       });
     });
-    return constraintItems;
-  }, [otherConstraints, useLimitations]);
 
-  const aboutContacts = useMemo(
-    () =>
-      context.collection
-        ?.getContacts()
-        ?.filter((contact: IContact) =>
-          contact.roles.includes(contactRoles.ABOUT)
-        ),
-    [context.collection]
-  );
+    const aboutContacts = collection
+      ?.getContacts()
+      ?.filter((contact: IContact) =>
+        contact.roles.includes(contactRoles.ABOUT)
+      );
 
-  const credits = useMemo(
-    () => context.collection?.getCredits(),
-    [context.collection]
-  );
+    const credits = collection?.getCredits();
+
+    return [
+      license,
+      licenseUrl,
+      licenseGraphic,
+      citationContacts,
+      suggestedCitation,
+      constraints,
+      aboutContacts,
+      credits,
+    ];
+  }, [collection]);
 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!context.collection) {
+    if (!collection) {
       setIsLoading(true);
     } else {
       setIsLoading(false);
     }
-  }, [context.collection]);
+  }, [collection]);
 
   const blocks: NavigatablePanelChild[] = useMemo(
     () => [
       {
         title: TITLE_SUGGESTED_CITATION,
-        component: (
-          <SuggestedCitationList suggestedCitation={suggestedCitation ?? ""} />
+        component: (props: Record<string, any>) => (
+          <SuggestedCitationList
+            {...props}
+            suggestedCitation={suggestedCitation ?? ""}
+          />
         ),
       },
       {
         title: "Cited Responsible Parties",
-        component: (
+        component: (props: Record<string, any>) => (
           <CitedResponsiblePartyList
+            {...props}
             responsibleParties={citationContacts ? citationContacts : []}
           />
         ),
       },
       {
         title: TITLE_LICENSE,
-        component: (
+        component: (props: Record<string, any>) => (
           <LicenseList
+            {...props}
             license={license ? license : ""}
             url={licenseUrl ? licenseUrl : ""}
             graphic={licenseGraphic ? licenseGraphic : ""}
@@ -152,17 +153,24 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       },
       {
         title: "Constraints",
-        component: <ConstraintList constraints={constraints} />,
+        component: (props: Record<string, any>) => (
+          <ConstraintList {...props} constraints={constraints} />
+        ),
       },
       {
         title: "Data Contact",
-        component: (
-          <ContactList contacts={aboutContacts ? aboutContacts : []} />
+        component: (props: Record<string, any>) => (
+          <ContactList
+            {...props}
+            contacts={aboutContacts ? aboutContacts : []}
+          />
         ),
       },
       {
         title: "Credits",
-        component: <CreditList credits={credits ? credits : []} />,
+        component: (props: Record<string, any>) => (
+          <CreditList {...props} credits={credits ? credits : []} />
+        ),
       },
     ],
     [
@@ -177,13 +185,12 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     ]
   );
 
-  if (context.collection) {
-    const collection = context.collection;
+  if (collection) {
     switch (mode) {
       case MODE.COMPACT:
         return (
           <SideCardContainer
-            title={TITLE_LICENSE}
+            title={"Citation"}
             onClick={() =>
               goToDetailPage(
                 collection.id,
@@ -191,6 +198,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
                 pageReferer.DETAIL_PAGE_REFERER
               )
             }
+            py={"16px"}
           >
             <SuggestedCitationList
               suggestedCitation={suggestedCitation ?? ""}

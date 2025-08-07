@@ -11,8 +11,8 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { bboxPolygon } from "@turf/turf";
 
 import * as turf from "@turf/turf";
-import wmsIcon from "../../../assets/icons/wms.png";
-import wfsIcon from "../../../assets/icons/wfs.png";
+import wmsIcon from "../../../assets/icons/wms-icon.png";
+import wfsIcon from "../../../assets/icons/wfs-icon.png";
 import linkIcon from "../../../assets/icons/link.png";
 
 // interfaces:
@@ -26,6 +26,7 @@ export interface ILink {
   href: string;
   type: string;
   title: string;
+  "ai:group"?: string;
   getIcon?: () => string;
 }
 
@@ -68,13 +69,15 @@ export interface IContact {
 export interface IConcept {
   id: string;
   url: string;
+  description: string;
+  title: string;
 }
 
 export interface ITheme {
   scheme: string;
+  concepts: IConcept[];
   description: string;
   title: string;
-  concepts: IConcept[];
 }
 
 export interface IAssociatedRecordGroup {
@@ -108,6 +111,13 @@ export enum MediaType {
   TEXT_HTML = "text/html",
   IMAGE_PNG = "image/png",
   PYTHON_NOTEBOOK = "application/x-ipynb+json",
+}
+
+export enum AIGroup {
+  DATA_ACCESS = "Data Access",
+  DOCUMENT = "Document",
+  PYTHON_NOTEBOOK = "Python Notebook",
+  OTHER = "Other",
 }
 
 const getIcon = (href: string, rel: string) => {
@@ -150,10 +160,7 @@ export class OGCCollection {
 
   set links(links: ILink[] | undefined) {
     this.propLinks = links?.map<ILink>((link) => {
-      return {
-        ...link,
-        getIcon: () => getIcon(link.href, link.rel),
-      };
+      return { ...link, getIcon: () => getIcon(link.href, link.rel) };
     });
   }
 
@@ -178,7 +185,9 @@ export class OGCCollection {
     const target = this.links?.find(
       (l) => l.type === "image" && l.rel === RelationType.PREVIEW
     );
-    return target !== undefined ? target.href : default_thumbnail;
+    return target !== undefined && target.href.length > 0
+      ? target.href
+      : default_thumbnail;
   };
   // Locate the logo from the links array
   findIcon = (): string | undefined => {
@@ -204,23 +213,27 @@ export class OGCCollection {
   getLicense = (): string | undefined => this.propValue?.license;
   getCreation = (): string | undefined => this.propValue?.creation;
   getRevision = (): string | undefined => this.propValue?.revision;
-  getPythonNotebook = (): ILink[] | undefined =>
-    this.links?.filter((link) => link.type === MediaType.PYTHON_NOTEBOOK);
-  getDataAccessLinks = (): ILink[] | undefined =>
-    this.links?.filter(
-      (link) => link.rel === RelationType.WMS || link.rel === RelationType.WFS
-    );
-  getDistributionLinks = (): ILink[] | undefined =>
-    this.links?.filter(
-      (link) =>
-        link.rel === RelationType.RELATED &&
-        link.type !== MediaType.PYTHON_NOTEBOOK
-    );
   getMetadataUrl = (): string | undefined =>
     this.links?.filter(
       (link) =>
         link.type === "text/html" && link.rel === RelationType.DESCRIBEDBY
     )?.[0]?.href;
+  // Get links by AI group
+  getLinksByAIGroup = (group: string): ILink[] | undefined => {
+    const result = this.links?.filter((link) => link["ai:group"] === group);
+    return result?.length ? result : undefined;
+  };
+  getDataAccessLinks = (): ILink[] | undefined =>
+    this.getLinksByAIGroup(AIGroup.DATA_ACCESS);
+  getDocumentLinks = (): ILink[] | undefined =>
+    this.getLinksByAIGroup(AIGroup.DOCUMENT);
+  getPythonNotebookLinks = (): ILink[] | undefined =>
+    this.getLinksByAIGroup(AIGroup.PYTHON_NOTEBOOK);
+  getOtherLinks = (): ILink[] | undefined =>
+    this.getLinksByAIGroup(AIGroup.OTHER);
+  // Get all links that have an ai:group field
+  getAllAIGroupedLinks = (): ILink[] | undefined =>
+    this.links?.filter((link) => link["ai:group"] !== undefined);
   // A feature call summary is provided if you do cloud optimized data download
   hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
 }
@@ -246,10 +259,9 @@ export class Spatial {
   private parent: OGCCollection;
 
   bbox: Array<Position> = [];
-  temporal: {
-    interval: Array<Array<string | null>>;
-    trs?: string;
-  } = { interval: [[]] };
+  temporal: { interval: Array<Array<string | null>>; trs?: string } = {
+    interval: [[]],
+  };
   crs: string = "";
 
   constructor(ogcCollection: OGCCollection) {
@@ -287,10 +299,10 @@ export class Spatial {
 }
 
 export class OGCCollections {
-  private _total: number;
+  private readonly _total: number;
   private _search_after: Array<string>;
   private _collections: Array<OGCCollection>;
-  private _links: Array<ILink>;
+  private readonly _links: Array<ILink>;
 
   constructor(
     collections: Array<OGCCollection> = new Array<OGCCollection>(),
@@ -298,10 +310,18 @@ export class OGCCollections {
     total: number = 0,
     search_after: Array<string> = new Array<string>()
   ) {
-    this._collections = collections;
-    this._links = links;
+    // Make sure a new array is created instead of using the
+    // ref from the existing object
+    this._collections = new Array<OGCCollection>();
+    this._collections.push(...collections);
+
+    this._links = new Array<ILink>();
+    this._links.push(...links);
+
+    this._search_after = new Array<string>();
+    this._search_after.push(...search_after);
+
     this._total = total;
-    this._search_after = search_after;
   }
 
   get search_after() {
@@ -334,11 +354,13 @@ export class OGCCollections {
   }
 
   clone() {
+    // Need to create a new array, otherwise we will reuse
+    // the array and merge call will wrong
     return new OGCCollections(
-      this._collections,
-      this._links,
-      this._total,
-      this._search_after
+      this.collections,
+      this.links,
+      this.total,
+      this.search_after
     );
   }
 }

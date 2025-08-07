@@ -18,7 +18,7 @@ import MapContext from "../MapContext";
 import { useAppDispatch } from "../../../common/store/hooks";
 import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
-import { MapboxEvent, MapLayerMouseEvent } from "mapbox-gl";
+import { MapEvent, MapMouseEvent } from "mapbox-gl";
 import { Feature, Point } from "geojson";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import Map from "../Map";
@@ -88,7 +88,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
 
   useEffect(() => {
     const onMouseClick = (
-      ev: MapLayerMouseEvent & { targetLayerId: string }
+      ev: Partial<MapMouseEvent & { targetLayerId: string }>
     ): void => {
       if (ev.target && map && panel && panel.current) {
         // Check if the layer exists before querying
@@ -99,39 +99,39 @@ const CardPopup: React.FC<CardPopupProps> = ({
           return;
         }
 
-        // Convert click coordinates to point for feature querying
-        const point = map.project(ev.lngLat);
-        // Query features from the specified layer at the clicked point
-        const features = point
-          ? map.queryRenderedFeatures(point, {
-              layers: [ev.targetLayerId ?? layerId],
-            })
-          : [];
+        if (ev.lngLat) {
+          // Convert click coordinates to point for feature querying
+          const point = map.project(ev.lngLat);
+          // Query features from the specified layer at the clicked point
+          const features = point
+            ? map.queryRenderedFeatures(point, {
+                layers: [ev.targetLayerId ?? layerId],
+              })
+            : [];
 
-        // Check if we found any features at the clicked location
-        if (features && features.length > 0) {
-          const feature = features[0] as Feature<Point>;
-          const uuid = feature?.properties?.uuid as string;
+          // Check if we found any features at the clicked location
+          if (features && features.length > 0) {
+            const feature = features[0] as Feature<Point>;
+            const uuid = feature?.properties?.uuid as string;
 
-          if (uuid) {
-            getCollectionData(uuid).then((collection) => {
-              collection && setContent(collection);
-            });
-            panel.current.style.visibility = "visible";
+            if (uuid) {
+              getCollectionData(uuid).then((collection) => {
+                collection && setContent(collection);
+              });
+              panel.current.style.visibility = "visible";
+            } else {
+              panel.current.style.visibility = "hidden";
+            }
           } else {
+            // If no features found (i.e. click in empty space), hide the popup
             panel.current.style.visibility = "hidden";
           }
-        } else {
-          // If no features found (i.e. click in empty space), hide the popup
-          panel.current.style.visibility = "hidden";
         }
       }
     };
 
-    const onMouseMoved = (
-      ev: MapboxEvent<MouseEvent | WheelEvent | TouchEvent | undefined>
-    ): void => {
-      if (ev.target && panel && panel.current) {
+    const onMouseMoved = (ev: MapEvent | undefined): void => {
+      if (ev?.target && panel && panel.current) {
         panel.current.style.visibility = "hidden";
       }
     };

@@ -1,5 +1,5 @@
 import { styled, Tabs } from "@mui/material";
-import { border, color, padding } from "../../../styles/constants";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface StyledTabsProps {
   children?: React.ReactNode;
@@ -16,13 +16,11 @@ const StyledTabs = styled((props: StyledTabsProps) => (
     TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
   />
 ))({
-  borderBottom: `${border.xs} ${color.tabPanel.divider}`,
+  borderBottom: `1px solid ${rc8Theme.palette.grey600}`,
   "& .MuiTabs-indicator": {
     display: "flex",
     justifyContent: "center",
     backgroundColor: "transparent",
-    height: "5px",
-    paddingTop: padding.medium,
   },
   "& .MuiTabs-indicatorSpan": {
     position: "absolute",
@@ -31,7 +29,7 @@ const StyledTabs = styled((props: StyledTabsProps) => (
     height: 0,
     borderLeft: "5px solid transparent",
     borderRight: "5px solid transparent",
-    borderBottom: `5px solid  ${color.tabPanel.divider}`,
+    borderBottom: `5px solid  ${rc8Theme.palette.primary2}`,
   },
 });
 
