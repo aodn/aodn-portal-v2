@@ -1,9 +1,9 @@
 import { IconProps } from "../../../types/assets/iconsTypes";
 
-export const LocationIcon = ({
+export const PlaceIcon = ({
   color = "#3B6E8F",
-  width = 28,
-  height = 28,
+  width = 26,
+  height = 26,
 }: IconProps) => (
   <svg
     id="Layer_1"
@@ -12,6 +12,7 @@ export const LocationIcon = ({
     viewBox="0 0 40 40"
     width={width}
     height={height}
+    data-testid="PlaceIcon"
   >
     <path
       fill={color}

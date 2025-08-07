@@ -1,10 +1,7 @@
 import { FC, useCallback, useMemo } from "react";
-import { Tune } from "@mui/icons-material";
 import { Stack, SxProps } from "@mui/material";
 import SearchbarExpandableButton from "./SearchbarExpandableButton";
 import SearchIcon from "@mui/icons-material/Search";
-import DateRangeIcon from "@mui/icons-material/DateRange";
-import PlaceIcon from "@mui/icons-material/Place";
 import { borderRadius, color, fontWeight, gap } from "../../styles/constants";
 import { useAppSelector } from "../common/store/hooks";
 import {
@@ -15,9 +12,9 @@ import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { booleanEqual } from "@turf/boolean-equal";
 import { pageReferer } from "../common/constants";
-import { DateIcon } from "../../assets/icons/search/date";
-import { LocationIcon } from "../../assets/icons/search/location";
-import { FilterIcon } from "../../assets/icons/search/filter";
+import { DateRangeIcon } from "../../assets/icons/search/date";
+import { PlaceIcon } from "../../assets/icons/search/location";
+import { TuneIcon } from "../../assets/icons/search/filter";
 
 export enum SearchbarButtonNames {
   Search = "search",
@@ -148,7 +145,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       sx={sx}
     >
       <SearchbarExpandableButton
-        icon={<DateIcon />}
+        icon={<DateRangeIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Date)}
         badgeContent={dateCount}
         dotBadge
@@ -169,7 +166,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         data-testid="date-range-button"
       />
       <SearchbarExpandableButton
-        icon={<LocationIcon />}
+        icon={<PlaceIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Location)}
         badgeContent={areaCount}
         dotBadge
@@ -190,7 +187,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         data-testid="location-button"
       />
       <SearchbarExpandableButton
-        icon={<FilterIcon />}
+        icon={<TuneIcon />}
         text={capitalizeFirstLetter(SearchbarButtonNames.Filter)}
         badgeContent={filterCount}
         onClick={() => handleClickButton(SearchbarButtonNames.Filter)}

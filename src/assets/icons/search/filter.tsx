@@ -1,6 +1,6 @@
 import { IconProps } from "../../../types/assets/iconsTypes";
 
-export const FilterIcon = ({
+export const TuneIcon = ({
   color = "#3B6E8F",
   width = 26,
   height = 26,
@@ -12,6 +12,7 @@ export const FilterIcon = ({
     viewBox="0 0 40 40"
     width={width}
     height={height}
+    data-testid="TuneIcon"
   >
     <path
       fill={color}

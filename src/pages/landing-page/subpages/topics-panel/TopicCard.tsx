@@ -71,6 +71,7 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
             WebkitLineClamp: "2",
             WebkitBoxOrient: "vertical",
             wordBreak: "break-word",
+            lineHeight: 1.2,
           }}
         >
           {cardData.title}

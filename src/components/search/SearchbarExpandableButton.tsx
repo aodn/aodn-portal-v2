@@ -1,14 +1,14 @@
 import { FC, ReactNode } from "react";
-import { Button, SxProps } from "@mui/material";
+import { Button, SxProps, Typography } from "@mui/material";
 import StyledBadge, { Position } from "../common/badge/StyledBadge";
 import {
   borderRadius,
   color,
   fontColor,
-  fontSize,
   gap,
   padding,
 } from "../../styles/constants";
+import rc8Theme from "../../styles/themeRC8";
 
 interface SearchbarExpandableButtonProps {
   icon: ReactNode;
@@ -54,13 +54,14 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
       data-testid={`searchbar-button-badge-${text}`}
     >
       <Button
-        fullWidth
         sx={{
+          borderRadius: "8px",
+          bcolor: rc8Theme.palette.primary6,
           "& .MuiButton-startIcon": {
             marginRight: showText ? gap.md : 0,
             marginLeft: 0,
+            py: "2px",
           },
-          fontSize: fontSize.info,
           ...defaultButtonSx,
           ...buttonSx,
         }}
@@ -68,7 +69,13 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
         onClick={onClick}
         data-testid={testId}
       >
-        {showText && text}
+        <Typography
+          variant="title1Medium"
+          color={rc8Theme.palette.primary1}
+          sx={{ ml: "10px" }}
+        >
+          {showText && text}
+        </Typography>
       </Button>
     </StyledBadge>
   );
