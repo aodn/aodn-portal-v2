@@ -25,6 +25,8 @@
     "@deck.gl/layers": "^9.0.17",
     "@deck.gl/mapbox": "^9.0.17",
     "@emotion/styled": "^11.11.0",
+    "@fontsource/open-sans": "^5.2.6",
+    "@fontsource/poppins": "^5.2.6",
     "@loaders.gl/core": "4.3.3",
     "@luma.gl/core": "^9.0.17",
     "@luma.gl/engine": "^9.0.17",
