@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import Box from "@mui/material/Box";
-import { borderRadius, padding } from "../../../styles/constants";
+import { padding } from "../../../styles/constants";
 import StyledTabs from "./StyledTabs";
 import StyledTab from "./StyledTab";
 import { SxProps } from "@mui/system";
@@ -78,10 +78,6 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   return (
     <Box
       sx={{
-        overflow: "hidden",
-        borderRadius: "8px",
-        border: `1px solid ${rc8Theme.palette.grey500}`,
-        boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.10)",
         ...sx,
       }}
     >
