@@ -16,6 +16,7 @@ const StyledTabs = styled((props: StyledTabsProps) => (
     TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
   />
 ))({
+  backgroundColor: rc8Theme.palette.primary6,
   borderBottom: `1px solid ${rc8Theme.palette.grey600}`,
   "& .MuiTabs-indicator": {
     display: "flex",
@@ -25,11 +26,11 @@ const StyledTabs = styled((props: StyledTabsProps) => (
   "& .MuiTabs-indicatorSpan": {
     position: "absolute",
     bottom: "0",
-    width: 0,
-    height: 0,
-    borderLeft: "5px solid transparent",
-    borderRight: "5px solid transparent",
-    borderBottom: `5px solid  ${rc8Theme.palette.primary2}`,
+    width: "12px",
+    height: "6px",
+    borderLeft: "6px solid transparent",
+    borderRight: "6px solid transparent",
+    borderBottom: `6px solid  ${rc8Theme.palette.primary2}`,
   },
 });
 

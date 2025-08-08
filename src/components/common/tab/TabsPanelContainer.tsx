@@ -78,6 +78,10 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   return (
     <Box
       sx={{
+        overflow: "hidden",
+        borderRadius: "8px",
+        border: `1px solid ${rc8Theme.palette.grey500}`,
+        boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.10)",
         ...sx,
       }}
     >
