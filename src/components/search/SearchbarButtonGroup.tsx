@@ -2,7 +2,7 @@ import { FC, useCallback, useMemo } from "react";
 import { Stack, SxProps } from "@mui/material";
 import SearchbarExpandableButton from "./SearchbarExpandableButton";
 import SearchIcon from "@mui/icons-material/Search";
-import { borderRadius, color, fontWeight, gap } from "../../styles/constants";
+import { gap } from "../../styles/constants";
 import { useAppSelector } from "../common/store/hooks";
 import {
   DEFAULT_SEARCH_LOCATION,
@@ -15,6 +15,7 @@ import { pageReferer } from "../common/constants";
 import { DateRangeIcon } from "../../assets/icons/search/date";
 import { PlaceIcon } from "../../assets/icons/search/location";
 import { TuneIcon } from "../../assets/icons/search/filter";
+import rc8Theme from "../../styles/themeRC8";
 
 export enum SearchbarButtonNames {
   Search = "search",
@@ -34,9 +35,9 @@ interface SearchbarButtonGroupProps {
 
 const buttonStyleOnDropdownOpen = {
   color: "#fff",
-  backgroundColor: color.blue.dark,
+  backgroundColor: rc8Theme.palette.primary1,
   "&:hover": {
-    backgroundColor: color.blue.dark,
+    backgroundColor: rc8Theme.palette.primary1,
   },
 };
 
@@ -146,6 +147,12 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
     >
       <SearchbarExpandableButton
         icon={<DateRangeIcon />}
+        iconProps={{
+          color:
+            isPopupOpen && activeButton === SearchbarButtonNames.Date
+              ? "#FFF"
+              : rc8Theme.palette.primary1,
+        }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Date)}
         badgeContent={dateCount}
         dotBadge
@@ -167,6 +174,12 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       />
       <SearchbarExpandableButton
         icon={<PlaceIcon />}
+        iconProps={{
+          color:
+            isPopupOpen && activeButton === SearchbarButtonNames.Location
+              ? "#FFF"
+              : rc8Theme.palette.primary1,
+        }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Location)}
         badgeContent={areaCount}
         dotBadge
@@ -188,6 +201,12 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       />
       <SearchbarExpandableButton
         icon={<TuneIcon />}
+        iconProps={{
+          color:
+            isPopupOpen && activeButton === SearchbarButtonNames.Filter
+              ? "#FFF"
+              : rc8Theme.palette.primary1,
+        }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Filter)}
         badgeContent={filterCount}
         onClick={() => handleClickButton(SearchbarButtonNames.Filter)}
@@ -212,12 +231,12 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         onClick={handleSearchClick}
         showText={false}
         buttonSx={{
-          color: "#fff",
-          fontWeight: fontWeight.light,
-          backgroundColor: color.blue.extraDark,
-          borderRadius: borderRadius.small,
+          width: "48px",
+          color: "#FFF",
+          backgroundColor: rc8Theme.palette.primary2,
+          borderRadius: "8px",
           "&:hover": {
-            backgroundColor: color.brightBlue.dark,
+            backgroundColor: rc8Theme.palette.secondary1,
           },
         }}
         data-testid="search-button"
