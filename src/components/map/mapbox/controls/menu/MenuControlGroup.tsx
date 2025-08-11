@@ -1,5 +1,11 @@
-import React, { FC, cloneElement, isValidElement, Children } from "react";
-import { Box, SxProps, Theme } from "@mui/material";
+import React, {
+  FC,
+  cloneElement,
+  isValidElement,
+  Children,
+  useRef,
+} from "react";
+import { Grid, SxProps, Theme } from "@mui/material";
 
 // Define the props for MenuControlGroup
 interface MenuControlGroupProps {
@@ -13,6 +19,8 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
   children,
   className = "menu-control-group",
 }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
   // Define the styles to apply to children
   const childStyles: SxProps<Theme> = {
     // Target the mapboxgl-ctrl-group class on the child's rendered div
@@ -28,48 +36,39 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       flexDirection: "column",
       alignItems: "center",
       // Apply first-child styles
-      "&:first-of-type": {
-        marginTop: "10px",
-        borderTopLeftRadius: "6px",
-        borderTopRightRadius: "6px",
-      },
-      // Apply last-child styles
-      "&:last-of-type": {
-        borderBottomLeftRadius: "6px",
-        borderBottomRightRadius: "6px",
-      },
+      // "&:first-of-type": {
+      //   marginTop: "10px",
+      //   borderTopLeftRadius: "6px",
+      //   borderTopRightRadius: "6px",
+      // },
+      // // Apply last-child styles
+      // "&:last-of-type": {
+      //   borderBottomLeftRadius: "6px",
+      //   borderBottomRightRadius: "6px",
+      // },
     },
   };
 
   return (
-    <Box>
+    <Grid
+      container
+      direction="column"
+      ref={ref}
+      sx={{
+        borderRadius: "6px",
+        bgcolor: "red",
+        padding: "4px",
+        marginX: "10px",
+      }}
+    >
       {Children.map(children, (child, index) => {
         if (isValidElement(child)) {
-          const childCount = Children.count(children);
-          const isFirst = index === 0;
-          const isLast = index === childCount - 1;
-
-          // Create additional styles for first/last elements
-          const additionalStyles: SxProps<Theme> = {
-            [`&.${className}`]: {
-              ...(isFirst && {
-                marginTop: "10px",
-                borderTopLeftRadius: "6px",
-                borderTopRightRadius: "6px",
-              }),
-              ...(isLast && {
-                borderBottomLeftRadius: "6px",
-                borderBottomRightRadius: "6px",
-              }),
-            },
-          };
-
           // Merge childStyles with the child's existing sx prop
           return cloneElement<any>(child, {
             className: className,
+            parentRef: ref,
             sx: [
               childStyles,
-              additionalStyles,
               ...(Array.isArray(child.props.sx)
                 ? child.props.sx
                 : [child.props.sx]),
@@ -78,7 +77,7 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
         }
         return child;
       })}
-    </Box>
+    </Grid>
   );
 };
 
