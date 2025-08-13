@@ -1,16 +1,16 @@
 import { ToggleButton } from "@mui/material";
 import { styled } from "@mui/system";
-import { color } from "../../../styles/constants";
+import rc8Theme from "../../../styles/themeRC8";
 
 export const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
-  boxShadow: (theme as any).shadows[2],
   border: "none",
-  borderRadius: 0,
-  backgroundColor: "#fff",
+  backgroundColor: rc8Theme.palette.primary6,
+  padding: "10px 24px",
   "&.Mui-selected": {
-    backgroundColor: color.blue.darkSemiTransparent,
+    backgroundColor: rc8Theme.palette.primary1,
+    color: "#FFF",
     "&:hover": {
-      backgroundColor: color.blue.darkSemiTransparent,
+      backgroundColor: rc8Theme.palette.primary1,
     },
   },
 }));

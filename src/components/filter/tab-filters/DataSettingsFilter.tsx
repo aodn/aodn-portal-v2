@@ -11,6 +11,7 @@ import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { fontColor, fontWeight } from "../../../styles/constants";
 import { DatasetFrequency } from "../../common/store/searchReducer";
 import { IndexDataType, ItemButton } from "../FilterDefinition";
+import rc8Theme from "../../../styles/themeRC8";
 
 enum DataSettingsCategory {
   dataDeliverMode = "dataDeliveryMode",
@@ -158,12 +159,11 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
       </Box> */}
       <Box>
         <Typography
-          p={0}
-          pl={1}
-          fontWeight={fontWeight.bold}
-          color={fontColor.blue.dark}
+          variant="title1Medium"
+          color={rc8Theme.palette.text1}
+          sx={{ padding: "8px 20px" }}
         >
-          Data Delivery Frequency
+          Data Delivery Mode
         </Typography>
         <StyledToggleButtonGroup
           exclusive={true}
@@ -183,12 +183,11 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
       </Box>
       <Box>
         <Typography
-          p={0}
-          pl={1}
-          fontWeight={fontWeight.bold}
-          color={fontColor.blue.dark}
+          variant="title1Medium"
+          color={rc8Theme.palette.text1}
+          sx={{ padding: "8px 20px" }}
         >
-          Download Service Available
+          Download Service Availablility
         </Typography>
         <StyledToggleButtonGroup
           value={filters.dataIndexedType}
@@ -207,10 +206,9 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
       </Box>
       {/* <Box>
         <Typography
-          p={0}
-          pl={1}
-          fontWeight={fontWeight.bold}
-          color={fontColor.blue.dark}
+          variant="title1Medium"
+          color={rc8Theme.palette.text1}
+          sx={{ padding: "8px 20px" }}
         >
           Data Service
         </Typography>

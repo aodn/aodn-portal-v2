@@ -1,9 +1,14 @@
 :root {
   line-height: 1.5;
   font-weight: 400;
+
+  /* Define RC8 font variables */
+  --font-poppins: "Poppins", sans-serif;
+  --font-open-sans: "Open Sans", sans-serif;
 }
 
 #root {
+  text-align: center;
   width: 100%;
 }
 
