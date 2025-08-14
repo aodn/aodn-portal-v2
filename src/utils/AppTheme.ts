@@ -50,6 +50,7 @@
 
 import { createTheme, ThemeOptions } from "@mui/material/styles";
 import rc8Theme from "../styles/themeRC8";
+import { FONT_FAMILIES } from "../styles/fontsRC8";
 
 declare module "@mui/material/styles" {
   interface Theme {
@@ -222,23 +223,18 @@ const theme: ThemeOptions = {
   },
 
   typography: {
-    // TODO: RC8 design update not complete yet, temporarily not using new fonts
     ...rc8Theme.typography, // Include all RC8 variants (heading1, slogan1, etc.)
-    fontFamily: [
-      "Lexend",
-      "Helvetica Neue",
-      "Noto Sans",
-      "Ariel",
-      "sans-serif",
-      "Roboto",
-    ].join(","),
 
+    // Only override what needs to be changed, keep everything else intact
+    fontFamily: FONT_FAMILIES.openSans, // Global font changed to RC8
+
+    // Existing variants: only change font, keep other properties unchanged
     detailTitle: {
       fontSize: "16px",
       fontStyle: "normal",
       fontWeight: 600,
       color: "#5B5B5B",
-      fontFamily: "Noto Sans",
+      fontFamily: FONT_FAMILIES.poppins, // Use Poppins for titles/headings
     },
     detailContent: {
       lineHeight: "22.5px",
@@ -246,7 +242,7 @@ const theme: ThemeOptions = {
       fontStyle: "normal",
       fontWeight: 400,
       color: "#5B5B5B",
-      fontFamily: "Noto Sans",
+      fontFamily: FONT_FAMILIES.openSans, // Body text uses Open Sans
       wordBreak: "break-word",
     },
 
@@ -254,20 +250,22 @@ const theme: ThemeOptions = {
       padding: "10px 0 0 0",
       lineHeight: "1.5",
       color: "#747474",
-      fontFamily: "Noto Sans",
+      fontFamily: FONT_FAMILIES.openSans, // Body text uses Open Sans
     },
     body2: {
       fontSize: "0.8rem",
       color: "#BBBBBB",
+      fontFamily: FONT_FAMILIES.openSans, // Body text uses Open Sans
     },
     subtitle1: {
       padding: "10px 0 0 0",
       lineHeight: "1.5",
       color: "#FFFFFF",
-      fontFamily: "Lexend",
+      fontFamily: FONT_FAMILIES.openSans, // Body text uses Open Sans
     },
     h1: {
       fontWeight: 700,
+      fontFamily: FONT_FAMILIES.poppins, // Use Poppins for titles/headings
     },
     // h3 is now used for the title on the filter. Any other can use it but please
     // only modify it just for the filter title
@@ -275,26 +273,27 @@ const theme: ThemeOptions = {
       fontSize: "1rem",
       fontWeight: 800,
       padding: "10px 0 0 0",
-      fontFamily: "Noto Sans",
+      fontFamily: FONT_FAMILIES.poppins, // Use Poppins for titles/headings
       color: "#3A6F8F",
     },
     h4: {
       fontSize: "1.5rem",
       fontWeight: 400,
       padding: "10px 0 0 0",
-      fontFamily: "Noto Sans",
+      fontFamily: FONT_FAMILIES.poppins, // Use Poppins for titles/headings
       color: "#747474",
     },
     h5: {
       fontSize: "1.5rem",
       fontWeight: 400,
       padding: "40px 0 0 0",
-      fontFamily: "Noto Sans",
+      fontFamily: FONT_FAMILIES.poppins, // Use Poppins for titles/headings
       color: "#747474",
     },
     h6: {
       fontSize: "16px",
       fontWeight: 400,
+      fontFamily: FONT_FAMILIES.poppins, // Use Poppins for titles/headings
     },
   },
   shape: {
