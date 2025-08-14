@@ -29,7 +29,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
   containerSx,
   "data-testid": testId,
 }) => {
-  const { isUnderLaptop } = useBreakpoint();
+  const { isMobile, isUnderLaptop } = useBreakpoint();
 
   // Clone the custome icon element and add props
   const iconWithProps = isValidElement(icon)
@@ -38,7 +38,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
 
   const defaultButtonSx: SxProps = {
     ...rc8Theme.typography.body1Medium,
-    fontSize: isUnderLaptop ? "14px" : "16px",
+    fontSize: isMobile ? "12px" : isUnderLaptop ? "14px" : "16px",
     height: "42px",
     color: rc8Theme.palette.primary1,
     backgroundColor: rc8Theme.palette.primary6,
@@ -64,7 +64,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
     >
       <IconButton
         sx={{
-          gap: showText ? "12px" : 0,
+          gap: showText ? (isMobile ? "4px" : "12px") : 0,
           ...defaultButtonSx,
           ...buttonSx,
         }}
