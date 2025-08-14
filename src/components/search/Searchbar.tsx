@@ -151,7 +151,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           border: `${border.sm} ${color.blue.dark}`,
           borderRadius: borderRadius.small,
           backgroundColor: { xs: "transparent", sm: "#fff" },
-          paddingY: gap.md,
+          paddingY: "1px",
         }}
       >
         <InputWithSuggester

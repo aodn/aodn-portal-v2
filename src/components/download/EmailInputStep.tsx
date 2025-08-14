@@ -12,7 +12,7 @@ import { InformationIcon } from "../../assets/icons/download/information";
 import { ClearIcon } from "../../assets/icons/download/clear";
 
 interface EmailInputStepProps {
-  isMobile: boolean;
+  isUnderLaptop: boolean;
   emailInputRef: React.RefObject<HTMLInputElement>;
   email: string;
   emailError?: string;
@@ -52,7 +52,7 @@ const adornmentStyles = {
 };
 
 const EmailInputStep: React.FC<EmailInputStepProps> = ({
-  isMobile,
+  isUnderLaptop,
   emailInputRef,
   email,
   emailError,
@@ -173,7 +173,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
   );
 
   return (
-    <Box sx={{ pl: isMobile ? 1 : 2 }}>
+    <Box sx={{ pl: isUnderLaptop ? 1 : 2 }}>
       <Typography variant="title1Medium">Email Address</Typography>
 
       <EmailTextField />
@@ -181,7 +181,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
       <DownloadInstructions />
 
       <DataUsageForm
-        isMobile={isMobile}
+        isUnderLaptop={isUnderLaptop}
         dataUsage={dataUsage}
         setDataUsage={onDataUsageChange}
       />

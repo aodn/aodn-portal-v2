@@ -130,7 +130,7 @@ const ReactMap = memo(
           testMode: import.meta.env.MODE === "dev",
           attributionControl: false,
           localIdeographFontFamily:
-            "'Noto Sans', 'Noto Sans CJK SC', sans-serif",
+            "'Open Sans', 'Open Sans CJK SC', sans-serif",
         });
       } catch (err) {
         console.log("Map initialization failed:", err);

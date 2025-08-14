@@ -64,7 +64,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         <Typography
           variant="title2Regular"
           whiteSpace="nowrap"
-          sx={{ fontSize: isMobile ? "12px" : "16px" }}
+          sx={{ fontSize: isMobile ? "14px" : "16px" }}
         >
           {renderShowingResultsText(total, count)}
         </Typography>
