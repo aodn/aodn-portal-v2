@@ -181,7 +181,9 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
                       : activeButton === SearchbarButtonNames.Date
                 )
                   ? filterButtonWidth
-                  : "48px",
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
               }
         }
         containerSx={{ flex: 1 }}
@@ -218,7 +220,9 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
                       : activeButton === SearchbarButtonNames.Location
                 )
                   ? filterButtonWidth
-                  : "48px",
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
               }
         }
         containerSx={{ flex: 1 }}
@@ -255,7 +259,9 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
                       : activeButton === SearchbarButtonNames.Filter
                 )
                   ? filterButtonWidth
-                  : "48px",
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
               }
         }
         data-testid="filtersBtn"

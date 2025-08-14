@@ -41,7 +41,6 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
     fontSize: isUnderLaptop ? "14px" : "16px",
     height: "42px",
     color: rc8Theme.palette.primary1,
-    mx: "1px",
     backgroundColor: rc8Theme.palette.primary6,
     borderRadius: "8px",
     "&:hover": {
