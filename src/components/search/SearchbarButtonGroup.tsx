@@ -172,7 +172,17 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         buttonSx={
           isPopupOpen && activeButton === SearchbarButtonNames.Date
             ? buttonStyleOnDropdownOpen
-            : { width: filterButtonWidth }
+            : {
+                width: (
+                  shouldShrinkAllButtons
+                    ? false
+                    : shouldExpandAllButtons
+                      ? true
+                      : activeButton === SearchbarButtonNames.Date
+                )
+                  ? filterButtonWidth
+                  : "48px",
+              }
         }
         containerSx={{ flex: 1 }}
         data-testid="date-range-button"
@@ -199,7 +209,17 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         buttonSx={
           isPopupOpen && activeButton === SearchbarButtonNames.Location
             ? buttonStyleOnDropdownOpen
-            : { width: filterButtonWidth }
+            : {
+                width: (
+                  shouldShrinkAllButtons
+                    ? false
+                    : shouldExpandAllButtons
+                      ? true
+                      : activeButton === SearchbarButtonNames.Location
+                )
+                  ? filterButtonWidth
+                  : "48px",
+              }
         }
         containerSx={{ flex: 1 }}
         data-testid="location-button"
@@ -226,7 +246,17 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         buttonSx={
           isPopupOpen && activeButton === SearchbarButtonNames.Filter
             ? buttonStyleOnDropdownOpen
-            : { width: filterButtonWidth }
+            : {
+                width: (
+                  shouldShrinkAllButtons
+                    ? false
+                    : shouldExpandAllButtons
+                      ? true
+                      : activeButton === SearchbarButtonNames.Filter
+                )
+                  ? filterButtonWidth
+                  : "48px",
+              }
         }
         data-testid="filtersBtn"
       />
