@@ -29,7 +29,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
   "data-testid": testId,
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isUnderLaptop = useMediaQuery(theme.breakpoints.down("md"));
 
   // Clone the custome icon element and add props
   const iconWithProps = isValidElement(icon)
@@ -38,7 +38,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
 
   const defaultButtonSx: SxProps = {
     ...rc8Theme.typography.body1Medium,
-    fontSize: isMobile ? "14px" : "16px",
+    fontSize: isUnderLaptop ? "14px" : "16px",
     height: "42px",
     color: rc8Theme.palette.primary1,
     mx: "1px",

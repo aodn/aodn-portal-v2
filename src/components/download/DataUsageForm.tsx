@@ -60,7 +60,7 @@ export interface DataUsageInformation {
 }
 
 interface DataUsageFormProps {
-  isMobile: boolean;
+  isUnderLaptop: boolean;
   dataUsage: DataUsageInformation;
   setDataUsage: (dataUsage: DataUsageInformation) => void;
 }
@@ -84,21 +84,21 @@ const commonStyles = {
     color: rc8Theme.palette.text2,
     padding: 0,
   },
-  formControlLabel: (isMobile: boolean) => ({
+  formControlLabel: (isUnderLaptop: boolean) => ({
     margin: 0,
     display: "flex",
     alignItems: "center",
-    width: isMobile ? "100%" : "auto",
-    minWidth: isMobile ? "auto" : "fit-content",
+    width: isUnderLaptop ? "100%" : "auto",
+    minWidth: isUnderLaptop ? "auto" : "fit-content",
     "& .MuiFormControlLabel-label": {
       paddingLeft: "8px",
-      flex: isMobile ? 1 : "none",
+      flex: isUnderLaptop ? 1 : "none",
     },
   }),
-  formGroup: (isMobile: boolean) => ({
+  formGroup: (isUnderLaptop: boolean) => ({
     display: "flex",
-    flexDirection: isMobile ? "column" : "row",
-    flexWrap: isMobile ? "nowrap" : "wrap",
+    flexDirection: isUnderLaptop ? "column" : "row",
+    flexWrap: isUnderLaptop ? "nowrap" : "wrap",
     gap: 1,
     alignItems: "flex-start",
   }),
@@ -114,7 +114,7 @@ const fieldRenderers = {
       value: string | boolean | string[],
       isChecked?: boolean
     ) => void,
-    isMobile: boolean
+    isUnderLaptop: boolean
   ) => {
     const multiSelectValues =
       (dataUsage[field.key as keyof DataUsageInformation] as string[]) || [];
@@ -130,7 +130,7 @@ const fieldRenderers = {
           />
         }
         label={<Typography sx={commonStyles.labelText}>{option}</Typography>}
-        sx={commonStyles.formControlLabel(isMobile)}
+        sx={commonStyles.formControlLabel(isUnderLaptop)}
       />
     ));
   },
@@ -143,7 +143,7 @@ const fieldRenderers = {
       value: string | boolean | string[],
       isChecked?: boolean
     ) => void,
-    isMobile: boolean
+    isUnderLaptop: boolean
   ) => {
     const singleSelectValue = dataUsage[
       field.key as keyof DataUsageInformation
@@ -163,7 +163,7 @@ const fieldRenderers = {
           />
         }
         label={<Typography sx={commonStyles.labelText}>{option}</Typography>}
-        sx={commonStyles.formControlLabel(isMobile)}
+        sx={commonStyles.formControlLabel(isUnderLaptop)}
       />
     ));
   },
@@ -176,7 +176,7 @@ const fieldRenderers = {
       value: string | boolean | string[],
       isChecked?: boolean
     ) => void,
-    isMobile: boolean
+    isUnderLaptop: boolean
   ) => {
     const yesNoValue = dataUsage[field.key as keyof DataUsageInformation] as
       | boolean
@@ -195,7 +195,7 @@ const fieldRenderers = {
             />
           }
           label={<Typography sx={commonStyles.labelText}>{option}</Typography>}
-          sx={commonStyles.formControlLabel(isMobile)}
+          sx={commonStyles.formControlLabel(isUnderLaptop)}
         />
       );
     });
@@ -210,7 +210,7 @@ interface FieldRendererProps {
     value: string | boolean | string[],
     isChecked?: boolean
   ) => void;
-  isMobile: boolean;
+  isUnderLaptop: boolean;
 }
 
 // Generic field renderer component with proper typing
@@ -218,11 +218,11 @@ function FieldRendererComponent({
   field,
   dataUsage,
   onChange,
-  isMobile,
+  isUnderLaptop,
 }: FieldRendererProps): React.JSX.Element {
   const renderOptions = (): React.ReactNode[] => {
     const renderer = fieldRenderers[field.type];
-    return renderer ? renderer(field, dataUsage, onChange, isMobile) : [];
+    return renderer ? renderer(field, dataUsage, onChange, isUnderLaptop) : [];
   };
 
   return (
@@ -231,7 +231,7 @@ function FieldRendererComponent({
         {field.title}
         {field.required && <span style={{ color: "red" }}> *</span>}
       </FormLabel>
-      <FormGroup sx={commonStyles.formGroup(isMobile)}>
+      <FormGroup sx={commonStyles.formGroup(isUnderLaptop)}>
         {renderOptions()}
       </FormGroup>
     </FormControl>
@@ -276,7 +276,7 @@ const fieldChangeHandlers = {
 };
 
 function DataUsageForm({
-  isMobile,
+  isUnderLaptop,
   dataUsage,
   setDataUsage,
 }: DataUsageFormProps): React.JSX.Element {
@@ -317,7 +317,7 @@ function DataUsageForm({
             field={field}
             dataUsage={dataUsage}
             onChange={handleFieldChange}
-            isMobile={isMobile}
+            isUnderLaptop={isUnderLaptop}
           />
         ))}
       </Box>

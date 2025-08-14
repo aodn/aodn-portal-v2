@@ -96,8 +96,8 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   sx,
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const filterButtonWidth = isMobile ? "100%" : "120px";
+  const isUnderLaptop = useMediaQuery(theme.breakpoints.down("md"));
+  const filterButtonWidth = isUnderLaptop ? "100%" : "120px";
   const buttonStyleOnDropdownOpen = {
     color: "#fff",
     backgroundColor: rc8Theme.palette.primary1,
@@ -271,10 +271,10 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
           color: "#FFF",
           backgroundColor: rc8Theme.palette.primary2,
           borderRadius: "8px",
-          ml: isMobile ? "0" : "2px",
+          ml: isUnderLaptop ? "0" : "2px",
           "&:hover": {
             backgroundColor: rc8Theme.palette.secondary1,
-            ml: isMobile ? "0" : "2px",
+            ml: isUnderLaptop ? "0" : "2px",
           },
         }}
         data-testid="search-button"
