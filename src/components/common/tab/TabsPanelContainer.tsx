@@ -10,7 +10,6 @@ import { padding } from "../../../styles/constants";
 import StyledTabs from "./StyledTabs";
 import StyledTab from "./StyledTab";
 import { SxProps } from "@mui/system";
-import rc8Theme from "../../../styles/themeRC8";
 
 export interface Tab {
   label: string;
