@@ -5,7 +5,6 @@ import {
   DialogContent,
   Typography,
   useTheme,
-  useMediaQuery,
   Divider,
 } from "@mui/material";
 import DataSelection from "./DataSelection";
@@ -15,6 +14,7 @@ import EmailInputStep from "./EmailInputStep";
 import { DialogHeader } from "./DialogHeader";
 import DialogStepper from "./stepper/DialogStepper";
 import StepperButton from "./stepper/StepperButton";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 interface DownloadDialogProps {
   isOpen: boolean;
@@ -33,7 +33,7 @@ const steps: Step[] = [
 
 const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
   const theme = useTheme();
-  const isUnderLaptop = useMediaQuery(theme.breakpoints.down("md"));
+  const { isUnderLaptop } = useBreakpoint();
 
   const {
     emailInputRef,

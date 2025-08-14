@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo } from "react";
-import { Stack, SxProps, useMediaQuery, useTheme } from "@mui/material";
+import { Stack, SxProps } from "@mui/material";
 import SearchbarExpandableButton from "./SearchbarExpandableButton";
 import { gap } from "../../styles/constants";
 import { useAppSelector } from "../common/store/hooks";
@@ -16,6 +16,7 @@ import { PlaceIcon } from "../../assets/icons/search/location";
 import { TuneIcon } from "../../assets/icons/search/filter";
 import rc8Theme from "../../styles/themeRC8";
 import { SearchIcon } from "../../assets/icons/search/search";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 export enum SearchbarButtonNames {
   Search = "search",
@@ -95,8 +96,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   isPopupOpen,
   sx,
 }) => {
-  const theme = useTheme();
-  const isUnderLaptop = useMediaQuery(theme.breakpoints.down("md"));
+  const { isUnderLaptop } = useBreakpoint();
   const filterButtonWidth = isUnderLaptop ? "100%" : "120px";
   const buttonStyleOnDropdownOpen = {
     color: "#fff",

@@ -85,7 +85,6 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
         onChange={handleChange}
         aria-label="tabsPanelContainer"
         data-testid="tabs-panel-container"
-        sx={{ px: "28px" }}
       >
         {tabs.map((tab, index) => (
           <StyledTab

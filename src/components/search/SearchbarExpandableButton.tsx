@@ -1,7 +1,8 @@
 import { FC, ReactNode, cloneElement, isValidElement } from "react";
-import { IconButton, SxProps, useMediaQuery, useTheme } from "@mui/material";
+import { IconButton, SxProps } from "@mui/material";
 import StyledBadge, { Position } from "../common/badge/StyledBadge";
 import rc8Theme from "../../styles/themeRC8";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 interface SearchbarExpandableButtonProps {
   icon: ReactNode;
@@ -28,8 +29,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
   containerSx,
   "data-testid": testId,
 }) => {
-  const theme = useTheme();
-  const isUnderLaptop = useMediaQuery(theme.breakpoints.down("md"));
+  const { isUnderLaptop } = useBreakpoint();
 
   // Clone the custome icon element and add props
   const iconWithProps = isValidElement(icon)

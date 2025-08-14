@@ -229,6 +229,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
           sx={{
             "& .MuiTabs-root": {
               backgroundColor: rc8Theme.palette.primary6,
+              px: "28px",
             },
           }}
         />
