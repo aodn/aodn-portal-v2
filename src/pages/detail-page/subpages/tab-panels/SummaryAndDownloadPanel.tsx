@@ -40,9 +40,6 @@ import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
 import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 
-const TRUNCATE_COUNT = 800;
-const TRUNCATE_COUNT_TABLET = 500;
-const TRUNCATE_COUNT_MOBILE = 200;
 const mapContainerId = "map-detail-container-id";
 
 enum LayerName {
@@ -140,7 +137,6 @@ const overallBoundingBox = (
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   bbox,
 }) => {
-  const { isUnderLaptop, isMobile } = useBreakpoint();
   const {
     collection,
     featureCollection,
@@ -153,7 +149,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
-  const abstract = collection?.description ? collection.description : "";
+  const abstract = collection?.getEnhancedDescription() || "";
 
   const mapLayerConfig = useMemo((): LayerSwitcherLayer<LayerName>[] => {
     const layers: LayerSwitcherLayer<LayerName>[] = [];
@@ -265,17 +261,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       <Grid container>
         <Grid item xs={12}>
           <Stack direction="column">
-            <ExpandableTextArea
-              text={abstract}
-              showMoreStr={"Show All"}
-              truncateCount={
-                isUnderLaptop
-                  ? isMobile
-                    ? TRUNCATE_COUNT_MOBILE
-                    : TRUNCATE_COUNT_TABLET
-                  : TRUNCATE_COUNT
-              }
-            />
+            <ExpandableTextArea text={abstract} showMoreStr={"Show All"} />
             <Box sx={{ visibility: "visible" }}>
               <Box
                 arial-label="map"

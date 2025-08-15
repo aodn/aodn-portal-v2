@@ -218,6 +218,9 @@ export class OGCCollection {
       (link) =>
         link.type === "text/html" && link.rel === RelationType.DESCRIBEDBY
     )?.[0]?.href;
+  // Get the AI enhanced description
+  getEnhancedDescription = (): string | undefined =>
+    this.propValue?.["ai:description"];
   // Get links by AI group
   getLinksByAIGroup = (group: string): ILink[] | undefined => {
     const result = this.links?.filter((link) => link["ai:group"] === group);
@@ -253,6 +256,7 @@ export class SummariesProperties {
   readonly revision?: string;
   readonly centroid?: Array<Array<number>>;
   readonly pace?: string;
+  readonly "ai:description"?: string;
 }
 
 export class Spatial {
