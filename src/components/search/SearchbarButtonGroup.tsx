@@ -96,7 +96,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   isPopupOpen,
   sx,
 }) => {
-  const { isUnderLaptop } = useBreakpoint();
+  const { isMobile, isUnderLaptop } = useBreakpoint();
   const filterButtonWidth = isUnderLaptop ? "100%" : "120px";
   const buttonStyleOnDropdownOpen = {
     color: "#fff",
@@ -181,7 +181,9 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
                       : activeButton === SearchbarButtonNames.Date
                 )
                   ? filterButtonWidth
-                  : "48px",
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
               }
         }
         containerSx={{ flex: 1 }}
@@ -218,7 +220,9 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
                       : activeButton === SearchbarButtonNames.Location
                 )
                   ? filterButtonWidth
-                  : "48px",
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
               }
         }
         containerSx={{ flex: 1 }}
@@ -255,7 +259,9 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
                       : activeButton === SearchbarButtonNames.Filter
                 )
                   ? filterButtonWidth
-                  : "48px",
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
               }
         }
         data-testid="filtersBtn"
