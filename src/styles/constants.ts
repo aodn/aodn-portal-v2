@@ -72,7 +72,7 @@ const fontSize = {
 };
 
 const fontFamily = {
-  general: "Noto Sans",
+  general: '"Open Sans", sans-serif',
   openSans: '"Open Sans", sans-serif',
 };
 

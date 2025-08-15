@@ -21,9 +21,7 @@ import {
   border,
   borderRadius,
   color,
-  fontColor,
   fontSize,
-  fontWeight,
   padding,
 } from "../../../styles/constants";
 import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
@@ -32,6 +30,7 @@ import dayjs from "dayjs";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import { dateDefault, pageReferer } from "../../../components/common/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
+import rc8Theme from "../../../styles/themeRC8";
 
 enum Status {
   onGoing = "onGoing",
@@ -137,8 +136,8 @@ const renderCompletedStatus = () => (
     <Typography
       padding={0}
       paddingX={padding.extraSmall}
-      color={color.blue.dark}
-      fontSize={fontSize.label}
+      variant="title1Medium"
+      color={rc8Theme.palette.text1}
     >
       Completed
     </Typography>
@@ -160,7 +159,11 @@ const renderSubTitle = (
             bgcolor: color.pace,
           }}
         >
-          <Typography padding={0} fontSize={fontSize.label}>
+          <Typography
+            padding={0}
+            variant="title1Medium"
+            color={rc8Theme.palette.text1}
+          >
             {capitalizeFirstLetter(pace)}
           </Typography>
         </RoundCard>
@@ -175,7 +178,8 @@ const renderSubTitle = (
         <Typography
           padding={0}
           paddingRight={padding.small}
-          fontSize={fontSize.label}
+          variant="title1Medium"
+          color={rc8Theme.palette.text1}
         >
           {startDate}
         </Typography>
@@ -189,7 +193,8 @@ const renderSubTitle = (
           <Typography
             padding={0}
             paddingLeft={padding.small}
-            fontSize={fontSize.label}
+            variant="title1Medium"
+            color={rc8Theme.palette.text1}
           >
             {endDate}
           </Typography>
@@ -280,14 +285,9 @@ const HeaderSection = () => {
             gap={isMobile ? 0 : 1}
           >
             <Typography
+              variant="heading3"
               aria-label="collection title"
-              fontSize={
-                isMobile
-                  ? fontSize.detailPageHeadingMobile
-                  : fontSize.detailPageHeading
-              }
-              fontWeight={fontWeight.bold}
-              color={fontColor.gray.dark}
+              color={rc8Theme.palette.text2}
               sx={{
                 p: 0,
                 overflow: "hidden",

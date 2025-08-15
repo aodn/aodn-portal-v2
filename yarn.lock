@@ -1218,6 +1218,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/open-sans@npm:^5.2.6":
+  version: 5.2.6
+  resolution: "@fontsource/open-sans@npm:5.2.6"
+  checksum: 10c0/63d084d65016bd20c0080de44db801286c05f9da3e728fa792a0e24670aa7e7a30c943d89d4b4eb5ac8d3f5b84726daf163ca6a01799faf8b12936d3d48403f6
+  languageName: node
+  linkType: hard
+
+"@fontsource/poppins@npm:^5.2.6":
+  version: 5.2.6
+  resolution: "@fontsource/poppins@npm:5.2.6"
+  checksum: 10c0/d812b4e13dd2da24af37ae992b436c1ef049f0fae60d9416bb947b94832f4cf662504f56ec1edb7eb85fb71ea461d3195f3884980db5b665ef0ccff8b08e5c39
+  languageName: node
+  linkType: hard
+
 "@gitmoji/commit-types@npm:1.1.5":
   version: 1.1.5
   resolution: "@gitmoji/commit-types@npm:1.1.5"
@@ -6144,6 +6158,8 @@ __metadata:
     "@deck.gl/mapbox": "npm:^9.0.17"
     "@emotion/react": "npm:11.14.0"
     "@emotion/styled": "npm:^11.11.0"
+    "@fontsource/open-sans": "npm:^5.2.6"
+    "@fontsource/poppins": "npm:^5.2.6"
     "@loaders.gl/core": "npm:4.3.3"
     "@luma.gl/core": "npm:^9.0.17"
     "@luma.gl/engine": "npm:^9.0.17"

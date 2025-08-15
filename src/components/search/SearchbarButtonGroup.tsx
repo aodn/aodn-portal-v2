@@ -1,11 +1,7 @@
 import { FC, useCallback, useMemo } from "react";
-import { Tune } from "@mui/icons-material";
 import { Stack, SxProps } from "@mui/material";
 import SearchbarExpandableButton from "./SearchbarExpandableButton";
-import SearchIcon from "@mui/icons-material/Search";
-import DateRangeIcon from "@mui/icons-material/DateRange";
-import PlaceIcon from "@mui/icons-material/Place";
-import { borderRadius, color, fontWeight, gap } from "../../styles/constants";
+import { gap } from "../../styles/constants";
 import { useAppSelector } from "../common/store/hooks";
 import {
   DEFAULT_SEARCH_LOCATION,
@@ -15,6 +11,12 @@ import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { booleanEqual } from "@turf/boolean-equal";
 import { pageReferer } from "../common/constants";
+import { DateRangeIcon } from "../../assets/icons/search/date";
+import { PlaceIcon } from "../../assets/icons/search/location";
+import { TuneIcon } from "../../assets/icons/search/filter";
+import rc8Theme from "../../styles/themeRC8";
+import { SearchIcon } from "../../assets/icons/search/search";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 export enum SearchbarButtonNames {
   Search = "search",
@@ -31,14 +33,6 @@ interface SearchbarButtonGroupProps {
   isPopupOpen: boolean;
   sx?: SxProps;
 }
-
-const buttonStyleOnDropdownOpen = {
-  color: "#fff",
-  backgroundColor: color.blue.dark,
-  "&:hover": {
-    backgroundColor: color.blue.dark,
-  },
-};
 
 const checkCount = ({
   filterObj,
@@ -102,6 +96,17 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   isPopupOpen,
   sx,
 }) => {
+  const { isMobile, isUnderLaptop } = useBreakpoint();
+  const filterButtonWidth = isUnderLaptop ? "100%" : "120px";
+  const buttonStyleOnDropdownOpen = {
+    color: "#fff",
+    backgroundColor: rc8Theme.palette.primary1,
+    width: filterButtonWidth,
+    "&:hover": {
+      backgroundColor: rc8Theme.palette.primary1,
+    },
+  };
+
   const componentParams: ParameterState = useAppSelector(
     (state) => state.paramReducer
   );
@@ -139,6 +144,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       width="auto"
       direction="row"
       justifyContent="end"
+      alignItems="center"
       spacing={0.5}
       padding={gap.sm}
       paddingLeft={gap.md}
@@ -146,6 +152,12 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
     >
       <SearchbarExpandableButton
         icon={<DateRangeIcon />}
+        iconProps={{
+          color:
+            isPopupOpen && activeButton === SearchbarButtonNames.Date
+              ? "#FFF"
+              : rc8Theme.palette.primary1,
+        }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Date)}
         badgeContent={dateCount}
         dotBadge
@@ -160,13 +172,31 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         buttonSx={
           isPopupOpen && activeButton === SearchbarButtonNames.Date
             ? buttonStyleOnDropdownOpen
-            : {}
+            : {
+                width: (
+                  shouldShrinkAllButtons
+                    ? false
+                    : shouldExpandAllButtons
+                      ? true
+                      : activeButton === SearchbarButtonNames.Date
+                )
+                  ? filterButtonWidth
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
+              }
         }
         containerSx={{ flex: 1 }}
         data-testid="date-range-button"
       />
       <SearchbarExpandableButton
         icon={<PlaceIcon />}
+        iconProps={{
+          color:
+            isPopupOpen && activeButton === SearchbarButtonNames.Location
+              ? "#FFF"
+              : rc8Theme.palette.primary1,
+        }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Location)}
         badgeContent={areaCount}
         dotBadge
@@ -181,13 +211,31 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         buttonSx={
           isPopupOpen && activeButton === SearchbarButtonNames.Location
             ? buttonStyleOnDropdownOpen
-            : {}
+            : {
+                width: (
+                  shouldShrinkAllButtons
+                    ? false
+                    : shouldExpandAllButtons
+                      ? true
+                      : activeButton === SearchbarButtonNames.Location
+                )
+                  ? filterButtonWidth
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
+              }
         }
         containerSx={{ flex: 1 }}
         data-testid="location-button"
       />
       <SearchbarExpandableButton
-        icon={<Tune />}
+        icon={<TuneIcon />}
+        iconProps={{
+          color:
+            isPopupOpen && activeButton === SearchbarButtonNames.Filter
+              ? "#FFF"
+              : rc8Theme.palette.primary1,
+        }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Filter)}
         badgeContent={filterCount}
         onClick={() => handleClickButton(SearchbarButtonNames.Filter)}
@@ -202,7 +250,19 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         buttonSx={
           isPopupOpen && activeButton === SearchbarButtonNames.Filter
             ? buttonStyleOnDropdownOpen
-            : {}
+            : {
+                width: (
+                  shouldShrinkAllButtons
+                    ? false
+                    : shouldExpandAllButtons
+                      ? true
+                      : activeButton === SearchbarButtonNames.Filter
+                )
+                  ? filterButtonWidth
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
+              }
         }
         data-testid="filtersBtn"
       />
@@ -212,12 +272,15 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         onClick={handleSearchClick}
         showText={false}
         buttonSx={{
-          color: "#fff",
-          fontWeight: fontWeight.light,
-          backgroundColor: color.blue.extraDark,
-          borderRadius: borderRadius.small,
+          width: "48px",
+          height: "48px",
+          color: "#FFF",
+          backgroundColor: rc8Theme.palette.primary2,
+          borderRadius: "8px",
+          ml: isUnderLaptop ? "0" : "2px",
           "&:hover": {
-            backgroundColor: color.brightBlue.dark,
+            backgroundColor: rc8Theme.palette.secondary1,
+            ml: isUnderLaptop ? "0" : "2px",
           },
         }}
         data-testid="search-button"

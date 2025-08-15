@@ -12,7 +12,12 @@ const EndpointedDiamondIcon: React.FC<EndpointedDiamondIconProps> = ({
   const color = theme.palette.grey600;
   const highlightedColor = theme.palette.primary.main;
   return (
-    <SvgIcon xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+    <SvgIcon
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      sx={{ fontSize: "20px" }}
+    >
       <path
         d="M12 4 L20 12 L12 20 L4 12 Z"
         stroke={color}

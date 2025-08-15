@@ -1,13 +1,8 @@
 import { FC, useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
-import {
-  borderRadius,
-  fontSize,
-  fontWeight,
-  padding,
-  shadow,
-} from "../../../../styles/constants";
+import { borderRadius, padding, shadow } from "../../../../styles/constants";
 import { TOPICS_CARD_HEIGHT, TOPICS_CARD_ICON_BOX_SIZE } from "./constants";
+import rc8Theme from "../../../../styles/themeRC8";
 
 export interface TopicCardType {
   title: string;
@@ -67,14 +62,16 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
         textAlign="center"
       >
         <Typography
-          fontSize={fontSize.label}
-          fontWeight={isHovered ? fontWeight.bold : fontWeight.medium}
+          variant="body2Regular"
+          color={rc8Theme.palette.text2}
           sx={{
+            mt: "8px",
             overflow: "hidden",
             display: "-webkit-box",
             WebkitLineClamp: "2",
             WebkitBoxOrient: "vertical",
             wordBreak: "break-word",
+            lineHeight: 1.2,
           }}
         >
           {cardData.title}

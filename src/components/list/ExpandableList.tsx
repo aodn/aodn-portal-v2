@@ -5,6 +5,7 @@ import NaList from "./NaList";
 import EndpointedDiamondIcon from "../icon/EndpointedDiamondIcon";
 import { InfoContentType } from "../info/InfoDefinition";
 import InfoTip from "../info/InfoTip";
+import rc8Theme from "../../styles/themeRC8";
 
 interface ExpandableListProps {
   title?: string;
@@ -25,7 +26,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
   let showingCollapseCount = 0;
   const [isShowingMore, setIsShowingMore] = useState(false);
   return (
-    <Grid container sx={{ marginTop: theme.mp.md }}>
+    <Grid container sx={{ marginTop: "6px" }}>
       {title !== "Statement" && (
         <Grid item md={12} display="flex" alignItems="center">
           {navigatable && (
@@ -35,8 +36,10 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
           )}
           <Typography
             display="inline"
-            variant="heading4"
             sx={{
+              ...rc8Theme.typography.heading4,
+              color: rc8Theme.palette.text2,
+              pb: "8px",
               marginLeft: theme.mp.md,
             }}
             data-testid={`detail-sub-section-${title}`}
