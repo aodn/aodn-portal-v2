@@ -10,7 +10,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import NorthIcon from "@mui/icons-material/North";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -31,6 +30,7 @@ import { openInNewTab } from "../../../utils/LinkUtils";
 import { scrollToTop } from "../../../utils/ScrollUtils";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../../common/constants";
+import { NorthIcon } from "../../../assets/icons/footer/arrowUp";
 
 interface IconContainerProps {
   children: JSX.Element;
@@ -71,14 +71,12 @@ const Footer: FC = () => {
           <AODNSiteLogo />
           <Button onClick={() => scrollToTop()}>
             <IconContainer>
-              <NorthIcon
-                sx={{ color: color.gray.medium, fontSize: fontSize.info }}
-              />
+              <NorthIcon />
             </IconContainer>
             <Typography
               paddingTop={0}
-              color={color.gray.medium}
-              fontSize={fontSize.info}
+              typography="title1Medium"
+              sx={{ lineHeight: "24px", ml: "8px" }}
             >
               Back to Top
             </Typography>

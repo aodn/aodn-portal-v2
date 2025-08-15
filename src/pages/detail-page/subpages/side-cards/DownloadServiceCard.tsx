@@ -1,5 +1,5 @@
 import { Typography, Button, Box } from "@mui/material";
-import { DownloadNotAvailableIcon } from "../../../../assets/icons/download/download_not_available";
+import { DownloadNotAvailableIcon } from "../../../../assets/icons/download/downloadNotAvaliable";
 import rc8Theme from "../../../../styles/themeRC8";
 import SideCardContainer from "./SideCardContainer";
 
