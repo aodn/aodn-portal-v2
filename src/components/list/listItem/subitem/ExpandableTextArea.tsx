@@ -1,17 +1,24 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import TextAreaBaseGrid from "./TextAreaBaseGrid";
 import { Box, Button, Grid } from "@mui/material";
-import MarkdownRenderer from "../../../common/MarkdownRenderer";
+import MarkdownRenderer from "../../../common/markdown/MarkdownRenderer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 const LINE_CLAMP_DEFAULT = 10; // Default number of lines to show before expanding
 const LINE_CLAMP_DEFAULT_TABLET = 7;
 const LINE_CLAMP_DEFAULT_MOBILE = 5;
+
 interface ExpandableTextAreaProps {
   text: string;
   isClickable?: boolean;
   onClick?: () => void;
   showMoreStr?: string;
+  // Configuration for line clamping, allowing different values for different breakpoints
+  lineClampConfig?: {
+    default?: number;
+    tablet?: number;
+    mobile?: number;
+  };
 }
 
 const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
@@ -19,6 +26,11 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   isClickable = false,
   onClick = () => {},
   showMoreStr = "Show More",
+  lineClampConfig = {
+    default: LINE_CLAMP_DEFAULT,
+    tablet: LINE_CLAMP_DEFAULT_TABLET,
+    mobile: LINE_CLAMP_DEFAULT_MOBILE,
+  },
 }) => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -73,11 +85,10 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
                 ? "unset"
                 : isUnderLaptop
                   ? isMobile
-                    ? LINE_CLAMP_DEFAULT_MOBILE
-                    : LINE_CLAMP_DEFAULT_TABLET
-                  : LINE_CLAMP_DEFAULT,
+                    ? lineClampConfig.mobile
+                    : lineClampConfig.tablet
+                  : lineClampConfig.default,
               WebkitBoxOrient: "vertical",
-              lineHeight: 1.6,
             }}
           >
             <MarkdownRenderer text={text} />

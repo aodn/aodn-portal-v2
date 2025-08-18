@@ -6,7 +6,7 @@ import {
   ListItemText,
   Link as MuiLink,
 } from "@mui/material";
-import rc8Theme from "../../styles/themeRC8";
+import rc8Theme from "../../../styles/themeRC8";
 
 // Simple Markdown Renderer Supports:
 // Lists: Each item on new line, start with -.
@@ -176,7 +176,7 @@ const renderInlineContent = (text: string) => {
             key={index}
             component="span"
             variant="body2Regular"
-            sx={{ fontWeight: 500 }}
+            fontWeight={500}
           >
             {part.content}
           </Typography>
@@ -187,7 +187,7 @@ const renderInlineContent = (text: string) => {
             key={index}
             component="span"
             variant="body2Regular"
-            sx={{ fontStyle: "italic" }}
+            fontStyle="italic"
           >
             {part.content}
           </Typography>
@@ -227,14 +227,24 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
         switch (element.type) {
           case "heading1":
             return (
-              <Typography key={element.key} variant="heading3" component="h1">
+              <Typography
+                key={element.key}
+                variant="heading3"
+                component="h1"
+                my={1}
+              >
                 {renderInlineContent(element.content)}
               </Typography>
             );
 
           case "heading2":
             return (
-              <Typography key={element.key} variant="heading4" component="h2">
+              <Typography
+                key={element.key}
+                variant="heading4"
+                component="h2"
+                my={1}
+              >
                 {renderInlineContent(element.content)}
               </Typography>
             );
@@ -245,7 +255,8 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
                 key={element.key}
                 variant="title1Medium"
                 component="h3"
-                sx={{ fontWeight: 500 }}
+                my={0.5}
+                fontWeight={500}
               >
                 {renderInlineContent(element.content)}
               </Typography>
@@ -257,7 +268,8 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
                 key={element.key}
                 variant="title2Regular"
                 component="h4"
-                sx={{ fontWeight: 500 }}
+                my={0.5}
+                fontWeight={500}
               >
                 {renderInlineContent(element.content)}
               </Typography>
@@ -265,7 +277,12 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
 
           case "paragraph":
             return (
-              <Typography key={element.key} variant="body1Medium" paragraph>
+              <Typography
+                key={element.key}
+                variant="body1Medium"
+                paragraph
+                mb={1}
+              >
                 {renderInlineContent(element.content)}
               </Typography>
             );
@@ -276,8 +293,13 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
                 key={element.key}
                 sx={{
                   pl: 2,
+                  py: 0,
+                  pb: 1,
+                  "& .MuiListItemText-root": {
+                    m: 0,
+                  },
                   "& .MuiListItem-root": {
-                    py: 0.25,
+                    py: 0,
                     px: 0,
                     display: "list-item",
                     listStyleType: "disc",

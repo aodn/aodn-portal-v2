@@ -28,7 +28,6 @@ import {
 import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point, Position } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
-import useBreakpoint from "../../../../hooks/useBreakpoint";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerTileLayer from "../../../../components/map/mapbox/layers/GeoServerTileLayer";
 import MapLayerSwitcher, {
