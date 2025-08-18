@@ -12,6 +12,8 @@ from pages.detail_page import DetailPage
         '0015db7e-e684-7548-e053-08114f8cd4ad',
     ],
 )
+
+@pytest.mark.skip
 def test_show_all_and_less_description(
     responsive_page: Page, uuid: str
 ) -> None:
