@@ -196,7 +196,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                   ...rc8Theme.typography.body1Medium,
                   color: rc8Theme.palette.text2,
                   fontWeight: 700,
-                  py: "6px",
+                  my: "6px",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   display: "-webkit-box",
