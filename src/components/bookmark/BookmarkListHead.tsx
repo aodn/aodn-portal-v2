@@ -32,18 +32,33 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
       }}
       data-testid="bookmark-list-head"
     >
-      <Typography variant="title2Regular" color={rc8Theme.palette.text1}>
+      <Typography
+        sx={{
+          ...rc8Theme.typography.title2Regular,
+          color: rc8Theme.palette.text1,
+          fontWeight: 600,
+          lineHeight: "24px",
+          py: "10px",
+        }}
+      >
         {getTitle()}
       </Typography>
       <Button
-        sx={{ position: "absolute", right: 0, textTransform: "none" }}
+        sx={{
+          position: "absolute",
+          right: 0,
+          textTransform: "none",
+        }}
         onClick={onClearAllBookmarks}
         data-testid="bookmark-list-head-clearall"
       >
         <Typography
-          variant="body1Medium"
-          color={rc8Theme.palette.text1}
-          pr="18px"
+          sx={{
+            ...rc8Theme.typography.body1Medium,
+            color: rc8Theme.palette.text1,
+            fontWeight: 600,
+            py: "4px",
+          }}
         >
           Clear
         </Typography>

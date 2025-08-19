@@ -186,16 +186,17 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               <Box
                 onMouseEnter={() => setHoverOnButton(true)}
                 onMouseLeave={() => setHoverOnButton(false)}
-                mr={"4px"}
+                sx={{ mr: "4px", py: "6px" }}
               >
                 <BookmarkButton dataset={item} />
               </Box>
 
               <Typography
-                variant="body1Medium"
-                color={rc8Theme.palette.text2}
                 sx={{
-                  padding: 0,
+                  ...rc8Theme.typography.body1Medium,
+                  color: rc8Theme.palette.text2,
+                  fontWeight: 700,
+                  py: "6px",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   display: "-webkit-box",

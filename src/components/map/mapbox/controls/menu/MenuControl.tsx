@@ -27,6 +27,7 @@ import {
   fontWeight,
 } from "../../../../../styles/constants";
 import grey from "../../../../common/colors/grey";
+import rc8Theme from "../../../../../styles/themeRC8";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
@@ -50,12 +51,11 @@ export const switcherIconButtonSx = (open: boolean) => ({
 });
 
 export const switcherTitleTypographySx = {
+  ...rc8Theme.typography.title1Medium,
+  color: rc8Theme.palette.text1,
+  fontWeight: 500,
   backgroundColor: color.blue.medium,
   borderRadius: borderRadius["menuTop"],
-  fontSize: "16px",
-  color: "#090C02",
-  fontWeight: fontWeight.regular,
-  fontFamily: fontFamily.openSans,
   minHeight: "40px",
   display: "flex",
   alignItems: "center",

@@ -5,9 +5,10 @@ import Map from "../map/mapbox/Map";
 import Layers from "../map/mapbox/layers/Layers";
 import GeojsonLayer from "../map/mapbox/layers/GeojsonLayer";
 import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
-import { fontColor, fontSize, padding } from "../../styles/constants";
+import { padding } from "../../styles/constants";
 import { TabNavigation } from "../../hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "../common/constants";
+import rc8Theme from "../../styles/themeRC8";
 
 export interface BookmarkListCardType {
   dataset: OGCCollection;
@@ -62,9 +63,10 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
 
         <Tooltip title="More detail..." placement="top">
           <Typography
-            color={fontColor.gray.medium}
-            fontSize={fontSize.resultCardContent}
             sx={{
+              ...rc8Theme.typography.body3Small,
+              color: rc8Theme.palette.grey700,
+              fontWeight: 700,
               padding: 0,
               paddingX: padding.small,
               overflow: "hidden",
