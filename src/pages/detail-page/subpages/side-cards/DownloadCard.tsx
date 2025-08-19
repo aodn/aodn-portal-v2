@@ -25,7 +25,7 @@ import DownloadDialog from "../../../../components/download/DownloadDialog";
 import DataSelection from "../../../../components/download/DataSelection";
 
 const options = [
-  // { label: "NetCDFs", value: "NetCDFs" },
+  { label: "NetCDFs", value: "netcdf" },
   { label: "CSV", value: "csv" },
 ];
 
