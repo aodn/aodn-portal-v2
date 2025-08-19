@@ -14,7 +14,10 @@ const CreditList: React.FC<CreditListProps> = ({
 }) => {
   const creditItems = credits.map((credit, index) => (
     <ItemBaseGrid key={index}>
-      <ExpandableTextArea text={credit} />
+      <ExpandableTextArea
+        text={credit}
+        lineClampConfig={{ default: 4, mobile: 3, tablet: 3 }}
+      />
     </ItemBaseGrid>
   ));
 
