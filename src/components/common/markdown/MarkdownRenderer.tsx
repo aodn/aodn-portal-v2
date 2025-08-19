@@ -292,15 +292,14 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
               <List
                 key={element.key}
                 sx={{
-                  pl: 2,
-                  py: 0,
-                  pb: 1,
+                  p: 0,
+                  ml: 2,
+                  mb: 1,
                   "& .MuiListItemText-root": {
                     m: 0,
                   },
                   "& .MuiListItem-root": {
-                    py: 0,
-                    px: 0,
+                    p: 0,
                     display: "list-item",
                     listStyleType: "disc",
                     listStylePosition: "outside",
