@@ -145,6 +145,7 @@
     "revision": "2008-08-01T10:39:20",
     "credits": [],
     "license": "",
+    "ai:description": "This data set contains Simrad EK500 single beam echosounder data at 38 and 120 kHz and Simrad EA500 single beam echosounder data at 12 kHz from the Southern Surveyor. The EK500 data is primarily for water column characterisation (fish stocks, microplankton distribution) and on occasions for seabed classification (particularly prior to the EM300 swath mapper being installed), while the EA500 data is primarily for bathymetric readings.",
     "centroid": [[116.63, -19.37]],
     "statement": "Original field data collected by the Marine Science Acoustic Group, CMAR CSIRO, Hobart. Data processed as required to output measures of acoustic backscatter, typically related to schooling populations of commercial fish, for the purpose of biomass estimation. No routine data products."
   },

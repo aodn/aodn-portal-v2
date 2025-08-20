@@ -3,6 +3,7 @@ from playwright.sync_api import Page, expect
 
 from pages.detail_page import DetailPage
 
+
 @pytest.mark.parametrize(
     'title, uuid, suggested_citation, cited_responsible_parties, license, constraints, data_contact, credits',
     [
