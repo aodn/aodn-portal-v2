@@ -36,7 +36,7 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
         sx={{
           ...rc8Theme.typography.title2Regular,
           color: rc8Theme.palette.text1,
-          fontWeight: 600,
+          fontWeight: 500,
           lineHeight: "24px",
           py: "10px",
         }}
@@ -56,7 +56,7 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
           sx={{
             ...rc8Theme.typography.body1Medium,
             color: rc8Theme.palette.text1,
-            fontWeight: 600,
+            fontWeight: 500,
             py: "4px",
           }}
         >
