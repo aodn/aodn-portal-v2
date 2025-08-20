@@ -9,8 +9,10 @@ class SummaryTab(BasePage):
     def __init__(self, page: Page):
         self.page = page
 
-        # Page locators
+        # -- Page locators --
         self.tab = self.get_tab(self.TAB_NAME)
+
+        # abstract
         self.description = self.page.get_by_test_id('expandable-text-area')
         self.show_all_button = page.get_by_role('button', name='Show All')
         self.show_less_button = page.get_by_role('button', name='Show Less')

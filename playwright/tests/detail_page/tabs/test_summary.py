@@ -27,7 +27,7 @@ def test_show_all_and_less_description(
 
     detail_page.load(uuid)
     summary = detail_page.tabs.summary
-    detail_page.pause()
+
     initial_height = detail_page.get_element_height(summary.description)
     summary.show_all_button.click()
     assert detail_page.get_element_height(summary.description) > initial_height
