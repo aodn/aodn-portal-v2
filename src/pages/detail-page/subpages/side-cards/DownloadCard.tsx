@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -23,6 +23,10 @@ import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import DownloadDialog from "../../../../components/download/DownloadDialog";
 import DataSelection from "../../../../components/download/DataSelection";
+import {
+  DownloadConditionType,
+  FormatCondition,
+} from "../../context/DownloadDefinitions";
 
 const options = [
   { label: "NetCDFs", value: "netcdf" },
@@ -32,12 +36,38 @@ const options = [
 const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const { downloadConditions, isCollectionNotFound } = useDetailPageContext();
+  const {
+    downloadConditions,
+    isCollectionNotFound,
+    getAndSetDownloadConditions,
+  } = useDetailPageContext();
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
 
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
   }, []);
+
+  useEffect(() => {
+    // set default format
+    if (
+      downloadConditions.filter(
+        (condition) => condition.type === DownloadConditionType.FORMAT
+      ).length === 0
+    ) {
+      getAndSetDownloadConditions(DownloadConditionType.FORMAT, [
+        new FormatCondition("format", "netcdf"),
+      ]);
+    }
+  }, [downloadConditions, getAndSetDownloadConditions]);
+
+  const onSelectChange = useCallback(
+    (value: string) => {
+      getAndSetDownloadConditions(DownloadConditionType.FORMAT, [
+        new FormatCondition("format", value),
+      ]);
+    },
+    [getAndSetDownloadConditions]
+  );
 
   const selectSxProps = useMemo(
     () => ({
@@ -57,7 +87,11 @@ const DownloadCard = () => {
         setIsOpen={setDownloadDialogOpen}
       />
       <Stack sx={{ padding: padding.medium }} spacing={2}>
-        <CommonSelect items={options} sx={selectSxProps} />
+        <CommonSelect
+          items={options}
+          sx={selectSxProps}
+          onSelectCallback={onSelectChange}
+        />
         <Button
           disabled={isCollectionNotFound}
           sx={{
@@ -87,7 +121,15 @@ const DownloadCard = () => {
           sx={{ paddingX: padding.medium }}
           expandIcon={<ExpandMoreIcon />}
         >
-          <Badge color="primary" badgeContent={downloadConditions.length}>
+          <Badge
+            color="primary"
+            badgeContent={
+              // the count here should exclude the format condition
+              downloadConditions.filter(
+                (condition) => condition.type !== DownloadConditionType.FORMAT
+              ).length
+            }
+          >
             <Typography
               fontWeight={fontWeight.bold}
               color={fontColor.gray.medium}
