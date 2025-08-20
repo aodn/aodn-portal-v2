@@ -3,7 +3,7 @@ import { Button, SxProps, Typography } from "@mui/material";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import rc8Theme from "../../../styles/themeRC8";
-import { ContentCopyIcon } from "../../../assets/icons/download/content_copy";
+import { ContentCopyIcon } from "../../../assets/icons/download/contentCopy";
 
 export const COPY_BUTTON_WIDTH = "166px";
 export const COPY_BUTTON_HEIGHT = "40px";
