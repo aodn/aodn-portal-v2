@@ -54,7 +54,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   }, [text, isExpanded]);
 
   return (
-    <TextAreaBaseGrid>
+    <TextAreaBaseGrid sx={{ width: "100%" }}>
       <Grid item md={12}>
         <Box
           sx={{
