@@ -66,7 +66,7 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
             sx={{
               ...rc8Theme.typography.body3Small,
               color: rc8Theme.palette.grey700,
-              fontWeight: 700,
+              fontWeight: 400,
               padding: 0,
               paddingX: padding.small,
               overflow: "hidden",
