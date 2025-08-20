@@ -43,7 +43,13 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   const { isUnderLaptop, isMobile } = useBreakpoint();
 
   return (
-    <Stack sx={sx} direction="row" spacing={1} width="100%" flexWrap="nowrap">
+    <Stack
+      sx={sx}
+      direction="row"
+      spacing={isMobile ? 0.1 : 1}
+      width="100%"
+      flexWrap="nowrap"
+    >
       <Paper
         elevation={0}
         sx={{
@@ -55,7 +61,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           border: `0.5px solid ${rc8Theme.palette.grey500}`,
           borderRadius: "6px",
           bgcolor: rc8Theme.palette.primary6,
-          px: isMobile ? "4px" : "20px",
+          px: isUnderLaptop ? (isMobile ? "0" : "4px") : "20px",
           py: "10px",
           flexShrink: 0,
         }}
@@ -64,7 +70,9 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         <Typography
           variant="title2Regular"
           whiteSpace="nowrap"
-          sx={{ fontSize: isMobile ? "12px" : "16px" }}
+          sx={{
+            fontSize: isUnderLaptop ? (isMobile ? "12px" : "14px") : "16px",
+          }}
         >
           {renderShowingResultsText(total, count)}
         </Typography>
@@ -72,7 +80,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
       <Stack
         flexDirection="row"
         flex={1}
-        gap={1}
+        gap={isMobile ? 0.1 : 1}
         flexWrap="nowrap"
         minWidth={0}
       >

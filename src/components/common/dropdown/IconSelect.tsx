@@ -64,7 +64,7 @@ const renderIcon = (
   // Handle React Element
   if (isValidElement(icon)) {
     return (
-      <Box mr={isIconOnly ? 0 : margin.lg} mb={-1}>
+      <Box mr={isIconOnly ? 0 : margin.lg} mb={"-5px"}>
         {icon}
       </Box>
     );
@@ -73,7 +73,7 @@ const renderIcon = (
   // Handle FunctionComponent
   const IconComponent = icon as FunctionComponent<IconProps>;
   return (
-    <Box mr={isIconOnly ? 0 : margin.lg} mb={-1}>
+    <Box mr={isIconOnly ? 0 : margin.lg} mb={"-5px"}>
       <IconComponent color={color} bgColor={iconBgColor} />
     </Box>
   );
@@ -93,6 +93,9 @@ const renderSelectValue = (
       alignItems="center"
       flexWrap="nowrap"
       gap={isIconOnly ? 0 : 1}
+      //temp fix for mobile
+      ml={isIconOnly ? "-3.2px" : 0}
+      mt={isIconOnly ? "1px" : 0}
     >
       {renderIcon(icon, color, iconBgColor, isIconOnly)}
       {!isIconOnly && label && (

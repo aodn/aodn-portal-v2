@@ -1,7 +1,6 @@
 import { FC, useCallback, useMemo } from "react";
 import { Stack, SxProps } from "@mui/material";
 import SearchbarExpandableButton from "./SearchbarExpandableButton";
-import SearchIcon from "@mui/icons-material/Search";
 import { gap } from "../../styles/constants";
 import { useAppSelector } from "../common/store/hooks";
 import {
@@ -16,6 +15,8 @@ import { DateRangeIcon } from "../../assets/icons/search/date";
 import { PlaceIcon } from "../../assets/icons/search/location";
 import { TuneIcon } from "../../assets/icons/search/filter";
 import rc8Theme from "../../styles/themeRC8";
+import { SearchIcon } from "../../assets/icons/search/search";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 export enum SearchbarButtonNames {
   Search = "search",
@@ -32,14 +33,6 @@ interface SearchbarButtonGroupProps {
   isPopupOpen: boolean;
   sx?: SxProps;
 }
-
-const buttonStyleOnDropdownOpen = {
-  color: "#fff",
-  backgroundColor: rc8Theme.palette.primary1,
-  "&:hover": {
-    backgroundColor: rc8Theme.palette.primary1,
-  },
-};
 
 const checkCount = ({
   filterObj,
@@ -103,6 +96,17 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   isPopupOpen,
   sx,
 }) => {
+  const { isMobile, isUnderLaptop } = useBreakpoint();
+  const filterButtonWidth = isUnderLaptop ? "100%" : "120px";
+  const buttonStyleOnDropdownOpen = {
+    color: "#fff",
+    backgroundColor: rc8Theme.palette.primary1,
+    width: filterButtonWidth,
+    "&:hover": {
+      backgroundColor: rc8Theme.palette.primary1,
+    },
+  };
+
   const componentParams: ParameterState = useAppSelector(
     (state) => state.paramReducer
   );
@@ -140,6 +144,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       width="auto"
       direction="row"
       justifyContent="end"
+      alignItems="center"
       spacing={0.5}
       padding={gap.sm}
       paddingLeft={gap.md}
@@ -167,7 +172,19 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         buttonSx={
           isPopupOpen && activeButton === SearchbarButtonNames.Date
             ? buttonStyleOnDropdownOpen
-            : {}
+            : {
+                width: (
+                  shouldShrinkAllButtons
+                    ? false
+                    : shouldExpandAllButtons
+                      ? true
+                      : activeButton === SearchbarButtonNames.Date
+                )
+                  ? filterButtonWidth
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
+              }
         }
         containerSx={{ flex: 1 }}
         data-testid="date-range-button"
@@ -194,7 +211,19 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         buttonSx={
           isPopupOpen && activeButton === SearchbarButtonNames.Location
             ? buttonStyleOnDropdownOpen
-            : {}
+            : {
+                width: (
+                  shouldShrinkAllButtons
+                    ? false
+                    : shouldExpandAllButtons
+                      ? true
+                      : activeButton === SearchbarButtonNames.Location
+                )
+                  ? filterButtonWidth
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
+              }
         }
         containerSx={{ flex: 1 }}
         data-testid="location-button"
@@ -221,7 +250,19 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         buttonSx={
           isPopupOpen && activeButton === SearchbarButtonNames.Filter
             ? buttonStyleOnDropdownOpen
-            : {}
+            : {
+                width: (
+                  shouldShrinkAllButtons
+                    ? false
+                    : shouldExpandAllButtons
+                      ? true
+                      : activeButton === SearchbarButtonNames.Filter
+                )
+                  ? filterButtonWidth
+                  : isUnderLaptop
+                    ? "42px"
+                    : "48px",
+              }
         }
         data-testid="filtersBtn"
       />
@@ -232,11 +273,14 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         showText={false}
         buttonSx={{
           width: "48px",
+          height: "48px",
           color: "#FFF",
           backgroundColor: rc8Theme.palette.primary2,
           borderRadius: "8px",
+          ml: isUnderLaptop ? "0" : "2px",
           "&:hover": {
             backgroundColor: rc8Theme.palette.secondary1,
+            ml: isUnderLaptop ? "0" : "2px",
           },
         }}
         data-testid="search-button"

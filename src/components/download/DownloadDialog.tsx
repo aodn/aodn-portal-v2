@@ -5,7 +5,6 @@ import {
   DialogContent,
   Typography,
   useTheme,
-  useMediaQuery,
   Divider,
 } from "@mui/material";
 import DataSelection from "./DataSelection";
@@ -15,6 +14,7 @@ import EmailInputStep from "./EmailInputStep";
 import { DialogHeader } from "./DialogHeader";
 import DialogStepper from "./stepper/DialogStepper";
 import StepperButton from "./stepper/StepperButton";
+import useBreakpoint from "../../hooks/useBreakpoint";
 
 interface DownloadDialogProps {
   isOpen: boolean;
@@ -33,7 +33,7 @@ const steps: Step[] = [
 
 const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { isUnderLaptop } = useBreakpoint();
 
   const {
     emailInputRef,
@@ -78,21 +78,21 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            gap: isMobile ? 0 : hasDownloadConditions ? 3 : 0,
+            flexDirection: isUnderLaptop ? "column" : "row",
+            gap: isUnderLaptop ? 0 : hasDownloadConditions ? 3 : 0,
             flex: 1,
           }}
         >
           {hasDownloadConditions && (
             <Box
               sx={{
-                width: isMobile ? "100%" : "300px",
+                width: isUnderLaptop ? "100%" : "300px",
               }}
             >
               <Typography
                 variant="h6"
                 sx={{
-                  mb: isMobile ? 0 : 2.5,
+                  mb: isUnderLaptop ? 0 : 2.5,
                 }}
               >
                 Data Selection
@@ -101,11 +101,11 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
             </Box>
           )}
 
-          {isMobile && hasDownloadConditions && <Divider sx={{ my: 2 }} />}
+          {isUnderLaptop && hasDownloadConditions && <Divider sx={{ my: 2 }} />}
 
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <EmailInputStep
-              isMobile={isMobile}
+              isUnderLaptop={isUnderLaptop}
               emailInputRef={emailInputRef}
               email={email}
               dataUsage={dataUsage}
@@ -138,20 +138,20 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
       open={isOpen}
       onClose={handleIsClose}
       maxWidth={false}
-      fullScreen={isMobile}
+      fullScreen={isUnderLaptop}
       PaperProps={{
         component: activeStep === 1 ? "form" : "div",
         onSubmit: activeStep === 1 ? handleFormSubmit : undefined,
         sx: {
           borderRadius: 0.5,
-          position: isMobile ? "static" : "fixed",
-          transform: isMobile ? "none" : "translateY(0)",
-          width: isMobile ? "auto" : "1024px",
-          height: isMobile ? "auto" : "720px",
-          maxWidth: isMobile ? "calc(100vw - 16px)" : "1024px",
-          maxHeight: isMobile ? "calc(100vh - 32px)" : "720px",
-          minWidth: isMobile ? "auto" : "600px",
-          margin: isMobile ? "16px 8px" : "auto",
+          position: isUnderLaptop ? "static" : "fixed",
+          transform: isUnderLaptop ? "none" : "translateY(0)",
+          width: isUnderLaptop ? "auto" : "1024px",
+          height: isUnderLaptop ? "auto" : "720px",
+          maxWidth: isUnderLaptop ? "calc(100vw - 16px)" : "1024px",
+          maxHeight: isUnderLaptop ? "calc(100vh - 32px)" : "720px",
+          minWidth: isUnderLaptop ? "auto" : "600px",
+          margin: isUnderLaptop ? "16px 8px" : "auto",
           display: "flex",
           flexDirection: "column",
           [theme.breakpoints.between("md", "lg")]: {
@@ -167,7 +167,7 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
 
       <Box
         sx={{
-          px: isMobile ? 2 : 4,
+          px: isUnderLaptop ? 2 : 4,
           py: 2,
           flexShrink: 0,
           backgroundColor: "#fff",
@@ -184,7 +184,7 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
 
       <DialogContent
         sx={{
-          px: isMobile ? 2 : 4,
+          px: isUnderLaptop ? 2 : 4,
           py: 2,
           flex: 1,
           overflowY: "auto",
@@ -197,9 +197,9 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
 
       <DialogActions
         sx={{
-          p: isMobile ? 2 : 3,
+          p: isUnderLaptop ? 2 : 3,
           pt: 1,
-          justifyContent: isMobile ? "center" : "flex-end",
+          justifyContent: isUnderLaptop ? "center" : "flex-end",
           gap: 2,
           my: 1,
           flexShrink: 0,

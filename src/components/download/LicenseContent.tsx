@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import CopyButton from "../../components/common/buttons/CopyButton";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
-import { ContentCopyIcon } from "../../assets/icons/download/content_copy";
+import { ContentCopyIcon } from "../../assets/icons/download/contentCopy";
 import rc8Theme from "../../styles/themeRC8";
 
 const LicenseContent = () => {

@@ -12,7 +12,7 @@ const ConstraintList: React.FC<ConstraintListProps> = ({
   constraints,
   selected = false,
 }) => {
-  const generateConstraintCollaseItem = (
+  const generateConstraintCollapseItem = (
     constraint: {
       title: string;
       content: string[];
@@ -22,14 +22,18 @@ const ConstraintList: React.FC<ConstraintListProps> = ({
     return (
       <CollapseItem title={constraint.title} isOpen key={index}>
         {constraint.content.map((line, index) => (
-          <ExpandableTextArea text={line} key={index} />
+          <ExpandableTextArea
+            text={line}
+            key={index}
+            lineClampConfig={{ default: 4, mobile: 3, tablet: 3 }}
+          />
         ))}
       </CollapseItem>
     );
   };
 
   const constraintItems = constraints.map((constraint, index) =>
-    generateConstraintCollaseItem(constraint, index)
+    generateConstraintCollapseItem(constraint, index)
   );
 
   return (

@@ -10,7 +10,7 @@ import { padding } from "../../../styles/constants";
 import StyledTabs from "./StyledTabs";
 import StyledTab from "./StyledTab";
 import { SxProps } from "@mui/system";
-import rc8Theme from "../../../styles/themeRC8";
+import useBreakpoint from "../../../hooks/useBreakpoint";
 
 export interface Tab {
   label: string;
@@ -59,6 +59,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   handleTabChange,
   sx,
 }) => {
+  const { isAboveDesktop } = useBreakpoint();
   const [value, setValue] = useState(tabValue ?? 0);
 
   const handleChange = useCallback(
@@ -86,7 +87,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
         onChange={handleChange}
         aria-label="tabsPanelContainer"
         data-testid="tabs-panel-container"
-        sx={{ px: "28px" }}
+        sx={{ px: isAboveDesktop ? "10px" : "8px" }}
       >
         {tabs.map((tab, index) => (
           <StyledTab
