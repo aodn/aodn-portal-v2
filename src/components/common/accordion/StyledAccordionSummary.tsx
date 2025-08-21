@@ -12,6 +12,9 @@ const StyledAccordionSummary = styled(
   "& .MuiAccordionSummary-content": {
     margin: 0,
   },
+  "&.Mui-expanded": {
+    backgroundColor: "#fff",
+  },
 });
 
 export default StyledAccordionSummary;

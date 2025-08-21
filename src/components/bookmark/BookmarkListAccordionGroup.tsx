@@ -186,26 +186,34 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               <Box
                 onMouseEnter={() => setHoverOnButton(true)}
                 onMouseLeave={() => setHoverOnButton(false)}
-                sx={{ mr: "4px", py: "6px" }}
+                sx={{ mr: "4px" }}
               >
                 <BookmarkButton dataset={item} />
               </Box>
-
-              <Typography
+              <Box
                 sx={{
-                  ...rc8Theme.typography.body1Medium,
-                  color: rc8Theme.palette.text2,
-                  fontWeight: 700,
-                  my: "6px",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: "2",
-                  WebkitBoxOrient: "vertical",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100%",
                 }}
               >
-                {item.title}
-              </Typography>
+                <Typography
+                  sx={{
+                    ...rc8Theme.typography.body1Medium,
+                    color: rc8Theme.palette.text2,
+                    fontWeight: 500,
+                    pt: 0,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: "2",
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {item.title}
+                </Typography>
+              </Box>
               <Box display="flex" alignItems="center" height={"90%"}>
                 <IconButton
                   onClick={() => onRemoveFromBookmarkList(item)}

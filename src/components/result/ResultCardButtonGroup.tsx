@@ -81,7 +81,7 @@ const ButtonContainer: FC<ButtonContainerProps> = ({
     item
     xs={isGridView ? 6 : 3}
     display="flex"
-    justifyContent="space-between"
+    justifyContent="center"
     alignItems="center"
     sx={{ ...sx }}
   >
