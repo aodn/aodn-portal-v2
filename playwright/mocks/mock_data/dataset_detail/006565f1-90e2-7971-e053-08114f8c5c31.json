@@ -171,6 +171,7 @@
     "revision": "2015-01-14T17:23:23",
     "credits": [],
     "license": "",
+    "ai:description": "RV Franklin Voyage FR 10/87 -  The voyage took place in the Indian Ocean and the Gulf of Carpentaria during 3-24 November 1987. This record was created as the following paper documents located in box file \"FR10/87 EB\" received from Ed Butler were scanned and archived.The box file \"FR 10/87 EB\" can be found in the Datacentre store room, Building 5,  5SS54 -bay 3, shelf 4.\n\nOn-line Documentation: (added as of: 12/08/2014)\n-fr198710_BridgeLog_Copy.pdf\n-fr198710_EventLog_Computer.pdf\n-fr198710_EventLog_Original.pdf\n-fr198710_Cruise_Summary.pdf\n\n\nDocumentation is on the internal network: \\processedVoyageData\\RV_Franklin  [voyage]  \\global_docs.\n\nThe raw data archive is part of an LTO backup tape which holds the entire raw data collection from all Franklin voyages. Date range 1985 - 2002. Data from all MAG tapes, /data tapes, echolog tapes and echolog CDs is included. See http://www.marine.csiro.au/marq/edd_search2.cd_details?id=519 for details.",
     "centroid": [
       [121.355, -13.49],
       [131.696, -11.325],

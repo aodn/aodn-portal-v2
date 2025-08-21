@@ -170,11 +170,12 @@ class SearchComponent(BasePage):
     def reset_all_filters(self) -> None:
         """Reset all search filters"""
         self.date_button.click()
-        self.wait_for_timeout(200)  # wait for values to load
+        self.wait_for_timeout(300)  # wait for values to load
         self.filter_reset.click()
+        self.wait_for_timeout(500)  # wait for date reset
         self.location_button.click()
-        self.wait_for_timeout(200)  # wait for values to load
+        self.wait_for_timeout(300)  # wait for values to load
         self.filter_reset.click()
         self.filter_button.click()
-        self.wait_for_timeout(200)  # wait for values to load
+        self.wait_for_timeout(300)  # wait for values to load
         self.filter_reset.click()

@@ -214,6 +214,7 @@
     "revision": "2016-12-09T15:36:31",
     "credits": [],
     "license": "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was provided by CSIRO.",
+    "ai:description": "This record describes the biological data collected on Rachel Cruise 08/1984. The data were obtained from the Australian North West Shelf and northern coast between September and October 1984. The dataset consists of length, sex, species identity data for sharks, mainly Carcharhinus tilstoni, Carcharhinus sorrah, Scomberomorus commerson and Thunnus tonggol, from gillnet and longline samples. This dataset was collected as part of the CSIRO Northern Pelagic Fish Stock Research Project.",
     "centroid": [[124.419, -14.466]],
     "statement": "Data source: original field data"
   },
