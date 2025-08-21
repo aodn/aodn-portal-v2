@@ -133,7 +133,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   display: "-webkit-box",
-                  WebkitLineClamp: isSelectedDataset || showButtons ? "2" : "4",
+                  WebkitLineClamp: isSelectedDataset || showButtons ? "2" : "3",
                   WebkitBoxOrient: "vertical",
                   wordBreak: "break-word",
                 }}

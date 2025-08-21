@@ -62,7 +62,7 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
         textAlign="center"
       >
         <Typography
-          variant="body2Regular"
+          variant="body3Small"
           color={rc8Theme.palette.text2}
           sx={{
             mt: "8px",

@@ -75,13 +75,11 @@ const renderListCards: FC<ResultCardsListType> = ({
       <Grid container spacing={1}>
         {contents.result.collections.map(
           (collection: OGCCollection, index: number) => (
-            // TODO: change to key={collection.id} will find a bug that there exists datasets
-            // with same key (duplicated datasets). Need to check front end fetch more or backend
             <Grid
               item
               xs={12}
               sm={6}
-              md={isFullListView ? 4 : 12}
+              md={isFullListView ? 6 : 12}
               key={index}
               sx={{
                 // Must hardcode, else the box will expand if not enough height
