@@ -254,6 +254,7 @@
     "revision": "2001-03-28T11:23:29",
     "credits": [],
     "license": "Data is made available under a Creative Commons Attribution 4.0 International Licence, please see link. Data is supplied 'as is' without any warranty or guarantee except as required by law to be given to you. The data may not be free of error, comprehensive, current or appropriate for your particular purpose. You accept all risk and responsibility for its use. ATTRIBUTION STATEMENT: The dataset [Insert-dataset-name-here] downloaded on [Insert-DD-Mmm-YYYY-here] was collected on voyage [Insert-voyage-name-here] by the Marine National Facility.",
+    "ai:description": "This dataset contains the processed Conductivity-Temperature-Depth (CTD) data collected on Franklin voyage FR 08/95. The voyage took place in the east Indian Ocean during 13 September - 14 October 1995. This dataset has been processed and is archived within the CSIRO Marine and Atmospheric Research Data Centre in Hobart. Additional information regarding this dataset is contained in the cruise report for this voyage and/or the data processing report (as available).",
     "centroid": [
       [110.679, -19.72],
       [111.0, -12.0],

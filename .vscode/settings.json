@@ -6,6 +6,7 @@
     "playwright/tests",
     "--rootdir=playwright",
     "-s",
+    "--tracing=off",
     "-c /dev/null" /* ignore configfile: pytest.ini */
   ]
 }

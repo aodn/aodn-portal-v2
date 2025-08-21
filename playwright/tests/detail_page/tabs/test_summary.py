@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 from playwright.sync_api import Page
 
@@ -12,8 +10,6 @@ from pages.detail_page import DetailPage
         '0015db7e-e684-7548-e053-08114f8cd4ad',
     ],
 )
-
-@pytest.mark.skip
 def test_show_all_and_less_description(
     responsive_page: Page, uuid: str
 ) -> None:
@@ -21,22 +17,19 @@ def test_show_all_and_less_description(
     Verifies that the 'Show All' and 'Show Less' buttons on the detail page
     'Summary' tab correctly expand and collapse the description text.
 
-    The test loads a dataset using its UUID, captures the initial length of
-    the description text, clicks 'Show All' to confirm the description
-    expands to a longer length, and then clicks 'Show Less' to ensure
-    the description returns to its original length, validating the
+    The test loads a dataset using its UUID, captures the initial height of
+    the description element, clicks 'Show All' to confirm the description
+    expands to a longer height, and then clicks 'Show Less' to ensure
+    the description returns to its original height, validating the
     UI's description toggle functionality works correctly.
     """
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
-    description = detail_page.description
+    summary = detail_page.tabs.summary
 
-    def get_description_length(text: Optional[str]) -> int:
-        return len(text) if text is not None else 0
-
-    initial_length = get_description_length(description.text_content())
-    detail_page.get_by_role('button', name='Show All').click()
-    assert get_description_length(description.text_content()) > initial_length
-    detail_page.get_by_role('button', name='Show Less').click()
-    assert get_description_length(description.text_content()) == initial_length
+    initial_height = detail_page.get_element_height(summary.description)
+    summary.show_all_button.click()
+    assert detail_page.get_element_height(summary.description) > initial_height
+    summary.show_less_button.click()
+    assert detail_page.get_element_height(summary.description) == initial_height

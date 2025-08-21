@@ -27,7 +27,6 @@ class DetailPage(BasePage):
 
         self.page_title = self.get_label(text='collection title')
         self.return_button = self.page.get_by_test_id('return-button')
-        self.description = self.page.get_by_test_id('expandable-text-area')
         self.share_button = self.page.get_by_test_id('share-button')
         self.copy_link = self.page.get_by_test_id('copy-link')
 
