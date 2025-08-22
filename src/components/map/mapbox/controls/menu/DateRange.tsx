@@ -39,9 +39,9 @@ interface DateRangeControlProps extends ControlProps {
 }
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
-const SLIDER_WIDTH_DEFAULT = 600;
-const SLIDER_WIDTH_TABLET = 400;
-const SLIDER_WIDTH_MOBILE = 250;
+const SLIDER_WIDTH_DEFAULT = 790;
+const SLIDER_WIDTH_TABLET = 510;
+const SLIDER_WIDTH_MOBILE = 260;
 
 const DateSlider: React.FC<DateSliderProps> = ({
   currentMinDate,

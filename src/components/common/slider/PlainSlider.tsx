@@ -17,9 +17,9 @@ const PlainSlider = ({ isVertical = false, ...props }: PlainSliderProps) => {
         ? "calc(100% + 1px)"
         : isMobile || isTablet
           ? "-30px" // Show above the thumb on mobile/tablet
-          : "calc(100% + 2px)", // Show below the thumb on desktop
-      left: isVertical ? "calc(100% + 25px)" : "50%", // Center horizontally for horizontal slider
-      transform: isVertical ? "none" : "translateX(-50%)", // Center the label horizontally
+          : "calc(100% + 5.5px)",
+      left: isVertical ? "calc(100% + 25px)" : "50%",
+      transform: isVertical ? "none" : "translateX(-50%)",
     },
 
     "& .MuiSlider-track": {
