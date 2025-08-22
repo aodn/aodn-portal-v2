@@ -14,7 +14,12 @@ const MetadataUrlList: React.FC<MetadataUrlListProps> = ({
 }) => {
   const metadataLinkItem = (
     <ItemBaseGrid key={url}>
-      <Link href={url} target="_blank" rel="noopener noreferrer">
+      <Link
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        sx={{ wordBreak: "break-all" }}
+      >
         {url}
       </Link>
     </ItemBaseGrid>
