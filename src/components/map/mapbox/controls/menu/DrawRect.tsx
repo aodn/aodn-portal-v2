@@ -17,12 +17,12 @@ import {
   IDownloadCondition,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import _ from "lodash";
-import { IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import DrawRectangle from "./DrawRectangle";
 import { ControlProps } from "./Definition";
 import { BboxSelectionIcon } from "../../../../../assets/map/bbox_selection";
 import { switcherIconButtonSx } from "./MenuControl";
-import { color } from "../../../../../styles/constants";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface DrawControlProps extends ControlProps {
   getAndSetDownloadConditions: (
@@ -32,18 +32,21 @@ interface DrawControlProps extends ControlProps {
 }
 
 const MENU_ID = "draw-rect-menu-button";
+const TRASH_ID = "draw-rect-trash-button";
 
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
   getAndSetDownloadConditions,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
+  const [hasFeatures, setHasFeatures] = useState<boolean>(false);
+
   const mapDraw = useMemo<MapboxDraw>(
     () =>
       new MapboxDraw({
         displayControlsDefault: false,
         controls: {
-          trash: true,
+          trash: false, // Disable the default trash, handle it ourselves
         },
         defaultMode: "simple_select",
         modes: {
@@ -66,6 +69,20 @@ const DrawRect: React.FC<DrawControlProps> = ({
     }
   }, []);
 
+  const handleTrashClick = useCallback(() => {
+    // Get all selected features and delete them
+    const selectedFeatures = mapDraw.getSelectedIds();
+    if (selectedFeatures.length > 0) {
+      mapDraw.delete(selectedFeatures);
+    } else {
+      // If no features are selected, delete all features
+      const allFeatures = mapDraw.getAll().features;
+      if (allFeatures.length > 0) {
+        mapDraw.deleteAll();
+      }
+    }
+  }, [mapDraw]);
+
   useEffect(() => {
     if (open) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -84,24 +101,13 @@ const DrawRect: React.FC<DrawControlProps> = ({
       const currentMode = mapDraw.getMode();
       const isDrawingMode = currentMode === "draw_rectangle";
       setOpen(isDrawingMode);
+
+      // Check if there are any features to enable/disable trash button
+      const features = mapDraw.getAll().features;
+      setHasFeatures(features.length > 0);
     }, 100);
     return () => clearInterval(modePollingInterval);
   }, [mapDraw]);
-
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.textContent = `
-    .mapboxgl-ctrl-group .mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_trash {
-      width: 40px;
-      height: 40px;
-    }
-  `;
-    document.head.appendChild(style);
-
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
 
   useEffect(() => {
     if (map) {
@@ -109,6 +115,8 @@ const DrawRect: React.FC<DrawControlProps> = ({
       // so the below logic looks for remain valid box and set all effectively remove the item
       const onCreateOrUpdate = () => {
         const features = mapDraw.getAll().features;
+        setHasFeatures(features.length > 0);
+
         const box: BBoxCondition[] =
           features
             ?.filter((feature) => feature.geometry.type === "Polygon")
@@ -142,16 +150,38 @@ const DrawRect: React.FC<DrawControlProps> = ({
   }, [mapDraw, map, getAndSetDownloadConditions]);
 
   return (
-    <IconButton
-      aria-label="draw-rect-menu"
-      id={MENU_ID}
-      data-testid={MENU_ID}
-      ref={anchorRef}
-      onClick={() => mapDraw.changeMode("draw_rectangle")}
-      sx={switcherIconButtonSx(open)}
-    >
-      <BboxSelectionIcon />
-    </IconButton>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+      <IconButton
+        aria-label="draw-rect-menu"
+        id={MENU_ID}
+        data-testid={MENU_ID}
+        ref={anchorRef}
+        onClick={() => mapDraw.changeMode("draw_rectangle")}
+        sx={switcherIconButtonSx(open)}
+      >
+        <BboxSelectionIcon />
+      </IconButton>
+
+      <IconButton
+        aria-label="delete-rectangles"
+        id={TRASH_ID}
+        data-testid={TRASH_ID}
+        onClick={handleTrashClick}
+        disabled={!hasFeatures}
+        sx={{
+          ...switcherIconButtonSx(false),
+          opacity: hasFeatures ? 1 : 0.5,
+          cursor: hasFeatures ? "pointer" : "not-allowed",
+          mt: "4px",
+          "&.MuiIconButton-root": { border: "0px solid transparent" },
+          "&.Mui-disabled": {
+            border: "0px solid transparent",
+          },
+        }}
+      >
+        <DeleteIcon />
+      </IconButton>
+    </Box>
   );
 };
 
