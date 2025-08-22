@@ -222,7 +222,7 @@ const renderSubTitle = (
 
 const HeaderSection = () => {
   const location = useLocation();
-  const { isUnderLaptop, isMobile } = useBreakpoint();
+  const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
   const { collection, checkIfCopied, copyToClipboard } = useDetailPageContext();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
@@ -276,19 +276,22 @@ const HeaderSection = () => {
       flexDirection={{ xs: "column", sm: "row" }}
       gap={1}
       width="100%"
+      height="100%"
     >
-      <Stack
-        direction="row"
-        gap={1}
-        justifyContent="space-between"
-        width="100%"
-      >
-        {renderGoBackButton(() => onGoBack(referer), referer)}
-        {renderShareButton({
-          copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
-          hideText: isMobile,
-        })}
-      </Stack>
+      {isMobile && (
+        <Stack
+          direction="row"
+          gap={1}
+          justifyContent="space-between"
+          width="100%"
+        >
+          {renderGoBackButton(() => onGoBack(referer), referer)}
+          {renderShareButton({
+            copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
+            hideText: isMobile,
+          })}
+        </Stack>
+      )}
       <Paper
         aria-label="header"
         elevation={3}
@@ -359,16 +362,23 @@ const HeaderSection = () => {
           )}
         </Grid>
       </Paper>
-      <Box display="flex" flexDirection="column" gap={1}>
-        {isUnderLaptop &&
-          !isMobile &&
-          renderGoBackButton(() => onGoBack(referer), referer)}
-        {!isMobile &&
-          renderShareButton({
+      {isTablet && (
+        <Box display="flex" flexDirection="column" gap={1}>
+          {renderGoBackButton(() => onGoBack(referer), referer)}
+          {renderShareButton({
             copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
             hideText: isMobile,
           })}
-      </Box>
+        </Box>
+      )}
+      {!isUnderLaptop && (
+        <Box height="100%">
+          {renderShareButton({
+            copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
+            hideText: isMobile,
+          })}
+        </Box>
+      )}
     </Box>
   );
 };
