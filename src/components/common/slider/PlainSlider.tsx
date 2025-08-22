@@ -1,25 +1,26 @@
 import { Slider, SliderProps, styled } from "@mui/material";
 import rc8Theme from "../../../styles/themeRC8";
-import useBreakpoint from "../../../hooks/useBreakpoint";
 
 interface PlainSliderProps extends SliderProps {
   isVertical?: boolean;
 }
 
-const PlainSlider = ({ isVertical = false, ...props }: PlainSliderProps) => {
-  const { isMobile, isTablet } = useBreakpoint();
-
-  const StyledSlider = styled(Slider)(({ theme }) => ({
+// Move StyledSlider outside and make it dynamic based on props
+const StyledSlider = styled(Slider)<PlainSliderProps>(({
+  theme,
+  isVertical = false,
+}) => {
+  return {
     "& .MuiSlider-valueLabel": {
       ...rc8Theme.typography.body1Medium,
       backgroundColor: "transparent",
-      top: isVertical
-        ? "calc(100% + 1px)"
-        : isMobile || isTablet
-          ? "-30px" // Show above the thumb on mobile/tablet
-          : "calc(100% + 5.5px)",
+      top: isVertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)", // Default positioning
       left: isVertical ? "calc(100% + 25px)" : "50%",
       transform: isVertical ? "none" : "translateX(-50%)",
+
+      [theme.breakpoints.down("md")]: {
+        top: isVertical ? "calc(100% + 1px)" : "-30px", // Above thumb on mobile/tablet
+      },
     },
 
     "& .MuiSlider-track": {
@@ -39,9 +40,11 @@ const PlainSlider = ({ isVertical = false, ...props }: PlainSliderProps) => {
       height: "23px",
       boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.50)",
     },
-  }));
+  };
+});
 
-  return <StyledSlider {...props} />;
+const PlainSlider = ({ isVertical = false, ...props }: PlainSliderProps) => {
+  return <StyledSlider isVertical={isVertical} {...props} />;
 };
 
 export default PlainSlider;

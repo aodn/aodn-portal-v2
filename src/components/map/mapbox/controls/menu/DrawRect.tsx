@@ -70,7 +70,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
   }, []);
 
   const handleTrashClick = useCallback(() => {
-    if (!hasFeatures) return; // Early return if no features
+    if (!hasFeatures) return;
 
     // Get all selected features and delete them
     const selectedFeatures = mapDraw.getSelectedIds();
