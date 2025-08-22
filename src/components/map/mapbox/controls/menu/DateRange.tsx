@@ -6,15 +6,16 @@ import {
   IDownloadConditionCallback,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
-import { Grid, IconButton, Popper, Typography } from "@mui/material";
+import { Grid, IconButton, Popper, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
 import PlainSlider from "../../../../common/slider/PlainSlider";
 import { dateDefault } from "../../../../common/constants";
 import useBreakpoint from "../../../../../hooks/useBreakpoint";
-import { color, fontSize, padding } from "../../../../../styles/constants";
+import { padding } from "../../../../../styles/constants";
 import { TimeRangeIcon } from "../../../../../assets/map/time_range";
 import { switcherIconButtonSx } from "./MenuControl";
+import rc8Theme from "../../../../../styles/themeRC8";
 
 interface DateSliderProps {
   visible?: boolean;
@@ -76,10 +77,9 @@ const DateSlider: React.FC<DateSliderProps> = ({
     <Grid
       container
       sx={{
-        backgroundColor: "lightgray",
+        backgroundColor: rc8Theme.palette.primary6,
+        borderRadius: "6px",
         display: "flex",
-        px: padding.small,
-        py: padding.extraSmall,
         width: isMobile
           ? SLIDER_WIDTH_MOBILE
           : isTablet
@@ -92,19 +92,54 @@ const DateSlider: React.FC<DateSliderProps> = ({
         item
         xs={12}
         container
-        sx={{ px: padding.medium, pt: padding.small }}
+        sx={{
+          px: padding.medium,
+          pt: isMobile || isTablet ? "24px" : padding.small,
+        }}
       >
-        <PlainSlider
-          value={dateRangeStamp}
-          min={dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT))}
-          max={dateToValue(dayjs(maxDate, dateDefault.SIMPLE_DATE_FORMAT))}
-          onChangeCommitted={onDateRangeChange}
-          onChange={handleSliderChange}
-          valueLabelDisplay="auto"
-          valueLabelFormat={(value: number) =>
-            valueToDate(value).format(dateDefault.SIMPLE_DATE_FORMAT)
-          }
-        />
+        <Stack
+          width="100%"
+          direction="row"
+          alignItems="center"
+          mx={isMobile ? "18px" : "6px"}
+          gap="16px"
+        >
+          <Typography
+            sx={{
+              ...rc8Theme.typography.title1Medium,
+              color: rc8Theme.palette.text1,
+              whiteSpace: "nowrap",
+              mr: "8px",
+              display: isMobile ? "none" : "block",
+            }}
+          >
+            Start Date
+          </Typography>
+          <PlainSlider
+            value={dateRangeStamp}
+            min={dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT))}
+            max={dateToValue(dayjs(maxDate, dateDefault.SIMPLE_DATE_FORMAT))}
+            onChangeCommitted={onDateRangeChange}
+            onChange={handleSliderChange}
+            valueLabelDisplay="auto"
+            valueLabelFormat={(value: number) =>
+              valueToDate(value).format(
+                dateDefault.SIMPLE_DATE_FORMAT.replace("-", "/")
+              )
+            }
+          />
+          <Typography
+            sx={{
+              ...rc8Theme.typography.title1Medium,
+              color: rc8Theme.palette.text1,
+              whiteSpace: "nowrap",
+              ml: "8px",
+              display: isMobile ? "none" : "block",
+            }}
+          >
+            On going
+          </Typography>
+        </Stack>
       </Grid>
       <Grid
         item
@@ -112,20 +147,27 @@ const DateSlider: React.FC<DateSliderProps> = ({
         display="flex"
         justifyContent="space-between"
         alignItems="center"
+        sx={{
+          mx: "20px",
+          mt: isMobile || isTablet ? "2px" : "6px",
+          mb: isMobile || isTablet ? "2px" : "6px",
+        }}
       >
         <Typography
-          padding={0}
-          fontSize={fontSize.label}
-          color={color.gray.light}
+          sx={{
+            ...rc8Theme.typography.body1Medium,
+            color: rc8Theme.palette.text1,
+          }}
         >
-          {minDate}
+          {minDate.replace("-", "/")}
         </Typography>
         <Typography
-          padding={0}
-          fontSize={fontSize.label}
-          color={color.gray.light}
+          sx={{
+            ...rc8Theme.typography.body1Medium,
+            color: rc8Theme.palette.text1,
+          }}
         >
-          {maxDate}
+          {maxDate.replace("-", "/")}
         </Typography>
       </Grid>
     </Grid>
@@ -139,6 +181,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   maxDate,
   getAndSetDownloadConditions,
 }) => {
+  const { isMobile, isTablet } = useBreakpoint();
   const [open, setOpen] = useState<boolean>(false);
   const anchorRef = useRef(null);
   const [currentMinDate, setCurrentMinDate] = useState<string | undefined>(
@@ -206,7 +249,10 @@ const DateRange: React.FC<DateRangeControlProps> = ({
           {
             name: "offset",
             options: {
-              offset: [0, 270], // Add 16px vertical padding from bottom edge
+              offset: [
+                isMobile || isTablet ? 3 : 2,
+                isMobile || isTablet ? 262 : 266,
+              ], // Add 16px vertical padding from bottom edge
             },
           },
           {
