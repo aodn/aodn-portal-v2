@@ -27,8 +27,9 @@ import {
   DownloadConditionType,
   FormatCondition,
 } from "../../context/DownloadDefinitions";
+import { DatasetType } from "../../../../components/common/store/OGCCollectionDefinitions";
 
-const options = [
+const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
   { label: "CSV", value: "csv" },
 ];
@@ -37,6 +38,7 @@ const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const {
+    collection,
     downloadConditions,
     isCollectionNotFound,
     getAndSetDownloadConditions,
@@ -46,6 +48,22 @@ const DownloadCard = () => {
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
   }, []);
+
+  // Currently, csv is the best format for parquet datasets, and netcdf is the best for zarr datasets.
+  // we will support more formats in the future, but for now, we filter the formats based on the dataset type.
+  const filteredDownloadFormats = useMemo(() => {
+    const datasetType = collection?.getDatasetType();
+    if (!datasetType) {
+      return downloadFormats;
+    }
+    if (datasetType === DatasetType.PARQUET) {
+      return downloadFormats.filter((format) => format.value === "csv");
+    }
+    if (datasetType === DatasetType.ZARR) {
+      return downloadFormats.filter((format) => format.value === "netcdf");
+    }
+    return downloadFormats;
+  }, [collection]);
 
   useEffect(() => {
     // set default format
@@ -88,7 +106,7 @@ const DownloadCard = () => {
       />
       <Stack sx={{ padding: padding.medium }} spacing={2}>
         <CommonSelect
-          items={options}
+          items={filteredDownloadFormats}
           sx={selectSxProps}
           onSelectCallback={onSelectChange}
         />
