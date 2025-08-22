@@ -70,6 +70,8 @@ const DrawRect: React.FC<DrawControlProps> = ({
   }, []);
 
   const handleTrashClick = useCallback(() => {
+    if (!hasFeatures) return; // Early return if no features
+
     // Get all selected features and delete them
     const selectedFeatures = mapDraw.getSelectedIds();
     if (selectedFeatures.length > 0) {
@@ -81,7 +83,21 @@ const DrawRect: React.FC<DrawControlProps> = ({
         mapDraw.deleteAll();
       }
     }
-  }, [mapDraw]);
+
+    setTimeout(() => {
+      const features = mapDraw.getAll().features;
+      const box: BBoxCondition[] =
+        features
+          ?.filter((feature) => feature.geometry.type === "Polygon")
+          .map((feature) => {
+            const polygon = feature.geometry as Polygon;
+            const bbox = turf.bbox(polygon);
+            const id = _.toString(feature.id);
+            return new BBoxCondition(id, bbox, () => mapDraw.delete(id));
+          }) || [];
+      getAndSetDownloadConditions(DownloadConditionType.BBOX, box);
+    }, 0);
+  }, [mapDraw, hasFeatures, getAndSetDownloadConditions]);
 
   useEffect(() => {
     if (open) {
@@ -163,7 +179,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
       </IconButton>
 
       <IconButton
-        aria-label="delete-rectangles"
+        aria-label="Delete"
         id={TRASH_ID}
         data-testid={TRASH_ID}
         onClick={handleTrashClick}
