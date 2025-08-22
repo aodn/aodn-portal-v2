@@ -21,6 +21,15 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Filter out children that have visible prop set to false
+  const visibleChildren = Children.toArray(children).filter((child) => {
+    if (isValidElement(child)) {
+      // Check if the child has a visible prop and if it's false
+      return child.props.visible !== false;
+    }
+    return true;
+  });
+
   // Define the styles to apply to children
   const childStyles: SxProps<Theme> = {
     // Target the mapboxgl-ctrl-group class on the child's rendered div
@@ -36,35 +45,26 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       flexDirection: "column",
       alignItems: "center",
       // Apply first-child styles
-      // "&:first-of-type": {
-      //   marginTop: "10px",
-      //   borderTopLeftRadius: "6px",
-      //   borderTopRightRadius: "6px",
-      // },
-      // // Apply last-child styles
-      // "&:last-of-type": {
-      //   borderBottomLeftRadius: "6px",
-      //   borderBottomRightRadius: "6px",
-      // },
+      "&:first-of-type": {
+        marginTop: "10px",
+        borderTopLeftRadius: "6px",
+        borderTopRightRadius: "6px",
+      },
+      // Apply last-child styles
+      "&:last-of-type": {
+        borderBottomLeftRadius: "6px",
+        borderBottomRightRadius: "6px",
+      },
     },
   };
 
   return (
-    <Grid
-      container
-      direction="column"
-      ref={ref}
-      sx={{
-        borderRadius: "6px",
-        bgcolor: "red",
-        padding: "4px",
-        marginX: "10px",
-      }}
-    >
-      {Children.map(children, (child, index) => {
+    <Grid container direction="column" ref={ref}>
+      {visibleChildren.map((child, index) => {
         if (isValidElement(child)) {
           // Merge childStyles with the child's existing sx prop
           return cloneElement<any>(child, {
+            key: child.key || index,
             className: className,
             parentRef: ref,
             sx: [
