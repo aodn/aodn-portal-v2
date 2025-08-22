@@ -144,6 +144,7 @@
     "revision": "2018-04-20T06:00:28",
     "credits": [],
     "license": "Creative Commons Attribution 4.0 International Licence",
+    "ai:description": "<p>This dataset contains identifications of polychaetes collected during surveys on the RV Solander in northern Australia:  SOL4934 (27 August-24 September, 2009) , SOL5117 (30 July-27 August, 2010), SOL5463 (3-31 May 2012), and SOL5650 (12 September-6 October 2012). Sediment was collected with a Smith McIntyre grab or boxcore and elutriated over a 500um sieve. Elutriated material was then sorted back at Geoscience Australia, and all polychaetes were removed and sent to the Museum and Art Gallery of the Northern Territory (MAGNT). Chris Glasby and Charlotte Watson taxonomically identified each animal to the lowest possible level, differentiating species using established names and operational taxonomic units (OTUs).  Specimens are lodged at the MAGNT. See relevant post-survey reports (GA Records 2010/09, 2011/08,  2012/66  and 2013/38) for further details on survey methods and specimen acquisition. This dataset is published with the permission of the CEO, Geoscience Australia.\n<p>This research is supported by the National Environmental Science Program (NESP) Marine Biodiversity Hub through Project D1.",
     "centroid": [[127.51, -12.222]]
   },
   "id": "194daf7c-828b-4a96-a768-6254b14b2a92",

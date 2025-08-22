@@ -27,7 +27,6 @@ class DetailPage(BasePage):
 
         self.page_title = self.get_label(text='collection title')
         self.return_button = self.page.get_by_test_id('return-button')
-        self.description = self.page.get_by_test_id('expandable-text-area')
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')
