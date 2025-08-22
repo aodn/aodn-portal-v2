@@ -51,13 +51,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   const { isUnderLaptop, isMobile } = useBreakpoint();
 
   return (
-    <Stack
-      sx={sx}
-      direction="row"
-      spacing={isMobile ? 0.1 : 1}
-      width="100%"
-      flexWrap="nowrap"
-    >
+    <Stack sx={sx} direction="row" spacing={1} width="100%" flexWrap="nowrap">
       <Paper
         elevation={0}
         sx={{
@@ -89,7 +83,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
       <Stack
         flexDirection="row"
         flex={1}
-        gap={isMobile ? 0.1 : 1}
+        gap={1}
         flexWrap="nowrap"
         minWidth={0}
       >
