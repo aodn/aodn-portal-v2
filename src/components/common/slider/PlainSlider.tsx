@@ -14,7 +14,7 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
     "& .MuiSlider-valueLabel": {
       ...rc8Theme.typography.body1Medium,
       backgroundColor: "transparent",
-      top: isVertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)", // Default positioning
+      top: isVertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
       left: isVertical ? "calc(100% + 25px)" : "50%",
       transform: isVertical ? "none" : "translateX(-50%)",
 
@@ -22,7 +22,15 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
         top: isVertical ? "calc(100% + 1px)" : "-30px", // Above thumb on mobile/tablet
       },
     },
+    "& .MuiSlider-thumb:hover .MuiSlider-valueLabel": {
+      top: isVertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
+      left: isVertical ? "calc(100% + 25px)" : "50%",
+      transform: isVertical ? "none" : "translateX(-50%)",
 
+      [theme.breakpoints.down("md")]: {
+        top: isVertical ? "calc(100% + 1px)" : "-30px",
+      },
+    },
     "& .MuiSlider-track": {
       boxShadow: "0 0 3px 1px rgba(0, 0, 0, 0.10) inset",
       backgroundColor: rc8Theme.palette.primary1,
