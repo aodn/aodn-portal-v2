@@ -121,7 +121,7 @@ const ReactMap = memo(
         }
 
         // Create new map instance
-        return new Map({
+        const newMap = new Map({
           container: panelId,
           accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
           style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
@@ -132,6 +132,25 @@ const ReactMap = memo(
           localIdeographFontFamily:
             "'Open Sans', 'Open Sans CJK SC', sans-serif",
         });
+
+        newMap.on("load", () => {
+          // Remove scale control if it exists
+          const scaleElement = newMap
+            .getContainer()
+            .querySelector(".mapboxgl-ctrl-scale");
+          if (scaleElement) {
+            (scaleElement as HTMLElement).style.display = "none";
+          }
+          // Remove logo after map loads
+          const logoElement = newMap
+            .getContainer()
+            .querySelector(".mapboxgl-ctrl-logo");
+          if (logoElement) {
+            (logoElement as HTMLElement).style.display = "none";
+          }
+        });
+
+        return newMap;
       } catch (err) {
         console.log("Map initialization failed:", err);
       }
