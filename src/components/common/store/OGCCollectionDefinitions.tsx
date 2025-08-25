@@ -111,6 +111,8 @@ export enum MediaType {
   TEXT_HTML = "text/html",
   IMAGE_PNG = "image/png",
   PYTHON_NOTEBOOK = "application/x-ipynb+json",
+  PARQUET = "application/x-parquet",
+  ZARR = "application/x-zarr",
 }
 
 export enum AIGroup {
@@ -118,6 +120,11 @@ export enum AIGroup {
   DOCUMENT = "Document",
   PYTHON_NOTEBOOK = "Python Notebook",
   OTHER = "Other",
+}
+
+export enum DatasetType {
+  PARQUET = "parquet",
+  ZARR = "zarr",
 }
 
 const getIcon = (href: string, rel: string) => {
@@ -239,6 +246,28 @@ export class OGCCollection {
     this.links?.filter((link) => link["ai:group"] !== undefined);
   // A feature call summary is provided if you do cloud optimized data download
   hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
+  getDatasetType = () => {
+    // get all links whose rel is summary
+    const summaryLinks = this.links?.filter((link) => link.rel === "summary");
+    if (!summaryLinks || summaryLinks.length === 0) {
+      return undefined;
+    }
+    if (summaryLinks.length > 1) {
+      console.error("Multiple summary links found, this is unexpected.");
+    }
+
+    const type = summaryLinks[0].type;
+    if (type === MediaType.PARQUET) {
+      return DatasetType.PARQUET;
+    } else if (type === MediaType.ZARR) {
+      return DatasetType.ZARR;
+    } else {
+      console.error(
+        `Unsupported dataset type: ${type}. Only PARQUET and ZARR are supported.`
+      );
+      return undefined;
+    }
+  };
 }
 
 export class SummariesProperties {

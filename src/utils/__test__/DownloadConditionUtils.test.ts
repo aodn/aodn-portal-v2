@@ -1,10 +1,12 @@
 import {
   getDateConditionFrom,
+  getFormatFrom,
   getMultiPolygonFrom,
 } from "../DownloadConditionUtils";
 import {
   BBoxCondition,
   DateRangeCondition,
+  FormatCondition,
   IDownloadCondition,
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import { MultiPolygon } from "geojson";
@@ -104,6 +106,16 @@ describe("DownloadConditionUtils", () => {
       expect(() => getMultiPolygonFrom(conditions)).toThrow(
         "Invalid bounding box"
       );
+    });
+
+    it("should return the format from the conditions", () => {
+      const conditions: IDownloadCondition[] = [
+        new FormatCondition("test-format", "netcdf", () => {}),
+        new BBoxCondition("id1", [100.0, 0.0, 101.0, 1.0]),
+        new BBoxCondition("id2", [102.0, 2.0, 103.0, 3.0]),
+      ];
+      const result = getFormatFrom(conditions);
+      expect(result).toBe("netcdf");
     });
   });
 });
