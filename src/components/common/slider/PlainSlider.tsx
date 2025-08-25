@@ -17,12 +17,15 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
       top: isVertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
       left: isVertical ? "calc(100% + 25px)" : "50%",
       transform: isVertical ? "none" : "translateX(-50%)",
+      opacity: 0, // Hide text by default
+      transition: "opacity 0.5s ease", // text transition on hover
 
       [theme.breakpoints.down("md")]: {
         top: isVertical ? "calc(100% + 1px)" : "-30px", // Above thumb on mobile/tablet
       },
     },
     "& .MuiSlider-thumb:hover .MuiSlider-valueLabel": {
+      opacity: 1, // Show text on hover
       top: isVertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
       left: isVertical ? "calc(100% + 25px)" : "50%",
       transform: isVertical ? "none" : "translateX(-50%)",
@@ -52,7 +55,9 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
 });
 
 const PlainSlider = ({ isVertical = false, ...props }: PlainSliderProps) => {
-  return <StyledSlider isVertical={isVertical} {...props} />;
+  return (
+    <StyledSlider isVertical={isVertical} {...props} valueLabelDisplay="on" />
+  );
 };
 
 export default PlainSlider;
