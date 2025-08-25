@@ -108,7 +108,11 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
       {!showAllTopics && (
-        <Box sx={{ pr: "26px" }}>
+        <Box
+          sx={{
+            transform: "translate(-50%, -50%)",
+          }}
+        >
           <IconButton
             onClick={() => handleScroll(-topicsPanelContainerWidth)}
             disabled={isLeftDisabled}
@@ -116,8 +120,17 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
               visibility: isLeftDisabled ? "hidden" : "visible",
               bgcolor: "#FFF",
               borderRadius: "50%",
-              height: "44px",
-              width: "44px",
+              height: "32px",
+              width: "32px",
+              "&:hover": {
+                bgcolor: "#FFF",
+              },
+              "&:focus": {
+                bgcolor: "#FFF",
+              },
+              "&:active": {
+                bgcolor: "#FFF",
+              },
             }}
           >
             <ArrowBackIosNewIcon
@@ -167,7 +180,11 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         </Stack>
       </Box>
       {!showAllTopics && (
-        <Box sx={{ pl: "26px" }}>
+        <Box
+          sx={{
+            transform: "translate(50%, -50%)",
+          }}
+        >
           <IconButton
             onClick={() => handleScroll(topicsPanelContainerWidth)}
             disabled={isRightDisabled}
@@ -175,8 +192,17 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
               visibility: isRightDisabled ? "hidden" : "visible",
               bgcolor: "#FFF",
               borderRadius: "50%",
-              height: "44px",
-              width: "44px",
+              height: "32px",
+              width: "32px",
+              "&:hover": {
+                bgcolor: "#FFF",
+              },
+              "&:focus": {
+                bgcolor: "#FFF",
+              },
+              "&:active": {
+                bgcolor: "#FFF",
+              },
             }}
           >
             <ArrowForwardIosIcon

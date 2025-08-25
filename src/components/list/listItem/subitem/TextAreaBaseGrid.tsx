@@ -9,16 +9,8 @@ const TextAreaBaseGrid = ({
   sx,
   ...props
 }: React.PropsWithChildren<TextAreaGridProps>) => {
-  const theme = useTheme();
   return (
-    <Grid
-      item
-      sx={{
-        my: theme.mp.sm,
-        ...sx,
-      }}
-      {...props}
-    >
+    <Grid item sx={sx} {...props}>
       {children}
     </Grid>
   );

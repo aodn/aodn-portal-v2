@@ -24,7 +24,9 @@ import {
   fontSize,
   padding,
 } from "../../../styles/constants";
-import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
+import ShareButtonMenu, {
+  CopyLinkConfig,
+} from "../../../components/menu/ShareButtonMenu";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
 import dayjs from "dayjs";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
@@ -63,7 +65,6 @@ const HeaderButton: FC<HeaderButtonProps> = ({ children, onClick, sx }) => (
   </Paper>
 );
 
-// Render the go back button next to the header
 const renderGoBackButton = (onClick: () => void, referer: string) => {
   const tip =
     referer !== pageReferer.SEARCH_PAGE_REFERER
@@ -92,6 +93,18 @@ const renderGoBackButton = (onClick: () => void, referer: string) => {
     </Box>
   );
 };
+
+const renderShareButton = ({
+  copyLinkConfig,
+  hideText,
+}: {
+  copyLinkConfig: CopyLinkConfig | undefined;
+  hideText: boolean;
+}) => (
+  <HeaderButton>
+    <ShareButtonMenu copyLinkConfig={copyLinkConfig} hideText={hideText} />
+  </HeaderButton>
+);
 
 const RoundCard = ({ children, sx }: { children: ReactNode; sx: SxProps }) => {
   return (
@@ -209,7 +222,7 @@ const renderSubTitle = (
 
 const HeaderSection = () => {
   const location = useLocation();
-  const { isUnderLaptop, isMobile } = useBreakpoint();
+  const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
   const { collection, checkIfCopied, copyToClipboard } = useDetailPageContext();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
@@ -258,7 +271,27 @@ const HeaderSection = () => {
     [location.state?.referer]
   );
   return (
-    <Box display="flex" flexDirection="row" gap={1} width="100%">
+    <Box
+      display="flex"
+      flexDirection={{ xs: "column", sm: "row" }}
+      gap={1}
+      width="100%"
+      height="100%"
+    >
+      {isMobile && (
+        <Stack
+          direction="row"
+          gap={1}
+          justifyContent="space-between"
+          width="100%"
+        >
+          {renderGoBackButton(() => onGoBack(referer), referer)}
+          {renderShareButton({
+            copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
+            hideText: isMobile,
+          })}
+        </Stack>
+      )}
       <Paper
         aria-label="header"
         elevation={3}
@@ -329,15 +362,23 @@ const HeaderSection = () => {
           )}
         </Grid>
       </Paper>
-      <Box display="flex" flexDirection="column" gap={1}>
-        {isUnderLaptop && renderGoBackButton(() => onGoBack(referer), referer)}
-        <HeaderButton>
-          <ShareButtonMenu
-            copyLinkConfig={{ isCopied, copyToClipboard, copyUrl }}
-            hideText={isMobile}
-          />
-        </HeaderButton>
-      </Box>
+      {isTablet && (
+        <Box display="flex" flexDirection="column" gap={1}>
+          {renderGoBackButton(() => onGoBack(referer), referer)}
+          {renderShareButton({
+            copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
+            hideText: isMobile,
+          })}
+        </Box>
+      )}
+      {!isUnderLaptop && (
+        <Box height="100%">
+          {renderShareButton({
+            copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
+            hideText: isMobile,
+          })}
+        </Box>
+      )}
     </Box>
   );
 };

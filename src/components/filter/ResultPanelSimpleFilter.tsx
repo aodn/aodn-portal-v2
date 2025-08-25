@@ -24,12 +24,20 @@ export interface ResultPanelSimpleFilterType
 
 interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 
-const renderShowingResultsText = (total: number, count: number) =>
+const renderShowingResultsText = (
+  total: number,
+  count: number,
+  isUnderLaptop: boolean
+) =>
   total === 0
     ? "No result found"
     : total === 1
-      ? "Showing 1 of total 1 result"
-      : `Showing 1 - ${count} of ${formatNumber(total)} results`;
+      ? isUnderLaptop
+        ? "1 of total 1 result"
+        : "Showing 1 of total 1 result"
+      : isUnderLaptop
+        ? `1 - ${count} of ${formatNumber(total)} results`
+        : `Showing 1 - ${count} of ${formatNumber(total)} results`;
 
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   count,
@@ -43,13 +51,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   const { isUnderLaptop, isMobile } = useBreakpoint();
 
   return (
-    <Stack
-      sx={sx}
-      direction="row"
-      spacing={isMobile ? 0.1 : 1}
-      width="100%"
-      flexWrap="nowrap"
-    >
+    <Stack sx={sx} direction="row" spacing={1} width="100%" flexWrap="nowrap">
       <Paper
         elevation={0}
         sx={{
@@ -71,16 +73,17 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           variant="title2Regular"
           whiteSpace="nowrap"
           sx={{
-            fontSize: isUnderLaptop ? (isMobile ? "12px" : "14px") : "16px",
+            fontSize: "16px",
           }}
+          px={2}
         >
-          {renderShowingResultsText(total, count)}
+          {renderShowingResultsText(total, count, isUnderLaptop)}
         </Typography>
       </Paper>
       <Stack
         flexDirection="row"
         flex={1}
-        gap={isMobile ? 0.1 : 1}
+        gap={1}
         flexWrap="nowrap"
         minWidth={0}
       >
