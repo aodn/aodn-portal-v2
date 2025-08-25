@@ -17,7 +17,6 @@ import {
   MapControlType,
   MenuControlType,
 } from "./Definition";
-import { Box } from "@mui/material";
 import {
   borderRadius,
   color,
@@ -27,7 +26,7 @@ import {
   fontWeight,
 } from "../../../../../styles/constants";
 import grey from "../../../../common/colors/grey";
-import rc8Theme from "../../../../../styles/themeRC8";
+import { Grid } from "@mui/material";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
@@ -51,11 +50,12 @@ export const switcherIconButtonSx = (open: boolean) => ({
 });
 
 export const switcherTitleTypographySx = {
-  ...rc8Theme.typography.title1Medium,
-  color: rc8Theme.palette.text1,
-  fontWeight: 500,
   backgroundColor: color.blue.medium,
   borderRadius: borderRadius["menuTop"],
+  fontSize: "16px",
+  color: "#090C02",
+  fontWeight: fontWeight.regular,
+  fontFamily: fontFamily.openSans,
   minHeight: "40px",
   display: "flex",
   alignItems: "center",
@@ -107,6 +107,7 @@ export const switcherMenuContentLabelTypographySx = {
 
 interface MenuControlProps extends MenuControlType {
   menu: MapControlType | null;
+  parentRef?: RefObject<HTMLDivElement>;
 }
 
 class MapControl implements IControl {
@@ -206,6 +207,7 @@ class MapControl implements IControl {
 // test all control on map in different page !!
 const MenuControl: React.FC<MenuControlProps> = ({
   menu,
+  parentRef,
   position = "top-right",
   sx = { borderRadius: "8px" },
   visible = true,
@@ -228,11 +230,22 @@ const MenuControl: React.FC<MenuControlProps> = ({
           containerRef.current
         );
         map?.addControl(newControl, position);
+
+        // Set the parentRef to the control parent.
+        if (parentRef && parentRef?.current) {
+          containerRef.current.parentNode?.appendChild(parentRef.current);
+        }
+
+        // Move the container to a new parent if specified
+        if (parentRef && parentRef.current && containerRef.current) {
+          parentRef.current.appendChild(containerRef.current);
+        }
+
         return newControl;
       }
       return prev;
     });
-  }, [map, menu, control, containerRef, position]);
+  }, [map, menu, control, containerRef, position, parentRef]);
 
   useEffect(() => {
     // Once the control set, you cannot change it, in case the props of menu update
@@ -248,7 +261,8 @@ const MenuControl: React.FC<MenuControlProps> = ({
   }, [control, visible]);
 
   return (
-    <Box
+    <Grid
+      item
       ref={containerRef}
       className={`mapboxgl-ctrl mapboxgl-ctrl-group ${className || ""}`}
       sx={sx}
