@@ -125,7 +125,12 @@ def test_map_shows_geoserver_layer_when_wms_link_present(
 
     # Verify that the Geoserver WMS layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)
-    assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
+    assert (
+        detail_page.detail_map.is_map_layer_visible(
+            layer_id, is_map_loading=False
+        )
+        is True
+    )
 
 
 @pytest.mark.parametrize(
@@ -196,4 +201,9 @@ def test_map_shows_hexbin_and_symbol_layers(
     # Select Symbol layer and verify its visibility on the map
     detail_page.detail_map.symbol_layer.click()
     layer_id = layer_factory.get_layer_id(LayerType.SYMBOL)
-    assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
+    assert (
+        detail_page.detail_map.is_map_layer_visible(
+            layer_id, is_map_loading=False
+        )
+        is True
+    )
