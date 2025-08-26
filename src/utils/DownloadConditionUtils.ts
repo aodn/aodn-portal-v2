@@ -70,11 +70,13 @@ export const getFormatFrom = (conditions: IDownloadCondition[]): string => {
   const filteredCondition = conditions.filter(
     (condition) => condition.type === DownloadConditionType.FORMAT
   );
-  if (filteredCondition.length > 1) {
-    throw new Error("Multiple format conditions found");
-  }
   if (filteredCondition.length === 1) {
     return (filteredCondition[0] as FormatCondition).format;
   }
-  return undefined;
+  if (filteredCondition.length > 1) {
+    throw new Error("Multiple format conditions found");
+  }
+  throw new Error(
+    "No format condition found. It should has at least one default format"
+  );
 };
