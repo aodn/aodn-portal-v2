@@ -4,10 +4,9 @@ import AdditionalInfoPanel from "./tab-panels/AdditionalInfoPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
 import SummaryAndDownloadPanel from "./tab-panels/SummaryAndDownloadPanel";
 import AssociatedRecordsPanel from "./tab-panels/AssociatedRecordsPanel";
-import { Card, Grid } from "@mui/material";
+import { Box, Card } from "@mui/material";
 import { borderRadius } from "../../../styles/constants";
 import { useDetailPageContext } from "../context/detail-page-context";
-import RecordNotFoundPanel from "./tab-panels/RecordNotFoundPanel";
 import TabsPanelContainer, {
   Tab,
 } from "../../../components/common/tab/TabsPanelContainer";
@@ -18,6 +17,7 @@ import {
   pageReferer,
 } from "../../../components/common/constants";
 import useTabNavigation from "../../../hooks/useTabNavigation";
+import notMatchingRecordImage from "@/assets/images/no_matching_record.png";
 
 interface ContentSectionProps {
   mapFocusArea?: LngLatBounds;
@@ -107,12 +107,21 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     setTabValue(index);
   }, [TABS, params]);
 
-  // if no collection found, unfocus the tab
-  useEffect(() => {
-    if (isCollectionNotFound) {
-      setTabValue(-1);
-    }
-  }, [isCollectionNotFound]);
+  if (isCollectionNotFound) {
+    return (
+      <Box
+        component="img"
+        src={notMatchingRecordImage}
+        alt="not found image"
+        sx={{
+          height: "50vh", // Full viewport height
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+    );
+  }
 
   return (
     <Card
@@ -123,16 +132,9 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     >
       <TabsPanelContainer
         tabs={TABS}
-        isCollectionNotFound={isCollectionNotFound}
         tabValue={tabValue}
         handleTabChange={handleTabChange}
       />
-
-      {isCollectionNotFound && (
-        <Grid container sx={{ height: "1000px" }}>
-          <RecordNotFoundPanel />
-        </Grid>
-      )}
     </Card>
   );
 };

@@ -9,9 +9,18 @@ interface InfoCardProps {
   status?: InfoStatusType;
   children?: React.ReactNode;
   sx?: SxProps;
+  titleSx?: SxProps; // Additional styling for the title
+  contentSx?: SxProps; // Additional styling for the content body
 }
 
-const InfoCard: FC<InfoCardProps> = ({ infoContent, status, children, sx }) => {
+const InfoCard: FC<InfoCardProps> = ({
+  infoContent,
+  status,
+  children,
+  sx,
+  titleSx,
+  contentSx,
+}) => {
   // Function to detect and convert emails and URLs to clickable links
   const renderTextWithLinks = (text: string) => {
     const parts = text.split(COMBINED_LINK_REGEX);
@@ -65,7 +74,7 @@ const InfoCard: FC<InfoCardProps> = ({ infoContent, status, children, sx }) => {
         flexDirection: "row",
         justifyContent: "left",
         alignItems: "center",
-        padding: 1,
+        padding: "8px", // Fixed padding as per design
         ...sx,
       }}
     >
@@ -84,22 +93,26 @@ const InfoCard: FC<InfoCardProps> = ({ infoContent, status, children, sx }) => {
       />
       {infoContent && (
         <Paper elevation={0} sx={{ flex: 1 }}>
-          <Typography
-            variant="heading4"
-            sx={{
-              display: "block",
-              padding: 2,
-              color: rc8Theme.palette.primary.main,
-              textAlign: "center",
-              letterSpacing: "0.05em",
-            }}
-          >
-            {infoContent.title}
-          </Typography>
+          {infoContent.title && (
+            <Typography
+              variant="heading4"
+              sx={{
+                display: "block",
+                padding: 2,
+                color: rc8Theme.palette.primary.main,
+                textAlign: "center",
+                letterSpacing: "0.05em",
+                ...titleSx,
+              }}
+            >
+              {infoContent.title}
+            </Typography>
+          )}
+
           <Typography
             component="div"
             variant="body2Regular"
-            sx={{ display: "block", padding: 2, paddingTop: 0 }}
+            sx={{ display: "block", padding: 2, paddingTop: 0, ...contentSx }}
           >
             {renderTextWithLinks(infoContent.body)}
           </Typography>

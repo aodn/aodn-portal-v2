@@ -1,11 +1,13 @@
-import * as React from "react";
 import { Box, Typography } from "@mui/material";
+import notFoundImage from "@/assets/images/no_matching_record.png";
 
 const NotFoundPage = () => {
   return (
     <Box
+      component="img"
+      src={notFoundImage}
+      alt="not found image"
       sx={{
-        backgroundImage: "url(/images/pagenotfound.png)",
         backgroundSize: "cover", // Covers the entire area
         backgroundPosition: "center", // Centers the image
         backgroundRepeat: "no-repeat", // Prevents tiling
