@@ -76,5 +76,5 @@ export const getFormatFrom = (conditions: IDownloadCondition[]): string => {
   if (filteredCondition.length === 1) {
     return (filteredCondition[0] as FormatCondition).format;
   }
-  return "default_format"; // or any default format you want to return
+  return undefined;
 };

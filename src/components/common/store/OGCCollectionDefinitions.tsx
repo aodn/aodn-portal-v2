@@ -247,7 +247,6 @@ export class OGCCollection {
   // A feature call summary is provided if you do cloud optimized data download
   hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
   getDatasetType = () => {
-    // get all links whose rel is summary
     const summaryLinks = this.links?.filter((link) => link.rel === "summary");
     if (!summaryLinks || summaryLinks.length === 0) {
       return undefined;
