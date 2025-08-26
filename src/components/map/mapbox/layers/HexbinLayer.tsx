@@ -7,6 +7,7 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import { Map, Popup } from "mapbox-gl";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 import { Color } from "@deck.gl/core";
+import { TestHelper } from "../../../common/test/helper";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
@@ -148,7 +149,12 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
     }
   }, [featureCollection, visible]);
 
-  return null;
+  return (
+    <TestHelper
+      id={map?.getContainer().id || ""}
+      getHexbinLayer={() => MAPBOX_OVERLAY_HEXAGON_LAYER}
+    />
+  );
 };
 
 export default HexbinLayer;

@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useMemo } from "react";
+import { FC, useContext, useEffect, useMemo, useState } from "react";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
@@ -6,6 +6,7 @@ import { formatToUrl } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../constants";
 import { Position } from "geojson";
 import { fitToBound } from "../../../../utils/MapUtils";
+import { TestHelper } from "../../../common/test/helper";
 
 interface TileUrlParams {
   LAYERS: string[];
@@ -237,7 +238,12 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     visible,
   ]);
 
-  return null;
+  return (
+    <TestHelper
+      id={map?.getContainer().id || ""}
+      getGeoServerTileLayer={() => titleLayerId}
+    />
+  );
 };
 
 export default GeoServerTileLayer;

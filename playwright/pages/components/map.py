@@ -31,6 +31,7 @@ class Map(BasePage):
         )
         self.layers_menu = self.get_by_id('layer-show-hide-menu-button')
         self.hexbin_layer = page.get_by_role('radio', name='Hexbin')
+        self.symbol_layer = page.get_by_role('radio', name='Symbol')
         self.geoserver_layer = page.get_by_role('radio', name='GeoServer')
 
         self.daterange_show_hide_menu_button = page.get_by_test_id(
@@ -42,6 +43,9 @@ class Map(BasePage):
         self.delete_button = self.get_button('Delete')
         self.date_slider = page.get_by_test_id(
             'dateslider-daterange-menu-button'
+        )
+        self.map_preview_not_available_announcement = self.get_text(
+            'Map preview not available'
         )
 
     def hover_map(self) -> None:
@@ -130,7 +134,7 @@ class Map(BasePage):
         layers = execute_map_js(self.page, 'getMapLayers', self.map_id)
         return str(layers)
 
-    def get_Layer_id_from_test_props(self, layer_function_name: str) -> str:
+    def get_layer_id_from_test_props(self, layer_function_name: str) -> str:
         """Get specific layer id"""
         self.wait_for_map_loading()
         layer_id = execute_map_js(self.page, layer_function_name, self.map_id)
@@ -138,15 +142,27 @@ class Map(BasePage):
 
     def get_AU_Marine_Parks_Layer_id(self) -> str:
         """Get the Australian Marine Parks layer id"""
-        return self.get_Layer_id_from_test_props('getAUMarineParksLayer')
+        return self.get_layer_id_from_test_props('getAUMarineParksLayer')
 
     def get_World_Boundaries_Layer_id(self) -> str:
         """Get the World Boundaries layer id"""
-        return self.get_Layer_id_from_test_props('getWorldBoundariesLayer')
+        return self.get_layer_id_from_test_props('getWorldBoundariesLayer')
 
     def get_Spider_Layer_id(self) -> str:
         """Get the Spider layer id"""
-        return self.get_Layer_id_from_test_props('getSpiderLayer')
+        return self.get_layer_id_from_test_props('getSpiderLayer')
+
+    def get_Geo_Server_Layer_id(self) -> str:
+        """Get the GeoServerTile layer id"""
+        return self.get_layer_id_from_test_props('getGeoServerLayer')
+
+    def get_Hexbin_Layer_id(self) -> str:
+        """Get the Hexbin layer id"""
+        return self.get_layer_id_from_test_props('getHexbinLayer')
+
+    def get_Symbol_Layer_id(self) -> str:
+        """Get the Symbol layer id"""
+        return self.get_layer_id_from_test_props('getSymbolLayer')
 
     def is_map_layer_visible(self, layer_id: str) -> bool:
         """Check whether a given map layer is visible"""

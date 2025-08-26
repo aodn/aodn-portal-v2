@@ -1,4 +1,4 @@
-from urllib.parse import parse_qs, unquote_plus, urlparse
+from urllib.parse import unquote_plus
 
 import pytest
 from playwright.sync_api import Locator, Page, TimeoutError
@@ -29,6 +29,7 @@ class DetailPage(BasePage):
         self.return_button = self.page.get_by_test_id('return-button')
         self.share_button = self.page.get_by_test_id('share-button')
         self.copy_link = self.page.get_by_test_id('copy-link')
+        self.wms_link_header = self.get_text('WMS Service Link')
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')
@@ -78,10 +79,3 @@ class DetailPage(BasePage):
         self.share_button.click()
         self.copy_link.click()
         return self.page.evaluate('() => navigator.clipboard.readText()')
-
-    def get_tab_name_from_url(self) -> str:
-        """Extracts the tab name from the current URL"""
-        current_url = self.page.url
-        parsed_url = urlparse(current_url)
-        query_params = parse_qs(parsed_url.query)
-        return query_params.get('tab', [''])[0]

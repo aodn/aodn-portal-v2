@@ -439,6 +439,13 @@
       "ai:group": "Data Access"
     },
     {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "aodn:aodn_wave_nrt_v2_timeseries_map",
+      "ai:group": "Data Access"
+    },
+    {
       "href": "/metadata/8edf509b-1481-48fd-b9c5-b95b42247f82",
       "rel": "related",
       "type": "text/html",

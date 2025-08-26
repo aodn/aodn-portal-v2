@@ -10,6 +10,9 @@ interface TestProps {
   getAUMarineParksLayer?: () => string;
   getWorldBoundariesLayer?: () => string;
   getSpiderLayer?: () => string;
+  getGeoServerTileLayer?: () => string;
+  getHexbinLayer?: () => string;
+  getSymbolLayer?: () => string;
   getMapClickLngLat?: () => LngLat;
   getSelectedLocationIntersects?: () => any;
 }
