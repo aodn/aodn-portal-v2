@@ -54,7 +54,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   }, [text, isExpanded]);
 
   return (
-    <TextAreaBaseGrid>
+    <TextAreaBaseGrid sx={{ width: "100%" }}>
       <Grid item md={12}>
         <Box
           sx={{
@@ -73,7 +73,6 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
                 }
               : undefined
           }
-          data-testid="expandable-text-area"
         >
           <Box
             ref={contentRef}
@@ -90,6 +89,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
                   : lineClampConfig.default,
               WebkitBoxOrient: "vertical",
             }}
+            data-testid="expandable-text-area"
           >
             <MarkdownRenderer text={text} />
           </Box>

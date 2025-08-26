@@ -131,6 +131,7 @@
       }
     ],
     "license": "Creative Commons Attribution 4.0 International License",
+    "ai:description": "IMOS is designed to be a fully-integrated, national system, observing at ocean-basin and regional scales, and covering physical, chemical and biological variables. IMOS observations are carried out by 10 national Facilities, each deploying a particular type of observing platform: Argo Floats, Ships of opportunity, Deep-water moorings, Ocean Gliders, Autonomous underwater vehicles, Coastal moorings, Coastal ocean radars, Animal tracking and monitoring, Wireless sensor networks, and Satellite remote sensing. IMOS Facilities, operated by partner institutions around the country, are funded to deploy equipment and deliver data streams for use by the entire Australian marine and climate science community and its international collaborators.\n\nThe IMOS Ocean Portal (http://imos.aodn.org.au) allows marine and climate scientists and other users to discover and explore data streams coming from all of the Facilities – some in near-real time, and all as delayed-mode, quality-controlled data. \n\nIMOS is supported by the Australian Government and is led by the University of Tasmania on behalf of the Australian marine and climate science community.\n\nThis record provides a visualisation of all IMOS assets, from its ten facilities.",
     "status": "",
     "creation": "2020-07-09T15:40:31",
     "credits": [

@@ -1,12 +1,6 @@
 import { FC, useCallback } from "react";
 import { Box, Button, SxProps, Typography } from "@mui/material";
-import {
-  color,
-  fontColor,
-  fontSize,
-  fontWeight,
-  padding,
-} from "../../styles/constants";
+import rc8Theme from "../../styles/themeRC8";
 
 interface BookmarkListHeadProps {
   bookmarkCount: number | undefined;
@@ -33,26 +27,39 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
-        p: padding.extraSmall,
-        bgcolor: color.blue.darkSemiTransparent,
+        bgcolor: rc8Theme.palette.primary4,
         ...sx,
       }}
       data-testid="bookmark-list-head"
     >
       <Typography
-        p={0}
-        fontSize={fontSize.info}
-        color={fontColor.blue.dark}
-        fontWeight={fontWeight.bold}
+        sx={{
+          ...rc8Theme.typography.title2Regular,
+          color: rc8Theme.palette.text1,
+          fontWeight: 500,
+          lineHeight: "24px",
+          py: "10px",
+        }}
       >
         {getTitle()}
       </Typography>
       <Button
-        sx={{ position: "absolute", right: 0, textTransform: "none" }}
+        sx={{
+          position: "absolute",
+          right: 0,
+          textTransform: "none",
+        }}
         onClick={onClearAllBookmarks}
         data-testid="bookmark-list-head-clearall"
       >
-        <Typography p={0} fontSize={fontSize.label} color={fontColor.blue.dark}>
+        <Typography
+          sx={{
+            ...rc8Theme.typography.body1Medium,
+            color: rc8Theme.palette.text1,
+            fontWeight: 500,
+            py: "4px",
+          }}
+        >
           Clear
         </Typography>
       </Button>

@@ -38,6 +38,7 @@ import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
 import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
+import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -292,55 +293,57 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <NavigationControl />
                     <ScaleControl />
                     <DisplayCoordinate />
-                    <MenuControl menu={<BaseMapSwitcher />} />
-                    <MenuControl
-                      menu={
-                        <ReferenceLayerSwitcher
-                          layers={staticBaseLayerConfig}
-                          onEvent={handleBaseMapSwitch}
-                        />
-                      }
-                    />
-                    <MenuControl
-                      menu={
-                        <MapLayerSwitcher
-                          layers={mapLayerConfig}
-                          onEvent={handleGeoLayerChange}
-                        />
-                      }
-                    />
-                    <MenuControl
-                      visible={
-                        selectedLayer === LayerName.Hexbin ||
-                        selectedLayer === LayerName.Symbol
-                      }
-                      menu={
-                        <DateRange
-                          minDate={minDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
-                          maxDate={maxDateStamp.format(
-                            dateDefault.SIMPLE_DATE_FORMAT
-                          )}
-                          getAndSetDownloadConditions={
-                            getAndSetDownloadConditions
-                          }
-                        />
-                      }
-                    />
-                    <MenuControl
-                      visible={
-                        selectedLayer === LayerName.Hexbin ||
-                        selectedLayer === LayerName.Symbol
-                      }
-                      menu={
-                        <DrawRect
-                          getAndSetDownloadConditions={
-                            getAndSetDownloadConditions
-                          }
-                        />
-                      }
-                    />
+                    <MenuControlGroup>
+                      <MenuControl menu={<BaseMapSwitcher />} />
+                      <MenuControl
+                        menu={
+                          <ReferenceLayerSwitcher
+                            layers={staticBaseLayerConfig}
+                            onEvent={handleBaseMapSwitch}
+                          />
+                        }
+                      />
+                      <MenuControl
+                        menu={
+                          <MapLayerSwitcher
+                            layers={mapLayerConfig}
+                            onEvent={handleGeoLayerChange}
+                          />
+                        }
+                      />
+                      <MenuControl
+                        visible={
+                          selectedLayer === LayerName.Hexbin ||
+                          selectedLayer === LayerName.Symbol
+                        }
+                        menu={
+                          <DateRange
+                            minDate={minDateStamp.format(
+                              dateDefault.SIMPLE_DATE_FORMAT
+                            )}
+                            maxDate={maxDateStamp.format(
+                              dateDefault.SIMPLE_DATE_FORMAT
+                            )}
+                            getAndSetDownloadConditions={
+                              getAndSetDownloadConditions
+                            }
+                          />
+                        }
+                      />
+                      <MenuControl
+                        visible={
+                          selectedLayer === LayerName.Hexbin ||
+                          selectedLayer === LayerName.Symbol
+                        }
+                        menu={
+                          <DrawRect
+                            getAndSetDownloadConditions={
+                              getAndSetDownloadConditions
+                            }
+                          />
+                        }
+                      />
+                    </MenuControlGroup>
                   </Controls>
                   <Layers>
                     {createStaticLayers(staticLayer)}

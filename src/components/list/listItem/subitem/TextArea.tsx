@@ -11,7 +11,13 @@ interface TextAreaProps {
 const TextArea: React.FC<TextAreaProps> = ({ text, sx }: TextAreaProps) => {
   return (
     <TextAreaBaseGrid sx={sx}>
-      <Typography variant="detailContent">
+      <Typography
+        component="span"
+        variant="body2Regular"
+        sx={{
+          wordBreak: "break-word",
+        }}
+      >
         {decodeHtmlEntities(text)}
       </Typography>
     </TextAreaBaseGrid>

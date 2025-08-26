@@ -11,6 +11,7 @@ const StyledAccordionDetails = styled(MuiAccordionDetails)(() => ({
   ".MuiAccordion-root.Mui-expanded &": {
     opacity: 1,
     transitionDelay: `${EXPAND_DELAY}ms`,
+    borderTop: "none",
   },
   "& .MuiButton-root": {
     display: "inline-flex",

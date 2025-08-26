@@ -289,7 +289,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       freeSolo
       PopperComponent={CustomPopper}
       PaperComponent={CustomPaper}
-      open={isSearchbarActive}
+      open={isSearchbarActive && options.length > 0}
       onOpen={handleSearchbarOpen}
       onClose={handleSearchbarClose}
       value={inputValue}

@@ -8,12 +8,12 @@ import {
 import { useSelector } from "react-redux";
 import useElementSize from "../../hooks/useElementSize";
 import BookmarkListAccordionGroup from "../bookmark/BookmarkListAccordionGroup";
-import { border, borderRadius, color } from "../../styles/constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { BOOKMARK_LIST_WIDTH_RESULTS } from "./constants";
 import useTabNavigation from "../../hooks/useTabNavigation";
 import BookmarkListHead from "../bookmark/BookmarkListHead";
+import rc8Theme from "../../styles/themeRC8";
 
 export interface BookmarkListButtonBasicType {
   onDeselectDataset?: () => void;
@@ -55,20 +55,31 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
           justifyContent: "center",
           alignItems: "center",
           width: "100%",
-          height: "36px",
-          border: `${border.xs} ${color.blue.darkSemiTransparent}`,
-          borderRadius: borderRadius.small,
-          backgroundColor: color.white.sixTenTransparent,
+          height: "40px",
+          border: `0.5px solid ${rc8Theme.palette.grey500}`,
+          borderRadius: "6px",
+          backgroundColor: rc8Theme.palette.primary6,
+          position: "relative",
           ":hover": {
             cursor: "pointer",
           },
         }}
       >
-        {anchorEl ? (
-          <ExpandLessIcon color="primary" />
-        ) : (
-          <ExpandMoreIcon color="primary" />
-        )}
+        <Box
+          sx={{
+            position: "absolute",
+            left: "8px",
+            padding: "4px 10px",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          {anchorEl ? (
+            <ExpandLessIcon sx={{ color: rc8Theme.palette.primary.main }} />
+          ) : (
+            <ExpandMoreIcon sx={{ color: rc8Theme.palette.primary.main }} />
+          )}
+        </Box>
         <BookmarkListHead
           onClearAllBookmarks={handleClearAllBookmarks}
           bookmarkCount={bookmarkItems.length}
@@ -79,6 +90,14 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
         open={!!anchorEl}
         anchorEl={anchorEl}
         placement="bottom-end"
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: [0, 6],
+            },
+          },
+        ]}
         sx={{
           minWidth: BOOKMARK_LIST_WIDTH_RESULTS,
           width: bookmarkButtonWidth,

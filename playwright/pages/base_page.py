@@ -106,3 +106,11 @@ class BasePage:
     def get_page_scroll_y(self) -> int:
         """Get the current page scroll Y position"""
         return execute_common_js(self.page, 'getPageScrollY')
+
+    def get_element_height(self, locator: Locator) -> int:
+        """Get the height of the given element"""
+        bounding_box = locator.bounding_box()
+        if bounding_box is not None:
+            return int(bounding_box['height'])
+        else:
+            raise ValueError('Element is not visible')

@@ -1,9 +1,8 @@
 import { FC, SyntheticEvent, useCallback, useEffect, useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import StyledAccordion from "../common/accordion/StyledAccordion";
 import StyledAccordionSummary from "../common/accordion/StyledAccordionSummary";
-import { color, fontColor, fontSize, fontWeight } from "../../styles/constants";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
 import BookmarkListCard from "./BookmarkListCard";
 import BookmarkButton from "./BookmarkButton";
@@ -24,6 +23,8 @@ import {
 } from "../map/mapbox/controls/menu/Definition";
 import BookmarkListHead from "./BookmarkListHead";
 import { TabNavigation } from "../../hooks/useTabNavigation";
+import rc8Theme from "../../styles/themeRC8";
+import { CancelIcon } from "../../assets/icons/download/cancel";
 
 export interface BookmarkListAccordionGroupBasicType {
   onDeselectDataset?: () => void;
@@ -180,49 +181,52 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               flexDirection="row"
               justifyContent="space-between"
               flexWrap="nowrap"
-              alignItems="center"
               width="100%"
             >
               <Box
                 onMouseEnter={() => setHoverOnButton(true)}
                 onMouseLeave={() => setHoverOnButton(false)}
+                sx={{ mr: "4px" }}
               >
                 <BookmarkButton dataset={item} />
               </Box>
-
-              <Typography
-                color={fontColor.gray.dark}
-                fontSize={fontSize.label}
-                fontWeight={fontWeight.bold}
+              <Box
                 sx={{
-                  padding: 0,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: "2",
-                  WebkitBoxOrient: "vertical",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100%",
                 }}
               >
-                {item.title}
-              </Typography>
-              <Button
-                sx={{
-                  minWidth: "15px",
-                  maxWidth: "15px",
-                  color: color.gray.dark,
-                  fontSize: fontSize.icon,
-                  fontWeight: fontWeight.bold,
-                  " &:hover": {
-                    color: color.blue.dark,
-                    fontSize: fontSize.info,
-                  },
-                }}
-                onClick={() => onRemoveFromBookmarkList(item)}
-                onMouseEnter={() => setHoverOnButton(true)}
-                onMouseLeave={() => setHoverOnButton(false)}
-              >
-                X
-              </Button>
+                <Typography
+                  sx={{
+                    ...rc8Theme.typography.body1Medium,
+                    color: rc8Theme.palette.text2,
+                    fontWeight: 500,
+                    pt: 0,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: "2",
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {item.title}
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="center" height={"90%"}>
+                <IconButton
+                  onClick={() => onRemoveFromBookmarkList(item)}
+                  onMouseEnter={() => setHoverOnButton(true)}
+                  onMouseLeave={() => setHoverOnButton(false)}
+                >
+                  <CancelIcon
+                    height={12}
+                    width={12}
+                    color={rc8Theme.palette.grey700}
+                  />
+                </IconButton>
+              </Box>
             </Box>
           </StyledAccordionSummary>
           <StyledAccordionDetails>

@@ -54,6 +54,8 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
       disabled={disabled}
       sx={{
         p: 0,
+        gap: "6px",
+        ml: "-14px",
         textTransform: "none",
         opacity: disabled ? 0.5 : 1,
         minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
@@ -81,9 +83,11 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
           pt={0}
           pl={padding.extraSmall}
           mt={-0.5}
-          variant="body2Regular"
-          color={rc8Theme.palette.text1}
           whiteSpace="nowrap"
+          sx={{
+            ...rc8Theme.typography.body2Regular,
+            color: rc8Theme.palette.primary1,
+          }}
         >
           {text}
         </Typography>

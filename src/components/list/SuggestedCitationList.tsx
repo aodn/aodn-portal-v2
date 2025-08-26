@@ -39,7 +39,7 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
           key={suggestedCitation}
           disableHover={mode === MODE.COMPACT}
         >
-          <Stack direction="column" alignItems="center" gap={1}>
+          <Stack direction="column" alignItems="center">
             <ExpandableTextArea text={suggestedCitation} />
             <CopyButton
               handleClick={handleCopy}
