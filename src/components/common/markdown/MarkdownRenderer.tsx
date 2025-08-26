@@ -213,7 +213,7 @@ const renderInlineContent = (text: string) => {
         );
       case "text":
       default:
-        return part.content;
+        return <>{part.content}</>;
     }
   });
 };
@@ -279,7 +279,7 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
             return (
               <Typography
                 key={element.key}
-                variant="body1Medium"
+                variant="body2Regular"
                 paragraph
                 mb={1}
               >

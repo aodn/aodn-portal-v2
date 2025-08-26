@@ -82,6 +82,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
             <CardHeader
               sx={{
                 height: "auto",
+                maxHeight: 45,
                 width: "95%",
                 p: 0,
                 "& .MuiCardHeader-action": {
@@ -99,7 +100,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     display: "-webkit-box",
-                    WebkitLineClamp: isSimplified ? undefined : "2",
+                    WebkitLineClamp: "2",
                     WebkitBoxOrient: "vertical",
                     cursor: "pointer",
                     alignItems: "flex-start",
@@ -145,6 +146,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     isSimplified ? onClickDetail(uuid) : onClickCard(content)
                   }
                   sx={{
+                    minHeight: 90,
                     pt: padding.extraSmall,
                     overflow: "hidden",
                     display: "-webkit-box",
@@ -153,7 +155,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                       ? 5
                       : isSelectedDataset || showButtons
                         ? "4"
-                        : "6",
+                        : "5",
                     WebkitBoxOrient: "vertical",
                     wordBreak: "break-word",
                   }}

@@ -34,9 +34,9 @@ const LicenseList: React.FC<LicenseListProps> = ({
         key="licenseList"
         disableHover={mode === MODE.COMPACT}
       >
-        <Grid container item md={12}>
+        <Grid container item xs={12}>
           {license && (
-            <Grid item md={12}>
+            <Grid item xs={12}>
               <Typography
                 variant="body2Regular"
                 sx={{ color: rc8Theme.palette.text1 }}
@@ -46,14 +46,18 @@ const LicenseList: React.FC<LicenseListProps> = ({
             </Grid>
           )}
           {url && (
-            <Grid item md={12}>
+            <Grid
+              item
+              xs={12}
+              sx={{ overflowWrap: "break-word", overflow: "hidden" }}
+            >
               <Link href={url} target="_blank" rel="noreferrer">
                 {url}
               </Link>
             </Grid>
           )}
           {graphic && (
-            <Grid item md={12} sx={{ marginTop: theme.mp.md }}>
+            <Grid item xs={12} sx={{ marginTop: theme.mp.md }}>
               {graphic && <img src={graphic} alt="license graphic" />}
             </Grid>
           )}

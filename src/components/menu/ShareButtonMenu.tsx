@@ -30,7 +30,7 @@ interface ShareMenuItem {
   handler: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-interface CopyLinkConfig {
+export interface CopyLinkConfig {
   isCopied: boolean;
   copyUrl: string;
   copyToClipboard: (url: string) => void;

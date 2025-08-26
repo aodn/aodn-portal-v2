@@ -29,9 +29,9 @@ import iconTimeSeriesDatasets from "@/assets/topics-panel-icons/icon_time_series
 
 import { TopicCardType } from "./TopicCard";
 
-export const SCROLL_BUTTON_SIZE = 20;
+export const SCROLL_BUTTON_SIZE = 18;
 
-export const TOPICS_PANEL_GAP = 16;
+export const TOPICS_PANEL_GAP = 12;
 
 export const TOPICS_PANEL_ROWS_DEFAULT = 2;
 
@@ -40,8 +40,8 @@ export const TOPICS_PANEL_COLS_LAPTOP = 8;
 export const TOPICS_PANEL_COLS_TABLET = 6;
 export const TOPICS_PANEL_COLS_MOBILE = 3;
 
-export const TOPICS_CARD_ICON_BOX_SIZE = 90;
-export const TOPICS_CARD_HEIGHT = 136;
+export const TOPICS_CARD_ICON_BOX_SIZE = 80;
+export const TOPICS_CARD_HEIGHT = 120;
 
 export const ALL_TOPICS_CARD: TopicCardType = {
   title: "Show All",

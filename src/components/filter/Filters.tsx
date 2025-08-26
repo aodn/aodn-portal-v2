@@ -4,7 +4,6 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { Box, IconButton, SxProps } from "@mui/material";
@@ -90,59 +89,57 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     useAppSelector((state) => state.paramReducer);
 
   const [filters, setFilters] = useState<Filters>({});
-
-  const TABS: Tab[] = useMemo(() => {
-    return [
-      {
-        label: "Parameters",
-        value: FiltersTabs.Parameters,
-        component: (
-          <ThemeFilter
-            filters={filters}
-            setFilters={setFilters}
-            sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
-          />
-        ),
-        showBadge: checkBadge(filters, FiltersTabs.Parameters),
-      },
-      {
-        label: "Platform",
-        value: FiltersTabs.Platform,
-        component: (
-          <PlatformFilter
-            filters={filters}
-            setFilters={setFilters}
-            sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
-          />
-        ),
-        showBadge: checkBadge(filters, FiltersTabs.Platform),
-      },
-      {
-        label: "Organisation",
-        value: FiltersTabs.Organisation,
-        component: (
-          <OrganisationFilter
-            filters={filters}
-            setFilters={setFilters}
-            sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
-          />
-        ),
-        showBadge: checkBadge(filters, FiltersTabs.Organisation),
-      },
-      {
-        label: "Data",
-        value: FiltersTabs.DataSettings,
-        component: (
-          <DataSettingsFilter
-            filters={filters}
-            setFilters={setFilters}
-            sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
-          />
-        ),
-        showBadge: checkBadge(filters, FiltersTabs.DataSettings),
-      },
-    ];
-  }, [filters, setFilters]);
+  // Do not use useMemo here due to change in filters items not filters
+  const TABS: Tab[] = [
+    {
+      label: "Parameters",
+      value: FiltersTabs.Parameters,
+      component: (
+        <ThemeFilter
+          filters={filters}
+          setFilters={setFilters}
+          sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+        />
+      ),
+      showBadge: checkBadge(filters, FiltersTabs.Parameters),
+    },
+    {
+      label: "Platform",
+      value: FiltersTabs.Platform,
+      component: (
+        <PlatformFilter
+          filters={filters}
+          setFilters={setFilters}
+          sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+        />
+      ),
+      showBadge: checkBadge(filters, FiltersTabs.Platform),
+    },
+    {
+      label: "Organisation",
+      value: FiltersTabs.Organisation,
+      component: (
+        <OrganisationFilter
+          filters={filters}
+          setFilters={setFilters}
+          sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+        />
+      ),
+      showBadge: checkBadge(filters, FiltersTabs.Organisation),
+    },
+    {
+      label: "Data",
+      value: FiltersTabs.DataSettings,
+      component: (
+        <DataSettingsFilter
+          filters={filters}
+          setFilters={setFilters}
+          sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+        />
+      ),
+      showBadge: checkBadge(filters, FiltersTabs.DataSettings),
+    },
+  ];
 
   const handleClearAll = useCallback(() => {
     setFilters({});
