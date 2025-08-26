@@ -76,7 +76,5 @@ export const getFormatFrom = (conditions: IDownloadCondition[]): string => {
   if (filteredCondition.length > 1) {
     throw new Error("Multiple format conditions found");
   }
-  throw new Error(
-    "No format condition found. It should has at least one default format"
-  );
+  return "";
 };
