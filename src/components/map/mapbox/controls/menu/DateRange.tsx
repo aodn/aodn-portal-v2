@@ -39,9 +39,11 @@ interface DateRangeControlProps extends ControlProps {
 }
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
-const SLIDER_WIDTH_DEFAULT = 790;
-const SLIDER_WIDTH_TABLET = 510;
-const SLIDER_WIDTH_MOBILE = 260;
+const SLIDER_WIDTH_MOBILE = 254;
+const SLIDER_WIDTH_TABLET = 666;
+const SLIDER_WIDTH_LAPTOP = 900;
+const SLIDER_WIDTH_DESKTOP = 698;
+const SLIDER_WIDTH_4K = 850;
 
 const DateSlider: React.FC<DateSliderProps> = ({
   currentMinDate,
@@ -50,7 +52,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
   maxDate,
   onDateRangeChange,
 }) => {
-  const { isMobile, isTablet } = useBreakpoint();
+  const { isMobile, isTablet, isLaptop, isDesktop, is4K } = useBreakpoint();
   const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
     dateToValue(
       dayjs(
@@ -80,11 +82,15 @@ const DateSlider: React.FC<DateSliderProps> = ({
         backgroundColor: rc8Theme.palette.primary6,
         borderRadius: "6px",
         display: "flex",
-        width: isMobile
-          ? SLIDER_WIDTH_MOBILE
-          : isTablet
-            ? SLIDER_WIDTH_TABLET
-            : SLIDER_WIDTH_DEFAULT,
+        width: is4K
+          ? SLIDER_WIDTH_4K
+          : isDesktop
+            ? SLIDER_WIDTH_DESKTOP
+            : isLaptop
+              ? SLIDER_WIDTH_LAPTOP
+              : isTablet
+                ? SLIDER_WIDTH_TABLET
+                : SLIDER_WIDTH_MOBILE,
       }}
       data-testid={COMPONENT_ID}
     >
@@ -249,10 +255,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
           {
             name: "offset",
             options: {
-              offset: [
-                isMobile || isTablet ? 3 : 2,
-                isMobile || isTablet ? 262 : 266,
-              ], // Add 16px vertical padding from bottom edge
+              offset: [0, isMobile || isTablet ? 262 : 266], // Add 16px vertical padding from bottom edge
             },
           },
           {
