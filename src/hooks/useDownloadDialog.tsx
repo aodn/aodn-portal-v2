@@ -12,6 +12,7 @@ import { DataUsageInformation } from "../components/download/DataUsageForm";
 import { useDetailPageContext } from "../pages/detail-page/context/detail-page-context";
 import {
   getDateConditionFrom,
+  getFormatFrom,
   getMultiPolygonFrom,
 } from "../utils/DownloadConditionUtils";
 import { DatasetDownloadRequest } from "../pages/detail-page/context/DownloadDefinitions";
@@ -87,6 +88,11 @@ export const useDownloadDialog = (
 
   const multiPolygon = useMemo(
     () => getMultiPolygonFrom(downloadConditions),
+    [downloadConditions]
+  );
+
+  const format = useMemo(
+    () => getFormatFrom(downloadConditions),
     [downloadConditions]
   );
 
@@ -262,6 +268,7 @@ export const useDownloadDialog = (
           start_date: dateRange.start,
           end_date: dateRange.end,
           multi_polygon: multiPolygon,
+          format: format,
           data_usage: dataUsage,
         },
         outputs: {},
@@ -304,7 +311,15 @@ export const useDownloadDialog = (
           }
         );
     },
-    [dateRange.end, dateRange.start, dispatch, multiPolygon, uuid, dataUsage]
+    [
+      uuid,
+      dateRange.start,
+      dateRange.end,
+      multiPolygon,
+      format,
+      dataUsage,
+      dispatch,
+    ]
   );
 
   // ================== FORM SUBMISSION HANDLERS ==================
