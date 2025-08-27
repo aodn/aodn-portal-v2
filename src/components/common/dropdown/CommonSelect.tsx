@@ -48,7 +48,6 @@ const CommonSelect: FC<CommonSelectProps> = memo(
       items[0]?.value
     );
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const { isCollectionNotFound } = useDetailPageContext();
 
     const handleOnChange = useCallback(
       (event: SelectChangeEvent<string>) => {
@@ -68,11 +67,7 @@ const CommonSelect: FC<CommonSelectProps> = memo(
     );
 
     return (
-      <FormControl
-        fullWidth
-        disabled={isCollectionNotFound}
-        data-testid={dataTestId}
-      >
+      <FormControl fullWidth data-testid={dataTestId}>
         <Select
           value={selectedItem}
           onOpen={handleOpenState(true)}

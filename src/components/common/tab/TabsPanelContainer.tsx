@@ -27,7 +27,6 @@ interface TabPanelProps {
 
 interface TabsPanelContainerProps {
   tabs: Tab[];
-  isCollectionNotFound?: boolean;
   tabValue?: number;
   handleTabChange?: (newValue: number) => void;
   sx?: SxProps;
@@ -54,7 +53,6 @@ const a11yProps = (index: number) => ({
 
 const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   tabs,
-  isCollectionNotFound = false,
   tabValue = undefined,
   handleTabChange,
   sx,
@@ -96,7 +94,6 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
             {...a11yProps(index)}
             sx={{ textTransform: "none" }}
             showBadge={tab.showBadge}
-            disabled={isCollectionNotFound}
           />
         ))}
       </StyledTabs>

@@ -42,7 +42,6 @@ describe("CommonSelect", () => {
     // Reset mocks
     vi.clearAllMocks();
     // Default context mock
-    mockUseDetailPageContext.mockReturnValue({ isCollectionNotFound: false });
   });
 
   it("renders correctly with default props", () => {
@@ -115,16 +114,6 @@ describe("CommonSelect", () => {
       );
       expect(screen.getByText("Item 3")).toBeInTheDocument();
     });
-  });
-
-  it("disables select when isCollectionNotFound is true", () => {
-    mockUseDetailPageContext.mockReturnValue({ isCollectionNotFound: true });
-    render(<CommonSelect {...defaultProps} />);
-
-    const select = screen.getByTestId("common-select");
-    const combobox = within(select).getByRole("combobox");
-
-    expect(combobox).toHaveAttribute("aria-disabled", "true");
   });
 
   it("calls scroll utilities when opening/closing dropdown", () => {

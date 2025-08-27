@@ -2,6 +2,7 @@ import {
   BBoxCondition,
   DateRangeCondition,
   DownloadConditionType,
+  FormatCondition,
   IDownloadCondition,
 } from "../pages/detail-page/context/DownloadDefinitions";
 import { dateDefault } from "../components/common/constants";
@@ -63,4 +64,17 @@ export const getMultiPolygonFrom = (
   );
 
   return combineBBoxesToMultiPolygon(bboxes);
+};
+
+export const getFormatFrom = (conditions: IDownloadCondition[]): string => {
+  const filteredCondition = conditions.filter(
+    (condition) => condition.type === DownloadConditionType.FORMAT
+  );
+  if (filteredCondition.length === 1) {
+    return (filteredCondition[0] as FormatCondition).format;
+  }
+  if (filteredCondition.length > 1) {
+    throw new Error("Multiple format conditions found");
+  }
+  return "";
 };
