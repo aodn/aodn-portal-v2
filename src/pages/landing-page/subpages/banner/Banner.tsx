@@ -7,9 +7,9 @@ import {
   padding,
 } from "../../../../styles/constants";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
-import bannerImage1 from "../../../../assets/images/banner_image_1.png";
-import bannerImage2 from "../../../../assets/images/banner_image_2.png";
-import bannerImage3 from "../../../../assets/images/banner_image_3.png";
+import bannerImage1 from "@/assets/images/banner_image_1.png";
+import bannerImage2 from "@/assets/images/banner_image_2.png";
+import bannerImage3 from "@/assets/images/banner_image_3.png";
 
 const renderBannerText = () => {
   return (

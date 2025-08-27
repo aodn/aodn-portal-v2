@@ -33,6 +33,8 @@ import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArro
 import { dateDefault, pageReferer } from "../../../components/common/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import rc8Theme from "../../../styles/themeRC8";
+import InfoCard from "../../../components/info/InfoCard";
+import { InfoStatusType } from "../../../components/info/InfoDefinition";
 
 enum Status {
   onGoing = "onGoing",
@@ -223,7 +225,8 @@ const renderSubTitle = (
 const HeaderSection = () => {
   const location = useLocation();
   const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
-  const { collection, checkIfCopied, copyToClipboard } = useDetailPageContext();
+  const { collection, checkIfCopied, copyToClipboard, isCollectionNotFound } =
+    useDetailPageContext();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
@@ -286,10 +289,11 @@ const HeaderSection = () => {
           width="100%"
         >
           {renderGoBackButton(() => onGoBack(referer), referer)}
-          {renderShareButton({
-            copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
-            hideText: isMobile,
-          })}
+          {!isCollectionNotFound &&
+            renderShareButton({
+              copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
+              hideText: isMobile,
+            })}
         </Stack>
       )}
       <Paper
@@ -297,81 +301,99 @@ const HeaderSection = () => {
         elevation={3}
         sx={{
           position: "relative",
-          padding: padding.medium,
+          padding: isCollectionNotFound ? 0 : padding.medium,
           backgroundColor: "white",
           borderRadius: borderRadius.small,
           flex: 1,
         }}
       >
         {!isUnderLaptop && renderGoBackButton(() => onGoBack(referer), referer)}
-        <Grid container spacing={1}>
-          <Grid
-            item
-            xs={12}
-            sm={10}
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "start",
-              flexDirection: "column",
+        {isCollectionNotFound && (
+          <InfoCard
+            infoContent={{
+              body: "There is no matching record. Please return to the search page.",
             }}
-            gap={isMobile ? 0 : 1}
-          >
-            <Typography
-              variant="heading3"
-              aria-label="collection title"
-              color={rc8Theme.palette.text2}
+            status={InfoStatusType.ERROR}
+            sx={{ boxShadow: "unset", width: "100%", height: "140px" }} // Fixed height as per design
+            contentSx={{
+              padding: 0,
+              px: 2,
+              textAlign: "center",
+              ...rc8Theme.typography.title1Medium,
+            }}
+          />
+        )}
+        {!isCollectionNotFound && (
+          <Grid container spacing={1}>
+            <Grid
+              item
+              xs={12}
+              sm={10}
               sx={{
-                p: 0,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: "3",
-                WebkitBoxOrient: "vertical",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "start",
+                flexDirection: "column",
+              }}
+              gap={isMobile ? 0 : 1}
+            >
+              <Typography
+                variant="heading3"
+                aria-label="collection title"
+                color={rc8Theme.palette.text2}
+                sx={{
+                  p: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: "3",
+                  WebkitBoxOrient: "vertical",
+                }}
+              >
+                {title}
+              </Typography>
+              {!isMobile && renderSubTitle(pace, startDate, endDate, status)}
+            </Grid>
+            <Grid
+              item
+              xs={4}
+              sm={2}
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "flex-start",
               }}
             >
-              {title}
-            </Typography>
-            {!isMobile && renderSubTitle(pace, startDate, endDate, status)}
-          </Grid>
-          <Grid
-            item
-            xs={4}
-            sm={2}
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "flex-start",
-            }}
-          >
-            {collection && (
-              <OrganizationLogo
-                logo={collection.findIcon()}
-                sx={{
-                  height: isMobile ? "50px" : "80px",
-                  paddingX: padding.extraSmall,
-                }}
-                defaultImageSrc={imosLogoWithTitle}
-              />
+              {collection && (
+                <OrganizationLogo
+                  logo={collection.findIcon()}
+                  sx={{
+                    height: isMobile ? "50px" : "80px",
+                    paddingX: padding.extraSmall,
+                  }}
+                  defaultImageSrc={imosLogoWithTitle}
+                />
+              )}
+            </Grid>
+            {isMobile && (
+              <Grid item xs={8} sm={12}>
+                {renderSubTitle(pace, startDate, endDate, status)}
+              </Grid>
             )}
           </Grid>
-          {isMobile && (
-            <Grid item xs={8} sm={12}>
-              {renderSubTitle(pace, startDate, endDate, status)}
-            </Grid>
-          )}
-        </Grid>
+        )}
       </Paper>
       {isTablet && (
         <Box display="flex" flexDirection="column" gap={1}>
           {renderGoBackButton(() => onGoBack(referer), referer)}
-          {renderShareButton({
-            copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
-            hideText: isMobile,
-          })}
+          {!isCollectionNotFound &&
+            renderShareButton({
+              copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
+              hideText: isMobile,
+            })}
         </Box>
       )}
-      {!isUnderLaptop && (
+      {!isUnderLaptop && !isCollectionNotFound && (
         <Box height="100%">
           {renderShareButton({
             copyLinkConfig: { isCopied, copyToClipboard, copyUrl },

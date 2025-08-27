@@ -5,8 +5,8 @@ import {
   IDownloadConditionCallback,
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
-import BBOX_IMG from "../../assets/icons/bbox.png";
-import TIME_RANGE_IMG from "../../assets/images/time-range.png";
+import BBOX_IMG from "@/assets/icons/bbox.png";
+import TIME_RANGE_IMG from "@/assets/images/time-range.png";
 import CloseIcon from "@mui/icons-material/Close";
 
 interface DownloadConditionBoxProps

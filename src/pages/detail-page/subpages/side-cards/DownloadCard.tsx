@@ -37,12 +37,8 @@ const downloadFormats = [
 const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const {
-    collection,
-    downloadConditions,
-    isCollectionNotFound,
-    getAndSetDownloadConditions,
-  } = useDetailPageContext();
+  const { collection, downloadConditions, getAndSetDownloadConditions } =
+    useDetailPageContext();
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
 
   const onDownload = useCallback(() => {
@@ -111,11 +107,8 @@ const DownloadCard = () => {
           onSelectCallback={onSelectChange}
         />
         <Button
-          disabled={isCollectionNotFound}
           sx={{
-            backgroundColor: isCollectionNotFound
-              ? "lightGrey"
-              : theme.palette.primary.main,
+            backgroundColor: theme.palette.primary.main,
             borderRadius: borderRadius.small,
             ":hover": {
               backgroundColor: theme.palette.primary.main,
@@ -135,7 +128,6 @@ const DownloadCard = () => {
         onChange={() => setAccordionExpanded((prevState) => !prevState)}
       >
         <AccordionSummary
-          disabled={isCollectionNotFound}
           sx={{ paddingX: padding.medium }}
           expandIcon={<ExpandMoreIcon />}
         >

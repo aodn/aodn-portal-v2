@@ -16,6 +16,8 @@ interface SideSectionProps extends SpatialCoverageCardProps {}
 const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
   const { isCollectionNotFound, collection } = useDetailPageContext();
 
+  if (isCollectionNotFound) return null;
+
   return (
     <Stack
       direction={{ xs: "column", sm: "row", md: "column" }}
@@ -35,15 +37,12 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
       ) : (
         <DownloadServiceCard />
       )}
-      {!isCollectionNotFound && (
-        <>
-          <DataAccessPanel mode={MODE.COMPACT} type={TYPE.DATA_ACCESS} />
-          <SpatialCoverageCard
-            onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
-          />
-          <CitationPanel mode={MODE.COMPACT} />
-        </>
-      )}
+
+      <DataAccessPanel mode={MODE.COMPACT} type={TYPE.DATA_ACCESS} />
+      <SpatialCoverageCard
+        onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
+      />
+      <CitationPanel mode={MODE.COMPACT} />
     </Stack>
   );
 };
