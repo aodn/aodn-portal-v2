@@ -52,7 +52,7 @@ window.__map_functions = {
     if (this.getTestProps(mapId).getGeoServerTileLayer) {
       return this.getTestProps(mapId).getGeoServerTileLayer();
     } else {
-      throw new Error("GeoServerTile layer not found");
+      throw new Error("Geoserver layer not found");
     }
   },
   getHexbinLayer: function (mapId) {

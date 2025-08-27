@@ -158,7 +158,7 @@ class Map(BasePage):
         return self.get_layer_id_from_test_props('getSpiderLayer')
 
     def get_Geo_Server_Layer_id(self) -> str:
-        """Get the GeoServerTile layer id"""
+        """Get the Geoserver layer id"""
         return self.get_layer_id_from_test_props(
             'getGeoServerLayer', is_map_loading=False
         )
