@@ -1,9 +1,7 @@
 import { FC, useCallback, useMemo, useState } from "react";
 import {
   Alert,
-  Box,
   Button,
-  CircularProgress,
   Divider,
   Grid,
   LinearProgress,
@@ -22,7 +20,6 @@ import CommonSelect, {
   SelectItem,
 } from "../../../../components/common/dropdown/CommonSelect";
 import { ILink } from "../../../../components/common/store/OGCCollectionDefinitions";
-import axios from "axios";
 import rc8Theme from "../../../../styles/themeRC8";
 
 // TODO: options should fetch from wfs server
@@ -30,16 +27,6 @@ const options = [
   // { label: "NetCDFs", value: "NetCDFs" },
   { label: "CSV", value: "csv" },
 ];
-
-// example url: "https://geoserver-123.aodn.org.au/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=imos:aatams_sattag_dm_profile_map&outputFormat=text/csv"
-// const WFSBaseUrl = "https://geoserver-123.aodn.org.au/geoserver/ows";
-// const WFSParam = {
-//   service: "WFS",
-//   version: "2.0.0",
-//   request: "GetFeature",
-//   typeName: "imos:aatams_sattag_dm_profile_map",
-//   outputFormat: "text/csv",
-// };
 
 enum DownloadStatus {
   NOT_STARTED = "Download not started",
@@ -63,16 +50,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
   const [downloadingStatus, setDownloadingStatus] = useState<DownloadStatus>(
     DownloadStatus.NOT_STARTED
   );
-  const [downloadProgress, setDownloadProgress] = useState<number>(0);
   const [downloadedBytes, setDownloadedBytes] = useState<number>(0);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  // const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  // const { downloadConditions, collection } = useDetailPageContext();
-  // const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
-
-  // const onDownload = useCallback(() => {
-  //   setDownloadDialogOpen(true);
-  // }, []);
 
   const WFSOptions: SelectItem<string>[] = useMemo(
     () =>
@@ -88,70 +67,10 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
     },
     [setSelectedDataItem]
   );
-  const handleDownload = useCallback(
-    async (selectedDataItem: string | undefined) => {
-      setDownloadingStatus(DownloadStatus.IN_PROGRESS);
-      setDownloadProgress(0);
-      setSnackbarOpen(true);
 
-      const selectedLink = WFSLinks.find(
-        (link) => link.title === selectedDataItem
-      );
-
-      if (!selectedLink?.title || !uuid) {
-        console.error("UUID or layer name is not provided for download");
-        setDownloadingStatus(DownloadStatus.ERROR);
-        return;
-      }
-
-      try {
-        // Option 1: Using axios with progress tracking
-        const response = await axios.post(
-          "/api/v1/ogc/processes/downloadWfs/execution",
-          {
-            inputs: {
-              uuid: uuid,
-              recipient: "",
-              layer_name: selectedLink.title,
-            },
-          },
-          {
-            responseType: "blob",
-            timeout: 300000, // 5 minutes
-            onDownloadProgress: (progressEvent) => {
-              if (progressEvent.total) {
-                const progress =
-                  (progressEvent.loaded / progressEvent.total) * 100;
-                setDownloadProgress(progress);
-              }
-            },
-          }
-        );
-
-        // Handle successful response
-        downloadFile(response.data, generateFileName(selectedLink.title));
-        setDownloadingStatus(DownloadStatus.COMPLETED);
-        setSnackbarOpen(true);
-        return response.data;
-      } catch (error) {
-        // Handle error
-        setDownloadingStatus(DownloadStatus.ERROR);
-        setSnackbarOpen(true);
-        console.error("Download request failed:", error);
-
-        // Reset progress on error
-        setDownloadProgress(0);
-        throw error;
-      }
-    },
-    [WFSLinks, uuid]
-  );
-
-  // Alternative implementation using fetch API for very large files
   const handleDownloadWithFetch = useCallback(
     async (selectedDataItem: string | undefined) => {
       setDownloadingStatus(DownloadStatus.IN_PROGRESS);
-      setDownloadProgress(0);
       setDownloadedBytes(0);
       setSnackbarOpen(true);
 
@@ -193,8 +112,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // we show actual bytes downloaded
-
+        // Showing actual bytes downloaded
         if (!response.body) {
           throw new Error("Response body is null");
         }
@@ -235,7 +153,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
       } catch (error) {
         setDownloadingStatus(DownloadStatus.ERROR);
         setSnackbarOpen(true);
-        setDownloadProgress(0);
         setDownloadedBytes(0);
         console.error("Download request failed:", error);
         throw error;
@@ -319,7 +236,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
               backgroundColor: rc8Theme.palette.primary.main,
             },
           }}
-          // onClick={() => handleDownload(selectedDataItem)}
           onClick={() => handleDownloadWithFetch(selectedDataItem)}
         >
           <Typography padding={0} color="#fff">
