@@ -114,9 +114,10 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
         src={notMatchingRecordImage}
         alt="not found image"
         sx={{
-          height: "50vh", // Full viewport height
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          height: "70vh", // Set the height to 70% of the viewport height
+          width: "100%",
+          objectFit: "contain",
+          objectPosition: "center",
           backgroundRepeat: "no-repeat",
         }}
       />
