@@ -48,9 +48,36 @@ window.__map_functions = {
       throw new Error("Spider layer not found");
     }
   },
+  getGeoServerLayer: function (mapId) {
+    if (this.getTestProps(mapId).getGeoServerTileLayer) {
+      return this.getTestProps(mapId).getGeoServerTileLayer();
+    } else {
+      throw new Error("Geoserver layer not found");
+    }
+  },
+  getHexbinLayer: function (mapId) {
+    if (this.getTestProps(mapId).getHexbinLayer) {
+      return this.getTestProps(mapId).getHexbinLayer();
+    } else {
+      throw new Error("Hexbin layer not found");
+    }
+  },
+  getSymbolLayer: function (mapId) {
+    if (this.getTestProps(mapId).getSymbolLayer) {
+      return this.getTestProps(mapId).getSymbolLayer();
+    } else {
+      throw new Error("Symbol layer not found");
+    }
+  },
   isMapLayerVisible: function (mapId, layerId) {
     const map = this.getMap(mapId);
-    return undefined != map.getLayer(layerId);
+    if (map.getLayer(layerId) == undefined) {
+      return false;
+    } else if (map.getLayer(layerId).props == undefined) {
+      return true;
+    } else {
+      return map.getLayer(layerId).props.visible;
+    }
   },
   findAndClickCluster: function (mapId) {
     const map = this.getMap(mapId);

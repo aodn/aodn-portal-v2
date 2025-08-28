@@ -27,6 +27,9 @@ class DetailPage(BasePage):
 
         self.page_title = self.get_label(text='collection title')
         self.return_button = self.page.get_by_test_id('return-button')
+        self.share_button = self.page.get_by_test_id('share-button')
+        self.copy_link = self.page.get_by_test_id('copy-link')
+        self.wms_link_header = self.get_text('WMS Service Link')
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')
@@ -67,3 +70,12 @@ class DetailPage(BasePage):
 
     def click_show_less(self, item_list: str) -> None:
         self.page.get_by_test_id(f'show-less-detail-btn-{item_list}').click()
+
+    def get_shared_link(self) -> str:
+        """Returns the shared link from the copy link button"""
+        self.page.context.grant_permissions(
+            ['clipboard-write', 'clipboard-read']
+        )
+        self.share_button.click()
+        self.copy_link.click()
+        return self.page.evaluate('() => navigator.clipboard.readText()')

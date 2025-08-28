@@ -5,3 +5,6 @@ class LayerType(Enum):
     MARINE_PARKS = auto()
     WORLD_BOUNDARIES = auto()
     SPIDER = auto()
+    GEO_SERVER = auto()
+    HEXBIN = auto()
+    SYMBOL = auto()

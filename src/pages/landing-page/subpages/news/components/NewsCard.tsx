@@ -30,6 +30,7 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
           height="280px"
           image={news.image}
           alt={`news image-${news.title}`}
+          data-testid={news.subheading}
           sx={{
             borderRadius: borderRadius.large,
             objectFit: "cover",

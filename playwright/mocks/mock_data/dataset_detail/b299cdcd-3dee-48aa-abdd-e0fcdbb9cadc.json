@@ -1,0 +1,1293 @@
+{
+  "properties": {
+    "temporal": [
+      {
+        "start": "2018-01-14T12:10:00Z"
+      }
+    ],
+    "statement": "Waverider buoy data from the World Meteorological Organization (WMO) Global Telecommunication System (GTS) is provided, as delivered, by the Bureau of Meteorology. In March 2018, Queensland buoys were added. In July 2020, NSW MHL buoys were added. In September 2020, Victorian buoys were added. In April 2021, IMOS buoys were added, with more added In November 2021. In November 2002 UWA, NSW Nearshore Wave Data Program, Victorian Coastal Monitoring Program and Pilbara Port's buoys were added. In August 2023 Flinders University + SARDI buoys were added.\n\nThis data is collated by AODN, and made available as a timeseries. The location of the buoy in the WMO message is recorded in degrees, minutes (not seconds), hence the location is only accurate to 1-2 kilometres.",
+    "license": "Creative Commons Attribution 4.0 International License",
+    "ai:description": "Buoys provide integral wave parameters. Buoy data from the following organisations contribute to the National Wave Archive:\n\n- Manly Hydraulics Laboratory (part of the NSW Department of Planning and Environment (DPE), which has assumed function of the former NSW Office of Environment and Heritage (OEH))\n- Bureau of Meteorology\n- Western Australia Department of Transport (DOT)\n- Queensland Department of Environment and Science (DES)\n- Integrated Marine Observing System (IMOS)\n- Gippsland Ports\n- NSW Nearshore Wave Data Program from the NSW Department of Planning and Environment (DPE)\n- University of Western Australia (UWA)\n- Deakin University\n- Pilbara Ports Authority\n- Flinders University\n- South Australian Research and Development Institute (SARDI).\n\nThe data from MHL, BOM, DOT, DES, Gippsland Ports and Pilbara Ports Authority is gathered by the Waverider system developed by the Dutch company, Datawell. Some older wave data were collected using non-directional Waverider buoys. As technology advanced and directional measuring capabilities were developed in wave buoys, wave buoy networks were gradually upgraded to directional Waverider buoys. Therefore, some older datasets do not have directional information whereas newer datasets have directional information.\n\nThe data from IMOS, the NSW Nearshore Wave Data Program, DPE, UWA, Deakin, Flinders University and SARDI comes from Spotter Wave Buoys, developed by Sofar Ocean Technologies, which collect data similarly to the Waverider system.\n\nBOM, DES, DOT, MHL, IMOS (some) and Gippsland Ports - The wave buoy data is issued in GTS bulletins (which are only available for 24 hours): IOWK01 (in BUFR format) and SWWE01 (CREX format). The data is collated by the Bureau into a CSV file (containing the last 24 hours of observations) which is updated every hour, at 5 minutes past the hour. This data is provided via WFS to the AODN.\n\nNote - The Maria Island buoy is currently undergoing repairs, so data is unavailable; we will update when resolved (May 2024).\n\nIMOS (some), DPE, UWA, Deakin, Flinders University + SARDI - The data is updated every hour, at 40 minutes past the hour.\n\nPilbara Ports Authority - The data is uploaded every hour, at 30 minutes past the hour.",
+    "themes": [
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Oceans | Ocean Waves | Significant Wave Height",
+            "description": "",
+            "title": "GCMD Science Keywords"
+          },
+          {
+            "id": "Oceans | Ocean Waves | Wave Period",
+            "description": "",
+            "title": "GCMD Science Keywords"
+          },
+          {
+            "id": "Oceans | Ocean Waves | Wave Spectra",
+            "description": "",
+            "title": "GCMD Science Keywords"
+          },
+          {
+            "id": "Oceans | Ocean Waves | Wave Speed/direction",
+            "description": "",
+            "title": "GCMD Science Keywords"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "concepts": [
+          {
+            "id": "Global / Oceans | Indian Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Coastal Waters (Australia) | South Australia Coast, SA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Great Australian Bight, SA/WA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Coral Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Coastal Waters (Australia) | Queensland Coast South, QLD",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Kangaroo Island, SA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Albatross Bay, QLD",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Global / Oceans | South West Pacific Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Coastal Waters (Australia) | Tasmania Coast West, TAS",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Coastal Waters (Australia) | West Australia Coast South, WA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Coastal Waters (Australia) | Victoria Coast, VIC",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Coastal Waters (Australia) | New South Wales Coast, NSW",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Coastal Waters (Australia) | West Australia Coast West, WA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Global / Oceans | Pacific Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Coastal Waters (Australia) | Queensland Coast Northwest, QLD",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Coastal Waters (Australia) | Northern Territory Coast, NT",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Gulf St. Vincent, SA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Maria Island, TAS",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Gippsland Lakes, VIC",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Great Barrier Reef, QLD",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "concepts": [
+          {
+            "id": "marinewms",
+            "description": "",
+            "title": "Keywords"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "moored surface buoy",
+            "url": "http://vocab.nerc.ac.uk/collection/L06/current/41",
+            "description": "",
+            "title": "AODN Platform Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Average height of the highest 1/3rd of waves on the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/35",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Maximum height of waves on the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/GCMXZZ01",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Sea-floor depth below surface of the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/574",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Average zero crossing period of the highest 1/10th waves on the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/37",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Period at second highest energy spectrum peak of waves on the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/40",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Average zero crossing period of the highest 1/3rd of waves on the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/417",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Directional spreading of waves on the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/GSPRZZ01",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Direction of waves on the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/GWDRZZ01",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Direction at spectral maximum of waves on the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/4",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Average zero crossing period of waves on the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/36",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Period at the peak spectral energy of waves on the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/3",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Spectral significant height of waves on the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/2",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "concepts": [
+          {
+            "id": "Wave Buoys Sub-Facility, Integrated Marine Observing System (IMOS)",
+            "url": "http://vocab.aodn.org.au/def/organisation/entity/590",
+            "description": "",
+            "title": "AODN Organisation Vocabulary"
+          },
+          {
+            "id": "Coastal Wave Buoys Facility, Integrated Marine Observing System (IMOS)",
+            "url": "http://vocab.aodn.org.au/def/organisation/entity/678",
+            "description": "",
+            "title": "AODN Organisation Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "wave recorders",
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/110",
+            "description": "",
+            "title": "AODN Instrument Vocabulary"
+          },
+          {
+            "id": "Sofar Ocean Spotter wave buoy",
+            "url": "http://vocab.nerc.ac.uk/collection/L22/current/TOOL1781",
+            "description": "",
+            "title": "AODN Instrument Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "Categories",
+        "concepts": [
+          {
+            "id": "oceans"
+          }
+        ]
+      }
+    ],
+    "citation": {
+      "otherConstraints": [
+        "The licence details for use of this data is \"free and unrestricted\". We request that attribution is \"Department of Transport [W.A]; State of Queensland, Department of Environment and Science; Australian Bureau of Meteorology; Department of Planning and Environment (DPE), New South Wales Government; Gippsland Ports; Integrated Marine Observing System; University of Western Australia (UWA); Deakin University, Pilbara Ports Authority, Flinders University and South Australian Research and Development Institute (SARDI) [year-of-data-downloaded], Wave buoys Observations - Australia - near real-time, Downloaded from [url] on [date-of-download]\".",
+        "Please refer to http://www.bom.gov.au/other/disclaimer.shtml for Bureau disclaimer details.",
+        "DOT buoys - The Dept of Transport [W.A] provides this data with the following disclaimer: \"The Dept of Transport does not provide any warranty as to the accuracy of the Information nor as to its reliability. No person or corporation should act solely on the Information without considering, and, if necessary, seeking verification of the Information from an alternative information supplier. Neither Transport nor any member officer or employee undertakes responsibility in any way whatsoever to any person or corporation in respect of the Information including any errors or omissions therein however caused, whether through negligence or otherwise. (Dept of) Transport and all its member officers and employees expressly disclaim all and any liability to any person or corporation into whose hands the Information may come whether as purchased or otherwise, in respect of anything and of the consequences of anything done or omitted to be done by any such person or corporation in reliance in whole or part upon the whole or any part of the Information.\"",
+        "DES buoys - The Coastal Impacts Unit, DES disclaims all responsibility for the information provided, and all liability (including without limitation, liability in negligence) for all expenses, losses, damages, and costs that may be incurred as a result of the information being inaccurate or incomplete in any way for any reason",
+        "MHL buoys - New disclaimer (November 2022) - NSW buoys Recipients of this ocean wave data will be subject to the following conditions: The Department of Planning and Environment (DPE) [NSW] provides this data with the following disclaimer: \"The Department of Planning and Environment does not provide any warranty as to the accuracy of the Information nor as to its reliability. No person or corporation should act solely on the Information without considering, and, if necessary, seeking verification of the Information from an alternative information supplier. Neither DPE nor any member officer or employee undertakes responsibility in any way whatsoever to any person or corporation in respect of the Information including any errors or omissions therein however caused, whether through negligence or otherwise. DPE and all its member officers and employees expressly disclaim all and any liability to any person or corporation into whose hands the Information may come whether as purchased or otherwise, in respect of anything and of the consequences of anything done or omitted to be done by any such person or corporation in reliance in whole or part upon the whole or any part of the Information.\" The Department of Planning and Environment (DPE) [NSW] disclaims all responsibility for the information provided, and all liability (including without limitation, liability in negligence) for all expenses, losses, damages, and costs that may be incurred as a result of the information being inaccurate or incomplete in any way for any reason. Please refer to the NSW Government data disclaimer on SEED https://www.seed.nsw.gov.au/copyright-disclaimer. \n\nFormer disclaimer - The Department of Planning, Industry and Environment (DPIE) [NSW] provides this data with the following disclaimer: \"The Department of Planning, Industry and Environment does not provide any warranty as to the accuracy of the Information nor as to its reliability. No person or corporation should act solely on the Information without considering, and, if necessary, seeking verification of the Information from an alternative information supplier. Neither DPIE nor any member officer or employee undertakes responsibility in any way whatsoever to any person or corporation in respect of the Information including any errors or omissions therein however caused, whether through negligence or otherwise. DPIE and all its member officers and employees expressly disclaim all and any liability to any person or corporation into whose hands the Information may come whether as purchased or otherwise, in respect of anything and of the consequences of anything done or omitted to be done by any such person or corporation in reliance in whole or part upon the whole or any part of the Information.\" The Department of Planning, Industry and Environment (DPIE) [NSW] disclaims all responsibility for the information provided, and all liability (including without limitation, liability in negligence) for all expenses, losses, damages, and costs that may be incurred as a result of the information being inaccurate or incomplete in any way for any reason. Please refer to the NSW Government data disclaimer on SEED https://www.seed.nsw.gov.au/copyright-disclaimer",
+        "Gippsland buoys - In consideration of Gippsland Ports Committee of Management Inc. permitting use of this data, you acknowledge and agree that neither the Crown in respect of the State of Victoria, Gippsland Ports Committee of Management Inc. or its Directors or employees, give any warranty in relation to the data (including currency, accuracy, reliability, completeness or suitability) and accept no liability (including without limitation, liability in negligence) whatsoever and howsoever caused for any loss damage or cost (including consequential damage) relating to any use of or reliance on the data.",
+        "IMOS buoys - Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: \"Data was sourced from Australia's Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure strategy (NCRIS).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in 'credit' in the metadata record).",
+        "UWA buoys - Any users of IMOS data are required to clearly acknowledge the source of the material in the format: \\\"Data was sourced from Australia?s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS)\\\". This wave data was collected and quality controlled by the University of Western Australia. This dataset is an output from the Catching Oz Waves project, which received investment (https://doi.org/10.47486/DP748) from the Australian Research Data Commons (ARDC). The ARDC is funded by the National Collaborative Research Infrastructure Strategy (NCRIS).\"",
+        "NSW nearshore wave buoys - Data users must clearly acknowledge: NSW nearshore wave buoy data were collected, processed and provided by the NSW Department of Planning and Environment Nearshore Wave Data Program\\\". For more information visit: https://datasets.seed.nsw.gov.au/dataset/nsw-nearshore-wave-buoy-parameter-time-series-data-completed-deployments. This dataset is an output from the Catching Oz Waves project, which received investment (https://doi.org/10.47486/DP748) from the Australian Research Data Commons (ARDC). The ARDC is funded by the National Collaborative Research Infrastructure Strategy (NCRIS).",
+        "Deakin University buoys - If you use this data please attribute as ?Wave data was provided by the Victorian Coastal Monitoring Program with funding through Department of Environment, Land, Water and Planning, University of Melbourne and Deakin University.? For the Cape Bridgewater Sofar Ocean buoys that are being used in the IMOS new technology proving trials in additional please acknowledge ?Data was sourced from Australia?s Integrated Marine Observing System (IMOS) ? IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS). This dataset is an output from the Catching Oz Waves  project, which received investment (https://doi.org/10.47486/DP748) from the Australian Research Data Commons (ARDC). The ARDC is funded by the National Collaborative Research Infrastructure Strategy (NCRIS).?",
+        "Pilbara Ports buoys - Data users must clearly acknowledge: \"Data was provided by the Pilbara Ports Authority with assistance from OMC International. This dataset is an output from the Catching Oz Waves project, which received investment (https://doi.org/10.47486/DP748) from the Australian Research Data Commons (ARDC). The ARDC is funded by the National Collaborative Research Infrastructure Strategy (NCRIS)\"",
+        "South Australian buoys - If you are using this data please acknowledge that “Flinders University and the South Australia Research and Development Institute provided the wave data from Gulf Saint Vincent, via funding from SA Water, the Environment Protection Authority (EPA) and the SA Department for Environment and Water (DEW) through its Coastal Research and Development Grant Program.” If you are using data from the Robe wave buoys please acknowledge that “Flinders University and the South Australia Research and Development Institute provided the wave data from the Robe region, via funding from the District Council of Robe.”"
+      ]
+    },
+    "status": "onGoing",
+    "revision": "2025-02-19T03:52:18",
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [114, -31],
+              [115, -31],
+              [115, -30.000000000000007],
+              [114, -30.000000000000007],
+              [114, -31]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [115, -33],
+              [116, -33],
+              [116, -31],
+              [115, -31],
+              [115, -33]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [129, -11],
+              [130, -11],
+              [130, -10],
+              [129, -10],
+              [129, -11]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [141, -12.999999999999986],
+              [142, -12.999999999999986],
+              [142, -11],
+              [141, -11],
+              [141, -12.999999999999986]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [145, -17],
+              [146, -17],
+              [146, -16],
+              [145, -16],
+              [145, -17]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [147, -20],
+              [148, -20],
+              [148, -19],
+              [147, -19],
+              [147, -20]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [151, -24],
+              [152, -24],
+              [152, -23.000000000000018],
+              [151, -23.000000000000018],
+              [151, -24]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [152, -25],
+              [153, -25],
+              [153, -24],
+              [152, -24],
+              [152, -25]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [149, -22],
+              [150, -22],
+              [150, -21.000000000000018],
+              [149, -21.000000000000018],
+              [149, -22]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [153, -29],
+              [154, -29],
+              [154, -28],
+              [155, -28],
+              [155, -27],
+              [154, -27],
+              [154, -25],
+              [153, -25],
+              [153, -29]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [153, -31],
+              [154, -31],
+              [154, -30.000000000000007],
+              [153, -30.000000000000007],
+              [153, -31]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [114, -34],
+              [115, -34],
+              [115, -33],
+              [114, -33],
+              [114, -34]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [151, -35.00000000000001],
+              [152, -35.00000000000001],
+              [152, -33],
+              [151, -33],
+              [151, -35.00000000000001]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [150, -37.99999999999999],
+              [151, -37.99999999999999],
+              [151, -37],
+              [150, -37],
+              [150, -37.99999999999999]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [147, -37.99999999999999],
+              [148, -37.99999999999999],
+              [148, -37],
+              [147, -37],
+              [147, -37.99999999999999]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [121, -35.00000000000001],
+              [122, -35.00000000000001],
+              [122, -33],
+              [121, -33],
+              [121, -35.00000000000001]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [136, -37],
+              [137, -37],
+              [137, -35.999999999999986],
+              [136, -35.999999999999986],
+              [136, -37]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [150, -35.999999999999986],
+              [151, -35.999999999999986],
+              [151, -35.00000000000001],
+              [150, -35.00000000000001],
+              [150, -35.999999999999986]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [116.99999999999999, -35.999999999999986],
+              [118.00000000000001, -35.999999999999986],
+              [118.00000000000001, -35.00000000000001],
+              [116.99999999999999, -35.00000000000001],
+              [116.99999999999999, -35.999999999999986]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [145, -42.999999999999986],
+              [146, -42.999999999999986],
+              [146, -42.00000000000001],
+              [145, -42.00000000000001],
+              [145, -42.999999999999986]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [148, -42.999999999999986],
+              [149, -42.999999999999986],
+              [149, -42.00000000000001],
+              [148, -42.00000000000001],
+              [148, -42.999999999999986]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "pace": "real-time",
+    "centroid": [[152.5, -24.25]],
+    "creation": "2020-07-15T12:11:02",
+    "contacts": [
+      {
+        "organization": "Department of Transport (DoT), Western Australian Government",
+        "position": "Manager Oceanographic Services",
+        "emails": ["tides@transport.wa.gov.au"],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "organization": "Department of Environment and Science (DES), Queensland Government",
+        "emails": ["coastal.sciences@dsiti.qld.gov.au"],
+        "addresses": [
+          {
+            "city": "Brisbane",
+            "country": "Australia",
+            "delivery_point": ["Coastal Impacts Unit", "GPO Box 2454"],
+            "administrative_area": "Queensland",
+            "postal_code": "4001"
+          }
+        ],
+        "roles": ["pointOfContact", "about"],
+        "phones": [
+          {
+            "value": "137468",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Australian Bureau of Meteorology",
+        "position": "Data Requirements and Quality",
+        "emails": ["marine_obs@bom.gov.au"],
+        "addresses": [
+          {
+            "city": "Docklands",
+            "country": "Australia",
+            "delivery_point": ["700 Collins Street"],
+            "administrative_area": "Victoria",
+            "postal_code": "3008"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "organization": "Manly Hydraulics Laboratory (MHL)",
+        "emails": ["MHL.Reception@mhl.nsw.gov.au"],
+        "addresses": [
+          {
+            "city": "Sydney",
+            "country": "Australia",
+            "delivery_point": ["110B King Street, Manly Vale"],
+            "administrative_area": "NSW",
+            "postal_code": "2093"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.mhl.nsw.gov.au",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": ""
+          }
+        ],
+        "roles": ["pointOfContact", "about"],
+        "phones": [
+          {
+            "value": "(02) 9949 0200",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Gippsland Ports",
+        "emails": ["feedback@gippslandports.vic.gov.au"],
+        "addresses": [
+          {
+            "city": "Bairnsdale",
+            "country": "Australia",
+            "delivery_point": [
+              "Hydrographic Services Department",
+              "97 Main Street"
+            ],
+            "administrative_area": "Victoria",
+            "postal_code": "3875"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://www.gippslandports.vic.gov.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": ""
+          }
+        ],
+        "roles": ["pointOfContact", "about"],
+        "phones": [
+          {
+            "value": "+61 3 5150 0500",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "name": "Hansen, Jeff",
+        "organization": "The University of Western Australia (UWA)",
+        "emails": ["jeff.hansen@uwa.edu.au"],
+        "addresses": [
+          {
+            "city": "Perth",
+            "country": "Australia",
+            "delivery_point": ["35 Stirling Highway, Crawley"],
+            "administrative_area": "Western Australia",
+            "postal_code": "6009"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "name": "Ierodiaconou, Daniel",
+        "organization": "Deakin University",
+        "emails": ["daniel.ierodiaconou@deakin.edu.au"],
+        "addresses": [
+          {
+            "city": "Burwood",
+            "country": "Australia",
+            "delivery_point": [
+              "School of Life and Environmental Sciences",
+              "221 Burwood Highway"
+            ],
+            "administrative_area": "Victoria",
+            "postal_code": "3125"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "name": "King, Richard",
+        "organization": "Pilbara Ports Authority",
+        "emails": ["Richard.King@pilbaraports.com.au"],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "name": "Miot da Silva, Graziela",
+        "organization": "Flinders University",
+        "emails": ["graziela.miotdasilva@flinders.edu.au"],
+        "addresses": [
+          {
+            "city": "Adelaide",
+            "country": "Australia",
+            "delivery_point": ["Earth Sciences (315)", "GPO Box 2100"],
+            "administrative_area": "South Australia",
+            "postal_code": "5001"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "position": "Data Officer",
+        "emails": ["info@aodn.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["University of Tasmania", "Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://imos.org.au/aodn.html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Australian Ocean Data Network (AODN)"
+          }
+        ],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": [
+          {
+            "value": "61 3 6226 7488",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      },
+      {
+        "organization": "Australian Bureau of Meteorology",
+        "emails": ["mgdu@bom.gov.au"],
+        "addresses": [
+          {
+            "city": "Docklands",
+            "country": "Australia",
+            "delivery_point": ["700 Collins Street"],
+            "administrative_area": "Victoria",
+            "postal_code": "3008"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      },
+      {
+        "organization": "Department of Transport (DoT), Western Australian Government",
+        "emails": ["tides@transport.wa.gov.au"],
+        "addresses": [
+          {
+            "country": "Australia",
+            "administrative_area": "Western Australia"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      },
+      {
+        "organization": "Department of Environment and Science (DES), Queensland Government",
+        "emails": ["info@des.qld.gov.au"],
+        "addresses": [
+          {
+            "city": "Brisbane",
+            "country": "Australia",
+            "delivery_point": ["Coastal Impacts Unit", "GPO Box 2454"],
+            "administrative_area": "Queensland",
+            "postal_code": "4001"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "137468",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Department of Planning and Environment (DPE), New South Wales Government",
+        "addresses": [
+          {
+            "city": "Paramatta",
+            "country": "Australia",
+            "delivery_point": ["Locked Bag 5022"],
+            "administrative_area": "New South Wales",
+            "postal_code": "2124"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://www.planning.nsw.gov.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": ""
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "1300 420 596",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Gippsland Ports",
+        "emails": ["feedback@gippslandports.vic.gov.au"],
+        "addresses": [
+          {
+            "city": "Bairnsdale",
+            "country": "Australia",
+            "delivery_point": [
+              "Hydrographic Services Department",
+              "97 Main Street"
+            ],
+            "administrative_area": "Victoria",
+            "postal_code": "3875"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://www.gippslandports.vic.gov.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": ""
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "+61 3 5150 0500",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "emails": ["imos@imos.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.imos.org.au/html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Integrated Marine Observing System (IMOS)"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "61 3 6226 7549",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimilie"]
+          }
+        ]
+      },
+      {
+        "organization": "The University of Western Australia (UWA)",
+        "emails": ["general.enquiries@uwa.edu.au"],
+        "addresses": [
+          {
+            "city": "Perth",
+            "country": "Australia",
+            "delivery_point": ["35 Stirling Highway, Crawley"],
+            "administrative_area": "Western Australia",
+            "postal_code": "6009"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.uwa.edu.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the University of Western Australia (UWA)"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "+61 8 6488 6000",
+            "roles": ["voice"]
+          },
+          {
+            "value": "+61 8 6488 1380",
+            "roles": ["facsimilie"]
+          }
+        ]
+      },
+      {
+        "organization": "Deakin University",
+        "emails": ["enquire@deakin.edu.au"],
+        "addresses": [
+          {
+            "city": "Burwood",
+            "country": "Australia",
+            "delivery_point": ["221 Burwood Highway"],
+            "administrative_area": "Victoria",
+            "postal_code": "3125"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.deakin.edu.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Deakin University website"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      },
+      {
+        "organization": "Pilbara Ports Authority",
+        "emails": ["feedback@pilbaraports.com.au"],
+        "addresses": [
+          {
+            "city": "Perth",
+            "country": "Australia",
+            "delivery_point": ["Level 5/999 Hay Street"],
+            "administrative_area": "Western Australia",
+            "postal_code": "6000"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://www.pilbaraports.com.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Pilbara Ports Authority website"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "+61 8 6217 7112",
+            "roles": ["voice"]
+          },
+          {
+            "value": "+61 8 9226 2196",
+            "roles": ["facsimilie"]
+          }
+        ]
+      },
+      {
+        "organization": "Flinders University",
+        "addresses": [
+          {
+            "city": "Adelaide",
+            "country": "Australia",
+            "delivery_point": ["GPO Box 2100"],
+            "administrative_area": "South Australia",
+            "postal_code": "5001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.flinders.edu.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Flinders University website"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      },
+      {
+        "organization": "South Australian Research and Development Institute (SARDI)",
+        "emails": ["pirsa.sardi@sa.gov.au"],
+        "addresses": [
+          {
+            "city": "Adelaide",
+            "country": "Australia",
+            "delivery_point": ["GPO Box 397"],
+            "administrative_area": "South Australia",
+            "postal_code": "5001"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://pir.sa.gov.au/research/about_sardi",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "SARDI website"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      }
+    ],
+    "credits": [
+      "Australian Bureau of Meteorology",
+      "Data from the Buoys in Western Australia is kindly provided by Department of Transport (DOT)",
+      "Data from the Buoys in Queensland is kindly provided by Department of Environment and Science (DES). The following buoys are part of these joint projects: Tweed River entrance sand bypass project (Tweed Heads), Port of Brisbane Corporation (North Moreton Bay and Caloundra), Gold Coast City Council (Gold Coast), Department of Transport and Main Roads (Mooloolaba), Gladstone Ports Corporation (Gladstone), North Queensland Bulk Ports Corporation Limited (Hay Point, Albatross Bay)",
+      "Data collection of Manly Hydraulics Laboratory (MHL) buoys, funded by NSW Department of Planning and Environment (DPE) (formerly known as Department of Planning, Industry and Environment (DPIE)) (prior funding by former NSW Office of Environment and Heritage (OEH))",
+      "MHL Waverider buoy system and data management undertaken for NSW DPE (formerly DPIE) by NSW Public Works Manly Hydraulics Laboratory",
+      "Data from the Lakes Entrance buoy is kindly provided by Gippsland Ports.",
+      "Data from the Maria Island and Goodrich Bank Buoys - the wave buoy infrastructure was funded by the Integrated Marine Observing System (IMOS), with co-investment from the Bureau of Meteorology and the Australian Institute of Marine Science.",
+      "Data from the Brisbane Offshore Buoy - the wave buoy infrastructure was funded by the Integrated Marine Observing System (IMOS), with co-investment from the Department of Environment and Science (DES), Queensland and the Australian Institute of Marine Science.",
+      "NSW nearshore wave buoy data were collected, processed and provided by the NSW DPE Nearshore Wave Data Program",
+      "Data from the Deakin buoys - Wave data was provided by the Victorian Coastal Monitoring Program with funding through Department of Environment, Land, Water and Planning, University of Melbourne and Deakin University.",
+      "Data from the Pilbara buoys - Data was provided by the Pilbara Ports Authority with assistance from OMC International.",
+      "Catching Oz Waves project",
+      "Flinders University and the South Australia Research and Development Institute provided the wave data from Gulf Saint Vincent, via funding from SA Water, the Environment Protection Authority (EPA) and the SA Department for Environment and Water (DEW) through its Coastal Research and Development Grant Program. The buoys in the Robe area were funded by the District Council of Robe."
+    ]
+  },
+  "id": "b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc",
+  "title": "Wave buoys Observations - Australia - near real-time",
+  "description": "Buoys provide integral wave parameters. Buoy data from the following organisations contribute to the National Wave Archive: Manly Hydraulics Laboratory (part of the NSW Department of Planning and Environment (DPE), which has assumed function of the former NSW Office of Environment and Heritage (OEH)); Bureau of Meteorology; Western Australia Department of Transport (DOT); the Queensland Department of Environment and Science (DES); the Integrated Marine Observing System (IMOS); Gippsland Ports; the NSW Nearshore Wave Data Program from the NSW Department of Planning and Environment (DPE); the University of Western Australia (UWA); Deakin University, Pilbara Ports Authority and Flinders University and South Australian Research and Development Institute (SARDI). \n\nThe data from MHL, BOM, DOT, DES, Gippsland Ports and Pilbara Ports Authority, is gathered by the Waverider system developed by the Dutch company, Datawell. Some older wave data were collected using non-directional Waverider buoys. As technology advanced and directional measuring capabilities were developed in wave buoys, wave buoy networks were gradually upgraded to directional Waverider buoys. Therefore, some older datasets do not have directional information whereas newer datasets have directional information.\n\nThe data from IMOS, the NSW Nearshore Wave Data Program, DPE, UWA, Deakin, Flinders University and SARDI comes from Spotter Wave Buoys, developed by Sofar Ocean Technologies, which collect data similarly to the Waverider system.\n\nBOM, DES, DOT, MHL, IMOS (some) and Gippsland Ports - The wave buoy data is issued in GTS bulletins (which are only available for 24 hours) : IOWK01 (in BUFR format) and SWWE01 (CREX format). The data is collated by the Bureau into a CSV file (containing the last 24 hours of observations) which is updated every hour, at 5 minutes past the hour. This data is provided via WFS to the AODN.\nNote - The Maria Island buoy is currently undergoing repairs, so data is unavailable, we will update when resolved (May 2024).\n\nIMOS (some), DPE, UWA, Deakin, Flinders University + SARDI - The data is updated every hour, at 40 minutes past the hour.\n\nPilbara Ports Authority - The data is uploaded every hour, at 30 minutes past the hour.",
+  "links": [
+    {
+      "href": "http://www.bom.gov.au/products/IDS65030.shtml",
+      "rel": "related",
+      "type": "text/html",
+      "title": "DownloadableData: [graph] Cape du Couedic Wave Observations",
+      "ai:group": "Other"
+    },
+    {
+      "href": "http://www.bom.gov.au/products/IDT65014.shtml",
+      "rel": "related",
+      "type": "text/html",
+      "title": "DownloadableData: [graph] Cape Sorell Waverider Buoy Observations",
+      "ai:group": "Other"
+    },
+    {
+      "href": "http://wisupt.bom.gov.au/openwis-user-portal/srv/en/main.home",
+      "rel": "related",
+      "type": "text/html",
+      "title": "DownloadableData: [BUFR-IOWK01 or CREX-SWWE01] WMO WIS GTS wavebuoy bulletins",
+      "ai:group": "Other"
+    },
+    {
+      "href": "http://www.transport.wa.gov.au/imarine/about-wave-data.asp",
+      "rel": "related",
+      "type": "text/html",
+      "title": "WA DOT Wave monitoring sites",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://www.qld.gov.au/environment/coasts-waterways/beach/waves-sites",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Queensland Department of Environment & Science wave monitoring sites",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://vicwaves.com.au/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Victorian Coastal Monitoring Program sites",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://sawaves.org/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "South Australian Monitoring Program sites",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://imos.aodn.org.au/imos123/home?uuid=b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc",
+      "rel": "related",
+      "type": "text/html",
+      "title": "View and download data though the AODN Portal"
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "aodn:aodn_wave_nrt_v2_timeseries_map",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+      "rel": "wfs",
+      "type": "",
+      "title": "aodn:aodn_wave_nrt_v2_timeseries_data",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "OGC WFS help documentation",
+      "ai:group": "Document"
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+      "rel": "IMOS:AGGREGATION--bodaac",
+      "type": "",
+      "title": "aodn_wave_nrt_v2_timeseries_map#url"
+    },
+    {
+      "href": "https://help.aodn.org.au/web-services/ncurllist-service/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "ncUrlList help documentation"
+    },
+    {
+      "href": "http://www.bom.gov.au/products/IDT65091.shtml",
+      "rel": "related",
+      "type": "text/html",
+      "title": "DownloadableData: [graph] Maria Island Wave Observations",
+      "ai:group": "Other"
+    },
+    {
+      "href": "http://www.bom.gov.au/products/IDD65028.shtml",
+      "rel": "related",
+      "type": "text/html",
+      "title": "DownloadableData: [graph] Goodrich Bank Wave Observations",
+      "ai:group": "Other"
+    },
+    {
+      "href": "http://content.aodn.org.au/?prefix=Documents/AODN/Waves/Instruments_manuals/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Instrument manuals",
+      "ai:group": "Document"
+    },
+    {
+      "href": "https://content.aodn.org.au/Documents/IMOS/Conventions/Wave_standards/AODN_wave_buoy_operations_and_data_management_guidelines_v1.0.pdf",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Wave Buoy Operations and Data Management Guidelines Manual",
+      "ai:group": "Document"
+    },
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/Bureau_of_Meteorology/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog (BOM)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Environment_and_Science-Queensland/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog (DES)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Planning_and_Environment-New_South_Wales/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog (NSW-DPE)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Planning_and_Environment-New_South_Wales/Manly_Hydraulics_Laboratory/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog (MHL)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Transport-Western_Australia/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog (DoT)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/Deakin_University/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog (Deakin)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/Pilbara_Ports_Authority/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog (Pilbara Ports Authority)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/Gippsland-Ports-Victoria/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog (Gippsland Ports)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://thredds.aodn.org.au/thredds/catalog/Flinders_University/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog (Flinders University)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://registry.opendata.aws/aodn_wave_buoy_realtime_nonqc/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Access To AWS Open Data Program registry for the Cloud Optimised version of this dataset",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://nbviewer.org/github/aodn/aodn_cloud_optimised/blob/main/notebooks/wave_buoy_realtime_nonqc.ipynb",
+      "rel": "related",
+      "type": "application/x-ipynb+json",
+      "title": "Access to Jupyter notebook to query Cloud Optimised converted dataset",
+      "ai:group": "Python Notebook"
+    },
+    {
+      "href": "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/harvesting/IMOS_colour_logo.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc",
+      "rel": "describedby",
+      "type": "text/html",
+      "title": "Full metadata link"
+    },
+    {
+      "href": "http://i.creativecommons.org/l/by/4.0/88x31.png",
+      "rel": "license",
+      "type": "image/png"
+    },
+    {
+      "href": "http://creativecommons.org/licenses/by/4.0/",
+      "rel": "license",
+      "type": "text/html"
+    },
+    {
+      "href": "\"https://nbviewer.org/github/aodn/aodn_cloud_optimised/blob/main/notebooks/wave_buoy_realtime_nonqc.ipynb\"",
+      "rel": "related",
+      "type": "application/x-ipynb+json",
+      "title": "Python notebook example",
+      "ai:group": "Python Notebook"
+    },
+    {
+      "href": "http://localhost:8081/api/v1/ogc/collections/b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc/items/summary",
+      "rel": "summary",
+      "type": "application/json",
+      "title": "Summary"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [114.0, -43.0, 155.0, -10.0],
+        [114.0, -31.0, 115.0, -30.0],
+        [115.0, -33.0, 116.0, -31.0],
+        [129.0, -11.0, 130.0, -10.0],
+        [141.0, -13.0, 142.0, -11.0],
+        [145.0, -17.0, 146.0, -16.0],
+        [147.0, -20.0, 148.0, -19.0],
+        [151.0, -24.0, 152.0, -23.0],
+        [152.0, -25.0, 153.0, -24.0],
+        [149.0, -22.0, 150.0, -21.0],
+        [153.0, -29.0, 155.0, -25.0],
+        [153.0, -31.0, 154.0, -30.0],
+        [114.0, -34.0, 115.0, -33.0],
+        [151.0, -35.0, 152.0, -33.0],
+        [150.0, -38.0, 151.0, -37.0],
+        [147.0, -38.0, 148.0, -37.0],
+        [121.0, -35.0, 122.0, -33.0],
+        [136.0, -37.0, 137.0, -36.0],
+        [150.0, -36.0, 151.0, -35.0],
+        [117.0, -36.0, 118.0, -35.0],
+        [145.0, -43.0, 146.0, -42.0],
+        [148.0, -43.0, 149.0, -42.0]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["2018-01-14T12:10:00.000+00:00", null],
+        ["2018-01-14T12:10:00.000+00:00", null]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

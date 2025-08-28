@@ -13,6 +13,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 import _ from "lodash";
+import { TestHelper } from "../../../common/test/helper";
 
 interface DetailClusterSize {
   default?: number | string;
@@ -217,7 +218,12 @@ const DetailSymbolLayer: FC<LayerBasicType> = ({
     };
   }, [map, updateSource]);
 
-  return <></>;
+  return (
+    <TestHelper
+      id={map?.getContainer().id || ""}
+      getSymbolLayer={() => clusterLayer}
+    />
+  );
 };
 
 export default DetailSymbolLayer;
