@@ -1,17 +1,10 @@
 import React, { FC, useCallback } from "react";
-import { Box, Stack, SxProps } from "@mui/material";
+import { Box, Stack, SxProps, Typography, useTheme } from "@mui/material";
 import { useAppDispatch } from "../../common/store/hooks";
 import { updateDatasetGroup } from "../../common/store/componentParamReducer";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
-// import StateTerritoryAgenciesIcon from "../../icon/organisation/StateTerritoryAgenciesIcon";
-// import AustralianUniversitiesIcon from "../../icon/organisation/AustralianUniversitiesIcon";
-// import DepartmentAgenciesIcon from "../../icon/organisation/DepartmentAgenciesIcon";
-// import IndustryIcon from "../../icon/organisation/IndustryIcon";
-// import LocalGovernmentIcon from "../../icon/organisation/LocalGovernmentIcon";
-// import InternationalIcon from "../../icon/organisation/InternationalIcon";
-// import NonGovernmentIcon from "../../icon/organisation/NonGovernmentIcon";
 import IMOSIcon from "../../icon/organisation/IMOSIcon";
 import AustraliaAntarcticProgramIcon from "../../icon/organisation/AustraliaAntarcticProgramIcon";
 import AIMSIcon from "../../icon/organisation/AIMSIcon";
@@ -92,6 +85,7 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
   setFilters,
   sx,
 }) => {
+  const theme = useTheme();
   const dispatch = useAppDispatch();
   const handleChange = useCallback(
     (_: React.MouseEvent<HTMLElement>, newAlignment: string) => {
@@ -116,17 +110,33 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
           value={filters.organisation?.[0]}
           onChange={handleChange}
         >
-          {ORGANISATION.map(({ value, label, icon }) => (
-            <StyledToggleButton value={value} key={value} aria-label={label}>
-              <Stack
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                direction="column"
+          {ORGANISATION.map(({ value, label, icon }, index) => (
+            <Box
+              key={index}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <StyledToggleButton
+                value={value}
+                aria-label={label}
+                sx={{
+                  boxShadow: theme.shadows[7],
+                  backgroundColor: theme.palette.common.white,
+                  height: "88px",
+                  width: "96px",
+                }}
               >
-                {icon && icon}
-              </Stack>
-            </StyledToggleButton>
+                <Stack
+                  display="row"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  {icon && icon}
+                </Stack>
+              </StyledToggleButton>
+              <Typography>{label}</Typography>
+            </Box>
           ))}
         </StyledToggleButtonGroup>
       </Box>
