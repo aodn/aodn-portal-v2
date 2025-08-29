@@ -48,7 +48,7 @@
  * - Future: rc8Spacing, rc8Breakpoints, rc8Elevation, rc8BorderRadius
  */
 
-import { createTheme, ThemeOptions } from "@mui/material/styles";
+import { createTheme, Shadows, ThemeOptions } from "@mui/material/styles";
 import rc8Theme from "../styles/themeRC8";
 import { FONT_FAMILIES } from "../styles/fontsRC8";
 
@@ -302,35 +302,32 @@ const theme: ThemeOptions = {
   /** when using shadows, please use existing shadows if they are the same with
    * your requirement. If not, please replace one placeholder with your shadow values.
    * Please be very careful when trying to modify existing shadows because they
-   * are in use.
+   * are in use. Default array size for shadow is 25, you should change this number
+   * if more shadow is needed
    */
-  shadows: [
-    "none",
-    "1.5px 1.5px 3px 0px rgba(0, 0, 0, 0.20)",
-    "1px 1px 10px 1px #d4d4d4", // filter toggle button
-    "0 0 10px rgba(0, 0, 0, 0.1)", // banner heading
-    "0 0 30px rgba(0, 0, 0, 1.9)", // banner subtitle
-    "inset 1px 1px rgba(0, 0, 0, 0.1)", // detail page select
-    "0 0 10px rgba(0, 0, 0, 0.1)", // share button header
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-    "placeholder",
-  ],
+  shadows: Array(25)
+    .fill("none")
+    .map((_, index) => {
+      switch (index) {
+        case 1:
+          return "1.5px 1.5px 3px 0px rgba(0, 0, 0, 0.20)";
+        case 2:
+          return "1px 1px 10px 1px #d4d4d4"; // filter toggle button
+        case 3:
+          return "0 0 10px rgba(0, 0, 0, 0.1)"; // banner heading
+        case 4:
+          return "0 0 30px rgba(0, 0, 0, 1.9)"; // banner subtitle
+        case 5:
+          return "inset 1px 1px rgba(0, 0, 0, 0.1)"; // detail page select
+        case 6:
+          return "0 0 10px rgba(0, 0, 0, 0.1)"; // share button header
+        case 7:
+          return "0 0 6px rgba(0, 0, 0, 0.25)"; // share style toggle button
+        default:
+          return "none";
+      }
+    }) as Shadows,
+
   components: {
     MuiButton: {
       styleOverrides: {
