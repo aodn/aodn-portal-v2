@@ -125,7 +125,6 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
                 direction="column"
               >
                 {icon && icon}
-                {label}
               </Stack>
             </StyledToggleButton>
           ))}
