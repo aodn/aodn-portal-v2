@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { FC, memo, ReactElement, useCallback, useState } from "react";
 import { IconProps } from "../../icon/types";
-import { useDetailPageContext } from "../../../pages/detail-page/context/detail-page-context";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 
 export interface SelectItem<T = string> {
@@ -22,6 +21,7 @@ export interface CommonSelectProps<T = string> {
   value?: T | null;
   label?: string;
   onSelectCallback?: (value: T) => void;
+  disabled?: boolean;
   dataTestId?: string;
   sx?: SxProps;
 }
@@ -44,6 +44,7 @@ const CommonSelect: FC<CommonSelectProps> = memo(
     items,
     label,
     onSelectCallback,
+    disabled = false,
     dataTestId = "common-select",
     sx,
   }: CommonSelectProps) => {
@@ -70,7 +71,7 @@ const CommonSelect: FC<CommonSelectProps> = memo(
     );
 
     return (
-      <FormControl fullWidth data-testid={dataTestId}>
+      <FormControl fullWidth data-testid={dataTestId} disabled={disabled}>
         {label && <FormLabel>{label}</FormLabel>}
         <Select
           value={selectedItem}

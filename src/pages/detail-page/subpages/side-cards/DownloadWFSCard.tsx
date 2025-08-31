@@ -21,21 +21,15 @@ import CommonSelect, {
 } from "../../../../components/common/dropdown/CommonSelect";
 import { ILink } from "../../../../components/common/store/OGCCollectionDefinitions";
 import rc8Theme from "../../../../styles/themeRC8";
+import useWFSDownload, {
+  DownloadStatus,
+} from "../../../../hooks/useWFSDownload";
 
 // TODO: options should fetch from wfs server
 const options = [
   // { label: "NetCDFs", value: "NetCDFs" },
   { label: "CSV", value: "csv" },
 ];
-
-enum DownloadStatus {
-  NOT_STARTED = "Download not started",
-  IN_PROGRESS = "Downloading in progress",
-  COMPLETED = "Download completed",
-  ERROR = "Download error",
-  FAILED = "Download failed",
-  FINISHED = "Download finished",
-}
 
 interface DownloadWFSCardProps {
   WFSLinks: ILink[];
@@ -44,157 +38,42 @@ interface DownloadWFSCardProps {
 
 const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
   const theme = useTheme();
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
     WFSLinks[0]?.title
   );
-  const [downloadingStatus, setDownloadingStatus] = useState<DownloadStatus>(
-    DownloadStatus.NOT_STARTED
-  );
-  const [downloadedBytes, setDownloadedBytes] = useState<number>(0);
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const {
+    downloadingStatus,
+    downloadedBytes,
+    progressMessage,
+    startDownload,
+    cancelDownload,
+    formatBytes,
+    isDownloading,
+  } = useWFSDownload(() => setSnackbarOpen(true));
 
-  const WFSOptions: SelectItem<string>[] = useMemo(
-    () =>
-      WFSLinks.map((link) => {
-        return { value: link.title, label: link.title } as SelectItem<string>;
-      }),
+  const WFSOptions = useMemo(
+    () => WFSLinks.map((link) => ({ value: link.title, label: link.title })),
     [WFSLinks]
   );
 
-  const handleSelectDataItem = useCallback(
-    (value: string | undefined) => {
-      setSelectedDataItem(value);
-    },
-    [setSelectedDataItem]
-  );
+  const handleSelectDataItem = useCallback((value: string | undefined) => {
+    setSelectedDataItem(value);
+  }, []);
 
-  const handleDownloadWithFetch = useCallback(
-    async (selectedDataItem: string | undefined) => {
-      setDownloadingStatus(DownloadStatus.IN_PROGRESS);
-      setDownloadedBytes(0);
-      setSnackbarOpen(true);
+  const handleDownloadClick = useCallback(async () => {
+    if (!selectedDataItem || !uuid) {
+      console.error("Missing required parameters");
+      return;
+    }
 
-      const selectedLink = WFSLinks.find(
-        (link) => link.title === selectedDataItem
-      );
+    await startDownload(uuid, selectedDataItem);
+  }, [selectedDataItem, uuid, startDownload]);
 
-      if (!selectedLink?.title || !uuid) {
-        console.error("UUID or layer name is not provided for download");
-        setDownloadingStatus(DownloadStatus.ERROR);
-        return;
-      }
-
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
-
-        const response = await fetch(
-          "/api/v1/ogc/processes/downloadWfs/execution",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              inputs: {
-                uuid: uuid,
-                recipient: "",
-                layer_name: selectedLink.title,
-              },
-            }),
-            signal: controller.signal,
-          }
-        );
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Showing actual bytes downloaded
-        if (!response.body) {
-          throw new Error("Response body is null");
-        }
-
-        const reader = response.body.getReader();
-        const chunks: Uint8Array[] = [];
-        let receivedLength = 0;
-
-        let done = false;
-        while (!done) {
-          const result = await reader.read();
-          done = result.done;
-          const value = result.value;
-
-          if (done || !value) break;
-
-          chunks.push(value);
-          receivedLength += value.length;
-
-          // Update downloaded bytes for UI display
-          setDownloadedBytes(receivedLength);
-        }
-
-        // Combine chunks into single Uint8Array
-        const allChunks = new Uint8Array(receivedLength);
-        let position = 0;
-        for (const chunk of chunks) {
-          allChunks.set(chunk, position);
-          position += chunk.length;
-        }
-
-        // Create blob and download
-        const blob = new Blob([allChunks]);
-        downloadFile(blob, generateFileName(selectedLink.title));
-
-        setDownloadingStatus(DownloadStatus.COMPLETED);
-        setSnackbarOpen(true);
-      } catch (error) {
-        setDownloadingStatus(DownloadStatus.ERROR);
-        setSnackbarOpen(true);
-        setDownloadedBytes(0);
-        console.error("Download request failed:", error);
-        throw error;
-      }
-    },
-    [WFSLinks, uuid]
-  );
-
-  // Helper function to format bytes for display
-  const formatBytes = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  // Helper function to generate appropriate filename
-  const generateFileName = (layerName: string) => {
-    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
-    const sanitizedLayerName = layerName.replace(/[^a-z0-9]/gi, "_");
-    return `${sanitizedLayerName}_${timestamp}.csv`;
-  };
-
-  // Helper function to handle file download
-  const downloadFile = (blob: Blob, filename: string) => {
-    // Create blob URL
-    const url = window.URL.createObjectURL(blob);
-
-    // Create temporary anchor element
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-
-    // Append to body, click, and remove
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // Clean up blob URL to free memory
-    window.URL.revokeObjectURL(url);
-  };
+  const handleCancelClick = useCallback(() => {
+    cancelDownload();
+    setSnackbarOpen(true);
+  }, [cancelDownload]);
 
   const selectSxProps = useMemo(
     () => ({
@@ -219,6 +98,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
           items={options}
           label="Select format"
           sx={selectSxProps}
+          disabled={isDownloading}
         />
         <CommonSelect
           items={WFSOptions}
@@ -226,9 +106,10 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}
           sx={selectSxProps}
+          disabled={isDownloading}
         />
         <Button
-          disabled={downloadingStatus === DownloadStatus.IN_PROGRESS}
+          disabled={isDownloading}
           sx={{
             backgroundColor: rc8Theme.palette.primary.main,
             borderRadius: borderRadius.small,
@@ -236,15 +117,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
               backgroundColor: rc8Theme.palette.primary.main,
             },
           }}
-          onClick={() => handleDownloadWithFetch(selectedDataItem)}
+          onClick={() => handleDownloadClick()}
         >
           <Typography padding={0} color="#fff">
-            {downloadingStatus === DownloadStatus.IN_PROGRESS
-              ? "Downloading..."
-              : "Download WFS Data"}
+            {isDownloading ? "Downloading..." : "Download WFS Data"}
           </Typography>
         </Button>
-        {downloadingStatus === DownloadStatus.IN_PROGRESS && (
+        {isDownloading && (
           <Stack spacing={1}>
             <LinearProgress
               variant="indeterminate"
@@ -287,7 +166,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
                     color="textSecondary"
                     textAlign="left"
                   >
-                    Preparing download...
+                    {progressMessage || "Preparing download..."}
                   </Typography>
                 </Grid>
               )}
@@ -331,14 +210,14 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
           severity={
             downloadingStatus === DownloadStatus.ERROR
               ? "error"
-              : downloadingStatus === DownloadStatus.IN_PROGRESS
-                ? "info"
-                : "success"
+              : downloadingStatus === DownloadStatus.COMPLETED
+                ? "success"
+                : "info"
           }
           variant="filled"
           sx={{ width: "100%" }}
         >
-          {downloadingStatus}
+          {progressMessage || downloadingStatus}
         </Alert>
       </Snackbar>
     </Stack>
