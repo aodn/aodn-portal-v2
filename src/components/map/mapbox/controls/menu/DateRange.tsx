@@ -1,4 +1,5 @@
 import React, { useCallback, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   DateRangeCondition,
   DownloadConditionType,
@@ -6,7 +7,7 @@ import {
   IDownloadConditionCallback,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
-import { Grid, IconButton, Popper, Stack, Typography } from "@mui/material";
+import { Grid, IconButton, Stack, Typography, Box } from "@mui/material";
 import dayjs from "dayjs";
 import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
 import PlainSlider from "../../../../common/slider/PlainSlider";
@@ -39,11 +40,6 @@ interface DateRangeControlProps extends ControlProps {
 }
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
-const SLIDER_WIDTH_MOBILE = 254;
-const SLIDER_WIDTH_TABLET = 666;
-const SLIDER_WIDTH_LAPTOP = 900;
-const SLIDER_WIDTH_DESKTOP = 698;
-const SLIDER_WIDTH_4K = 850;
 
 const DateSlider: React.FC<DateSliderProps> = ({
   currentMinDate,
@@ -82,15 +78,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
         backgroundColor: rc8Theme.palette.primary6,
         borderRadius: "6px",
         display: "flex",
-        width: is4K
-          ? SLIDER_WIDTH_4K
-          : isDesktop
-            ? SLIDER_WIDTH_DESKTOP
-            : isLaptop
-              ? SLIDER_WIDTH_LAPTOP
-              : isTablet
-                ? SLIDER_WIDTH_TABLET
-                : SLIDER_WIDTH_MOBILE,
+        width: "100%",
+        mx: "8px",
       }}
       data-testid={COMPONENT_ID}
     >
@@ -186,8 +175,8 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   minDate,
   maxDate,
   getAndSetDownloadConditions,
+  map, // Map instance passed through ControlProps via cloneElement
 }) => {
-  const { isMobile, isTablet } = useBreakpoint();
   const [open, setOpen] = useState<boolean>(false);
   const anchorRef = useRef(null);
   const [currentMinDate, setCurrentMinDate] = useState<string | undefined>(
@@ -196,6 +185,9 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   const [currentMaxDate, setCurrentMaxDate] = useState<string | undefined>(
     undefined
   );
+
+  // Get the map container DOM element from props
+  const mapContainer = map?.getContainer();
 
   const onDateRangeChange = useCallback(
     (
@@ -246,38 +238,32 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       >
         <TimeRangeIcon />
       </IconButton>
-      <Popper
-        open={open}
-        anchorEl={anchorRef.current}
-        placement="bottom-end"
-        disablePortal
-        modifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [0, isMobile || isTablet ? 262 : 266], // Add 16px vertical padding from bottom edge
-            },
-          },
-          {
-            name: "preventOverflow",
-            options: {
-              boundariesElement: "viewport", // Constrain to viewport or container
-            },
-          },
-          {
-            name: "flip",
-            enabled: false, // Prevent flipping to keep at bottom
-          },
-        ]}
-      >
-        <DateSlider
-          currentMinDate={currentMinDate}
-          currentMaxDate={currentMaxDate}
-          minDate={minDate}
-          maxDate={maxDate}
-          onDateRangeChange={onDateRangeChange}
-        />
-      </Popper>
+
+      {open &&
+        mapContainer &&
+        createPortal(
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: "8px",
+              left: "0", // Start from left edge of container
+              right: "0", // Extend to right edge of container
+              pointerEvents: "all",
+              // Center content within the full width
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <DateSlider
+              currentMinDate={currentMinDate}
+              currentMaxDate={currentMaxDate}
+              minDate={minDate}
+              maxDate={maxDate}
+              onDateRangeChange={onDateRangeChange}
+            />
+          </Box>,
+          mapContainer
+        )}
     </>
   );
 };
