@@ -1,15 +1,19 @@
 import { FC, useCallback, useMemo, useState } from "react";
 import {
   Alert,
+  Box,
   Button,
   Divider,
   Grid,
+  IconButton,
   LinearProgress,
   Snackbar,
   Stack,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
+import CancelIcon from "@mui/icons-material/Cancel";
 import {
   border,
   borderRadius,
@@ -59,7 +63,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
     setSelectedDataItem(value);
   }, []);
 
-  const handleDownloadClick = useCallback(async () => {
+  const handleDownload = useCallback(async () => {
     if (!selectedDataItem || !uuid) {
       console.error("Missing required parameters");
       return;
@@ -68,9 +72,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
     await startDownload(uuid, selectedDataItem);
   }, [selectedDataItem, uuid, startDownload]);
 
-  const handleCancelClick = useCallback(() => {
+  const handleCancelDownload = useCallback(() => {
     cancelDownload();
-    setSnackbarOpen(true);
   }, [cancelDownload]);
 
   const selectSxProps = useMemo(
@@ -107,19 +110,33 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
           disabled={isDownloading}
         />
         <Button
-          disabled={isDownloading}
           sx={{
+            position: "relative",
             backgroundColor: rc8Theme.palette.primary.main,
             borderRadius: borderRadius.small,
             ":hover": {
               backgroundColor: rc8Theme.palette.primary.main,
             },
+            cursor: isDownloading ? "not-allowed" : "pointer",
           }}
-          onClick={() => handleDownloadClick()}
+          onClick={isDownloading ? undefined : () => handleDownload()}
         >
           <Typography padding={0} color="#fff">
             {isDownloading ? "Downloading..." : "Download WFS Data"}
           </Typography>
+          {isDownloading && (
+            <Box sx={{ position: "absolute", right: 1 }}>
+              <Tooltip placement="top" title="Cancel Download">
+                <IconButton
+                  size="small"
+                  onClick={handleCancelDownload}
+                  sx={{ color: rc8Theme.palette.grey[100] }}
+                >
+                  <CancelIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )}
         </Button>
         {isDownloading && (
           <Stack spacing={1}>
@@ -201,7 +218,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackbarOpen}
         autoHideDuration={5000}
-        onClose={() => setSnackbarOpen(false)}
+        onClose={(_, reason) => {
+          // Only close on timeout or explicit close, not on clickaway
+          // This prevents the snackbar from closing when user clicks cancelDownload button
+          if (reason !== "clickaway") {
+            setSnackbarOpen(false);
+          }
+        }}
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}

@@ -426,15 +426,18 @@ const useWFSDownload = (onCallback?: () => void) => {
         }
         cleanupDownload();
       } catch (error) {
-        setDownloadingStatus(DownloadStatus.ERROR);
-        setDownloadedBytes(0);
-        setProgressMessage(
-          error instanceof Error
-            ? `Download failed: ${error.message}`
-            : "Download failed: Unknown error"
-        );
-        onCallback && onCallback();
-        cleanupDownload();
+        // If error is NOT due to user cancellation
+        if (abortControllerRef.current) {
+          setDownloadingStatus(DownloadStatus.ERROR);
+          setProgressMessage(
+            error instanceof Error
+              ? `Download failed: ${error.message}`
+              : "Download failed: Unknown error"
+          );
+          setDownloadedBytes(0);
+          onCallback && onCallback();
+          cleanupDownload();
+        }
       }
     },
     [cleanupDownload, onCallback, processSSEEvent]
