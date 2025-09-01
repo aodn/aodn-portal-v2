@@ -10,11 +10,16 @@ import DataAccessPanel, { TYPE } from "./tab-panels/DataAccessPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
 import { MODE } from "../../../components/list/CommonDef";
 import DownloadServiceCard from "./side-cards/DownloadServiceCard";
+import { ILink } from "../../../components/common/store/OGCCollectionDefinitions";
+import DownloadWFSCard from "./side-cards/DownloadWFSCard";
 
 interface SideSectionProps extends SpatialCoverageCardProps {}
 
 const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
   const { isCollectionNotFound, collection } = useDetailPageContext();
+  const WFSLinks: ILink[] | undefined = collection
+    ?.getDataAccessLinks()
+    ?.filter((link) => link.rel === "wfs");
 
   if (isCollectionNotFound) return null;
 
@@ -33,6 +38,16 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
           }}
         >
           <DownloadCard />
+        </Card>
+      ) : WFSLinks && WFSLinks.length !== 0 ? (
+        <Card
+          sx={{
+            backgroundColor: "#fff",
+            borderRadius: borderRadius.small,
+            width: "100%",
+          }}
+        >
+          <DownloadWFSCard WFSLinks={WFSLinks} uuid={collection?.id} />
         </Card>
       ) : (
         <DownloadServiceCard />

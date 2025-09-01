@@ -24,7 +24,7 @@ export enum TYPE {
 
 const OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE =
   "Access to Jupyter notebook to query Cloud Optimised converted dataset";
-const PYTHON_NOTEBOOK_EXAMPLE_LINK = "Python notebook Example";
+const PYTHON_NOTEBOOK_EXAMPLE_LINK_TITLE = "Python notebook Example";
 
 // Only find optimized Python notebook links if they exist, otherwise fall back to example links
 const getOptimizedPythonNotebookLinks = (
@@ -44,7 +44,7 @@ const getOptimizedPythonNotebookLinks = (
 
   // Otherwise, fall back to example links
   const exampleLinks = links.filter(
-    (link) => link.title === PYTHON_NOTEBOOK_EXAMPLE_LINK
+    (link) => link.title === PYTHON_NOTEBOOK_EXAMPLE_LINK_TITLE
   );
 
   return exampleLinks.length > 0 ? exampleLinks : undefined;
