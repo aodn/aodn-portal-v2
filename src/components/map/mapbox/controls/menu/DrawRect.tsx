@@ -20,7 +20,7 @@ import _ from "lodash";
 import { Box, IconButton } from "@mui/material";
 import DrawRectangle from "./DrawRectangle";
 import { ControlProps } from "./Definition";
-import { BboxSelectionIcon } from "../../../../../assets/map/bbox_selection";
+import { BboxSelectionIcon } from "../../../../../assets/icons/map/bbox_selection";
 import { switcherIconButtonSx } from "./MenuControl";
 import DeleteIcon from "@mui/icons-material/Delete";
 

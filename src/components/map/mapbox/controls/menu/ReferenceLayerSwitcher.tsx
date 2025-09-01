@@ -27,7 +27,7 @@ import {
   switcherTitleTypographySx,
 } from "./MenuControl";
 import { BaseMapSwitcherLayer } from "./BaseMapSwitcher";
-import { ReferenceLayerIcon } from "../../../../../assets/map/ref_layer";
+import { ReferenceLayerIcon } from "../../../../../assets/icons/map/ref_layer";
 
 interface ReferenceLayerSwitcherProps extends ControlProps {
   // Static layer to be added to the switch
