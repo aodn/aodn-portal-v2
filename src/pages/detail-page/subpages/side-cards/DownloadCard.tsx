@@ -8,6 +8,7 @@ import {
   Stack,
   Typography,
   useTheme,
+  Box,
 } from "@mui/material";
 import {
   border,
@@ -17,6 +18,9 @@ import {
   fontWeight,
   padding,
 } from "../../../../styles/constants";
+import rc8Theme from "../../../../styles/themeRC8";
+import SideCardContainer from "./SideCardContainer";
+import { DownloadNotAvailableIcon } from "../../../../assets/icons/download/downloadNotAvaliable";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
@@ -34,7 +38,11 @@ const downloadFormats = [
   { label: "CSV", value: "csv" },
 ];
 
-const DownloadCard = () => {
+interface DownloadCardProps {
+  hasSummaryFeature?: boolean;
+}
+
+const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const { collection, downloadConditions, getAndSetDownloadConditions } =
@@ -94,8 +102,9 @@ const DownloadCard = () => {
     [theme]
   );
 
-  return (
-    <Stack direction="column">
+  // Render content when download is available (hasSummaryFeature = true)
+  const renderDownload = () => (
+    <>
       <DownloadDialog
         isOpen={downloadDialogOpen}
         setIsOpen={setDownloadDialogOpen}
@@ -153,7 +162,64 @@ const DownloadCard = () => {
           <DataSelection />
         </AccordionDetails>
       </PlainAccordion>
-    </Stack>
+    </>
+  );
+
+  // Render content when download is not available (hasSummaryFeature = false)
+  const renderDownloadUnavailable = () => (
+    <Box px="16px" py="22px">
+      <Box
+        sx={{
+          borderRadius: "6px",
+          border: `1px solid ${rc8Theme.palette.grey600}`,
+          background: "#FFF",
+          padding: "16px",
+          marginBottom: "22px",
+        }}
+      >
+        <Typography
+          variant="body2Regular"
+          sx={{
+            color: rc8Theme.palette.text2,
+            textAlign: "center",
+            width: "100%",
+            display: "block",
+          }}
+        >
+          Data download via this method is not currently available. Please see
+          other data access options below.
+        </Typography>
+      </Box>
+
+      <Button
+        disabled
+        variant="contained"
+        disableElevation
+        sx={{
+          width: "100%",
+          height: "38px",
+          background: rc8Theme.palette.grey600,
+          borderRadius: "6px",
+          gap: 1,
+          ...rc8Theme.typography.body1Medium,
+          "&:disabled": {
+            background: rc8Theme.palette.grey600,
+            color: "white",
+            cursor: "not-allowed",
+          },
+        }}
+        aria-label="Download data - currently unavailable"
+      >
+        <DownloadNotAvailableIcon />
+        Download
+      </Button>
+    </Box>
+  );
+
+  return (
+    <SideCardContainer title="Download Service" px={0} py={0}>
+      {hasSummaryFeature ? renderDownload() : renderDownloadUnavailable()}
+    </SideCardContainer>
   );
 };
 

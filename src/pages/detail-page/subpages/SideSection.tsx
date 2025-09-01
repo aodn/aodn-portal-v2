@@ -1,6 +1,5 @@
 import { FC } from "react";
-import { Card, Stack } from "@mui/material";
-import { borderRadius } from "../../../styles/constants";
+import { Stack } from "@mui/material";
 import DownloadCard from "./side-cards/DownloadCard";
 import SpatialCoverageCard, {
   SpatialCoverageCardProps,
@@ -9,7 +8,6 @@ import { useDetailPageContext } from "../context/detail-page-context";
 import DataAccessPanel, { TYPE } from "./tab-panels/DataAccessPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
 import { MODE } from "../../../components/list/CommonDef";
-import DownloadServiceCard from "./side-cards/DownloadServiceCard";
 
 interface SideSectionProps extends SpatialCoverageCardProps {}
 
@@ -24,20 +22,7 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
       gap={2}
       flexWrap="wrap"
     >
-      {collection?.hasSummaryFeature() ? (
-        <Card
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: borderRadius.small,
-            width: "100%",
-          }}
-        >
-          <DownloadCard />
-        </Card>
-      ) : (
-        <DownloadServiceCard />
-      )}
-
+      <DownloadCard hasSummaryFeature={collection?.hasSummaryFeature()} />
       <DataAccessPanel mode={MODE.COMPACT} type={TYPE.DATA_ACCESS} />
       <SpatialCoverageCard
         onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
