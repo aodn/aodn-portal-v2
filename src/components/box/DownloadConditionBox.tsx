@@ -55,7 +55,6 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
         border: "1.5px solid rgba(97, 140, 165, 0.3)",
         borderRadius: theme.borderRadius.md,
         backgroundColor: "rgba(231, 242, 255, 0.3)",
-        marginTop: theme.mp.md,
       }}
     >
       <Grid item xs={2} sm={1} md={3} xl={2} sx={{ padding: theme.mp.md }}>

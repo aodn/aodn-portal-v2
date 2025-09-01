@@ -183,13 +183,12 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
             <Typography
               typography="title1Medium"
               color={rc8Theme.palette.text1}
-              sx={{ padding: 0, marginRight: "10px" }}
             >
               Data Selection
             </Typography>
           </Badge>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails sx={{ pt: "4px" }}>
           <DataSelection />
         </AccordionDetails>
       </PlainAccordion>
