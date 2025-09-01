@@ -171,22 +171,31 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
           sx={{ paddingX: padding.medium }}
           expandIcon={<ExpandMoreIcon />}
         >
-          <Badge
-            color="primary"
-            badgeContent={
-              // the count here should exclude the format condition
-              downloadConditions.filter(
-                (condition) => condition.type !== DownloadConditionType.FORMAT
-              ).length
-            }
-          >
+          <Box display="flex" alignItems="center" gap={3}>
             <Typography
               typography="title1Medium"
               color={rc8Theme.palette.text1}
+              p={0}
             >
               Data Selection
             </Typography>
-          </Badge>
+            <Badge
+              sx={{
+                "& .MuiBadge-badge": {
+                  backgroundColor: rc8Theme.palette.primary1,
+                  ...rc8Theme.typography.title2Regular,
+                  color: rc8Theme.palette.text3,
+                  pb: "1px",
+                },
+              }}
+              badgeContent={
+                // the count here should exclude the format condition
+                downloadConditions.filter(
+                  (condition) => condition.type !== DownloadConditionType.FORMAT
+                ).length
+              }
+            />
+          </Box>
         </AccordionSummary>
         <AccordionDetails sx={{ pt: "4px" }}>
           <DataSelection />
