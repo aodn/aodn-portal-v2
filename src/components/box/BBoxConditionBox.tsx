@@ -23,7 +23,12 @@ const BBoxConditionBox: React.FC<BBoxConditionProps> = ({
       type={DownloadConditionType.BBOX}
       removeCallback={() => onRemove && onRemove()}
     >
-      <Grid container spacing={1} data-testid="bbox-condition-box">
+      <Grid
+        container
+        rowSpacing={"4px"}
+        columnSpacing={"12px"}
+        data-testid="bbox-condition-box"
+      >
         <Grid item xs={6} sm={2} md={6}>
           <BBoxItem label={"N"} value={bbox[3]} />
         </Grid>

@@ -5,6 +5,7 @@ import {
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import React, { useMemo } from "react";
 import { Typography } from "@mui/material";
+import rc8Theme from "../../styles/themeRC8";
 
 interface DateRangeConditionBoxProps {
   dateRangeCondition: DateRangeCondition;
@@ -28,16 +29,14 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
     >
       <Typography
         sx={{
-          color: "#090C02",
+          ...rc8Theme.typography.title1Medium,
+          color: rc8Theme.palette.text1,
           fontSize: "14px",
-          fontStyle: "normal",
-          fontWeight: 400,
-          lineHeight: "22px",
           padding: 0,
         }}
         data-testid="date-range-condition-box"
       >
-        {start + " to " + end}
+        {start.replace("-", "/") + " - " + end.replace("-", "/")}
       </Typography>
     </DownloadConditionBox>
   );
