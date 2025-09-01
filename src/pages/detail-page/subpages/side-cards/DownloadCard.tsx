@@ -32,6 +32,8 @@ import {
   FormatCondition,
 } from "../../context/DownloadDefinitions";
 import { DatasetType } from "../../../../components/common/store/OGCCollectionDefinitions";
+import { DownloadIcon } from "../../../../assets/icons/download/download";
+import { InformationIcon } from "../../../../assets/icons/download/information";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -93,7 +95,7 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
 
   const selectSxProps = useMemo(
     () => ({
-      height: "30px",
+      height: "38px",
       textAlign: "start",
       backgroundColor: "transparent",
       boxShadow: theme.shadows[5],
@@ -109,7 +111,7 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
         isOpen={downloadDialogOpen}
         setIsOpen={setDownloadDialogOpen}
       />
-      <Stack sx={{ padding: padding.medium }} spacing={2}>
+      <Stack sx={{ px: "16px", pt: "22px" }} spacing={2}>
         <CommonSelect
           items={filteredDownloadFormats}
           sx={selectSxProps}
@@ -122,14 +124,43 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
             ":hover": {
               backgroundColor: theme.palette.primary.main,
             },
+            gap: 1,
           }}
           onClick={onDownload}
         >
-          <Typography padding={0} color="#fff">
+          <DownloadIcon />
+          <Typography
+            typography="title1Medium"
+            color={rc8Theme.palette.text3}
+            padding={0}
+          >
             Download
           </Typography>
         </Button>
       </Stack>
+
+      {/* todo: add subsetting logic */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "flex-start",
+          py: "12px",
+          px: "16px",
+        }}
+      >
+        <Box sx={{ minWidth: 22, flexShrink: 0, px: "8px" }}>
+          <InformationIcon
+            color={rc8Theme.palette.secondary1}
+            height={24}
+            width={24}
+          />
+        </Box>
+        <Typography variant="body2" color={rc8Theme.palette.text2} pt="3px">
+          Please consider subsetting your download selection using the tools on
+          the map.
+        </Typography>
+      </Box>
+
       <Divider sx={{ width: "100%" }} />
       <PlainAccordion
         expanded={accordionExpanded}
@@ -150,8 +181,8 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
             }
           >
             <Typography
-              fontWeight={fontWeight.bold}
-              color={fontColor.gray.medium}
+              typography="title1Medium"
+              color={rc8Theme.palette.text1}
               sx={{ padding: 0, marginRight: "10px" }}
             >
               Data Selection
