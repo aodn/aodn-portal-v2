@@ -1,37 +1,65 @@
 import { useCallback, useState, useRef } from "react";
 
+// Aligned with backend WFS SSE event names
+enum EventName {
+  CONNECTION_ESTABLISHED = "connection-established",
+  KEEP_ALIVE = "keep-alive",
+  WFS_REQUEST_READY = "wfs-request-ready",
+  DOWNLOAD_STARTED = "download-started",
+  FILE_CHUNK = "file-chunk",
+  DOWNLOAD_COMPLETE = "download-complete",
+  ERROR = "error",
+}
+
+// Aligned with backend WFS SSE event status
+enum EventStatus {
+  STREAMING = "streaming",
+  WAITING_FOR_WFS_SERVER = "waiting-for-wfs-server",
+}
+
+// Aligned with backend WFS SSE event data
 interface SSEEventData {
-  status?: string;
+  data?: string;
+  status?: EventStatus;
   message?: string;
   timestamp?: number;
-  chunkNumber?: number;
-  data?: string;
   chunkSize?: number;
+  chunkNumber?: number;
+  totalChunks?: number;
   totalBytes?: number;
   final?: boolean;
   filename?: string;
   error?: string;
-  totalChunks?: number;
 }
 
-enum DownloadStatus {
-  NOT_STARTED = "Download not started",
-  IN_PROGRESS = "Downloading in progress",
-  WAITING_SERVER = "Waiting for WFS server response",
-  STREAMING = "Streaming data",
+// Download status from frontend use
+enum DownloadProgressMessage {
+  INITIALIZING = "Initializing download...",
+  CONNECTING = "Connecting to WFS server...",
+  WAITING_SERVER = "Waiting for WFS server response...",
+  STARTING = "Starting download...",
+  IN_PROGRESS = "Downloading in progress...",
   COMPLETED = "Download completed",
   ERROR = "Download error",
   FAILED = "Download failed",
+  CANCELED = "Download cancelled",
+}
+
+// Download status for frontend use
+enum DownloadStatus {
+  NOT_STARTED = "not-started",
+  WAITING_SERVER = "waiting-server",
+  IN_PROGRESS = "in-progress",
+  COMPLETED = "completed",
+  ERROR = "error",
 }
 
 const useWFSDownload = (onCallback?: () => void) => {
   const [downloadingStatus, setDownloadingStatus] = useState<DownloadStatus>(
     DownloadStatus.NOT_STARTED
   );
-  const [downloadedBytes, setDownloadedBytes] = useState<number>(0);
   const [progressMessage, setProgressMessage] = useState<string>("");
-
-  // Refs for managing download state
+  const [downloadedBytes, setDownloadedBytes] = useState<number>(0);
   const abortControllerRef = useRef<AbortController | null>(null);
   const fileChunksRef = useRef<string[]>([]);
   const receivedChunksRef = useRef<Set<number>>(new Set());
@@ -79,43 +107,51 @@ const useWFSDownload = (onCallback?: () => void) => {
     cleanupDownload();
     setDownloadedBytes(0);
     setDownloadingStatus(DownloadStatus.NOT_STARTED);
-    setProgressMessage("Download cancelled");
+    setProgressMessage(DownloadProgressMessage.CANCELED);
     onCallback && onCallback();
   }, [cleanupDownload, onCallback]);
 
-  // Process SSE events
-  const processSSEEvent = useCallback(
+  // Process SSE data according to event type
+  const processSSEData = useCallback(
     async (eventType: string, data: SSEEventData, layerName: string) => {
       switch (eventType) {
-        case "connection-established":
-          setDownloadingStatus(DownloadStatus.NOT_STARTED);
-          setProgressMessage("Connected to server");
+        case EventName.CONNECTION_ESTABLISHED:
+          setDownloadingStatus(DownloadStatus.WAITING_SERVER);
+          setProgressMessage(DownloadProgressMessage.CONNECTING);
           onCallback && onCallback();
           break;
 
-        case "keep-alive":
-          setProgressMessage("Waiting for server...");
-          if (data.status === "waiting-for-wfs-server") {
+        case EventName.WFS_REQUEST_READY:
+          setDownloadingStatus(DownloadStatus.WAITING_SERVER);
+          setProgressMessage(
+            data.message || DownloadProgressMessage.CONNECTING
+          );
+          onCallback && onCallback();
+          break;
+
+        case EventName.KEEP_ALIVE:
+          if (data.status === EventStatus.WAITING_FOR_WFS_SERVER) {
             setDownloadingStatus(DownloadStatus.WAITING_SERVER);
-          } else if (data.status === "streaming") {
-            setDownloadingStatus(DownloadStatus.STREAMING);
+            setProgressMessage(DownloadProgressMessage.WAITING_SERVER);
+            onCallback && onCallback();
+          } else if (data.status === EventStatus.STREAMING) {
+            setDownloadingStatus(DownloadStatus.IN_PROGRESS);
           }
           break;
 
-        case "wfs-request-ready":
-          setProgressMessage("Connecting to WFS server...");
-          setDownloadingStatus(DownloadStatus.WAITING_SERVER);
+        case EventName.DOWNLOAD_STARTED:
+          setDownloadingStatus(DownloadStatus.IN_PROGRESS);
+          setProgressMessage(
+            data.message || DownloadProgressMessage.IN_PROGRESS
+          );
           onCallback && onCallback();
-          break;
-
-        case "download-started":
           // Reset chunk tracking on download start
           fileChunksRef.current = [];
           receivedChunksRef.current.clear();
           expectedTotalChunksRef.current = 0;
           break;
 
-        case "file-chunk":
+        case EventName.FILE_CHUNK:
           if (data.data && data.chunkNumber && data.chunkNumber > 0) {
             const index = data.chunkNumber - 1; // Convert to 0-based index
 
@@ -139,13 +175,12 @@ const useWFSDownload = (onCallback?: () => void) => {
             // Update progress display
             if (data.totalBytes) {
               setDownloadedBytes(data.totalBytes);
-              setProgressMessage(DownloadStatus.IN_PROGRESS);
-              //   setProgressMessage(`${formatBytes(data.totalBytes)} received`);
+              setProgressMessage(DownloadProgressMessage.IN_PROGRESS);
             }
           }
           break;
 
-        case "download-complete":
+        case EventName.DOWNLOAD_COMPLETE:
           // Reconstruct file from base64 chunks
           try {
             // Use server-provided totalChunks first, fallback to our tracking
@@ -216,7 +251,9 @@ const useWFSDownload = (onCallback?: () => void) => {
             downloadFile(blob, filename);
 
             setDownloadingStatus(DownloadStatus.COMPLETED);
-            setProgressMessage("Download completed successfully");
+            setProgressMessage(
+              data.message || DownloadProgressMessage.COMPLETED
+            );
             onCallback && onCallback();
           } catch (decodeError) {
             console.error("Error decoding file data:", decodeError);
@@ -226,9 +263,13 @@ const useWFSDownload = (onCallback?: () => void) => {
           }
           break;
         case "error":
+          console.error("SSE Error event:", data.error || data.message);
+          setDownloadingStatus(DownloadStatus.ERROR);
+          setProgressMessage(data.message || "Unknown error");
+          onCallback && onCallback();
+          break;
         default:
           if (data.error || data.message?.includes("Error")) {
-            console.error("SSE Error:", data.error || data.message);
             setDownloadingStatus(DownloadStatus.ERROR);
             setProgressMessage(
               data.message || data.error || "Unknown error occurred"
@@ -241,8 +282,8 @@ const useWFSDownload = (onCallback?: () => void) => {
     [onCallback]
   );
 
-  // Helper function to process complete SSE events
-  const processCompleteSSEEvent = useCallback(
+  // Process SSE event text and extract type + data
+  const processSSEEvent = useCallback(
     async (eventText: string, layerName: string) => {
       try {
         const lines = eventText.split("\n");
@@ -261,23 +302,22 @@ const useWFSDownload = (onCallback?: () => void) => {
 
         if (eventType && dataContent) {
           const data: SSEEventData = JSON.parse(dataContent);
-          await processSSEEvent(eventType, data, layerName);
+          await processSSEData(eventType, data, layerName);
         }
       } catch (error) {
         console.error("Failed to process SSE event:", error, eventText);
       }
     },
-    [processSSEEvent]
+    [processSSEData]
   );
 
-  // Main download function using manual fetch + streaming (your original approach)
+  // Main download function using manual fetch + streaming
   const startDownload = useCallback(
     async (uuid: string, layerName: string) => {
       // Clean up any existing download
       cleanupDownload();
 
       if (!layerName || !uuid) {
-        console.error("UUID or layer name is not provided for download");
         setDownloadingStatus(DownloadStatus.ERROR);
         setProgressMessage("Missing required parameters");
         onCallback && onCallback();
@@ -286,17 +326,17 @@ const useWFSDownload = (onCallback?: () => void) => {
 
       // Initialize download state
       setDownloadedBytes(0);
-      setDownloadingStatus(DownloadStatus.NOT_STARTED);
-      setProgressMessage("Initializing download...");
+      setDownloadingStatus(DownloadStatus.WAITING_SERVER);
+      setProgressMessage(DownloadProgressMessage.INITIALIZING);
       onCallback && onCallback();
 
       try {
         const controller = new AbortController();
         abortControllerRef.current = controller;
-        const timeoutId = setTimeout(() => controller.abort(), 600000); // Frontend 10 minutes timeout
+        const timeoutId = setTimeout(() => controller.abort(), 1200000); // Frontend 20 minutes timeout
 
         const response = await fetch(
-          "/api/v1/ogc/processes/downloadWfs/execution/sse",
+          "/api/v1/ogc/processes/downloadWfs/execution",
           {
             method: "POST",
             headers: {
@@ -323,11 +363,19 @@ const useWFSDownload = (onCallback?: () => void) => {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          console.error(`HTTP error! status: ${response.status}`);
+          setDownloadingStatus(DownloadStatus.ERROR);
+          setProgressMessage(`HTTP error! status: ${response.status}`);
+          onCallback && onCallback();
         }
 
         if (!response.body) {
-          throw new Error("Response body is null");
+          console.error("Response body is null");
+          setDownloadingStatus(DownloadStatus.ERROR);
+          setProgressMessage("Response body is null");
+          onCallback && onCallback();
+          cleanupDownload();
+          return;
         }
 
         // Parse SSE stream manually with improved robustness
@@ -344,7 +392,7 @@ const useWFSDownload = (onCallback?: () => void) => {
           const value = result.value;
           buffer += decoder.decode(value, { stream: true });
 
-          // Process complete SSE events (improved parsing)
+          // Process complete SSE events
           let eventStart = 0;
           while (eventStart < buffer.length) {
             // Look for complete event (ends with double newline)
@@ -358,7 +406,7 @@ const useWFSDownload = (onCallback?: () => void) => {
             // Extract and process complete event
             const eventText = buffer.slice(eventStart, eventEnd);
             if (eventText.trim()) {
-              await processCompleteSSEEvent(eventText, layerName);
+              await processSSEEvent(eventText, layerName);
               if (eventText.includes("download-complete")) {
                 downloadCompleted = true;
               }
@@ -376,7 +424,6 @@ const useWFSDownload = (onCallback?: () => void) => {
           );
           onCallback && onCallback();
         }
-
         cleanupDownload();
       } catch (error) {
         setDownloadingStatus(DownloadStatus.ERROR);
@@ -390,7 +437,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         cleanupDownload();
       }
     },
-    [cleanupDownload, onCallback, processCompleteSSEEvent]
+    [cleanupDownload, onCallback, processSSEEvent]
   );
 
   return {
@@ -402,10 +449,9 @@ const useWFSDownload = (onCallback?: () => void) => {
     formatBytes,
     isDownloading:
       downloadingStatus === DownloadStatus.IN_PROGRESS ||
-      downloadingStatus === DownloadStatus.WAITING_SERVER ||
-      downloadingStatus === DownloadStatus.STREAMING,
+      downloadingStatus === DownloadStatus.WAITING_SERVER,
   };
 };
 
 export default useWFSDownload;
-export { DownloadStatus };
+export { DownloadProgressMessage, DownloadStatus };

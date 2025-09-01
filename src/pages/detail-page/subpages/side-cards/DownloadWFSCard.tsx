@@ -16,9 +16,7 @@ import {
   color,
   padding,
 } from "../../../../styles/constants";
-import CommonSelect, {
-  SelectItem,
-} from "../../../../components/common/dropdown/CommonSelect";
+import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
 import { ILink } from "../../../../components/common/store/OGCCollectionDefinitions";
 import rc8Theme from "../../../../styles/themeRC8";
 import useWFSDownload, {
