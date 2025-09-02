@@ -1,8 +1,11 @@
 import { FC, useCallback, useMemo, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
-import { ILink as LinkType } from "../../../common/store/OGCCollectionDefinitions";
+import {
+  DataAccessSubGroup,
+  getSubgroup,
+  ILink as LinkType,
+} from "../../../common/store/OGCCollectionDefinitions";
 import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
-import { color, fontColor, padding } from "../../../../styles/constants";
 import { openInNewTab } from "../../../../utils/LinkUtils";
 import CopyButton, {
   COPY_BUTTON_HEIGHT,
@@ -58,16 +61,16 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
             <Box
               component="img"
               width={
-                link.rel === "wfs" || link.href.includes("/wfs")
+                getSubgroup(link) === DataAccessSubGroup.WFS
                   ? "27px" // Fixed WFS icon size as per design
-                  : link.rel === "wms"
+                  : getSubgroup(link) === DataAccessSubGroup.WMS
                     ? "22px" // Fixed WMS icon size as per design
                     : "16px" // Fixed Link icon size as per design
               }
               height={
-                link.rel === "wfs" || link.href.includes("/wfs")
+                getSubgroup(link) === DataAccessSubGroup.WFS
                   ? "30px"
-                  : link.rel === "wms"
+                  : getSubgroup(link) === DataAccessSubGroup.WMS
                     ? "28px"
                     : "16px"
               }

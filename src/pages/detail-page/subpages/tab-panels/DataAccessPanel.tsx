@@ -1,12 +1,15 @@
-import React, { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { Typography } from "@mui/material";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import LinkCard from "../../../../components/list/listItem/subitem/LinkCard";
 import { MODE } from "../../../../components/list/CommonDef";
 import NaList from "../../../../components/list/NaList";
-import { ILink } from "../../../../components/common/store/OGCCollectionDefinitions";
+import {
+  DataAccessSubGroup,
+  getSubgroup,
+  ILink,
+} from "../../../../components/common/store/OGCCollectionDefinitions";
 import SideCardContainer from "../side-cards/SideCardContainer";
-import { groupBy } from "../../../../utils/ObjectUtils";
 import { fontWeight, fontSize } from "../../../../styles/constants";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import useTabNavigation from "../../../../hooks/useTabNavigation";
@@ -56,8 +59,10 @@ interface DataAccessPanelProps {
 }
 
 const TITLE: Map<string, string> = new Map([
-  ["wms", "WMS Service Link"],
-  ["wfs", "WFS Service Link"],
+  [DataAccessSubGroup.WMS, "WMS Service Link"],
+  [DataAccessSubGroup.WFS, "WFS Service Link"],
+  [DataAccessSubGroup.AWS, "AWS Service Link"],
+  [DataAccessSubGroup.THREDDS, "THREDDS Service Link"],
 ]);
 
 const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
@@ -71,11 +76,27 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
       dataAccessLinks: ILink[] | undefined
     ) => {
       if (uuid && dataAccessLinks && dataAccessLinks.length > 0) {
-        // Group links by type and display it in blocks
-        const grouped: Record<string, ILink[]> = groupBy(
-          dataAccessLinks,
-          "rel"
-        );
+        // Group links by subgroup type
+        const grouped: Record<string, ILink[]> = {};
+
+        dataAccessLinks.forEach((link) => {
+          const subgroup = getSubgroup(link);
+          const key = subgroup || "other";
+          if (!grouped[key]) {
+            grouped[key] = [];
+          }
+          grouped[key].push(link);
+        });
+
+        // Define the display order: WMS, WFS, then other subgroups
+        const orderedKeys = [
+          DataAccessSubGroup.WMS,
+          DataAccessSubGroup.WFS,
+          DataAccessSubGroup.AWS,
+          DataAccessSubGroup.THREDDS,
+          "other",
+        ].filter((key) => grouped[key]);
+
         return (
           <SideCardContainer
             title={title}
@@ -89,23 +110,26 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
             px={"10px"}
             py={"16px"}
           >
-            {Object.entries(grouped).map(([key, item]: [string, ILink[]]) => (
-              <Typography
-                padding={1}
-                key={`da-${key}`}
-                fontWeight={fontWeight.bold}
-                fontSize={fontSize.slideCardSubTitle}
-              >
-                {TITLE.has(key) ? TITLE.get(key) : "Misc Link"}
-                {!item || item.length === 0 ? (
-                  <NaList title={title ? title : ""} />
-                ) : (
-                  item.map((link: ILink, index: number) => (
-                    <LinkCard key={`ch-${index}`} link={link} icon={false} />
-                  ))
-                )}
-              </Typography>
-            ))}
+            {orderedKeys.map((key) => {
+              const item = grouped[key];
+              return (
+                <Typography
+                  padding={1}
+                  key={`da-${key}`}
+                  fontWeight={fontWeight.bold}
+                  fontSize={fontSize.slideCardSubTitle}
+                >
+                  {TITLE.has(key) ? TITLE.get(key) : "Misc Link"}
+                  {!item || item.length === 0 ? (
+                    <NaList title={title ? title : ""} />
+                  ) : (
+                    item.map((link: ILink, index: number) => (
+                      <LinkCard key={`ch-${index}`} link={link} icon={false} />
+                    ))
+                  )}
+                </Typography>
+              );
+            })}
           </SideCardContainer>
         );
       }
