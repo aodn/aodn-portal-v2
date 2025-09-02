@@ -10,14 +10,6 @@ import {
   useTheme,
   Box,
 } from "@mui/material";
-import {
-  border,
-  borderRadius,
-  color,
-  fontColor,
-  fontWeight,
-  padding,
-} from "../../../../styles/constants";
 import rc8Theme from "../../../../styles/themeRC8";
 import SideCardContainer from "./SideCardContainer";
 import { DownloadNotAvailableIcon } from "../../../../assets/icons/download/downloadNotAvaliable";
@@ -50,10 +42,23 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
   const { collection, downloadConditions, getAndSetDownloadConditions } =
     useDetailPageContext();
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
+  const [showSubsettingMessage, setShowSubsettingMessage] =
+    useState<boolean>(false);
+
+  // Store the filtered download conditions count
+  const subsettingSelectionCount = useMemo(() => {
+    return downloadConditions.filter(
+      (condition) => condition.type !== DownloadConditionType.FORMAT
+    ).length;
+  }, [downloadConditions]);
 
   const onDownload = useCallback(() => {
-    setDownloadDialogOpen(true);
-  }, []);
+    if (subsettingSelectionCount < 1) {
+      setShowSubsettingMessage(true);
+    } else {
+      setDownloadDialogOpen(true);
+    }
+  }, [subsettingSelectionCount]);
 
   // Currently, csv is the best format for parquet datasets, and netcdf is the best for zarr datasets.
   // we will support more formats in the future, but for now, we filter the formats based on the dataset type.
@@ -84,6 +89,13 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
     }
   }, [downloadConditions, getAndSetDownloadConditions]);
 
+  // Reset subsetting message when conditions change
+  useEffect(() => {
+    if (subsettingSelectionCount >= 1) {
+      setShowSubsettingMessage(false);
+    }
+  }, [subsettingSelectionCount]);
+
   const onSelectChange = useCallback(
     (value: string) => {
       getAndSetDownloadConditions(DownloadConditionType.FORMAT, [
@@ -97,9 +109,9 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
     () => ({
       height: "38px",
       textAlign: "start",
-      backgroundColor: "transparent",
+      backgroundColor: "#fff",
       boxShadow: theme.shadows[5],
-      border: `${border.xs} ${color.blue.dark}`,
+      border: `1px solid ${rc8Theme.palette.primary1}`,
     }),
     [theme]
   );
@@ -111,7 +123,13 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
         isOpen={downloadDialogOpen}
         setIsOpen={setDownloadDialogOpen}
       />
-      <Stack sx={{ px: "16px", pt: "22px" }} spacing={2}>
+      <Stack
+        sx={{
+          px: "16px",
+          py: "22px",
+        }}
+        spacing={2}
+      >
         <CommonSelect
           items={filteredDownloadFormats}
           sx={selectSxProps}
@@ -119,10 +137,10 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
         />
         <Button
           sx={{
-            backgroundColor: theme.palette.primary.main,
-            borderRadius: borderRadius.small,
+            backgroundColor: rc8Theme.palette.primary1,
+            borderRadius: "6px",
             ":hover": {
-              backgroundColor: theme.palette.primary.main,
+              backgroundColor: rc8Theme.palette.primary1,
             },
             gap: 1,
           }}
@@ -139,68 +157,66 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
         </Button>
       </Stack>
 
-      {/* todo: add subsetting logic */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "flex-start",
-          py: "12px",
-          px: "16px",
-        }}
-      >
-        <Box sx={{ minWidth: 22, flexShrink: 0, px: "8px" }}>
-          <InformationIcon
-            color={rc8Theme.palette.secondary1}
-            height={24}
-            width={24}
-          />
-        </Box>
-        <Typography variant="body2" color={rc8Theme.palette.text2} pt="3px">
-          Please consider subsetting your download selection using the tools on
-          the map.
-        </Typography>
-      </Box>
-
-      <Divider sx={{ width: "100%" }} />
-      <PlainAccordion
-        expanded={accordionExpanded}
-        elevation={0}
-        onChange={() => setAccordionExpanded((prevState) => !prevState)}
-      >
-        <AccordionSummary
-          sx={{ paddingX: padding.medium }}
-          expandIcon={<ExpandMoreIcon />}
+      {/* Show subsetting message when button is clicked and subsettingSelectionCount < 1 */}
+      {showSubsettingMessage && subsettingSelectionCount < 1 && (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            pb: "22px",
+            px: "16px",
+          }}
         >
-          <Box display="flex" alignItems="center" gap={3}>
-            <Typography
-              typography="title1Medium"
-              color={rc8Theme.palette.text1}
-              p={0}
-            >
-              Data Selection
-            </Typography>
-            <Badge
-              sx={{
-                "& .MuiBadge-badge": {
-                  backgroundColor: rc8Theme.palette.primary1,
-                  ...rc8Theme.typography.title2Regular,
-                  color: rc8Theme.palette.text3,
-                  pb: "1px",
-                },
-              }}
-              badgeContent={
-                // the count here should exclude the format condition
-                downloadConditions.filter(
-                  (condition) => condition.type !== DownloadConditionType.FORMAT
-                ).length
-              }
+          <Box sx={{ minWidth: 22, flexShrink: 0, px: "8px" }}>
+            <InformationIcon
+              color={rc8Theme.palette.secondary1}
+              height={24}
+              width={24}
             />
           </Box>
-        </AccordionSummary>
-        <AccordionDetails sx={{ pt: "4px" }}>
-          <DataSelection />
-        </AccordionDetails>
-      </PlainAccordion>
+          <Typography variant="body2" color={rc8Theme.palette.text2} pt="3px">
+            Please consider subsetting your download selection using the tools
+            on the map.
+          </Typography>
+        </Box>
+      )}
+
+      <Divider sx={{ width: "100%" }} />
+
+      {/* Hide Data Selection accordion when subsettingSelectionCount < 1 */}
+      {subsettingSelectionCount >= 1 && (
+        <PlainAccordion
+          expanded={accordionExpanded}
+          elevation={0}
+          onChange={() => setAccordionExpanded((prevState) => !prevState)}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Box display="flex" alignItems="center" gap={3}>
+              <Typography
+                typography="title1Medium"
+                color={rc8Theme.palette.text1}
+                p={0}
+              >
+                Data Selection
+              </Typography>
+              <Badge
+                sx={{
+                  "& .MuiBadge-badge": {
+                    backgroundColor: rc8Theme.palette.primary1,
+                    ...rc8Theme.typography.title2Regular,
+                    color: rc8Theme.palette.text3,
+                    pb: "1px",
+                  },
+                }}
+                badgeContent={subsettingSelectionCount}
+              />
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={{ pt: "4px" }}>
+            <DataSelection />
+          </AccordionDetails>
+        </PlainAccordion>
+      )}
     </>
   );
 
