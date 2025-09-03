@@ -23,27 +23,31 @@ import {
   DownloadConditionType,
   FormatCondition,
 } from "../../context/DownloadDefinitions";
-import { DatasetType } from "../../../../components/common/store/OGCCollectionDefinitions";
+import {
+  DatasetType,
+  ILink,
+} from "../../../../components/common/store/OGCCollectionDefinitions";
 import { DownloadIcon } from "../../../../assets/icons/download/download";
 import { InformationIcon } from "../../../../assets/icons/download/information";
+import DownloadWFSCard from "./DownloadWFSCard";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
   { label: "CSV", value: "csv" },
 ];
 
-interface DownloadCardProps {
-  hasSummaryFeature?: boolean;
-}
-
-const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
+const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const { collection, downloadConditions, getAndSetDownloadConditions } =
     useDetailPageContext();
+
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
   const [showSubsettingMessage, setShowSubsettingMessage] =
     useState<boolean>(false);
+
+  // Get WFS links for fallback rendering
+  const WFSLinks: ILink[] | undefined = collection?.getWFSLinks();
 
   // Store the filtered download conditions count
   const subsettingSelectionCount = useMemo(() => {
@@ -116,7 +120,7 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
     [theme]
   );
 
-  // Render content when download is available (hasSummaryFeature = true)
+  // Render content when download is available (hasSummary = true)
   const renderDownload = () => (
     <>
       <DownloadDialog
@@ -220,7 +224,7 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
     </>
   );
 
-  // Render content when download is not available (hasSummaryFeature = false)
+  // Render content when download is not available
   const renderDownloadUnavailable = () => (
     <Box px="16px" py="22px">
       <Box
@@ -271,9 +275,19 @@ const DownloadCard = ({ hasSummaryFeature = true }: DownloadCardProps) => {
     </Box>
   );
 
+  const getContent = () => {
+    if (collection?.hasSummaryFeature()) {
+      return renderDownload();
+    }
+    if (WFSLinks && WFSLinks.length > 0) {
+      return <DownloadWFSCard WFSLinks={WFSLinks} uuid={collection?.id} />;
+    }
+    return renderDownloadUnavailable();
+  };
+
   return (
     <SideCardContainer title="Download Service" px={0} py={0}>
-      {hasSummaryFeature ? renderDownload() : renderDownloadUnavailable()}
+      {getContent()}
     </SideCardContainer>
   );
 };
