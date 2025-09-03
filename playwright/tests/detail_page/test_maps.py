@@ -101,7 +101,6 @@ def test_spatial_map_click_zooms_detail_map(
         '1fba3a57-35f4-461b-8a0e-551af229714e',
     ],
 )
-@pytest.mark.skip
 def test_map_shows_geoserver_layer_when_wms_link_present(
     responsive_page: Page, uuid: str
 ) -> None:
