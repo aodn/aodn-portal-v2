@@ -9,7 +9,6 @@ import {
   Typography,
   useTheme,
   Box,
-  Card,
 } from "@mui/material";
 import rc8Theme from "../../../../styles/themeRC8";
 import SideCardContainer from "./SideCardContainer";
@@ -27,11 +26,9 @@ import {
 import {
   DatasetType,
   ILink,
-  OGCCollection,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import { DownloadIcon } from "../../../../assets/icons/download/download";
 import { InformationIcon } from "../../../../assets/icons/download/information";
-import { borderRadius } from "../../../../styles/constants";
 import DownloadWFSCard from "./DownloadWFSCard";
 
 const downloadFormats = [
@@ -39,37 +36,18 @@ const downloadFormats = [
   { label: "CSV", value: "csv" },
 ];
 
-interface DownloadCardProps {
-  collection?: OGCCollection;
-  hasSummaryFeature?: boolean;
-}
-
-const DownloadCard = ({
-  collection: propCollection,
-  hasSummaryFeature,
-}: DownloadCardProps) => {
+const DownloadCard = () => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const {
-    collection: contextCollection,
-    downloadConditions,
-    getAndSetDownloadConditions,
-  } = useDetailPageContext();
-
-  // Use prop collection if provided, otherwise fall back to context
-  const collection = propCollection || contextCollection;
-
-  // Determine if summary feature is available
-  const hasSummary = hasSummaryFeature ?? collection?.hasSummaryFeature();
+  const { collection, downloadConditions, getAndSetDownloadConditions } =
+    useDetailPageContext();
 
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
   const [showSubsettingMessage, setShowSubsettingMessage] =
     useState<boolean>(false);
 
   // Get WFS links for fallback rendering
-  const WFSLinks: ILink[] | undefined = collection
-    ?.getDataAccessLinks()
-    ?.filter((link) => link.rel === "wfs");
+  const WFSLinks: ILink[] | undefined = collection?.getWFSLinks();
 
   // Store the filtered download conditions count
   const subsettingSelectionCount = useMemo(() => {
