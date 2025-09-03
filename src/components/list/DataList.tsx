@@ -1,7 +1,11 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
-import { ILink } from "../common/store/OGCCollectionDefinitions";
+import {
+  ILink,
+  DataAccessSubGroup,
+  getSubgroup,
+} from "../common/store/OGCCollectionDefinitions";
 import LinkCard from "./listItem/subitem/LinkCard";
 
 interface DataListProps {
@@ -20,7 +24,27 @@ const DataList: React.FC<DataListProps> = ({
   dataAccessLinks,
   selected = false,
 }) => {
-  const dataAccessItems = dataAccessLinks?.map((link: ILink, index: number) => (
+  // Sort links by subgroup in the preferred order: WMS, WFS, AWS, THREDDS, then others
+  const sortedLinks = dataAccessLinks
+    ? [...dataAccessLinks].sort((a, b) => {
+        const subgroupA = getSubgroup(a);
+        const subgroupB = getSubgroup(b);
+
+        const order = [
+          DataAccessSubGroup.WMS,
+          DataAccessSubGroup.WFS,
+          DataAccessSubGroup.AWS,
+          DataAccessSubGroup.THREDDS,
+        ];
+
+        const indexA = subgroupA ? order.indexOf(subgroupA) : 999; // Put unknown subgroups at the end
+        const indexB = subgroupB ? order.indexOf(subgroupB) : 999;
+
+        return indexA - indexB;
+      })
+    : undefined;
+
+  const dataAccessItems = sortedLinks?.map((link: ILink, index: number) => (
     <ItemBaseGrid key={index}>
       <LinkCard key={index} link={link} />
     </ItemBaseGrid>

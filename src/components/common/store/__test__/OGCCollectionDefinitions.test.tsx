@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { OGCCollection, RelationType } from "../OGCCollectionDefinitions"; // Adjust the import path as needed
+import {
+  getSubgroup,
+  OGCCollection,
+  RelationType,
+} from "../OGCCollectionDefinitions"; // Adjust the import path as needed
 
 // Mock the imported icons and default thumbnail
 vi.mock("@/assets/images/default-thumbnail.png", () => ({
@@ -59,7 +63,7 @@ describe("OGCCollection", () => {
           href: "http://example.com/wms",
           type: "application/xml",
           title: "WMS Link",
-          "ai:group": "Data Access",
+          "ai:group": "Data Access > wms",
           getIcon: () => "mocked-wms-icon.png",
         },
       ];
@@ -102,7 +106,7 @@ describe("OGCCollection", () => {
           href: "http://example.com/wms",
           type: "application/xml",
           title: "WMS Link",
-          "ai:group": "Data Access",
+          "ai:group": "Data Access > wms",
           getIcon: () => "mocked-wms-icon.png",
         },
       ];
@@ -187,6 +191,50 @@ describe("OGCCollection", () => {
 
       const dataAccessLinks = collection.getDataAccessLinks();
       expect(dataAccessLinks).toBeUndefined();
+    });
+
+    it("should extract subgroup from ai:group with subgroup", () => {
+      const link = {
+        rel: "related",
+        href: "http://example.com/wms",
+        type: "text/html",
+        title: "WMS Link",
+        "ai:group": "Data Access > wms",
+        getIcon: () => "mocked-wms-icon.png",
+      };
+
+      const result = getSubgroup(link);
+      expect(result).toBe("wms");
+    });
+
+    it("should return WMS links by subgroup", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        {
+          rel: "wms",
+          href: "http://example.com/wms",
+          type: "",
+          title: "WMS Service",
+          "ai:group": "Data Access > wms",
+          getIcon: () => "mocked-wms-icon.png",
+        },
+        {
+          rel: "wfs",
+          href: "http://example.com/wfs",
+          type: "",
+          title: "WFS Service",
+          "ai:group": "Data Access > wfs",
+          getIcon: () => "mocked-wfs-icon.png",
+        },
+      ];
+
+      const wmsLinks = collection.getWMSLinks();
+      const wfsLinks = collection.getWFSLinks();
+
+      expect(wmsLinks).toHaveLength(1);
+      expect(wmsLinks?.[0].title).toBe("WMS Service");
+      expect(wfsLinks).toHaveLength(1);
+      expect(wfsLinks?.[0].title).toBe("WFS Service");
     });
   });
 });
