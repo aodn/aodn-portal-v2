@@ -14,7 +14,7 @@ import PlainSlider from "../../../../common/slider/PlainSlider";
 import { dateDefault } from "../../../../common/constants";
 import useBreakpoint from "../../../../../hooks/useBreakpoint";
 import { padding } from "../../../../../styles/constants";
-import { TimeRangeIcon } from "../../../../../assets/map/time_range";
+import { TimeRangeIcon } from "../../../../../assets/icons/map/time_range";
 import { switcherIconButtonSx } from "./MenuControl";
 import rc8Theme from "../../../../../styles/themeRC8";
 

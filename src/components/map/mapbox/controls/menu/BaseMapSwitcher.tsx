@@ -28,7 +28,7 @@ import {
   switcherTitleTypographySx,
 } from "./MenuControl";
 import { MapDefaultConfig } from "../../constants";
-import { BaseLayerIcon } from "../../../../../assets/map/base_layer";
+import { BaseLayerIcon } from "../../../../../assets/icons/map/base_layer";
 
 export interface BaseMapSwitcherLayer {
   id: string;

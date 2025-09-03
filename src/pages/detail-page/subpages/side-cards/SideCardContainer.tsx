@@ -6,8 +6,8 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import rc8Theme from "../../../../styles/themeRC8";
+import { ArrowOutwardIcon } from "../../../../assets/icons/side-cards/arrowOutward";
 
 interface SideCardContainerProps {
   title: string;
@@ -59,7 +59,7 @@ const SideCardContainer: FC<SideCardContainerProps> = ({
               onClick={onClick}
               sx={{ color: rc8Theme.palette.text2 }}
             >
-              <ArrowOutwardIcon fontSize="small" />
+              <ArrowOutwardIcon />
             </IconButton>
           )
         }

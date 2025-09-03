@@ -1,17 +1,16 @@
 import { FC } from "react";
 import { Card, Stack } from "@mui/material";
-import { borderRadius } from "../../../styles/constants";
+import { useDetailPageContext } from "../context/detail-page-context";
+import { MODE } from "../../../components/list/CommonDef";
+import { ILink } from "../../../components/common/store/OGCCollectionDefinitions";
 import DownloadCard from "./side-cards/DownloadCard";
+import DownloadWFSCard from "./side-cards/DownloadWFSCard";
+import DataAccessPanel, { TYPE } from "./tab-panels/DataAccessPanel";
 import SpatialCoverageCard, {
   SpatialCoverageCardProps,
 } from "./side-cards/SpatialCoverageCard";
-import { useDetailPageContext } from "../context/detail-page-context";
-import DataAccessPanel, { TYPE } from "./tab-panels/DataAccessPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
-import { MODE } from "../../../components/list/CommonDef";
-import DownloadServiceCard from "./side-cards/DownloadServiceCard";
-import { ILink } from "../../../components/common/store/OGCCollectionDefinitions";
-import DownloadWFSCard from "./side-cards/DownloadWFSCard";
+import { borderRadius } from "../../../styles/constants";
 
 interface SideSectionProps extends SpatialCoverageCardProps {}
 
@@ -30,15 +29,7 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
       flexWrap="wrap"
     >
       {collection?.hasSummaryFeature() ? (
-        <Card
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: borderRadius.small,
-            width: "100%",
-          }}
-        >
-          <DownloadCard />
-        </Card>
+        <DownloadCard hasSummaryFeature={collection?.hasSummaryFeature()} />
       ) : WFSLinks && WFSLinks.length !== 0 ? (
         <Card
           sx={{
@@ -49,9 +40,7 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
         >
           <DownloadWFSCard WFSLinks={WFSLinks} uuid={collection?.id} />
         </Card>
-      ) : (
-        <DownloadServiceCard />
-      )}
+      ) : null}
 
       <DataAccessPanel mode={MODE.COMPACT} type={TYPE.DATA_ACCESS} />
       <SpatialCoverageCard

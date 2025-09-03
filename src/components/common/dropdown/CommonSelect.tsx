@@ -9,6 +9,8 @@ import {
 import { FC, memo, ReactElement, useCallback, useState } from "react";
 import { IconProps } from "../../icon/types";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
+import rc8Theme from "../../../styles/themeRC8";
+import { ExpandMore } from "@mui/icons-material";
 
 export interface SelectItem<T = string> {
   value: T;
@@ -27,16 +29,35 @@ export interface CommonSelectProps<T = string> {
 }
 
 const DEFAULT_SELECT_STYLE: SxProps = {
+  ...rc8Theme.typography.body1Medium,
+  color: rc8Theme.palette.text1,
+  border: `1px solid ${rc8Theme.palette.primary1}`,
   padding: "0",
   textAlign: "center",
   height: "44px",
-  borderRadius: "4px",
+  borderRadius: "6px",
   backgroundColor: "#fff",
   "& fieldset": {
     border: "none",
   },
   boxShadow: "2px 2px 4px 0px rgba(0, 0, 0, 0.15)",
-  fontSize: "14px",
+};
+
+const DEFAULT_MENU_PROPS = {
+  PaperProps: {
+    sx: {
+      backgroundColor: "#fff",
+      border: `1px solid ${rc8Theme.palette.primary1}`,
+      borderRadius: "6px",
+      mt: "6px",
+      "& .MuiMenuItem-root": {
+        color: rc8Theme.palette.text1,
+        "&.Mui-selected": {
+          backgroundColor: rc8Theme.palette.primary5,
+        },
+      },
+    },
+  },
 };
 
 const CommonSelect: FC<CommonSelectProps> = memo(
@@ -79,6 +100,8 @@ const CommonSelect: FC<CommonSelectProps> = memo(
           onClose={handleOpenState(false)}
           open={isOpen}
           onChange={handleOnChange}
+          IconComponent={ExpandMore}
+          MenuProps={DEFAULT_MENU_PROPS}
           sx={{
             ...DEFAULT_SELECT_STYLE,
             ...sx,

@@ -26,7 +26,7 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import { SearchStyleIcon } from "../../../../../assets/map/search_style";
+import { SearchStyleIcon } from "../../../../../assets/icons/map/search_style";
 
 export interface LayerSwitcherLayer<T = string> {
   id: T;

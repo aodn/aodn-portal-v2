@@ -105,7 +105,7 @@ export const designTokensRC8 = {
       body1Medium: {
         fontFamily: FONT_FAMILIES.openSans,
         fontSize: "14px",
-        fontWeight: 400,
+        fontWeight: 500,
         lineHeight: "22px",
         color: "#000",
       },

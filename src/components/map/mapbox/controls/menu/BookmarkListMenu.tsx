@@ -7,7 +7,7 @@ import BookmarkListAccordionGroup, {
   BookmarkListAccordionGroupBasicType,
 } from "../../../../bookmark/BookmarkListAccordionGroup";
 import { BOOKMARK_LIST_WIDTH_MAP } from "../../../../result/constants";
-import { BookmarkIcon } from "../../../../../assets/map/bookmark";
+import { BookmarkIcon } from "../../../../../assets/icons/map/bookmark";
 
 export interface BookmarkListMenuBasicType
   extends ControlProps,
