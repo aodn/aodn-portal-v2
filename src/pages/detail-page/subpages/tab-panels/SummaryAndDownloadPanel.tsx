@@ -12,7 +12,6 @@ import Layers, {
 import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
 import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
-import DetailSymbolLayer from "../../../../components/map/mapbox/layers/DetailSymbolLayer";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
 import BaseMapSwitcher, {
@@ -45,7 +44,6 @@ const mapContainerId = "map-detail-container-id";
 enum LayerName {
   Hexbin = "hexbin",
   GeoServer = "geoServer",
-  Symbol = "symbol",
 }
 
 interface SummaryAndDownloadPanelProps {
@@ -161,12 +159,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         layers.push({
           id: LayerName.Hexbin,
           name: capitalizeFirstLetter(LayerName.Hexbin),
-          default: true,
-        });
-
-        layers.push({
-          id: LayerName.Symbol,
-          name: capitalizeFirstLetter(LayerName.Symbol),
           default: true,
         });
       }
@@ -313,10 +305,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         }
                       />
                       <MenuControl
-                        visible={
-                          selectedLayer === LayerName.Hexbin ||
-                          selectedLayer === LayerName.Symbol
-                        }
+                        visible={selectedLayer === LayerName.Hexbin}
                         menu={
                           <DateRange
                             minDate={minDateStamp.format(
@@ -332,10 +321,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         }
                       />
                       <MenuControl
-                        visible={
-                          selectedLayer === LayerName.Hexbin ||
-                          selectedLayer === LayerName.Symbol
-                        }
+                        visible={selectedLayer === LayerName.Hexbin}
                         menu={
                           <DrawRect
                             getAndSetDownloadConditions={
@@ -366,11 +352,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       featureCollection={filteredFeatureCollection}
                       visible={selectedLayer === LayerName.Hexbin}
                     />
-                    {selectedLayer === LayerName.Symbol && (
-                      <DetailSymbolLayer
-                        featureCollection={filteredFeatureCollection}
-                      />
-                    )}
                   </Layers>
                 </Map>
               </Box>
