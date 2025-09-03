@@ -122,24 +122,41 @@ export enum AIGroup {
   OTHER = "Other",
 }
 
+export enum DataAccessSubGroup {
+  WFS = "wfs",
+  WMS = "wms",
+  AWS = "aws",
+  THREDDS = "thredds",
+}
+
 export enum DatasetType {
   PARQUET = "parquet",
   ZARR = "zarr",
 }
 
-const getIcon = (href: string, rel: string) => {
-  switch (rel) {
-    case "wms":
-      return wmsIcon;
+// Helper function to extract subgroup type from ai:group
+export const getSubgroup = (link: ILink): DataAccessSubGroup | undefined => {
+  const aiGroup = link["ai:group"];
+  if (!aiGroup || !aiGroup.includes(" > ")) {
+    return undefined;
+  }
+  return aiGroup.split(" > ")[1]?.trim() as DataAccessSubGroup;
+};
 
-    case "wfs":
-      return wfsIcon;
+const getIcon = (link: ILink) => {
+  const subgroupType = getSubgroup(link);
 
-    default:
-      if (href.includes("/wfs")) {
+  if (subgroupType) {
+    switch (subgroupType.toLowerCase()) {
+      case DataAccessSubGroup.WMS:
+        return wmsIcon;
+      case DataAccessSubGroup.WFS:
         return wfsIcon;
-      }
-      return linkIcon;
+      default:
+        return linkIcon;
+    }
+  } else {
+    return linkIcon;
   }
 };
 
@@ -148,6 +165,27 @@ export class OGCCollection {
   private propValue?: SummariesProperties;
   private propExtent?: Spatial;
   private propLinks?: Array<ILink>;
+  // Get links by AI group
+  private getLinksByAIGroup = (group: string): ILink[] | undefined => {
+    const result = this.links?.filter((link) => link["ai:group"] === group);
+    return result?.length ? result : undefined;
+  };
+  // Get links by AI group prefix
+  private getLinksByAIGroupPrefix = (
+    groupPrefix: string
+  ): ILink[] | undefined => {
+    const result = this.links?.filter((link) =>
+      link["ai:group"]?.startsWith(groupPrefix)
+    );
+    return result?.length ? result : undefined;
+  };
+  // Get links by AI subgroup
+  private getLinksByAISubgroup = (subgroup: string): ILink[] | undefined => {
+    const result = this.links?.filter(
+      (link) => getSubgroup(link)?.toLowerCase() === subgroup.toLowerCase()
+    );
+    return result?.length ? result : undefined;
+  };
 
   readonly id: string = "undefined";
   readonly title?: string;
@@ -167,7 +205,7 @@ export class OGCCollection {
 
   set links(links: ILink[] | undefined) {
     this.propLinks = links?.map<ILink>((link) => {
-      return { ...link, getIcon: () => getIcon(link.href, link.rel) };
+      return { ...link, getIcon: () => getIcon(link) };
     });
   }
 
@@ -228,20 +266,18 @@ export class OGCCollection {
   // Get the AI enhanced description
   getEnhancedDescription = (): string | undefined =>
     this.propValue?.["ai:description"];
-  // Get links by AI group
-  getLinksByAIGroup = (group: string): ILink[] | undefined => {
-    const result = this.links?.filter((link) => link["ai:group"] === group);
-    return result?.length ? result : undefined;
-  };
   getDataAccessLinks = (): ILink[] | undefined =>
-    this.getLinksByAIGroup(AIGroup.DATA_ACCESS);
+    this.getLinksByAIGroupPrefix(AIGroup.DATA_ACCESS);
+  getWMSLinks = (): ILink[] | undefined =>
+    this.getLinksByAISubgroup(DataAccessSubGroup.WMS);
+  getWFSLinks = (): ILink[] | undefined =>
+    this.getLinksByAISubgroup(DataAccessSubGroup.WFS);
   getDocumentLinks = (): ILink[] | undefined =>
     this.getLinksByAIGroup(AIGroup.DOCUMENT);
   getPythonNotebookLinks = (): ILink[] | undefined =>
     this.getLinksByAIGroup(AIGroup.PYTHON_NOTEBOOK);
   getOtherLinks = (): ILink[] | undefined =>
     this.getLinksByAIGroup(AIGroup.OTHER);
-  // Get all links that have an ai:group field
   getAllAIGroupedLinks = (): ILink[] | undefined =>
     this.links?.filter((link) => link["ai:group"] !== undefined);
   // A feature call summary is provided if you do cloud optimized data download

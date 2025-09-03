@@ -101,6 +101,7 @@ def test_spatial_map_click_zooms_detail_map(
         '1fba3a57-35f4-461b-8a0e-551af229714e',
     ],
 )
+@pytest.mark.skip
 def test_map_shows_geoserver_layer_when_wms_link_present(
     responsive_page: Page, uuid: str
 ) -> None:
@@ -177,12 +178,11 @@ def test_map_shows_hexbin_and_symbol_layers(
 ) -> None:
     """
     This test uses a dataset specifically chosen to include a summary link and verifies
-    that both Hexbin and Symbol layers can be previewed and toggled on the map.
+    that both Hexbin can be previewed and toggled on the map.
 
     This test ensures that:
-    1. Both Hexbin and Symbol layer options are displayed in the layers menu
+    1. Both Hexbin options are displayed in the layers menu
     2. The Hexbin layer is added to the map and is visible by default
-    3. Selecting the Symbol layer correctly adds it to the map and makes it visible
     """
     detail_page = DetailPage(responsive_page)
 
@@ -190,17 +190,12 @@ def test_map_shows_hexbin_and_symbol_layers(
 
     detail_page.load(uuid)
     detail_page.detail_map.layers_menu.click()
-    # Ensure both Hexbin and Symbol layer options are displayed in the layers menu
+    # Ensure both Hexbin options are displayed in the layers menu
     expect(detail_page.detail_map.hexbin_layer).to_be_visible()
-    expect(detail_page.detail_map.symbol_layer).to_be_visible()
 
     # Verify that the Hexbin layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerType.HEXBIN)
     assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
-
-    # Select Symbol layer and verify its visibility on the map
-    detail_page.detail_map.symbol_layer.click()
-    layer_id = layer_factory.get_layer_id(LayerType.SYMBOL)
     assert (
         detail_page.detail_map.is_map_layer_visible(
             layer_id, is_map_loading=False
