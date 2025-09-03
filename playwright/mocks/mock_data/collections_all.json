@@ -28,7 +28,7 @@
           "rel": "wms",
           "type": "",
           "title": "imos:asset_map",
-          "ai:group": "Data Access"
+          "ai:group": "Data Access > wms"
         },
         {
           "href": "https://portal.aodn.org.au/search?uuid=1fba3a57-35f4-461b-8a0e-551af229714e",
@@ -42,7 +42,7 @@
           "rel": "wfs",
           "type": "",
           "title": "imos:asset_map",
-          "ai:group": "Data Access"
+          "ai:group": "Data Access > wfs"
         },
         {
           "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
