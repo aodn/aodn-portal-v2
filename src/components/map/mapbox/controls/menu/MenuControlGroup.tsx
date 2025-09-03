@@ -21,18 +21,24 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Filter out children that have visible prop set to false
-  const visibleChildren = Children.toArray(children).filter((child) => {
-    if (isValidElement(child)) {
-      // Check if the child has a visible prop and if it's false
-      return child.props.visible !== false;
-    }
-    return true;
-  });
+  const allChildren = Children.toArray(children);
 
-  // Define the styles to apply to children
-  const childStyles: SxProps<Theme> = {
-    // Target the mapboxgl-ctrl-group class on the child's rendered div
+  // Calculate which children are visible and determine first/last visible indices
+  const childrenWithVisibility = allChildren.map((child, index) => ({
+    child,
+    index,
+    isVisible: isValidElement(child) ? child.props.visible !== false : true,
+  }));
+
+  const visibleIndices = childrenWithVisibility
+    .filter((item) => item.isVisible)
+    .map((item) => item.index);
+
+  const firstVisibleIndex = visibleIndices[0];
+  const lastVisibleIndex = visibleIndices[visibleIndices.length - 1];
+
+  // Base styles for all children
+  const baseChildStyles: SxProps<Theme> = {
     [`&.${className}`]: {
       borderRadius: 0,
       background: "#FFF",
@@ -44,35 +50,62 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      // Apply first-child styles
-      "&:first-of-type": {
-        marginTop: "10px",
-        borderTopLeftRadius: "6px",
-        borderTopRightRadius: "6px",
-      },
-      // Apply last-child styles
-      "&:last-of-type": {
-        borderBottomLeftRadius: "6px",
-        borderBottomRightRadius: "6px",
-      },
+    },
+  };
+
+  // First child specific styles
+  const firstChildStyles: SxProps<Theme> = {
+    [`&.${className}`]: {
+      marginTop: "10px",
+      borderTopLeftRadius: "6px",
+      borderTopRightRadius: "6px",
+    },
+  };
+
+  // Last child specific styles
+  const lastChildStyles: SxProps<Theme> = {
+    [`&.${className}`]: {
+      borderBottomLeftRadius: "6px",
+      borderBottomRightRadius: "6px",
     },
   };
 
   return (
     <Grid container direction="column" ref={ref}>
-      {visibleChildren.map((child, index) => {
+      {allChildren.map((child, index) => {
         if (isValidElement(child)) {
-          // Merge childStyles with the child's existing sx prop
+          const isVisible = child.props.visible !== false;
+          const isFirstVisible = index === firstVisibleIndex;
+          const isLastVisible = index === lastVisibleIndex;
+
+          // Build styles array based on position
+          const childStylesArray = [baseChildStyles];
+
+          if (isFirstVisible) {
+            childStylesArray.push(firstChildStyles);
+          }
+
+          if (isLastVisible) {
+            childStylesArray.push(lastChildStyles);
+          }
+
+          // Add visibility control
+          childStylesArray.push({
+            display: isVisible ? "flex" : "none",
+          });
+
+          // Add any existing styles from the child
+          if (Array.isArray(child.props.sx)) {
+            childStylesArray.push(...child.props.sx);
+          } else if (child.props.sx) {
+            childStylesArray.push(child.props.sx);
+          }
+
           return cloneElement<any>(child, {
             key: child.key || index,
             className: className,
             parentRef: ref,
-            sx: [
-              childStyles,
-              ...(Array.isArray(child.props.sx)
-                ? child.props.sx
-                : [child.props.sx]),
-            ],
+            sx: childStylesArray,
           });
         }
         return child;
