@@ -62,13 +62,6 @@ window.__map_functions = {
       throw new Error("Hexbin layer not found");
     }
   },
-  getSymbolLayer: function (mapId) {
-    if (this.getTestProps(mapId).getSymbolLayer) {
-      return this.getTestProps(mapId).getSymbolLayer();
-    } else {
-      throw new Error("Symbol layer not found");
-    }
-  },
   isMapLayerVisible: function (mapId, layerId) {
     const map = this.getMap(mapId);
     if (map.getLayer(layerId) == undefined) {

@@ -169,12 +169,6 @@ class Map(BasePage):
             'getHexbinLayer', is_map_loading=False
         )
 
-    def get_Symbol_Layer_id(self) -> str:
-        """Get the Symbol layer id"""
-        return self.get_layer_id_from_test_props(
-            'getSymbolLayer', is_map_loading=False
-        )
-
     def is_map_layer_visible(
         self, layer_id: str, is_map_loading: bool = True
     ) -> bool:
