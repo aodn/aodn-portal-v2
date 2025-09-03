@@ -56,6 +56,26 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, label, features }) => {
         "fill-outline-color": "black",
       },
     });
+
+    // Add a symbol layer to display the names
+    map?.addLayer({
+      id: layerLabelId,
+      type: "symbol",
+      source: sourceId,
+      layout: {
+        "text-field": ["get", label],
+        "text-offset": [0, 1.25],
+        "text-anchor": "top",
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "symbol-placement": "point",
+      },
+      paint: {
+        "text-color": "#ffffff",
+        "text-halo-color": "#000000",
+        "text-halo-width": 2,
+      },
+    });
   }, [map, layerId, sourceId, layerLabelId, features, id, label]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
