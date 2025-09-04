@@ -262,7 +262,7 @@ const useWFSDownload = (onCallback?: () => void) => {
             onCallback && onCallback();
           }
           break;
-        case "error":
+        case EventName.ERROR:
           console.error("SSE Error event:", data.error || data.message);
           setDownloadingStatus(DownloadStatus.ERROR);
           setProgressMessage(data.message || "Unknown error");
@@ -378,42 +378,47 @@ const useWFSDownload = (onCallback?: () => void) => {
           return;
         }
 
-        // Parse SSE stream manually with improved robustness
+        // Parse SSE stream manually
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
         let done = false;
         let downloadCompleted = false;
-        while (!done && !controller.signal.aborted) {
-          const result = await reader.read();
-          done = result.done;
-          if (done) break;
 
-          const value = result.value;
-          buffer += decoder.decode(value, { stream: true });
+        try {
+          while (!done && !controller.signal.aborted) {
+            const result = await reader.read();
+            done = result.done;
+            if (done) break;
 
-          // Process complete SSE events
-          let eventStart = 0;
-          while (eventStart < buffer.length) {
-            // Look for complete event (ends with double newline)
-            const eventEnd = buffer.indexOf("\n\n", eventStart);
-            if (eventEnd === -1) {
-              // No complete event found, keep remaining buffer for next iteration
-              buffer = buffer.slice(eventStart);
-              break;
-            }
+            const value = result.value;
+            buffer += decoder.decode(value, { stream: true });
 
-            // Extract and process complete event
-            const eventText = buffer.slice(eventStart, eventEnd);
-            if (eventText.trim()) {
-              await processSSEEvent(eventText, layerName);
-              if (eventText.includes("download-complete")) {
-                downloadCompleted = true;
+            // Process complete SSE events
+            let eventStart = 0;
+            while (eventStart < buffer.length && !controller.signal.aborted) {
+              // Look for complete event (ends with double newline)
+              const eventEnd = buffer.indexOf("\n\n", eventStart);
+              if (eventEnd === -1) {
+                // No complete event found, keep remaining buffer for next iteration
+                buffer = buffer.slice(eventStart);
+                break;
               }
-            }
 
-            eventStart = eventEnd + 2; // Skip the double newline
+              // Extract and process complete event
+              const eventText = buffer.slice(eventStart, eventEnd);
+              if (eventText.trim()) {
+                await processSSEEvent(eventText, layerName);
+                if (eventText.includes("download-complete")) {
+                  downloadCompleted = true;
+                }
+              }
+
+              eventStart = eventEnd + 2; // Skip the double newline
+            }
           }
+        } finally {
+          await reader.cancel("Cleaning up stream");
         }
 
         // Only show error if we haven't successfully completed the download
@@ -424,20 +429,22 @@ const useWFSDownload = (onCallback?: () => void) => {
           );
           onCallback && onCallback();
         }
-        cleanupDownload();
-      } catch (error) {
-        // If error is NOT due to user cancellation
-        if (abortControllerRef.current) {
-          setDownloadingStatus(DownloadStatus.ERROR);
-          setProgressMessage(
-            error instanceof Error
-              ? `Download failed: ${error.message}`
-              : "Download failed: Unknown error"
-          );
-          setDownloadedBytes(0);
-          onCallback && onCallback();
+
+        // Clean up immediately after processing
+        if (!controller.signal.aborted) {
           cleanupDownload();
         }
+      } catch (error) {
+        // If error is NOT due to user cancellation
+        setDownloadingStatus(DownloadStatus.ERROR);
+        setProgressMessage(
+          error instanceof Error
+            ? `Download failed: ${error.message}`
+            : "Download failed: Unknown error"
+        );
+        setDownloadedBytes(0);
+        onCallback && onCallback();
+        cleanupDownload();
       }
     },
     [cleanupDownload, onCallback, processSSEEvent]
