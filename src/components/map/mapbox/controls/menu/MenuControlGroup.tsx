@@ -30,7 +30,6 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       boxShadow: "none",
       marginY: 0,
       mx: "1px",
-      padding: "4px",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -43,7 +42,7 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       direction="column"
       ref={ref}
       sx={{
-        width: "46px",
+        width: "45px",
         bgcolor: "#FFF",
         borderRadius: "6px",
         boxShadow: "4px 4px 4px 0px rgba(0, 0, 0, 0.10)",
@@ -54,9 +53,6 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
     >
       {Children.toArray(children).map((child, index) => {
         if (isValidElement(child)) {
-          // Don't render if visible is explicitly false
-          if (child.props.visible === false) return null;
-
           return cloneElement<any>(child, {
             key: child.key || index,
             className: className,
