@@ -20,15 +20,6 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Filter out children that have visible prop set to false
-  const visibleChildren = Children.toArray(children).filter((child) => {
-    if (isValidElement(child)) {
-      // Check if the child has a visible prop and if it's false
-      return child.props.visible !== false;
-    }
-    return true;
-  });
-
   // Define the styles to apply to children
   const childStyles: SxProps<Theme> = {
     // Target the mapboxgl-ctrl-group class on the child's rendered div
@@ -61,8 +52,11 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
         py: "3px",
       }}
     >
-      {visibleChildren.map((child, index) => {
+      {Children.toArray(children).map((child, index) => {
         if (isValidElement(child)) {
+          // Don't render if visible is explicitly false
+          if (child.props.visible === false) return null;
+
           return cloneElement<any>(child, {
             key: child.key || index,
             className: className,
