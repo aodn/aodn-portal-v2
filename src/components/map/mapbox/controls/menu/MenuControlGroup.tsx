@@ -30,7 +30,6 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       boxShadow: "none",
       marginY: 0,
       mx: "1px",
-      my: "1px",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
