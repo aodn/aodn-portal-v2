@@ -257,14 +257,7 @@ const MenuControl: React.FC<MenuControlProps> = ({
   }, [control, menu?.props]);
 
   useEffect(() => {
-    if (control) {
-      // Add a small delay to ensure proper state settling
-      const timeoutId = setTimeout(() => {
-        control.setVisible(visible);
-      }, 0);
-
-      return () => clearTimeout(timeoutId);
-    }
+    control?.setVisible(visible);
   }, [control, visible]);
 
   return (
