@@ -73,7 +73,7 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
             ...rc8Theme.typography.title2Regular,
             color: rc8Theme.palette.text1,
             bgcolor: rc8Theme.palette.primary6,
-            px: "38px",
+            px: "24px",
             py: "8px",
             "&.Mui-selected": {
               border: "none",
