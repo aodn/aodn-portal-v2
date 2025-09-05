@@ -28,7 +28,7 @@ import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point, Position } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
-import GeoServerLayer from "../../../../components/map/mapbox/layers/GeoServerLayer";
+import GeoServerTileLayer from "../../../../components/map/mapbox/layers/GeoServerLayer";
 import MapLayerSwitcher, {
   LayerSwitcherLayer,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
@@ -339,7 +339,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       // GeoServerLayer is heavy to load, so we can load it
                       // but hide it with visible = false
                     }
-                    <GeoServerLayer
+                    <GeoServerTileLayer
                       geoServerTileLayerConfig={{
                         baseUrl: ensureHttps(getWMSServer(collection)[0]),
                         tileUrlParams: { LAYERS: getWMSLayerNames(collection) },
