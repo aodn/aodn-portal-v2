@@ -35,15 +35,20 @@ import MapLayerSwitcher, {
 import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
-import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
+import {
+  DatasetType,
+  OGCCollection,
+} from "../../../../components/common/store/OGCCollectionDefinitions";
 import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
+import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 
 const mapContainerId = "map-detail-container-id";
 
 enum LayerName {
   Hexbin = "hexbin",
   GeoServer = "geoServer",
+  SpatialExtent = "spatial Extent",
 }
 
 interface SummaryAndDownloadPanelProps {
@@ -154,7 +159,21 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const layers: LayerSwitcherLayer<LayerName>[] = [];
 
     if (collection) {
-      const isSupportHexbin = collection?.hasSummaryFeature() === true;
+      const hasSummaryFeature: boolean =
+        collection?.hasSummaryFeature() || false;
+      const isZarrDataset: boolean =
+        collection.getDatasetType() === DatasetType.ZARR;
+
+      // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
+      const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
+
+      if (hasSummaryFeature && isZarrDataset) {
+        layers.push({
+          id: LayerName.SpatialExtent,
+          name: capitalizeFirstLetter(LayerName.SpatialExtent),
+          default: isZarrDataset,
+        });
+      }
       if (isSupportHexbin) {
         layers.push({
           id: LayerName.Hexbin,
@@ -305,7 +324,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         }
                       />
                       <MenuControl
-                        visible={selectedLayer === LayerName.Hexbin}
+                        // visible={selectedLayer === LayerName.Hexbin}
                         menu={
                           <DateRange
                             minDate={minDateStamp.format(
@@ -321,7 +340,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         }
                       />
                       <MenuControl
-                        visible={selectedLayer === LayerName.Hexbin}
+                        // visible={selectedLayer === LayerName.Hexbin}
                         menu={
                           <DrawRect
                             getAndSetDownloadConditions={
@@ -351,6 +370,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <HexbinLayer
                       featureCollection={filteredFeatureCollection}
                       visible={selectedLayer === LayerName.Hexbin}
+                    />
+                    <GeojsonLayer
+                      collection={collection}
+                      isVisible={selectedLayer === LayerName.SpatialExtent}
                     />
                   </Layers>
                 </Map>
