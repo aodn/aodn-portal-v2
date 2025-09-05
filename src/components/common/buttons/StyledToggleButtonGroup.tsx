@@ -6,10 +6,10 @@ export const StyledToggleButtonGroup = styled(ToggleButtonGroup)({
   display: "flex",
   flexDirection: "row",
   flexWrap: "wrap",
-  gap: "14px 12px",
+  gap: "14px 20px",
   margin: "8px 20px",
   "& .MuiToggleButton-root": {
-    borderRadius: "6px",
+    borderRadius: "12px",
     textTransform: "capitalize",
     ...rc8Theme.typography.body1Medium,
     color: rc8Theme.palette.text1,
