@@ -113,7 +113,7 @@ const checkWMSAvailability = (
   return true;
 };
 
-const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
+const GeoServerLayer: FC<GeoServerTileLayerProps> = ({
   geoServerTileLayerConfig,
   onWMSAvailabilityChange,
   visible,
@@ -254,4 +254,4 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   );
 };
 
-export default GeoServerTileLayer;
+export default GeoServerLayer;
