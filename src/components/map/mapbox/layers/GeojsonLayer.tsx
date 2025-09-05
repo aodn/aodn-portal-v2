@@ -25,6 +25,7 @@ interface GeojsonLayerProps {
   onMouseMove?: (event: MapLayerMouseEvent) => void;
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   animate?: boolean;
+  isVisible?: boolean;
 }
 
 const GeojsonLayer: FC<GeojsonLayerProps> = ({
@@ -35,6 +36,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   onMouseMove = (_: MapLayerMouseEvent) => {},
   setPhotos,
   animate = true,
+  isVisible = true,
 }) => {
   const { map } = useContext(MapContext);
   const [_, setMapLoaded] = useState<boolean | null>(null);
@@ -121,7 +123,6 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     // https://github.com/mapbox/mapbox-gl-js/issues/8660
     //
     if (map?.getSource(sourceId)) return true;
-
     console.log("geojson, create layer " + map?.getContainer().id);
     map?.addSource(sourceId, {
       type: "geojson",
@@ -137,8 +138,11 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         "fill-color": stringToColor(collectionId),
         "fill-outline-color": "yellow",
       },
+      layout: {
+        visibility: isVisible ? "visible" : "none",
+      },
     });
-  }, [map, extent, collectionId, sourceId, layerId]);
+  }, [map, extent, collectionId, sourceId, layerId, isVisible]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
   // the behavior of mapbox, this useEffect, add the layer back based on user event
@@ -148,6 +152,16 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       map?.off("styledata", createLayer);
     };
   }, [map, createLayer]);
+
+  useEffect(() => {
+    if (!map || !map.getLayer(layerId)) return;
+
+    map.setLayoutProperty(
+      layerId,
+      "visibility",
+      isVisible ? "visible" : "none"
+    );
+  }, [map, layerId, isVisible]);
 
   useEffect(() => {
     if (map === null) return;
