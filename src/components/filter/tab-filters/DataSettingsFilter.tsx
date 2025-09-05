@@ -8,7 +8,6 @@ import { useAppDispatch } from "../../common/store/hooks";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
-import { fontColor, fontWeight } from "../../../styles/constants";
 import { DatasetFrequency } from "../../common/store/searchReducer";
 import { IndexDataType, ItemButton } from "../FilterDefinition";
 import rc8Theme from "../../../styles/themeRC8";
@@ -159,9 +158,12 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
       </Box> */}
       <Box>
         <Typography
-          variant="title1Medium"
-          color={rc8Theme.palette.text1}
-          sx={{ padding: "8px 20px" }}
+          sx={{
+            ...rc8Theme.typography.title1Medium,
+            color: rc8Theme.palette.text1,
+            fontWeight: 500,
+            padding: "8px 20px",
+          }}
         >
           Data Delivery Mode
         </Typography>
@@ -169,6 +171,24 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
           exclusive={true}
           value={filters.dataDeliveryFrequency?.[0]}
           onChange={handleChange(DataSettingsCategory.dataDeliveryFrequency)}
+          sx={{
+            gap: "14px 12px",
+            "& .MuiToggleButton-root": {
+              borderRadius: "6px",
+              textTransform: "capitalize",
+              ...rc8Theme.typography.title2Regular,
+              color: rc8Theme.palette.text1,
+              bgcolor: "#fff",
+              border: `1px solid ${rc8Theme.palette.grey500}`,
+              px: "38px",
+              py: "8px",
+              "&.Mui-selected": {
+                border: "none",
+                bgcolor: rc8Theme.palette.primary1,
+                color: "#fff",
+              },
+            },
+          }}
         >
           {DATA_SETTINGS.dataDeliveryFrequency.map((item) => (
             <StyledToggleButton
@@ -183,15 +203,36 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
       </Box>
       <Box>
         <Typography
-          variant="title1Medium"
-          color={rc8Theme.palette.text1}
-          sx={{ padding: "8px 20px" }}
+          sx={{
+            ...rc8Theme.typography.title1Medium,
+            color: rc8Theme.palette.text1,
+            fontWeight: 500,
+            padding: "8px 20px",
+          }}
         >
           Download Service Availablility
         </Typography>
         <StyledToggleButtonGroup
           value={filters.dataIndexedType}
           onChange={handleChange(DataSettingsCategory.dataIndexedType)}
+          sx={{
+            gap: "14px 12px",
+            "& .MuiToggleButton-root": {
+              borderRadius: "6px",
+              textTransform: "capitalize",
+              ...rc8Theme.typography.title2Regular,
+              color: rc8Theme.palette.text1,
+              bgcolor: "#fff",
+              border: `1px solid ${rc8Theme.palette.grey500}`,
+              px: "38px",
+              py: "8px",
+              "&.Mui-selected": {
+                border: "none",
+                bgcolor: rc8Theme.palette.primary1,
+                color: "#fff",
+              },
+            },
+          }}
         >
           {DATA_SETTINGS.dataIndexedType.map((item) => (
             <StyledToggleButton

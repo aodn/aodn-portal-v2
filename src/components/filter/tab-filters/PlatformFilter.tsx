@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { Box, Stack, SxProps } from "@mui/material";
+import { Box, Stack, SxProps, Typography } from "@mui/material";
 import { useAppDispatch } from "../../common/store/hooks";
 import { updatePlatform } from "../../common/store/componentParamReducer";
 import { TabFilterType } from "../Filters";
@@ -14,6 +14,7 @@ import AircraftIcon from "../../icon/platform/AircraftIcon";
 import BioPlatformIcon from "../../icon/platform/BioPlatformIcon";
 import RadarIcon from "../../icon/platform/RadarIcon";
 import AUVIcon from "../../icon/platform/AUVIcon";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface PlatformFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -91,23 +92,56 @@ const PlatformFilter: FC<PlatformFilterProps> = ({
         <StyledToggleButtonGroup
           value={filters.platform}
           onChange={handleChange}
+          sx={{
+            gap: "14px 20px",
+            "& .MuiToggleButton-root": {
+              borderRadius: "12px",
+              textTransform: "capitalize",
+              ...rc8Theme.typography.body1Medium,
+              color: rc8Theme.palette.text1,
+              "&.Mui-selected": {
+                border: `3px solid ${rc8Theme.palette.primary1}`,
+                backgroundColor: "#fff",
+              },
+            },
+          }}
         >
           {PLATFORMS.map((item) => (
-            <StyledToggleButton
-              value={item.value}
-              key={item.value}
-              aria-label={item.label}
+            <Box
+              key={item.label}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
             >
-              <Stack
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                direction="column"
+              <StyledToggleButton
+                value={item.value}
+                key={item.value}
+                aria-label={item.label}
+                sx={{
+                  boxShadow: "0 0 6px 0 rgba(0, 0, 0, 0.25)",
+                  backgroundColor: "#fff",
+                  width: "96px",
+                  height: "88px",
+                }}
               >
-                {item.icon && item.icon}
+                <Stack
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  direction="column"
+                >
+                  {item.icon && item.icon}
+                </Stack>
+              </StyledToggleButton>
+              <Typography
+                sx={{
+                  ...rc8Theme.typography.title2Regular,
+                  color: rc8Theme.palette.text1,
+                }}
+              >
                 {item.label}
-              </Stack>
-            </StyledToggleButton>
+              </Typography>
+            </Box>
           ))}
         </StyledToggleButtonGroup>
       </Box>
