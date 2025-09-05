@@ -9,6 +9,7 @@ import { fetchParameterVocabsWithStore } from "../../common/store/searchReducer"
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { TabFilterType } from "../Filters";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface ThemeFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -64,6 +65,23 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
       <StyledToggleButtonGroup
         value={filters.parameterVocabs?.map((vocab) => vocab.label) || []}
         onChange={handleChange}
+        sx={{
+          gap: "14px 12px",
+          "& .MuiToggleButton-root": {
+            borderRadius: "6px",
+            textTransform: "capitalize",
+            ...rc8Theme.typography.title2Regular,
+            color: rc8Theme.palette.text1,
+            bgcolor: rc8Theme.palette.primary6,
+            px: "38px",
+            py: "8px",
+            "&.Mui-selected": {
+              border: "none",
+              bgcolor: rc8Theme.palette.primary1,
+              color: "#fff",
+            },
+          },
+        }}
       >
         {buttonLabels.map((label) => (
           <StyledToggleButton value={label} key={label} aria-label={label}>

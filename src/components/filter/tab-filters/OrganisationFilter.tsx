@@ -110,6 +110,19 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
           exclusive
           value={filters.organisation?.[0]}
           onChange={handleChange}
+          sx={{
+            gap: "14px 20px",
+            "& .MuiToggleButton-root": {
+              borderRadius: "12px",
+              textTransform: "capitalize",
+              ...rc8Theme.typography.body1Medium,
+              color: rc8Theme.palette.text1,
+              "&.Mui-selected": {
+                border: `3px solid ${rc8Theme.palette.primary1}`,
+                backgroundColor: theme.palette.common.white,
+              },
+            },
+          }}
         >
           {ORGANISATION.map(({ value, label, icon }, index) => (
             <Box
