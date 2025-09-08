@@ -200,10 +200,13 @@ const SearchPage = () => {
       }
 
       // Use standard param to get fields you need, record is stored in redux,
-      // set page so that it returns fewer records
-      const paramPaged = createSearchParamFrom(componentParam, {
-        pagesize: DEFAULT_SEARCH_PAGE_SIZE,
-      });
+      // set page so that it returns fewer record
+      const paramPaged = createSearchParamFrom(
+        { ...componentParam, includeNoGeometry: true },
+        {
+          pagesize: DEFAULT_SEARCH_PAGE_SIZE,
+        }
+      );
       // The return implicit contains a AbortController due to use of signal in
       // axios call
       listSearchAbortRef.current = dispatch(fetchResultWithStore(paramPaged));
