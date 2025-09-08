@@ -30,7 +30,7 @@ class Map(BasePage):
             'reference-show-hide-menu-button'
         )
         self.layers_menu = self.get_by_id('layer-show-hide-menu-button')
-        self.hexbin_layer = page.get_by_role('radio', name='Hexbin')
+        self.hexbin_layer = page.get_by_role('radio', name='Hex Grid')
         self.symbol_layer = page.get_by_role('radio', name='Symbol')
         self.geoserver_layer = page.get_by_role('radio', name='GeoServer')
 
