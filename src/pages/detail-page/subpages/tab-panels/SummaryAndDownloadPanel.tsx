@@ -343,6 +343,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       geoServerTileLayerConfig={{
                         baseUrl: ensureHttps(getWMSServer(collection)[0]),
                         tileUrlParams: { LAYERS: getWMSLayerNames(collection) },
+                        vectorUrlParams: {
+                          LAYERS: getWMSLayerNames(collection),
+                        },
                         bbox: overallBoundingBox(collection),
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}

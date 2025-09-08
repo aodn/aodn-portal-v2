@@ -307,8 +307,8 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
                   },
                 }}
               >
-                {element.items.map((item: any) => (
-                  <ListItem key={item.key}>
+                {element.items.map((item: any, i: number) => (
+                  <ListItem key={`${element.key}-${item.key}-${i}`}>
                     <ListItemText
                       primary={renderInlineContent(item.content)}
                       primaryTypographyProps={{

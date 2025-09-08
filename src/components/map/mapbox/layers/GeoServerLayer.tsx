@@ -25,14 +25,21 @@ interface TileUrlParams {
   HEIGHT?: number;
 }
 
+interface VectorUrlParams {
+  LAYERS: string[];
+  SRS?: string;
+}
+
 interface GeoServerTileLayerConfig {
   tileUrlParams: TileUrlParams;
+  vectorUrlParams: VectorUrlParams;
   baseUrl: string;
   tileSize: number;
   minZoom: number;
   maxZoom: number;
   opacity: number;
   bbox: Position;
+  useVector: boolean;
 }
 
 interface GeoServerTileLayerProps extends LayerBasicType {
@@ -61,6 +68,11 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
     WIDTH: 256,
     HEIGHT: 256,
   },
+  vectorUrlParams: {
+    LAYERS: [],
+    //Change the coordinate system from EPSG:4326 to EPSG:3857 (Web Mercator) which is what Mapbox GL expects for WMS tiles.
+    SRS: "EPSG:900913",
+  },
   baseUrl: "",
   tileSize: 256,
   minZoom: MapDefaultConfig.MIN_ZOOM,
@@ -72,6 +84,7 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
     MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
   ],
   opacity: 1.0,
+  useVector: true,
 };
 // This function is specific for IMOS server geoserver-123
 // we can speed up the query by calling the cache server we own.
@@ -134,15 +147,25 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     );
     // We append cache server URL in front, if layer is not in cache server, it
     // will fall back to the original URL.
-    const tileUrl = [
-      formatToUrl<TileUrlParams>(
-        applyGeoWebCacheIfPossible(config.baseUrl, config.tileUrlParams)
-      ),
-      formatToUrl<TileUrlParams>({
-        baseUrl: config.baseUrl,
-        params: config.tileUrlParams,
-      }),
-    ];
+    let tileUrl = undefined;
+    if (config.useVector) {
+      const u = new URL(config.baseUrl);
+      tileUrl = [
+        "https://tilecache.aodn.org.au/geoserver/gwc/service/wmts?layer=imos:argo_profile_bio_map&style=&tilematrixset=EPSG:900913&Service=WMTS&Request=GetTile&Version=1.0.0&Format=application/vnd.mapbox-vector-tile&TileMatrix=EPSG:900913:3&TileCol={x}&TileRow={y}",
+      ];
+      config.tileSize = 512; // Must be of this size for mapbox
+    } else {
+      tileUrl = [
+        formatToUrl<TileUrlParams>(
+          applyGeoWebCacheIfPossible(config.baseUrl, config.tileUrlParams)
+        ),
+        formatToUrl<TileUrlParams>({
+          baseUrl: config.baseUrl,
+          params: config.tileUrlParams,
+        }),
+      ];
+    }
+
     const isWMSAvailable = checkWMSAvailability(
       config.baseUrl,
       config.tileUrlParams,
@@ -156,46 +179,43 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     if (map === null || map === undefined) return;
 
     const createSource = () => {
-      if (isWMSAvailable) {
-        // Add the WMS source following Mapbox's example
-        if (!map?.getSource(sourceLayerId)) {
-          map?.addSource(sourceLayerId, {
-            type: "raster",
-            tiles: tileUrl,
-            tileSize: config.tileSize,
-            minzoom: config.minZoom,
-            maxzoom: config.maxZoom,
-          });
-        }
+      // Add the WMS source following Mapbox's example
+      if (!map?.getSource(sourceLayerId)) {
+        map?.addSource(sourceLayerId, {
+          type: !config.useVector && isWMSAvailable ? "raster" : "vector",
+          tiles: tileUrl,
+          tileSize: config.tileSize,
+          minzoom: config.minZoom,
+          maxzoom: config.maxZoom,
+        });
       }
     };
 
     const createLayers = (layoutVisible: undefined | boolean) => {
       // Check WMS availability before adding the layer
-      if (isWMSAvailable) {
-        // Add the raster layer
-        if (!map?.getLayer(titleLayerId)) {
-          map?.addLayer({
-            id: titleLayerId,
-            type: "raster",
-            source: sourceLayerId,
-            paint: {},
-            layout: {
-              visibility: layoutVisible ? "visible" : "none",
-            },
+      // Add the raster layer
+      if (!map?.getLayer(titleLayerId)) {
+        map?.addLayer({
+          id: titleLayerId,
+          type: !config.useVector && isWMSAvailable ? "raster" : "fill",
+          source: sourceLayerId,
+          "source-layer": config?.vectorUrlParams?.LAYERS[0],
+          paint: {},
+          layout: {
+            visibility: layoutVisible ? "visible" : "none",
+          },
+        });
+
+        // Handle only if new layer added
+        const handleIdle = () => {
+          if (!isWMSAvailable) return;
+          fitToBound(map, config.bbox, {
+            animate: true,
+            zoomOffset: 0.5,
           });
+        };
 
-          // Handle only if new layer added
-          const handleIdle = () => {
-            if (!isWMSAvailable) return;
-            fitToBound(map, config.bbox, {
-              animate: true,
-              zoomOffset: 0.5,
-            });
-          };
-
-          layoutVisible && map?.once("idle", handleIdle);
-        }
+        layoutVisible && map?.once("idle", handleIdle);
       }
     };
 
@@ -238,6 +258,8 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
     config.maxZoom,
     config.minZoom,
     config.tileSize,
+    config?.useVector,
+    config?.vectorUrlParams?.LAYERS,
     isWMSAvailable,
     map,
     sourceLayerId,
