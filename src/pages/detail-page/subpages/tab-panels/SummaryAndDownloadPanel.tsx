@@ -30,7 +30,9 @@ import DisplayCoordinate from "../../../../components/map/mapbox/controls/Displa
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerTileLayer from "../../../../components/map/mapbox/layers/GeoServerTileLayer";
 import MapLayerSwitcher, {
+  LayerName,
   LayerSwitcherLayer,
+  MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
@@ -40,27 +42,9 @@ import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/Me
 
 const mapContainerId = "map-detail-container-id";
 
-enum LayerName {
-  Hexbin = "hexbin",
-  GeoServer = "geoServer",
-}
-
 interface SummaryAndDownloadPanelProps {
   bbox?: LngLatBounds;
 }
-
-const MapLayers: Record<LayerName, LayerSwitcherLayer<LayerName>> = {
-  [LayerName.Hexbin]: {
-    id: LayerName.Hexbin,
-    name: "Hex Grid",
-    default: true,
-  },
-  [LayerName.GeoServer]: {
-    id: LayerName.GeoServer,
-    name: "Geoserver",
-    default: true,
-  },
-};
 
 const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
   {
