@@ -75,10 +75,17 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
             bgcolor: rc8Theme.palette.primary6,
             px: "24px",
             py: "8px",
+            "&:hover": {
+              bgcolor: rc8Theme.palette.primary1,
+              color: "#fff",
+            },
             "&.Mui-selected": {
               border: "none",
               bgcolor: rc8Theme.palette.primary1,
               color: "#fff",
+              "&:hover": {
+                bgcolor: rc8Theme.palette.primary1,
+              },
             },
           },
         }}

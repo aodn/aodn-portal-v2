@@ -5,5 +5,4 @@ import rc8Theme from "../../../styles/themeRC8";
 export const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   border: "none",
   backgroundColor: rc8Theme.palette.primary6,
-  padding: "10px 10px",
 }));
