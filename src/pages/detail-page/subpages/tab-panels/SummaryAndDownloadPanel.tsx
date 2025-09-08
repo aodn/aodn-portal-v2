@@ -32,7 +32,6 @@ import GeoServerTileLayer from "../../../../components/map/mapbox/layers/GeoServ
 import MapLayerSwitcher, {
   LayerSwitcherLayer,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
@@ -49,6 +48,19 @@ enum LayerName {
 interface SummaryAndDownloadPanelProps {
   bbox?: LngLatBounds;
 }
+
+const MapLayers: Record<LayerName, LayerSwitcherLayer<LayerName>> = {
+  [LayerName.Hexbin]: {
+    id: LayerName.Hexbin,
+    name: "Hex Grid",
+    default: true,
+  },
+  [LayerName.GeoServer]: {
+    id: LayerName.GeoServer,
+    name: "Geoserver",
+    default: true,
+  },
+};
 
 const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
   {
@@ -156,16 +168,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     if (collection) {
       const isSupportHexbin = collection?.hasSummaryFeature() === true;
       if (isSupportHexbin) {
-        layers.push({
-          id: LayerName.Hexbin,
-          name: capitalizeFirstLetter(LayerName.Hexbin),
-          default: true,
-        });
+        layers.push(MapLayers[LayerName.Hexbin]);
       }
 
       layers.push({
-        id: LayerName.GeoServer,
-        name: capitalizeFirstLetter(LayerName.GeoServer),
+        ...MapLayers[LayerName.GeoServer],
         default: !isSupportHexbin,
       });
 
