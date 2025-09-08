@@ -30,9 +30,10 @@ import DisplayCoordinate from "../../../../components/map/mapbox/controls/Displa
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerTileLayer from "../../../../components/map/mapbox/layers/GeoServerTileLayer";
 import MapLayerSwitcher, {
+  LayerName,
   LayerSwitcherLayer,
+  MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import { OGCCollection } from "../../../../components/common/store/OGCCollectionDefinitions";
@@ -40,11 +41,6 @@ import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/m
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 
 const mapContainerId = "map-detail-container-id";
-
-enum LayerName {
-  Hexbin = "hexbin",
-  GeoServer = "geoServer",
-}
 
 interface SummaryAndDownloadPanelProps {
   bbox?: LngLatBounds;
@@ -156,16 +152,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     if (collection) {
       const isSupportHexbin = collection?.hasSummaryFeature() === true;
       if (isSupportHexbin) {
-        layers.push({
-          id: LayerName.Hexbin,
-          name: capitalizeFirstLetter(LayerName.Hexbin),
-          default: true,
-        });
+        layers.push(MapLayers[LayerName.Hexbin]);
       }
 
       layers.push({
-        id: LayerName.GeoServer,
-        name: capitalizeFirstLetter(LayerName.GeoServer),
+        ...MapLayers[LayerName.GeoServer],
         default: !isSupportHexbin,
       });
 
