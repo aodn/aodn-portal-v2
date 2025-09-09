@@ -190,7 +190,7 @@ def test_map_shows_hexbin_and_symbol_layers(
     detail_page.load(uuid)
     detail_page.detail_map.layers_menu.click()
     # Ensure both Hexbin options are displayed in the layers menu
-    # This is a zarr dataset. Hexbin should be instead of spatial extent for a short term solution
+    detail_page.wait_for_timeout(2000)
     expect(detail_page.detail_map.hexbin_layer).to_be_visible()
 
 # Verify that the Hexbin layer is present and visible on the map
