@@ -3,6 +3,7 @@ import { Link, Paper, SxProps, Typography } from "@mui/material";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
 import rc8Theme from "../../styles/themeRC8";
 import { COMBINED_LINK_REGEX, isEmail, isUrl } from "../../utils/StringUtils";
+import TextRender from "../common/text/TextRender";
 
 interface InfoCardProps {
   infoContent?: InfoContentType;
@@ -21,51 +22,6 @@ const InfoCard: FC<InfoCardProps> = ({
   titleSx,
   contentSx,
 }) => {
-  // Function to detect and convert emails and URLs to clickable links
-  const renderTextWithLinks = (text: string) => {
-    const parts = text.split(COMBINED_LINK_REGEX);
-
-    return parts.map((part, index) => {
-      // Check if part is an email
-      if (isEmail(part)) {
-        return (
-          <Link
-            key={index}
-            href={`mailto:${part}`}
-            color="primary"
-            underline="hover"
-            sx={{
-              color: rc8Theme.palette.primary.main,
-            }}
-          >
-            {part}
-          </Link>
-        );
-      }
-
-      // Check if part is a URL
-      if (isUrl(part)) {
-        return (
-          <Link
-            key={index}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            color="primary"
-            underline="hover"
-            sx={{
-              color: rc8Theme.palette.primary.main,
-            }}
-          >
-            {part}
-          </Link>
-        );
-      }
-
-      return part;
-    });
-  };
-
   return (
     <Paper
       sx={{
@@ -108,13 +64,12 @@ const InfoCard: FC<InfoCardProps> = ({
               {infoContent.title}
             </Typography>
           )}
-
           <Typography
             component="div"
             variant="body2Regular"
             sx={{ display: "block", padding: 2, paddingTop: 0, ...contentSx }}
           >
-            {renderTextWithLinks(infoContent.body)}
+            <TextRender text={infoContent.body} />
           </Typography>
         </Paper>
       )}

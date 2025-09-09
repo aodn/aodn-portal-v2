@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import TextAreaBaseGrid from "./TextAreaBaseGrid";
 import { Box, Button, Grid } from "@mui/material";
-import MarkdownRenderer from "../../../common/markdown/MarkdownRenderer";
+import MarkdownRenderer from "../../../common/text/MarkdownRenderer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 const LINE_CLAMP_DEFAULT = 10; // Default number of lines to show before expanding
