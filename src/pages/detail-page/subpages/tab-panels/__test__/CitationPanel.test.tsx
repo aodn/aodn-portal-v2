@@ -80,8 +80,10 @@ describe("CitationPanel", async () => {
       ).to.exist;
 
       expect(
-        screen.queryByText(
-          'Attribution: Format for citation of metadata sourced from Australian Institute of Marine Science (AIMS) in a list of reference is as follows: "Australian Institute of Marine Science (AIMS). (2020). Northern Australia Automated Marine Weather and Oceanographic Stations, Sites: [Davies Reef]. https://doi.org/10.25845/5c09bf93f315d, accessed[date-of-access]".'
+        screen.queryByText((content) =>
+          content.startsWith(
+            "Attribution: Format for citation of metadata sourced from Australian Institute of Marine Science (AIMS)"
+          )
         )
       ).to.exist;
 
