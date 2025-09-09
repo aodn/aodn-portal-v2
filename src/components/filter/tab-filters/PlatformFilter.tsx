@@ -137,6 +137,10 @@ const PlatformFilter: FC<PlatformFilterProps> = ({
                 sx={{
                   ...rc8Theme.typography.title2Regular,
                   color: rc8Theme.palette.text1,
+                  whiteSpace: "normal",
+                  wordWrap: "break-word",
+                  textAlign: "center",
+                  maxWidth: "96px",
                 }}
               >
                 {item.label}

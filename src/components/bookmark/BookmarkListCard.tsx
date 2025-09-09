@@ -42,7 +42,14 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
             height: "150px",
           }}
         >
-          <Map panelId={mapContainerId}>
+          <Map
+            panelId={mapContainerId}
+            announcement={
+              dataset.getGeometry() === undefined
+                ? "model:No spatial information for this record"
+                : undefined
+            }
+          >
             <Layers>
               <GeojsonLayer collection={dataset} animate={false} />
             </Layers>
