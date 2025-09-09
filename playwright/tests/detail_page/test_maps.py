@@ -165,7 +165,6 @@ def test_map_not_showing_geoserver_layer_preview_when_wms_link_absent(
     layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)
     assert detail_page.detail_map.is_map_layer_visible(layer_id) is False
 
-
 @pytest.mark.parametrize(
     'uuid',
     [
@@ -188,11 +187,13 @@ def test_map_shows_hexbin_and_symbol_layers(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    # wait for 10 seconds to ensure everything loads
+    detail_page.wait_for_timeout(10000)
     detail_page.detail_map.layers_menu.click()
     # Ensure both Hexbin options are displayed in the layers menu
     expect(detail_page.detail_map.hexbin_layer).to_be_visible()
 
-    # Verify that the Hexbin layer is present and visible on the map
+# Verify that the Hexbin layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerType.HEXBIN)
     assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
     assert (
