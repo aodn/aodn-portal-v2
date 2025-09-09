@@ -188,7 +188,6 @@ const DrawRect: React.FC<DrawControlProps> = ({
           ...switcherIconButtonSx(false),
           opacity: hasFeatures ? 1 : 0.5,
           cursor: hasFeatures ? "pointer" : "not-allowed",
-          mt: "4px",
           "&.MuiIconButton-root": { border: "0px solid transparent" },
           "&.Mui-disabled": {
             border: "0px solid transparent",

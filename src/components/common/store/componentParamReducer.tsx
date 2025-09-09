@@ -64,6 +64,7 @@ export interface ParameterState {
   polygon?: Feature<Polygon>;
   datasetGroup?: string;
   hasCOData?: boolean;
+  includeNoGeometry?: boolean;
   dateTimeFilterRange?: DateTimeFilterRange;
   searchText?: string;
   parameterVocabs?: Array<Vocab>;

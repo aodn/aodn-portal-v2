@@ -28,6 +28,11 @@ import {
 } from "@mui/material";
 import { SearchStyleIcon } from "../../../../../assets/icons/map/search_style";
 
+export enum LayerName {
+  Hexbin = "hexbin",
+  GeoServer = "geoServer",
+}
+
 export interface LayerSwitcherLayer<T = string> {
   id: T;
   name: string;
@@ -37,6 +42,19 @@ export interface LayerSwitcherLayer<T = string> {
 interface LayerSwitcherProps extends ControlProps {
   layers: Array<LayerSwitcherLayer>;
 }
+
+export const MapLayers: Record<LayerName, LayerSwitcherLayer<LayerName>> = {
+  [LayerName.Hexbin]: {
+    id: LayerName.Hexbin,
+    name: "Hex Grid",
+    default: true,
+  },
+  [LayerName.GeoServer]: {
+    id: LayerName.GeoServer,
+    name: "Geoserver",
+    default: true,
+  },
+};
 
 const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   layers,

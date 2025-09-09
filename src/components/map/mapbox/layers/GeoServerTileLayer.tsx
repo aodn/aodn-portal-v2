@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useMemo, useState } from "react";
+import { FC, useContext, useEffect, useMemo } from "react";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
@@ -132,9 +132,17 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
       defaultGeoServerTileLayerConfig,
       geoServerTileLayerConfig
     );
-    const tileUrl = formatToUrl<TileUrlParams>(
-      applyGeoWebCacheIfPossible(config.baseUrl, config.tileUrlParams)
-    );
+    // We append cache server URL in front, if layer is not in cache server, it
+    // will fall back to the original URL.
+    const tileUrl = [
+      formatToUrl<TileUrlParams>(
+        applyGeoWebCacheIfPossible(config.baseUrl, config.tileUrlParams)
+      ),
+      formatToUrl<TileUrlParams>({
+        baseUrl: config.baseUrl,
+        params: config.tileUrlParams,
+      }),
+    ];
     const isWMSAvailable = checkWMSAvailability(
       config.baseUrl,
       config.tileUrlParams,
@@ -153,7 +161,7 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
         if (!map?.getSource(sourceLayerId)) {
           map?.addSource(sourceLayerId, {
             type: "raster",
-            tiles: [tileUrl],
+            tiles: tileUrl,
             tileSize: config.tileSize,
             minzoom: config.minZoom,
             maxzoom: config.maxZoom,

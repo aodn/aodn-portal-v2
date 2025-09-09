@@ -10,6 +10,7 @@ import AustraliaAntarcticProgramIcon from "../../icon/organisation/AustraliaAnta
 import AIMSIcon from "../../icon/organisation/AIMSIcon";
 import CSIROIcon from "../../icon/organisation/CSIROIcon";
 import IMASIcon from "../../icon/organisation/IMASIcon";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface OrganisationFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -109,6 +110,19 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
           exclusive
           value={filters.organisation?.[0]}
           onChange={handleChange}
+          sx={{
+            gap: "14px 20px",
+            "& .MuiToggleButton-root": {
+              borderRadius: "12px",
+              textTransform: "capitalize",
+              ...rc8Theme.typography.body1Medium,
+              color: rc8Theme.palette.text1,
+              "&.Mui-selected": {
+                border: `3px solid ${rc8Theme.palette.primary1}`,
+                backgroundColor: theme.palette.common.white,
+              },
+            },
+          }}
         >
           {ORGANISATION.map(({ value, label, icon }, index) => (
             <Box
@@ -128,14 +142,23 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
                 }}
               >
                 <Stack
-                  display="row"
-                  justifyContent="center"
-                  alignItems="center"
+                  sx={{
+                    display: "row",
+                    justifyContent: "center",
+                    alignItem: "center",
+                  }}
                 >
                   {icon && icon}
                 </Stack>
               </StyledToggleButton>
-              <Typography>{label}</Typography>
+              <Typography
+                sx={{
+                  ...rc8Theme.typography.title2Regular,
+                  color: rc8Theme.palette.text1,
+                }}
+              >
+                {label}
+              </Typography>
             </Box>
           ))}
         </StyledToggleButtonGroup>

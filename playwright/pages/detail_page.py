@@ -63,7 +63,7 @@ class DetailPage(BasePage):
 
     def get_not_found_element(self, item: str) -> Locator:
         """Returns the given item not found element"""
-        return self.get_text(f'{item} Not Found')
+        return self.get_text(f'{item} not available')
 
     def click_show_more(self, item_list: str) -> None:
         self.page.get_by_test_id(f'show-more-detail-btn-{item_list}').click()

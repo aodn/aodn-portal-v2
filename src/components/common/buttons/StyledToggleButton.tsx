@@ -6,11 +6,4 @@ export const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   border: "none",
   backgroundColor: rc8Theme.palette.primary6,
   padding: "10px 10px",
-  "&.Mui-selected": {
-    backgroundColor: rc8Theme.palette.primary1,
-    color: "#FFF",
-    "&:hover": {
-      backgroundColor: rc8Theme.palette.primary1,
-    },
-  },
 }));
