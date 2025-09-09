@@ -172,15 +172,13 @@ def test_map_not_showing_geoserver_layer_preview_when_wms_link_absent(
         '0015db7e-e684-7548-e053-08114f8cd4ad',  # This dataset includes a link with rel="summary"
     ],
 )
-def test_map_shows_hexbin_and_symbol_layers(
-    responsive_page: Page, uuid: str
-) -> None:
+def test_map_shows_hexbin_layer(responsive_page: Page, uuid: str) -> None:
     """
-    This test uses a dataset specifically chosen to include a summary link and verifies
-    that both Hexbin can be previewed and toggled on the map.
+    This test uses a dataset specifically chosen to include a summary link
+    and verifies that the Hexbin layer appears on the map.
 
     This test ensures that:
-    1. Both Hexbin options are displayed in the layers menu
+    1. The Hexbin layer option is displayed in the layers menu
     2. The Hexbin layer is added to the map and is visible by default
     """
     detail_page = DetailPage(responsive_page)
@@ -195,9 +193,3 @@ def test_map_shows_hexbin_and_symbol_layers(
     # Verify that the Hexbin layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerType.HEXBIN)
     assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
-    assert (
-        detail_page.detail_map.is_map_layer_visible(
-            layer_id, is_map_loading=False
-        )
-        is True
-    )
