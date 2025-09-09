@@ -200,7 +200,8 @@ const SearchPage = () => {
       }
 
       // Use standard param to get fields you need, record is stored in redux,
-      // set page so that it returns fewer record
+      // set page so that it returns fewer record. Also allow search on record
+      // without geometry (like docs)
       const paramPaged = createSearchParamFrom(
         { ...componentParam, includeNoGeometry: true },
         {
