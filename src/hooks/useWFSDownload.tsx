@@ -93,10 +93,6 @@ const useWFSDownload = (onCallback?: () => void) => {
 
   // Clean up function
   const cleanupDownload = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
     fileChunksRef.current = [];
     receivedChunksRef.current.clear();
     expectedTotalChunksRef.current = 0;
@@ -104,6 +100,10 @@ const useWFSDownload = (onCallback?: () => void) => {
 
   // Cancel download function
   const cancelDownload = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
     cleanupDownload();
     setDownloadedBytes(0);
     setDownloadingStatus(DownloadStatus.NOT_STARTED);
@@ -333,7 +333,7 @@ const useWFSDownload = (onCallback?: () => void) => {
       try {
         const controller = new AbortController();
         abortControllerRef.current = controller;
-        const timeoutId = setTimeout(() => controller.abort(), 1200000); // Frontend 20 minutes timeout
+        const timeoutId = setTimeout(() => controller.abort(), 20 * 60000); // Frontend 20 minutes timeout
 
         const response = await fetch(
           "/api/v1/ogc/processes/downloadWfs/execution",
@@ -435,15 +435,7 @@ const useWFSDownload = (onCallback?: () => void) => {
           cleanupDownload();
         }
       } catch (error) {
-        // If error is NOT due to user cancellation
-        setDownloadingStatus(DownloadStatus.ERROR);
-        setProgressMessage(
-          error instanceof Error
-            ? `Download failed: ${error.message}`
-            : "Download failed: Unknown error"
-        );
         setDownloadedBytes(0);
-        onCallback && onCallback();
         cleanupDownload();
       }
     },
