@@ -31,6 +31,7 @@ import { SearchStyleIcon } from "../../../../../assets/icons/map/search_style";
 export enum LayerName {
   Hexbin = "hexbin",
   GeoServer = "geoServer",
+  SpatialExtent = "spatialExtent",
 }
 
 export interface LayerSwitcherLayer<T = string> {
@@ -53,6 +54,11 @@ export const MapLayers: Record<LayerName, LayerSwitcherLayer<LayerName>> = {
     id: LayerName.GeoServer,
     name: "Geoserver",
     default: true,
+  },
+  [LayerName.SpatialExtent]: {
+    id: LayerName.SpatialExtent,
+    name: "Spatial Extent",
+    default: false,
   },
 };
 

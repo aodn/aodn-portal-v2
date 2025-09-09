@@ -47,12 +47,6 @@ import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer"
 
 const mapContainerId = "map-detail-container-id";
 
-enum LayerName {
-  Hexbin = "hexbin",
-  GeoServer = "geoServer",
-  SpatialExtent = "spatial Extent",
-}
-
 interface SummaryAndDownloadPanelProps {
   bbox?: LngLatBounds;
 }
@@ -171,9 +165,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
       if (hasSummaryFeature && isZarrDataset) {
         layers.push({
-          id: LayerName.SpatialExtent,
-          name: capitalizeFirstLetter(LayerName.SpatialExtent),
-          default: isZarrDataset,
+          ...MapLayers[LayerName.SpatialExtent],
         });
       }
       if (isSupportHexbin) {
