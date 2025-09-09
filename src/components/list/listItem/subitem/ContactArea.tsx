@@ -39,7 +39,8 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
     <Grid container>
       <Grid item container md={12}>
         <Grid item container md={1} display="flex" justifyContent="center">
-          <LocationOnOutlinedIcon />
+          {/* todo */}
+          {/* <LocationOnOutlinedIcon /> */}
         </Grid>
         <Grid item container md={5} data-testid="contact-address">
           {!delivery_point &&
@@ -47,9 +48,11 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
             !country &&
             !postal_code &&
             !administrative_area && (
-              <Grid item md={12}>
-                [NO ADDRESS]
-              </Grid>
+              <></>
+              // todo
+              // <Grid item md={12}>
+              //   [NO ADDRESS]
+              // </Grid>
             )}
           {delivery_point?.map((line) => {
             return (
@@ -83,9 +86,11 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
         </Grid>
         <Grid item md={6} data-testid="contact-phone">
           {(!phones || phones.length === 0) && (
-            <Grid item md={12}>
-              [NO CONTACT]
-            </Grid>
+            <></>
+            // todo
+            // <Grid item md={12}>
+            //   [NO CONTACT]
+            // </Grid>
           )}
           {phones &&
             phones.map((phone) => {
@@ -110,12 +115,15 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
       <Grid item container md={12}>
         <Grid item container md={12} data-testid="contact-link">
           <Grid item md={1} display="flex" justifyContent="center">
-            <LanguageOutlinedIcon />
+            {/* todo */}
+            {/* <LanguageOutlinedIcon /> */}
           </Grid>
           {(!links || links.length === 0) && (
-            <Grid item md={11}>
-              [NO URL]
-            </Grid>
+            <></>
+            // todo
+            // <Grid item md={11}>
+            //   [NO URL]
+            // </Grid>
           )}
           {links &&
             links.map((link, index) => {

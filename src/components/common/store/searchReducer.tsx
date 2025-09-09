@@ -347,10 +347,10 @@ const createSearchParamFrom = (
   p.sortby = i.sortby;
   p.text = i.searchText;
 
-  const c = mergeWithDefaults(
+  const c = mergeWithDefaults<SearchControl>(
     {
       score: DEFAULT_SEARCH_SCORE,
-    } as SearchControl,
+    },
     control
   );
 
@@ -414,7 +414,9 @@ const createSearchParamFrom = (
   }
 
   if (i.bbox) {
-    const f = cqlDefaultFilters.get("BBOX_POLYGON") as PolygonOperation;
+    const f = cqlDefaultFilters.get(
+      i.includeNoGeometry ? "BBOX_POLYGON_OR_EMPTY_EXTENTS" : "BBOX_POLYGON"
+    ) as PolygonOperation;
     p.filter = appendFilter(p.filter, f(i.bbox));
   }
 

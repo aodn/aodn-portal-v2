@@ -30,7 +30,9 @@ import DisplayCoordinate from "../../../../components/map/mapbox/controls/Displa
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerTileLayer from "../../../../components/map/mapbox/layers/GeoServerTileLayer";
 import MapLayerSwitcher, {
+  LayerName,
   LayerSwitcherLayer,
+  MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 import { ensureHttps } from "../../../../utils/UrlUtils";
@@ -175,16 +177,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         });
       }
       if (isSupportHexbin) {
-        layers.push({
-          id: LayerName.Hexbin,
-          name: capitalizeFirstLetter(LayerName.Hexbin),
-          default: true,
-        });
+        layers.push(MapLayers[LayerName.Hexbin]);
       }
 
       layers.push({
-        id: LayerName.GeoServer,
-        name: capitalizeFirstLetter(LayerName.GeoServer),
+        ...MapLayers[LayerName.GeoServer],
         default: !isSupportHexbin,
       });
 
