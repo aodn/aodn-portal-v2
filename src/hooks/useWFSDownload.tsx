@@ -333,7 +333,10 @@ const useWFSDownload = (onCallback?: () => void) => {
       try {
         const controller = new AbortController();
         abortControllerRef.current = controller;
-        const timeoutId = setTimeout(() => controller.abort(), 20 * 60000); // Frontend 20 minutes timeout
+        const timeout = process.env.VITE_WFS_DOWNLOADING_TIMEOUT
+          ? Number(process.env.VITE_WFS_DOWNLOADING_TIMEOUT)
+          : 20 * 60000; // Frontend 20 minutes timeout by default
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
 
         const response = await fetch(
           "/api/v1/ogc/processes/downloadWfs/execution",
