@@ -18,6 +18,8 @@ interface SpatialExtentsProps {
   addedLayerIds?: Array<string>;
 }
 
+const POINT_CLICK_INDICATOR = "spatialExtentsPointClick";
+
 const createPointsLayerId = (id: string) => `${id}-points`;
 
 const createLinesLayerId = (id: string) => `${id}-lines`;
@@ -160,17 +162,19 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
       // Make sure even same id under same area will be set once.
       if (
         onDatasetSelected &&
-        (ev.from === undefined || ev.from !== "spatialExtentsPointClick")
+        (ev.from === undefined || ev.from !== POINT_CLICK_INDICATOR)
       ) {
         if (ev.features) {
           const uuids = [
-            ...new Set(ev.features.map((feature) => feature.properties?.uuid)),
+            ...new Set<string>(
+              ev.features.map((feature) => feature.properties?.uuid)
+            ),
           ];
           onDatasetSelected(uuids);
           const customEvent = {
             ...ev,
             targetLayerId: layerId,
-            from: "spatialExtentsPointClick", // Avoid infinite loop
+            from: POINT_CLICK_INDICATOR, // Avoid infinite loop
           };
           // Fire a synthetic click event with the custom event
           // This will be captured by CardPopup's event listeners so
@@ -185,35 +189,42 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
 
   const onEmptySpaceClick = useCallback(
     (ev: MapMouseEvent, layerIds: string[]) => {
-      const point = map?.project(ev.lngLat);
-
       // Query for features at the clicked point, but only in the addedLayerIds
       const validIds = layerIds.filter((id) => map?.getLayer(id));
-      const features = point
-        ? map?.queryRenderedFeatures(point, {
-            layers: validIds,
-          })
-        : [];
+      const features = map
+        ?.queryRenderedFeatures(ev.point, {
+          layers: validIds,
+        })
+        ?.filter((v) => {
+          // In uncluster layer we can have multiple selected ids, so make sure
+          // the geo json feature found in the point refers to a selected id.
+          return selectedUuids?.includes(v.properties?.uuids);
+        });
 
       // If no features are found at the click point (i.e., clicked on empty space)
       if (features && features.length === 0 && onDatasetSelected) {
         onDatasetSelected([]);
       }
     },
-    [map, onDatasetSelected]
+    [map, onDatasetSelected, selectedUuids]
   );
 
   useEffect(() => {
     const e = (ev: MapMouseEvent) => onEmptySpaceClick(ev, addedLayerIds);
-
-    map?.on("click", layerId, onPointClick);
     map?.on("click", e);
 
     return () => {
-      map?.off("click", layerId, onPointClick);
       map?.off("click", e);
     };
-  }, [map, layerId, addedLayerIds, onPointClick, onEmptySpaceClick]);
+  }, [map, addedLayerIds, onEmptySpaceClick]);
+
+  useEffect(() => {
+    map?.on("click", layerId, onPointClick);
+
+    return () => {
+      map?.off("click", layerId, onPointClick);
+    };
+  }, [map, layerId, onPointClick]);
 
   // Remove all layers and sources created by addSpatialExtentsLayer
   useEffect(() => {
