@@ -34,7 +34,6 @@ import MapLayerSwitcher, {
   LayerSwitcherLayer,
   MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import {
@@ -121,7 +120,7 @@ const getWMSLayerNames = (collection: OGCCollection | undefined) => {
 const overallBoundingBox = (
   collection: OGCCollection | undefined
 ): Position | undefined => {
-  const bbox = collection?.extent?.bbox;
+  const bbox = collection?.getBBox();
   if (!bbox || !bbox[0] || bbox[0].length !== 4) {
     return [
       MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,

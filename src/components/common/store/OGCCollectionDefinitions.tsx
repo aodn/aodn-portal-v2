@@ -248,6 +248,7 @@ export class OGCCollection {
   getCredits = (): string[] | undefined => this.propValue?.credits;
   getContacts = (): IContact[] | undefined => this.propValue?.contacts;
   getThemes = (): ITheme[] | undefined => this.propValue?.themes;
+  getBBox = (): Position[] | undefined => this.propExtent?.bbox;
   // It is a well form geometry collection of detail spatial extents
   getGeometry = (): GeometryCollection | undefined => this.propValue?.geometry;
   getCentroid = (): Array<Feature<Point>> | undefined =>

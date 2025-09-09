@@ -5,10 +5,10 @@ import { useDetailPageContext } from "../../context/detail-page-context";
 import Layers from "../../../../components/map/mapbox/layers/Layers";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import { FC, useCallback } from "react";
-import { Popup, MapLayerMouseEvent } from "mapbox-gl";
+import { Popup, MapMouseEvent } from "mapbox-gl";
 
 export interface SpatialCoverageCardProps {
-  onSpatialCoverageLayerClick?: (event: MapLayerMouseEvent) => void;
+  onSpatialCoverageLayerClick?: (event: MapMouseEvent) => void;
 }
 
 const popup = new Popup({
@@ -22,7 +22,7 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
   const { collection } = useDetailPageContext();
   const mapContainerId = "map-spatial-extent-container-id";
 
-  const onMouseEnterHandler = useCallback((event: MapLayerMouseEvent) => {
+  const onMouseEnterHandler = useCallback((event: MapMouseEvent) => {
     event.target.getCanvas().style.cursor = "pointer";
     popup
       .setLngLat(event.lngLat)
@@ -30,17 +30,17 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
       .addTo(event.target);
   }, []);
 
-  const onMouseLeaveHandler = useCallback((event: MapLayerMouseEvent) => {
+  const onMouseLeaveHandler = useCallback((event: MapMouseEvent) => {
     event.target.getCanvas().style.cursor = "";
     popup.remove();
   }, []);
 
-  const onMouseMoveHandler = useCallback((event: MapLayerMouseEvent) => {
+  const onMouseMoveHandler = useCallback((event: MapMouseEvent) => {
     popup.setLngLat(event.lngLat);
   }, []);
 
   return (
-    collection?.extent?.bbox && (
+    collection?.getBBox() && (
       <SideCardContainer title="Spatial Coverage" px={0} py={0}>
         <Box
           arial-label="map"
