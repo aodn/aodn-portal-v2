@@ -43,8 +43,6 @@ const DownloadCard = () => {
     useDetailPageContext();
 
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
-  const [showSubsettingMessage, setShowSubsettingMessage] =
-    useState<boolean>(false);
 
   // Get WFS links for fallback rendering
   const WFSLinks: ILink[] | undefined = collection?.getWFSLinks();
@@ -57,12 +55,8 @@ const DownloadCard = () => {
   }, [downloadConditions]);
 
   const onDownload = useCallback(() => {
-    if (subsettingSelectionCount < 1) {
-      setShowSubsettingMessage(true);
-    } else {
-      setDownloadDialogOpen(true);
-    }
-  }, [subsettingSelectionCount]);
+    setDownloadDialogOpen(true);
+  }, []);
 
   // Currently, csv is the best format for parquet datasets, and netcdf is the best for zarr datasets.
   // we will support more formats in the future, but for now, we filter the formats based on the dataset type.
@@ -92,13 +86,6 @@ const DownloadCard = () => {
       ]);
     }
   }, [downloadConditions, getAndSetDownloadConditions]);
-
-  // Reset subsetting message when conditions change
-  useEffect(() => {
-    if (subsettingSelectionCount >= 1) {
-      setShowSubsettingMessage(false);
-    }
-  }, [subsettingSelectionCount]);
 
   const onSelectChange = useCallback(
     (value: string) => {
@@ -161,8 +148,8 @@ const DownloadCard = () => {
         </Button>
       </Stack>
 
-      {/* Show subsetting message when button is clicked and subsettingSelectionCount < 1 */}
-      {showSubsettingMessage && subsettingSelectionCount < 1 && (
+      {/* Show subsetting message when subsettingSelectionCount < 1 */}
+      {subsettingSelectionCount < 1 && (
         <Box
           sx={{
             display: "flex",

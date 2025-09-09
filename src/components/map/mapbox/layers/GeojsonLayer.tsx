@@ -12,17 +12,17 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
-import { MapLayerMouseEvent } from "mapbox-gl";
+import { MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { fitToBound } from "../../../../utils/MapUtils";
 
 interface GeojsonLayerProps {
   // Vector tile layer should add to map
   collection: OGCCollection;
-  onLayerClick?: (event: MapLayerMouseEvent) => void;
-  onMouseEnter?: (event: MapLayerMouseEvent) => void;
-  onMouseLeave?: (event: MapLayerMouseEvent) => void;
-  onMouseMove?: (event: MapLayerMouseEvent) => void;
+  onLayerClick?: (event: MapMouseEvent) => void;
+  onMouseEnter?: (event: MapMouseEvent) => void;
+  onMouseLeave?: (event: MapMouseEvent) => void;
+  onMouseMove?: (event: MapMouseEvent) => void;
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   animate?: boolean;
   isVisible?: boolean;
@@ -30,10 +30,10 @@ interface GeojsonLayerProps {
 
 const GeojsonLayer: FC<GeojsonLayerProps> = ({
   collection,
-  onLayerClick = (_: MapLayerMouseEvent) => {},
-  onMouseEnter = (_: MapLayerMouseEvent) => {},
-  onMouseLeave = (_: MapLayerMouseEvent) => {},
-  onMouseMove = (_: MapLayerMouseEvent) => {},
+  onLayerClick = (_: MapMouseEvent) => {},
+  onMouseEnter = (_: MapMouseEvent) => {},
+  onMouseLeave = (_: MapMouseEvent) => {},
+  onMouseMove = (_: MapMouseEvent) => {},
   setPhotos,
   animate = true,
   isVisible = true,
@@ -123,7 +123,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     // https://github.com/mapbox/mapbox-gl-js/issues/8660
     //
     if (map?.getSource(sourceId)) return true;
-    console.log("geojson, create layer " + map?.getContainer().id);
+
     map?.addSource(sourceId, {
       type: "geojson",
       // Use a URL for the value for the `data` property.
