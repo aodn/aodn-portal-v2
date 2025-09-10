@@ -7,6 +7,7 @@ import {
   Link as MuiLink,
 } from "@mui/material";
 import rc8Theme from "../../../styles/themeRC8";
+import TextRender from "./TextRender";
 
 // Simple Markdown Renderer Supports:
 // Lists: Each item on new line, start with -.
@@ -203,6 +204,7 @@ const renderInlineContent = (text: string) => {
             sx={{
               color: rc8Theme.palette.primary.main,
               textDecoration: "none",
+              wordBreak: "break-all",
               "&:hover": {
                 textDecoration: "underline",
               },
@@ -212,8 +214,9 @@ const renderInlineContent = (text: string) => {
           </MuiLink>
         );
       case "text":
+        return <TextRender key={index} text={part.content} />;
       default:
-        return <>{part.content}</>;
+        return <TextRender key={index} text={part.content} />;
     }
   });
 };
