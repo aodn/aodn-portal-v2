@@ -15,7 +15,10 @@ import {
   getFormatFrom,
   getMultiPolygonFrom,
 } from "../utils/DownloadConditionUtils";
-import { DatasetDownloadRequest } from "../pages/detail-page/context/DownloadDefinitions";
+import {
+  DatasetDownloadRequest,
+  DownloadConditionType,
+} from "../pages/detail-page/context/DownloadDefinitions";
 import { processDatasetDownload } from "../components/common/store/searchReducer";
 
 // ================== CONSTANTS ==================
@@ -57,6 +60,34 @@ export const useDownloadDialog = (
   });
   const [emailError, setEmailError] = useState<string>("");
 
+  // ================== COMPUTED VALUES ==================
+  const hasDownloadConditions = useMemo(() => {
+    return downloadConditions && downloadConditions.length > 0;
+  }, [downloadConditions]);
+
+  const subsettingSelectionCount = useMemo(() => {
+    return (
+      downloadConditions?.filter(
+        (condition) => condition.type !== DownloadConditionType.FORMAT
+      ).length || 0
+    );
+  }, [downloadConditions]);
+
+  const dateRange = useMemo(
+    () => getDateConditionFrom(downloadConditions),
+    [downloadConditions]
+  );
+
+  const multiPolygon = useMemo(
+    () => getMultiPolygonFrom(downloadConditions),
+    [downloadConditions]
+  );
+
+  const format = useMemo(
+    () => getFormatFrom(downloadConditions),
+    [downloadConditions]
+  );
+
   // ================== VALIDATION HELPERS ==================
   const isEmailValid = useCallback((emailValue: string): boolean => {
     if (!emailValue.trim()) {
@@ -76,54 +107,30 @@ export const useDownloadDialog = (
     return true;
   }, []);
 
-  // ================== COMPUTED VALUES ==================
-  const hasDownloadConditions = useMemo(() => {
-    return downloadConditions && downloadConditions.length > 0;
-  }, [downloadConditions]);
-
-  const dateRange = useMemo(
-    () => getDateConditionFrom(downloadConditions),
-    [downloadConditions]
-  );
-
-  const multiPolygon = useMemo(
-    () => getMultiPolygonFrom(downloadConditions),
-    [downloadConditions]
-  );
-
-  const format = useMemo(
-    () => getFormatFrom(downloadConditions),
-    [downloadConditions]
-  );
-
-  // ================== INITIALIZATION & PERSISTENCE ==================
-  // Initialize email input field value
+  // ================== INITIALIZATION - Only when dialog opens ==================
   useEffect(() => {
-    if (emailInputRef.current && email) {
-      emailInputRef.current.value = email;
-    }
-  }, [email, activeStep]);
+    if (!isOpen) return;
 
-  // Load saved data when dialog opens
-  useEffect(() => {
-    if (isOpen) {
-      setActiveStep(0);
-      setProcessingStatus("");
-      setIsSuccess(false);
+    // Reset all state when dialog opens
+    setActiveStep(0);
+    setProcessingStatus("");
+    setIsSuccess(false);
+    setIsProcessing(false);
 
-      // Restore saved email
+    // Load saved data from localStorage
+    try {
       const savedEmail = localStorage.getItem("download_dialog_email") || "";
-      setEmail(savedEmail);
-      if (emailInputRef.current) {
-        emailInputRef.current.value = savedEmail;
-      }
+      const savedDataUsageString = localStorage.getItem(
+        "download_dialog_dataUsage"
+      );
 
-      // Restore saved data usage preferences
-      const savedDataUsage = localStorage.getItem("download_dialog_dataUsage");
-      if (savedDataUsage) {
+      setEmail(savedEmail);
+
+      if (savedDataUsageString) {
         try {
-          setDataUsage(JSON.parse(savedDataUsage));
-        } catch (e) {
+          const savedDataUsage = JSON.parse(savedDataUsageString);
+          setDataUsage(savedDataUsage);
+        } catch {
           setDataUsage({
             purposes: [],
             sectors: [],
@@ -137,40 +144,56 @@ export const useDownloadDialog = (
           allow_contact: null,
         });
       }
+    } catch (error) {
+      console.warn("Error loading saved data:", error);
     }
-  }, [isOpen]);
+  }, [isOpen]); // Only depend on isOpen
 
-  // Handle processing timeout
+  // ================== EMAIL INPUT SYNC ==================
   useEffect(() => {
-    if (isProcessing) {
-      const timer = setTimeout(() => {
-        setProcessingStatus(STATUS_CODES.TIMEOUT);
-        setIsProcessing(false);
-      }, TIMEOUT_LIMIT);
-      return () => clearTimeout(timer);
+    if (emailInputRef.current && email) {
+      emailInputRef.current.value = email;
     }
+  }, [email, activeStep]);
+
+  // ================== PROCESSING TIMEOUT ==================
+  useEffect(() => {
+    if (!isProcessing) return;
+
+    const timer = setTimeout(() => {
+      setProcessingStatus(STATUS_CODES.TIMEOUT);
+      setIsProcessing(false);
+    }, TIMEOUT_LIMIT);
+
+    return () => clearTimeout(timer);
   }, [isProcessing]);
 
   // ================== DIALOG MANAGEMENT ==================
-  // Close dialog and reset all state
   const handleIsClose = useCallback(() => {
     setIsSuccess(false);
     setProcessingStatus("");
     setActiveStep(0);
     setEmail("");
+    setEmailError("");
     setDataUsage({
       purposes: [],
       sectors: [],
       allow_contact: null,
     });
     setIsProcessing(false);
-    localStorage.removeItem("download_dialog_email");
-    localStorage.removeItem("download_dialog_dataUsage");
+
+    // Clear localStorage
+    try {
+      // localStorage.removeItem("download_dialog_email");
+      // localStorage.removeItem("download_dialog_dataUsage");
+    } catch (error) {
+      console.warn("Error clearing localStorage:", error);
+    }
+
     setIsOpen(false);
   }, [setIsOpen]);
 
   // ================== STEP NAVIGATION ==================
-  // Handle step changes with validation
   const handleStepChange = useCallback(
     (targetStep: number) => {
       const currentEmailValue = emailInputRef.current?.value?.trim() || "";
@@ -180,15 +203,23 @@ export const useDownloadDialog = (
         if (!isEmailValid(currentEmailValue)) {
           return;
         }
-
         setEmail(currentEmailValue);
-        localStorage.setItem("download_dialog_email", currentEmailValue);
+        // Save to localStorage
+        try {
+          localStorage.setItem("download_dialog_email", currentEmailValue);
+        } catch (error) {
+          console.warn("Error saving email:", error);
+        }
       }
 
       // Save email when staying on step 0
       if (activeStep === 0 && targetStep === 0 && currentEmailValue) {
         setEmail(currentEmailValue);
-        localStorage.setItem("download_dialog_email", currentEmailValue);
+        try {
+          localStorage.setItem("download_dialog_email", currentEmailValue);
+        } catch (error) {
+          console.warn("Error saving email:", error);
+        }
       }
 
       setActiveStep(targetStep);
@@ -215,19 +246,14 @@ export const useDownloadDialog = (
   );
 
   // ================== DATA USAGE MANAGEMENT ==================
-  // Handle data usage form changes with persistence
   const handleDataUsageChange = useCallback(
     (newDataUsage: DataUsageInformation) => {
-      const currentEmail =
-        email ||
-        emailInputRef.current?.value ||
-        localStorage.getItem("download_dialog_email") ||
-        "";
+      const currentEmail = email || emailInputRef.current?.value || "";
 
       setDataUsage(newDataUsage);
 
-      // Save both data usage and email to localStorage
-      Promise.resolve().then(() => {
+      // Save to localStorage immediately
+      try {
         localStorage.setItem(
           "download_dialog_dataUsage",
           JSON.stringify(newDataUsage)
@@ -245,21 +271,22 @@ export const useDownloadDialog = (
             setEmail(currentEmail);
           }
         }
-      });
+      } catch (error) {
+        console.warn("Error saving data usage:", error);
+      }
     },
-    [email, setDataUsage]
+    [email]
   );
 
   // ================== DOWNLOAD REQUEST PROCESSING ==================
-  // Submit download job to backend
   const submitJob = useCallback(
-    (email: string) => {
+    (emailToSubmit: string) => {
       if (!uuid) {
         setIsProcessing(false);
         return;
       }
 
-      const normalizedEmail = email.toLowerCase();
+      const normalizedEmail = emailToSubmit.toLowerCase();
 
       const request: DatasetDownloadRequest = {
         inputs: {
@@ -290,8 +317,12 @@ export const useDownloadDialog = (
             if (/^2\d{2}$/.test(statusCode)) {
               setIsSuccess(true);
               // Clear saved data after successful submission
-              localStorage.removeItem("download_dialog_email");
-              localStorage.removeItem("download_dialog_dataUsage");
+              try {
+                // localStorage.removeItem("download_dialog_email");
+                // localStorage.removeItem("download_dialog_dataUsage");
+              } catch (error) {
+                console.warn("Error clearing saved data:", error);
+              }
             }
           } else {
             console.log("Internal server error.");
@@ -323,17 +354,19 @@ export const useDownloadDialog = (
   );
 
   // ================== FORM SUBMISSION HANDLERS ==================
-  // Handle email input
   const handleClearEmail = useCallback(() => {
     setEmail("");
     setEmailError("");
     if (emailInputRef.current) {
       emailInputRef.current.value = "";
     }
-    localStorage.removeItem("download_dialog_email");
+    try {
+      localStorage.removeItem("download_dialog_email");
+    } catch (error) {
+      console.warn("Error clearing email:", error);
+    }
   }, []);
 
-  // Handle form submission (step 2)
   const handleFormSubmit = useCallback(
     (event: FormEvent) => {
       event.preventDefault();
@@ -352,7 +385,6 @@ export const useDownloadDialog = (
     [submitJob]
   );
 
-  // Handle stepper button clicks
   const handleStepperButtonClick = useCallback(() => {
     // Step 0: Navigate to license agreement
     if (activeStep === 0) {
@@ -371,8 +403,7 @@ export const useDownloadDialog = (
     submitJob(emailToSubmit);
   }, [activeStep, email, handleStepChange, submitJob, isEmailValid]);
 
-  // ================== UI HELPERS ==================
-  // Get processing status message for display
+  // ================== UI HELPERS (Stable) ==================
   const getProcessStatusText = useCallback((): string => {
     if (!processingStatus) return "";
 
@@ -393,7 +424,6 @@ export const useDownloadDialog = (
     return "Something went wrong";
   }, [processingStatus]);
 
-  // Get button title based on current step
   const getStepperButtonTitle = useCallback(() => {
     if (activeStep === 0) {
       return "Next";
@@ -412,6 +442,7 @@ export const useDownloadDialog = (
     emailError,
     dataUsage,
     hasDownloadConditions,
+    subsettingSelectionCount,
     handleIsClose,
     handleStepClick,
     handleStepperButtonClick,

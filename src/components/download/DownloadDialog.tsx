@@ -7,6 +7,7 @@ import {
   useTheme,
   Divider,
 } from "@mui/material";
+import { useMemo } from "react";
 import DataSelection from "./DataSelection";
 import LicenseContent from "./LicenseContent";
 import { useDownloadDialog } from "../../hooks/useDownloadDialog";
@@ -45,6 +46,7 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
     emailError,
     dataUsage,
     hasDownloadConditions,
+    subsettingSelectionCount,
     handleIsClose,
     handleStepClick,
     handleStepperButtonClick,
@@ -55,6 +57,10 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
     getStepperButtonTitle,
     setEmailError,
   } = useDownloadDialog(isOpen, setIsOpen);
+
+  // Determine if DataSelection should be shown
+  const shouldShowDataSelection =
+    hasDownloadConditions && subsettingSelectionCount >= 1;
 
   const getButtonStatus = () => {
     const isFailure = processingStatus && !processingStatus.startsWith("2");
@@ -79,11 +85,12 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
           sx={{
             display: "flex",
             flexDirection: isUnderLaptop ? "column" : "row",
-            gap: isUnderLaptop ? 0 : hasDownloadConditions ? 3 : 0,
+            gap: isUnderLaptop ? 0 : shouldShowDataSelection ? 3 : 0,
             flex: 1,
           }}
         >
-          {hasDownloadConditions && (
+          {/* Only show DataSelection when subsettingSelectionCount >= 1 */}
+          {shouldShowDataSelection && (
             <Box
               sx={{
                 width: isUnderLaptop ? "100%" : "300px",
@@ -101,7 +108,10 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
             </Box>
           )}
 
-          {isUnderLaptop && hasDownloadConditions && <Divider sx={{ my: 2 }} />}
+          {/* Only show divider when DataSelection is visible on mobile */}
+          {isUnderLaptop && shouldShowDataSelection && (
+            <Divider sx={{ my: 2 }} />
+          )}
 
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <EmailInputStep
@@ -119,6 +129,7 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
       );
     }
 
+    // Step 1: License Agreement
     return (
       <Box sx={{ flex: 1 }}>
         <Box sx={{ flex: 1 }}>
@@ -163,8 +174,10 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
         },
       }}
     >
+      {/* Dialog Header */}
       <DialogHeader onClose={handleIsClose} />
 
+      {/* Stepper Section */}
       <Box
         sx={{
           px: isUnderLaptop ? 2 : 4,
@@ -182,6 +195,7 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
         />
       </Box>
 
+      {/* Main Content */}
       <DialogContent
         sx={{
           px: isUnderLaptop ? 2 : 4,
@@ -195,6 +209,7 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
         {renderStepContent()}
       </DialogContent>
 
+      {/* Action Buttons */}
       <DialogActions
         sx={{
           p: isUnderLaptop ? 2 : 3,

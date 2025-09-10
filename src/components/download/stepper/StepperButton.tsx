@@ -25,6 +25,12 @@ const COMMON_BUTTON_STYLES = {
   px: "46px",
   mx: "10px",
   borderRadius: "4px",
+  // Prevent text wrapping
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  // Ensure button grows to accommodate content
+  minWidth: "fit-content",
 } as const;
 
 const StepperButton = ({
