@@ -45,8 +45,8 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
           <Map
             panelId={mapContainerId}
             announcement={
-              dataset.getGeometry() === undefined
-                ? "model:No spatial information for this record"
+              dataset.getBBox() === undefined
+                ? "model:Spatial information not available"
                 : undefined
             }
           >
