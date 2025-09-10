@@ -40,7 +40,13 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
       <Grid item container md={12}>
         <Grid item container md={1} display="flex" justifyContent="center">
           {/* todo */}
-          {/* <LocationOnOutlinedIcon /> */}
+          {!(
+            !delivery_point &&
+            !city &&
+            !country &&
+            !postal_code &&
+            !administrative_area
+          ) && <LocationOnOutlinedIcon />}
         </Grid>
         <Grid item container md={5} data-testid="contact-address">
           {!delivery_point &&
@@ -116,7 +122,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
         <Grid item container md={12} data-testid="contact-link">
           <Grid item md={1} display="flex" justifyContent="center">
             {/* todo */}
-            {/* <LanguageOutlinedIcon /> */}
+            {!(!links || links.length === 0) && <LanguageOutlinedIcon />}
           </Grid>
           {(!links || links.length === 0) && (
             <></>
