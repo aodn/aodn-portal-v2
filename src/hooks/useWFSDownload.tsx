@@ -1,5 +1,7 @@
 import { useCallback, useState, useRef } from "react";
 
+const CONNECTION_TIMEOUT_DEFAULT = 20 * 60000;
+
 // Aligned with backend WFS SSE event names
 enum EventName {
   CONNECTION_ESTABLISHED = "connection-established",
@@ -335,7 +337,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         abortControllerRef.current = controller;
         const timeout = process.env.VITE_WFS_DOWNLOADING_TIMEOUT
           ? Number(process.env.VITE_WFS_DOWNLOADING_TIMEOUT)
-          : 20 * 60000; // Frontend 20 minutes timeout by default
+          : CONNECTION_TIMEOUT_DEFAULT; // Frontend 20 minutes timeout by default
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
         const response = await fetch(
