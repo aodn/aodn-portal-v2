@@ -8,7 +8,7 @@ import { Position } from "geojson";
 import { fitToBound } from "../../../../utils/MapUtils";
 import { TestHelper } from "../../../common/test/helper";
 
-interface TileUrlParams {
+interface UrlParams {
   LAYERS: string[];
   TRANSPARENT?: string;
   VERSION?: string;
@@ -20,13 +20,14 @@ interface TileUrlParams {
   STYLES?: string;
   QUERYABLE?: string;
   SRS?: string;
+  CRS?: string;
   BBOX?: string;
   WIDTH?: number;
   HEIGHT?: number;
 }
 
-interface GeoServerTileLayerConfig {
-  tileUrlParams: TileUrlParams;
+interface GeoServerLayerConfig {
+  urlParams: UrlParams;
   baseUrl: string;
   tileSize: number;
   minZoom: number;
@@ -35,15 +36,15 @@ interface GeoServerTileLayerConfig {
   bbox: Position;
 }
 
-interface GeoServerTileLayerProps extends LayerBasicType {
-  geoServerTileLayerConfig?: Partial<GeoServerTileLayerConfig>;
+interface GeoServerLayerProps extends LayerBasicType {
+  geoServerLayerConfig?: Partial<GeoServerLayerConfig>;
   onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
 }
 
 // Example url for mapbox wms resource: "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256"
 
-const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
-  tileUrlParams: {
+const defaultWMSLayerConfig: GeoServerLayerConfig = {
+  urlParams: {
     LAYERS: [],
     TRANSPARENT: "TRUE",
     VERSION: "1.1.1",
@@ -54,8 +55,43 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
     REQUEST: "GetMap",
     STYLES: "",
     QUERYABLE: "true",
+    // Change the coordinate system from EPSG:4326 to EPSG:3857 (Web Mercator) which is what Mapbox GL expects for WMS tiles.
+    // "EPSG:900913" is same as EPSG:3857, just it is an old name
+    SRS: "EPSG:900913",
+    // Adapt to the Mapbox GL WMS Bbox format
+    BBOX: "{bbox-epsg-3857}",
+    WIDTH: 256,
+    HEIGHT: 256,
+  },
+  baseUrl: "",
+  tileSize: 256,
+  minZoom: MapDefaultConfig.MIN_ZOOM,
+  maxZoom: MapDefaultConfig.MAX_ZOOM,
+  bbox: [
+    MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
+    MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
+    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
+    MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
+  ],
+  opacity: 1.0,
+};
+
+const defaultNCWMSLayerConfig: GeoServerLayerConfig = {
+  urlParams: {
+    LAYERS: [],
+    TRANSPARENT: "TRUE",
+    VERSION: "1.3.0",
+    FORMAT: "image/png",
+    EXCEPTIONS: "application/vnd.ogc.se_xml",
+    TILED: "true",
+    SERVICE: "ncwms",
+    REQUEST: "GetMap",
+    STYLES: "",
+    QUERYABLE: "true",
     //Change the coordinate system from EPSG:4326 to EPSG:3857 (Web Mercator) which is what Mapbox GL expects for WMS tiles.
-    SRS: "EPSG:3857",
+    CRS: "EPSG:3857",
+    // Adapt to the Mapbox GL WMS Bbox format
+    // BBOX: `${MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT},${MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON},${MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT},${MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON}`,
     // Adapt to the Mapbox GL WMS Bbox format
     BBOX: "{bbox-epsg-3857}",
     WIDTH: 256,
@@ -76,16 +112,12 @@ const defaultGeoServerTileLayerConfig: GeoServerTileLayerConfig = {
 // This function is specific for IMOS server geoserver-123
 // we can speed up the query by calling the cache server we own.
 // A proxy setup to redirect the call on firewall level
-const applyGeoWebCacheIfPossible = (baseUrl: string, param: TileUrlParams) => {
+const applyGeoWebCacheIfPossible = (baseUrl: string, param: UrlParams) => {
   if (baseUrl.includes("geoserver-123.aodn.org.au/geoserver/wms")) {
     // We can rewrite value so that it use internal cache server
     return {
       baseUrl: "/geowebcache/service/wms",
-      params: {
-        ...param,
-        SRS: "EPSG:900913", // This is same as "EPSG:3857", but tile server use a old name, mapbox must use 3857
-        //BBOX: "{bbox-epsg-900913}",
-      },
+      params: param,
     };
   } else {
     return {
@@ -102,7 +134,7 @@ const getTileLayerId = (layerId: string) => `${layerId}-tile`;
 
 const checkWMSAvailability = (
   baseUrl: string,
-  urlConfig: TileUrlParams,
+  urlConfig: UrlParams,
   onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
 ): boolean => {
   // TODO: Implement a proper WMS availability check if needed, e.g., by making a request to the WMS endpoint
@@ -113,43 +145,47 @@ const checkWMSAvailability = (
   return true;
 };
 
-const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
-  geoServerTileLayerConfig,
+const GeoServerLayer: FC<GeoServerLayerProps> = ({
+  geoServerLayerConfig,
   onWMSAvailabilityChange,
   visible,
-}: GeoServerTileLayerProps) => {
+}: GeoServerLayerProps) => {
   const { map } = useContext(MapContext);
 
   const [titleLayerId, sourceLayerId] = useMemo(() => {
     const layerId = getLayerId(map?.getContainer().id);
     const titleLayerId = getTileLayerId(layerId);
     const sourceLayerId = getTileSourceId(layerId);
-    return [layerId, titleLayerId, sourceLayerId];
+    return [titleLayerId, sourceLayerId];
   }, [map]);
 
   const [config, tileUrl, isWMSAvailable] = useMemo(() => {
     const config = mergeWithDefaults(
-      defaultGeoServerTileLayerConfig,
-      geoServerTileLayerConfig
+      // ncwms is a customise instance by IMOS in the geoserver-123, no cache server
+      // is provided in this case.
+      geoServerLayerConfig?.baseUrl?.endsWith("ncwms")
+        ? defaultNCWMSLayerConfig
+        : defaultWMSLayerConfig,
+      geoServerLayerConfig
     );
     // We append cache server URL in front, if layer is not in cache server, it
     // will fall back to the original URL.
     const tileUrl = [
-      formatToUrl<TileUrlParams>(
-        applyGeoWebCacheIfPossible(config.baseUrl, config.tileUrlParams)
+      formatToUrl<UrlParams>(
+        applyGeoWebCacheIfPossible(config.baseUrl, config.urlParams)
       ),
-      formatToUrl<TileUrlParams>({
+      formatToUrl<UrlParams>({
         baseUrl: config.baseUrl,
-        params: config.tileUrlParams,
+        params: config.urlParams,
       }),
     ];
     const isWMSAvailable = checkWMSAvailability(
       config.baseUrl,
-      config.tileUrlParams,
+      config.urlParams,
       onWMSAvailabilityChange
     );
     return [config, tileUrl, isWMSAvailable];
-  }, [geoServerTileLayerConfig, onWMSAvailabilityChange]);
+  }, [geoServerLayerConfig, onWMSAvailabilityChange]);
 
   // Add the tile layer to the map
   useEffect(() => {
@@ -254,4 +290,4 @@ const GeoServerTileLayer: FC<GeoServerTileLayerProps> = ({
   );
 };
 
-export default GeoServerTileLayer;
+export default GeoServerLayer;
