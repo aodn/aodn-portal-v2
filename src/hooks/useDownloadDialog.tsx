@@ -403,7 +403,7 @@ export const useDownloadDialog = (
     submitJob(emailToSubmit);
   }, [activeStep, email, handleStepChange, submitJob, isEmailValid]);
 
-  // ================== UI HELPERS (Stable) ==================
+  // ================== UI HELPERS ==================
   const getProcessStatusText = useCallback((): string => {
     if (!processingStatus) return "";
 
