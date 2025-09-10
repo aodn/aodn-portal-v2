@@ -55,8 +55,9 @@ const defaultWMSLayerConfig: GeoServerLayerConfig = {
     REQUEST: "GetMap",
     STYLES: "",
     QUERYABLE: "true",
-    //Change the coordinate system from EPSG:4326 to EPSG:3857 (Web Mercator) which is what Mapbox GL expects for WMS tiles.
-    SRS: "EPSG:3857",
+    // Change the coordinate system from EPSG:4326 to EPSG:3857 (Web Mercator) which is what Mapbox GL expects for WMS tiles.
+    // "EPSG:900913" is same as EPSG:3857, just it is an old name
+    SRS: "EPSG:900913",
     // Adapt to the Mapbox GL WMS Bbox format
     BBOX: "{bbox-epsg-3857}",
     WIDTH: 256,
@@ -88,9 +89,11 @@ const defaultNCWMSLayerConfig: GeoServerLayerConfig = {
     STYLES: "",
     QUERYABLE: "true",
     //Change the coordinate system from EPSG:4326 to EPSG:3857 (Web Mercator) which is what Mapbox GL expects for WMS tiles.
-    CRS: "EPSG:4326",
+    CRS: "EPSG:3857",
     // Adapt to the Mapbox GL WMS Bbox format
-    BBOX: `${MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT},${MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON},${MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT},${MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON}`,
+    // BBOX: `${MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT},${MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON},${MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT},${MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON}`,
+    // Adapt to the Mapbox GL WMS Bbox format
+    BBOX: "{bbox-epsg-3857}",
     WIDTH: 256,
     HEIGHT: 256,
   },
@@ -114,11 +117,7 @@ const applyGeoWebCacheIfPossible = (baseUrl: string, param: UrlParams) => {
     // We can rewrite value so that it use internal cache server
     return {
       baseUrl: "/geowebcache/service/wms",
-      params: {
-        ...param,
-        SRS: "EPSG:900913", // This is same as "EPSG:3857", but tile server use a old name, mapbox must use 3857
-        //BBOX: "{bbox-epsg-900913}",
-      },
+      params: param,
     };
   } else {
     return {
@@ -162,6 +161,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
   const [config, tileUrl, isWMSAvailable] = useMemo(() => {
     const config = mergeWithDefaults(
+      // ncwms is a customise instance by IMOS in the geoserver-123, no cache server
+      // is provided in this case.
       geoServerLayerConfig?.baseUrl?.endsWith("ncwms")
         ? defaultNCWMSLayerConfig
         : defaultWMSLayerConfig,
