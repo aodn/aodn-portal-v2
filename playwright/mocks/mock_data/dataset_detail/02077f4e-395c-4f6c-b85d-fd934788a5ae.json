@@ -335,7 +335,7 @@
       "rel": "wms",
       "type": "",
       "title": "cmar:CATCH_HEADER_AODN_VIEW",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access > wms"
     },
     {
       "href": "https://www.marine.csiro.au/datacentre/projects/BioData/PDFs/BOX_AB2009_1426/BOX_AB2009_1426_index.htm",

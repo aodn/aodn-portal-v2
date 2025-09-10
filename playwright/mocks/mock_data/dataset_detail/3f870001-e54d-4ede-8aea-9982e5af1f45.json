@@ -227,7 +227,7 @@
       "rel": "wms",
       "type": "",
       "title": "mnf:CTD_HEADER_AODN_VIEW",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access > wms"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=877",

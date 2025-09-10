@@ -17,3 +17,5 @@ class Routes:
     )
     COLLECTION_DETAIL = f'{PREFIX}/collections/*'
     COLLECTION_DETAIL_ITEM = f'{PREFIX}/collections/*/items/summary'
+
+    GEOWEBCACHE = '*/**/geowebcache/service/wms*'

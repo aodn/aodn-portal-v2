@@ -199,7 +199,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     search_page.map.drag_map()
     search_page.map.zoom_to_level()
-    search_page.wait_for_search_to_complete()
+    search_page.wait_for_timeout(3000)  # Wait for the map to settle
 
     map_center = search_page.map.get_map_center()
     map_zoom = search_page.map.get_map_zoom()
@@ -217,7 +217,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     new_search_page = SearchPage(new_page)
     new_search_page.goto(current_url)
-    new_search_page.wait_for_search_to_complete()
+    search_page.wait_for_timeout(3000)  # Wait for the map to settle
 
     new_map_center = new_search_page.map.get_map_center()
     new_map_zoom = new_search_page.map.get_map_zoom()
@@ -246,7 +246,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
 
     search_page.map.drag_map()
     search_page.map.zoom_to_level()
-    search_page.wait_for_search_to_complete()
+    search_page.wait_for_timeout(3000)  # Wait for the map to settle
 
     map_center = search_page.map.get_map_center()
     map_zoom = search_page.map.get_map_zoom()
