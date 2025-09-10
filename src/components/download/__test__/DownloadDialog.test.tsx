@@ -16,6 +16,7 @@ const mockUseDownloadDialog = {
   dataUsage: { purposes: [], sectors: [], allow_contact: null },
   snackbar: { open: false, message: "", severity: "error" as const },
   hasDownloadConditions: false,
+  subsettingSelectionCount: 0,
   handleIsClose: vi.fn(),
   handleStepClick: vi.fn(),
   handleStepperButtonClick: vi.fn(),
@@ -216,6 +217,7 @@ describe("DownloadDialog", () => {
 
   it("should display data selection when hasDownloadConditions is true", () => {
     mockUseDownloadDialog.hasDownloadConditions = true;
+    mockUseDownloadDialog.subsettingSelectionCount = 1;
 
     render(
       <TestWrapper>
@@ -228,6 +230,7 @@ describe("DownloadDialog", () => {
 
     // Reset state
     mockUseDownloadDialog.hasDownloadConditions = false;
+    mockUseDownloadDialog.subsettingSelectionCount = 0;
   });
 
   it("should show validation snackbar when snackbar is open", () => {
