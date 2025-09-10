@@ -161,12 +161,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
       // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
       const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
-
-      if (hasSummaryFeature && isZarrDataset) {
-        layers.push({
-          ...MapLayers[LayerName.SpatialExtent],
-        });
-      }
+      // Must be order by Hexbin > GeoServer > Spatial extents
       if (isSupportHexbin) {
         layers.push(MapLayers[LayerName.Hexbin]);
       }
@@ -175,6 +170,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         ...MapLayers[LayerName.GeoServer],
         default: !isSupportHexbin,
       });
+
+      if (hasSummaryFeature && isZarrDataset) {
+        layers.push({
+          ...MapLayers[LayerName.SpatialExtent],
+        });
+      }
 
       // Init the layer with values here taking the default
       setSelectedLayer((v: LayerName | null): LayerName | null => {
