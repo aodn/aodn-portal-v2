@@ -5,7 +5,6 @@ import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import { formatToUrl } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../constants";
 import { Position } from "geojson";
-import { fitToBound } from "../../../../utils/MapUtils";
 import { TestHelper } from "../../../common/test/helper";
 
 interface UrlParams {
@@ -209,7 +208,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     const createLayers = (layoutVisible: undefined | boolean) => {
       // Check WMS availability before adding the layer
       if (isWMSAvailable) {
-        // Add the raster layer
+        // Add the raster layer, do not add any fitBounds here, it makes the map animate strange. Control it at map level
         if (!map?.getLayer(titleLayerId)) {
           map?.addLayer({
             id: titleLayerId,
@@ -220,17 +219,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               visibility: layoutVisible ? "visible" : "none",
             },
           });
-
-          // Handle only if new layer added
-          const handleIdle = () => {
-            if (!isWMSAvailable) return;
-            fitToBound(map, config.bbox, {
-              animate: true,
-              zoomOffset: 0.5,
-            });
-          };
-
-          layoutVisible && map?.once("idle", handleIdle);
         }
       }
     };
@@ -270,7 +258,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       map?.once("idle", cleanUp);
     };
   }, [
-    config.bbox,
     config.maxZoom,
     config.minZoom,
     config.tileSize,
