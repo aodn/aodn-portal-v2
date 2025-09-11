@@ -6,7 +6,7 @@ import { formatToUrl } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig, MapEventEnum } from "../constants";
 import { Position } from "geojson";
 import { TestHelper } from "../../../common/test/helper";
-import { MapMouseEvent, Popup } from "mapbox-gl";
+import { MapMouseEvent, MapMouseEventType, Popup } from "mapbox-gl";
 
 interface UrlParams {
   LAYERS: string[];
@@ -210,7 +210,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       }
     };
 
-    const createPopup = (event: MapMouseEvent) => {
+    const handlePopup = (event: MapMouseEvent) => {
       const featureUrl = formatToUrl<UrlParams>(
         applyGeoWebCacheIfPossible(config.baseUrl, {
           ...config.urlParams,
@@ -242,7 +242,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               visibility: layoutVisible ? "visible" : "none",
             },
           });
-          map.on(MapEventEnum.CLICK, titleLayerId, createPopup);
+          map.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
         }
       }
     };
@@ -262,7 +262,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     const cleanPopup = () => {
       popupRef.current?.remove();
       popupRef.current = null;
-      map.off(MapEventEnum.CLICK, titleLayerId, createPopup);
+      map.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
     };
 
     const cleanUp = () => {
