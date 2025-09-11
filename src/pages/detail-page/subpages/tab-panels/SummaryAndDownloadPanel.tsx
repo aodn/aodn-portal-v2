@@ -351,7 +351,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       geoServerLayerConfig={{
                         baseUrl: ensureHttps(getWMSServer(collection)[0]),
                         urlParams: { LAYERS: getWMSLayerNames(collection) },
-                        bbox: overallBoundingBox(collection),
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
                       visible={selectedLayer === LayerName.GeoServer}

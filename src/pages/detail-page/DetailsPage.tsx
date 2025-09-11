@@ -6,13 +6,13 @@ import SideSection from "./subpages/SideSection";
 import { DetailPageProvider } from "./context/detail-page-provider";
 import ContentSection from "./subpages/ContentSection";
 import SectionContainer from "../../components/layout/components/SectionContainer";
-import { LngLatBounds, MapLayerMouseEvent } from "mapbox-gl";
+import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { useCallback, useState } from "react";
 
 const DetailsPage = () => {
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
   const onSpatialCoverageLayerClick = useCallback(
-    (evt: MapLayerMouseEvent) => {
+    (evt: MapMouseEvent) => {
       if (evt.type === "click" && evt.lngLat) {
         // Magic number 10 to move to a bound area given the lnglat
         const bounds = evt.lngLat.toBounds(10);
