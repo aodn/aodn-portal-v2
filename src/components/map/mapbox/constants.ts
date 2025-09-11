@@ -1,3 +1,11 @@
+import { PopupOptions } from "mapbox-gl";
+
+export enum MapEventEnum {
+  CLICK = "click",
+  IDLE = "idle",
+  STYLEDATA = "styledata",
+}
+
 export const MapDefaultConfig = {
   // Magic number, try and error by experience
   DEBOUNCE_BEFORE_EVENT_FIRE: 1000,
@@ -14,4 +22,10 @@ export const MapDefaultConfig = {
     NORTH_LAT: -8,
     SOUTH_LAT: -43,
   },
+  DEFAULT_POPUP: {
+    closeButton: true,
+    closeOnClick: false,
+    maxWidth: "none",
+    offset: [0, -5],
+  } as PopupOptions,
 };

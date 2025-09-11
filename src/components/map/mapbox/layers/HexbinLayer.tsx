@@ -8,6 +8,7 @@ import { Map, Popup } from "mapbox-gl";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 import { Color } from "@deck.gl/core";
 import { TestHelper } from "../../../common/test/helper";
+import { MapDefaultConfig } from "../constants";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
@@ -62,12 +63,7 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
             }
 
             // Create popup
-            popupRef.current = new Popup({
-              closeButton: true,
-              closeOnClick: false,
-              maxWidth: "none",
-              offset: [0, -5],
-            });
+            popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
             // Set gpuAggregation to true will make points object disappear
             const points: Feature<Point>[] = info.object.points || [];
 

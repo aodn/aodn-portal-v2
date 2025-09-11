@@ -1,11 +1,12 @@
-import { FC, useContext, useEffect, useMemo } from "react";
+import { FC, useContext, useEffect, useMemo, useRef } from "react";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import { formatToUrl } from "../../../../utils/UrlUtils";
-import { MapDefaultConfig } from "../constants";
+import { MapDefaultConfig, MapEventEnum } from "../constants";
 import { Position } from "geojson";
 import { TestHelper } from "../../../common/test/helper";
+import { MapMouseEvent, Popup } from "mapbox-gl";
 
 interface UrlParams {
   LAYERS: string[];
@@ -18,6 +19,9 @@ interface UrlParams {
   REQUEST?: string;
   STYLES?: string;
   QUERYABLE?: string;
+  INFO_FORMAT?: string;
+  FEATURE_COUNT?: number;
+  BUFFER?: number;
   SRS?: string;
   CRS?: string;
   BBOX?: string;
@@ -150,6 +154,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   visible,
 }: GeoServerLayerProps) => {
   const { map } = useContext(MapContext);
+  const popupRef = useRef<Popup | null>();
 
   const [titleLayerId, sourceLayerId] = useMemo(() => {
     const layerId = getLayerId(map?.getContainer().id);
@@ -205,6 +210,24 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       }
     };
 
+    const createPopup = (event: MapMouseEvent) => {
+      const featureUrl = formatToUrl<UrlParams>(
+        applyGeoWebCacheIfPossible(config.baseUrl, {
+          ...config.urlParams,
+          REQUEST: "GetFeatureInfo",
+          INFO_FORMAT: "text/html",
+          FEATURE_COUNT: 100,
+          BUFFER: 10,
+        })
+      );
+      fetch(featureUrl).then(async (value) => {
+        const html = await value.text();
+        cleanPopup();
+        popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+        popupRef.current.setLngLat(event.lngLat).setHTML(html).addTo(map);
+      });
+    };
+
     const createLayers = (layoutVisible: undefined | boolean) => {
       // Check WMS availability before adding the layer
       if (isWMSAvailable) {
@@ -219,6 +242,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               visibility: layoutVisible ? "visible" : "none",
             },
           });
+          map.on(MapEventEnum.CLICK, titleLayerId, createPopup);
         }
       }
     };
@@ -235,9 +259,17 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       }
     };
 
+    const cleanPopup = () => {
+      popupRef.current?.remove();
+      popupRef.current = null;
+      map.off(MapEventEnum.CLICK, titleLayerId, createPopup);
+    };
+
     const cleanUp = () => {
       if (map === null || map === undefined) return;
-      map?.off("styledata", createLayersOnStyleChange);
+
+      cleanPopup();
+      map?.off(MapEventEnum.STYLEDATA, createLayersOnStyleChange);
       // Important to check this because the map may be unloading and when you try
       // to access getLayer or similar function, the style will be undefined and throw
       // exception
@@ -250,17 +282,19 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     // Must use idle because the map already loaded if this is not
     // the default layer
-    map?.once("idle", createLayersOnInit);
-    map?.on("styledata", createLayersOnStyleChange);
+    map?.once(MapEventEnum.IDLE, createLayersOnInit);
+    map?.on(MapEventEnum.STYLEDATA, createLayersOnStyleChange);
 
     // Cleanup function
     return () => {
-      map?.once("idle", cleanUp);
+      map?.once(MapEventEnum.IDLE, cleanUp);
     };
   }, [
+    config.baseUrl,
     config.maxZoom,
     config.minZoom,
     config.tileSize,
+    config.urlParams,
     isWMSAvailable,
     map,
     sourceLayerId,
