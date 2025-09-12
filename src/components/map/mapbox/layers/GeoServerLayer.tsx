@@ -19,6 +19,7 @@ interface UrlParams {
   REQUEST?: string;
   STYLES?: string;
   QUERYABLE?: string;
+  QUERY_LAYERS?: string[];
   INFO_FORMAT?: string;
   FEATURE_COUNT?: number;
   BUFFER?: number;
@@ -27,6 +28,8 @@ interface UrlParams {
   BBOX?: string;
   WIDTH?: number;
   HEIGHT?: number;
+  X?: number;
+  Y?: number;
 }
 
 interface GeoServerLayerConfig {
@@ -46,7 +49,7 @@ interface GeoServerLayerProps extends LayerBasicType {
 
 // Example url for mapbox wms resource: "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256"
 
-const defaultWMSLayerConfig: GeoServerLayerConfig = {
+const DEFAULT_WMS_MAP_CONFIG: GeoServerLayerConfig = {
   urlParams: {
     LAYERS: [],
     TRANSPARENT: "TRUE",
@@ -79,7 +82,37 @@ const defaultWMSLayerConfig: GeoServerLayerConfig = {
   opacity: 1.0,
 };
 
-const defaultNCWMSLayerConfig: GeoServerLayerConfig = {
+const DEFAULT_WMS_FEATURE_CONFIG: GeoServerLayerConfig = {
+  urlParams: {
+    LAYERS: [],
+    TRANSPARENT: "TRUE",
+    VERSION: "1.1.1",
+    FORMAT: "text/html",
+    EXCEPTIONS: "application/vnd.ogc.se_xml",
+    TILED: "true",
+    SERVICE: "WMS",
+    REQUEST: "GetFeatureInfo",
+    STYLES: "",
+    QUERYABLE: "true",
+    SRS: "EPSG:4326", // This is the support from Geoserver which matches mapbox coordinate
+    INFO_FORMAT: "text/html",
+    FEATURE_COUNT: 100,
+    BUFFER: 10,
+  },
+  baseUrl: "",
+  tileSize: 256,
+  minZoom: MapDefaultConfig.MIN_ZOOM,
+  maxZoom: MapDefaultConfig.MAX_ZOOM,
+  bbox: [
+    MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
+    MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
+    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
+    MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
+  ],
+  opacity: 1.0,
+};
+
+const DEFAULT_NCWMS_MAP_CONFIG: GeoServerLayerConfig = {
   urlParams: {
     LAYERS: [],
     TRANSPARENT: "TRUE",
@@ -112,6 +145,7 @@ const defaultNCWMSLayerConfig: GeoServerLayerConfig = {
   ],
   opacity: 1.0,
 };
+
 // This function is specific for IMOS server geoserver-123
 // we can speed up the query by calling the cache server we own.
 // A proxy setup to redirect the call on firewall level
@@ -168,8 +202,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       // ncwms is a customise instance by IMOS in the geoserver-123, no cache server
       // is provided in this case.
       geoServerLayerConfig?.baseUrl?.endsWith("ncwms")
-        ? defaultNCWMSLayerConfig
-        : defaultWMSLayerConfig,
+        ? DEFAULT_NCWMS_MAP_CONFIG
+        : DEFAULT_WMS_MAP_CONFIG,
       geoServerLayerConfig
     );
     // We append cache server URL in front, if layer is not in cache server, it
@@ -211,21 +245,38 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     };
 
     const handlePopup = (event: MapMouseEvent) => {
-      const featureUrl = formatToUrl<UrlParams>(
-        applyGeoWebCacheIfPossible(config.baseUrl, {
-          ...config.urlParams,
-          REQUEST: "GetFeatureInfo",
-          INFO_FORMAT: "text/html",
-          FEATURE_COUNT: 100,
-          BUFFER: 10,
-        })
+      const feature = mergeWithDefaults(
+        DEFAULT_WMS_FEATURE_CONFIG,
+        geoServerLayerConfig
       );
-      fetch(featureUrl).then(async (value) => {
-        const html = await value.text();
-        cleanPopup();
-        popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
-        popupRef.current.setLngLat(event.lngLat).setHTML(html).addTo(map);
-      });
+
+      feature.urlParams.WIDTH = map.getCanvas().width;
+      feature.urlParams.HEIGHT = map.getCanvas().height;
+
+      feature.urlParams.X = Math.round(event.point.x);
+      feature.urlParams.Y = Math.round(event.point.y);
+
+      feature.urlParams.QUERY_LAYERS = feature?.urlParams?.LAYERS;
+      // URL already specify the CRS/SRS to match mapbox so no need to do projection on bounds
+      feature.urlParams.BBOX = map.getBounds()?.toArray().flat().join(","); // LngLatBounds
+
+      const featureUrl = formatToUrl<UrlParams>(
+        applyGeoWebCacheIfPossible(feature.baseUrl, feature.urlParams)
+      );
+
+      console.log(featureUrl);
+      fetch(featureUrl)
+        .then((response) => {
+          if (!response.ok)
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          return response.text();
+        })
+        .then((data) => {
+          cleanPopup();
+          popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+          popupRef.current.setLngLat(event.lngLat).setHTML(data).addTo(map);
+        })
+        .catch((err) => console.error("GetFeatureInfo error:", err));
     };
 
     const createLayers = (layoutVisible: undefined | boolean) => {
@@ -262,13 +313,13 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     const cleanPopup = () => {
       popupRef.current?.remove();
       popupRef.current = null;
-      map.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
     };
 
     const cleanUp = () => {
       if (map === null || map === undefined) return;
 
       cleanPopup();
+      map?.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
       map?.off(MapEventEnum.STYLEDATA, createLayersOnStyleChange);
       // Important to check this because the map may be unloading and when you try
       // to access getLayer or similar function, the style will be undefined and throw
@@ -295,6 +346,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.minZoom,
     config.tileSize,
     config.urlParams,
+    geoServerLayerConfig,
     isWMSAvailable,
     map,
     sourceLayerId,
