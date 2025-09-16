@@ -11,5 +11,12 @@ class LandingPage(BasePage):
         self.page = page
         self.search = SearchComponent(page)
 
+        # -- Page locators --
+        self.hero_text = page.get_by_test_id('hero-text')
+
     def load(self) -> None:
-        self.page.goto(settings.baseURL, wait_until='domcontentloaded')
+        self.page.goto(settings.baseURL, wait_until='load')
+
+    def is_loaded(self) -> bool:
+        """Return True if current page is the landing page"""
+        return self.page.url.endswith('/') and self.hero_text.is_visible()

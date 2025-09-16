@@ -290,6 +290,7 @@ def test_map_buttons(desktop_page: Page, data_title: str) -> None:
     expect(search_page.map.layers_menu).to_be_visible()
 
     search_page.result_title.get_by_text(data_title).click()
+    detail_page.detail_map.wait_for_map_loading()
 
     # Check the visibility of detail page map buttons
     expect(detail_page.detail_map.basemap_show_hide_menu).to_be_visible()
@@ -324,7 +325,6 @@ def test_map_zoom_out_and_drag_does_not_crash(desktop_page: Page) -> None:
     search_page = SearchPage(desktop_page)
 
     landing_page.load()
-    landing_page.search.fill_search_text('imos ships')
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
 
