@@ -114,3 +114,20 @@ class BasePage:
             return int(bounding_box['height'])
         else:
             raise ValueError('Element is not visible')
+
+    def wait_for_url_update(self, timeout: int = 5000) -> None:
+        """
+        Wait for the current page URL to update.
+
+        Args:
+            timeout: Maximum time to wait in milliseconds (default: 5000ms)
+        """
+        initial_url = self.page.url
+        try:
+            self.page.wait_for_function(
+                f"() => window.location.href !== '{initial_url}'",
+                timeout=timeout,
+            )
+        except TimeoutError:
+            # URL update was too quick or didn't happen.
+            pass

@@ -195,11 +195,11 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
+    search_page.map.wait_for_map_loading()
 
     search_page.map.drag_map()
     search_page.map.zoom_to_level()
-    search_page.wait_for_timeout(3000)  # Wait for the map to settle
+    search_page.wait_for_url_update()
 
     map_center = search_page.map.get_map_center()
     map_zoom = search_page.map.get_map_zoom()
@@ -216,8 +216,8 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
     )
 
     new_search_page = SearchPage(new_page)
-    new_search_page.goto(current_url)
-    search_page.wait_for_timeout(3000)  # Wait for the map to settle
+    new_search_page.goto(current_url, wait_until='load')
+    new_search_page.map.wait_for_map_loading()
 
     new_map_center = new_search_page.map.get_map_center()
     new_map_zoom = new_search_page.map.get_map_zoom()
@@ -242,23 +242,24 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
+    search_page.map.wait_for_map_loading()
 
     search_page.map.drag_map()
     search_page.map.zoom_to_level()
-    search_page.wait_for_timeout(3000)  # Wait for the map to settle
+    search_page.wait_for_url_update()
 
     map_center = search_page.map.get_map_center()
     map_zoom = search_page.map.get_map_zoom()
 
     search_page.first_result_title.click()
     detail_page.return_button.click()
+    search_page.map.wait_for_map_loading()
 
     new_map_center = search_page.map.get_map_center()
     new_map_zoom = search_page.map.get_map_zoom()
 
-    assert are_coordinates_equal(map_center, new_map_center)
     assert are_value_equal(map_zoom, new_map_zoom)
+    assert are_coordinates_equal(map_center, new_map_center)
 
 
 @pytest.mark.parametrize(
