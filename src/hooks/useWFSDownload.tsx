@@ -1,6 +1,12 @@
 import { useCallback, useState, useRef } from "react";
+import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
+import {
+  getDateConditionFrom,
+  getMultiPolygonFrom,
+  getFormatFrom,
+} from "../utils/DownloadConditionUtils";
 
-const CONNECTION_TIMEOUT_DEFAULT = 20 * 60000;
+const CONNECTION_TIMEOUT_DEFAULT = 20 * 60000; // Frontend 20 minutes timeout by default
 
 // Aligned with backend WFS SSE event names
 enum EventName {
@@ -315,7 +321,11 @@ const useWFSDownload = (onCallback?: () => void) => {
 
   // Main download function using manual fetch + streaming
   const startDownload = useCallback(
-    async (uuid: string, layerName: string) => {
+    async (
+      uuid: string,
+      layerName: string,
+      downloadConditions: IDownloadCondition[]
+    ) => {
       // Clean up any existing download
       cleanupDownload();
 
@@ -333,12 +343,27 @@ const useWFSDownload = (onCallback?: () => void) => {
       onCallback && onCallback();
 
       try {
+        // Extract download conditions
+        const dateRange = getDateConditionFrom(downloadConditions);
+        const multiPolygon = getMultiPolygonFrom(downloadConditions);
+        const format = getFormatFrom(downloadConditions);
+        console.log(
+          "dateRange, polygon, format ===",
+          dateRange,
+          multiPolygon,
+          format
+        );
+
+        // Set timeout for the entire download operation
+        const timeout = import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT;
+        const timeoutId = setTimeout(
+          () => controller.abort(),
+          Number(timeout) || CONNECTION_TIMEOUT_DEFAULT
+        );
+
+        // Start fetch with abort controller
         const controller = new AbortController();
         abortControllerRef.current = controller;
-        const timeout = process.env.VITE_WFS_DOWNLOADING_TIMEOUT
-          ? Number(process.env.VITE_WFS_DOWNLOADING_TIMEOUT)
-          : CONNECTION_TIMEOUT_DEFAULT; // Frontend 20 minutes timeout by default
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
 
         const response = await fetch(
           "/api/v1/ogc/processes/downloadWfs/execution",
@@ -351,7 +376,10 @@ const useWFSDownload = (onCallback?: () => void) => {
             body: JSON.stringify({
               inputs: {
                 uuid: uuid,
-                recipient: "",
+                // start_date: dateRange.start,
+                // end_date: dateRange.end,
+                // multi_polygon: multiPolygon,
+                // fields: [], // TODO: Add fields selection in future
                 layer_name: layerName,
               },
               outputs: {},
