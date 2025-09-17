@@ -6,7 +6,7 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "plugins": [{ "name": "typescript-plugin-css-modules" }],
-    "types": ["vite/client"],
+    "types": ["vite/client", "@types/gtag.js"],
     "esModuleInterop": true,
 
     /* Bundler mode */
