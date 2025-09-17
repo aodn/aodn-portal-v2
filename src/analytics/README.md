@@ -1,46 +1,35 @@
-## Logic Flow
-
-```
-Component → useAnalytics() → track() → trackCustomEvent() → window.gtag() → GA4
-```
-
-## Files
-
-- `constants.ts` - Event definitions
-- `customEventTracker.ts` - Core gtag function
-- `useAnalytics.ts` - React hook
+# Google Analytics Integration
 
 ## Usage
 
 ```typescript
-import { useAnalytics } from "./analytics/useAnalytics";
-import { TRACKING_EVENTS } from "./analytics/constants";
+import { trackCustomEvent } from "./analytics/customEventTracker";
+import { CustomEvent } from "./analytics/constants";
 
-const { track } = useAnalytics();
-
-// Basic tracking
-track(TRACKING_EVENTS.COPY_CITATION_CLICK);
-
-// With parameters (param_name: param_value)
-track(TRACKING_EVENTS.COPY_CITATION_CLICK, {
-  param_name: param_value,
-  param_name: param_value,
-});
+// In your component
+const handleClick = () => {
+  trackCustomEvent(CustomEvent.COPY_CITATION_CLICK);
+};
 ```
 
-## Adding Events
+## Adding New Events
 
 1. Add to `constants.ts`:
 
 ```typescript
-export const TRACKING_EVENTS = {
-  COPY_CITATION_CLICK: "copy_citation_click",
-  NEW_EVENT: "new_event", // ← Add here
-} as const;
+export enum CustomEvent {
+  COPY_CITATION_CLICK = "copy_citation_click",
+  YOUR_NEW_EVENT = "your_new_event", // ← Add here
+}
 ```
 
 2. Use it:
 
 ```typescript
-track(TRACKING_EVENTS.NEW_EVENT);
+trackCustomEvent(CustomEvent.YOUR_NEW_EVENT);
 ```
+
+## Naming Rules
+
+- Use underscores (not hyphens): `copy_citation_click` ✅ not `copy-citation-click` ❌
+- Keep names descriptive and consistent

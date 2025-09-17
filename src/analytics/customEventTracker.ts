@@ -1,13 +1,12 @@
-import { TrackingEventName } from "./constants";
+import { CustomEvent } from "./constants";
 
+/**
+ * Send custom events to Google Analytics
+ */
 export function trackCustomEvent(
-  eventName: TrackingEventName,
+  eventName: CustomEvent,
   eventParameters: Record<string, any> = {}
 ) {
-  console.log("Custom Event:", eventName);
-  console.log("Event Parameters:", eventParameters);
-
-  if (window.gtag) {
-    window.gtag("event", eventName, eventParameters);
-  }
+  // Send event to GA4 via gtag
+  window.gtag?.("event", eventName, eventParameters);
 }
