@@ -347,6 +347,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       // GeoServerLayer is heavy to load, so we can load it
                       // but hide it with visible = false
                     }
+                    <HexbinLayer
+                      featureCollection={filteredFeatureCollection}
+                      visible={selectedLayer === LayerName.Hexbin}
+                    />
                     <GeoServerLayer
                       geoServerLayerConfig={{
                         baseUrl: ensureHttps(getWMSServer(collection)[0]),
@@ -354,10 +358,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
                       visible={selectedLayer === LayerName.GeoServer}
-                    />
-                    <HexbinLayer
-                      featureCollection={filteredFeatureCollection}
-                      visible={selectedLayer === LayerName.Hexbin}
                     />
                     <GeojsonLayer
                       collection={collection}

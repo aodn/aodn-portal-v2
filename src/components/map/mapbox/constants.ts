@@ -4,6 +4,7 @@ export enum MapEventEnum {
   CLICK = "click",
   IDLE = "idle",
   STYLEDATA = "styledata",
+  LOAD = "load",
 }
 
 export const MapDefaultConfig = {

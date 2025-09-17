@@ -30,6 +30,8 @@ interface UrlParams {
   HEIGHT?: number;
   X?: number;
   Y?: number;
+  I?: number;
+  J?: number;
 }
 
 interface GeoServerLayerConfig {
@@ -146,6 +148,36 @@ const DEFAULT_NCWMS_MAP_CONFIG: GeoServerLayerConfig = {
   opacity: 1.0,
 };
 
+const DEFAULT_NCWMS_FEATURE_CONFIG: GeoServerLayerConfig = {
+  urlParams: {
+    LAYERS: [],
+    TRANSPARENT: "TRUE",
+    VERSION: "1.3.0",
+    FORMAT: "text/xml",
+    EXCEPTIONS: "application/vnd.ogc.se_xml",
+    TILED: "true",
+    SERVICE: "ncwms",
+    REQUEST: "GetFeatureInfo",
+    STYLES: "",
+    QUERYABLE: "true",
+    CRS: "EPSG:3857",
+    INFO_FORMAT: "text/xml",
+    FEATURE_COUNT: 100,
+    BUFFER: 10,
+  },
+  baseUrl: "",
+  tileSize: 256,
+  minZoom: MapDefaultConfig.MIN_ZOOM,
+  maxZoom: MapDefaultConfig.MAX_ZOOM,
+  bbox: [
+    MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
+    MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
+    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
+    MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
+  ],
+  opacity: 1.0,
+};
+
 // This function is specific for IMOS server geoserver-123
 // we can speed up the query by calling the cache server we own.
 // A proxy setup to redirect the call on firewall level
@@ -165,7 +197,7 @@ const applyGeoWebCacheIfPossible = (baseUrl: string, param: UrlParams) => {
 };
 
 // Helper functions to generate consistent IDs
-const getLayerId = (id: string | undefined) => `${id}-geo-server-tile-layer`;
+const getLayerId = (id: string | undefined) => `${id}-geo-server-layer`;
 const getTileSourceId = (layerId: string) => `${layerId}-source`;
 const getTileLayerId = (layerId: string) => `${layerId}-tile`;
 
@@ -246,13 +278,18 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     const handlePopup = (event: MapMouseEvent) => {
       const feature = mergeWithDefaults(
-        DEFAULT_WMS_FEATURE_CONFIG,
+        geoServerLayerConfig?.baseUrl?.endsWith("ncwms")
+          ? DEFAULT_NCWMS_FEATURE_CONFIG
+          : DEFAULT_WMS_FEATURE_CONFIG,
         geoServerLayerConfig
       );
 
       feature.urlParams.WIDTH = map.getCanvas().width;
       feature.urlParams.HEIGHT = map.getCanvas().height;
 
+      // Protocol 1.3.0 use I J instead of X Y
+      feature.urlParams.I = Math.round(event.point.x);
+      feature.urlParams.J = Math.round(event.point.y);
       feature.urlParams.X = Math.round(event.point.x);
       feature.urlParams.Y = Math.round(event.point.y);
 
@@ -281,7 +318,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     const createLayers = (layoutVisible: undefined | boolean) => {
       // Check WMS availability before adding the layer
-      if (isWMSAvailable) {
+      if (isWMSAvailable && layoutVisible) {
         // Add the raster layer, do not add any fitBounds here, it makes the map animate strange. Control it at map level
         if (!map?.getLayer(titleLayerId)) {
           map?.addLayer({
@@ -338,7 +375,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     // Cleanup function
     return () => {
-      map?.once(MapEventEnum.IDLE, cleanUp);
+      cleanUp();
     };
   }, [
     config.baseUrl,
