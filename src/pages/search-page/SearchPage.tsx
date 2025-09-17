@@ -62,6 +62,7 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 import _ from "lodash";
+import { trackSearchUrlParameters } from "../../analytics/searchParamsEvent";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -71,6 +72,8 @@ const SearchPage = () => {
   const redirectSearch = useRedirectSearch();
   const layout = useAppSelector((state) => state.paramReducer.layout);
   const currentSort = useAppSelector((state) => state.paramReducer.sort);
+  // Track the last processed URL to prevent duplicate analytics calls
+  const lastProcessedUrl = useRef("");
   // Layers contains record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   // CurrentLayout is used to remember last layout after change to full map view , which is SearchResultLayoutEnum exclude the value FULL_MAP
@@ -410,6 +413,29 @@ const SearchPage = () => {
     listSearchAbortRef.current?.abort();
     listSearchAbortRef.current = null;
   }, []);
+
+  // Analytics tracking effect - monitors URL parameter changes
+  useEffect(() => {
+    // Delay execution to avoid React Strict Mode duplicate calls in development
+    const timer = setTimeout(() => {
+      const currentUrl = location.search;
+
+      const hasAlreadyProcessedThisUrl =
+        lastProcessedUrl.current === currentUrl;
+      if (hasAlreadyProcessedThisUrl) {
+        return;
+      }
+
+      // Send URL parameters to GA4 analytics using utility function
+      trackSearchUrlParameters(currentUrl);
+
+      // Mark this URL as processed to prevent duplicate tracking
+      lastProcessedUrl.current = currentUrl;
+    }, 100);
+
+    // Cleanup timer on component unmount or dependency change
+    return () => clearTimeout(timer);
+  }, [location?.search]); // Re-run when URL search parameters change
 
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
