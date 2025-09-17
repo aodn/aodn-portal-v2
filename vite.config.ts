@@ -31,6 +31,30 @@ export default ({ mode }) => {
     };
   };
 
+  const inlineGoogleAnalyticsPlugin = () => {
+    return {
+      name: "inline-google-analytics",
+      transformIndexHtml(html) {
+        // Skip GA in test mode
+        if (mode === "test") {
+          return html.replace("<!-- google-analytics-js -->", "");
+        }
+
+        const gaScript = `
+          <script async src="https://www.googletagmanager.com/gtag/js?id=${process.env.VITE_GA_MEASUREMENT_ID}"></script>
+          <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.VITE_GA_MEASUREMENT_ID}');
+          </script>
+        `;
+
+        return html.replace("<!-- google-analytics-js -->", gaScript);
+      },
+    };
+  };
+
   return defineConfig({
     server: {
       watch: {
@@ -68,7 +92,8 @@ export default ({ mode }) => {
       mode !== "test" &&
         eslint({ exclude: ["/virtual:/**", "node_modules/**"] }),
       inlineNewRelicPlugin(),
-    ],
+      inlineGoogleAnalyticsPlugin(),
+    ].filter(Boolean),
     build: {
       outDir: "dist",
     },

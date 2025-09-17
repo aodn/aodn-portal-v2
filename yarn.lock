@@ -4919,6 +4919,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/gtag.js@npm:^0.0.20":
+  version: 0.0.20
+  resolution: "@types/gtag.js@npm:0.0.20"
+  checksum: 10c0/eb878aa3cfab6b98f5e69ef3383e9788aaea6a4d0611c72078678374dcbb4731f533ff2bf479a865536f1626a57887b1198279ff35a65d223fe4f93d9c76dbdd
+  languageName: node
+  linkType: hard
+
 "@types/hast@npm:^2.0.0":
   version: 2.3.10
   resolution: "@types/hast@npm:2.3.10"
@@ -6178,6 +6185,7 @@ __metadata:
     "@testing-library/user-event": "npm:^14.5.2"
     "@turf/turf": "npm:7.0.0"
     "@types/dompurify": "npm:^3.2.0"
+    "@types/gtag.js": "npm:^0.0.20"
     "@types/he": "npm:^1"
     "@types/jest": "npm:^29.5.12"
     "@types/lodash": "npm:^4.17.0"
