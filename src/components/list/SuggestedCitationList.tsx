@@ -8,8 +8,8 @@ import { Stack, Typography } from "@mui/material";
 import CopyButton from "../common/buttons/CopyButton";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 import rc8Theme from "../../styles/themeRC8";
+import { AnalyticsEvent } from "../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../analytics/customEventTracker";
-import { CustomEvent } from "../../analytics/constants";
 
 interface SuggestedCitationListProps {
   suggestedCitation: string;
@@ -33,7 +33,7 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
   const handleCopy = useCallback(async () => {
     await copyToClipboard(suggestedCitation);
     // Track copy citation button click
-    trackCustomEvent(CustomEvent.COPY_CITATION_CLICK);
+    trackCustomEvent(AnalyticsEvent.COPY_CITATION_CLICK);
   }, [copyToClipboard, suggestedCitation]);
 
   const suggestedCitationItem = useMemo(

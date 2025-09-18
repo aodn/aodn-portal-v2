@@ -4,6 +4,6 @@
  * Naming Convention:
  * - Use underscores (not hyphens) for GA4 compatibility
  */
-export enum CustomEvent {
+export enum AnalyticsEvent {
   COPY_CITATION_CLICK = "copy_citation_click",
 }

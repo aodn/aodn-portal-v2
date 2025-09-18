@@ -14,7 +14,12 @@ import bannerImage3 from "@/assets/images/banner_image_3.png";
 const renderBannerText = () => {
   return (
     <Box flex={1} mt="-10%">
-      <Stack direction="column" justifyContent="center" alignItems="start">
+      <Stack
+        direction="column"
+        justifyContent="center"
+        alignItems="start"
+        data-testid="hero-text"
+      >
         <Typography
           sx={{
             fontSize: {

@@ -55,6 +55,7 @@ const AODNSiteLogo = () => {
           color={fontColor.blue.dark}
           padding={0}
           paddingLeft={padding.medium}
+          data-testid="aodn-home-link"
         >
           Australian Ocean <br />
           Data Network
