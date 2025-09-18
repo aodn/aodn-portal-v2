@@ -376,9 +376,9 @@ const useWFSDownload = (onCallback?: () => void) => {
             body: JSON.stringify({
               inputs: {
                 uuid: uuid,
-                // start_date: dateRange.start,
-                // end_date: dateRange.end,
-                // multi_polygon: multiPolygon,
+                start_date: dateRange.start,
+                end_date: dateRange.end,
+                multi_polygon: multiPolygon,
                 // fields: [], // TODO: Add fields selection in future
                 layer_name: layerName,
               },
