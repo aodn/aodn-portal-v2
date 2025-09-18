@@ -416,26 +416,19 @@ const SearchPage = () => {
 
   // Analytics tracking effect - monitors URL parameter changes
   useEffect(() => {
-    // Delay execution to avoid React Strict Mode duplicate calls in development
+    // Prevent duplicate analytics calls
+    const currentUrl = location.search;
+    // Check if already processed this URL
+    if (lastProcessedUrl.current === currentUrl) {
+      return;
+    }
+    lastProcessedUrl.current = currentUrl;
+    // Delay execution to avoid React Strict Mode issues
     const timer = setTimeout(() => {
-      const currentUrl = location.search;
-
-      const hasAlreadyProcessedThisUrl =
-        lastProcessedUrl.current === currentUrl;
-      if (hasAlreadyProcessedThisUrl) {
-        return;
-      }
-
-      // Send URL parameters to GA4 analytics using utility function
       trackSearchUrlParameters(currentUrl);
-
-      // Mark this URL as processed to prevent duplicate tracking
-      lastProcessedUrl.current = currentUrl;
     }, 100);
-
-    // Cleanup timer on component unmount or dependency change
     return () => clearTimeout(timer);
-  }, [location?.search]); // Re-run when URL search parameters change
+  }, [location?.search]);
 
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.

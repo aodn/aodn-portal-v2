@@ -1,10 +1,10 @@
-import { CustomEvent } from "./constants";
+import { AnalyticsEvent } from "./analyticsEvents";
 import { trackCustomEvent } from "./customEventTracker";
 
 /**
  * Parameter mapping from URL shortcodes to meaningful names
  */
-const URL_PARAM_MAPPING: Map<string, string> = new Map([
+const URL_PARAM_MAPPING = new Map([
   ["B1", "bbox_bbox"],
   ["B2", "bbox_geometry_type"],
   ["B3", "bbox_geometry_coordinates"],
@@ -27,11 +27,11 @@ const URL_PARAM_MAPPING: Map<string, string> = new Map([
 /**
  * Parse URL search string and convert to meaningful parameter names
  */
-function parseUrlParameters(urlSearch: string): Record<string, string> {
+function parseUrlParameters(urlSearch: string) {
   if (!urlSearch) return {};
 
   const params = new URLSearchParams(urlSearch);
-  const result: Record<string, string> = {};
+  const result: Gtag.CustomParams = {};
 
   // URLSearchParams.entries() returns pairs like ["I2", "false"], ["searchText", "111"]
   // The [key, value] syntax extracts the first element as 'key' and second as 'value'
@@ -47,11 +47,11 @@ function parseUrlParameters(urlSearch: string): Record<string, string> {
 /**
  * Track search URL parameters to analytics
  */
-export function trackSearchUrlParameters(urlSearch: string): void {
+export function trackSearchUrlParameters(urlSearch: string) {
   // Convert URL params like "?I2=false&searchText=111" into object like {has_co_data: "false", search_term: "111"}
   const parameters = parseUrlParameters(urlSearch);
 
   if (Object.keys(parameters).length > 0) {
-    trackCustomEvent(CustomEvent.SEARCH_URL_PARAMS, parameters);
+    trackCustomEvent(AnalyticsEvent.SEARCH_URL_PARAMS, parameters);
   }
 }
