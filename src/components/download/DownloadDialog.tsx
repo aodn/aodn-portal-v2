@@ -7,7 +7,6 @@ import {
   useTheme,
   Divider,
 } from "@mui/material";
-import { useMemo } from "react";
 import DataSelection from "./DataSelection";
 import LicenseContent from "./LicenseContent";
 import { useDownloadDialog } from "../../hooks/useDownloadDialog";
