@@ -6,4 +6,5 @@
  */
 export enum AnalyticsEvent {
   COPY_CITATION_CLICK = "copy_citation_click",
+  PAGE_RESPONSE_TIME = "page_response_time",
 }
