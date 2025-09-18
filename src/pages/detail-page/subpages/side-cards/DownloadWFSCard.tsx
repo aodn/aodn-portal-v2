@@ -111,10 +111,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
   }, []);
 
   const handleDownload = useCallback(async () => {
-    if (!selectedDataItem || !uuid) {
-      console.log("no data item or uuid selected");
-      return;
-    }
+    if (!selectedDataItem || !uuid) return;
+
     if (subsettingSelectionCount < 1) {
       setShowSubsettingMessage(true);
     }

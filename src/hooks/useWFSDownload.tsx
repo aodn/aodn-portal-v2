@@ -346,13 +346,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         // Extract download conditions
         const dateRange = getDateConditionFrom(downloadConditions);
         const multiPolygon = getMultiPolygonFrom(downloadConditions);
-        const format = getFormatFrom(downloadConditions);
-        console.log(
-          "dateRange, polygon, format ===",
-          dateRange,
-          multiPolygon,
-          format
-        );
+        const format = getFormatFrom(downloadConditions); // TODO: currently unused - CSV only for WFS for now
 
         // Set timeout for the entire download operation
         const timeout = import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT;
