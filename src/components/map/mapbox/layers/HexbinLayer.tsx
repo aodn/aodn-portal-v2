@@ -122,10 +122,10 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
       if (overlayRef.current && map?.isStyleLoaded()) {
         map?.removeControl(overlayRef.current);
         overlayRef.current = undefined;
-        if (popupRef.current) {
-          popupRef.current.remove();
-          popupRef.current = null;
-        }
+      }
+      if (popupRef.current) {
+        popupRef.current.remove();
+        popupRef.current = null;
       }
     };
 
@@ -142,6 +142,10 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
       overlayRef.current?.setProps({
         layers: [createHexagonLayer(featureCollection, visible)],
       });
+    }
+    if (popupRef.current) {
+      popupRef.current.remove();
+      popupRef.current = null;
     }
   }, [featureCollection, visible]);
 
