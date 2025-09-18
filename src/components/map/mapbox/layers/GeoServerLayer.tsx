@@ -276,7 +276,83 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       }
     };
 
+    const createLayers = () => {
+      // Check WMS availability before adding the layer
+      if (isWMSAvailable) {
+        // Add the raster layer, do not add any fitBounds here, it makes the map animate strange. Control it at map level
+        if (!map?.getLayer(titleLayerId)) {
+          map?.addLayer({
+            id: titleLayerId,
+            type: "raster",
+            source: sourceLayerId,
+            paint: {
+              // This make sure we can see the rect draw by subsetting.
+              "raster-opacity": 0.6,
+            },
+            layout: {
+              visibility: "none", // By default invisible
+            },
+          });
+        }
+      }
+    };
+
+    const createLayersOnStyleChange = () => {
+      createSource();
+      createLayers();
+    };
+
+    const createLayersOnInit = () => {
+      if (map?.isStyleLoaded()) {
+        createSource();
+        createLayers();
+      }
+    };
+
+    const cleanUp = () => {
+      if (map === null || map === undefined) return;
+      map?.off(MapEventEnum.STYLEDATA, createLayersOnStyleChange);
+      // Important to check this because the map may be unloading and when you try
+      // to access getLayer or similar function, the style will be undefined and throw
+      // exception
+      if (map?.isStyleLoaded()) {
+        if (titleLayerId && map?.getLayer(titleLayerId)) {
+          map?.removeLayer(titleLayerId);
+        }
+      }
+    };
+
+    // Must use idle because the map already loaded if this is not
+    // the default layer
+    map?.once(MapEventEnum.IDLE, createLayersOnInit);
+    map?.on(MapEventEnum.STYLEDATA, createLayersOnStyleChange);
+
+    // Cleanup function
+    return () => {
+      cleanUp();
+    };
+  }, [
+    config.baseUrl,
+    config.maxZoom,
+    config.minZoom,
+    config.tileSize,
+    config.urlParams,
+    isWMSAvailable,
+    map,
+    sourceLayerId,
+    tileUrl,
+    titleLayerId,
+  ]);
+
+  useEffect(() => {
+    const cleanPopup = () => {
+      popupRef.current?.remove();
+      popupRef.current = null;
+    };
+
     const handlePopup = (event: MapMouseEvent) => {
+      if (!map) return;
+
       const feature = mergeWithDefaults(
         geoServerLayerConfig?.baseUrl?.endsWith("ncwms")
           ? DEFAULT_NCWMS_FEATURE_CONFIG
@@ -308,92 +384,46 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             throw new Error(`HTTP error! Status: ${response.status}`);
           return response.text();
         })
-        .then((data) => {
+        .then((htmlString) => {
           cleanPopup();
-          popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
-          popupRef.current.setLngLat(event.lngLat).setHTML(data).addTo(map);
+
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlString, "text/html");
+          if (doc.body.innerHTML.trim() !== "") {
+            popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+            popupRef.current
+              .setLngLat(event.lngLat)
+              .setHTML(htmlString)
+              .addTo(map);
+          }
         })
         .catch((err) => console.error("GetFeatureInfo error:", err));
     };
 
-    const createLayers = (layoutVisible: undefined | boolean) => {
-      // Check WMS availability before adding the layer
-      if (isWMSAvailable && layoutVisible) {
-        // Add the raster layer, do not add any fitBounds here, it makes the map animate strange. Control it at map level
-        if (!map?.getLayer(titleLayerId)) {
-          map?.addLayer({
-            id: titleLayerId,
-            type: "raster",
-            source: sourceLayerId,
-            paint: {
-              // This make sure we can see the rect draw by subsetting.
-              "raster-opacity": 0.6,
-            },
-            layout: {
-              visibility: layoutVisible ? "visible" : "none",
-            },
-          });
-          map.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+    if (map) {
+      // Given the useEffect run in order, the layer creation is call via MapEventEnum.IDLE
+      // so here we need to use MapEventEnum.IDLE too so that it become the next call when
+      // IDLE
+      map.once(MapEventEnum.IDLE, () => {
+        const layer = map?.getLayer(titleLayerId);
+
+        layer &&
+          map.setLayoutProperty(
+            titleLayerId,
+            "visibility",
+            visible ? "visible" : "none"
+          );
+
+        if (visible) {
+          map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
         }
-      }
-    };
-
-    const createLayersOnStyleChange = () => {
-      createSource();
-      createLayers(visible);
-    };
-
-    const createLayersOnInit = () => {
-      if (map?.isStyleLoaded()) {
-        createSource();
-        createLayers(visible);
-      }
-    };
-
-    const cleanPopup = () => {
-      popupRef.current?.remove();
-      popupRef.current = null;
-    };
-
-    const cleanUp = () => {
-      if (map === null || map === undefined) return;
-
-      cleanPopup();
-      map?.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
-      map?.off(MapEventEnum.STYLEDATA, createLayersOnStyleChange);
-      // Important to check this because the map may be unloading and when you try
-      // to access getLayer or similar function, the style will be undefined and throw
-      // exception
-      if (map?.isStyleLoaded()) {
-        if (titleLayerId && map?.getLayer(titleLayerId)) {
-          map?.removeLayer(titleLayerId);
-        }
-      }
-    };
-
-    // Must use idle because the map already loaded if this is not
-    // the default layer
-    map?.once(MapEventEnum.IDLE, createLayersOnInit);
-    map?.on(MapEventEnum.STYLEDATA, createLayersOnStyleChange);
-
-    // Cleanup function
+      });
+    }
     return () => {
-      cleanUp();
+      map?.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+      cleanPopup();
     };
-  }, [
-    config.baseUrl,
-    config.maxZoom,
-    config.minZoom,
-    config.tileSize,
-    config.urlParams,
-    geoServerLayerConfig,
-    isWMSAvailable,
-    map,
-    sourceLayerId,
-    tileUrl,
-    titleLayerId,
-    visible,
-  ]);
+  }, [geoServerLayerConfig, map, titleLayerId, visible]);
 
   return (
     <TestHelper
