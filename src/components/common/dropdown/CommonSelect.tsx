@@ -63,6 +63,7 @@ const DEFAULT_MENU_PROPS = {
 const CommonSelect: FC<CommonSelectProps> = memo(
   ({
     items,
+    value,
     label,
     onSelectCallback,
     disabled = false,
@@ -70,7 +71,7 @@ const CommonSelect: FC<CommonSelectProps> = memo(
     sx,
   }: CommonSelectProps) => {
     const [selectedItem, setSelectedItem] = useState<string | undefined>(
-      items[0]?.value
+      value || items[0]?.value
     );
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -95,7 +96,7 @@ const CommonSelect: FC<CommonSelectProps> = memo(
       <FormControl fullWidth data-testid={dataTestId} disabled={disabled}>
         {label && <FormLabel>{label}</FormLabel>}
         <Select
-          value={selectedItem}
+          value={value || selectedItem}
           onOpen={handleOpenState(true)}
           onClose={handleOpenState(false)}
           open={isOpen}
