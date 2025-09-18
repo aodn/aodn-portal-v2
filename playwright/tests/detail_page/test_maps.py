@@ -118,6 +118,8 @@ def test_map_shows_geoserver_layer_when_wms_link_present(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    detail_page.detail_map.wait_for_map_loading()
+
     expect(detail_page.wms_link_header).to_be_visible()
     expect(
         detail_page.detail_map.map_preview_not_available_announcement
@@ -156,6 +158,8 @@ def test_map_not_showing_geoserver_layer_preview_when_wms_link_absent(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    detail_page.detail_map.wait_for_map_loading()
+
     expect(detail_page.wms_link_header).not_to_be_visible()
     expect(
         detail_page.detail_map.map_preview_not_available_announcement
@@ -165,40 +169,33 @@ def test_map_not_showing_geoserver_layer_preview_when_wms_link_absent(
     layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)
     assert detail_page.detail_map.is_map_layer_visible(layer_id) is False
 
+
 @pytest.mark.parametrize(
     'uuid',
     [
         '0015db7e-e684-7548-e053-08114f8cd4ad',  # This dataset includes a link with rel="summary"
     ],
 )
-def test_map_shows_hexbin_and_symbol_layers(
-    responsive_page: Page, uuid: str
-) -> None:
+def test_map_shows_hexgrid_layer(responsive_page: Page, uuid: str) -> None:
     """
-    This test uses a dataset specifically chosen to include a summary link and verifies
-    that both Hexbin can be previewed and toggled on the map.
+    This test uses a dataset specifically chosen to include a summary link
+    and verifies that the Hex Grid layer appears on the map.
 
     This test ensures that:
-    1. Both Hexbin options are displayed in the layers menu
-    2. The Hexbin layer is added to the map and is visible by default
+    1. The Hex Grid layer option is displayed in the layers menu
+    2. The Hex Grid layer is added to the map and is visible by default
     """
     detail_page = DetailPage(responsive_page)
 
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    # wait for 10 seconds to ensure everything loads
-    detail_page.wait_for_timeout(10000)
-    detail_page.detail_map.layers_menu.click()
-    # Ensure both Hexbin options are displayed in the layers menu
-    expect(detail_page.detail_map.hexbin_layer).to_be_visible()
+    detail_page.detail_map.wait_for_map_loading()
 
-# Verify that the Hexbin layer is present and visible on the map
-    layer_id = layer_factory.get_layer_id(LayerType.HEXBIN)
+    detail_page.detail_map.layers_menu.click()
+    # Ensure that the Hex Grid option is displayed in the layers menu
+    expect(detail_page.detail_map.hex_grid_layer).to_be_visible()
+
+    # Verify that the Hex Grid layer is present and visible on the map
+    layer_id = layer_factory.get_layer_id(LayerType.HEX_GRID)
     assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
-    assert (
-        detail_page.detail_map.is_map_layer_visible(
-            layer_id, is_map_loading=False
-        )
-        is True
-    )

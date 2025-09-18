@@ -443,7 +443,7 @@
       "rel": "wms",
       "type": "",
       "title": "aodn:aodn_wave_nrt_v2_timeseries_map",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access > wms"
     },
     {
       "href": "/metadata/8edf509b-1481-48fd-b9c5-b95b42247f82",

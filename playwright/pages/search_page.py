@@ -1,4 +1,4 @@
-from playwright.sync_api import Locator, Page, TimeoutError
+from playwright.sync_api import Locator, Page
 
 from core.dataclasses.search_filter import SearchFilterConfig
 from core.factories.search_filter_validator_factory import (
@@ -41,10 +41,10 @@ class SearchPage(BasePage):
         # buttons
         self.result_sort_button = self.get_by_id('result-sort-button')
         self.result_view_button = self.get_by_id('result-layout-button')
-        self.list_and_map_view_button = self.get_text('List and Map')
-        self.grid_and_map_view_button = self.get_text('Grid and Map')
-        self.full_map_view_button = self.get_text('Full Map View')
-        self.full_list_view_button = self.get_text('Full List View')
+        self.list_and_map_view_button = page.get_by_test_id('menuitem-LIST')
+        self.grid_and_map_view_button = page.get_by_test_id('menuitem-GRID')
+        self.full_map_view_button = page.get_by_test_id('menuitem-FULL_MAP')
+        self.full_list_view_button = page.get_by_test_id('menuitem-FULL_LIST')
         self.map_toggle_button = self.get_by_id('map-toggle-control-button')
         self.show_more_results = self.get_by_id(
             'result-card-load-more-btn'
@@ -52,27 +52,11 @@ class SearchPage(BasePage):
 
     def wait_for_search_to_complete(self) -> None:
         """
-        Waits for the search loading indicator to disappear, handling the case
-        where it may appear twice. This function waits for the indicator to
-        become hidden, and if it reappears, it waits again until it disappears.
+        Waits for the search results to finish loading.
+        Since the data is mocked, loading is typically very fast.
+        This method simply adds a short delay to ensure UI stability.
         """
-        try:
-            self.loading.wait_for(state='visible', timeout=2000)
-        except TimeoutError:
-            # If the loading indicator doesn't appear within the timeout,
-            # assume the search is complete and ignore the exception.
-            pass
-
-        self.loading.wait_for(state='hidden', timeout=30 * 1000)
-
-        # Handle the case when loading indicator appears twice
-        try:
-            self.loading.wait_for(state='visible', timeout=1000)
-            self.loading.wait_for(state='hidden', timeout=30 * 1000)
-        except TimeoutError:
-            # If the loading indicator doesn't reappear within the timeout,
-            # assume the search is complete and ignore the exception.
-            pass
+        self.page.wait_for_timeout(100)
 
     def click_dataset(self, title: str) -> None:
         """Click on the given dataset title"""

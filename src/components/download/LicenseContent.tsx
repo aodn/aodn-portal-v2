@@ -4,6 +4,8 @@ import CopyButton from "../../components/common/buttons/CopyButton";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 import { ContentCopyIcon } from "../../assets/icons/download/contentCopy";
 import rc8Theme from "../../styles/themeRC8";
+import { trackCustomEvent } from "../../analytics/customEventTracker";
+import { AnalyticsEvent } from "../../analytics/analyticsEvents";
 
 const LicenseContent = () => {
   const { checkIfCopied, copyToClipboard } = useDetailPageContext();
@@ -23,6 +25,8 @@ const LicenseContent = () => {
 
   const handleCopy = useCallback(async () => {
     await copyToClipboard(citationText);
+    // Track copy citation button click
+    trackCustomEvent(AnalyticsEvent.COPY_CITATION_CLICK);
   }, [copyToClipboard, citationText]);
 
   const commonBodyStyles = {

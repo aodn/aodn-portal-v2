@@ -325,7 +325,10 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             id: titleLayerId,
             type: "raster",
             source: sourceLayerId,
-            paint: {},
+            paint: {
+              // This make sure we can see the rect draw by subsetting.
+              "raster-opacity": 0.6,
+            },
             layout: {
               visibility: layoutVisible ? "visible" : "none",
             },

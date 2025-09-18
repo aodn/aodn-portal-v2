@@ -11,6 +11,7 @@ from mocks.api.collections import (
     handle_collections_centroid_api,
     handle_collections_popup_api,
 )
+from mocks.api.geowebcache import handle_geowebcache_api
 from mocks.api.search_collections import (
     handle_provider_api,
     handle_temporal_api,
@@ -35,3 +36,4 @@ def apply_mock(page: Page) -> None:
     api_router.route_collection_detail(
         handle_detail_api, handle_detail_item_api
     )
+    api_router.route_geowebcache(handle_geowebcache_api)

@@ -30,10 +30,11 @@ class Map(BasePage):
             'reference-show-hide-menu-button'
         )
         self.layers_menu = self.get_by_id('layer-show-hide-menu-button')
-        self.hexbin_layer = page.get_by_role('radio', name='Hex Grid')
-        self.symbol_layer = page.get_by_role('radio', name='Symbol')
+        self.hex_grid_layer = page.get_by_role('radio', name='Hex Grid')
         self.geoserver_layer = page.get_by_role('radio', name='GeoServer')
-        self.spatial_extent_layer = page.get_by_role("radio", name="Spatial Extent")
+        self.spatial_extent_layer = page.get_by_role(
+            'radio', name='Spatial Extent'
+        )
 
         self.daterange_show_hide_menu_button = page.get_by_test_id(
             'daterange-show-hide-menu-button'
@@ -122,6 +123,7 @@ class Map(BasePage):
 
     def wait_for_map_loading(self) -> None:
         """Wait until the map is fully loaded"""
+        self.page.wait_for_selector(f'#{self.map_id}', state='attached')
         wait_for_js_function(self.page, 'isMapLoaded', 20000, self.map_id)
 
     def click_map(self) -> None:
@@ -164,8 +166,8 @@ class Map(BasePage):
             'getGeoServerLayer', is_map_loading=False
         )
 
-    def get_Hexbin_Layer_id(self) -> str:
-        """Get the Hexbin layer id"""
+    def get_Hex_Grid_Layer_id(self) -> str:
+        """Get the Hex Grid layer id"""
         return self.get_layer_id_from_test_props(
             'getHexbinLayer', is_map_loading=False
         )
