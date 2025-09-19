@@ -40,6 +40,7 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
       onMouseEnter={() => setHoverOnContainer(true)}
       onMouseLeave={() => setHoverOnContainer(false)}
       sx={{
+        width: "100%",
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
@@ -95,9 +96,9 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
             }}
           >
             <Typography
-              variant="title1Medium"
-              color={rc8Theme.palette.primary.main}
               sx={{
+                ...rc8Theme.typography.title1Medium,
+                color: rc8Theme.palette.primary.main,
                 padding: 0,
                 overflowWrap: "break-word",
                 textOverflow: "ellipsis",
