@@ -22,6 +22,7 @@ import {
 import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { DatasetDownloadRequest } from "../../../pages/detail-page/context/DownloadDefinitions";
+import { trackSearchUrlParameters } from "../../../analytics/searchParamsEvent";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -114,6 +115,13 @@ const searchResult = async (
 
   if (param.sortby !== undefined && param.sortby.length !== 0) {
     p.sortby = param.sortby;
+  }
+
+  // Track analytics only for list searches to avoid duplicate events
+  // Map searches always use "id,centroid" properties
+  if (param.properties !== "id,centroid") {
+    // Track search page url parameters
+    trackSearchUrlParameters(param);
   }
 
   return axios
