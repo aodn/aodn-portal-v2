@@ -117,8 +117,12 @@ const searchResult = async (
     p.sortby = param.sortby;
   }
 
-  // Track search page url parameters
-  trackSearchUrlParameters(param);
+  // Track analytics only for list searches to avoid duplicate events
+  // Map searches always use "id,centroid" properties
+  if (param.properties !== "id,centroid") {
+    // Track search page url parameters
+    trackSearchUrlParameters(param);
+  }
 
   return axios
     .get<string>("/api/v1/ogc/collections", {
