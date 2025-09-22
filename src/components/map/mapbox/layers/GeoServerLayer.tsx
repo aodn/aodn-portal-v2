@@ -360,11 +360,15 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
           cleanPopup();
           if (response.featureInfo?.length !== 0) {
             const popupContainer = document.createElement("div");
+            // Some content from server is super long
+            popupContainer.style.overflow = "auto";
+            popupContainer.style.maxHeight =
+              MapDefaultConfig.DEFAULT_POPUP.maxWidth || "300px";
+
             if (response.html) {
-              const html = response.html;
-              popupContainer.style.overflow = "auto";
-              popupContainer.style.maxHeight = "200px";
-              popupContainer.innerHTML = html;
+              // The server can return html directly, so we can only use it
+              // which restricted our formatting
+              popupContainer.innerHTML = response.html;
             } else {
               if (popupRootRef.current === null) {
                 popupRootRef.current = createRoot(popupContainer);
@@ -376,7 +380,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
               popupRef.current
                 .setLngLat(event.lngLat)
-                .setMaxWidth("300px")
                 .setDOMContent(popupContainer)
                 .addTo(map);
             }, 100);
