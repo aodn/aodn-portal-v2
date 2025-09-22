@@ -385,7 +385,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             }, 100);
           }
         })
-        .catch((err) => console.error("GetFeatureInfo error:", err));
+        .catch((err) => console.error("Popup:", err));
     };
 
     if (map) {
