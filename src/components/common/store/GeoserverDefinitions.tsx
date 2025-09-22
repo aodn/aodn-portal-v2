@@ -17,12 +17,9 @@ export type MapFeatureResponse = {
   jIndex: number;
   gridCentreLon: number;
   gridCentreLat: number;
+  html?: string;
   featureInfo?: Array<{
     time?: Date;
     value?: number;
-    platformNumber?: string;
-    dataCentre?: string;
-    profileProcessingMode?: string;
-    oxygenSensorOnFloat?: boolean;
   }>;
 };

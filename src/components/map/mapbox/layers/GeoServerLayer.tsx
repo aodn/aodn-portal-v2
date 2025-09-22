@@ -334,26 +334,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                   Value: {value.value}
                 </Typography>
               )}
-              {value.platformNumber && (
-                <Typography component="div" variant="body3Small">
-                  Platform: {value.platformNumber}
-                </Typography>
-              )}
-              {value.dataCentre && (
-                <Typography component="div" variant="body3Small">
-                  Data centre: {value.dataCentre}
-                </Typography>
-              )}
-              {value.profileProcessingMode && (
-                <Typography component="div" variant="body3Small">
-                  Processing mode: {value.profileProcessingMode}
-                </Typography>
-              )}
-              {value.oxygenSensorOnFloat && (
-                <Typography component="div" variant="body3Small">
-                  Oxygen sensor on float: {value.oxygenSensorOnFloat}
-                </Typography>
-              )}
             </CardContent>
           ))}
         </>
@@ -384,15 +364,29 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             if (popupRootRef.current === null) {
               popupRootRef.current = createRoot(popupContainer);
             }
-            popupRootRef.current?.render(popupContent(response));
-            setTimeout(() => {
-              // Give time for root render then popup can cal the position
-              popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
-              popupRef.current
-                .setLngLat(event.lngLat)
-                .setDOMContent(popupContainer)
-                .addTo(map);
-            }, 100);
+            if (response.html) {
+              const html = response.html;
+              setTimeout(() => {
+                // Give time for root render then popup can cal the position
+                popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+                popupRef.current
+                  .setLngLat(event.lngLat)
+                  .setHTML(
+                    `<div style={{overflow: "auto", maxWidth: "200px", maxHeight: "200px", display: "block"}}>${html}</div>`
+                  )
+                  .addTo(map);
+              }, 100);
+            } else {
+              popupRootRef.current?.render(popupContent(response));
+              setTimeout(() => {
+                // Give time for root render then popup can cal the position
+                popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+                popupRef.current
+                  .setLngLat(event.lngLat)
+                  .setDOMContent(popupContainer)
+                  .addTo(map);
+              }, 100);
+            }
           }
         })
         .catch((err) => console.error("GetFeatureInfo error:", err));
