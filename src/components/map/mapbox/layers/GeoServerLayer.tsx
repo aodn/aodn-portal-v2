@@ -7,6 +7,14 @@ import { MapDefaultConfig, MapEventEnum } from "../constants";
 import { Position } from "geojson";
 import { TestHelper } from "../../../common/test/helper";
 import { MapMouseEvent, MapMouseEventType, Popup } from "mapbox-gl";
+import {
+  MapFeatureRequest,
+  MapFeatureResponse,
+} from "../../../common/store/GeoserverDefinitions";
+import { useAppDispatch } from "../../../common/store/hooks";
+import { fetchMapFeature } from "../../../common/store/searchReducer";
+import { CardContent, Typography } from "@mui/material";
+import { createRoot, Root } from "react-dom/client";
 
 interface UrlParams {
   LAYERS: string[];
@@ -36,6 +44,7 @@ interface UrlParams {
 
 interface GeoServerLayerConfig {
   urlParams: UrlParams;
+  uuid: string;
   baseUrl: string;
   tileSize: number;
   minZoom: number;
@@ -71,36 +80,7 @@ const DEFAULT_WMS_MAP_CONFIG: GeoServerLayerConfig = {
     WIDTH: 256,
     HEIGHT: 256,
   },
-  baseUrl: "",
-  tileSize: 256,
-  minZoom: MapDefaultConfig.MIN_ZOOM,
-  maxZoom: MapDefaultConfig.MAX_ZOOM,
-  bbox: [
-    MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
-    MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
-    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
-    MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
-  ],
-  opacity: 1.0,
-};
-
-const DEFAULT_WMS_FEATURE_CONFIG: GeoServerLayerConfig = {
-  urlParams: {
-    LAYERS: [],
-    TRANSPARENT: "TRUE",
-    VERSION: "1.1.1",
-    FORMAT: "text/html",
-    EXCEPTIONS: "application/vnd.ogc.se_xml",
-    TILED: "true",
-    SERVICE: "WMS",
-    REQUEST: "GetFeatureInfo",
-    STYLES: "",
-    QUERYABLE: "true",
-    SRS: "EPSG:4326", // This is the support from Geoserver which matches mapbox coordinate
-    INFO_FORMAT: "text/html",
-    FEATURE_COUNT: 100,
-    BUFFER: 10,
-  },
+  uuid: "",
   baseUrl: "",
   tileSize: 256,
   minZoom: MapDefaultConfig.MIN_ZOOM,
@@ -135,36 +115,7 @@ const DEFAULT_NCWMS_MAP_CONFIG: GeoServerLayerConfig = {
     WIDTH: 256,
     HEIGHT: 256,
   },
-  baseUrl: "",
-  tileSize: 256,
-  minZoom: MapDefaultConfig.MIN_ZOOM,
-  maxZoom: MapDefaultConfig.MAX_ZOOM,
-  bbox: [
-    MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
-    MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
-    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
-    MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
-  ],
-  opacity: 1.0,
-};
-
-const DEFAULT_NCWMS_FEATURE_CONFIG: GeoServerLayerConfig = {
-  urlParams: {
-    LAYERS: [],
-    TRANSPARENT: "TRUE",
-    VERSION: "1.3.0",
-    FORMAT: "text/xml",
-    EXCEPTIONS: "application/vnd.ogc.se_xml",
-    TILED: "true",
-    SERVICE: "ncwms",
-    REQUEST: "GetFeatureInfo",
-    STYLES: "",
-    QUERYABLE: "true",
-    CRS: "EPSG:3857",
-    INFO_FORMAT: "text/xml",
-    FEATURE_COUNT: 100,
-    BUFFER: 10,
-  },
+  uuid: "",
   baseUrl: "",
   tileSize: 256,
   minZoom: MapDefaultConfig.MIN_ZOOM,
@@ -214,13 +165,17 @@ const checkWMSAvailability = (
   return true;
 };
 
+const popupContainer = document.createElement("div");
+
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
   geoServerLayerConfig,
   onWMSAvailabilityChange,
   visible,
 }: GeoServerLayerProps) => {
   const { map } = useContext(MapContext);
+  const dispatch = useAppDispatch();
   const popupRef = useRef<Popup | null>();
+  const popupRootRef = useRef<Root | null>();
 
   const [titleLayerId, sourceLayerId] = useMemo(() => {
     const layerId = getLayerId(map?.getContainer().id);
@@ -345,56 +300,99 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   ]);
 
   useEffect(() => {
+    // Create a temporary div for React rendering
+
     const cleanPopup = () => {
+      popupRootRef.current?.unmount();
+      popupRootRef.current = null;
       popupRef.current?.remove();
       popupRef.current = null;
+    };
+
+    const popupContent = (c: MapFeatureResponse) => {
+      return (
+        <>
+          {c.longitude && c.longitude && (
+            <CardContent>
+              <Typography component="div" variant="body3Small">
+                Latitude: {c.latitude}
+              </Typography>
+              <Typography component="div" variant="body3Small">
+                Longitude: {c.longitude}
+              </Typography>
+            </CardContent>
+          )}
+          {c.featureInfo?.map((value, index) => (
+            <CardContent key={index}>
+              {value.time && (
+                <Typography component="div" variant="body3Small">
+                  Time: {value.time.toString()}
+                </Typography>
+              )}
+              {value.value && (
+                <Typography component="div" variant="body3Small">
+                  Value: {value.value}
+                </Typography>
+              )}
+              {value.platformNumber && (
+                <Typography component="div" variant="body3Small">
+                  Platform: {value.platformNumber}
+                </Typography>
+              )}
+              {value.dataCentre && (
+                <Typography component="div" variant="body3Small">
+                  Data centre: {value.dataCentre}
+                </Typography>
+              )}
+              {value.profileProcessingMode && (
+                <Typography component="div" variant="body3Small">
+                  Processing mode: {value.profileProcessingMode}
+                </Typography>
+              )}
+              {value.oxygenSensorOnFloat && (
+                <Typography component="div" variant="body3Small">
+                  Oxygen sensor on float: {value.oxygenSensorOnFloat}
+                </Typography>
+              )}
+            </CardContent>
+          ))}
+        </>
+      );
     };
 
     const handlePopup = (event: MapMouseEvent) => {
       if (!map) return;
 
-      const feature = mergeWithDefaults(
-        geoServerLayerConfig?.baseUrl?.endsWith("ncwms")
-          ? DEFAULT_NCWMS_FEATURE_CONFIG
-          : DEFAULT_WMS_FEATURE_CONFIG,
-        geoServerLayerConfig
-      );
+      const request: MapFeatureRequest = {
+        uuid: geoServerLayerConfig?.uuid || "",
+        layerName: geoServerLayerConfig?.urlParams?.LAYERS.join(",") || "",
+        width: map.getCanvas().width,
+        height: map.getCanvas().height,
+        // Protocol 1.3.0 use I J instead of X Y
+        i: Math.round(event.point.x),
+        x: Math.round(event.point.x),
+        j: Math.round(event.point.y),
+        y: Math.round(event.point.y),
+        bbox: map.getBounds()?.toArray().flat().join(","),
+      };
 
-      feature.urlParams.WIDTH = map.getCanvas().width;
-      feature.urlParams.HEIGHT = map.getCanvas().height;
-
-      // Protocol 1.3.0 use I J instead of X Y
-      feature.urlParams.I = Math.round(event.point.x);
-      feature.urlParams.J = Math.round(event.point.y);
-      feature.urlParams.X = Math.round(event.point.x);
-      feature.urlParams.Y = Math.round(event.point.y);
-
-      feature.urlParams.QUERY_LAYERS = feature?.urlParams?.LAYERS;
-      // URL already specify the CRS/SRS to match mapbox so no need to do projection on bounds
-      feature.urlParams.BBOX = map.getBounds()?.toArray().flat().join(","); // LngLatBounds
-
-      const featureUrl = formatToUrl<UrlParams>(
-        applyGeoWebCacheIfPossible(feature.baseUrl, feature.urlParams)
-      );
-
-      console.log(featureUrl);
-      fetch(featureUrl)
+      dispatch(fetchMapFeature(request))
+        .unwrap()
         .then((response) => {
-          if (!response.ok)
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          return response.text();
-        })
-        .then((htmlString) => {
           cleanPopup();
-
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(htmlString, "text/html");
-          if (doc.body.innerHTML.trim() !== "") {
-            popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
-            popupRef.current
-              .setLngLat(event.lngLat)
-              .setHTML(htmlString)
-              .addTo(map);
+          if (response.featureInfo?.length !== 0) {
+            if (popupRootRef.current === null) {
+              popupRootRef.current = createRoot(popupContainer);
+            }
+            popupRootRef.current?.render(popupContent(response));
+            setTimeout(() => {
+              // Give time for root render then popup can cal the position
+              popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+              popupRef.current
+                .setLngLat(event.lngLat)
+                .setDOMContent(popupContainer)
+                .addTo(map);
+            }, 100);
           }
         })
         .catch((err) => console.error("GetFeatureInfo error:", err));
@@ -406,16 +404,22 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       // IDLE
       map.once(MapEventEnum.IDLE, () => {
         const layer = map?.getLayer(titleLayerId);
+        if (layer) {
+          const vis = map.getLayoutProperty(titleLayerId, "visibility");
+          const targetVis = visible ? "visible" : "none";
 
-        layer &&
-          map.setLayoutProperty(
-            titleLayerId,
-            "visibility",
-            visible ? "visible" : "none"
-          );
+          if (vis !== targetVis) {
+            // Need update if value diff, this is used to avoid duplicate call to useEffect
+            map.setLayoutProperty(
+              titleLayerId,
+              "visibility",
+              visible ? "visible" : "none"
+            );
 
-        if (visible) {
-          map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+            if (visible) {
+              map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+            }
+          }
         }
       });
     }
@@ -423,7 +427,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       map?.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
       cleanPopup();
     };
-  }, [geoServerLayerConfig, map, titleLayerId, visible]);
+  }, [dispatch, geoServerLayerConfig, map, titleLayerId, visible]);
 
   return (
     <TestHelper

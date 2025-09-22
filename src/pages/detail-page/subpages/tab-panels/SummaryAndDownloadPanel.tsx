@@ -353,6 +353,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                     <GeoServerLayer
                       geoServerLayerConfig={{
+                        uuid: collection.id,
                         baseUrl: ensureHttps(getWMSServer(collection)[0]),
                         urlParams: { LAYERS: getWMSLayerNames(collection) },
                       }}
