@@ -165,8 +165,6 @@ const checkWMSAvailability = (
   return true;
 };
 
-const popupContainer = document.createElement("div");
-
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
   geoServerLayerConfig,
   onWMSAvailabilityChange,
@@ -361,32 +359,27 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         .then((response) => {
           cleanPopup();
           if (response.featureInfo?.length !== 0) {
-            if (popupRootRef.current === null) {
-              popupRootRef.current = createRoot(popupContainer);
-            }
+            const popupContainer = document.createElement("div");
             if (response.html) {
               const html = response.html;
-              setTimeout(() => {
-                // Give time for root render then popup can cal the position
-                popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
-                popupRef.current
-                  .setLngLat(event.lngLat)
-                  .setHTML(
-                    `<div style={{overflow: "auto", maxWidth: "200px", maxHeight: "200px", display: "block"}}>${html}</div>`
-                  )
-                  .addTo(map);
-              }, 100);
+              popupContainer.style.overflow = "auto";
+              popupContainer.style.maxHeight = "200px";
+              popupContainer.innerHTML = html;
             } else {
+              if (popupRootRef.current === null) {
+                popupRootRef.current = createRoot(popupContainer);
+              }
               popupRootRef.current?.render(popupContent(response));
-              setTimeout(() => {
-                // Give time for root render then popup can cal the position
-                popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
-                popupRef.current
-                  .setLngLat(event.lngLat)
-                  .setDOMContent(popupContainer)
-                  .addTo(map);
-              }, 100);
             }
+            setTimeout(() => {
+              // Give time for root render then popup can cal the position
+              popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+              popupRef.current
+                .setLngLat(event.lngLat)
+                .setMaxWidth("300px")
+                .setDOMContent(popupContainer)
+                .addTo(map);
+            }, 100);
           }
         })
         .catch((err) => console.error("GetFeatureInfo error:", err));
