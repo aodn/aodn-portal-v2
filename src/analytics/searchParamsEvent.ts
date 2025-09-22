@@ -3,7 +3,7 @@ import { trackCustomEvent } from "./customEventTracker";
 import { SearchParameters } from "../components/common/store/searchReducer";
 
 /**
- * Track search parameters at the API call level
+ * Track search parameters at the API call level with session-based deduplication
  *
  * INPUT EXAMPLE:
  * {
@@ -18,31 +18,47 @@ import { SearchParameters } from "../components/common/store/searchReducer";
  *   "has_co_data": "true"
  * }
  */
-export function trackSearchUrlParameters(
-  searchParams: SearchParameters & { signal?: AbortSignal }
-) {
-  const { text, filter } = searchParams;
-  const analyticsParams: Gtag.CustomParams = {};
-
-  // Extract search text
-  if (text) {
-    analyticsParams.search_text = String(text);
+export function trackSearchUrlParameters(searchParams: SearchParameters) {
+  // Skip list searches
+  if (searchParams.properties !== "id,centroid") {
+    return;
   }
 
-  // Extract bbox and CO data from filter
-  if (filter) {
-    const bboxMatch = filter.match(/BBOX\(geometry,([-\d.,]+)\)/);
+  // Create unique key for this search
+  const searchKey = `${searchParams.text || ""}_${searchParams.sortby || ""}`;
+
+  // Check if already tracked in this session
+  const lastTracked = sessionStorage.getItem("lastSearch") || "";
+  if (searchKey === lastTracked) {
+    return;
+  }
+
+  // Remember this search
+  sessionStorage.setItem("lastSearch", searchKey);
+
+  // Prepare analytics data
+  const analyticsData: Gtag.CustomParams = {};
+
+  if (searchParams.text) {
+    analyticsData.search_text = String(searchParams.text);
+  }
+
+  if (searchParams.filter) {
+    const bboxMatch = searchParams.filter.match(/BBOX\(geometry,([-\d.,]+)\)/);
     if (bboxMatch) {
-      analyticsParams.bbox = bboxMatch[1];
+      analyticsData.bbox = bboxMatch[1];
     }
 
-    analyticsParams.has_co_data = filter.includes("assets_summary IS NOT NULL")
+    analyticsData.has_co_data = searchParams.filter.includes(
+      "assets_summary IS NOT NULL"
+    )
       ? "true"
       : "false";
   }
 
-  // Send to GA4 if we have data
-  if (Object.keys(analyticsParams).length > 0) {
-    trackCustomEvent(AnalyticsEvent.SEARCH_URL_PARAMS, analyticsParams);
+  // Send to analytics
+  if (Object.keys(analyticsData).length > 0) {
+    console.log("🚀 ~ trackSearchUrlParameters ~ searchParams:", searchParams);
+    trackCustomEvent(AnalyticsEvent.SEARCH_URL_PARAMS, analyticsData);
   }
 }
