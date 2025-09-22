@@ -58,7 +58,7 @@ export function trackSearchUrlParameters(searchParams: SearchParameters) {
 
   // Send to analytics
   if (Object.keys(analyticsData).length > 0) {
-    console.log("🚀 ~ trackSearchUrlParameters ~ searchParams:", searchParams);
+    // console.log("🚀 ~ trackSearchUrlParameters ~ searchParams:", searchParams);
     trackCustomEvent(AnalyticsEvent.SEARCH_URL_PARAMS, analyticsData);
   }
 }
