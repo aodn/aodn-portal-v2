@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { openInNewTab } from "../../../utils/LinkUtils";
 import HeaderMenu, { HeaderMenuStyle } from "../components/HeaderMenu";
 import { userEvent } from "@testing-library/user-event";
@@ -22,27 +22,28 @@ describe("HeaderMenu", () => {
       expect(screen.getByText("Resources")).toBeInTheDocument();
     });
 
-    it("calls openInNewTab when an About Us item is clicked", async () => {
+    it("calls openInNewTab when an About Us item is clicked", () => {
       const user = userEvent.setup();
       render(<HeaderMenu menuStyle={HeaderMenuStyle.DROPDOWN_MENU} />);
 
       // Find and click the "About Us" button to open dropdown
       const aboutUsButton = screen.getByText("About Us");
-      await user.click(aboutUsButton);
+      user.click(aboutUsButton);
 
       // Wait for dropdown menu to appear and find "About IMOS" item
-      const aboutImosItem = await waitFor(
-        () => screen.findByText("About IMOS"),
-        { timeout: 5000 }
-      );
+      return waitFor(() => screen.findByText("About IMOS"), {
+        timeout: 5000,
+      }).then(() => {
+        const aboutImosItem = screen.getByText("About IMOS");
+        expect(aboutImosItem).toBeInTheDocument();
 
-      expect(aboutImosItem).toBeInTheDocument();
-
-      // Click the "About IMOS" menu item
-      await user.click(aboutImosItem);
-
-      // Check if openInNewTab was called with the correct URL
-      expect(openInNewTab).toHaveBeenCalledWith("https://imos.org.au/");
+        // Click the "About IMOS" menu item
+        user.click(aboutImosItem);
+        // Check if openInNewTab was called with the correct URL
+        return waitFor(() =>
+          expect(openInNewTab).toHaveBeenCalledWith("https://imos.org.au/")
+        );
+      });
     });
   });
 

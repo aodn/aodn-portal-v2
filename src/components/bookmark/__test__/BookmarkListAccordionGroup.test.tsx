@@ -13,6 +13,9 @@ import { userEvent } from "@testing-library/user-event";
 import { server } from "../../../__mocks__/server";
 import * as bookmarkListReducer from "../../common/store/bookmarkListReducer";
 import { COLLECTIONS_WAVE } from "../../../__mocks__/data/COLLECTIONS_WAVE";
+import fs from "fs/promises";
+import path from "path";
+import { marineParkDefault } from "../../common/constants";
 
 // Mock the OGCCollection item
 const item1 = {
@@ -42,6 +45,11 @@ const item3 = {
 const collection1: OGCCollection = Object.assign(new OGCCollection(), item1);
 const collection2: OGCCollection = Object.assign(new OGCCollection(), item2);
 const collection3: OGCCollection = Object.assign(new OGCCollection(), item3);
+
+const geoJsonPath = path.resolve(
+  __dirname,
+  `../../../public/${marineParkDefault.geojson}`
+);
 
 // Mock the local store, so that bookmarkListReducer save value to Record instead of the window store
 const localStorageMock = (() => {
@@ -76,6 +84,17 @@ describe("Bookmark List Accordion Group", () => {
   beforeAll(() => {
     server.listen();
     mockInitialize = vi.spyOn(bookmarkListReducer, "initializeBookmarkList");
+    // Mock fetch globally
+    vi.spyOn(global, "fetch").mockImplementation(async (url) => {
+      if (url?.toString().includes(marineParkDefault.geojson)) {
+        const fileContent = await fs.readFile(geoJsonPath, "utf-8");
+        return new Response(fileContent, {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      throw new Error(`Unexpected fetch URL: ${url}`);
+    });
   });
 
   beforeEach(() => {
