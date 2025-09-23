@@ -22,6 +22,7 @@ import {
 import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { DatasetDownloadRequest } from "../../../pages/detail-page/context/DownloadDefinitions";
+import { MapFeatureRequest, MapFeatureResponse } from "./GeoserverDefinitions";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -305,6 +306,19 @@ const searcher = createSlice({
   },
 });
 
+const fetchMapFeature = createAsyncThunk<
+  MapFeatureResponse,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>("geoserver/fetchMapFeature", (request: MapFeatureRequest, thunkApi: any) => {
+  return axios
+    .get<MapFeatureResponse>(
+      `/api/v1/ogc/collections/${request.uuid}/items/wms_map_feature`,
+      { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+    )
+    .then((response) => response.data)
+    .catch(errorHandling(thunkApi));
+});
 /**
  * Appends a filter condition using AND operation.
  */
@@ -453,6 +467,7 @@ export {
   fetchResultByUuidNoStore,
   fetchFeaturesByUuid,
   fetchParameterVocabsWithStore,
+  fetchMapFeature,
   processDatasetDownload,
   jsonToOGCCollections,
 };

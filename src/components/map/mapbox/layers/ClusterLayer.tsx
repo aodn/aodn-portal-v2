@@ -19,7 +19,7 @@ import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
 import { FeatureCollection, Point } from "geojson";
-import { MapDefaultConfig } from "../constants";
+import { MapDefaultConfig, MapEventEnum } from "../constants";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
 import CardPopup from "../component/CardPopup";
@@ -219,11 +219,11 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       map?.on("mouseleave", unclusterPointLayer, defaultMouseLeaveEventHandler);
     };
 
-    map?.once("idle", createLayers);
+    map?.once(MapEventEnum.IDLE, createLayers);
 
     // When user change the map style, for example change base map, all layer will be removed
     // as per mapbox design, we need to listen to that even and add back the layer
-    map?.on("styledata", createLayers);
+    map?.on(MapEventEnum.STYLEDATA, createLayers);
 
     return () => {
       map?.off("mouseenter", clusterLayer, defaultMouseEnterEventHandler);
@@ -280,9 +280,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   useEffect(() => {
     updateSource();
-    map?.on("styledata", updateSource);
+    map?.on(MapEventEnum.STYLEDATA, updateSource);
     return () => {
-      map?.off("styledata", updateSource);
+      map?.off(MapEventEnum.STYLEDATA, updateSource);
     };
   }, [map, updateSource]);
 
