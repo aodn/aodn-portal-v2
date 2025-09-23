@@ -5,9 +5,11 @@ import {
   ListItem as MuiListItem,
   ListItemText,
   Link as MuiLink,
+  Stack,
 } from "@mui/material";
 import rc8Theme from "../../../styles/themeRC8";
 import TextRender from "./TextRender";
+import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 
 // Simple Markdown Renderer Supports:
 // Lists: Each item on new line, start with - or "number. ".
@@ -35,6 +37,7 @@ enum ListType {
 }
 
 interface ListItem {
+  number?: string; // for numbered lists
   content: string;
   key: string;
 }
@@ -42,8 +45,8 @@ interface ListItem {
 interface MarkdownElement {
   type: ElementType;
   content?: string;
-  listType?: ListType;
-  items?: ListItem[];
+  listType?: ListType; // for lists
+  items?: ListItem[]; // for lists
   key: string;
 }
 
@@ -85,7 +88,7 @@ const parseMarkdown = (text: string): MarkdownElement[] => {
       const content = trimmed.replace(/^###\s*/, "");
       elements.push({
         type: ElementType.Heading4,
-        content: content,
+        content: capitalizeFirstLetter(content, false),
         key: `${ElementType.Heading4}-${index}`,
       });
       return;
@@ -96,7 +99,7 @@ const parseMarkdown = (text: string): MarkdownElement[] => {
       const content = trimmed.replace(/^###\s*/, "");
       elements.push({
         type: ElementType.Heading3,
-        content: content,
+        content: capitalizeFirstLetter(content, false),
         key: `${ElementType.Heading3}-${index}`,
       });
       return;
@@ -107,7 +110,7 @@ const parseMarkdown = (text: string): MarkdownElement[] => {
       const content = trimmed.replace(/^##\s*/, "");
       elements.push({
         type: ElementType.Heading2,
-        content: content,
+        content: capitalizeFirstLetter(content, false),
         key: `${ElementType.Heading2}-${index}`,
       });
       return;
@@ -118,7 +121,7 @@ const parseMarkdown = (text: string): MarkdownElement[] => {
       const content = trimmed.replace(/^#\s*/, "");
       elements.push({
         type: ElementType.Heading1,
-        content: content,
+        content: capitalizeFirstLetter(content, false),
         key: `${ElementType.Heading1}-${index}`,
       });
       return;
@@ -127,16 +130,17 @@ const parseMarkdown = (text: string): MarkdownElement[] => {
     // Handle numbered list items - check for number. at the start
     const numberedListMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
     if (numberedListMatch) {
-      // If we're not in a numbered list or switching from bullet to numbered
+      // This indicates we start a new numbered list
       if (currentList !== ListType.Numbered) {
         flushList();
         currentList = ListType.Numbered;
       }
       const number = numberedListMatch[1];
-      const text = numberedListMatch[2];
-      const content = `${number}.\u00A0\u00A0${text}`;
+      const content = numberedListMatch[2];
+      // const content = `${number}.\u00A0\u00A0${text}`;
       listItems.push({
-        content: content,
+        number,
+        content: capitalizeFirstLetter(content, false),
         key: `${ElementType.List}-${index}`,
       });
       return;
@@ -144,12 +148,14 @@ const parseMarkdown = (text: string): MarkdownElement[] => {
 
     // Handle bullet list items - check for - at the start, with or without space
     if (trimmed.startsWith("-")) {
-      if (!currentList) {
+      // This indicates we start a new bullet list
+      if (currentList !== ListType.Bullet) {
+        flushList();
         currentList = ListType.Bullet;
       }
       const content = trimmed.replace(/^-\s*/, "");
       listItems.push({
-        content: content,
+        content: capitalizeFirstLetter(content, false),
         key: `${ElementType.List}-${index}`,
       });
       return;
@@ -159,7 +165,7 @@ const parseMarkdown = (text: string): MarkdownElement[] => {
     flushList();
     elements.push({
       type: ElementType.Paragraph,
-      content: trimmed,
+      content: capitalizeFirstLetter(trimmed, false),
       key: `${ElementType.Paragraph}-${index}`,
     });
   });
@@ -344,37 +350,69 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
             );
 
           case ElementType.List:
-            return (
-              <List
-                key={element.key}
-                sx={{
-                  p: 0,
-                  ml: 2,
-                  mb: element.listType === ListType.Numbered ? 0 : 1,
-                  "& .MuiListItemText-root": {
-                    m: 0,
-                  },
-                  "& .MuiListItem-root": {
-                    p: 0,
-                    display: "list-item",
-                    listStyleType:
-                      element.listType === ListType.Numbered ? "none" : "disc",
-                    ml: element.listType === ListType.Numbered ? 0 : 2,
-                  },
-                }}
-              >
-                {element.items?.map((item: any) => (
-                  <MuiListItem key={item.key}>
-                    <ListItemText
-                      primary={renderInlineContent(item.content)}
-                      primaryTypographyProps={{
-                        variant: "body2Regular",
-                      }}
-                    />
-                  </MuiListItem>
-                ))}
-              </List>
-            );
+            switch (element.listType) {
+              case ListType.Numbered:
+                return (
+                  <List
+                    key={element.key}
+                    sx={{
+                      p: 0,
+                      ml: 1.8,
+                      mb: 1,
+                      "& .MuiListItem-root": {
+                        p: 0,
+                        display: "list-item",
+                        listStyleType: "none",
+                      },
+                    }}
+                  >
+                    {element.items?.map((item: ListItem) => (
+                      <MuiListItem key={item.key}>
+                        <Stack direction="row" spacing={1}>
+                          <Typography variant="body2Regular" p={0}>
+                            {`${item.number}.`}
+                          </Typography>
+                          <Typography variant="body2Regular" p={0}>
+                            {renderInlineContent(item.content)}
+                          </Typography>
+                        </Stack>
+                      </MuiListItem>
+                    ))}
+                  </List>
+                );
+              default:
+                return (
+                  <List
+                    key={element.key}
+                    sx={{
+                      p: 0,
+                      ml: 2,
+                      mb: 1,
+                      "& .MuiListItemText-root": {
+                        m: 0,
+                        p: 0,
+                      },
+                      "& .MuiListItem-root": {
+                        p: 0,
+                        display: "list-item",
+                        listStyleType: "disc",
+                        ml: 2,
+                      },
+                    }}
+                  >
+                    {element.items?.map((item: ListItem) => (
+                      <MuiListItem key={item.key}>
+                        <ListItemText
+                          primary={renderInlineContent(item.content)}
+                          primaryTypographyProps={{
+                            variant: "body2Regular",
+                          }}
+                        />
+                      </MuiListItem>
+                    ))}
+                  </List>
+                );
+            }
 
           default:
             return null;

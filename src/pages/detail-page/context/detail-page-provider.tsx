@@ -7,7 +7,6 @@ import {
 import { DetailPageContext, SpatialExtentPhoto } from "./detail-page-context";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../components/common/store/hooks";
-import { HttpStatusCode } from "axios";
 import { FeatureCollection, Point } from "geojson";
 import {
   DownloadConditionType,
