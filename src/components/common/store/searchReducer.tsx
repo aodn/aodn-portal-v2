@@ -22,7 +22,7 @@ import {
 import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { DatasetDownloadRequest } from "../../../pages/detail-page/context/DownloadDefinitions";
-import { trackSearchUrlParameters } from "../../../analytics/searchParamsEvent";
+import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -118,7 +118,7 @@ const searchResult = async (
   }
 
   // Track search page url parameters
-  trackSearchUrlParameters(param);
+  trackSearchResultParameters(param);
 
   return axios
     .get<string>("/api/v1/ogc/collections", {
