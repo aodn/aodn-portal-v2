@@ -22,6 +22,10 @@ export default ({ mode }) => {
           path.resolve(__dirname, "public/relic_script.js"),
           "utf8"
         );
+        // Skip GA in test mode
+        if (mode === "test") {
+          return html.replace("<!-- new-relic-js -->", "");
+        }
 
         return html.replace(
           "<!-- new-relic-js -->",

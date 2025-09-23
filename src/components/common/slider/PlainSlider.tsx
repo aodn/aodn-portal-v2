@@ -2,22 +2,22 @@ import { Slider, SliderProps, styled } from "@mui/material";
 import rc8Theme from "../../../styles/themeRC8";
 
 interface PlainSliderProps extends SliderProps {
-  isVertical?: boolean;
+  is_vertical?: boolean;
 }
 
 const StyledSlider = styled(Slider)<PlainSliderProps>(({
   theme,
-  isVertical = false,
+  is_vertical = false,
 }) => {
   const labelPositioning = {
-    top: isVertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
-    left: isVertical ? "calc(100% + 25px)" : "50%",
-    transform: isVertical ? "none" : "translateX(-50%)",
+    top: is_vertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
+    left: is_vertical ? "calc(100% + 25px)" : "50%",
+    transform: is_vertical ? "none" : "translateX(-50%)",
   };
 
   const labelPositioningMobile = {
     [theme.breakpoints.down("md")]: {
-      top: isVertical ? "calc(100% + 1px)" : "-30px",
+      top: is_vertical ? "calc(100% + 1px)" : "-30px",
     },
   };
 
@@ -56,8 +56,8 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
   };
 });
 
-const PlainSlider = ({ isVertical = false, ...props }: PlainSliderProps) => {
-  return <StyledSlider isVertical={isVertical} {...props} />;
+const PlainSlider = ({ is_vertical = false, ...props }: PlainSliderProps) => {
+  return <StyledSlider is_vertical={is_vertical} {...props} />;
 };
 
 export default PlainSlider;

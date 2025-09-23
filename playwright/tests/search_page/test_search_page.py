@@ -105,7 +105,7 @@ def test_show_more_results(
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
+    search_page.wait_for_page_stabilization()
     expect(search_page.get_dataset_by_id(chunk_1_first_data)).to_be_visible()
 
     show_result_count_text = search_page.get_show_result_count_text(

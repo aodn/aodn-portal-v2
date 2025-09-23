@@ -1569,7 +1569,7 @@
       "rel": "wms",
       "type": "",
       "title": "seamap:geomorph_AMP_grp",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access > wms"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/1bb8f09c-99d6-431f-b902-4d3e4cef02df.png",
