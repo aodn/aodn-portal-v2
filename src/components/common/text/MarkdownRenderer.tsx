@@ -275,6 +275,7 @@ const renderInlineContent = (text: string | undefined) => {
 const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
   const elements = parseMarkdown(text);
 
+  console.log("elements", elements);
   return (
     <>
       {elements.map((element) => {

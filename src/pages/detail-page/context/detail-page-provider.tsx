@@ -91,9 +91,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setIsCollectionNotFound(false);
       })
       .catch((error) => {
-        if (error.statusCode && error.statusCode === HttpStatusCode.NotFound) {
-          setIsCollectionNotFound(true);
-        }
+        console.log("Error fetching collection by UUID:", error);
+        setIsCollectionNotFound(true);
       });
   }, [dispatch, location.search, uuid]);
 
