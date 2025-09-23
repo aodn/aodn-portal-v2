@@ -358,7 +358,10 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         .unwrap()
         .then((response) => {
           cleanPopup();
-          if (response.featureInfo?.length !== 0) {
+          if (
+            response.featureInfo !== undefined ||
+            response.html !== undefined
+          ) {
             const popupContainer = document.createElement("div");
             // Some content from server is super long
             popupContainer.style.overflow = "auto";
