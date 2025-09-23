@@ -20,10 +20,10 @@ import { decode } from "he";
  */
 export const capitalizeFirstLetter = (
   str: string,
-  shouldLowercaseTheRest?: boolean
+  shouldLowercaseTheRest: boolean = true
 ): string =>
   `${str.charAt(0).toUpperCase()}${
-    shouldLowercaseTheRest ? `${str.slice(1).toLowerCase()}` : `${str.slice(1)}`
+    shouldLowercaseTheRest ? str.slice(1).toLowerCase() : str.slice(1)
   }`;
 
 /**
