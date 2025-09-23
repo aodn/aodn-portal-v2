@@ -22,6 +22,7 @@ import {
 import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { DatasetDownloadRequest } from "../../../pages/detail-page/context/DownloadDefinitions";
+import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
 import { MapFeatureRequest, MapFeatureResponse } from "./GeoserverDefinitions";
 
 export enum DatasetFrequency {
@@ -116,6 +117,9 @@ const searchResult = async (
   if (param.sortby !== undefined && param.sortby.length !== 0) {
     p.sortby = param.sortby;
   }
+
+  // Track search page url parameters
+  trackSearchResultParameters(param);
 
   return axios
     .get<string>("/api/v1/ogc/collections", {

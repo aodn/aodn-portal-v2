@@ -5,8 +5,7 @@ import { AnalyticsEvent } from "./analyticsEvents";
  */
 export function trackCustomEvent(
   eventName: AnalyticsEvent,
-  eventParameters: Record<string, any> = {}
+  eventParameters?: Gtag.CustomParams
 ) {
-  // Send event to GA4 via gtag
   window.gtag?.("event", eventName, eventParameters);
 }

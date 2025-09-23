@@ -6,4 +6,5 @@
  */
 export enum AnalyticsEvent {
   COPY_CITATION_CLICK = "copy_citation_click",
+  SEARCH_RESULT_PARAMS = "search_result_params",
 }
