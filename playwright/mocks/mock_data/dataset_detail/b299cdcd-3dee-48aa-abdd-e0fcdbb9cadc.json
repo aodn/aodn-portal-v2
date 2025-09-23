@@ -1084,14 +1084,14 @@
       "rel": "wms",
       "type": "",
       "title": "aodn:aodn_wave_nrt_v2_timeseries_map",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access > wms"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
       "rel": "wfs",
       "type": "",
       "title": "aodn:aodn_wave_nrt_v2_timeseries_data",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access > wfs"
     },
     {
       "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
