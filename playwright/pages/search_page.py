@@ -107,3 +107,9 @@ class SearchPage(BasePage):
         )
         for param_name, is_valid in validation_results.items():
             assert is_valid, f"Parameter '{param_name}' is not correctly reflected in Request URL: {url}"
+
+    def wait_for_page_stabilization(self) -> None:
+        """
+        Waits for the search page to stabilize by monitoring the URL update.
+        """
+        self.wait_for_url_update()
