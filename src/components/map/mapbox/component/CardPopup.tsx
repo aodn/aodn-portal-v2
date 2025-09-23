@@ -27,6 +27,7 @@ import GeojsonLayer from "../layers/GeojsonLayer";
 import ResultCardButtonGroup from "../../../result/ResultCardButtonGroup";
 import BookmarkButton from "../../../bookmark/BookmarkButton";
 import { detailPageDefault, pageReferer } from "../../../common/constants";
+import { MapEventEnum } from "../constants";
 
 interface CardPopupProps {
   layerId: string;
@@ -148,7 +149,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
     };
 
     if (isUnderLaptop) {
-      map?.on("click", onMouseClick);
+      map?.on(MapEventEnum.CLICK, onMouseClick);
       map?.on("moveend", onMouseMoved);
       // Handle case when move out of map without leaving popup box
       // then do a search
@@ -156,7 +157,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
     }
 
     return () => {
-      map?.off("click", onMouseClick);
+      map?.off(MapEventEnum.CLICK, onMouseClick);
       map?.off("moveend", onMouseMoved);
       map?.off("sourcedata", onSourceChange);
     };

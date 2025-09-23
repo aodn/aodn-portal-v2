@@ -101,7 +101,7 @@ fetch(marineParkDefault.geojson)
     locationOptions.push(...l);
   })
   .catch((error) => {
-    console.error("Error fetching JSON:", error);
+    console.error("Error fetching JSON in LocationFilter:", error);
   });
 
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
