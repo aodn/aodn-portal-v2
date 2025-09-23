@@ -1,10 +1,7 @@
 import { useCallback, useState, useRef } from "react";
+import { useAppDispatch } from "../components/common/store/hooks";
+import { processWFSDownload } from "../components/common/store/searchReducer";
 import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
-import {
-  getDateConditionFrom,
-  getMultiPolygonFrom,
-  getFormatFrom,
-} from "../utils/DownloadConditionUtils";
 
 const CONNECTION_TIMEOUT_DEFAULT = 20 * 60000; // Frontend 20 minutes timeout by default
 
@@ -63,6 +60,7 @@ enum DownloadStatus {
 }
 
 const useWFSDownload = (onCallback?: () => void) => {
+  const dispatch = useAppDispatch();
   const [downloadingStatus, setDownloadingStatus] = useState<DownloadStatus>(
     DownloadStatus.NOT_STARTED
   );
@@ -343,51 +341,37 @@ const useWFSDownload = (onCallback?: () => void) => {
       onCallback && onCallback();
 
       try {
-        // Extract download conditions
-        const dateRange = getDateConditionFrom(downloadConditions);
-        const multiPolygon = getMultiPolygonFrom(downloadConditions);
-        const format = getFormatFrom(downloadConditions); // TODO: currently unused - CSV only for WFS for now
-
         // Set timeout for the entire download operation
         const timeout = import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT;
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
         const timeoutId = setTimeout(
           () => controller.abort(),
           Number(timeout) || CONNECTION_TIMEOUT_DEFAULT
         );
 
-        // Start fetch with abort controller
-        const controller = new AbortController();
-        abortControllerRef.current = controller;
-
-        const response = await fetch(
-          "/api/v1/ogc/processes/downloadWfs/execution",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "text/event-stream",
-            },
-            body: JSON.stringify({
-              inputs: {
-                uuid: uuid,
-                start_date: dateRange.start,
-                end_date: dateRange.end,
-                multi_polygon: multiPolygon,
-                // fields: [], // TODO: Add fields selection in future
-                layer_name: layerName,
-              },
-              outputs: {},
-              subscriber: {
-                successUri: "",
-                inProgressUri: "",
-                failedUri: "",
-              },
-            }),
+        // Use Redux action to make the API call
+        const resultAction = await dispatch(
+          processWFSDownload({
+            uuid,
+            layerName,
+            downloadConditions,
             signal: controller.signal,
-          }
+          })
         );
 
         clearTimeout(timeoutId);
+
+        if (processWFSDownload.rejected.match(resultAction)) {
+          setDownloadingStatus(DownloadStatus.ERROR);
+          setProgressMessage(
+            resultAction.payload?.message || "Failed to start WFS download"
+          );
+          onCallback && onCallback();
+          return;
+        }
+
+        const response = resultAction.payload as Response;
 
         if (!response.ok) {
           console.error(`HTTP error! status: ${response.status}`);
@@ -466,7 +450,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         cleanupDownload();
       }
     },
-    [cleanupDownload, onCallback, processSSEEvent]
+    [cleanupDownload, onCallback, processSSEEvent, dispatch]
   );
 
   return {

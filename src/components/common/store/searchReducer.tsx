@@ -21,7 +21,15 @@ import {
 } from "../../../utils/ErrorBoundary";
 import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
-import { DatasetDownloadRequest } from "../../../pages/detail-page/context/DownloadDefinitions";
+import {
+  DatasetDownloadRequest,
+  IDownloadCondition,
+} from "../../../pages/detail-page/context/DownloadDefinitions";
+import {
+  getDateConditionFrom,
+  getMultiPolygonFrom,
+  getFormatFrom,
+} from "../../../utils/DownloadConditionUtils";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -45,6 +53,13 @@ export type SearchControl = {
   pagesize?: number;
   searchafter?: Array<string>;
   score?: number;
+};
+
+export type WFSDownloadRequest = {
+  uuid: string;
+  layerName: string;
+  downloadConditions: IDownloadCondition[];
+  signal?: AbortSignal;
 };
 
 type OGCSearchParameters = {
@@ -270,6 +285,68 @@ const processDatasetDownload = createAsyncThunk<
   }
 );
 
+const processWFSDownload = createAsyncThunk<
+  Response,
+  WFSDownloadRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "download/downloadWFS",
+  async (request: WFSDownloadRequest, thunkAPI: any) => {
+    try {
+      // Extract download conditions
+      const dateRange = getDateConditionFrom(request.downloadConditions);
+      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+      const format = getFormatFrom(request.downloadConditions); // Currently unused - CSV only for WFS
+
+      const response = await fetch(
+        "/api/v1/ogc/processes/downloadWfs/execution",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+          },
+          body: JSON.stringify({
+            inputs: {
+              uuid: request.uuid,
+              start_date: dateRange.start,
+              end_date: dateRange.end,
+              multi_polygon: multiPolygon,
+              layer_name: request.layerName,
+            },
+            outputs: {},
+            subscriber: {
+              successUri: "",
+              inProgressUri: "",
+              failedUri: "",
+            },
+          }),
+          signal: request.signal || thunkAPI.signal,
+        }
+      );
+
+      if (!response.ok) {
+        return thunkAPI.rejectWithValue(
+          createErrorResponse(
+            response.status,
+            `HTTP error! status: ${response.status}`,
+            "WFS download request failed"
+          )
+        );
+      }
+
+      return response;
+    } catch (error) {
+      if (error instanceof Error) {
+        return thunkAPI.rejectWithValue(
+          createErrorResponse(500, error.message, "WFS download request failed")
+        );
+      }
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 const fetchParameterVocabsWithStore = createAsyncThunk<
   Array<Vocab>,
   Map<string, string> | null,
@@ -454,6 +531,7 @@ export {
   fetchFeaturesByUuid,
   fetchParameterVocabsWithStore,
   processDatasetDownload,
+  processWFSDownload,
   jsonToOGCCollections,
 };
 
