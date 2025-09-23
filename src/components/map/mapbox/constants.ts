@@ -26,7 +26,7 @@ export const MapDefaultConfig = {
   DEFAULT_POPUP: {
     closeButton: true,
     closeOnClick: false,
-    maxWidth: "300px",
+    maxWidth: "500px",
     offset: [0, -5],
   } as PopupOptions,
 };

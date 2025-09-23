@@ -365,8 +365,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             const popupContainer = document.createElement("div");
             // Some content from server is super long
             popupContainer.style.overflow = "auto";
-            popupContainer.style.maxHeight =
-              MapDefaultConfig.DEFAULT_POPUP.maxWidth || "300px";
+            popupContainer.style.maxHeight = "300px";
 
             if (response.html) {
               // The server can return html directly, so we can only use it
