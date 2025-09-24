@@ -10,9 +10,10 @@ export function trackPageResponseTime(): void {
         // Log to console
         // console.log(`📊 Response Time: ${responseTime}ms`);
 
-        // Send to Google Analytics using existing trackCustomEvent
+        // Send to Google Analytics with speed labels
         trackCustomEvent(AnalyticsEvent.PAGE_RESPONSE_TIME, {
           response_time_ms: responseTime,
+          speed: getSpeedLabel(responseTime), // fast, needs_improvement, or slow
         });
       }
     } catch (error) {
@@ -32,4 +33,10 @@ function getResponseTime(): number {
 
   // Round to whole milliseconds (e.g., 245.67ms → 246ms)
   return Math.round(responseTime);
+}
+
+function getSpeedLabel(responseTime: number): string {
+  if (responseTime < 500) return "fast";
+  if (responseTime < 1000) return "needs_improvement";
+  return "slow";
 }
