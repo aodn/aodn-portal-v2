@@ -1,6 +1,6 @@
 from typing import Any
 
-from playwright.sync_api import Locator, Page
+from playwright.sync_api import Locator, Page, TimeoutError
 
 from pages.js_scripts.js_utils import (
     execute_common_js,
