@@ -341,7 +341,6 @@ const useWFSDownload = (onCallback?: () => void) => {
       onCallback && onCallback();
 
       try {
-        // Use Redux action to make the API call
         const downloadPromise = dispatch(
           processWFSDownload({
             uuid,

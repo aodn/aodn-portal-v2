@@ -22,7 +22,7 @@ import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import {
   DatasetDownloadRequest,
-  IDownloadCondition,
+  WFSDownloadRequest,
 } from "../../../pages/detail-page/context/DownloadDefinitions";
 import {
   getDateConditionFrom,
@@ -54,12 +54,6 @@ export type SearchControl = {
   pagesize?: number;
   searchafter?: Array<string>;
   score?: number;
-};
-
-export type WFSDownloadRequest = {
-  uuid: string;
-  layerName: string;
-  downloadConditions: IDownloadCondition[];
 };
 
 type OGCSearchParameters = {
@@ -332,22 +326,13 @@ const processWFSDownload = createAsyncThunk<
 
       if (!response.ok) {
         return thunkAPI.rejectWithValue(
-          createErrorResponse(
-            response.status,
-            `HTTP error! status: ${response.status}`,
-            "WFS download request failed"
-          )
+          createErrorResponse(response.status, "WFS download request failed")
         );
       }
 
       return response;
     } catch (error) {
-      if (error instanceof Error) {
-        return thunkAPI.rejectWithValue(
-          createErrorResponse(500, error.message, "WFS download request failed")
-        );
-      }
-      return thunkAPI.rejectWithValue(error);
+      errorHandling(thunkAPI);
     }
   }
 );
