@@ -285,7 +285,7 @@ const processDatasetDownload = createAsyncThunk<
 );
 
 const processWFSDownload = createAsyncThunk<
-  ReadableStream,
+  any,
   WFSDownloadRequest,
   { rejectValue: ErrorResponse }
 >(
@@ -313,8 +313,10 @@ const processWFSDownload = createAsyncThunk<
         },
       };
 
-      return axios
-        .post("/api/v1/ogc/processes/downloadWfs/execution", requestBody, {
+      return axios.post(
+        "/api/v1/ogc/processes/downloadWfs/execution",
+        requestBody,
+        {
           adapter: "fetch", // Use fetch adapter for streaming
           responseType: "stream",
           headers: {
@@ -322,11 +324,10 @@ const processWFSDownload = createAsyncThunk<
             Accept: "text/event-stream",
             "Cache-Control": "no-cache",
           },
-          timeout: WFS_DOWNLOAD_TIMEOUT, // 20 minutes for WFS downloads
+          timeout: WFS_DOWNLOAD_TIMEOUT,
           signal: thunkAPI.signal,
-        })
-        .then((response) => response.data)
-        .catch(errorHandling(thunkAPI));
+        }
+      );
     } catch (error) {
       errorHandling(thunkAPI);
     }

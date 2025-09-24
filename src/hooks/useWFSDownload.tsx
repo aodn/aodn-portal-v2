@@ -361,7 +361,7 @@ const useWFSDownload = (onCallback?: () => void) => {
           return;
         }
 
-        const responseStream = resultAction.payload as ReadableStream;
+        const responseStream = resultAction.payload.data as ReadableStream;
 
         if (!responseStream) {
           console.error("Response stream is null");
