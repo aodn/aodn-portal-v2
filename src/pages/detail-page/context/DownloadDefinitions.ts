@@ -90,3 +90,9 @@ export class FormatCondition
     this.removeCallback = removeCallback;
   }
 }
+
+export type WFSDownloadRequest = {
+  uuid: string;
+  layerName: string;
+  downloadConditions: IDownloadCondition[];
+};
