@@ -3,8 +3,6 @@ import { useAppDispatch } from "../components/common/store/hooks";
 import { processWFSDownload } from "../components/common/store/searchReducer";
 import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
 
-const CONNECTION_TIMEOUT_DEFAULT = 20 * 60000; // Frontend 20 minutes timeout by default
-
 // Aligned with backend WFS SSE event names
 enum EventName {
   CONNECTION_ESTABLISHED = "connection-established",
@@ -363,19 +361,19 @@ const useWFSDownload = (onCallback?: () => void) => {
           return;
         }
 
-        const response = resultAction.payload as Response;
+        const responseStream = resultAction.payload as ReadableStream;
 
-        if (!response.body) {
-          console.error("Response body is null");
+        if (!responseStream) {
+          console.error("Response stream is null");
           setDownloadingStatus(DownloadStatus.ERROR);
-          setProgressMessage("Response body is null");
+          setProgressMessage("Response stream is null");
           onCallback && onCallback();
           cleanupDownload();
           return;
         }
 
         // Parse SSE stream manually
-        const reader = response.body.getReader();
+        const reader = responseStream.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
         let done = false;

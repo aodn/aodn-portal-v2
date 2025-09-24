@@ -78,6 +78,8 @@ export const FULL_LIST_PAGE_SIZE = 21;
 
 const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
 const TIMEOUT = 60000;
+const WFS_DOWNLOAD_TIMEOUT =
+  Number(import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT) || 1200000; // Default 20 minutes timeout for WFS downloads
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
   return new OGCCollections(
@@ -283,7 +285,7 @@ const processDatasetDownload = createAsyncThunk<
 );
 
 const processWFSDownload = createAsyncThunk<
-  Response,
+  ReadableStream,
   WFSDownloadRequest,
   { rejectValue: ErrorResponse }
 >(
@@ -311,26 +313,20 @@ const processWFSDownload = createAsyncThunk<
         },
       };
 
-      const response = await fetch(
-        "/api/v1/ogc/processes/downloadWfs/execution",
-        {
-          method: "POST",
+      return axios
+        .post("/api/v1/ogc/processes/downloadWfs/execution", requestBody, {
+          adapter: "fetch", // Use fetch adapter for streaming
+          responseType: "stream",
           headers: {
             "Content-Type": "application/json",
             Accept: "text/event-stream",
+            "Cache-Control": "no-cache",
           },
-          body: JSON.stringify(requestBody),
+          timeout: WFS_DOWNLOAD_TIMEOUT, // 20 minutes for WFS downloads
           signal: thunkAPI.signal,
-        }
-      );
-
-      if (!response.ok) {
-        return thunkAPI.rejectWithValue(
-          createErrorResponse(response.status, "WFS download request failed")
-        );
-      }
-
-      return response;
+        })
+        .then((response) => response.data)
+        .catch(errorHandling(thunkAPI));
     } catch (error) {
       errorHandling(thunkAPI);
     }
