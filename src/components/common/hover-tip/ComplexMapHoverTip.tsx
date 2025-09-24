@@ -48,7 +48,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
       tabNavigation(
         collection.id,
         detailPageDefault.SUMMARY,
-        "download-section"
+        pageReferer.SEARCH_PAGE_REFERER
       ),
     [collection.id, tabNavigation]
   );

@@ -232,39 +232,42 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
           </Stack>
         )}
       </Stack>
-      <Divider sx={{ width: "100%" }} />
+
       {subsettingSelectionCount >= 1 ? (
-        <PlainAccordion
-          expanded={accordionExpanded}
-          elevation={0}
-          onChange={() => setAccordionExpanded((prevState) => !prevState)}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Box display="flex" alignItems="center" gap={3}>
-              <Typography
-                typography="title1Medium"
-                color={rc8Theme.palette.text1}
-                p={0}
-              >
-                Data Selection
-              </Typography>
-              <Badge
-                sx={{
-                  "& .MuiBadge-badge": {
-                    backgroundColor: rc8Theme.palette.primary1,
-                    ...rc8Theme.typography.title2Regular,
-                    color: rc8Theme.palette.text3,
-                    pb: "1px",
-                  },
-                }}
-                badgeContent={subsettingSelectionCount}
-              />
-            </Box>
-          </AccordionSummary>
-          <AccordionDetails sx={{ pt: "4px" }}>
-            <DataSelection />
-          </AccordionDetails>
-        </PlainAccordion>
+        <>
+          <Divider sx={{ width: "100%" }} />
+          <PlainAccordion
+            expanded={accordionExpanded}
+            elevation={0}
+            onChange={() => setAccordionExpanded((prevState) => !prevState)}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Box display="flex" alignItems="center" gap={3}>
+                <Typography
+                  typography="title1Medium"
+                  color={rc8Theme.palette.text1}
+                  p={0}
+                >
+                  Data Selection
+                </Typography>
+                <Badge
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      backgroundColor: rc8Theme.palette.primary1,
+                      ...rc8Theme.typography.title2Regular,
+                      color: rc8Theme.palette.text3,
+                      pb: "1px",
+                    },
+                  }}
+                  badgeContent={subsettingSelectionCount}
+                />
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails sx={{ pt: "4px" }}>
+              <DataSelection />
+            </AccordionDetails>
+          </PlainAccordion>
+        </>
       ) : (
         <SubsettingMessage />
       )}
