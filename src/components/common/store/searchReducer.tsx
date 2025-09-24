@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import { ParameterState, Vocab } from "./componentParamReducer";
-
 import {
   cqlDefaultFilters,
   DatasetGroup,
@@ -61,7 +60,6 @@ export type WFSDownloadRequest = {
   uuid: string;
   layerName: string;
   downloadConditions: IDownloadCondition[];
-  signal?: AbortSignal;
 };
 
 type OGCSearchParameters = {
@@ -303,6 +301,22 @@ const processWFSDownload = createAsyncThunk<
       const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
       const format = getFormatFrom(request.downloadConditions); // Currently unused - CSV only for WFS
 
+      const requestBody = {
+        inputs: {
+          uuid: request.uuid,
+          start_date: dateRange.start,
+          end_date: dateRange.end,
+          multi_polygon: multiPolygon,
+          layer_name: request.layerName,
+        },
+        outputs: {},
+        subscriber: {
+          successUri: "",
+          inProgressUri: "",
+          failedUri: "",
+        },
+      };
+
       const response = await fetch(
         "/api/v1/ogc/processes/downloadWfs/execution",
         {
@@ -311,22 +325,8 @@ const processWFSDownload = createAsyncThunk<
             "Content-Type": "application/json",
             Accept: "text/event-stream",
           },
-          body: JSON.stringify({
-            inputs: {
-              uuid: request.uuid,
-              start_date: dateRange.start,
-              end_date: dateRange.end,
-              multi_polygon: multiPolygon,
-              layer_name: request.layerName,
-            },
-            outputs: {},
-            subscriber: {
-              successUri: "",
-              inProgressUri: "",
-              failedUri: "",
-            },
-          }),
-          signal: request.signal || thunkAPI.signal,
+          body: JSON.stringify(requestBody),
+          signal: thunkAPI.signal,
         }
       );
 

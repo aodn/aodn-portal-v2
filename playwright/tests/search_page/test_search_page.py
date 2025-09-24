@@ -89,7 +89,6 @@ def test_full_list_view(desktop_page: Page) -> None:
         ),
     ],
 )
-@pytest.mark.skip
 def test_show_more_results(
     desktop_page: Page,
     chunk_1_first_data: str,

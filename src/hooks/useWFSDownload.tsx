@@ -66,7 +66,7 @@ const useWFSDownload = (onCallback?: () => void) => {
   );
   const [progressMessage, setProgressMessage] = useState<string>("");
   const [downloadedBytes, setDownloadedBytes] = useState<number>(0);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const downloadPromiseRef = useRef<any>(null);
   const fileChunksRef = useRef<string[]>([]);
   const receivedChunksRef = useRef<Set<number>>(new Set());
   const expectedTotalChunksRef = useRef<number>(0);
@@ -106,9 +106,9 @@ const useWFSDownload = (onCallback?: () => void) => {
 
   // Cancel download function
   const cancelDownload = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
+    if (downloadPromiseRef.current) {
+      downloadPromiseRef.current.abort();
+      downloadPromiseRef.current = null;
     }
     cleanupDownload();
     setDownloadedBytes(0);
@@ -341,26 +341,19 @@ const useWFSDownload = (onCallback?: () => void) => {
       onCallback && onCallback();
 
       try {
-        // Set timeout for the entire download operation
-        const timeout = import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT;
-        const controller = new AbortController();
-        abortControllerRef.current = controller;
-        const timeoutId = setTimeout(
-          () => controller.abort(),
-          Number(timeout) || CONNECTION_TIMEOUT_DEFAULT
-        );
-
         // Use Redux action to make the API call
-        const resultAction = await dispatch(
+        const downloadPromise = dispatch(
           processWFSDownload({
             uuid,
             layerName,
             downloadConditions,
-            signal: controller.signal,
           })
         );
 
-        clearTimeout(timeoutId);
+        // Store the promise so we can abort it later
+        downloadPromiseRef.current = downloadPromise;
+
+        const resultAction = await downloadPromise;
 
         if (processWFSDownload.rejected.match(resultAction)) {
           setDownloadingStatus(DownloadStatus.ERROR);
@@ -372,13 +365,6 @@ const useWFSDownload = (onCallback?: () => void) => {
         }
 
         const response = resultAction.payload as Response;
-
-        if (!response.ok) {
-          console.error(`HTTP error! status: ${response.status}`);
-          setDownloadingStatus(DownloadStatus.ERROR);
-          setProgressMessage(`HTTP error! status: ${response.status}`);
-          onCallback && onCallback();
-        }
 
         if (!response.body) {
           console.error("Response body is null");
@@ -397,7 +383,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         let downloadCompleted = false;
 
         try {
-          while (!done && !controller.signal.aborted) {
+          while (!done) {
             const result = await reader.read();
             done = result.done;
             if (done) break;
@@ -407,7 +393,7 @@ const useWFSDownload = (onCallback?: () => void) => {
 
             // Process complete SSE events
             let eventStart = 0;
-            while (eventStart < buffer.length && !controller.signal.aborted) {
+            while (eventStart < buffer.length) {
               // Look for complete event (ends with double newline)
               const eventEnd = buffer.indexOf("\n\n", eventStart);
               if (eventEnd === -1) {
@@ -433,7 +419,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         }
 
         // Only show error if we haven't successfully completed the download
-        if (!downloadCompleted && !controller.signal.aborted) {
+        if (!downloadCompleted) {
           setDownloadingStatus(DownloadStatus.ERROR);
           setProgressMessage(
             "Download incomplete - connection closed unexpectedly"
@@ -442,9 +428,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         }
 
         // Clean up immediately after processing
-        if (!controller.signal.aborted) {
-          cleanupDownload();
-        }
+        cleanupDownload();
       } catch (error) {
         setDownloadedBytes(0);
         cleanupDownload();

@@ -105,7 +105,6 @@ def test_map_updates_on_search_change(
         ),
     ],
 )
-@pytest.mark.skip
 def test_map_reference_layers(
     desktop_page: Page, layer_text: str, layer_type: LayerType
 ) -> None:
