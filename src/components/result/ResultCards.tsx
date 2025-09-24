@@ -181,6 +181,14 @@ const ResultCards: FC<ResultCardsProps> = ({
   const goToDetailPage = useTabNavigation();
   const { fetchRecord } = useFetchData();
 
+  const [count, total] = useMemo(() => {
+    const count = contents.result.collections.length;
+    const total = contents.result.total;
+    return [count, total];
+  }, [contents.result.collections.length, contents.result.total]);
+
+  const selectedUuid = useMemo(() => selectedUuids?.[0], [selectedUuids]);
+
   const loadMoreResults = useCallback(
     // Must use async here to make sure load done before return
     // which block any action on new search message with the append
@@ -194,15 +202,6 @@ const ResultCards: FC<ResultCardsProps> = ({
       ),
     [fetchRecord, layout]
   );
-
-  const count = useMemo(
-    () => contents.result.collections.length,
-    [contents.result.collections.length]
-  );
-
-  const total = useMemo(() => contents.result.total, [contents.result.total]);
-
-  const selectedUuid = useMemo(() => selectedUuids?.[0], [selectedUuids]);
 
   const onClickBtnCard = useCallback(
     (item: OGCCollection | undefined) => onClickCard?.(item),
@@ -246,6 +245,16 @@ const ResultCards: FC<ResultCardsProps> = ({
     [goToDetailPage, onClickLinks]
   );
 
+  const renderLoadMoreButton = useCallback(() => {
+    return (
+      <DetailSubtabBtn
+        id="result-card-load-more-btn"
+        title="Show more results"
+        onClick={loadMoreResults}
+      />
+    );
+  }, [loadMoreResults]);
+
   // Fetching more data for full list view if the initial records less than 20
   useEffect(() => {
     // Must use async here to make sure load done before return
@@ -262,16 +271,6 @@ const ResultCards: FC<ResultCardsProps> = ({
     };
     loadRecords();
   }, [count, fetchRecord, layout, total]);
-
-  const renderLoadMoreButton = useCallback(() => {
-    return (
-      <DetailSubtabBtn
-        id="result-card-load-more-btn"
-        title="Show more results"
-        onClick={loadMoreResults}
-      />
-    );
-  }, [loadMoreResults]);
 
   if (!contents) return;
 
