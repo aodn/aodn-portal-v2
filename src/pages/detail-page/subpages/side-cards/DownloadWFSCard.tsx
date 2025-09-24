@@ -37,6 +37,7 @@ import {
   DownloadConditionType,
   FormatCondition,
 } from "../../context/DownloadDefinitions";
+import SubsettingMessage from "./SubsettingMessage";
 
 const options = [
   // { label: "NetCDFs", value: "NetCDFs" },
@@ -54,8 +55,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const { downloadConditions, getAndSetDownloadConditions } =
     useDetailPageContext();
-  const [showSubsettingMessage, setShowSubsettingMessage] =
-    useState<boolean>(false);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
     WFSLinks[0]?.title
@@ -112,18 +111,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
 
   const handleDownload = useCallback(async () => {
     if (!selectedDataItem || !uuid) return;
-
-    if (subsettingSelectionCount < 1) {
-      setShowSubsettingMessage(true);
-    }
     await startDownload(uuid, selectedDataItem, downloadConditions);
-  }, [
-    selectedDataItem,
-    uuid,
-    subsettingSelectionCount,
-    startDownload,
-    downloadConditions,
-  ]);
+  }, [selectedDataItem, uuid, startDownload, downloadConditions]);
 
   const handleCancelDownload = useCallback(() => {
     cancelDownload();
@@ -244,37 +233,42 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
         )}
       </Stack>
       <Divider sx={{ width: "100%" }} />
-      <PlainAccordion
-        expanded={accordionExpanded}
-        elevation={0}
-        onChange={() => setAccordionExpanded((prevState) => !prevState)}
-      >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Box display="flex" alignItems="center" gap={3}>
-            <Typography
-              typography="title1Medium"
-              color={rc8Theme.palette.text1}
-              p={0}
-            >
-              Data Selection
-            </Typography>
-            <Badge
-              sx={{
-                "& .MuiBadge-badge": {
-                  backgroundColor: rc8Theme.palette.primary1,
-                  ...rc8Theme.typography.title2Regular,
-                  color: rc8Theme.palette.text3,
-                  pb: "1px",
-                },
-              }}
-              badgeContent={subsettingSelectionCount}
-            />
-          </Box>
-        </AccordionSummary>
-        <AccordionDetails sx={{ pt: "4px" }}>
-          <DataSelection />
-        </AccordionDetails>
-      </PlainAccordion>
+      {subsettingSelectionCount >= 1 ? (
+        <PlainAccordion
+          expanded={accordionExpanded}
+          elevation={0}
+          onChange={() => setAccordionExpanded((prevState) => !prevState)}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Box display="flex" alignItems="center" gap={3}>
+              <Typography
+                typography="title1Medium"
+                color={rc8Theme.palette.text1}
+                p={0}
+              >
+                Data Selection
+              </Typography>
+              <Badge
+                sx={{
+                  "& .MuiBadge-badge": {
+                    backgroundColor: rc8Theme.palette.primary1,
+                    ...rc8Theme.typography.title2Regular,
+                    color: rc8Theme.palette.text3,
+                    pb: "1px",
+                  },
+                }}
+                badgeContent={subsettingSelectionCount}
+              />
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={{ pt: "4px" }}>
+            <DataSelection />
+          </AccordionDetails>
+        </PlainAccordion>
+      ) : (
+        <SubsettingMessage />
+      )}
+
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackbarOpen}

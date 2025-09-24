@@ -28,8 +28,8 @@ import {
   ILink,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import { DownloadIcon } from "../../../../assets/icons/download/download";
-import { InformationIcon } from "../../../../assets/icons/download/information";
 import DownloadWFSCard from "./DownloadWFSCard";
+import SubsettingMessage from "./SubsettingMessage";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -149,28 +149,7 @@ const DownloadCard = () => {
       </Stack>
 
       {/* Show subsetting message when subsettingSelectionCount < 1 */}
-      {subsettingSelectionCount < 1 && (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "flex-start",
-            pb: "22px",
-            px: "16px",
-          }}
-        >
-          <Box sx={{ minWidth: 22, flexShrink: 0, px: "8px" }}>
-            <InformationIcon
-              color={rc8Theme.palette.secondary1}
-              height={24}
-              width={24}
-            />
-          </Box>
-          <Typography variant="body2" color={rc8Theme.palette.text2} pt="3px">
-            Please consider subsetting your download selection using the tools
-            on the map.
-          </Typography>
-        </Box>
-      )}
+      {subsettingSelectionCount < 1 && <SubsettingMessage />}
 
       <Divider sx={{ width: "100%" }} />
 
