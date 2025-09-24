@@ -179,26 +179,29 @@ const ResultCards: FC<ResultCardsProps> = ({
 }) => {
   const { isUnderLaptop } = useBreakpoint();
   const goToDetailPage = useTabNavigation();
-  const { fetchMore } = useFetchData();
+  const { fetchRecord } = useFetchData();
+
+  const [count, total] = useMemo(() => {
+    const count = contents.result.collections.length;
+    const total = contents.result.total;
+    return [count, total];
+  }, [contents.result.collections.length, contents.result.total]);
+
+  const selectedUuid = useMemo(() => selectedUuids?.[0], [selectedUuids]);
 
   const loadMoreResults = useCallback(
-    () =>
-      fetchMore(
+    // Must use async here to make sure load done before return
+    // which block any action on new search message with the append
+    // action in the fetchRecord.
+    async () =>
+      await fetchRecord(
+        false,
         layout === SearchResultLayoutEnum.FULL_LIST
           ? FULL_LIST_PAGE_SIZE
           : DEFAULT_SEARCH_PAGE_SIZE
       ),
-    [fetchMore, layout]
+    [fetchRecord, layout]
   );
-
-  const count = useMemo(
-    () => contents.result.collections.length,
-    [contents.result.collections.length]
-  );
-
-  const total = useMemo(() => contents.result.total, [contents.result.total]);
-
-  const selectedUuid = useMemo(() => selectedUuids?.[0], [selectedUuids]);
 
   const onClickBtnCard = useCallback(
     (item: OGCCollection | undefined) => onClickCard?.(item),
@@ -242,17 +245,6 @@ const ResultCards: FC<ResultCardsProps> = ({
     [goToDetailPage, onClickLinks]
   );
 
-  // Fetching more data for full list view if the initial records less than 20
-  useEffect(() => {
-    if (
-      layout === SearchResultLayoutEnum.FULL_LIST &&
-      count < total &&
-      count < 20
-    ) {
-      fetchMore(FULL_LIST_PAGE_SIZE);
-    }
-  }, [count, fetchMore, layout, total]);
-
   const renderLoadMoreButton = useCallback(() => {
     return (
       <DetailSubtabBtn
@@ -262,6 +254,23 @@ const ResultCards: FC<ResultCardsProps> = ({
       />
     );
   }, [loadMoreResults]);
+
+  // Fetching more data for full list view if the initial records less than 20
+  useEffect(() => {
+    // Must use async here to make sure load done before return
+    // which block any action on new search message with the append
+    // action in the fetchRecord.
+    const loadRecords = async () => {
+      if (
+        layout === SearchResultLayoutEnum.FULL_LIST &&
+        count < total &&
+        count < 20
+      ) {
+        await fetchRecord(false, FULL_LIST_PAGE_SIZE);
+      }
+    };
+    loadRecords();
+  }, [count, fetchRecord, layout, total]);
 
   if (!contents) return;
 
