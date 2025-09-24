@@ -124,7 +124,7 @@ def test_map_reference_layers(
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
+    search_page.wait_for_page_stabilization()
     expect(search_page.first_result_title).to_be_visible()
 
     search_page.map.reference_layer_menu.click()
@@ -200,7 +200,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     search_page.map.drag_map()
     search_page.map.zoom_to_level()
-    search_page.wait_for_url_update()
+    search_page.wait_for_page_stabilization()
 
     map_center = search_page.map.get_map_center()
     map_zoom = search_page.map.get_map_zoom()
@@ -247,7 +247,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
 
     search_page.map.drag_map()
     search_page.map.zoom_to_level()
-    search_page.wait_for_url_update()
+    search_page.wait_for_page_stabilization()
 
     map_center = search_page.map.get_map_center()
     map_zoom = search_page.map.get_map_zoom()

@@ -30,6 +30,8 @@ import {
   getMultiPolygonFrom,
   getFormatFrom,
 } from "../../../utils/DownloadConditionUtils";
+import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
+import { MapFeatureRequest, MapFeatureResponse } from "./GeoserverDefinitions";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -130,6 +132,9 @@ const searchResult = async (
   if (param.sortby !== undefined && param.sortby.length !== 0) {
     p.sortby = param.sortby;
   }
+
+  // Track search page url parameters
+  trackSearchResultParameters(param);
 
   return axios
     .get<string>("/api/v1/ogc/collections", {
@@ -382,6 +387,19 @@ const searcher = createSlice({
   },
 });
 
+const fetchMapFeature = createAsyncThunk<
+  MapFeatureResponse,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>("geoserver/fetchMapFeature", (request: MapFeatureRequest, thunkApi: any) => {
+  return axios
+    .get<MapFeatureResponse>(
+      `/api/v1/ogc/collections/${request.uuid}/items/wms_map_feature`,
+      { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+    )
+    .then((response) => response.data)
+    .catch(errorHandling(thunkApi));
+});
 /**
  * Appends a filter condition using AND operation.
  */
@@ -530,6 +548,7 @@ export {
   fetchResultByUuidNoStore,
   fetchFeaturesByUuid,
   fetchParameterVocabsWithStore,
+  fetchMapFeature,
   processDatasetDownload,
   processWFSDownload,
   jsonToOGCCollections,
