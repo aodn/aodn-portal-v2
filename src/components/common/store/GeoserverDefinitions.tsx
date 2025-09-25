@@ -1,5 +1,4 @@
 export type MapTileRequest = {
-  uuid: string;
   layerName: string;
   width?: number;
   height?: number;

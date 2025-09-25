@@ -112,7 +112,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       formatToUrl<MapTileRequest>({
         baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
         params: {
-          uuid: config?.uuid,
           layerName: geoServerLayerConfig?.urlParams?.LAYERS.join(",") || "",
           bbox: config?.urlParams?.BBOX,
         },
