@@ -1,25 +1,24 @@
 import { AnalyticsEvent } from "./analyticsEvents";
 import { trackCustomEvent } from "./customEventTracker";
 
-export function trackPageResponseTime(): void {
-  window.addEventListener("load", () => {
-    try {
-      const responseTime = getResponseTime();
+export function trackPageResponseTime() {
+  const responseTime = getResponseTime();
 
-      if (responseTime > 0) {
-        // Log to console
-        // console.log(`📊 Response Time: ${responseTime}ms`);
+  if (responseTime > 0) {
+    const currentUrl = window.location.href;
+    const speedLabel = getSpeedLabel(responseTime);
 
-        // Send to Google Analytics with speed labels
-        trackCustomEvent(AnalyticsEvent.PAGE_RESPONSE_TIME, {
-          response_time_ms: responseTime,
-          speed: getSpeedLabel(responseTime), // fast, needs_improvement, or slow
-        });
-      }
-    } catch (error) {
-      console.error("Response time tracking failed:", error);
-    }
-  });
+    // console.log(
+    //   `📊 Page response in ${responseTime}ms (${speedLabel}) @ ${currentUrl}`
+    // );
+
+    // Send to Google Analytics with speed labels
+    trackCustomEvent(AnalyticsEvent.PAGE_RESPONSE_TIME, {
+      response_time_ms: responseTime,
+      speed: speedLabel,
+      url: currentUrl,
+    });
+  }
 }
 
 function getResponseTime(): number {
