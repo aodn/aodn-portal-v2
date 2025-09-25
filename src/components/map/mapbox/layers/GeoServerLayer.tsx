@@ -10,6 +10,7 @@ import { MapMouseEvent, MapMouseEventType, Popup } from "mapbox-gl";
 import {
   MapFeatureRequest,
   MapFeatureResponse,
+  MapTileRequest,
 } from "../../../common/store/GeoserverDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import { fetchMapFeature } from "../../../common/store/searchReducer";
@@ -18,28 +19,11 @@ import { createRoot, Root } from "react-dom/client";
 
 interface UrlParams {
   LAYERS: string[];
-  TRANSPARENT?: string;
-  VERSION?: string;
-  FORMAT?: string;
-  EXCEPTIONS?: string;
-  TILED?: string;
-  SERVICE?: string;
-  REQUEST?: string;
-  STYLES?: string;
-  QUERYABLE?: string;
-  QUERY_LAYERS?: string[];
-  INFO_FORMAT?: string;
-  FEATURE_COUNT?: number;
-  BUFFER?: number;
-  SRS?: string;
-  CRS?: string;
   BBOX?: string;
   WIDTH?: number;
   HEIGHT?: number;
   X?: number;
   Y?: number;
-  I?: number;
-  J?: number;
 }
 
 interface GeoServerLayerConfig {
@@ -63,22 +47,8 @@ interface GeoServerLayerProps extends LayerBasicType {
 const DEFAULT_WMS_MAP_CONFIG: GeoServerLayerConfig = {
   urlParams: {
     LAYERS: [],
-    TRANSPARENT: "TRUE",
-    VERSION: "1.1.1",
-    FORMAT: "image/png",
-    EXCEPTIONS: "application/vnd.ogc.se_xml",
-    TILED: "true",
-    SERVICE: "WMS",
-    REQUEST: "GetMap",
-    STYLES: "",
-    QUERYABLE: "true",
-    // Change the coordinate system from EPSG:4326 to EPSG:3857 (Web Mercator) which is what Mapbox GL expects for WMS tiles.
-    // "EPSG:900913" is same as EPSG:3857, just it is an old name
-    SRS: "EPSG:900913",
     // Adapt to the Mapbox GL WMS Bbox format
     BBOX: "{bbox-epsg-3857}",
-    WIDTH: 256,
-    HEIGHT: 256,
   },
   uuid: "",
   baseUrl: "",
@@ -92,59 +62,6 @@ const DEFAULT_WMS_MAP_CONFIG: GeoServerLayerConfig = {
     MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
   ],
   opacity: 1.0,
-};
-
-const DEFAULT_NCWMS_MAP_CONFIG: GeoServerLayerConfig = {
-  urlParams: {
-    LAYERS: [],
-    TRANSPARENT: "TRUE",
-    VERSION: "1.3.0",
-    FORMAT: "image/png",
-    EXCEPTIONS: "application/vnd.ogc.se_xml",
-    TILED: "true",
-    SERVICE: "ncwms",
-    REQUEST: "GetMap",
-    STYLES: "",
-    QUERYABLE: "true",
-    //Change the coordinate system from EPSG:4326 to EPSG:3857 (Web Mercator) which is what Mapbox GL expects for WMS tiles.
-    CRS: "EPSG:3857",
-    // Adapt to the Mapbox GL WMS Bbox format
-    // BBOX: `${MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT},${MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON},${MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT},${MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON}`,
-    // Adapt to the Mapbox GL WMS Bbox format
-    BBOX: "{bbox-epsg-3857}",
-    WIDTH: 256,
-    HEIGHT: 256,
-  },
-  uuid: "",
-  baseUrl: "",
-  tileSize: 256,
-  minZoom: MapDefaultConfig.MIN_ZOOM,
-  maxZoom: MapDefaultConfig.MAX_ZOOM,
-  bbox: [
-    MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
-    MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
-    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
-    MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
-  ],
-  opacity: 1.0,
-};
-
-// This function is specific for IMOS server geoserver-123
-// we can speed up the query by calling the cache server we own.
-// A proxy setup to redirect the call on firewall level
-const applyGeoWebCacheIfPossible = (baseUrl: string, param: UrlParams) => {
-  if (baseUrl.includes("geoserver-123.aodn.org.au/geoserver/wms")) {
-    // We can rewrite value so that it use internal cache server
-    return {
-      baseUrl: "/geowebcache/service/wms",
-      params: param,
-    };
-  } else {
-    return {
-      baseUrl: baseUrl,
-      params: param,
-    };
-  }
 };
 
 // Helper functions to generate consistent IDs
@@ -186,20 +103,18 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     const config = mergeWithDefaults(
       // ncwms is a customise instance by IMOS in the geoserver-123, no cache server
       // is provided in this case.
-      geoServerLayerConfig?.baseUrl?.endsWith("ncwms")
-        ? DEFAULT_NCWMS_MAP_CONFIG
-        : DEFAULT_WMS_MAP_CONFIG,
+      DEFAULT_WMS_MAP_CONFIG,
       geoServerLayerConfig
     );
     // We append cache server URL in front, if layer is not in cache server, it
     // will fall back to the original URL.
     const tileUrl = [
-      formatToUrl<UrlParams>(
-        applyGeoWebCacheIfPossible(config.baseUrl, config.urlParams)
-      ),
-      formatToUrl<UrlParams>({
-        baseUrl: config.baseUrl,
-        params: config.urlParams,
+      formatToUrl<MapTileRequest>({
+        baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
+        params: {
+          layerName: geoServerLayerConfig?.urlParams?.LAYERS.join(",") || "",
+          bbox: config?.urlParams?.BBOX,
+        },
       }),
     ];
     const isWMSAvailable = checkWMSAvailability(
@@ -346,10 +261,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         layerName: geoServerLayerConfig?.urlParams?.LAYERS.join(",") || "",
         width: map.getCanvas().width,
         height: map.getCanvas().height,
-        // Protocol 1.3.0 use I J instead of X Y
-        i: Math.round(event.point.x),
         x: Math.round(event.point.x),
-        j: Math.round(event.point.y),
         y: Math.round(event.point.y),
         bbox: map.getBounds()?.toArray().flat().join(","),
       };

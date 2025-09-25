@@ -10,7 +10,6 @@ export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
   const apiPath = process.env.VITE_API_HOST;
-  const geowebcacheWMSPath = process.env.VITE_GWC_WMS;
 
   const inlineNewRelicPlugin = () => {
     // We need to inline the relic_script in the index.html, you can dynamic include based on env here
@@ -83,10 +82,6 @@ export default ({ mode }) => {
         },
         "/api/v1/ogc/processes": {
           target: apiPath,
-          changeOrigin: true,
-        },
-        "/geowebcache/service/wms": {
-          target: geowebcacheWMSPath,
           changeOrigin: true,
         },
       },
