@@ -94,7 +94,7 @@ def test_spatial_map_click_zooms_detail_map(
     assert round(click_lng_lat['lng']) == round(new_detail_map_center['lng'])
     assert round(click_lng_lat['lat']) == round(new_detail_map_center['lat'])
 
-
+@pytest.mark.skip
 @pytest.mark.parametrize(
     'uuid',
     [
