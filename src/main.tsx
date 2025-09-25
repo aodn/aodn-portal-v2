@@ -5,16 +5,12 @@ import { Provider } from "react-redux";
 import store from "./components/common/store/store";
 import "./index.css";
 import "./styles/fontsRC8";
-import { trackPageResponseTime } from "./analytics/pageResTimeEvent";
 
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {
   throw new Error("No element with id 'root' found");
 }
-
-// 🎯 page response time tracking
-trackPageResponseTime();
 
 const root = createRoot(rootElement);
 
