@@ -1,3 +1,11 @@
+export type MapTileRequest = {
+  uuid: string;
+  layerName: string;
+  width?: number;
+  height?: number;
+  bbox?: string;
+};
+
 export type MapFeatureRequest = {
   uuid: string;
   layerName: string;
@@ -5,8 +13,6 @@ export type MapFeatureRequest = {
   height?: number;
   x?: number;
   y?: number;
-  i?: number;
-  j?: number;
   bbox?: string;
 };
 
