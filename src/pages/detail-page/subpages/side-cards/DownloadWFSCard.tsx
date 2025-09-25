@@ -1,6 +1,9 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import {
+  AccordionDetails,
+  AccordionSummary,
   Alert,
+  Badge,
   Box,
   Button,
   Divider,
@@ -14,6 +17,7 @@ import {
   useTheme,
 } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   border,
   borderRadius,
@@ -26,10 +30,18 @@ import rc8Theme from "../../../../styles/themeRC8";
 import useWFSDownload, {
   DownloadStatus,
 } from "../../../../hooks/useWFSDownload";
+import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
+import { useDetailPageContext } from "../../context/detail-page-context";
+import DataSelection from "../../../../components/download/DataSelection";
+import {
+  DownloadConditionType,
+  FormatCondition,
+} from "../../context/DownloadDefinitions";
+import SubsettingMessage from "./SubsettingMessage";
 
-// TODO: options should fetch from wfs server
 const options = [
   // { label: "NetCDFs", value: "NetCDFs" },
+  // Currently only CSV is supported for WFS downloading
   { label: "CSV", value: "csv" },
 ];
 
@@ -40,9 +52,15 @@ interface DownloadWFSCardProps {
 
 const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
   const theme = useTheme();
+  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
+  const { downloadConditions, getAndSetDownloadConditions } =
+    useDetailPageContext();
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
     WFSLinks[0]?.title
+  );
+  const [selectedFormat, setSelectedFormat] = useState<string>(
+    options[0].value
   );
   const {
     downloadingStatus,
@@ -53,28 +71,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
     formatBytes,
     isDownloading,
   } = useWFSDownload(() => setSnackbarOpen(true));
-
-  const WFSOptions = useMemo(
-    () => WFSLinks.map((link) => ({ value: link.title, label: link.title })),
-    [WFSLinks]
-  );
-
-  const handleSelectDataItem = useCallback((value: string | undefined) => {
-    setSelectedDataItem(value);
-  }, []);
-
-  const handleDownload = useCallback(async () => {
-    if (!selectedDataItem || !uuid) {
-      console.error("Missing required parameters");
-      return;
-    }
-
-    await startDownload(uuid, selectedDataItem);
-  }, [selectedDataItem, uuid, startDownload]);
-
-  const handleCancelDownload = useCallback(() => {
-    cancelDownload();
-  }, [cancelDownload]);
 
   const selectSxProps = useMemo(
     () => ({
@@ -87,6 +83,48 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
     [theme]
   );
 
+  const WFSOptions = useMemo(
+    () => WFSLinks.map((link) => ({ value: link.title, label: link.title })),
+    [WFSLinks]
+  );
+
+  // Store the filtered download conditions count
+  const subsettingSelectionCount = useMemo(() => {
+    return downloadConditions.filter(
+      (condition) => condition.type !== DownloadConditionType.FORMAT
+    ).length;
+  }, [downloadConditions]);
+
+  const handleSelectFormat = useCallback(
+    (value: string) => {
+      setSelectedFormat(value);
+      getAndSetDownloadConditions(DownloadConditionType.FORMAT, [
+        new FormatCondition("format", value),
+      ]);
+    },
+    [getAndSetDownloadConditions]
+  );
+
+  const handleSelectDataItem = useCallback((value: string) => {
+    setSelectedDataItem(value);
+  }, []);
+
+  const handleDownload = useCallback(async () => {
+    if (!selectedDataItem || !uuid) return;
+    await startDownload(uuid, selectedDataItem, downloadConditions);
+  }, [selectedDataItem, uuid, startDownload, downloadConditions]);
+
+  const handleCancelDownload = useCallback(() => {
+    cancelDownload();
+  }, [cancelDownload]);
+
+  useEffect(() => {
+    // set default format
+    getAndSetDownloadConditions(DownloadConditionType.FORMAT, [
+      new FormatCondition("format", options[0].value),
+    ]);
+  }, [getAndSetDownloadConditions]);
+
   return (
     <Stack direction="column">
       {/* TODO: Add download dialog in the future  */}
@@ -98,6 +136,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
         <CommonSelect
           items={options}
           label="Select format"
+          value={selectedFormat}
+          onSelectCallback={handleSelectFormat}
           sx={selectSxProps}
           disabled={isDownloading}
         />
@@ -109,23 +149,25 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
           sx={selectSxProps}
           disabled={isDownloading}
         />
-        <Button
-          sx={{
-            position: "relative",
-            backgroundColor: rc8Theme.palette.primary.main,
-            borderRadius: borderRadius.small,
-            ":hover": {
+        <Box position="relative">
+          <Button
+            sx={{
+              width: "100%",
               backgroundColor: rc8Theme.palette.primary.main,
-            },
-            cursor: isDownloading ? "not-allowed" : "pointer",
-          }}
-          onClick={isDownloading ? undefined : () => handleDownload()}
-        >
-          <Typography padding={0} color="#fff">
-            {isDownloading ? "Downloading..." : "Download WFS Data"}
-          </Typography>
+              borderRadius: borderRadius.small,
+              ":hover": {
+                backgroundColor: rc8Theme.palette.primary.main,
+              },
+              cursor: isDownloading ? "not-allowed" : "pointer",
+            }}
+            onClick={isDownloading ? undefined : () => handleDownload()}
+          >
+            <Typography padding={0} color="#fff">
+              {isDownloading ? "Downloading..." : "Download WFS Data"}
+            </Typography>
+          </Button>
           {isDownloading && (
-            <Box sx={{ position: "absolute", right: 1 }}>
+            <Box sx={{ position: "absolute", right: 1, top: 1 }}>
               <Tooltip placement="top" title="Cancel Download">
                 <IconButton
                   size="small"
@@ -137,7 +179,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
               </Tooltip>
             </Box>
           )}
-        </Button>
+        </Box>
+
         {isDownloading && (
           <Stack spacing={1}>
             <LinearProgress
@@ -189,31 +232,46 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
           </Stack>
         )}
       </Stack>
-      <Divider sx={{ width: "100%" }} />
-      {/* TODO: Add this block back when we need data-selection for WFS download */}
-      {/* <PlainAccordion
-        expanded={accordionExpanded}
-        elevation={0}
-        onChange={() => setAccordionExpanded((prevState) => !prevState)}
-      >
-        <AccordionSummary
-          sx={{ paddingX: padding.medium }}
-          expandIcon={<ExpandMoreIcon />}
-        >
-          <Badge color="primary" badgeContent={downloadConditions.length}>
-            <Typography
-              fontWeight={fontWeight.bold}
-              color={fontColor.gray.medium}
-              sx={{ padding: 0, marginRight: "10px" }}
-            >
-              Data Selection
-            </Typography>
-          </Badge>
-        </AccordionSummary>
-        <AccordionDetails>
-          <DataSelection />
-        </AccordionDetails>
-      </PlainAccordion> */}
+
+      {subsettingSelectionCount >= 1 ? (
+        <>
+          <Divider sx={{ width: "100%" }} />
+          <PlainAccordion
+            expanded={accordionExpanded}
+            elevation={0}
+            onChange={() => setAccordionExpanded((prevState) => !prevState)}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Box display="flex" alignItems="center" gap={3}>
+                <Typography
+                  typography="title1Medium"
+                  color={rc8Theme.palette.text1}
+                  p={0}
+                >
+                  Data Selection
+                </Typography>
+                <Badge
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      backgroundColor: rc8Theme.palette.primary1,
+                      ...rc8Theme.typography.title2Regular,
+                      color: rc8Theme.palette.text3,
+                      pb: "1px",
+                    },
+                  }}
+                  badgeContent={subsettingSelectionCount}
+                />
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails sx={{ pt: "4px" }}>
+              <DataSelection />
+            </AccordionDetails>
+          </PlainAccordion>
+        </>
+      ) : (
+        <SubsettingMessage />
+      )}
+
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackbarOpen}

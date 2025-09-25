@@ -98,23 +98,13 @@ const getMinMaxDateStamps = (
 // As WMSServer may be an array if there are multiple wms links, for now we only use the first one.
 // TODO: This should be improved to handle multiple WMS layers and servers if needed.
 const getWMSServer = (collection: OGCCollection | undefined) => {
-  const dataAccessLinks = collection?.getDataAccessLinks();
-  if (!dataAccessLinks || dataAccessLinks.length === 0) {
-    return [];
-  }
-  return dataAccessLinks
-    .filter((link) => link.rel === "wms" && link.href)
-    .map((link) => link.href);
+  const wmsServers = collection?.getWMSLinks()?.map((link) => link.href);
+  return wmsServers && wmsServers.length > 0 ? wmsServers[0] : "";
 };
 
 const getWMSLayerNames = (collection: OGCCollection | undefined) => {
-  const DataAccessLinks = collection?.getDataAccessLinks();
-  if (!DataAccessLinks || DataAccessLinks.length === 0) {
-    return [];
-  }
-  return DataAccessLinks.filter((link) => link.rel === "wms" && link.title).map(
-    (link) => link.title
-  );
+  const layerNames = collection?.getWMSLinks()?.map((link) => link.title);
+  return layerNames && layerNames.length > 0 ? layerNames : [];
 };
 
 const overallBoundingBox = (
@@ -347,17 +337,18 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       // GeoServerLayer is heavy to load, so we can load it
                       // but hide it with visible = false
                     }
+                    <HexbinLayer
+                      featureCollection={filteredFeatureCollection}
+                      visible={selectedLayer === LayerName.Hexbin}
+                    />
                     <GeoServerLayer
                       geoServerLayerConfig={{
-                        baseUrl: ensureHttps(getWMSServer(collection)[0]),
+                        uuid: collection.id,
+                        baseUrl: ensureHttps(getWMSServer(collection)),
                         urlParams: { LAYERS: getWMSLayerNames(collection) },
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
                       visible={selectedLayer === LayerName.GeoServer}
-                    />
-                    <HexbinLayer
-                      featureCollection={filteredFeatureCollection}
-                      visible={selectedLayer === LayerName.Hexbin}
                     />
                     <GeojsonLayer
                       collection={collection}

@@ -10,7 +10,6 @@ export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
   const apiPath = process.env.VITE_API_HOST;
-  const geowebcacheWMSPath = process.env.VITE_GWC_WMS;
 
   const inlineNewRelicPlugin = () => {
     // We need to inline the relic_script in the index.html, you can dynamic include based on env here
@@ -22,6 +21,10 @@ export default ({ mode }) => {
           path.resolve(__dirname, "public/relic_script.js"),
           "utf8"
         );
+        // Skip GA in test mode
+        if (mode === "test") {
+          return html.replace("<!-- new-relic-js -->", "");
+        }
 
         return html.replace(
           "<!-- new-relic-js -->",
@@ -79,10 +82,6 @@ export default ({ mode }) => {
         },
         "/api/v1/ogc/processes": {
           target: apiPath,
-          changeOrigin: true,
-        },
-        "/geowebcache/service/wms": {
-          target: geowebcacheWMSPath,
           changeOrigin: true,
         },
       },

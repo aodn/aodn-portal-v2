@@ -6,5 +6,4 @@ class LayerType(Enum):
     WORLD_BOUNDARIES = auto()
     SPIDER = auto()
     GEO_SERVER = auto()
-    HEXBIN = auto()
-    SYMBOL = auto()
+    HEX_GRID = auto()

@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import { ParameterState, Vocab } from "./componentParamReducer";
-
 import {
   cqlDefaultFilters,
   DatasetGroup,
@@ -21,7 +20,17 @@ import {
 } from "../../../utils/ErrorBoundary";
 import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
-import { DatasetDownloadRequest } from "../../../pages/detail-page/context/DownloadDefinitions";
+import {
+  DatasetDownloadRequest,
+  WFSDownloadRequest,
+} from "../../../pages/detail-page/context/DownloadDefinitions";
+import {
+  getDateConditionFrom,
+  getMultiPolygonFrom,
+  getFormatFrom,
+} from "../../../utils/DownloadConditionUtils";
+import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
+import { MapFeatureRequest, MapFeatureResponse } from "./GeoserverDefinitions";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -69,6 +78,8 @@ export const FULL_LIST_PAGE_SIZE = 21;
 
 const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
 const TIMEOUT = 60000;
+const WFS_DOWNLOAD_TIMEOUT =
+  Number(import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT) || 1200000; // Default 20 minutes timeout for WFS downloads
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
   return new OGCCollections(
@@ -115,6 +126,9 @@ const searchResult = async (
   if (param.sortby !== undefined && param.sortby.length !== 0) {
     p.sortby = param.sortby;
   }
+
+  // Track search page url parameters
+  trackSearchResultParameters(param);
 
   return axios
     .get<string>("/api/v1/ogc/collections", {
@@ -270,6 +284,56 @@ const processDatasetDownload = createAsyncThunk<
   }
 );
 
+const processWFSDownload = createAsyncThunk<
+  any,
+  WFSDownloadRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "download/downloadWFS",
+  async (request: WFSDownloadRequest, thunkAPI: any) => {
+    try {
+      // Extract download conditions
+      const dateRange = getDateConditionFrom(request.downloadConditions);
+      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+      const format = getFormatFrom(request.downloadConditions); // Currently unused - CSV only for WFS
+
+      const requestBody = {
+        inputs: {
+          uuid: request.uuid,
+          start_date: dateRange.start,
+          end_date: dateRange.end,
+          multi_polygon: multiPolygon,
+          layer_name: request.layerName,
+        },
+        outputs: {},
+        subscriber: {
+          successUri: "",
+          inProgressUri: "",
+          failedUri: "",
+        },
+      };
+
+      return axios.post(
+        "/api/v1/ogc/processes/downloadWfs/execution",
+        requestBody,
+        {
+          adapter: "fetch", // Use fetch adapter for streaming
+          responseType: "stream",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+            "Cache-Control": "no-cache",
+          },
+          timeout: WFS_DOWNLOAD_TIMEOUT,
+          signal: thunkAPI.signal,
+        }
+      );
+    } catch (error) {
+      errorHandling(thunkAPI);
+    }
+  }
+);
+
 const fetchParameterVocabsWithStore = createAsyncThunk<
   Array<Vocab>,
   Map<string, string> | null,
@@ -305,6 +369,19 @@ const searcher = createSlice({
   },
 });
 
+const fetchMapFeature = createAsyncThunk<
+  MapFeatureResponse,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>("geoserver/fetchMapFeature", (request: MapFeatureRequest, thunkApi: any) => {
+  return axios
+    .get<MapFeatureResponse>(
+      `/api/v1/ogc/collections/${request.uuid}/items/wms_map_feature`,
+      { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+    )
+    .then((response) => response.data)
+    .catch(errorHandling(thunkApi));
+});
 /**
  * Appends a filter condition using AND operation.
  */
@@ -453,7 +530,9 @@ export {
   fetchResultByUuidNoStore,
   fetchFeaturesByUuid,
   fetchParameterVocabsWithStore,
+  fetchMapFeature,
   processDatasetDownload,
+  processWFSDownload,
   jsonToOGCCollections,
 };
 

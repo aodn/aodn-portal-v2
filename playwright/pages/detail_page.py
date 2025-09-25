@@ -40,7 +40,7 @@ class DetailPage(BasePage):
     def load(self, uuid: str) -> None:
         """Load the detail page for the given uuid"""
         url = f'{settings.baseURL}/details/{uuid}'
-        self.page.goto(url, wait_until='domcontentloaded')
+        self.page.goto(url, wait_until='load')
 
     def return_and_get_api_request_url(self) -> str:
         """Return to the previous page and return the API URL used for the request."""

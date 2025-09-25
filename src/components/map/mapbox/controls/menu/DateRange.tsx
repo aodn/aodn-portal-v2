@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   DateRangeCondition,
@@ -48,7 +48,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
   maxDate,
   onDateRangeChange,
 }) => {
-  const { isMobile, isTablet, isLaptop, isDesktop, is4K } = useBreakpoint();
+  const { isMobile, isTablet } = useBreakpoint();
   const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
     dateToValue(
       dayjs(
@@ -70,6 +70,24 @@ const DateSlider: React.FC<DateSliderProps> = ({
     },
     []
   );
+
+  useEffect(() => {
+    const newDateRangeStamp = [
+      dateToValue(
+        dayjs(
+          currentMinDate ? currentMinDate : minDate,
+          dateDefault.SIMPLE_DATE_FORMAT
+        )
+      ),
+      dateToValue(
+        dayjs(
+          currentMaxDate ? currentMaxDate : maxDate,
+          dateDefault.SIMPLE_DATE_FORMAT
+        )
+      ),
+    ];
+    setDateRangeStamp(newDateRangeStamp);
+  }, [currentMinDate, currentMaxDate, minDate, maxDate]);
 
   return (
     <Grid
@@ -216,6 +234,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
           () => {
             setCurrentMinDate(undefined);
             setCurrentMaxDate(undefined);
+            setOpen(false);
           }
         );
         getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [

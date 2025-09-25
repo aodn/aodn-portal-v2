@@ -11,5 +11,5 @@ if [ $? -eq 1 ]; then
     echo "Server did not start successfully. Skipping tests."
     exit 1
 else
-    python3 -m poetry run pytest --tracing retain-on-failure
+    python3 -m poetry run pytest --numprocesses auto --tracing retain-on-failure
 fi

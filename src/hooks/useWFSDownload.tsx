@@ -1,6 +1,7 @@
 import { useCallback, useState, useRef } from "react";
-
-const CONNECTION_TIMEOUT_DEFAULT = 20 * 60000;
+import { useAppDispatch } from "../components/common/store/hooks";
+import { processWFSDownload } from "../components/common/store/searchReducer";
+import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
 
 // Aligned with backend WFS SSE event names
 enum EventName {
@@ -57,12 +58,13 @@ enum DownloadStatus {
 }
 
 const useWFSDownload = (onCallback?: () => void) => {
+  const dispatch = useAppDispatch();
   const [downloadingStatus, setDownloadingStatus] = useState<DownloadStatus>(
     DownloadStatus.NOT_STARTED
   );
   const [progressMessage, setProgressMessage] = useState<string>("");
   const [downloadedBytes, setDownloadedBytes] = useState<number>(0);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const downloadPromiseRef = useRef<any>(null);
   const fileChunksRef = useRef<string[]>([]);
   const receivedChunksRef = useRef<Set<number>>(new Set());
   const expectedTotalChunksRef = useRef<number>(0);
@@ -102,9 +104,9 @@ const useWFSDownload = (onCallback?: () => void) => {
 
   // Cancel download function
   const cancelDownload = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
+    if (downloadPromiseRef.current) {
+      downloadPromiseRef.current.abort();
+      downloadPromiseRef.current = null;
     }
     cleanupDownload();
     setDownloadedBytes(0);
@@ -315,7 +317,11 @@ const useWFSDownload = (onCallback?: () => void) => {
 
   // Main download function using manual fetch + streaming
   const startDownload = useCallback(
-    async (uuid: string, layerName: string) => {
+    async (
+      uuid: string,
+      layerName: string,
+      downloadConditions: IDownloadCondition[]
+    ) => {
       // Clean up any existing download
       cleanupDownload();
 
@@ -333,65 +339,48 @@ const useWFSDownload = (onCallback?: () => void) => {
       onCallback && onCallback();
 
       try {
-        const controller = new AbortController();
-        abortControllerRef.current = controller;
-        const timeout = process.env.VITE_WFS_DOWNLOADING_TIMEOUT
-          ? Number(process.env.VITE_WFS_DOWNLOADING_TIMEOUT)
-          : CONNECTION_TIMEOUT_DEFAULT; // Frontend 20 minutes timeout by default
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-        const response = await fetch(
-          "/api/v1/ogc/processes/downloadWfs/execution",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "text/event-stream",
-            },
-            body: JSON.stringify({
-              inputs: {
-                uuid: uuid,
-                recipient: "",
-                layer_name: layerName,
-              },
-              outputs: {},
-              subscriber: {
-                successUri: "",
-                inProgressUri: "",
-                failedUri: "",
-              },
-            }),
-            signal: controller.signal,
-          }
+        const downloadPromise = dispatch(
+          processWFSDownload({
+            uuid,
+            layerName,
+            downloadConditions,
+          })
         );
 
-        clearTimeout(timeoutId);
+        // Store the promise so we can abort it later
+        downloadPromiseRef.current = downloadPromise;
 
-        if (!response.ok) {
-          console.error(`HTTP error! status: ${response.status}`);
+        const resultAction = await downloadPromise;
+
+        if (processWFSDownload.rejected.match(resultAction)) {
           setDownloadingStatus(DownloadStatus.ERROR);
-          setProgressMessage(`HTTP error! status: ${response.status}`);
+          setProgressMessage(
+            resultAction.payload?.message || "Failed to start WFS download"
+          );
           onCallback && onCallback();
+          return;
         }
 
-        if (!response.body) {
-          console.error("Response body is null");
+        const responseStream = resultAction.payload.data as ReadableStream;
+
+        if (!responseStream) {
+          console.error("Response stream is null");
           setDownloadingStatus(DownloadStatus.ERROR);
-          setProgressMessage("Response body is null");
+          setProgressMessage("Response stream is null");
           onCallback && onCallback();
           cleanupDownload();
           return;
         }
 
         // Parse SSE stream manually
-        const reader = response.body.getReader();
+        const reader = responseStream.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
         let done = false;
         let downloadCompleted = false;
 
         try {
-          while (!done && !controller.signal.aborted) {
+          while (!done) {
             const result = await reader.read();
             done = result.done;
             if (done) break;
@@ -401,7 +390,7 @@ const useWFSDownload = (onCallback?: () => void) => {
 
             // Process complete SSE events
             let eventStart = 0;
-            while (eventStart < buffer.length && !controller.signal.aborted) {
+            while (eventStart < buffer.length) {
               // Look for complete event (ends with double newline)
               const eventEnd = buffer.indexOf("\n\n", eventStart);
               if (eventEnd === -1) {
@@ -427,7 +416,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         }
 
         // Only show error if we haven't successfully completed the download
-        if (!downloadCompleted && !controller.signal.aborted) {
+        if (!downloadCompleted) {
           setDownloadingStatus(DownloadStatus.ERROR);
           setProgressMessage(
             "Download incomplete - connection closed unexpectedly"
@@ -436,15 +425,13 @@ const useWFSDownload = (onCallback?: () => void) => {
         }
 
         // Clean up immediately after processing
-        if (!controller.signal.aborted) {
-          cleanupDownload();
-        }
+        cleanupDownload();
       } catch (error) {
         setDownloadedBytes(0);
         cleanupDownload();
       }
     },
-    [cleanupDownload, onCallback, processSSEEvent]
+    [cleanupDownload, onCallback, processSSEEvent, dispatch]
   );
 
   return {

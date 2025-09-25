@@ -14,11 +14,17 @@ import { decode } from "he";
  * // result: 'Hello'
  *
  * @example
+ * example of capitalizing first letter and lowercasing the rest
  * const result = capitalizeFirstLetter('alReAdY cOrReCt');
  * // result: 'Already correct'
  */
-export const capitalizeFirstLetter = (str: string): string =>
-  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+export const capitalizeFirstLetter = (
+  str: string,
+  shouldLowercaseTheRest: boolean = true
+): string =>
+  `${str.charAt(0).toUpperCase()}${
+    shouldLowercaseTheRest ? str.slice(1).toLowerCase() : str.slice(1)
+  }`;
 
 /**
  * Formats a number with comma separators for thousands.

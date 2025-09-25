@@ -23,6 +23,7 @@ import ContentCopy from "@mui/icons-material/ContentCopy";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 import useClipboard from "../../hooks/useClipboard";
+import { useLocation } from "react-router-dom";
 
 interface ShareMenuItem {
   name: string;
@@ -71,10 +72,12 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const location = useLocation();
 
   const {
     checkIfCopied: checkIfCopiedDefault,
     copyToClipboard: copyToClipboardDefault,
+    clearClipboard,
   } = useClipboard();
   // Generate share URL with UTM parameters for Google Analytics tracking
   // Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
@@ -83,7 +86,10 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
     url.searchParams.set("utm_source", "portal"); // Track source as 'portal'
     url.searchParams.set("utm_medium", "share_link"); // Track medium as 'share_link'
     return url.toString();
-  }, []);
+    // We need to update the url when the location changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
+
   const isCopiedDefault = useMemo(
     () => checkIfCopiedDefault(copyUrlDefault),
     [checkIfCopiedDefault, copyUrlDefault]
@@ -105,8 +111,9 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
   const handleClose = useCallback(() => {
     setIsOpen(false);
     enableScroll();
+    clearClipboard();
     onClose && onClose();
-  }, [onClose]);
+  }, [clearClipboard, onClose]);
 
   return (
     <>

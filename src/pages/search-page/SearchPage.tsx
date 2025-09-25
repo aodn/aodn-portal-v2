@@ -10,10 +10,8 @@ import store, {
 import {
   createSearchParamFrom,
   DEFAULT_SEARCH_MAP_SIZE,
-  DEFAULT_SEARCH_PAGE_SIZE,
   fetchResultByUuidNoStore,
   fetchResultNoStore,
-  fetchResultWithStore,
   jsonToOGCCollections,
   SearchParameters,
 } from "../../components/common/store/searchReducer";
@@ -62,6 +60,7 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 import _ from "lodash";
+import useFetchData from "../../hooks/useFetchData";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -69,6 +68,7 @@ const SearchPage = () => {
   const dispatch = useAppDispatch();
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
+  const { fetchRecord } = useFetchData();
   const layout = useAppSelector((state) => state.paramReducer.layout);
   const currentSort = useAppSelector((state) => state.paramReducer.sort);
   // Layers contains record with uuid and bbox only
@@ -191,31 +191,17 @@ const SearchPage = () => {
 
   const doListSearch = useCallback(
     (needNavigate: boolean = false) => {
-      const componentParam: ParameterState = getComponentState(
-        store.getState()
-      );
-
       if (listSearchAbortRef.current) {
         listSearchAbortRef.current.abort();
       }
-
-      // Use standard param to get fields you need, record is stored in redux,
-      // set page so that it returns fewer record. Also allow search on record
-      // without geometry (like docs)
-      const paramPaged = createSearchParamFrom(
-        { ...componentParam, includeNoGeometry: true },
-        {
-          pagesize: DEFAULT_SEARCH_PAGE_SIZE,
-        }
-      );
       // The return implicit contains a AbortController due to use of signal in
       // axios call
-      listSearchAbortRef.current = dispatch(fetchResultWithStore(paramPaged));
+      listSearchAbortRef.current = fetchRecord(true);
       doMapSearch(needNavigate).finally(
         () => (mapSearchAbortRef.current = null)
       );
     },
-    [dispatch, doMapSearch]
+    [doMapSearch, fetchRecord]
   );
 
   // The result will be changed based on the zoomed area, that is only
