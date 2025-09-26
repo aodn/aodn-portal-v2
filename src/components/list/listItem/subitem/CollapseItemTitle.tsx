@@ -1,5 +1,6 @@
 import React from "react";
 import { Grid, Typography } from "@mui/material";
+import rc8Theme from "../../../../styles/themeRC8";
 
 interface CollapseItemTitleProps {
   setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,7 +27,14 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
           whiteSpace: "normal",
         }}
       >
-        <Typography variant="detailTitle">
+        <Typography
+          sx={{
+            ...rc8Theme.typography.body1Medium,
+            p: 0,
+            my: "10px",
+            mx: "6px",
+          }}
+        >
           {text ? text : "[ NO TITLE ]"}
         </Typography>
       </Grid>

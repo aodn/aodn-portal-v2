@@ -47,7 +47,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
               sx={{
                 ...rc8Theme.typography.heading4,
                 color: rc8Theme.palette.text2,
-                pb: "8px",
+                pb: "6px",
                 marginLeft: theme.mp.md,
               }}
               data-testid={`detail-sub-section-${title}`}
