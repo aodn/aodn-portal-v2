@@ -36,7 +36,8 @@ const ThemeList: React.FC<ThemeListProps> = ({
                   alignItems: "center",
                   justifyItems: "center",
                   backgroundColor: theme.palette.common.white,
-                  padding: "8px 13.2px",
+                  padding: "8px 14px",
+                  my: "4px",
                   gap: gap.xlg,
                   borderRadius: borderRadius.small,
                 }}
