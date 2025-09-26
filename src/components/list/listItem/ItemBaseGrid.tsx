@@ -26,7 +26,6 @@ const ItemBaseGrid = ({
   sx,
   ...props
 }: React.PropsWithChildren<ItemBaseGridProps>) => {
-  const theme = useTheme();
   const [isOnHover, setIsOnHover] = useState<boolean>(false);
 
   // Determine background color
@@ -47,7 +46,6 @@ const ItemBaseGrid = ({
           minheight: "44px",
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
           borderRadius: "4px",
           my: disableHover ? "10px" : "6px",
           p: disableHover ? 0 : "4px 16px",

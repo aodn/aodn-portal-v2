@@ -53,7 +53,11 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
         >
           <IconButton
             onClick={handleClose}
-            style={{ position: "absolute", top: 8, right: 8 }}
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: { xs: "35px", sm: "15px" },
+            }}
           >
             <CloseIcon />
           </IconButton>
