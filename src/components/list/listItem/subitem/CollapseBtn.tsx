@@ -1,7 +1,8 @@
 import { IconButton } from "@mui/material";
 import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
 import React from "react";
+import rc8Theme from "../../../../styles/themeRC8";
+import { ExpandMore } from "../../../../assets/icons/details/expend";
 
 interface CollapseBtnProps {
   setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,7 +18,11 @@ const CollapseBtn: React.FC<CollapseBtnProps> = ({
       aria-label="expand or collapse"
       onClick={() => setIsExpanded((prev) => !prev)}
     >
-      {isExpanded ? <ExpandLess /> : <ExpandMore />}
+      {isExpanded ? (
+        <ExpandLess sx={{ color: rc8Theme.palette.primary1, fontWeight: 0 }} />
+      ) : (
+        <ExpandMore />
+      )}
     </IconButton>
   );
 };

@@ -3,6 +3,7 @@ import { useHoverContext } from "./ItemBaseGrid";
 import { Collapse, Grid, Typography, useTheme } from "@mui/material";
 import CollapseBtn from "./subitem/CollapseBtn";
 import TiltedChainIcon from "../../icon/TiltedChainIcon";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface CollapseAssociatedRecordItemProps {
   title: string;
@@ -14,9 +15,6 @@ const CollapseAssociatedRecordItem: React.FC<
   CollapseAssociatedRecordItemProps
 > = ({ title, titleAction, children }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const { isOnHover } = useHoverContext();
-  const theme = useTheme();
 
   return (
     <Grid container>
@@ -33,14 +31,18 @@ const CollapseAssociatedRecordItem: React.FC<
           md={12}
           onClick={() => setIsExpanded(!isExpanded)}
           data-testid={`collapse-item-${title}`}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
         >
           <Grid
             item
             md={1}
             onClick={titleAction}
             sx={{
-              alignSelf: "center",
               cursor: "pointer",
+              pt: "5px",
             }}
           >
             <TiltedChainIcon />
@@ -48,15 +50,28 @@ const CollapseAssociatedRecordItem: React.FC<
 
           <Grid item md={11}>
             <Typography
-              variant="detailTitle"
-              sx={{ color: isOnHover ? theme.palette.primary.main : "inherit" }}
+              sx={{
+                ...rc8Theme.typography.title1Medium,
+                color: rc8Theme.palette.primary1,
+                p: 0,
+              }}
             >
               {title ? title : "[ NO TITLE ]"}
             </Typography>
           </Grid>
         </Grid>
       </Grid>
-      <CollapseBtn setIsExpanded={setIsExpanded} isExpanded={isExpanded} />
+      <Grid
+        item
+        md={1}
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+        }}
+      >
+        <CollapseBtn setIsExpanded={setIsExpanded} isExpanded={isExpanded} />
+      </Grid>
       <Grid item md={12}>
         <Collapse in={isExpanded}>
           {children ? children : "[ NO CONTENT ]"}
