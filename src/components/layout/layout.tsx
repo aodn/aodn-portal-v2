@@ -14,6 +14,7 @@ interface LayoutProps {}
 const Layout = ({ children }: React.PropsWithChildren<LayoutProps>) => {
   const location = useLocation();
 
+  // This Layout wraps all pages - any effects here run globally on every route change
   useEffect(() => {
     // 🎯 page response time tracking
     trackPageResponseTime();
