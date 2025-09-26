@@ -1,11 +1,11 @@
 import { FC, useCallback, useRef, useState } from "react";
 import { IconButton, Popover } from "@mui/material";
-import InfoIcon from "@mui/icons-material/Info";
-import CloseIcon from "@mui/icons-material/Close";
 import InfoCard from "./InfoCard";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 import rc8Theme from "../../styles/themeRC8";
+import { InfoIcon } from "../../assets/icons/details/info";
+import { CloseIcon } from "../../assets/icons/download/close";
 
 interface InfoTipProps {
   infoContent?: InfoContentType;

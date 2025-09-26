@@ -28,26 +28,37 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
   return (
     <Grid container sx={{ marginTop: "6px" }}>
       {title !== "Statement" && (
-        <Grid item md={12} display="flex" alignItems="center">
-          {navigatable && (
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <EndpointedDiamondIcon isHighlighted={selected} />
-            </Box>
-          )}
-          <Typography
-            display="inline"
-            sx={{
-              ...rc8Theme.typography.heading4,
-              color: rc8Theme.palette.text2,
-              pb: "8px",
-              marginLeft: theme.mp.md,
-            }}
-            data-testid={`detail-sub-section-${title}`}
-          >
-            {title}
-          </Typography>
+        <Grid
+          item
+          xs={12}
+          md={12}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box display="flex" sx={{ ml: "12px" }}>
+            {navigatable && (
+              <Box display="flex" justifyContent="center" alignItems="center">
+                <EndpointedDiamondIcon isHighlighted={selected} />
+              </Box>
+            )}
+            <Typography
+              display="inline"
+              sx={{
+                ...rc8Theme.typography.heading4,
+                color: rc8Theme.palette.text2,
+                pb: "8px",
+                marginLeft: theme.mp.md,
+              }}
+              data-testid={`detail-sub-section-${title}`}
+            >
+              {title}
+            </Typography>
+          </Box>
           {info && (
-            <Box sx={{ marginLeft: theme.mp.sm }}>
+            <Box
+              sx={{ marginLeft: theme.mp.sm, mr: { xs: "20px", sm: "35px" } }}
+            >
               <InfoTip infoContent={info} />
             </Box>
           )}
