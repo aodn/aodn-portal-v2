@@ -7,7 +7,7 @@ import { ExpandMore } from "../../../../assets/icons/details/expendMore";
 interface CollapseBtnProps {
   setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
   isExpanded: boolean;
-  iconColor: string;
+  iconColor?: string;
 }
 
 const CollapseBtn: React.FC<CollapseBtnProps> = ({
