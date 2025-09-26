@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import ScrollToTop from "../common/scroll/ScrollToTop";
 import { useLocation } from "react-router-dom";
 import { trackPageResponseTime } from "../../analytics/pageResTimeEvent";
+import { trackWebVitals } from "../../analytics/webVitalsEvents";
 
 interface LayoutProps {}
 
@@ -18,6 +19,8 @@ const Layout = ({ children }: React.PropsWithChildren<LayoutProps>) => {
   useEffect(() => {
     // 🎯 page response time tracking
     trackPageResponseTime();
+    // 🎯 web vitals tracking
+    trackWebVitals();
   }, [location.pathname]);
 
   return (
