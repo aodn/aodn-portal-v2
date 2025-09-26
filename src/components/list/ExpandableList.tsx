@@ -31,7 +31,6 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
         <Grid
           item
           xs={12}
-          md={12}
           display="flex"
           alignItems="center"
           justifyContent="space-between"

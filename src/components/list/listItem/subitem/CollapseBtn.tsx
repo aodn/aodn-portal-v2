@@ -7,18 +7,24 @@ import { ExpandMore } from "../../../../assets/icons/details/expendMore";
 interface CollapseBtnProps {
   setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
   isExpanded: boolean;
+  iconColor: string;
 }
 
 const CollapseBtn: React.FC<CollapseBtnProps> = ({
   setIsExpanded,
   isExpanded,
+  iconColor,
 }) => {
   return (
     <IconButton
       aria-label="expand or collapse"
       onClick={() => setIsExpanded((prev) => !prev)}
     >
-      {isExpanded ? <ExpandLess /> : <ExpandMore />}
+      {isExpanded ? (
+        <ExpandLess color={iconColor} />
+      ) : (
+        <ExpandMore color={iconColor} />
+      )}
     </IconButton>
   );
 };
