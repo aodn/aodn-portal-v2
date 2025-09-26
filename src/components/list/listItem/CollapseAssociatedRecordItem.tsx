@@ -20,6 +20,7 @@ const CollapseAssociatedRecordItem: React.FC<
     <Grid container>
       <Grid
         item
+        xs={11}
         md={11}
         sx={{
           alignSelf: "center",
@@ -28,32 +29,34 @@ const CollapseAssociatedRecordItem: React.FC<
         <Grid
           item
           container
+          xs={12}
           md={12}
           onClick={() => setIsExpanded(!isExpanded)}
           data-testid={`collapse-item-${title}`}
           sx={{
             display: "flex",
-            alignItems: "center",
+            alignItems: "flex-start",
           }}
         >
           <Grid
             item
+            xs={2}
             md={1}
             onClick={titleAction}
             sx={{
               cursor: "pointer",
-              pt: "5px",
+              pt: "2px",
             }}
           >
             <TiltedChainIcon />
           </Grid>
 
-          <Grid item md={11}>
+          <Grid item md={11} xs={10}>
             <Typography
               sx={{
                 ...rc8Theme.typography.title1Medium,
                 color: rc8Theme.palette.primary1,
-                p: 0,
+                pt: "2px",
               }}
             >
               {title ? title : "[ NO TITLE ]"}
@@ -63,16 +66,17 @@ const CollapseAssociatedRecordItem: React.FC<
       </Grid>
       <Grid
         item
+        xs={1}
         md={1}
         sx={{
           display: "flex",
           justifyContent: "flex-end",
-          alignItems: "center",
+          alignItems: "flex-start",
         }}
       >
         <CollapseBtn setIsExpanded={setIsExpanded} isExpanded={isExpanded} />
       </Grid>
-      <Grid item md={12}>
+      <Grid item md={12} xs={12}>
         <Collapse in={isExpanded}>
           {children ? children : "[ NO CONTENT ]"}
         </Collapse>
