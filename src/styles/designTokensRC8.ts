@@ -35,7 +35,7 @@ export const designTokensRC8 = {
         fontSize: "64px",
         fontWeight: 500,
         lineHeight: "96px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Slogan styles - Size: 48, Line Height: 72
@@ -44,7 +44,7 @@ export const designTokensRC8 = {
         fontSize: "48px",
         fontWeight: 300,
         lineHeight: "72px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Heading styles - Size: 40, Line Height: 48
@@ -53,7 +53,7 @@ export const designTokensRC8 = {
         fontSize: "40px",
         fontWeight: 500,
         lineHeight: "48px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Heading styles - Size: 24, Line Height: 36
@@ -62,7 +62,7 @@ export const designTokensRC8 = {
         fontSize: "24px",
         fontWeight: 500,
         lineHeight: "36px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Heading styles - Size: 20, Line Height: 30
@@ -71,7 +71,7 @@ export const designTokensRC8 = {
         fontSize: "20px",
         fontWeight: 500,
         lineHeight: "30px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Heading styles - Size: 16, Line Height: 22
@@ -80,7 +80,7 @@ export const designTokensRC8 = {
         fontSize: "16px",
         fontWeight: 500,
         lineHeight: "22px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Title styles - Size: 16, Line Height: 26
@@ -89,7 +89,7 @@ export const designTokensRC8 = {
         fontSize: "16px",
         fontWeight: 400,
         lineHeight: "26px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Title styles - Size: 16, Line Height: 26
@@ -98,7 +98,7 @@ export const designTokensRC8 = {
         fontSize: "16px",
         fontWeight: 400,
         lineHeight: "26px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Body styles - Size: 14, Line Height: 22
@@ -107,7 +107,7 @@ export const designTokensRC8 = {
         fontSize: "14px",
         fontWeight: 500,
         lineHeight: "22px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Body styles - Size: 14, Line Height: 22
@@ -116,7 +116,7 @@ export const designTokensRC8 = {
         fontSize: "14px",
         fontWeight: 400,
         lineHeight: "22px",
-        color: "#000",
+        color: "#090C02",
       },
 
       // Body styles - Size: 13, Line Height: 20
@@ -125,7 +125,7 @@ export const designTokensRC8 = {
         fontSize: "13px",
         fontWeight: 400,
         lineHeight: "20px",
-        color: "#000",
+        color: "#090C02",
       },
     },
   },
@@ -183,7 +183,7 @@ export const designTokensRC8 = {
       secondary1: "#54BCEB",
 
       // Neutral series
-      neutral1: "#000",
+      neutral1: "#090C02",
       neutral2: "#FFF",
       neutral3: "#D9D7BD",
       neutral4: "#BCB98A",
