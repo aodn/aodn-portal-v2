@@ -19,7 +19,7 @@ const CollapseContactItem: React.FC<CollapseContactItemProps> = ({
 
   return (
     <ItemBaseGrid container data-testid="collapseItem">
-      <Grid item md={11} sx={{ alignSelf: "center" }}>
+      <Grid item xs={11} sx={{ alignSelf: "center" }}>
         <CollapseContactItemTitle
           setIsExpanded={setIsExpanded}
           isExpanded={isExpanded}
@@ -27,11 +27,11 @@ const CollapseContactItem: React.FC<CollapseContactItemProps> = ({
           text={title}
         />
       </Grid>
-      <Grid item md={1}>
+      <Grid item xs={1}>
         <CollapseBtn isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
       </Grid>
 
-      <Grid item md={12}>
+      <Grid item xs={12}>
         <Collapse in={isExpanded}>
           <Grid container item md={12}>
             {children ? children : "[ NO CONTENT ]"}
