@@ -11,6 +11,9 @@ import CopyButton, {
   COPY_BUTTON_HEIGHT,
 } from "../../../common/buttons/CopyButton";
 import rc8Theme from "../../../../styles/themeRC8";
+import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
+import { trackCustomEvent } from "../../../../analytics/customEventTracker";
+import { dataAccessParams } from "../../../../analytics/dataAccessEvents";
 
 interface LinkCardProps {
   icon?: boolean;
@@ -33,6 +36,9 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
 
   const handleCopyLink = useCallback(async () => {
     await copyToClipboard(link.href, link.title);
+
+    // Track data access copy event
+    trackCustomEvent(AnalyticsEvent.DATA_ACCESS_CLICK, dataAccessParams(link));
   }, [copyToClipboard, link.href, link.title]);
 
   return (
@@ -93,6 +99,20 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
             onClick={(e) => {
               e.preventDefault();
               openInNewTab(link.href);
+
+              // Track data access event click
+              trackCustomEvent(
+                AnalyticsEvent.DATA_ACCESS_CLICK,
+                dataAccessParams(link)
+              );
+              // console.log("link card clicked", {
+              //   title: link.title,
+              //   href: link.href,
+              //   type: link.type,
+              //   rel: link.rel,
+              //   subgroup: getSubgroup(link),
+              //   ai_group: link["ai:group"],
+              // });
             }}
           >
             <Typography
