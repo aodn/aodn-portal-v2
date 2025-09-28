@@ -13,7 +13,7 @@ import CopyButton, {
 import rc8Theme from "../../../../styles/themeRC8";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
-import { dataAccessParams } from "../../../../analytics/dataAccessEvents";
+import { dataAccessParams } from "../../../../analytics/dataAccessEvent";
 
 interface LinkCardProps {
   icon?: boolean;
