@@ -39,7 +39,7 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
 
     // Track data access copy event
     trackCustomEvent(AnalyticsEvent.DATA_ACCESS_CLICK, dataAccessParams(link));
-  }, [copyToClipboard, link.href, link.title]);
+  }, [copyToClipboard, link.href, link.title, link]);
 
   return (
     <Box
@@ -105,14 +105,6 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
                 AnalyticsEvent.DATA_ACCESS_CLICK,
                 dataAccessParams(link)
               );
-              // console.log("link card clicked", {
-              //   title: link.title,
-              //   href: link.href,
-              //   type: link.type,
-              //   rel: link.rel,
-              //   subgroup: getSubgroup(link),
-              //   ai_group: link["ai:group"],
-              // });
             }}
           >
             <Typography
