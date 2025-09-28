@@ -39,7 +39,7 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
 
     // Track data access copy event
     trackCustomEvent(AnalyticsEvent.DATA_ACCESS_CLICK, dataAccessParams(link));
-  }, [copyToClipboard, link.href, link.title, link]);
+  }, [copyToClipboard, link]);
 
   return (
     <Box
