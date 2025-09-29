@@ -17,6 +17,7 @@ from mocks.api.search_collections import (
     handle_temporal_api,
 )
 from mocks.api.vocabs import handle_vocabs_api
+from mocks.api.wms_map_tile import handle_wms_map_tile_api
 from mocks.api_router import ApiRouter
 
 
@@ -37,3 +38,4 @@ def apply_mock(page: Page) -> None:
         handle_detail_api, handle_detail_item_api
     )
     api_router.route_geowebcache(handle_geowebcache_api)
+    api_router.route_wms_map_tile(handle_wms_map_tile_api)

@@ -94,7 +94,7 @@ def test_spatial_map_click_zooms_detail_map(
     assert round(click_lng_lat['lng']) == round(new_detail_map_center['lng'])
     assert round(click_lng_lat['lat']) == round(new_detail_map_center['lat'])
 
-@pytest.mark.skip
+
 @pytest.mark.parametrize(
     'uuid',
     [
@@ -118,7 +118,6 @@ def test_map_shows_geoserver_layer_when_wms_link_present(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    detail_page.detail_map.wait_for_map_loading()
 
     expect(detail_page.wms_link_header).to_be_visible()
     expect(
@@ -158,7 +157,6 @@ def test_map_not_showing_geoserver_layer_preview_when_wms_link_absent(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    detail_page.detail_map.wait_for_map_loading()
 
     expect(detail_page.wms_link_header).not_to_be_visible()
     expect(
