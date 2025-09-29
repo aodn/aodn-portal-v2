@@ -18,7 +18,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
       <CollapseItem title={keyword.title} key={index}>
         {keyword.content && keyword.content.length > 0
           ? keyword.content.map((line, index) => (
-              <TextArea text={line} key={index} />
+              <TextArea text={line} key={index} sx={{ pb: "10px" }} />
             ))
           : "[ NO CONTENT ]"}
       </CollapseItem>

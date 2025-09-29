@@ -3,6 +3,7 @@ import TextAreaBaseGrid from "./TextAreaBaseGrid";
 import { Box, Button, Grid } from "@mui/material";
 import MarkdownRenderer from "../../../common/text/MarkdownRenderer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import rc8Theme from "../../../../styles/themeRC8";
 
 const LINE_CLAMP_DEFAULT = 10; // Default number of lines to show before expanding
 const LINE_CLAMP_DEFAULT_TABLET = 7;
@@ -97,7 +98,13 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
       </Grid>
       {(needsExpansion || isExpanded) && (
         <Grid item md={12} display="flex" justifyContent="flex-end">
-          <Button onClick={onButtonClick}>
+          <Button
+            onClick={onButtonClick}
+            sx={{
+              ...rc8Theme.typography.body1Medium,
+              color: rc8Theme.palette.text2,
+            }}
+          >
             {isExpanded ? "Show Less" : showMoreStr}
           </Button>
         </Grid>

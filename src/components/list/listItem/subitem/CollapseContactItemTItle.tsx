@@ -1,6 +1,7 @@
 import React from "react";
 import { Grid, Link, Tooltip, Typography } from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import rc8Theme from "../../../../styles/themeRC8";
 
 interface CollapseContactItemTItleProps {
   isExpanded: boolean;
@@ -17,7 +18,9 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
 }) => {
   const generateTitle = () => {
     return (
-      <Typography variant="detailTitle">
+      <Typography
+        sx={{ ...rc8Theme.typography.body1Medium, p: 0, my: "10px", mx: "6px" }}
+      >
         {text ? text : "[ NO TITLE ]"}
       </Typography>
     );
@@ -32,7 +35,7 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
       data-testid={`collapse-item-${text}`}
     >
       {isExpanded && (
-        <Grid item md={1}>
+        <Grid item md={1} sx={{ pt: "7px" }}>
           <MailOutlineIcon />
         </Grid>
       )}

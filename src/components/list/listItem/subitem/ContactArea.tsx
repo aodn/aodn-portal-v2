@@ -1,4 +1,4 @@
-import { Grid, Link, Typography } from "@mui/material";
+import { Grid, Link, Typography, Box } from "@mui/material";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
 import React from "react";
@@ -38,17 +38,55 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
   return (
     <Grid container>
       <Grid item container md={12}>
-        <Grid item container md={1} display="flex" justifyContent="center">
-          {/* todo */}
+        <Grid item md={6}>
+          {/* Address section */}
           {!(
             !delivery_point &&
             !city &&
             !country &&
             !postal_code &&
             !administrative_area
-          ) && <LocationOnOutlinedIcon />}
-        </Grid>
-        <Grid item container md={5} data-testid="contact-address">
+          ) && (
+            <Box
+              display="flex"
+              alignItems="flex-start"
+              gap={1}
+              data-testid="contact-address"
+            >
+              <LocationOnOutlinedIcon sx={{ mt: 0.5, flexShrink: 0 }} />
+              <Box>
+                {delivery_point?.map((line) => (
+                  <Typography
+                    variant="detailContent"
+                    key={line}
+                    display="block"
+                  >
+                    {line}
+                  </Typography>
+                ))}
+                {city && (
+                  <Typography variant="detailContent" display="block">
+                    {city}
+                  </Typography>
+                )}
+                {administrative_area && (
+                  <Typography variant="detailContent" display="block">
+                    {administrative_area}
+                  </Typography>
+                )}
+                {postal_code && (
+                  <Typography variant="detailContent" display="block">
+                    {postal_code}
+                  </Typography>
+                )}
+                {country && (
+                  <Typography variant="detailContent" display="block">
+                    {country}
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+          )}
           {!delivery_point &&
             !city &&
             !country &&
@@ -60,35 +98,6 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
               //   [NO ADDRESS]
               // </Grid>
             )}
-          {delivery_point?.map((line) => {
-            return (
-              <Grid item md={12} key={line}>
-                <Typography variant="detailContent">{line}</Typography>
-              </Grid>
-            );
-          })}
-          {city && (
-            <Grid item md={12}>
-              <Typography variant="detailContent">{city}</Typography>
-            </Grid>
-          )}
-          {administrative_area && (
-            <Grid item md={12}>
-              <Typography variant="detailContent">
-                {administrative_area}
-              </Typography>
-            </Grid>
-          )}
-          {postal_code && (
-            <Grid item md={12}>
-              <Typography variant="detailContent">{postal_code}</Typography>
-            </Grid>
-          )}
-          {country && (
-            <Grid item md={12}>
-              <Typography variant="detailContent">{country}</Typography>
-            </Grid>
-          )}
         </Grid>
         <Grid item md={6} data-testid="contact-phone">
           {(!phones || phones.length === 0) && (
@@ -101,44 +110,49 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
           {phones &&
             phones.map((phone) => {
               return (
-                <Grid container item md={12} key={phone.value}>
-                  <Grid item md={1}>
-                    {/*Debug usage. Should be existing for long term*/}
-                    {phone.roles.length > 1 &&
-                      "MORE ROLES FOUND IN PHONE. PLEASE IMPLEMENT"}
-                    {getIconByRole(phone.roles[0])}
-                  </Grid>
-                  <Grid item md={11}>
-                    <Typography variant="detailContent">
-                      {`\u00A0 ${phone.value} (${phone.roles[0]})`}
-                    </Typography>
-                  </Grid>
-                </Grid>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                  key={phone.value}
+                  mb={0.5}
+                >
+                  {/*Debug usage. Should be existing for long term*/}
+                  {phone.roles.length > 1 &&
+                    "MORE ROLES FOUND IN PHONE. PLEASE IMPLEMENT"}
+                  {getIconByRole(phone.roles[0])}
+                  <Typography variant="detailContent">
+                    {`${phone.value} (${phone.roles[0]})`}
+                  </Typography>
+                </Box>
               );
             })}
         </Grid>
       </Grid>
       <Grid item container md={12}>
         <Grid item container md={12} data-testid="contact-link">
-          <Grid item md={1} display="flex" justifyContent="center">
-            {/* todo */}
-            {!(!links || links.length === 0) && <LanguageOutlinedIcon />}
-          </Grid>
-          {(!links || links.length === 0) && (
-            <></>
-            // todo
-            // <Grid item md={11}>
-            //   [NO URL]
-            // </Grid>
-          )}
-          {links &&
-            links.map((link, index) => {
-              return (
-                <Grid item md={11} key={index}>
-                  <Link href={link.href}>{link.title}</Link>
-                </Grid>
-              );
-            })}
+          <Box display="flex" alignItems="flex-start" gap={1}>
+            {!(!links || links.length === 0) && (
+              <LanguageOutlinedIcon sx={{ mt: 0.5, flexShrink: 0 }} />
+            )}
+            <Box sx={{ mt: "4px" }}>
+              {(!links || links.length === 0) && (
+                <></>
+                // todo
+                // <Grid item md={11}>
+                //   [NO URL]
+                // </Grid>
+              )}
+              {links &&
+                links.map((link, index) => {
+                  return (
+                    <Link href={link.href} key={index}>
+                      {link.title}
+                    </Link>
+                  );
+                })}
+            </Box>
+          </Box>
         </Grid>
       </Grid>
     </Grid>

@@ -3,6 +3,7 @@ import { useHoverContext } from "./ItemBaseGrid";
 import { Collapse, Grid, Typography, useTheme } from "@mui/material";
 import CollapseBtn from "./subitem/CollapseBtn";
 import TiltedChainIcon from "../../icon/TiltedChainIcon";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface CollapseAssociatedRecordItemProps {
   title: string;
@@ -15,14 +16,11 @@ const CollapseAssociatedRecordItem: React.FC<
 > = ({ title, titleAction, children }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { isOnHover } = useHoverContext();
-  const theme = useTheme();
-
   return (
     <Grid container>
       <Grid
         item
-        md={11}
+        xs={11}
         sx={{
           alignSelf: "center",
         }}
@@ -30,34 +28,53 @@ const CollapseAssociatedRecordItem: React.FC<
         <Grid
           item
           container
-          md={12}
+          xs={12}
           onClick={() => setIsExpanded(!isExpanded)}
           data-testid={`collapse-item-${title}`}
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+          }}
         >
           <Grid
             item
+            xs={2}
             md={1}
             onClick={titleAction}
             sx={{
-              alignSelf: "center",
               cursor: "pointer",
+              pt: "5px",
             }}
           >
             <TiltedChainIcon />
           </Grid>
 
-          <Grid item md={11}>
+          <Grid item xs={10}>
             <Typography
-              variant="detailTitle"
-              sx={{ color: isOnHover ? theme.palette.primary.main : "inherit" }}
+              sx={{
+                ...rc8Theme.typography.title1Medium,
+                color: rc8Theme.palette.primary1,
+                pt: "5px",
+              }}
             >
               {title ? title : "[ NO TITLE ]"}
             </Typography>
           </Grid>
         </Grid>
       </Grid>
-      <CollapseBtn setIsExpanded={setIsExpanded} isExpanded={isExpanded} />
-      <Grid item md={12}>
+      <Grid
+        item
+        xs={1}
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "flex-start",
+          pt: "5px",
+        }}
+      >
+        <CollapseBtn setIsExpanded={setIsExpanded} isExpanded={isExpanded} />
+      </Grid>
+      <Grid item xs={12}>
         <Collapse in={isExpanded}>
           {children ? children : "[ NO CONTENT ]"}
         </Collapse>
