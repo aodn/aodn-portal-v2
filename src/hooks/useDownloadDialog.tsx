@@ -20,6 +20,8 @@ import {
   DownloadConditionType,
 } from "../pages/detail-page/context/DownloadDefinitions";
 import { processDatasetDownload } from "../components/common/store/searchReducer";
+import { trackCustomEvent } from "../analytics/customEventTracker";
+import { AnalyticsEvent } from "../analytics/analyticsEvents";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -399,9 +401,14 @@ export const useDownloadDialog = (
       return;
     }
 
+    // Track 'download_co_data' submit button click
+    trackCustomEvent(AnalyticsEvent.DOWNLOAD_CO_DATA, {
+      dataset_uuid: uuid,
+    });
+
     setIsProcessing(true);
     submitJob(emailToSubmit);
-  }, [activeStep, email, handleStepChange, submitJob, isEmailValid]);
+  }, [activeStep, email, handleStepChange, submitJob, isEmailValid, uuid]);
 
   // ================== UI HELPERS ==================
   const getProcessStatusText = useCallback((): string => {
