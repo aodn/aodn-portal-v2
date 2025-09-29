@@ -19,3 +19,4 @@ class Routes:
     COLLECTION_DETAIL_ITEM = f'{PREFIX}/collections/*/items/summary'
 
     GEOWEBCACHE = '*/**/geowebcache/service/wms*'
+    WMS_MAP_TILE = '*/**/items/wms_map_tile?*'
