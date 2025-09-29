@@ -113,3 +113,11 @@ class ApiRouter:
         self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.GEOWEBCACHE, handler_function)
+
+    def route_wms_map_tile(self, handler_function: Callable) -> None:
+        self.route(Routes.WMS_MAP_TILE, handler_function)
+
+    def unroute_wms_map_tile(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.WMS_MAP_TILE, handler_function)
