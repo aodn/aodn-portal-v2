@@ -355,7 +355,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             }
                           />
                         }
-                        visible={timeSliderSupport}
+                        visible={
+                          timeSliderSupport && mapLayerConfig.length !== 0
+                        }
                       />
                       <MenuControl
                         // visible={selectedLayer === LayerName.Hexbin}
@@ -366,6 +368,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             }
                           />
                         }
+                        visible={mapLayerConfig.length !== 0}
                       />
                     </MenuControlGroup>
                   </Controls>
