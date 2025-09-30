@@ -183,16 +183,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     return layers;
   }, [collection]);
 
-  const filteredFeatureCollection = useMemo(() => {
-    if (!featureCollection) {
-      return undefined;
-    }
-
+  const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
     );
     if (!dateRangeConditionGeneric) {
-      return featureCollection;
+      return [undefined, undefined];
     }
     const dateRangeCondition = dateRangeConditionGeneric as DateRangeCondition;
 
@@ -204,20 +200,58 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       dateRangeCondition.end,
       dateDefault.SIMPLE_DATE_FORMAT
     );
+    return [conditionStart, conditionEnd];
+  }, [downloadConditions]);
 
-    const filteredFeatures = featureCollection.features?.filter((feature) => {
-      const date = dayjs(
-        feature.properties?.date,
-        dateDefault.SIMPLE_Y_M_DATE_FORMAT
-      );
-      return date.isAfter(conditionStart) && date.isBefore(conditionEnd);
-    });
+  const filteredFeatureCollection = useMemo(() => {
+    // TODO: In long run should move it to ogcapi
+    if (!featureCollection) {
+      return undefined;
+    }
 
-    return {
-      ...featureCollection,
-      features: filteredFeatures,
-    };
-  }, [downloadConditions, featureCollection]);
+    if (filterStartDate !== undefined && filterEndDate !== undefined) {
+      const filteredFeatures = featureCollection.features?.filter((feature) => {
+        const date = dayjs(
+          feature.properties?.date,
+          dateDefault.SIMPLE_Y_M_DATE_FORMAT
+        );
+        return date.isAfter(filterStartDate) && date.isBefore(filterEndDate);
+      });
+
+      return {
+        ...featureCollection,
+        features: filteredFeatures,
+      };
+    } else if (filterStartDate !== undefined) {
+      const filteredFeatures = featureCollection.features?.filter((feature) => {
+        const date = dayjs(
+          feature.properties?.date,
+          dateDefault.SIMPLE_Y_M_DATE_FORMAT
+        );
+        return date.isAfter(filterStartDate);
+      });
+
+      return {
+        ...featureCollection,
+        features: filteredFeatures,
+      };
+    } else if (filterEndDate !== undefined) {
+      const filteredFeatures = featureCollection.features?.filter((feature) => {
+        const date = dayjs(
+          feature.properties?.date,
+          dateDefault.SIMPLE_Y_M_DATE_FORMAT
+        );
+        return date.isBefore(filterStartDate);
+      });
+
+      return {
+        ...featureCollection,
+        features: filteredFeatures,
+      };
+    } else {
+      return featureCollection;
+    }
+  }, [featureCollection, filterEndDate, filterStartDate]);
 
   const handleMapChange = useCallback((event: MapEvent | undefined) => {
     // implement later
@@ -345,7 +379,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       geoServerLayerConfig={{
                         uuid: collection.id,
                         baseUrl: ensureHttps(getWMSServer(collection)),
-                        urlParams: { LAYERS: getWMSLayerNames(collection) },
+                        urlParams: {
+                          LAYERS: getWMSLayerNames(collection),
+                          START_DATE: filterStartDate,
+                          END_DATE: filterEndDate,
+                        },
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
                       visible={selectedLayer === LayerName.GeoServer}

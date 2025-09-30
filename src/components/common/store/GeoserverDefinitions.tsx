@@ -2,6 +2,7 @@ export type MapTileRequest = {
   layerName: string;
   width?: number;
   height?: number;
+  datetime?: string;
   bbox?: string;
 };
 
