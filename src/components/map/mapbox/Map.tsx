@@ -44,17 +44,17 @@ interface MapProps extends MapBasicType {}
 const styles = [
   {
     id: "1",
-    name: "Street map",
+    name: "Street Map",
     style: "mapbox://styles/mapbox/streets-v12",
   },
   {
     id: "2",
-    name: "Topographic map ",
+    name: "Topographic Map",
     style: "mapbox://styles/mapbox/outdoors-v12",
   },
   {
     id: "3",
-    name: "Satellite map",
+    name: "Satellite Map",
     style: "mapbox://styles/mapbox/satellite-v9",
   },
   {
