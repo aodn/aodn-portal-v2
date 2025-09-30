@@ -157,10 +157,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         layers.push(MapLayers[LayerName.Hexbin]);
       }
 
-      layers.push({
-        ...MapLayers[LayerName.GeoServer],
-        default: !isSupportHexbin,
-      });
+      if (isWMSAvailable) {
+        layers.push({
+          ...MapLayers[LayerName.GeoServer],
+          default: !isSupportHexbin,
+        });
+      }
 
       if (hasSummaryFeature && isZarrDataset) {
         layers.push({
@@ -182,7 +184,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       });
     }
     return layers;
-  }, [collection]);
+  }, [collection, isWMSAvailable]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
@@ -307,7 +309,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     selectedLayer === LayerName.Hexbin
                       ? collection.hasSummaryFeature()
                         ? undefined
-                        : "model:No data available"
+                        : "model: No data available"
                       : isWMSAvailable
                         ? undefined
                         : "model: Map preview not available" // No GeoServer WMS data available
@@ -336,6 +338,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             onEvent={handleGeoLayerChange}
                           />
                         }
+                        visible={mapLayerConfig.length !== 0}
                       />
                       <MenuControl
                         // visible={selectedLayer === LayerName.Hexbin}
