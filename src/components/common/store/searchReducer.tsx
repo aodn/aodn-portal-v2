@@ -375,29 +375,35 @@ const fetchGeoServerMapFeature = createAsyncThunk<
   MapFeatureResponse,
   MapFeatureRequest,
   { rejectValue: ErrorResponse }
->("geoserver/fetchMapFeature", (request: MapFeatureRequest, thunkApi: any) => {
-  return axios
-    .get<MapFeatureResponse>(
-      `/api/v1/ogc/collections/${request.uuid}/items/wms_map_feature`,
-      { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
-    )
-    .then((response) => response.data)
-    .catch(errorHandling(thunkApi));
-});
+>(
+  "geoserver/fetchGeoServerMapFeature",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return axios
+      .get<MapFeatureResponse>(
+        `/api/v1/ogc/collections/${request.uuid}/items/wms_map_feature`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
 
 const fetchGeoServerMapFields = createAsyncThunk<
   Array<MapFieldResponse>,
   MapFeatureRequest,
   { rejectValue: ErrorResponse }
->("geoserver/fetchMapFeature", (request: MapFeatureRequest, thunkApi: any) => {
-  return axios
-    .get<MapFeatureResponse>(
-      `/api/v1/ogc/collections/${request.uuid}/items/wms_map_fields`,
-      { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
-    )
-    .then((response) => response.data)
-    .catch(errorHandling(thunkApi));
-});
+>(
+  "geoserver/fetchGeoServerMapFields",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return axios
+      .get<MapFeatureResponse>(
+        `/api/v1/ogc/collections/${request.uuid}/items/wms_downloadable_fields`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
 /**
  * Appends a filter condition using AND operation.
  */
