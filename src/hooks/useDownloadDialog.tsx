@@ -20,6 +20,8 @@ import {
   DownloadConditionType,
 } from "../pages/detail-page/context/DownloadDefinitions";
 import { processDatasetDownload } from "../components/common/store/searchReducer";
+import { trackCustomEvent } from "../analytics/customEventTracker";
+import { AnalyticsEvent } from "../analytics/analyticsEvents";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -61,32 +63,31 @@ export const useDownloadDialog = (
   const [emailError, setEmailError] = useState<string>("");
 
   // ================== COMPUTED VALUES ==================
-  const hasDownloadConditions = useMemo(() => {
-    return downloadConditions && downloadConditions.length > 0;
-  }, [downloadConditions]);
-
-  const subsettingSelectionCount = useMemo(() => {
-    return (
+  const {
+    hasDownloadConditions,
+    subsettingSelectionCount,
+    dateRange,
+    multiPolygon,
+    format,
+  } = useMemo(() => {
+    const hasDownloadConditions =
+      downloadConditions && downloadConditions.length > 0;
+    const subsettingSelectionCount =
       downloadConditions?.filter(
         (condition) => condition.type !== DownloadConditionType.FORMAT
-      ).length || 0
-    );
+      ).length || 0;
+    const dateRange = getDateConditionFrom(downloadConditions);
+    const multiPolygon = getMultiPolygonFrom(downloadConditions);
+    const format = getFormatFrom(downloadConditions);
+
+    return {
+      hasDownloadConditions,
+      subsettingSelectionCount,
+      dateRange,
+      multiPolygon,
+      format,
+    };
   }, [downloadConditions]);
-
-  const dateRange = useMemo(
-    () => getDateConditionFrom(downloadConditions),
-    [downloadConditions]
-  );
-
-  const multiPolygon = useMemo(
-    () => getMultiPolygonFrom(downloadConditions),
-    [downloadConditions]
-  );
-
-  const format = useMemo(
-    () => getFormatFrom(downloadConditions),
-    [downloadConditions]
-  );
 
   // ================== VALIDATION HELPERS ==================
   const isEmailValid = useCallback((emailValue: string): boolean => {
@@ -399,9 +400,14 @@ export const useDownloadDialog = (
       return;
     }
 
+    // Track 'download_co_data' submit button click
+    trackCustomEvent(AnalyticsEvent.DOWNLOAD_CO_DATA, {
+      dataset_uuid: uuid,
+    });
+
     setIsProcessing(true);
     submitJob(emailToSubmit);
-  }, [activeStep, email, handleStepChange, submitJob, isEmailValid]);
+  }, [activeStep, email, handleStepChange, submitJob, isEmailValid, uuid]);
 
   // ================== UI HELPERS ==================
   const getProcessStatusText = useCallback((): string => {

@@ -9,7 +9,7 @@ const undisputedLabelId = "mapbox-world-country-undisputed-country-label";
 const MapboxWorldLayersDef = {
   WORLD: {
     id: "static-mapbox-world-layer",
-    name: "World boundaries and Places",
+    name: "World Boundaries and Places",
   },
 };
 
