@@ -29,3 +29,9 @@ export type MapFeatureResponse = {
     value?: number;
   }>;
 };
+
+export type MapFieldResponse = {
+  label: string;
+  type: string;
+  name: string;
+};

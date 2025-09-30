@@ -18,7 +18,10 @@ import {
   MapTileRequest,
 } from "../../../common/store/GeoserverDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
-import { fetchMapFeature } from "../../../common/store/searchReducer";
+import {
+  fetchGeoServerMapFeature,
+  fetchGeoServerMapFields,
+} from "../../../common/store/searchReducer";
 import { CardContent, Typography } from "@mui/material";
 import { createRoot, Root } from "react-dom/client";
 import dayjs, { Dayjs } from "dayjs";
@@ -95,6 +98,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   geoServerLayerConfig,
   onWMSAvailabilityChange,
   visible,
+  setTimeSliderSupport,
 }: GeoServerLayerProps) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
@@ -305,7 +309,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         bbox: map.getBounds()?.toArray().flat().join(","),
       };
 
-      dispatch(fetchMapFeature(request))
+      dispatch(fetchGeoServerMapFeature(request))
         .unwrap()
         .then((response) => {
           cleanPopup();
@@ -361,6 +365,18 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
             if (visible) {
               map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+              // Check if this layer support time slider
+              const request: MapFeatureRequest = {
+                uuid: geoServerLayerConfig?.uuid || "",
+                layerName:
+                  geoServerLayerConfig?.urlParams?.LAYERS.join(",") || "",
+              };
+              dispatch(fetchGeoServerMapFields(request))
+                .unwrap()
+                .then((value) => {
+                  const found = value.find((v) => v.type === "dateTime");
+                  setTimeSliderSupport?.(found !== undefined);
+                });
             }
           }
         }
@@ -370,7 +386,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       map?.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
       cleanPopup();
     };
-  }, [dispatch, geoServerLayerConfig, map, titleLayerId, visible]);
+  }, [
+    dispatch,
+    geoServerLayerConfig,
+    map,
+    setTimeSliderSupport,
+    titleLayerId,
+    visible,
+  ]);
 
   return (
     <TestHelper

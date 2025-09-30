@@ -136,6 +136,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(null);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
+  const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
   const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
   const abstract =
     collection?.getEnhancedDescription() || collection?.description || "";
@@ -351,6 +352,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             }
                           />
                         }
+                        visible={timeSliderSupport}
                       />
                       <MenuControl
                         // visible={selectedLayer === LayerName.Hexbin}
@@ -387,6 +389,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
                       visible={selectedLayer === LayerName.GeoServer}
+                      setTimeSliderSupport={setTimeSliderSupport}
                     />
                     <GeojsonLayer
                       collection={collection}
