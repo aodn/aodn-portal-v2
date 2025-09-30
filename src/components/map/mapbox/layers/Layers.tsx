@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { Dispatch, PropsWithChildren, SetStateAction } from "react";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { LngLatBounds, MapMouseEvent, LngLat, Map as Mapbox } from "mapbox-gl";
 import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
@@ -19,6 +19,7 @@ export interface LayerBasicType {
   // outside of viewport.
   preferCurrentCentroid?: boolean;
   visible?: boolean;
+  setTimeSliderSupport?: Dispatch<SetStateAction<boolean>>;
 }
 // Use to create static layer on map, you need to add menu item to select those layers,
 // refer to map section
