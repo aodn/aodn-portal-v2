@@ -137,9 +137,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
-  const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
   const abstract =
     collection?.getEnhancedDescription() || collection?.description || "";
+
+  const [minDateStamp, maxDateStamp] = useMemo(
+    () => getMinMaxDateStamps(featureCollection),
+    [featureCollection]
+  );
 
   const mapLayerConfig = useMemo((): LayerSwitcherLayer<LayerName>[] => {
     const layers: LayerSwitcherLayer<LayerName>[] = [];
