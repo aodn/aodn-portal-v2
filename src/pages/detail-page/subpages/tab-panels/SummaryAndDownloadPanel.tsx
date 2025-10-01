@@ -137,9 +137,27 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
-  const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
   const abstract =
     collection?.getEnhancedDescription() || collection?.description || "";
+
+  const [minDateStamp, maxDateStamp] = useMemo(() => {
+    // We trust the metadata value instead of raw data, in fact it is hard to have a common
+    // time value, for example cloud optimized date range may be different from the
+    // geoserver one
+    let start = undefined;
+    let end = undefined;
+
+    const extent = collection?.getExtent();
+    if (extent) {
+      const [s, e] = extent.getOverallTemporal();
+      start = s;
+      end = e;
+    }
+    return [
+      dayjs(start, dateDefault.DISPLAY_FORMAT),
+      dayjs(end, dateDefault.DISPLAY_FORMAT),
+    ];
+  }, [collection]);
 
   const mapLayerConfig = useMemo((): LayerSwitcherLayer<LayerName>[] => {
     const layers: LayerSwitcherLayer<LayerName>[] = [];
