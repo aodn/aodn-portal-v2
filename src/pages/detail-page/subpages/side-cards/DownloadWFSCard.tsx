@@ -46,18 +46,23 @@ const options = [
 ];
 
 interface DownloadWFSCardProps {
-  WFSLinks: ILink[];
+  WFSLinks: ILink[] | undefined;
+  WMSLinks: ILink[] | undefined;
   uuid?: string;
 }
 
-const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
+const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
+  WFSLinks,
+  WMSLinks,
+  uuid,
+}) => {
   const theme = useTheme();
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
   const { downloadConditions, getAndSetDownloadConditions } =
     useDetailPageContext();
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
-    WFSLinks[0]?.title
+    WMSLinks?.[0]?.title
   );
   const [selectedFormat, setSelectedFormat] = useState<string>(
     options[0].value
@@ -83,9 +88,14 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
     [theme]
   );
 
-  const WFSOptions = useMemo(
-    () => WFSLinks.map((link) => ({ value: link.title, label: link.title })),
-    [WFSLinks]
+  // TODO: for now we just display all WMS and WFS links, but we may need better UI design or hide the WFS links
+  const dataSelectOptions = useMemo(
+    () =>
+      [...(WMSLinks ?? []), ...(WFSLinks ?? [])].map((link) => ({
+        value: link.title,
+        label: link.title,
+      })),
+    [WMSLinks, WFSLinks]
   );
 
   // Store the filtered download conditions count
@@ -142,7 +152,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({ WFSLinks, uuid }) => {
           disabled={isDownloading}
         />
         <CommonSelect
-          items={WFSOptions}
+          items={dataSelectOptions}
           label="Select data"
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}

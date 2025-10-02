@@ -46,6 +46,7 @@ const DownloadCard = () => {
 
   // Get WFS links for fallback rendering
   const WFSLinks: ILink[] | undefined = collection?.getWFSLinks();
+  const WMSLinks: ILink[] | undefined = collection?.getWMSLinks();
 
   // Store the filtered download conditions count
   const subsettingSelectionCount = useMemo(() => {
@@ -245,8 +246,17 @@ const DownloadCard = () => {
     if (collection?.hasSummaryFeature()) {
       return renderDownload();
     }
-    if (WFSLinks && WFSLinks.length > 0) {
-      return <DownloadWFSCard WFSLinks={WFSLinks} uuid={collection?.id} />;
+    if (
+      (WFSLinks && WFSLinks.length > 0) ||
+      (WMSLinks && WMSLinks.length > 0)
+    ) {
+      return (
+        <DownloadWFSCard
+          WFSLinks={WFSLinks}
+          WMSLinks={WMSLinks}
+          uuid={collection?.id}
+        />
+      );
     }
     return renderDownloadUnavailable();
   };
