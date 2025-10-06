@@ -9,6 +9,7 @@ import ScrollToTop from "../common/scroll/ScrollToTop";
 import { useLocation } from "react-router-dom";
 import { trackPageResponseTime } from "../../analytics/pageResTimeEvent";
 import { trackWebVitals } from "../../analytics/webVitalsEvents";
+import SEO from "../common/seo/SEO";
 
 interface LayoutProps {}
 
@@ -25,6 +26,7 @@ const Layout = ({ children }: React.PropsWithChildren<LayoutProps>) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
+      <SEO />
       <ScrollToTop />
       <Header />
       <main>{children}</main>
