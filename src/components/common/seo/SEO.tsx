@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router-dom";
 
 // Configuration
-const SITE_URL = "https://portal-production.aodn.org.au";
+const SITE_URL = "https://portal-beta.aodn.org.au";
 
 // TODO: Add more SEO configuration when needed
 // export const seoConfig = {

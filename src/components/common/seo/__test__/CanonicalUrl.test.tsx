@@ -28,7 +28,7 @@ describe("SEO - Canonical URL", () => {
 
     await waitFor(() => {
       const url = getCanonicalUrl();
-      expect(url).toBe("https://portal-production.aodn.org.au/");
+      expect(url).toBe("https://portal-beta.aodn.org.au/");
       expect(url).not.toContain("///");
     });
   });
@@ -37,9 +37,7 @@ describe("SEO - Canonical URL", () => {
     renderSEO(<SEO />, "/search");
 
     await waitFor(() => {
-      expect(getCanonicalUrl()).toBe(
-        "https://portal-production.aodn.org.au/search"
-      );
+      expect(getCanonicalUrl()).toBe("https://portal-beta.aodn.org.au/search");
     });
   });
 
@@ -48,7 +46,7 @@ describe("SEO - Canonical URL", () => {
 
     await waitFor(() => {
       expect(getCanonicalUrl()).toBe(
-        "https://portal-production.aodn.org.au/details/0145df96-3847-474b-8b63-a66f0e03ff54"
+        "https://portal-beta.aodn.org.au/details/0145df96-3847-474b-8b63-a66f0e03ff54"
       );
     });
   });
