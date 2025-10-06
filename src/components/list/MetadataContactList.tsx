@@ -2,8 +2,7 @@ import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
 import ContactArea from "./listItem/subitem/ContactArea";
 import ExpandableList from "./ExpandableList";
-import { Grid, Link, Typography, useTheme } from "@mui/material";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
+import { Link, Typography, useTheme } from "@mui/material";
 import rc8Theme from "../../styles/themeRC8";
 import { MailOutlineIcon } from "../../assets/icons/details/mail";
 import CollapseItem from "./listItem/CollapseItem";
@@ -43,7 +42,7 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
       );
     });
     return contactsToAdd;
-  }, [contacts, theme.mp.md]);
+  }, [contacts]);
 
   return (
     <ExpandableList
