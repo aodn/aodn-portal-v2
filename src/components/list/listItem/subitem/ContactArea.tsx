@@ -1,159 +1,174 @@
-import { Grid, Link, Typography, Box } from "@mui/material";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
 import React from "react";
 import {
   IAddress,
   IContact,
 } from "../../../common/store/OGCCollectionDefinitions";
-import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
-import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
+import rc8Theme from "../../../../styles/themeRC8";
+import { Grid, Link, Typography, Box } from "@mui/material";
+import { LocationOnOutlinedIcon } from "../../../../assets/icons/details/location";
+import { LanguageOutlinedIcon } from "../../../../assets/icons/details/language";
+import { LocalPhoneOutlinedIcon } from "../../../../assets/icons/details/phone";
+import { PrintOutlinedIcon } from "../../../../assets/icons/details/fax";
 
 interface ContactAreaProps {
   contact: IContact;
 }
 
 const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
-  let addresses: IAddress;
-  if (contact && Array.isArray(contact.addresses) && contact.addresses[0]) {
-    addresses = contact.addresses[0];
-  } else {
-    addresses = {} as IAddress;
-  }
+  const address = contact?.addresses?.[0] || ({} as IAddress);
   const { delivery_point, city, country, postal_code, administrative_area } =
-    addresses;
-  const phones = contact.phones;
-  const links = contact.links;
+    address;
 
-  const getIconByRole = (role: string) => {
+  const phones = contact?.phones || [];
+  const links = contact?.links || [];
+  const hasAddress =
+    delivery_point || city || country || postal_code || administrative_area;
+
+  const getPhoneIcon = (role: string) => {
     switch (role) {
       case "voice":
         return <LocalPhoneOutlinedIcon />;
       case "facsimile":
         return <PrintOutlinedIcon />;
       default:
-      // TODO: toast warning
+        return null; // TODO: Add toast warning
     }
   };
+
+  const renderTextLine = (text: string, key?: string) => (
+    <Typography
+      key={key}
+      sx={{ ...rc8Theme.typography.body2Regular, pt: "2px", mt: "4px" }}
+      display="block"
+    >
+      {text}
+    </Typography>
+  );
+
   return (
-    <Grid container>
-      <Grid item container md={12}>
-        <Grid item md={6}>
-          {/* Address section */}
-          {!(
-            !delivery_point &&
-            !city &&
-            !country &&
-            !postal_code &&
-            !administrative_area
-          ) && (
-            <Box
-              display="flex"
-              alignItems="flex-start"
-              gap={1}
-              data-testid="contact-address"
-            >
-              <LocationOnOutlinedIcon sx={{ mt: 0.5, flexShrink: 0 }} />
-              <Box>
-                {delivery_point?.map((line) => (
-                  <Typography
-                    variant="detailContent"
-                    key={line}
-                    display="block"
-                  >
-                    {line}
-                  </Typography>
-                ))}
-                {city && (
-                  <Typography variant="detailContent" display="block">
-                    {city}
-                  </Typography>
-                )}
-                {administrative_area && (
-                  <Typography variant="detailContent" display="block">
-                    {administrative_area}
-                  </Typography>
-                )}
-                {postal_code && (
-                  <Typography variant="detailContent" display="block">
-                    {postal_code}
-                  </Typography>
-                )}
-                {country && (
-                  <Typography variant="detailContent" display="block">
-                    {country}
-                  </Typography>
-                )}
-              </Box>
+    <Grid container spacing={2} sx={{ mt: "1px", mb: "14px" }}>
+      <Grid item container spacing={2}>
+        {/* Address */}
+        <Grid item xs={12} sm={12} md={6}>
+          <Box
+            display="flex"
+            alignItems="flex-start"
+            gap={1.5}
+            data-testid="contact-address"
+          >
+            <Box sx={{ mt: "4px", flexShrink: 0 }}>
+              <LocationOnOutlinedIcon />
             </Box>
-          )}
-          {!delivery_point &&
-            !city &&
-            !country &&
-            !postal_code &&
-            !administrative_area && (
-              <></>
-              // todo
-              // <Grid item md={12}>
-              //   [NO ADDRESS]
-              // </Grid>
-            )}
-        </Grid>
-        <Grid item md={6} data-testid="contact-phone">
-          {(!phones || phones.length === 0) && (
-            <></>
-            // todo
-            // <Grid item md={12}>
-            //   [NO CONTACT]
-            // </Grid>
-          )}
-          {phones &&
-            phones.map((phone) => {
-              return (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                  key={phone.value}
-                  mb={0.5}
+            <Box>
+              {hasAddress ? (
+                <>
+                  {delivery_point?.map((line) => renderTextLine(line, line))}
+                  {city && renderTextLine(city)}
+                  {administrative_area && renderTextLine(administrative_area)}
+                  {postal_code && renderTextLine(postal_code)}
+                  {country && renderTextLine(country)}
+                </>
+              ) : (
+                <Typography
+                  sx={{
+                    ...rc8Theme.typography.body2Regular,
+                    pt: "2px",
+                    mt: "4px",
+                  }}
+                  display="block"
                 >
-                  {/*Debug usage. Should be existing for long term*/}
-                  {phone.roles.length > 1 &&
-                    "MORE ROLES FOUND IN PHONE. PLEASE IMPLEMENT"}
-                  {getIconByRole(phone.roles[0])}
-                  <Typography variant="detailContent">
-                    {`${phone.value} (${phone.roles[0]})`}
-                  </Typography>
-                </Box>
-              );
-            })}
-        </Grid>
-      </Grid>
-      <Grid item container md={12}>
-        <Grid item container md={12} data-testid="contact-link">
-          <Box display="flex" alignItems="flex-start" gap={1}>
-            {!(!links || links.length === 0) && (
-              <LanguageOutlinedIcon sx={{ mt: 0.5, flexShrink: 0 }} />
-            )}
-            <Box sx={{ mt: "4px" }}>
-              {(!links || links.length === 0) && (
-                <></>
-                // todo
-                // <Grid item md={11}>
-                //   [NO URL]
-                // </Grid>
+                  {/* Empty text placeholder */}
+                </Typography>
               )}
-              {links &&
-                links.map((link, index) => {
-                  return (
-                    <Link href={link.href} key={index}>
-                      {link.title}
-                    </Link>
-                  );
-                })}
             </Box>
           </Box>
         </Grid>
+
+        {/* Phones */}
+        <Grid item xs={12} sm={12} md={6} data-testid="contact-phone">
+          {phones.length > 0 ? (
+            phones.map((phone) => (
+              <Box
+                key={phone.value}
+                display="flex"
+                alignItems="center"
+                gap={1.5}
+                mb={0.5}
+              >
+                {phone.roles.length > 1 && (
+                  <Typography color="error" variant="caption">
+                    Multiple roles found - please implement
+                  </Typography>
+                )}
+
+                <Box sx={{ mt: "4px", flexShrink: 0 }}>
+                  {getPhoneIcon(phone.roles[0])}
+                </Box>
+
+                <Typography
+                  sx={{
+                    ...rc8Theme.typography.body2Regular,
+                    pt: 0,
+                  }}
+                >
+                  {`${phone.value} (${phone.roles[0]})`}
+                </Typography>
+              </Box>
+            ))
+          ) : (
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <Box sx={{ flexShrink: 0 }}>
+                <LocalPhoneOutlinedIcon />
+              </Box>
+              <Typography
+                sx={{
+                  ...rc8Theme.typography.body2Regular,
+                  pt: 0,
+                }}
+              >
+                {/* Empty text placeholder */}
+              </Typography>
+            </Box>
+          )}
+        </Grid>
+      </Grid>
+
+      {/* Links */}
+      <Grid item xs={12}>
+        <Box
+          display="flex"
+          alignItems="flex-start"
+          gap={1.5}
+          data-testid="contact-link"
+        >
+          <LanguageOutlinedIcon />
+          <Box sx={{ minWidth: 0 }}>
+            {links.length > 0 ? (
+              links.map((link, index) => (
+                <Link
+                  key={index}
+                  href={link.href}
+                  display="block"
+                  sx={{
+                    ...rc8Theme.typography.body2Regular,
+                    color: rc8Theme.palette.primary1,
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {link.title}
+                </Link>
+              ))
+            ) : (
+              <Typography
+                sx={{
+                  ...rc8Theme.typography.body2Regular,
+                }}
+              >
+                {/* Empty text placeholder */}
+              </Typography>
+            )}
+          </Box>
+        </Box>
       </Grid>
     </Grid>
   );
