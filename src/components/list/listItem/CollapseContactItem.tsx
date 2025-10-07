@@ -3,6 +3,7 @@ import ItemBaseGrid from "./ItemBaseGrid";
 import { Collapse, Grid } from "@mui/material";
 import CollapseContactItemTitle from "./subitem/CollapseContactItemTItle";
 import CollapseBtn from "./subitem/CollapseBtn";
+import rc8Theme from "../../../styles/themeRC8";
 
 interface CollapseContactItemProps {
   title: string;
@@ -28,7 +29,11 @@ const CollapseContactItem: React.FC<CollapseContactItemProps> = ({
         />
       </Grid>
       <Grid item xs={1}>
-        <CollapseBtn isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+        <CollapseBtn
+          isExpanded={isExpanded}
+          setIsExpanded={setIsExpanded}
+          iconColor={rc8Theme.palette.text2}
+        />
       </Grid>
 
       <Grid item xs={12}>
