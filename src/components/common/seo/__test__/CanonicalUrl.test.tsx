@@ -2,9 +2,9 @@ import { describe, it, expect, afterEach } from "vitest";
 import { render, waitFor } from "@testing-library/react";
 import { HelmetProvider } from "react-helmet-async";
 import { MemoryRouter } from "react-router-dom";
-import SEO from "../SEO";
+import CanonicalUrl from "../CanonicalUrl";
 
-const renderSEO = (ui: React.ReactElement, route = "/") => {
+const renderCanonicalUrl = (ui: React.ReactElement, route = "/") => {
   return render(
     <HelmetProvider>
       <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
@@ -16,7 +16,7 @@ const getCanonicalUrl = () => {
   return document.querySelector('link[rel="canonical"]')?.getAttribute("href");
 };
 
-describe("SEO - Canonical URL", () => {
+describe("CanonicalUrl", () => {
   afterEach(() => {
     document
       .querySelectorAll('link[rel="canonical"]')
@@ -24,7 +24,7 @@ describe("SEO - Canonical URL", () => {
   });
 
   it("should set canonical URL without double slashes", async () => {
-    renderSEO(<SEO />, "/");
+    renderCanonicalUrl(<CanonicalUrl />, "/");
 
     await waitFor(() => {
       const url = getCanonicalUrl();
@@ -34,7 +34,7 @@ describe("SEO - Canonical URL", () => {
   });
 
   it("should handle regular paths", async () => {
-    renderSEO(<SEO />, "/search");
+    renderCanonicalUrl(<CanonicalUrl />, "/search");
 
     await waitFor(() => {
       expect(getCanonicalUrl()).toBe("https://portal-beta.aodn.org.au/search");
@@ -42,7 +42,10 @@ describe("SEO - Canonical URL", () => {
   });
 
   it("should handle detail pages with UUID", async () => {
-    renderSEO(<SEO />, "/details/0145df96-3847-474b-8b63-a66f0e03ff54");
+    renderCanonicalUrl(
+      <CanonicalUrl />,
+      "/details/0145df96-3847-474b-8b63-a66f0e03ff54"
+    );
 
     await waitFor(() => {
       expect(getCanonicalUrl()).toBe(
