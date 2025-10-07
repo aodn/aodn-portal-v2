@@ -195,3 +195,38 @@ def test_buttons_disappear_on_mobile(mobile_page: Page) -> None:
     expect(search_page.bookmark_list).not_to_be_visible()
     expect(search_page.map.zoom_in_button).not_to_be_visible()
     expect(search_page.map.zoom_out_button).not_to_be_visible()
+
+
+def test_search_result_layout_remains_intact_after_reload(
+    desktop_page: Page,
+) -> None:
+    """
+    Verifies that the search result list layout remains intact after
+    navigating to the landing page and reloading the page.
+    """
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    # switch to full list view
+    search_page.result_view_button.click()
+    search_page.full_list_view_button.click()
+    expect(search_page.result_list).to_be_visible()
+    expect(search_page.main_map).not_to_be_visible()
+
+    search_page.go_to_landing_page()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+    expect(search_page.result_list).to_be_visible()
+    expect(search_page.main_map).not_to_be_visible()
+
+    # reload the page
+    desktop_page.reload()
+    search_page.wait_for_search_to_complete()
+
+    # verify that the full list view is still active
+    expect(search_page.result_list).to_be_visible()
+    expect(search_page.main_map).not_to_be_visible()

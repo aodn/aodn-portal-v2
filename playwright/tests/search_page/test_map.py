@@ -339,3 +339,83 @@ def test_map_zoom_out_and_drag_does_not_crash(desktop_page: Page) -> None:
     # Additional drag operation to verify map responsiveness after zooming and dragging
     search_page.map.drag_map(left=200)
     assert True
+
+
+def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
+    """
+    This test verifies a previously identified issue where a search is performed,
+    the map position is changed, the user navigates to the landing page, then
+    to the search page, followed by the detail page, and returns to the search
+    page. The test ensures that the search page map always loads at its default
+    position (zoom level and center coordinates) after visiting the landing page,
+    instead of retaining the previously changed position.
+    """
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+    detail_page = DetailPage(desktop_page)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
+
+    default_map_center = search_page.map.get_map_center()
+    default_map_zoom = search_page.map.get_map_zoom()
+
+    search_page.map.drag_map()
+    search_page.map.zoom_to_level()
+    search_page.wait_for_page_stabilization()
+
+    search_page.go_to_landing_page()
+    landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
+
+    current_map_center = search_page.map.get_map_center()
+    current_map_zoom = search_page.map.get_map_zoom()
+
+    assert are_value_equal(current_map_zoom, default_map_zoom)
+    assert are_coordinates_equal(current_map_center, default_map_center)
+
+    search_page.first_result_title.click()
+    detail_page.return_button.click()
+    search_page.map.wait_for_map_loading()
+
+    current_map_center = search_page.map.get_map_center()
+    current_map_zoom = search_page.map.get_map_zoom()
+
+    assert are_value_equal(current_map_zoom, default_map_zoom)
+    assert are_coordinates_equal(current_map_center, default_map_center)
+
+
+@pytest.mark.parametrize(
+    'data_id, data_lng, data_lat',
+    [
+        (
+            '19da2ce7-138f-4427-89de-a50c724f5f54',
+            '135.25',
+            '-36.12',
+        ),
+    ],
+)
+def test_map_card_popup_download_button(
+    desktop_page: Page, data_id: str, data_lng: str, data_lat: str
+) -> None:
+    """
+    Validates that clicking the download button in the map card popup opens the detail page
+    and then clicking the return button navigates back to the search page.
+    """
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+    detail_page = DetailPage(desktop_page)
+
+    landing_page.load()
+    landing_page.search.fill_search_text(data_id)
+    landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
+
+    search_page.map.zoom_to_level(zoom_level=7)
+    search_page.map.center_map(data_lng, data_lat)
+    search_page.map.hover_map()
+    search_page.result_card_download_button.last.click()
+
+    detail_page.return_button.click()
+    expect(search_page.main_map).to_be_visible()

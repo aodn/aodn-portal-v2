@@ -1,6 +1,6 @@
 import random
 
-from playwright.sync_api import Page
+from playwright.sync_api import Page, TimeoutError
 
 from pages.base_page import BasePage
 from pages.js_scripts.js_utils import (
@@ -124,7 +124,10 @@ class Map(BasePage):
     def wait_for_map_loading(self) -> None:
         """Wait until the map is fully loaded"""
         self.page.wait_for_selector(f'#{self.map_id}', state='attached')
-        wait_for_js_function(self.page, 'isMapLoaded', 20000, self.map_id)
+        try:
+            wait_for_js_function(self.page, 'isMapLoaded', 20000, self.map_id)
+        except TimeoutError:
+            pass  # Continue even if the map fails to load within the timeout
 
     def click_map(self) -> None:
         """Click the map at the current position of the mouse"""

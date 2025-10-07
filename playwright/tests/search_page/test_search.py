@@ -3,6 +3,7 @@ from playwright.sync_api import Page, expect
 
 from core.enums.data_settings_filter import DataSettingsFilter
 from core.enums.search_sort_type import SearchSortType
+from core.enums.search_view_layouts import SearchViewLayouts
 from mocks.api.search_sort import (
     handle_sort_by_modified,
     handle_sort_by_relevance,
@@ -307,3 +308,54 @@ def test_search_state_persists_with_url(
         filter_organisation,
         filter_data.label,
     )
+
+
+@pytest.mark.parametrize(
+    'view_type, location_a, location_b, location_c, location_d',
+    [
+        (SearchViewLayouts.FULL_LIST, 'Apollo', 'Bremer', 'Franklin', 'Zeehan'),
+        (SearchViewLayouts.LIST, 'Apollo', 'Bremer', 'Franklin', 'Zeehan'),
+    ],
+)
+def test_repeated_search_action(
+    desktop_page: Page,
+    view_type: SearchViewLayouts,
+    location_a: str,
+    location_b: str,
+    location_c: str,
+    location_d: str,
+) -> None:
+    """
+    Verifies that performing repeated searches with different locations works correctly.
+    """
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+    # Set view type
+    search_page.result_view_button.click()
+    search_page.click_text(view_type.display_name, exact=True)
+
+    # Perform first search
+    search_page.search.location_button.click()
+    search_page.get_radio_input(location_a).check()
+    api_url = search_page.search.perform_search_and_get_api_url()
+    assert api_url is not None
+
+    # Perform repeated searches with different locations
+    # Second Search
+    search_page.search.location_button.click()
+    search_page.get_radio_input(location_b).check()
+    api_url = search_page.search.perform_search_and_get_api_url()
+    assert api_url is not None
+    # Third search
+    search_page.search.location_button.click()
+    search_page.get_radio_input(location_c).check()
+    api_url = search_page.search.perform_search_and_get_api_url()
+    assert api_url is not None
+    # Fourth search
+    search_page.search.location_button.click()
+    search_page.get_radio_input(location_d).check()
+    api_url = search_page.search.perform_search_and_get_api_url()
+    assert api_url is not None
