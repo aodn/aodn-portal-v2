@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -137,8 +137,21 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
-  const abstract =
-    collection?.getEnhancedDescription() || collection?.description || "";
+
+  const abstract = useMemo(
+    () => collection?.getEnhancedDescription() || collection?.description || "",
+    [collection]
+  );
+
+  const hasSummaryFeature = useMemo(
+    () => collection?.hasSummaryFeature() || false,
+    [collection]
+  );
+
+  const hasDownloadService = useMemo(
+    () => isWMSAvailable || hasSummaryFeature,
+    [hasSummaryFeature, isWMSAvailable]
+  );
 
   const [minDateStamp, maxDateStamp] = useMemo(() => {
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
@@ -163,13 +176,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const layers: LayerSwitcherLayer<LayerName>[] = [];
 
     if (collection) {
-      const hasSummaryFeature: boolean =
-        collection?.hasSummaryFeature() || false;
       const isZarrDataset: boolean =
         collection.getDatasetType() === DatasetType.ZARR;
 
       // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
       const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
+
       // Must be order by Hexbin > GeoServer > Spatial extents
       if (isSupportHexbin) {
         layers.push(MapLayers[LayerName.Hexbin]);
@@ -188,21 +200,32 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         });
       }
 
-      // Init the layer with values here taking the default
-      setSelectedLayer((v: LayerName | null): LayerName | null => {
-        if (v) {
-          return v;
-        } else {
-          // Not init before, make it the same as the default value of this config
-          const layer: LayerSwitcherLayer<LayerName> | undefined = layers.find(
-            (l) => l.default
-          );
-          return layer != null ? layer.id : null;
-        }
-      });
+      if (!hasDownloadService) {
+        layers.push({
+          ...MapLayers[LayerName.SpatialExtent],
+          default: true,
+        });
+      }
     }
     return layers;
-  }, [collection, isWMSAvailable]);
+  }, [collection, hasSummaryFeature, isWMSAvailable, hasDownloadService]);
+
+  useEffect(() => {
+    if (mapLayerConfig.length > 0) {
+      // Check if current selection is still valid
+      const isCurrentLayerValid = mapLayerConfig.some(
+        (layer) => layer.id === selectedLayer
+      );
+
+      if (!isCurrentLayerValid || selectedLayer === null) {
+        // Find the default layer or use the first one
+        const defaultLayer = mapLayerConfig.find((l) => l.default);
+        setSelectedLayer(defaultLayer ? defaultLayer.id : mapLayerConfig[0].id);
+      }
+    }
+    // Only depend on mapLayerConfig
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapLayerConfig]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
@@ -323,15 +346,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   animate={false}
                   panelId={mapContainerId}
                   projection={"mercator"} // Hexbin support this project or globe only
-                  announcement={
-                    selectedLayer === LayerName.Hexbin
-                      ? collection.hasSummaryFeature()
-                        ? undefined
-                        : "model: No data available"
-                      : isWMSAvailable
-                        ? undefined
-                        : "model: Map preview not available" // No GeoServer WMS data available
-                  }
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
                 >
@@ -359,7 +373,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         visible={mapLayerConfig.length !== 0}
                       />
                       <MenuControl
-                        // visible={selectedLayer === LayerName.Hexbin}
+                        visible={timeSliderSupport && hasDownloadService}
                         menu={
                           <DateRange
                             minDate={minDateStamp.format(
@@ -373,12 +387,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             }
                           />
                         }
-                        visible={
-                          timeSliderSupport && mapLayerConfig.length !== 0
-                        }
                       />
                       <MenuControl
-                        // visible={selectedLayer === LayerName.Hexbin}
+                        visible={hasDownloadService}
                         menu={
                           <DrawRect
                             getAndSetDownloadConditions={
@@ -386,7 +397,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             }
                           />
                         }
-                        visible={mapLayerConfig.length !== 0}
                       />
                     </MenuControlGroup>
                   </Controls>
