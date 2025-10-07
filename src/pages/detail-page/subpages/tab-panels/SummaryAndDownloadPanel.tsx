@@ -136,9 +136,28 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(null);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
-  const [minDateStamp, maxDateStamp] = getMinMaxDateStamps(featureCollection);
+  const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
   const abstract =
     collection?.getEnhancedDescription() || collection?.description || "";
+
+  const [minDateStamp, maxDateStamp] = useMemo(() => {
+    // We trust the metadata value instead of raw data, in fact it is hard to have a common
+    // time value, for example cloud optimized date range may be different from the
+    // geoserver one
+    let start = undefined;
+    let end = undefined;
+
+    const extent = collection?.getExtent();
+    if (extent) {
+      const [s, e] = extent.getOverallTemporal();
+      start = s;
+      end = e;
+    }
+    return [
+      dayjs(start, dateDefault.DISPLAY_FORMAT),
+      dayjs(end, dateDefault.DISPLAY_FORMAT),
+    ];
+  }, [collection]);
 
   const mapLayerConfig = useMemo((): LayerSwitcherLayer<LayerName>[] => {
     const layers: LayerSwitcherLayer<LayerName>[] = [];
@@ -156,10 +175,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         layers.push(MapLayers[LayerName.Hexbin]);
       }
 
-      layers.push({
-        ...MapLayers[LayerName.GeoServer],
-        default: !isSupportHexbin,
-      });
+      if (isWMSAvailable) {
+        layers.push({
+          ...MapLayers[LayerName.GeoServer],
+          default: !isSupportHexbin,
+        });
+      }
 
       if (hasSummaryFeature && isZarrDataset) {
         layers.push({
@@ -181,18 +202,14 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       });
     }
     return layers;
-  }, [collection]);
+  }, [collection, isWMSAvailable]);
 
-  const filteredFeatureCollection = useMemo(() => {
-    if (!featureCollection) {
-      return undefined;
-    }
-
+  const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
     );
     if (!dateRangeConditionGeneric) {
-      return featureCollection;
+      return [undefined, undefined];
     }
     const dateRangeCondition = dateRangeConditionGeneric as DateRangeCondition;
 
@@ -204,20 +221,58 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       dateRangeCondition.end,
       dateDefault.SIMPLE_DATE_FORMAT
     );
+    return [conditionStart, conditionEnd];
+  }, [downloadConditions]);
 
-    const filteredFeatures = featureCollection.features?.filter((feature) => {
-      const date = dayjs(
-        feature.properties?.date,
-        dateDefault.SIMPLE_Y_M_DATE_FORMAT
-      );
-      return date.isAfter(conditionStart) && date.isBefore(conditionEnd);
-    });
+  const filteredFeatureCollection = useMemo(() => {
+    // TODO: In long run should move it to ogcapi
+    if (!featureCollection) {
+      return undefined;
+    }
 
-    return {
-      ...featureCollection,
-      features: filteredFeatures,
-    };
-  }, [downloadConditions, featureCollection]);
+    if (filterStartDate !== undefined && filterEndDate !== undefined) {
+      const filteredFeatures = featureCollection.features?.filter((feature) => {
+        const date = dayjs(
+          feature.properties?.date,
+          dateDefault.SIMPLE_Y_M_DATE_FORMAT
+        );
+        return date.isAfter(filterStartDate) && date.isBefore(filterEndDate);
+      });
+
+      return {
+        ...featureCollection,
+        features: filteredFeatures,
+      };
+    } else if (filterStartDate !== undefined) {
+      const filteredFeatures = featureCollection.features?.filter((feature) => {
+        const date = dayjs(
+          feature.properties?.date,
+          dateDefault.SIMPLE_Y_M_DATE_FORMAT
+        );
+        return date.isAfter(filterStartDate);
+      });
+
+      return {
+        ...featureCollection,
+        features: filteredFeatures,
+      };
+    } else if (filterEndDate !== undefined) {
+      const filteredFeatures = featureCollection.features?.filter((feature) => {
+        const date = dayjs(
+          feature.properties?.date,
+          dateDefault.SIMPLE_Y_M_DATE_FORMAT
+        );
+        return date.isBefore(filterStartDate);
+      });
+
+      return {
+        ...featureCollection,
+        features: filteredFeatures,
+      };
+    } else {
+      return featureCollection;
+    }
+  }, [featureCollection, filterEndDate, filterStartDate]);
 
   const handleMapChange = useCallback((event: MapEvent | undefined) => {
     // implement later
@@ -272,7 +327,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     selectedLayer === LayerName.Hexbin
                       ? collection.hasSummaryFeature()
                         ? undefined
-                        : "model:No data available"
+                        : "model: No data available"
                       : isWMSAvailable
                         ? undefined
                         : "model: Map preview not available" // No GeoServer WMS data available
@@ -301,6 +356,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             onEvent={handleGeoLayerChange}
                           />
                         }
+                        visible={mapLayerConfig.length !== 0}
                       />
                       <MenuControl
                         // visible={selectedLayer === LayerName.Hexbin}
@@ -317,6 +373,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             }
                           />
                         }
+                        visible={
+                          timeSliderSupport && mapLayerConfig.length !== 0
+                        }
                       />
                       <MenuControl
                         // visible={selectedLayer === LayerName.Hexbin}
@@ -327,6 +386,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             }
                           />
                         }
+                        visible={mapLayerConfig.length !== 0}
                       />
                     </MenuControlGroup>
                   </Controls>
@@ -345,10 +405,15 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       geoServerLayerConfig={{
                         uuid: collection.id,
                         baseUrl: ensureHttps(getWMSServer(collection)),
-                        urlParams: { LAYERS: getWMSLayerNames(collection) },
+                        urlParams: {
+                          LAYERS: getWMSLayerNames(collection),
+                          START_DATE: filterStartDate,
+                          END_DATE: filterEndDate,
+                        },
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
                       visible={selectedLayer === LayerName.GeoServer}
+                      setTimeSliderSupport={setTimeSliderSupport}
                     />
                     <GeojsonLayer
                       collection={collection}

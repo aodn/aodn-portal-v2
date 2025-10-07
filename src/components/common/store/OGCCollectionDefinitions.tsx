@@ -14,6 +14,8 @@ import * as turf from "@turf/turf";
 import wmsIcon from "../../../assets/icons/wms-icon.png";
 import wfsIcon from "../../../assets/icons/wfs-icon.png";
 import linkIcon from "../../../assets/icons/link.png";
+import dayjs from "dayjs";
+import { dateDefault } from "../constants";
 
 // interfaces:
 export interface IKeyword {
@@ -253,7 +255,7 @@ export class OGCCollection {
   getGeometry = (): GeometryCollection | undefined => this.propValue?.geometry;
   getCentroid = (): Array<Feature<Point>> | undefined =>
     this.propValue?.centroid?.map((i) => turf.point(i));
-  getTemporal = (): ITemporal[] | undefined => this.propValue?.temporal;
+  getExtent = () => this.propExtent;
   getCitation = (): ICitation | undefined => this.propValue?.citation;
   getStatement = (): string | undefined => this.propValue?.statement;
   getLicense = (): string | undefined => this.propValue?.license;
@@ -326,9 +328,11 @@ export class SummariesProperties {
 
 export class Spatial {
   private parent: OGCCollection;
-
-  bbox: Array<Position> = [];
-  temporal: { interval: Array<Array<string | null>>; trs?: string } = {
+  private bounding_box: Array<Position> = [];
+  private temporal_value: {
+    interval: Array<Array<string | null>>;
+    trs?: string;
+  } = {
     interval: [[]],
   };
   crs: string = "";
@@ -336,6 +340,35 @@ export class Spatial {
   constructor(ogcCollection: OGCCollection) {
     this.parent = ogcCollection;
   }
+
+  set temporal(value: { interval: Array<Array<string | null>>; trs?: string }) {
+    this.temporal_value = value;
+  }
+
+  get temporal() {
+    return this.temporal_value;
+  }
+
+  set bbox(bbox: Array<Position>) {
+    this.bounding_box = bbox;
+  }
+
+  get bbox() {
+    return this.bounding_box;
+  }
+
+  getOverallTemporal = () => {
+    const period = this.temporal.interval;
+    let startDate: string | undefined = undefined;
+    let endDate: string | undefined = undefined;
+    if (period?.[0][0]) {
+      startDate = dayjs(period[0][0]).format(dateDefault.DISPLAY_FORMAT);
+    }
+    if (period?.[0][1]) {
+      endDate = dayjs(period[0][1]).format(dateDefault.DISPLAY_FORMAT);
+    }
+    return [startDate, endDate];
+  };
   /**
    * Create a GeoJSON FeatureCollection from the bounding boxes and points value.
    * @param start - The index to start from, from spec, the first is the overall bounding box

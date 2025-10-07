@@ -106,14 +106,6 @@ class ApiRouter:
         self.unroute(Routes.COLLECTION_DETAIL, detail_handler)
         self.unroute(Routes.COLLECTION_DETAIL_ITEM, detail_item_handler)
 
-    def route_geowebcache(self, handler_function: Callable) -> None:
-        self.route(Routes.GEOWEBCACHE, handler_function)
-
-    def unroute_geowebcache(
-        self, handler_function: Optional[Callable] = None
-    ) -> None:
-        self.unroute(Routes.GEOWEBCACHE, handler_function)
-
     def route_wms_map_tile(self, handler_function: Callable) -> None:
         self.route(Routes.WMS_MAP_TILE, handler_function)
 
@@ -121,3 +113,11 @@ class ApiRouter:
         self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.WMS_MAP_TILE, handler_function)
+
+    def route_wms_downloadable_fields(self, handler_function: Callable) -> None:
+        self.route(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)
+
+    def unroute_wms_downloadable_fields(
+            self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)

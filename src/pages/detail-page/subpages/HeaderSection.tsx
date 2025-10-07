@@ -28,9 +28,8 @@ import ShareButtonMenu, {
   CopyLinkConfig,
 } from "../../../components/menu/ShareButtonMenu";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
-import dayjs from "dayjs";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import { dateDefault, pageReferer } from "../../../components/common/constants";
+import { pageReferer } from "../../../components/common/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import rc8Theme from "../../../styles/themeRC8";
 import InfoCard from "../../../components/info/InfoCard";
@@ -244,19 +243,22 @@ const HeaderSection = () => {
     [checkIfCopied, copyUrl]
   );
 
-  const title = useMemo(() => collection?.title, [collection?.title]);
-  const pace = useMemo(() => collection?.getPace(), [collection]);
-  const status = useMemo(() => collection?.getStatus(), [collection]);
-  const period: (string | null)[][] | undefined =
-    collection?.extent?.temporal.interval;
-  let startDate: string | undefined;
-  let endDate: string | undefined;
-  if (period && period[0][0]) {
-    startDate = dayjs(period[0][0]).format(dateDefault.DISPLAY_FORMAT);
-  }
-  if (period && period[0][1]) {
-    endDate = dayjs(period[0][1]).format(dateDefault.DISPLAY_FORMAT);
-  }
+  const [title, pace, status, startDate, endDate] = useMemo(() => {
+    const title = collection?.title;
+    const pace = collection?.getPace();
+    const status = collection?.getStatus();
+    const extent = collection?.getExtent();
+
+    let startDate = undefined;
+    let endDate = undefined;
+    if (extent) {
+      const [s, e] = extent.getOverallTemporal();
+      startDate = s;
+      endDate = e;
+    }
+
+    return [title, pace, status, startDate, endDate];
+  }, [collection]);
 
   const onGoBack = useCallback(
     (referer: string) => {

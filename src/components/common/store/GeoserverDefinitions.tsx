@@ -2,6 +2,7 @@ export type MapTileRequest = {
   layerName: string;
   width?: number;
   height?: number;
+  datetime?: string;
   bbox?: string;
 };
 
@@ -27,4 +28,10 @@ export type MapFeatureResponse = {
     time?: Date;
     value?: number;
   }>;
+};
+
+export type MapFieldResponse = {
+  label: string;
+  type: string;
+  name: string;
 };

@@ -2,10 +2,7 @@ import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
 import ContactArea from "./listItem/subitem/ContactArea";
 import ExpandableList from "./ExpandableList";
-import { Grid, Link, Typography, useTheme } from "@mui/material";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
-import rc8Theme from "../../styles/themeRC8";
+import CollapseContactItem from "./listItem/CollapseContactItem";
 
 interface MetadataContactListProps {
   contacts: IContact[];
@@ -16,43 +13,21 @@ const MetadataContactList: React.FC<MetadataContactListProps> = ({
   contacts,
   selected = false,
 }) => {
-  const theme = useTheme();
   const metadataContacts: ReactNode[] = useMemo(() => {
     const contactsToAdd: ReactNode[] = [];
     contacts?.map((contact, index) => {
       const suffix = contact.name ? ` - ${contact.name}` : "";
-      const email = contact?.emails?.[0];
+      const email = contact?.emails?.[0] || "";
+      const title = contact.organization + suffix;
+
       contactsToAdd.push(
-        <ItemBaseGrid
-          key={index}
-          sx={{
-            display: "block",
-            alignItems: "center",
-            justifyContent: "space-between",
-            py: "10px",
-          }}
-        >
-          <Grid item container md={12} sx={{ marginBottom: theme.mp.md }}>
-            <Grid item container md={1}>
-              <MailOutlineIcon />
-            </Grid>
-            <Grid item md={11} sx={{ textAlign: "left", whiteSpace: "normal" }}>
-              <Link href={`mailto:${email ? email : ""}`}>
-                <Typography
-                  data-testid="metadata-contact-title"
-                  sx={{ ...rc8Theme.typography.title1Medium, p: 0 }}
-                >
-                  {contact.organization + suffix}
-                </Typography>
-              </Link>
-            </Grid>
-          </Grid>
+        <CollapseContactItem key={index} title={title} email={email}>
           <ContactArea contact={contact} />
-        </ItemBaseGrid>
+        </CollapseContactItem>
       );
     });
     return contactsToAdd;
-  }, [contacts, theme.mp.md]);
+  }, [contacts]);
 
   return (
     <ExpandableList

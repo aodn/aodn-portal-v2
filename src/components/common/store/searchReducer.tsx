@@ -27,10 +27,13 @@ import {
 import {
   getDateConditionFrom,
   getMultiPolygonFrom,
-  getFormatFrom,
 } from "../../../utils/DownloadConditionUtils";
 import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
-import { MapFeatureRequest, MapFeatureResponse } from "./GeoserverDefinitions";
+import {
+  MapFeatureRequest,
+  MapFeatureResponse,
+  MapFieldResponse,
+} from "./GeoserverDefinitions";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -295,7 +298,6 @@ const processWFSDownload = createAsyncThunk<
       // Extract download conditions
       const dateRange = getDateConditionFrom(request.downloadConditions);
       const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
-      const format = getFormatFrom(request.downloadConditions); // Currently unused - CSV only for WFS
 
       const requestBody = {
         inputs: {
@@ -369,19 +371,39 @@ const searcher = createSlice({
   },
 });
 
-const fetchMapFeature = createAsyncThunk<
+const fetchGeoServerMapFeature = createAsyncThunk<
   MapFeatureResponse,
   MapFeatureRequest,
   { rejectValue: ErrorResponse }
->("geoserver/fetchMapFeature", (request: MapFeatureRequest, thunkApi: any) => {
-  return axios
-    .get<MapFeatureResponse>(
-      `/api/v1/ogc/collections/${request.uuid}/items/wms_map_feature`,
-      { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
-    )
-    .then((response) => response.data)
-    .catch(errorHandling(thunkApi));
-});
+>(
+  "geoserver/fetchGeoServerMapFeature",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return axios
+      .get<MapFeatureResponse>(
+        `/api/v1/ogc/collections/${request.uuid}/items/wms_map_feature`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
+
+const fetchGeoServerMapFields = createAsyncThunk<
+  Array<MapFieldResponse>,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "geoserver/fetchGeoServerMapFields",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return axios
+      .get<MapFeatureResponse>(
+        `/api/v1/ogc/collections/${request.uuid}/items/wms_downloadable_fields`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
 /**
  * Appends a filter condition using AND operation.
  */
@@ -530,7 +552,8 @@ export {
   fetchResultByUuidNoStore,
   fetchFeaturesByUuid,
   fetchParameterVocabsWithStore,
-  fetchMapFeature,
+  fetchGeoServerMapFeature,
+  fetchGeoServerMapFields,
   processDatasetDownload,
   processWFSDownload,
   jsonToOGCCollections,

@@ -6,20 +6,32 @@ import { formatToUrl } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig, MapEventEnum } from "../constants";
 import { Position } from "geojson";
 import { TestHelper } from "../../../common/test/helper";
-import { MapMouseEvent, MapMouseEventType, Popup } from "mapbox-gl";
+import {
+  MapMouseEvent,
+  MapMouseEventType,
+  Popup,
+  RasterTileSource,
+} from "mapbox-gl";
 import {
   MapFeatureRequest,
   MapFeatureResponse,
   MapTileRequest,
 } from "../../../common/store/GeoserverDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
-import { fetchMapFeature } from "../../../common/store/searchReducer";
+import {
+  fetchGeoServerMapFeature,
+  fetchGeoServerMapFields,
+} from "../../../common/store/searchReducer";
 import { CardContent, Typography } from "@mui/material";
 import { createRoot, Root } from "react-dom/client";
+import dayjs, { Dayjs } from "dayjs";
+import { dateDefault } from "../../../common/constants";
 
 interface UrlParams {
   LAYERS: string[];
   BBOX?: string;
+  START_DATE?: Dayjs;
+  END_DATE?: Dayjs;
   WIDTH?: number;
   HEIGHT?: number;
   X?: number;
@@ -86,6 +98,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   geoServerLayerConfig,
   onWMSAvailabilityChange,
   visible,
+  setTimeSliderSupport,
 }: GeoServerLayerProps) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
@@ -99,7 +112,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     return [titleLayerId, sourceLayerId];
   }, [map]);
 
-  const [config, tileUrl, isWMSAvailable] = useMemo(() => {
+  const [config, isWMSAvailable] = useMemo(() => {
     const config = mergeWithDefaults(
       // ncwms is a customise instance by IMOS in the geoserver-123, no cache server
       // is provided in this case.
@@ -108,22 +121,44 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     );
     // We append cache server URL in front, if layer is not in cache server, it
     // will fall back to the original URL.
-    const tileUrl = [
-      formatToUrl<MapTileRequest>({
-        baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
-        params: {
-          layerName: geoServerLayerConfig?.urlParams?.LAYERS.join(",") || "",
-          bbox: config?.urlParams?.BBOX,
-        },
-      }),
-    ];
     const isWMSAvailable = checkWMSAvailability(
       config.baseUrl,
       config.urlParams,
       onWMSAvailabilityChange
     );
-    return [config, tileUrl, isWMSAvailable];
+    return [config, isWMSAvailable];
   }, [geoServerLayerConfig, onWMSAvailabilityChange]);
+
+  const tileUrl = useMemo(() => {
+    // We append cache server URL in front, if layer is not in cache server, it
+    // will fall back to the original URL.
+    const start =
+      geoServerLayerConfig?.urlParams?.START_DATE === undefined
+        ? dayjs(dateDefault.min)
+        : geoServerLayerConfig?.urlParams?.START_DATE;
+
+    const end =
+      geoServerLayerConfig?.urlParams?.END_DATE === undefined
+        ? dayjs(dateDefault.max)
+        : geoServerLayerConfig?.urlParams?.END_DATE;
+
+    return [
+      formatToUrl<MapTileRequest>({
+        baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
+        params: {
+          layerName: geoServerLayerConfig?.urlParams?.LAYERS.join(",") || "",
+          bbox: config?.urlParams?.BBOX,
+          datetime: `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
+        },
+      }),
+    ];
+  }, [
+    config?.urlParams?.BBOX,
+    config.uuid,
+    geoServerLayerConfig?.urlParams?.END_DATE,
+    geoServerLayerConfig?.urlParams?.LAYERS,
+    geoServerLayerConfig?.urlParams?.START_DATE,
+  ]);
 
   // Add the tile layer to the map
   useEffect(() => {
@@ -213,6 +248,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   ]);
 
   useEffect(() => {
+    // Update source if tileUrl changed
+    if (map?.getSource(sourceLayerId)) {
+      const rasterSource = map.getSource(sourceLayerId) as RasterTileSource;
+      rasterSource.setTiles(tileUrl);
+    }
+  }, [map, sourceLayerId, tileUrl]);
+
+  useEffect(() => {
     // Create a temporary div for React rendering
 
     const cleanPopup = () => {
@@ -266,7 +309,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         bbox: map.getBounds()?.toArray().flat().join(","),
       };
 
-      dispatch(fetchMapFeature(request))
+      dispatch(fetchGeoServerMapFeature(request))
         .unwrap()
         .then((response) => {
           cleanPopup();
@@ -322,6 +365,18 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
             if (visible) {
               map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+              // Check if this layer support time slider
+              const request: MapFeatureRequest = {
+                uuid: geoServerLayerConfig?.uuid || "",
+                layerName:
+                  geoServerLayerConfig?.urlParams?.LAYERS.join(",") || "",
+              };
+              dispatch(fetchGeoServerMapFields(request))
+                .unwrap()
+                .then((value) => {
+                  const found = value.find((v) => v.type === "dateTime");
+                  setTimeSliderSupport?.(found !== undefined);
+                });
             }
           }
         }
@@ -331,7 +386,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       map?.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
       cleanPopup();
     };
-  }, [dispatch, geoServerLayerConfig, map, titleLayerId, visible]);
+  }, [
+    dispatch,
+    geoServerLayerConfig,
+    map,
+    setTimeSliderSupport,
+    titleLayerId,
+    visible,
+  ]);
 
   return (
     <TestHelper

@@ -56,6 +56,7 @@ def test_selecting_date_range_adds_download_filter(
     """
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
+    detail_page.wait_for_timeout(2000)
 
     # Select date range show/hide menu
     detail_page.detail_map.daterange_show_hide_menu_button.click()
