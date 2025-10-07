@@ -26,6 +26,7 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
           mx: "6px",
           color: { color },
         }}
+        data-testid="metadata-contact-title"
       >
         {text ? text : "[ NO TITLE ]"}
       </Typography>
