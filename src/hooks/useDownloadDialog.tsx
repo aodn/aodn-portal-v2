@@ -49,7 +49,6 @@ export const useDownloadDialog = (
   const { downloadConditions } = useDetailPageContext();
 
   // ================== STATE MANAGEMENT ==================
-  const emailInputRef = useRef<HTMLInputElement>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -88,6 +87,16 @@ export const useDownloadDialog = (
       format,
     };
   }, [downloadConditions]);
+
+  // ================== REFS FOR STABLE CALLBACKS ==================
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const latestValuesRef = useRef({
+    dataUsage,
+    dateRange,
+    format,
+    multiPolygon,
+    subsettingSelectionCount,
+  });
 
   // ================== VALIDATION HELPERS ==================
   const isEmailValid = useCallback((emailValue: string): boolean => {
@@ -150,13 +159,31 @@ export const useDownloadDialog = (
     }
   }, [isOpen]); // Only depend on isOpen
 
-  // ================== EMAIL INPUT SYNC ==================
+  // ================== SYNC LATEST VALUES ==================
+  // ================== SYNC LATEST VALUES ==================
   useEffect(() => {
+    // Sync email input
     if (emailInputRef.current && email) {
       emailInputRef.current.value = email;
     }
-  }, [email, activeStep]);
 
+    // Sync ref values
+    latestValuesRef.current = {
+      dataUsage,
+      dateRange,
+      format,
+      multiPolygon,
+      subsettingSelectionCount,
+    };
+  }, [
+    email,
+    activeStep,
+    dataUsage,
+    dateRange,
+    format,
+    multiPolygon,
+    subsettingSelectionCount,
+  ]);
   // ================== PROCESSING TIMEOUT ==================
   useEffect(() => {
     if (!isProcessing) return;
@@ -289,6 +316,10 @@ export const useDownloadDialog = (
 
       const normalizedEmail = emailToSubmit.toLowerCase();
 
+      // Get latest values from ref
+      const { dataUsage, dateRange, format, multiPolygon } =
+        latestValuesRef.current;
+
       const request: DatasetDownloadRequest = {
         inputs: {
           uuid: uuid,
@@ -343,15 +374,7 @@ export const useDownloadDialog = (
           }
         );
     },
-    [
-      uuid,
-      dateRange.start,
-      dateRange.end,
-      multiPolygon,
-      format,
-      dataUsage,
-      dispatch,
-    ]
+    [uuid, dispatch]
   );
 
   // ================== FORM SUBMISSION HANDLERS ==================
@@ -400,10 +423,18 @@ export const useDownloadDialog = (
       return;
     }
 
-    // Track 'download_co_data' submit button click
+    // Get latest values from ref
+    const {
+      dataUsage,
+      dateRange,
+      format,
+      multiPolygon,
+      subsettingSelectionCount,
+    } = latestValuesRef.current;
+
+    // Track download event with obfuscated email (. becomes *, @ becomes #)
     trackCustomEvent(AnalyticsEvent.DOWNLOAD_CO_DATA, {
       dataset_uuid: uuid,
-      // Track download event with obfuscated email (. becomes *, @ becomes #)
       email: emailToSubmit.replace(/\./g, "*").replace("@", "#"),
       purposes: dataUsage.purposes,
       sectors: dataUsage.sectors,
