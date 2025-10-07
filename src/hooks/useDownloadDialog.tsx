@@ -403,6 +403,16 @@ export const useDownloadDialog = (
     // Track 'download_co_data' submit button click
     trackCustomEvent(AnalyticsEvent.DOWNLOAD_CO_DATA, {
       dataset_uuid: uuid,
+      // Track download event with obfuscated email (. becomes *, @ becomes #)
+      email: emailToSubmit.replace(/\./g, "*").replace("@", "#"),
+      purposes: dataUsage.purposes,
+      sectors: dataUsage.sectors,
+      allow_contact: dataUsage.allow_contact,
+      start_date: dateRange.start,
+      end_date: dateRange.end,
+      format: format,
+      has_spatial_extent: !!multiPolygon,
+      subsetting_count: subsettingSelectionCount,
     });
 
     setIsProcessing(true);
