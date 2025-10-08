@@ -26,7 +26,11 @@ const InfoMessage: FC<InfoMessageProps> = ({ infoText, iconColor, sx }) => {
           width={24}
         />
       </Box>
-      <Typography variant="body2" color={rc8Theme.palette.text2} pt="3px">
+      <Typography
+        sx={{ ...rc8Theme.typography.body2Regular }}
+        color={rc8Theme.palette.text2}
+        pt="3px"
+      >
         {infoText}
       </Typography>
     </Box>

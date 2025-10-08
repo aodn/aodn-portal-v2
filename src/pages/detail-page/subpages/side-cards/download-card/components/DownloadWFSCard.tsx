@@ -9,16 +9,9 @@ import {
   Stack,
   Tooltip,
   Typography,
-  useTheme,
 } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
-import {
-  border,
-  borderRadius,
-  color,
-  padding,
-} from "../../../../../../styles/constants";
-import CommonSelect from "../../../../../../components/common/dropdown/CommonSelect";
+import { borderRadius } from "../../../../../../styles/constants";
 import { ILink } from "../../../../../../components/common/store/OGCCollectionDefinitions";
 import rc8Theme from "../../../../../../styles/themeRC8";
 import useWFSDownload, {
@@ -32,6 +25,7 @@ import {
 import InfoMessage from "./InfoMessage";
 import DownloadButton from "../../../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
+import DownloadSelect from "./DownloadSelect";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -51,7 +45,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   getAndSetDownloadConditions,
   removeDownloadCondition,
 }) => {
-  const theme = useTheme();
   const {
     downloadingStatus,
     downloadedBytes,
@@ -67,17 +60,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   );
   const [selectedFormat, setSelectedFormat] = useState<string>(
     formatOptions[0].value
-  );
-
-  const selectSxProps = useMemo(
-    () => ({
-      height: "30px",
-      textAlign: "start",
-      backgroundColor: "transparent",
-      boxShadow: theme.shadows[5],
-      border: `${border.xs} ${color.blue.dark}`,
-    }),
-    [theme]
   );
 
   // For now we just display the wms layer to make sure the download data is associated with the geoserver layer
@@ -146,9 +128,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
               <>
                 <Grid item xs={6}>
                   <Typography
-                    variant="body2"
-                    color="textSecondary"
                     textAlign="right"
+                    sx={{ ...rc8Theme.typography.body3Small }}
                   >
                     Downloaded:
                   </Typography>
@@ -156,9 +137,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
                 <Grid item xs={6}>
                   <Typography
                     width="60%"
-                    variant="body2"
-                    color="textSecondary"
                     textAlign="left"
+                    sx={{ ...rc8Theme.typography.body3Small }}
                   >
                     {dataSize}
                   </Typography>
@@ -193,22 +173,20 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         isOpen={downloadDialogOpen}
         setIsOpen={setDownloadDialogOpen}
       /> */}
-      <Stack sx={{ padding: padding.medium }} spacing={2}>
-        <CommonSelect
+      <Stack sx={{ p: "16px" }} spacing={2}>
+        <DownloadSelect
+          disabled={isDownloading}
           items={formatOptions}
           label="Format Selection"
           value={selectedFormat}
           onSelectCallback={handleSelectFormat}
-          sx={selectSxProps}
-          disabled={isDownloading}
         />
-        <CommonSelect
+        <DownloadSelect
+          disabled={isDownloading}
           items={dataSelectOptions}
           label="Data Selection"
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}
-          sx={selectSxProps}
-          disabled={isDownloading}
         />
         <Box position="relative">
           <DownloadButton
@@ -238,6 +216,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
         hideInfoMessage={isDownloading}
+        disable={isDownloading}
+        sx={{ px: "16px" }}
       />
 
       <Snackbar

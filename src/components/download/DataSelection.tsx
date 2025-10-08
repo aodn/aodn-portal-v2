@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { Box, SxProps } from "@mui/material";
 import BBoxConditionBox from "../box/BBoxConditionBox";
 import DateRangeConditionBox from "../box/DateRangeConditionBox";
@@ -13,16 +13,18 @@ import {
 
 interface DataSelectionComponentProps extends DownloadCondition {
   sx?: SxProps;
+  disable?: boolean;
 }
 
 /**
  * DataSelectionComponent - Displays selected data conditions (bbox and date range)
  * Extracted from DownloadCard to be reusable across different components
  */
-const DataSelection: React.FC<DataSelectionComponentProps> = ({
+const DataSelection: FC<DataSelectionComponentProps> = ({
   sx,
   downloadConditions,
   removeDownloadCondition,
+  disable,
 }) => {
   const bboxConditions: BBoxCondition[] = useMemo(() => {
     const bboxConditions = downloadConditions.filter(
@@ -54,6 +56,7 @@ const DataSelection: React.FC<DataSelectionComponentProps> = ({
             key={index}
             bboxCondition={bboxCondition}
             onRemove={() => handleRemove(bboxCondition)}
+            disable={disable}
           />
         );
       })}
@@ -63,6 +66,7 @@ const DataSelection: React.FC<DataSelectionComponentProps> = ({
             key={index}
             dateRangeCondition={dateRangeCondition}
             onRemove={() => handleRemove(dateRangeCondition)}
+            disable={disable}
           />
         );
       })}

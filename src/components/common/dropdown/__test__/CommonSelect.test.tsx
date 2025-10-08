@@ -127,7 +127,7 @@ describe("CommonSelect", () => {
 
   it("applies custom sx styles", () => {
     const customSx = { backgroundColor: "red" };
-    render(<CommonSelect {...defaultProps} sx={customSx} />);
+    render(<CommonSelect {...defaultProps} selectSx={customSx} />);
     const formControl = screen.getByTestId("common-select");
     expect(formControl).toHaveStyle("background-color: rgba(0, 0, 0, 0)");
   });

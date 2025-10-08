@@ -1,3 +1,4 @@
+import { FC } from "react";
 import { useDetailPageContext } from "../../../context/detail-page-context";
 import { ILink } from "../../../../../components/common/store/OGCCollectionDefinitions";
 import DownloadWFSCard from "./components/DownloadWFSCard";
@@ -5,7 +6,7 @@ import DownloadCloudOptimisedCard from "./components/DownloadCloudOptimisedCard"
 import SideCardContainer from "../SideCardContainer";
 import DownloadNOtAvailableCard from "./components/DownloadNOtAvailableCard";
 
-const DownloadCard = () => {
+const DownloadCard: FC = () => {
   const {
     collection,
     downloadConditions,

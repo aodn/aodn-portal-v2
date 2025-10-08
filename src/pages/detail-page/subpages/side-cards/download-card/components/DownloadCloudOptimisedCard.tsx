@@ -1,7 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
-import { Stack, useTheme } from "@mui/material";
-import rc8Theme from "../../../../../../styles/themeRC8";
-import CommonSelect from "../../../../../../components/common/dropdown/CommonSelect";
+import { Stack } from "@mui/material";
 import DownloadDialog from "../../../../../../components/download/DownloadDialog";
 import {
   DownloadCondition,
@@ -14,6 +12,7 @@ import {
 } from "../../../../../../components/common/store/OGCCollectionDefinitions";
 import DownloadButton from "../../../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
+import DownloadSelect from "./DownloadSelect";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -30,19 +29,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   getAndSetDownloadConditions,
   removeDownloadCondition,
 }) => {
-  const theme = useTheme();
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
-
-  const selectSxProps = useMemo(
-    () => ({
-      height: "38px",
-      textAlign: "start",
-      backgroundColor: "#fff",
-      boxShadow: theme.shadows[5],
-      border: `1px solid ${rc8Theme.palette.primary1}`,
-    }),
-    [theme]
-  );
 
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
@@ -87,25 +74,11 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   );
 
   return (
-    <>
-      <DownloadDialog
-        isOpen={downloadDialogOpen}
-        setIsOpen={setDownloadDialogOpen}
-        downloadConditions={downloadConditions}
-        getAndSetDownloadConditions={getAndSetDownloadConditions}
-        removeDownloadCondition={removeDownloadCondition}
-      />
-
-      <Stack
-        sx={{
-          px: "16px",
-          py: "22px",
-        }}
-        spacing={2}
-      >
-        <CommonSelect
+    <Stack direction="column">
+      <Stack sx={{ p: "16px" }} spacing={2}>
+        <DownloadSelect
+          label="Format Selection"
           items={filteredDownloadFormats}
-          sx={selectSxProps}
           onSelectCallback={onSelectChange}
         />
         <DownloadButton onDownload={onDownload} />
@@ -116,7 +89,15 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
       />
-    </>
+
+      <DownloadDialog
+        isOpen={downloadDialogOpen}
+        setIsOpen={setDownloadDialogOpen}
+        downloadConditions={downloadConditions}
+        getAndSetDownloadConditions={getAndSetDownloadConditions}
+        removeDownloadCondition={removeDownloadCondition}
+      />
+    </Stack>
   );
 };
 

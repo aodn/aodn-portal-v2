@@ -14,6 +14,7 @@ interface DownloadConditionBoxProps
   extends IDownloadCondition,
     IDownloadConditionCallback {
   children: React.ReactNode;
+  disable?: boolean;
 }
 
 const iconMap: Partial<Record<DownloadConditionType, React.ComponentType>> = {
@@ -60,6 +61,7 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
   type,
   children,
   removeCallback,
+  disable = false,
 }) => {
   const theme = useTheme();
   return (
@@ -97,7 +99,7 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
         </Grid>
       </Grid>
       <Box position="absolute" top={"4px"} right={"4px"}>
-        <IconButton onClick={removeCallback}>
+        <IconButton onClick={removeCallback} disabled={disable}>
           <CloseIcon />
         </IconButton>
       </Box>

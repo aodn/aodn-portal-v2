@@ -1,10 +1,12 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
   Badge,
   Box,
   Divider,
+  Stack,
+  SxProps,
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -19,6 +21,8 @@ import InfoMessage from "./InfoMessage";
 
 interface DownloadSubsettingProps extends DownloadCondition {
   hideInfoMessage?: boolean;
+  sx?: SxProps;
+  disable?: boolean;
 }
 
 const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
@@ -26,8 +30,9 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
   downloadConditions,
   getAndSetDownloadConditions,
   removeDownloadCondition,
+  disable,
 }) => {
-  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
+  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(false);
   // Store the filtered download conditions count
   const subsettingSelectionCount = useMemo(() => {
     return downloadConditions.filter(
@@ -35,18 +40,29 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
     ).length;
   }, [downloadConditions]);
 
+  useEffect(() => {
+    if (subsettingSelectionCount > 0) {
+      setAccordionExpanded(true);
+    } else {
+      setAccordionExpanded(false);
+    }
+  }, [subsettingSelectionCount]);
+
   return (
-    <>
+    <Stack direction="column">
       {!hideInfoMessage && subsettingSelectionCount === 0 && (
         <InfoMessage
           infoText="Please consider subsetting your download selection using the tools on
         the map."
           iconColor={rc8Theme.palette.secondary1}
-          sx={{ pb: "22px", px: "12px" }}
+          sx={{ pl: "8px", pr: "16px" }}
         />
       )}
 
-      <Divider sx={{ width: "100%" }} />
+      <Divider
+        sx={{ width: "100%", pt: subsettingSelectionCount === 0 ? "16px" : 0 }}
+      />
+
       <PlainAccordion
         expanded={accordionExpanded}
         elevation={0}
@@ -79,10 +95,11 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
+            disable={disable}
           />
         </AccordionDetails>
       </PlainAccordion>
-    </>
+    </Stack>
   );
 };
 

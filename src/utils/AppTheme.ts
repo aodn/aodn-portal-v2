@@ -318,7 +318,7 @@ const theme: ThemeOptions = {
         case 4:
           return "0 0 30px rgba(0, 0, 0, 1.9)"; // banner subtitle
         case 5:
-          return "inset 1px 1px rgba(0, 0, 0, 0.1)"; // detail page select
+          return "1px 1px 4px 0 rgba(0, 0, 0, 0.25)"; // detail page select
         case 6:
           return "0 0 10px rgba(0, 0, 0, 0.1)"; // share button header
         case 7:
