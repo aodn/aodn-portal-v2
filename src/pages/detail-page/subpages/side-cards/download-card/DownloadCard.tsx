@@ -1,25 +1,17 @@
-import { useDetailPageContext } from "../../context/detail-page-context";
-import {
-  DownloadConditionType,
-  IDownloadCondition,
-} from "../../context/DownloadDefinitions";
-import { ILink } from "../../../../components/common/store/OGCCollectionDefinitions";
-import DownloadWFSCard from "./DownloadWFSCard";
-import DownloadCloudOptimisedCard from "./DownloadCloudOptimisedCard";
-import DownloadNOtAvailableCard from "./DownloadNOtAvailableCard";
-import SideCardContainer from "./SideCardContainer";
-
-export type DownloadCondition = {
-  downloadConditions: IDownloadCondition[];
-  getAndSetDownloadConditions: (
-    type: DownloadConditionType,
-    conditions: IDownloadCondition[]
-  ) => IDownloadCondition[];
-};
+import { useDetailPageContext } from "../../../context/detail-page-context";
+import { ILink } from "../../../../../components/common/store/OGCCollectionDefinitions";
+import DownloadWFSCard from "./components/DownloadWFSCard";
+import DownloadCloudOptimisedCard from "./components/DownloadCloudOptimisedCard";
+import SideCardContainer from "../SideCardContainer";
+import DownloadNOtAvailableCard from "./components/DownloadNOtAvailableCard";
 
 const DownloadCard = () => {
-  const { collection, downloadConditions, getAndSetDownloadConditions } =
-    useDetailPageContext();
+  const {
+    collection,
+    downloadConditions,
+    getAndSetDownloadConditions,
+    removeDownloadCondition,
+  } = useDetailPageContext();
 
   const WFSLinks: ILink[] | undefined = collection?.getWFSLinks();
   const WMSLinks: ILink[] | undefined = collection?.getWMSLinks();
@@ -31,6 +23,7 @@ const DownloadCard = () => {
           collection={collection}
           downloadConditions={downloadConditions}
           getAndSetDownloadConditions={getAndSetDownloadConditions}
+          removeDownloadCondition={removeDownloadCondition}
         />
       );
     }
@@ -45,6 +38,7 @@ const DownloadCard = () => {
           uuid={collection?.id}
           downloadConditions={downloadConditions}
           getAndSetDownloadConditions={getAndSetDownloadConditions}
+          removeDownloadCondition={removeDownloadCondition}
         />
       );
     }

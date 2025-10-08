@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from "react";
 import { Box, SxProps } from "@mui/material";
-import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 import BBoxConditionBox from "../box/BBoxConditionBox";
 import DateRangeConditionBox from "../box/DateRangeConditionBox";
 import {
@@ -9,10 +8,10 @@ import {
   DateRangeCondition,
   IDownloadCondition,
   IDownloadConditionCallback,
+  type DownloadCondition,
 } from "../../pages/detail-page/context/DownloadDefinitions";
 
-interface DataSelectionComponentProps {
-  gap?: number;
+interface DataSelectionComponentProps extends DownloadCondition {
   sx?: SxProps;
 }
 
@@ -21,12 +20,10 @@ interface DataSelectionComponentProps {
  * Extracted from DownloadCard to be reusable across different components
  */
 const DataSelection: React.FC<DataSelectionComponentProps> = ({
-  gap = 2,
   sx,
+  downloadConditions,
+  removeDownloadCondition,
 }) => {
-  const { downloadConditions, removeDownloadCondition } =
-    useDetailPageContext();
-
   const bboxConditions: BBoxCondition[] = useMemo(() => {
     const bboxConditions = downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.BBOX
@@ -50,7 +47,7 @@ const DataSelection: React.FC<DataSelectionComponentProps> = ({
   );
 
   return (
-    <Box gap={gap} sx={sx}>
+    <Box sx={{ gap: 2, ...sx }}>
       {bboxConditions.map((bboxCondition, index) => {
         return (
           <BBoxConditionBox

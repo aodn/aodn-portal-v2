@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
-import rc8Theme from "../../../../styles/themeRC8";
-import { DownloadNotAvailableIcon } from "../../../../assets/icons/download/downloadNotAvaliable";
+import rc8Theme from "../../../../../../styles/themeRC8";
+import { DownloadNotAvailableIcon } from "../../../../../../assets/icons/download/downloadNotAvaliable";
 
 const DownloadNOtAvailableCard = () => {
   return (
