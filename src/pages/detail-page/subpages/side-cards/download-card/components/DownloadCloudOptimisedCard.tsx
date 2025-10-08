@@ -91,6 +91,9 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
       <DownloadDialog
         isOpen={downloadDialogOpen}
         setIsOpen={setDownloadDialogOpen}
+        downloadConditions={downloadConditions}
+        getAndSetDownloadConditions={getAndSetDownloadConditions}
+        removeDownloadCondition={removeDownloadCondition}
       />
 
       <Stack
