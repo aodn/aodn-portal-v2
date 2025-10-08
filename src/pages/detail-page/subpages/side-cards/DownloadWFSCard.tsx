@@ -31,21 +31,19 @@ import useWFSDownload, {
   DownloadStatus,
 } from "../../../../hooks/useWFSDownload";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
-import { useDetailPageContext } from "../../context/detail-page-context";
 import DataSelection from "../../../../components/download/DataSelection";
 import {
   DownloadConditionType,
   FormatCondition,
 } from "../../context/DownloadDefinitions";
 import SubsettingMessage from "./SubsettingMessage";
+import { DownloadCondition } from "./DownloadCard";
 
-const options = [
-  // { label: "NetCDFs", value: "NetCDFs" },
-  // Currently only CSV is supported for WFS downloading
-  { label: "CSV", value: "csv" },
-];
+// Currently only CSV is supported for WFS downloading
+// TODO:the format options will be fetched from the backend in the future
+const formatOptions = [{ label: "CSV", value: "csv" }];
 
-interface DownloadWFSCardProps {
+interface DownloadWFSCardProps extends DownloadCondition {
   WFSLinks: ILink[] | undefined;
   WMSLinks: ILink[] | undefined;
   uuid?: string;
@@ -55,18 +53,10 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   WFSLinks,
   WMSLinks,
   uuid,
+  downloadConditions,
+  getAndSetDownloadConditions,
 }) => {
   const theme = useTheme();
-  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
-  const { downloadConditions, getAndSetDownloadConditions } =
-    useDetailPageContext();
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
-    WMSLinks?.[0]?.title
-  );
-  const [selectedFormat, setSelectedFormat] = useState<string>(
-    options[0].value
-  );
   const {
     downloadingStatus,
     downloadedBytes,
@@ -76,6 +66,14 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     formatBytes,
     isDownloading,
   } = useWFSDownload(() => setSnackbarOpen(true));
+  const [accordionExpanded, setAccordionExpanded] = useState<boolean>(true);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
+    WMSLinks?.[0]?.title
+  );
+  const [selectedFormat, setSelectedFormat] = useState<string>(
+    formatOptions[0].value
+  );
 
   const selectSxProps = useMemo(
     () => ({
@@ -131,7 +129,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   useEffect(() => {
     // set default format
     getAndSetDownloadConditions(DownloadConditionType.FORMAT, [
-      new FormatCondition("format", options[0].value),
+      new FormatCondition("format", formatOptions[0].value),
     ]);
   }, [getAndSetDownloadConditions]);
 
@@ -144,7 +142,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       /> */}
       <Stack sx={{ padding: padding.medium }} spacing={2}>
         <CommonSelect
-          items={options}
+          items={formatOptions}
           label="Select format"
           value={selectedFormat}
           onSelectCallback={handleSelectFormat}
