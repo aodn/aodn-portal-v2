@@ -22,6 +22,7 @@ import {
 import { processDatasetDownload } from "../components/common/store/searchReducer";
 import { trackCustomEvent } from "../analytics/customEventTracker";
 import { AnalyticsEvent } from "../analytics/analyticsEvents";
+import { calculateBboxes } from "../analytics/downloadCODataEvent";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -159,7 +160,6 @@ export const useDownloadDialog = (
     }
   }, [isOpen]); // Only depend on isOpen
 
-  // ================== SYNC LATEST VALUES ==================
   // ================== SYNC LATEST VALUES ==================
   useEffect(() => {
     // Sync email input
@@ -433,6 +433,8 @@ export const useDownloadDialog = (
     } = latestValuesRef.current;
 
     // Track download event with obfuscated email (. becomes *, @ becomes #)
+    const bboxes = calculateBboxes(multiPolygon);
+
     trackCustomEvent(AnalyticsEvent.DOWNLOAD_CO_DATA, {
       dataset_uuid: uuid,
       email: emailToSubmit.replace(/\./g, "*").replace("@", "#"),
@@ -442,7 +444,12 @@ export const useDownloadDialog = (
       start_date: dateRange.start,
       end_date: dateRange.end,
       format: format,
-      has_spatial_extent: !!multiPolygon,
+      ...(subsettingSelectionCount > 0 &&
+        Object.keys(bboxes).length > 0 &&
+        bboxes),
+      ...(subsettingSelectionCount > 0 && {
+        spatial_extent_count: multiPolygon?.coordinates?.length || 0,
+      }),
       subsetting_count: subsettingSelectionCount,
     });
 
