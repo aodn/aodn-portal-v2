@@ -17,6 +17,7 @@ import store from "../../../components/common/store/store";
 import { ThemeProvider } from "@mui/material/styles";
 import { DetailPageProvider } from "../context/detail-page-provider";
 import DetailsPage from "../DetailsPage";
+import { HelmetProvider } from "react-helmet-async";
 
 vi.mock("react-router-dom", () => ({
   ...vi.importActual("react-router-dom"),
@@ -59,11 +60,13 @@ describe("No Record Found", () => {
     // Render the component
     render(
       <Provider store={store}>
-        <ThemeProvider theme={AppTheme}>
-          <DetailPageProvider>
-            <DetailsPage />
-          </DetailPageProvider>
-        </ThemeProvider>
+        <HelmetProvider>
+          <ThemeProvider theme={AppTheme}>
+            <DetailPageProvider>
+              <DetailsPage />
+            </DetailPageProvider>
+          </ThemeProvider>
+        </HelmetProvider>
       </Provider>
     );
 

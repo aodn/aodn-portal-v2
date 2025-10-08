@@ -46,6 +46,7 @@ const mockRedirectSearch = vi.fn();
 import SearchPage from "../SearchPage";
 import { BrowserRouter as Router } from "react-router-dom";
 import { pageReferer } from "../../../components/common/constants";
+import { HelmetProvider } from "react-helmet-async";
 
 // Mock the Map component to avoid map initialization
 vi.mock("../../../components/map/mapbox/Map", () => {
@@ -117,11 +118,13 @@ describe("SearchPage Basic", () => {
 
     render(
       <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <SearchPage />
-          </Router>
-        </ThemeProvider>
+        <HelmetProvider>
+          <ThemeProvider theme={theme}>
+            <Router>
+              <SearchPage />
+            </Router>
+          </ThemeProvider>
+        </HelmetProvider>
       </Provider>
     );
 
@@ -161,11 +164,13 @@ describe("SearchPage Basic", () => {
 
     render(
       <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <SearchPage />
-          </Router>
-        </ThemeProvider>
+        <HelmetProvider>
+          <ThemeProvider theme={theme}>
+            <Router>
+              <SearchPage />
+            </Router>
+          </ThemeProvider>
+        </HelmetProvider>
       </Provider>
     );
 
@@ -212,11 +217,13 @@ describe("SearchPage Basic", () => {
     // Render the component
     render(
       <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <SearchPage />
-          </Router>
-        </ThemeProvider>
+        <HelmetProvider>
+          <ThemeProvider theme={theme}>
+            <Router>
+              <SearchPage />
+            </Router>
+          </ThemeProvider>
+        </HelmetProvider>
       </Provider>
     );
 
@@ -249,11 +256,13 @@ describe("SearchPage Basic", () => {
 
     render(
       <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <SearchPage />
-          </Router>
-        </ThemeProvider>
+        <HelmetProvider>
+          <ThemeProvider theme={theme}>
+            <Router>
+              <SearchPage />
+            </Router>
+          </ThemeProvider>
+        </HelmetProvider>
       </Provider>
     );
 
@@ -289,11 +298,13 @@ describe("SearchPage Basic", () => {
 
     render(
       <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <SearchPage />
-          </Router>
-        </ThemeProvider>
+        <HelmetProvider>
+          <ThemeProvider theme={theme}>
+            <Router>
+              <SearchPage />
+            </Router>
+          </ThemeProvider>
+        </HelmetProvider>
       </Provider>
     );
 
