@@ -2,7 +2,7 @@ import { FC } from "react";
 import { Stack } from "@mui/material";
 import { useDetailPageContext } from "../context/detail-page-context";
 import { MODE } from "../../../components/list/CommonDef";
-import DownloadCard from "./side-cards/DownloadCard";
+import DownloadCard from "./side-cards/download-card/DownloadCard";
 import DataAccessPanel, { TYPE } from "./tab-panels/DataAccessPanel";
 import SpatialCoverageCard, {
   SpatialCoverageCardProps,

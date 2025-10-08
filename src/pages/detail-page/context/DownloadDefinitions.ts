@@ -96,3 +96,12 @@ export type WFSDownloadRequest = {
   layerName: string;
   downloadConditions: IDownloadCondition[];
 };
+
+export type DownloadCondition = {
+  downloadConditions: IDownloadCondition[];
+  getAndSetDownloadConditions: (
+    type: DownloadConditionType,
+    conditions: IDownloadCondition[]
+  ) => IDownloadCondition[];
+  removeDownloadCondition: (condition: IDownloadCondition) => void;
+};

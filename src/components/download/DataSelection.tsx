@@ -1,6 +1,5 @@
-import React, { useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { Box, SxProps } from "@mui/material";
-import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 import BBoxConditionBox from "../box/BBoxConditionBox";
 import DateRangeConditionBox from "../box/DateRangeConditionBox";
 import {
@@ -9,24 +8,24 @@ import {
   DateRangeCondition,
   IDownloadCondition,
   IDownloadConditionCallback,
+  type DownloadCondition,
 } from "../../pages/detail-page/context/DownloadDefinitions";
 
-interface DataSelectionComponentProps {
-  gap?: number;
+interface DataSelectionComponentProps extends DownloadCondition {
   sx?: SxProps;
+  disable?: boolean;
 }
 
 /**
  * DataSelectionComponent - Displays selected data conditions (bbox and date range)
  * Extracted from DownloadCard to be reusable across different components
  */
-const DataSelection: React.FC<DataSelectionComponentProps> = ({
-  gap = 2,
+const DataSelection: FC<DataSelectionComponentProps> = ({
   sx,
+  downloadConditions,
+  removeDownloadCondition,
+  disable,
 }) => {
-  const { downloadConditions, removeDownloadCondition } =
-    useDetailPageContext();
-
   const bboxConditions: BBoxCondition[] = useMemo(() => {
     const bboxConditions = downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.BBOX
@@ -50,13 +49,14 @@ const DataSelection: React.FC<DataSelectionComponentProps> = ({
   );
 
   return (
-    <Box gap={gap} sx={sx}>
+    <Box sx={{ gap: 2, ...sx }}>
       {bboxConditions.map((bboxCondition, index) => {
         return (
           <BBoxConditionBox
             key={index}
             bboxCondition={bboxCondition}
             onRemove={() => handleRemove(bboxCondition)}
+            disable={disable}
           />
         );
       })}
@@ -66,6 +66,7 @@ const DataSelection: React.FC<DataSelectionComponentProps> = ({
             key={index}
             dateRangeCondition={dateRangeCondition}
             onRemove={() => handleRemove(dateRangeCondition)}
+            disable={disable}
           />
         );
       })}

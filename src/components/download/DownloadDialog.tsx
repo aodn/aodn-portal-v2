@@ -15,8 +15,9 @@ import { DialogHeader } from "./DialogHeader";
 import DialogStepper from "./stepper/DialogStepper";
 import StepperButton from "./stepper/StepperButton";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import { DownloadCondition } from "../../pages/detail-page/context/DownloadDefinitions";
 
-interface DownloadDialogProps {
+interface DownloadDialogProps extends DownloadCondition {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
@@ -31,7 +32,13 @@ const steps: Step[] = [
   { number: 2, label: "Usage limitation and licenses" },
 ];
 
-const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
+const DownloadDialog = ({
+  isOpen,
+  setIsOpen,
+  downloadConditions,
+  getAndSetDownloadConditions,
+  removeDownloadCondition,
+}: DownloadDialogProps) => {
   const theme = useTheme();
   const { isUnderLaptop } = useBreakpoint();
 
@@ -103,7 +110,11 @@ const DownloadDialog = ({ isOpen, setIsOpen }: DownloadDialogProps) => {
               >
                 Data Selection
               </Typography>
-              <DataSelection />
+              <DataSelection
+                downloadConditions={downloadConditions}
+                getAndSetDownloadConditions={getAndSetDownloadConditions}
+                removeDownloadCondition={removeDownloadCondition}
+              />
             </Box>
           )}
 
