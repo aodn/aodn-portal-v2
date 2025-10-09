@@ -2,8 +2,10 @@ import { Box, Divider, Typography } from "@mui/material";
 import IMOS from "@/assets/logos/imos_logo_with_title.png";
 import {
   fontColor,
+  fontFamily,
   fontSize,
   fontWeight,
+  lineHeight,
   padding,
 } from "../../../styles/constants";
 import useRedirectHome from "../../../hooks/useRedirectHome";
@@ -46,13 +48,15 @@ const AODNSiteLogo = () => {
       >
         <Typography
           textAlign="left"
+          lineHeight={lineHeight.heading}
+          fontFamily={fontFamily.poppins}
           fontSize={
             isMobile
               ? fontSize.AODNSiteLogoTextMobile
               : fontSize.AODNSiteLogoText
           }
-          fontWeight={fontWeight.medium}
-          color={fontColor.blue.dark}
+          fontWeight={fontWeight.light}
+          color={fontColor.blue.header}
           padding={0}
           paddingLeft={padding.medium}
           data-testid="aodn-home-link"
