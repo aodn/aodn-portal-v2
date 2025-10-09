@@ -95,7 +95,7 @@ const fontColor = {
   },
   blue: {
     dark: "#356183",
-    header: "#3B6EBF",
+    header: "#3B6E8F",
     medium: "#468CB6",
   },
 };
