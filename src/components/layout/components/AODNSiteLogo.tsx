@@ -5,6 +5,7 @@ import {
   fontFamily,
   fontSize,
   fontWeight,
+  lineHeight,
   padding,
 } from "../../../styles/constants";
 import useRedirectHome from "../../../hooks/useRedirectHome";
@@ -47,13 +48,14 @@ const AODNSiteLogo = () => {
       >
         <Typography
           textAlign="left"
-          fontFamily={fontFamily.helvetica}
+          lineHeight={lineHeight.heading}
+          fontFamily={fontFamily.poppins}
           fontSize={
             isMobile
               ? fontSize.AODNSiteLogoTextMobile
               : fontSize.AODNSiteLogoText
           }
-          fontWeight={fontWeight.medium}
+          fontWeight={fontWeight.light}
           color={fontColor.blue.header}
           padding={0}
           paddingLeft={padding.medium}

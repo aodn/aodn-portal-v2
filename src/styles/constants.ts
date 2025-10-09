@@ -43,7 +43,7 @@ const padding = {
 };
 
 const fontSize = {
-  AODNSiteLogoText: "20px",
+  AODNSiteLogoText: "17px",
   AODNSiteLogoTextMobile: "12px",
   bannerTitleExtraLarge: "64px",
   bannerTitleLarge: "48px",
@@ -74,7 +74,7 @@ const fontSize = {
 const fontFamily = {
   general: '"Open Sans", sans-serif',
   openSans: '"Open Sans", sans-serif',
-  helvetica: '"Helvetica Neue", sans-serif',
+  poppins: '"Poppins", sans-serif',
 };
 
 const fontWeight = {
@@ -175,7 +175,7 @@ const shadow = {
 
 const lineHeight = {
   body: "22px",
-  heading: "26px",
+  heading: "22px",
 };
 
 export {
