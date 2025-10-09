@@ -2,6 +2,7 @@ import { Box, Divider, Typography } from "@mui/material";
 import IMOS from "@/assets/logos/imos_logo_with_title.png";
 import {
   fontColor,
+  fontFamily,
   fontSize,
   fontWeight,
   padding,
@@ -46,13 +47,14 @@ const AODNSiteLogo = () => {
       >
         <Typography
           textAlign="left"
+          fontFamily={fontFamily.helvetica}
           fontSize={
             isMobile
               ? fontSize.AODNSiteLogoTextMobile
               : fontSize.AODNSiteLogoText
           }
           fontWeight={fontWeight.medium}
-          color={fontColor.blue.dark}
+          color={fontColor.blue.header}
           padding={0}
           paddingLeft={padding.medium}
           data-testid="aodn-home-link"
