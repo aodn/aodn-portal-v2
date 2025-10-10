@@ -60,7 +60,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
       tabNavigation(
         collection.id,
         detailPageDefault.SUMMARY,
-        "download-section"
+        pageReferer.SEARCH_PAGE_REFERER
       ),
     [tabNavigation]
   );
