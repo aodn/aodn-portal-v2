@@ -153,6 +153,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     [hasSummaryFeature, isWMSAvailable]
   );
 
+  const hasSpatialExtent = useMemo(() => !!collection?.getBBox(), [collection]);
+
+  const noMapPreview = useMemo(
+    () => !hasDownloadService && !hasSpatialExtent,
+    [hasDownloadService, hasSpatialExtent]
+  );
+
   const [minDateStamp, maxDateStamp] = useMemo(() => {
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
     // time value, for example cloud optimized date range may be different from the
@@ -191,21 +198,22 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         });
       }
 
-      if (hasSummaryFeature && isZarrDataset) {
-        layers.push({
-          ...MapLayers[LayerName.SpatialExtent],
-        });
+      if (hasSummaryFeature && isZarrDataset && hasSpatialExtent) {
+        layers.push(MapLayers[LayerName.SpatialExtent]);
       }
 
-      if (!hasDownloadService) {
-        layers.push({
-          ...MapLayers[LayerName.SpatialExtent],
-          default: true,
-        });
+      if (!hasDownloadService && hasSpatialExtent) {
+        layers.push(MapLayers[LayerName.SpatialExtent]);
       }
     }
     return layers;
-  }, [collection, hasSummaryFeature, isWMSAvailable, hasDownloadService]);
+  }, [
+    collection,
+    hasSummaryFeature,
+    isWMSAvailable,
+    hasSpatialExtent,
+    hasDownloadService,
+  ]);
 
   useEffect(() => {
     if (mapLayerConfig.length > 0) {
@@ -343,6 +351,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   animate={false}
                   panelId={mapContainerId}
                   projection={"mercator"} // Hexbin support this project or globe only
+                  announcement={
+                    noMapPreview ? "Map Preview Not Available" : undefined
+                  }
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
                 >
