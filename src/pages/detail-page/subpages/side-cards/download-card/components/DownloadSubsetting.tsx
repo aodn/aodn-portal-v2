@@ -63,42 +63,44 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
         sx={{ width: "100%", pt: subsettingSelectionCount === 0 ? "16px" : 0 }}
       />
 
-      <PlainAccordion
-        expanded={accordionExpanded}
-        elevation={0}
-        onChange={() => setAccordionExpanded((prevState) => !prevState)}
-      >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Box display="flex" alignItems="center" gap={3}>
-            <Typography
-              typography="title1Medium"
-              color={rc8Theme.palette.text1}
-              p={0}
-            >
-              Download Selection
-            </Typography>
-            <Badge
-              sx={{
-                "& .MuiBadge-badge": {
-                  backgroundColor: rc8Theme.palette.primary1,
-                  ...rc8Theme.typography.title2Regular,
-                  color: rc8Theme.palette.text3,
-                  pb: "1px",
-                },
-              }}
-              badgeContent={subsettingSelectionCount}
+      {subsettingSelectionCount > 0 && (
+        <PlainAccordion
+          expanded={accordionExpanded}
+          elevation={0}
+          onChange={() => setAccordionExpanded((prevState) => !prevState)}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Box display="flex" alignItems="center" gap={3}>
+              <Typography
+                typography="title1Medium"
+                color={rc8Theme.palette.text1}
+                p={0}
+              >
+                Download Selection
+              </Typography>
+              <Badge
+                sx={{
+                  "& .MuiBadge-badge": {
+                    backgroundColor: rc8Theme.palette.primary1,
+                    ...rc8Theme.typography.title2Regular,
+                    color: rc8Theme.palette.text3,
+                    pb: "1px",
+                  },
+                }}
+                badgeContent={subsettingSelectionCount}
+              />
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={{ pt: "4px" }}>
+            <DataSelection
+              downloadConditions={downloadConditions}
+              getAndSetDownloadConditions={getAndSetDownloadConditions}
+              removeDownloadCondition={removeDownloadCondition}
+              disable={disable}
             />
-          </Box>
-        </AccordionSummary>
-        <AccordionDetails sx={{ pt: "4px" }}>
-          <DataSelection
-            downloadConditions={downloadConditions}
-            getAndSetDownloadConditions={getAndSetDownloadConditions}
-            removeDownloadCondition={removeDownloadCondition}
-            disable={disable}
-          />
-        </AccordionDetails>
-      </PlainAccordion>
+          </AccordionDetails>
+        </PlainAccordion>
+      )}
     </Stack>
   );
 };
