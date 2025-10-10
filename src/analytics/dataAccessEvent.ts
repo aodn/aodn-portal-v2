@@ -3,6 +3,7 @@ import {
   ILink,
 } from "../components/common/store/OGCCollectionDefinitions";
 
+// ================== UTILITY FUNCTIONS ==================
 export function dataAccessParams(link: ILink): Gtag.CustomParams {
   return {
     title: link.title,
