@@ -36,7 +36,7 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
           boxShadow: theme.shadows[5],
           mt: "6px",
           "& .MuiMenuItem-root": {
-            color: rc8Theme.palette.text1,
+            ...rc8Theme.typography.body1Medium,
             "&.Mui-selected": {
               backgroundColor: rc8Theme.palette.primary5,
             },
