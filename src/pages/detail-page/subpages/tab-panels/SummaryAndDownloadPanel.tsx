@@ -192,15 +192,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       }
 
       if (hasSummaryFeature && isZarrDataset) {
-        layers.push({
-          ...MapLayers[LayerName.SpatialExtent],
-        });
+        layers.push(MapLayers[LayerName.SpatialExtent]);
       }
 
       if (!hasDownloadService) {
-        layers.push({
-          ...MapLayers[LayerName.SpatialExtent],
-        });
+        layers.push(MapLayers[LayerName.SpatialExtent]);
       }
     }
     return layers;
