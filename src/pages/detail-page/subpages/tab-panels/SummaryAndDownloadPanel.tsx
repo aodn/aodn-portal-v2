@@ -200,7 +200,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       if (!hasDownloadService) {
         layers.push({
           ...MapLayers[LayerName.SpatialExtent],
-          default: true,
         });
       }
     }
