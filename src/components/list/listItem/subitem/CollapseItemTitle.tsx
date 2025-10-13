@@ -5,11 +5,13 @@ import rc8Theme from "../../../../styles/themeRC8";
 interface CollapseItemTitleProps {
   setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
   text: string;
+  color: string;
 }
 
 const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
   setIsExpanded,
   text,
+  color,
 }) => {
   return (
     <Grid
@@ -30,6 +32,7 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
         <Typography
           sx={{
             ...rc8Theme.typography.body1Medium,
+            color: color,
             p: 0,
             my: "10px",
             mx: "6px",

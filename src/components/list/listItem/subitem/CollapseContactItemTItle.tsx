@@ -4,15 +4,15 @@ import rc8Theme from "../../../../styles/themeRC8";
 import { MailOutlineIcon } from "../../../../assets/icons/details/mail";
 
 interface CollapseContactItemTItleProps {
-  isExpanded: boolean;
-  setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+  isExpanded?: boolean;
+  setIsExpanded?: React.Dispatch<React.SetStateAction<boolean>>;
   email?: string | undefined;
   text: string;
 }
 
 const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
   setIsExpanded,
-  isExpanded,
+  isExpanded = false,
   email,
   text,
 }) => {
@@ -24,7 +24,7 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
           p: 0,
           my: "10px",
           mx: "6px",
-          color: { color },
+          color: color,
         }}
         data-testid="metadata-contact-title"
       >
@@ -38,7 +38,7 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
       item
       container
       md={12}
-      onClick={() => setIsExpanded((prev) => !prev)}
+      onClick={() => setIsExpanded?.((prev) => !prev)}
       data-testid={`collapse-item-${text}`}
     >
       {isExpanded && (

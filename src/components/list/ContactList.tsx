@@ -2,7 +2,9 @@ import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ContactArea from "./listItem/subitem/ContactArea";
-import CollapseContactItem from "./listItem/CollapseContactItem";
+import CollapseItem from "./listItem/CollapseItem";
+import CollapseContactItemTitle from "./listItem/subitem/CollapseContactItemTItle";
+import { Grid } from "@mui/material";
 
 interface ContactListProps {
   contacts: IContact[];
@@ -23,9 +25,16 @@ export const mapContactsToCollapseItems = (
       const email = contact.emails?.[0] ?? "";
 
       return (
-        <CollapseContactItem key={index} title={title} email={email}>
-          <ContactArea contact={contact} />
-        </CollapseContactItem>
+        <CollapseItem
+          key={index}
+          titleComponent={
+            <CollapseContactItemTitle email={email} text={title} />
+          }
+        >
+          <Grid container item md={12}>
+            <ContactArea contact={contact} />
+          </Grid>
+        </CollapseItem>
       );
     }) || []
   );

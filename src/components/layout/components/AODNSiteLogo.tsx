@@ -24,8 +24,8 @@ const AODNSiteLogo = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: "70px",
-        pt: "6px",
+        height: "78px",
+        pt: "2px",
       }}
     >
       <Box

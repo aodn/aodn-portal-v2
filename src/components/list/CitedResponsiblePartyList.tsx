@@ -1,7 +1,5 @@
 import { IContact } from "../common/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
-import ContactArea from "./listItem/subitem/ContactArea";
-import CollapseContactItem from "./listItem/CollapseContactItem";
 import ExpandableList from "./ExpandableList";
 import { mapContactsToCollapseItems } from "./ContactList";
 
