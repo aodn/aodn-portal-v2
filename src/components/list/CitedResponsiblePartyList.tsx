@@ -3,6 +3,7 @@ import React, { ReactNode, useMemo } from "react";
 import ContactArea from "./listItem/subitem/ContactArea";
 import CollapseContactItem from "./listItem/CollapseContactItem";
 import ExpandableList from "./ExpandableList";
+import { mapContactsToCollapseItems } from "./ContactList";
 
 interface CitedResponsiblePartyListProps {
   responsibleParties: IContact[];
@@ -14,19 +15,7 @@ const CitedResponsiblePartyList: React.FC<CitedResponsiblePartyListProps> = ({
   selected = false,
 }) => {
   const collapseComponents: ReactNode[] = useMemo(
-    () =>
-      responsibleParties?.map((contact, index) => {
-        const suffix = contact.name ? ` - ${contact.name}` : "";
-        return (
-          <CollapseContactItem
-            key={index}
-            title={contact.organization + suffix}
-            email={contact.emails ? contact.emails[0] : ""}
-          >
-            <ContactArea contact={contact} />
-          </CollapseContactItem>
-        );
-      }) || [],
+    () => mapContactsToCollapseItems(responsibleParties),
     [responsibleParties]
   );
 

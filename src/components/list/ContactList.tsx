@@ -9,24 +9,34 @@ interface ContactListProps {
   selected?: boolean;
 }
 
+export const mapContactsToCollapseItems = (
+  contacts: IContact[]
+): ReactNode[] => {
+  return (
+    contacts?.map((contact, index) => {
+      const organization = contact.organization ?? "";
+      const suffix = contact.name ?? "";
+      const title =
+        organization && suffix
+          ? `${organization} - ${suffix}`
+          : organization + suffix;
+      const email = contact.emails?.[0] ?? "";
+
+      return (
+        <CollapseContactItem key={index} title={title} email={email}>
+          <ContactArea contact={contact} />
+        </CollapseContactItem>
+      );
+    }) || []
+  );
+};
+
 const ContactList: React.FC<ContactListProps> = ({
   contacts,
   selected = false,
 }) => {
   const collapseComponents: ReactNode[] = useMemo(
-    () =>
-      contacts?.map((contact, index) => {
-        const suffix = contact.name ? ` - ${contact.name}` : "";
-        return (
-          <CollapseContactItem
-            key={index}
-            title={contact.organization + suffix}
-            email={contact.emails ? contact.emails[0] : ""}
-          >
-            <ContactArea contact={contact} />
-          </CollapseContactItem>
-        );
-      }) || [],
+    () => mapContactsToCollapseItems(contacts),
     [contacts]
   );
 
