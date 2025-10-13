@@ -24,13 +24,14 @@ const AODNSiteLogo = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        heigt: "100px",
+        height: "70px",
         pt: "6px",
       }}
     >
       <Box
         sx={{
           cursor: "pointer",
+          ml: { xs: "10px", md: "2px" },
         }}
         onClick={() => openInNewTab("https://imos.org.au/")}
       >
@@ -49,7 +50,7 @@ const AODNSiteLogo = () => {
           bgcolor: `${rc8Theme.palette.primary1}`,
           opacity: "40%",
           width: "1.5px",
-          mx: "10px",
+          mx: { md: "10px" },
           my: "6px",
         }}
       />

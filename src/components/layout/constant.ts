@@ -22,7 +22,7 @@ export const PAGE_CONTENT_WIDTH_UNDER_LAPTOP = 0.95;
 export const SEARCHBAR_CONTENT_WIDTH = 0.9;
 
 export const AODN_SITE_LOGO_WIDTH = "72px";
-export const AODN_SITE_LOGO_WIDTH_MOBILE = 35;
+export const AODN_SITE_LOGO_WIDTH_MOBILE = "50px";
 
 export const HEADER_HEIGHT = 120;
 export const HEADER_HEIGHT_MOBILE = 65;
