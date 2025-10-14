@@ -5,12 +5,14 @@ import ContactArea from "./listItem/subitem/ContactArea";
 import CollapseItem from "./listItem/CollapseItem";
 import CollapseContactItemTitle from "./listItem/subitem/CollapseContactItemTItle";
 import { Grid } from "@mui/material";
+import ItemBaseGrid from "./listItem/ItemBaseGrid";
 
 interface ContactListProps {
   contacts: IContact[];
   selected?: boolean;
 }
 
+// ContactList.tsx
 export const mapContactsToCollapseItems = (
   contacts: IContact[]
 ): ReactNode[] => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Link, Tooltip, Typography } from "@mui/material";
+import { Grid, Link, Tooltip, Typography, Box } from "@mui/material";
 import rc8Theme from "../../../../styles/themeRC8";
 import { MailOutlineIcon } from "../../../../assets/icons/details/mail";
 
@@ -22,7 +22,6 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
         sx={{
           ...rc8Theme.typography.body1Medium,
           p: 0,
-          my: "10px",
           mx: "6px",
           color: color,
         }}
@@ -41,21 +40,29 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
       onClick={() => setIsExpanded?.((prev) => !prev)}
       data-testid={`collapse-item-${text}`}
     >
-      {isExpanded && (
-        <Grid item md={1} sx={{ pt: "10px" }}>
-          <MailOutlineIcon />
-        </Grid>
-      )}
-      <Grid item md={10} sx={{ textAlign: "left", whiteSpace: "normal" }}>
+      <Grid
+        item
+        md={12}
+        sx={{ textAlign: "left", whiteSpace: "normal", py: "10px" }}
+      >
         {isExpanded ? (
-          <Tooltip
-            title={email ? `mail to: ${email}` : "[NO EMAIL PROVIDED]"}
-            placement="top"
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 1,
+            }}
           >
-            <Link href={`mailto:${email}`}>
-              {generateTitle(rc8Theme.palette.primary1)}
-            </Link>
-          </Tooltip>
+            <MailOutlineIcon />
+            <Tooltip
+              title={email ? `mail to: ${email}` : "[NO EMAIL PROVIDED]"}
+              placement="top"
+            >
+              <Link href={`mailto:${email}`}>
+                {generateTitle(rc8Theme.palette.primary1)}
+              </Link>
+            </Tooltip>
+          </Box>
         ) : (
           generateTitle(rc8Theme.palette.text1)
         )}

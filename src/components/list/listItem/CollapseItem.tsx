@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { cloneElement, ReactNode, useState } from "react";
 import { Collapse, Grid } from "@mui/material";
 import ItemBaseGrid from "./ItemBaseGrid";
 import CollapseItemTitle from "./subitem/CollapseItemTitle";
@@ -13,7 +13,6 @@ interface CollapseItemProps {
   expandedIcon?: ReactNode; // Additional icon shown only when expanded
   onIconClick?: () => void; // Click handler for expandedIcon when visible
   titleComponent?: ReactNode; // Allow custom title component
-  useBaseGrid?: boolean; // Control whether to use ItemBaseGrid
   titleColor?: string; // Custom title color
   collapseBtnColor?: string; // Custom collapse button icon color
 }
@@ -26,84 +25,103 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
   expandedIcon,
   onIconClick,
   titleComponent,
-  useBaseGrid = true,
   titleColor = rc8Theme.palette.text1,
   collapseBtnColor = rc8Theme.palette.text2,
 }) => {
   const [isExpanded, setIsExpanded] = useState(isOpen);
 
-  const Wrapper = useBaseGrid ? ItemBaseGrid : Grid;
-  const displayIcon = isExpanded && expandedIcon ? expandedIcon : icon;
+  // Show expanded icon when expanded, otherwise show regular icon
+  const currentIcon = isExpanded && expandedIcon ? expandedIcon : icon;
+
+  // Check if the icon should be clickable
+  const isIconClickable = onIconClick && isExpanded && expandedIcon;
+
+  const toggleExpanded = () => setIsExpanded(!isExpanded);
+
+  const handleIconClick = (e: React.MouseEvent) => {
+    if (isIconClickable) {
+      e.stopPropagation(); // Prevent toggling when clicking icon
+      onIconClick();
+    }
+  };
+
+  const renderTitle = () => {
+    if (titleComponent) {
+      // Inject isExpanded and setIsExpanded into custom title component
+      return cloneElement(titleComponent as React.ReactElement, {
+        isExpanded,
+        setIsExpanded,
+      });
+    }
+
+    // Use default title component
+    return (
+      <CollapseItemTitle
+        setIsExpanded={setIsExpanded}
+        text={title}
+        color={titleColor}
+      />
+    );
+  };
 
   return (
-    <Wrapper container data-testid="collapseItem">
-      <Grid item xs={11} sx={{ alignSelf: "flex-start" }}>
-        <Grid
-          container
-          alignItems="flex-start"
-          onClick={() => setIsExpanded(!isExpanded)}
-          sx={{ cursor: "pointer" }}
-        >
-          {displayIcon && (
-            <Grid
-              item
-              xs={2}
-              md={1}
-              onClick={(e) => {
-                if (onIconClick && isExpanded && expandedIcon) {
-                  e.stopPropagation();
-                  onIconClick();
-                }
-              }}
-              sx={{
-                cursor:
-                  onIconClick && isExpanded && expandedIcon
-                    ? "pointer"
-                    : "default",
-                pt: "8px",
-              }}
-            >
-              {displayIcon}
-            </Grid>
-          )}
-          <Grid item xs={displayIcon ? 10 : 12}>
-            {titleComponent ? (
-              React.cloneElement(titleComponent as React.ReactElement, {
-                isExpanded,
-                setIsExpanded,
-              })
-            ) : (
-              <CollapseItemTitle
-                setIsExpanded={setIsExpanded}
-                text={title}
-                color={titleColor}
-              />
+    <ItemBaseGrid>
+      <Grid container data-testid="collapseItem">
+        {/* Main content area (icon + title) */}
+        <Grid item xs={11} sx={{ alignSelf: "flex-start" }}>
+          <Grid
+            container
+            alignItems="flex-start"
+            onClick={toggleExpanded}
+            sx={{ cursor: "pointer" }}
+          >
+            {/* Icon section */}
+            {currentIcon && (
+              <Grid
+                item
+                xs={2}
+                md={1}
+                onClick={handleIconClick}
+                sx={{
+                  cursor: isIconClickable ? "pointer" : "default",
+                  pt: "8px",
+                }}
+              >
+                {currentIcon}
+              </Grid>
             )}
+
+            {/* Title section */}
+            <Grid item xs={currentIcon ? 10 : 12}>
+              {renderTitle()}
+            </Grid>
           </Grid>
         </Grid>
+
+        {/* Collapse button */}
+        <Grid
+          item
+          xs={1}
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "flex-start",
+            pt: "10px",
+          }}
+        >
+          <CollapseBtn
+            setIsExpanded={setIsExpanded}
+            isExpanded={isExpanded}
+            iconColor={collapseBtnColor}
+          />
+        </Grid>
+
+        {/* Collapsible content */}
+        <Grid item xs={12}>
+          <Collapse in={isExpanded}>{children || "[ NO CONTENT ]"}</Collapse>
+        </Grid>
       </Grid>
-      <Grid
-        item
-        xs={1}
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "flex-start",
-          pt: displayIcon ? "8px" : 0,
-        }}
-      >
-        <CollapseBtn
-          setIsExpanded={setIsExpanded}
-          isExpanded={isExpanded}
-          iconColor={collapseBtnColor}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <Collapse in={isExpanded}>
-          {children ? children : "[ NO CONTENT ]"}
-        </Collapse>
-      </Grid>
-    </Wrapper>
+    </ItemBaseGrid>
   );
 };
 
