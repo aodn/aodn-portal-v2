@@ -2,7 +2,6 @@ import App from "./App";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { HelmetProvider } from "react-helmet-async";
 import store from "./components/common/store/store";
 import "./index.css";
 import "./styles/fontsRC8";
@@ -18,9 +17,7 @@ const root = createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <HelmetProvider>
-        <App />
-      </HelmetProvider>
+      <App />
     </Provider>
   </React.StrictMode>
 );
