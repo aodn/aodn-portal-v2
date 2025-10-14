@@ -397,24 +397,28 @@ def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
     ],
 )
 def test_map_card_popup_download_button(
-    desktop_page: Page, data_id: str, data_lng: str, data_lat: str
+    responsive_page: Page, data_id: str, data_lng: str, data_lat: str
 ) -> None:
     """
     Validates that clicking the download button in the map card popup opens the detail page
     and then clicking the return button navigates back to the search page.
     """
-    landing_page = LandingPage(desktop_page)
-    search_page = SearchPage(desktop_page)
-    detail_page = DetailPage(desktop_page)
+    landing_page = LandingPage(responsive_page)
+    search_page = SearchPage(responsive_page)
+    detail_page = DetailPage(responsive_page)
 
     landing_page.load()
     landing_page.search.fill_search_text(data_id)
     landing_page.search.click_search_button()
-    search_page.wait_for_page_stabilization()
+    search_page.wait_for_search_to_complete()
+
+    search_page.result_view_button.click()
+    search_page.full_map_view_button.click()
 
     search_page.map.zoom_to_level(zoom_level=7)
     search_page.map.center_map(data_lng, data_lat)
     search_page.map.hover_map()
+    search_page.map.click_map()
     search_page.result_card_download_button.last.click()
 
     detail_page.return_button.click()
