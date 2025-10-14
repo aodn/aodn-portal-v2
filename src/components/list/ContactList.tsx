@@ -3,9 +3,8 @@ import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ContactArea from "./listItem/subitem/ContactArea";
 import CollapseItem from "./listItem/CollapseItem";
-import CollapseContactItemTitle from "./listItem/subitem/CollapseContactItemTItle";
+import CollapseContactItemTitle from "./listItem/subitem/CollapseContactItemTitle";
 import { Grid } from "@mui/material";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
 
 interface ContactListProps {
   contacts: IContact[];
