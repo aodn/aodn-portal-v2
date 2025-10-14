@@ -127,7 +127,7 @@ describe("IconSelect", () => {
 
   it("applies custom sx styles", () => {
     const customSx = { borderColor: "purple" };
-    renderWithTheme(<IconSelect {...defaultProps} sx={customSx} />);
+    renderWithTheme(<IconSelect {...defaultProps} selectSx={customSx} />);
     const select = screen.getByTestId("icon-select");
     expect(select).toHaveStyle("border-color: purple");
   });

@@ -2,10 +2,11 @@ import { IAssociatedRecord } from "../common/store/OGCCollectionDefinitions";
 import React, { memo, ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import { openInNewTab } from "../../utils/LinkUtils";
-import CollapseAssociatedRecordItem from "./listItem/CollapseAssociatedRecordItem";
+import CollapseItem from "./listItem/CollapseItem";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { pageDefault } from "../common/constants";
+import rc8Theme from "../../styles/themeRC8";
+import { TitleChainIcon } from "../../assets/icons/details/link";
 
 interface AssociatedRecordListProps {
   title: string;
@@ -21,24 +22,25 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
   memo<AssociatedRecordListProps>(
     ({ title, records, selected = false }: AssociatedRecordListProps) => {
       const collapseComponents: ReactNode[] = useMemo(() => {
-        const components: ReactNode[] = [];
-        records?.map((record, index) => {
-          components.push(
-            <ItemBaseGrid key={index}>
-              <CollapseAssociatedRecordItem
-                titleAction={() => openRecord(record.uuid)}
-                title={`${record.title}`}
-              >
-                <ExpandableTextArea
-                  text={record.abstract}
-                  isClickable
-                  onClick={() => openRecord(record.uuid)}
-                />
-              </CollapseAssociatedRecordItem>
-            </ItemBaseGrid>
-          );
-        });
-        return components;
+        return (
+          records?.map((record, index) => (
+            <CollapseItem
+              key={index}
+              title={`${record.title}`}
+              icon={<TitleChainIcon />}
+              expandedIcon={<TitleChainIcon />}
+              onIconClick={() => openRecord(record.uuid)}
+              titleColor={rc8Theme.palette.primary1}
+              collapseBtnColor={rc8Theme.palette.primary1}
+            >
+              <ExpandableTextArea
+                text={record.abstract}
+                isClickable
+                onClick={() => openRecord(record.uuid)}
+              />
+            </CollapseItem>
+          )) || []
+        );
       }, [records]);
 
       return (

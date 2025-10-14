@@ -69,12 +69,18 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [currentLayer, setCurrentLayer] = useState<string | undefined>(
-    layers.find((i) => i.default)?.id
+    layers.find((layer) => layer.default)?.id
   );
 
   const handleToggle = useCallback(() => {
     setOpen((prevOpen) => !prevOpen);
   }, [setOpen]);
+
+  useEffect(() => {
+    setCurrentLayer(
+      layers.filter((layer) => layer.default)[0]?.id || layers[0]?.id
+    );
+  }, [layers]);
 
   useEffect(() => {
     // Handle event when other control clicked, this component should close

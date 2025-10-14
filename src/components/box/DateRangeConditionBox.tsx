@@ -10,11 +10,13 @@ import rc8Theme from "../../styles/themeRC8";
 interface DateRangeConditionBoxProps {
   dateRangeCondition: DateRangeCondition;
   onRemove?: () => void;
+  disable?: boolean;
 }
 
 const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
   onRemove,
   dateRangeCondition,
+  disable,
 }) => {
   const start = useMemo(
     () => dateRangeCondition.start,
@@ -26,6 +28,7 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
       id={dateRangeCondition.id}
       type={DownloadConditionType.DATE_RANGE}
       removeCallback={() => onRemove && onRemove()}
+      disable={disable}
     >
       <Typography
         sx={{

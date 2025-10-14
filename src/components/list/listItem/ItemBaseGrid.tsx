@@ -1,4 +1,4 @@
-import { Grid, GridProps, SxProps, Theme, useTheme } from "@mui/material";
+import { Grid, GridProps, SxProps, Theme } from "@mui/material";
 import React, { createContext, useContext, useState } from "react";
 import rc8Theme from "../../../styles/themeRC8";
 

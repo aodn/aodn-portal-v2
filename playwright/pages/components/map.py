@@ -46,9 +46,6 @@ class Map(BasePage):
         self.date_slider = page.get_by_test_id(
             'dateslider-daterange-menu-button'
         )
-        self.map_preview_not_available_announcement = self.get_text(
-            'Map preview not available'
-        )
 
     def hover_map(self) -> None:
         """Move the mouse cursor to the center of the map"""

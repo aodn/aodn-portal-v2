@@ -1,6 +1,5 @@
 import React from "react";
 import { IconButton } from "@mui/material";
-import rc8Theme from "../../../../styles/themeRC8";
 import { ExpandLess } from "../../../../assets/icons/details/expandLess";
 import { ExpandMore } from "../../../../assets/icons/details/expendMore";
 

@@ -89,6 +89,14 @@ vi.mock("@/components/download/ValidationSnackbar", () => ({
     ) : null,
 }));
 
+const mockProps = {
+  isOpen: true,
+  setIsOpen: vi.fn(),
+  downloadConditions: [],
+  getAndSetDownloadConditions: vi.fn(),
+  removeDownloadCondition: vi.fn(),
+};
+
 // Test wrapper component
 const TestWrapper = ({ children }: { children: React.ReactNode }) => {
   const theme = createTheme();
@@ -115,7 +123,7 @@ describe("DownloadDialog", () => {
   it("should render dialog when open", () => {
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 
@@ -125,7 +133,7 @@ describe("DownloadDialog", () => {
   it("should not render dialog when closed", () => {
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={false} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} isOpen={false} />
       </TestWrapper>
     );
 
@@ -135,7 +143,7 @@ describe("DownloadDialog", () => {
   it("should display stepper with correct steps", () => {
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 
@@ -145,7 +153,7 @@ describe("DownloadDialog", () => {
   it("should render email input step by default (step 0)", () => {
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 
@@ -156,7 +164,7 @@ describe("DownloadDialog", () => {
   it("should call handleStepperButtonClick when next button is clicked", () => {
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 
@@ -171,7 +179,7 @@ describe("DownloadDialog", () => {
   it("should call handleIsClose when close button is clicked", () => {
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 
@@ -189,7 +197,7 @@ describe("DownloadDialog", () => {
 
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 
@@ -204,7 +212,7 @@ describe("DownloadDialog", () => {
 
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 
@@ -221,7 +229,7 @@ describe("DownloadDialog", () => {
 
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 
@@ -242,7 +250,7 @@ describe("DownloadDialog", () => {
 
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 
@@ -259,7 +267,7 @@ describe("DownloadDialog", () => {
 
     render(
       <TestWrapper>
-        <DownloadDialog isOpen={true} setIsOpen={vi.fn()} />
+        <DownloadDialog {...mockProps} />
       </TestWrapper>
     );
 

@@ -234,7 +234,6 @@ const DateRange: React.FC<DateRangeControlProps> = ({
           () => {
             setCurrentMinDate(undefined);
             setCurrentMaxDate(undefined);
-            setOpen(false);
           }
         );
         getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
