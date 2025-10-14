@@ -121,9 +121,6 @@ def test_map_shows_geoserver_layer_when_wms_link_present(
     detail_page.load(uuid)
 
     expect(detail_page.wms_link_header).to_be_visible()
-    expect(
-        detail_page.detail_map.map_preview_not_available_announcement
-    ).not_to_be_visible()
 
     # Verify that the Geoserver WMS layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)
@@ -160,9 +157,6 @@ def test_map_not_showing_geoserver_layer_preview_when_wms_link_absent(
     detail_page.load(uuid)
 
     expect(detail_page.wms_link_header).not_to_be_visible()
-    expect(
-        detail_page.detail_map.map_preview_not_available_announcement
-    ).to_be_visible()
 
     # Verify that the Geoserver layer is not present on the map
     layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)

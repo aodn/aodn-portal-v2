@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -137,39 +137,55 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
-  const abstract =
-    collection?.getEnhancedDescription() || collection?.description || "";
+
+  const abstract = useMemo(
+    () => collection?.getEnhancedDescription() || collection?.description || "",
+    [collection]
+  );
+
+  const hasSummaryFeature = useMemo(
+    () => collection?.hasSummaryFeature() || false,
+    [collection]
+  );
+
+  const hasDownloadService = useMemo(
+    () => isWMSAvailable || hasSummaryFeature,
+    [hasSummaryFeature, isWMSAvailable]
+  );
+
+  const hasSpatialExtent = useMemo(() => !!collection?.getBBox(), [collection]);
+
+  const noMapPreview = useMemo(
+    () => !hasDownloadService && !hasSpatialExtent,
+    [hasDownloadService, hasSpatialExtent]
+  );
 
   const [minDateStamp, maxDateStamp] = useMemo(() => {
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
     // time value, for example cloud optimized date range may be different from the
     // geoserver one
-    let start = undefined;
-    let end = undefined;
+    let start = dayjs(dateDefault.min);
+    let end = dayjs(dateDefault.max);
 
     const extent = collection?.getExtent();
     if (extent) {
       const [s, e] = extent.getOverallTemporal();
-      start = s;
-      end = e;
+      start = s === undefined ? start : dayjs(s, dateDefault.DISPLAY_FORMAT);
+      end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
     }
-    return [
-      dayjs(start, dateDefault.DISPLAY_FORMAT),
-      dayjs(end, dateDefault.DISPLAY_FORMAT),
-    ];
+    return [start, end];
   }, [collection]);
 
   const mapLayerConfig = useMemo((): LayerSwitcherLayer<LayerName>[] => {
     const layers: LayerSwitcherLayer<LayerName>[] = [];
 
     if (collection) {
-      const hasSummaryFeature: boolean =
-        collection?.hasSummaryFeature() || false;
       const isZarrDataset: boolean =
         collection.getDatasetType() === DatasetType.ZARR;
 
       // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
       const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
+
       // Must be order by Hexbin > GeoServer > Spatial extents
       if (isSupportHexbin) {
         layers.push(MapLayers[LayerName.Hexbin]);
@@ -182,27 +198,39 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         });
       }
 
-      if (hasSummaryFeature && isZarrDataset) {
-        layers.push({
-          ...MapLayers[LayerName.SpatialExtent],
-        });
+      if (hasSummaryFeature && isZarrDataset && hasSpatialExtent) {
+        layers.push(MapLayers[LayerName.SpatialExtent]);
       }
 
-      // Init the layer with values here taking the default
-      setSelectedLayer((v: LayerName | null): LayerName | null => {
-        if (v) {
-          return v;
-        } else {
-          // Not init before, make it the same as the default value of this config
-          const layer: LayerSwitcherLayer<LayerName> | undefined = layers.find(
-            (l) => l.default
-          );
-          return layer != null ? layer.id : null;
-        }
-      });
+      if (!hasDownloadService && hasSpatialExtent) {
+        layers.push(MapLayers[LayerName.SpatialExtent]);
+      }
     }
     return layers;
-  }, [collection, isWMSAvailable]);
+  }, [
+    collection,
+    hasSummaryFeature,
+    isWMSAvailable,
+    hasSpatialExtent,
+    hasDownloadService,
+  ]);
+
+  useEffect(() => {
+    if (mapLayerConfig.length > 0) {
+      // Check if current selection is still valid
+      const isCurrentLayerValid = mapLayerConfig.some(
+        (layer) => layer.id === selectedLayer
+      );
+
+      if (!isCurrentLayerValid || selectedLayer === null) {
+        // Find the default layer or use the first one
+        const defaultLayer = mapLayerConfig.find((l) => l.default);
+        setSelectedLayer(defaultLayer ? defaultLayer.id : mapLayerConfig[0].id);
+      }
+    }
+    // Only depend on mapLayerConfig
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapLayerConfig]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
@@ -324,13 +352,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   panelId={mapContainerId}
                   projection={"mercator"} // Hexbin support this project or globe only
                   announcement={
-                    selectedLayer === LayerName.Hexbin
-                      ? collection.hasSummaryFeature()
-                        ? undefined
-                        : "model: No data available"
-                      : isWMSAvailable
-                        ? undefined
-                        : "model: Map preview not available" // No GeoServer WMS data available
+                    noMapPreview ? "Map Preview Not Available" : undefined
                   }
                   onMoveEvent={handleMapChange}
                   onZoomEvent={handleMapChange}
@@ -359,7 +381,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         visible={mapLayerConfig.length !== 0}
                       />
                       <MenuControl
-                        // visible={selectedLayer === LayerName.Hexbin}
+                        visible={timeSliderSupport && hasDownloadService}
                         menu={
                           <DateRange
                             minDate={minDateStamp.format(
@@ -373,12 +395,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             }
                           />
                         }
-                        visible={
-                          timeSliderSupport && mapLayerConfig.length !== 0
-                        }
                       />
                       <MenuControl
-                        // visible={selectedLayer === LayerName.Hexbin}
+                        visible={hasDownloadService}
                         menu={
                           <DrawRect
                             getAndSetDownloadConditions={
@@ -386,7 +405,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             }
                           />
                         }
-                        visible={mapLayerConfig.length !== 0}
                       />
                     </MenuControlGroup>
                   </Controls>

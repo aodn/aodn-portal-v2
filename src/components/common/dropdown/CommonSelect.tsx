@@ -2,6 +2,7 @@ import {
   FormControl,
   FormLabel,
   MenuItem,
+  MenuProps,
   Select,
   SelectChangeEvent,
   SxProps,
@@ -25,7 +26,9 @@ export interface CommonSelectProps<T = string> {
   onSelectCallback?: (value: T) => void;
   disabled?: boolean;
   dataTestId?: string;
-  sx?: SxProps;
+  selectSx?: SxProps;
+  labelSx?: SxProps;
+  menuProps?: Partial<MenuProps>;
 }
 
 const DEFAULT_SELECT_STYLE: SxProps = {
@@ -68,7 +71,9 @@ const CommonSelect: FC<CommonSelectProps> = memo(
     onSelectCallback,
     disabled = false,
     dataTestId = "common-select",
-    sx,
+    selectSx,
+    labelSx,
+    menuProps,
   }: CommonSelectProps) => {
     const [selectedItem, setSelectedItem] = useState<string | undefined>(
       value || items[0]?.value
@@ -94,7 +99,7 @@ const CommonSelect: FC<CommonSelectProps> = memo(
 
     return (
       <FormControl fullWidth data-testid={dataTestId} disabled={disabled}>
-        {label && <FormLabel>{label}</FormLabel>}
+        {label && <FormLabel sx={labelSx}>{label}</FormLabel>}
         <Select
           value={value || selectedItem}
           onOpen={handleOpenState(true)}
@@ -102,10 +107,10 @@ const CommonSelect: FC<CommonSelectProps> = memo(
           open={isOpen}
           onChange={handleOnChange}
           IconComponent={ExpandMore}
-          MenuProps={DEFAULT_MENU_PROPS}
+          MenuProps={menuProps || DEFAULT_MENU_PROPS}
           sx={{
             ...DEFAULT_SELECT_STYLE,
-            ...sx,
+            ...selectSx,
           }}
         >
           {items.map(({ value, label }) => (

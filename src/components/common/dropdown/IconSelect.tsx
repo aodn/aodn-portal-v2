@@ -159,7 +159,7 @@ const IconSelect = <T extends string | number = string>({
   onSelectCallback,
   dataTestId: testId,
   isIconOnly = false,
-  sx,
+  selectSx: sx,
 }: IconSelectProps<T>) => {
   const [selectedItem, setSelectedItem] = useState<T | null>(value ?? null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
