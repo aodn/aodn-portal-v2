@@ -5,6 +5,8 @@ import { openInNewTab } from "../../utils/LinkUtils";
 import CollapseItem from "./listItem/CollapseItem";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 import { pageDefault } from "../common/constants";
+import rc8Theme from "../../styles/themeRC8";
+import { TitleChainIcon } from "../../assets/icons/details/link";
 
 interface AssociatedRecordListProps {
   title: string;
@@ -22,7 +24,15 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
       const collapseComponents: ReactNode[] = useMemo(() => {
         return (
           records?.map((record, index) => (
-            <CollapseItem key={index} title={`${record.title}`}>
+            <CollapseItem
+              key={index}
+              title={`${record.title}`}
+              icon={<TitleChainIcon />}
+              expandedIcon={<TitleChainIcon />}
+              onIconClick={() => openRecord(record.uuid)}
+              titleColor={rc8Theme.palette.primary1}
+              collapseBtnColor={rc8Theme.palette.primary1}
+            >
               <ExpandableTextArea
                 text={record.abstract}
                 isClickable

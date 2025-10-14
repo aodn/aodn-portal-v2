@@ -1,5 +1,5 @@
 import React, { cloneElement, ReactNode, useState } from "react";
-import { Collapse, Grid } from "@mui/material";
+import { Collapse, Grid, Box } from "@mui/material";
 import ItemBaseGrid from "./ItemBaseGrid";
 import CollapseItemTitle from "./subitem/CollapseItemTitle";
 import CollapseBtn from "./subitem/CollapseBtn";
@@ -68,34 +68,33 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
     <ItemBaseGrid>
       <Grid container data-testid="collapseItem">
         {/* Main content area (icon + title) */}
-        <Grid item xs={11} sx={{ alignSelf: "flex-start" }}>
-          <Grid
-            container
-            alignItems="flex-start"
+        <Grid item xs={11}>
+          <Box
             onClick={toggleExpanded}
-            sx={{ cursor: "pointer" }}
+            sx={{
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 1.5,
+            }}
           >
             {/* Icon section */}
             {currentIcon && (
-              <Grid
-                item
-                xs={2}
-                md={1}
+              <Box
                 onClick={handleIconClick}
                 sx={{
                   cursor: isIconClickable ? "pointer" : "default",
-                  pt: "8px",
+                  flexShrink: 0,
+                  pt: "10px",
                 }}
               >
                 {currentIcon}
-              </Grid>
+              </Box>
             )}
 
             {/* Title section */}
-            <Grid item xs={currentIcon ? 10 : 12}>
-              {renderTitle()}
-            </Grid>
-          </Grid>
+            <Box sx={{ flex: 1 }}>{renderTitle()}</Box>
+          </Box>
         </Grid>
 
         {/* Collapse button */}

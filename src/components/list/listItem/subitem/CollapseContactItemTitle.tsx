@@ -20,7 +20,7 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
     return (
       <Typography
         sx={{
-          ...rc8Theme.typography.body1Medium,
+          ...rc8Theme.typography.title1Medium,
           p: 0,
           mx: "6px",
           color: color,

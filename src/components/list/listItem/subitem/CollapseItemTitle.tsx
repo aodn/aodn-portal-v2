@@ -31,10 +31,10 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
       >
         <Typography
           sx={{
-            ...rc8Theme.typography.body1Medium,
+            ...rc8Theme.typography.title1Medium,
             color: color,
             p: 0,
-            my: "10px",
+            my: "8px",
             mx: "6px",
           }}
         >
