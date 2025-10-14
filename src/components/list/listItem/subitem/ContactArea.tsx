@@ -56,37 +56,26 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
             gap={1.5}
             data-testid="contact-address"
           >
-            <Box sx={{ mt: "4px", flexShrink: 0 }}>
-              <LocationOnOutlinedIcon />
-            </Box>
-            <Box>
-              {hasAddress ? (
-                <>
+            {hasAddress && (
+              <>
+                <Box sx={{ mt: "4px", flexShrink: 0 }}>
+                  <LocationOnOutlinedIcon />
+                </Box>
+                <Box>
                   {delivery_point?.map((line) => renderTextLine(line, line))}
                   {city && renderTextLine(city)}
                   {administrative_area && renderTextLine(administrative_area)}
                   {postal_code && renderTextLine(postal_code)}
                   {country && renderTextLine(country)}
-                </>
-              ) : (
-                <Typography
-                  sx={{
-                    ...rc8Theme.typography.body2Regular,
-                    pt: "2px",
-                    mt: "4px",
-                  }}
-                  display="block"
-                >
-                  {/* Empty text placeholder */}
-                </Typography>
-              )}
-            </Box>
+                </Box>
+              </>
+            )}
           </Box>
         </Grid>
 
         {/* Phones */}
         <Grid item xs={12} sm={12} md={6} data-testid="contact-phone">
-          {phones.length > 0 ? (
+          {phones.length > 0 &&
             phones.map((phone) => (
               <Box
                 key={phone.value}
@@ -114,22 +103,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
                   {`${phone.value} (${phone.roles[0]})`}
                 </Typography>
               </Box>
-            ))
-          ) : (
-            <Box display="flex" alignItems="center" gap={1.5}>
-              <Box sx={{ flexShrink: 0 }}>
-                <LocalPhoneOutlinedIcon />
-              </Box>
-              <Typography
-                sx={{
-                  ...rc8Theme.typography.body2Regular,
-                  pt: 0,
-                }}
-              >
-                {/* Empty text placeholder */}
-              </Typography>
-            </Box>
-          )}
+            ))}
         </Grid>
       </Grid>
 
@@ -141,9 +115,9 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
           gap={1.5}
           data-testid="contact-link"
         >
-          <LanguageOutlinedIcon />
+          {links.length > 0 && <LanguageOutlinedIcon />}
           <Box sx={{ minWidth: 0 }}>
-            {links.length > 0 ? (
+            {links.length > 0 &&
               links.map((link, index) => (
                 <Link
                   key={index}
@@ -157,16 +131,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
                 >
                   {link.title}
                 </Link>
-              ))
-            ) : (
-              <Typography
-                sx={{
-                  ...rc8Theme.typography.body2Regular,
-                }}
-              >
-                {/* Empty text placeholder */}
-              </Typography>
-            )}
+              ))}
           </Box>
         </Box>
       </Grid>

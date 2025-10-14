@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import React from "react";
 import rc8Theme from "../../../../styles/themeRC8";
 
