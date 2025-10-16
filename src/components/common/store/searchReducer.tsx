@@ -33,6 +33,7 @@ import {
   MapFeatureRequest,
   MapFeatureResponse,
   MapFieldResponse,
+  MapLayerResponse,
 } from "./GeoserverDefinitions";
 
 export enum DatasetFrequency {
@@ -404,6 +405,25 @@ const fetchGeoServerMapFields = createAsyncThunk<
       .catch(errorHandling(thunkApi));
   }
 );
+
+// TODO: refactor types and names that also used in fetchGeoServerMapFields
+const fetchGeoServerMapLayers = createAsyncThunk<
+  Array<MapLayerResponse>,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "geoserver/fetchGeoServerMapLayers",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return axios
+      .get<MapLayerResponse>(
+        `/api/v1/ogc/collections/${request.uuid}/items/wms_layers`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
+
 /**
  * Appends a filter condition using AND operation.
  */
@@ -554,6 +574,7 @@ export {
   fetchParameterVocabsWithStore,
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
+  fetchGeoServerMapLayers,
   processDatasetDownload,
   processWFSDownload,
   jsonToOGCCollections,

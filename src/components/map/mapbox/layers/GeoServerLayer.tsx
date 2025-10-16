@@ -41,7 +41,7 @@ interface UrlParams {
 interface GeoServerLayerConfig {
   urlParams: UrlParams;
   uuid: string;
-  baseUrl: string;
+  // baseUrl: string;
   tileSize: number;
   minZoom: number;
   maxZoom: number;
@@ -63,7 +63,7 @@ const DEFAULT_WMS_MAP_CONFIG: GeoServerLayerConfig = {
     BBOX: "{bbox-epsg-3857}",
   },
   uuid: "",
-  baseUrl: "",
+  // baseUrl: "",
   tileSize: 256,
   minZoom: MapDefaultConfig.MIN_ZOOM,
   maxZoom: MapDefaultConfig.MAX_ZOOM,
@@ -82,12 +82,12 @@ const getTileSourceId = (layerId: string) => `${layerId}-source`;
 const getTileLayerId = (layerId: string) => `${layerId}-tile`;
 
 const checkWMSAvailability = (
-  baseUrl: string,
+  // baseUrl: string,
   urlConfig: UrlParams,
   onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
 ): boolean => {
   // TODO: Implement a proper WMS availability check if needed, e.g., by making a request to the WMS endpoint
-  if (urlConfig.LAYERS.length === 0 || baseUrl === "") {
+  if (urlConfig.LAYERS.length === 0) {
     onWMSAvailabilityChange?.(false);
     return false;
   }
@@ -122,7 +122,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     // We append cache server URL in front, if layer is not in cache server, it
     // will fall back to the original URL.
     const isWMSAvailable = checkWMSAvailability(
-      config.baseUrl,
+      // config.baseUrl,
       config.urlParams,
       onWMSAvailabilityChange
     );
@@ -235,7 +235,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       cleanUp();
     };
   }, [
-    config.baseUrl,
+    // config.baseUrl,
     config.maxZoom,
     config.minZoom,
     config.tileSize,
