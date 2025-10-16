@@ -43,6 +43,8 @@ import {
 import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
+import CommonSelect from "../../../../components/common/dropdown/CommonSelect";
+import DownloadSelect from "../side-cards/download-card/components/DownloadSelect";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -419,6 +421,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       featureCollection={filteredFeatureCollection}
                       visible={selectedLayer === LayerName.Hexbin}
                     />
+                    {/* // TODO: need to handle when the wms layername is wrong */}
                     <GeoServerLayer
                       geoServerLayerConfig={{
                         uuid: collection.id,
@@ -441,6 +444,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 </Map>
               </Box>
             </Box>
+            <DownloadSelect items={[]} label="Map Layers" />
           </Stack>
         </Grid>
       </Grid>

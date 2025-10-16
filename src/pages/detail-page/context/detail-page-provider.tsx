@@ -38,6 +38,13 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [downloadConditions, _setDownloadConditions] = useState<
     IDownloadCondition[]
   >([]);
+  const [mwsLayers, setMwsLayers] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [wmsFields, setWmsFields] = useState<
+    { label: string; value: string }[]
+  >([]);
+
   const getAndSetDownloadConditions = useCallback(
     (
       type: DownloadConditionType,
@@ -54,6 +61,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     },
     []
   );
+
   const removeDownloadCondition = useCallback(
     (condition: IDownloadCondition) => {
       _setDownloadConditions((prev) =>
@@ -86,6 +94,10 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     dispatch(fetchResultByUuidNoStore(uuid))
       .unwrap()
       .then((collection) => {
+        if (!collection) {
+          setIsCollectionNotFound(true);
+          return;
+        }
         setCollection(collection);
         setIsCollectionNotFound(false);
       })
@@ -103,6 +115,12 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setFeatures(features);
       });
   }, [dispatch, location.search, uuid]);
+
+  // call wms_download_fields first to get wms selector fields
+  // if it doesn't work that mean the wms link is invalid
+  // in this case we will call wms_layers to get all the layers
+  // once get the all the layers we will use the correct layerName to call wms_download_fields again
+  useEffect(() => {}, []);
 
   return (
     <DetailPageContext.Provider

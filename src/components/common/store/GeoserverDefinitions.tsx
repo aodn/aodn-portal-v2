@@ -35,3 +35,9 @@ export type MapFieldResponse = {
   type: string;
   name: string;
 };
+
+export type MapLayerResponse = {
+  name: string;
+  title: string;
+  serverUrl: string;
+};
