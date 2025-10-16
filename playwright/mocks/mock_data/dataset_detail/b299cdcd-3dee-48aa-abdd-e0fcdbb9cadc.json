@@ -1028,193 +1028,188 @@
       "href": "http://www.bom.gov.au/products/IDS65030.shtml",
       "rel": "related",
       "type": "text/html",
-      "title": "DownloadableData: [graph] Cape du Couedic Wave Observations",
+      "title": "DownloadableData: [graph] Cape du Couedic Wave Observations[]",
       "ai:group": "Other"
     },
     {
       "href": "http://www.bom.gov.au/products/IDT65014.shtml",
       "rel": "related",
       "type": "text/html",
-      "title": "DownloadableData: [graph] Cape Sorell Waverider Buoy Observations",
+      "title": "DownloadableData: [graph] Cape Sorell Waverider Buoy Observations[]",
       "ai:group": "Other"
     },
     {
       "href": "http://wisupt.bom.gov.au/openwis-user-portal/srv/en/main.home",
       "rel": "related",
       "type": "text/html",
-      "title": "DownloadableData: [BUFR-IOWK01 or CREX-SWWE01] WMO WIS GTS wavebuoy bulletins",
+      "title": "DownloadableData: [BUFR-IOWK01 or CREX-SWWE01] WMO WIS GTS wavebuoy bulletins[]",
       "ai:group": "Other"
     },
     {
       "href": "http://www.transport.wa.gov.au/imarine/about-wave-data.asp",
       "rel": "related",
       "type": "text/html",
-      "title": "WA DOT Wave monitoring sites",
+      "title": "WA DOT Wave monitoring sites[]",
       "ai:group": "Other"
     },
     {
       "href": "https://www.qld.gov.au/environment/coasts-waterways/beach/waves-sites",
       "rel": "related",
       "type": "text/html",
-      "title": "Queensland Department of Environment & Science wave monitoring sites",
+      "title": "Queensland Department of Environment & Science wave monitoring sites[]",
       "ai:group": "Other"
     },
     {
-      "href": "https://vicwaves.com.au/",
+      "href": "https://auswaves.org/",
       "rel": "related",
       "type": "text/html",
-      "title": "Victorian Coastal Monitoring Program sites",
-      "ai:group": "Other"
-    },
-    {
-      "href": "https://sawaves.org/",
-      "rel": "related",
-      "type": "text/html",
-      "title": "South Australian Monitoring Program sites",
+      "title": "AusWaves website[]",
       "ai:group": "Other"
     },
     {
       "href": "https://imos.aodn.org.au/imos123/home?uuid=b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc",
       "rel": "related",
       "type": "text/html",
-      "title": "View and download data though the AODN Portal"
+      "title": "View and download data though the AODN Portal[]",
+      "ai:group": "Data Access"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
       "rel": "wms",
       "type": "",
-      "title": "aodn:aodn_wave_nrt_v2_timeseries_map",
+      "title": "aodn:aodn_wave_nrt_v2_timeseries_map[Waverider buoys Near Real Time time-series]",
       "ai:group": "Data Access > wms"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
       "rel": "wfs",
       "type": "",
-      "title": "aodn:aodn_wave_nrt_v2_timeseries_data",
+      "title": "aodn:aodn_wave_nrt_v2_timeseries_data[This OGC WFS service returns filtered geographic information. The returned data is available in multiple formats including CSV.]",
       "ai:group": "Data Access > wfs"
     },
     {
       "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
       "rel": "related",
       "type": "text/html",
-      "title": "OGC WFS help documentation",
+      "title": "OGC WFS help documentation[]",
       "ai:group": "Document"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
       "rel": "IMOS:AGGREGATION--bodaac",
       "type": "",
-      "title": "aodn_wave_nrt_v2_timeseries_map#url"
+      "title": "aodn_wave_nrt_v2_timeseries_map#url[The ncUrlList is a WFS service that returns a list of URLs matching a query.]"
     },
     {
       "href": "https://help.aodn.org.au/web-services/ncurllist-service/",
       "rel": "related",
       "type": "text/html",
-      "title": "ncUrlList help documentation"
+      "title": "ncUrlList help documentation[]",
+      "ai:group": "Document"
     },
     {
       "href": "http://www.bom.gov.au/products/IDT65091.shtml",
       "rel": "related",
       "type": "text/html",
-      "title": "DownloadableData: [graph] Maria Island Wave Observations",
+      "title": "DownloadableData: [graph] Maria Island Wave Observations[]",
       "ai:group": "Other"
     },
     {
       "href": "http://www.bom.gov.au/products/IDD65028.shtml",
       "rel": "related",
       "type": "text/html",
-      "title": "DownloadableData: [graph] Goodrich Bank Wave Observations",
+      "title": "DownloadableData: [graph] Goodrich Bank Wave Observations[]",
       "ai:group": "Other"
     },
     {
       "href": "http://content.aodn.org.au/?prefix=Documents/AODN/Waves/Instruments_manuals/",
       "rel": "related",
       "type": "text/html",
-      "title": "Instrument manuals",
+      "title": "Instrument manuals[]",
       "ai:group": "Document"
     },
     {
       "href": "https://content.aodn.org.au/Documents/IMOS/Conventions/Wave_standards/AODN_wave_buoy_operations_and_data_management_guidelines_v1.0.pdf",
       "rel": "related",
       "type": "text/html",
-      "title": "Wave Buoy Operations and Data Management Guidelines Manual",
+      "title": "Wave Buoy Operations and Data Management Guidelines Manual[]",
       "ai:group": "Document"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Bureau_of_Meteorology/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (BOM)",
-      "ai:group": "Data Access"
+      "title": "NetCDF files via THREDDS catalog (BOM)[]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Environment_and_Science-Queensland/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (DES)",
-      "ai:group": "Data Access"
+      "title": "NetCDF files via THREDDS catalog (DES)[]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Planning_and_Environment-New_South_Wales/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (NSW-DPE)",
-      "ai:group": "Data Access"
+      "title": "NetCDF files via THREDDS catalog (NSW Government)[]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Planning_and_Environment-New_South_Wales/Manly_Hydraulics_Laboratory/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (MHL)",
-      "ai:group": "Data Access"
+      "title": "NetCDF files via THREDDS catalog (MHL)[]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Transport-Western_Australia/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (DoT)",
-      "ai:group": "Data Access"
+      "title": "NetCDF files via THREDDS catalog (DoT)[]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Deakin_University/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (Deakin)",
-      "ai:group": "Data Access"
+      "title": "NetCDF files via THREDDS catalog (Deakin)[]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Pilbara_Ports_Authority/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (Pilbara Ports Authority)",
-      "ai:group": "Data Access"
+      "title": "NetCDF files via THREDDS catalog (Pilbara Ports Authority)[]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Gippsland-Ports-Victoria/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (Gippsland Ports)",
-      "ai:group": "Data Access"
+      "title": "NetCDF files via THREDDS catalog (Gippsland Ports)[]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Flinders_University/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (Flinders University)",
-      "ai:group": "Data Access"
+      "title": "NetCDF files via THREDDS catalog (Flinders University)[]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "https://registry.opendata.aws/aodn_wave_buoy_realtime_nonqc/",
       "rel": "related",
       "type": "text/html",
-      "title": "Access To AWS Open Data Program registry for the Cloud Optimised version of this dataset",
-      "ai:group": "Data Access"
+      "title": "Access To AWS Open Data Program registry for the Cloud Optimised version of this dataset[]",
+      "ai:group": "Data Access > aws"
     },
     {
-      "href": "https://nbviewer.org/github/aodn/aodn_cloud_optimised/blob/main/notebooks/wave_buoy_realtime_nonqc.ipynb",
+      "href": "https://github.com/aodn/aodn_cloud_optimised/blob/main/notebooks/wave_buoy_realtime_nonqc.ipynb",
       "rel": "related",
       "type": "application/x-ipynb+json",
-      "title": "Access to Jupyter notebook to query Cloud Optimised converted dataset",
+      "title": "Access to Jupyter notebook to query Cloud Optimised converted dataset[]",
       "ai:group": "Python Notebook"
     },
     {

@@ -334,70 +334,70 @@
       "href": "https://www.cmar.csiro.au/geoserver/wms?&CQL_FILTER=SURVEY_NAME%20%3D%20%27SS199508%27",
       "rel": "wms",
       "type": "",
-      "title": "cmar:CATCH_HEADER_AODN_VIEW",
+      "title": "cmar:CATCH_HEADER_AODN_VIEW[Catch data for Southern Surveyor Voyage SS 08/95]",
       "ai:group": "Data Access > wms"
     },
     {
       "href": "https://www.marine.csiro.au/datacentre/projects/BioData/PDFs/BOX_AB2009_1426/BOX_AB2009_1426_index.htm",
       "rel": "data",
       "type": "",
-      "title": "Stored Media List (CSIRO internal use only)",
+      "title": "Stored Media List (CSIRO internal use only)[Biological Field Data Sheets - 1988 GAB Survey - RV Southern Surveyor - various Plans and Summaries plus SS 8/95 (1988 - 1995) as PDF (Item ref: AB2009_1426 PDFs)]",
       "ai:group": "Document"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=SS199508&data_type=catch",
       "rel": "data",
       "type": "",
-      "title": "Data Link",
+      "title": "Data Link[Data available via Data Trawler]",
       "ai:group": "Data Access"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link",
+      "title": "Data Link[RV Southern Surveyor Survey Information including voyage plans and summaries]",
       "ai:group": "Data Access"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=18",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link",
+      "title": "Documentation Link[Catch Composition Data (pdf)]",
       "ai:group": "Document"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=19",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link",
+      "title": "Documentation Link[Deck Logs (pdf)]",
       "ai:group": "Document"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=20",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link",
+      "title": "Documentation Link[Field Biological Data (pdf)]",
       "ai:group": "Document"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link",
+      "title": "Documentation Link[Marine National Facility]",
       "ai:group": "Document"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=21",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link",
+      "title": "Documentation Link[Station Logs (pdf)]",
       "ai:group": "Document"
     },
     {
       "href": "https://creativecommons.org/licenses/by/4.0/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link",
+      "title": "Documentation Link[This work is licensed under a Creative Commons Attribution 4.0 International License]",
       "ai:group": "Document"
     },
     {

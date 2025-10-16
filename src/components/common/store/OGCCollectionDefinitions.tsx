@@ -29,6 +29,7 @@ export interface ILink {
   type: string;
   title: string;
   "ai:group"?: string;
+  description?: string;
   getIcon?: () => string;
 }
 

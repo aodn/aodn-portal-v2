@@ -19,6 +19,7 @@ describe("LinkCard", () => {
     href: "https://example.com/test-link",
     rel: "test",
     title: "Test_Link_Title",
+    description: "A test link for unit testing",
     type: "text/html",
     getIcon: vi.fn().mockReturnValue("/test-icon.svg"),
   };
@@ -39,7 +40,8 @@ describe("LinkCard", () => {
     render(<LinkCard link={mockLink} />);
 
     // Check if title is rendered and underscores are replaced with spaces
-    const linkTitle = screen.getByText("Test Link Title");
+    // description should be rendered as the expected text if the link has a description
+    const linkTitle = screen.getByText("A test link for unit testing");
     expect(linkTitle).toBeInTheDocument();
   });
 
@@ -86,7 +88,7 @@ describe("LinkCard", () => {
   it("calls openInNewTab when link is clicked", () => {
     render(<LinkCard link={mockLink} />);
 
-    const link = screen.getByText("Test Link Title");
+    const link = screen.getByText("A test link for unit testing");
     userEvent.click(link);
     return waitFor(
       () => {

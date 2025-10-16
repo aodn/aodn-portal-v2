@@ -69,12 +69,12 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     if (WMSLinks && WMSLinks.length > 0) {
       return WMSLinks.map((link) => ({
         value: link.title,
-        label: link.title,
+        label: link.description ?? link.title,
       }));
     }
     return (WFSLinks ?? []).map((link) => ({
       value: link.title,
-      label: link.title,
+      label: link.description ?? link.title,
     }));
   }, [WFSLinks, WMSLinks]);
 

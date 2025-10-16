@@ -157,14 +157,14 @@
       "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link",
+      "title": "Data Link[RV Southern Surveyor Survey Information including voyage plans and summaries]",
       "ai:group": "Data Access"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link",
+      "title": "Documentation Link[Marine National Facility]",
       "ai:group": "Document"
     },
     {

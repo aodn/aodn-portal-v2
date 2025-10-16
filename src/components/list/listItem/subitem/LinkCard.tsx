@@ -119,7 +119,7 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
                 WebkitBoxOrient: "vertical",
               }}
             >
-              {link.title.replace(/_/g, " ")}
+              {(link.description ?? link.title).replace(/_/g, " ")}
             </Typography>
           </Link>
         </Box>

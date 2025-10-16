@@ -225,54 +225,54 @@
       "href": "https://thredds.aodn.org.au/thredds/catalog/IMOS/SOOP/SOOP-BA/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link"
+      "title": "Data Link[]"
     },
     {
       "href": "/metadata/8edf509b-1481-48fd-b9c5-b95b42247f82",
       "rel": "related",
       "type": "text/html",
-      "title": "AODN record"
+      "title": "AODN record[]"
     },
     {
       "href": "http://imos.org.au",
       "rel": "related",
       "type": "text/html",
-      "title": "IMOS website",
+      "title": "IMOS website[]",
       "ai:group": "Other"
     },
     {
       "href": "https://portal.aodn.org.au",
       "rel": "related",
       "type": "text/html",
-      "title": "AODN Portal",
+      "title": "AODN Portal[]",
       "ai:group": "Other"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
       "rel": "wms",
       "type": "",
-      "title": "imos:asset_map",
+      "title": "imos:asset_map[IMOS assets]",
       "ai:group": "Data Access > wms"
     },
     {
       "href": "https://portal.aodn.org.au/search?uuid=1fba3a57-35f4-461b-8a0e-551af229714e",
       "rel": "related",
       "type": "text/html",
-      "title": "View though the AODN Portal",
+      "title": "View though the AODN Portal[]",
       "ai:group": "Other"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
       "rel": "wfs",
       "type": "",
-      "title": "imos:asset_map",
+      "title": "imos:asset_map[This OGC WFS service returns filtered geographic information. The returned data is available in multiple formats including CSV.]",
       "ai:group": "Data Access > wfs"
     },
     {
       "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
       "rel": "related",
       "type": "text/html",
-      "title": "OGC WFS help documentation",
+      "title": "OGC WFS help documentation[]",
       "ai:group": "Document"
     },
     {

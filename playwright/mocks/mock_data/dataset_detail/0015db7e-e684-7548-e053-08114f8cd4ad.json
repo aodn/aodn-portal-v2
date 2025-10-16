@@ -435,49 +435,42 @@
       "href": "https://thredds.aodn.org.au/thredds/catalog/IMOS/SOOP/SOOP-BA/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link",
-      "ai:group": "Data Access"
-    },
-    {
-      "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
-      "rel": "wms",
-      "type": "",
-      "title": "aodn:aodn_wave_nrt_v2_timeseries_map",
-      "ai:group": "Data Access > wms"
+      "title": "Data Link[Data Available through the IMOS Thredds Server (netCDF format)]",
+      "ai:group": "Data Access > thredds"
     },
     {
       "href": "/metadata/8edf509b-1481-48fd-b9c5-b95b42247f82",
       "rel": "related",
       "type": "text/html",
-      "title": "AODN record",
+      "title": "AODN record[Link to Metadata Record at the AODN Portal]",
       "ai:group": "Other"
     },
     {
       "href": "https://portal.aodn.org.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link",
+      "title": "Data Link[External AODN Datasets, select Platform: (Vessel of Opportunity, then IMOS - Bio-Acoustic Ships of Opportunity (BA SOOP)]",
       "ai:group": "Other"
     },
     {
       "href": "https://imos.org.au/facilities/shipsofopportunity",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link",
+      "title": "Data Link[Link to IMOS Webpage: Ship of Opportunity Bio-Acoustic]",
       "ai:group": "Other"
     },
     {
       "href": "https://researchdata.ands.org.au/imos-bio-acoustic-sub-facility/440039/",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link",
+      "title": "Data Link[Link to Research Data Australia]",
       "ai:group": "Other"
     },
     {
       "href": "https://imos.org.au/fileadmin/user_upload/shared/SOOP/plugin-SOOP-BA_NetCDF_manual_v1.1.pdf",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link",
+      "title": "Documentation Link[NetCDF Data Format: Manual Download]",
       "ai:group": "Document"
     },
     {
