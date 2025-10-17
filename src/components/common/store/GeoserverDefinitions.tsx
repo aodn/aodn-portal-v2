@@ -8,7 +8,7 @@ export type MapTileRequest = {
 
 export type MapFeatureRequest = {
   uuid: string;
-  layerName: string;
+  layerName?: string;
   width?: number;
   height?: number;
   x?: number;

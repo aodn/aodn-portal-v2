@@ -408,7 +408,7 @@ const fetchGeoServerMapFields = createAsyncThunk<
 
 // TODO: refactor types and names that also used in fetchGeoServerMapFields
 const fetchGeoServerMapLayers = createAsyncThunk<
-  Array<MapFieldResponse>,
+  Array<MapLayerResponse>,
   MapFeatureRequest,
   { rejectValue: ErrorResponse }
 >(
@@ -416,7 +416,7 @@ const fetchGeoServerMapLayers = createAsyncThunk<
   (request: MapFeatureRequest, thunkApi: any) => {
     return axios
       .get<MapLayerResponse>(
-        `/api/v1/ogc/collections/${request.uuid}/items/wfs_layers`,
+        `/api/v1/ogc/collections/${request.uuid}/items/wms_layers`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)
@@ -574,6 +574,7 @@ export {
   fetchParameterVocabsWithStore,
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
+  fetchGeoServerMapLayers,
   processDatasetDownload,
   processWFSDownload,
   jsonToOGCCollections,
