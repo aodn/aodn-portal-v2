@@ -12,7 +12,7 @@ import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import lodash from "lodash";
 import { TestHelper } from "../../common/test/helper";
 import { MapDefaultConfig } from "./constants";
-import { Paper } from "@mui/material";
+import { CircularProgress, Paper } from "@mui/material";
 import { padding } from "../../../styles/constants";
 
 // Define here to avoid repeat typing and accidentally changed value
@@ -33,6 +33,7 @@ export interface MapBasicType {
   animate?: boolean;
   projection?: ProjectionSpecification | string;
   announcement?: string;
+  loading?: boolean;
   onZoomEvent?: (event: MapEvent | undefined) => void;
   onMoveEvent?: (event: MapEvent | undefined) => void;
 }
@@ -84,6 +85,7 @@ const ReactMap = memo(
     projection = MapDefaultConfig.PROJECTION,
     animate = false,
     announcement = undefined,
+    loading = false,
     onZoomEvent,
     onMoveEvent,
     children,
@@ -300,6 +302,24 @@ const ReactMap = memo(
         </Paper>
         <TestHelper id={panelId} getMap={() => map} />
         {children}
+        {
+          // Put it here so the other layer render first
+        }
+        {loading && (
+          <Paper
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "absolute",
+              background: "transparent",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <CircularProgress sx={{ color: "#4ecdc4" }} thickness={6} />
+          </Paper>
+        )}
       </MapContext.Provider>
     );
   }
