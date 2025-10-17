@@ -33,7 +33,6 @@ export interface MapBasicType {
   animate?: boolean;
   projection?: ProjectionSpecification | string;
   announcement?: string;
-  loading?: boolean;
   onZoomEvent?: (event: MapEvent | undefined) => void;
   onMoveEvent?: (event: MapEvent | undefined) => void;
 }
@@ -85,12 +84,12 @@ const ReactMap = memo(
     projection = MapDefaultConfig.PROJECTION,
     animate = false,
     announcement = undefined,
-    loading = false,
     onZoomEvent,
     onMoveEvent,
     children,
   }: React.PropsWithChildren<MapProps>) => {
     const [map, setMap] = useState<Map | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
     const containerRef = useRef<HTMLElement | null>(null);
 
     // Debouce to make the map transit smoother
@@ -251,7 +250,27 @@ const ReactMap = memo(
     }
 
     return (
-      <MapContext.Provider value={{ map }}>
+      <MapContext.Provider value={{ map: map, setLoading: setLoading }}>
+        {loading && (
+          <Paper
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "absolute",
+              backgroundColor: "black",
+              opacity: 0.15,
+              height: "100%",
+              width: "100%",
+              zIndex: 500,
+            }}
+          >
+            <CircularProgress
+              sx={{ color: "#4ecdc4", opacity: 1 }}
+              thickness={6}
+            />
+          </Paper>
+        )}
         <Paper
           data-testid="announcement-panel"
           sx={{
@@ -302,24 +321,6 @@ const ReactMap = memo(
         </Paper>
         <TestHelper id={panelId} getMap={() => map} />
         {children}
-        {
-          // Put it here so the other layer render first
-        }
-        {loading && (
-          <Paper
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "absolute",
-              background: "transparent",
-              height: "100%",
-              width: "100%",
-            }}
-          >
-            <CircularProgress sx={{ color: "#4ecdc4" }} thickness={6} />
-          </Paper>
-        )}
       </MapContext.Provider>
     );
   }
