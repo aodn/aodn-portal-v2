@@ -104,7 +104,7 @@ describe("LinkCard", () => {
   it("calls openInNewTab when link is clicked", () => {
     render(<LinkCard link={mockLink} />);
 
-    const link = screen.getByText("Test Link Title");
+    const link = screen.getByText("Test Link Title", { exact: false });
     userEvent.click(link);
     return waitFor(
       () => {
