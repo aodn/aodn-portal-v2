@@ -33,15 +33,11 @@ describe("DownloadConditionUtils", () => {
       );
     });
 
-    it("should return the default date range condition if none is found", () => {
+    it("should return non-specified date range condition if none is found", () => {
       const conditions: IDownloadCondition[] = [];
       const result = getDateConditionFrom(conditions);
       expect(result).toEqual(
-        new DateRangeCondition(
-          "defaultid",
-          dayjs(dateDefault.min).format(dateDefault.DATE_FORMAT),
-          dayjs(dateDefault.max).format(dateDefault.DATE_FORMAT)
-        )
+        new DateRangeCondition("defaultid", "non-specified", "non-specified")
       );
     });
   });
