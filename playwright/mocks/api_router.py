@@ -118,6 +118,6 @@ class ApiRouter:
         self.route(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)
 
     def unroute_wms_downloadable_fields(
-            self, handler_function: Optional[Callable] = None
+        self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)
