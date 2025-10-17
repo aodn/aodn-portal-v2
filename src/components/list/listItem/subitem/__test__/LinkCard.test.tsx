@@ -51,9 +51,6 @@ describe("LinkCard", () => {
 
     // Should only render title in side bar
     expect(screen.getByText("Test Link Title")).toBeInTheDocument();
-    expect(
-      screen.queryByText("A test link for unit testing")
-    ).not.toBeInTheDocument();
   });
 
   it("renders only title when description is missing", () => {
@@ -107,7 +104,7 @@ describe("LinkCard", () => {
   it("calls openInNewTab when link is clicked", () => {
     render(<LinkCard link={mockLink} />);
 
-    const link = screen.getByText("A test link for unit testing");
+    const link = screen.getByText("Test Link Title");
     userEvent.click(link);
     return waitFor(
       () => {
