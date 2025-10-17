@@ -22,11 +22,9 @@ export const getDateConditionFrom = (
   if (filteredCondition.length === 1) {
     return filteredCondition[0] as DateRangeCondition;
   }
-  return new DateRangeCondition(
-    "defaultid",
-    dayjs(dateDefault.min).format(dateDefault.DATE_FORMAT),
-    dayjs(dateDefault.max).format(dateDefault.DATE_FORMAT)
-  );
+  // if no date range condition found, return null for both start and end date.
+  // So backends can exclude date range in the notification emails
+  return new DateRangeCondition("defaultid", "non-specified", "non-specified");
 };
 
 export const getMultiPolygonFrom = (
