@@ -124,7 +124,12 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                     <NaList title={title ? title : ""} />
                   ) : (
                     item.map((link: ILink, index: number) => (
-                      <LinkCard key={`ch-${index}`} link={link} icon={false} />
+                      <LinkCard
+                        key={`ch-${index}`}
+                        link={link}
+                        icon={false}
+                        showTitleOnly={true}
+                      />
                     ))
                   )}
                 </Typography>
