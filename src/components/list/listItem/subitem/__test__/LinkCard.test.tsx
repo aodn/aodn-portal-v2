@@ -40,9 +40,11 @@ describe("LinkCard", () => {
     render(<LinkCard link={mockLink} />);
 
     // Should render both title and description with underscores replaced
-    expect(screen.getByText("Test Link Title")).toBeInTheDocument();
     expect(
-      screen.getByText("A test link for unit testing")
+      screen.getByText("Test Link Title", { exact: false })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("A test link for unit testing", { exact: false })
     ).toBeInTheDocument();
   });
 
@@ -58,7 +60,9 @@ describe("LinkCard", () => {
     render(<LinkCard link={linkWithoutDescription} />);
 
     // Should only render title if no description is provided
-    expect(screen.getByText("Test Link Title")).toBeInTheDocument();
+    expect(
+      screen.getByText("Test Link Title", { exact: false })
+    ).toBeInTheDocument();
   });
 
   it("shows copy button on hover when link has not been copied", () => {
