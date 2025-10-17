@@ -36,13 +36,32 @@ describe("LinkCard", () => {
     } as any);
   });
 
-  it("renders with correct link title", () => {
+  it("renders with title and description by default", () => {
     render(<LinkCard link={mockLink} />);
 
-    // Check if title is rendered and underscores are replaced with spaces
-    // description should be rendered as the expected text if the link has a description
-    const linkTitle = screen.getByText("A test link for unit testing");
-    expect(linkTitle).toBeInTheDocument();
+    // Should render both title and description with underscores replaced
+    expect(screen.getByText("Test Link Title")).toBeInTheDocument();
+    expect(
+      screen.getByText("A test link for unit testing")
+    ).toBeInTheDocument();
+  });
+
+  it("renders only title when showTitleOnly is true", () => {
+    render(<LinkCard link={mockLink} showTitleOnly={true} />);
+
+    // Should only render title in side bar
+    expect(screen.getByText("Test Link Title")).toBeInTheDocument();
+    expect(
+      screen.queryByText("A test link for unit testing")
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders only title when description is missing", () => {
+    const linkWithoutDescription = { ...mockLink, description: undefined };
+    render(<LinkCard link={linkWithoutDescription} />);
+
+    // Should only render title if no description is provided
+    expect(screen.getByText("Test Link Title")).toBeInTheDocument();
   });
 
   it("shows copy button on hover when link has not been copied", () => {
