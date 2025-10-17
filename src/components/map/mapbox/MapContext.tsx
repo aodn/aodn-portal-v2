@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, Dispatch, SetStateAction } from "react";
 
 // Refer to this https://maplibre.org/news/2023-01-03-aws-maplibre-plugins/
 //
@@ -12,6 +12,7 @@ import { Map } from "mapbox-gl";
 // ---------------------------------------------------------------
 type MapContextType = {
   map: Map | null;
+  setLoading: Dispatch<SetStateAction<boolean>>;
 };
 
 const MapContext = createContext<Partial<MapContextType>>({});
