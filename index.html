@@ -22,42 +22,11 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-
-    <!-- SEO: Only homepage is indexable in search engines -->
-    <link rel="canonical" href="https://portal-beta.aodn.org.au/" />
-    <script>
-      // Add noindex to all pages except homepage on portal-beta.aodn.org.au
-      const isProductionDomain =
-        window.location.hostname === "portal-beta.aodn.org.au";
-      const isHomepage = window.location.pathname === "/";
-
-      if (!isProductionDomain || !isHomepage) {
-        const meta = document.createElement("meta");
-        meta.name = "robots";
-        meta.content = "noindex, follow";
-        document.head.appendChild(meta);
-      }
-    </script>
-    <!-- End SEO -->
     <title>AODN Portal</title>
     <!-- Tracking code - the comment below initializes monitoring - DO NOT DELETE -->
     <!-- new-relic-js -->
     <!-- google-analytics-js -->
-
-    <!-- Google Tag Manager -->
-    <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-M5WPD8GZ");
-    </script>
-    <!-- End Google Tag Manager -->
+    <!-- seo-tags -->
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
