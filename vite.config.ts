@@ -58,6 +58,42 @@ export default ({ mode }) => {
     };
   };
 
+  const inlineSEOPlugin = () => {
+    return {
+      name: "inline-seo",
+      transformIndexHtml(html) {
+        const canonicalUrl = process.env.VITE_CANONICAL_URL || "";
+
+        // Skip SEO tags in test mode or if no canonical URL is set
+        if (mode === "test" || !canonicalUrl) {
+          return html.replace("<!-- seo-tags -->", "");
+        }
+
+        // Extract hostname from canonical URL for comparison
+        const canonicalHostname = new URL(canonicalUrl).hostname;
+
+        const seoTags = `
+        <!-- SEO: Only homepage is indexable in search engines -->
+        <link rel="canonical" href="${canonicalUrl}" />
+        <script>
+          const isProductionDomain = window.location.hostname === "${canonicalHostname}";
+          const isHomepage = window.location.pathname === "/";
+
+          if (!isProductionDomain || !isHomepage) {
+            const meta = document.createElement("meta");
+            meta.name = "robots";
+            meta.content = "noindex, follow";
+            document.head.appendChild(meta);
+          }
+        </script>
+        <!-- End SEO -->
+        `;
+
+        return html.replace("<!-- seo-tags -->", seoTags);
+      },
+    };
+  };
+
   return defineConfig({
     server: {
       watch: {
@@ -92,6 +128,7 @@ export default ({ mode }) => {
         eslint({ exclude: ["/virtual:/**", "node_modules/**"] }),
       inlineNewRelicPlugin(),
       inlineGoogleAnalyticsPlugin(),
+      inlineSEOPlugin(),
     ].filter(Boolean),
     build: {
       outDir: "dist",

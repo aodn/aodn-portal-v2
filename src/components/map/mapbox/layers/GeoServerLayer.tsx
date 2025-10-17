@@ -100,7 +100,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   visible,
   setTimeSliderSupport,
 }: GeoServerLayerProps) => {
-  const { map } = useContext(MapContext);
+  const { map, setLoading } = useContext(MapContext);
   const dispatch = useAppDispatch();
   const popupRef = useRef<Popup | null>();
   const popupRootRef = useRef<Root | null>();
@@ -364,6 +364,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             );
 
             if (visible) {
+              setLoading?.(true);
               map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
               // Check if this layer support time slider
               const request: MapFeatureRequest = {
@@ -376,7 +377,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                 .then((value) => {
                   const found = value.find((v) => v.type === "dateTime");
                   setTimeSliderSupport?.(found !== undefined);
-                });
+                })
+                .finally(() => setLoading?.(false));
             }
           }
         }
@@ -390,6 +392,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     dispatch,
     geoServerLayerConfig,
     map,
+    setLoading,
     setTimeSliderSupport,
     titleLayerId,
     visible,
