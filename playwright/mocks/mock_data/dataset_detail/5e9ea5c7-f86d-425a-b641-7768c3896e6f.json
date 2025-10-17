@@ -238,36 +238,41 @@
       "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link[RV Southern Surveyor Survey Information including voyage plans and summaries]",
-      "ai:group": "Data Access"
+      "title": "Data Link",
+      "ai:group": "Data Access",
+      "description": "RV Southern Surveyor Survey Information including voyage plans and summaries"
     },
     {
       "href": "https://marlin.csiro.au/geonetwork/srv/eng/catalog.search#/metadata/5e9ea5c7-f86d-425a-b641-7768c3896e6f",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link[Unprocessed data in *.log files]",
-      "ai:group": "Other"
+      "title": "Data Link",
+      "ai:group": "Other",
+      "description": "Unprocessed data in *.log files"
     },
     {
       "href": "https://www.marine.csiro.au/data/requests/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link[Data Request Form]",
-      "ai:group": "Document"
+      "title": "Documentation Link",
+      "ai:group": "Document",
+      "description": "Data Request Form"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link[Marine National Facility]",
-      "ai:group": "Document"
+      "title": "Documentation Link",
+      "ai:group": "Document",
+      "description": "Marine National Facility"
     },
     {
       "href": "https://creativecommons.org/licenses/by/4.0/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link[This work is licensed under a Creative Commons Attribution 4.0 International License]",
-      "ai:group": "Document"
+      "title": "Documentation Link",
+      "ai:group": "Document",
+      "description": "This work is licensed under a Creative Commons Attribution 4.0 International License"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

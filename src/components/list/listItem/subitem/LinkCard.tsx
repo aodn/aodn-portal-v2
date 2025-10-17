@@ -18,9 +18,14 @@ import { dataAccessParams } from "../../../../analytics/dataAccessEvent";
 interface LinkCardProps {
   icon?: boolean;
   link: LinkType;
+  showTitleOnly?: boolean;
 }
 
-const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
+const LinkCard: FC<LinkCardProps> = ({
+  icon = true,
+  link,
+  showTitleOnly = false,
+}) => {
   const [hoverOnContainer, setHoverOnContainer] = useState<boolean>(false);
   const { checkIfCopied, copyToClipboard } = useDetailPageContext();
 
@@ -115,11 +120,23 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
                 overflowWrap: "break-word",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
-                WebkitLineClamp: "2",
+                // WebkitLineClamp: "2",
                 WebkitBoxOrient: "vertical",
               }}
             >
-              {(link.description ?? link.title).replace(/_/g, " ")}
+              {showTitleOnly ? (
+                link.title.replace(/_/g, " ")
+              ) : (
+                <>
+                  {link.title.replace(/_/g, " ")}
+                  {link.description && (
+                    <>
+                      <br />
+                      {link.description.replace(/_/g, " ")}
+                    </>
+                  )}
+                </>
+              )}
             </Typography>
           </Link>
         </Box>

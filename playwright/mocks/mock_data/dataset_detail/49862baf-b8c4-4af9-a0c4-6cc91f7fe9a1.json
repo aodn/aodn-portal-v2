@@ -157,15 +157,17 @@
       "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=8",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link[RV Southern Surveyor Survey Information including voyage plans and summaries]",
-      "ai:group": "Data Access"
+      "title": "Data Link",
+      "ai:group": "Data Access",
+      "description": "RV Southern Surveyor Survey Information including voyage plans and summaries"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link[Marine National Facility]",
-      "ai:group": "Document"
+      "title": "Documentation Link",
+      "ai:group": "Document",
+      "description": "Marine National Facility"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

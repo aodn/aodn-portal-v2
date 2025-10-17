@@ -215,29 +215,33 @@
       "href": "https://www.marine.csiro.au/data/gsm/gsm_extract.cfm?survey=IN2019_V06&instrument=EM122",
       "rel": "related",
       "type": "text/html",
-      "title": "Geophysical Survey and Mapping website information for this data set[Geophysical Survey and Mapping website information for this data set and link to downloading data.]",
-      "ai:group": "Other"
+      "title": "Geophysical Survey and Mapping website information for this data set",
+      "ai:group": "Other",
+      "description": "Geophysical Survey and Mapping website information for this data set and link to downloading data."
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=309",
       "rel": "related",
       "type": "text/html",
-      "title": "RV Investigator survey information[RV Investigator survey information including voyage plans and summaries]",
-      "ai:group": "Data Access"
+      "title": "RV Investigator survey information",
+      "ai:group": "Data Access",
+      "description": "RV Investigator survey information including voyage plans and summaries"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "MNF home page[Marine National Facility home page]",
-      "ai:group": "Other"
+      "title": "MNF home page",
+      "ai:group": "Other",
+      "description": "Marine National Facility home page"
     },
     {
       "href": "https://www.marine.csiro.au/data/gsm/get_report.cfm?survey=in2019_v06",
       "rel": "related",
       "type": "text/html",
-      "title": "Geophysical Survey and Mapping acquisition report[Geophysical Survey and Mapping acquisition report]",
-      "ai:group": "Document"
+      "title": "Geophysical Survey and Mapping acquisition report",
+      "ai:group": "Document",
+      "description": "Geophysical Survey and Mapping acquisition report"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

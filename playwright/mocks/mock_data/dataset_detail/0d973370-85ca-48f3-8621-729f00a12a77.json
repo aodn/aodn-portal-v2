@@ -326,8 +326,9 @@
       "href": "https://creativecommons.org/licenses/by/4.0/",
       "rel": "related",
       "type": "text/html",
-      "title": "Documentation Link[This work is licensed under a Creative Commons Attribution 4.0 International License]",
-      "ai:group": "Document"
+      "title": "Documentation Link",
+      "ai:group": "Document",
+      "description": "This work is licensed under a Creative Commons Attribution 4.0 International License"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",
