@@ -158,16 +158,14 @@
       "rel": "related",
       "type": "text/html",
       "title": "Data Link",
-      "ai:group": "Data Access",
-      "description": "RV Southern Surveyor Survey Information including voyage plans and summaries"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
       "title": "Documentation Link",
-      "ai:group": "Document",
-      "description": "Marine National Facility"
+      "ai:group": "Document"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

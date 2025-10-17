@@ -1060,34 +1060,38 @@
       "ai:group": "Other"
     },
     {
-      "href": "https://auswaves.org/",
+      "href": "https://vicwaves.com.au/",
       "rel": "related",
       "type": "text/html",
-      "title": "AusWaves website",
+      "title": "Victorian Coastal Monitoring Program sites",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://sawaves.org/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "South Australian Monitoring Program sites",
       "ai:group": "Other"
     },
     {
       "href": "https://imos.aodn.org.au/imos123/home?uuid=b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc",
       "rel": "related",
       "type": "text/html",
-      "title": "View and download data though the AODN Portal",
-      "ai:group": "Data Access"
+      "title": "View and download data though the AODN Portal"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
       "rel": "wms",
       "type": "",
       "title": "aodn:aodn_wave_nrt_v2_timeseries_map",
-      "ai:group": "Data Access > wms",
-      "description": "Waverider buoys Near Real Time time-series"
+      "ai:group": "Data Access > wms"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
       "rel": "wfs",
       "type": "",
       "title": "aodn:aodn_wave_nrt_v2_timeseries_data",
-      "ai:group": "Data Access > wfs",
-      "description": "This OGC WFS service returns filtered geographic information. The returned data is available in multiple formats including CSV."
+      "ai:group": "Data Access > wfs"
     },
     {
       "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
@@ -1100,15 +1104,13 @@
       "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
       "rel": "IMOS:AGGREGATION--bodaac",
       "type": "",
-      "title": "aodn_wave_nrt_v2_timeseries_map#url",
-      "description": "The ncUrlList is a WFS service that returns a list of URLs matching a query."
+      "title": "aodn_wave_nrt_v2_timeseries_map#url"
     },
     {
       "href": "https://help.aodn.org.au/web-services/ncurllist-service/",
       "rel": "related",
       "type": "text/html",
-      "title": "ncUrlList help documentation",
-      "ai:group": "Document"
+      "title": "ncUrlList help documentation"
     },
     {
       "href": "http://www.bom.gov.au/products/IDT65091.shtml",
@@ -1143,73 +1145,73 @@
       "rel": "related",
       "type": "text/html",
       "title": "NetCDF files via THREDDS catalog (BOM)",
-      "ai:group": "Data Access > thredds"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Environment_and_Science-Queensland/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
       "title": "NetCDF files via THREDDS catalog (DES)",
-      "ai:group": "Data Access > thredds"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Planning_and_Environment-New_South_Wales/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "NetCDF files via THREDDS catalog (NSW Government)",
-      "ai:group": "Data Access > thredds"
+      "title": "NetCDF files via THREDDS catalog (NSW-DPE)",
+      "ai:group": "Data Access"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Planning_and_Environment-New_South_Wales/Manly_Hydraulics_Laboratory/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
       "title": "NetCDF files via THREDDS catalog (MHL)",
-      "ai:group": "Data Access > thredds"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Department_of_Transport-Western_Australia/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
       "title": "NetCDF files via THREDDS catalog (DoT)",
-      "ai:group": "Data Access > thredds"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Deakin_University/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
       "title": "NetCDF files via THREDDS catalog (Deakin)",
-      "ai:group": "Data Access > thredds"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Pilbara_Ports_Authority/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
       "title": "NetCDF files via THREDDS catalog (Pilbara Ports Authority)",
-      "ai:group": "Data Access > thredds"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Gippsland-Ports-Victoria/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
       "title": "NetCDF files via THREDDS catalog (Gippsland Ports)",
-      "ai:group": "Data Access > thredds"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://thredds.aodn.org.au/thredds/catalog/Flinders_University/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/catalog.html",
       "rel": "related",
       "type": "text/html",
       "title": "NetCDF files via THREDDS catalog (Flinders University)",
-      "ai:group": "Data Access > thredds"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://registry.opendata.aws/aodn_wave_buoy_realtime_nonqc/",
       "rel": "related",
       "type": "text/html",
       "title": "Access To AWS Open Data Program registry for the Cloud Optimised version of this dataset",
-      "ai:group": "Data Access > aws"
+      "ai:group": "Data Access"
     },
     {
-      "href": "https://github.com/aodn/aodn_cloud_optimised/blob/main/notebooks/wave_buoy_realtime_nonqc.ipynb",
+      "href": "https://nbviewer.org/github/aodn/aodn_cloud_optimised/blob/main/notebooks/wave_buoy_realtime_nonqc.ipynb",
       "rel": "related",
       "type": "application/x-ipynb+json",
       "title": "Access to Jupyter notebook to query Cloud Optimised converted dataset",

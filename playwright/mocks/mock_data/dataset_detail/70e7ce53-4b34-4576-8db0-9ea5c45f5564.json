@@ -228,32 +228,28 @@
       "rel": "related",
       "type": "text/html",
       "title": "Geophysical Survey and Mapping website information for this data set",
-      "ai:group": "Other",
-      "description": "Geophysical Survey and Mapping website information for this data set and link to downloading data."
+      "ai:group": "Other"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/survey_list.cfm?source_id=309",
       "rel": "related",
       "type": "text/html",
       "title": "RV Investigator survey information",
-      "ai:group": "Data Access",
-      "description": "RV Investigator survey information"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://mnf.csiro.au/",
       "rel": "related",
       "type": "text/html",
       "title": "MNF home page",
-      "ai:group": "Other",
-      "description": "Marine National Facility home page"
+      "ai:group": "Other"
     },
     {
       "href": "https://www.marine.csiro.au/data/gsm/get_report.cfm?survey=IN2019_V06",
       "rel": "related",
       "type": "text/html",
       "title": "Geophysical Survey and Mapping data acquisition and processing report",
-      "ai:group": "Document",
-      "description": "Geophysical Survey and Mapping data acquisition and processing report"
+      "ai:group": "Document"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

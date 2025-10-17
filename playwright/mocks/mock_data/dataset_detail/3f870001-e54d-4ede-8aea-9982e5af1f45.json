@@ -226,9 +226,8 @@
       "href": "https://www.cmar.csiro.au/geoserver/wms?&CQL_FILTER=SURVEY_NAME%20%3D%20%27RACH198408%27",
       "rel": "wms",
       "type": "",
-      "title": "cmar:CATCH_HEADER_AODN_VIEW",
-      "ai:group": "Data Access > wms",
-      "description": "Catch data for Rachel Voyage R 08 (1984)"
+      "title": "mnf:CTD_HEADER_AODN_VIEW",
+      "ai:group": "Data Access > wms"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=877",
@@ -239,26 +238,23 @@
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=878",
-      "rel": "data",
+      "rel": "related",
       "type": "",
       "title": "Cruise Summary (pdf)",
       "ai:group": "Document"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=RACH198408&data_type=catch",
-      "rel": "data",
+      "rel": "related",
       "type": "",
-      "title": "Data Link",
-      "ai:group": "Data Access",
-      "description": "Data available via Data Trawler"
+      "title": "Data Link"
     },
     {
       "href": "https://creativecommons.org/licenses/by/4.0/",
       "rel": "related",
       "type": "text/html",
       "title": "Documentation Link",
-      "ai:group": "Document",
-      "description": "Creative Commons Attribution 4.0 International Licence"
+      "ai:group": "Document"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

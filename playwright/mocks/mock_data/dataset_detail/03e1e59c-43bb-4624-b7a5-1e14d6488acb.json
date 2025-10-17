@@ -272,32 +272,28 @@
       "rel": "wms",
       "type": "",
       "title": "mnf:CTD_HEADER_AODN_VIEW",
-      "ai:group": "Data Access > wms",
-      "description": "CTD data for Franklin Voyage FR 08/95"
+      "ai:group": "Data Access > wms"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/dataset.cfm?survey=FR199508&data_type=ctd",
       "rel": "data",
       "type": "",
       "title": "Data Link",
-      "ai:group": "Data Access",
-      "description": "Data available via Data Trawler"
+      "ai:group": "Data Access"
     },
     {
       "href": "https://www.marine.csiro.au/data/trawler/download.cfm?file_id=42",
       "rel": "related",
       "type": "text/html",
       "title": "Documentation Link",
-      "ai:group": "Document",
-      "description": "Processing report for this dataset"
+      "ai:group": "Document"
     },
     {
       "href": "https://creativecommons.org/licenses/by/4.0/",
       "rel": "related",
       "type": "text/html",
       "title": "Documentation Link",
-      "ai:group": "Document",
-      "description": "This work is licensed under a Creative Commons Attribution 4.0 International License"
+      "ai:group": "Document"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/58d5af30-fbc6-42dc-8971-5468df74e9ee.png",

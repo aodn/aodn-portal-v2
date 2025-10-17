@@ -1554,14 +1554,14 @@
       "href": "https://github.com/jacquomo/Geomorphmetry_SeamapAus",
       "rel": "WWW:LINK-1.0-http--readme",
       "type": "",
-      "title": "SUPPLEMENTARY - code and RMarkdown Notebook workflow for geomorphic classification [GitHub repo]",
+      "title": "",
       "ai:group": "Other"
     },
     {
       "href": "https://seamapaustralia.org/map/#57ab9851-4906-4338-a34d-a1a05971db61",
       "rel": "WWW:LINK-1.0-http--portal",
       "type": "",
-      "title": "Explore the data through the interactive Seamap Australia portal",
+      "title": "",
       "ai:group": "Other"
     },
     {
@@ -1569,8 +1569,7 @@
       "rel": "wms",
       "type": "",
       "title": "seamap:geomorph_AMP_grp",
-      "ai:group": "Data Access > wms",
-      "description": "Geomorphometry of AMPs Web Mapping Service layer (for use in desktop GIS or similar)"
+      "ai:group": "Data Access > wms"
     },
     {
       "href": "https://geonetwork-edge.edge.aodn.org.au:443/geonetwork/images/logos/1bb8f09c-99d6-431f-b902-4d3e4cef02df.png",
