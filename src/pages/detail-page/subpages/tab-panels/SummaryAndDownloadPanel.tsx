@@ -413,7 +413,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         visible={mapLayerConfig.length !== 0}
                       />
                       <MenuControl
-                        visible={timeSliderSupport && hasDownloadService}
+                        visible={
+                          (selectedLayer === LayerName.GeoServer &&
+                            timeSliderSupport) ||
+                          (selectedLayer === LayerName.Hexbin &&
+                            hasSummaryFeature)
+                        }
                         menu={
                           <DateRange
                             minDate={minDateStamp.format(

@@ -19,6 +19,7 @@ describe("LinkCard", () => {
     href: "https://example.com/test-link",
     rel: "test",
     title: "Test_Link_Title",
+    description: "A test link for unit testing",
     type: "text/html",
     getIcon: vi.fn().mockReturnValue("/test-icon.svg"),
   };
@@ -35,12 +36,33 @@ describe("LinkCard", () => {
     } as any);
   });
 
-  it("renders with correct link title", () => {
+  it("renders with title and description by default", () => {
     render(<LinkCard link={mockLink} />);
 
-    // Check if title is rendered and underscores are replaced with spaces
-    const linkTitle = screen.getByText("Test Link Title");
-    expect(linkTitle).toBeInTheDocument();
+    // Should render both title and description with underscores replaced
+    expect(
+      screen.getByText("Test Link Title", { exact: false })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("A test link for unit testing", { exact: false })
+    ).toBeInTheDocument();
+  });
+
+  it("renders only title when showTitleOnly is true", () => {
+    render(<LinkCard link={mockLink} showTitleOnly={true} />);
+
+    // Should only render title in side bar
+    expect(screen.getByText("Test Link Title")).toBeInTheDocument();
+  });
+
+  it("renders only title when description is missing", () => {
+    const linkWithoutDescription = { ...mockLink, description: undefined };
+    render(<LinkCard link={linkWithoutDescription} />);
+
+    // Should only render title if no description is provided
+    expect(
+      screen.getByText("Test Link Title", { exact: false })
+    ).toBeInTheDocument();
   });
 
   it("shows copy button on hover when link has not been copied", () => {
@@ -86,7 +108,7 @@ describe("LinkCard", () => {
   it("calls openInNewTab when link is clicked", () => {
     render(<LinkCard link={mockLink} />);
 
-    const link = screen.getByText("Test Link Title");
+    const link = screen.getByText("Test Link Title", { exact: false });
     userEvent.click(link);
     return waitFor(
       () => {
