@@ -212,4 +212,37 @@ describe("AssociatedRecordsPanel", async () => {
       { timeout: 5000 }
     );
   });
+
+  it("should render AssociatedRecordsPanel with malform associated links", () => {
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details/0145df96-3847-474b-8b63-a66f0e03ff54",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "0145df96-3847-474b-8b63-a66f0e03ff54",
+    });
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DetailPageProvider>
+            <AssociatedRecordsPanel />
+          </DetailPageProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    return waitFor(() => screen.findAllByText("Parent Record"), {
+      timeout: 2000,
+    }).then(() => {
+      // There are some malform json in the associated links, we make sure parse error will not
+      // cause the whole page to die, so as long as we get Parent Record, we know we handled the error
+      const parentRecordText = screen.queryAllByText("Parent Record");
+      expect(parentRecordText).toHaveLength(2);
+    });
+  });
 });
