@@ -62,31 +62,18 @@ export default ({ mode }) => {
     return {
       name: "inline-seo",
       transformIndexHtml(html) {
-        const canonicalUrl = process.env.VITE_CANONICAL_URL || "";
-
-        // Skip SEO tags in test mode or if no canonical URL is set
-        if (mode === "test" || !canonicalUrl) {
-          return html.replace("<!-- seo-tags -->", "");
-        }
-
-        // Extract hostname from canonical URL for comparison
-        const canonicalHostname = new URL(canonicalUrl).hostname;
+        const canonicalUrl = "https://portal-beta.aodn.org.au/";
 
         const seoTags = `
-        <!-- SEO: Only homepage is indexable in search engines -->
-        <link rel="canonical" href="${canonicalUrl}" />
-        <script>
-          const isProductionDomain = window.location.hostname === "${canonicalHostname}";
-          const isHomepage = window.location.pathname === "/";
+          <!-- SEO: Canonical URL points all environments to production -->
 
-          if (!isProductionDomain || !isHomepage) {
-            const meta = document.createElement("meta");
-            meta.name = "robots";
-            meta.content = "noindex, follow";
-            document.head.appendChild(meta);
-          }
-        </script>
-        <!-- End SEO -->
+          <!-- Bing Webmaster Tools Verification -->
+          <meta name="msvalidate.01" content="02593ED7942BD40F39C6E03B5EF2265E" />
+
+          <!-- Canonical URL: All environments point to production for SEO consolidation -->
+          <link rel="canonical" href="${canonicalUrl}" />
+
+          <!-- End SEO -->
         `;
 
         return html.replace("<!-- seo-tags -->", seoTags);
