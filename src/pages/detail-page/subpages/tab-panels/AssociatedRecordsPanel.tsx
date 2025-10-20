@@ -17,14 +17,21 @@ const getUuid = (str: string) => {
   return str.split(":").pop();
 };
 
-const generateRecordBy = (link: ILink) => {
-  const { title, recordAbstract } = parseJson(link.title);
-  const uuid = getUuid(link.href);
-  return {
-    uuid: uuid ? uuid : "",
-    title: title,
-    abstract: recordAbstract,
-  };
+const generateRecordBy = (
+  link: ILink
+): { uuid: string; title: string; abstract: string } | null => {
+  const parsed = parseJson(link.title);
+  if (parsed) {
+    const { title, recordAbstract } = parsed;
+    const uuid = getUuid(link.href);
+    return {
+      uuid: uuid ? uuid : "",
+      title: title,
+      abstract: recordAbstract,
+    };
+  } else {
+    return null;
+  }
 };
 
 const AssociatedRecordsPanel = () => {
@@ -45,13 +52,16 @@ const AssociatedRecordsPanel = () => {
         return;
       }
       if (link.rel === RelationType.PARENT) {
-        parents.push(generateRecordBy(link));
+        const parent = generateRecordBy(link);
+        parent && parents.push(parent);
       }
       if (link.rel === RelationType.CHILD) {
-        children.push(generateRecordBy(link));
+        const child = generateRecordBy(link);
+        child && children.push(child);
       }
       if (link.rel === RelationType.SIBLING) {
-        siblings.push(generateRecordBy(link));
+        const sibling = generateRecordBy(link);
+        sibling && siblings.push(sibling);
       }
     });
 
