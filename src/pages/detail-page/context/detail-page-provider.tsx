@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import {
   fetchFeaturesByUuid,
@@ -42,7 +42,6 @@ const getWMSLayerNames = (collection: OGCCollection | undefined) => {
 export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   children,
 }) => {
-  const location = useLocation();
   const { uuid } = useParams();
   const dispatch = useAppDispatch();
   const { checkIfCopied, copyToClipboard } = useClipboard();
@@ -60,6 +59,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [wmsLayers, setMwsLayers] = useState<MapLayerResponse[]>([]);
   const [wmsFields, setWmsFields] = useState<MapFieldResponse[]>([]);
   const [isLoadingWmsLayer, setIsLoadingWmsLayer] = useState<boolean>(true);
+  const [isLoadingWmsFields, setIsLoadingWmsFields] = useState(false);
+  // TODO: implement later
   const [geoServerLoadingMessage, setGeoServerLoadingMessage] =
     useState<string>("");
 
@@ -107,7 +108,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         console.log("Error fetching collection by UUID:", error);
         setIsCollectionNotFound(true);
       });
-  }, [dispatch, location.search, uuid]);
+  }, [dispatch, uuid]);
 
   useEffect(() => {
     if (!uuid) return;
@@ -116,23 +117,23 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       .then((features) => {
         setFeatures(features);
       });
-  }, [dispatch, location.search, uuid]);
+  }, [dispatch, uuid]);
 
   // call wms_download_fields first to get wms selector fields
   // if it doesn't work that means the wms link is invalid (invalid server url or layerName)
   // in this case we will call wms_layers to get all the possible layers
   // once get the all the layers we will use the correct layerName to for wms_download_fields, wms_map_tile and wms_map_feature
   useEffect(() => {
-    if (!uuid) return;
+    if (!uuid || !collection || isLoadingWmsFields) return;
 
     const layerName = getWMSLayerNames(collection)?.[0] || "";
 
-    const fieldRequest: MapFeatureRequest = {
+    const wmsFieldsRequest: MapFeatureRequest = {
       uuid: uuid,
       layerName: layerName,
     };
-
-    dispatch(fetchGeoServerMapFields(fieldRequest))
+    setIsLoadingWmsFields(true);
+    dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
       .unwrap()
       .then((fields) => {
         setWmsFields(fields);
@@ -145,11 +146,11 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         if (error.statusCode === 404) {
           console.log("Failed to fetch fields, fetching layers instead", error);
 
-          const layerRequest: MapFeatureRequest = {
+          const wmsLayersRequest: MapFeatureRequest = {
             uuid: uuid,
           };
 
-          dispatch(fetchGeoServerMapLayers(layerRequest))
+          dispatch(fetchGeoServerMapLayers(wmsLayersRequest))
             .unwrap()
             .then((layers) => {
               setMwsLayers(layers);
@@ -157,16 +158,17 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
             })
             .catch((layerError) => {
               console.error("Failed to fetch layers", layerError);
+              setIsLoadingWmsLayer(false);
             });
         } else {
           console.error("Failed to fetch fields", error);
         }
+      })
+      .finally(() => {
+        setIsLoadingWmsFields(false);
       });
-  }, [collection, dispatch, uuid]);
-
-  // console.log("wms fields", wmsFields);
-  // console.log("wms layers", wmsLayers);
-  // console.log("is loading wms layer", isLoadingWmsLayer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, uuid, collection]);
 
   return (
     <DetailPageContext.Provider

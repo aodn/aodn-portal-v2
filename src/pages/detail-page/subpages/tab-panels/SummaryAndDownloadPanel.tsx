@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Grid, Stack } from "@mui/material";
-import { padding } from "../../../../styles/constants";
+import { Box, Grid, LinearProgress, Stack, Typography } from "@mui/material";
+import { borderRadius, padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import Controls from "../../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
@@ -44,6 +44,7 @@ import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/m
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import DownloadSelect from "../side-cards/download-card/components/DownloadSelect";
+import rc8Theme from "../../../../styles/themeRC8";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -145,13 +146,24 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     }));
   }, [wmsLayers]);
 
+  const wmsLinksOptions = useMemo(() => {
+    const wmsLinks = collection?.getWMSLinks();
+    if (!wmsLinks || wmsLinks.length === 0) {
+      return [];
+    }
+    return wmsLinks.map((link) => ({
+      value: link.title,
+      label: link.title,
+    }));
+  }, [collection]);
+
   // Need to init with null as collection value can be undefined when it entered this component.
   const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(null);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
   const [selectedWMSLayer, setSelectedWMSLayer] = useState<string>(
-    wmsLayersOptions?.[0]?.value || ""
+    wmsLayersOptions?.[0]?.value || wmsLinksOptions?.[0]?.value || ""
   );
 
   const abstract = useMemo(
@@ -322,17 +334,14 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setSelectedWMSLayer(value);
   }, []);
 
-  console.log("wms fields", wmsFields);
-  console.log("wms layers", wmsLayers);
-  console.log("is loading wms layer", isLoadingWmsLayer);
-  console.log("wms layer options", wmsLayersOptions);
-  console.log("selected wms layer", selectedWMSLayer);
-
   useEffect(() => {
     if (wmsLayersOptions && wmsLayersOptions.length > 0) {
       setSelectedWMSLayer(wmsLayersOptions[0].value);
     }
-  }, [wmsLayersOptions]);
+    if (wmsLayersOptions.length === 0 && wmsLinksOptions.length > 0) {
+      setSelectedWMSLayer(wmsLinksOptions[0].value);
+    }
+  }, [wmsLayersOptions, wmsLinksOptions]);
 
   const handleMapChange = useCallback((event: MapEvent | undefined) => {
     // implement later
@@ -479,12 +488,35 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
               </Box>
             </Box>
             {selectedLayer === LayerName.GeoServer && (
-              <DownloadSelect
-                items={wmsLayersOptions}
-                label="Map Layers"
-                value={selectedWMSLayer}
-                onSelectCallback={handleSelectWMSLayer}
-              />
+              <Box>
+                {isLoadingWmsLayer ? (
+                  <>
+                    <Typography py={2}>Fetching Geoserver Layers...</Typography>
+                    <LinearProgress
+                      variant="indeterminate"
+                      sx={{
+                        height: 8,
+                        borderRadius: borderRadius.small,
+                        backgroundColor: rc8Theme.palette.grey[300],
+                        "& .MuiLinearProgress-bar": {
+                          backgroundColor: rc8Theme.palette.primary.main,
+                        },
+                      }}
+                    />
+                  </>
+                ) : (
+                  <DownloadSelect
+                    items={
+                      wmsLayersOptions.length > 0
+                        ? wmsLayersOptions
+                        : wmsLinksOptions
+                    }
+                    label="Map Layers"
+                    value={selectedWMSLayer}
+                    onSelectCallback={handleSelectWMSLayer}
+                  />
+                )}
+              </Box>
             )}
           </Stack>
         </Grid>

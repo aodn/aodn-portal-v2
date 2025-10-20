@@ -86,11 +86,18 @@ const checkWMSAvailability = (
   urlConfig: UrlParams,
   onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
 ): boolean => {
-  // TODO: Implement a proper WMS availability check if needed, e.g., by making a request to the WMS endpoint
-  if (urlConfig.LAYERS.length === 0) {
+  // Check if LAYERS is undefined, null, empty array, or contains only empty strings
+  const hasValidLayers =
+    urlConfig.LAYERS &&
+    urlConfig.LAYERS.length > 0 &&
+    urlConfig.LAYERS.some((layer) => layer && layer.trim() !== "");
+
+  if (!hasValidLayers) {
     onWMSAvailabilityChange?.(false);
     return false;
   }
+
+  onWMSAvailabilityChange?.(true);
   return true;
 };
 
