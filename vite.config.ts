@@ -62,7 +62,7 @@ export default ({ mode }) => {
     return {
       name: "inline-seo",
       transformIndexHtml(html) {
-        const canonicalUrl = process.env.VITE_CANONICAL_URL || "";
+        const canonicalUrl = "https://portal-beta.aodn.org.au/";
 
         const seoTags = `
           <!-- SEO: Canonical URL points all environments to production -->
