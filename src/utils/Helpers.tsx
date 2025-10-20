@@ -12,7 +12,7 @@ export const parseJson = (jsonString: string): any => {
   try {
     return JSON.parse(jsonString);
   } catch (error) {
-    console.error("Invalid JSON string:", error);
+    console.error(`Invalid JSON string: ${jsonString}`, error);
     return null;
   }
 };
