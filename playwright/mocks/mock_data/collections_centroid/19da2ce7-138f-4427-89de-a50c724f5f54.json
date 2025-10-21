@@ -1,0 +1,18 @@
+{
+  "links": [],
+  "collections": [
+    {
+      "properties": {
+        "centroid": [[135.25, -36.125]]
+      },
+      "id": "19da2ce7-138f-4427-89de-a50c724f5f54",
+      "links": [],
+      "itemType": "Collection"
+    }
+  ],
+  "total": 1,
+  "search_after": [
+    "str:19da2ce7-138f-4427-89de-a50c724f5f54",
+    "str:19da2ce7-138f-4427-89de-a50c724f5f54"
+  ]
+}

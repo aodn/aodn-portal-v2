@@ -88,6 +88,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
             ...rc8Theme.typography.body2Regular,
             color: rc8Theme.palette.primary1,
           }}
+          data-testid={`result-card-button-${text}`}
         >
           {text}
         </Typography>
