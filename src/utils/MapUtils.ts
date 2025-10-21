@@ -1,6 +1,8 @@
 import { Root } from "react-dom/client";
 import { Map as MapboxMap } from "mapbox-gl";
 import { Position } from "geojson";
+import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
+import { MapDefaultConfig } from "../components/map/mapbox/constants";
 
 // Constants with explanations
 /**
@@ -123,4 +125,19 @@ export const safeRemoveControl = (
       root?.unmount();
     });
   }
+};
+
+export const overallBoundingBox = (
+  collection: OGCCollection | undefined
+): Position | undefined => {
+  const bbox = collection?.getBBox();
+  if (!bbox || !bbox[0] || bbox[0].length !== 4) {
+    return [
+      MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
+      MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
+      MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
+      MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
+    ];
+  }
+  return bbox[0];
 };
