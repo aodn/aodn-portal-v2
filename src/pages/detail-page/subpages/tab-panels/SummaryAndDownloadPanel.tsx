@@ -34,11 +34,7 @@ import MapLayerSwitcher, {
   LayerSwitcherLayer,
   MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { ensureHttps } from "../../../../utils/UrlUtils";
-import {
-  DatasetType,
-  OGCCollection,
-} from "../../../../components/common/store/OGCCollectionDefinitions";
+import { DatasetType } from "../../../../components/common/store/OGCCollectionDefinitions";
 import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
@@ -94,18 +90,6 @@ const getMinMaxDateStamps = (
   ];
 };
 
-// As WMSServer may be an array if there are multiple wms links, for now we only use the first one.
-// TODO: This should be improved to handle multiple WMS layers and servers if needed.
-const getWMSServer = (collection: OGCCollection | undefined) => {
-  const wmsServers = collection?.getWMSLinks()?.map((link) => link.href);
-  return wmsServers && wmsServers.length > 0 ? wmsServers[0] : "";
-};
-
-const getWMSLayerNames = (collection: OGCCollection | undefined) => {
-  const layerNames = collection?.getWMSLinks()?.map((link) => link.title);
-  return layerNames && layerNames.length > 0 ? layerNames : [];
-};
-
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   mapFocusArea,
 }) => {
@@ -114,6 +98,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     featureCollection,
     downloadConditions,
     getAndSetDownloadConditions,
+    setSelectedWmsLayer,
   } = useDetailPageContext();
 
   // Need to init with null as collection value can be undefined when it entered this component.
@@ -291,7 +276,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     console.log("Map change event", event);
   }, []);
 
-  const handleGeoLayerChange = useCallback(
+  const handleMapLayerChange = useCallback(
     (id: LayerName) =>
       setSelectedLayer((v: LayerName | null) => (v !== id ? id : v)),
     []
@@ -312,6 +297,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         return [...e];
       }),
     []
+  );
+
+  const onWmsLayerChange = useCallback(
+    (wmsLayerName: string) => setSelectedWmsLayer(wmsLayerName),
+    [setSelectedWmsLayer]
   );
 
   return (
@@ -359,7 +349,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         menu={
                           <MapLayerSwitcher
                             layers={mapLayerConfig}
-                            onEvent={handleGeoLayerChange}
+                            onEvent={handleMapLayerChange}
                           />
                         }
                         visible={mapLayerConfig.length !== 0}
@@ -410,17 +400,16 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                     <GeoServerLayer
                       geoServerLayerConfig={{
-                        uuid: collection.id,
-                        baseUrl: ensureHttps(getWMSServer(collection)),
                         urlParams: {
-                          LAYERS: getWMSLayerNames(collection),
                           START_DATE: filterStartDate,
                           END_DATE: filterEndDate,
                         },
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
+                      onWmsLayerChange={onWmsLayerChange}
                       visible={selectedLayer === LayerName.GeoServer}
                       setTimeSliderSupport={setTimeSliderSupport}
+                      collection={collection}
                     />
                     <GeojsonLayer
                       collection={collection}

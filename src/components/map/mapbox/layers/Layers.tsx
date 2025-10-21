@@ -5,6 +5,7 @@ import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 import * as turf from "@turf/turf";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
+import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 export interface LayerBasicType {
   // Tile layer should added to map
@@ -20,6 +21,7 @@ export interface LayerBasicType {
   preferCurrentCentroid?: boolean;
   visible?: boolean;
   setTimeSliderSupport?: Dispatch<SetStateAction<boolean>>;
+  collection?: OGCCollection;
 }
 // Use to create static layer on map, you need to add menu item to select those layers,
 // refer to map section

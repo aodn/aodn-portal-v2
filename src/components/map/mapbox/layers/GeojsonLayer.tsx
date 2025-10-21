@@ -10,12 +10,15 @@ import React, {
 } from "react";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
-import { SpatialExtentPhoto } from "../../../../pages/detail-page/context/detail-page-context";
 import { Position } from "geojson";
 import { MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { fitToBound } from "../../../../utils/MapUtils";
 
+interface SpatialExtentPhoto {
+  bbox: Position;
+  url: string;
+}
 interface GeojsonLayerProps {
   // Vector tile layer should add to map
   collection: OGCCollection;

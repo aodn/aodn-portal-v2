@@ -1,10 +1,10 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import {
   fetchFeaturesByUuid,
   fetchResultByUuidNoStore,
 } from "../../../components/common/store/searchReducer";
-import { DetailPageContext, SpatialExtentPhoto } from "./detail-page-context";
+import { DetailPageContext } from "./detail-page-context";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "../../../components/common/store/hooks";
 import { FeatureCollection, Point } from "geojson";
@@ -23,7 +23,6 @@ interface DetailPageProviderProps {
 export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   children,
 }) => {
-  const location = useLocation();
   const { uuid } = useParams();
   const dispatch = useAppDispatch();
   const { checkIfCopied, copyToClipboard } = useClipboard();
@@ -38,6 +37,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [downloadConditions, _setDownloadConditions] = useState<
     IDownloadCondition[]
   >([]);
+  const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>("");
+
   const getAndSetDownloadConditions = useCallback(
     (
       type: DownloadConditionType,
@@ -54,6 +55,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     },
     []
   );
+
   const removeDownloadCondition = useCallback(
     (condition: IDownloadCondition) => {
       _setDownloadConditions((prev) =>
@@ -65,27 +67,15 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     []
   );
 
-  const [photos, setPhotos] = useState<SpatialExtentPhoto[]>([]);
-  const [extentsPhotos, setExtentsPhotos] = useState<SpatialExtentPhoto[]>([]);
-  const [photoHovered, setPhotoHovered] = useState<SpatialExtentPhoto>();
-  const [photoSelected, setPhotoSelected] = useState<SpatialExtentPhoto>();
-  const [hasSnapshotsFinished, setHasSnapshotsFinished] =
-    useState<boolean>(false);
-
-  const extentsLength = collection?.getBBox()?.length;
-  useEffect(() => {
-    if (photos.length === extentsLength) {
-      setHasSnapshotsFinished(true);
-      if (photos.length === 1) return;
-      setExtentsPhotos(photos.slice(1, extentsLength));
-    }
-  }, [extentsLength, hasSnapshotsFinished, photos, photos.length]);
-
   useEffect(() => {
     if (!uuid) return;
     dispatch(fetchResultByUuidNoStore(uuid))
       .unwrap()
       .then((collection) => {
+        if (!collection) {
+          setIsCollectionNotFound(true);
+          return;
+        }
         setCollection(collection);
         setIsCollectionNotFound(false);
       })
@@ -93,7 +83,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         console.log("Error fetching collection by UUID:", error);
         setIsCollectionNotFound(true);
       });
-  }, [dispatch, location.search, uuid]);
+  }, [dispatch, uuid]);
 
   useEffect(() => {
     if (!uuid) return;
@@ -102,7 +92,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       .then((features) => {
         setFeatures(features);
       });
-  }, [dispatch, location.search, uuid]);
+  }, [dispatch, uuid]);
 
   return (
     <DetailPageContext.Provider
@@ -114,18 +104,10 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         downloadConditions,
         getAndSetDownloadConditions,
         removeDownloadCondition,
-        photos,
-        setPhotos,
-        extentsPhotos,
-        setExtentsPhotos,
-        photoHovered,
-        setPhotoHovered,
-        photoSelected,
-        setPhotoSelected,
-        hasSnapshotsFinished,
-        setHasSnapshotsFinished,
         checkIfCopied,
         copyToClipboard,
+        selectedWmsLayer,
+        setSelectedWmsLayer,
       }}
     >
       {children}

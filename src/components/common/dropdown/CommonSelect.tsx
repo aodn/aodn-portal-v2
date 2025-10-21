@@ -76,7 +76,7 @@ const CommonSelect: FC<CommonSelectProps> = memo(
     menuProps,
   }: CommonSelectProps) => {
     const [selectedItem, setSelectedItem] = useState<string | undefined>(
-      value || items[0]?.value
+      value || items[0]?.value || ""
     );
     const [isOpen, setIsOpen] = useState<boolean>(false);
 

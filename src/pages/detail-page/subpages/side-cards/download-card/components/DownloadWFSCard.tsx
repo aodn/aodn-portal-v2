@@ -34,12 +34,14 @@ const formatOptions = [{ label: "CSV", value: "csv" }];
 interface DownloadWFSCardProps extends DownloadCondition {
   WFSLinks: ILink[] | undefined;
   WMSLinks: ILink[] | undefined;
+  selectedWmsLayerName: string | undefined;
   uuid?: string;
 }
 
 const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   WFSLinks,
   WMSLinks,
+  selectedWmsLayerName,
   uuid,
   downloadConditions,
   getAndSetDownloadConditions,
@@ -56,7 +58,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   } = useWFSDownload(() => setSnackbarOpen(true));
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
-    WMSLinks?.[0]?.title
+    selectedWmsLayerName || WMSLinks?.[0]?.title || ""
   );
   const [selectedFormat, setSelectedFormat] = useState<string>(
     formatOptions[0].value
@@ -66,6 +68,10 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   // And hide all the wfs layers if there is a wms layer
   // Will display all the wfs layers if there is no wms layer
   const dataSelectOptions = useMemo(() => {
+    if (selectedWmsLayerName) {
+      return [{ value: selectedWmsLayerName, label: selectedWmsLayerName }];
+    }
+
     if (WMSLinks && WMSLinks.length > 0) {
       return WMSLinks.map((link) => ({
         value: link.title,
@@ -76,7 +82,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       value: link.title,
       label: link.title,
     }));
-  }, [WFSLinks, WMSLinks]);
+  }, [WFSLinks, WMSLinks, selectedWmsLayerName]);
 
   const handleSelectFormat = useCallback(
     (value: string) => {
@@ -107,6 +113,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       new FormatCondition("format", formatOptions[0].value),
     ]);
   }, [getAndSetDownloadConditions]);
+
+  useEffect(() => {
+    // set default data item
+    if (selectedWmsLayerName) {
+      setSelectedDataItem(selectedWmsLayerName);
+    }
+  }, [selectedWmsLayerName]);
 
   const renderProgressMessage = useCallback(
     (dataSize: string, progressMessage: string) => {
