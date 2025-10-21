@@ -1,10 +1,10 @@
 from http import HTTPStatus
 from typing import Dict, List, Union
-from urllib.parse import parse_qs, urlparse
 
 from playwright.sync_api import Route
 
 from utils.json_utils import load_json_data
+from utils.url_utils import get_query_params
 
 
 class SuggesterOptions:
@@ -44,10 +44,7 @@ def load_suggester_options(filename: str) -> SuggesterOptions:
 def handle_search_autocomplete_api(route: Route) -> None:
     suggester_options = load_suggester_options('suggester_options.json')
 
-    query_string = urlparse(route.request.url).query
-    search_params = parse_qs(query_string)
-
-    inputs = search_params.get('input', [])
+    inputs = get_query_params(route, 'input')
     if len(inputs) != 1:
         route.fulfill(
             status=HTTPStatus.BAD_REQUEST,

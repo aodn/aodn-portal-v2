@@ -11,15 +11,14 @@ from mocks.api.collections import (
     handle_collections_centroid_api,
     handle_collections_popup_api,
 )
-from mocks.api.geowebcache import handle_geowebcache_api
 from mocks.api.search_collections import (
     handle_provider_api,
     handle_temporal_api,
 )
 from mocks.api.vocabs import handle_vocabs_api
 from mocks.api.wms_map import (
-    handle_wms_map_tile_api,
     handle_wms_downloadable_fields_api,
+    handle_wms_map_tile_api,
 )
 from mocks.api_router import ApiRouter
 
