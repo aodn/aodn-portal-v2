@@ -76,7 +76,7 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
             }}
           />
         </>
-      ) : (
+      ) : wmsLayersOptions.length > 0 ? (
         <CommonSelect
           items={wmsLayersOptions}
           label="Map Layers"
@@ -85,7 +85,7 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
           menuProps={menuProps}
           selectSx={selectProps}
         />
-      )}
+      ) : null}
     </Box>
   );
 };

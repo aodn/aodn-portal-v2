@@ -90,6 +90,7 @@ const getTileLayerId = (layerId: string) => `${layerId}-tile`;
 
 const checkWMSAvailability = (
   urlConfig: UrlParams,
+  onWMSNotAvailable: () => void,
   onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
 ): boolean => {
   // Check if LAYERS is undefined, null, empty array, or contains only empty strings
@@ -100,6 +101,7 @@ const checkWMSAvailability = (
 
   if (!hasValidLayers) {
     onWMSAvailabilityChange?.(false);
+    onWMSNotAvailable();
     return false;
   }
 
@@ -161,6 +163,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     const isWMSAvailable = checkWMSAvailability(
       config.urlParams,
+      () => setIsLoadingWmsFields(false),
       onWMSAvailabilityChange
     );
     return [config, isWMSAvailable];
@@ -461,17 +464,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
       .unwrap()
       .then((fields) => {
-        // setWmsFields(fields);
-        // setIsLoadingWmsFields(false);
-        setMapLoading?.(false);
+        // Successfully fetched fields, loading is complete
+        setIsLoadingWmsFields(false);
       })
       .catch((error: ErrorResponse) => {
-        console.log("error fetching fields, error:", error.statusCode);
         // For now only catch 404 error for further fetching layers
         // TODO: we could fetch layers even there is no error to find all wms layers that support wfs download
         if (error.statusCode === 404) {
           console.log("Failed to fetch fields, fetching layers instead", error);
-
           const wmsLayersRequest: MapFeatureRequest = {
             uuid: collection.id,
           };
@@ -482,21 +482,21 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               if (layers && layers.length > 0) {
                 setSelectedWmsLayer(formWmsLayerOptions(layers)[0].value || "");
                 setWmsLayers(formWmsLayerOptions(layers));
+                setIsLoadingWmsFields(false);
               }
-              setMapLoading?.(false);
             })
-            .catch((layerError) => {
-              console.error("Failed to fetch layers", layerError);
-              setMapLoading?.(false);
+            .catch((error) => {
+              console.log("Failed to fetch layers, ok to ignore", error);
+              setIsLoadingWmsFields(false);
             });
         } else {
-          console.error("Failed to fetch fields", error);
+          console.error("Failed to fetch fields, ok to ignore", error);
         }
       })
       .finally(() => {
-        setIsLoadingWmsFields(false);
+        setMapLoading?.(false);
       });
-    //Only listen to collection change
+    // Only listen to collection change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, collection]);
 
