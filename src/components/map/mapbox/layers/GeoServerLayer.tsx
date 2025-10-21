@@ -63,7 +63,6 @@ const DEFAULT_WMS_MAP_CONFIG: GeoServerLayerConfig = {
     BBOX: "{bbox-epsg-3857}",
   },
   uuid: "",
-  // baseUrl: "",
   tileSize: 256,
   minZoom: MapDefaultConfig.MIN_ZOOM,
   maxZoom: MapDefaultConfig.MAX_ZOOM,
@@ -82,7 +81,6 @@ const getTileSourceId = (layerId: string) => `${layerId}-source`;
 const getTileLayerId = (layerId: string) => `${layerId}-tile`;
 
 const checkWMSAvailability = (
-  // baseUrl: string,
   urlConfig: UrlParams,
   onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
 ): boolean => {
@@ -121,15 +119,11 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
   const [config, isWMSAvailable] = useMemo(() => {
     const config = mergeWithDefaults(
-      // ncwms is a customise instance by IMOS in the geoserver-123, no cache server
-      // is provided in this case.
       DEFAULT_WMS_MAP_CONFIG,
       geoServerLayerConfig
     );
-    // We append cache server URL in front, if layer is not in cache server, it
-    // will fall back to the original URL.
+
     const isWMSAvailable = checkWMSAvailability(
-      // config.baseUrl,
       config.urlParams,
       onWMSAvailabilityChange
     );
@@ -137,8 +131,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   }, [geoServerLayerConfig, onWMSAvailabilityChange]);
 
   const tileUrl = useMemo(() => {
-    // We append cache server URL in front, if layer is not in cache server, it
-    // will fall back to the original URL.
     const start =
       geoServerLayerConfig?.urlParams?.START_DATE === undefined
         ? dayjs(dateDefault.min)
@@ -242,7 +234,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       cleanUp();
     };
   }, [
-    // config.baseUrl,
     config.maxZoom,
     config.minZoom,
     config.tileSize,

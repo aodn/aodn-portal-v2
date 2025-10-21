@@ -97,17 +97,6 @@ const getMinMaxDateStamps = (
   ];
 };
 
-// const getWMSServer = (collection: OGCCollection | undefined) => {
-//   const wmsServers = collection?.getWMSLinks()?.map((link) => link.href);
-//   return wmsServers && wmsServers.length > 0 ? wmsServers[0] : "";
-// };
-
-// TODO: This should be improved to handle multiple WMS layers and servers if needed.
-// const getWMSLayerNames = (collection: OGCCollection | undefined) => {
-//   const layerNames = collection?.getWMSLinks()?.map((link) => link.title);
-//   return layerNames && layerNames.length > 0 ? layerNames : [];
-// };
-
 const overallBoundingBox = (
   collection: OGCCollection | undefined
 ): Position | undefined => {
@@ -131,7 +120,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     featureCollection,
     downloadConditions,
     getAndSetDownloadConditions,
-    wmsFields,
     wmsLayers,
     isLoadingWmsLayer,
   } = useDetailPageContext();
@@ -468,7 +456,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     <GeoServerLayer
                       geoServerLayerConfig={{
                         uuid: collection.id,
-                        // baseUrl: ensureHttps(getWMSServer(collection)),
                         urlParams: {
                           LAYERS: [selectedWMSLayer],
                           START_DATE: filterStartDate,
