@@ -5,10 +5,6 @@ import {
   DownloadConditionType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
-import {
-  MapFieldResponse,
-  MapLayerResponse,
-} from "../../../components/common/store/GeoserverDefinitions";
 
 interface DetailPageContextType {
   collection: OGCCollection | undefined;
@@ -23,9 +19,6 @@ interface DetailPageContextType {
   removeDownloadCondition: (condition: IDownloadCondition) => void;
   copyToClipboard: (text: string, referenceId?: string) => Promise<void>;
   checkIfCopied: (text: string, referenceId?: string) => boolean;
-  wmsFields: MapFieldResponse[];
-  wmsLayers: MapLayerResponse[];
-  isLoadingWmsLayer: boolean;
 }
 
 const DetailPageContextDefault = {
@@ -38,9 +31,6 @@ const DetailPageContextDefault = {
   removeDownloadCondition: () => {},
   checkIfCopied: () => false,
   copyToClipboard: async () => {},
-  wmsFields: [],
-  wmsLayers: [],
-  isLoadingWmsLayer: true,
 };
 
 export const DetailPageContext = createContext<DetailPageContextType>(

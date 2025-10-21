@@ -2,8 +2,6 @@ import { useParams } from "react-router-dom";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import {
   fetchFeaturesByUuid,
-  fetchGeoServerMapFields,
-  fetchGeoServerMapLayers,
   fetchResultByUuidNoStore,
 } from "../../../components/common/store/searchReducer";
 import { DetailPageContext } from "./detail-page-context";
@@ -17,27 +15,10 @@ import {
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import useClipboard from "../../../hooks/useClipboard";
-import {
-  MapFeatureRequest,
-  MapFieldResponse,
-  MapLayerResponse,
-} from "../../../components/common/store/GeoserverDefinitions";
-import { ErrorResponse } from "../../../utils/ErrorBoundary";
 
 interface DetailPageProviderProps {
   children: ReactNode;
 }
-
-const GEOSERVER_LOADING_MESSAGES = {
-  initial: "Initializing map...",
-  fetching_layers: "Fetching available map layers...",
-  failure: "No Map Preview Available",
-};
-
-const getWMSLayerNames = (collection: OGCCollection | undefined) => {
-  const layerNames = collection?.getWMSLinks()?.map((link) => link.title);
-  return layerNames && layerNames.length > 0 ? layerNames : [];
-};
 
 export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   children,
@@ -56,13 +37,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [downloadConditions, _setDownloadConditions] = useState<
     IDownloadCondition[]
   >([]);
-  const [wmsLayers, setMwsLayers] = useState<MapLayerResponse[]>([]);
-  const [wmsFields, setWmsFields] = useState<MapFieldResponse[]>([]);
-  const [isLoadingWmsLayer, setIsLoadingWmsLayer] = useState<boolean>(true);
-  const [isLoadingWmsFields, setIsLoadingWmsFields] = useState(false);
-  // TODO: implement later
-  const [geoServerLoadingMessage, setGeoServerLoadingMessage] =
-    useState<string>("");
 
   const getAndSetDownloadConditions = useCallback(
     (
@@ -119,57 +93,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       });
   }, [dispatch, uuid]);
 
-  // call wms_download_fields first to get wms selector fields
-  // if it doesn't work that means the wms link is invalid (invalid server url or layerName)
-  // in this case we will call wms_layers to get all the possible layers
-  // once get the all the layers we will use the correct layerName to for wms_download_fields, wms_map_tile and wms_map_feature
-  useEffect(() => {
-    if (!uuid || !collection || isLoadingWmsFields) return;
-
-    const layerName = getWMSLayerNames(collection)?.[0] || "";
-
-    const wmsFieldsRequest: MapFeatureRequest = {
-      uuid: uuid,
-      layerName: layerName,
-    };
-    setIsLoadingWmsFields(true);
-    dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
-      .unwrap()
-      .then((fields) => {
-        setWmsFields(fields);
-        setIsLoadingWmsLayer(false);
-      })
-      .catch((error: ErrorResponse) => {
-        console.log("error fetching fields, error:", error.statusCode);
-        // For now only catch 404 error for further fetching layers
-        // TODO: we could fetch layers even there is no error to find all wms layers that support wfs download
-        if (error.statusCode === 404) {
-          console.log("Failed to fetch fields, fetching layers instead", error);
-
-          const wmsLayersRequest: MapFeatureRequest = {
-            uuid: uuid,
-          };
-
-          dispatch(fetchGeoServerMapLayers(wmsLayersRequest))
-            .unwrap()
-            .then((layers) => {
-              setMwsLayers(layers);
-              setIsLoadingWmsLayer(false);
-            })
-            .catch((layerError) => {
-              console.error("Failed to fetch layers", layerError);
-              setIsLoadingWmsLayer(false);
-            });
-        } else {
-          console.error("Failed to fetch fields", error);
-        }
-      })
-      .finally(() => {
-        setIsLoadingWmsFields(false);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, uuid, collection]);
-
   return (
     <DetailPageContext.Provider
       value={{
@@ -182,9 +105,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         removeDownloadCondition,
         checkIfCopied,
         copyToClipboard,
-        wmsFields,
-        wmsLayers,
-        isLoadingWmsLayer,
       }}
     >
       {children}

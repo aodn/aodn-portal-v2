@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Grid, LinearProgress, Stack, Typography } from "@mui/material";
-import { borderRadius, padding } from "../../../../styles/constants";
+import { Box, Grid, Stack } from "@mui/material";
+import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import Controls from "../../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
@@ -34,7 +34,6 @@ import MapLayerSwitcher, {
   LayerSwitcherLayer,
   MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-// import { ensureHttps } from "../../../../utils/UrlUtils";
 import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import {
   DatasetType,
@@ -43,8 +42,6 @@ import {
 import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
-import DownloadSelect from "../side-cards/download-card/components/DownloadSelect";
-import rc8Theme from "../../../../styles/themeRC8";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -120,39 +117,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     featureCollection,
     downloadConditions,
     getAndSetDownloadConditions,
-    wmsLayers,
-    isLoadingWmsLayer,
   } = useDetailPageContext();
-
-  const wmsLayersOptions = useMemo(() => {
-    if (!wmsLayers || wmsLayers.length === 0) {
-      return [];
-    }
-    return wmsLayers.map((layer) => ({
-      value: layer.name,
-      label: layer.title,
-    }));
-  }, [wmsLayers]);
-
-  const wmsLinksOptions = useMemo(() => {
-    const wmsLinks = collection?.getWMSLinks();
-    if (!wmsLinks || wmsLinks.length === 0) {
-      return [];
-    }
-    return wmsLinks.map((link) => ({
-      value: link.title,
-      label: link.title,
-    }));
-  }, [collection]);
 
   // Need to init with null as collection value can be undefined when it entered this component.
   const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(null);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
-  const [selectedWMSLayer, setSelectedWMSLayer] = useState<string>(
-    wmsLayersOptions?.[0]?.value || wmsLinksOptions?.[0]?.value || ""
-  );
 
   const abstract = useMemo(
     () => collection?.getEnhancedDescription() || collection?.description || "",
@@ -318,19 +289,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     }
   }, [featureCollection, filterEndDate, filterStartDate]);
 
-  const handleSelectWMSLayer = useCallback((value: string) => {
-    setSelectedWMSLayer(value);
-  }, []);
-
-  useEffect(() => {
-    if (wmsLayersOptions && wmsLayersOptions.length > 0) {
-      setSelectedWMSLayer(wmsLayersOptions[0].value);
-    }
-    if (wmsLayersOptions.length === 0 && wmsLinksOptions.length > 0) {
-      setSelectedWMSLayer(wmsLinksOptions[0].value);
-    }
-  }, [wmsLayersOptions, wmsLinksOptions]);
-
   const handleMapChange = useCallback((event: MapEvent | undefined) => {
     // implement later
     console.log("Map change event", event);
@@ -455,9 +413,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                     <GeoServerLayer
                       geoServerLayerConfig={{
-                        uuid: collection.id,
                         urlParams: {
-                          LAYERS: [selectedWMSLayer],
                           START_DATE: filterStartDate,
                           END_DATE: filterEndDate,
                         },
@@ -465,6 +421,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
                       visible={selectedLayer === LayerName.GeoServer}
                       setTimeSliderSupport={setTimeSliderSupport}
+                      collection={collection}
                     />
                     <GeojsonLayer
                       collection={collection}
@@ -474,37 +431,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 </Map>
               </Box>
             </Box>
-            {selectedLayer === LayerName.GeoServer && (
-              <Box>
-                {isLoadingWmsLayer ? (
-                  <>
-                    <Typography py={2}>Fetching Geoserver Layers...</Typography>
-                    <LinearProgress
-                      variant="indeterminate"
-                      sx={{
-                        height: 8,
-                        borderRadius: borderRadius.small,
-                        backgroundColor: rc8Theme.palette.grey[300],
-                        "& .MuiLinearProgress-bar": {
-                          backgroundColor: rc8Theme.palette.primary.main,
-                        },
-                      }}
-                    />
-                  </>
-                ) : (
-                  <DownloadSelect
-                    items={
-                      wmsLayersOptions.length > 0
-                        ? wmsLayersOptions
-                        : wmsLinksOptions
-                    }
-                    label="Map Layers"
-                    value={selectedWMSLayer}
-                    onSelectCallback={handleSelectWMSLayer}
-                  />
-                )}
-              </Box>
-            )}
           </Stack>
         </Grid>
       </Grid>

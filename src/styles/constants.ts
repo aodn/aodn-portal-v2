@@ -163,6 +163,7 @@ const filterList = {
 
 const zIndex = {
   MAP_COORD: 1,
+  MAP_POPUP: 5,
   FILTER_MODAL: 9,
   FILTER_OVERLAY: 10,
   header: 100,

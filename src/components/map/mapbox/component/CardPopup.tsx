@@ -176,7 +176,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
         height: "100%",
         width: "100%",
         pointerEvents: "none", // Forward all event to behind
-        zIndex: zIndex["MAP_COORD"],
+        zIndex: zIndex.MAP_POPUP,
       }}
     >
       <Card
