@@ -46,7 +46,7 @@ import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer"
 const mapContainerId = "map-detail-container-id";
 
 interface SummaryAndDownloadPanelProps {
-  bbox?: LngLatBounds;
+  mapFocusArea?: LngLatBounds;
 }
 
 const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
@@ -107,7 +107,7 @@ const getWMSLayerNames = (collection: OGCCollection | undefined) => {
 };
 
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
-  bbox,
+  mapFocusArea,
 }) => {
   const {
     collection,
@@ -331,7 +331,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 }}
               >
                 <Map
-                  bbox={bbox}
+                  bbox={mapFocusArea}
                   animate={false}
                   panelId={mapContainerId}
                   projection={"mercator"} // Hexbin support this project or globe only

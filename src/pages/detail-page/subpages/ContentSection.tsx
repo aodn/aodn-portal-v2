@@ -59,7 +59,7 @@ const summaryAndDownloadPanelTab = (
   return {
     label: "Summary",
     value: detailPageDefault.SUMMARY,
-    component: <SummaryAndDownloadPanel bbox={mapFocusArea} />,
+    component: <SummaryAndDownloadPanel mapFocusArea={mapFocusArea} />,
   };
 };
 
