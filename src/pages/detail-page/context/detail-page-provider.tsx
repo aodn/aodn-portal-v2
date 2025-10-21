@@ -37,6 +37,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [downloadConditions, _setDownloadConditions] = useState<
     IDownloadCondition[]
   >([]);
+  const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>("");
 
   const getAndSetDownloadConditions = useCallback(
     (
@@ -105,6 +106,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         removeDownloadCondition,
         checkIfCopied,
         copyToClipboard,
+        selectedWmsLayer,
+        setSelectedWmsLayer,
       }}
     >
       {children}

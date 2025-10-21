@@ -1,4 +1,12 @@
-import { FC, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
@@ -60,6 +68,7 @@ interface GeoServerLayerConfig {
 interface GeoServerLayerProps extends LayerBasicType {
   geoServerLayerConfig?: Partial<GeoServerLayerConfig>;
   onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
+  onWmsLayerChange?: (wmsLayerName: string) => void;
 }
 
 // Example url for mapbox wms resource: "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256"
@@ -134,16 +143,17 @@ const formWmsLinkOptions = (layers: ILink[] | undefined): SelectItem[] => {
 
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
   geoServerLayerConfig,
-  onWMSAvailabilityChange,
   visible,
-  setTimeSliderSupport,
   collection,
+  onWMSAvailabilityChange,
+  onWmsLayerChange,
+  setTimeSliderSupport,
 }: GeoServerLayerProps) => {
   const { map, setLoading: setMapLoading } = useContext(MapContext);
   const dispatch = useAppDispatch();
   const popupRef = useRef<Popup | null>();
   const popupRootRef = useRef<Root | null>();
-  const [isLoadingWmsFields, setIsLoadingWmsFields] = useState(false);
+  const [isFetchingWmsLayers, setIsFetchingWmsLayers] = useState(false);
   const [wmsLayers, setWmsLayers] = useState<SelectItem<string>[]>([]);
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>(""); // Only handle single wms layer for now. Could be extended to multi-layer in multi-select in future
 
@@ -163,7 +173,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     const isWMSAvailable = checkWMSAvailability(
       config.urlParams,
-      () => setIsLoadingWmsFields(false),
+      () => setIsFetchingWmsLayers(false),
       onWMSAvailabilityChange
     );
     return [config, isWMSAvailable];
@@ -202,6 +212,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.urlParams.START_DATE,
     config.uuid,
   ]);
+
+  const handleWmsLayerChange = useCallback(
+    (value: string) => {
+      setSelectedWmsLayer(value);
+      onWmsLayerChange?.(value);
+    },
+    [onWmsLayerChange]
+  );
 
   // Add the tile layer to the map
   useEffect(() => {
@@ -444,7 +462,17 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   // in this case we will call wms_layers to get all the possible layers
   // once get the all the layers we will use the correct layerName to for wms_download_fields, wms_map_tile and wms_map_feature
   useEffect(() => {
-    if (!collection || isLoadingWmsFields) return;
+    if (!collection || isFetchingWmsLayers) return;
+
+    setIsFetchingWmsLayers(true);
+    setMapLoading?.(true);
+
+    const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
+    if (wmsLinksOptions && wmsLinksOptions.length > 0) {
+      handleWmsLayerChange(wmsLinksOptions[0].value);
+      setWmsLayers(wmsLinksOptions);
+    }
+
     const layerName = getWmsLayerNames(collection)?.[0] || "";
 
     const wmsFieldsRequest: MapFeatureRequest = {
@@ -452,26 +480,16 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       layerName: layerName,
     };
 
-    const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
-    if (wmsLinksOptions && wmsLinksOptions.length > 0) {
-      setSelectedWmsLayer(wmsLinksOptions[0].value);
-      setWmsLayers(wmsLinksOptions);
-    }
-
-    setIsLoadingWmsFields(true);
-    setMapLoading?.(true);
-
     dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
       .unwrap()
-      .then((fields) => {
+      .then(() => {
         // Successfully fetched fields, loading is complete
-        setIsLoadingWmsFields(false);
+        setIsFetchingWmsLayers(false);
       })
       .catch((error: ErrorResponse) => {
         // For now only catch 404 error for further fetching layers
         // TODO: we could fetch layers even there is no error to find all wms layers that support wfs download
         if (error.statusCode === 404) {
-          console.log("Failed to fetch fields, fetching layers instead", error);
           const wmsLayersRequest: MapFeatureRequest = {
             uuid: collection.id,
           };
@@ -480,17 +498,19 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             .unwrap()
             .then((layers) => {
               if (layers && layers.length > 0) {
-                setSelectedWmsLayer(formWmsLayerOptions(layers)[0].value || "");
+                handleWmsLayerChange(
+                  formWmsLayerOptions(layers)[0].value || ""
+                );
                 setWmsLayers(formWmsLayerOptions(layers));
-                setIsLoadingWmsFields(false);
+                setIsFetchingWmsLayers(false);
               }
             })
             .catch((error) => {
               console.log("Failed to fetch layers, ok to ignore", error);
-              setIsLoadingWmsFields(false);
+              setIsFetchingWmsLayers(false);
             });
         } else {
-          console.error("Failed to fetch fields, ok to ignore", error);
+          console.log("Failed to fetch fields, ok to ignore", error);
         }
       })
       .finally(() => {
@@ -500,14 +520,13 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, collection]);
 
-  console.log("isLoadingWmsFields", isLoadingWmsFields);
   return (
     <>
       <GeoserverLayerSelect
         wmsLayersOptions={wmsLayers}
         selectedWMSLayer={selectedWmsLayer}
-        handleSelectWMSLayer={(value: string) => setSelectedWmsLayer(value)}
-        isLoading={isLoadingWmsFields}
+        handleSelectWMSLayer={(value: string) => handleWmsLayerChange(value)}
+        isLoading={isFetchingWmsLayers}
       />
 
       <TestHelper

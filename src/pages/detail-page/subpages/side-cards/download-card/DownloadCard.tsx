@@ -12,6 +12,7 @@ const DownloadCard: FC = () => {
     downloadConditions,
     getAndSetDownloadConditions,
     removeDownloadCondition,
+    selectedWmsLayer,
   } = useDetailPageContext();
 
   const WFSLinks: ILink[] | undefined = collection?.getWFSLinks();
@@ -36,6 +37,7 @@ const DownloadCard: FC = () => {
         <DownloadWFSCard
           WFSLinks={WFSLinks}
           WMSLinks={WMSLinks}
+          selectedWmsLayerName={selectedWmsLayer}
           uuid={collection?.id}
           downloadConditions={downloadConditions}
           getAndSetDownloadConditions={getAndSetDownloadConditions}

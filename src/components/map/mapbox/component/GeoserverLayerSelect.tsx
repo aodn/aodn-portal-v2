@@ -1,5 +1,12 @@
 import { FC, useMemo } from "react";
-import { Box, LinearProgress, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Divider,
+  LinearProgress,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { borderRadius, zIndex } from "../../../../styles/constants";
 import CommonSelect, {
   SelectItem,
@@ -21,14 +28,11 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
 }) => {
   const theme = useTheme();
 
-  const selectProps = useMemo(
-    () => ({
-      backgroundColor: "#fff",
-      border: "none",
-      boxShadow: theme.shadows[5],
-    }),
-    [theme]
-  );
+  const selectProps = {
+    backgroundColor: "transparent",
+    border: "none",
+    boxShadow: "unset",
+  };
 
   const menuProps = useMemo(
     () => ({
@@ -55,10 +59,12 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
       id="geoserver-layer-select-container"
       sx={{
         width: "auto",
+        maxWidth: "100%",
         position: "absolute",
-        bottom: 0,
+        top: 0,
+        left: "40px",
         zIndex: zIndex.MAP_POPUP,
-        padding: "8px",
+        padding: "10px",
       }}
     >
       {isLoading ? (
@@ -77,14 +83,43 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
           />
         </>
       ) : wmsLayersOptions.length > 0 ? (
-        <CommonSelect
-          items={wmsLayersOptions}
-          label="Map Layers"
-          value={selectedWMSLayer}
-          onSelectCallback={handleSelectWMSLayer}
-          menuProps={menuProps}
-          selectSx={selectProps}
-        />
+        <Stack
+          direction="row"
+          sx={{
+            backgroundColor: "#fff",
+            border: "none",
+            borderRadius: borderRadius.small,
+            boxShadow: theme.shadows[5],
+            alignContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            sx={{
+              ...rc8Theme.typography.body1Medium,
+              pt: 0,
+              px: "12px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Dataset Selection
+          </Typography>
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={{
+              bgcolor: rc8Theme.palette.grey600,
+              my: "6px",
+            }}
+          />
+          <CommonSelect
+            items={wmsLayersOptions}
+            value={selectedWMSLayer}
+            onSelectCallback={handleSelectWMSLayer}
+            menuProps={menuProps}
+            selectSx={selectProps}
+          />
+        </Stack>
       ) : null}
     </Box>
   );

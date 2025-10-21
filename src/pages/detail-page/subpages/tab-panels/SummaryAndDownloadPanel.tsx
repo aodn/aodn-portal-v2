@@ -117,6 +117,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     featureCollection,
     downloadConditions,
     getAndSetDownloadConditions,
+    setSelectedWmsLayer,
   } = useDetailPageContext();
 
   // Need to init with null as collection value can be undefined when it entered this component.
@@ -294,7 +295,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     console.log("Map change event", event);
   }, []);
 
-  const handleGeoLayerChange = useCallback(
+  const handleMapLayerChange = useCallback(
     (id: LayerName) =>
       setSelectedLayer((v: LayerName | null) => (v !== id ? id : v)),
     []
@@ -315,6 +316,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         return [...e];
       }),
     []
+  );
+
+  const onWmsLayerChange = useCallback(
+    (wmsLayerName: string) => setSelectedWmsLayer(wmsLayerName),
+    [setSelectedWmsLayer]
   );
 
   return (
@@ -362,7 +368,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         menu={
                           <MapLayerSwitcher
                             layers={mapLayerConfig}
-                            onEvent={handleGeoLayerChange}
+                            onEvent={handleMapLayerChange}
                           />
                         }
                         visible={mapLayerConfig.length !== 0}
@@ -419,6 +425,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         },
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
+                      onWmsLayerChange={onWmsLayerChange}
                       visible={selectedLayer === LayerName.GeoServer}
                       setTimeSliderSupport={setTimeSliderSupport}
                       collection={collection}
