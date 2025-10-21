@@ -59,7 +59,7 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
       id="geoserver-layer-select-container"
       sx={{
         width: "auto",
-        maxWidth: "100%",
+        maxWidth: "70%",
         position: "absolute",
         top: 0,
         left: "40px",
@@ -68,12 +68,34 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
       }}
     >
       {isLoading ? (
-        <>
-          <Typography py={2}>Fetching Geoserver Layers...</Typography>
+        <Stack
+          direction="column"
+          sx={{
+            backgroundColor: "#fff",
+            border: "none",
+            borderRadius: borderRadius.small,
+            boxShadow: theme.shadows[5],
+            alignContent: "center",
+            alignItems: "center",
+            p: "12px",
+          }}
+          gap={1}
+        >
+          <Typography
+            sx={{
+              ...rc8Theme.typography.body1Medium,
+              p: 0,
+              px: "12px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Fetching Geoserver Layers...
+          </Typography>
           <LinearProgress
             variant="indeterminate"
             sx={{
               height: 8,
+              width: "100%",
               borderRadius: borderRadius.small,
               backgroundColor: rc8Theme.palette.grey[300],
               "& .MuiLinearProgress-bar": {
@@ -81,7 +103,7 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
               },
             }}
           />
-        </>
+        </Stack>
       ) : wmsLayersOptions.length > 0 ? (
         <Stack
           direction="row"

@@ -522,12 +522,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
   return (
     <>
-      <GeoserverLayerSelect
-        wmsLayersOptions={wmsLayers}
-        selectedWMSLayer={selectedWmsLayer}
-        handleSelectWMSLayer={(value: string) => handleWmsLayerChange(value)}
-        isLoading={isFetchingWmsLayers}
-      />
+      {visible && (
+        <GeoserverLayerSelect
+          wmsLayersOptions={wmsLayers}
+          selectedWMSLayer={selectedWmsLayer}
+          handleSelectWMSLayer={(value: string) => handleWmsLayerChange(value)}
+          isLoading={isFetchingWmsLayers}
+        />
+      )}
 
       <TestHelper
         id={map?.getContainer().id || ""}
