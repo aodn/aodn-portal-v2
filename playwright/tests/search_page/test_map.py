@@ -396,16 +396,47 @@ def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
         ),
     ],
 )
-def test_map_card_popup_download_button(
-    responsive_page: Page, data_id: str, data_lng: str, data_lat: str
+def test_map_card_popup_download_button_in_desktop(
+    desktop_page: Page, data_id: str, data_lng: str, data_lat: str
 ) -> None:
     """
     Validates that clicking the download button in the map card popup opens the detail page
     and then clicking the return button navigates back to the search page.
     """
-    landing_page = LandingPage(responsive_page)
-    search_page = SearchPage(responsive_page)
-    detail_page = DetailPage(responsive_page)
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+    detail_page = DetailPage(desktop_page)
+
+    landing_page.load()
+    landing_page.search.fill_search_text(data_id)
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    search_page.map.center_map(data_lng, data_lat)
+    search_page.map.hover_map()
+
+    search_page.result_card_download_button.last.click()
+
+    detail_page.return_button.click()
+    expect(search_page.main_map).to_be_visible()
+
+
+@pytest.mark.parametrize(
+    'data_id',
+    [
+        '19da2ce7-138f-4427-89de-a50c724f5f54',
+    ],
+)
+def test_map_card_popup_download_button_in_mobile(
+    mobile_page: Page, data_id: str
+) -> None:
+    """
+    Validates that clicking the download button in the map card popup opens the detail page
+    and then clicking the return button navigates back to the search page.
+    """
+    landing_page = LandingPage(mobile_page)
+    search_page = SearchPage(mobile_page)
+    detail_page = DetailPage(mobile_page)
 
     landing_page.load()
     landing_page.search.fill_search_text(data_id)
@@ -414,11 +445,9 @@ def test_map_card_popup_download_button(
 
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
+    search_page.map.wait_for_map_loading()
 
-    search_page.map.zoom_to_level(zoom_level=7)
-    search_page.map.center_map(data_lng, data_lat)
-    search_page.map.hover_map()
-    search_page.map.click_map()
+    search_page.map.find_and_click_data_point(data_id)
     search_page.result_card_download_button.last.click()
 
     detail_page.return_button.click()

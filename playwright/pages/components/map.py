@@ -213,3 +213,9 @@ class Map(BasePage):
             self.page, 'getMapClickLngLat', self.map_id
         )
         return dict(click_coordinate)
+
+    def find_and_click_data_point(self, uuid: str) -> bool:
+        """Find and click on a data point on the map"""
+        return execute_map_js(
+            self.page, 'findAndClickDataPoint', self.map_id, uuid
+        )

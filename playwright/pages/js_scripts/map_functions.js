@@ -116,4 +116,21 @@ window.__map_functions = {
   getMapClickLngLat: function (mapId) {
     return this.getTestProps(mapId).getMapClickLngLat();
   },
+  findAndClickDataPoint: function (mapId, uuid) {
+    const map = this.getMap(mapId);
+    const featuresArray = map.queryRenderedFeatures();
+    const feature = featuresArray.find((f) => f.properties.uuid === uuid);
+    if (feature) {
+      const coordinates = feature.geometry.coordinates;
+      const point = map.project(coordinates);
+      map.fire("click", {
+        lngLat: coordinates,
+        point: point,
+        originalEvent: { preventDefault: () => {} },
+      });
+
+      return true;
+    }
+    return false;
+  },
 };
