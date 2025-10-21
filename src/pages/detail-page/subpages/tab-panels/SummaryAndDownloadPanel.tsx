@@ -25,7 +25,7 @@ import {
   DownloadConditionType,
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
-import { FeatureCollection, Point, Position } from "geojson";
+import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer from "../../../../components/map/mapbox/layers/GeoServerLayer";
@@ -35,7 +35,6 @@ import MapLayerSwitcher, {
   MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { ensureHttps } from "../../../../utils/UrlUtils";
-import { MapDefaultConfig } from "../../../../components/map/mapbox/constants";
 import {
   DatasetType,
   OGCCollection,
@@ -47,7 +46,7 @@ import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer"
 const mapContainerId = "map-detail-container-id";
 
 interface SummaryAndDownloadPanelProps {
-  bbox?: LngLatBounds;
+  mapFocusArea?: LngLatBounds;
 }
 
 const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
@@ -107,23 +106,8 @@ const getWMSLayerNames = (collection: OGCCollection | undefined) => {
   return layerNames && layerNames.length > 0 ? layerNames : [];
 };
 
-const overallBoundingBox = (
-  collection: OGCCollection | undefined
-): Position | undefined => {
-  const bbox = collection?.getBBox();
-  if (!bbox || !bbox[0] || bbox[0].length !== 4) {
-    return [
-      MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON,
-      MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT,
-      MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
-      MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
-    ];
-  }
-  return bbox[0];
-};
-
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
-  bbox,
+  mapFocusArea,
 }) => {
   const {
     collection,
@@ -347,7 +331,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 }}
               >
                 <Map
-                  bbox={bbox}
+                  bbox={mapFocusArea}
                   animate={false}
                   panelId={mapContainerId}
                   projection={"mercator"} // Hexbin support this project or globe only
@@ -453,5 +437,5 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
 };
 
-export { getMinMaxDateStamps, overallBoundingBox };
+export { getMinMaxDateStamps };
 export default SummaryAndDownloadPanel;
