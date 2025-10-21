@@ -45,6 +45,15 @@ describe("AssociatedRecordsPanel", async () => {
       useParams: vi.fn(),
     }));
 
+    openSpy = vi
+      .spyOn(window, "open")
+      .mockImplementation((url, target, features) => {
+        console.log(`spy open window called ${url} ${target} ${features}`);
+        return null;
+      });
+  });
+
+  it("should render AssociatedRecordsPanel", () => {
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",
@@ -57,13 +66,6 @@ describe("AssociatedRecordsPanel", async () => {
       uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
     });
 
-    openSpy = vi
-      .spyOn(window, "open")
-      .mockImplementation((url, target, features) => {
-        console.log(`spy open window called ${url} ${target} ${features}`);
-        return null;
-      });
-
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -73,9 +75,7 @@ describe("AssociatedRecordsPanel", async () => {
         </ThemeProvider>
       </Provider>
     );
-  });
 
-  it("should render AssociatedRecordsPanel", () => {
     return waitFor(() => screen.findAllByText("Parent Record"), {
       timeout: 2000,
     }).then(() => {
@@ -86,6 +86,28 @@ describe("AssociatedRecordsPanel", async () => {
   });
 
   it("should open a new tab when clicking on a record abstract", () => {
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DetailPageProvider>
+            <AssociatedRecordsPanel />
+          </DetailPageProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+
     return waitFor(
       () =>
         screen.findAllByText(
@@ -124,6 +146,28 @@ describe("AssociatedRecordsPanel", async () => {
   });
 
   it("should be able to show / hide more records", async () => {
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DetailPageProvider>
+            <AssociatedRecordsPanel />
+          </DetailPageProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+
     const lowerRecordTitle =
       "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
 
@@ -167,5 +211,38 @@ describe("AssociatedRecordsPanel", async () => {
       },
       { timeout: 5000 }
     );
+  });
+
+  it("should render AssociatedRecordsPanel with malform associated links", () => {
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details/0145df96-3847-474b-8b63-a66f0e03ff54",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "0145df96-3847-474b-8b63-a66f0e03ff54",
+    });
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DetailPageProvider>
+            <AssociatedRecordsPanel />
+          </DetailPageProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    return waitFor(() => screen.findAllByText("Parent Record"), {
+      timeout: 2000,
+    }).then(() => {
+      // There are some malform json in the associated links, we make sure parse error will not
+      // cause the whole page to die, so as long as we get Parent Record, we know we handled the error
+      const parentRecordText = screen.queryAllByText("Parent Record");
+      expect(parentRecordText).toHaveLength(2);
+    });
   });
 });

@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { PARAMETER_VOCABS } from "./data/PARAMETER_VOCABS";
 import { COLLECTIONS_WAVE } from "./data/COLLECTIONS_WAVE";
+import { COLLECTIONS_MALFORM_RELATED } from "./data/COLLECTIONS_MALFORM_RELATED";
 import { COLLECTIONS_ITEM_SUMMARY } from "./data/COLLECTIONS_ITEM_SUMMARY";
 import {
   COLLECTIONS_IMOS_PAGE1,
@@ -63,6 +64,10 @@ export const handlers = [
 
     if (uuid === NORMAL_COLLECTION.id) {
       return HttpResponse.json(NORMAL_COLLECTION);
+    }
+
+    if (uuid === COLLECTIONS_MALFORM_RELATED.id) {
+      return HttpResponse.json(COLLECTIONS_MALFORM_RELATED);
     }
 
     if (uuid == NORMAL_COLLECTION.id + "emptyabout") {

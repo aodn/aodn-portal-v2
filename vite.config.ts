@@ -58,6 +58,29 @@ export default ({ mode }) => {
     };
   };
 
+  const inlineSEOPlugin = () => {
+    return {
+      name: "inline-seo",
+      transformIndexHtml(html) {
+        const canonicalUrl = "https://portal-beta.aodn.org.au/";
+
+        const seoTags = `
+          <!-- SEO: Canonical URL points all environments to production -->
+
+          <!-- Bing Webmaster Tools Verification -->
+          <meta name="msvalidate.01" content="02593ED7942BD40F39C6E03B5EF2265E" />
+
+          <!-- Canonical URL: All environments point to production for SEO consolidation -->
+          <link rel="canonical" href="${canonicalUrl}" />
+
+          <!-- End SEO -->
+        `;
+
+        return html.replace("<!-- seo-tags -->", seoTags);
+      },
+    };
+  };
+
   return defineConfig({
     server: {
       watch: {
@@ -92,6 +115,7 @@ export default ({ mode }) => {
         eslint({ exclude: ["/virtual:/**", "node_modules/**"] }),
       inlineNewRelicPlugin(),
       inlineGoogleAnalyticsPlugin(),
+      inlineSEOPlugin(),
     ].filter(Boolean),
     build: {
       outDir: "dist",
