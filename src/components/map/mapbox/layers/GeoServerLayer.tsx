@@ -426,17 +426,26 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             if (visible) {
               setMapLoading?.(true);
               map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
-              const request: MapFeatureRequest = {
-                uuid: config.uuid || "",
-                layerName: config.urlParams.LAYERS?.join(",") || "",
-              };
-              dispatch(fetchGeoServerMapFields(request))
-                .unwrap()
-                .then((value) => {
-                  const found = value.find((v) => v.type === "dateTime");
-                  setTimeSliderSupport?.(found !== undefined);
-                })
-                .finally(() => setMapLoading?.(false));
+              const layerName = config.urlParams.LAYERS?.join(",") || "";
+
+              // Check time slider support - only fetch fields if we have a valid layer name
+              if (layerName && layerName.trim() !== "") {
+                const request: MapFeatureRequest = {
+                  uuid: config.uuid || "",
+                  layerName: layerName,
+                };
+                dispatch(fetchGeoServerMapFields(request))
+                  .unwrap()
+                  .then((value) => {
+                    const found = value.find((v) => v.type === "dateTime");
+                    setTimeSliderSupport?.(found !== undefined);
+                  })
+                  .finally(() => setMapLoading?.(false));
+              } else {
+                // If no valid layer name, just set loading to false and assume no time slider support
+                setTimeSliderSupport?.(false);
+                setMapLoading?.(false);
+              }
             }
           }
         }
