@@ -172,9 +172,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       }
 
       if (!hasDownloadService && hasSpatialExtent) {
-        layers.push(MapLayers[LayerName.SpatialExtent]);
+        layers.push({
+          ...MapLayers[LayerName.SpatialExtent],
+          default: true,
+        });
       }
     }
+
     return layers;
   }, [
     collection,
@@ -191,9 +195,14 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         (layer) => layer.id === selectedLayer
       );
 
-      if (!isCurrentLayerValid || selectedLayer === null) {
-        // Find the default layer or use the first one
-        const defaultLayer = mapLayerConfig.find((l) => l.default);
+      // Find the default layer (if any)
+      const defaultLayer = mapLayerConfig.find((l) => l.default);
+
+      if (
+        selectedLayer === null ||
+        !isCurrentLayerValid ||
+        (defaultLayer && selectedLayer !== defaultLayer.id)
+      ) {
         setSelectedLayer(defaultLayer ? defaultLayer.id : mapLayerConfig[0].id);
       }
     }
@@ -277,8 +286,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   }, []);
 
   const handleMapLayerChange = useCallback(
-    (id: LayerName) =>
-      setSelectedLayer((v: LayerName | null) => (v !== id ? id : v)),
+    (layerName: LayerName) =>
+      setSelectedLayer((prevLayerName: LayerName | null) =>
+        prevLayerName !== layerName ? layerName : prevLayerName
+      ),
     []
   );
 
@@ -407,9 +418,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }}
                       onWMSAvailabilityChange={onWMSAvailabilityChange}
                       onWmsLayerChange={onWmsLayerChange}
-                      visible={selectedLayer === LayerName.GeoServer}
                       setTimeSliderSupport={setTimeSliderSupport}
                       collection={collection}
+                      visible={selectedLayer === LayerName.GeoServer}
                     />
                     <GeojsonLayer
                       collection={collection}
