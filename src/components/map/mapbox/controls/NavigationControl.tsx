@@ -7,6 +7,8 @@ import {
 import { renderToStaticMarkup } from "react-dom/server";
 import { ZoomInIcon } from "../../../../assets/icons/map/zoom_in";
 import { ZoomOutIcon } from "../../../../assets/icons/map/zoom_out";
+import { ZoomResetIcon } from "../../../../assets/icons/map/zoom_reset";
+import { MapDefaultConfig } from "../constants";
 
 interface NavigationControlProps {
   visible?: boolean;
@@ -15,23 +17,45 @@ interface NavigationControlProps {
   visualizePitch?: boolean;
 }
 
-const zoomInSvg = encodeURIComponent(renderToStaticMarkup(<ZoomInIcon />));
-const zoomOutSvg = encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon />));
-
 class StyledNavigationControl extends MapboxNavigationControl {
+  private readonly zoomReset: HTMLButtonElement | undefined = undefined;
+  private zoomResetHandler: (event: MouseEvent) => void = () => {};
+
+  private static readonly ICON_PX = "39px";
+
   constructor(options: {
     showCompass?: boolean;
     showZoom?: boolean;
     visualizePitch?: boolean;
   }) {
     super(options); // Pass options to parent class
+    // create our own button
+    const zoomResetSpan = document.createElement("span");
+    zoomResetSpan.className = "mapbox-ctrl-icon";
+    zoomResetSpan.style.backgroundImage = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon />))}")`;
+    zoomResetSpan.ariaHidden = "true";
+    zoomResetSpan.title = "Zoom Reset";
+    zoomResetSpan.style.display = "inline-block";
+    zoomResetSpan.style.height = "100%";
+    zoomResetSpan.style.width = "100%";
+
+    this.zoomReset = document.createElement("button");
+    this.zoomReset.id = "map-zoom-reset";
+    this.zoomReset.type = "button";
+    this.zoomReset.ariaLabel = "Zoom Reset";
+    this.zoomReset.ariaHidden = "false";
+    this.zoomReset.appendChild(zoomResetSpan);
+    this.zoomReset.style.minHeight = StyledNavigationControl.ICON_PX;
+    this.zoomReset.style.minWidth = StyledNavigationControl.ICON_PX;
   }
 
   onAdd(map: Mapbox): HTMLElement {
     const container = super.onAdd(map);
     container.style.background = "none";
-    container.style.paddingBottom = "20px";
-    container.style.border = "none";
+    container.style.border = "0px";
+    container.style.borderStyle = "none";
+    container.style.boxShadow = "none";
+    container.style.gap = "20px";
 
     const zoomIn = container.querySelector(
       ".mapboxgl-ctrl-zoom-in"
@@ -44,10 +68,10 @@ class StyledNavigationControl extends MapboxNavigationControl {
 
       // Change the image to our design, hence keep function
       if (icon) {
-        icon.style.backgroundImage = `url("data:image/svg+xml;charset=utf8,${zoomInSvg}")`;
+        icon.style.backgroundImage = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomInIcon />))}")`;
       }
-      zoomIn.style.minHeight = "35px";
-      zoomIn.style.minWidth = "35px";
+      zoomIn.style.minHeight = StyledNavigationControl.ICON_PX;
+      zoomIn.style.minWidth = StyledNavigationControl.ICON_PX;
     }
 
     const zoomOut = container.querySelector(
@@ -61,10 +85,10 @@ class StyledNavigationControl extends MapboxNavigationControl {
 
       // Change the image to our design, hence keep function
       if (icon) {
-        icon.style.backgroundImage = `url("data:image/svg+xml;charset=utf8,${zoomOutSvg}")`;
+        icon.style.backgroundImage = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon />))}")`;
       }
-      zoomOut.style.minHeight = "35px";
-      zoomOut.style.minWidth = "35px";
+      zoomOut.style.minHeight = StyledNavigationControl.ICON_PX;
+      zoomOut.style.minWidth = StyledNavigationControl.ICON_PX;
     }
     // We do not need the compass
     const compass = container.querySelector(
@@ -72,10 +96,19 @@ class StyledNavigationControl extends MapboxNavigationControl {
     ) as HTMLButtonElement | null;
 
     if (compass) {
-      compass.style.height = "0px";
-      compass.style.visibility = "none";
+      container.removeChild(compass);
     }
+
+    // Now add our own element
+    container.appendChild(this.zoomReset!);
+    this.zoomResetHandler = () => map.zoomTo(MapDefaultConfig.ZOOM);
+    this.zoomReset?.addEventListener("click", this.zoomResetHandler);
+
     return container;
+  }
+
+  onRemove() {
+    this.zoomReset?.removeEventListener("click", this.zoomResetHandler!);
   }
 }
 

@@ -21,6 +21,7 @@ export const ZoomOutIcon = () => (
         width="38.7884"
         height="38.7884"
         filterUnits="userSpaceOnUse"
+        colorInterpolationFilters="sRGB"
       >
         <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix
