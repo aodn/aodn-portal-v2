@@ -52,12 +52,14 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.zoomReset.appendChild(zoomResetSpan);
     this.zoomReset.style.minHeight = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.minWidth = StyledNavigationControl.ICON_PX;
+    this.zoomReset.style.borderTop = "0px";
   }
 
   onAdd(map: Mapbox): HTMLElement {
     const container = super.onAdd(map) as HTMLDivElement;
     container.id = CONTAINER_MAP_ZOOM_ID;
     container.style.cssText = `
+      align-content: left;
       border: 0 !important;
       border-radius: 0 !important;
       border-style: none !important;
@@ -81,6 +83,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
       }
       zoomIn.style.minHeight = StyledNavigationControl.ICON_PX;
       zoomIn.style.minWidth = StyledNavigationControl.ICON_PX;
+      zoomIn.style.borderTop = "0px";
     }
 
     const zoomOut = container.querySelector(
@@ -98,6 +101,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
       }
       zoomOut.style.minHeight = StyledNavigationControl.ICON_PX;
       zoomOut.style.minWidth = StyledNavigationControl.ICON_PX;
+      zoomOut.style.borderTop = "0px";
     }
 
     // Now add our own element
