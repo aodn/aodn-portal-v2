@@ -17,6 +17,8 @@ interface NavigationControlProps {
   visualizePitch?: boolean;
 }
 
+const CONTAINER_MAP_ZOOM_ID = "map-zoom-reset";
+
 class StyledNavigationControl extends MapboxNavigationControl {
   private readonly zoomReset: HTMLButtonElement | undefined = undefined;
   private map: Mapbox | undefined = undefined;
@@ -54,6 +56,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
 
   onAdd(map: Mapbox): HTMLElement {
     const container = super.onAdd(map) as HTMLDivElement;
+    container.id = CONTAINER_MAP_ZOOM_ID;
     container.style.cssText = `
       border: 0 !important;
       border-radius: 0 !important;
@@ -104,7 +107,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
 
     this.zoomButtonDisable = () => {
       container.style.pointerEvents = "none";
-      container.style.opacity = "0.7";
+      container.style.opacity = "0.8";
     };
 
     this.zoomButtonEnable = () => {
@@ -158,25 +161,12 @@ const NavigationControl = ({
   }, [map, showCompass, showZoom, visualizePitch]);
 
   useEffect(() => {
-    const zoomIn: HTMLButtonElement | null = document.querySelector(
-      ".mapboxgl-ctrl-zoom-in"
-    );
-    if (zoomIn) {
-      zoomIn.style.display = visible ? "block" : "none";
-    }
+    const container: HTMLButtonElement | null = document.getElementById(
+      CONTAINER_MAP_ZOOM_ID
+    ) as HTMLButtonElement;
 
-    const zoomOut: HTMLButtonElement | null = document.querySelector(
-      ".mapboxgl-ctrl-zoom-out"
-    );
-    if (zoomOut) {
-      zoomOut.style.display = visible ? "block" : "none";
-    }
-
-    const compass: HTMLButtonElement | null = document.querySelector(
-      ".mapboxgl-ctrl-compass"
-    );
-    if (compass) {
-      compass.style.display = visible ? "block" : "none";
+    if (container) {
+      container.style.display = visible ? "block" : "none";
     }
   }, [visible]);
   return <React.Fragment />;
