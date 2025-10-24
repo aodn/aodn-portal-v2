@@ -19,7 +19,10 @@ interface NavigationControlProps {
 
 class StyledNavigationControl extends MapboxNavigationControl {
   private readonly zoomReset: HTMLButtonElement | undefined = undefined;
+  private map: Mapbox | undefined = undefined;
   private zoomResetHandler: (event: MouseEvent) => void = () => {};
+  private zoomButtonDisable: () => void = () => {};
+  private zoomButtonEnable: () => void = () => {};
 
   private static readonly ICON_PX = "39px";
 
@@ -42,7 +45,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.zoomReset = document.createElement("button");
     this.zoomReset.id = "map-zoom-reset";
     this.zoomReset.type = "button";
-    this.zoomReset.ariaLabel = "Zoom Reset";
+    this.zoomReset.ariaLabel = "Zoom reset";
     this.zoomReset.ariaHidden = "false";
     this.zoomReset.appendChild(zoomResetSpan);
     this.zoomReset.style.minHeight = StyledNavigationControl.ICON_PX;
@@ -50,12 +53,15 @@ class StyledNavigationControl extends MapboxNavigationControl {
   }
 
   onAdd(map: Mapbox): HTMLElement {
-    const container = super.onAdd(map);
-    container.style.background = "none";
-    container.style.border = "0px";
-    container.style.borderStyle = "none";
-    container.style.boxShadow = "none";
-    container.style.gap = "20px";
+    const container = super.onAdd(map) as HTMLDivElement;
+    container.style.cssText = `
+      border: 0 !important;
+      border-radius: 0 !important;
+      border-style: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      gap: 20px
+    `;
 
     const zoomIn = container.querySelector(
       ".mapboxgl-ctrl-zoom-in"
@@ -90,31 +96,41 @@ class StyledNavigationControl extends MapboxNavigationControl {
       zoomOut.style.minHeight = StyledNavigationControl.ICON_PX;
       zoomOut.style.minWidth = StyledNavigationControl.ICON_PX;
     }
-    // We do not need the compass
-    const compass = container.querySelector(
-      ".mapboxgl-ctrl-compass"
-    ) as HTMLButtonElement | null;
-
-    if (compass) {
-      container.removeChild(compass);
-    }
 
     // Now add our own element
     container.appendChild(this.zoomReset!);
     this.zoomResetHandler = () => map.zoomTo(MapDefaultConfig.ZOOM);
     this.zoomReset?.addEventListener("click", this.zoomResetHandler);
 
+    this.zoomButtonDisable = () => {
+      container.style.pointerEvents = "none";
+      container.style.opacity = "0.7";
+    };
+
+    this.zoomButtonEnable = () => {
+      container.style.pointerEvents = "auto";
+      container.style.opacity = "1";
+    };
+
+    map.on("zoomstart", this.zoomButtonDisable);
+    map.on("zoomend", this.zoomButtonEnable);
+
+    this.zoomButtonDisable();
+    this.map = map;
     return container;
   }
 
   onRemove() {
+    super.onRemove();
     this.zoomReset?.removeEventListener("click", this.zoomResetHandler!);
+    this.map?.off("zoomstart", this.zoomButtonDisable);
+    this.map?.off("zoomend", this.zoomButtonEnable);
   }
 }
 
 const NavigationControl = ({
   visible = true,
-  showCompass = true,
+  showCompass = false,
   showZoom = true,
   visualizePitch = true,
 }: NavigationControlProps) => {
