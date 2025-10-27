@@ -14,4 +14,5 @@ export enum AnalyticsEvent {
   WEB_VITALS_INP = "web_vitals_inp", // Interaction to Next Paint
   WEB_VITALS_CLS = "web_vitals_cls", // Cumulative Layout Shift
   DATA_ACCESS_CLICK = "data_access_click",
+  DETAILS_PAGE_DATASET = "details_page_dataset",
 }

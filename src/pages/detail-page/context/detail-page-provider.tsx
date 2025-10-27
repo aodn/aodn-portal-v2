@@ -15,6 +15,8 @@ import {
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import useClipboard from "../../../hooks/useClipboard";
+import { AnalyticsEvent } from "../../../analytics/analyticsEvents";
+import { trackCustomEvent } from "../../../analytics/customEventTracker";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -78,6 +80,13 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         }
         setCollection(collection);
         setIsCollectionNotFound(false);
+
+        // Track analytics when user views a dataset details page
+        trackCustomEvent(AnalyticsEvent.DETAILS_PAGE_DATASET, {
+          dataset_group: collection.properties?.dataset_group,
+          dataset_id: uuid,
+          dataset_title: collection.title,
+        });
       })
       .catch((error) => {
         console.log("Error fetching collection by UUID:", error);
