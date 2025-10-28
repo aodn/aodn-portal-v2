@@ -64,12 +64,16 @@ const Header: FC = () => {
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: "#fff",
-          paddingY: padding.small,
+          paddingY: padding.medium,
         }}
         contentAreaStyle={{
           flexDirection: isMobile ? "column" : "row",
-          width: isSearchResultPage ? "90%" : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
-          maxWidth: isSearchResultPage ? "90%" : PAGE_CONTENT_MAX_WIDTH,
+          width: isSearchResultPage
+            ? SEARCHBAR_CONTENT_WIDTH
+            : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+          maxWidth: isSearchResultPage
+            ? SEARCHBAR_CONTENT_WIDTH
+            : PAGE_CONTENT_MAX_WIDTH,
         }}
       >
         <Stack

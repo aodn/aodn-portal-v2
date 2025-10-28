@@ -44,7 +44,7 @@ const padding = {
 
 const fontSize = {
   AODNSiteLogoText: "17px",
-  AODNSiteLogoTextMobile: "12px",
+  AODNSiteLogoTextMobile: "14px",
   bannerTitleExtraLarge: "64px",
   bannerTitleLarge: "48px",
   bannerTitleMedium: "36px",
