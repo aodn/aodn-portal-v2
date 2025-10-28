@@ -147,16 +147,27 @@ const DrawRect: React.FC<DrawControlProps> = ({
         getAndSetDownloadConditions(DownloadConditionType.BBOX, box);
       };
 
+      const onModeChanged = (e: { mode: string }) => {
+        const isDrawing = e.mode === "draw_rectangle";
+        if (isDrawing) {
+          map.dragPan.disable(); // Optional: prevent accidental pan
+        } else {
+          map.dragPan.enable();
+        }
+      };
+
       map.addControl(mapDraw);
       map.on("draw.create", onCreateOrUpdate);
       map.on("draw.delete", onCreateOrUpdate);
       map.on("draw.update", onCreateOrUpdate);
+      map.on("draw.modechange", onModeChanged);
 
       return () => {
         try {
           map.off("draw.create", onCreateOrUpdate);
           map.off("draw.delete", onCreateOrUpdate);
           map.off("draw.update", onCreateOrUpdate);
+          map.off("draw.modechange", onModeChanged);
           map.removeControl(mapDraw);
         } catch (ignored) {
           /* can be ignored */
