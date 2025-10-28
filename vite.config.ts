@@ -81,6 +81,38 @@ export default ({ mode }) => {
     };
   };
 
+  const copyRobotsPlugin = () => {
+    return {
+      name: "copy-robots-txt",
+      // Dev server
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url === "/robots.txt") {
+            const file =
+              mode === "production" ? "robots.prod.txt" : "robots.nonprod.txt";
+            const content = fs.readFileSync(
+              path.resolve(__dirname, "public", file),
+              "utf8"
+            );
+            res.setHeader("Content-Type", "text/plain");
+            res.end(content);
+            return;
+          }
+          next();
+        });
+      },
+      // Build
+      closeBundle() {
+        const file =
+          mode === "production" ? "robots.prod.txt" : "robots.nonprod.txt";
+        fs.copyFileSync(
+          path.resolve(__dirname, "dist", file),
+          path.resolve(__dirname, "dist/robots.txt")
+        );
+      },
+    };
+  };
+
   return defineConfig({
     server: {
       watch: {
@@ -116,6 +148,7 @@ export default ({ mode }) => {
       inlineNewRelicPlugin(),
       inlineGoogleAnalyticsPlugin(),
       inlineSEOPlugin(),
+      copyRobotsPlugin(),
     ].filter(Boolean),
     build: {
       outDir: "dist",
