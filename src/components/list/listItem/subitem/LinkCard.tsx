@@ -129,7 +129,7 @@ const LinkCard: FC<LinkCardProps> = ({
               ) : (
                 <>
                   {link.title.replace(/_/g, " ")}
-                  {link.description && (
+                  {link.description && link.description !== link.title && (
                     <>
                       <br />
                       {link.description.replace(/_/g, " ")}
