@@ -43,6 +43,7 @@ import {
 } from "../../../common/store/OGCCollectionDefinitions";
 import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
+import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 
 interface UrlParams {
   LAYERS?: string[];
@@ -357,7 +358,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     };
 
     const handlePopup = (event: MapMouseEvent) => {
-      if (!map) return;
+      // If user drawing do not popup info box
+      if (!map || isDrawModeRectangle(map)) return;
 
       const request: MapFeatureRequest = {
         uuid: config.uuid || "",

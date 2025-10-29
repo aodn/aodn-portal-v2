@@ -3,6 +3,8 @@ import { Map as MapboxMap } from "mapbox-gl";
 import { Position } from "geojson";
 import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
 import { MapDefaultConfig } from "../components/map/mapbox/constants";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import { DRAW_RECTANGLE_MODE } from "../components/map/mapbox/controls/menu/DrawRect";
 
 // Constants with explanations
 /**
@@ -140,4 +142,16 @@ export const overallBoundingBox = (
     ];
   }
   return bbox[0];
+};
+/**
+ * This is use to check if map have inserted the MapboxDraw control and is current set to draw rectangle mode
+ * @param map
+ */
+export const isDrawModeRectangle = (
+  map: MapboxMap | null | undefined
+): boolean => {
+  if (!map) return false;
+  // The control is the instance we added with `map.addControl(draw)`
+  const ctrl = map._controls?.find((c: any) => c instanceof MapboxDraw);
+  return ctrl?.getMode() === DRAW_RECTANGLE_MODE;
 };

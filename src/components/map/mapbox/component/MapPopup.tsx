@@ -18,6 +18,7 @@ import { useAppDispatch } from "../../../common/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 
 interface MapPopupProps {
   layerId: string;
@@ -150,7 +151,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
       };
 
       const onPointMouseEnter = (ev: MapMouseEvent) => {
-        if (!ev.target || !map) return;
+        if (!ev.target || !map || isDrawModeRectangle(map)) return;
 
         ev.target.getCanvas().style.cursor = "pointer";
         if (ev.features && ev.features.length > 0) {
