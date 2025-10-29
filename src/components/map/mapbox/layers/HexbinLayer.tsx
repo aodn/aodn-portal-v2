@@ -9,6 +9,7 @@ import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 import { Color } from "@deck.gl/core";
 import { TestHelper } from "../../../common/test/helper";
 import { MapDefaultConfig } from "../constants";
+import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
@@ -55,7 +56,7 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
         interleaved: true,
         layers: [],
         onClick: (info) => {
-          if (info.picked && info.object) {
+          if (info.picked && info.object && !isDrawModeRectangle(map)) {
             // Remove existing popup
             if (popupRef.current) {
               popupRef.current.remove();

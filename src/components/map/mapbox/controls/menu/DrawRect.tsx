@@ -33,6 +33,7 @@ interface DrawControlProps extends ControlProps {
 
 const MENU_ID = "draw-rect-menu-button";
 const TRASH_ID = "draw-rect-trash-button";
+const DRAW_RECTANGLE_MODE = "draw_rectangle";
 
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
@@ -115,7 +116,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
   useEffect(() => {
     const modePollingInterval = setInterval(() => {
       const currentMode = mapDraw.getMode();
-      const isDrawingMode = currentMode === "draw_rectangle";
+      const isDrawingMode = currentMode === DRAW_RECTANGLE_MODE;
       setOpen(isDrawingMode);
 
       // Check if there are any features to enable/disable trash button
@@ -148,7 +149,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
       };
 
       const onModeChanged = (e: { mode: string }) => {
-        const isDrawing = e.mode === "draw_rectangle";
+        const isDrawing = e.mode === DRAW_RECTANGLE_MODE;
         if (isDrawing) {
           map.dragPan.disable(); // Optional: prevent accidental pan
         } else {
@@ -183,7 +184,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
         id={MENU_ID}
         data-testid={MENU_ID}
         ref={anchorRef}
-        onClick={() => mapDraw.changeMode("draw_rectangle")}
+        onClick={() => mapDraw.changeMode(DRAW_RECTANGLE_MODE)}
         sx={switcherIconButtonSx(open)}
       >
         <BboxSelectionIcon />
@@ -211,4 +212,5 @@ const DrawRect: React.FC<DrawControlProps> = ({
   );
 };
 
+export { DRAW_RECTANGLE_MODE };
 export default DrawRect;
