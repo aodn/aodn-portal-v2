@@ -45,6 +45,11 @@ import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 
+enum LAYER_VISIBILITY {
+  VISIBLE = "visible",
+  NONE = "none",
+}
+
 interface UrlParams {
   LAYERS?: string[];
   BBOX?: string;
@@ -241,7 +246,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       }
     };
 
-    const createLayers = () => {
+    const createLayers = (
+      visibility: LAYER_VISIBILITY = LAYER_VISIBILITY.NONE
+    ) => {
       // Check WMS availability before adding the layer
       if (isWMSAvailable) {
         // Add the raster layer, do not add any fitBounds here, it makes the map animate strange. Control it at map level
@@ -255,7 +262,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               "raster-opacity": 0.6,
             },
             layout: {
-              visibility: "none", // By default invisible
+              visibility: visibility,
             },
           });
         }
@@ -264,20 +271,13 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     const createLayersOnStyleChange = () => {
       createSource();
-      createLayers();
-      if (titleLayerId && map?.getLayer(titleLayerId)) {
-        map.setLayoutProperty(
-          titleLayerId,
-          "visibility",
-          visible ? "visible" : "none"
-        );
-      }
+      createLayers(visible ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE);
     };
 
     const createLayersOnInit = () => {
       if (map?.isStyleLoaded()) {
         createSource();
-        createLayers();
+        createLayers(); // Use default LAYER_VISIBILITY.NONE for initial creation
       }
     };
 
@@ -423,15 +423,13 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         const layer = map?.getLayer(titleLayerId);
         if (layer) {
           const vis = map.getLayoutProperty(titleLayerId, "visibility");
-          const targetVis = visible ? "visible" : "none";
+          const targetVis = visible
+            ? LAYER_VISIBILITY.VISIBLE
+            : LAYER_VISIBILITY.NONE;
 
           if (vis !== targetVis) {
             // Need update if value diff, this is used to avoid duplicate call to useEffect
-            map.setLayoutProperty(
-              titleLayerId,
-              "visibility",
-              visible ? "visible" : "none"
-            );
+            map.setLayoutProperty(titleLayerId, "visibility", targetVis);
 
             if (visible) {
               setMapLoading?.(true);
