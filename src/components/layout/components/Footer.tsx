@@ -31,6 +31,7 @@ import { scrollToTop } from "../../../utils/ScrollUtils";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../../common/constants";
 import { NorthIcon } from "../../../assets/icons/footer/arrowUp";
+import { BlueskyLogoIcon } from "../../../assets/icons/footer/bluesky";
 
 interface IconContainerProps {
   children: JSX.Element;
@@ -236,10 +237,14 @@ const Footer: FC = () => {
                 </IconButton>
                 <IconButton
                   sx={{ color: color.blue.extraDark }}
-                  aria-label="X"
-                  onClick={() => openInNewTab("https://twitter.com/IMOS_AUS")}
+                  aria-label="Bluesky"
+                  onClick={() =>
+                    openInNewTab(
+                      "https://bsky.app/profile/imos-aus.bsky.social"
+                    )
+                  }
                 >
-                  <XIcon />
+                  <BlueskyLogoIcon />
                 </IconButton>
                 <IconButton
                   sx={{ color: color.blue.extraDark }}

@@ -31,9 +31,39 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
 
+  // add datasetselection option
+  const [selectedDataItem, setSelectedDataItem] = useState<
+    string | undefined
+  >();
+
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
   }, []);
+
+  const dataSelectOptions = useMemo(() => {
+    const summaryLinks = collection?.links?.filter(
+      (link) => link.rel === "summary"
+    );
+
+    if (!summaryLinks || summaryLinks.length === 0) {
+      return [];
+    }
+
+    return summaryLinks.map((link) => ({
+      value: link.title,
+      label: link.title.replace(/\.(zarr|parquet)$/i, ""),
+    }));
+  }, [collection]);
+
+  const handleSelectDataItem = useCallback((value: string) => {
+    setSelectedDataItem(value);
+  }, []);
+
+  useEffect(() => {
+    if (dataSelectOptions.length > 0 && !selectedDataItem) {
+      setSelectedDataItem(dataSelectOptions[0].value);
+    }
+  }, [dataSelectOptions, selectedDataItem]);
 
   // Currently, csv is the best format for parquet datasets, and netcdf is the best for zarr datasets.
   // we will support more formats in the future, but for now, we filter the formats based on the dataset type.
@@ -80,6 +110,12 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
           label="Format Selection"
           items={filteredDownloadFormats}
           onSelectCallback={onSelectChange}
+        />
+        <DownloadSelect
+          label="Data Selection"
+          items={dataSelectOptions}
+          value={selectedDataItem}
+          onSelectCallback={handleSelectDataItem}
         />
         <DownloadButton onDownload={onDownload} />
       </Stack>

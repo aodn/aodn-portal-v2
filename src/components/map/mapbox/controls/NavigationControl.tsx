@@ -131,7 +131,6 @@ class StyledNavigationControl extends MapboxNavigationControl {
     map.on(MOVE_START, this.zoomButtonDisable);
     map.on(MOVE_END, this.zoomButtonEnable);
 
-    this.zoomButtonDisable();
     this.map = map;
     return this.container;
   }
@@ -191,4 +190,5 @@ const NavigationControl = ({
   return <React.Fragment />;
 };
 
+export { CONTAINER_MAP_ZOOM_ID };
 export default NavigationControl;

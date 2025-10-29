@@ -12,6 +12,7 @@ import CommonSelect, {
   SelectItem,
 } from "../../../common/dropdown/CommonSelect";
 import rc8Theme from "../../../../styles/themeRC8";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 interface GeoserverLayerSelectProps {
   wmsLayersOptions: SelectItem<string>[];
@@ -27,6 +28,7 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
   isLoading,
 }) => {
   const theme = useTheme();
+  const { isUnderLaptop } = useBreakpoint();
 
   const selectProps = {
     backgroundColor: "transparent",
@@ -62,7 +64,7 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
         maxWidth: "70%",
         position: "absolute",
         top: 0,
-        left: "40px",
+        left: `${isUnderLaptop ? "0px" : "40px"}`,
         zIndex: zIndex.MAP_BASE,
         padding: "10px",
       }}
