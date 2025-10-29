@@ -6,6 +6,7 @@ import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
+import { MOVE_END, MOVE_START, ZOOM_END, ZOOM_START } from "../Map";
 
 export interface ToggleControlProps {
   showFullMap: boolean;
@@ -47,6 +48,8 @@ class ToggleControlClass implements IControl {
   private container: HTMLDivElement | null = null;
   private root: Root | null = null;
   private props: ToggleControlProps;
+  private buttonDisable: () => void = () => {};
+  private buttonEnable: () => void = () => {};
 
   constructor(props: ToggleControlProps) {
     this.props = props;
@@ -66,11 +69,31 @@ class ToggleControlClass implements IControl {
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
     this.root = createRoot(this.container!);
     this.redraw(this.props.showFullMap);
+
+    this.buttonDisable = () => {
+      if (this.container) {
+        this.container.style.pointerEvents = "none";
+        this.container.style.opacity = "0.8";
+      }
+    };
+
+    this.buttonEnable = () => {
+      if (this.container) {
+        this.container.style.pointerEvents = "auto";
+        this.container.style.opacity = "1";
+      }
+    };
+
+    map.on(ZOOM_START, this.buttonDisable);
+    map.on(ZOOM_END, this.buttonEnable);
+
+    map.on(MOVE_START, this.buttonDisable);
+    map.on(MOVE_END, this.buttonEnable);
+
     return this.container;
   }
 
-  onRemove(_: Map): void {
-    console.log("onRemove toggle button");
+  onRemove(map: Map): void {
     if (this.container?.parentNode) {
       // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
       // Keep the old pointer
@@ -80,6 +103,12 @@ class ToggleControlClass implements IControl {
         this.root?.unmount();
       });
     }
+
+    map.off(ZOOM_START, this.buttonDisable);
+    map.off(ZOOM_END, this.buttonEnable);
+
+    map.off(MOVE_START, this.buttonDisable);
+    map.off(MOVE_END, this.buttonEnable);
   }
 }
 
