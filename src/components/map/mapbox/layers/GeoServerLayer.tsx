@@ -265,6 +265,13 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     const createLayersOnStyleChange = () => {
       createSource();
       createLayers();
+      if (titleLayerId && map?.getLayer(titleLayerId)) {
+        map.setLayoutProperty(
+          titleLayerId,
+          "visibility",
+          visible ? "visible" : "none"
+        );
+      }
     };
 
     const createLayersOnInit = () => {
@@ -306,6 +313,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     sourceLayerId,
     tileUrl,
     titleLayerId,
+    visible,
   ]);
 
   useEffect(() => {
