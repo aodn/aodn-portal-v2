@@ -38,6 +38,7 @@ import { DatasetType } from "../../../../components/common/store/OGCCollectionDe
 import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -106,6 +107,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
+
+  const { isUnderLaptop } = useBreakpoint();
 
   const abstract = useMemo(
     () => collection?.getEnhancedDescription() || collection?.description || "",
@@ -343,7 +346,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   onZoomEvent={handleMapChange}
                 >
                   <Controls>
-                    <NavigationControl />
+                    <NavigationControl visible={!isUnderLaptop} />
                     <ScaleControl />
                     <DisplayCoordinate />
                     <MenuControlGroup>
