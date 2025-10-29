@@ -9,6 +9,7 @@ import { ZoomInIcon } from "../../../../assets/icons/map/zoom_in";
 import { ZoomOutIcon } from "../../../../assets/icons/map/zoom_out";
 import { ZoomResetIcon } from "../../../../assets/icons/map/zoom_reset";
 import { MapDefaultConfig } from "../constants";
+import { MOVE_END, MOVE_START, ZOOM_END, ZOOM_START } from "../Map";
 
 interface NavigationControlProps {
   visible?: boolean;
@@ -22,6 +23,7 @@ const CONTAINER_MAP_ZOOM_ID = "map-zoom-reset";
 class StyledNavigationControl extends MapboxNavigationControl {
   private readonly zoomReset: HTMLButtonElement | undefined = undefined;
   private map: Mapbox | undefined = undefined;
+  private container: HTMLDivElement | undefined = undefined;
   private zoomResetHandler: (event: MouseEvent) => void = () => {};
   private zoomButtonDisable: () => void = () => {};
   private zoomButtonEnable: () => void = () => {};
@@ -56,9 +58,9 @@ class StyledNavigationControl extends MapboxNavigationControl {
   }
 
   onAdd(map: Mapbox): HTMLElement {
-    const container = super.onAdd(map) as HTMLDivElement;
-    container.id = CONTAINER_MAP_ZOOM_ID;
-    container.style.cssText = `
+    this.container = super.onAdd(map) as HTMLDivElement;
+    this.container.id = CONTAINER_MAP_ZOOM_ID;
+    this.container.style.cssText = `
       align-content: left;
       border: 0 !important;
       border-radius: 0 !important;
@@ -68,7 +70,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
       gap: 20px
     `;
 
-    const zoomIn = container.querySelector(
+    const zoomIn = this.container.querySelector(
       ".mapboxgl-ctrl-zoom-in"
     ) as HTMLButtonElement | null;
 
@@ -86,7 +88,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
       zoomIn.style.borderTop = "0px";
     }
 
-    const zoomOut = container.querySelector(
+    const zoomOut = this.container.querySelector(
       ".mapboxgl-ctrl-zoom-out"
     ) as HTMLButtonElement | null;
 
@@ -105,33 +107,45 @@ class StyledNavigationControl extends MapboxNavigationControl {
     }
 
     // Now add our own element
-    container.appendChild(this.zoomReset!);
+    this.container.appendChild(this.zoomReset!);
     this.zoomResetHandler = () => map.zoomTo(MapDefaultConfig.ZOOM);
     this.zoomReset?.addEventListener("click", this.zoomResetHandler);
 
     this.zoomButtonDisable = () => {
-      container.style.pointerEvents = "none";
-      container.style.opacity = "0.8";
+      if (this.container) {
+        this.container.style.pointerEvents = "none";
+        this.container.style.opacity = "0.8";
+      }
     };
 
     this.zoomButtonEnable = () => {
-      container.style.pointerEvents = "auto";
-      container.style.opacity = "1";
+      if (this.container) {
+        this.container.style.pointerEvents = "auto";
+        this.container.style.opacity = "1";
+      }
     };
 
-    map.on("zoomstart", this.zoomButtonDisable);
-    map.on("zoomend", this.zoomButtonEnable);
+    map.on(ZOOM_START, this.zoomButtonDisable);
+    map.on(ZOOM_END, this.zoomButtonEnable);
+
+    map.on(MOVE_START, this.zoomButtonDisable);
+    map.on(MOVE_END, this.zoomButtonEnable);
 
     this.zoomButtonDisable();
     this.map = map;
-    return container;
+    return this.container;
   }
 
   onRemove() {
     super.onRemove();
     this.zoomReset?.removeEventListener("click", this.zoomResetHandler!);
-    this.map?.off("zoomstart", this.zoomButtonDisable);
-    this.map?.off("zoomend", this.zoomButtonEnable);
+    this.container?.removeChild(this.zoomReset!);
+
+    this.map?.off(ZOOM_START, this.zoomButtonDisable);
+    this.map?.off(ZOOM_END, this.zoomButtonEnable);
+
+    this.map?.off(MOVE_START, this.zoomButtonDisable);
+    this.map?.off(MOVE_END, this.zoomButtonEnable);
   }
 }
 
@@ -148,6 +162,7 @@ const NavigationControl = ({
 
   useEffect(() => {
     if (map !== null) {
+      // We do not need to destruct the control, it will be call automatically by map
       setControl((prev: StyledNavigationControl | undefined) => {
         if (!prev) {
           const n = new StyledNavigationControl({
