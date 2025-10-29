@@ -22,7 +22,7 @@ const COMMON_BUTTON_STYLES = {
   color: rc8Theme.palette.text1,
   height: "40px",
   gap: "10px",
-  px: "46px",
+  px: "40px",
   mx: "10px",
   borderRadius: "4px",
   // Prevent text wrapping

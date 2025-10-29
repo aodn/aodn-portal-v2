@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Box,
   Dialog,
@@ -16,6 +17,7 @@ import DialogStepper from "./stepper/DialogStepper";
 import StepperButton from "./stepper/StepperButton";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { DownloadCondition } from "../../pages/detail-page/context/DownloadDefinitions";
+import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 
 interface DownloadDialogProps extends DownloadCondition {
   isOpen: boolean;
@@ -63,6 +65,19 @@ const DownloadDialog = ({
     getStepperButtonTitle,
     setEmailError,
   } = useDownloadDialog(isOpen, setIsOpen);
+
+  // Disable background scroll when dialog is open
+  useEffect(() => {
+    if (isOpen) {
+      disableScroll();
+    } else {
+      enableScroll();
+    }
+
+    return () => {
+      enableScroll();
+    };
+  }, [isOpen]);
 
   // Determine if DataSelection should be shown
   const shouldShowDataSelection =
@@ -170,7 +185,7 @@ const DownloadDialog = ({
           width: isUnderLaptop ? "auto" : "1024px",
           height: isUnderLaptop ? "auto" : "720px",
           maxWidth: isUnderLaptop ? "calc(100vw - 16px)" : "1024px",
-          maxHeight: isUnderLaptop ? "calc(100vh - 32px)" : "720px",
+          maxHeight: isUnderLaptop ? "85vh" : "720px",
           minWidth: isUnderLaptop ? "auto" : "600px",
           margin: isUnderLaptop ? "16px 8px" : "auto",
           display: "flex",
