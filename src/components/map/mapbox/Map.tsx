@@ -328,4 +328,4 @@ const ReactMap = memo(
 ReactMap.displayName = "ReactMap";
 export default ReactMap;
 
-export { styles };
+export { styles, ZOOM_START, ZOOM_END, MOVE_END, MOVE_START };
