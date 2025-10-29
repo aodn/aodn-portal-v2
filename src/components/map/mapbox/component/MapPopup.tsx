@@ -19,6 +19,7 @@ import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
+import { zIndex } from "../../../../styles/constants";
 
 interface MapPopupProps {
   layerId: string;
@@ -47,6 +48,7 @@ const renderLoadingBox = ({ popupHeight, popupWidth }: PopupConfig) => (
       alignItems: "center",
       height: popupHeight,
       width: popupWidth,
+      zIndex: zIndex.MAP_POPUP,
     }}
   >
     <CircularProgress />
@@ -90,6 +92,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
                 height: defaultPopupConfig.popupHeight,
                 width: defaultPopupConfig.popupWidth,
                 borderRadius: 0,
+                zIndex: zIndex.MAP_POPUP,
               }}
               onMouseLeave={onMouseLeave}
             >

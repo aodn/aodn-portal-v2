@@ -24,6 +24,7 @@ import {
   fontFamily,
   fontSize,
   fontWeight,
+  zIndex,
 } from "../../../../../styles/constants";
 import grey from "../../../../common/colors/grey";
 import { Grid } from "@mui/material";
@@ -69,7 +70,7 @@ export const switcherMenuBoxSx = {
   whiteSpace: "nowrap",
   borderRadius: borderRadius["menu"],
   backgroundColor: grey["resultCard"],
-  zIndex: 1,
+  zIndex: zIndex.MAP_CONTROL,
   width: "260px",
 };
 

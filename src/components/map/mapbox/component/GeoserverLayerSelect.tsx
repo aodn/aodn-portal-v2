@@ -63,7 +63,7 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
         position: "absolute",
         top: 0,
         left: "40px",
-        zIndex: zIndex.MAP_POPUP,
+        zIndex: zIndex.MAP_BASE,
         padding: "10px",
       }}
     >
