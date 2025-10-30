@@ -162,8 +162,10 @@ const filterList = {
 };
 
 const zIndex = {
-  MAP_COORD: 1,
-  MAP_POPUP: 2,
+  MAP_COORD: 0,
+  MAP_BASE: 1,
+  MAP_CONTROL: 2,
+  MAP_POPUP: 3,
   FILTER_MODAL: 9,
   FILTER_OVERLAY: 10,
   header: 100,
