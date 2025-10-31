@@ -29,6 +29,9 @@ export interface DatasetDownloadRequest {
       sectors: string[];
       allow_contact: boolean | null;
     };
+    collection_title?: string;
+    full_metadata_link?: string;
+    suggested_citation?: string;
   };
   outputs: object;
   subscriber: {
