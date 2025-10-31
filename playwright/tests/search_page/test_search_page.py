@@ -6,7 +6,7 @@ from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
 
-@pytest.skip("unstable")
+@pytest.mark.skip("unstable")
 def test_map_full_screen_toggle(desktop_page: Page) -> None:
     """
     Verifies that the map can be toggled to full screen and back
