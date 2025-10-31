@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import useFetchData from "../useFetchData";
 import { useAppDispatch } from "../../components/common/store/hooks";
 import { updateSearchText } from "../../components/common/store/componentParamReducer";
-import axios from "axios";
 import { renderHook } from "@testing-library/react";
 import { Provider } from "react-redux";
 import store from "../../components/common/store/store";
@@ -11,6 +10,7 @@ import * as searchReducer from "../../components/common/store/searchReducer";
 import {
   fetchResultWithStore,
   fetchResultAppendStore,
+  ogcAxiosWithRetry,
 } from "../../components/common/store/searchReducer";
 import { response1 } from "./data";
 
@@ -21,7 +21,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 
 describe("useFetchData", () => {
   beforeEach(() => {
-    vi.spyOn(axios, "get");
+    vi.spyOn(ogcAxiosWithRetry, "get");
     vi.spyOn(searchReducer, "fetchResultWithStore");
     vi.spyOn(searchReducer, "fetchResultAppendStore");
   });
@@ -44,7 +44,7 @@ describe("useFetchData", () => {
     result.current.fetchRecord(true);
 
     // We should expect a call to
-    expect(axios.get).toHaveBeenCalledWith("/api/v1/ogc/collections", {
+    expect(ogcAxiosWithRetry.get).toHaveBeenCalledWith("/ogc/collections", {
       params: {
         filter:
           "page_size=11 AND (BBOX(geometry,104,-43,163,-8) OR geometry IS NULL)",
@@ -73,7 +73,7 @@ describe("useFetchData", () => {
     );
 
     // mock return for first call
-    (axios.get as any).mockImplementation(() =>
+    (ogcAxiosWithRetry.get as any).mockImplementation(() =>
       Promise.resolve({ data: response1 })
     );
 
@@ -82,7 +82,7 @@ describe("useFetchData", () => {
     // Now if we fetch more record it should call with something like this
     await result.current.fetchRecord(false);
 
-    expect(axios.get).toHaveBeenCalledWith("/api/v1/ogc/collections", {
+    expect(ogcAxiosWithRetry.get).toHaveBeenCalledWith("/ogc/collections", {
       params: {
         filter:
           "page_size=11 AND search_after='1.0||88||str:ffe8f19c-de4a-4362-89be-7605b2dd6b8c' AND (BBOX(geometry,104,-43,163,-8) OR geometry IS NULL)",

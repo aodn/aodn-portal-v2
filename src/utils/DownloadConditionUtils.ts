@@ -5,10 +5,8 @@ import {
   FormatCondition,
   IDownloadCondition,
 } from "../pages/detail-page/context/DownloadDefinitions";
-import { dateDefault } from "../components/common/constants";
 import { MultiPolygon } from "geojson";
 import { combineBBoxesToMultiPolygon } from "./GeoJsonUtils";
-import dayjs from "dayjs";
 
 export const getDateConditionFrom = (
   conditions: IDownloadCondition[]
