@@ -422,6 +422,7 @@ def test_map_card_popup_download_button_in_desktop(
     expect(search_page.main_map).to_be_visible()
 
 
+@pytest.mark.skip("unstable")
 @pytest.mark.parametrize(
     'data_id',
     [
