@@ -7,6 +7,7 @@ import { decode } from "he";
  * Capitalizes the first letter of a given string.
  *
  * @param str The input string to be capitalized
+ * @param shouldLowercaseTheRest
  * @returns A new string with the first letter capitalized
  *
  * @example

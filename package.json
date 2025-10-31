@@ -41,6 +41,7 @@
     "@reduxjs/toolkit": "^2.1.0",
     "@turf/turf": "7.0.0",
     "axios": "^1.11.0",
+    "axios-retry": "4.5.0",
     "dayjs": "^1.11.10",
     "deck.gl": "^9.0.17",
     "dompurify": "^3.2.4",

@@ -61,6 +61,12 @@ import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 import _ from "lodash";
 import useFetchData from "../../hooks/useFetchData";
+import {
+  MOVE_END,
+  MOVE_START,
+  ZOOM_END,
+  ZOOM_START,
+} from "../../components/map/mapbox/Map";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -148,43 +154,45 @@ const SearchPage = () => {
           pagesize: DEFAULT_SEARCH_MAP_SIZE,
         }
       );
-      // Update URL earlier as map take time to search, so user may copy incorrect URL during
-      // search
-      if (needNavigate) {
-        debounceHistoryUpdateRef?.current?.cancel();
-        debounceHistoryUpdateRef?.current?.(
-          pageDefault.search + "?" + formatToUrlParam(componentParam)
-        );
+      // Make sure no other code abort the search
+      if (mapSearchAbortRef.current) {
+        // Update URL earlier as map take time to search, so user may copy incorrect URL during
+        // search and make sure no one cancel the search
+        if (needNavigate) {
+          debounceHistoryUpdateRef?.current?.cancel();
+          debounceHistoryUpdateRef?.current?.(
+            pageDefault.search + "?" + formatToUrlParam(componentParam)
+          );
+        }
+        dispatch(
+          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+          // and ordered by uuid to avoid affecting cluster calculation
+          fetchResultNoStore({
+            ...paramNonPaged,
+            properties: "id,centroid",
+            sortby: "id",
+            signal: controller.signal,
+          } as SearchParameters & { signal: AbortSignal })
+        )
+          .unwrap()
+          .then((collections: string) => {
+            // This check is need due to user can move the map around when the search
+            // is still in progress, the store have the latest map bbox so we can check
+            // if the constant we store matches the bbox, if not then we know map
+            // moved and results isn't valid
+            const current = getComponentState(store.getState())?.bbox;
+            if (
+              componentParam.bbox !== undefined &&
+              current !== undefined &&
+              booleanEqual(componentParam.bbox, current)
+            ) {
+              setLayers(jsonToOGCCollections(collections).collections);
+            }
+          })
+          .catch(() => {
+            // console.log("doSearchMap signal abort");
+          });
       }
-
-      dispatch(
-        // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
-        // and ordered by uuid to avoid affecting cluster calculation
-        fetchResultNoStore({
-          ...paramNonPaged,
-          properties: "id,centroid",
-          sortby: "id",
-          signal: controller.signal,
-        } as SearchParameters & { signal: AbortSignal })
-      )
-        .unwrap()
-        .then((collections: string) => {
-          // This check is need due to user can move the map around when the search
-          // is still in progress, the store have the latest map bbox so we can check
-          // if the constant we store matches the bbox, if not then we know map
-          // moved and results isn't valid
-          const current = getComponentState(store.getState())?.bbox;
-          if (
-            componentParam.bbox !== undefined &&
-            current !== undefined &&
-            booleanEqual(componentParam.bbox, current)
-          ) {
-            setLayers(jsonToOGCCollections(collections).collections);
-          }
-        })
-        .catch(() => {
-          // console.log("doSearchMap signal abort");
-        });
     },
     [dispatch]
   );
@@ -208,7 +216,15 @@ const SearchPage = () => {
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent | undefined) => {
-      if (event?.type === "zoomend" || event?.type === "moveend") {
+      if (event?.type === ZOOM_START || event?.type === MOVE_START) {
+        // abort any on-going search
+        listSearchAbortRef.current?.abort();
+        listSearchAbortRef.current = null;
+
+        mapSearchAbortRef.current?.abort();
+        mapSearchAbortRef.current = null;
+        // Empty line
+      } else if (event?.type === ZOOM_END || event?.type === MOVE_END) {
         const componentParam: ParameterState = getComponentState(
           store.getState()
         );

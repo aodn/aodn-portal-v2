@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
+import axiosRetry, { isNetworkError, isRetryableError } from "axios-retry";
 import { ParameterState, Vocab } from "./componentParamReducer";
 import {
   cqlDefaultFilters,
@@ -103,6 +104,43 @@ const initialState: ObjectValue = {
   },
   parameterVocabsResult: new Array<Vocab>(),
 };
+
+// ---------------------------------------------------------------------
+// 1. Create a **dedicated** axios instance for the OGC endpoint
+//     (you can reuse the default `axios` if you want global retries)
+const ogcAxiosWithRetry = axios.create({
+  baseURL: "/api/v1",
+  timeout: 15_000,
+});
+
+// 2. Attach retry logic
+axiosRetry(ogcAxiosWithRetry, {
+  retries: 10,
+  retryDelay: (retryCount) => {
+    // exponential back-off: start with 1000ms
+    return 1000 * Math.pow(2, retryCount - 1);
+  },
+
+  // -----------------------------------------------------------------
+  // 3. **Which errors should trigger a retry?**
+  // -----------------------------------------------------------------
+  retryCondition: (error) => {
+    // 1. Network / DNS / timeout errors
+    if (isNetworkError(error)) return true;
+
+    // 2. 5xx server errors + a few 4xx that are usually transient
+    if (error.response) {
+      const code = error.response.status;
+      return code >= 500 || [408, 429].includes(code);
+    }
+
+    // 3. Timeout (axios sets `code: 'ECONNABORTED'`)
+    if (error.code === "ECONNABORTED") return true;
+
+    // 4. Any other retryable error flagged by axios-retry
+    return isRetryableError(error);
+  },
+});
 /**
  Define search functions
  */
@@ -134,8 +172,8 @@ const searchResult = async (
   // Track search page url parameters
   trackSearchResultParameters(param);
 
-  return axios
-    .get<string>("/api/v1/ogc/collections", {
+  return ogcAxiosWithRetry
+    .get<string>("/ogc/collections", {
       params: p,
       timeout: TIMEOUT,
       signal: param.signal || thunkApi.signal,
@@ -578,6 +616,7 @@ export {
   processDatasetDownload,
   processWFSDownload,
   jsonToOGCCollections,
+  ogcAxiosWithRetry,
 };
 
 export default searcher.reducer;
