@@ -392,7 +392,7 @@ def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
         (
             '19da2ce7-138f-4427-89de-a50c724f5f54',
             '135.25',
-            '-36.12',
+            '-36.15',
         ),
     ],
 )
@@ -415,6 +415,7 @@ def test_map_card_popup_download_button_in_desktop(
     search_page.map.center_map(data_lng, data_lat)
     search_page.map.hover_map()
 
+    search_page.map.wait_for_map_idle()
     search_page.result_card_download_button.last.click()
 
     detail_page.return_button.click()
