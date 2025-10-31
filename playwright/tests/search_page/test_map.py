@@ -392,7 +392,7 @@ def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
         (
             '19da2ce7-138f-4427-89de-a50c724f5f54',
             '135.25',
-            '-36.15',
+            '-36.0',
         ),
     ],
 )
