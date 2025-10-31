@@ -202,8 +202,8 @@ const searchParameterVocabs = async (
   param: Map<string, string> | null,
   thunkApi: any
 ) =>
-  axios
-    .get<Array<Vocab>>("/api/v1/ogc/ext/parameter/vocabs", {
+  ogcAxiosWithRetry
+    .get<Array<Vocab>>("/ogc/ext/parameter/vocabs", {
       timeout: TIMEOUT,
     })
     .then((response) => response.data)
@@ -232,8 +232,8 @@ const fetchSuggesterOptions = createAsyncThunk<
 >(
   "search/fetchSuggesterOptions",
   async (params: SuggesterParameters, thunkApi: any) =>
-    axios
-      .get<any>("/api/v1/ogc/ext/autocomplete", {
+    ogcAxiosWithRetry
+      .get<any>("/ogc/ext/autocomplete", {
         params: params,
         timeout: TIMEOUT,
       })
@@ -288,8 +288,8 @@ const fetchResultByUuidNoStore = createAsyncThunk<
   string,
   { rejectValue: ErrorResponse }
 >("search/fetchResultByUuidNoStore", async (id: string, thunkApi: any) =>
-  axios
-    .get<OGCCollection>(`/api/v1/ogc/collections/${id}`)
+  ogcAxiosWithRetry
+    .get<OGCCollection>(`/ogc/collections/${id}`)
     .then((response) => Object.assign(new OGCCollection(), response.data))
     .catch(errorHandling(thunkApi))
 );
@@ -299,10 +299,8 @@ const fetchFeaturesByUuid = createAsyncThunk<
   string,
   { rejectValue: ErrorResponse }
 >("search/fetchDatasetByUuid", async (id: string, thunkApi: any) =>
-  axios
-    .get<FeatureCollection<Point>>(
-      `/api/v1/ogc/collections/${id}/items/summary`
-    )
+  ogcAxiosWithRetry
+    .get<FeatureCollection<Point>>(`/ogc/collections/${id}/items/summary`)
     .then((response) => response.data)
     .catch(errorHandling(thunkApi))
 );
@@ -315,8 +313,8 @@ const processDatasetDownload = createAsyncThunk<
   "download/downloadDataset",
   async (reequest: DatasetDownloadRequest, thunkAPI: any) => {
     try {
-      const response = await axios.post(
-        "/api/v1/ogc/processes/download/execution",
+      const response = await ogcAxiosWithRetry.post(
+        "/ogc/processes/download/execution",
         reequest
       );
       return response.data;
@@ -354,8 +352,8 @@ const processWFSDownload = createAsyncThunk<
         },
       };
 
-      return axios.post(
-        "/api/v1/ogc/processes/downloadWfs/execution",
+      return ogcAxiosWithRetry.post(
+        "/ogc/processes/downloadWfs/execution",
         requestBody,
         {
           adapter: "fetch", // Use fetch adapter for streaming
@@ -417,9 +415,9 @@ const fetchGeoServerMapFeature = createAsyncThunk<
 >(
   "geoserver/fetchGeoServerMapFeature",
   (request: MapFeatureRequest, thunkApi: any) => {
-    return axios
+    return ogcAxiosWithRetry
       .get<MapFeatureResponse>(
-        `/api/v1/ogc/collections/${request.uuid}/items/wms_map_feature`,
+        `/ogc/collections/${request.uuid}/items/wms_map_feature`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)
@@ -434,9 +432,9 @@ const fetchGeoServerMapFields = createAsyncThunk<
 >(
   "geoserver/fetchGeoServerMapFields",
   (request: MapFeatureRequest, thunkApi: any) => {
-    return axios
+    return ogcAxiosWithRetry
       .get<MapFeatureResponse>(
-        `/api/v1/ogc/collections/${request.uuid}/items/wms_downloadable_fields`,
+        `/ogc/collections/${request.uuid}/items/wms_downloadable_fields`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)
@@ -452,9 +450,9 @@ const fetchGeoServerMapLayers = createAsyncThunk<
 >(
   "geoserver/fetchGeoServerMapLayers",
   (request: MapFeatureRequest, thunkApi: any) => {
-    return axios
+    return ogcAxiosWithRetry
       .get<MapLayerResponse>(
-        `/api/v1/ogc/collections/${request.uuid}/items/wms_layers`,
+        `/ogc/collections/${request.uuid}/items/wms_layers`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)
