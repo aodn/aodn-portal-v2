@@ -410,9 +410,9 @@ def test_map_card_popup_download_button_in_desktop(
     landing_page.load()
     landing_page.search.fill_search_text(data_id)
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
 
     search_page.map.center_map(data_lng, data_lat)
+    search_page.wait_for_page_stabilization()
     search_page.map.hover_map()
 
     search_page.result_card_download_button.last.click()
@@ -441,11 +441,10 @@ def test_map_card_popup_download_button_in_mobile(
     landing_page.load()
     landing_page.search.fill_search_text(data_id)
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
 
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
-    search_page.map.wait_for_map_loading()
+    search_page.wait_for_timeout(3000)
 
     search_page.map.find_and_click_data_point(data_id)
     search_page.result_card_download_button.last.click()
