@@ -55,15 +55,13 @@ export function trackSearchResultParameters(searchParams: SearchParameters) {
     if (!filter) return "";
 
     // Remove BBOX and page_size (technical parameters)
-    const userFilter = filter
+    return filter
       .replace(/\s+AND\s+BBOX[^)]+\)/g, "") // Remove BBOX
       .replace(/\s+AND\s+INTERSECTS[^)]+\)\)\)/g, "") // Remove INTERSECTS
       .replace(/page_size=\d+\s+AND\s+/g, "") // Remove page_size
       .replace(/\s+AND\s+/g, " AND ") // Clean up multiple ANDs
       .replace(/^AND\s+|AND\s+$/g, "") // Remove leading/trailing AND
       .trim();
-
-    return userFilter;
   };
 
   const searchKey = `${searchParams.text || ""}_${searchParams.sortby || ""}_${extractUserFilters(searchParams.filter || "")}`;

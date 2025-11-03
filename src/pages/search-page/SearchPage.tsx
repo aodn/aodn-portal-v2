@@ -151,14 +151,6 @@ const SearchPage = () => {
       );
       // Make sure no other code abort the search
       if (mapSearchAbortRef.current) {
-        // Update URL earlier as map take time to search, so user may copy incorrect URL during
-        // search and make sure no one cancel the search
-        if (needNavigate) {
-          debounceHistoryUpdateRef?.current?.cancel();
-          debounceHistoryUpdateRef?.current?.(
-            pageDefault.search + "?" + formatToUrlParam(componentParam)
-          );
-        }
         dispatch(
           // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
           // and ordered by uuid to avoid affecting cluster calculation
@@ -182,6 +174,16 @@ const SearchPage = () => {
               booleanEqual(componentParam.bbox, current)
             ) {
               setLayers(jsonToOGCCollections(collections).collections);
+            }
+          })
+          .then(() => {
+            // Must update status after search done, this change the location.state and will
+            // cause all search cancel
+            if (needNavigate) {
+              debounceHistoryUpdateRef?.current?.cancel();
+              debounceHistoryUpdateRef?.current?.(
+                pageDefault.search + "?" + formatToUrlParam(componentParam)
+              );
             }
           })
           .catch(() => {
