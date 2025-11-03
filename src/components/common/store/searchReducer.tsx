@@ -169,8 +169,8 @@ const searchResult = async (
     p.sortby = param.sortby;
   }
 
-  // Track search page url parameters
-  trackSearchResultParameters(param);
+  // Track search page url parameters, do not block the search
+  setTimeout(() => trackSearchResultParameters(param), 500);
 
   return ogcAxiosWithRetry
     .get<string>("/ogc/collections", {

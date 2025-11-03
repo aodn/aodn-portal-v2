@@ -49,7 +49,7 @@ def test_basic_search(
     expect(search_page.search.search_field).to_have_value(category_name)
     expect(search_page.first_result_title).to_be_visible()
 
-@pytest.mark.skip("untable")
+
 @pytest.mark.parametrize(
     'sort_type',
     [SearchSortType.TITLE, SearchSortType.MODIFIED],

@@ -385,7 +385,6 @@ def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
     assert are_value_equal(current_map_zoom, default_map_zoom)
     assert are_coordinates_equal(current_map_center, default_map_center)
 
-@pytest.mark.skip("untable")
 @pytest.mark.parametrize(
     'data_id, data_lng, data_lat',
     [
@@ -422,7 +421,6 @@ def test_map_card_popup_download_button_in_desktop(
     expect(search_page.main_map).to_be_visible()
 
 
-@pytest.mark.skip("unstable")
 @pytest.mark.parametrize(
     'data_id',
     [
