@@ -1,7 +1,10 @@
-from typing import Any
+from typing import Any, Callable, Tuple
+from urllib.parse import unquote_plus
 
+import pytest
 from playwright.sync_api import Locator, Page, TimeoutError
 
+from mocks.routes import Routes
 from pages.js_scripts.js_utils import (
     execute_common_js,
     load_common_js_functions,
@@ -131,3 +134,40 @@ class BasePage:
         except TimeoutError:
             # URL update was too quick or didn't happen.
             pass
+
+    def perform_action_and_get_api_url(
+        self, action: Callable[[], None]
+    ) -> Tuple[str, str]:
+        """
+        Perform an action (e.g., click search, zoom/drag map) and return the API URLs
+        used for the request.
+
+        Args:
+            action: A callable function that performs the desired action
+
+        Returns:
+            Tuple containing the collections URL and centroid URL
+        """
+        try:
+            with (
+                self.page.expect_request(
+                    Routes.COLLECTION_ALL
+                ) as collections_request_info,
+                self.page.expect_request(
+                    Routes.COLLECTION_CENTROID
+                ) as centroid_request_info,
+            ):
+                action()  # Execute the passed function
+                self.wait_for_timeout(1000)
+
+            collections_request = collections_request_info.value
+            centroid_request = centroid_request_info.value
+
+            return (
+                unquote_plus(collections_request.url),
+                unquote_plus(centroid_request.url),
+            )
+        except TimeoutError:
+            pytest.fail(
+                'API URL not found within the timeout, search did not trigger successfully.'
+            )

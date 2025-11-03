@@ -198,7 +198,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
     search_page.map.wait_for_map_loading()
 
     search_page.map.drag_map()
-    search_page.map.zoom_to_level()
+    search_page.map.zoom_in()
     search_page.wait_for_page_stabilization()
 
     map_center = search_page.map.get_map_center()
@@ -245,7 +245,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     search_page.map.wait_for_map_loading()
 
     search_page.map.drag_map()
-    search_page.map.zoom_to_level()
+    search_page.map.zoom_in()
     search_page.wait_for_page_stabilization()
 
     map_center = search_page.map.get_map_center()
@@ -362,7 +362,7 @@ def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
     default_map_zoom = search_page.map.get_map_zoom()
 
     search_page.map.drag_map()
-    search_page.map.zoom_to_level()
+    search_page.map.zoom_in()
     search_page.wait_for_page_stabilization()
 
     search_page.go_to_landing_page()

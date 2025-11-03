@@ -113,6 +113,11 @@ class Map(BasePage):
         self.page.mouse.move(x, y)
         self.page.mouse.up()
 
+    def zoom_in(self) -> None:
+        """Perform zoom in the map using the mouse wheel"""
+        self.hover_map()  # Moves the mouse to the center of the map
+        self.page.mouse.wheel(0, -500)  # Zoom in
+
     def center_map(self, lng: str, lat: str) -> None:
         """Center the map to a given longitude and latitude coordinates"""
         execute_map_js(self.page, 'centerMap', self.map_id, lng, lat)

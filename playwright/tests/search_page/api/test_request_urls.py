@@ -75,7 +75,9 @@ def test_search_api_request_urls_across_page(
     )
 
     # Perform search, capture the API URL
-    api_url_result = landing_page.search.perform_search_and_get_api_url()
+    api_url_result = landing_page.perform_action_and_get_api_url(
+        action=landing_page.search.click_search_button
+    )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
@@ -100,7 +102,9 @@ def test_search_api_request_urls_across_page(
     )
 
     # Perform search again to capture the API URL after reset
-    api_url_result = search_page.search.perform_search_and_get_api_url()
+    api_url_result = search_page.perform_action_and_get_api_url(
+        action=search_page.search.click_search_button
+    )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
@@ -181,7 +185,9 @@ def test_search_api_request_urls_after_map_state_change(
     )
 
     # Perform search and capture the API URL
-    api_url_result = landing_page.search.perform_search_and_get_api_url()
+    api_url_result = landing_page.perform_action_and_get_api_url(
+        action=landing_page.search.click_search_button
+    )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
@@ -206,7 +212,9 @@ def test_search_api_request_urls_after_map_state_change(
     )
 
     # Perform search again to capture the API URL after reset
-    api_url_result = search_page.search.perform_search_and_get_api_url()
+    api_url_result = search_page.perform_action_and_get_api_url(
+        action=search_page.search.click_search_button
+    )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
@@ -220,8 +228,11 @@ def test_search_api_request_urls_after_map_state_change(
     if not search_page.main_map.is_visible():
         search_page.result_view_button.click()
         search_page.full_map_view_button.click()
-    search_page.map.zoom_to_level(5)
-    search_page.wait_for_timeout(500)
+    api_url_result = search_page.perform_action_and_get_api_url(
+        action=search_page.map.zoom_in
+    )
+    api_url_collection, api_url_centroid = api_url_result
+
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters_reset
     )
@@ -306,7 +317,9 @@ def test_search_api_request_urls_reflect_parameter_updates(
     )
 
     # Perform search and capture the API URL
-    api_url_result = landing_page.search.perform_search_and_get_api_url()
+    api_url_result = landing_page.perform_action_and_get_api_url(
+        action=landing_page.search.click_search_button
+    )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
@@ -341,7 +354,9 @@ def test_search_api_request_urls_reflect_parameter_updates(
     )
 
     # Perform search and capture the API URL
-    api_url_result = search_page.search.perform_search_and_get_api_url()
+    api_url_result = search_page.perform_action_and_get_api_url(
+        action=search_page.search.click_search_button
+    )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
