@@ -178,8 +178,9 @@ const SearchPage = () => {
           })
           .then(() => {
             // Must update status after search done, this change the location.state and will
-            // cause all search cancel
-            if (needNavigate) {
+            // cause all search cancel. However, we also need to make sure that the controller is not canceled
+            // and replace by a new one due to new search
+            if (needNavigate && controller === mapSearchAbortRef.current) {
               debounceHistoryUpdateRef?.current?.cancel();
               debounceHistoryUpdateRef?.current?.(
                 pageDefault.search + "?" + formatToUrlParam(componentParam)
