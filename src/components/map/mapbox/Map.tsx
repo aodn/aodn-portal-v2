@@ -166,12 +166,19 @@ const ReactMap = memo(
         // Stop drag cause map to rotate.
         map.dragRotate.disable();
 
-        // If exist fit the map to this area, this useful if url pass around and
-        // the bbox in the url is not the default area of the map
-        // Use same function to save processing
-        const cancelDebounce = () => debounceOnZoomEvent.cancel();
-        map.on(MOVE_START, cancelDebounce);
-        map.on(ZOOM_START, cancelDebounce);
+        // You do want to cancel the previous move end via debounce but not the move start
+        const cancelDebounceAndMove = (event: MapEvent) => {
+          debounceOnZoomEvent.cancel();
+          onMoveEvent?.(event);
+        };
+        map.on(MOVE_START, cancelDebounceAndMove);
+
+        // You do want to cancel the previous zoom end via debounce but not the zoom start
+        const cancelDebounceAndZoom = (event: MapEvent) => {
+          debounceOnZoomEvent.cancel();
+          onZoomEvent?.(event);
+        };
+        map.on(ZOOM_START, cancelDebounceAndZoom);
 
         // Do not setup here, the useEffect block will setup it correctly, if you set it here
         // you will get one extra data load which is of no use.
@@ -206,8 +213,8 @@ const ReactMap = memo(
           // We need this when the map destroy
           map.off(ZOOM_END, debounceOnZoomEvent);
           map.off(MOVE_END, debounceOnMoveEvent);
-          map.off(MOVE_START, cancelDebounce);
-          map.off(ZOOM_START, cancelDebounce);
+          map.off(MOVE_START, cancelDebounceAndMove);
+          map.off(ZOOM_START, cancelDebounceAndZoom);
           map.remove();
           setMap(null);
         };
@@ -218,7 +225,14 @@ const ReactMap = memo(
       return () => {
         cleanup?.();
       };
-    }, [initializeMap, projection, debounceOnZoomEvent, debounceOnMoveEvent]);
+    }, [
+      initializeMap,
+      projection,
+      debounceOnZoomEvent,
+      debounceOnMoveEvent,
+      onMoveEvent,
+      onZoomEvent,
+    ]);
 
     useEffect(() => {
       if (!map || !bbox || !containerRef.current?.isConnected) return;
