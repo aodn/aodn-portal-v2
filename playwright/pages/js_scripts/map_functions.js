@@ -22,6 +22,10 @@ window.__map_functions = {
     const map = this.getMap(mapId);
     return map.loaded();
   },
+  isMapIdle: function (mapId) {
+    const map = this.getMap(mapId);
+    return map.idle();
+  },
   getMapLayers: function (mapId) {
     const map = this.getMap(mapId);
     const layer = this.getMapLayer(mapId);

@@ -5,8 +5,8 @@ import {
   fontColor,
   fontSize,
   fontWeight,
-  gap,
   padding,
+  zIndex,
 } from "../../../styles/constants";
 import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
 import Map from "../../map/mapbox/Map";
@@ -63,35 +63,28 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   );
 
   return (
-    <Box flex={1} sx={{ ...sx }}>
+    <Box flex={1} sx={{ zIndex: zIndex.MAP_POPUP, ...sx }}>
       <Stack direction="column" spacing={1}>
         <Box position="relative">
+          <Box position="absolute" top={-4} right={-4}>
+            <BookmarkButton dataset={collection} />
+          </Box>
           <Tooltip title={collection.title} placement="top">
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              height="auto"
-              width="90%"
+            <Typography
+              fontWeight={fontWeight.bold}
+              fontSize={fontSize.label}
+              sx={{
+                padding: 0,
+                width: "90%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: "5",
+                WebkitBoxOrient: "vertical",
+              }}
             >
-              <Typography
-                fontWeight={fontWeight.bold}
-                fontSize={fontSize.label}
-                sx={{
-                  padding: 0,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: "5",
-                  WebkitBoxOrient: "vertical",
-                }}
-              >
-                {collection.title}
-              </Typography>
-              <Box position="absolute" top={gap.xs} right={gap.xs}>
-                <BookmarkButton dataset={collection} />
-              </Box>
-            </Box>
+              {collection.title}
+            </Typography>
           </Tooltip>
         </Box>
         <Box

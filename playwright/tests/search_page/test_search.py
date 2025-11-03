@@ -92,6 +92,8 @@ def test_search_result_sort(
     search_page.click_text(sort_type.display_name, exact=True)
 
     search_page.wait_for_search_to_complete()
+    responsive_page.wait_for_timeout(2000)
+
     updated_first_title = search_page.first_result_title.inner_text()
 
     assert initial_first_title != updated_first_title
