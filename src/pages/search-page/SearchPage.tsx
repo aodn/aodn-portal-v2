@@ -178,8 +178,9 @@ const SearchPage = () => {
           })
           .then(() => {
             // Must update status after search done, this change the location.state and will
-            // cause all search cancel
-            if (needNavigate) {
+            // cause all search cancel. However, we also need to make sure that the controller is not canceled
+            // and replace by a new one due to new search
+            if (needNavigate && controller === mapSearchAbortRef.current) {
               debounceHistoryUpdateRef?.current?.cancel();
               debounceHistoryUpdateRef?.current?.(
                 pageDefault.search + "?" + formatToUrlParam(componentParam)
@@ -188,7 +189,8 @@ const SearchPage = () => {
           })
           .catch(() => {
             // console.log("doSearchMap signal abort");
-          });
+          })
+          .finally(() => (mapSearchAbortRef.current = null));
       }
     },
     [dispatch]
@@ -202,9 +204,7 @@ const SearchPage = () => {
       // The return implicit contains a AbortController due to use of signal in
       // axios call
       listSearchAbortRef.current = fetchRecord(true);
-      doMapSearch(needNavigate).finally(
-        () => (mapSearchAbortRef.current = null)
-      );
+      doMapSearch(needNavigate).finally(() => {});
     },
     [doMapSearch, fetchRecord]
   );
