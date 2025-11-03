@@ -90,9 +90,7 @@ def test_search_result_sort(
 
     search_page.result_sort_button.click()
     search_page.click_text(sort_type.display_name, exact=True)
-
-    search_page.wait_for_search_to_complete()
-    responsive_page.wait_for_timeout(2000)
+    search_page.wait_for_timeout(1000)  # Wait for the results to update
 
     updated_first_title = search_page.first_result_title.inner_text()
 

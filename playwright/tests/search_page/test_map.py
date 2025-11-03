@@ -385,6 +385,7 @@ def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
     assert are_value_equal(current_map_zoom, default_map_zoom)
     assert are_coordinates_equal(current_map_center, default_map_center)
 
+
 @pytest.mark.parametrize(
     'data_id, data_lng, data_lat',
     [

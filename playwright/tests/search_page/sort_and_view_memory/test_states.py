@@ -134,7 +134,7 @@ def test_sort_and_view_states_persist_with_url(
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
+    search_page.wait_for_page_stabilization()
 
     search_page.result_sort_button.click()
     search_page.click_text(sort_type.display_name, exact=True)
@@ -143,7 +143,6 @@ def test_sort_and_view_states_persist_with_url(
     search_page.click_text(view_type.display_name, exact=True)
 
     # Use the current page URL and open a new tab with the same URL
-    search_page.wait_for_search_to_complete()
     current_url = search_page.url
     new_page = responsive_page.context.new_page()
 

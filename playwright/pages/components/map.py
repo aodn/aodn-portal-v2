@@ -132,12 +132,12 @@ class Map(BasePage):
             pass  # Continue even if the map fails to load within the timeout
 
     def wait_for_map_idle(self) -> None:
-        """Wait until the map is fully loaded"""
+        """Wait until the map is idle"""
         self.page.wait_for_selector(f'#{self.map_id}', state='attached')
         try:
             wait_for_js_function(self.page, 'isMapIdle', 20000, self.map_id)
         except TimeoutError:
-            pass  # Continue even if the map fails to load within the timeout
+            pass  # Continue without error if the map fails to become idle within the timeout
 
     def click_map(self) -> None:
         """Click the map at the current position of the mouse"""
