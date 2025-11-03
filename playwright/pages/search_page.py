@@ -59,7 +59,7 @@ class SearchPage(BasePage):
         Since the data is mocked, loading is typically very fast.
         This method simply adds a short delay to ensure UI stability.
         """
-        self.page.wait_for_timeout(100)
+        self.page.wait_for_load_state("load")
 
     def click_dataset(self, title: str) -> None:
         """Click on the given dataset title"""

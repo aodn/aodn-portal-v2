@@ -189,7 +189,8 @@ const SearchPage = () => {
           })
           .catch(() => {
             // console.log("doSearchMap signal abort");
-          });
+          })
+          .finally(() => (mapSearchAbortRef.current = null));
       }
     },
     [dispatch]
@@ -203,9 +204,7 @@ const SearchPage = () => {
       // The return implicit contains a AbortController due to use of signal in
       // axios call
       listSearchAbortRef.current = fetchRecord(true);
-      doMapSearch(needNavigate).finally(
-        () => (mapSearchAbortRef.current = null)
-      );
+      doMapSearch(needNavigate).finally(() => {});
     },
     [doMapSearch, fetchRecord]
   );
