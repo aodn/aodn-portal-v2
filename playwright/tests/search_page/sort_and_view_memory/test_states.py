@@ -20,11 +20,7 @@ from playwright.sync_api import Page, expect
 from core.constants.devices import DesktopDevices
 from core.enums.search_sort_type import SearchSortType
 from core.enums.search_view_layouts import SearchViewLayouts
-from mocks.api.collections import (
-    handle_collections_all_api,
-    handle_collections_centroid_api,
-)
-from mocks.api_router import ApiRouter
+from mocks.apply import apply_mock
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
@@ -147,11 +143,7 @@ def test_sort_and_view_states_persist_with_url(
     new_page = responsive_page.context.new_page()
 
     # Add API mocking to the new page
-    api_router = ApiRouter(new_page)
-    api_router.route_collection(
-        handle_collections_centroid_api,
-        handle_collections_all_api,
-    )
+    apply_mock(new_page)
 
     new_search_page = SearchPage(new_page)
     new_search_page.goto(current_url)
@@ -228,11 +220,7 @@ def test_view_states_for_paste_url_screen_resize(
     new_page = desktop_page.context.new_page()
 
     # Add API mocking to the new page
-    api_router = ApiRouter(new_page)
-    api_router.route_collection(
-        handle_collections_centroid_api,
-        handle_collections_all_api,
-    )
+    apply_mock(new_page)
 
     new_search_page = SearchPage(new_page)
     new_page.set_viewport_size(DesktopDevices.SMALL)
