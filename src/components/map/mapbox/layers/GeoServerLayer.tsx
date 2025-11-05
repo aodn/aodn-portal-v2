@@ -430,10 +430,15 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
           if (vis !== targetVis) {
             // Need update if value diff, this is used to avoid duplicate call to useEffect
             map.setLayoutProperty(titleLayerId, "visibility", targetVis);
+          }
 
-            if (visible) {
+          // Register click handler whenever layer is visible
+          if (visible) {
+            map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+
+            // Only fetch layer fields when visibility actually changes
+            if (vis !== targetVis) {
               setMapLoading?.(true);
-              map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
               const layerName = config.urlParams.LAYERS?.join(",") || "";
 
               // Check time slider support - only fetch fields if we have a valid layer name
