@@ -1,11 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
-from mocks.api.collection_detail import (
-    handle_detail_api,
-    handle_detail_item_api,
-)
-from mocks.api_router import ApiRouter
+from mocks.apply import apply_mock
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 
@@ -37,10 +33,7 @@ def test_featured_datasets(
         dataset.click()
     new_page = new_page_info.value
     # Add API mocking to the new page
-    api_router = ApiRouter(new_page)
-    api_router.route_collection_detail(
-        handle_detail_api, handle_detail_item_api
-    )
+    apply_mock(new_page)
 
     detail_page = DetailPage(new_page_info.value)
     detail_page.wait_for_load_state()

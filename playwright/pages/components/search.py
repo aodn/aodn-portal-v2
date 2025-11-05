@@ -1,10 +1,7 @@
 from typing import List, Tuple
-from urllib.parse import unquote_plus
 
-import pytest
-from playwright.sync_api import Page, TimeoutError, expect
+from playwright.sync_api import Page, expect
 
-from mocks.routes import Routes
 from pages.base_page import BasePage
 from pages.js_scripts.js_utils import (
     execute_common_js,
@@ -39,35 +36,6 @@ class SearchComponent(BasePage):
     def click_search_button(self) -> None:
         """Click on the search button"""
         self.search_button.click()
-
-    def perform_search_and_get_api_url(self) -> Tuple[str, str]:
-        """
-        Perform a search by clicking the search button and return the API URL's
-        used for the search.
-        """
-        try:
-            with (
-                self.page.expect_request(
-                    Routes.COLLECTION_ALL
-                ) as collections_request_info,
-                self.page.expect_request(
-                    Routes.COLLECTION_CENTROID
-                ) as centroid_request_info,
-            ):
-                self.click_search_button()
-                self.wait_for_timeout(1000)
-
-            collections_request = collections_request_info.value
-            centroid_request = centroid_request_info.value
-
-            return (
-                unquote_plus(collections_request.url),
-                unquote_plus(centroid_request.url),
-            )
-        except TimeoutError:
-            pytest.fail(
-                'API URL not found within the timeout, search did not trigger successfully.'
-            )
 
     def get_date_range(self) -> Tuple[str, str]:
         """

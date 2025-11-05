@@ -625,6 +625,20 @@ pytest-base-url = ">=1.0.0,<3.0.0"
 python-slugify = ">=6.0.0,<9.0.0"
 
 [[package]]
+name = "pytest-repeat"
+version = "0.9.4"
+description = "pytest plugin for repeating tests"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "pytest_repeat-0.9.4-py3-none-any.whl", hash = "sha256:c1738b4e412a6f3b3b9e0b8b29fcd7a423e50f87381ad9307ef6f5a8601139f3"},
+    {file = "pytest_repeat-0.9.4.tar.gz", hash = "sha256:d92ac14dfaa6ffcfe6917e5d16f0c9bc82380c135b03c2a5f412d2637f224485"},
+]
+
+[package.dependencies]
+pytest = "*"
+
+[[package]]
 name = "pytest-xdist"
 version = "3.6.1"
 description = "pytest xdist plugin for distributed testing, most importantly across multiple CPUs"
@@ -861,4 +875,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ac8c4622f9fa61411bfc78d14acf0ba6bc2a7aed717ed2b5fd39fc09b876dd51"
+content-hash = "17cc76f47d6cc18d2545ec3206382715a9a43425f3069f970ffdc7fdffe58cc9"

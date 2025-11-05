@@ -198,7 +198,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
     search_page.map.wait_for_map_loading()
 
     search_page.map.drag_map()
-    search_page.map.zoom_to_level()
+    search_page.map.zoom_in()
     search_page.wait_for_page_stabilization()
 
     map_center = search_page.map.get_map_center()
@@ -245,7 +245,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     search_page.map.wait_for_map_loading()
 
     search_page.map.drag_map()
-    search_page.map.zoom_to_level()
+    search_page.map.zoom_in()
     search_page.wait_for_page_stabilization()
 
     map_center = search_page.map.get_map_center()
@@ -362,7 +362,7 @@ def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
     default_map_zoom = search_page.map.get_map_zoom()
 
     search_page.map.drag_map()
-    search_page.map.zoom_to_level()
+    search_page.map.zoom_in()
     search_page.wait_for_page_stabilization()
 
     search_page.go_to_landing_page()
@@ -384,6 +384,7 @@ def test_map_resets_to_default_after_landing_page(desktop_page: Page) -> None:
 
     assert are_value_equal(current_map_zoom, default_map_zoom)
     assert are_coordinates_equal(current_map_center, default_map_center)
+
 
 @pytest.mark.parametrize(
     'data_id, data_lng, data_lat',
@@ -409,9 +410,9 @@ def test_map_card_popup_download_button_in_desktop(
     landing_page.load()
     landing_page.search.fill_search_text(data_id)
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
 
     search_page.map.center_map(data_lng, data_lat)
+    search_page.wait_for_page_stabilization()
     search_page.map.hover_map()
 
     search_page.map.wait_for_map_idle()
@@ -441,14 +442,14 @@ def test_map_card_popup_download_button_in_mobile(
     landing_page.load()
     landing_page.search.fill_search_text(data_id)
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
 
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
-    search_page.map.wait_for_map_loading()
+    search_page.wait_for_timeout(3000)
 
     search_page.map.find_and_click_data_point(data_id)
     search_page.result_card_download_button.last.click()
 
     detail_page.return_button.click()
     expect(search_page.main_map).to_be_visible()
+    mobile_page.pause()

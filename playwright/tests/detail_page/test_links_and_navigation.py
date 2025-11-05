@@ -1,11 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
-from mocks.api.collection_detail import (
-    handle_detail_api,
-    handle_detail_item_api,
-)
-from mocks.api_router import ApiRouter
+from mocks.apply import apply_mock
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
@@ -49,10 +45,7 @@ def test_detail_page_link_share(
     new_page = responsive_page.context.new_page()
 
     # Add API mocking to the new page
-    api_router = ApiRouter(new_page)
-    api_router.route_collection_detail(
-        handle_detail_api, handle_detail_item_api
-    )
+    apply_mock(new_page)
 
     new_detail_page = DetailPage(new_page)
     new_detail_page.goto(copied_url)

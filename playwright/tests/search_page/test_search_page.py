@@ -16,6 +16,7 @@ def test_map_full_screen_toggle(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
 
     expect(search_page.result_list).to_be_visible()
     search_page.map.full_screen_toggle_button.click()
@@ -35,6 +36,7 @@ def test_grid_and_map_view(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
 
     search_page.result_view_button.click()
     search_page.grid_and_map_view_button.click()
@@ -52,6 +54,7 @@ def test_full_map_view(responsive_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
 
     expect(search_page.result_list).to_be_visible()
     search_page.result_view_button.click()
@@ -69,6 +72,7 @@ def test_full_list_view(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
 
     expect(search_page.main_map).to_be_visible()
     search_page.result_view_button.click()
