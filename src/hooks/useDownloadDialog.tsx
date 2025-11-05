@@ -47,7 +47,7 @@ export const useDownloadDialog = (
   // ================== DEPENDENCIES & CONTEXT ==================
   const { uuid } = useParams<{ uuid: string }>();
   const dispatch = useAppDispatch();
-  const { downloadConditions } = useDetailPageContext();
+  const { downloadConditions, collection } = useDetailPageContext();
 
   // ================== STATE MANAGEMENT ==================
   const [activeStep, setActiveStep] = useState(0);
@@ -329,6 +329,10 @@ export const useDownloadDialog = (
           multi_polygon: multiPolygon,
           format: format,
           data_usage: dataUsage,
+          collection_title: collection?.title || "",
+          full_metadata_link: collection?.getMetadataUrl() || "",
+          suggested_citation:
+            collection?.getCitation()?.suggestedCitation || "",
         },
         outputs: {},
         subscriber: {
@@ -374,7 +378,7 @@ export const useDownloadDialog = (
           }
         );
     },
-    [uuid, dispatch]
+    [uuid, dispatch, collection]
   );
 
   // ================== FORM SUBMISSION HANDLERS ==================
