@@ -412,13 +412,22 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             }, 100);
           }
         })
-        .catch((err) => console.error("Popup:", err));
+        .catch((err) => {
+          // Clean up any existing popups on error
+          cleanPopup();
+          console.error("Popup:", err);
+        });
     };
 
     if (map) {
+      // Register click handler if layer should be visible
+      if (visible) {
+        map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+      }
+
+      // Handle visibility changes and layer field fetching on IDLE
       // Given the useEffect run in order, the layer creation is call via MapEventEnum.IDLE
-      // so here we need to use MapEventEnum.IDLE too so that it become the next call when
-      // IDLE
+      // so here we need to use MapEventEnum.IDLE too so that it become the next call when IDLE
       map.once(MapEventEnum.IDLE, () => {
         const layer = map?.getLayer(titleLayerId);
         if (layer) {
@@ -431,9 +440,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             // Need update if value diff, this is used to avoid duplicate call to useEffect
             map.setLayoutProperty(titleLayerId, "visibility", targetVis);
 
+            // Only fetch layer fields when visibility actually changes
             if (visible) {
               setMapLoading?.(true);
-              map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
               const layerName = config.urlParams.LAYERS?.join(",") || "";
 
               // Check time slider support - only fetch fields if we have a valid layer name
