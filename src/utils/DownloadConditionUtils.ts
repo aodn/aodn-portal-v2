@@ -27,26 +27,13 @@ export const getDateConditionFrom = (
 
 export const getMultiPolygonFrom = (
   conditions: IDownloadCondition[]
-): MultiPolygon => {
+): MultiPolygon | string => {
   const filteredCondition = conditions.filter(
     (condition) => condition.type === DownloadConditionType.BBOX
   );
   // if no bbox condition found, return the whole world
   if (filteredCondition.length === 0) {
-    return {
-      type: "MultiPolygon",
-      coordinates: [
-        [
-          [
-            [-180, 90],
-            [-180, -90],
-            [180, -90],
-            [180, 90],
-            [-180, 90],
-          ],
-        ],
-      ],
-    };
+    return "non-specified";
   }
 
   const bboxes: [number, number, number, number][] = filteredCondition.map(
