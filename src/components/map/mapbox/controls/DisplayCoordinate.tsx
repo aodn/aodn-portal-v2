@@ -30,7 +30,8 @@ const DisplayCoordinate = () => {
       ref={ref}
       style={{
         display: "inline-block",
-        position: "relative",
+        position: "absolute",
+        bottom: 0,
         zIndex: zIndex["MAP_COORD"],
         backgroundColor: "rgba(255, 255, 255, 0.6)",
       }}

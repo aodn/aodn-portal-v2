@@ -139,10 +139,24 @@ const formWmsLayerOptions = (
   }));
 };
 
+const extractLayerName = (layer: ILink): string => {
+  // Two ways to use the wms like, either you put the layer name in title or you put a description and then
+  // give a link to wms, now if it is the later case then we try to see if the url have attribute layer name there
+  // if yes we use it otherwise we use the title.
+  if (layer.href) {
+    const url = new URL(layer.href);
+    const ln = url.searchParams.get("layers");
+    if (ln) {
+      return ln;
+    }
+  }
+  return layer.title;
+};
+
 const formWmsLinkOptions = (layers: ILink[] | undefined): SelectItem[] => {
   if (!layers || layers.length === 0) return [];
   return layers?.map((layer) => ({
-    value: layer.title,
+    value: extractLayerName(layer),
     label: layer.title, // Use title for label for now. Could be changed to ai:label in future
   }));
 };
