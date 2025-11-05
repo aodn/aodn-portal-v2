@@ -2,7 +2,7 @@ import { Box, Button, Typography } from "@mui/material";
 import rc8Theme from "../../../../../../styles/themeRC8";
 import { DownloadNotAvailableIcon } from "../../../../../../assets/icons/download/downloadNotAvaliable";
 
-const DownloadNOtAvailableCard = () => {
+const DownloadNotAvailableCard = () => {
   return (
     <Box px="16px" py="22px">
       <Box
@@ -53,4 +53,4 @@ const DownloadNOtAvailableCard = () => {
   );
 };
 
-export default DownloadNOtAvailableCard;
+export default DownloadNotAvailableCard;
