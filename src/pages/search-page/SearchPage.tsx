@@ -61,7 +61,12 @@ import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 import _ from "lodash";
 import useFetchData from "../../hooks/useFetchData";
-import { MOVE_END, ZOOM_END } from "../../components/map/mapbox/Map";
+import {
+  MOVE_END,
+  MOVE_START,
+  ZOOM_END,
+  ZOOM_START,
+} from "../../components/map/mapbox/Map";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -213,7 +218,13 @@ const SearchPage = () => {
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent | undefined) => {
-      if (event?.type === ZOOM_END || event?.type === MOVE_END) {
+      if (event?.type === ZOOM_START || event?.type === MOVE_START) {
+        // If another zoom or move starts, we can cancel the current map search
+        // as it is useless because another zoom/move end will come and trigger
+        // search again
+        mapSearchAbortRef.current?.abort();
+        mapSearchAbortRef.current = null;
+      } else if (event?.type === ZOOM_END || event?.type === MOVE_END) {
         const componentParam: ParameterState = getComponentState(
           store.getState()
         );
