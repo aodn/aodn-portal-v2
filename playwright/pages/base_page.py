@@ -158,7 +158,7 @@ class BasePage:
                 ) as centroid_request_info,
             ):
                 action()  # Execute the passed function
-                self.wait_for_timeout(1000)
+                self.wait_for_url_update()
 
             collections_request = collections_request_info.value
             centroid_request = centroid_request_info.value

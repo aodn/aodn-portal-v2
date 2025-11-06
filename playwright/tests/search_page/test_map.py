@@ -195,14 +195,16 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.map.wait_for_map_loading()
+    search_page.wait_for_search_to_complete()
 
     search_page.map.drag_map()
     search_page.map.zoom_in()
     search_page.wait_for_page_stabilization()
+    search_page.map.wait_for_map_idle()
 
     map_center = search_page.map.get_map_center()
     map_zoom = search_page.map.get_map_zoom()
+    search_page.wait_for_url_update()
 
     # Use the current page URL and open a new tab with the same URL
     current_url = search_page.url
@@ -217,7 +219,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     new_search_page = SearchPage(new_page)
     new_search_page.goto(current_url, wait_until='load')
-    new_search_page.map.wait_for_map_loading()
+    new_search_page.map.wait_for_map_idle()
 
     new_map_center = new_search_page.map.get_map_center()
     new_map_zoom = new_search_page.map.get_map_zoom()

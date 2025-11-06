@@ -169,9 +169,20 @@ const ReactMap = memo(
         // If exist fit the map to this area, this useful if url pass around and
         // the bbox in the url is not the default area of the map
         // Use same function to save processing
-        const cancelDebounce = () => debounceOnZoomEvent.cancel();
-        map.on(MOVE_START, cancelDebounce);
-        map.on(ZOOM_START, cancelDebounce);
+        const cancelDebounceAndStartMove = (event: MapEvent) => {
+          debounceOnMoveEvent.cancel();
+          // Give start move event a chance to send to listener
+          onMoveEvent?.(event);
+        };
+
+        const cancelDebounceAndStartZoom = (event: MapEvent) => {
+          debounceOnZoomEvent.cancel();
+          // Give start zoom event a chance to send to listener
+          onZoomEvent?.(event);
+        };
+
+        map.on(MOVE_START, cancelDebounceAndStartMove);
+        map.on(ZOOM_START, cancelDebounceAndStartZoom);
 
         // Do not setup here, the useEffect block will setup it correctly, if you set it here
         // you will get one extra data load which is of no use.
@@ -206,8 +217,8 @@ const ReactMap = memo(
           // We need this when the map destroy
           map.off(ZOOM_END, debounceOnZoomEvent);
           map.off(MOVE_END, debounceOnMoveEvent);
-          map.off(MOVE_START, cancelDebounce);
-          map.off(ZOOM_START, cancelDebounce);
+          map.off(MOVE_START, cancelDebounceAndStartMove);
+          map.off(ZOOM_START, cancelDebounceAndStartZoom);
           map.remove();
           setMap(null);
         };
@@ -218,7 +229,14 @@ const ReactMap = memo(
       return () => {
         cleanup?.();
       };
-    }, [initializeMap, projection, debounceOnZoomEvent, debounceOnMoveEvent]);
+    }, [
+      initializeMap,
+      projection,
+      debounceOnZoomEvent,
+      debounceOnMoveEvent,
+      onMoveEvent,
+      onZoomEvent,
+    ]);
 
     useEffect(() => {
       if (!map || !bbox || !containerRef.current?.isConnected) return;
