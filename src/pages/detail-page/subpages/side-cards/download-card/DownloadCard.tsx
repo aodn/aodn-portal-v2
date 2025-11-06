@@ -4,7 +4,7 @@ import { ILink } from "../../../../../components/common/store/OGCCollectionDefin
 import DownloadWFSCard from "./components/DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./components/DownloadCloudOptimisedCard";
 import SideCardContainer from "../SideCardContainer";
-import DownloadNOtAvailableCard from "./components/DownloadNOtAvailableCard";
+import DownloadNotAvailableCard from "./components/DownloadNotAvailableCard";
 
 const DownloadCard: FC = () => {
   const {
@@ -45,7 +45,7 @@ const DownloadCard: FC = () => {
         />
       );
     }
-    return <DownloadNOtAvailableCard />;
+    return <DownloadNotAvailableCard />;
   };
 
   return (
