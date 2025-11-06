@@ -217,7 +217,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     new_search_page = SearchPage(new_page)
     new_search_page.goto(current_url, wait_until='load')
-    new_search_page.map.wait_for_map_loading()
+    new_search_page.map.wait_for_map_idle()
 
     new_map_center = new_search_page.map.get_map_center()
     new_map_zoom = new_search_page.map.get_map_zoom()
