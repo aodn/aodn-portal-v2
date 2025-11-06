@@ -26,6 +26,8 @@ import InfoMessage from "./InfoMessage";
 import DownloadButton from "../../../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
+import { trackCustomEvent } from "../../../../../../analytics/customEventTracker";
+import { AnalyticsEvent } from "../../../../../../analytics/analyticsEvents";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -100,8 +102,22 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
 
   const handleDownload = useCallback(async () => {
     if (!selectedDataItem || !uuid) return;
+
+    // WFS download tracking
+    trackCustomEvent(AnalyticsEvent.DOWNLOAD_WFS_DATA, {
+      wfs_download_uuid: uuid,
+      wfs_download_data_selection: selectedDataItem,
+      wfs_download_format: selectedFormat,
+    });
+
     await startDownload(uuid, selectedDataItem, downloadConditions);
-  }, [selectedDataItem, uuid, startDownload, downloadConditions]);
+  }, [
+    selectedDataItem,
+    selectedFormat,
+    uuid,
+    startDownload,
+    downloadConditions,
+  ]);
 
   const handleCancelDownload = useCallback(() => {
     cancelDownload();
