@@ -22,7 +22,7 @@ export interface DatasetDownloadRequest {
     recipient: string;
     start_date: string;
     end_date: string;
-    multi_polygon: MultiPolygon;
+    multi_polygon: MultiPolygon | string;
     format: string;
     data_usage?: {
       purposes: string[];

@@ -23,6 +23,7 @@ import { processDatasetDownload } from "../components/common/store/searchReducer
 import { trackCustomEvent } from "../analytics/customEventTracker";
 import { AnalyticsEvent } from "../analytics/analyticsEvents";
 import { calculateBboxes } from "../analytics/downloadCODataEvent";
+import { MultiPolygon } from "geojson";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -432,8 +433,25 @@ export const useDownloadDialog = (
       subsettingSelectionCount,
     } = latestValuesRef.current;
 
+    const wholeGlobe: MultiPolygon = {
+      type: "MultiPolygon",
+      coordinates: [
+        [
+          [
+            [-180, 90],
+            [-180, -90],
+            [180, -90],
+            [180, 90],
+            [-180, 90],
+          ],
+        ],
+      ],
+    };
+
+    const multiPolygonToTrack =
+      typeof multiPolygon === "string" ? wholeGlobe : multiPolygon;
     // Track download event with obfuscated email (. becomes *, @ becomes #)
-    const bboxes = calculateBboxes(multiPolygon);
+    const bboxes = calculateBboxes(multiPolygonToTrack);
 
     trackCustomEvent(AnalyticsEvent.DOWNLOAD_CO_DATA, {
       dataset_uuid: uuid,
@@ -448,7 +466,7 @@ export const useDownloadDialog = (
         Object.keys(bboxes).length > 0 &&
         bboxes),
       ...(subsettingSelectionCount > 0 && {
-        spatial_extent_count: multiPolygon?.coordinates?.length || 0,
+        spatial_extent_count: multiPolygonToTrack?.coordinates?.length || 0,
       }),
       subsetting_count: subsettingSelectionCount,
     });
