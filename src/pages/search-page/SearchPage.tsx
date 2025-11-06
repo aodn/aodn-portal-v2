@@ -224,9 +224,6 @@ const SearchPage = () => {
         // search again
         mapSearchAbortRef.current?.abort();
         mapSearchAbortRef.current = null;
-
-        listSearchAbortRef.current?.abort();
-        listSearchAbortRef.current = null;
       } else if (event?.type === ZOOM_END || event?.type === MOVE_END) {
         const componentParam: ParameterState = getComponentState(
           store.getState()
