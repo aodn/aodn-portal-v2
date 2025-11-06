@@ -127,6 +127,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const hasSpatialExtent = useMemo(() => !!collection?.getBBox(), [collection]);
 
+  const isZarrDataset = useMemo(
+    () => collection?.getDatasetType() === DatasetType.ZARR,
+    [collection]
+  );
+
   const noMapPreview = useMemo(
     () => !hasDownloadService && !hasSpatialExtent,
     [hasDownloadService, hasSpatialExtent]
@@ -152,9 +157,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const layers: LayerSwitcherLayer<LayerName>[] = [];
 
     if (collection) {
-      const isZarrDataset: boolean =
-        collection.getDatasetType() === DatasetType.ZARR;
-
       // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
       const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
 
@@ -186,6 +188,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   }, [
     collection,
     hasSummaryFeature,
+    isZarrDataset,
     isWMSAvailable,
     hasSpatialExtent,
     hasDownloadService,
@@ -373,7 +376,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                           (selectedLayer === LayerName.GeoServer &&
                             timeSliderSupport) ||
                           (selectedLayer === LayerName.Hexbin &&
-                            hasSummaryFeature)
+                            hasSummaryFeature) ||
+                          (selectedLayer === LayerName.SpatialExtent &&
+                            hasSummaryFeature &&
+                            isZarrDataset)
                         }
                         menu={
                           <DateRange
