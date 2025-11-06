@@ -204,6 +204,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     map_center = search_page.map.get_map_center()
     map_zoom = search_page.map.get_map_zoom()
+    search_page.wait_for_url_update()
 
     # Use the current page URL and open a new tab with the same URL
     current_url = search_page.url
