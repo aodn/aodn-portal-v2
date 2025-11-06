@@ -38,7 +38,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   onMouseLeave = (_: MapMouseEvent) => {},
   onMouseMove = (_: MapMouseEvent) => {},
   setPhotos,
-  animate = true,
+  animate = false,
   isVisible = true,
 }) => {
   const { map } = useContext(MapContext);
@@ -65,8 +65,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       const bound = bboxes[index];
       if (map) {
         fitToBound(map, bound, {
-          animate: false,
-          zoomOffset: index === 0 ? -1 : -1.5, // More zoom out for first photo (overview)
+          animate: animate,
         });
 
         map.once("idle", () => {
@@ -113,8 +112,6 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         // Just fit to the overall extent (first bbox)
         fitToBound(map, bboxes[0], {
           animate,
-          // For map container with fixed 150px height, we need a bit more zoom out
-          zoomOffset: -1,
         });
       }
     },
