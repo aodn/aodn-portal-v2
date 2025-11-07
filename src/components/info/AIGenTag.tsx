@@ -32,6 +32,7 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
         ref={buttonRef}
         onClick={handleClick}
         sx={{ padding: 0, bgcolor: "transparent" }}
+        data-testId="AIGenTag-icon"
       >
         <AIGenIcon color={rc8Theme.palette.primary1} />
       </IconButton>
@@ -48,6 +49,7 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
           vertical: "top",
           horizontal: "right",
         }}
+        data-testId="AIGenTag-popup"
       >
         <InfoCard
           status={InfoStatusType.NONE}
@@ -67,6 +69,7 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
               top: "8px",
               right: "8px",
             }}
+            data-testId="AIGenTag-close-button"
           >
             <CloseIcon />
           </IconButton>
