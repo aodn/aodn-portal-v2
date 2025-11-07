@@ -154,7 +154,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const scrollableSectionRef = useRef<HTMLDivElement | null>(null);
   const basePointRef = useRef<HTMLDivElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const { isMobile } = useBreakpoint();
+  const { isUnderLaptop } = useBreakpoint();
 
   // Create an array of refs with the same size as the menu list which is the size of childrenList
   const menuRefs = useRef(
@@ -235,7 +235,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     </Grid>
   ) : (
     <Grid container>
-      {!isMobile && (
+      {!isUnderLaptop && (
         <Grid item sm={3} direction="row">
           <Grid container wrap="nowrap" direction="row">
             <Grid item md={1}>
@@ -260,7 +260,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       <Grid
         item
         xs={12}
-        sm={9}
+        md={9}
         ref={scrollableSectionRef}
         sx={{
           height: PANEL_VISIBLE_HEIGHT + "px",
