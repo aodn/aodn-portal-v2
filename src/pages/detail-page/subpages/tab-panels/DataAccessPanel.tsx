@@ -210,7 +210,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
           isLoading={false}
           AIGenContent={{
             title: "Link Grouped",
-            body: "Links are grouped by AI. ",
+            body: "The data access links are grouped by AI models into a better structure.",
           }}
         />
       );

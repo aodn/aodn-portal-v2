@@ -333,7 +333,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 <AIGenTag
                   infoContent={{
                     title: "Content reformatted",
-                    body: "The summary content of dataset is reformatted by AI models into a better layout with highlighted keywords.",
+                    body: "The summary content of dataset is reformatted by AI models into a better layout.",
                   }}
                 />
               </Box>
