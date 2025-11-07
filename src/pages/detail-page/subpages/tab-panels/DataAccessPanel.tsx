@@ -204,7 +204,16 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
 
     case MODE.NORMAL:
     default:
-      return <NavigatablePanel childrenList={blocks} isLoading={false} />;
+      return (
+        <NavigatablePanel
+          childrenList={blocks}
+          isLoading={false}
+          AIGenContent={{
+            title: "Link Grouped",
+            body: "Links are grouped by AI. ",
+          }}
+        />
+      );
   }
 };
 
