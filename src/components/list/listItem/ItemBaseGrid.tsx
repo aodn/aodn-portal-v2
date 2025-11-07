@@ -42,7 +42,7 @@ const ItemBaseGrid = ({
         onMouseLeave={disableHover ? undefined : () => setIsOnHover(false)}
         sx={{
           backgroundColor: getBackgroundColor(),
-          width: "95%",
+          width: "98%",
           minheight: "44px",
           display: "flex",
           alignItems: "center",
