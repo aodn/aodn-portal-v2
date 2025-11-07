@@ -14,6 +14,7 @@ import { Position } from "geojson";
 import { MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { fitToBound } from "../../../../utils/MapUtils";
+import bluePin from "@/assets/icons/blue_pin.png";
 
 interface SpatialExtentPhoto {
   bbox: Position;
@@ -30,6 +31,8 @@ interface GeojsonLayerProps {
   animate?: boolean;
   isVisible?: boolean;
 }
+
+const BLUE_PIN_NAME = "blue_pin_name";
 
 const GeojsonLayer: FC<GeojsonLayerProps> = ({
   collection,
@@ -48,7 +51,9 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   // Do not use memo on this, some case result in wrong id.
   const containerId = map?.getContainer().id;
   const sourceId = `geojson-${containerId}-source-${collectionId}`;
-  const layerId = `geojson-${containerId}-layer-${collectionId}`;
+
+  const layerPolygonId = `geojson-${containerId}-layer-${collectionId}-poly`;
+  const layerPointId = `geojson-${containerId}-layer-${collectionId}-point`;
 
   // Function to take photo of the map for given bounding boxes
   const takePhoto = useCallback(
@@ -131,9 +136,10 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     });
 
     map?.addLayer({
-      id: layerId,
+      id: layerPolygonId,
       type: "fill",
       source: sourceId,
+      filter: ["!=", ["geometry-type"], "Point"],
       paint: {
         "fill-color": stringToColor(collectionId),
         "fill-outline-color": "yellow",
@@ -142,7 +148,26 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         visibility: isVisible ? "visible" : "none",
       },
     });
-  }, [map, extent, collectionId, sourceId, layerId, isVisible]);
+
+    map?.addLayer({
+      id: layerPointId,
+      type: "symbol",
+      source: sourceId,
+      filter: ["==", ["geometry-type"], "Point"],
+      layout: {
+        visibility: isVisible ? "visible" : "none",
+        "icon-image": BLUE_PIN_NAME,
+      },
+    });
+  }, [
+    map,
+    sourceId,
+    extent,
+    layerPolygonId,
+    collectionId,
+    isVisible,
+    layerPointId,
+  ]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
   // the behavior of mapbox, this useEffect, add the layer back based on user event
@@ -154,14 +179,20 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   }, [map, createLayer]);
 
   useEffect(() => {
-    if (!map || !map.getLayer(layerId)) return;
+    if (!map || !map.getLayer(layerPolygonId) || !map.getLayer(layerPointId))
+      return;
 
     map.setLayoutProperty(
-      layerId,
+      layerPolygonId,
       "visibility",
       isVisible ? "visible" : "none"
     );
-  }, [map, layerId, isVisible]);
+    map.setLayoutProperty(
+      layerPointId,
+      "visibility",
+      isVisible ? "visible" : "none"
+    );
+  }, [map, layerPolygonId, isVisible, layerPointId]);
 
   useEffect(() => {
     if (map === null) return;
@@ -176,33 +207,43 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           // Call handleIdle when the map is idle
           const onceIdle = () => handleIdle(extent?.bbox);
           map?.once("idle", onceIdle);
-          map?.on("click", layerId, onLayerClick);
-          map?.on("mouseenter", layerId, onMouseEnter);
-          map?.on("mouseleave", layerId, onMouseLeave);
-          map?.on("mousemove", layerId, onMouseMove);
+          map?.on("click", layerPolygonId, onLayerClick);
+          map?.on("mouseenter", layerPolygonId, onMouseEnter);
+          map?.on("mouseleave", layerPolygonId, onMouseLeave);
+          map?.on("mousemove", layerPolygonId, onMouseMove);
 
           return true;
         } else return prev;
       })
     );
+
+    map?.once("load", () => {
+      map?.loadImage(bluePin, (err, img) => {
+        if (!err && img && map?.hasImage(BLUE_PIN_NAME))
+          map.addImage(BLUE_PIN_NAME, img);
+      });
+    });
+
     return () => {
       // Always remember to clean up resources
       try {
         if (map?.getSource(sourceId)) {
-          map?.removeLayer(layerId);
+          map?.removeLayer(layerPolygonId);
+          map?.removeLayer(layerPointId);
           map?.removeSource(sourceId);
+          map?.removeImage(BLUE_PIN_NAME);
         }
       } catch (error) {
         // OK to ignore error here
       } finally {
-        map?.off("click", layerId, onLayerClick);
-        map?.off("mouseenter", layerId, onMouseEnter);
-        map?.off("mouseleave", layerId, onMouseLeave);
-        map?.off("mousemove", layerId, onMouseMove);
+        map?.off("click", layerPolygonId, onLayerClick);
+        map?.off("mouseenter", layerPolygonId, onMouseEnter);
+        map?.off("mouseleave", layerPolygonId, onMouseLeave);
+        map?.off("mousemove", layerPolygonId, onMouseMove);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, handleIdle, layerId, sourceId]);
+  }, [map, handleIdle, layerPolygonId, sourceId]);
 
   return <React.Fragment />;
 };

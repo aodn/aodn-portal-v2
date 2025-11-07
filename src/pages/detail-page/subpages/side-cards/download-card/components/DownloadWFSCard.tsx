@@ -28,6 +28,7 @@ import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import { trackCustomEvent } from "../../../../../../analytics/customEventTracker";
 import { AnalyticsEvent } from "../../../../../../analytics/analyticsEvents";
+import { formWmsLinkOptions } from "../../../../../../components/map/mapbox/layers/GeoServerLayer";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -60,7 +61,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   } = useWFSDownload(() => setSnackbarOpen(true));
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
-    selectedWmsLayerName || WMSLinks?.[0]?.title || ""
+    undefined
   );
   const [selectedFormat, setSelectedFormat] = useState<string>(
     formatOptions[0].value
@@ -71,14 +72,12 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   // Will display all the wfs layers if there is no wms layer
   const dataSelectOptions = useMemo(() => {
     if (selectedWmsLayerName) {
+      setSelectedDataItem(selectedWmsLayerName);
       return [{ value: selectedWmsLayerName, label: selectedWmsLayerName }];
     }
 
     if (WMSLinks && WMSLinks.length > 0) {
-      return WMSLinks.map((link) => ({
-        value: link.title,
-        label: link.title,
-      }));
+      return formWmsLinkOptions(WFSLinks);
     }
     return (WFSLinks ?? []).map((link) => ({
       value: link.title,
@@ -129,13 +128,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       new FormatCondition("format", formatOptions[0].value),
     ]);
   }, [getAndSetDownloadConditions]);
-
-  useEffect(() => {
-    // set default data item
-    if (selectedWmsLayerName) {
-      setSelectedDataItem(selectedWmsLayerName);
-    }
-  }, [selectedWmsLayerName]);
 
   const renderProgressMessage = useCallback(
     (dataSize: string, progressMessage: string) => {
