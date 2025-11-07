@@ -10,6 +10,8 @@ import React, {
   useState,
 } from "react";
 import DetailSubtabBtn from "../../../../components/common/buttons/DetailSubtabBtn";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
+import AIGenTag from "../../../../components/info/AIGenTag";
 
 // the visible height of the navigatable panel. May change according to the design
 const PANEL_VISIBLE_HEIGHT = 1480;
@@ -149,6 +151,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const scrollableSectionRef = useRef<HTMLDivElement | null>(null);
   const basePointRef = useRef<HTMLDivElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const { isMobile } = useBreakpoint();
 
   // Create an array of refs with the same size as the menu list which is the size of childrenList
   const menuRefs = useRef(
@@ -228,36 +231,45 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       <CircularProgress />
     </Grid>
   ) : (
-    <Grid container>
-      <Grid item container md={3} direction="row">
-        <Grid
-          container
-          wrap="nowrap"
-          direction="row" // Ensure buttons stack horizontal
-        >
-          <Grid item md={1}>
-            <VerticalIndicator index={selectedIndex} itemRefs={menuRefs} />
+    <Grid container position="relative">
+      <Box position="absolute" zIndex="2" top={0} right={8} bgcolor="#fff">
+        <AIGenTag infoContent={{ title: "AI GEN", body: "1234" }} />
+      </Box>
+      {!isMobile && (
+        <Grid item sm={3} direction="row">
+          <Grid
+            container
+            wrap="nowrap"
+            direction="row" // Ensure buttons stack horizontal
+          >
+            <Grid item md={1}>
+              <VerticalIndicator index={selectedIndex} itemRefs={menuRefs} />
+            </Grid>
+            <Grid item>
+              {childrenList.map((child, index) => {
+                return (
+                  <DetailSubtabBtn
+                    key={index}
+                    title={child.title}
+                    onClick={onNavigate(index)}
+                    ref={menuRefs.current[index]}
+                  />
+                );
+              })}
+            </Grid>
           </Grid>
-          <Grid item>
-            {childrenList.map((child, index) => {
-              return (
-                <DetailSubtabBtn
-                  key={index}
-                  title={child.title}
-                  onClick={onNavigate(index)}
-                  ref={menuRefs.current[index]}
-                />
-              );
-            })}
-          </Grid>
+          <Grid item md={1} />
         </Grid>
-        <Grid item md={1} />
-      </Grid>
+      )}
       <Grid
         item
-        md={9}
+        xs={12}
+        sm={9}
         ref={scrollableSectionRef}
-        sx={{ height: PANEL_VISIBLE_HEIGHT + "px", overflowY: "auto" }}
+        sx={{
+          height: PANEL_VISIBLE_HEIGHT + "px",
+          overflowY: "auto",
+        }}
         onScroll={handleScroll}
         position="relative"
         data-testid="scrollable-section"

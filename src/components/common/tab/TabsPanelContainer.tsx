@@ -41,7 +41,7 @@ const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
       aria-labelledby={`tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: padding.large }}>{children}</Box>}
+      {value === index && <Box sx={{ p: padding.medium }}>{children}</Box>}
     </Box>
   );
 };

@@ -1,8 +1,7 @@
 import { FC } from "react";
-import { Link, Paper, SxProps, Typography } from "@mui/material";
+import { Paper, SxProps, Typography } from "@mui/material";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
 import rc8Theme from "../../styles/themeRC8";
-import { COMBINED_LINK_REGEX, isEmail, isUrl } from "../../utils/StringUtils";
 import TextRender from "../common/text/TextRender";
 
 interface InfoCardProps {
@@ -34,19 +33,22 @@ const InfoCard: FC<InfoCardProps> = ({
         ...sx,
       }}
     >
-      <Paper
-        elevation={0}
-        sx={{
-          width: "6px", // Fixed width as per design
-          height: "100%",
-          backgroundColor:
-            status === InfoStatusType.ERROR
-              ? rc8Theme.palette.error.main
-              : status === InfoStatusType.WARNING
-                ? rc8Theme.palette.warning.main
-                : rc8Theme.palette.info.main,
-        }}
-      />
+      {status !== InfoStatusType.NONE && (
+        <Paper
+          elevation={0}
+          sx={{
+            width: "6px", // Fixed width as per design
+            height: "100%",
+            backgroundColor:
+              status === InfoStatusType.ERROR
+                ? rc8Theme.palette.error.main
+                : status === InfoStatusType.WARNING
+                  ? rc8Theme.palette.warning.main
+                  : rc8Theme.palette.info.main,
+          }}
+        />
+      )}
+
       {infoContent && (
         <Paper elevation={0} sx={{ flex: 1 }}>
           {infoContent.title && (
