@@ -340,7 +340,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
               <ExpandableTextArea
                 text={abstract}
                 showMoreStr={"Show All"}
-                sx={{ width: "98%" }}
+                sx={{ width: isUnderLaptop ? "95%" : "98%" }}
               />
             </Stack>
             <Box sx={{ visibility: "visible" }}>
