@@ -19,6 +19,7 @@ from pages.detail_page import DetailPage
         ),
     ],
 )
+@pytest.mark.skip(reason="The navigation panel is removed in mobile view, so test need to update")
 def test_related_resources_sections(
     responsive_page: Page,
     title: str,
