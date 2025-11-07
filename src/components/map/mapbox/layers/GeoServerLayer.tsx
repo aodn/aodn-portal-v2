@@ -505,8 +505,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     if (!collection || isFetchingWmsLayers) return;
 
     setIsFetchingWmsLayers(true);
-    setMapLoading?.(true);
-
     const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
     if (wmsLinksOptions && wmsLinksOptions.length > 0) {
       handleWmsLayerChange(wmsLinksOptions[0].value);
@@ -520,45 +518,53 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       layerName: layerName,
     };
 
-    dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
-      .unwrap()
-      .then(() => {
-        // Successfully fetched fields, loading is complete
-        setIsFetchingWmsLayers(false);
-      })
-      .catch((error: ErrorResponse) => {
-        // For now only catch 404 error for further fetching layers
-        // TODO: we could fetch layers even there is no error to find all wms layers that support wfs download
-        if (error.statusCode === 404) {
-          const wmsLayersRequest: MapFeatureRequest = {
-            uuid: collection.id,
-          };
+    if (layerName && layerName.trim().length > 0) {
+      setMapLoading?.(true);
 
-          dispatch(fetchGeoServerMapLayers(wmsLayersRequest))
-            .unwrap()
-            .then((layers) => {
-              if (layers && layers.length > 0) {
-                handleWmsLayerChange(
-                  formWmsLayerOptions(layers)[0].value || ""
-                );
-                setWmsLayers(formWmsLayerOptions(layers));
+      dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
+        .unwrap()
+        .then(() => {
+          // Successfully fetched fields, loading is complete
+          setIsFetchingWmsLayers(false);
+        })
+        .catch((error: ErrorResponse) => {
+          // For now only catch 404 error for further fetching layers
+          // TODO: we could fetch layers even there is no error to find all wms layers that support wfs download
+          if (error.statusCode === 404) {
+            const wmsLayersRequest: MapFeatureRequest = {
+              uuid: collection.id,
+            };
+
+            dispatch(fetchGeoServerMapLayers(wmsLayersRequest))
+              .unwrap()
+              .then((layers) => {
+                if (layers && layers.length > 0) {
+                  handleWmsLayerChange(
+                    formWmsLayerOptions(layers)[0].value || ""
+                  );
+                  setWmsLayers(formWmsLayerOptions(layers));
+                  setIsFetchingWmsLayers(false);
+                }
+              })
+              .catch((error) => {
+                console.log("Failed to fetch layers, ok to ignore", error);
                 setIsFetchingWmsLayers(false);
-              }
-            })
-            .catch((error) => {
-              console.log("Failed to fetch layers, ok to ignore", error);
-              setIsFetchingWmsLayers(false);
-            });
-        } else {
-          console.log("Failed to fetch fields, ok to ignore", error);
-        }
-      })
-      .finally(() => {
-        setMapLoading?.(false);
-      });
-    // Only listen to collection change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, collection]);
+              });
+          } else {
+            console.log("Failed to fetch fields, ok to ignore", error);
+          }
+        })
+        .finally(() => {
+          setMapLoading?.(false);
+        });
+    }
+  }, [
+    dispatch,
+    collection,
+    isFetchingWmsLayers,
+    setMapLoading,
+    handleWmsLayerChange,
+  ]);
 
   return (
     <>
