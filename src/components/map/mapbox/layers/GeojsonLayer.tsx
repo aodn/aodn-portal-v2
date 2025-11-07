@@ -197,6 +197,14 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   useEffect(() => {
     if (map === null) return;
 
+    // Order important we want to load the image first
+    map?.once("load", () => {
+      map?.loadImage(bluePin, (err, img) => {
+        if (!err && img && !map?.hasImage(BLUE_PIN_NAME))
+          map.addImage(BLUE_PIN_NAME, img);
+      });
+    });
+
     // This situation is map object created, hence not null, but not completely loaded
     // therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
@@ -216,13 +224,6 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         } else return prev;
       })
     );
-
-    map?.once("load", () => {
-      map?.loadImage(bluePin, (err, img) => {
-        if (!err && img && map?.hasImage(BLUE_PIN_NAME))
-          map.addImage(BLUE_PIN_NAME, img);
-      });
-    });
 
     return () => {
       // Always remember to clean up resources

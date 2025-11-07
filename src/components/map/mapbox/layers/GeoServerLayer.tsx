@@ -113,13 +113,9 @@ const checkWMSAvailability = (
     urlConfig.LAYERS.length > 0 &&
     urlConfig.LAYERS.some((layer) => layer && layer.trim() !== "");
 
-  if (!hasValidLayers) {
-    onWMSAvailabilityChange?.(false);
-    return false;
-  }
-
-  onWMSAvailabilityChange?.(true);
-  return true;
+  // Avoid state changes during rendering warning, delay status update for a while
+  setTimeout(() => onWMSAvailabilityChange?.(!!hasValidLayers), 500);
+  return !!hasValidLayers;
 };
 
 const getWmsLayerNames = (collection: OGCCollection | undefined) => {
