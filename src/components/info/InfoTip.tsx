@@ -39,8 +39,8 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
         anchorEl={buttonRef.current}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: "top",
+          horizontal: "right",
         }}
       >
         <InfoCard
@@ -48,7 +48,8 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
           infoContent={infoContent}
           sx={{
             width: "310px", // Fixed width as per design
-            height: "190px", // Fixed Height as per design
+            height: "auto",
+            maxHeight: "80vh",
           }}
         >
           <IconButton
@@ -56,7 +57,7 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
             sx={{
               position: "absolute",
               top: 8,
-              right: { xs: "35px", sm: "15px" },
+              right: 8,
             }}
           >
             <CloseIcon />
