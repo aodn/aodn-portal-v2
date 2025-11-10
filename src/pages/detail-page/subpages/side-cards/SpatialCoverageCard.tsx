@@ -6,6 +6,7 @@ import Layers from "../../../../components/map/mapbox/layers/Layers";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import { FC, useCallback } from "react";
 import { Popup, MapMouseEvent } from "mapbox-gl";
+import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 
 export interface SpatialCoverageCardProps {
   onSpatialCoverageLayerClick?: (event: MapMouseEvent) => void;
@@ -52,6 +53,7 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
         >
           <Map panelId={mapContainerId} zoom={0} minZoom={0}>
             <Layers>
+              <FitToSpatialExtentsLayer collection={collection} />
               <GeojsonLayer
                 collection={collection}
                 onLayerClick={onSpatialCoverageLayerClick}
