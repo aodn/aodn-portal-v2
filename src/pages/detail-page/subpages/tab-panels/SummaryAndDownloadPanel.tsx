@@ -338,6 +338,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 }}
               >
                 <Map
+                  bbox={mapFocusArea}
                   animate={false}
                   panelId={mapContainerId}
                   projection={"mercator"} // Hexbin support this project or globe only
