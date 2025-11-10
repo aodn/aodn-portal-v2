@@ -114,7 +114,7 @@ const checkWMSAvailability = (
     urlConfig.LAYERS.some((layer) => layer && layer.trim() !== "");
 
   // Avoid state changes during rendering warning, delay status update for a while
-  setTimeout(() => onWMSAvailabilityChange?.(!!hasValidLayers), 10);
+  setTimeout(() => onWMSAvailabilityChange?.(!!hasValidLayers), 100);
   return !!hasValidLayers;
 };
 
