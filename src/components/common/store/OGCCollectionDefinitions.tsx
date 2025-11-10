@@ -1,8 +1,6 @@
 import {
   Feature,
   FeatureCollection,
-  GeoJsonProperties,
-  Geometry,
   GeometryCollection,
   Point,
   Position,
@@ -379,7 +377,7 @@ export class Spatial {
   getGeojsonFromBBox = (start: number): FeatureCollection => {
     const featureCollections: FeatureCollection = {
       type: "FeatureCollection",
-      features: new Array<Feature<Geometry, GeoJsonProperties>>(),
+      features: new Array<Feature>(),
     };
 
     // Filter valid bounding boxes and points
@@ -390,9 +388,23 @@ export class Spatial {
     if (validBoxesAndPoints && validBoxesAndPoints.length > 1) {
       // Create features from valid boxes and points starting from the given index
       const features = validBoxesAndPoints.slice(start).map((pos) => {
-        return pos.length === 4
-          ? bboxPolygon([pos[0], pos[1], pos[2], pos[3]])
-          : turf.point(pos);
+        if (pos.length === 4) {
+          // So it can be bbox, line or point
+          if (pos[0] !== pos[2] && pos[1] !== pos[3]) {
+            // Bbox
+            return bboxPolygon([pos[0], pos[1], pos[2], pos[3]]);
+          } else if (pos[0] === pos[2] && pos[1] === pos[3]) {
+            // Must be point
+            return turf.point(pos);
+          }
+        } else {
+          return turf.lineString([
+            [pos[0], pos[1]],
+            [pos[2], pos[3]],
+          ]);
+        }
+        // Assume it is point it will be two pos
+        return turf.point(pos);
       });
 
       // Add individual bounding boxes and points
