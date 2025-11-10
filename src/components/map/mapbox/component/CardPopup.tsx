@@ -28,6 +28,7 @@ import ResultCardButtonGroup from "../../../result/ResultCardButtonGroup";
 import BookmarkButton from "../../../bookmark/BookmarkButton";
 import { detailPageDefault, pageReferer } from "../../../common/constants";
 import { MapEventEnum } from "../constants";
+import FitToSpatialExtentsLayer from "../layers/FitToSpatialExtentsLayer";
 
 interface CardPopupProps {
   layerId: string;
@@ -204,6 +205,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
               animate={false}
             >
               <Layers>
+                <FitToSpatialExtentsLayer collection={content} />
                 <GeojsonLayer collection={content} visible={true} />
               </Layers>
             </Map>

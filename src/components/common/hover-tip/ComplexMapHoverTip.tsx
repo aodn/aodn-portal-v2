@@ -15,6 +15,7 @@ import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
 import BookmarkButton from "../../bookmark/BookmarkButton";
 import { TabNavigation } from "../../../hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "../constants";
+import FitToSpatialExtentsLayer from "../../map/mapbox/layers/FitToSpatialExtentsLayer";
 
 interface BasicMapHoverTipProps {
   content?: string | undefined | null;
@@ -95,6 +96,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
         >
           <Map panelId={`${mapContainerId}-${collection.id}`}>
             <Layers>
+              <FitToSpatialExtentsLayer collection={collection} />
               <GeojsonLayer
                 collection={collection}
                 animate={false}
