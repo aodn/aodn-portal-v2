@@ -114,7 +114,7 @@ const checkWMSAvailability = (
     urlConfig.LAYERS.some((layer) => layer && layer.trim() !== "");
 
   // Avoid state changes during rendering warning, delay status update for a while
-  setTimeout(() => onWMSAvailabilityChange?.(!!hasValidLayers), 500);
+  setTimeout(() => onWMSAvailabilityChange?.(!!hasValidLayers), 10);
   return !!hasValidLayers;
 };
 
@@ -191,15 +191,16 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         urlParams: { LAYERS: [selectedWmsLayer] },
       });
     }
-
-    const isWMSAvailable = checkWMSAvailability(
-      config.urlParams,
-      onWMSAvailabilityChange
-    );
+    // If you are still fetching, then assume you have layer until you complete
+    // fetch then you have a valid value
+    const isWMSAvailable = isFetchingWmsLayers
+      ? true
+      : checkWMSAvailability(config.urlParams, onWMSAvailabilityChange);
     return [config, isWMSAvailable];
   }, [
-    collection,
+    collection?.id,
     geoServerLayerConfig,
+    isFetchingWmsLayers,
     onWMSAvailabilityChange,
     selectedWmsLayer,
   ]);
@@ -215,16 +216,18 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         ? dayjs(dateDefault.max)
         : config.urlParams.END_DATE;
 
-    return [
-      formatToUrl<MapTileRequest>({
-        baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
-        params: {
-          layerName: config.urlParams.LAYERS?.join(",") || "",
-          bbox: config?.urlParams?.BBOX,
-          datetime: `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
-        },
-      }),
-    ];
+    return config.uuid
+      ? [
+          formatToUrl<MapTileRequest>({
+            baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
+            params: {
+              layerName: config.urlParams.LAYERS?.join(",") || "",
+              bbox: config?.urlParams?.BBOX,
+              datetime: `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
+            },
+          }),
+        ]
+      : [];
   }, [
     config.urlParams?.BBOX,
     config.urlParams.END_DATE,
@@ -284,12 +287,16 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     };
 
     const createLayersOnStyleChange = () => {
-      createSource();
-      createLayers(visible ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE);
+      if (tileUrl && tileUrl.length > 0) {
+        createSource();
+        createLayers(
+          visible ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE
+        );
+      }
     };
 
     const createLayersOnInit = () => {
-      if (map?.isStyleLoaded()) {
+      if (map?.isStyleLoaded() && tileUrl && tileUrl.length > 0) {
         createSource();
         createLayers(); // Use default LAYER_VISIBILITY.NONE for initial creation
       }
@@ -558,6 +565,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
           .finally(() => {
             setMapLoading?.(false);
           });
+      } else {
+        setIsFetchingWmsLayers(false);
       }
     }
   }, [
