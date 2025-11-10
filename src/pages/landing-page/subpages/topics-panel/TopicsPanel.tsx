@@ -21,6 +21,8 @@ import {
   updateSearchText,
 } from "../../../../components/common/store/componentParamReducer";
 import rc8Theme from "../../../../styles/themeRC8";
+import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
+import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 
 interface TopicsPanelProps {}
 
@@ -71,6 +73,10 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       dispatch(clearComponentParam());
       // Then update search text with the selected topic value
       dispatch(updateSearchText(value));
+      // Track topics panel button click
+      trackCustomEvent(AnalyticsEvent.SEARCH_TOPIC_CLICK, {
+        search_topic: value,
+      });
 
       redirectSearch("TopicsPanel");
     },

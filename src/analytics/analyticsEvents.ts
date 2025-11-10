@@ -7,6 +7,7 @@
 export enum AnalyticsEvent {
   // User engagement and business events
   SEARCH_RESULT_PARAMS = "search_result_params",
+  SEARCH_TOPIC_CLICK = "search_topic_click",
   DETAILS_PAGE_DATASET = "details_page_dataset",
   COPY_CITATION_CLICK = "copy_citation_click",
   DATA_ACCESS_CLICK = "data_access_click",
