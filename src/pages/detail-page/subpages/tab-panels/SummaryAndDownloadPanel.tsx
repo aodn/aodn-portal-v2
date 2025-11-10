@@ -435,7 +435,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                     <GeojsonLayer
                       collection={collection}
-                      isVisible={selectedLayer === LayerName.SpatialExtent}
+                      visible={selectedLayer === LayerName.SpatialExtent}
                     />
                   </Layers>
                 </Map>

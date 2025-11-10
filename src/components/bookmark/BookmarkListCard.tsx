@@ -51,7 +51,11 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
             }
           >
             <Layers>
-              <GeojsonLayer collection={dataset} animate={false} />
+              <GeojsonLayer
+                collection={dataset}
+                animate={false}
+                visible={true}
+              />
             </Layers>
           </Map>
         </Box>

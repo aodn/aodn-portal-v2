@@ -30,7 +30,7 @@ interface GeojsonLayerProps {
   onMouseMove?: (event: MapMouseEvent) => void;
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   animate?: boolean;
-  isVisible?: boolean;
+  visible?: boolean;
 }
 
 const BLUE_PIN_NAME = "blue_pin_name";
@@ -43,7 +43,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   onMouseMove = (_: MapMouseEvent) => {},
   setPhotos,
   animate = false,
-  isVisible = true,
+  visible = false,
 }) => {
   const { map } = useContext(MapContext);
   const [_, setMapLoaded] = useState<boolean | null>(null);
@@ -141,7 +141,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         "fill-outline-color": "yellow",
       },
       layout: {
-        visibility: isVisible ? "visible" : "none",
+        visibility: visible ? "visible" : "none",
       },
     });
 
@@ -151,7 +151,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       source: sourceId,
       filter: ["==", ["geometry-type"], "Point"],
       layout: {
-        visibility: isVisible ? "visible" : "none",
+        visibility: visible ? "visible" : "none",
         "icon-image": BLUE_PIN_NAME,
       },
     });
@@ -161,7 +161,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     extent,
     layerPolygonId,
     collectionId,
-    isVisible,
+    visible,
     layerPointId,
   ]);
 
@@ -181,14 +181,14 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     map.setLayoutProperty(
       layerPolygonId,
       "visibility",
-      isVisible ? "visible" : "none"
+      visible ? "visible" : "none"
     );
     map.setLayoutProperty(
       layerPointId,
       "visibility",
-      isVisible ? "visible" : "none"
+      visible ? "visible" : "none"
     );
-  }, [map, layerPolygonId, isVisible, layerPointId]);
+  }, [map, layerPolygonId, visible, layerPointId]);
 
   useEffect(() => {
     if (map === null) return;

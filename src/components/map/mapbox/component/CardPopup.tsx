@@ -204,7 +204,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
               animate={false}
             >
               <Layers>
-                <GeojsonLayer collection={content} />
+                <GeojsonLayer collection={content} visible={true} />
               </Layers>
             </Map>
           </CardMedia>
