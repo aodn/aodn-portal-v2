@@ -11,16 +11,9 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import lodash from "lodash";
 import { TestHelper } from "../../common/test/helper";
-import { MapDefaultConfig } from "./constants";
+import { MapDefaultConfig, MapEventEnum } from "./constants";
 import { CircularProgress, Paper } from "@mui/material";
 import { padding } from "../../../styles/constants";
-
-// Define here to avoid repeat typing and accidentally changed value
-// due to typo.
-const ZOOM_START = "zoomstart";
-const ZOOM_END = "zoomend";
-const MOVE_START = "movestart";
-const MOVE_END = "moveend";
 
 export interface MapBasicType {
   centerLongitude?: number;
@@ -134,7 +127,7 @@ const ReactMap = memo(
             "'Open Sans', 'Open Sans CJK SC', sans-serif",
         });
 
-        newMap.on("load", () => {
+        newMap.on(MapEventEnum.LOAD, () => {
           // Remove scale control if it exists
           const scaleElement = newMap
             .getContainer()
@@ -181,8 +174,8 @@ const ReactMap = memo(
           onZoomEvent?.(event);
         };
 
-        map.on(MOVE_START, cancelDebounceAndStartMove);
-        map.on(ZOOM_START, cancelDebounceAndStartZoom);
+        map.on(MapEventEnum.MOVE_START, cancelDebounceAndStartMove);
+        map.on(MapEventEnum.ZOOM_START, cancelDebounceAndStartZoom);
 
         // Do not setup here, the useEffect block will setup it correctly, if you set it here
         // you will get one extra data load which is of no use.
@@ -215,10 +208,10 @@ const ReactMap = memo(
             resizeObserver.unobserve(containerRef.current);
           }
           // We need this when the map destroy
-          map.off(ZOOM_END, debounceOnZoomEvent);
-          map.off(MOVE_END, debounceOnMoveEvent);
-          map.off(MOVE_START, cancelDebounceAndStartMove);
-          map.off(ZOOM_START, cancelDebounceAndStartZoom);
+          map.off(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
+          map.off(MapEventEnum.MOVE_END, debounceOnMoveEvent);
+          map.off(MapEventEnum.MOVE_START, cancelDebounceAndStartMove);
+          map.off(MapEventEnum.ZOOM_START, cancelDebounceAndStartZoom);
           map.remove();
           setMap(null);
         };
@@ -241,8 +234,8 @@ const ReactMap = memo(
     useEffect(() => {
       if (!map || !bbox || !containerRef.current?.isConnected) return;
       // Turn off event to avoid looping
-      map.off(ZOOM_END, debounceOnZoomEvent);
-      map.off(MOVE_END, debounceOnMoveEvent);
+      map.off(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
+      map.off(MapEventEnum.MOVE_END, debounceOnMoveEvent);
       // DO NOT use fitBounds(), it will cause the zoom and padding adjust so
       // you end up map area drift.
       if (animate) {
@@ -256,9 +249,9 @@ const ReactMap = memo(
           zoom: zoom,
         });
       }
-      map.on("idle", () => {
-        map.on(ZOOM_END, debounceOnZoomEvent);
-        map.on(MOVE_END, debounceOnMoveEvent);
+      map.on(MapEventEnum.IDLE, () => {
+        map.on(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
+        map.on(MapEventEnum.MOVE_END, debounceOnMoveEvent);
       });
     }, [bbox, zoom, map, debounceOnZoomEvent, debounceOnMoveEvent, animate]);
 
@@ -346,4 +339,4 @@ const ReactMap = memo(
 ReactMap.displayName = "ReactMap";
 export default ReactMap;
 
-export { styles, ZOOM_START, ZOOM_END, MOVE_END, MOVE_START };
+export { styles };

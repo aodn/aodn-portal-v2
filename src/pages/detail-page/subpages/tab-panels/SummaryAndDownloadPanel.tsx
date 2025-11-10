@@ -39,6 +39,7 @@ import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/m
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -408,6 +409,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     </MenuControlGroup>
                   </Controls>
                   <Layers>
+                    <FitToSpatialExtentsLayer collection={collection} />
                     {createStaticLayers(staticLayer)}
                     {
                       // Put the first two later here so that they all init the same time
