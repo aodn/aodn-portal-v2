@@ -9,6 +9,7 @@ export enum MapEventEnum {
   ZOOM_END = "zoomend",
   MOVE_START = "movestart",
   MOVE_END = "moveend",
+  RENDER = "render",
 }
 
 export const MapDefaultConfig = {

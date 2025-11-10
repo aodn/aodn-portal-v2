@@ -40,7 +40,6 @@ import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/Me
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
-import AIGenIcon from "../../../../components/icon/AIGenIcon";
 import AIGenTag from "../../../../components/info/AIGenTag";
 
 const mapContainerId = "map-detail-container-id";
