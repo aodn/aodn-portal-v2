@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -39,6 +39,7 @@ import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/m
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 import AIGenIcon from "../../../../components/icon/AIGenIcon";
 import AIGenTag from "../../../../components/info/AIGenTag";
 
@@ -165,24 +166,31 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       // Must be order by Hexbin > GeoServer > Spatial extents
       if (isSupportHexbin) {
         layers.push(MapLayers[LayerName.Hexbin]);
+        setSelectedLayer(LayerName.Hexbin);
       }
 
       if (isWMSAvailable) {
-        layers.push({
+        const l = {
           ...MapLayers[LayerName.GeoServer],
           default: !isSupportHexbin,
-        });
+        };
+        layers.push(l);
+
+        if (l.default) {
+          setSelectedLayer(LayerName.GeoServer);
+        }
       }
 
-      if (hasSummaryFeature && isZarrDataset && hasSpatialExtent) {
-        layers.push(MapLayers[LayerName.SpatialExtent]);
-      }
-
-      if (!hasDownloadService && hasSpatialExtent) {
-        layers.push({
+      if (!isSupportHexbin && hasSpatialExtent) {
+        const l = {
           ...MapLayers[LayerName.SpatialExtent],
-          default: true,
-        });
+          default: !isSupportHexbin && !isWMSAvailable,
+        };
+
+        layers.push(l);
+        if (l.default) {
+          setSelectedLayer(LayerName.SpatialExtent);
+        }
       }
     }
 
@@ -193,30 +201,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     isZarrDataset,
     isWMSAvailable,
     hasSpatialExtent,
-    hasDownloadService,
   ]);
-
-  useEffect(() => {
-    if (mapLayerConfig.length > 0) {
-      // Check if current selection is still valid
-      const isCurrentLayerValid = mapLayerConfig.some(
-        (layer) => layer.id === selectedLayer
-      );
-
-      // Find the default layer (if any)
-      const defaultLayer = mapLayerConfig.find((l) => l.default);
-
-      if (
-        selectedLayer === null ||
-        !isCurrentLayerValid ||
-        (defaultLayer && selectedLayer !== defaultLayer.id)
-      ) {
-        setSelectedLayer(defaultLayer ? defaultLayer.id : mapLayerConfig[0].id);
-      }
-    }
-    // Only depend on mapLayerConfig
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapLayerConfig]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
@@ -424,6 +409,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     </MenuControlGroup>
                   </Controls>
                   <Layers>
+                    <FitToSpatialExtentsLayer collection={collection} />
                     {createStaticLayers(staticLayer)}
                     {
                       // Put the first two later here so that they all init the same time
@@ -449,7 +435,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                     <GeojsonLayer
                       collection={collection}
-                      isVisible={selectedLayer === LayerName.SpatialExtent}
+                      visible={selectedLayer === LayerName.SpatialExtent}
                     />
                   </Layers>
                 </Map>

@@ -15,6 +15,7 @@ import { MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { fitToBound } from "../../../../utils/MapUtils";
 import bluePin from "@/assets/icons/blue_pin.png";
+import { MapEventEnum } from "../constants";
 
 interface SpatialExtentPhoto {
   bbox: Position;
@@ -29,7 +30,7 @@ interface GeojsonLayerProps {
   onMouseMove?: (event: MapMouseEvent) => void;
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   animate?: boolean;
-  isVisible?: boolean;
+  visible?: boolean;
 }
 
 const BLUE_PIN_NAME = "blue_pin_name";
@@ -42,7 +43,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   onMouseMove = (_: MapMouseEvent) => {},
   setPhotos,
   animate = false,
-  isVisible = true,
+  visible = false,
 }) => {
   const { map } = useContext(MapContext);
   const [_, setMapLoaded] = useState<boolean | null>(null);
@@ -113,14 +114,9 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         });
         // Call takePhoto with the bounding boxes and starts with the first bounding box (index set to 0)
         takePhoto(bboxes, 0);
-      } else {
-        // Just fit to the overall extent (first bbox)
-        fitToBound(map, bboxes[0], {
-          animate,
-        });
       }
     },
-    [animate, map, setPhotos, takePhoto]
+    [setPhotos, takePhoto]
   );
 
   const createLayer = useCallback(() => {
@@ -145,7 +141,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         "fill-outline-color": "yellow",
       },
       layout: {
-        visibility: isVisible ? "visible" : "none",
+        visibility: visible ? "visible" : "none",
       },
     });
 
@@ -155,7 +151,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       source: sourceId,
       filter: ["==", ["geometry-type"], "Point"],
       layout: {
-        visibility: isVisible ? "visible" : "none",
+        visibility: visible ? "visible" : "none",
         "icon-image": BLUE_PIN_NAME,
       },
     });
@@ -165,7 +161,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     extent,
     layerPolygonId,
     collectionId,
-    isVisible,
+    visible,
     layerPointId,
   ]);
 
@@ -185,20 +181,20 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     map.setLayoutProperty(
       layerPolygonId,
       "visibility",
-      isVisible ? "visible" : "none"
+      visible ? "visible" : "none"
     );
     map.setLayoutProperty(
       layerPointId,
       "visibility",
-      isVisible ? "visible" : "none"
+      visible ? "visible" : "none"
     );
-  }, [map, layerPolygonId, isVisible, layerPointId]);
+  }, [map, layerPolygonId, visible, layerPointId]);
 
   useEffect(() => {
     if (map === null) return;
 
     // Order important we want to load the image first
-    map?.once("load", () => {
+    map?.once(MapEventEnum.IDLE, () => {
       map?.loadImage(bluePin, (err, img) => {
         if (!err && img && !map?.hasImage(BLUE_PIN_NAME))
           map.addImage(BLUE_PIN_NAME, img);
@@ -208,7 +204,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     // This situation is map object created, hence not null, but not completely loaded
     // therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
-    map?.once("load", () =>
+    map?.once(MapEventEnum.IDLE, () =>
       setMapLoaded((prev) => {
         if (!prev) {
           createLayer();

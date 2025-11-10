@@ -6,7 +6,7 @@ import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
-import { MOVE_END, MOVE_START, ZOOM_END, ZOOM_START } from "../Map";
+import { MapEventEnum } from "../constants";
 
 export interface ToggleControlProps {
   showFullMap: boolean;
@@ -84,11 +84,11 @@ class ToggleControlClass implements IControl {
       }
     };
 
-    map.on(ZOOM_START, this.buttonDisable);
-    map.on(ZOOM_END, this.buttonEnable);
+    map.on(MapEventEnum.ZOOM_START, this.buttonDisable);
+    map.on(MapEventEnum.ZOOM_END, this.buttonEnable);
 
-    map.on(MOVE_START, this.buttonDisable);
-    map.on(MOVE_END, this.buttonEnable);
+    map.on(MapEventEnum.MOVE_START, this.buttonDisable);
+    map.on(MapEventEnum.MOVE_END, this.buttonEnable);
 
     return this.container;
   }
@@ -104,11 +104,11 @@ class ToggleControlClass implements IControl {
       });
     }
 
-    map.off(ZOOM_START, this.buttonDisable);
-    map.off(ZOOM_END, this.buttonEnable);
+    map.off(MapEventEnum.ZOOM_START, this.buttonDisable);
+    map.off(MapEventEnum.ZOOM_END, this.buttonEnable);
 
-    map.off(MOVE_START, this.buttonDisable);
-    map.off(MOVE_END, this.buttonEnable);
+    map.off(MapEventEnum.MOVE_START, this.buttonDisable);
+    map.off(MapEventEnum.MOVE_END, this.buttonEnable);
   }
 }
 

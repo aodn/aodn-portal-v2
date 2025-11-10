@@ -95,7 +95,11 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
         >
           <Map panelId={`${mapContainerId}-${collection.id}`}>
             <Layers>
-              <GeojsonLayer collection={collection} animate={false} />
+              <GeojsonLayer
+                collection={collection}
+                animate={false}
+                visible={true}
+              />
             </Layers>
           </Map>
         </Box>
