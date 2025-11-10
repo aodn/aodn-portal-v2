@@ -43,22 +43,9 @@ describe("DownloadConditionUtils", () => {
   });
 
   describe("getMultiPolygonFrom", () => {
-    it("should return a MultiPolygon representing the whole world if no BBox condition is found", () => {
+    it("should return non-specified if no BBox condition is found", () => {
       const conditions: IDownloadCondition[] = [];
-      const expected: MultiPolygon = {
-        type: "MultiPolygon",
-        coordinates: [
-          [
-            [
-              [-180, 90],
-              [-180, -90],
-              [180, -90],
-              [180, 90],
-              [-180, 90],
-            ],
-          ],
-        ],
-      };
+      const expected = "non-specified";
       const result = getMultiPolygonFrom(conditions);
       expect(result).toEqual(expected);
     });
