@@ -29,7 +29,7 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
       <IconButton
         ref={buttonRef}
         onClick={handleClick}
-        sx={{ color: rc8Theme.palette.info.main }}
+        sx={{ color: rc8Theme.palette.info.main, padding: 0 }}
       >
         <InfoIcon />
       </IconButton>

@@ -10,6 +10,9 @@ import React, {
   useState,
 } from "react";
 import DetailSubtabBtn from "../../../../components/common/buttons/DetailSubtabBtn";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
+import AIGenTag from "../../../../components/info/AIGenTag";
+import { InfoContentType } from "../../../../components/info/InfoDefinition";
 
 // the visible height of the navigatable panel. May change according to the design
 const PANEL_VISIBLE_HEIGHT = 1480;
@@ -22,6 +25,7 @@ export interface NavigatablePanelChild {
 interface NavigatablePanelProps {
   childrenList: NavigatablePanelChild[];
   isLoading: boolean;
+  AIGenContent?: InfoContentType;
 }
 
 interface VerticalIndicatorProps {
@@ -145,10 +149,12 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
 const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   childrenList,
   isLoading,
+  AIGenContent,
 }) => {
   const scrollableSectionRef = useRef<HTMLDivElement | null>(null);
   const basePointRef = useRef<HTMLDivElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const { isUnderLaptop } = useBreakpoint();
 
   // Create an array of refs with the same size as the menu list which is the size of childrenList
   const menuRefs = useRef(
@@ -229,39 +235,60 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
     </Grid>
   ) : (
     <Grid container>
-      <Grid item container md={3} direction="row">
-        <Grid
-          container
-          wrap="nowrap"
-          direction="row" // Ensure buttons stack horizontal
-        >
-          <Grid item md={1}>
-            <VerticalIndicator index={selectedIndex} itemRefs={menuRefs} />
+      {!isUnderLaptop && (
+        <Grid item sm={3} direction="row">
+          <Grid container wrap="nowrap" direction="row">
+            <Grid item md={1}>
+              <VerticalIndicator index={selectedIndex} itemRefs={menuRefs} />
+            </Grid>
+            <Grid item>
+              {childrenList.map((child, index) => {
+                return (
+                  <DetailSubtabBtn
+                    key={index}
+                    title={child.title}
+                    onClick={onNavigate(index)}
+                    ref={menuRefs.current[index]}
+                  />
+                );
+              })}
+            </Grid>
           </Grid>
-          <Grid item>
-            {childrenList.map((child, index) => {
-              return (
-                <DetailSubtabBtn
-                  key={index}
-                  title={child.title}
-                  onClick={onNavigate(index)}
-                  ref={menuRefs.current[index]}
-                />
-              );
-            })}
-          </Grid>
+          <Grid item md={1} />
         </Grid>
-        <Grid item md={1} />
-      </Grid>
+      )}
       <Grid
         item
+        xs={12}
         md={9}
         ref={scrollableSectionRef}
-        sx={{ height: PANEL_VISIBLE_HEIGHT + "px", overflowY: "auto" }}
+        sx={{
+          height: PANEL_VISIBLE_HEIGHT + "px",
+          overflowY: "auto",
+        }}
         onScroll={handleScroll}
         position="relative"
         data-testid="scrollable-section"
       >
+        {AIGenContent && (
+          <Box
+            position="absolute"
+            zIndex="2"
+            top={0}
+            right={8}
+            p="4px"
+            bgcolor="#fff"
+            borderRadius="50%"
+          >
+            <AIGenTag
+              infoContent={{
+                title: AIGenContent.title,
+                body: AIGenContent.body,
+              }}
+            />
+          </Box>
+        )}
+
         {childrenList.map((child, index) => {
           return (
             <Box

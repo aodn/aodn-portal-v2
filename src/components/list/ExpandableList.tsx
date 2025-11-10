@@ -28,13 +28,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
   return (
     <Grid container sx={{ marginTop: "6px" }}>
       {title !== "Statement" && (
-        <Grid
-          item
-          xs={12}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-        >
+        <Grid item xs={12} display="flex" alignItems="center">
           <Box display="flex" sx={{ ml: "12px" }}>
             {navigatable && (
               <Box display="flex" justifyContent="center" alignItems="center">

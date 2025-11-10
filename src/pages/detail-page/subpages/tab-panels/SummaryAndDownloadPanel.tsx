@@ -40,6 +40,8 @@ import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/Me
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
+import AIGenIcon from "../../../../components/icon/AIGenIcon";
+import AIGenTag from "../../../../components/info/AIGenTag";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -311,7 +313,21 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       <Grid container>
         <Grid item xs={12}>
           <Stack direction="column">
-            <ExpandableTextArea text={abstract} showMoreStr={"Show All"} />
+            <Stack position="relative" direction={"row"}>
+              <Box position="absolute" top={-6} right={-6}>
+                <AIGenTag
+                  infoContent={{
+                    title: "Content reformatted",
+                    body: "The summary content of dataset is reformatted by AI models into a better layout.",
+                  }}
+                />
+              </Box>
+              <ExpandableTextArea
+                text={abstract}
+                showMoreStr={"Show All"}
+                sx={{ width: isUnderLaptop ? "95%" : "98%" }}
+              />
+            </Stack>
             <Box sx={{ visibility: "visible" }}>
               <Box
                 arial-label="map"
