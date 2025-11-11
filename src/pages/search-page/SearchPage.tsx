@@ -226,7 +226,6 @@ const SearchPage = () => {
           // If another zoom or move starts, we can cancel the current map search
           // as it is useless because another zoom/move end will come and trigger
           // search again
-          console.log("Cancel devom ot eu / zoom");
           mapSearchAbortRef.current?.abort();
           mapSearchAbortRef.current = null;
         } else if (
