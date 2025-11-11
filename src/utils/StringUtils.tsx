@@ -74,7 +74,8 @@ export const createFilterString = (uuids: Array<string>): string => {
   return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
 };
 
-// Regex patterns for link detection
+export const LINE_BREAK_REGEX = /<br\s*\/?>/gi;
+
 export const EMAIL_REGEX =
   /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
 
