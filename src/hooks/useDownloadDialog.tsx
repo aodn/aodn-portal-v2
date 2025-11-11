@@ -70,7 +70,7 @@ export const useDownloadDialog = (
     dateRange,
     multiPolygon,
     format,
-    keys,
+    key,
   } = useMemo(() => {
     const hasDownloadConditions =
       downloadConditions && downloadConditions.length > 0;
@@ -81,7 +81,7 @@ export const useDownloadDialog = (
     const dateRange = getDateConditionFrom(downloadConditions);
     const multiPolygon = getMultiPolygonFrom(downloadConditions);
     const format = getFormatFrom(downloadConditions);
-    const keys = getKeyFrom(downloadConditions);
+    const key = getKeyFrom(downloadConditions);
 
     return {
       hasDownloadConditions,
@@ -89,7 +89,7 @@ export const useDownloadDialog = (
       dateRange,
       multiPolygon,
       format,
-      keys,
+      key,
     };
   }, [downloadConditions]);
 
@@ -100,7 +100,7 @@ export const useDownloadDialog = (
     dateRange,
     format,
     multiPolygon,
-    keys,
+    key,
     subsettingSelectionCount,
   });
 
@@ -178,7 +178,7 @@ export const useDownloadDialog = (
       dateRange,
       format,
       multiPolygon,
-      keys,
+      key,
       subsettingSelectionCount,
     };
   }, [
@@ -188,7 +188,7 @@ export const useDownloadDialog = (
     dateRange,
     format,
     multiPolygon,
-    keys,
+    key,
     subsettingSelectionCount,
   ]);
   // ================== PROCESSING TIMEOUT ==================
@@ -324,13 +324,13 @@ export const useDownloadDialog = (
       const normalizedEmail = emailToSubmit.toLowerCase();
 
       // Get latest values from ref
-      const { dataUsage, dateRange, format, multiPolygon, keys } =
+      const { dataUsage, dateRange, format, multiPolygon, key } =
         latestValuesRef.current;
 
       const request: DatasetDownloadRequest = {
         inputs: {
           uuid: uuid,
-          keys: keys,
+          key: key,
           recipient: normalizedEmail,
           start_date: dateRange.start,
           end_date: dateRange.end,

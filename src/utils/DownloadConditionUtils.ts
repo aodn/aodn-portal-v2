@@ -78,7 +78,7 @@ export const getFormatFrom = (conditions: IDownloadCondition[]): string => {
 
 export const getKeyFrom = (conditions: IDownloadCondition[]): string => {
   return conditions
-    .filter((condition) => condition.type === DownloadConditionType.KEYS)
-    .map((condition) => (condition as KeyCondition).keys)
+    .filter((condition) => condition.type === DownloadConditionType.KEY)
+    .map((condition) => (condition as KeyCondition).key)
     .join(",");
 };

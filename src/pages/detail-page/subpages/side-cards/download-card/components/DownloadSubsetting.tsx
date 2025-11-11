@@ -38,7 +38,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
     return downloadConditions.filter(
       (condition) =>
         condition.type !== DownloadConditionType.FORMAT &&
-        condition.type !== DownloadConditionType.KEYS
+        condition.type !== DownloadConditionType.KEY
     ).length;
   }, [downloadConditions]);
 

@@ -59,8 +59,8 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   const handleSelectDataItem = useCallback(
     (value: string) => {
       setSelectedDataItem(value);
-      getAndSetDownloadConditions(DownloadConditionType.KEYS, [
-        new KeyCondition("keys", value),
+      getAndSetDownloadConditions(DownloadConditionType.KEY, [
+        new KeyCondition("key", value),
       ]);
     },
     [getAndSetDownloadConditions]
@@ -68,14 +68,14 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
 
   useEffect(() => {
     const hasKeyCondition = downloadConditions.some(
-      (condition) => condition.type === DownloadConditionType.KEYS
+      (condition) => condition.type === DownloadConditionType.KEY
     );
 
     if (dataSelectOptions.length > 0 && !hasKeyCondition) {
       const defaultValue = dataSelectOptions[0].value;
       setSelectedDataItem(defaultValue);
-      getAndSetDownloadConditions(DownloadConditionType.KEYS, [
-        new KeyCondition("keys", defaultValue),
+      getAndSetDownloadConditions(DownloadConditionType.KEY, [
+        new KeyCondition("key", defaultValue),
       ]);
     }
   }, [dataSelectOptions, downloadConditions, getAndSetDownloadConditions]);
