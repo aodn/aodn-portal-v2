@@ -4,6 +4,7 @@ export enum DownloadConditionType {
   BBOX = "bbox",
   DATE_RANGE = "date_range",
   FORMAT = "format",
+  KEYS = "keys",
 }
 
 export interface IDownloadCondition {
@@ -19,6 +20,7 @@ export interface IDownloadConditionCallback {
 export interface DatasetDownloadRequest {
   inputs: {
     uuid: string;
+    keys: string;
     recipient: string;
     start_date: string;
     end_date: string;
@@ -87,6 +89,21 @@ export class FormatCondition
   constructor(id: string, format: string, removeCallback?: () => void) {
     this.id = id;
     this.format = format;
+    this.removeCallback = removeCallback;
+  }
+}
+
+export class KeyCondition
+  implements IDownloadCondition, IDownloadConditionCallback
+{
+  type = DownloadConditionType.KEYS;
+  id: string;
+  keys: string;
+  removeCallback?: () => void;
+
+  constructor(id: string, keys: string, removeCallback?: () => void) {
+    this.id = id;
+    this.keys = keys;
     this.removeCallback = removeCallback;
   }
 }

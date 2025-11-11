@@ -13,6 +13,7 @@ import { useDetailPageContext } from "../pages/detail-page/context/detail-page-c
 import {
   getDateConditionFrom,
   getFormatFrom,
+  getKeyFrom,
   getMultiPolygonFrom,
 } from "../utils/DownloadConditionUtils";
 import {
@@ -69,6 +70,7 @@ export const useDownloadDialog = (
     dateRange,
     multiPolygon,
     format,
+    keys,
   } = useMemo(() => {
     const hasDownloadConditions =
       downloadConditions && downloadConditions.length > 0;
@@ -79,6 +81,7 @@ export const useDownloadDialog = (
     const dateRange = getDateConditionFrom(downloadConditions);
     const multiPolygon = getMultiPolygonFrom(downloadConditions);
     const format = getFormatFrom(downloadConditions);
+    const keys = getKeyFrom(downloadConditions);
 
     return {
       hasDownloadConditions,
@@ -86,6 +89,7 @@ export const useDownloadDialog = (
       dateRange,
       multiPolygon,
       format,
+      keys,
     };
   }, [downloadConditions]);
 
@@ -96,6 +100,7 @@ export const useDownloadDialog = (
     dateRange,
     format,
     multiPolygon,
+    keys,
     subsettingSelectionCount,
   });
 
@@ -173,6 +178,7 @@ export const useDownloadDialog = (
       dateRange,
       format,
       multiPolygon,
+      keys,
       subsettingSelectionCount,
     };
   }, [
@@ -182,6 +188,7 @@ export const useDownloadDialog = (
     dateRange,
     format,
     multiPolygon,
+    keys,
     subsettingSelectionCount,
   ]);
   // ================== PROCESSING TIMEOUT ==================
@@ -317,12 +324,13 @@ export const useDownloadDialog = (
       const normalizedEmail = emailToSubmit.toLowerCase();
 
       // Get latest values from ref
-      const { dataUsage, dateRange, format, multiPolygon } =
+      const { dataUsage, dateRange, format, multiPolygon, keys } =
         latestValuesRef.current;
 
       const request: DatasetDownloadRequest = {
         inputs: {
           uuid: uuid,
+          keys: keys,
           recipient: normalizedEmail,
           start_date: dateRange.start,
           end_date: dateRange.end,
