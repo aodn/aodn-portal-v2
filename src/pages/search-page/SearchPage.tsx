@@ -215,41 +215,46 @@ const SearchPage = () => {
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent | undefined) => {
-      if (
-        event?.type === MapEventEnum.ZOOM_START ||
-        event?.type === MapEventEnum.MOVE_START
-      ) {
-        // If another zoom or move starts, we can cancel the current map search
-        // as it is useless because another zoom/move end will come and trigger
-        // search again
-        mapSearchAbortRef.current?.abort();
-        mapSearchAbortRef.current = null;
-      } else if (
-        event?.type === MapEventEnum.ZOOM_END ||
-        event?.type === MapEventEnum.MOVE_END
-      ) {
-        const componentParam: ParameterState = getComponentState(
-          store.getState()
-        );
+      if ((event as any)?.originalEvent) {
+        // Make sure it is user generated event, if we zoom map via api we do not
+        // want the search cancel
+        if (
+          event?.type === MapEventEnum.ZOOM_START ||
+          event?.type === MapEventEnum.MOVE_START
+        ) {
+          // If another zoom or move starts, we can cancel the current map search
+          // as it is useless because another zoom/move end will come and trigger
+          // search again
+          console.log("Cancel devom ot eu / zoom");
+          mapSearchAbortRef.current?.abort();
+          mapSearchAbortRef.current = null;
+        } else if (
+          event?.type === MapEventEnum.ZOOM_END ||
+          event?.type === MapEventEnum.MOVE_END
+        ) {
+          const componentParam: ParameterState = getComponentState(
+            store.getState()
+          );
 
-        const bounds = event?.target.getBounds();
-        if (bounds == null) return;
+          const bounds = event?.target.getBounds();
+          if (bounds == null) return;
 
-        const ne = bounds.getNorthEast(); // NorthEast corner
-        const sw = bounds.getSouthWest(); // SouthWest corner
-        // Note order: longitude, latitude.2
-        const bbox = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
+          const ne = bounds.getNorthEast(); // NorthEast corner
+          const sw = bounds.getSouthWest(); // SouthWest corner
+          // Note order: longitude, latitude.2
+          const bbox = bboxPolygon([sw.lng, sw.lat, ne.lng, ne.lat]);
 
-        // Sometimes the map fire zoomend even nothing happens, this may
-        // due to some redraw, so in here we check if the polygon really
-        // changed, if not then there is no need to do anything
-        if (componentParam.bbox && !booleanEqual(componentParam.bbox, bbox)) {
-          // These two lines cause flick on map move, why we need that two line?
-          //setBbox(bounds);
-          //setZoom(event.target.getZoom());
-          dispatch(updateFilterBBox(bbox));
-          dispatch(updateZoom(event.target.getZoom()));
-          doListSearch(true);
+          // Sometimes the map fire zoomend even nothing happens, this may
+          // due to some redraw, so in here we check if the polygon really
+          // changed, if not then there is no need to do anything
+          if (componentParam.bbox && !booleanEqual(componentParam.bbox, bbox)) {
+            // These two lines cause flick on map move, why we need that two line?
+            //setBbox(bounds);
+            //setZoom(event.target.getZoom());
+            dispatch(updateFilterBBox(bbox));
+            dispatch(updateZoom(event.target.getZoom()));
+            doListSearch(true);
+          }
         }
       }
     },
