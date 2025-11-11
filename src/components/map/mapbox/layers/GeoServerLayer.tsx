@@ -44,6 +44,7 @@ import {
 import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
+import { checkEmptyArray } from "../../../../utils/Helpers";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
@@ -108,10 +109,7 @@ const checkWMSAvailability = (
   onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
 ): boolean => {
   // Check if LAYERS is undefined, null, empty array, or contains only empty strings
-  const hasValidLayers =
-    urlConfig.LAYERS &&
-    urlConfig.LAYERS.length > 0 &&
-    urlConfig.LAYERS.some((layer) => layer && layer.trim() !== "");
+  const hasValidLayers = checkEmptyArray(urlConfig.LAYERS);
 
   // Avoid state changes during rendering warning, delay status update for a while
   setTimeout(() => onWMSAvailabilityChange?.(!!hasValidLayers), 100);

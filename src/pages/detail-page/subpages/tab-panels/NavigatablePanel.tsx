@@ -236,7 +236,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   ) : (
     <Grid container>
       {!isUnderLaptop && (
-        <Grid item sm={3} direction="row">
+        <Grid item md={3}>
           <Grid container wrap="nowrap" direction="row">
             <Grid item md={1}>
               <VerticalIndicator index={selectedIndex} itemRefs={menuRefs} />
