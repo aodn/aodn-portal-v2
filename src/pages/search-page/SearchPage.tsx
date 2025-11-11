@@ -215,9 +215,10 @@ const SearchPage = () => {
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent | undefined) => {
-      if ((event as any)?.originalEvent) {
+      if ((event as any)?.originalEvent || import.meta.env.MODE === "dev") {
         // Make sure it is user generated event, if we zoom map via api we do not
-        // want the search cancel
+        // want the search cancel OR in dev mode where test case use a lot of api
+        // call to move map
         if (
           event?.type === MapEventEnum.ZOOM_START ||
           event?.type === MapEventEnum.MOVE_START
