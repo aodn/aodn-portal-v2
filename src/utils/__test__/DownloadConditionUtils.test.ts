@@ -2,11 +2,13 @@ import {
   getDateConditionFrom,
   getFormatFrom,
   getMultiPolygonFrom,
+  getKeyFrom,
 } from "../DownloadConditionUtils";
 import {
   BBoxCondition,
   DateRangeCondition,
   FormatCondition,
+  KeyCondition,
   IDownloadCondition,
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import { MultiPolygon } from "geojson";
@@ -99,6 +101,43 @@ describe("DownloadConditionUtils", () => {
       ];
       const result = getFormatFrom(conditions);
       expect(result).toBe("netcdf");
+    });
+  });
+
+  describe("getKeyFrom", () => {
+    test("should return empty string when no key condition found", () => {
+      const conditions: IDownloadCondition[] = [];
+      const result = getKeyFrom(conditions);
+      expect(result).toBe("");
+    });
+
+    test("should return single key when one key condition found", () => {
+      const conditions: IDownloadCondition[] = [
+        new KeyCondition("key", "data.zarr"),
+      ];
+      const result = getKeyFrom(conditions);
+      expect(result).toBe("data.zarr");
+    });
+
+    test("should return comma-separated keys when multiple key conditions found", () => {
+      const conditions: IDownloadCondition[] = [
+        new KeyCondition("key", "data.zarr"),
+        new KeyCondition("key", "observations.parquet"),
+      ];
+      const result = getKeyFrom(conditions);
+      expect(result).toBe("data.zarr,observations.parquet");
+    });
+
+    test("should handle mixed conditions with keys", () => {
+      const conditions: IDownloadCondition[] = [
+        new FormatCondition("format", "csv"),
+        new KeyCondition("key", "dataset1.zarr"),
+        new BBoxCondition("bbox1", [100, -40, 150, -10]),
+        new KeyCondition("key", "dataset2.parquet"),
+        new DateRangeCondition("date1", "2024-01-01", "2024-12-31"),
+      ];
+      const result = getKeyFrom(conditions);
+      expect(result).toBe("dataset1.zarr,dataset2.parquet");
     });
   });
 });

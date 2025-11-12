@@ -289,9 +289,6 @@ export class OGCCollection {
     if (!summaryLinks || summaryLinks.length === 0) {
       return undefined;
     }
-    if (summaryLinks.length > 1) {
-      console.error("Multiple summary links found, this is unexpected.");
-    }
 
     const type = summaryLinks[0].type;
     if (type === MediaType.PARQUET) {
@@ -323,7 +320,7 @@ export class SummariesProperties {
   readonly centroid?: Array<Array<number>>;
   readonly pace?: string;
   readonly "ai:description"?: string;
-  readonly dataset_group?: string;
+  readonly dataset_group?: Array<string>;
 }
 
 export class Spatial {
