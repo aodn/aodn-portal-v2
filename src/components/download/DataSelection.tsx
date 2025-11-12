@@ -42,15 +42,11 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
 
   const handleRemove = useCallback(
     (condition: IDownloadConditionCallback & IDownloadCondition) => {
-      console.log("handle remove data selection");
       condition.removeCallback && condition.removeCallback();
       removeDownloadCondition(condition);
     },
     [removeDownloadCondition]
   );
-
-  console.log("bbox condition box", bboxConditions);
-  console.log("date range condition box", dateRangeCondition);
 
   return (
     <Box sx={{ gap: 2, ...sx }}>
