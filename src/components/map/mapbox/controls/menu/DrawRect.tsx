@@ -29,6 +29,7 @@ interface DrawControlProps extends ControlProps {
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
   ) => IDownloadCondition[];
+  downloadConditions: IDownloadCondition[];
 }
 
 const MENU_ID = "draw-rect-menu-button";
@@ -38,6 +39,7 @@ const DRAW_RECTANGLE_MODE = "draw_rectangle";
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
   getAndSetDownloadConditions,
+  downloadConditions,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [hasFeatures, setHasFeatures] = useState<boolean>(false);
@@ -141,8 +143,18 @@ const DrawRect: React.FC<DrawControlProps> = ({
               const polygon = feature.geometry as Polygon;
               const bbox = turf.bbox(polygon);
               const id = _.toString(feature.id);
-              // The removeCallback will be called when use click the bbox condition delete button
-              return new BBoxCondition(id, bbox, () => mapDraw.delete(id));
+              // The removeCallback will be called when user click the bbox condition delete button
+              return new BBoxCondition(id, bbox, () => {
+                try {
+                  // Check if mapDraw instance is still valid before attempting to delete
+                  if (mapDraw && typeof mapDraw.delete === "function") {
+                    mapDraw.delete(id);
+                  }
+                } catch (error) {
+                  console.warn("Failed to delete bbox from map:", error);
+                  // The bbox will still be removed from the conditions list by the parent component
+                }
+              });
             }) || [];
         // In case of delete, the box already gone on map, so we just need to remove the condition
         getAndSetDownloadConditions(DownloadConditionType.BBOX, box);

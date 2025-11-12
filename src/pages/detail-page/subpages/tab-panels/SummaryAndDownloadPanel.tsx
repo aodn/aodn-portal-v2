@@ -402,6 +402,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                             getAndSetDownloadConditions={
                               getAndSetDownloadConditions
                             }
+                            downloadConditions={downloadConditions}
                           />
                         }
                       />
