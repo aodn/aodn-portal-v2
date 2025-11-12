@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import TextAreaBaseGrid from "./TextAreaBaseGrid";
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button, Grid, SxProps } from "@mui/material";
 import MarkdownRenderer from "../../../common/text/MarkdownRenderer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import rc8Theme from "../../../../styles/themeRC8";
@@ -20,6 +20,7 @@ interface ExpandableTextAreaProps {
     tablet?: number;
     mobile?: number;
   };
+  sx?: SxProps;
 }
 
 const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
@@ -32,6 +33,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
     tablet: LINE_CLAMP_DEFAULT_TABLET,
     mobile: LINE_CLAMP_DEFAULT_MOBILE,
   },
+  sx,
 }) => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -55,7 +57,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   }, [text, isExpanded]);
 
   return (
-    <TextAreaBaseGrid sx={{ width: "100%" }}>
+    <TextAreaBaseGrid sx={{ width: "100%", ...sx }}>
       <Grid item md={12}>
         <Box
           sx={{

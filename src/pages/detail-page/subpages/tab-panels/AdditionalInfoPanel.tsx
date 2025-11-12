@@ -11,6 +11,8 @@ import MetadataUrlList from "../../../../components/list/MetadataUrlList";
 import MetadataDateList from "../../../../components/list/MetadataDateList";
 import { convertDateFormat } from "../../../../utils/DateUtils";
 import { contactRoles } from "../../../../components/common/constants";
+import { checkEmptyArray } from "../../../../utils/Helpers";
+import { IContact } from "../../../../components/common/store/OGCCollectionDefinitions";
 
 const AdditionalInfoPanel = () => {
   const context = useDetailPageContext();
@@ -26,15 +28,17 @@ const AdditionalInfoPanel = () => {
     metadataUrl,
     keywords,
   ] = useMemo(() => {
-    const metadataContact = context.collection
-      ?.getContacts()
-      ?.filter((contact) => contact.roles.includes(contactRoles.METADATA));
+    const metadataContact =
+      context.collection
+        ?.getContacts()
+        ?.filter((contact) => contact.roles.includes(contactRoles.METADATA)) ??
+      [];
 
-    const themes = context.collection?.getThemes();
+    const themes = context.collection?.getThemes() ?? [];
 
-    const statement = context.collection?.getStatement();
+    const statement = context.collection?.getStatement() ?? "";
 
-    const metadataId = context.collection?.id;
+    const metadataId = context.collection?.id ?? "";
 
     const t = context.collection?.getRevision();
     const revision = t ? convertDateFormat(t) : "";
@@ -46,17 +50,13 @@ const AdditionalInfoPanel = () => {
     const creation = c ? convertDateFormat(c) : "";
 
     let categories: Array<string> = [];
-    for (const theme of themes ?? []) {
+    for (const theme of themes) {
       if (theme.scheme === "Categories") {
         categories = theme.concepts.map((concept) => concept.id);
       }
     }
 
-    let metadataUrl = undefined;
-    if (context.collection) {
-      const ml = context.collection.getMetadataUrl();
-      metadataUrl = ml ? ml : "";
-    }
+    const metadataUrl = context.collection?.getMetadataUrl() ?? "";
 
     let keywords: { title: string; content: string[] }[] = [];
     themes?.forEach((theme) => {
@@ -114,17 +114,13 @@ const AdditionalInfoPanel = () => {
       {
         title: "Lineage",
         component: (props: Record<string, any>) => (
-          <StatementList
-            {...props}
-            statement={statement ?? ""}
-            title={"Lineage"}
-          />
+          <StatementList {...props} statement={statement} title={"Lineage"} />
         ),
       },
       {
         title: "Themes",
         component: (props: Record<string, any>) => (
-          <ThemeList {...props} title={"Themes"} themes={categories ?? []} />
+          <ThemeList {...props} title={"Themes"} themes={categories} />
         ),
       },
       {
@@ -136,22 +132,19 @@ const AdditionalInfoPanel = () => {
       {
         title: "Metadata Contact",
         component: (props: Record<string, any>) => (
-          <MetadataContactList
-            {...props}
-            contacts={metadataContact ? metadataContact : []}
-          />
+          <MetadataContactList {...props} contacts={metadataContact} />
         ),
       },
       {
         title: "Metadata Identifier",
         component: (props: Record<string, any>) => (
-          <MetadataIdentifierList {...props} identifier={metadataId ?? ""} />
+          <MetadataIdentifierList {...props} identifier={metadataId} />
         ),
       },
       {
         title: "Full Metadata Link",
         component: (props: Record<string, any>) => (
-          <MetadataUrlList {...props} url={metadataUrl ? metadataUrl : ""} />
+          <MetadataUrlList {...props} url={metadataUrl} />
         ),
       },
       {

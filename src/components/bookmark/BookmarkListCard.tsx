@@ -9,6 +9,7 @@ import { padding } from "../../styles/constants";
 import { TabNavigation } from "../../hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "../common/constants";
 import rc8Theme from "../../styles/themeRC8";
+import FitToSpatialExtentsLayer from "../map/mapbox/layers/FitToSpatialExtentsLayer";
 
 export interface BookmarkListCardType {
   dataset: OGCCollection;
@@ -51,7 +52,12 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
             }
           >
             <Layers>
-              <GeojsonLayer collection={dataset} animate={false} />
+              <FitToSpatialExtentsLayer collection={dataset} />
+              <GeojsonLayer
+                collection={dataset}
+                animate={false}
+                visible={true}
+              />
             </Layers>
           </Map>
         </Box>

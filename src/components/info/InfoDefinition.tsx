@@ -1,4 +1,5 @@
 export enum InfoStatusType {
+  NONE = "none",
   INFO = "info",
   WARNING = "warning",
   ERROR = "error",

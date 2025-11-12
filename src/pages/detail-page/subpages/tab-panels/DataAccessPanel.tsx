@@ -20,6 +20,7 @@ import {
 import DataList from "../../../../components/list/DataList";
 import DocumentList from "../../../../components/list/DocumentLIst";
 import OtherItemList from "../../../../components/list/OtherItemList";
+import CodeTutorialsList from "../../../../components/list/CodeTutorialsList";
 
 export enum TYPE {
   DATA_ACCESS = "DATA_ACCESS",
@@ -167,10 +168,10 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
       {
         title: "Code Tutorials",
         component: (props: Record<string, any>) => (
-          <DocumentList
+          <CodeTutorialsList
             {...props}
             title={"Code Tutorials"}
-            documentLinks={getOptimizedPythonNotebookLinks(
+            pythonNotebookLinks={getOptimizedPythonNotebookLinks(
               collection?.getPythonNotebookLinks()
             )}
           />
@@ -204,7 +205,16 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
 
     case MODE.NORMAL:
     default:
-      return <NavigatablePanel childrenList={blocks} isLoading={false} />;
+      return (
+        <NavigatablePanel
+          childrenList={blocks}
+          isLoading={false}
+          AIGenContent={{
+            title: "Link Grouped",
+            body: "The data access links are grouped by AI models into a better structure.",
+          }}
+        />
+      );
   }
 };
 

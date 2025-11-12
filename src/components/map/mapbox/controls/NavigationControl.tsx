@@ -8,8 +8,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { ZoomInIcon } from "../../../../assets/icons/map/zoom_in";
 import { ZoomOutIcon } from "../../../../assets/icons/map/zoom_out";
 import { ZoomResetIcon } from "../../../../assets/icons/map/zoom_reset";
-import { MapDefaultConfig } from "../constants";
-import { MOVE_END, MOVE_START, ZOOM_END, ZOOM_START } from "../Map";
+import { MapDefaultConfig, MapEventEnum } from "../constants";
 
 interface NavigationControlProps {
   visible?: boolean;
@@ -125,11 +124,11 @@ class StyledNavigationControl extends MapboxNavigationControl {
       }
     };
 
-    map.on(ZOOM_START, this.zoomButtonDisable);
-    map.on(ZOOM_END, this.zoomButtonEnable);
+    map.on(MapEventEnum.ZOOM_START, this.zoomButtonDisable);
+    map.on(MapEventEnum.ZOOM_END, this.zoomButtonEnable);
 
-    map.on(MOVE_START, this.zoomButtonDisable);
-    map.on(MOVE_END, this.zoomButtonEnable);
+    map.on(MapEventEnum.MOVE_START, this.zoomButtonDisable);
+    map.on(MapEventEnum.MOVE_END, this.zoomButtonEnable);
 
     this.map = map;
     return this.container;
@@ -140,11 +139,11 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.zoomReset?.removeEventListener("click", this.zoomResetHandler!);
     this.container?.removeChild(this.zoomReset!);
 
-    this.map?.off(ZOOM_START, this.zoomButtonDisable);
-    this.map?.off(ZOOM_END, this.zoomButtonEnable);
+    this.map?.off(MapEventEnum.ZOOM_START, this.zoomButtonDisable);
+    this.map?.off(MapEventEnum.ZOOM_END, this.zoomButtonEnable);
 
-    this.map?.off(MOVE_START, this.zoomButtonDisable);
-    this.map?.off(MOVE_END, this.zoomButtonEnable);
+    this.map?.off(MapEventEnum.MOVE_START, this.zoomButtonDisable);
+    this.map?.off(MapEventEnum.MOVE_END, this.zoomButtonEnable);
   }
 }
 

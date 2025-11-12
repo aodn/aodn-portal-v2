@@ -40,3 +40,8 @@ export const sortByRelevance = (
     (item) => item.length,
   ]);
 };
+
+// Check if array is undefined, null, empty array, or contains only empty strings
+export const checkEmptyArray = (array?: any[]): boolean => {
+  return array?.some((item) => item?.toString().trim() !== "") ?? false;
+};

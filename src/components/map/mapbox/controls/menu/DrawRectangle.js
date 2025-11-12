@@ -72,7 +72,11 @@ const DrawRectangle = {
     ) {
       this.updateUIClasses({ mouse: "pointer" });
       state.endPoint = [e.lngLat.lng, e.lngLat.lat];
-      this.changeMode("simple_select", { featuresId: state.rectangle.id });
+      // Defer mode change to allow other click handlers to see we're still in draw mode
+      // This prevents accidental popups on the second click
+      setTimeout(() => {
+        this.changeMode("simple_select", { featuresId: state.rectangle.id });
+      }, 0);
     }
     // on first click, save clicked point coords as starting for  rectangle
     state.startPoint = [e.lngLat.lng, e.lngLat.lat];

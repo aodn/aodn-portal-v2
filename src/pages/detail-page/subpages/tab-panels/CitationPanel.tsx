@@ -20,6 +20,7 @@ import SideCardContainer from "../side-cards/SideCardContainer";
 import useTabNavigation from "../../../../hooks/useTabNavigation";
 import CreditList from "../../../../components/list/CreditList";
 import ContactList from "../../../../components/list/ContactList";
+import { checkEmptyArray } from "../../../../utils/Helpers";
 
 interface CitationPanelProps {
   mode?: MODE;
@@ -42,25 +43,30 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     aboutContacts,
     credits,
   ] = useMemo(() => {
-    const license = collection?.getLicense();
+    const license = collection?.getLicense() ?? "";
 
-    const licenseUrl = collection?.links?.find((link) => {
-      return (
-        link.rel === RelationType.LICENSE && link.type === MediaType.TEXT_HTML
-      );
-    })?.href;
+    const licenseUrl =
+      collection?.links?.find((link) => {
+        return (
+          link.rel === RelationType.LICENSE && link.type === MediaType.TEXT_HTML
+        );
+      })?.href ?? "";
 
-    const licenseGraphic = collection?.links?.find((link) => {
-      return (
-        link.rel === RelationType.LICENSE && link.type === MediaType.IMAGE_PNG
-      );
-    })?.href;
+    const licenseGraphic =
+      collection?.links?.find((link) => {
+        return (
+          link.rel === RelationType.LICENSE && link.type === MediaType.IMAGE_PNG
+        );
+      })?.href ?? "";
 
-    const citationContacts = collection
-      ?.getContacts()
-      ?.filter((contact) => contact.roles.includes(contactRoles.CITATION));
+    const citationContacts =
+      collection
+        ?.getContacts()
+        ?.filter((contact) => contact.roles.includes(contactRoles.CITATION)) ??
+      [];
 
-    const suggestedCitation = collection?.getCitation()?.suggestedCitation;
+    const suggestedCitation =
+      collection?.getCitation()?.suggestedCitation ?? "";
 
     const otherConstraints = collection
       ?.getCitation()
@@ -90,13 +96,18 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       });
     });
 
-    const aboutContacts = collection
-      ?.getContacts()
-      ?.filter((contact: IContact) =>
-        contact.roles.includes(contactRoles.ABOUT)
-      );
+    const aboutContacts =
+      collection
+        ?.getContacts()
+        ?.filter((contact: IContact) =>
+          contact.roles.includes(contactRoles.ABOUT)
+        ) ?? [];
 
-    const credits = collection?.getCredits();
+    let credits: string[] = [];
+    const crd = collection?.getCredits();
+    if (crd && checkEmptyArray(crd)) {
+      credits = crd;
+    }
 
     return [
       license,
@@ -136,7 +147,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
         component: (props: Record<string, any>) => (
           <CitedResponsiblePartyList
             {...props}
-            responsibleParties={citationContacts ? citationContacts : []}
+            responsibleParties={citationContacts}
           />
         ),
       },
@@ -145,9 +156,9 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
         component: (props: Record<string, any>) => (
           <LicenseList
             {...props}
-            license={license ? license : ""}
-            url={licenseUrl ? licenseUrl : ""}
-            graphic={licenseGraphic ? licenseGraphic : ""}
+            license={license}
+            url={licenseUrl}
+            graphic={licenseGraphic}
           />
         ),
       },
@@ -160,16 +171,13 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       {
         title: "Data Contact",
         component: (props: Record<string, any>) => (
-          <ContactList
-            {...props}
-            contacts={aboutContacts ? aboutContacts : []}
-          />
+          <ContactList {...props} contacts={aboutContacts} />
         ),
       },
       {
         title: "Credits",
         component: (props: Record<string, any>) => (
-          <CreditList {...props} credits={credits ? credits : []} />
+          <CreditList {...props} credits={credits} />
         ),
       },
     ],

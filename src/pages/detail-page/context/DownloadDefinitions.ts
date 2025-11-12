@@ -24,13 +24,16 @@ export interface DatasetDownloadRequest {
     recipient: string;
     start_date: string;
     end_date: string;
-    multi_polygon: MultiPolygon;
+    multi_polygon: MultiPolygon | string;
     format: string;
     data_usage?: {
       purposes: string[];
       sectors: string[];
       allow_contact: boolean | null;
     };
+    collection_title?: string;
+    full_metadata_link?: string;
+    suggested_citation?: string;
   };
   outputs: object;
   subscriber: {

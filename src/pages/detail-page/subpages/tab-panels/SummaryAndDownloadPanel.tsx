@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -39,6 +39,8 @@ import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/m
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
+import AIGenTag from "../../../../components/info/AIGenTag";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -127,6 +129,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const hasSpatialExtent = useMemo(() => !!collection?.getBBox(), [collection]);
 
+  const isZarrDataset = useMemo(
+    () => collection?.getDatasetType() === DatasetType.ZARR,
+    [collection]
+  );
+
   const noMapPreview = useMemo(
     () => !hasDownloadService && !hasSpatialExtent,
     [hasDownloadService, hasSpatialExtent]
@@ -152,33 +159,37 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const layers: LayerSwitcherLayer<LayerName>[] = [];
 
     if (collection) {
-      const isZarrDataset: boolean =
-        collection.getDatasetType() === DatasetType.ZARR;
-
       // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
       const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
 
       // Must be order by Hexbin > GeoServer > Spatial extents
       if (isSupportHexbin) {
         layers.push(MapLayers[LayerName.Hexbin]);
+        setSelectedLayer(LayerName.Hexbin);
       }
 
       if (isWMSAvailable) {
-        layers.push({
+        const l = {
           ...MapLayers[LayerName.GeoServer],
           default: !isSupportHexbin,
-        });
+        };
+        layers.push(l);
+
+        if (l.default) {
+          setSelectedLayer(LayerName.GeoServer);
+        }
       }
 
-      if (hasSummaryFeature && isZarrDataset && hasSpatialExtent) {
-        layers.push(MapLayers[LayerName.SpatialExtent]);
-      }
-
-      if (!hasDownloadService && hasSpatialExtent) {
-        layers.push({
+      if (!isSupportHexbin && hasSpatialExtent) {
+        const l = {
           ...MapLayers[LayerName.SpatialExtent],
-          default: true,
-        });
+          default: !isSupportHexbin && !isWMSAvailable,
+        };
+
+        layers.push(l);
+        if (l.default) {
+          setSelectedLayer(LayerName.SpatialExtent);
+        }
       }
     }
 
@@ -186,32 +197,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   }, [
     collection,
     hasSummaryFeature,
+    isZarrDataset,
     isWMSAvailable,
     hasSpatialExtent,
-    hasDownloadService,
   ]);
-
-  useEffect(() => {
-    if (mapLayerConfig.length > 0) {
-      // Check if current selection is still valid
-      const isCurrentLayerValid = mapLayerConfig.some(
-        (layer) => layer.id === selectedLayer
-      );
-
-      // Find the default layer (if any)
-      const defaultLayer = mapLayerConfig.find((l) => l.default);
-
-      if (
-        selectedLayer === null ||
-        !isCurrentLayerValid ||
-        (defaultLayer && selectedLayer !== defaultLayer.id)
-      ) {
-        setSelectedLayer(defaultLayer ? defaultLayer.id : mapLayerConfig[0].id);
-      }
-    }
-    // Only depend on mapLayerConfig
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapLayerConfig]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
@@ -323,7 +312,21 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       <Grid container>
         <Grid item xs={12}>
           <Stack direction="column">
-            <ExpandableTextArea text={abstract} showMoreStr={"Show All"} />
+            <Stack position="relative" direction={"row"}>
+              <Box position="absolute" top={-6} right={-6}>
+                <AIGenTag
+                  infoContent={{
+                    title: "Content reformatted",
+                    body: "The summary content of dataset is reformatted by AI models into a better layout.",
+                  }}
+                />
+              </Box>
+              <ExpandableTextArea
+                text={abstract}
+                showMoreStr={"Show All"}
+                sx={{ width: isUnderLaptop ? "95%" : "98%" }}
+              />
+            </Stack>
             <Box sx={{ visibility: "visible" }}>
               <Box
                 arial-label="map"
@@ -373,7 +376,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                           (selectedLayer === LayerName.GeoServer &&
                             timeSliderSupport) ||
                           (selectedLayer === LayerName.Hexbin &&
-                            hasSummaryFeature)
+                            hasSummaryFeature) ||
+                          (selectedLayer === LayerName.SpatialExtent &&
+                            hasSummaryFeature &&
+                            isZarrDataset)
                         }
                         menu={
                           <DateRange
@@ -402,6 +408,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     </MenuControlGroup>
                   </Controls>
                   <Layers>
+                    <FitToSpatialExtentsLayer collection={collection} />
                     {createStaticLayers(staticLayer)}
                     {
                       // Put the first two later here so that they all init the same time
@@ -427,7 +434,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     />
                     <GeojsonLayer
                       collection={collection}
-                      isVisible={selectedLayer === LayerName.SpatialExtent}
+                      visible={selectedLayer === LayerName.SpatialExtent}
                     />
                   </Layers>
                 </Map>

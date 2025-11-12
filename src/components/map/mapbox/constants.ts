@@ -5,6 +5,11 @@ export enum MapEventEnum {
   IDLE = "idle",
   STYLEDATA = "styledata",
   LOAD = "load",
+  ZOOM_START = "zoomstart",
+  ZOOM_END = "zoomend",
+  MOVE_START = "movestart",
+  MOVE_END = "moveend",
+  RENDER = "render",
 }
 
 export const MapDefaultConfig = {

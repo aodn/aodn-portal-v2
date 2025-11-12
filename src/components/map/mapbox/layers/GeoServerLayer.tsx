@@ -44,6 +44,7 @@ import {
 import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
+import { checkEmptyArray } from "../../../../utils/Helpers";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
@@ -105,23 +106,14 @@ const getTileLayerId = (layerId: string) => `${layerId}-tile`;
 
 const checkWMSAvailability = (
   urlConfig: UrlParams,
-  onWMSNotAvailable: () => void,
   onWMSAvailabilityChange: ((isWMSAvailable: boolean) => void) | undefined
 ): boolean => {
   // Check if LAYERS is undefined, null, empty array, or contains only empty strings
-  const hasValidLayers =
-    urlConfig.LAYERS &&
-    urlConfig.LAYERS.length > 0 &&
-    urlConfig.LAYERS.some((layer) => layer && layer.trim() !== "");
+  const hasValidLayers = checkEmptyArray(urlConfig.LAYERS);
 
-  if (!hasValidLayers) {
-    onWMSAvailabilityChange?.(false);
-    onWMSNotAvailable();
-    return false;
-  }
-
-  onWMSAvailabilityChange?.(true);
-  return true;
+  // Avoid state changes during rendering warning, delay status update for a while
+  setTimeout(() => onWMSAvailabilityChange?.(!!hasValidLayers), 100);
+  return !!hasValidLayers;
 };
 
 const getWmsLayerNames = (collection: OGCCollection | undefined) => {
@@ -139,10 +131,24 @@ const formWmsLayerOptions = (
   }));
 };
 
+const extractLayerName = (layer: ILink): string => {
+  // Two ways to use the wms like, either you put the layer name in title or you put a description and then
+  // give a link to wms, now if it is the later case then we try to see if the url have attribute layer name there
+  // if yes we use it otherwise we use the title.
+  if (layer.href) {
+    const url = new URL(layer.href);
+    const ln = url.searchParams.get("layers");
+    if (ln) {
+      return ln;
+    }
+  }
+  return layer.title;
+};
+
 const formWmsLinkOptions = (layers: ILink[] | undefined): SelectItem[] => {
   if (!layers || layers.length === 0) return [];
   return layers?.map((layer) => ({
-    value: layer.title,
+    value: extractLayerName(layer),
     label: layer.title, // Use title for label for now. Could be changed to ai:label in future
   }));
 };
@@ -159,9 +165,10 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   const dispatch = useAppDispatch();
   const popupRef = useRef<Popup | null>();
   const popupRootRef = useRef<Root | null>();
-  const [isFetchingWmsLayers, setIsFetchingWmsLayers] = useState(false);
-  const [wmsLayers, setWmsLayers] = useState<SelectItem<string>[]>([]);
+  const [wmsLayers, setWmsLayers] = useState<SelectItem[]>([]);
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>(""); // Only handle single wms layer for now. Could be extended to multi-layer in multi-select in future
+
+  const [isFetchingWmsLayers, setIsFetchingWmsLayers] = useState(true);
 
   const [titleLayerId, sourceLayerId] = useMemo(() => {
     const layerId = getLayerId(map?.getContainer().id);
@@ -171,21 +178,27 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   }, [map]);
 
   const [config, isWMSAvailable] = useMemo(() => {
-    const updateConfig = mergeWithDefaults(geoServerLayerConfig || {}, {
-      uuid: collection?.id,
-      urlParams: { LAYERS: [selectedWmsLayer] },
-    });
-    const config = mergeWithDefaults(DEFAULT_WMS_MAP_CONFIG, updateConfig);
-
-    const isWMSAvailable = checkWMSAvailability(
-      config.urlParams,
-      () => setIsFetchingWmsLayers(false),
-      onWMSAvailabilityChange
+    let config = mergeWithDefaults(
+      DEFAULT_WMS_MAP_CONFIG,
+      geoServerLayerConfig
     );
+
+    if (selectedWmsLayer && selectedWmsLayer.length > 0) {
+      config = mergeWithDefaults(config, {
+        uuid: collection?.id,
+        urlParams: { LAYERS: [selectedWmsLayer] },
+      });
+    }
+    // If you are still fetching, then assume you have layer until you complete
+    // fetch then you have a valid value
+    const isWMSAvailable = isFetchingWmsLayers
+      ? true
+      : checkWMSAvailability(config.urlParams, onWMSAvailabilityChange);
     return [config, isWMSAvailable];
   }, [
-    collection,
+    collection?.id,
     geoServerLayerConfig,
+    isFetchingWmsLayers,
     onWMSAvailabilityChange,
     selectedWmsLayer,
   ]);
@@ -201,16 +214,18 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         ? dayjs(dateDefault.max)
         : config.urlParams.END_DATE;
 
-    return [
-      formatToUrl<MapTileRequest>({
-        baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
-        params: {
-          layerName: config.urlParams.LAYERS?.join(",") || "",
-          bbox: config?.urlParams?.BBOX,
-          datetime: `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
-        },
-      }),
-    ];
+    return config.uuid
+      ? [
+          formatToUrl<MapTileRequest>({
+            baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
+            params: {
+              layerName: config.urlParams.LAYERS?.join(",") || "",
+              bbox: config?.urlParams?.BBOX,
+              datetime: `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
+            },
+          }),
+        ]
+      : [];
   }, [
     config.urlParams?.BBOX,
     config.urlParams.END_DATE,
@@ -270,12 +285,16 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     };
 
     const createLayersOnStyleChange = () => {
-      createSource();
-      createLayers(visible ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE);
+      if (tileUrl && tileUrl.length > 0) {
+        createSource();
+        createLayers(
+          visible ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE
+        );
+      }
     };
 
     const createLayersOnInit = () => {
-      if (map?.isStyleLoaded()) {
+      if (map?.isStyleLoaded() && tileUrl && tileUrl.length > 0) {
         createSource();
         createLayers(); // Use default LAYER_VISIBILITY.NONE for initial creation
       }
@@ -412,13 +431,22 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             }, 100);
           }
         })
-        .catch((err) => console.error("Popup:", err));
+        .catch((err) => {
+          // Clean up any existing popups on error
+          cleanPopup();
+          console.error("Popup:", err);
+        });
     };
 
     if (map) {
+      // Register click handler if layer should be visible
+      if (visible) {
+        map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+      }
+
+      // Handle visibility changes and layer field fetching on IDLE
       // Given the useEffect run in order, the layer creation is call via MapEventEnum.IDLE
-      // so here we need to use MapEventEnum.IDLE too so that it become the next call when
-      // IDLE
+      // so here we need to use MapEventEnum.IDLE too so that it become the next call when IDLE
       map.once(MapEventEnum.IDLE, () => {
         const layer = map?.getLayer(titleLayerId);
         if (layer) {
@@ -431,9 +459,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             // Need update if value diff, this is used to avoid duplicate call to useEffect
             map.setLayoutProperty(titleLayerId, "visibility", targetVis);
 
+            // Only fetch layer fields when visibility actually changes
             if (visible) {
               setMapLoading?.(true);
-              map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
               const layerName = config.urlParams.LAYERS?.join(",") || "";
 
               // Check time slider support - only fetch fields if we have a valid layer name
@@ -448,6 +476,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                     const found = value.find((v) => v.type === "dateTime");
                     setTimeSliderSupport?.(found !== undefined);
                   })
+                  .catch(() => {})
                   .finally(() => setMapLoading?.(false));
               } else {
                 // If no valid layer name, just set loading to false and assume no time slider support
@@ -479,63 +508,72 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   // in this case we will call wms_layers to get all the possible layers
   // once get the all the layers we will use the correct layerName to for wms_download_fields, wms_map_tile and wms_map_feature
   useEffect(() => {
-    if (!collection || isFetchingWmsLayers) return;
+    if (!collection) return;
 
-    setIsFetchingWmsLayers(true);
-    setMapLoading?.(true);
+    if (isFetchingWmsLayers) {
+      const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
+      if (wmsLinksOptions && wmsLinksOptions.length > 0) {
+        handleWmsLayerChange(wmsLinksOptions[0].value);
+        setWmsLayers(wmsLinksOptions);
+      }
 
-    const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
-    if (wmsLinksOptions && wmsLinksOptions.length > 0) {
-      handleWmsLayerChange(wmsLinksOptions[0].value);
-      setWmsLayers(wmsLinksOptions);
-    }
+      const layerName = getWmsLayerNames(collection)?.[0] || "";
 
-    const layerName = getWmsLayerNames(collection)?.[0] || "";
+      const wmsFieldsRequest: MapFeatureRequest = {
+        uuid: collection.id,
+        layerName: layerName,
+      };
 
-    const wmsFieldsRequest: MapFeatureRequest = {
-      uuid: collection.id,
-      layerName: layerName,
-    };
+      if (layerName && layerName.trim().length > 0) {
+        setMapLoading?.(true);
 
-    dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
-      .unwrap()
-      .then(() => {
-        // Successfully fetched fields, loading is complete
+        dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
+          .unwrap()
+          .then(() => {
+            // Successfully fetched fields, loading is complete
+            setIsFetchingWmsLayers(false);
+          })
+          .catch((error: ErrorResponse) => {
+            // For now only catch 404 error for further fetching layers
+            // TODO: we could fetch layers even there is no error to find all wms layers that support wfs download
+            if (error.statusCode === 404) {
+              const wmsLayersRequest: MapFeatureRequest = {
+                uuid: collection.id,
+              };
+
+              dispatch(fetchGeoServerMapLayers(wmsLayersRequest))
+                .unwrap()
+                .then((layers) => {
+                  if (layers && layers.length > 0) {
+                    handleWmsLayerChange(
+                      formWmsLayerOptions(layers)[0].value || ""
+                    );
+                    setWmsLayers(formWmsLayerOptions(layers));
+                    setIsFetchingWmsLayers(false);
+                  }
+                })
+                .catch((error) => {
+                  console.log("Failed to fetch layers, ok to ignore", error);
+                  setIsFetchingWmsLayers(false);
+                });
+            } else {
+              console.log("Failed to fetch fields, ok to ignore", error);
+            }
+          })
+          .finally(() => {
+            setMapLoading?.(false);
+          });
+      } else {
         setIsFetchingWmsLayers(false);
-      })
-      .catch((error: ErrorResponse) => {
-        // For now only catch 404 error for further fetching layers
-        // TODO: we could fetch layers even there is no error to find all wms layers that support wfs download
-        if (error.statusCode === 404) {
-          const wmsLayersRequest: MapFeatureRequest = {
-            uuid: collection.id,
-          };
-
-          dispatch(fetchGeoServerMapLayers(wmsLayersRequest))
-            .unwrap()
-            .then((layers) => {
-              if (layers && layers.length > 0) {
-                handleWmsLayerChange(
-                  formWmsLayerOptions(layers)[0].value || ""
-                );
-                setWmsLayers(formWmsLayerOptions(layers));
-                setIsFetchingWmsLayers(false);
-              }
-            })
-            .catch((error) => {
-              console.log("Failed to fetch layers, ok to ignore", error);
-              setIsFetchingWmsLayers(false);
-            });
-        } else {
-          console.log("Failed to fetch fields, ok to ignore", error);
-        }
-      })
-      .finally(() => {
-        setMapLoading?.(false);
-      });
-    // Only listen to collection change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, collection]);
+      }
+    }
+  }, [
+    collection,
+    dispatch,
+    handleWmsLayerChange,
+    isFetchingWmsLayers,
+    setMapLoading,
+  ]);
 
   return (
     <>
@@ -556,4 +594,5 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   );
 };
 
+export { formWmsLinkOptions };
 export default GeoServerLayer;
