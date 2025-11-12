@@ -323,7 +323,7 @@ export class SummariesProperties {
   readonly centroid?: Array<Array<number>>;
   readonly pace?: string;
   readonly "ai:description"?: string;
-  readonly dataset_group?: string;
+  readonly dataset_group?: Array<string>;
 }
 
 export class Spatial {

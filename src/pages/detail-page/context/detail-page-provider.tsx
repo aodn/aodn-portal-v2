@@ -83,7 +83,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
 
         // Track analytics when user views a dataset details page
         trackCustomEvent(AnalyticsEvent.DETAILS_PAGE_DATASET, {
-          details_page_dataset_group: collection.properties?.dataset_group,
+          details_page_dataset_group:
+            collection.properties?.dataset_group?.join(","),
           details_page_dataset_id: uuid,
           details_page_dataset_title: collection.title,
         });
