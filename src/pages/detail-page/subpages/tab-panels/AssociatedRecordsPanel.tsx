@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import {
   IAssociatedRecord,

@@ -38,7 +38,7 @@ const InfoCard: FC<InfoCardProps> = ({
           elevation={0}
           sx={{
             width: "6px", // Fixed width as per design
-            height: "100%",
+            alignSelf: "stretch",
             backgroundColor:
               status === InfoStatusType.ERROR
                 ? rc8Theme.palette.error.main

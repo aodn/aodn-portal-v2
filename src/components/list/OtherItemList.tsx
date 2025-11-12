@@ -6,7 +6,7 @@ import LinkCard from "./listItem/subitem/LinkCard";
 
 const INFO_TIP_CONTENT = {
   title: "Information",
-  body: "All efforts have been taken to logically group the links found in the metadata record. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
+  body: "Links to other helpful resources available on external websites.<br> <br> All efforts have been taken to logically group the links found in the metadata record. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
 };
 
 interface OtherItemListProps {

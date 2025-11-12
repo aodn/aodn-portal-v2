@@ -13,7 +13,7 @@ interface CodeTutorialsListProps {
 
 const INFO_TIP_CONTENT = {
   title: "Information",
-  body: "All efforts have been taken to logically group the links found in the metadata record. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
+  body: "Links to external resources offering step-by-step coding guides and examples.<br> <br> All efforts have been taken to logically group the links found in the metadata record. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
 };
 
 const CodeTutorialsList: React.FC<CodeTutorialsListProps> = ({

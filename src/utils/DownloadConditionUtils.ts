@@ -3,6 +3,7 @@ import {
   DateRangeCondition,
   DownloadConditionType,
   FormatCondition,
+  KeyCondition,
   IDownloadCondition,
 } from "../pages/detail-page/context/DownloadDefinitions";
 import { MultiPolygon } from "geojson";
@@ -60,4 +61,11 @@ export const getFormatFrom = (conditions: IDownloadCondition[]): string => {
     throw new Error("Multiple format conditions found");
   }
   return "";
+};
+
+export const getKeyFrom = (conditions: IDownloadCondition[]): string => {
+  return conditions
+    .filter((condition) => condition.type === DownloadConditionType.KEY)
+    .map((condition) => (condition as KeyCondition).key)
+    .join(",");
 };

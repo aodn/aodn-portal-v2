@@ -5,6 +5,7 @@ import {
   DownloadCondition,
   DownloadConditionType,
   FormatCondition,
+  KeyCondition,
 } from "../../../../context/DownloadDefinitions";
 import {
   DatasetType,
@@ -55,15 +56,29 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     }));
   }, [collection]);
 
-  const handleSelectDataItem = useCallback((value: string) => {
-    setSelectedDataItem(value);
-  }, []);
+  const handleSelectDataItem = useCallback(
+    (value: string) => {
+      setSelectedDataItem(value);
+      getAndSetDownloadConditions(DownloadConditionType.KEY, [
+        new KeyCondition("key", value),
+      ]);
+    },
+    [getAndSetDownloadConditions]
+  );
 
   useEffect(() => {
-    if (dataSelectOptions.length > 0 && !selectedDataItem) {
-      setSelectedDataItem(dataSelectOptions[0].value);
+    const hasKeyCondition = downloadConditions.some(
+      (condition) => condition.type === DownloadConditionType.KEY
+    );
+
+    if (dataSelectOptions.length > 0 && !hasKeyCondition) {
+      const defaultValue = dataSelectOptions[0].value;
+      setSelectedDataItem(defaultValue);
+      getAndSetDownloadConditions(DownloadConditionType.KEY, [
+        new KeyCondition("key", defaultValue),
+      ]);
     }
-  }, [dataSelectOptions, selectedDataItem]);
+  }, [dataSelectOptions, downloadConditions, getAndSetDownloadConditions]);
 
   // Currently, csv is the best format for parquet datasets, and netcdf is the best for zarr datasets.
   // we will support more formats in the future, but for now, we filter the formats based on the dataset type.

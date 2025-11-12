@@ -16,7 +16,7 @@ interface DataListProps {
 
 const INFO_TIP_CONTENT = {
   title: "Information",
-  body: "All efforts have been taken to logically group the links found in the metadata record. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
+  body: "References to external platforms or services offering direct access to the associated data.<br> <br> All efforts have been taken to logically group the links found in the metadata record. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
 };
 
 const DataList: React.FC<DataListProps> = ({
