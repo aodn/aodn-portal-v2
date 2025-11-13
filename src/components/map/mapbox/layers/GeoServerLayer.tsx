@@ -112,8 +112,8 @@ const checkWMSAvailability = (
   const hasValidLayers = checkEmptyArray(urlConfig.LAYERS);
 
   // Avoid state changes during rendering warning, delay status update for a while
-  setTimeout(() => onWMSAvailabilityChange?.(!!hasValidLayers), 100);
-  return !!hasValidLayers;
+  setTimeout(() => onWMSAvailabilityChange?.(hasValidLayers), 100);
+  return hasValidLayers;
 };
 
 const getWmsLayerNames = (collection: OGCCollection | undefined) => {
@@ -556,6 +556,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                   console.log("Failed to fetch layers, ok to ignore", error);
                   setIsFetchingWmsLayers(false);
                 });
+            } else if (error.statusCode === 403) {
+              // If is not allow likely due to white list, we should set the wms not support to block display WMS layer
+              onWMSAvailabilityChange?.(false);
             } else {
               console.log("Failed to fetch fields, ok to ignore", error);
             }
@@ -572,6 +575,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     dispatch,
     handleWmsLayerChange,
     isFetchingWmsLayers,
+    onWMSAvailabilityChange,
     setMapLoading,
   ]);
 
