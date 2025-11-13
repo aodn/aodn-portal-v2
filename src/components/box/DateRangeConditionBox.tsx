@@ -6,6 +6,8 @@ import {
 import React, { useMemo } from "react";
 import { Typography } from "@mui/material";
 import rc8Theme from "../../styles/themeRC8";
+import dayjs from "dayjs";
+import { dateDefault } from "../common/constants";
 
 interface DateRangeConditionBoxProps {
   dateRangeCondition: DateRangeCondition;
@@ -39,7 +41,9 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
         }}
         data-testid="date-range-condition-box"
       >
-        {start.replace("-", "/") + " - " + end.replace("-", "/")}
+        {dayjs(start).format(dateDefault.DISPLAY_FORMAT) +
+          " - " +
+          dayjs(end).format(dateDefault.DISPLAY_FORMAT)}
       </Typography>
     </DownloadConditionBox>
   );
