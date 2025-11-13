@@ -36,7 +36,9 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
   // Store the filtered download conditions count
   const subsettingSelectionCount = useMemo(() => {
     return downloadConditions.filter(
-      (condition) => condition.type !== DownloadConditionType.FORMAT
+      (condition) =>
+        condition.type !== DownloadConditionType.FORMAT &&
+        condition.type !== DownloadConditionType.KEY
     ).length;
   }, [downloadConditions]);
 

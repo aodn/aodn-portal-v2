@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Polygon } from "geojson";
+import { Polygon, Feature } from "geojson";
 import * as turf from "@turf/turf";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 
@@ -29,6 +29,7 @@ interface DrawControlProps extends ControlProps {
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
   ) => IDownloadCondition[];
+  downloadConditions: IDownloadCondition[];
 }
 
 const MENU_ID = "draw-rect-menu-button";
@@ -38,6 +39,7 @@ const DRAW_RECTANGLE_MODE = "draw_rectangle";
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
   getAndSetDownloadConditions,
+  downloadConditions,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [hasFeatures, setHasFeatures] = useState<boolean>(false);
@@ -56,6 +58,37 @@ const DrawRect: React.FC<DrawControlProps> = ({
         },
       }),
     []
+  );
+
+  // Converts map features to BBoxCondition objects and updates the context
+  const syncMapFeaturesToContext = useCallback(
+    (mapDraw: MapboxDraw) => {
+      const features = mapDraw.getAll().features;
+      const newConditions = features
+        .filter((feature) => feature.geometry.type === "Polygon")
+        .map((feature) => {
+          const polygon = feature.geometry as Polygon;
+          const bbox = turf.bbox(polygon);
+          const id = _.toString(feature.id);
+
+          return new BBoxCondition(id, bbox, () => {
+            try {
+              mapDraw.delete(id);
+            } catch (error) {
+              // Ok to ignore the error as this happens when user try to delete a download bbox condition when map is off
+              // We use an effect to update the onRemove callback when map is on again
+              console.warn(
+                "Failed to delete bbox from map, but ok to ignore:",
+                error
+              );
+            }
+          });
+        });
+
+      getAndSetDownloadConditions(DownloadConditionType.BBOX, newConditions);
+      return newConditions;
+    },
+    [getAndSetDownloadConditions]
   );
 
   const anchorRef = useRef(null);
@@ -86,19 +119,9 @@ const DrawRect: React.FC<DrawControlProps> = ({
     }
 
     setTimeout(() => {
-      const features = mapDraw.getAll().features;
-      const box: BBoxCondition[] =
-        features
-          ?.filter((feature) => feature.geometry.type === "Polygon")
-          .map((feature) => {
-            const polygon = feature.geometry as Polygon;
-            const bbox = turf.bbox(polygon);
-            const id = _.toString(feature.id);
-            return new BBoxCondition(id, bbox, () => mapDraw.delete(id));
-          }) || [];
-      getAndSetDownloadConditions(DownloadConditionType.BBOX, box);
+      syncMapFeaturesToContext(mapDraw);
     }, 0);
-  }, [mapDraw, hasFeatures, getAndSetDownloadConditions]);
+  }, [mapDraw, hasFeatures, syncMapFeaturesToContext]);
 
   useEffect(() => {
     if (open) {
@@ -133,19 +156,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
       const onCreateOrUpdate = () => {
         const features = mapDraw.getAll().features;
         setHasFeatures(features.length > 0);
-
-        const box: BBoxCondition[] =
-          features
-            ?.filter((feature) => feature.geometry.type === "Polygon")
-            .map((feature) => {
-              const polygon = feature.geometry as Polygon;
-              const bbox = turf.bbox(polygon);
-              const id = _.toString(feature.id);
-              // The removeCallback will be called when use click the bbox condition delete button
-              return new BBoxCondition(id, bbox, () => mapDraw.delete(id));
-            }) || [];
-        // In case of delete, the box already gone on map, so we just need to remove the condition
-        getAndSetDownloadConditions(DownloadConditionType.BBOX, box);
+        syncMapFeaturesToContext(mapDraw);
       };
 
       const onModeChanged = (e: { mode: string }) => {
@@ -175,7 +186,52 @@ const DrawRect: React.FC<DrawControlProps> = ({
         }
       };
     }
-  }, [mapDraw, map, getAndSetDownloadConditions]);
+  }, [mapDraw, map, syncMapFeaturesToContext]);
+
+  // Effect for init map draw rectangle
+  useEffect(() => {
+    if (!map || !mapDraw) return;
+    const existingBboxConditions = downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.BBOX
+    ) as BBoxCondition[];
+
+    const features = mapDraw.getAll().features;
+
+    // We only need to update map rectangles when number of bbox in context and map are different
+    const shouldUpdateDrawRect =
+      features.length !== existingBboxConditions.length;
+
+    if (shouldUpdateDrawRect) {
+      mapDraw.deleteAll();
+
+      // For each existing bbox conditions from context, we create feature and add to map
+      existingBboxConditions.forEach((condition) => {
+        const [west, south, east, north] = condition.bbox;
+        const feature: Feature<Polygon> = {
+          type: "Feature",
+          geometry: {
+            type: "Polygon",
+            coordinates: [
+              [
+                [west, north],
+                [east, north],
+                [east, south],
+                [west, south],
+                [west, north],
+              ],
+            ],
+          },
+          properties: {},
+        };
+        mapDraw.add(feature);
+      });
+
+      // Recreate conditions with new onRemove callback referencing new feature id
+      setTimeout(() => {
+        syncMapFeaturesToContext(mapDraw);
+      }, 0);
+    }
+  }, [downloadConditions, syncMapFeaturesToContext, map, mapDraw]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
