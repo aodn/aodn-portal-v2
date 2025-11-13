@@ -3,8 +3,6 @@ const dateDefault = {
   DATE_TIME_FORMAT: "YYYY-MM-DDT00:00:00[Z]",
   DATE_FORMAT: "YYYY-MM-DD",
   DISPLAY_FORMAT: "DD/MM/YYYY",
-  SIMPLE_DATE_FORMAT: "MM-YYYY",
-  SIMPLE_Y_M_DATE_FORMAT: "YYYY-MM",
   min: new Date("01/01/1970"),
   max: new Date(),
 };

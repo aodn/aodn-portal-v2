@@ -213,12 +213,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
     const conditionStart = dayjs(
       dateRangeCondition.start,
-      dateDefault.SIMPLE_DATE_FORMAT
+      dateDefault.DATE_FORMAT
     );
-    const conditionEnd = dayjs(
-      dateRangeCondition.end,
-      dateDefault.SIMPLE_DATE_FORMAT
-    );
+    const conditionEnd = dayjs(dateRangeCondition.end, dateDefault.DATE_FORMAT);
     return [conditionStart, conditionEnd];
   }, [downloadConditions]);
 
@@ -230,10 +227,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
     if (filterStartDate !== undefined && filterEndDate !== undefined) {
       const filteredFeatures = featureCollection.features?.filter((feature) => {
-        const date = dayjs(
-          feature.properties?.date,
-          dateDefault.SIMPLE_Y_M_DATE_FORMAT
-        );
+        const date = dayjs(feature.properties?.date, dateDefault.DATE_FORMAT);
         return date.isAfter(filterStartDate) && date.isBefore(filterEndDate);
       });
 
@@ -243,10 +237,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       };
     } else if (filterStartDate !== undefined) {
       const filteredFeatures = featureCollection.features?.filter((feature) => {
-        const date = dayjs(
-          feature.properties?.date,
-          dateDefault.SIMPLE_Y_M_DATE_FORMAT
-        );
+        const date = dayjs(feature.properties?.date, dateDefault.DATE_FORMAT);
         return date.isAfter(filterStartDate);
       });
 
@@ -256,10 +247,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       };
     } else if (filterEndDate !== undefined) {
       const filteredFeatures = featureCollection.features?.filter((feature) => {
-        const date = dayjs(
-          feature.properties?.date,
-          dateDefault.SIMPLE_Y_M_DATE_FORMAT
-        );
+        const date = dayjs(feature.properties?.date, dateDefault.DATE_FORMAT);
         return date.isBefore(filterStartDate);
       });
 
@@ -384,14 +372,15 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                         menu={
                           <DateRange
                             minDate={minDateStamp.format(
-                              dateDefault.SIMPLE_DATE_FORMAT
+                              dateDefault.DATE_FORMAT
                             )}
                             maxDate={maxDateStamp.format(
-                              dateDefault.SIMPLE_DATE_FORMAT
+                              dateDefault.DATE_FORMAT
                             )}
                             getAndSetDownloadConditions={
                               getAndSetDownloadConditions
                             }
+                            downloadConditions={downloadConditions}
                           />
                         }
                       />

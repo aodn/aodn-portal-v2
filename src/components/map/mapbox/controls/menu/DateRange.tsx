@@ -7,28 +7,12 @@ import {
   IDownloadConditionCallback,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
-import { Grid, IconButton, Stack, Typography, Box } from "@mui/material";
+import { IconButton, Box } from "@mui/material";
 import dayjs from "dayjs";
-import { dateToValue, valueToDate } from "../../../../../utils/DateUtils";
-import PlainSlider from "../../../../common/slider/PlainSlider";
 import { dateDefault } from "../../../../common/constants";
-import useBreakpoint from "../../../../../hooks/useBreakpoint";
-import { padding } from "../../../../../styles/constants";
 import { TimeRangeIcon } from "../../../../../assets/icons/map/time_range";
 import { switcherIconButtonSx } from "./MenuControl";
-import rc8Theme from "../../../../../styles/themeRC8";
-
-interface DateSliderProps {
-  visible?: boolean;
-  currentMinDate: string | undefined;
-  currentMaxDate: string | undefined;
-  minDate: string;
-  maxDate: string;
-  onDateRangeChange: (
-    event: Event | React.SyntheticEvent<Element, Event>,
-    value: number | number[]
-  ) => void;
-}
+import DateSlider from "../../../../common/slider/DateSlider";
 
 interface DateRangeControlProps extends ControlProps {
   minDate: string;
@@ -37,155 +21,8 @@ interface DateRangeControlProps extends ControlProps {
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
   ) => IDownloadCondition[];
+  downloadConditions: IDownloadCondition[];
 }
-
-const COMPONENT_ID = "dateslider-daterange-menu-button";
-
-const DateSlider: React.FC<DateSliderProps> = ({
-  currentMinDate,
-  currentMaxDate,
-  minDate,
-  maxDate,
-  onDateRangeChange,
-}) => {
-  const { isMobile, isTablet } = useBreakpoint();
-  const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
-    dateToValue(
-      dayjs(
-        currentMinDate ? currentMinDate : minDate,
-        dateDefault.SIMPLE_DATE_FORMAT
-      )
-    ),
-    dateToValue(
-      dayjs(
-        currentMaxDate ? currentMaxDate : maxDate,
-        dateDefault.SIMPLE_DATE_FORMAT
-      )
-    ),
-  ]);
-  const handleSliderChange = useCallback(
-    (_: Event, newValue: number | number[]) => {
-      const v = newValue as number[];
-      setDateRangeStamp(v);
-    },
-    []
-  );
-
-  useEffect(() => {
-    const newDateRangeStamp = [
-      dateToValue(
-        dayjs(
-          currentMinDate ? currentMinDate : minDate,
-          dateDefault.SIMPLE_DATE_FORMAT
-        )
-      ),
-      dateToValue(
-        dayjs(
-          currentMaxDate ? currentMaxDate : maxDate,
-          dateDefault.SIMPLE_DATE_FORMAT
-        )
-      ),
-    ];
-    setDateRangeStamp(newDateRangeStamp);
-  }, [currentMinDate, currentMaxDate, minDate, maxDate]);
-
-  return (
-    <Grid
-      container
-      sx={{
-        backgroundColor: rc8Theme.palette.primary6,
-        borderRadius: "6px",
-        display: "flex",
-        width: "100%",
-        mx: "8px",
-      }}
-      data-testid={COMPONENT_ID}
-    >
-      <Grid
-        item
-        xs={12}
-        container
-        sx={{
-          px: padding.medium,
-          pt: isMobile || isTablet ? "24px" : padding.small,
-        }}
-      >
-        <Stack
-          width="100%"
-          direction="row"
-          alignItems="center"
-          mx={isMobile ? "18px" : "6px"}
-          gap="16px"
-        >
-          <Typography
-            sx={{
-              ...rc8Theme.typography.title1Medium,
-              color: rc8Theme.palette.text1,
-              whiteSpace: "nowrap",
-              mr: "8px",
-              display: isMobile ? "none" : "block",
-            }}
-          >
-            Start Date
-          </Typography>
-          <PlainSlider
-            value={dateRangeStamp}
-            min={dateToValue(dayjs(minDate, dateDefault.SIMPLE_DATE_FORMAT))}
-            max={dateToValue(dayjs(maxDate, dateDefault.SIMPLE_DATE_FORMAT))}
-            onChangeCommitted={onDateRangeChange}
-            onChange={handleSliderChange}
-            valueLabelDisplay="auto"
-            valueLabelFormat={(value: number) =>
-              valueToDate(value).format(
-                dateDefault.SIMPLE_DATE_FORMAT.replace("-", "/")
-              )
-            }
-          />
-          <Typography
-            sx={{
-              ...rc8Theme.typography.title1Medium,
-              color: rc8Theme.palette.text1,
-              whiteSpace: "nowrap",
-              ml: "8px",
-              display: isMobile ? "none" : "block",
-            }}
-          >
-            On going
-          </Typography>
-        </Stack>
-      </Grid>
-      <Grid
-        item
-        xs={12}
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{
-          mx: "20px",
-          mt: isMobile || isTablet ? "2px" : "6px",
-          mb: isMobile || isTablet ? "2px" : "6px",
-        }}
-      >
-        <Typography
-          sx={{
-            ...rc8Theme.typography.body1Medium,
-            color: rc8Theme.palette.text1,
-          }}
-        >
-          {minDate.replace("-", "/")}
-        </Typography>
-        <Typography
-          sx={{
-            ...rc8Theme.typography.body1Medium,
-            color: rc8Theme.palette.text1,
-          }}
-        >
-          {maxDate.replace("-", "/")}
-        </Typography>
-      </Grid>
-    </Grid>
-  );
-};
 
 const MENU_ID = "daterange-show-hide-menu-button";
 
@@ -193,6 +30,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   minDate,
   maxDate,
   getAndSetDownloadConditions,
+  downloadConditions,
   map, // Map instance passed through ControlProps via cloneElement
 }) => {
   const [open, setOpen] = useState<boolean>(false);
@@ -213,8 +51,8 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       dateRangeStamps: number | number[]
     ) => {
       const d = dateRangeStamps as number[];
-      const start = dayjs(d[0]).format(dateDefault.SIMPLE_DATE_FORMAT);
-      const end = dayjs(d[1]).format(dateDefault.SIMPLE_DATE_FORMAT);
+      const start = dayjs(d[0]).format(dateDefault.DATE_FORMAT);
+      const end = dayjs(d[1]).format(dateDefault.DATE_FORMAT);
 
       if (minDate === start && maxDate === end) {
         const prev = getAndSetDownloadConditions(
@@ -228,7 +66,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
         });
       } else {
         const dateRangeCondition = new DateRangeCondition(
-          "date_range",
+          DownloadConditionType.DATE_RANGE,
           start,
           end,
           () => {
@@ -245,6 +83,19 @@ const DateRange: React.FC<DateRangeControlProps> = ({
     },
     [maxDate, minDate, getAndSetDownloadConditions]
   );
+
+  useEffect(() => {
+    const dateTime = downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.DATE_RANGE
+    ) as DateRangeCondition[];
+    if (dateTime && dateTime.length !== 0) {
+      setOpen(true);
+      const start = dayjs(dateTime[0].start).format(dateDefault.DATE_FORMAT);
+      const end = dayjs(dateTime[0].end).format(dateDefault.DATE_FORMAT);
+      setCurrentMinDate(start ?? undefined);
+      setCurrentMaxDate(end ?? undefined);
+    }
+  }, [downloadConditions]);
 
   return (
     <>
