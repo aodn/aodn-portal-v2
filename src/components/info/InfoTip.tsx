@@ -30,7 +30,7 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
         ref={buttonRef}
         onClick={handleClick}
         sx={{ color: rc8Theme.palette.info.main, padding: 0 }}
-        data-testId="Info-tip-icon"
+        data-testid="Info-tip-icon"
       >
         <InfoIcon />
       </IconButton>
@@ -43,7 +43,7 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
           vertical: "top",
           horizontal: "right",
         }}
-        data-testId="Info-tip-popup"
+        data-testid="Info-tip-popup"
       >
         <InfoCard
           status={InfoStatusType.INFO}
@@ -61,7 +61,7 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
               top: 8,
               right: 8,
             }}
-            data-testId="Info-tip-close-button"
+            data-testid="Info-tip-close-button"
           >
             <CloseIcon />
           </IconButton>
