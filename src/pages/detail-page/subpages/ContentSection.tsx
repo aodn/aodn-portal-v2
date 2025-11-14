@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useMemo } from "react";
 import DataAccessPanel from "./tab-panels/DataAccessPanel";
 import AdditionalInfoPanel from "./tab-panels/AdditionalInfoPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
@@ -53,29 +53,28 @@ const associatedRecordsPanelTab: Tab = {
   component: <AssociatedRecordsPanel />,
 };
 
-const summaryAndDownloadPanelTab = (
-  mapFocusArea: LngLatBounds | undefined
-): Tab => {
-  return {
-    label: "Summary",
-    value: detailPageDefault.SUMMARY,
-    component: <SummaryAndDownloadPanel mapFocusArea={mapFocusArea} />,
-  };
-};
-
 const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
   const { uuid } = useParams();
   const tabNavigation = useTabNavigation();
 
+  const summaryAndDownloadPanelTab = useMemo(
+    (): Tab => ({
+      label: "Summary",
+      value: detailPageDefault.SUMMARY,
+      component: <SummaryAndDownloadPanel mapFocusArea={mapFocusArea} />,
+    }),
+    [mapFocusArea]
+  );
+
   const TABS: Tab[] = useMemo(
     () => [
-      summaryAndDownloadPanelTab(mapFocusArea),
+      summaryAndDownloadPanelTab,
       dataAccessPanelTab,
       citationPanelTab,
       additionalInfoPanelTab,
       associatedRecordsPanelTab,
     ],
-    [mapFocusArea]
+    [summaryAndDownloadPanelTab]
   );
 
   const location = useLocation();
@@ -85,8 +84,6 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     () => new URLSearchParams(location.search),
     [location.search]
   );
-
-  const [tabValue, setTabValue] = useState<number>(findTabIndex(params, TABS));
 
   const handleTabChange = useCallback(
     (newValue: number) => {
@@ -101,11 +98,6 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     },
     [TABS, tabNavigation, uuid]
   );
-
-  useEffect(() => {
-    const index = findTabIndex(params, TABS);
-    setTabValue(index);
-  }, [TABS, params]);
 
   if (isCollectionNotFound) {
     return (
@@ -133,7 +125,7 @@ const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
     >
       <TabsPanelContainer
         tabs={TABS}
-        tabValue={tabValue}
+        tabValue={findTabIndex(params, TABS)}
         handleTabChange={handleTabChange}
       />
     </Card>

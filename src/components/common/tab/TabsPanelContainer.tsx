@@ -1,10 +1,4 @@
-import React, {
-  FC,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { FC, memo, SyntheticEvent, useCallback, useState } from "react";
 import Box from "@mui/material/Box";
 import { padding } from "../../../styles/constants";
 import StyledTabs from "./StyledTabs";
@@ -51,64 +45,63 @@ const a11yProps = (index: number) => ({
   "aria-controls": `tabpanel-${index}`,
 });
 
-const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
-  tabs,
-  tabValue = undefined,
-  handleTabChange,
-  sx,
-}) => {
-  const { isAboveDesktop } = useBreakpoint();
-  const [value, setValue] = useState(tabValue ?? 0);
+const TabsPanelContainer: FC<TabsPanelContainerProps> = memo(
+  ({
+    tabs,
+    tabValue = undefined,
+    handleTabChange,
+    sx,
+  }: TabsPanelContainerProps) => {
+    const { isAboveDesktop } = useBreakpoint();
+    const [value, setValue] = useState(tabValue ?? 0);
 
-  const handleChange = useCallback(
-    (_: SyntheticEvent, newValue: number) => {
-      setValue(newValue);
-      handleTabChange?.(newValue);
-    },
-    [handleTabChange]
-  );
+    const handleChange = useCallback(
+      (_: SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+        handleTabChange?.(newValue);
+      },
+      [handleTabChange]
+    );
 
-  useEffect(() => {
-    if (tabValue) setValue(tabValue);
-  }, [tabValue]);
+    if (!tabs?.length) return;
 
-  if (!tabs?.length) return;
-
-  return (
-    <Box
-      sx={{
-        ...sx,
-      }}
-    >
-      <StyledTabs
-        value={value}
-        onChange={handleChange}
-        aria-label="tabsPanelContainer"
-        data-testid="tabs-panel-container"
-        sx={{ px: isAboveDesktop ? "10px" : "8px" }}
+    return (
+      <Box
+        sx={{
+          ...sx,
+        }}
       >
-        {tabs.map((tab, index) => (
-          <StyledTab
-            key={index}
-            label={tab.label}
-            {...a11yProps(index)}
-            sx={{ textTransform: "none" }}
-            showBadge={tab.showBadge}
-          />
-        ))}
-      </StyledTabs>
-      {tabs.map((tab, index) => (
-        <TabPanel
-          key={index}
+        <StyledTabs
           value={value}
-          index={index}
-          data-testid={`tab-panel-${tab.label}`}
+          onChange={handleChange}
+          aria-label="tabsPanelContainer"
+          data-testid="tabs-panel-container"
+          sx={{ px: isAboveDesktop ? "10px" : "8px" }}
         >
-          {tab.component}
-        </TabPanel>
-      ))}
-    </Box>
-  );
-};
+          {tabs.map((tab, index) => (
+            <StyledTab
+              key={tab.value}
+              label={tab.label}
+              {...a11yProps(index)}
+              sx={{ textTransform: "none" }}
+              showBadge={tab.showBadge}
+            />
+          ))}
+        </StyledTabs>
+        {tabs.map((tab, index) => (
+          <TabPanel
+            key={tab.value}
+            value={value}
+            index={index}
+            data-testid={`tab-panel-${tab.label}`}
+          >
+            {tab.component}
+          </TabPanel>
+        ))}
+      </Box>
+    );
+  }
+);
 
+TabsPanelContainer.displayName = "TabsPanelContainer";
 export default TabsPanelContainer;
