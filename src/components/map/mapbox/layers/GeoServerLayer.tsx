@@ -504,7 +504,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     titleLayerId,
     visible,
   ]);
-
   // call wms_download_fields first to get wms selector fields
   // if it doesn't work that means the wms link is invalid (invalid server url or layerName)
   // in this case we will call wms_layers to get all the possible layers
@@ -512,7 +511,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   useEffect(() => {
     if (!collection) return;
 
-    if (isFetchingWmsLayers) {
+    setIsFetchingWmsLayers(true);
+
+    const fetchLayers = () => {
       const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
       if (wmsLinksOptions && wmsLinksOptions.length > 0) {
         handleWmsLayerChange(wmsLinksOptions[0].value);
@@ -572,13 +573,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       } else {
         setIsFetchingWmsLayers(false);
       }
-    }
+    };
+    // Give a slight delay so that the state updated before we do fetch
+    setTimeout(() => fetchLayers(), 10);
   }, [
     collection,
     dispatch,
     enableGeoServerWhiteList,
     handleWmsLayerChange,
-    isFetchingWmsLayers,
     onWMSAvailabilityChange,
     setMapLoading,
   ]);
