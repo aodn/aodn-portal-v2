@@ -45,6 +45,7 @@ import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 import { checkEmptyArray } from "../../../../utils/Helpers";
+import AdminScreenContext from "../../../admin/AdminScreenContext";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
@@ -112,8 +113,8 @@ const checkWMSAvailability = (
   const hasValidLayers = checkEmptyArray(urlConfig.LAYERS);
 
   // Avoid state changes during rendering warning, delay status update for a while
-  setTimeout(() => onWMSAvailabilityChange?.(!!hasValidLayers), 100);
-  return !!hasValidLayers;
+  setTimeout(() => onWMSAvailabilityChange?.(hasValidLayers), 100);
+  return hasValidLayers;
 };
 
 const getWmsLayerNames = (collection: OGCCollection | undefined) => {
@@ -162,6 +163,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   setTimeSliderSupport,
 }: GeoServerLayerProps) => {
   const { map, setLoading: setMapLoading } = useContext(MapContext);
+  const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const dispatch = useAppDispatch();
   const popupRef = useRef<Popup | null>();
   const popupRootRef = useRef<Root | null>();
@@ -502,7 +504,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     titleLayerId,
     visible,
   ]);
-
   // call wms_download_fields first to get wms selector fields
   // if it doesn't work that means the wms link is invalid (invalid server url or layerName)
   // in this case we will call wms_layers to get all the possible layers
@@ -510,7 +511,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   useEffect(() => {
     if (!collection) return;
 
-    if (isFetchingWmsLayers) {
+    setIsFetchingWmsLayers(true);
+
+    const fetchLayers = () => {
       const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
       if (wmsLinksOptions && wmsLinksOptions.length > 0) {
         handleWmsLayerChange(wmsLinksOptions[0].value);
@@ -522,6 +525,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       const wmsFieldsRequest: MapFeatureRequest = {
         uuid: collection.id,
         layerName: layerName,
+        enableGeoServerWhiteList: enableGeoServerWhiteList,
       };
 
       if (layerName && layerName.trim().length > 0) {
@@ -556,6 +560,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                   console.log("Failed to fetch layers, ok to ignore", error);
                   setIsFetchingWmsLayers(false);
                 });
+            } else if (error.statusCode === 403) {
+              // If is not allow likely due to white list, we should set the wms not support to block display WMS layer
+              onWMSAvailabilityChange?.(false);
             } else {
               console.log("Failed to fetch fields, ok to ignore", error);
             }
@@ -566,12 +573,15 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       } else {
         setIsFetchingWmsLayers(false);
       }
-    }
+    };
+    // Give a slight delay so that the state updated before we do fetch
+    setTimeout(() => fetchLayers(), 10);
   }, [
     collection,
     dispatch,
+    enableGeoServerWhiteList,
     handleWmsLayerChange,
-    isFetchingWmsLayers,
+    onWMSAvailabilityChange,
     setMapLoading,
   ]);
 

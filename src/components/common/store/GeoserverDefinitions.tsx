@@ -14,6 +14,7 @@ export type MapFeatureRequest = {
   x?: number;
   y?: number;
   bbox?: string;
+  enableGeoServerWhiteList?: boolean;
 };
 
 export type MapFeatureResponse = {
