@@ -45,6 +45,7 @@ import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 import { checkEmptyArray } from "../../../../utils/Helpers";
+import AdminScreenContext from "../../../admin/AdminScreenContext";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
@@ -162,6 +163,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   setTimeSliderSupport,
 }: GeoServerLayerProps) => {
   const { map, setLoading: setMapLoading } = useContext(MapContext);
+  const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const dispatch = useAppDispatch();
   const popupRef = useRef<Popup | null>();
   const popupRootRef = useRef<Root | null>();
@@ -522,6 +524,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       const wmsFieldsRequest: MapFeatureRequest = {
         uuid: collection.id,
         layerName: layerName,
+        enableGeoServerWhiteList: enableGeoServerWhiteList,
       };
 
       if (layerName && layerName.trim().length > 0) {
@@ -573,6 +576,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   }, [
     collection,
     dispatch,
+    enableGeoServerWhiteList,
     handleWmsLayerChange,
     isFetchingWmsLayers,
     onWMSAvailabilityChange,
