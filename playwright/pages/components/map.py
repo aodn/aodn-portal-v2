@@ -20,8 +20,8 @@ class Map(BasePage):
         self.full_screen_toggle_button = self.get_by_id(
             'map-toggle-control-button'
         )
-        self.zoom_in_button = self.get_label('Zoom In')
-        self.zoom_out_button = self.get_label('Zoom Out')
+        self.zoom_in_button = self.get_button('Zoom in')
+        self.zoom_out_button = self.get_button('Zoom out')
         self.bookmarks_icon = self.get_by_id('bookmark-list-button')
         self.basemap_show_hide_menu = page.get_by_test_id(
             'basemap-show-hide-menu-button'
@@ -146,7 +146,7 @@ class Map(BasePage):
 
     def get_map_layers(self) -> str:
         """Get the total number of heatmap layers"""
-        self.wait_for_map_loading()
+        self.wait_for_map_idle()
         layers = execute_map_js(self.page, 'getMapLayers', self.map_id)
         return str(layers)
 

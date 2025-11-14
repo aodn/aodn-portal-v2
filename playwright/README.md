@@ -90,10 +90,28 @@ To install `Conda`, please refer to the [official guide](https://conda.io/projec
    ```
 
 3. To run tests in parallel, use the `--numprocesses` flag:
+
    ```bash
    pytest --numprocesses auto
    ```
+
    More configurable options can be found in the [official documentation](https://playwright.dev/python/docs/running-tests).
+
+4. Run a single test multiple times:
+
+   ```bash
+   pytest -k test_function_name --count=10
+   ```
+
+   Here, `-k` selects the test by name, and `--count` runs it the specified number of times.
+
+5. Run the same test multiple times in parallel:
+
+   ```bash
+   pytest -k test_function_name --count=5 -n 5
+   ```
+
+   Here, `--count=5` creates 5 instances of the test, and `-n 5` distributes them across 5 parallel workers.
 
 ## Test Results & Debugging Failed Tests
 

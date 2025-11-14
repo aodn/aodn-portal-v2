@@ -97,13 +97,15 @@ def test_sort_and_view_states_persist_after_map_toggle(
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
+    search_page.wait_for_page_stabilization()
 
     search_page.result_sort_button.click()
     search_page.click_text(sort_type.display_name, exact=True)
 
     search_page.result_view_button.click()
     search_page.click_text(view_type.display_name, exact=True)
+    if view_type == SearchViewLayouts.GRID:
+        expect(search_page.result_grid).to_be_visible()
 
     search_page.map_toggle_button.click()
     search_page.map.wait_for_map_idle()

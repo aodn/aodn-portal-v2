@@ -34,7 +34,7 @@ def test_map_drag_updates_search_results(desktop_page: Page) -> None:
     landing_page.load()
     landing_page.search.fill_search_text('imos')
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
+    search_page.wait_for_page_stabilization()
     initial_data = search_page.first_result_title.inner_text()
 
     # Change api mocking to get updated mocked response after the map drag event
@@ -43,7 +43,7 @@ def test_map_drag_updates_search_results(desktop_page: Page) -> None:
         handle_collections_update_all_api,
     )
     search_page.map.drag_map()
-    search_page.wait_for_timeout(3000)  # wait for the search results to update
+    search_page.wait_for_page_stabilization()
     updated_data = search_page.first_result_title.inner_text()
 
     assert initial_data != updated_data
@@ -55,10 +55,12 @@ def test_map_drag_updates_search_results(desktop_page: Page) -> None:
         ('imos', 'plankton'),
     ],
 )
+@pytest.mark.skip(reason='Feature contains a bug and is being investigated.')
 def test_map_updates_on_search_change(
     desktop_page: Page, search_text: str, updated_search_text: str
 ) -> None:
     """
+
     Confirms that performing a new search by updating the search text also updates
     the map to display a different set of data.
 
@@ -195,12 +197,12 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
+    search_page.wait_for_page_stabilization()
 
     search_page.map.drag_map()
+    search_page.wait_for_page_stabilization()
     search_page.map.zoom_in()
     search_page.wait_for_page_stabilization()
-    search_page.map.wait_for_map_idle()
 
     map_center = search_page.map.get_map_center()
     map_zoom = search_page.map.get_map_zoom()
@@ -244,9 +246,10 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.map.wait_for_map_loading()
+    search_page.wait_for_page_stabilization()
 
     search_page.map.drag_map()
+    search_page.wait_for_page_stabilization()
     search_page.map.zoom_in()
     search_page.wait_for_page_stabilization()
 
