@@ -2,16 +2,15 @@ import React from "react";
 import { Grid, Link, Tooltip, Typography, Box } from "@mui/material";
 import rc8Theme from "../../../../styles/themeRC8";
 import { MailOutlineIcon } from "../../../../assets/icons/details/mail";
+import { openInNewTab } from "../../../../utils/LinkUtils";
 
 interface CollapseContactItemTItleProps {
   isExpanded?: boolean;
-  setIsExpanded?: React.Dispatch<React.SetStateAction<boolean>>;
   email?: string | undefined;
   text: string;
 }
 
 const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
-  setIsExpanded,
   isExpanded = false,
   email,
   text,
@@ -33,13 +32,7 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
   };
 
   return (
-    <Grid
-      item
-      container
-      md={12}
-      onClick={() => setIsExpanded?.((prev) => !prev)}
-      data-testid={`collapse-item-${text}`}
-    >
+    <Grid item container md={12} data-testid={`collapse-item-${text}`}>
       <Grid
         item
         md={12}
@@ -58,7 +51,14 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
               title={email ? `mail to: ${email}` : "[NO EMAIL PROVIDED]"}
               placement="top"
             >
-              <Link href={`mailto:${email}`}>
+              <Link
+                href={`mailto:${email}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openInNewTab(`mailto:${email}`);
+                }}
+              >
                 {generateTitle(rc8Theme.palette.primary1)}
               </Link>
             </Tooltip>

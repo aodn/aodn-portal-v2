@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import {
   DataAccessSubGroup,
@@ -7,9 +7,6 @@ import {
 } from "../../../common/store/OGCCollectionDefinitions";
 import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
 import { openInNewTab } from "../../../../utils/LinkUtils";
-import CopyButton, {
-  COPY_BUTTON_HEIGHT,
-} from "../../../common/buttons/CopyButton";
 import rc8Theme from "../../../../styles/themeRC8";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
@@ -18,15 +15,10 @@ import { dataAccessParams } from "../../../../analytics/dataAccessEvent";
 interface LinkCardProps {
   icon?: boolean;
   link: LinkType;
-  showTitleOnly?: boolean;
 }
 
-const LinkCard: FC<LinkCardProps> = ({
-  icon = true,
-  link,
-  showTitleOnly = false,
-}) => {
-  const [hoverOnContainer, setHoverOnContainer] = useState<boolean>(false);
+const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
+  // const [hoverOnContainer, setHoverOnContainer] = useState<boolean>(false);
   const { checkIfCopied, copyToClipboard } = useDetailPageContext();
 
   const isCopied = useMemo(
@@ -34,10 +26,10 @@ const LinkCard: FC<LinkCardProps> = ({
     [checkIfCopied, link.href, link.title]
   );
 
-  const showCopyButton = useMemo(
-    () => isCopied || hoverOnContainer,
-    [hoverOnContainer, isCopied]
-  );
+  // const showCopyButton = useMemo(
+  //   () => isCopied || hoverOnContainer,
+  //   [hoverOnContainer, isCopied]
+  // );
 
   const handleCopyLink = useCallback(async () => {
     await copyToClipboard(link.href, link.title);
@@ -48,8 +40,8 @@ const LinkCard: FC<LinkCardProps> = ({
 
   return (
     <Box
-      onMouseEnter={() => setHoverOnContainer(true)}
-      onMouseLeave={() => setHoverOnContainer(false)}
+      // onMouseEnter={() => setHoverOnContainer(true)}
+      // onMouseLeave={() => setHoverOnContainer(false)}
       sx={{
         width: "100%",
         display: "flex",
@@ -94,7 +86,7 @@ const LinkCard: FC<LinkCardProps> = ({
         <Box
           sx={{
             overflow: "hidden",
-            minHeight: COPY_BUTTON_HEIGHT,
+            minHeight: "40px",
             alignContent: "center",
           }}
         >
@@ -103,6 +95,7 @@ const LinkCard: FC<LinkCardProps> = ({
             underline="hover"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               openInNewTab(link.href);
 
               // Track data access event click
@@ -124,25 +117,13 @@ const LinkCard: FC<LinkCardProps> = ({
                 WebkitBoxOrient: "vertical",
               }}
             >
-              {showTitleOnly ? (
-                link.title.replace(/_/g, " ")
-              ) : (
-                <>
-                  {link.title.replace(/_/g, " ")}
-                  {link.description && link.description !== link.title && (
-                    <>
-                      <br />
-                      {link.description.replace(/_/g, " ")}
-                    </>
-                  )}
-                </>
-              )}
+              {link.title.replace(/_/g, " ")}
             </Typography>
           </Link>
         </Box>
       </Box>
 
-      {showCopyButton && (
+      {/* {showCopyButton && (
         <CopyButton
           handleClick={handleCopyLink}
           hasBeenCopied={isCopied}
@@ -152,7 +133,7 @@ const LinkCard: FC<LinkCardProps> = ({
             textAfterCopy: "Link Copied",
           }}
         />
-      )}
+      )} */}
     </Box>
   );
 };

@@ -5,9 +5,6 @@ import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import rc8Theme from "../../../styles/themeRC8";
 import { ContentCopyIcon } from "../../../assets/icons/download/contentCopy";
 
-export const COPY_BUTTON_WIDTH = "166px";
-export const COPY_BUTTON_HEIGHT = "40px";
-
 interface CopyButtonConfig {
   iconBeforeCopy?: ReactNode;
   iconAfterCopy?: ReactNode;
@@ -45,8 +42,6 @@ const CopyButton: FC<CopyButtonProps> = ({
       onClick={handleClick}
       data-testid={`copy-button-${copyText}`}
       sx={{
-        width: COPY_BUTTON_WIDTH,
-        height: COPY_BUTTON_HEIGHT,
         borderRadius: "6px",
         bgcolor: "#fff",
         border: `1px solid ${rc8Theme.palette.primary1}`,
