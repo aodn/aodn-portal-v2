@@ -11,8 +11,6 @@ import MetadataUrlList from "../../../../components/list/MetadataUrlList";
 import MetadataDateList from "../../../../components/list/MetadataDateList";
 import { convertDateFormat } from "../../../../utils/DateUtils";
 import { contactRoles } from "../../../../components/common/constants";
-import { checkEmptyArray } from "../../../../utils/Helpers";
-import { IContact } from "../../../../components/common/store/OGCCollectionDefinitions";
 
 const AdditionalInfoPanel = () => {
   const context = useDetailPageContext();
