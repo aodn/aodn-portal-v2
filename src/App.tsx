@@ -7,6 +7,7 @@ import AppRouter from "./utils/AppRouter";
 import { CssBaseline } from "@mui/material";
 import Scrollbar from "./components/common/scroll/ScrollBar";
 import GlobalLoader from "./components/loading/GlobalLoader";
+import AdminScreen from "./components/admin/AdminScreen";
 
 const app = () => {
   return (
@@ -14,7 +15,9 @@ const app = () => {
       <CssBaseline />
       <Scrollbar />
       <GlobalLoader>
-        <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
+        <AdminScreen>
+          <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
+        </AdminScreen>
       </GlobalLoader>
     </ThemeProvider>
   );
