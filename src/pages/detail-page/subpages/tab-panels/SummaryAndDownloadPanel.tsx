@@ -315,120 +315,114 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 sx={{ width: isUnderLaptop ? "95%" : "98%" }}
               />
             </Stack>
-            <Box sx={{ visibility: "visible" }}>
-              <Box
-                arial-label="map"
-                id={mapContainerId}
-                sx={{
-                  width: "100%",
-                  minHeight: "550px",
-                  marginY: padding.large,
-                }}
+            <Box
+              arial-label="map"
+              id={mapContainerId}
+              sx={{
+                width: "100%",
+                minHeight: "550px",
+                marginY: padding.large,
+              }}
+            >
+              <Map
+                bbox={mapFocusArea}
+                animate={false}
+                panelId={mapContainerId}
+                projection={"mercator"} // Hexbin support this project or globe only
+                announcement={
+                  noMapPreview ? "Map Preview Not Available" : undefined
+                }
+                onMoveEvent={handleMapChange}
+                onZoomEvent={handleMapChange}
               >
-                <Map
-                  bbox={mapFocusArea}
-                  animate={false}
-                  panelId={mapContainerId}
-                  projection={"mercator"} // Hexbin support this project or globe only
-                  announcement={
-                    noMapPreview ? "Map Preview Not Available" : undefined
+                <Controls>
+                  <NavigationControl visible={!isUnderLaptop} />
+                  <ScaleControl />
+                  <DisplayCoordinate />
+                  <MenuControlGroup>
+                    <MenuControl menu={<BaseMapSwitcher />} />
+                    <MenuControl
+                      menu={
+                        <ReferenceLayerSwitcher
+                          layers={staticBaseLayerConfig}
+                          onEvent={handleBaseMapSwitch}
+                        />
+                      }
+                    />
+                    <MenuControl
+                      menu={
+                        <MapLayerSwitcher
+                          layers={mapLayerConfig}
+                          onEvent={handleMapLayerChange}
+                        />
+                      }
+                      visible={mapLayerConfig.length !== 0}
+                    />
+                    <MenuControl
+                      visible={
+                        (selectedLayer === LayerName.GeoServer &&
+                          timeSliderSupport) ||
+                        (selectedLayer === LayerName.Hexbin &&
+                          hasSummaryFeature) ||
+                        (selectedLayer === LayerName.SpatialExtent &&
+                          hasSummaryFeature &&
+                          isZarrDataset)
+                      }
+                      menu={
+                        <DateRange
+                          minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
+                          maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
+                          getAndSetDownloadConditions={
+                            getAndSetDownloadConditions
+                          }
+                          downloadConditions={downloadConditions}
+                        />
+                      }
+                    />
+                    <MenuControl
+                      visible={hasDownloadService}
+                      menu={
+                        <DrawRect
+                          getAndSetDownloadConditions={
+                            getAndSetDownloadConditions
+                          }
+                          downloadConditions={downloadConditions}
+                        />
+                      }
+                    />
+                  </MenuControlGroup>
+                </Controls>
+                <Layers>
+                  <FitToSpatialExtentsLayer collection={collection} />
+                  {createStaticLayers(staticLayer)}
+                  {
+                    // Put the first two later here so that they all init the same time
+                    // GeoServerLayer is heavy to load, so we can load it
+                    // but hide it with visible = false
                   }
-                  onMoveEvent={handleMapChange}
-                  onZoomEvent={handleMapChange}
-                >
-                  <Controls>
-                    <NavigationControl visible={!isUnderLaptop} />
-                    <ScaleControl />
-                    <DisplayCoordinate />
-                    <MenuControlGroup>
-                      <MenuControl menu={<BaseMapSwitcher />} />
-                      <MenuControl
-                        menu={
-                          <ReferenceLayerSwitcher
-                            layers={staticBaseLayerConfig}
-                            onEvent={handleBaseMapSwitch}
-                          />
-                        }
-                      />
-                      <MenuControl
-                        menu={
-                          <MapLayerSwitcher
-                            layers={mapLayerConfig}
-                            onEvent={handleMapLayerChange}
-                          />
-                        }
-                        visible={mapLayerConfig.length !== 0}
-                      />
-                      <MenuControl
-                        visible={
-                          (selectedLayer === LayerName.GeoServer &&
-                            timeSliderSupport) ||
-                          (selectedLayer === LayerName.Hexbin &&
-                            hasSummaryFeature) ||
-                          (selectedLayer === LayerName.SpatialExtent &&
-                            hasSummaryFeature &&
-                            isZarrDataset)
-                        }
-                        menu={
-                          <DateRange
-                            minDate={minDateStamp.format(
-                              dateDefault.DATE_FORMAT
-                            )}
-                            maxDate={maxDateStamp.format(
-                              dateDefault.DATE_FORMAT
-                            )}
-                            getAndSetDownloadConditions={
-                              getAndSetDownloadConditions
-                            }
-                            downloadConditions={downloadConditions}
-                          />
-                        }
-                      />
-                      <MenuControl
-                        visible={hasDownloadService}
-                        menu={
-                          <DrawRect
-                            getAndSetDownloadConditions={
-                              getAndSetDownloadConditions
-                            }
-                            downloadConditions={downloadConditions}
-                          />
-                        }
-                      />
-                    </MenuControlGroup>
-                  </Controls>
-                  <Layers>
-                    <FitToSpatialExtentsLayer collection={collection} />
-                    {createStaticLayers(staticLayer)}
-                    {
-                      // Put the first two later here so that they all init the same time
-                      // GeoServerLayer is heavy to load, so we can load it
-                      // but hide it with visible = false
-                    }
-                    <HexbinLayer
-                      featureCollection={filteredFeatureCollection}
-                      visible={selectedLayer === LayerName.Hexbin}
-                    />
-                    <GeoServerLayer
-                      geoServerLayerConfig={{
-                        urlParams: {
-                          START_DATE: filterStartDate,
-                          END_DATE: filterEndDate,
-                        },
-                      }}
-                      onWMSAvailabilityChange={onWMSAvailabilityChange}
-                      onWmsLayerChange={onWmsLayerChange}
-                      setTimeSliderSupport={setTimeSliderSupport}
-                      collection={collection}
-                      visible={selectedLayer === LayerName.GeoServer}
-                    />
-                    <GeojsonLayer
-                      collection={collection}
-                      visible={selectedLayer === LayerName.SpatialExtent}
-                    />
-                  </Layers>
-                </Map>
-              </Box>
+                  <HexbinLayer
+                    featureCollection={filteredFeatureCollection}
+                    visible={selectedLayer === LayerName.Hexbin}
+                  />
+                  <GeoServerLayer
+                    geoServerLayerConfig={{
+                      urlParams: {
+                        START_DATE: filterStartDate,
+                        END_DATE: filterEndDate,
+                      },
+                    }}
+                    onWMSAvailabilityChange={onWMSAvailabilityChange}
+                    onWmsLayerChange={onWmsLayerChange}
+                    setTimeSliderSupport={setTimeSliderSupport}
+                    collection={collection}
+                    visible={selectedLayer === LayerName.GeoServer}
+                  />
+                  <GeojsonLayer
+                    collection={collection}
+                    visible={selectedLayer === LayerName.SpatialExtent}
+                  />
+                </Layers>
+              </Map>
             </Box>
           </Stack>
         </Grid>
