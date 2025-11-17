@@ -41,11 +41,13 @@ import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer"
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 import AIGenTag from "../../../../components/info/AIGenTag";
+import { MapEventEnum } from "../../../../components/map/mapbox/constants";
 
 const mapContainerId = "map-detail-container-id";
 
 interface SummaryAndDownloadPanelProps {
   mapFocusArea?: LngLatBounds;
+  onMapMoveEnd?: (evt: MapEvent) => void;
 }
 
 const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
@@ -95,6 +97,7 @@ const getMinMaxDateStamps = (
 
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   mapFocusArea,
+  onMapMoveEnd,
 }) => {
   const {
     collection,
@@ -260,10 +263,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     }
   }, [featureCollection, filterEndDate, filterStartDate]);
 
-  const handleMapChange = useCallback((event: MapEvent | undefined) => {
-    // implement later
-    console.log("Map change event", event);
-  }, []);
+  const handleMapChange = useCallback(
+    (event: MapEvent | undefined) => {
+      // implement later
+      event && event.type === MapEventEnum.MOVE_END && onMapMoveEnd?.(event);
+    },
+    [onMapMoveEnd]
+  );
 
   const handleMapLayerChange = useCallback(
     (layerName: LayerName) =>
@@ -325,7 +331,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
               }}
             >
               <Map
-                bbox={mapFocusArea}
                 animate={false}
                 panelId={mapContainerId}
                 projection={"mercator"} // Hexbin support this project or globe only
@@ -393,7 +398,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   </MenuControlGroup>
                 </Controls>
                 <Layers>
-                  <FitToSpatialExtentsLayer collection={collection} />
+                  <FitToSpatialExtentsLayer
+                    collection={collection}
+                    bbox={mapFocusArea}
+                  />
                   {createStaticLayers(staticLayer)}
                   {
                     // Put the first two later here so that they all init the same time
