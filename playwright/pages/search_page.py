@@ -114,3 +114,4 @@ class SearchPage(BasePage):
         Waits for the search page to stabilize by monitoring the URL update.
         """
         self.wait_for_url_update()
+        self.wait_for_timeout(1000)
