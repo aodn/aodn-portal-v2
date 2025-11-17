@@ -11,7 +11,7 @@ import TabsPanelContainer, {
   Tab,
 } from "../../../components/common/tab/TabsPanelContainer";
 import { useLocation, useParams } from "react-router-dom";
-import { LngLatBounds } from "mapbox-gl";
+import { LngLatBounds, MapEvent } from "mapbox-gl";
 import {
   detailPageDefault,
   pageReferer,
@@ -21,6 +21,7 @@ import notMatchingRecordImage from "@/assets/images/no_matching_record.png";
 
 interface ContentSectionProps {
   mapFocusArea?: LngLatBounds;
+  onMapMoveEnd?: (evt: MapEvent) => void;
 }
 
 const findTabIndex = (params: URLSearchParams, tabs: Tab[]) => {
@@ -54,28 +55,37 @@ const associatedRecordsPanelTab: Tab = {
 };
 
 const summaryAndDownloadPanelTab = (
-  mapFocusArea: LngLatBounds | undefined
+  mapFocusArea: LngLatBounds | undefined,
+  onMapMoveEnd?: (evt: MapEvent) => void
 ): Tab => {
   return {
     label: "Summary",
     value: detailPageDefault.SUMMARY,
-    component: <SummaryAndDownloadPanel mapFocusArea={mapFocusArea} />,
+    component: (
+      <SummaryAndDownloadPanel
+        mapFocusArea={mapFocusArea}
+        onMapMoveEnd={onMapMoveEnd}
+      />
+    ),
   };
 };
 
-const ContentSection: FC<ContentSectionProps> = ({ mapFocusArea }) => {
+const ContentSection: FC<ContentSectionProps> = ({
+  mapFocusArea,
+  onMapMoveEnd,
+}) => {
   const { uuid } = useParams();
   const tabNavigation = useTabNavigation();
 
   const TABS: Tab[] = useMemo(
     () => [
-      summaryAndDownloadPanelTab(mapFocusArea),
+      summaryAndDownloadPanelTab(mapFocusArea, onMapMoveEnd),
       dataAccessPanelTab,
       citationPanelTab,
       additionalInfoPanelTab,
       associatedRecordsPanelTab,
     ],
-    [mapFocusArea]
+    [mapFocusArea, onMapMoveEnd]
   );
 
   const location = useLocation();

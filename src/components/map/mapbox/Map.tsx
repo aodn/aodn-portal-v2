@@ -127,22 +127,25 @@ const ReactMap = memo(
             "'Open Sans', 'Open Sans CJK SC', sans-serif",
         });
 
-        newMap.on(MapEventEnum.LOAD, () => {
-          // Remove scale control if it exists
-          const scaleElement = newMap
-            .getContainer()
-            .querySelector(".mapboxgl-ctrl-scale");
-          if (scaleElement) {
-            (scaleElement as HTMLElement).style.display = "none";
-          }
-          // Remove logo after map loads
-          const logoElement = newMap
-            .getContainer()
-            .querySelector(".mapboxgl-ctrl-logo");
-          if (logoElement) {
-            (logoElement as HTMLElement).style.display = "none";
-          }
-        });
+        newMap.once(MapEventEnum.LOAD, () =>
+          // Make sure map draw complete before changing the controls
+          setTimeout(() => {
+            // Remove scale control if it exists
+            const scaleElement = newMap
+              .getContainer()
+              .querySelector(".mapboxgl-ctrl-scale");
+            if (scaleElement) {
+              (scaleElement as HTMLElement).style.display = "none";
+            }
+            // Remove logo after map loads
+            const logoElement = newMap
+              .getContainer()
+              .querySelector(".mapboxgl-ctrl-logo");
+            if (logoElement) {
+              (logoElement as HTMLElement).style.display = "none";
+            }
+          }, 0)
+        );
 
         return newMap;
       } catch (err) {

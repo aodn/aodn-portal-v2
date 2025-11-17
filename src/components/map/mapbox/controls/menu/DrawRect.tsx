@@ -143,8 +143,12 @@ const DrawRect: React.FC<DrawControlProps> = ({
       setOpen(isDrawingMode);
 
       // Check if there are any features to enable/disable trash button
-      const features = mapDraw.getAll().features;
-      setHasFeatures(features.length > 0);
+      try {
+        const features = mapDraw.getAll().features;
+        setHasFeatures(features.length > 0);
+      } catch (e: unknown) {
+        // Ignore error
+      }
     }, 100);
     return () => clearInterval(modePollingInterval);
   }, [mapDraw]);
