@@ -39,9 +39,10 @@ const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
       hidden={value !== index}
       id={`tabpanel-${index}`}
       aria-labelledby={`tab-${index}`}
+      sx={{ p: padding.medium }}
       {...other}
     >
-      {value === index && <Box sx={{ p: padding.medium }}>{children}</Box>}
+      {value === index && children}
     </Box>
   );
 };

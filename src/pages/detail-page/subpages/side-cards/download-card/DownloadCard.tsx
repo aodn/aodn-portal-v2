@@ -1,6 +1,5 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { useDetailPageContext } from "../../../context/detail-page-context";
-import { ILink } from "../../../../../components/common/store/OGCCollectionDefinitions";
 import DownloadWFSCard from "./components/DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./components/DownloadCloudOptimisedCard";
 import SideCardContainer from "../SideCardContainer";
@@ -15,8 +14,10 @@ const DownloadCard: FC = () => {
     selectedWmsLayer,
   } = useDetailPageContext();
 
-  const WFSLinks: ILink[] | undefined = collection?.getWFSLinks();
-  const WMSLinks: ILink[] | undefined = collection?.getWMSLinks();
+  const [wfsLinks, wmsLinks] = useMemo(
+    () => [collection?.getWFSLinks(), collection?.getWMSLinks()],
+    [collection]
+  );
 
   const getContent = () => {
     if (collection?.hasSummaryFeature()) {
@@ -28,15 +29,11 @@ const DownloadCard: FC = () => {
           removeDownloadCondition={removeDownloadCondition}
         />
       );
-    }
-    if (
-      (WFSLinks && WFSLinks.length > 0) ||
-      (WMSLinks && WMSLinks.length > 0)
-    ) {
+    } else if (wfsLinks && wfsLinks.length > 0 && selectedWmsLayer) {
       return (
         <DownloadWFSCard
-          WFSLinks={WFSLinks}
-          WMSLinks={WMSLinks}
+          WFSLinks={wfsLinks}
+          WMSLinks={wmsLinks}
           selectedWmsLayerName={selectedWmsLayer}
           uuid={collection?.id}
           downloadConditions={downloadConditions}
