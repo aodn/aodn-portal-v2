@@ -1,22 +1,20 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
+import { useClipboardContext } from "../../../../context/clipboard/ClipboardContext";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 import {
   DataAccessSubGroup,
   getSubgroup,
   ILink as LinkType,
 } from "../../../common/store/OGCCollectionDefinitions";
-import useClipboard from "../../../../hooks/useClipboard";
 import { openInNewTab } from "../../../../utils/LinkUtils";
 import rc8Theme from "../../../../styles/themeRC8";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 import { dataAccessParams } from "../../../../analytics/dataAccessEvent";
-import CopyButton, {
-  CopyButtonConfig,
-} from "../../../common/buttons/CopyButton";
-import useBreakpoint from "../../../../hooks/useBreakpoint";
+import CopyButton from "../../../common/buttons/CopyButton";
 
-interface LinkCardProps extends CopyButtonConfig {
+interface LinkCardProps {
   icon?: boolean;
   link: LinkType;
   isCopyable?: boolean;
@@ -28,41 +26,30 @@ const LinkCard: FC<LinkCardProps> = ({
   link,
   isCopyable = true,
   showCopyOnHover = true,
-  copyButtonConfig,
 }) => {
+  const { checkIsCopied } = useClipboardContext();
   const [hoverOnContent, setHoverOnContent] = useState<boolean>(false);
-  const { checkIsCopied, copyToClipboard } = useClipboard();
   const { isUnderLaptop } = useBreakpoint();
-
-  const isCopied = useMemo(() => {
-    if (copyButtonConfig?.checkIsCopied) {
-      return copyButtonConfig.checkIsCopied(link.href, link.title);
-    } else {
-      return checkIsCopied(link.href, link.title);
-    }
-  }, [copyButtonConfig, checkIsCopied, link.href, link.title]);
 
   const isVisibleCopyButton = useMemo(() => {
     if (isUnderLaptop) {
       return true;
     }
+
+    const isCopied = checkIsCopied(link.href, link.title);
     if (showCopyOnHover) {
       return isCopied || hoverOnContent;
     } else {
       return true;
     }
-  }, [hoverOnContent, isCopied, isUnderLaptop, showCopyOnHover]);
-
-  const handleCopyLink = useCallback(async () => {
-    if (copyButtonConfig?.copyToClipboard) {
-      await copyButtonConfig.copyToClipboard(link.href, link.title);
-    } else {
-      await copyToClipboard(link.href, link.title);
-    }
-
-    // Track data access copy event
-    trackCustomEvent(AnalyticsEvent.DATA_ACCESS_CLICK, dataAccessParams(link));
-  }, [copyButtonConfig, copyToClipboard, link]);
+  }, [
+    checkIsCopied,
+    hoverOnContent,
+    isUnderLaptop,
+    link.href,
+    link.title,
+    showCopyOnHover,
+  ]);
 
   return (
     <Box
@@ -135,13 +122,9 @@ const LinkCard: FC<LinkCardProps> = ({
               sx={{
                 ...rc8Theme.typography.title1Medium,
                 color: rc8Theme.palette.primary.main,
-                // lineHeight: "40px",
                 padding: 0,
                 overflowWrap: "break-word",
-                // textOverflow: "ellipsis",
                 display: "inline",
-                // WebkitLineClamp: "2",
-                // WebkitBoxOrient: "vertical",
               }}
             >
               {link.title.replace(/_/g, " ")}
@@ -149,11 +132,19 @@ const LinkCard: FC<LinkCardProps> = ({
           </Link>
           {isCopyable && (
             <CopyButton
-              handleCopy={handleCopyLink}
-              isCopied={isCopied}
               visible={isVisibleCopyButton}
               copyText={link.href}
-              tooltipText={["Copy link", "Link copied"]}
+              referenceId={link.title}
+              copyButtonConfig={{
+                onCopy: () => {
+                  // Track data access copy event
+                  trackCustomEvent(
+                    AnalyticsEvent.DATA_ACCESS_CLICK,
+                    dataAccessParams(link)
+                  );
+                },
+                tooltipText: ["Copy link", "Link copied"],
+              }}
             />
           )}
         </Box>

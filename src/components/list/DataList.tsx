@@ -8,9 +8,8 @@ import {
 import LinkCard from "./listItem/subitem/LinkCard";
 import CollapseItem from "./listItem/CollapseItem";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
-import { CopyButtonConfig } from "../common/buttons/CopyButton";
 
-interface DataListProps extends CopyButtonConfig {
+interface DataListProps {
   dataAccessLinks?: ILink[];
   title?: string;
   selected?: boolean;
@@ -25,7 +24,6 @@ const DataList: React.FC<DataListProps> = ({
   title,
   dataAccessLinks,
   selected = false,
-  copyButtonConfig,
 }) => {
   // Sort links by subgroup in the preferred order: WMS, WFS, AWS, THREDDS, then others
   const sortedLinks = dataAccessLinks
@@ -48,19 +46,14 @@ const DataList: React.FC<DataListProps> = ({
     : undefined;
 
   const linkTitleComponent = (key: number, link: ILink) => (
-    <LinkCard key={key} link={link} copyButtonConfig={copyButtonConfig} />
+    <LinkCard key={key} link={link} />
   );
 
   const dataAccessItems = sortedLinks?.map((link: ILink, index: number) => (
     <>
       <CollapseItem titleComponent={linkTitleComponent(index, link)} isOpen>
         {link.description && (
-          <ExpandableTextArea
-            text={link.description}
-            isExpandable
-            isCopyable
-            copyButtonConfig={copyButtonConfig}
-          />
+          <ExpandableTextArea text={link.description} isExpandable isCopyable />
         )}
       </CollapseItem>
     </>

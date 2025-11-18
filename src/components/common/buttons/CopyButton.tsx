@@ -1,9 +1,10 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useCallback, useMemo } from "react";
 import { Box, IconButton, SxProps, Tooltip } from "@mui/material";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { ContentCopyIcon } from "../../../assets/icons/download/contentCopy";
 import rc8Theme from "../../../styles/themeRC8";
+import { useClipboardContext } from "../../../context/clipboard/ClipboardContext";
 
 interface CopyIconConfig {
   iconBeforeCopy?: ReactNode;
@@ -24,35 +25,42 @@ export interface CopyButtonConfig {
   copyButtonConfig?: CopyButtonBasic;
 }
 
-export interface CopyButtonBasic {
-  copyToClipboard?: (text: string, referenceId?: string) => Promise<void>;
-  checkIsCopied?: (text: string, referenceId?: string | undefined) => boolean;
+interface CopyButtonBasic {
+  onCopy?: (value?: any) => void;
   copyIconConfig?: CopyIconConfig;
   tooltipText?: string[];
 }
 
-interface CopyButtonProps {
-  handleCopy: () => void;
-  isCopied?: boolean;
+interface CopyButtonProps extends CopyButtonConfig {
+  copyText: string;
   visible?: boolean;
-  copyText?: string;
-  tooltipText?: string[];
-  copyIconConfig?: CopyIconConfig;
+  referenceId?: string;
+  copyButtonConfig?: CopyButtonBasic;
   sx?: SxProps;
 }
 
 const CopyButton: FC<CopyButtonProps> = ({
-  handleCopy,
-  isCopied = false,
-  copyText,
-  tooltipText = [],
   visible = true,
-  copyIconConfig,
+  copyText = "",
+  referenceId = "",
+  copyButtonConfig,
   sx,
 }) => {
+  const { copyToClipboard, checkIsCopied } = useClipboardContext();
+
+  const onClick = useCallback(async () => {
+    await copyToClipboard(copyText, referenceId);
+    copyButtonConfig?.onCopy?.();
+  }, [copyButtonConfig, copyText, copyToClipboard, referenceId]);
+
+  const isCopied = useMemo(
+    () => checkIsCopied(copyText, referenceId),
+    [checkIsCopied, copyText, referenceId]
+  );
+
   const { iconBeforeCopy, iconAfterCopy } = mergeWithDefaults(
     COPY_ICON_CONFIG_DEFAULT,
-    copyIconConfig
+    copyButtonConfig?.copyIconConfig || {}
   );
 
   if (!visible) return null;
@@ -61,14 +69,16 @@ const CopyButton: FC<CopyButtonProps> = ({
     <Box component="span" sx={{ display: "inline-block", ...sx }}>
       <Tooltip
         title={
-          isCopied ? (tooltipText[1] ?? "Copied") : (tooltipText[0] ?? "Copy")
+          isCopied
+            ? (copyButtonConfig?.tooltipText?.[1] ?? "Copied")
+            : (copyButtonConfig?.tooltipText?.[0] ?? "Copy")
         }
         placement="top"
       >
         <IconButton
           data-testid={`copy-button-${copyText}`}
           onClick={(e) => {
-            handleCopy();
+            onClick();
             e.stopPropagation();
           }}
           sx={{

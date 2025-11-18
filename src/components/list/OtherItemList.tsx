@@ -3,14 +3,13 @@ import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { ILink } from "../common/store/OGCCollectionDefinitions";
 import LinkCard from "./listItem/subitem/LinkCard";
-import { CopyButtonConfig } from "../common/buttons/CopyButton";
 
 const INFO_TIP_CONTENT = {
   title: "Information",
   body: "Links to other helpful resources available on external websites.<br> <br> All efforts have been taken to logically group the links found in the metadata record. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
 };
 
-interface OtherItemListProps extends CopyButtonConfig {
+interface OtherItemListProps {
   title?: string;
   otherLinks?: ILink[];
   selected?: boolean;
@@ -20,11 +19,10 @@ const OtherItemList: React.FC<OtherItemListProps> = ({
   otherLinks,
   title,
   selected = false,
-  copyButtonConfig,
 }) => {
   const otherItems = otherLinks?.map((link: ILink, index: number) => (
     <ItemBaseGrid key={index}>
-      <LinkCard key={index} link={link} copyButtonConfig={copyButtonConfig} />
+      <LinkCard key={index} link={link} />
     </ItemBaseGrid>
   ));
 

@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import CopyButton from "../../components/common/buttons/CopyButton";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
 import rc8Theme from "../../styles/themeRC8";
@@ -7,7 +7,6 @@ import { trackCustomEvent } from "../../analytics/customEventTracker";
 import { AnalyticsEvent } from "../../analytics/analyticsEvents";
 
 const LicenseContent = () => {
-  const { checkIsCopied, copyToClipboard } = useDetailPageContext();
   const context = useDetailPageContext();
 
   const citationText = useMemo(
@@ -16,17 +15,6 @@ const LicenseContent = () => {
       "IMOS [year-of-data-downloaded], [Title], [data-access-url], accessed [date-of-access]",
     [context.collection]
   );
-
-  const isCopied = useMemo(
-    () => checkIsCopied(citationText),
-    [checkIsCopied, citationText]
-  );
-
-  const handleCopy = useCallback(async () => {
-    await copyToClipboard(citationText);
-    // Track copy citation button click
-    trackCustomEvent(AnalyticsEvent.COPY_CITATION_CLICK);
-  }, [copyToClipboard, citationText]);
 
   const commonBodyStyles = {
     color: rc8Theme.palette.text2,
@@ -117,9 +105,11 @@ const LicenseContent = () => {
         </Typography>
 
         <CopyButton
-          handleCopy={handleCopy}
-          isCopied={isCopied}
           copyText={citationText}
+          copyButtonConfig={{
+            // Track copy citation button click
+            onCopy: () => trackCustomEvent(AnalyticsEvent.COPY_CITATION_CLICK),
+          }}
         />
       </Box>
 

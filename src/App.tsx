@@ -8,6 +8,7 @@ import { CssBaseline } from "@mui/material";
 import Scrollbar from "./components/common/scroll/ScrollBar";
 import GlobalLoader from "./components/loading/GlobalLoader";
 import AdminScreen from "./components/admin/AdminScreen";
+import { ClipboardProvider } from "./context/clipboard/ClipboardProvider";
 
 const app = () => {
   return (
@@ -15,9 +16,11 @@ const app = () => {
       <CssBaseline />
       <Scrollbar />
       <GlobalLoader>
-        <AdminScreen>
-          <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
-        </AdminScreen>
+        <ClipboardProvider>
+          <AdminScreen>
+            <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
+          </AdminScreen>
+        </ClipboardProvider>
       </GlobalLoader>
     </ThemeProvider>
   );

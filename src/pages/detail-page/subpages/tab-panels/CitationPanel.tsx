@@ -30,7 +30,7 @@ const TITLE_LICENSE = "License";
 const TITLE_SUGGESTED_CITATION = "Suggested Citation";
 
 const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
-  const { collection, copyToClipboard, checkIsCopied } = useDetailPageContext();
+  const { collection } = useDetailPageContext();
   const goToDetailPage = useTabNavigation();
 
   const [
@@ -139,7 +139,6 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
           <SuggestedCitationList
             {...props}
             suggestedCitation={suggestedCitation ?? ""}
-            copyButtonConfig={{ copyToClipboard, checkIsCopied }}
           />
         ),
       },
@@ -184,8 +183,6 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     ],
     [
       suggestedCitation,
-      copyToClipboard,
-      checkIsCopied,
       citationContacts,
       license,
       licenseUrl,
@@ -214,7 +211,6 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
             <SuggestedCitationList
               suggestedCitation={suggestedCitation ?? ""}
               mode={mode}
-              copyButtonConfig={{ copyToClipboard, checkIsCopied }}
             />
             <LicenseList
               license={license ? license : ""}

@@ -1,16 +1,15 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
 import { Stack, Typography } from "@mui/material";
-import { CopyButtonConfig } from "../common/buttons/CopyButton";
 import rc8Theme from "../../styles/themeRC8";
 import { AnalyticsEvent } from "../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../analytics/customEventTracker";
 
-interface SuggestedCitationListProps extends CopyButtonConfig {
+interface SuggestedCitationListProps {
   suggestedCitation: string;
   title?: string;
   selected?: boolean;
@@ -22,19 +21,7 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
   title = "Suggested Citation",
   selected = false,
   mode,
-  copyButtonConfig,
 }) => {
-  const handleCopyWithTracking = useCallback(
-    async (text: string) => {
-      if (copyButtonConfig && copyButtonConfig.copyToClipboard) {
-        await copyButtonConfig.copyToClipboard(text);
-        // Track copy citation button click
-        trackCustomEvent(AnalyticsEvent.COPY_CITATION_CLICK);
-      }
-    },
-    [copyButtonConfig]
-  );
-
   const suggestedCitationItem = useMemo(
     () =>
       suggestedCitation ? (
@@ -47,14 +34,15 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
               text={suggestedCitation}
               isCopyable
               copyButtonConfig={{
-                ...copyButtonConfig,
-                copyToClipboard: handleCopyWithTracking,
+                // Track copy citation button click
+                onCopy: () =>
+                  trackCustomEvent(AnalyticsEvent.COPY_CITATION_CLICK),
               }}
             />
           </Stack>
         </ItemBaseGrid>
       ) : null,
-    [suggestedCitation, mode, copyButtonConfig, handleCopyWithTracking]
+    [suggestedCitation, mode]
   );
 
   switch (mode) {

@@ -4,9 +4,8 @@ import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { ILink } from "../common/store/OGCCollectionDefinitions";
 import LinkCard from "./listItem/subitem/LinkCard";
-import { CopyButtonConfig } from "../common/buttons/CopyButton";
 
-interface CodeTutorialsListProps extends CopyButtonConfig {
+interface CodeTutorialsListProps {
   pythonNotebookLinks?: ILink[];
   title?: string;
   selected?: boolean;
@@ -21,12 +20,11 @@ const CodeTutorialsList: React.FC<CodeTutorialsListProps> = ({
   title,
   pythonNotebookLinks,
   selected = false,
-  copyButtonConfig,
 }) => {
   const pythonNotebookItems = pythonNotebookLinks?.map(
     (link: ILink, index: number) => (
       <ItemBaseGrid key={index}>
-        <LinkCard key={index} link={link} copyButtonConfig={copyButtonConfig} />
+        <LinkCard key={index} link={link} />
       </ItemBaseGrid>
     )
   );

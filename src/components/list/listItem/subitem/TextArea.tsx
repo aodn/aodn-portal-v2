@@ -1,18 +1,17 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { SxProps, Theme, Typography } from "@mui/material";
+import { useClipboardContext } from "../../../../context/clipboard/ClipboardContext";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import TextAreaBaseGrid from "./TextAreaBaseGrid";
 import rc8Theme from "../../../../styles/themeRC8";
 import CopyButton, {
-  CopyButtonBasic,
+  CopyButtonConfig,
 } from "../../../common/buttons/CopyButton";
-import useClipboard from "../../../../hooks/useClipboard";
 
-interface TextAreaProps {
+interface TextAreaProps extends CopyButtonConfig {
   text: string;
   isCopyable?: boolean;
   showCopyOnHover?: boolean;
-  copyButtonConfig?: CopyButtonBasic;
   sx?: SxProps<Theme>;
 }
 
@@ -23,33 +22,17 @@ const TextArea: React.FC<TextAreaProps> = ({
   copyButtonConfig,
   sx,
 }: TextAreaProps) => {
+  const { checkIsCopied } = useClipboardContext();
   const [hoverOnContent, setHoverOnContent] = useState<boolean>(false);
-  const { checkIsCopied, copyToClipboard } = useClipboard();
-
-  const onCopyButtonClick = useCallback(async () => {
-    if (!isCopyable) return;
-    if (copyButtonConfig?.copyToClipboard) {
-      await copyButtonConfig.copyToClipboard(text);
-    } else {
-      await copyToClipboard(text);
-    }
-  }, [copyButtonConfig, copyToClipboard, isCopyable, text]);
-
-  const isCopied = useMemo(() => {
-    if (copyButtonConfig?.checkIsCopied) {
-      return copyButtonConfig.checkIsCopied(text);
-    } else {
-      return checkIsCopied(text);
-    }
-  }, [checkIsCopied, copyButtonConfig, text]);
 
   const isVisibleCopyButton = useMemo(() => {
+    const isCopied = checkIsCopied(text);
     if (showCopyOnHover) {
       return isCopied || hoverOnContent;
     } else {
       return true;
     }
-  }, [hoverOnContent, isCopied, showCopyOnHover]);
+  }, [checkIsCopied, hoverOnContent, showCopyOnHover, text]);
 
   return (
     <TextAreaBaseGrid
@@ -70,12 +53,9 @@ const TextArea: React.FC<TextAreaProps> = ({
       </Typography>
       {isCopyable && (
         <CopyButton
-          handleCopy={onCopyButtonClick}
-          isCopied={isCopied}
           visible={isVisibleCopyButton}
           copyText={text}
-          tooltipText={copyButtonConfig?.tooltipText}
-          copyIconConfig={copyButtonConfig?.copyIconConfig}
+          copyButtonConfig={copyButtonConfig}
         />
       )}
     </TextAreaBaseGrid>

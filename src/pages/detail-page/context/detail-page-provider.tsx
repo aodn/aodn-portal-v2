@@ -14,7 +14,6 @@ import {
 } from "./DownloadDefinitions";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import useClipboard from "../../../hooks/useClipboard";
 import { AnalyticsEvent } from "../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../analytics/customEventTracker";
 
@@ -27,7 +26,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
 }) => {
   const { uuid } = useParams();
   const dispatch = useAppDispatch();
-  const { checkIsCopied, copyToClipboard } = useClipboard();
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
@@ -114,8 +112,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         downloadConditions,
         getAndSetDownloadConditions,
         removeDownloadCondition,
-        checkIsCopied,
-        copyToClipboard,
         selectedWmsLayer,
         setSelectedWmsLayer,
       }}

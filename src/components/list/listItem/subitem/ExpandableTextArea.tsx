@@ -5,21 +5,21 @@ import React, {
   useEffect,
   useMemo,
 } from "react";
-import TextAreaBaseGrid from "./TextAreaBaseGrid";
 import { Box, Button, Grid, SxProps } from "@mui/material";
-import MarkdownRenderer from "../../../common/text/MarkdownRenderer";
+import { useClipboardContext } from "../../../../context/clipboard/ClipboardContext";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
-import rc8Theme from "../../../../styles/themeRC8";
-import useClipboard from "../../../../hooks/useClipboard";
+import TextAreaBaseGrid from "./TextAreaBaseGrid";
+import MarkdownRenderer from "../../../common/text/MarkdownRenderer";
 import CopyButton, {
-  CopyButtonBasic,
+  CopyButtonConfig,
 } from "../../../common/buttons/CopyButton";
+import rc8Theme from "../../../../styles/themeRC8";
 
 const LINE_CLAMP_DEFAULT = 10; // Default number of lines to show before expanding
 const LINE_CLAMP_DEFAULT_TABLET = 7;
 const LINE_CLAMP_DEFAULT_MOBILE = 5;
 
-interface ExpandableTextAreaProps {
+interface ExpandableTextAreaProps extends CopyButtonConfig {
   text: string;
   isExpandable?: boolean;
   isCopyable?: boolean;
@@ -32,7 +32,6 @@ interface ExpandableTextAreaProps {
     tablet?: number;
     mobile?: number;
   };
-  copyButtonConfig?: CopyButtonBasic;
   sx?: SxProps;
 }
 
@@ -51,8 +50,8 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   copyButtonConfig,
   sx,
 }) => {
+  const { checkIsCopied } = useClipboardContext();
   const { isUnderLaptop, isMobile } = useBreakpoint();
-  const { checkIsCopied, copyToClipboard } = useClipboard();
   const [isExpanded, setIsExpanded] = useState(false);
   const [needsExpansion, setNeedsExpansion] = useState(false);
   const [hoverOnContent, setHoverOnContent] = useState<boolean>(false);
@@ -62,29 +61,14 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
     setIsExpanded((prev) => !prev);
   }, []);
 
-  const onCopyButtonClick = useCallback(async () => {
-    if (copyButtonConfig?.copyToClipboard) {
-      await copyButtonConfig.copyToClipboard(text);
-    } else {
-      await copyToClipboard(text);
-    }
-  }, [copyButtonConfig, copyToClipboard, text]);
-
-  const isCopied = useMemo(() => {
-    if (copyButtonConfig?.checkIsCopied) {
-      return copyButtonConfig.checkIsCopied(text);
-    } else {
-      return checkIsCopied(text);
-    }
-  }, [checkIsCopied, copyButtonConfig, text]);
-
   const isVisibleCopyButton = useMemo(() => {
+    const isCopied = checkIsCopied(text);
     if (showCopyOnHover) {
       return isCopied || hoverOnContent;
     } else {
       return true;
     }
-  }, [hoverOnContent, isCopied, showCopyOnHover]);
+  }, [checkIsCopied, hoverOnContent, showCopyOnHover, text]);
 
   // Check if content actually needs expansion by measuring DOM
   useEffect(() => {
@@ -145,12 +129,9 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
             <MarkdownRenderer text={text}>
               {isCopyable && (
                 <CopyButton
-                  handleCopy={onCopyButtonClick}
-                  isCopied={isCopied}
                   visible={isVisibleCopyButton}
                   copyText={text}
-                  tooltipText={copyButtonConfig?.tooltipText}
-                  copyIconConfig={copyButtonConfig?.copyIconConfig}
+                  copyButtonConfig={copyButtonConfig}
                 />
               )}
             </MarkdownRenderer>
