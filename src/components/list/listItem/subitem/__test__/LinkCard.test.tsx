@@ -3,15 +3,19 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import LinkCard from "../LinkCard";
 import { ILink } from "../../../../common/store/OGCCollectionDefinitions";
-import * as DetailPageContext from "../../../../../pages/detail-page/context/detail-page-context";
+import * as ClipboardContext from "../../../../../context/clipboard/ClipboardContext";
 import * as LinkUtils from "../../../../../utils/LinkUtils";
 
-vi.mock("../../../../../pages/detail-page/context/detail-page-context", () => ({
-  useDetailPageContext: vi.fn(),
+vi.mock("../../../../../context/clipboard/ClipboardContext", () => ({
+  useClipboardContext: vi.fn(),
 }));
 
 vi.mock("../../../../../utils/LinkUtils", () => ({
   openInNewTab: vi.fn(),
+}));
+
+vi.mock("../../../../../hooks/useBreakpoint", () => ({
+  default: () => ({ isUnderLaptop: false }),
 }));
 
 describe("LinkCard", () => {
@@ -30,22 +34,25 @@ describe("LinkCard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
-      checkIfCopied: mockCheckIsCopied,
+    vi.mocked(ClipboardContext.useClipboardContext).mockReturnValue({
+      checkIsCopied: mockCheckIsCopied,
       copyToClipboard: mockCopyToClipboard,
-    } as any);
+      clearClipboard: vi.fn(),
+    });
   });
 
-  it("renders with title and description by default", () => {
+  it("renders with title by default", () => {
     render(<LinkCard link={mockLink} />);
 
-    // Should render both title and description with underscores replaced
+    // Should render title with underscores replaced
     expect(
       screen.getByText("Test Link Title", { exact: false })
     ).toBeInTheDocument();
+
+    // The component only shows the title, not the description
     expect(
-      screen.getByText("A test link for unit testing", { exact: false })
-    ).toBeInTheDocument();
+      screen.queryByText("A test link for unit testing", { exact: false })
+    ).not.toBeInTheDocument();
   });
 
   it("renders only title when description is missing", () => {
@@ -59,14 +66,16 @@ describe("LinkCard", () => {
   });
 
   it("shows copy button on hover when link has not been copied", () => {
-    vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
-      checkIfCopied: mockCheckIsCopied.mockReturnValue(false),
-      copyToClipboard: mockCopyToClipboard,
-    } as any);
+    mockCheckIsCopied.mockReturnValue(false);
 
     render(<LinkCard link={mockLink} />);
 
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
+
+    // Initially copy button should not be visible
+    expect(
+      screen.queryByTestId(`copy-button-${mockLink.href}`)
+    ).not.toBeInTheDocument();
 
     // Hover on the card
     userEvent.hover(linkCard);
@@ -84,14 +93,11 @@ describe("LinkCard", () => {
   });
 
   it("shows copy button when link has been copied", () => {
-    vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
-      checkIfCopied: mockCheckIsCopied.mockReturnValue(true),
-      copyToClipboard: mockCopyToClipboard,
-    } as any);
+    mockCheckIsCopied.mockReturnValue(true);
 
     render(<LinkCard link={mockLink} />);
 
-    // Wait for the button to be visible when clipboardText matches link.href
+    // Wait for the button to be visible when link has been copied
     return waitFor(() => {
       const copyButton = screen.queryByTestId(`copy-button-${mockLink.href}`);
       expect(copyButton).toBeInTheDocument();
@@ -111,24 +117,25 @@ describe("LinkCard", () => {
     );
   });
 
-  it("calls handleCopyToClipboard with correct URL when copy button is clicked", () => {
+  it("calls copyToClipboard with correct URL when copy button is clicked", () => {
+    mockCheckIsCopied.mockReturnValue(false);
+
     render(<LinkCard link={mockLink} />);
 
     const linkCard = screen.getByTestId(`link-card-${mockLink.href}`);
     userEvent.hover(linkCard);
+
     return waitFor(() => {
       return screen.getByTestId(`copy-button-${mockLink.href}`);
-    })
-      .then((copyButton) => {
-        userEvent.click(copyButton);
-      })
-      .then(() => {
-        return waitFor(() => {
-          expect(mockCopyToClipboard).toHaveBeenCalledWith(
-            mockLink.href,
-            mockLink.title
-          );
-        });
+    }).then((copyButton) => {
+      userEvent.click(copyButton);
+
+      return waitFor(() => {
+        expect(mockCopyToClipboard).toHaveBeenCalledWith(
+          mockLink.href,
+          mockLink.title
+        );
       });
+    });
   });
 });
