@@ -25,13 +25,13 @@ describe("LinkCard", () => {
   };
 
   const mockCopyToClipboard = vi.fn();
-  const mockCheckIfCopied = vi.fn();
+  const mockCheckIsCopied = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
-      checkIfCopied: mockCheckIfCopied,
+      checkIfCopied: mockCheckIsCopied,
       copyToClipboard: mockCopyToClipboard,
     } as any);
   });
@@ -48,13 +48,6 @@ describe("LinkCard", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders only title when showTitleOnly is true", () => {
-    render(<LinkCard link={mockLink} showTitleOnly={true} />);
-
-    // Should only render title in side bar
-    expect(screen.getByText("Test Link Title")).toBeInTheDocument();
-  });
-
   it("renders only title when description is missing", () => {
     const linkWithoutDescription = { ...mockLink, description: undefined };
     render(<LinkCard link={linkWithoutDescription} />);
@@ -67,7 +60,7 @@ describe("LinkCard", () => {
 
   it("shows copy button on hover when link has not been copied", () => {
     vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
-      checkIfCopied: mockCheckIfCopied.mockReturnValue(false),
+      checkIfCopied: mockCheckIsCopied.mockReturnValue(false),
       copyToClipboard: mockCopyToClipboard,
     } as any);
 
@@ -92,7 +85,7 @@ describe("LinkCard", () => {
 
   it("shows copy button when link has been copied", () => {
     vi.mocked(DetailPageContext.useDetailPageContext).mockReturnValue({
-      checkIfCopied: mockCheckIfCopied.mockReturnValue(true),
+      checkIfCopied: mockCheckIsCopied.mockReturnValue(true),
       copyToClipboard: mockCopyToClipboard,
     } as any);
 

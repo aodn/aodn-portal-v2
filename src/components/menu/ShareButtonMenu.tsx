@@ -75,7 +75,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
   const location = useLocation();
 
   const {
-    checkIfCopied: checkIfCopiedDefault,
+    checkIsCopied: checkIsCopiedDefault,
     copyToClipboard: copyToClipboardDefault,
     clearClipboard,
   } = useClipboard();
@@ -91,8 +91,8 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
   }, [location]);
 
   const isCopiedDefault = useMemo(
-    () => checkIfCopiedDefault(copyUrlDefault),
-    [checkIfCopiedDefault, copyUrlDefault]
+    () => checkIsCopiedDefault(copyUrlDefault),
+    [checkIsCopiedDefault, copyUrlDefault]
   );
 
   // If no copyLinkConfig is provided, use default values/functions from useClipboard

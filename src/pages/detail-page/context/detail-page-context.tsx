@@ -18,7 +18,7 @@ interface DetailPageContextType {
   ) => IDownloadCondition[];
   removeDownloadCondition: (condition: IDownloadCondition) => void;
   copyToClipboard: (text: string, referenceId?: string) => Promise<void>;
-  checkIfCopied: (text: string, referenceId?: string) => boolean;
+  checkIsCopied: (text: string, referenceId?: string) => boolean;
   selectedWmsLayer: string;
   setSelectedWmsLayer: Dispatch<React.SetStateAction<string>>;
 }
@@ -31,7 +31,7 @@ const DetailPageContextDefault = {
   downloadConditions: [],
   getAndSetDownloadConditions: () => [],
   removeDownloadCondition: () => {},
-  checkIfCopied: () => false,
+  checkIsCopied: () => false,
   copyToClipboard: async () => {},
   selectedWmsLayer: "",
   setSelectedWmsLayer: () => {},

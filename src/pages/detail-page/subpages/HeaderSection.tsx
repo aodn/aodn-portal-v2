@@ -224,7 +224,7 @@ const renderSubTitle = (
 const HeaderSection = () => {
   const location = useLocation();
   const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
-  const { collection, checkIfCopied, copyToClipboard, isCollectionNotFound } =
+  const { collection, checkIsCopied, copyToClipboard, isCollectionNotFound } =
     useDetailPageContext();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
@@ -239,8 +239,8 @@ const HeaderSection = () => {
   }, []);
 
   const isCopied = useMemo(
-    () => checkIfCopied(copyUrl),
-    [checkIfCopied, copyUrl]
+    () => checkIsCopied(copyUrl),
+    [checkIsCopied, copyUrl]
   );
 
   const [title, pace, status, startDate, endDate] = useMemo(() => {

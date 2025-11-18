@@ -40,7 +40,7 @@ describe("CopyLinkButton", () => {
   });
 
   it("displays copied state when hasBeenCopied is true", () => {
-    render(<CopyButton {...defaultProps} hasBeenCopied={true} />);
+    render(<CopyButton {...defaultProps} isCopied={true} />);
 
     expect(screen.getByText("Link Copied")).toBeInTheDocument();
     expect(screen.queryByTestId("DoneAllIcon")).toBeInTheDocument();

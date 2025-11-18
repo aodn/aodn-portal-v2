@@ -34,8 +34,8 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
             >
               <ExpandableTextArea
                 text={record.abstract}
-                isClickable
-                onClick={() => openRecord(record.uuid)}
+                isExpandable
+                onClickExpand={() => openRecord(record.uuid)}
               />
             </CollapseItem>
           )) || []

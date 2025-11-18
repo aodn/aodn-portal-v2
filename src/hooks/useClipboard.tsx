@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 
 interface UseClipboardReturn {
   copyToClipboard: (text: string, referenceId?: string) => Promise<void>;
-  checkIfCopied: (text: string, referenceId?: string) => boolean;
+  checkIsCopied: (text: string, referenceId?: string) => boolean;
   clearClipboard: () => Promise<void>;
 }
 
@@ -23,7 +23,7 @@ const useClipboard = (): UseClipboardReturn => {
   );
 
   // Check if specific text is in clipboard
-  const checkIfCopied = useCallback(
+  const checkIsCopied = useCallback(
     (text: string, referenceId?: string) => {
       return clipboard === (referenceId ? `${text}-${referenceId}` : text);
     },
@@ -42,7 +42,7 @@ const useClipboard = (): UseClipboardReturn => {
 
   return {
     copyToClipboard,
-    checkIfCopied,
+    checkIsCopied,
     clearClipboard,
   };
 };

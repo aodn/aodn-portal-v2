@@ -67,7 +67,7 @@ const TITLE: Map<string, string> = new Map([
 ]);
 
 const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
-  const { collection } = useDetailPageContext();
+  const { collection, copyToClipboard, checkIsCopied } = useDetailPageContext();
   const goToDetailPage = useTabNavigation();
 
   const createCompactPanel = useCallback(
@@ -129,7 +129,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                         key={`ch-${index}`}
                         link={link}
                         icon={false}
-                        showTitleOnly={true}
+                        copyButtonConfig={{ copyToClipboard, checkIsCopied }}
                       />
                     ))
                   )}
@@ -140,7 +140,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
         );
       }
     },
-    [goToDetailPage]
+    [checkIsCopied, copyToClipboard, goToDetailPage]
   );
 
   const blocks: NavigatablePanelChild[] = useMemo(
@@ -152,6 +152,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
             {...props}
             title={"Data"}
             dataAccessLinks={collection?.getDataAccessLinks()}
+            copyButtonConfig={{ copyToClipboard, checkIsCopied }}
           />
         ),
       },
@@ -162,6 +163,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
             {...props}
             title={"Document"}
             documentLinks={collection?.getDocumentLinks()}
+            copyButtonConfig={{ copyToClipboard, checkIsCopied }}
           />
         ),
       },
@@ -174,6 +176,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
             pythonNotebookLinks={getOptimizedPythonNotebookLinks(
               collection?.getPythonNotebookLinks()
             )}
+            copyButtonConfig={{ copyToClipboard, checkIsCopied }}
           />
         ),
       },
@@ -184,11 +187,12 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
             {...props}
             title={"Other"}
             otherLinks={collection?.getOtherLinks()}
+            copyButtonConfig={{ copyToClipboard, checkIsCopied }}
           />
         ),
       },
     ],
-    [collection]
+    [checkIsCopied, collection, copyToClipboard]
   );
 
   switch (mode) {

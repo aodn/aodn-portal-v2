@@ -3,8 +3,9 @@ import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { ILink } from "../common/store/OGCCollectionDefinitions";
 import LinkCard from "./listItem/subitem/LinkCard";
+import { CopyButtonConfig } from "../common/buttons/CopyButton";
 
-interface DocumentListProps {
+interface DocumentListProps extends CopyButtonConfig {
   title: string;
   documentLinks?: ILink[];
   selected?: boolean;
@@ -19,10 +20,11 @@ const DocumentList: React.FC<DocumentListProps> = ({
   documentLinks,
   title,
   selected = false,
+  copyButtonConfig,
 }) => {
   const documentItems = documentLinks?.map((link: ILink, index: number) => (
     <ItemBaseGrid key={index}>
-      <LinkCard key={index} link={link} />
+      <LinkCard key={index} link={link} copyButtonConfig={copyButtonConfig} />
     </ItemBaseGrid>
   ));
 

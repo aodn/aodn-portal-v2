@@ -2,13 +2,12 @@ import { Box, Typography } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import CopyButton from "../../components/common/buttons/CopyButton";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
-import { ContentCopyIcon } from "../../assets/icons/download/contentCopy";
 import rc8Theme from "../../styles/themeRC8";
 import { trackCustomEvent } from "../../analytics/customEventTracker";
 import { AnalyticsEvent } from "../../analytics/analyticsEvents";
 
 const LicenseContent = () => {
-  const { checkIfCopied, copyToClipboard } = useDetailPageContext();
+  const { checkIsCopied, copyToClipboard } = useDetailPageContext();
   const context = useDetailPageContext();
 
   const citationText = useMemo(
@@ -19,8 +18,8 @@ const LicenseContent = () => {
   );
 
   const isCopied = useMemo(
-    () => checkIfCopied(citationText),
-    [checkIfCopied, citationText]
+    () => checkIsCopied(citationText),
+    [checkIsCopied, citationText]
   );
 
   const handleCopy = useCallback(async () => {
@@ -118,32 +117,9 @@ const LicenseContent = () => {
         </Typography>
 
         <CopyButton
-          handleClick={handleCopy}
-          hasBeenCopied={isCopied}
+          handleCopy={handleCopy}
+          isCopied={isCopied}
           copyText={citationText}
-          copyButtonConfig={{
-            iconBeforeCopy: (
-              <ContentCopyIcon color={rc8Theme.palette.primary1} />
-            ),
-            textBeforeCopy: "",
-            textAfterCopy: "",
-          }}
-          sx={{
-            border: "none",
-            "&:hover": {
-              border: "none",
-            },
-            width: "30px",
-            minWidth: "30px",
-            height: "30px",
-            px: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            "& .MuiTypography-root": {
-              display: "none",
-            },
-          }}
         />
       </Box>
 

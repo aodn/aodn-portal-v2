@@ -27,7 +27,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
 }) => {
   const { uuid } = useParams();
   const dispatch = useAppDispatch();
-  const { checkIfCopied, copyToClipboard } = useClipboard();
+  const { checkIsCopied, copyToClipboard } = useClipboard();
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
@@ -114,7 +114,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         downloadConditions,
         getAndSetDownloadConditions,
         removeDownloadCondition,
-        checkIfCopied,
+        checkIsCopied,
         copyToClipboard,
         selectedWmsLayer,
         setSelectedWmsLayer,

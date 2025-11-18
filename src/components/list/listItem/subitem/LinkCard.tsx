@@ -1,47 +1,73 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import {
   DataAccessSubGroup,
   getSubgroup,
   ILink as LinkType,
 } from "../../../common/store/OGCCollectionDefinitions";
-import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
+import useClipboard from "../../../../hooks/useClipboard";
 import { openInNewTab } from "../../../../utils/LinkUtils";
 import rc8Theme from "../../../../styles/themeRC8";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 import { dataAccessParams } from "../../../../analytics/dataAccessEvent";
+import CopyButton, {
+  CopyButtonConfig,
+} from "../../../common/buttons/CopyButton";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 
-interface LinkCardProps {
+interface LinkCardProps extends CopyButtonConfig {
   icon?: boolean;
   link: LinkType;
+  isCopyable?: boolean;
+  showCopyOnHover?: boolean;
 }
 
-const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
-  // const [hoverOnContainer, setHoverOnContainer] = useState<boolean>(false);
-  const { checkIfCopied, copyToClipboard } = useDetailPageContext();
+const LinkCard: FC<LinkCardProps> = ({
+  icon = true,
+  link,
+  isCopyable = true,
+  showCopyOnHover = true,
+  copyButtonConfig,
+}) => {
+  const [hoverOnContent, setHoverOnContent] = useState<boolean>(false);
+  const { checkIsCopied, copyToClipboard } = useClipboard();
+  const { isUnderLaptop } = useBreakpoint();
 
-  const isCopied = useMemo(
-    () => checkIfCopied(link.href, link.title),
-    [checkIfCopied, link.href, link.title]
-  );
+  const isCopied = useMemo(() => {
+    if (copyButtonConfig?.checkIsCopied) {
+      return copyButtonConfig.checkIsCopied(link.href, link.title);
+    } else {
+      return checkIsCopied(link.href, link.title);
+    }
+  }, [copyButtonConfig, checkIsCopied, link.href, link.title]);
 
-  // const showCopyButton = useMemo(
-  //   () => isCopied || hoverOnContainer,
-  //   [hoverOnContainer, isCopied]
-  // );
+  const isVisibleCopyButton = useMemo(() => {
+    if (isUnderLaptop) {
+      return true;
+    }
+    if (showCopyOnHover) {
+      return isCopied || hoverOnContent;
+    } else {
+      return true;
+    }
+  }, [hoverOnContent, isCopied, isUnderLaptop, showCopyOnHover]);
 
   const handleCopyLink = useCallback(async () => {
-    await copyToClipboard(link.href, link.title);
+    if (copyButtonConfig?.copyToClipboard) {
+      await copyButtonConfig.copyToClipboard(link.href, link.title);
+    } else {
+      await copyToClipboard(link.href, link.title);
+    }
 
     // Track data access copy event
     trackCustomEvent(AnalyticsEvent.DATA_ACCESS_CLICK, dataAccessParams(link));
-  }, [copyToClipboard, link]);
+  }, [copyButtonConfig, copyToClipboard, link]);
 
   return (
     <Box
-      // onMouseEnter={() => setHoverOnContainer(true)}
-      // onMouseLeave={() => setHoverOnContainer(false)}
+      onMouseEnter={() => setHoverOnContent(true)}
+      onMouseLeave={() => setHoverOnContent(false)}
       sx={{
         width: "100%",
         display: "flex",
@@ -109,31 +135,29 @@ const LinkCard: FC<LinkCardProps> = ({ icon = true, link }) => {
               sx={{
                 ...rc8Theme.typography.title1Medium,
                 color: rc8Theme.palette.primary.main,
+                // lineHeight: "40px",
                 padding: 0,
                 overflowWrap: "break-word",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
+                // textOverflow: "ellipsis",
+                display: "inline",
                 // WebkitLineClamp: "2",
-                WebkitBoxOrient: "vertical",
+                // WebkitBoxOrient: "vertical",
               }}
             >
               {link.title.replace(/_/g, " ")}
             </Typography>
           </Link>
+          {isCopyable && (
+            <CopyButton
+              handleCopy={handleCopyLink}
+              isCopied={isCopied}
+              visible={isVisibleCopyButton}
+              copyText={link.href}
+              tooltipText={["Copy link", "Link copied"]}
+            />
+          )}
         </Box>
       </Box>
-
-      {/* {showCopyButton && (
-        <CopyButton
-          handleClick={handleCopyLink}
-          hasBeenCopied={isCopied}
-          copyText={link.href}
-          copyButtonConfig={{
-            textBeforeCopy: "Copy Link",
-            textAfterCopy: "Link Copied",
-          }}
-        />
-      )} */}
     </Box>
   );
 };
