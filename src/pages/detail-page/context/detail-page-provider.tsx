@@ -17,6 +17,7 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import useClipboard from "../../../hooks/useClipboard";
 import { AnalyticsEvent } from "../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../analytics/customEventTracker";
+import { LayerName } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -40,6 +41,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     IDownloadCondition[]
   >([]);
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>("");
+  const [selectedMapLayer, setSelectedMapLayer] = useState<
+    LayerName | undefined
+  >(undefined);
 
   const getAndSetDownloadConditions = useCallback(
     (
@@ -118,6 +122,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         copyToClipboard,
         selectedWmsLayer,
         setSelectedWmsLayer,
+        selectedMapLayer,
+        setSelectedMapLayer,
       }}
     >
       {children}

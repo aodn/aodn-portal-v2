@@ -105,42 +105,44 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     downloadConditions,
     getAndSetDownloadConditions,
     setSelectedWmsLayer,
+    selectedMapLayer,
+    setSelectedMapLayer,
   } = useDetailPageContext();
 
   // Need to init with null as collection value can be undefined when it entered this component.
-  const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(null);
+  const [selectedLayer, setSelectedLayer] = useState<LayerName | undefined>(
+    selectedMapLayer
+  );
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
 
   const { isUnderLaptop } = useBreakpoint();
 
-  const abstract = useMemo(
-    () => collection?.getEnhancedDescription() || collection?.description || "",
-    [collection]
-  );
-
-  const hasSummaryFeature = useMemo(
-    () => collection?.hasSummaryFeature() || false,
-    [collection]
-  );
-
-  const hasDownloadService = useMemo(
-    () => isWMSAvailable || hasSummaryFeature,
-    [hasSummaryFeature, isWMSAvailable]
-  );
-
-  const hasSpatialExtent = useMemo(() => !!collection?.getBBox(), [collection]);
-
-  const isZarrDataset = useMemo(
-    () => collection?.getDatasetType() === DatasetType.ZARR,
-    [collection]
-  );
-
-  const noMapPreview = useMemo(
-    () => !hasDownloadService && !hasSpatialExtent,
-    [hasDownloadService, hasSpatialExtent]
-  );
+  const [
+    abstract,
+    hasSummaryFeature,
+    hasDownloadService,
+    hasSpatialExtent,
+    isZarrDataset,
+    noMapPreview,
+  ] = useMemo(() => {
+    const abstract =
+      collection?.getEnhancedDescription() || collection?.description || "";
+    const hasSummaryFeature = collection?.hasSummaryFeature() || false;
+    const hasDownloadService = isWMSAvailable || hasSummaryFeature;
+    const hasSpatialExtent = !!collection?.getBBox();
+    const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
+    const noMapPreview = !hasDownloadService && !hasSpatialExtent;
+    return [
+      abstract,
+      hasSummaryFeature,
+      hasDownloadService,
+      hasSpatialExtent,
+      isZarrDataset,
+      noMapPreview,
+    ];
+  }, [collection, isWMSAvailable]);
 
   const [minDateStamp, maxDateStamp] = useMemo(() => {
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
@@ -168,7 +170,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       // Must be order by Hexbin > GeoServer > Spatial extents
       if (isSupportHexbin) {
         layers.push(MapLayers[LayerName.Hexbin]);
-        setSelectedLayer(LayerName.Hexbin);
+        // If value not set before, if user tab between page, previous selection should maintain.
+        setSelectedLayer((v) => (v === undefined ? LayerName.Hexbin : v));
       }
 
       if (isWMSAvailable) {
@@ -179,7 +182,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         layers.push(l);
 
         if (l.default) {
-          setSelectedLayer(LayerName.GeoServer);
+          // If value not set before, if user tab between page, previous selection should maintain.
+          setSelectedLayer((v) => (v === undefined ? LayerName.GeoServer : v));
         }
       }
 
@@ -191,7 +195,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
         layers.push(l);
         if (l.default) {
-          setSelectedLayer(LayerName.SpatialExtent);
+          // If value not set before, if user tab between page, previous selection should maintain.
+          setSelectedLayer((v) =>
+            v === undefined ? LayerName.SpatialExtent : v
+          );
         }
       }
     }
@@ -272,11 +279,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
 
   const handleMapLayerChange = useCallback(
-    (layerName: LayerName) =>
-      setSelectedLayer((prevLayerName: LayerName | null) =>
+    (layerName: LayerName) => {
+      setSelectedMapLayer(layerName);
+      setSelectedLayer((prevLayerName: LayerName | undefined) =>
         prevLayerName !== layerName ? layerName : prevLayerName
-      ),
-    []
+      );
+    },
+    [setSelectedMapLayer]
   );
 
   const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {

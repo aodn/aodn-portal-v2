@@ -5,6 +5,7 @@ import {
   DownloadConditionType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
+import { LayerName } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
 interface DetailPageContextType {
   collection: OGCCollection | undefined;
@@ -20,7 +21,9 @@ interface DetailPageContextType {
   copyToClipboard: (text: string, referenceId?: string) => Promise<void>;
   checkIfCopied: (text: string, referenceId?: string) => boolean;
   selectedWmsLayer: string;
-  setSelectedWmsLayer: Dispatch<React.SetStateAction<string>>;
+  setSelectedWmsLayer: Dispatch<SetStateAction<string>>;
+  selectedMapLayer: LayerName | undefined;
+  setSelectedMapLayer: Dispatch<SetStateAction<LayerName | undefined>>;
 }
 
 const DetailPageContextDefault = {
@@ -35,6 +38,8 @@ const DetailPageContextDefault = {
   copyToClipboard: async () => {},
   selectedWmsLayer: "",
   setSelectedWmsLayer: () => {},
+  selectedMapLayer: undefined,
+  setSelectedMapLayer: () => {},
 };
 
 export const DetailPageContext = createContext<DetailPageContextType>(
