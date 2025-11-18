@@ -7,11 +7,22 @@ import {
   IDownloadConditionCallback,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
-import { IconButton, Box } from "@mui/material";
+import { Box, IconButton, Popper, Divider, Typography } from "@mui/material";
+import {
+  eventEmitter,
+  formControlLabelSx,
+  switcherIconButtonSx,
+  switcherMenuBoxSx,
+  switcherMenuContentBoxSx,
+  switcherMenuContentIconSx,
+  switcherMenuContentLabelTypographySx,
+  switcherTitleTypographySx,
+  tooltipMenuBoxSx,
+  tooltipTitleTypographySx,
+} from "./MenuControl";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../common/constants";
 import { TimeRangeIcon } from "../../../../../assets/icons/map/time_range";
-import { switcherIconButtonSx } from "./MenuControl";
 import DateSlider from "../../../../common/slider/DateSlider";
 
 interface DateRangeControlProps extends ControlProps {
@@ -34,6 +45,10 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   map, // Map instance passed through ControlProps via cloneElement
 }) => {
   const [open, setOpen] = useState<boolean>(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const handleToggle = useCallback(() => {
+    setOpen((prevOpen) => !prevOpen);
+  }, [setOpen]);
   const anchorRef = useRef(null);
   const [currentMinDate, setCurrentMinDate] = useState<string | undefined>(
     undefined
@@ -102,11 +117,71 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       <IconButton
         data-testid={MENU_ID}
         ref={anchorRef}
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => {
+          handleToggle();
+          setShowTooltip(true);
+        }}
         sx={switcherIconButtonSx(open)}
       >
         <TimeRangeIcon />
       </IconButton>
+      <Popper
+        id="daterange-tooltip-popper-id"
+        open={showTooltip && !open} // Only show when hovering AND menu is NOT open
+        anchorEl={anchorRef.current}
+        role={undefined}
+        placement="left-start"
+        disablePortal
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: [0, 10], // 10px offset downward
+            },
+          },
+        ]}
+      >
+        <Box sx={tooltipMenuBoxSx}>
+          <Typography sx={tooltipTitleTypographySx}>Time Range</Typography>
+          <Divider />
+          <Box sx={{ padding: "8px 12px" }}>
+            <Typography
+              sx={{
+                fontSize: "12px",
+                color: "text.secondary",
+                lineHeight: 1.5,
+              }}
+            >
+              Select specific date or time range to filter the dataset details.
+            </Typography>
+          </Box>
+        </Box>
+      </Popper>
+
+      <Popper
+        id="daterange-popper-id"
+        open={open}
+        anchorEl={anchorRef.current}
+        role={undefined}
+        placement="left-start"
+        disablePortal
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: [0, 10], // This applies an offset of 10px downward
+            },
+          },
+        ]}
+      >
+        {
+          // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
+        }
+        <Box sx={tooltipMenuBoxSx}>
+          <Typography sx={tooltipTitleTypographySx}>Time Range</Typography>
+          <Divider />
+        </Box>
+      </Popper>
 
       {open &&
         mapContainer &&

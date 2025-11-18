@@ -107,6 +107,30 @@ export const switcherMenuContentLabelTypographySx = {
   lineHeight: "22px",
 };
 
+export const tooltipMenuBoxSx = {
+  color: grey["mapMenuText"],
+  display: "inline-block",
+  whiteSpace: "nowrap",
+  borderRadius: borderRadius["menu"],
+  backgroundColor: grey["resultCard"],
+  zIndex: zIndex.MAP_CONTROL,
+  padding: "8px 12px",
+  width: "260px",
+};
+
+export const tooltipTitleTypographySx = {
+  backgroundColor: color.blue.medium,
+  borderRadius: borderRadius["menuTop"],
+  fontSize: "16px",
+  color: "#090C02",
+  fontWeight: fontWeight.regular,
+  fontFamily: fontFamily.openSans,
+  minHeight: "40px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
 interface MenuControlProps extends MenuControlType {
   menu: MapControlType | null;
   parentRef?: RefObject<HTMLDivElement>;
