@@ -85,7 +85,7 @@ describe("AssociatedRecordsPanel", async () => {
     });
   });
 
-  it("should open a new tab when clicking on a record abstract", () => {
+  it("should expand and show description when clicking on a record title", () => {
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",
@@ -113,34 +113,23 @@ describe("AssociatedRecordsPanel", async () => {
         screen.findAllByText(
           "Northern Australia Automated Marine Weather and Oceanographic Stations"
         ),
+
       { timeout: 10000 }
     ).then(() => {
       return waitFor(() =>
         screen.findByTestId(
-          "collapse-item-Northern Australia Automated Marine Weather and Oceanographic Stations"
+          "link-card-/details/0887cb5b-b443-4e08-a169-038208109466"
         )
       ).then((parentTitle) => {
         expect(parentTitle).to.exist;
 
-        parentTitle && userEvent.click(parentTitle);
-        const parentAbstract = screen.queryByText(
-          /weather stations have been/i
-        );
-        expect(parentAbstract).to.exist;
-
-        if (parentAbstract) {
-          userEvent.click(parentAbstract);
-
-          return waitFor(
-            () =>
-              expect(openSpy).toHaveBeenCalledWith(
-                "/details/0887cb5b-b443-4e08-a169-038208109466",
-                "_blank",
-                "noopener,noreferrer"
-              ),
-            { timeout: 2000 }
+        userEvent.click(parentTitle);
+        return waitFor(() => {
+          const parentAbstract = screen.queryByText(
+            /weather stations have been/i
           );
-        }
+          expect(parentAbstract).to.exist;
+        });
       });
     });
   });
