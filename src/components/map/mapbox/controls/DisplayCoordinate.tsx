@@ -32,7 +32,7 @@ const DisplayCoordinate = () => {
         display: "inline-block",
         position: "absolute",
         bottom: 0,
-        zIndex: zIndex["MAP_COORD"],
+        zIndex: zIndex.MAP_BASE,
         backgroundColor: "rgba(255, 255, 255, 0.6)",
       }}
     />
