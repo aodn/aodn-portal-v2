@@ -530,10 +530,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         enableGeoServerWhiteList: enableGeoServerWhiteList,
       };
 
+      let fieldsSearch;
+      let layersSearch;
       if (layerName && layerName.trim().length > 0) {
         setMapLoading?.(true);
 
-        dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
+        fieldsSearch = dispatch(fetchGeoServerMapFields(wmsFieldsRequest));
+
+        fieldsSearch
           .unwrap()
           .then(() => {
             // Successfully fetched fields, loading is complete
@@ -547,7 +551,11 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                 uuid: collection.id,
               };
 
-              dispatch(fetchGeoServerMapLayers(wmsLayersRequest))
+              layersSearch = dispatch(
+                fetchGeoServerMapLayers(wmsLayersRequest)
+              );
+
+              layersSearch
                 .unwrap()
                 .then((layers) => {
                   if (layers && layers.length > 0) {
@@ -558,7 +566,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                     setIsFetchingWmsLayers(false);
                   }
                 })
-                .catch((error) => {
+                .catch((error: unknown) => {
                   console.log("Failed to fetch layers, ok to ignore", error);
                   setIsFetchingWmsLayers(false);
                 });
@@ -575,9 +583,16 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       } else {
         setIsFetchingWmsLayers(false);
       }
+      return [fieldsSearch, layersSearch];
     };
     // Give a slight delay so that the state updated before we do fetch
-    setTimeout(() => fetchLayers(), 10);
+    const [f, s] = fetchLayers();
+
+    return () => {
+      // Some query can be quite long kill it if another change comes
+      f?.abort();
+      s?.abort();
+    };
   }, [
     collection,
     dispatch,
