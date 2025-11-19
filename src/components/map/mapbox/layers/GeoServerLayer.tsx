@@ -166,6 +166,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   const { map, setLoading: setMapLoading } = useContext(MapContext);
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const dispatch = useAppDispatch();
+  const layerSearchRef = useRef<{
+    abort: (reason?: string) => void;
+  } | null>(null);
   const popupRef = useRef<Popup | null>();
   const popupRootRef = useRef<Root | null>();
   const [wmsLayers, setWmsLayers] = useState<SelectItem[]>([]);
@@ -547,10 +550,19 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                 uuid: collection.id,
               };
 
-              dispatch(fetchGeoServerMapLayers(wmsLayersRequest))
+              // Cancel previous search if exist
+              layerSearchRef.current?.abort();
+
+              const search = dispatch(
+                fetchGeoServerMapLayers(wmsLayersRequest)
+              );
+
+              layerSearchRef.current = search;
+
+              search
                 .unwrap()
                 .then((layers) => {
-                  if (layers && layers.length > 0) {
+                  if (layers && layers.length > 0 && !(search as any).aborted) {
                     handleWmsLayerChange(
                       formWmsLayerOptions(layers)[0].value || ""
                     );
@@ -558,8 +570,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                     setIsFetchingWmsLayers(false);
                   }
                 })
-                .catch((error) => {
-                  console.log("Failed to fetch layers, ok to ignore", error);
+                .catch(() => {
+                  // Fail or terminated fetch layer, assume WMS not available
+                  onWMSAvailabilityChange?.(false);
                   setIsFetchingWmsLayers(false);
                 });
             } else if (error.statusCode === HttpStatusCode.Unauthorized) {
