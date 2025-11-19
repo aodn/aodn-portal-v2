@@ -46,6 +46,7 @@ import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 import { checkEmptyArray } from "../../../../utils/Helpers";
 import AdminScreenContext from "../../../admin/AdminScreenContext";
+import { HttpStatusCode } from "axios";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
@@ -512,6 +513,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     if (!collection) return;
 
     setIsFetchingWmsLayers(true);
+    onWMSAvailabilityChange?.(true); // Show the loading status again
 
     const fetchLayers = () => {
       const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
@@ -560,7 +562,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                   console.log("Failed to fetch layers, ok to ignore", error);
                   setIsFetchingWmsLayers(false);
                 });
-            } else if (error.statusCode === 403) {
+            } else if (error.statusCode === HttpStatusCode.Unauthorized) {
               // If is not allow likely due to white list, we should set the wms not support to block display WMS layer
               onWMSAvailabilityChange?.(false);
             } else {
