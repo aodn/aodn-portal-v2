@@ -24,9 +24,7 @@ import {
   fontSize,
   padding,
 } from "../../../styles/constants";
-import ShareButtonMenu, {
-  CopyLinkConfig,
-} from "../../../components/menu/ShareButtonMenu";
+import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import { pageReferer } from "../../../components/common/constants";
@@ -95,15 +93,9 @@ const renderGoBackButton = (onClick: () => void, referer: string) => {
   );
 };
 
-const renderShareButton = ({
-  copyLinkConfig,
-  hideText,
-}: {
-  copyLinkConfig: CopyLinkConfig | undefined;
-  hideText: boolean;
-}) => (
+const renderShareButton = ({ hideText }: { hideText: boolean }) => (
   <HeaderButton>
-    <ShareButtonMenu copyLinkConfig={copyLinkConfig} hideText={hideText} />
+    <ShareButtonMenu hideText={hideText} />
   </HeaderButton>
 );
 
@@ -224,24 +216,9 @@ const renderSubTitle = (
 const HeaderSection = () => {
   const location = useLocation();
   const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
-  const { collection, checkIfCopied, copyToClipboard, isCollectionNotFound } =
-    useDetailPageContext();
+  const { collection, isCollectionNotFound } = useDetailPageContext();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
-
-  // Generate share URL with UTM parameters for Google Analytics tracking
-  // Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
-  const copyUrl = useMemo(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("utm_source", "portal"); // Track source as 'portal'
-    url.searchParams.set("utm_medium", "share_link"); // Track medium as 'share_link'
-    return url.toString();
-  }, []);
-
-  const isCopied = useMemo(
-    () => checkIfCopied(copyUrl),
-    [checkIfCopied, copyUrl]
-  );
 
   const [title, pace, status, startDate, endDate] = useMemo(() => {
     const title = collection?.title;
@@ -293,7 +270,6 @@ const HeaderSection = () => {
           {renderGoBackButton(() => onGoBack(referer), referer)}
           {!isCollectionNotFound &&
             renderShareButton({
-              copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
               hideText: isMobile,
             })}
         </Stack>
@@ -390,7 +366,6 @@ const HeaderSection = () => {
           {renderGoBackButton(() => onGoBack(referer), referer)}
           {!isCollectionNotFound &&
             renderShareButton({
-              copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
               hideText: isMobile,
             })}
         </Box>
@@ -398,7 +373,6 @@ const HeaderSection = () => {
       {!isUnderLaptop && !isCollectionNotFound && (
         <Box height="100%">
           {renderShareButton({
-            copyLinkConfig: { isCopied, copyToClipboard, copyUrl },
             hideText: isMobile,
           })}
         </Box>

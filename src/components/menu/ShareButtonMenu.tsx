@@ -1,4 +1,5 @@
 import { FC, ReactNode, useCallback, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Box,
   IconButton,
@@ -10,6 +11,10 @@ import {
   Typography,
 } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
+import { useClipboardContext } from "../../context/clipboard/ClipboardContext";
+import ContentCopy from "@mui/icons-material/ContentCopy";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 import {
   borderRadius,
   color,
@@ -19,11 +24,6 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import ContentCopy from "@mui/icons-material/ContentCopy";
-import DoneAllIcon from "@mui/icons-material/DoneAll";
-import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
-import useClipboard from "../../hooks/useClipboard";
-import { useLocation } from "react-router-dom";
 
 interface ShareMenuItem {
   name: string;
@@ -57,28 +57,23 @@ const getItems = ({
 ];
 
 interface ShareButtonProps {
-  copyLinkConfig?: CopyLinkConfig;
   hideText?: boolean;
   onClose?: () => void;
   sx?: SxProps;
 }
 
 const ShareButtonMenu: FC<ShareButtonProps> = ({
-  copyLinkConfig,
   hideText = false,
   onClose,
   sx,
 }) => {
+  const { checkIsCopied, copyToClipboard, clearClipboard } =
+    useClipboardContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const location = useLocation();
 
-  const {
-    checkIfCopied: checkIfCopiedDefault,
-    copyToClipboard: copyToClipboardDefault,
-    clearClipboard,
-  } = useClipboard();
   // Generate share URL with UTM parameters for Google Analytics tracking
   // Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
   const copyUrlDefault = useMemo(() => {
@@ -89,18 +84,6 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
     // We need to update the url when the location changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
-
-  const isCopiedDefault = useMemo(
-    () => checkIfCopiedDefault(copyUrlDefault),
-    [checkIfCopiedDefault, copyUrlDefault]
-  );
-
-  // If no copyLinkConfig is provided, use default values/functions from useClipboard
-  const { isCopied, copyUrl, copyToClipboard } = copyLinkConfig || {
-    isCopied: isCopiedDefault,
-    copyUrl: copyUrlDefault,
-    copyToClipboard: copyToClipboardDefault,
-  };
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setIsOpen(true);
@@ -183,7 +166,11 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
           },
         }}
       >
-        {getItems({ isCopied, copyUrl, copyToClipboard }).map((item, index) => (
+        {getItems({
+          isCopied: checkIsCopied(copyUrlDefault),
+          copyUrl: copyUrlDefault,
+          copyToClipboard,
+        }).map((item, index) => (
           <MenuItem key={index} onClick={item.handler} data-testid="copy-link">
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText>

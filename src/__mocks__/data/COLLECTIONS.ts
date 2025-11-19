@@ -309,7 +309,7 @@ const NORMAL_COLLECTION = {
       rel: "wfs",
       type: "",
       title: "Data access using R",
-      "ai:group": "Data Access",
+      "ai:group": "Data Access > wfs",
     },
     {
       href: "https://weather.aims.gov.au/#/station/4",

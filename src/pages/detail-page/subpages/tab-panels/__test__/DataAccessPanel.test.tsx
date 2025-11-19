@@ -66,7 +66,7 @@ describe("DataAccessPanel", async () => {
     expect(screen.queryAllByText("Data access via AODN Portal")).to.exist;
     expect(screen.queryAllByText("Data access via Programming API")).to.exist;
   });
-  // TODO: Test is false without return on waitFor
+
   test("should show COPY LINK button when on hover", () => {
     return waitFor(() => screen.findByText("Data access using R")).then(
       (link) => {
@@ -74,9 +74,15 @@ describe("DataAccessPanel", async () => {
 
         userEvent.hover(link!);
 
-        return waitFor(() => screen.findAllByText("Copy Link"), {
-          timeout: 5000,
-        }).then((copyBtns) => {
+        return waitFor(
+          () =>
+            screen.findAllByTestId(
+              "copy-button-https://docs.ropensci.org/dataaimsr/"
+            ),
+          {
+            timeout: 5000,
+          }
+        ).then((copyBtns) => {
           const visibleCount = copyBtns.filter(
             (btn) => getComputedStyle(btn).visibility === "visible"
           ).length;

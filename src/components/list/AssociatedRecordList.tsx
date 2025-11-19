@@ -31,12 +31,11 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
               expandedIcon={<TitleChainIcon />}
               onIconClick={() => openRecord(record.uuid)}
               titleColor={rc8Theme.palette.primary1}
-              collapseBtnColor={rc8Theme.palette.primary1}
             >
               <ExpandableTextArea
                 text={record.abstract}
-                isClickable
-                onClick={() => openRecord(record.uuid)}
+                isExpandable
+                onClickExpand={() => openRecord(record.uuid)}
               />
             </CollapseItem>
           )) || []

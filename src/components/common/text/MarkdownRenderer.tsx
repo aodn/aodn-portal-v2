@@ -6,6 +6,7 @@ import {
   ListItemText,
   Link as MuiLink,
   Stack,
+  Box,
 } from "@mui/material";
 import rc8Theme from "../../../styles/themeRC8";
 import TextRender from "./TextRender";
@@ -52,6 +53,7 @@ interface MarkdownElement {
 
 interface MarkdownRendererProps {
   text: string;
+  children?: React.ReactNode;
 }
 
 // Simple markdown parser for basic elements
@@ -278,12 +280,13 @@ const renderInlineContent = (text: string | undefined) => {
   });
 };
 
-const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
+const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text, children }) => {
   const elements = parseMarkdown(text);
 
   return (
     <>
-      {elements.map((element) => {
+      {elements.map((element, index) => {
+        const isLastElement = index === elements.length - 1;
         switch (element.type) {
           case ElementType.Heading1:
             return (
@@ -345,6 +348,11 @@ const MarkdownRenderer: FC<MarkdownRendererProps> = ({ text }) => {
                 mb={1}
               >
                 {renderInlineContent(element.content)}
+                {isLastElement && children && (
+                  <Box component="span" sx={{ display: "inline-block", ml: 1 }}>
+                    {children}
+                  </Box>
+                )}
               </Typography>
             );
 
