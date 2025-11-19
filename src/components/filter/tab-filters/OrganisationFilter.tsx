@@ -35,7 +35,7 @@ const ORGANISATION = [
     icon: <AustraliaAntarcticProgramIcon />,
   },
   {
-    value: "csiro oceans and atmosphere",
+    value: "csiro",
     label: "CSIRO",
     icon: <CSIROIcon />,
   },
