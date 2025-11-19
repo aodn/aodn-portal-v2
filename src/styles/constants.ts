@@ -162,8 +162,7 @@ const filterList = {
 };
 
 const zIndex = {
-  MAP_COORD: 0,
-  MAP_BASE: 1,
+  MAP_BASE: 0,
   MAP_CONTROL: 2,
   MAP_POPUP: 3,
   FILTER_MODAL: 9,
