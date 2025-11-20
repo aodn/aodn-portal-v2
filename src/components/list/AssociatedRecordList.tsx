@@ -36,7 +36,6 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
                 description: record.abstract,
                 getIcon: () => linkIcon,
               } as ILink)}
-              isOpen
             >
               <ExpandableTextArea
                 text={record.abstract}
