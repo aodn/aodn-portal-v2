@@ -1,12 +1,14 @@
-import { IAssociatedRecord } from "../common/store/OGCCollectionDefinitions";
+import {
+  IAssociatedRecord,
+  ILink,
+} from "../common/store/OGCCollectionDefinitions";
 import React, { memo, ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
-import { openInNewTab } from "../../utils/LinkUtils";
 import CollapseItem from "./listItem/CollapseItem";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
+import LinkCard from "./listItem/subitem/LinkCard";
+import linkIcon from "../../assets/icons/link.png";
 import { pageDefault } from "../common/constants";
-import rc8Theme from "../../styles/themeRC8";
-import { TitleChainIcon } from "../../assets/icons/details/link";
 
 interface AssociatedRecordListProps {
   title: string;
@@ -14,9 +16,9 @@ interface AssociatedRecordListProps {
   selected?: boolean;
 }
 
-const openRecord = (uuid: string) => {
-  openInNewTab(`${pageDefault.details}/${uuid}`);
-};
+const linkTitleComponent = (key: number, link: ILink) => (
+  <LinkCard key={key} link={link} />
+);
 
 const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
   memo<AssociatedRecordListProps>(
@@ -26,17 +28,24 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
           records?.map((record, index) => (
             <CollapseItem
               key={index}
-              title={`${record.title}`}
-              icon={<TitleChainIcon />}
-              expandedIcon={<TitleChainIcon />}
-              onIconClick={() => openRecord(record.uuid)}
-              titleColor={rc8Theme.palette.primary1}
-              collapseBtnColor={rc8Theme.palette.primary1}
+              titleComponent={linkTitleComponent(index, {
+                rel: "",
+                href: `${pageDefault.details}/${record.uuid}`,
+                title: record.title,
+                type: "",
+                description: record.abstract,
+                getIcon: () => linkIcon,
+              } as ILink)}
             >
               <ExpandableTextArea
                 text={record.abstract}
-                isClickable
-                onClick={() => openRecord(record.uuid)}
+                isExpandable
+                isCopyable
+                lineClampConfig={{
+                  default: 5,
+                  tablet: 4,
+                  mobile: 3,
+                }}
               />
             </CollapseItem>
           )) || []

@@ -1,12 +1,11 @@
-import { useState, useCallback } from "react";
+import { FC, ReactNode, useState, useCallback } from "react";
+import { ClipboardContext, ClipboardContextType } from "./ClipboardContext";
 
-interface UseClipboardReturn {
-  copyToClipboard: (text: string, referenceId?: string) => Promise<void>;
-  checkIfCopied: (text: string, referenceId?: string) => boolean;
-  clearClipboard: () => Promise<void>;
+interface ClipboardProviderProps {
+  children: ReactNode;
 }
 
-const useClipboard = (): UseClipboardReturn => {
+export const ClipboardProvider: FC<ClipboardProviderProps> = ({ children }) => {
   const [clipboard, setClipboard] = useState<string | undefined>(undefined);
 
   // Copy text to clipboard
@@ -23,7 +22,7 @@ const useClipboard = (): UseClipboardReturn => {
   );
 
   // Check if specific text is in clipboard
-  const checkIfCopied = useCallback(
+  const checkIsCopied = useCallback(
     (text: string, referenceId?: string) => {
       return clipboard === (referenceId ? `${text}-${referenceId}` : text);
     },
@@ -40,11 +39,15 @@ const useClipboard = (): UseClipboardReturn => {
     }
   }, []);
 
-  return {
+  const value: ClipboardContextType = {
     copyToClipboard,
-    checkIfCopied,
+    checkIsCopied,
     clearClipboard,
   };
-};
 
-export default useClipboard;
+  return (
+    <ClipboardContext.Provider value={value}>
+      {children}
+    </ClipboardContext.Provider>
+  );
+};

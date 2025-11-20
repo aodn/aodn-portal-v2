@@ -115,32 +115,48 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const { isUnderLaptop } = useBreakpoint();
 
-  const abstract = useMemo(
-    () => collection?.getEnhancedDescription() || collection?.description || "",
-    [collection]
-  );
+  const [
+    abstract,
+    hasSummaryFeature,
+    hasDownloadService,
+    hasSpatialExtent,
+    isZarrDataset,
+    noMapPreview,
+  ] = useMemo(() => {
+    const abstract =
+      collection?.getEnhancedDescription() || collection?.description || "";
+    const hasSummaryFeature = collection?.hasSummaryFeature() || false;
+    const hasDownloadService = isWMSAvailable || hasSummaryFeature;
+    const hasSpatialExtent = !!collection?.getBBox();
+    const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
+    const noMapPreview = !hasDownloadService && !hasSpatialExtent;
 
-  const hasSummaryFeature = useMemo(
-    () => collection?.hasSummaryFeature() || false,
-    [collection]
-  );
+    return [
+      abstract,
+      hasSummaryFeature,
+      hasDownloadService,
+      hasSpatialExtent,
+      isZarrDataset,
+      noMapPreview,
+    ];
+  }, [collection, isWMSAvailable]);
 
-  const hasDownloadService = useMemo(
-    () => isWMSAvailable || hasSummaryFeature,
-    [hasSummaryFeature, isWMSAvailable]
-  );
+  const enableSubsetting = useMemo(() => {
+    const enable =
+      (selectedLayer === LayerName.GeoServer && timeSliderSupport) ||
+      (selectedLayer === LayerName.Hexbin && hasSummaryFeature) ||
+      (selectedLayer === LayerName.SpatialExtent &&
+        hasSummaryFeature &&
+        isZarrDataset);
 
-  const hasSpatialExtent = useMemo(() => !!collection?.getBBox(), [collection]);
-
-  const isZarrDataset = useMemo(
-    () => collection?.getDatasetType() === DatasetType.ZARR,
-    [collection]
-  );
-
-  const noMapPreview = useMemo(
-    () => !hasDownloadService && !hasSpatialExtent,
-    [hasDownloadService, hasSpatialExtent]
-  );
+    return hasDownloadService && enable;
+  }, [
+    hasDownloadService,
+    hasSummaryFeature,
+    isZarrDataset,
+    selectedLayer,
+    timeSliderSupport,
+  ]);
 
   const [minDateStamp, maxDateStamp] = useMemo(() => {
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
@@ -364,15 +380,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       visible={mapLayerConfig.length !== 0}
                     />
                     <MenuControl
-                      visible={
-                        (selectedLayer === LayerName.GeoServer &&
-                          timeSliderSupport) ||
-                        (selectedLayer === LayerName.Hexbin &&
-                          hasSummaryFeature) ||
-                        (selectedLayer === LayerName.SpatialExtent &&
-                          hasSummaryFeature &&
-                          isZarrDataset)
-                      }
+                      visible={enableSubsetting}
                       menu={
                         <DateRange
                           minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
@@ -385,7 +393,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }
                     />
                     <MenuControl
-                      visible={hasDownloadService}
+                      visible={enableSubsetting}
                       menu={
                         <DrawRect
                           getAndSetDownloadConditions={

@@ -1,70 +1,96 @@
-import { FC, ReactNode } from "react";
-import { Button, SxProps, Typography } from "@mui/material";
+import { FC, ReactNode, useCallback, useMemo } from "react";
+import { Box, IconButton, SxProps, Tooltip } from "@mui/material";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
-import rc8Theme from "../../../styles/themeRC8";
 import { ContentCopyIcon } from "../../../assets/icons/download/contentCopy";
+import rc8Theme from "../../../styles/themeRC8";
+import { useClipboardContext } from "../../../context/clipboard/ClipboardContext";
 
-export const COPY_BUTTON_WIDTH = "166px";
-export const COPY_BUTTON_HEIGHT = "40px";
-
-interface CopyButtonConfig {
+interface CopyIconConfig {
   iconBeforeCopy?: ReactNode;
   iconAfterCopy?: ReactNode;
-  textBeforeCopy?: string;
-  textAfterCopy?: string;
 }
 
-const COPY_BUTTON_CONFIG_DEFAULT: CopyButtonConfig = {
-  iconBeforeCopy: <ContentCopyIcon height={24} width={24} />,
-  iconAfterCopy: <DoneAllIcon fontSize="small" color="primary" />,
-  textBeforeCopy: "Copy",
-  textAfterCopy: "Is Copied",
+// TODO: change to SVG as per design if needed
+const COPY_ICON_CONFIG_DEFAULT: CopyIconConfig = {
+  iconBeforeCopy: (
+    <ContentCopyIcon height={16} width={16} color={rc8Theme.palette.primary1} />
+  ),
+  iconAfterCopy: (
+    <DoneAllIcon sx={{ fontSize: "16px", color: rc8Theme.palette.primary1 }} />
+  ),
 };
 
-interface CopyButtonProps {
-  handleClick: () => void;
-  hasBeenCopied?: boolean;
+export interface CopyButtonConfig {
+  copyButtonConfig?: CopyButtonBasic;
+}
+
+interface CopyButtonBasic {
+  onCopy?: (value?: any) => void;
+  copyIconConfig?: CopyIconConfig;
+  tooltipText?: string[];
+}
+
+interface CopyButtonProps extends CopyButtonConfig {
   copyText: string;
-  copyButtonConfig?: CopyButtonConfig;
+  visible?: boolean;
+  referenceId?: string;
+  copyButtonConfig?: CopyButtonBasic;
   sx?: SxProps;
 }
 
 const CopyButton: FC<CopyButtonProps> = ({
-  handleClick,
-  hasBeenCopied = false,
-  copyText,
+  visible = true,
+  copyText = "",
+  referenceId = "",
   copyButtonConfig,
   sx,
 }) => {
-  const { iconBeforeCopy, iconAfterCopy, textBeforeCopy, textAfterCopy } =
-    mergeWithDefaults(COPY_BUTTON_CONFIG_DEFAULT, copyButtonConfig);
+  const { copyToClipboard, checkIsCopied } = useClipboardContext();
+
+  const onClick = useCallback(async () => {
+    await copyToClipboard(copyText, referenceId);
+    copyButtonConfig?.onCopy?.();
+  }, [copyButtonConfig, copyText, copyToClipboard, referenceId]);
+
+  const isCopied = useMemo(
+    () => checkIsCopied(copyText, referenceId),
+    [checkIsCopied, copyText, referenceId]
+  );
+
+  const { iconBeforeCopy, iconAfterCopy } = mergeWithDefaults(
+    COPY_ICON_CONFIG_DEFAULT,
+    copyButtonConfig?.copyIconConfig || {}
+  );
+
+  if (!visible) return null;
 
   return (
-    <Button
-      onClick={handleClick}
-      data-testid={`copy-button-${copyText}`}
-      sx={{
-        width: COPY_BUTTON_WIDTH,
-        height: COPY_BUTTON_HEIGHT,
-        borderRadius: "6px",
-        bgcolor: "#fff",
-        border: `1px solid ${rc8Theme.palette.primary1}`,
-        "&:hover": {
-          border: `2px solid ${rc8Theme.palette.primary1}`,
-          backgroundColor: "#fff",
-        },
-        ...sx,
-      }}
-    >
-      {hasBeenCopied ? iconAfterCopy : iconBeforeCopy}
-      <Typography
-        variant="body1Medium"
-        sx={{ color: rc8Theme.palette.text2, pl: "12px" }}
+    <Box component="span" sx={{ display: "inline-block", ...sx }}>
+      <Tooltip
+        title={
+          isCopied
+            ? (copyButtonConfig?.tooltipText?.[1] ?? "Copied")
+            : (copyButtonConfig?.tooltipText?.[0] ?? "Copy")
+        }
+        placement="top"
       >
-        {hasBeenCopied ? textAfterCopy : textBeforeCopy}
-      </Typography>
-    </Button>
+        <IconButton
+          data-testid={`copy-button-${copyText}`}
+          onClick={(e) => {
+            onClick();
+            e.stopPropagation();
+          }}
+          sx={{
+            padding: 0,
+            pl: "0.2em",
+            "&:hover": { bgcolor: "transparent" },
+          }}
+        >
+          {isCopied ? iconAfterCopy : iconBeforeCopy}
+        </IconButton>
+      </Tooltip>
+    </Box>
   );
 };
 

@@ -182,12 +182,12 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       },
     ],
     [
-      citationContacts,
-      constraints,
-      license,
-      licenseGraphic,
-      licenseUrl,
       suggestedCitation,
+      citationContacts,
+      license,
+      licenseUrl,
+      licenseGraphic,
+      constraints,
       aboutContacts,
       credits,
     ]

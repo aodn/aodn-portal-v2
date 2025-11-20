@@ -1,12 +1,13 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import {
   ILink,
   DataAccessSubGroup,
   getSubgroup,
 } from "../common/store/OGCCollectionDefinitions";
 import LinkCard from "./listItem/subitem/LinkCard";
+import CollapseItem from "./listItem/CollapseItem";
+import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 
 interface DataListProps {
   dataAccessLinks?: ILink[];
@@ -44,10 +45,18 @@ const DataList: React.FC<DataListProps> = ({
       })
     : undefined;
 
+  const linkTitleComponent = (key: number, link: ILink) => (
+    <LinkCard key={key} link={link} />
+  );
+
   const dataAccessItems = sortedLinks?.map((link: ILink, index: number) => (
-    <ItemBaseGrid key={index}>
-      <LinkCard key={index} link={link} />
-    </ItemBaseGrid>
+    <>
+      <CollapseItem titleComponent={linkTitleComponent(index, link)} isOpen>
+        {link.description && (
+          <ExpandableTextArea text={link.description} isExpandable isCopyable />
+        )}
+      </CollapseItem>
+    </>
   ));
 
   return (

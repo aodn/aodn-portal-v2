@@ -1,7 +1,7 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
-import TextArea from "./listItem/subitem/TextArea";
+import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 
 interface StatementListProps {
   title?: string;
@@ -16,7 +16,7 @@ const StatementList: React.FC<StatementListProps> = ({
 }) => {
   const statementItem = (
     <ItemBaseGrid container key={statement}>
-      <TextArea text={statement} />
+      <ExpandableTextArea text={statement} />
     </ItemBaseGrid>
   );
 
