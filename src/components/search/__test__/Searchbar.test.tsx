@@ -43,8 +43,8 @@ const mockLocation = {
 };
 
 // Mock react-router-dom with the mutable location
-vi.mock(import("react-router-dom"), async (importOriginal) => {
-  const actual = await importOriginal();
+vi.mock("react-router-dom", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("mapbox-gl")>();
   return {
     ...actual,
     useLocation: () => mockLocation,
