@@ -5,6 +5,7 @@ import {
   DownloadConditionType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
+import { LayerName } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
 interface DetailPageContextType {
   collection: OGCCollection | undefined;
@@ -18,7 +19,9 @@ interface DetailPageContextType {
   ) => IDownloadCondition[];
   removeDownloadCondition: (condition: IDownloadCondition) => void;
   selectedWmsLayer: string;
-  setSelectedWmsLayer: Dispatch<React.SetStateAction<string>>;
+  setSelectedWmsLayer: Dispatch<SetStateAction<string>>;
+  lastSelectedMapLayer: LayerName | null;
+  setLastSelectedMapLayer: Dispatch<SetStateAction<LayerName | null>>;
 }
 
 const DetailPageContextDefault = {
@@ -31,6 +34,8 @@ const DetailPageContextDefault = {
   removeDownloadCondition: () => {},
   selectedWmsLayer: "",
   setSelectedWmsLayer: () => {},
+  lastSelectedMapLayer: null,
+  setLastSelectedMapLayer: () => {},
 };
 
 export const DetailPageContext = createContext<DetailPageContextType>(

@@ -105,10 +105,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     downloadConditions,
     getAndSetDownloadConditions,
     setSelectedWmsLayer,
+    lastSelectedMapLayer,
+    setLastSelectedMapLayer,
   } = useDetailPageContext();
 
   // Need to init with null as collection value can be undefined when it entered this component.
-  const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(null);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
@@ -122,6 +123,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     hasSpatialExtent,
     isZarrDataset,
     noMapPreview,
+    minDateStamp,
+    maxDateStamp,
   ] = useMemo(() => {
     const abstract =
       collection?.getEnhancedDescription() || collection?.description || "";
@@ -130,35 +133,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const hasSpatialExtent = !!collection?.getBBox();
     const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
     const noMapPreview = !hasDownloadService && !hasSpatialExtent;
-
-    return [
-      abstract,
-      hasSummaryFeature,
-      hasDownloadService,
-      hasSpatialExtent,
-      isZarrDataset,
-      noMapPreview,
-    ];
-  }, [collection, isWMSAvailable]);
-
-  const enableSubsetting = useMemo(() => {
-    const enable =
-      (selectedLayer === LayerName.GeoServer && timeSliderSupport) ||
-      (selectedLayer === LayerName.Hexbin && hasSummaryFeature) ||
-      (selectedLayer === LayerName.SpatialExtent &&
-        hasSummaryFeature &&
-        isZarrDataset);
-
-    return hasDownloadService && enable;
-  }, [
-    hasDownloadService,
-    hasSummaryFeature,
-    isZarrDataset,
-    selectedLayer,
-    timeSliderSupport,
-  ]);
-
-  const [minDateStamp, maxDateStamp] = useMemo(() => {
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
     // time value, for example cloud optimized date range may be different from the
     // geoserver one
@@ -171,8 +145,35 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       start = s === undefined ? start : dayjs(s, dateDefault.DISPLAY_FORMAT);
       end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
     }
-    return [start, end];
-  }, [collection]);
+
+    return [
+      abstract,
+      hasSummaryFeature,
+      hasDownloadService,
+      hasSpatialExtent,
+      isZarrDataset,
+      noMapPreview,
+      start,
+      end,
+    ];
+  }, [collection, isWMSAvailable]);
+
+  const enableSubsetting = useMemo(() => {
+    const enable =
+      (lastSelectedMapLayer === LayerName.GeoServer && timeSliderSupport) ||
+      (lastSelectedMapLayer === LayerName.Hexbin && hasSummaryFeature) ||
+      (lastSelectedMapLayer === LayerName.SpatialExtent &&
+        hasSummaryFeature &&
+        isZarrDataset);
+
+    return hasDownloadService && enable;
+  }, [
+    hasDownloadService,
+    hasSummaryFeature,
+    isZarrDataset,
+    lastSelectedMapLayer,
+    timeSliderSupport,
+  ]);
 
   const mapLayerConfig = useMemo((): LayerSwitcherLayer<LayerName>[] => {
     const layers: LayerSwitcherLayer<LayerName>[] = [];
@@ -181,34 +182,53 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
       const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
 
-      // Must be order by Hexbin > GeoServer > Spatial extents
+      // Must be ordered by Hexbin > GeoServer > Spatial extents
       if (isSupportHexbin) {
         layers.push(MapLayers[LayerName.Hexbin]);
-        setSelectedLayer(LayerName.Hexbin);
+        setLastSelectedMapLayer((v) => (v ? v : LayerName.Hexbin));
       }
 
       if (isWMSAvailable) {
-        const l = {
-          ...MapLayers[LayerName.GeoServer],
-          default: !isSupportHexbin,
-        };
+        const l = MapLayers[LayerName.GeoServer];
         layers.push(l);
 
-        if (l.default) {
-          setSelectedLayer(LayerName.GeoServer);
-        }
+        setLastSelectedMapLayer((v) => {
+          // If layer selected before, we keep it as is and set default iff it is Geoserver
+          if (v) {
+            l.default = v === LayerName.GeoServer;
+            return v;
+          } else {
+            l.default = !isSupportHexbin;
+            return LayerName.GeoServer;
+          }
+        });
+      } else {
+        // isWMSAvailable is a delayed value and will update after system query the WMS server
+        // so in  case we have set the GeoServer and finally we know that it is WMS is not available
+        // we need to reset the value, otherwise the next if block logic will fail.
+        setLastSelectedMapLayer((v) => {
+          if (v && v === LayerName.GeoServer) {
+            return null;
+          } else {
+            return v;
+          }
+        });
       }
 
       if (!isSupportHexbin && hasSpatialExtent) {
-        const l = {
-          ...MapLayers[LayerName.SpatialExtent],
-          default: !isSupportHexbin && !isWMSAvailable,
-        };
-
+        const l = MapLayers[LayerName.SpatialExtent];
         layers.push(l);
-        if (l.default) {
-          setSelectedLayer(LayerName.SpatialExtent);
-        }
+
+        setLastSelectedMapLayer((v) => {
+          // If layer selected before, we keep it as is and set default iff it is SpatialExtent
+          if (v) {
+            l.default = v === LayerName.SpatialExtent;
+            return v;
+          } else {
+            l.default = !isSupportHexbin && !isWMSAvailable;
+            return LayerName.SpatialExtent;
+          }
+        });
       }
     }
 
@@ -219,6 +239,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     isZarrDataset,
     isWMSAvailable,
     hasSpatialExtent,
+    setLastSelectedMapLayer,
   ]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
@@ -288,11 +309,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
 
   const handleMapLayerChange = useCallback(
-    (layerName: LayerName) =>
-      setSelectedLayer((prevLayerName: LayerName | null) =>
+    (layerName: LayerName) => {
+      setLastSelectedMapLayer((prevLayerName: LayerName | null) =>
         prevLayerName !== layerName ? layerName : prevLayerName
-      ),
-    []
+      );
+    },
+    [setLastSelectedMapLayer]
   );
 
   const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
@@ -418,7 +440,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   }
                   <HexbinLayer
                     featureCollection={filteredFeatureCollection}
-                    visible={selectedLayer === LayerName.Hexbin}
+                    visible={lastSelectedMapLayer === LayerName.Hexbin}
                   />
                   <GeoServerLayer
                     geoServerLayerConfig={{
@@ -431,11 +453,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     onWmsLayerChange={onWmsLayerChange}
                     setTimeSliderSupport={setTimeSliderSupport}
                     collection={collection}
-                    visible={selectedLayer === LayerName.GeoServer}
+                    visible={lastSelectedMapLayer === LayerName.GeoServer}
                   />
                   <GeojsonLayer
                     collection={collection}
-                    visible={selectedLayer === LayerName.SpatialExtent}
+                    visible={lastSelectedMapLayer === LayerName.SpatialExtent}
                   />
                 </Layers>
               </Map>
