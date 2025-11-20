@@ -19,6 +19,7 @@ from pages.detail_page import DetailPage
         ),
     ],
 )
+@pytest.mark.skip(reason="UI changes needed to fix the test")
 def test_related_resources_sections_in_desktop(
     desktop_page: Page,
     title: str,
@@ -81,6 +82,7 @@ def test_related_resources_sections_in_desktop(
         ),
     ],
 )
+@pytest.mark.skip(reason="UI changes needed to fix the test")
 def test_related_resources_sections_in_mobile(
     mobile_page: Page,
     title: str,

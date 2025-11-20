@@ -82,11 +82,7 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
             {/* Title text section */}
             <Box sx={{ flex: 1 }}>
               {/* {renderTitle()} */}
-              <CollapseItemTitle
-                // onClick={toggleExpanded}
-                text={title}
-                titleComponent={titleElement()}
-              />
+              <CollapseItemTitle text={title} titleComponent={titleElement()} />
             </Box>
           </Box>
         </Grid>

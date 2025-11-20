@@ -5,7 +5,7 @@ import useBreakpoint from "../../../../hooks/useBreakpoint";
 import {
   DataAccessSubGroup,
   getSubgroup,
-  ILink as LinkType,
+  ILink,
 } from "../../../common/store/OGCCollectionDefinitions";
 import { openInNewTab } from "../../../../utils/LinkUtils";
 import rc8Theme from "../../../../styles/themeRC8";
@@ -16,7 +16,7 @@ import CopyButton from "../../../common/buttons/CopyButton";
 
 interface LinkCardProps {
   icon?: boolean;
-  link: LinkType;
+  link: ILink;
   isCopyable?: boolean;
   showCopyOnHover?: boolean;
 }

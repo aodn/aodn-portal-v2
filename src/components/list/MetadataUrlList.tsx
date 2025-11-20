@@ -1,8 +1,9 @@
 import React from "react";
-import { Link } from "@mui/material";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
-import rc8Theme from "../../styles/themeRC8";
+import LinkCard from "./listItem/subitem/LinkCard";
+import { ILink } from "../common/store/OGCCollectionDefinitions";
+import linkIcon from "../../assets/icons/link.png";
 
 interface MetadataUrlListProps {
   url: string;
@@ -15,19 +16,18 @@ const MetadataUrlList: React.FC<MetadataUrlListProps> = ({
 }) => {
   const metadataLinkItem = (
     <ItemBaseGrid key={url}>
-      <Link
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        sx={{
-          ...rc8Theme.typography.body2Regular,
-          color: rc8Theme.palette.primary1,
-          wordBreak: "break-all",
-          py: "10px",
-        }}
-      >
-        {url}
-      </Link>
+      <LinkCard
+        link={
+          {
+            rel: "",
+            href: url,
+            title: url,
+            type: "",
+            description: "",
+            getIcon: () => linkIcon,
+          } as ILink
+        }
+      />
     </ItemBaseGrid>
   );
 
