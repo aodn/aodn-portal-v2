@@ -52,16 +52,6 @@ export const switcherIconButtonSx = (open: boolean) => ({
   },
 });
 
-export const switcherTitleTypographySx = {
-  minHeight: "40px",
-  backgroundColor: rc8Theme.palette.primary4,
-  borderRadius: borderRadius["menuTop"],
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  ...rc8Theme.typography.title1Medium,
-};
-
 export const switcherMenuBoxSx = {
   color: grey["mapMenuText"],
   display: "inline-block",

@@ -14,20 +14,18 @@ import {
   Typography,
   ClickAwayListener,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import {
   switcherIconButtonSx,
   switcherMenuBoxSx,
   switcherMenuContentBoxSx,
   switcherMenuContentLabelTypographySx,
-  switcherTitleTypographySx,
 } from "./MenuControl";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../common/constants";
 import { TimeRangeIcon } from "../../../../../assets/icons/map/time_range";
 import DateSlider from "../../../../common/slider/DateSlider";
-import rc8Theme from "../../../../../styles/themeRC8";
 import { TimeRangeTooltipIcon } from "../../../../../assets/icons/map/tooltip_time_range";
+import MenuTitle from "./MenuTitle";
 
 interface DateRangeControlProps extends ControlProps {
   minDate: string;
@@ -154,22 +152,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       >
         <ClickAwayListener onClickAway={handleCloseTooltip}>
           <Box sx={switcherMenuBoxSx}>
-            <Box sx={switcherTitleTypographySx}>
-              <Typography sx={{ ...rc8Theme.typography.title1Medium }}>
-                Time Range
-              </Typography>
-              <IconButton
-                size="small"
-                onClick={handleCloseTooltip}
-                sx={{
-                  position: "absolute",
-                  right: "4px",
-                  mt: "4px",
-                }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </Box>
+            <MenuTitle title="Time Range" onClose={handleCloseTooltip} />
             <Box
               sx={{
                 ...switcherMenuContentBoxSx,

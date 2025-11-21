@@ -25,10 +25,10 @@ import {
   switcherMenuContentBoxSx,
   switcherMenuContentIconSx,
   switcherMenuContentLabelTypographySx,
-  switcherTitleTypographySx,
 } from "./MenuControl";
 import { MapDefaultConfig } from "../../constants";
 import { BaseLayerIcon } from "../../../../../assets/icons/map/base_layer";
+import MenuTitle from "./MenuTitle";
 
 export interface BaseMapSwitcherLayer {
   id: string;
@@ -117,9 +117,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
         <Box sx={switcherMenuBoxSx}>
-          <Typography sx={switcherTitleTypographySx}>
-            Map Base Layers
-          </Typography>
+          <MenuTitle title="Map Base Layers" onClose={handleToggle} />
           <Divider />
           <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">

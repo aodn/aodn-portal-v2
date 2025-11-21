@@ -24,10 +24,10 @@ import {
   switcherMenuContentBoxSx,
   switcherMenuContentIconSx,
   switcherMenuContentLabelTypographySx,
-  switcherTitleTypographySx,
 } from "./MenuControl";
 import { BaseMapSwitcherLayer } from "./BaseMapSwitcher";
 import { ReferenceLayerIcon } from "../../../../../assets/icons/map/ref_layer";
+import MenuTitle from "./MenuTitle";
 
 interface ReferenceLayerSwitcherProps extends ControlProps {
   // Static layer to be added to the switch
@@ -112,9 +112,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
         <Box sx={switcherMenuBoxSx}>
-          <Typography sx={switcherTitleTypographySx}>
-            Reference Layers
-          </Typography>
+          <MenuTitle title="Reference Layers" onClose={handleToggle} />
           <Divider />
           <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">
