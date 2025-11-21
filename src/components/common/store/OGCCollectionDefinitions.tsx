@@ -133,6 +133,7 @@ export enum DataAccessSubGroup {
 export enum DatasetType {
   PARQUET = "parquet",
   ZARR = "zarr",
+  UNKNOWN = "unknown",
 }
 
 // Helper function to extract subgroup type from ai:group
@@ -355,7 +356,7 @@ export class Spatial {
   }
 
   getOverallTemporal = () => {
-    const period = this.temporal.interval;
+    const period = this.temporal?.interval;
     let startDate: string | undefined = undefined;
     let endDate: string | undefined = undefined;
     if (period?.[0][0]) {

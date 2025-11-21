@@ -27,6 +27,7 @@ import {
 } from "@mui/material";
 import { SearchStyleIcon } from "../../../../../assets/icons/map/search_style";
 import MenuTitle from "./MenuTitle";
+import { ComponentId, DataTestId } from "../../constants";
 
 export enum LayerName {
   Hexbin = "hexbin",
@@ -107,8 +108,8 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   return (
     <>
       <IconButton
-        aria-label="layer-show-hide-menu"
-        id="layer-show-hide-menu-button"
+        aria-label={ComponentId.MapLayerSwitcher.Menu}
+        id={ComponentId.MapLayerSwitcher.MenuButton}
         ref={anchorRef}
         onClick={handleToggle}
         sx={switcherIconButtonSx(open)}
@@ -116,7 +117,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
         <SearchStyleIcon />
       </IconButton>
       <Popper
-        id="layer-popper-id"
+        id={ComponentId.MapLayerSwitcher.PopperId}
         open={open}
         anchorEl={anchorRef.current}
         role={undefined}
@@ -141,6 +142,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
             <FormControl component="fieldset">
               <RadioGroup
                 value={currentLayer}
+                data-testid={DataTestId.MapLayerSwitcher.RadioGroup}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setCurrentLayer(e.target.value);
                   if (onEvent) onEvent(e.target.value);

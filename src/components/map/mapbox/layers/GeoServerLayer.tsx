@@ -74,7 +74,7 @@ interface GeoServerLayerConfig {
   bbox: Position;
 }
 
-interface GeoServerLayerProps extends LayerBasicType {
+export interface GeoServerLayerProps extends LayerBasicType {
   geoServerLayerConfig?: Partial<GeoServerLayerConfig>;
   onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
   onWmsLayerChange?: (wmsLayerName: string) => void;

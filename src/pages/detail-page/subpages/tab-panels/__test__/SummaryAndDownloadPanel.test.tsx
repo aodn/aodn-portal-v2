@@ -1,8 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import dayjs from "dayjs";
 import { FeatureCollection, Point } from "geojson";
-import { getMinMaxDateStamps } from "../SummaryAndDownloadPanel";
-import { dateDefault } from "../../../../../components/common/constants"; // Adjust path as needed
+import {
+  buildMapLayerConfig,
+  getMinMaxDateStamps,
+} from "../SummaryAndDownloadPanel";
+import { dateDefault } from "../../../../../components/common/constants";
+import { LayerName } from "../../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
 // Helper to create a FeatureCollection for testing
 const createFeatureCollection = (
@@ -166,5 +170,85 @@ describe("getMinMaxDateStamps", () => {
     const [minDate, maxDate] = getMinMaxDateStamps(featureCollection);
     expect(minDate.isSame(dayjs(dateDefault.min))).toBe(true);
     expect(maxDate.isSame(dayjs(dateDefault.max))).toBe(true);
+  });
+});
+
+describe("SummaryAndDownloadPanel - buildMapLayerConfig", () => {
+  // Mimic useState set function behavior
+  let current: LayerName | null = null;
+  const setLast = vi.fn((updater) => {
+    current = typeof updater === "function" ? updater(current) : updater;
+  });
+
+  it("Hexbin + GeoServer, summary true, Zarr false, WMS true", () => {
+    current = null;
+    const layers = buildMapLayerConfig(
+      {} as any,
+      true,
+      false,
+      true,
+      true,
+      setLast
+    );
+
+    expect(layers.map((l) => l.id)).toEqual([
+      LayerName.Hexbin,
+      LayerName.GeoServer,
+    ]);
+    expect(layers[0].default).toBe(true);
+    expect(layers[1].default).toBe(false);
+  });
+
+  it("only GeoServer, no summary, WMS true", () => {
+    current = null;
+    const layers = buildMapLayerConfig(
+      {} as any,
+      false,
+      false,
+      true,
+      true,
+      setLast
+    );
+
+    expect(layers.map((l) => l.id)).toEqual([
+      LayerName.GeoServer,
+      LayerName.SpatialExtent,
+    ]);
+    expect(layers[0].default).toBe(true);
+    expect(layers[1].default).toBe(false);
+  });
+
+  it("only SpatialExtent, no summary, no WMS, has extent", () => {
+    current = null;
+    const layers = buildMapLayerConfig(
+      {} as any,
+      false,
+      false,
+      false,
+      true,
+      setLast
+    );
+
+    expect(layers.map((l) => l.id)).toEqual([LayerName.SpatialExtent]);
+    expect(layers[0].default).toBe(true);
+  });
+
+  it("Zarr, cloud optimized plus GeoServer", () => {
+    current = null;
+    const layers = buildMapLayerConfig(
+      {} as any,
+      true,
+      true,
+      true,
+      true,
+      setLast
+    );
+
+    expect(layers.map((l) => l.id)).toEqual([
+      LayerName.GeoServer,
+      LayerName.SpatialExtent,
+    ]);
+    expect(layers[0].default).toBe(true);
+    expect(layers[1].default).toBe(false);
   });
 });

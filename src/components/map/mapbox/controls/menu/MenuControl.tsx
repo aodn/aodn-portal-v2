@@ -21,9 +21,6 @@ import {
   borderRadius,
   color,
   fontColor,
-  fontFamily,
-  fontSize,
-  fontWeight,
   zIndex,
 } from "../../../../../styles/constants";
 import grey from "../../../../common/colors/grey";

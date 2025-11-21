@@ -16,6 +16,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { AnalyticsEvent } from "../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../analytics/customEventTracker";
+import { LayerName } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -38,6 +39,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     IDownloadCondition[]
   >([]);
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>("");
+  const [lastSelectedMapLayer, setLastSelectedMapLayer] =
+    useState<LayerName | null>(null);
 
   const getAndSetDownloadConditions = useCallback(
     (
@@ -114,6 +117,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         removeDownloadCondition,
         selectedWmsLayer,
         setSelectedWmsLayer,
+        lastSelectedMapLayer,
+        setLastSelectedMapLayer,
       }}
     >
       {children}
