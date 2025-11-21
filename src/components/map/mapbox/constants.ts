@@ -35,3 +35,23 @@ export const MapDefaultConfig = {
     offset: [0, -5],
   } as PopupOptions,
 };
+
+export const ComponentId = {
+  MapLayerSwitcher: {
+    Menu: "layer-show-hide-menu",
+    MenuButton: "layer-show-hide-menu-button",
+    PopperId: "layer-popper-id",
+  },
+};
+
+export const DataTestId = {
+  HeaderSection: {
+    ReturnButton: "return-button",
+  },
+  MapLayerSwitcher: {
+    RadioGroup: "layer-style-menu-items",
+  },
+  BaseMapSwitcher: {
+    MenuId: "basemap-show-hide-menu-button",
+  },
+};

@@ -17,6 +17,7 @@ import store from "../../../components/common/store/store";
 import { ThemeProvider } from "@mui/material/styles";
 import { DetailPageProvider } from "../context/detail-page-provider";
 import DetailsPage from "../DetailsPage";
+import { DataTestId } from "../../../components/map/mapbox/constants";
 
 vi.mock("react-router-dom", () => ({
   ...vi.importActual("react-router-dom"),
@@ -76,7 +77,9 @@ describe("No Record Found", () => {
       ).toBeInTheDocument();
     }).then(() => {
       // Verify return button is rendered
-      expect(screen.getByTestId("return-button")).toBeInTheDocument();
+      expect(
+        screen.getByTestId(DataTestId.HeaderSection.ReturnButton)
+      ).toBeInTheDocument();
 
       // Verify not found image is rendered
       expect(

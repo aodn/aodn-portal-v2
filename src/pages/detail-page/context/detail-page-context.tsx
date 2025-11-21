@@ -7,7 +7,7 @@ import {
 } from "./DownloadDefinitions";
 import { LayerName } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
-interface DetailPageContextType {
+export interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
   featureCollection: FeatureCollection<Point> | undefined;
@@ -38,8 +38,10 @@ const DetailPageContextDefault = {
   setLastSelectedMapLayer: () => {},
 };
 
-export const DetailPageContext = createContext<DetailPageContextType>(
+const DetailPageContext = createContext<DetailPageContextType>(
   DetailPageContextDefault
 );
 
-export const useDetailPageContext = () => useContext(DetailPageContext);
+const useDetailPageContext = () => useContext(DetailPageContext);
+
+export { DetailPageContextDefault, DetailPageContext, useDetailPageContext };
