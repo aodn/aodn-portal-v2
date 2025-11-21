@@ -1,4 +1,11 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -34,7 +41,10 @@ import MapLayerSwitcher, {
   LayerSwitcherLayer,
   MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { DatasetType } from "../../../../components/common/store/OGCCollectionDefinitions";
+import {
+  DatasetType,
+  OGCCollection,
+} from "../../../../components/common/store/OGCCollectionDefinitions";
 import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
@@ -93,6 +103,72 @@ const getMinMaxDateStamps = (
     minDate && minDate.isValid() ? minDate : dayjs(dateDefault.min),
     maxDate && maxDate.isValid() ? maxDate : dayjs(dateDefault.max),
   ];
+};
+// We want to vitest this easier
+export const buildMapLayerConfig = (
+  collection: OGCCollection | null | undefined,
+  hasSummaryFeature: boolean,
+  isZarrDataset: boolean,
+  isWMSAvailable: boolean,
+  hasSpatialExtent: boolean,
+  setLastSelectedMapLayer: Dispatch<SetStateAction<LayerName | null>>
+): LayerSwitcherLayer<LayerName>[] => {
+  const layers: LayerSwitcherLayer<LayerName>[] = [];
+
+  if (collection) {
+    // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
+    const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
+
+    // Must be ordered by Hexbin > GeoServer > Spatial extents
+    if (isSupportHexbin) {
+      layers.push(MapLayers[LayerName.Hexbin]);
+      setLastSelectedMapLayer((v) => (v ? v : LayerName.Hexbin));
+    }
+
+    if (isWMSAvailable) {
+      const l = MapLayers[LayerName.GeoServer];
+      layers.push(l);
+
+      setLastSelectedMapLayer((v) => {
+        // If layer selected before, we keep it as is and set default iff it is Geoserver
+        if (v) {
+          l.default = v === LayerName.GeoServer;
+          return v;
+        } else {
+          l.default = !isSupportHexbin;
+          return LayerName.GeoServer;
+        }
+      });
+    } else {
+      // isWMSAvailable is a delayed value and will update after system query the WMS server
+      // so in  case we have set the GeoServer and finally we know that it is WMS is not available
+      // we need to reset the value, otherwise the next if block logic will fail.
+      setLastSelectedMapLayer((v) => {
+        if (v && v === LayerName.GeoServer) {
+          return null;
+        } else {
+          return v;
+        }
+      });
+    }
+
+    if (!isSupportHexbin && hasSpatialExtent) {
+      const l = MapLayers[LayerName.SpatialExtent];
+      layers.push(l);
+
+      setLastSelectedMapLayer((v) => {
+        // If layer selected before, we keep it as is and set default iff it is SpatialExtent
+        if (v) {
+          l.default = v === LayerName.SpatialExtent;
+          return v;
+        } else {
+          l.default = !isSupportHexbin && !isWMSAvailable;
+          return LayerName.SpatialExtent;
+        }
+      });
+    }
+  }
+  return layers;
 };
 
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
@@ -175,72 +251,25 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     timeSliderSupport,
   ]);
 
-  const mapLayerConfig = useMemo((): LayerSwitcherLayer<LayerName>[] => {
-    const layers: LayerSwitcherLayer<LayerName>[] = [];
-
-    if (collection) {
-      // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
-      const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
-
-      // Must be ordered by Hexbin > GeoServer > Spatial extents
-      if (isSupportHexbin) {
-        layers.push(MapLayers[LayerName.Hexbin]);
-        setLastSelectedMapLayer((v) => (v ? v : LayerName.Hexbin));
-      }
-
-      if (isWMSAvailable) {
-        const l = MapLayers[LayerName.GeoServer];
-        layers.push(l);
-
-        setLastSelectedMapLayer((v) => {
-          // If layer selected before, we keep it as is and set default iff it is Geoserver
-          if (v) {
-            l.default = v === LayerName.GeoServer;
-            return v;
-          } else {
-            l.default = !isSupportHexbin;
-            return LayerName.GeoServer;
-          }
-        });
-      } else {
-        // isWMSAvailable is a delayed value and will update after system query the WMS server
-        // so in  case we have set the GeoServer and finally we know that it is WMS is not available
-        // we need to reset the value, otherwise the next if block logic will fail.
-        setLastSelectedMapLayer((v) => {
-          if (v && v === LayerName.GeoServer) {
-            return null;
-          } else {
-            return v;
-          }
-        });
-      }
-
-      if (!isSupportHexbin && hasSpatialExtent) {
-        const l = MapLayers[LayerName.SpatialExtent];
-        layers.push(l);
-
-        setLastSelectedMapLayer((v) => {
-          // If layer selected before, we keep it as is and set default iff it is SpatialExtent
-          if (v) {
-            l.default = v === LayerName.SpatialExtent;
-            return v;
-          } else {
-            l.default = !isSupportHexbin && !isWMSAvailable;
-            return LayerName.SpatialExtent;
-          }
-        });
-      }
-    }
-
-    return layers;
-  }, [
-    collection,
-    hasSummaryFeature,
-    isZarrDataset,
-    isWMSAvailable,
-    hasSpatialExtent,
-    setLastSelectedMapLayer,
-  ]);
+  const mapLayerConfig = useMemo(
+    (): LayerSwitcherLayer<LayerName>[] =>
+      buildMapLayerConfig(
+        collection,
+        hasSummaryFeature,
+        isZarrDataset,
+        isWMSAvailable,
+        hasSpatialExtent,
+        setLastSelectedMapLayer
+      ),
+    [
+      collection,
+      hasSummaryFeature,
+      isZarrDataset,
+      isWMSAvailable,
+      hasSpatialExtent,
+      setLastSelectedMapLayer,
+    ]
+  );
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
