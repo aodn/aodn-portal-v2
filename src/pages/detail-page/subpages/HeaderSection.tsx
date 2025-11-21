@@ -32,6 +32,7 @@ import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import rc8Theme from "../../../styles/themeRC8";
 import InfoCard from "../../../components/info/InfoCard";
 import { InfoStatusType } from "../../../components/info/InfoDefinition";
+import { DataTestId } from "../../../components/map/mapbox/constants";
 
 enum Status {
   onGoing = "onGoing",
@@ -78,7 +79,7 @@ const renderGoBackButton = (onClick: () => void, referer: string) => {
         top: { xs: "unset", md: "5%" },
       }}
       onClick={onClick}
-      data-testid="return-button"
+      data-testid={DataTestId.HeaderSection.ReturnButton}
     >
       <HeaderButton>
         <Tooltip title={tip} placement="top">

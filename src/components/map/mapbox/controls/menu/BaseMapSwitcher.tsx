@@ -27,7 +27,7 @@ import {
   switcherMenuContentLabelTypographySx,
   switcherTitleTypographySx,
 } from "./MenuControl";
-import { MapDefaultConfig } from "../../constants";
+import { DataTestId, MapDefaultConfig } from "../../constants";
 import { BaseLayerIcon } from "../../../../../assets/icons/map/base_layer";
 
 export interface BaseMapSwitcherLayer {
@@ -90,7 +90,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
       <IconButton
         aria-label="basemap-show-hide-menu"
         id={MENU_ID}
-        data-testid={MENU_ID}
+        data-testid={DataTestId.BaseMapSwitcher.MenuId}
         ref={anchorRef}
         onClick={handleToggle}
         sx={switcherIconButtonSx(open)}
