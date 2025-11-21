@@ -17,12 +17,25 @@ import {
   IDownloadCondition,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import _ from "lodash";
-import { Box, IconButton } from "@mui/material";
+import {
+  Box,
+  ClickAwayListener,
+  IconButton,
+  Popper,
+  Typography,
+} from "@mui/material";
 import DrawRectangle from "./DrawRectangle";
 import { ControlProps } from "./Definition";
 import { BboxSelectionIcon } from "../../../../../assets/icons/map/bbox_selection";
-import { switcherIconButtonSx } from "./MenuControl";
+import {
+  switcherIconButtonSx,
+  switcherMenuBoxSx,
+  switcherMenuContentBoxSx,
+  switcherMenuContentLabelTypographySx,
+} from "./MenuControl";
 import DeleteIcon from "@mui/icons-material/Delete";
+import MenuTitle from "./MenuTitle";
+import { BboxTooltipIcon } from "../../../../../assets/icons/map/tooltip_bbox";
 
 interface DrawControlProps extends ControlProps {
   getAndSetDownloadConditions: (
@@ -42,7 +55,26 @@ const DrawRect: React.FC<DrawControlProps> = ({
   downloadConditions,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [hasFeatures, setHasFeatures] = useState<boolean>(false);
+
+  const handleIconClick = () => {
+    if (showTooltip) {
+      // If tooltip is showing, close it but keep draw mode active
+      setShowTooltip(false);
+    } else if (!open) {
+      // If not in draw mode, activate draw mode and show tooltip
+      mapDraw.changeMode(DRAW_RECTANGLE_MODE);
+      setShowTooltip(true);
+    } else {
+      // If already in draw mode, just show tooltip again
+      setShowTooltip(true);
+    }
+  };
+
+  const handleCloseTooltip = () => {
+    setShowTooltip(false);
+  };
 
   const mapDraw = useMemo<MapboxDraw>(
     () =>
@@ -244,11 +276,53 @@ const DrawRect: React.FC<DrawControlProps> = ({
         id={MENU_ID}
         data-testid={MENU_ID}
         ref={anchorRef}
-        onClick={() => mapDraw.changeMode(DRAW_RECTANGLE_MODE)}
+        onClick={handleIconClick}
         sx={switcherIconButtonSx(open)}
       >
         <BboxSelectionIcon />
       </IconButton>
+
+      <Popper
+        disablePortal
+        id="bbox-tooltip-popper"
+        open={showTooltip}
+        anchorEl={anchorRef.current}
+        placement="left-start"
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: [0, 10],
+            },
+          },
+        ]}
+      >
+        <ClickAwayListener onClickAway={handleCloseTooltip}>
+          <Box sx={switcherMenuBoxSx}>
+            <MenuTitle title="Bounding Box" onClose={handleCloseTooltip} />
+            <Box
+              sx={{
+                ...switcherMenuContentBoxSx,
+                display: "grid",
+                gridTemplateColumns: "auto 1fr",
+                gap: 2,
+                alignItems: "start",
+              }}
+            >
+              <BboxTooltipIcon />
+              <Typography
+                sx={{
+                  ...switcherMenuContentLabelTypographySx,
+                  whiteSpace: "normal",
+                  wordWrap: "break-word",
+                }}
+              >
+                Use bounding box tool to draw a rectangle as selection.
+              </Typography>
+            </Box>
+          </Box>
+        </ClickAwayListener>
+      </Popper>
 
       <IconButton
         aria-label="Delete"
