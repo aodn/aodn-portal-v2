@@ -17,25 +17,14 @@ import {
   IDownloadCondition,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import _ from "lodash";
-import {
-  Box,
-  ClickAwayListener,
-  IconButton,
-  Popper,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import DrawRectangle from "./DrawRectangle";
 import { ControlProps } from "./Definition";
 import { BboxSelectionIcon } from "../../../../../assets/icons/map/bbox_selection";
-import {
-  switcherIconButtonSx,
-  switcherMenuBoxSx,
-  switcherMenuContentBoxSx,
-  switcherMenuContentLabelTypographySx,
-} from "./MenuControl";
+import { switcherIconButtonSx } from "./MenuControl";
 import DeleteIcon from "@mui/icons-material/Delete";
-import MenuTitle from "./MenuTitle";
 import { BboxTooltipIcon } from "../../../../../assets/icons/map/tooltip_bbox";
+import MenuTooltip from "./MenuTooltip";
 
 interface DrawControlProps extends ControlProps {
   getAndSetDownloadConditions: (
@@ -282,47 +271,14 @@ const DrawRect: React.FC<DrawControlProps> = ({
         <BboxSelectionIcon />
       </IconButton>
 
-      <Popper
-        disablePortal
-        id="bbox-tooltip-popper"
+      <MenuTooltip
         open={showTooltip}
         anchorEl={anchorRef.current}
-        placement="left-start"
-        modifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [0, 10],
-            },
-          },
-        ]}
-      >
-        <ClickAwayListener onClickAway={handleCloseTooltip}>
-          <Box sx={switcherMenuBoxSx}>
-            <MenuTitle title="Bounding Box" onClose={handleCloseTooltip} />
-            <Box
-              sx={{
-                ...switcherMenuContentBoxSx,
-                display: "grid",
-                gridTemplateColumns: "auto 1fr",
-                gap: 2,
-                alignItems: "start",
-              }}
-            >
-              <BboxTooltipIcon />
-              <Typography
-                sx={{
-                  ...switcherMenuContentLabelTypographySx,
-                  whiteSpace: "normal",
-                  wordWrap: "break-word",
-                }}
-              >
-                Use bounding box tool to draw a rectangle as selection.
-              </Typography>
-            </Box>
-          </Box>
-        </ClickAwayListener>
-      </Popper>
+        title="Bounding Box Selection"
+        description="Use bounding box tool to draw a rectangle as selection."
+        icon={<BboxTooltipIcon />}
+        onClose={handleCloseTooltip}
+      />
 
       <IconButton
         aria-label="Delete"

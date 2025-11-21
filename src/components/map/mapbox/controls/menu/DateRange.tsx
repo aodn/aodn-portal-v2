@@ -7,25 +7,14 @@ import {
   IDownloadConditionCallback,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
-import {
-  Box,
-  IconButton,
-  Popper,
-  Typography,
-  ClickAwayListener,
-} from "@mui/material";
-import {
-  switcherIconButtonSx,
-  switcherMenuBoxSx,
-  switcherMenuContentBoxSx,
-  switcherMenuContentLabelTypographySx,
-} from "./MenuControl";
+import { Box, IconButton } from "@mui/material";
+import { switcherIconButtonSx } from "./MenuControl";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../common/constants";
 import { TimeRangeIcon } from "../../../../../assets/icons/map/time_range";
 import DateSlider from "../../../../common/slider/DateSlider";
 import { TimeRangeTooltipIcon } from "../../../../../assets/icons/map/tooltip_time_range";
-import MenuTitle from "./MenuTitle";
+import MenuTooltip from "./MenuTooltip";
 
 interface DateRangeControlProps extends ControlProps {
   minDate: string;
@@ -135,48 +124,14 @@ const DateRange: React.FC<DateRangeControlProps> = ({
         <TimeRangeIcon />
       </IconButton>
 
-      <Popper
-        disablePortal
-        id="daterange-tooltip-popper"
+      <MenuTooltip
         open={showTooltip}
         anchorEl={anchorRef.current}
-        placement="left-start"
-        modifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [0, 10],
-            },
-          },
-        ]}
-      >
-        <ClickAwayListener onClickAway={handleCloseTooltip}>
-          <Box sx={switcherMenuBoxSx}>
-            <MenuTitle title="Time Range" onClose={handleCloseTooltip} />
-            <Box
-              sx={{
-                ...switcherMenuContentBoxSx,
-                display: "grid",
-                gridTemplateColumns: "auto 1fr",
-                gap: 2,
-                alignItems: "start",
-              }}
-            >
-              <TimeRangeTooltipIcon />
-              <Typography
-                sx={{
-                  ...switcherMenuContentLabelTypographySx,
-                  whiteSpace: "normal",
-                  wordWrap: "break-word",
-                }}
-              >
-                Select specific date or time range to filter the dataset
-                details.
-              </Typography>
-            </Box>
-          </Box>
-        </ClickAwayListener>
-      </Popper>
+        title="Time Range"
+        description="Select specific date or time range to filter the dataset details."
+        icon={<TimeRangeTooltipIcon />}
+        onClose={handleCloseTooltip}
+      />
 
       {open &&
         mapContainer &&
