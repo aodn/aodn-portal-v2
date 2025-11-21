@@ -121,8 +121,18 @@ export const buildMapLayerConfig = (
 
     // Must be ordered by Hexbin > GeoServer > Spatial extents
     if (isSupportHexbin) {
-      layers.push(MapLayers[LayerName.Hexbin]);
-      setLastSelectedMapLayer((v) => (v ? v : LayerName.Hexbin));
+      const l = MapLayers[LayerName.Hexbin];
+      layers.push(l);
+
+      setLastSelectedMapLayer((v) => {
+        if (v) {
+          l.default = v === LayerName.Hexbin;
+          return v;
+        } else {
+          l.default = true;
+          return LayerName.Hexbin;
+        }
+      });
     }
 
     if (isWMSAvailable) {

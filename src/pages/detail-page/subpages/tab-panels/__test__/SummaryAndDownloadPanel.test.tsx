@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import dayjs from "dayjs";
 import { FeatureCollection, Point } from "geojson";
 import {
@@ -197,6 +197,25 @@ describe("SummaryAndDownloadPanel - buildMapLayerConfig", () => {
     ]);
     expect(layers[0].default).toBe(true);
     expect(layers[1].default).toBe(false);
+  });
+
+  it("Hexbin + GeoServer, summary true, Zarr false, WMS true, selected GeoServer before", () => {
+    current = LayerName.GeoServer;
+    const layers = buildMapLayerConfig(
+      {} as any,
+      true,
+      false,
+      true,
+      true,
+      setLast
+    );
+
+    expect(layers.map((l) => l.id)).toEqual([
+      LayerName.Hexbin,
+      LayerName.GeoServer,
+    ]);
+    expect(layers[0].default).toBe(false);
+    expect(layers[1].default).toBe(true);
   });
 
   it("only GeoServer, no summary, WMS true", () => {
