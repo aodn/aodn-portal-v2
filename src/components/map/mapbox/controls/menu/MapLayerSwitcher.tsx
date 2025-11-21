@@ -13,7 +13,6 @@ import {
   switcherMenuContentBoxSx,
   switcherMenuContentIconSx,
   switcherMenuContentLabelTypographySx,
-  switcherTitleTypographySx,
 } from "./MenuControl";
 import {
   Box,
@@ -27,6 +26,7 @@ import {
   Divider,
 } from "@mui/material";
 import { SearchStyleIcon } from "../../../../../assets/icons/map/search_style";
+import MenuTitle from "./MenuTitle";
 import { ComponentId, DataTestId } from "../../constants";
 
 export enum LayerName {
@@ -136,7 +136,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
         <Box sx={switcherMenuBoxSx}>
-          <Typography sx={switcherTitleTypographySx}>Layer Style</Typography>
+          <MenuTitle title="Layer Style" onClose={handleToggle} />
           <Divider />
           <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">

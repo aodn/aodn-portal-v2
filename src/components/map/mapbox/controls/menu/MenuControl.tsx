@@ -21,13 +21,11 @@ import {
   borderRadius,
   color,
   fontColor,
-  fontFamily,
-  fontSize,
-  fontWeight,
   zIndex,
 } from "../../../../../styles/constants";
 import grey from "../../../../common/colors/grey";
 import { Grid } from "@mui/material";
+import rc8Theme from "../../../../../styles/themeRC8";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
@@ -50,19 +48,6 @@ export const switcherIconButtonSx = (open: boolean) => ({
     },
   },
 });
-
-export const switcherTitleTypographySx = {
-  backgroundColor: color.blue.medium,
-  borderRadius: borderRadius["menuTop"],
-  fontSize: "16px",
-  color: "#090C02",
-  fontWeight: fontWeight.regular,
-  fontFamily: fontFamily.openSans,
-  minHeight: "40px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
 
 export const switcherMenuBoxSx = {
   color: grey["mapMenuText"],
@@ -99,12 +84,7 @@ export const switcherMenuContentIconSx = {
 };
 
 export const switcherMenuContentLabelTypographySx = {
-  fontSize: fontSize.info,
-  color: "#090C02",
-  fontFamily: fontFamily.openSans,
-  fontWeight: fontWeight.regular,
-  letterSpacing: "0.5px",
-  lineHeight: "22px",
+  ...rc8Theme.typography.body2Regular,
 };
 
 interface MenuControlProps extends MenuControlType {

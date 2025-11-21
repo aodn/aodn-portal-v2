@@ -7,12 +7,14 @@ import {
   IDownloadConditionCallback,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
-import { IconButton, Box } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
+import { switcherIconButtonSx } from "./MenuControl";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../common/constants";
 import { TimeRangeIcon } from "../../../../../assets/icons/map/time_range";
-import { switcherIconButtonSx } from "./MenuControl";
 import DateSlider from "../../../../common/slider/DateSlider";
+import { TimeRangeTooltipIcon } from "../../../../../assets/icons/map/tooltip_time_range";
+import MenuTooltip from "./MenuTooltip";
 
 interface DateRangeControlProps extends ControlProps {
   minDate: string;
@@ -34,6 +36,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   map, // Map instance passed through ControlProps via cloneElement
 }) => {
   const [open, setOpen] = useState<boolean>(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const anchorRef = useRef(null);
   const [currentMinDate, setCurrentMinDate] = useState<string | undefined>(
     undefined
@@ -42,8 +45,21 @@ const DateRange: React.FC<DateRangeControlProps> = ({
     undefined
   );
 
-  // Get the map container DOM element from props
   const mapContainer = map?.getContainer();
+
+  const handleIconClick = () => {
+    if (open) {
+      setOpen(false);
+      setShowTooltip(false);
+    } else {
+      setOpen(true);
+      setShowTooltip(true);
+    }
+  };
+
+  const handleCloseTooltip = () => {
+    setShowTooltip(false);
+  };
 
   const onDateRangeChange = useCallback(
     (
@@ -102,11 +118,20 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       <IconButton
         data-testid={MENU_ID}
         ref={anchorRef}
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={handleIconClick}
         sx={switcherIconButtonSx(open)}
       >
         <TimeRangeIcon />
       </IconButton>
+
+      <MenuTooltip
+        open={showTooltip}
+        anchorEl={anchorRef.current}
+        title="Time Range"
+        description="Select specific date or time range to filter the dataset details."
+        icon={<TimeRangeTooltipIcon />}
+        onClose={handleCloseTooltip}
+      />
 
       {open &&
         mapContainer &&

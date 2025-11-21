@@ -23,6 +23,8 @@ import { ControlProps } from "./Definition";
 import { BboxSelectionIcon } from "../../../../../assets/icons/map/bbox_selection";
 import { switcherIconButtonSx } from "./MenuControl";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { BboxTooltipIcon } from "../../../../../assets/icons/map/tooltip_bbox";
+import MenuTooltip from "./MenuTooltip";
 
 interface DrawControlProps extends ControlProps {
   getAndSetDownloadConditions: (
@@ -42,7 +44,26 @@ const DrawRect: React.FC<DrawControlProps> = ({
   downloadConditions,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [hasFeatures, setHasFeatures] = useState<boolean>(false);
+
+  const handleIconClick = () => {
+    if (showTooltip) {
+      // If tooltip is showing, close it but keep draw mode active
+      setShowTooltip(false);
+    } else if (!open) {
+      // If not in draw mode, activate draw mode and show tooltip
+      mapDraw.changeMode(DRAW_RECTANGLE_MODE);
+      setShowTooltip(true);
+    } else {
+      // If already in draw mode, just show tooltip again
+      setShowTooltip(true);
+    }
+  };
+
+  const handleCloseTooltip = () => {
+    setShowTooltip(false);
+  };
 
   const mapDraw = useMemo<MapboxDraw>(
     () =>
@@ -244,11 +265,20 @@ const DrawRect: React.FC<DrawControlProps> = ({
         id={MENU_ID}
         data-testid={MENU_ID}
         ref={anchorRef}
-        onClick={() => mapDraw.changeMode(DRAW_RECTANGLE_MODE)}
+        onClick={handleIconClick}
         sx={switcherIconButtonSx(open)}
       >
         <BboxSelectionIcon />
       </IconButton>
+
+      <MenuTooltip
+        open={showTooltip}
+        anchorEl={anchorRef.current}
+        title="Bounding Box Selection"
+        description="Use bounding box tool to draw a rectangle as selection."
+        icon={<BboxTooltipIcon />}
+        onClose={handleCloseTooltip}
+      />
 
       <IconButton
         aria-label="Delete"
