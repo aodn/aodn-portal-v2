@@ -96,12 +96,12 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
     const handleMapEvent = () => setOpen(false);
 
     eventEmitter.on(EVENT_MENU.CLICKED, handleEvent);
-    eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
     eventEmitter.on(EVENT_MAP.MOVE_START, handleMapEvent);
+    eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
 
     return () => {
       eventEmitter.off(EVENT_MENU.CLICKED, handleEvent);
-      eventEmitter.off(EVENT_MAP.MOVE_START, handleEvent);
+      eventEmitter.off(EVENT_MAP.MOVE_START, handleMapEvent);
       eventEmitter.off(EVENT_MAP.CLICKED, handleMapEvent);
     };
   }, []);
