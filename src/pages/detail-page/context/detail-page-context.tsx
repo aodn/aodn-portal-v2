@@ -5,7 +5,10 @@ import {
   DownloadConditionType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
-import { LayerName } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import {
+  LayerName,
+  LayerSwitcherLayer,
+} from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
 export interface DetailPageContextType {
   collection: OGCCollection | undefined;
@@ -20,8 +23,10 @@ export interface DetailPageContextType {
   removeDownloadCondition: (condition: IDownloadCondition) => void;
   selectedWmsLayer: string;
   setSelectedWmsLayer: Dispatch<SetStateAction<string>>;
-  lastSelectedMapLayer: LayerName | null;
-  setLastSelectedMapLayer: Dispatch<SetStateAction<LayerName | null>>;
+  lastSelectedMapLayer: LayerSwitcherLayer<LayerName> | null;
+  setLastSelectedMapLayer: Dispatch<
+    SetStateAction<LayerSwitcherLayer<LayerName> | null>
+  >;
 }
 
 const DetailPageContextDefault = {

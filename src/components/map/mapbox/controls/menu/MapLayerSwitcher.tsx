@@ -41,8 +41,9 @@ export interface LayerSwitcherLayer<T = string> {
   default?: boolean;
 }
 
-interface LayerSwitcherProps extends ControlProps {
-  layers: Array<LayerSwitcherLayer>;
+interface LayerSwitcherProps
+  extends ControlProps<LayerSwitcherLayer<LayerName>> {
+  layers: Array<LayerSwitcherLayer<LayerName>>;
 }
 
 export const MapLayers: Record<LayerName, LayerSwitcherLayer<LayerName>> = {
@@ -145,7 +146,8 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
                 data-testid={DataTestId.MapLayerSwitcher.RadioGroup}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setCurrentLayer(e.target.value);
-                  if (onEvent) onEvent(e.target.value);
+                  const l = layers.find((l) => l.id === e.target.value);
+                  l && onEvent?.(l);
                 }}
               >
                 {layers.map((l) => (
