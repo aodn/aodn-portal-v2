@@ -1,12 +1,4 @@
-import {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -119,7 +111,6 @@ export const buildMapLayerConfig = (
   if (collection) {
     // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
     const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
-
     // Must be ordered by Hexbin > GeoServer > Spatial extents
     if (isSupportHexbin) {
       const l = MapLayers[LayerName.Hexbin];
@@ -137,6 +128,11 @@ export const buildMapLayerConfig = (
       const l = MapLayers[LayerName.SpatialExtent];
       l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
+    }
+
+    // Check if we have assigned any default, if no set the first one is default
+    if (layers.find((l) => l.default === true) === undefined) {
+      layers[0].default = true;
     }
   }
   return layers;

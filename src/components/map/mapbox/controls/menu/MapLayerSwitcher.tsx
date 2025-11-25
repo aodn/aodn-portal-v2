@@ -70,7 +70,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
 }) => {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [currentLayer, setCurrentLayer] = useState<string | undefined>(
+  const [currentLayer, setCurrentLayer] = useState<LayerName | undefined>(
     layers.find((layer) => layer.default)?.id
   );
 
@@ -145,8 +145,8 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
                 value={currentLayer}
                 data-testid={DataTestId.MapLayerSwitcher.RadioGroup}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setCurrentLayer(e.target.value);
                   const l = layers.find((l) => l.id === e.target.value);
+                  setCurrentLayer(l?.id);
                   l && onEvent?.(l);
                 }}
               >
