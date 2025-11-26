@@ -64,9 +64,8 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   }, [setOpen]);
 
   useEffect(() => {
-    setCurrentLayer(
-      layers.filter((layer) => layer.default)[0]?.id || layers[0]?.id
-    );
+    const defaultLayer = layers.filter((layer) => layer.default);
+    setCurrentLayer(defaultLayer[0]?.id || layers[0]?.id);
   }, [layers]);
 
   useEffect(() => {

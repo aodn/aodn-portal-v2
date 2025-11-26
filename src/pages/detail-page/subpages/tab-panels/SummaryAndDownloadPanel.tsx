@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -352,6 +352,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     [setSelectedWmsLayer]
   );
 
+  useEffect(() => {
+    setLastSelectedMapLayer((v) => {
+      return !v ? mapLayerConfig.filter((m) => m.default)[0] : v;
+    });
+  }, [mapLayerConfig, setLastSelectedMapLayer]);
   return (
     collection && (
       <Grid container>

@@ -130,7 +130,15 @@ const formWmsLayerOptions = (
   return layers.map((layer) => ({
     value: layer.name,
     label: layer.title,
-    queryable: layer.queryable,
+    queryable: layer.queryable !== "0",
+  }));
+};
+
+const formWmsLinkOptions = (layers: ILink[] | undefined): SelectItem[] => {
+  if (!layers || layers.length === 0) return [];
+  return layers?.map((layer) => ({
+    value: extractLayerName(layer),
+    label: layer.title, // Use title for label for now. Could be changed to ai:label in future
   }));
 };
 
@@ -146,14 +154,6 @@ const extractLayerName = (layer: ILink): string => {
     }
   }
   return layer.title;
-};
-
-const formWmsLinkOptions = (layers: ILink[] | undefined): SelectItem[] => {
-  if (!layers || layers.length === 0) return [];
-  return layers?.map((layer) => ({
-    value: extractLayerName(layer),
-    label: layer.title, // Use title for label for now. Could be changed to ai:label in future
-  }));
 };
 
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
