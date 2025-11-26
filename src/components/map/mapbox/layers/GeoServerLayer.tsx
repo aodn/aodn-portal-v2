@@ -465,31 +465,30 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
           if (vis !== targetVis) {
             // Need update if value diff, this is used to avoid duplicate call to useEffect
             map.setLayoutProperty(titleLayerId, "visibility", targetVis);
+          }
+          // Only fetch layer fields when visibility actually changes
+          if (visible) {
+            setMapLoading?.(true);
+            const layerName = config.urlParams.LAYERS?.join(",") || "";
 
-            // Only fetch layer fields when visibility actually changes
-            if (visible) {
-              setMapLoading?.(true);
-              const layerName = config.urlParams.LAYERS?.join(",") || "";
-
-              // Check time slider support - only fetch fields if we have a valid layer name
-              if (layerName && layerName.trim() !== "") {
-                const request: MapFeatureRequest = {
-                  uuid: config.uuid || "",
-                  layerName: layerName,
-                };
-                dispatch(fetchGeoServerMapFields(request))
-                  .unwrap()
-                  .then((value) => {
-                    const found = value.find((v) => v.type === "dateTime");
-                    setTimeSliderSupport?.(found !== undefined);
-                  })
-                  .catch(() => {})
-                  .finally(() => setMapLoading?.(false));
-              } else {
-                // If no valid layer name, just set loading to false and assume no time slider support
-                setTimeSliderSupport?.(false);
-                setMapLoading?.(false);
-              }
+            // Check time slider support - only fetch fields if we have a valid layer name
+            if (layerName && layerName.trim() !== "") {
+              const request: MapFeatureRequest = {
+                uuid: config.uuid || "",
+                layerName: layerName,
+              };
+              dispatch(fetchGeoServerMapFields(request))
+                .unwrap()
+                .then((value) => {
+                  const found = value.find((v) => v.type === "dateTime");
+                  setTimeSliderSupport?.(found !== undefined);
+                })
+                .catch(() => {})
+                .finally(() => setMapLoading?.(false));
+            } else {
+              // If no valid layer name, just set loading to false and assume no time slider support
+              setTimeSliderSupport?.(false);
+              setMapLoading?.(false);
             }
           }
         }

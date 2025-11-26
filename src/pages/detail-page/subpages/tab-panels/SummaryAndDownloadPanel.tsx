@@ -214,7 +214,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const enableSubsetting = useMemo(() => {
     const enable =
-      (lastSelectedMapLayer?.id === LayerName.GeoServer && timeSliderSupport) ||
+      (lastSelectedMapLayer?.id === LayerName.GeoServer &&
+        (timeSliderSupport || hasSummaryFeature)) ||
       (lastSelectedMapLayer?.id === LayerName.Hexbin && hasSummaryFeature) ||
       (lastSelectedMapLayer?.id === LayerName.SpatialExtent &&
         hasSummaryFeature &&
