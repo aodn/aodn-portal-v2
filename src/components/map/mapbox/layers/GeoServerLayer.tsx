@@ -77,6 +77,7 @@ interface GeoServerLayerConfig {
 export interface GeoServerLayerProps extends LayerBasicType {
   geoServerLayerConfig?: Partial<GeoServerLayerConfig>;
   onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
+  onWFSAvailabilityChange?: (wfsDownload: boolean) => void;
   onWmsLayerChange?: (wmsLayerName: string) => void;
 }
 
@@ -161,6 +162,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   visible,
   collection,
   onWMSAvailabilityChange,
+  onWFSAvailabilityChange,
   onWmsLayerChange,
   setTimeSliderSupport,
 }: GeoServerLayerProps) => {
@@ -482,6 +484,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                 .then((value) => {
                   const found = value.find((v) => v.type === "dateTime");
                   setTimeSliderSupport?.(found !== undefined);
+                  onWFSAvailabilityChange?.(true);
                 })
                 .catch(() => {})
                 .finally(() => setMapLoading?.(false));
@@ -503,6 +506,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.uuid,
     dispatch,
     map,
+    onWFSAvailabilityChange,
     setMapLoading,
     setTimeSliderSupport,
     titleLayerId,

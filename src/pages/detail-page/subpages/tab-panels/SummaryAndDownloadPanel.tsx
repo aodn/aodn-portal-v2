@@ -166,6 +166,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   // Need to init with null as collection value can be undefined when it entered this component.
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
+  const [isWFSAvailable, setIsWFSAvailable] = useState<boolean>(false);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
 
   const { isUnderLaptop } = useBreakpoint();
@@ -183,7 +184,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const abstract =
       collection?.getEnhancedDescription() || collection?.description || "";
     const hasSummaryFeature = collection?.hasSummaryFeature() || false;
-    const hasDownloadService = isWMSAvailable || hasSummaryFeature;
+    const hasDownloadService = isWFSAvailable || hasSummaryFeature;
     const hasSpatialExtent = !!collection?.getBBox();
     const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
     const noMapPreview = !hasDownloadService && !hasSpatialExtent;
@@ -210,7 +211,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       start,
       end,
     ];
-  }, [collection, isWMSAvailable]);
+  }, [collection, isWFSAvailable]);
 
   const enableSubsetting = useMemo(() => {
     const enable =
@@ -333,6 +334,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
     setIsWMSAvailable(isWMSAvailable);
+  }, []);
+
+  const onWFSAvailabilityChange = useCallback((isWFSAvailable: boolean) => {
+    setIsWFSAvailable(isWFSAvailable);
   }, []);
 
   const handleBaseMapSwitch = useCallback(
@@ -469,6 +474,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       },
                     }}
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
+                    onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
                     setTimeSliderSupport={setTimeSliderSupport}
                     collection={collection}
