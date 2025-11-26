@@ -29,9 +29,9 @@ enum EVENT_CLIPBOARD {
 // For those who use MenuControl, please extend you props with this interface
 // and the MenuControl will inject the map instance automatically for you
 // you can define your onEvent if you want
-export interface ControlProps {
+export interface ControlProps<T = any> {
   map?: MapBox;
-  onEvent?: (...args: any[]) => void;
+  onEvent?: (...args: T extends any[] ? T : [T]) => void;
 }
 
 export type MapControlType = React.ReactElement<

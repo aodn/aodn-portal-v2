@@ -1,11 +1,4 @@
-import {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -39,7 +32,6 @@ import GeoServerLayer from "../../../../components/map/mapbox/layers/GeoServerLa
 import MapLayerSwitcher, {
   LayerName,
   LayerSwitcherLayer,
-  MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import {
   DatasetType,
@@ -111,71 +103,47 @@ export const buildMapLayerConfig = (
   isZarrDataset: boolean,
   isWMSAvailable: boolean,
   hasSpatialExtent: boolean,
-  setLastSelectedMapLayer: Dispatch<SetStateAction<LayerName | null>>
+  lastSelectedMapLayer: LayerSwitcherLayer<LayerName> | null
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
 
   if (collection) {
     // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
     const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
-
     // Must be ordered by Hexbin > GeoServer > Spatial extents
     if (isSupportHexbin) {
-      const l = MapLayers[LayerName.Hexbin];
+      const l = {
+        id: LayerName.Hexbin,
+        name: "Hex Grid",
+        default: true,
+      };
+      l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
-
-      setLastSelectedMapLayer((v) => {
-        if (v) {
-          l.default = v === LayerName.Hexbin;
-          return v;
-        } else {
-          l.default = true;
-          return LayerName.Hexbin;
-        }
-      });
     }
 
     if (isWMSAvailable) {
-      const l = MapLayers[LayerName.GeoServer];
+      const l = {
+        id: LayerName.GeoServer,
+        name: "Geoserver",
+        default: true,
+      };
+      l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
-
-      setLastSelectedMapLayer((v) => {
-        // If layer selected before, we keep it as is and set default iff it is Geoserver
-        if (v) {
-          l.default = v === LayerName.GeoServer;
-          return v;
-        } else {
-          l.default = !isSupportHexbin;
-          return LayerName.GeoServer;
-        }
-      });
-    } else {
-      // isWMSAvailable is a delayed value and will update after system query the WMS server
-      // so in  case we have set the GeoServer and finally we know that it is WMS is not available
-      // we need to reset the value, otherwise the next if block logic will fail.
-      setLastSelectedMapLayer((v) => {
-        if (v && v === LayerName.GeoServer) {
-          return null;
-        } else {
-          return v;
-        }
-      });
     }
 
     if (!isSupportHexbin && hasSpatialExtent) {
-      const l = MapLayers[LayerName.SpatialExtent];
+      const l = {
+        id: LayerName.SpatialExtent,
+        name: "Spatial Extent",
+        default: false,
+      };
+      l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
+    }
 
-      setLastSelectedMapLayer((v) => {
-        // If layer selected before, we keep it as is and set default iff it is SpatialExtent
-        if (v) {
-          l.default = v === LayerName.SpatialExtent;
-          return v;
-        } else {
-          l.default = !isSupportHexbin && !isWMSAvailable;
-          return LayerName.SpatialExtent;
-        }
-      });
+    // Check if we have assigned any default, if no set the first one is default
+    if (layers.find((l) => l.default === true) === undefined) {
+      layers[0].default = true;
     }
   }
   return layers;
@@ -198,6 +166,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   // Need to init with null as collection value can be undefined when it entered this component.
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
+  const [isWFSAvailable, setIsWFSAvailable] = useState<boolean>(false);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
 
   const { isUnderLaptop } = useBreakpoint();
@@ -215,7 +184,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const abstract =
       collection?.getEnhancedDescription() || collection?.description || "";
     const hasSummaryFeature = collection?.hasSummaryFeature() || false;
-    const hasDownloadService = isWMSAvailable || hasSummaryFeature;
+    const hasDownloadService = isWFSAvailable || hasSummaryFeature;
     const hasSpatialExtent = !!collection?.getBBox();
     const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
     const noMapPreview = !hasDownloadService && !hasSpatialExtent;
@@ -242,13 +211,14 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       start,
       end,
     ];
-  }, [collection, isWMSAvailable]);
+  }, [collection, isWFSAvailable]);
 
   const enableSubsetting = useMemo(() => {
     const enable =
-      (lastSelectedMapLayer === LayerName.GeoServer && timeSliderSupport) ||
-      (lastSelectedMapLayer === LayerName.Hexbin && hasSummaryFeature) ||
-      (lastSelectedMapLayer === LayerName.SpatialExtent &&
+      (lastSelectedMapLayer?.id === LayerName.GeoServer &&
+        (timeSliderSupport || hasSummaryFeature)) ||
+      (lastSelectedMapLayer?.id === LayerName.Hexbin && hasSummaryFeature) ||
+      (lastSelectedMapLayer?.id === LayerName.SpatialExtent &&
         hasSummaryFeature &&
         isZarrDataset);
 
@@ -269,7 +239,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         isZarrDataset,
         isWMSAvailable,
         hasSpatialExtent,
-        setLastSelectedMapLayer
+        lastSelectedMapLayer
       ),
     [
       collection,
@@ -277,7 +247,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       isZarrDataset,
       isWMSAvailable,
       hasSpatialExtent,
-      setLastSelectedMapLayer,
+      lastSelectedMapLayer,
     ]
   );
 
@@ -348,9 +318,15 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
 
   const handleMapLayerChange = useCallback(
-    (layerName: LayerName) => {
-      setLastSelectedMapLayer((prevLayerName: LayerName | null) =>
-        prevLayerName !== layerName ? layerName : prevLayerName
+    (layer: LayerSwitcherLayer<LayerName>) => {
+      setLastSelectedMapLayer(
+        (prevLayer: LayerSwitcherLayer<LayerName> | null) => {
+          if (prevLayer) {
+            prevLayer.default = false;
+          }
+          layer.default = true;
+          return layer;
+        }
       );
     },
     [setLastSelectedMapLayer]
@@ -358,6 +334,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
     setIsWMSAvailable(isWMSAvailable);
+  }, []);
+
+  const onWFSAvailabilityChange = useCallback((isWFSAvailable: boolean) => {
+    setIsWFSAvailable(isWFSAvailable);
   }, []);
 
   const handleBaseMapSwitch = useCallback(
@@ -378,6 +358,11 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     [setSelectedWmsLayer]
   );
 
+  useEffect(() => {
+    setLastSelectedMapLayer((v) => {
+      return !v ? mapLayerConfig.filter((m) => m.default)[0] : v;
+    });
+  }, [mapLayerConfig, setLastSelectedMapLayer]);
   return (
     collection && (
       <Grid container>
@@ -479,7 +464,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   }
                   <HexbinLayer
                     featureCollection={filteredFeatureCollection}
-                    visible={lastSelectedMapLayer === LayerName.Hexbin}
+                    visible={lastSelectedMapLayer?.id === LayerName.Hexbin}
                   />
                   <GeoServerLayer
                     geoServerLayerConfig={{
@@ -489,14 +474,17 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       },
                     }}
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
+                    onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
                     setTimeSliderSupport={setTimeSliderSupport}
                     collection={collection}
-                    visible={lastSelectedMapLayer === LayerName.GeoServer}
+                    visible={lastSelectedMapLayer?.id === LayerName.GeoServer}
                   />
                   <GeojsonLayer
                     collection={collection}
-                    visible={lastSelectedMapLayer === LayerName.SpatialExtent}
+                    visible={
+                      lastSelectedMapLayer?.id === LayerName.SpatialExtent
+                    }
                   />
                 </Layers>
               </Map>

@@ -26,7 +26,10 @@ import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import useTabNavigation, {
   TabNavigation,
 } from "../../../hooks/useTabNavigation";
-import MapLayerSwitcher from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import MapLayerSwitcher, {
+  LayerName,
+  LayerSwitcherLayer,
+} from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import BookmarkListMenu, {
   BookmarkListMenuBasicType,
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
@@ -48,12 +51,6 @@ interface MapSectionProps
 }
 
 const mapContainerId = "result-page-main-map";
-
-enum LayerName {
-  Heatmap = "centre points (heatmap)",
-  Cluster = "centre points (clustered)",
-  Uncluster = "centre points (unclustered)",
-}
 
 const createPresentationLayers = (
   id: string | null,
@@ -112,7 +109,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
   }: MapSectionProps) => {
     const { isUnderLaptop } = useBreakpoint();
 
-    const [selectedLayer, setSelectedLayer] = useState<string | null>(
+    const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(
       LayerName.Cluster
     );
     const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
@@ -205,7 +202,11 @@ const MapSection: React.FC<MapSectionProps> = memo(
                         default: selectedLayer === LayerName.Heatmap,
                       },
                     ]}
-                    onEvent={(id: string) => setSelectedLayer(id)}
+                    onEvent={(
+                      layer: LayerSwitcherLayer<LayerName> | undefined
+                    ) => {
+                      layer && setSelectedLayer(layer.id);
+                    }}
                   />
                 }
               />

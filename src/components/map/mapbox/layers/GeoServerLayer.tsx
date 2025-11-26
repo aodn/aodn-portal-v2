@@ -77,6 +77,7 @@ interface GeoServerLayerConfig {
 export interface GeoServerLayerProps extends LayerBasicType {
   geoServerLayerConfig?: Partial<GeoServerLayerConfig>;
   onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
+  onWFSAvailabilityChange?: (wfsDownload: boolean) => void;
   onWmsLayerChange?: (wmsLayerName: string) => void;
 }
 
@@ -130,6 +131,15 @@ const formWmsLayerOptions = (
   return layers.map((layer) => ({
     value: layer.name,
     label: layer.title,
+    queryable: layer.queryable !== "0",
+  }));
+};
+
+const formWmsLinkOptions = (layers: ILink[] | undefined): SelectItem[] => {
+  if (!layers || layers.length === 0) return [];
+  return layers?.map((layer) => ({
+    value: extractLayerName(layer),
+    label: layer.title, // Use title for label for now. Could be changed to ai:label in future
   }));
 };
 
@@ -147,19 +157,12 @@ const extractLayerName = (layer: ILink): string => {
   return layer.title;
 };
 
-const formWmsLinkOptions = (layers: ILink[] | undefined): SelectItem[] => {
-  if (!layers || layers.length === 0) return [];
-  return layers?.map((layer) => ({
-    value: extractLayerName(layer),
-    label: layer.title, // Use title for label for now. Could be changed to ai:label in future
-  }));
-};
-
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
   geoServerLayerConfig,
   visible,
   collection,
   onWMSAvailabilityChange,
+  onWFSAvailabilityChange,
   onWmsLayerChange,
   setTimeSliderSupport,
 }: GeoServerLayerProps) => {
@@ -464,31 +467,31 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
           if (vis !== targetVis) {
             // Need update if value diff, this is used to avoid duplicate call to useEffect
             map.setLayoutProperty(titleLayerId, "visibility", targetVis);
+          }
+          // Only fetch layer fields when visibility actually changes
+          if (visible) {
+            setMapLoading?.(true);
+            const layerName = config.urlParams.LAYERS?.join(",") || "";
 
-            // Only fetch layer fields when visibility actually changes
-            if (visible) {
-              setMapLoading?.(true);
-              const layerName = config.urlParams.LAYERS?.join(",") || "";
-
-              // Check time slider support - only fetch fields if we have a valid layer name
-              if (layerName && layerName.trim() !== "") {
-                const request: MapFeatureRequest = {
-                  uuid: config.uuid || "",
-                  layerName: layerName,
-                };
-                dispatch(fetchGeoServerMapFields(request))
-                  .unwrap()
-                  .then((value) => {
-                    const found = value.find((v) => v.type === "dateTime");
-                    setTimeSliderSupport?.(found !== undefined);
-                  })
-                  .catch(() => {})
-                  .finally(() => setMapLoading?.(false));
-              } else {
-                // If no valid layer name, just set loading to false and assume no time slider support
-                setTimeSliderSupport?.(false);
-                setMapLoading?.(false);
-              }
+            // Check time slider support - only fetch fields if we have a valid layer name
+            if (layerName && layerName.trim() !== "") {
+              const request: MapFeatureRequest = {
+                uuid: config.uuid || "",
+                layerName: layerName,
+              };
+              dispatch(fetchGeoServerMapFields(request))
+                .unwrap()
+                .then((value) => {
+                  const found = value.find((v) => v.type === "dateTime");
+                  setTimeSliderSupport?.(found !== undefined);
+                  onWFSAvailabilityChange?.(true);
+                })
+                .catch(() => {})
+                .finally(() => setMapLoading?.(false));
+            } else {
+              // If no valid layer name, just set loading to false and assume no time slider support
+              setTimeSliderSupport?.(false);
+              setMapLoading?.(false);
             }
           }
         }
@@ -503,6 +506,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.uuid,
     dispatch,
     map,
+    onWFSAvailabilityChange,
     setMapLoading,
     setTimeSliderSupport,
     titleLayerId,
@@ -543,11 +547,13 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             setIsFetchingWmsLayers(false);
           })
           .catch((error: ErrorResponse) => {
-            // For now only catch 404 error for further fetching layers
-            // TODO: we could fetch layers even there is no error to find all wms layers that support wfs download
             if (error.statusCode === 404) {
+              // Although no associated fields found for the layer, we can still display it,
+              // What is sure is you cannot do subsetting if we come here because there is
+              // no field that we can operate
               const wmsLayersRequest: MapFeatureRequest = {
                 uuid: collection.id,
+                layerName: layerName,
               };
 
               // Cancel previous search if exist
@@ -568,12 +574,17 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                     );
                     setWmsLayers(formWmsLayerOptions(layers));
                     setIsFetchingWmsLayers(false);
+                    onWMSAvailabilityChange?.(true);
                   }
                 })
-                .catch(() => {
+                .catch((error) => {
                   // Fail or terminated fetch layer, assume WMS not available
-                  onWMSAvailabilityChange?.(false);
-                  setIsFetchingWmsLayers(false);
+                  if (error.name !== "AbortError") {
+                    // If abort means there is another result coming, so we cannot
+                    // set value conclusively for now.
+                    onWMSAvailabilityChange?.(false);
+                    setIsFetchingWmsLayers(false);
+                  }
                 });
             } else if (error.statusCode === HttpStatusCode.Unauthorized) {
               // If is not allow likely due to white list, we should set the wms not support to block display WMS layer
@@ -590,7 +601,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       }
     };
     // Give a slight delay so that the state updated before we do fetch
-    setTimeout(() => fetchLayers(), 10);
+    setTimeout(() => fetchLayers(), 0);
   }, [
     collection,
     dispatch,

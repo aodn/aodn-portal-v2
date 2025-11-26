@@ -33,6 +33,9 @@ export enum LayerName {
   Hexbin = "hexbin",
   GeoServer = "geoServer",
   SpatialExtent = "spatialExtent",
+  Heatmap = "centre points (heatmap)",
+  Cluster = "centre points (clustered)",
+  Uncluster = "centre points (unclustered)",
 }
 
 export interface LayerSwitcherLayer<T = string> {
@@ -41,27 +44,10 @@ export interface LayerSwitcherLayer<T = string> {
   default?: boolean;
 }
 
-interface LayerSwitcherProps extends ControlProps {
-  layers: Array<LayerSwitcherLayer>;
+interface LayerSwitcherProps
+  extends ControlProps<LayerSwitcherLayer<LayerName>> {
+  layers: Array<LayerSwitcherLayer<LayerName>>;
 }
-
-export const MapLayers: Record<LayerName, LayerSwitcherLayer<LayerName>> = {
-  [LayerName.Hexbin]: {
-    id: LayerName.Hexbin,
-    name: "Hex Grid",
-    default: true,
-  },
-  [LayerName.GeoServer]: {
-    id: LayerName.GeoServer,
-    name: "Geoserver",
-    default: true,
-  },
-  [LayerName.SpatialExtent]: {
-    id: LayerName.SpatialExtent,
-    name: "Spatial Extent",
-    default: false,
-  },
-};
 
 const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   layers,
@@ -69,7 +55,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
 }) => {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [currentLayer, setCurrentLayer] = useState<string | undefined>(
+  const [currentLayer, setCurrentLayer] = useState<LayerName | undefined>(
     layers.find((layer) => layer.default)?.id
   );
 
@@ -78,9 +64,8 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   }, [setOpen]);
 
   useEffect(() => {
-    setCurrentLayer(
-      layers.filter((layer) => layer.default)[0]?.id || layers[0]?.id
-    );
+    const defaultLayer = layers.filter((layer) => layer.default);
+    setCurrentLayer(defaultLayer[0]?.id || layers[0]?.id);
   }, [layers]);
 
   useEffect(() => {
@@ -95,12 +80,12 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
     const handleMapEvent = () => setOpen(false);
 
     eventEmitter.on(EVENT_MENU.CLICKED, handleEvent);
-    eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
     eventEmitter.on(EVENT_MAP.MOVE_START, handleMapEvent);
+    eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
 
     return () => {
       eventEmitter.off(EVENT_MENU.CLICKED, handleEvent);
-      eventEmitter.off(EVENT_MAP.MOVE_START, handleEvent);
+      eventEmitter.off(EVENT_MAP.MOVE_START, handleMapEvent);
       eventEmitter.off(EVENT_MAP.CLICKED, handleMapEvent);
     };
   }, []);
@@ -144,8 +129,9 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
                 value={currentLayer}
                 data-testid={DataTestId.MapLayerSwitcher.RadioGroup}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setCurrentLayer(e.target.value);
-                  if (onEvent) onEvent(e.target.value);
+                  const l = layers.find((l) => l.id === e.target.value);
+                  setCurrentLayer(l?.id);
+                  l && onEvent?.(l);
                 }}
               >
                 {layers.map((l) => (
