@@ -40,4 +40,5 @@ export type MapFieldResponse = {
 export type MapLayerResponse = {
   name: string;
   title: string;
+  queryable: string;
 };

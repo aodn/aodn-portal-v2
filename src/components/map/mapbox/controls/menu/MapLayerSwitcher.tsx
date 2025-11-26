@@ -33,6 +33,9 @@ export enum LayerName {
   Hexbin = "hexbin",
   GeoServer = "geoServer",
   SpatialExtent = "spatialExtent",
+  Heatmap = "centre points (heatmap)",
+  Cluster = "centre points (clustered)",
+  Uncluster = "centre points (unclustered)",
 }
 
 export interface LayerSwitcherLayer<T = string> {
@@ -45,24 +48,6 @@ interface LayerSwitcherProps
   extends ControlProps<LayerSwitcherLayer<LayerName>> {
   layers: Array<LayerSwitcherLayer<LayerName>>;
 }
-
-export const MapLayers: Record<LayerName, LayerSwitcherLayer<LayerName>> = {
-  [LayerName.Hexbin]: {
-    id: LayerName.Hexbin,
-    name: "Hex Grid",
-    default: true,
-  },
-  [LayerName.GeoServer]: {
-    id: LayerName.GeoServer,
-    name: "Geoserver",
-    default: true,
-  },
-  [LayerName.SpatialExtent]: {
-    id: LayerName.SpatialExtent,
-    name: "Spatial Extent",
-    default: false,
-  },
-};
 
 const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   layers,

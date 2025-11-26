@@ -32,7 +32,6 @@ import GeoServerLayer from "../../../../components/map/mapbox/layers/GeoServerLa
 import MapLayerSwitcher, {
   LayerName,
   LayerSwitcherLayer,
-  MapLayers,
 } from "../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import {
   DatasetType,
@@ -113,19 +112,31 @@ export const buildMapLayerConfig = (
     const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
     // Must be ordered by Hexbin > GeoServer > Spatial extents
     if (isSupportHexbin) {
-      const l = MapLayers[LayerName.Hexbin];
+      const l = {
+        id: LayerName.Hexbin,
+        name: "Hex Grid",
+        default: true,
+      };
       l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
     }
 
     if (isWMSAvailable) {
-      const l = MapLayers[LayerName.GeoServer];
+      const l = {
+        id: LayerName.GeoServer,
+        name: "Geoserver",
+        default: true,
+      };
       l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
     }
 
     if (!isSupportHexbin && hasSpatialExtent) {
-      const l = MapLayers[LayerName.SpatialExtent];
+      const l = {
+        id: LayerName.SpatialExtent,
+        name: "Spatial Extent",
+        default: false,
+      };
       l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
     }
