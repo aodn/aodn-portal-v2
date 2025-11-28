@@ -96,20 +96,29 @@ const getMinMaxDateStamps = (
     maxDate && maxDate.isValid() ? maxDate : dayjs(dateDefault.max),
   ];
 };
+
 // We want to vitest this easier
 export const buildMapLayerConfig = (
   collection: OGCCollection | null | undefined,
   hasSummaryFeature: boolean,
   isZarrDataset: boolean,
   isWMSAvailable: boolean,
-  hasSpatialExtent: boolean,
-  lastSelectedMapLayer: LayerSwitcherLayer<LayerName> | null
+  hasSpatialExtent: boolean
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
 
   if (collection) {
     // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
     const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
+
+    // Show spatial extent layer when
+    // 1. it is a zarr dataset
+    // 2. or no geoserver layer nor hexbin layer
+    const isSupportSpatialExtent =
+      hasSpatialExtent &&
+      ((hasSummaryFeature && isZarrDataset) ||
+        (!isWMSAvailable && !isSupportHexbin));
+
     // Must be ordered by Hexbin > GeoServer > Spatial extents
     if (isSupportHexbin) {
       const l = {
@@ -117,7 +126,6 @@ export const buildMapLayerConfig = (
         name: "Hex Grid",
         default: true,
       };
-      l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
     }
 
@@ -125,19 +133,18 @@ export const buildMapLayerConfig = (
       const l = {
         id: LayerName.GeoServer,
         name: "Geoserver",
-        default: true,
+        // If hexbin is supported, then geoserver is not default
+        default: isSupportHexbin ? false : true,
       };
-      l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
     }
 
-    if (!isSupportHexbin && hasSpatialExtent) {
+    if (isSupportSpatialExtent) {
       const l = {
         id: LayerName.SpatialExtent,
         name: "Spatial Extent",
         default: false,
       };
-      l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
     }
 
@@ -168,7 +175,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [isWFSAvailable, setIsWFSAvailable] = useState<boolean>(false);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
-
   const { isUnderLaptop } = useBreakpoint();
 
   const [
@@ -238,8 +244,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         hasSummaryFeature,
         isZarrDataset,
         isWMSAvailable,
-        hasSpatialExtent,
-        lastSelectedMapLayer
+        hasSpatialExtent
       ),
     [
       collection,
@@ -247,7 +252,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       isZarrDataset,
       isWMSAvailable,
       hasSpatialExtent,
-      lastSelectedMapLayer,
     ]
   );
 
@@ -360,9 +364,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   useEffect(() => {
     setLastSelectedMapLayer((v) => {
-      return !v ? mapLayerConfig.filter((m) => m.default)[0] : v;
+      if (mapLayerConfig.length > 0) {
+        return mapLayerConfig.filter((m) => m.default)[0] || mapLayerConfig[0];
+      }
+      return v;
     });
   }, [mapLayerConfig, setLastSelectedMapLayer]);
+
   return (
     collection && (
       <Grid container>
