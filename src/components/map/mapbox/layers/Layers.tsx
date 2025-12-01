@@ -21,6 +21,7 @@ export interface LayerBasicType {
   preferCurrentCentroid?: boolean;
   visible?: boolean;
   setTimeSliderSupport?: Dispatch<SetStateAction<boolean>>;
+  setDrawRectSupportSupport?: Dispatch<SetStateAction<boolean>>;
   collection?: OGCCollection;
 }
 // Use to create static layer on map, you need to add menu item to select those layers,

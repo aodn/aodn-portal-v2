@@ -23,6 +23,7 @@ import dayjs, { Dayjs } from "dayjs";
 import {
   DateRangeCondition,
   DownloadConditionType,
+  SubsettingType,
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
@@ -175,6 +176,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [isWFSAvailable, setIsWFSAvailable] = useState<boolean>(false);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
+  const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(true);
   const { isUnderLaptop } = useBreakpoint();
 
   const [
@@ -219,23 +221,41 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     ];
   }, [collection, isWFSAvailable]);
 
-  const enableSubsetting = useMemo(() => {
-    const enable =
-      (lastSelectedMapLayer?.id === LayerName.GeoServer &&
-        (timeSliderSupport || hasSummaryFeature)) ||
-      (lastSelectedMapLayer?.id === LayerName.Hexbin && hasSummaryFeature) ||
-      (lastSelectedMapLayer?.id === LayerName.SpatialExtent &&
-        hasSummaryFeature &&
-        isZarrDataset);
-
-    return hasDownloadService && enable;
-  }, [
-    hasDownloadService,
-    hasSummaryFeature,
-    isZarrDataset,
-    lastSelectedMapLayer,
-    timeSliderSupport,
-  ]);
+  const checkSubsettingSupport = useCallback(
+    (subsettingType: SubsettingType) => {
+      const isCODownloadAvailable =
+        (lastSelectedMapLayer?.id === LayerName.Hexbin && hasSummaryFeature) ||
+        (lastSelectedMapLayer?.id === LayerName.SpatialExtent &&
+          hasSummaryFeature &&
+          isZarrDataset);
+      switch (subsettingType) {
+        case SubsettingType.TimeSlider:
+          return (
+            (isCODownloadAvailable ||
+              (lastSelectedMapLayer?.id === LayerName.GeoServer &&
+                timeSliderSupport)) &&
+            hasDownloadService
+          );
+        case SubsettingType.DrawRect:
+          return (
+            (isCODownloadAvailable ||
+              (lastSelectedMapLayer?.id === LayerName.GeoServer &&
+                drawRectSupport)) &&
+            hasDownloadService
+          );
+        default:
+          return false;
+      }
+    },
+    [
+      drawRectSupport,
+      hasDownloadService,
+      hasSummaryFeature,
+      isZarrDataset,
+      lastSelectedMapLayer?.id,
+      timeSliderSupport,
+    ]
+  );
 
   const mapLayerConfig = useMemo(
     (): LayerSwitcherLayer<LayerName>[] =>
@@ -434,7 +454,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       visible={mapLayerConfig.length !== 0}
                     />
                     <MenuControl
-                      visible={enableSubsetting}
+                      visible={checkSubsettingSupport(
+                        SubsettingType.TimeSlider
+                      )}
                       menu={
                         <DateRange
                           minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
@@ -447,7 +469,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }
                     />
                     <MenuControl
-                      visible={enableSubsetting}
+                      visible={checkSubsettingSupport(SubsettingType.DrawRect)}
                       menu={
                         <DrawRect
                           getAndSetDownloadConditions={
@@ -485,6 +507,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
                     setTimeSliderSupport={setTimeSliderSupport}
+                    setDrawRectSupportSupport={setDrawRectSupportSupport}
                     collection={collection}
                     visible={lastSelectedMapLayer?.id === LayerName.GeoServer}
                   />

@@ -165,6 +165,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   onWFSAvailabilityChange,
   onWmsLayerChange,
   setTimeSliderSupport,
+  setDrawRectSupportSupport,
 }: GeoServerLayerProps) => {
   const { map, setLoading: setMapLoading } = useContext(MapContext);
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
@@ -473,7 +474,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             setMapLoading?.(true);
             const layerName = config.urlParams.LAYERS?.join(",") || "";
 
-            // Check time slider support - only fetch fields if we have a valid layer name
+            // Check subsetting support - only fetch fields if we have a valid layer name
             if (layerName && layerName.trim() !== "") {
               const request: MapFeatureRequest = {
                 uuid: config.uuid || "",
@@ -482,15 +483,23 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               dispatch(fetchGeoServerMapFields(request))
                 .unwrap()
                 .then((value) => {
-                  const found = value.find((v) => v.type === "dateTime");
-                  setTimeSliderSupport?.(found !== undefined);
+                  const foundDatetime = value.find(
+                    (v) => v.type === "dateTime"
+                  );
+                  const foundGeo = value.find(
+                    (v) => v.type === "geometrypropertytype"
+                  );
+                  setTimeSliderSupport?.(foundDatetime !== undefined);
+                  setDrawRectSupportSupport?.(foundGeo !== undefined);
                   onWFSAvailabilityChange?.(true);
                 })
                 .catch(() => {})
                 .finally(() => setMapLoading?.(false));
             } else {
-              // If no valid layer name, just set loading to false and assume no time slider support
+              // If no valid layer name, just set loading to false and assume no subsetting support
               setTimeSliderSupport?.(false);
+              setDrawRectSupportSupport?.(false);
+              onWFSAvailabilityChange?.(false);
               setMapLoading?.(false);
             }
           }
@@ -507,6 +516,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     dispatch,
     map,
     onWFSAvailabilityChange,
+    setDrawRectSupportSupport,
     setMapLoading,
     setTimeSliderSupport,
     titleLayerId,
