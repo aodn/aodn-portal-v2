@@ -175,8 +175,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [isWFSAvailable, setIsWFSAvailable] = useState<boolean>(false);
-  const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
-  const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(true);
+  const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
+  const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
 
   const [
@@ -223,22 +223,17 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const checkSubsettingSupport = useCallback(
     (subsettingType: SubsettingType) => {
-      const isCODownloadAvailable =
-        (lastSelectedMapLayer?.id === LayerName.Hexbin && hasSummaryFeature) ||
-        (lastSelectedMapLayer?.id === LayerName.SpatialExtent &&
-          hasSummaryFeature &&
-          isZarrDataset);
       switch (subsettingType) {
         case SubsettingType.TimeSlider:
           return (
-            (isCODownloadAvailable ||
+            (hasSummaryFeature ||
               (lastSelectedMapLayer?.id === LayerName.GeoServer &&
                 timeSliderSupport)) &&
             hasDownloadService
           );
         case SubsettingType.DrawRect:
           return (
-            (isCODownloadAvailable ||
+            (hasSummaryFeature ||
               (lastSelectedMapLayer?.id === LayerName.GeoServer &&
                 drawRectSupport)) &&
             hasDownloadService
@@ -251,7 +246,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       drawRectSupport,
       hasDownloadService,
       hasSummaryFeature,
-      isZarrDataset,
       lastSelectedMapLayer?.id,
       timeSliderSupport,
     ]
