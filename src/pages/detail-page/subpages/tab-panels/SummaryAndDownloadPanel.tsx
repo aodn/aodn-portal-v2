@@ -365,8 +365,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const onWFSAvailabilityChange = useCallback(
     (isWFSAvailable: boolean) => {
       setIsWFSAvailable(isWFSAvailable);
-      if (downloadService === DownloadServiceType.WFS && !isWFSAvailable) {
-        setDownloadService(DownloadServiceType.Unavailable);
+      if (downloadService === DownloadServiceType.WFS) {
+        if (isWFSAvailable) {
+          setDownloadService(DownloadServiceType.WFS);
+        } else {
+          setDownloadService(DownloadServiceType.Unavailable);
+        }
       }
     },
     [downloadService, setDownloadService]

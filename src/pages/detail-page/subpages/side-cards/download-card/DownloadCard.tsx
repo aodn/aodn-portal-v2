@@ -25,7 +25,7 @@ const DownloadCard: FC = () => {
   }, [collection]);
 
   useEffect(() => {
-    if (collection) {
+    if (collection && downloadService) {
       if (hasSummaryFeature) {
         setDownloadService(DownloadServiceType.CloudOptimised);
       } else if (wfsLinks.length > 0 && selectedWmsLayer) {
@@ -36,6 +36,7 @@ const DownloadCard: FC = () => {
     }
   }, [
     collection,
+    downloadService,
     hasSummaryFeature,
     selectedWmsLayer,
     setDownloadService,
