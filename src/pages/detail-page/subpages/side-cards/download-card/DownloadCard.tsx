@@ -1,9 +1,10 @@
-import { FC, useMemo } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { useDetailPageContext } from "../../../context/detail-page-context";
 import DownloadWFSCard from "./components/DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./components/DownloadCloudOptimisedCard";
 import SideCardContainer from "../SideCardContainer";
 import DownloadNotAvailableCard from "./components/DownloadNotAvailableCard";
+import { DownloadServiceType } from "../../../context/DownloadDefinitions";
 
 const DownloadCard: FC = () => {
   const {
@@ -12,42 +13,78 @@ const DownloadCard: FC = () => {
     getAndSetDownloadConditions,
     removeDownloadCondition,
     selectedWmsLayer,
+    downloadService,
+    setDownloadService,
   } = useDetailPageContext();
 
-  const [wfsLinks, wmsLinks] = useMemo(
-    () => [collection?.getWFSLinks(), collection?.getWMSLinks()],
-    [collection]
-  );
+  const [wfsLinks, wmsLinks, hasSummaryFeature] = useMemo(() => {
+    const wfsLinks = collection?.getWFSLinks() || [];
+    const wmsLinks = collection?.getWMSLinks() || [];
+    const hasSummaryFeature = collection?.hasSummaryFeature() || false;
+    return [wfsLinks, wmsLinks, hasSummaryFeature];
+  }, [collection]);
 
-  const getContent = () => {
-    if (collection?.hasSummaryFeature()) {
-      return (
-        <DownloadCloudOptimisedCard
-          collection={collection}
-          downloadConditions={downloadConditions}
-          getAndSetDownloadConditions={getAndSetDownloadConditions}
-          removeDownloadCondition={removeDownloadCondition}
-        />
-      );
-    } else if (wfsLinks && wfsLinks.length > 0 && selectedWmsLayer) {
-      return (
-        <DownloadWFSCard
-          WFSLinks={wfsLinks}
-          WMSLinks={wmsLinks}
-          selectedWmsLayerName={selectedWmsLayer}
-          uuid={collection?.id}
-          downloadConditions={downloadConditions}
-          getAndSetDownloadConditions={getAndSetDownloadConditions}
-          removeDownloadCondition={removeDownloadCondition}
-        />
-      );
+  useEffect(() => {
+    if (collection && downloadService) {
+      if (hasSummaryFeature) {
+        setDownloadService(DownloadServiceType.CloudOptimised);
+      } else if (wfsLinks.length > 0 && selectedWmsLayer) {
+        setDownloadService(DownloadServiceType.WFS);
+      } else {
+        setDownloadService(DownloadServiceType.Unavailable);
+      }
     }
-    return <DownloadNotAvailableCard />;
-  };
+  }, [
+    collection,
+    downloadService,
+    hasSummaryFeature,
+    selectedWmsLayer,
+    setDownloadService,
+    wfsLinks,
+  ]);
+
+  const downloadCard = useMemo(() => {
+    if (!collection) return null;
+    switch (downloadService) {
+      case DownloadServiceType.CloudOptimised:
+        return (
+          <DownloadCloudOptimisedCard
+            collection={collection}
+            downloadConditions={downloadConditions}
+            getAndSetDownloadConditions={getAndSetDownloadConditions}
+            removeDownloadCondition={removeDownloadCondition}
+          />
+        );
+      case DownloadServiceType.WFS:
+        return (
+          <DownloadWFSCard
+            WFSLinks={wfsLinks}
+            WMSLinks={wmsLinks}
+            selectedWmsLayerName={selectedWmsLayer}
+            uuid={collection?.id}
+            downloadConditions={downloadConditions}
+            getAndSetDownloadConditions={getAndSetDownloadConditions}
+            removeDownloadCondition={removeDownloadCondition}
+          />
+        );
+      case DownloadServiceType.Unavailable:
+      default:
+        return <DownloadNotAvailableCard />;
+    }
+  }, [
+    collection,
+    downloadConditions,
+    downloadService,
+    getAndSetDownloadConditions,
+    removeDownloadCondition,
+    selectedWmsLayer,
+    wfsLinks,
+    wmsLinks,
+  ]);
 
   return (
     <SideCardContainer title="Download Service" px={0} py={0}>
-      {getContent()}
+      {downloadCard}
     </SideCardContainer>
   );
 };

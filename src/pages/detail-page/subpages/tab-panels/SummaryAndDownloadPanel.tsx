@@ -23,6 +23,8 @@ import dayjs, { Dayjs } from "dayjs";
 import {
   DateRangeCondition,
   DownloadConditionType,
+  DownloadServiceType,
+  SubsettingType,
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
@@ -96,20 +98,29 @@ const getMinMaxDateStamps = (
     maxDate && maxDate.isValid() ? maxDate : dayjs(dateDefault.max),
   ];
 };
+
 // We want to vitest this easier
 export const buildMapLayerConfig = (
   collection: OGCCollection | null | undefined,
   hasSummaryFeature: boolean,
   isZarrDataset: boolean,
   isWMSAvailable: boolean,
-  hasSpatialExtent: boolean,
-  lastSelectedMapLayer: LayerSwitcherLayer<LayerName> | null
+  hasSpatialExtent: boolean
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
 
   if (collection) {
     // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
     const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
+
+    // Show spatial extent layer when
+    // 1. it is a zarr dataset
+    // 2. or no geoserver layer nor hexbin layer
+    const isSupportSpatialExtent =
+      hasSpatialExtent &&
+      ((hasSummaryFeature && isZarrDataset) ||
+        (!isWMSAvailable && !isSupportHexbin));
+
     // Must be ordered by Hexbin > GeoServer > Spatial extents
     if (isSupportHexbin) {
       const l = {
@@ -117,7 +128,6 @@ export const buildMapLayerConfig = (
         name: "Hex Grid",
         default: true,
       };
-      l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
     }
 
@@ -125,19 +135,18 @@ export const buildMapLayerConfig = (
       const l = {
         id: LayerName.GeoServer,
         name: "Geoserver",
-        default: true,
+        // If hexbin is supported, then geoserver is not default
+        default: isSupportHexbin ? false : true,
       };
-      l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
     }
 
-    if (!isSupportHexbin && hasSpatialExtent) {
+    if (isSupportSpatialExtent) {
       const l = {
         id: LayerName.SpatialExtent,
         name: "Spatial Extent",
         default: false,
       };
-      l.default = l.id === lastSelectedMapLayer?.id;
       layers.push(l);
     }
 
@@ -161,20 +170,21 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setSelectedWmsLayer,
     lastSelectedMapLayer,
     setLastSelectedMapLayer,
+    downloadService,
+    setDownloadService,
   } = useDetailPageContext();
 
   // Need to init with null as collection value can be undefined when it entered this component.
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [isWFSAvailable, setIsWFSAvailable] = useState<boolean>(false);
-  const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(true);
-
+  const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
+  const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
 
   const [
     abstract,
     hasSummaryFeature,
-    hasDownloadService,
     hasSpatialExtent,
     isZarrDataset,
     noMapPreview,
@@ -184,10 +194,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const abstract =
       collection?.getEnhancedDescription() || collection?.description || "";
     const hasSummaryFeature = collection?.hasSummaryFeature() || false;
-    const hasDownloadService = isWFSAvailable || hasSummaryFeature;
     const hasSpatialExtent = !!collection?.getBBox();
     const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
-    const noMapPreview = !hasDownloadService && !hasSpatialExtent;
+    const noMapPreview =
+      downloadService === DownloadServiceType.Unavailable && !hasSpatialExtent;
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
     // time value, for example cloud optimized date range may be different from the
     // geoserver one
@@ -204,32 +214,50 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     return [
       abstract,
       hasSummaryFeature,
-      hasDownloadService,
       hasSpatialExtent,
       isZarrDataset,
       noMapPreview,
       start,
       end,
     ];
-  }, [collection, isWFSAvailable]);
+  }, [collection, downloadService]);
 
-  const enableSubsetting = useMemo(() => {
-    const enable =
-      (lastSelectedMapLayer?.id === LayerName.GeoServer &&
-        (timeSliderSupport || hasSummaryFeature)) ||
-      (lastSelectedMapLayer?.id === LayerName.Hexbin && hasSummaryFeature) ||
-      (lastSelectedMapLayer?.id === LayerName.SpatialExtent &&
-        hasSummaryFeature &&
-        isZarrDataset);
+  const checkSubsettingSupport = useCallback(
+    (subsettingType: SubsettingType) => {
+      switch (subsettingType) {
+        // Time slider support when
+        // 1. CO download is available
+        // 2. or the in geoserver and it supports time slider
+        case SubsettingType.TimeSlider:
+          return (
+            hasSummaryFeature ||
+            (lastSelectedMapLayer?.id === LayerName.GeoServer &&
+              timeSliderSupport)
+          );
 
-    return hasDownloadService && enable;
-  }, [
-    hasDownloadService,
-    hasSummaryFeature,
-    isZarrDataset,
-    lastSelectedMapLayer,
-    timeSliderSupport,
-  ]);
+        // Draw rect support when
+        // 1. CO download is available
+        // 2. or the in geoserver and it supports draw rect
+        // Also the download service must be available
+        case SubsettingType.DrawRect:
+          return (
+            (hasSummaryFeature ||
+              (lastSelectedMapLayer?.id === LayerName.GeoServer &&
+                drawRectSupport)) &&
+            downloadService !== DownloadServiceType.Unavailable
+          );
+        default:
+          return false;
+      }
+    },
+    [
+      drawRectSupport,
+      downloadService,
+      hasSummaryFeature,
+      lastSelectedMapLayer?.id,
+      timeSliderSupport,
+    ]
+  );
 
   const mapLayerConfig = useMemo(
     (): LayerSwitcherLayer<LayerName>[] =>
@@ -238,8 +266,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
         hasSummaryFeature,
         isZarrDataset,
         isWMSAvailable,
-        hasSpatialExtent,
-        lastSelectedMapLayer
+        hasSpatialExtent
       ),
     [
       collection,
@@ -247,7 +274,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       isZarrDataset,
       isWMSAvailable,
       hasSpatialExtent,
-      lastSelectedMapLayer,
     ]
   );
 
@@ -336,9 +362,19 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setIsWMSAvailable(isWMSAvailable);
   }, []);
 
-  const onWFSAvailabilityChange = useCallback((isWFSAvailable: boolean) => {
-    setIsWFSAvailable(isWFSAvailable);
-  }, []);
+  const onWFSAvailabilityChange = useCallback(
+    (isWFSAvailable: boolean) => {
+      setIsWFSAvailable(isWFSAvailable);
+      if (downloadService === DownloadServiceType.WFS) {
+        if (isWFSAvailable) {
+          setDownloadService(DownloadServiceType.WFS);
+        } else {
+          setDownloadService(DownloadServiceType.Unavailable);
+        }
+      }
+    },
+    [downloadService, setDownloadService]
+  );
 
   const handleBaseMapSwitch = useCallback(
     (target: EventTarget & HTMLInputElement) =>
@@ -360,9 +396,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   useEffect(() => {
     setLastSelectedMapLayer((v) => {
-      return !v ? mapLayerConfig.filter((m) => m.default)[0] : v;
+      if (mapLayerConfig.length > 0) {
+        return mapLayerConfig.filter((m) => m.default)[0] || mapLayerConfig[0];
+      }
+      return v;
     });
   }, [mapLayerConfig, setLastSelectedMapLayer]);
+
   return (
     collection && (
       <Grid container>
@@ -426,7 +466,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       visible={mapLayerConfig.length !== 0}
                     />
                     <MenuControl
-                      visible={enableSubsetting}
+                      visible={checkSubsettingSupport(
+                        SubsettingType.TimeSlider
+                      )}
                       menu={
                         <DateRange
                           minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
@@ -439,7 +481,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       }
                     />
                     <MenuControl
-                      visible={enableSubsetting}
+                      visible={checkSubsettingSupport(SubsettingType.DrawRect)}
                       menu={
                         <DrawRect
                           getAndSetDownloadConditions={
@@ -477,6 +519,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
                     setTimeSliderSupport={setTimeSliderSupport}
+                    setDrawRectSupportSupport={setDrawRectSupportSupport}
                     collection={collection}
                     visible={lastSelectedMapLayer?.id === LayerName.GeoServer}
                   />
