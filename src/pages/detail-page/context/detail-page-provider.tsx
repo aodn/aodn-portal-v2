@@ -10,6 +10,7 @@ import { useAppDispatch } from "../../../components/common/store/hooks";
 import { FeatureCollection, Point } from "geojson";
 import {
   DownloadConditionType,
+  DownloadServiceType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -44,6 +45,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>("");
   const [lastSelectedMapLayer, setLastSelectedMapLayer] =
     useState<LayerSwitcherLayer<LayerName> | null>(null);
+  const [downloadService, setDownloadService] = useState<DownloadServiceType>(
+    DownloadServiceType.Unavailable
+  );
 
   const getAndSetDownloadConditions = useCallback(
     (
@@ -122,6 +126,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setSelectedWmsLayer,
         lastSelectedMapLayer,
         setLastSelectedMapLayer,
+        downloadService,
+        setDownloadService,
       }}
     >
       {children}

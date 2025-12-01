@@ -130,3 +130,9 @@ export enum SubsettingType {
   TimeSlider = "TimeSlider",
   DrawRect = "DrawRect",
 }
+
+export enum DownloadServiceType {
+  WFS = "WFS",
+  CloudOptimised = "CloudOptimised",
+  Unavailable = "Unavailable",
+}

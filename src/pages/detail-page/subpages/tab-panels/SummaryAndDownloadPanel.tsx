@@ -23,6 +23,7 @@ import dayjs, { Dayjs } from "dayjs";
 import {
   DateRangeCondition,
   DownloadConditionType,
+  DownloadServiceType,
   SubsettingType,
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
@@ -169,6 +170,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setSelectedWmsLayer,
     lastSelectedMapLayer,
     setLastSelectedMapLayer,
+    downloadService,
+    setDownloadService,
   } = useDetailPageContext();
 
   // Need to init with null as collection value can be undefined when it entered this component.
@@ -182,7 +185,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [
     abstract,
     hasSummaryFeature,
-    hasDownloadService,
     hasSpatialExtent,
     isZarrDataset,
     noMapPreview,
@@ -192,10 +194,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const abstract =
       collection?.getEnhancedDescription() || collection?.description || "";
     const hasSummaryFeature = collection?.hasSummaryFeature() || false;
-    const hasDownloadService = isWFSAvailable || hasSummaryFeature;
     const hasSpatialExtent = !!collection?.getBBox();
     const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
-    const noMapPreview = !hasDownloadService && !hasSpatialExtent;
+    const noMapPreview =
+      downloadService === DownloadServiceType.Unavailable && !hasSpatialExtent;
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
     // time value, for example cloud optimized date range may be different from the
     // geoserver one
@@ -212,31 +214,37 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     return [
       abstract,
       hasSummaryFeature,
-      hasDownloadService,
       hasSpatialExtent,
       isZarrDataset,
       noMapPreview,
       start,
       end,
     ];
-  }, [collection, isWFSAvailable]);
+  }, [collection, downloadService]);
 
   const checkSubsettingSupport = useCallback(
     (subsettingType: SubsettingType) => {
       switch (subsettingType) {
+        // Time slider support when
+        // 1. CO download is available
+        // 2. or the in geoserver and it supports time slider
         case SubsettingType.TimeSlider:
           return (
-            (hasSummaryFeature ||
-              (lastSelectedMapLayer?.id === LayerName.GeoServer &&
-                timeSliderSupport)) &&
-            hasDownloadService
+            hasSummaryFeature ||
+            (lastSelectedMapLayer?.id === LayerName.GeoServer &&
+              timeSliderSupport)
           );
+
+        // Draw rect support when
+        // 1. CO download is available
+        // 2. or the in geoserver and it supports draw rect
+        // Also the download service must be available
         case SubsettingType.DrawRect:
           return (
             (hasSummaryFeature ||
               (lastSelectedMapLayer?.id === LayerName.GeoServer &&
                 drawRectSupport)) &&
-            hasDownloadService
+            downloadService !== DownloadServiceType.Unavailable
           );
         default:
           return false;
@@ -244,7 +252,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     },
     [
       drawRectSupport,
-      hasDownloadService,
+      downloadService,
       hasSummaryFeature,
       lastSelectedMapLayer?.id,
       timeSliderSupport,
@@ -354,9 +362,15 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setIsWMSAvailable(isWMSAvailable);
   }, []);
 
-  const onWFSAvailabilityChange = useCallback((isWFSAvailable: boolean) => {
-    setIsWFSAvailable(isWFSAvailable);
-  }, []);
+  const onWFSAvailabilityChange = useCallback(
+    (isWFSAvailable: boolean) => {
+      setIsWFSAvailable(isWFSAvailable);
+      if (downloadService === DownloadServiceType.WFS && !isWFSAvailable) {
+        setDownloadService(DownloadServiceType.Unavailable);
+      }
+    },
+    [downloadService, setDownloadService]
+  );
 
   const handleBaseMapSwitch = useCallback(
     (target: EventTarget & HTMLInputElement) =>
