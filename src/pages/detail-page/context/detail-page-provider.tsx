@@ -10,13 +10,17 @@ import { useAppDispatch } from "../../../components/common/store/hooks";
 import { FeatureCollection, Point } from "geojson";
 import {
   DownloadConditionType,
+  DownloadServiceType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { AnalyticsEvent } from "../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../analytics/customEventTracker";
-import { LayerName } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import {
+  LayerName,
+  LayerSwitcherLayer,
+} from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -40,7 +44,10 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   >([]);
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>("");
   const [lastSelectedMapLayer, setLastSelectedMapLayer] =
-    useState<LayerName | null>(null);
+    useState<LayerSwitcherLayer<LayerName> | null>(null);
+  const [downloadService, setDownloadService] = useState<DownloadServiceType>(
+    DownloadServiceType.Unavailable
+  );
 
   const getAndSetDownloadConditions = useCallback(
     (
@@ -119,6 +126,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setSelectedWmsLayer,
         lastSelectedMapLayer,
         setLastSelectedMapLayer,
+        downloadService,
+        setDownloadService,
       }}
     >
       {children}

@@ -3,9 +3,13 @@ import { OGCCollection } from "../../../components/common/store/OGCCollectionDef
 import { FeatureCollection, Point } from "geojson";
 import {
   DownloadConditionType,
+  DownloadServiceType,
   IDownloadCondition,
 } from "./DownloadDefinitions";
-import { LayerName } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import {
+  LayerName,
+  LayerSwitcherLayer,
+} from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 
 export interface DetailPageContextType {
   collection: OGCCollection | undefined;
@@ -20,8 +24,12 @@ export interface DetailPageContextType {
   removeDownloadCondition: (condition: IDownloadCondition) => void;
   selectedWmsLayer: string;
   setSelectedWmsLayer: Dispatch<SetStateAction<string>>;
-  lastSelectedMapLayer: LayerName | null;
-  setLastSelectedMapLayer: Dispatch<SetStateAction<LayerName | null>>;
+  lastSelectedMapLayer: LayerSwitcherLayer<LayerName> | null;
+  setLastSelectedMapLayer: Dispatch<
+    SetStateAction<LayerSwitcherLayer<LayerName> | null>
+  >;
+  downloadService: DownloadServiceType;
+  setDownloadService: Dispatch<SetStateAction<DownloadServiceType>>;
 }
 
 const DetailPageContextDefault = {
@@ -36,6 +44,8 @@ const DetailPageContextDefault = {
   setSelectedWmsLayer: () => {},
   lastSelectedMapLayer: null,
   setLastSelectedMapLayer: () => {},
+  downloadService: DownloadServiceType.Unavailable,
+  setDownloadService: () => {},
 };
 
 const DetailPageContext = createContext<DetailPageContextType>(

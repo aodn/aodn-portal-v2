@@ -14,6 +14,7 @@ import rc8Theme from "../../../styles/themeRC8";
 import { ExpandMore } from "@mui/icons-material";
 
 export interface SelectItem<T = string> {
+  queryable?: boolean;
   value: T;
   label: string;
   icon?: ReactElement | FC<IconProps>;

@@ -7,6 +7,10 @@ import {
 } from "../SummaryAndDownloadPanel";
 import { dateDefault } from "../../../../../components/common/constants";
 import { LayerName } from "../../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import {
+  OGCCollection,
+  DatasetType,
+} from "../../../../../components/common/store/OGCCollectionDefinitions";
 
 // Helper to create a FeatureCollection for testing
 const createFeatureCollection = (
@@ -173,101 +177,132 @@ describe("getMinMaxDateStamps", () => {
   });
 });
 
-describe("SummaryAndDownloadPanel - buildMapLayerConfig", () => {
-  // Mimic useState set function behavior
-  let current: LayerName | null = null;
-  const setLast = vi.fn((updater) => {
-    current = typeof updater === "function" ? updater(current) : updater;
+describe("buildMapLayerConfig", () => {
+  // Helper function to create a mock OGCCollection
+  const createMockCollection = (
+    overrides: Partial<{
+      hasSummaryFeature: boolean;
+      getDatasetType: () => DatasetType | undefined;
+      getBBox: () => any;
+    }> = {}
+  ) => {
+    const mockCollection = {
+      hasSummaryFeature: vi
+        .fn()
+        .mockReturnValue(overrides.hasSummaryFeature ?? false),
+      getDatasetType: vi
+        .fn()
+        .mockReturnValue(overrides.getDatasetType?.() ?? undefined),
+      getBBox: vi.fn().mockReturnValue(overrides.getBBox?.() ?? undefined),
+    } as unknown as OGCCollection;
+
+    return mockCollection;
+  };
+
+  it("returns empty array when collection is null", () => {
+    const result = buildMapLayerConfig(null, false, false, false, false);
+    expect(result).toEqual([]);
   });
 
-  it("Hexbin + GeoServer, summary true, Zarr false, WMS true", () => {
-    current = null;
-    const layers = buildMapLayerConfig(
-      {} as any,
-      true,
-      false,
-      true,
-      true,
-      setLast
-    );
-
-    expect(layers.map((l) => l.id)).toEqual([
-      LayerName.Hexbin,
-      LayerName.GeoServer,
-    ]);
-    expect(layers[0].default).toBe(true);
-    expect(layers[1].default).toBe(false);
+  it("returns empty array when collection is undefined", () => {
+    const result = buildMapLayerConfig(undefined, false, false, false, false);
+    expect(result).toEqual([]);
   });
 
-  it("Hexbin + GeoServer, summary true, Zarr false, WMS true, selected GeoServer before", () => {
-    current = LayerName.GeoServer;
-    const layers = buildMapLayerConfig(
-      {} as any,
-      true,
-      false,
-      true,
-      true,
-      setLast
+  it("builds correct layer config with hexbin support", () => {
+    const mockCollection = createMockCollection({
+      hasSummaryFeature: true,
+      getBBox: () => [0, 0, 1, 1],
+    });
+
+    const result = buildMapLayerConfig(
+      mockCollection,
+      true, // hasSummaryFeature
+      false, // isZarrDataset
+      true, // isWMSAvailable
+      true // hasSpatialExtent
     );
 
-    expect(layers.map((l) => l.id)).toEqual([
-      LayerName.Hexbin,
-      LayerName.GeoServer,
-    ]);
-    expect(layers[0].default).toBe(false);
-    expect(layers[1].default).toBe(true);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({
+      id: LayerName.Hexbin,
+      name: "Hex Grid",
+      default: true,
+    });
+    expect(result[1]).toEqual({
+      id: LayerName.GeoServer,
+      name: "Geoserver",
+      default: false,
+    });
   });
 
-  it("only GeoServer, no summary, WMS true", () => {
-    current = null;
-    const layers = buildMapLayerConfig(
-      {} as any,
-      false,
-      false,
-      true,
-      true,
-      setLast
+  it("builds correct layer config for zarr dataset with spatial extent", () => {
+    const mockCollection = createMockCollection({
+      hasSummaryFeature: true,
+      getDatasetType: () => DatasetType.ZARR,
+      getBBox: () => [0, 0, 1, 1],
+    });
+
+    const result = buildMapLayerConfig(
+      mockCollection,
+      true, // hasSummaryFeature
+      true, // isZarrDataset
+      false, // isWMSAvailable
+      true // hasSpatialExtent
     );
 
-    expect(layers.map((l) => l.id)).toEqual([
-      LayerName.GeoServer,
-      LayerName.SpatialExtent,
-    ]);
-    expect(layers[0].default).toBe(true);
-    expect(layers[1].default).toBe(false);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({
+      id: LayerName.SpatialExtent,
+      name: "Spatial Extent",
+      default: true, // Should be set to true as it's the only layer
+    });
   });
 
-  it("only SpatialExtent, no summary, no WMS, has extent", () => {
-    current = null;
-    const layers = buildMapLayerConfig(
-      {} as any,
-      false,
-      false,
-      false,
-      true,
-      setLast
+  it("sets first layer as default when no layer has default set to true", () => {
+    const mockCollection = createMockCollection({
+      getBBox: () => [0, 0, 1, 1],
+    });
+
+    const result = buildMapLayerConfig(
+      mockCollection,
+      false, // hasSummaryFeature
+      false, // isZarrDataset
+      false, // isWMSAvailable (no WMS, no hexbin -> spatial extent should be available)
+      true // hasSpatialExtent
     );
 
-    expect(layers.map((l) => l.id)).toEqual([LayerName.SpatialExtent]);
-    expect(layers[0].default).toBe(true);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({
+      id: LayerName.SpatialExtent,
+      name: "Spatial Extent",
+      default: true, // Should be set to true as it's the only layer
+    });
   });
 
-  it("Zarr, cloud optimized plus GeoServer", () => {
-    current = null;
-    const layers = buildMapLayerConfig(
-      {} as any,
-      true,
-      true,
-      true,
-      true,
-      setLast
+  it("builds layer config with multiple layers and correct defaults", () => {
+    const mockCollection = createMockCollection({
+      getBBox: () => [0, 0, 1, 1],
+    });
+
+    const result = buildMapLayerConfig(
+      mockCollection,
+      true, // hasSummaryFeature
+      false, // isZarrDataset
+      true, // isWMSAvailable
+      true // hasSpatialExtent
     );
 
-    expect(layers.map((l) => l.id)).toEqual([
-      LayerName.GeoServer,
-      LayerName.SpatialExtent,
-    ]);
-    expect(layers[0].default).toBe(true);
-    expect(layers[1].default).toBe(false);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({
+      id: LayerName.Hexbin,
+      name: "Hex Grid",
+      default: true,
+    });
+    expect(result[1]).toEqual({
+      id: LayerName.GeoServer,
+      name: "Geoserver",
+      default: false, // Not default because hexbin is available
+    });
   });
 });
