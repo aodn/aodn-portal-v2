@@ -469,40 +469,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             // Need update if value diff, this is used to avoid duplicate call to useEffect
             map.setLayoutProperty(titleLayerId, "visibility", targetVis);
           }
-          // Only fetch layer fields when visibility actually changes
-          if (visible) {
-            setMapLoading?.(true);
-            const layerName = config.urlParams.LAYERS?.join(",") || "";
-
-            // Check subsetting support - only fetch fields if we have a valid layer name
-            if (layerName && layerName.trim() !== "") {
-              const request: MapFeatureRequest = {
-                uuid: config.uuid || "",
-                layerName: layerName,
-              };
-              dispatch(fetchGeoServerMapFields(request))
-                .unwrap()
-                .then((value) => {
-                  const foundDatetime = value.find(
-                    (v) => v.type === "dateTime"
-                  );
-                  const foundGeo = value.find(
-                    (v) => v.type === "geometrypropertytype"
-                  );
-                  setTimeSliderSupport?.(foundDatetime !== undefined);
-                  setDrawRectSupportSupport?.(foundGeo !== undefined);
-                  onWFSAvailabilityChange?.(true);
-                })
-                .catch(() => {})
-                .finally(() => setMapLoading?.(false));
-            } else {
-              // If no valid layer name, just set loading to false and assume no subsetting support
-              setTimeSliderSupport?.(false);
-              setDrawRectSupportSupport?.(false);
-              onWFSAvailabilityChange?.(false);
-              setMapLoading?.(false);
-            }
-          }
         }
       });
     }
@@ -552,8 +518,16 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
         dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
           .unwrap()
-          .then(() => {
+          .then((value) => {
             // Successfully fetched fields, loading is complete
+            const foundDatetime = value.find(
+              (v) => v.type === "dateTime" || v.type === "date"
+            );
+            const foundGeo = value.find(
+              (v) => v.type === "geometrypropertytype"
+            );
+            setTimeSliderSupport?.(foundDatetime !== undefined);
+            setDrawRectSupportSupport?.(foundGeo !== undefined);
             setIsFetchingWmsLayers(false);
           })
           .catch((error: ErrorResponse) => {
@@ -618,7 +592,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     enableGeoServerWhiteList,
     handleWmsLayerChange,
     onWMSAvailabilityChange,
+    setDrawRectSupportSupport,
     setMapLoading,
+    setTimeSliderSupport,
   ]);
 
   return (
