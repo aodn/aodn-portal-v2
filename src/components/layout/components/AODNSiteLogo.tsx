@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Divider, Link, Typography } from "@mui/material";
 import IMOS from "@/assets/logos/imos_logo_with_title.png";
 import {
   fontColor,
@@ -16,6 +16,7 @@ import {
   AODN_SITE_LOGO_HEIGHT_MOBILE,
 } from "../constant";
 import rc8Theme from "../../../styles/themeRC8";
+import { pageDefault } from "../../common/constants";
 
 const AODNSiteLogo = () => {
   const { isMobile } = useBreakpoint();
@@ -28,14 +29,20 @@ const AODNSiteLogo = () => {
         alignItems: "center",
         justifyContent: "center",
         height: isMobile ? AODN_SITE_LOGO_HEIGHT_MOBILE : AODN_SITE_LOGO_HEIGHT,
+        minWidth: "320px",
       }}
     >
       <Box
+        component={"a"}
         sx={{
           cursor: "pointer",
           height: "100%",
         }}
-        onClick={() => openInNewTab("https://imos.org.au/")}
+        href={"https://imos.org.au/"}
+        onClick={(e) => {
+          e.preventDefault();
+          openInNewTab("https://imos.org.au/");
+        }}
       >
         <img
           src={IMOS}
@@ -59,11 +66,19 @@ const AODNSiteLogo = () => {
           my: "6px",
         }}
       />
-      <Box
+      <Link
         sx={{
           cursor: "pointer",
+          textDecoration: "none",
+          "&:hover": {
+            textDecoration: "none",
+          },
         }}
-        onClick={() => redirectHome("AODNSiteLogo", true)}
+        href={pageDefault.landing}
+        onClick={(e) => {
+          e.preventDefault();
+          redirectHome("AODNSiteLogo", true);
+        }}
       >
         <Typography
           textAlign="left"
@@ -81,7 +96,7 @@ const AODNSiteLogo = () => {
           Australian Ocean <br />
           Data Network
         </Typography>
-      </Box>
+      </Link>
     </Box>
   );
 };
