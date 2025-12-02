@@ -53,7 +53,7 @@ const DataList: React.FC<DataListProps> = ({
     <>
       <CollapseItem titleComponent={linkTitleComponent(index, link)} isOpen>
         {link.description && (
-          <ExpandableTextArea text={link.description} isExpandable isCopyable />
+          <ExpandableTextArea text={link.description} isExpandable />
         )}
       </CollapseItem>
     </>

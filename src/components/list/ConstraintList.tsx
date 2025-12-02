@@ -26,6 +26,7 @@ const ConstraintList: React.FC<ConstraintListProps> = ({
             text={line}
             key={index}
             lineClampConfig={{ default: 4, mobile: 3, tablet: 3 }}
+            isCopyable
           />
         ))}
       </CollapseItem>
