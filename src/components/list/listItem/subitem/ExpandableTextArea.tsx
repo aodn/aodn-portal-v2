@@ -39,7 +39,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   text,
   isExpandable = false,
   isCopyable = false,
-  showCopyOnHover = true,
+  showCopyOnHover = false,
   onClickExpand = () => {},
   showMoreStr = "Show More",
   lineClampConfig = {

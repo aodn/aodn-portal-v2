@@ -38,8 +38,6 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
                 onCopy: () =>
                   trackCustomEvent(AnalyticsEvent.COPY_CITATION_CLICK),
               }}
-              // Set to false to always show copy button
-              showCopyOnHover={false}
             />
           </Stack>
         </ItemBaseGrid>

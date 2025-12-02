@@ -5,6 +5,8 @@ import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
 import rc8Theme from "../../styles/themeRC8";
+import CopyButton from "../common/buttons/CopyButton";
+import { openInNewTab } from "../../utils/LinkUtils";
 
 interface LicenseListProps {
   license?: string;
@@ -24,10 +26,14 @@ const LicenseList: React.FC<LicenseListProps> = ({
   mode = MODE.NORMAL,
 }) => {
   const theme = useTheme();
+
   const licenseComponent = useMemo(() => {
     if (!license && !url && !graphic) {
       return null;
     }
+
+    const licenseCopyContent = `${license} ${url}`;
+
     return (
       <ItemBaseGrid
         container
@@ -54,6 +60,12 @@ const LicenseList: React.FC<LicenseListProps> = ({
               <Link href={url} target="_blank" rel="noreferrer">
                 {url}
               </Link>
+              <CopyButton
+                copyText={licenseCopyContent}
+                copyButtonConfig={{
+                  tooltipText: ["Copy license", "License copied"],
+                }}
+              />
             </Grid>
           )}
           {graphic && (
@@ -64,7 +76,7 @@ const LicenseList: React.FC<LicenseListProps> = ({
         </Grid>
       </ItemBaseGrid>
     );
-  }, [graphic, license, theme.mp.md, url, mode]);
+  }, [license, url, graphic, mode, theme]);
 
   switch (mode) {
     case MODE.COMPACT:
