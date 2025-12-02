@@ -40,7 +40,6 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
               <ExpandableTextArea
                 text={record.abstract}
                 isExpandable
-                isCopyable
                 lineClampConfig={{
                   default: 5,
                   tablet: 4,
