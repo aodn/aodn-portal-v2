@@ -98,6 +98,11 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
                 justifyContent: "flex-end",
                 alignItems: "center",
               }}
+              data-testid={`collapse-btn-${
+                (titleComponent as any)?.props?.link?.title ??
+                title ??
+                "[ NO TITLE ]"
+              }`}
             >
               <CollapseBtn onClick={toggleExpanded} isExpanded={isExpanded} />
             </Grid>
