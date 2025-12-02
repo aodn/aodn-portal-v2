@@ -19,7 +19,10 @@ import {
   PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
   SEARCHBAR_CONTENT_WIDTH,
 } from "../constant";
-import { SEARCHBAR_EXPANSION_WIDTH } from "../../search/constants";
+import {
+  SEARCHBAR_EXPANSION_WIDTH_LAPTOP,
+  SEARCHBAR_EXPANSION_WIDTH_TABLET,
+} from "../../search/constants";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import ShareButtonMenu from "../../menu/ShareButtonMenu";
 import HeaderIconMenu from "./HeaderIconMenu";
@@ -81,6 +84,7 @@ const Header: FC = () => {
           alignItems="center"
           justifyContent="space-between"
           width="100%"
+          sx={{ flex: 1 }}
         >
           <AODNSiteLogo />
           {isMobile && <HeaderIconMenu />}
@@ -91,20 +95,26 @@ const Header: FC = () => {
             display="flex"
             flexDirection="row"
             alignItems="center"
+            justifyContent="right"
             gap={2}
-            minWidth={
-              shouldExpandSearchbar
-                ? isUnderLaptop
-                  ? "auto"
-                  : SEARCHBAR_EXPANSION_WIDTH
-                : "auto"
-            }
+            flex={2}
           >
             {!isMobile && (
               <>
-                <Searchbar
-                  setShouldExpandSearchbar={setShouldExpandSearchbar}
-                />
+                <Box
+                  minWidth={
+                    shouldExpandSearchbar
+                      ? isUnderLaptop
+                        ? SEARCHBAR_EXPANSION_WIDTH_TABLET
+                        : SEARCHBAR_EXPANSION_WIDTH_LAPTOP
+                      : "auto"
+                  }
+                >
+                  <Searchbar
+                    setShouldExpandSearchbar={setShouldExpandSearchbar}
+                  />
+                </Box>
+
                 {!isUnderLaptop && (
                   <ShareButtonMenu
                     hideText
