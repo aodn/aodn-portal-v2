@@ -481,7 +481,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.uuid,
     dispatch,
     map,
-    onWFSAvailabilityChange,
     setDrawRectSupportSupport,
     setMapLoading,
     setTimeSliderSupport,
@@ -497,6 +496,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     setIsFetchingWmsLayers(true);
     onWMSAvailabilityChange?.(true); // Show the loading status again
+    onWFSAvailabilityChange?.(false);
 
     const fetchLayers = () => {
       const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
@@ -529,6 +529,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             setTimeSliderSupport?.(foundDatetime !== undefined);
             setDrawRectSupportSupport?.(foundGeo !== undefined);
             setIsFetchingWmsLayers(false);
+            onWFSAvailabilityChange?.(true);
           })
           .catch((error: ErrorResponse) => {
             if (error.statusCode === 404) {
@@ -573,6 +574,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             } else if (error.statusCode === HttpStatusCode.Unauthorized) {
               // If is not allow likely due to white list, we should set the wms not support to block display WMS layer
               onWMSAvailabilityChange?.(false);
+              onWFSAvailabilityChange?.(false);
             } else {
               console.log("Failed to fetch fields, ok to ignore", error);
             }
@@ -591,6 +593,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     dispatch,
     enableGeoServerWhiteList,
     handleWmsLayerChange,
+    onWFSAvailabilityChange,
     onWMSAvailabilityChange,
     setDrawRectSupportSupport,
     setMapLoading,
