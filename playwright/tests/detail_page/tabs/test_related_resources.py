@@ -19,7 +19,6 @@ from pages.detail_page import DetailPage
         ),
     ],
 )
-@pytest.mark.skip(reason="UI changes needed to fix the test")
 def test_related_resources_sections_in_desktop(
     desktop_page: Page,
     title: str,
@@ -50,19 +49,19 @@ def test_related_resources_sections_in_desktop(
     related_resources.tab.click()
 
     related_resources.sub_records.click()
-    detail_page.get_collapse_item_title(sub_records).click()
+    detail_page.get_collapse_item_button(sub_records).click()
     sub_records_list = related_resources.get_sub_records_list()
     expect(sub_records_list.get_by_text(sub_records_value)).to_be_visible()
 
     related_resources.associated_records.click()
-    detail_page.get_collapse_item_title(associated_records).click()
+    detail_page.get_collapse_item_button(associated_records).click()
     associated_records_list = related_resources.get_associated_records_list()
     expect(
         associated_records_list.get_by_text(associated_records_value)
     ).to_be_visible()
 
     related_resources.parent_record.click()
-    detail_page.get_collapse_item_title(parent_record).click()
+    detail_page.get_collapse_item_button(parent_record).click()
     parent_record_list = related_resources.get_parent_record_list()
     expect(parent_record_list.get_by_text(parent_record_value)).to_be_visible()
 
@@ -82,7 +81,6 @@ def test_related_resources_sections_in_desktop(
         ),
     ],
 )
-@pytest.mark.skip(reason="UI changes needed to fix the test")
 def test_related_resources_sections_in_mobile(
     mobile_page: Page,
     title: str,
@@ -112,16 +110,16 @@ def test_related_resources_sections_in_mobile(
     related_resources = detail_page.tabs.related_resources
     related_resources.tab.click()
 
-    detail_page.get_collapse_item_title(sub_records).click()
+    detail_page.get_collapse_item_button(sub_records).click()
     sub_records_list = related_resources.get_sub_records_list()
     expect(sub_records_list.get_by_text(sub_records_value)).to_be_visible()
 
-    detail_page.get_collapse_item_title(associated_records).click()
+    detail_page.get_collapse_item_button(associated_records).click()
     associated_records_list = related_resources.get_associated_records_list()
     expect(
         associated_records_list.get_by_text(associated_records_value)
     ).to_be_visible()
 
-    detail_page.get_collapse_item_title(parent_record).click()
+    detail_page.get_collapse_item_button(parent_record).click()
     parent_record_list = related_resources.get_parent_record_list()
     expect(parent_record_list.get_by_text(parent_record_value)).to_be_visible()
