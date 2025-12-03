@@ -19,7 +19,7 @@ const DownloadCard: FC = () => {
   const [wfsLinks, wmsLinks] = useMemo(() => {
     const wfsLinks = collection?.getWFSLinks() || [];
     const wmsLinks = collection?.getWMSLinks() || [];
-    return [wfsLinks, wmsLinks, hasSummaryFeature];
+    return [wfsLinks, wmsLinks];
   }, [collection]);
 
   const downloadCard = useMemo(() => {
