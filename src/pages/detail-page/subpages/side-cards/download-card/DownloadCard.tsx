@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo } from "react";
+import { FC, useMemo } from "react";
 import { useDetailPageContext } from "../../../context/detail-page-context";
 import DownloadWFSCard from "./components/DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./components/DownloadCloudOptimisedCard";
@@ -14,34 +14,13 @@ const DownloadCard: FC = () => {
     removeDownloadCondition,
     selectedWmsLayer,
     downloadService,
-    setDownloadService,
   } = useDetailPageContext();
 
-  const [wfsLinks, wmsLinks, hasSummaryFeature] = useMemo(() => {
+  const [wfsLinks, wmsLinks] = useMemo(() => {
     const wfsLinks = collection?.getWFSLinks() || [];
     const wmsLinks = collection?.getWMSLinks() || [];
-    const hasSummaryFeature = collection?.hasSummaryFeature() || false;
-    return [wfsLinks, wmsLinks, hasSummaryFeature];
+    return [wfsLinks, wmsLinks];
   }, [collection]);
-
-  useEffect(() => {
-    if (collection && downloadService) {
-      if (hasSummaryFeature) {
-        setDownloadService(DownloadServiceType.CloudOptimised);
-      } else if (wfsLinks.length > 0 && selectedWmsLayer) {
-        setDownloadService(DownloadServiceType.WFS);
-      } else {
-        setDownloadService(DownloadServiceType.Unavailable);
-      }
-    }
-  }, [
-    collection,
-    downloadService,
-    hasSummaryFeature,
-    selectedWmsLayer,
-    setDownloadService,
-    wfsLinks,
-  ]);
 
   const downloadCard = useMemo(() => {
     if (!collection) return null;

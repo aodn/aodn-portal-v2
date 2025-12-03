@@ -136,7 +136,7 @@ export const buildMapLayerConfig = (
         id: LayerName.GeoServer,
         name: "Geoserver",
         // If hexbin is supported, then geoserver is not default
-        default: isSupportHexbin ? false : true,
+        default: !isSupportHexbin,
       };
       layers.push(l);
     }
@@ -177,7 +177,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   // Need to init with null as collection value can be undefined when it entered this component.
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
-  const [isWFSAvailable, setIsWFSAvailable] = useState<boolean>(false);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
@@ -364,16 +363,19 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
 
   const onWFSAvailabilityChange = useCallback(
     (isWFSAvailable: boolean) => {
-      setIsWFSAvailable(isWFSAvailable);
-      if (downloadService === DownloadServiceType.WFS) {
-        if (isWFSAvailable) {
-          setDownloadService(DownloadServiceType.WFS);
+      // Strong preference on cloud optimized data, if collection have it
+      // then always use it regardless of what WFS told us.
+      setDownloadService((type) => {
+        if (type !== DownloadServiceType.CloudOptimised) {
+          return isWFSAvailable
+            ? DownloadServiceType.WFS
+            : DownloadServiceType.Unavailable;
         } else {
-          setDownloadService(DownloadServiceType.Unavailable);
+          return type;
         }
-      }
+      });
     },
-    [downloadService, setDownloadService]
+    [setDownloadService]
   );
 
   const handleBaseMapSwitch = useCallback(
@@ -402,6 +404,19 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       return v;
     });
   }, [mapLayerConfig, setLastSelectedMapLayer]);
+
+  useEffect(() => {
+    // Set the type of download based on simple  in collection, the value
+    // may change by callback if more info available
+    const wfsLinks = collection?.getWFSLinks() || [];
+    if (hasSummaryFeature) {
+      setDownloadService(DownloadServiceType.CloudOptimised);
+    } else if (wfsLinks.length > 0) {
+      setDownloadService(DownloadServiceType.WFS);
+    } else {
+      setDownloadService(DownloadServiceType.Unavailable);
+    }
+  }, [collection, hasSummaryFeature, setDownloadService]);
 
   return (
     collection && (

@@ -469,40 +469,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             // Need update if value diff, this is used to avoid duplicate call to useEffect
             map.setLayoutProperty(titleLayerId, "visibility", targetVis);
           }
-          // Only fetch layer fields when visibility actually changes
-          if (visible) {
-            setMapLoading?.(true);
-            const layerName = config.urlParams.LAYERS?.join(",") || "";
-
-            // Check subsetting support - only fetch fields if we have a valid layer name
-            if (layerName && layerName.trim() !== "") {
-              const request: MapFeatureRequest = {
-                uuid: config.uuid || "",
-                layerName: layerName,
-              };
-              dispatch(fetchGeoServerMapFields(request))
-                .unwrap()
-                .then((value) => {
-                  const foundDatetime = value.find(
-                    (v) => v.type === "dateTime"
-                  );
-                  const foundGeo = value.find(
-                    (v) => v.type === "geometrypropertytype"
-                  );
-                  setTimeSliderSupport?.(foundDatetime !== undefined);
-                  setDrawRectSupportSupport?.(foundGeo !== undefined);
-                  onWFSAvailabilityChange?.(true);
-                })
-                .catch(() => {})
-                .finally(() => setMapLoading?.(false));
-            } else {
-              // If no valid layer name, just set loading to false and assume no subsetting support
-              setTimeSliderSupport?.(false);
-              setDrawRectSupportSupport?.(false);
-              onWFSAvailabilityChange?.(false);
-              setMapLoading?.(false);
-            }
-          }
         }
       });
     }
@@ -515,7 +481,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.uuid,
     dispatch,
     map,
-    onWFSAvailabilityChange,
     setDrawRectSupportSupport,
     setMapLoading,
     setTimeSliderSupport,
@@ -531,6 +496,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     setIsFetchingWmsLayers(true);
     onWMSAvailabilityChange?.(true); // Show the loading status again
+    onWFSAvailabilityChange?.(false);
 
     const fetchLayers = () => {
       const wmsLinksOptions = formWmsLinkOptions(collection?.getWMSLinks());
@@ -552,9 +518,18 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
         dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
           .unwrap()
-          .then(() => {
+          .then((value) => {
             // Successfully fetched fields, loading is complete
+            const foundDatetime = value.find(
+              (v) => v.type === "dateTime" || v.type === "date"
+            );
+            const foundGeo = value.find(
+              (v) => v.type === "geometrypropertytype"
+            );
+            setTimeSliderSupport?.(foundDatetime !== undefined);
+            setDrawRectSupportSupport?.(foundGeo !== undefined);
             setIsFetchingWmsLayers(false);
+            onWFSAvailabilityChange?.(true);
           })
           .catch((error: ErrorResponse) => {
             if (error.statusCode === 404) {
@@ -599,6 +574,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             } else if (error.statusCode === HttpStatusCode.Unauthorized) {
               // If is not allow likely due to white list, we should set the wms not support to block display WMS layer
               onWMSAvailabilityChange?.(false);
+              onWFSAvailabilityChange?.(false);
             } else {
               console.log("Failed to fetch fields, ok to ignore", error);
             }
@@ -617,8 +593,11 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     dispatch,
     enableGeoServerWhiteList,
     handleWmsLayerChange,
+    onWFSAvailabilityChange,
     onWMSAvailabilityChange,
+    setDrawRectSupportSupport,
     setMapLoading,
+    setTimeSliderSupport,
   ]);
 
   return (
