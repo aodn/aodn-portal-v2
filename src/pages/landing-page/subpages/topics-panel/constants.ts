@@ -26,6 +26,7 @@ import iconPlankton from "@/assets/topics-panel-icons/icon_plankton.png";
 import iconOceanColor from "@/assets/topics-panel-icons/icon_ocean_color.png";
 import iconBenthic from "@/assets/topics-panel-icons/icon_benthic.png";
 import iconTimeSeriesDatasets from "@/assets/topics-panel-icons/icon_time_series_datasets.png";
+import iconReef from "@/assets/topics-panel-icons/icon_reef.png";
 
 import { TopicCardType } from "./TopicCard";
 
@@ -125,6 +126,11 @@ export const TOPICS_CARDS: TopicCardType[] = [
   {
     title: "Fisheries",
     icon: iconFisheries,
+  },
+  {
+    title: "Reef",
+    icon: iconReef,
+    searchKey: "National Reef Monitoring Network",
   },
   {
     title: "Industry",

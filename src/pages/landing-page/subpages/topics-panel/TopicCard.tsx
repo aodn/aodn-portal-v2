@@ -7,6 +7,7 @@ import rc8Theme from "../../../../styles/themeRC8";
 export interface TopicCardType {
   title: string;
   icon: string;
+  searchKey?: string;
 }
 
 interface TopicCardProps {
@@ -32,7 +33,7 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
       sx={{
         cursor: "pointer",
       }}
-      onClick={() => handleClick(cardData.title)}
+      onClick={() => handleClick(cardData.searchKey || cardData.title)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
