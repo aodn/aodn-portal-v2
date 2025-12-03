@@ -12,7 +12,14 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
   titleComponent,
 }) => {
   return (
-    <Grid item container xs={12} data-testid={`collapse-item-${text}`}>
+    <Grid
+      item
+      container
+      xs={12}
+      data-testid={
+        text && text.length > 0 ? `collapse-item-${text}` : undefined
+      }
+    >
       {titleComponent ? (
         titleComponent
       ) : (

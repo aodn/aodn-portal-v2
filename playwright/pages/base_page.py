@@ -102,6 +102,10 @@ class BasePage:
         """Returns the given collapse item title"""
         return self.page.get_by_test_id(f'collapse-item-{title}')
 
+    def get_collapse_item_button(self, title: str) -> Locator:
+        """Returns the given collapse item button"""
+        return self.page.get_by_test_id(f'collapse-btn-{title}')
+
     def scroll_to_bottom(self) -> None:
         """Scroll to the bottom of the page"""
         execute_common_js(self.page, 'scrollToBottom')
