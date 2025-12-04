@@ -438,13 +438,12 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                 .setLngLat(event.lngLat)
                 .setDOMContent(popupContainer)
                 .addTo(map);
-            }, 100);
+            }, 0);
           }
         })
-        .catch((err) => {
+        .catch(() => {
           // Clean up any existing popups on error
           cleanPopup();
-          console.error("Popup:", err);
         });
     };
 
