@@ -12,7 +12,7 @@ interface DocumentListProps {
 
 const INFO_TIP_CONTENT = {
   title: "Information",
-  body: "References to documents available on external sites that provide supporting or related content.<br> <br> All efforts have been taken to logically group the links found in the metadata record. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
+  body: "References to documents available that provide supporting or related content.",
 };
 
 const DocumentList: React.FC<DocumentListProps> = ({
