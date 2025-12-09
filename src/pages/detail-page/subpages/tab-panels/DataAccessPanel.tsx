@@ -210,7 +210,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
           isLoading={false}
           AIGenContent={{
             title: "Link Grouped",
-            body: "The data access links are grouped by AI models into a better structure.",
+            body: "The data related links are grouped by AI models into a better structure. <br><br> The data related links are grouped by AI models into a better structure. If you believe an entry to incorrectly grouped please contact us at info@aodn.org.au",
           }}
         />
       );
