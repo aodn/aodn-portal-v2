@@ -6,6 +6,7 @@ import NotFoundPage from "../pages/NotFoundPage";
 import ErrorPage from "../pages/ErrorPage";
 import ErrorBoundary from "./ErrorBoundary";
 import { pageDefault } from "../components/common/constants";
+import SearchRedirect from "./SearchRedirect";
 
 const router = createBrowserRouter([
   {
@@ -21,7 +22,7 @@ const router = createBrowserRouter([
     path: pageDefault.search,
     element: (
       <ErrorBoundary>
-        <SearchPage />
+        <SearchRedirect />
       </ErrorBoundary>
     ),
     children: [],
