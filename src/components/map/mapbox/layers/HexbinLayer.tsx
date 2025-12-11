@@ -52,7 +52,7 @@ interface HexbinLayerProps extends LayerBasicType {
   filterEndDate?: dayjs.Dayjs;
 }
 
-const createFilteredFeatures = (
+export const createFilteredFeatures = (
   featureCollection?: FeatureCollection<Point>,
   filterStartDate?: dayjs.Dayjs,
   filterEndDate?: dayjs.Dayjs
@@ -69,7 +69,10 @@ const createFilteredFeatures = (
         [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
         true
       );
-      return date.isAfter(filterStartDate) && date.isBefore(filterEndDate);
+      return (
+        (date.isSame(filterStartDate) || date.isAfter(filterStartDate)) &&
+        (date.isSame(filterEndDate) || date.isBefore(filterEndDate))
+      );
     });
 
     return {
@@ -83,7 +86,7 @@ const createFilteredFeatures = (
         [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
         true
       );
-      return date.isAfter(filterStartDate);
+      return date.isSame(filterStartDate) || date.isAfter(filterStartDate);
     });
 
     return {
@@ -97,7 +100,7 @@ const createFilteredFeatures = (
         [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
         true
       );
-      return date.isBefore(filterStartDate);
+      return date.isSame(filterEndDate) || date.isBefore(filterEndDate);
     });
 
     return {
