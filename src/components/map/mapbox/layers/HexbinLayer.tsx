@@ -52,6 +52,63 @@ interface HexbinLayerProps extends LayerBasicType {
   filterEndDate?: dayjs.Dayjs;
 }
 
+const createFilteredFeatures = (
+  featureCollection?: FeatureCollection<Point>,
+  filterStartDate?: dayjs.Dayjs,
+  filterEndDate?: dayjs.Dayjs
+) => {
+  // TODO: In long run should move it to ogcapi
+  if (!featureCollection) {
+    return undefined;
+  }
+
+  if (filterStartDate !== undefined && filterEndDate !== undefined) {
+    const filteredFeatures = featureCollection.features?.filter((feature) => {
+      const date = dayjs(
+        feature.properties?.date,
+        [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+        true
+      );
+      return date.isAfter(filterStartDate) && date.isBefore(filterEndDate);
+    });
+
+    return {
+      ...featureCollection,
+      features: filteredFeatures,
+    };
+  } else if (filterStartDate !== undefined) {
+    const filteredFeatures = featureCollection.features?.filter((feature) => {
+      const date = dayjs(
+        feature.properties?.date,
+        [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+        true
+      );
+      return date.isAfter(filterStartDate);
+    });
+
+    return {
+      ...featureCollection,
+      features: filteredFeatures,
+    };
+  } else if (filterEndDate !== undefined) {
+    const filteredFeatures = featureCollection.features?.filter((feature) => {
+      const date = dayjs(
+        feature.properties?.date,
+        [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+        true
+      );
+      return date.isBefore(filterStartDate);
+    });
+
+    return {
+      ...featureCollection,
+      features: filteredFeatures,
+    };
+  } else {
+    return featureCollection;
+  }
+};
+
 const HexbinLayer: FC<HexbinLayerProps> = ({
   featureCollection,
   filterStartDate,
@@ -62,58 +119,11 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
   const popupRef = useRef<Popup | null>();
   const overlayRef = useRef<MapboxOverlay | null>();
 
-  const filteredFeatureCollection = useMemo(() => {
-    // TODO: In long run should move it to ogcapi
-    if (!featureCollection) {
-      return undefined;
-    }
-
-    if (filterStartDate !== undefined && filterEndDate !== undefined) {
-      const filteredFeatures = featureCollection.features?.filter((feature) => {
-        const date = dayjs(
-          feature.properties?.date,
-          [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
-          true
-        );
-        return date.isAfter(filterStartDate) && date.isBefore(filterEndDate);
-      });
-
-      return {
-        ...featureCollection,
-        features: filteredFeatures,
-      };
-    } else if (filterStartDate !== undefined) {
-      const filteredFeatures = featureCollection.features?.filter((feature) => {
-        const date = dayjs(
-          feature.properties?.date,
-          [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
-          true
-        );
-        return date.isAfter(filterStartDate);
-      });
-
-      return {
-        ...featureCollection,
-        features: filteredFeatures,
-      };
-    } else if (filterEndDate !== undefined) {
-      const filteredFeatures = featureCollection.features?.filter((feature) => {
-        const date = dayjs(
-          feature.properties?.date,
-          [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
-          true
-        );
-        return date.isBefore(filterStartDate);
-      });
-
-      return {
-        ...featureCollection,
-        features: filteredFeatures,
-      };
-    } else {
-      return featureCollection;
-    }
-  }, [featureCollection, filterEndDate, filterStartDate]);
+  const filteredFeatureCollection = useMemo(
+    () =>
+      createFilteredFeatures(featureCollection, filterStartDate, filterEndDate),
+    [featureCollection, filterEndDate, filterStartDate]
+  );
 
   const createLayer = useCallback(
     (map: Map) =>
