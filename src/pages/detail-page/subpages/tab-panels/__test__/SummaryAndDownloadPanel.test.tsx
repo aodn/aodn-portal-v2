@@ -305,4 +305,22 @@ describe("buildMapLayerConfig", () => {
       default: false, // Not default because hexbin is available
     });
   });
+
+  it("returns empty array when no layers are available (no preview mode)", () => {
+    const mockCollection = createMockCollection({
+      hasSummaryFeature: false, // no hexbin
+      getDatasetType: () => undefined, // not zarr
+      getBBox: () => undefined, // no spatial extent
+    });
+    const result = buildMapLayerConfig(
+      mockCollection,
+      false, // hasSummaryFeature = false → no hexbin
+      false, // isZarrDataset = false
+      false, // isWMSAvailable = false
+      false // hasSpatialExtent = false
+    );
+    // Should return empty array (no layers available)
+    expect(result).toEqual([]);
+    expect(result.length).toBe(0);
+  });
 });
