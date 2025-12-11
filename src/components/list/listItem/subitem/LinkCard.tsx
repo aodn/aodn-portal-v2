@@ -123,7 +123,7 @@ const LinkCard: FC<LinkCardProps> = ({
                 ...rc8Theme.typography.title1Medium,
                 color: rc8Theme.palette.primary.main,
                 padding: 0,
-                overflowWrap: "break-word",
+                overflowWrap: "anywhere",
                 display: "inline",
               }}
             >
