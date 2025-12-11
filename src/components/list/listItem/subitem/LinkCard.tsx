@@ -119,6 +119,7 @@ const LinkCard: FC<LinkCardProps> = ({
             }}
           >
             <Typography
+              component="span"
               sx={{
                 ...rc8Theme.typography.title1Medium,
                 color: rc8Theme.palette.primary.main,

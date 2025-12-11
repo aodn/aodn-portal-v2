@@ -121,7 +121,6 @@ const DepthSlider: FC<DepthSliderProps> = memo(() => {
       </Grid>
       <Grid item xs={3} sx={{ height: CONTAINER_HEIGHT }}>
         <PlainSlider
-          is_vertical
           getAriaLabel={() => "depth"}
           orientation="vertical"
           defaultValue={DEFAULT_VALUES}

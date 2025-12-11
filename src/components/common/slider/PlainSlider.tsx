@@ -1,5 +1,6 @@
-import { Slider, SliderProps, styled } from "@mui/material";
 import rc8Theme from "../../../styles/themeRC8";
+import { Slider, SliderProps, styled } from "@mui/material";
+import { useMemo } from "react";
 
 interface PlainSliderProps extends SliderProps {
   is_vertical?: boolean;
@@ -9,17 +10,20 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
   theme,
   is_vertical = false,
 }) => {
-  const labelPositioning = {
-    top: is_vertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
-    left: is_vertical ? "calc(100% + 25px)" : "50%",
-    transform: is_vertical ? "none" : "translateX(-50%)",
-  };
+  const [labelPositioning, labelPositioningMobile] = useMemo(() => {
+    const labelPositioning = {
+      top: is_vertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
+      left: is_vertical ? "calc(100% + 25px)" : "50%",
+      transform: is_vertical ? "none" : "translateX(-50%)",
+    };
 
-  const labelPositioningMobile = {
-    [theme.breakpoints.down("md")]: {
-      top: is_vertical ? "calc(100% + 1px)" : "-30px",
-    },
-  };
+    const labelPositioningMobile = {
+      [theme.breakpoints.down("md")]: {
+        top: is_vertical ? "calc(100% + 1px)" : "-30px",
+      },
+    };
+    return [labelPositioning, labelPositioningMobile];
+  }, [is_vertical, theme.breakpoints]);
 
   return {
     "& .MuiSlider-valueLabel": {
