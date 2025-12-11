@@ -151,7 +151,10 @@ export const buildMapLayerConfig = (
     }
 
     // Check if we have assigned any default, if no set the first one is default
-    if (layers.find((l) => l.default === true) === undefined) {
+    if (
+      layers.length > 0 &&
+      layers.find((l) => l.default === true) === undefined
+    ) {
       layers[0].default = true;
     }
   }
@@ -193,7 +196,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const abstract =
       collection?.getEnhancedDescription() || collection?.description || "";
     const hasSummaryFeature = collection?.hasSummaryFeature() || false;
-    const hasSpatialExtent = !!collection?.getBBox();
+    const bbox = collection?.getBBox();
+    const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
     const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
     const noMapPreview =
       downloadService === DownloadServiceType.Unavailable && !hasSpatialExtent;
