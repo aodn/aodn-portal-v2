@@ -1,4 +1,4 @@
-import { FC, useCallback, useContext, useEffect, useRef } from "react";
+import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { HexagonLayer } from "@deck.gl/aggregation-layers";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
@@ -10,6 +10,8 @@ import { Color } from "@deck.gl/core";
 import { TestHelper } from "../../../common/test/helper";
 import { MapDefaultConfig } from "../constants";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
+import dayjs from "dayjs";
+import { dateDefault } from "../../../common/constants";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
@@ -45,10 +47,73 @@ const createHexagonLayer = (
   });
 };
 
-const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
+interface HexbinLayerProps extends LayerBasicType {
+  filterStartDate?: dayjs.Dayjs;
+  filterEndDate?: dayjs.Dayjs;
+}
+
+const HexbinLayer: FC<HexbinLayerProps> = ({
+  featureCollection,
+  filterStartDate,
+  filterEndDate,
+  visible,
+}) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>();
   const overlayRef = useRef<MapboxOverlay | null>();
+
+  const filteredFeatureCollection = useMemo(() => {
+    // TODO: In long run should move it to ogcapi
+    if (!featureCollection) {
+      return undefined;
+    }
+
+    if (filterStartDate !== undefined && filterEndDate !== undefined) {
+      const filteredFeatures = featureCollection.features?.filter((feature) => {
+        const date = dayjs(
+          feature.properties?.date,
+          [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+          true
+        );
+        return date.isAfter(filterStartDate) && date.isBefore(filterEndDate);
+      });
+
+      return {
+        ...featureCollection,
+        features: filteredFeatures,
+      };
+    } else if (filterStartDate !== undefined) {
+      const filteredFeatures = featureCollection.features?.filter((feature) => {
+        const date = dayjs(
+          feature.properties?.date,
+          [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+          true
+        );
+        return date.isAfter(filterStartDate);
+      });
+
+      return {
+        ...featureCollection,
+        features: filteredFeatures,
+      };
+    } else if (filterEndDate !== undefined) {
+      const filteredFeatures = featureCollection.features?.filter((feature) => {
+        const date = dayjs(
+          feature.properties?.date,
+          [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+          true
+        );
+        return date.isBefore(filterStartDate);
+      });
+
+      return {
+        ...featureCollection,
+        features: filteredFeatures,
+      };
+    } else {
+      return featureCollection;
+    }
+  }, [featureCollection, filterEndDate, filterStartDate]);
 
   const createLayer = useCallback(
     (map: Map) =>
@@ -135,20 +200,20 @@ const HexbinLayer: FC<LayerBasicType> = ({ featureCollection, visible }) => {
     return () => {
       cleanup();
     };
-  }, [createLayer, featureCollection, map]);
+  }, [createLayer, map]);
 
   useEffect(() => {
     // Update the data on change
-    if (featureCollection && overlayRef.current) {
+    if (filteredFeatureCollection && overlayRef.current) {
       overlayRef.current?.setProps({
-        layers: [createHexagonLayer(featureCollection, visible)],
+        layers: [createHexagonLayer(filteredFeatureCollection, visible)],
       });
     }
     if (popupRef.current) {
       popupRef.current.remove();
       popupRef.current = null;
     }
-  }, [featureCollection, visible]);
+  }, [filteredFeatureCollection, visible]);
 
   return (
     <TestHelper

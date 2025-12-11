@@ -293,47 +293,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     return [conditionStart, conditionEnd];
   }, [downloadConditions]);
 
-  const filteredFeatureCollection = useMemo(() => {
-    // TODO: In long run should move it to ogcapi
-    if (!featureCollection) {
-      return undefined;
-    }
-
-    if (filterStartDate !== undefined && filterEndDate !== undefined) {
-      const filteredFeatures = featureCollection.features?.filter((feature) => {
-        const date = dayjs(feature.properties?.date, dateDefault.DATE_FORMAT);
-        return date.isAfter(filterStartDate) && date.isBefore(filterEndDate);
-      });
-
-      return {
-        ...featureCollection,
-        features: filteredFeatures,
-      };
-    } else if (filterStartDate !== undefined) {
-      const filteredFeatures = featureCollection.features?.filter((feature) => {
-        const date = dayjs(feature.properties?.date, dateDefault.DATE_FORMAT);
-        return date.isAfter(filterStartDate);
-      });
-
-      return {
-        ...featureCollection,
-        features: filteredFeatures,
-      };
-    } else if (filterEndDate !== undefined) {
-      const filteredFeatures = featureCollection.features?.filter((feature) => {
-        const date = dayjs(feature.properties?.date, dateDefault.DATE_FORMAT);
-        return date.isBefore(filterStartDate);
-      });
-
-      return {
-        ...featureCollection,
-        features: filteredFeatures,
-      };
-    } else {
-      return featureCollection;
-    }
-  }, [featureCollection, filterEndDate, filterStartDate]);
-
   const handleMapChange = useCallback(
     (event: MapEvent | undefined) => {
       // implement later
@@ -520,7 +479,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     // but hide it with visible = false
                   }
                   <HexbinLayer
-                    featureCollection={filteredFeatureCollection}
+                    featureCollection={featureCollection}
+                    filterStartDate={filterStartDate}
+                    filterEndDate={filterEndDate}
                     visible={lastSelectedMapLayer?.id === LayerName.Hexbin}
                   />
                   <GeoServerLayer
