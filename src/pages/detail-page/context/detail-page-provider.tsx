@@ -21,6 +21,7 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import { CloudOptimizedFeature } from "../../../components/common/store/CloudOptimizedDefinitions";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -35,7 +36,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     undefined
   );
   const [features, setFeatures] = useState<
-    FeatureCollection<Point> | undefined
+    FeatureCollection<Point, CloudOptimizedFeature> | undefined
   >(undefined);
   const [isCollectionNotFound, setIsCollectionNotFound] =
     useState<boolean>(false);

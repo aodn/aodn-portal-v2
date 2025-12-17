@@ -36,6 +36,9 @@ import {
   MapFieldResponse,
   MapLayerResponse,
 } from "./GeoserverDefinitions";
+import dayjs from "dayjs";
+import { dateDefault } from "../constants";
+import { CloudOptimizedFeature } from "./CloudOptimizedDefinitions";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -295,13 +298,26 @@ const fetchResultByUuidNoStore = createAsyncThunk<
 );
 
 const fetchFeaturesByUuid = createAsyncThunk<
-  FeatureCollection<Point>,
+  FeatureCollection<Point, CloudOptimizedFeature>,
   string,
   { rejectValue: ErrorResponse }
 >("search/fetchDatasetByUuid", async (id: string, thunkApi: any) =>
   ogcAxiosWithRetry
     .get<FeatureCollection<Point>>(`/ogc/collections/${id}/items/summary`)
-    .then((response) => response.data)
+    .then((response) => ({
+      ...response.data,
+      features: response.data.features.map((feature: any) => ({
+        ...feature,
+        properties: {
+          ...feature.properties,
+          timestamp: dayjs(
+            feature.properties?.date,
+            [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+            true
+          ).valueOf(),
+        },
+      })),
+    }))
     .catch(errorHandling(thunkApi))
 );
 

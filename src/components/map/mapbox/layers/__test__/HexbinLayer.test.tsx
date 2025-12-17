@@ -1,24 +1,47 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { createFilteredFeatures } from "../HexbinLayer";
+import { Feature, Point } from "geojson";
+import { CloudOptimizedFeature } from "../../../../common/store/CloudOptimizedDefinitions";
+import { dateDefault } from "../../../../common/constants";
 
-const mockFeature = (date: string) => ({
+const mockFeature = (date: Dayjs): Feature<Point, CloudOptimizedFeature> => ({
   type: "Feature" as const,
   geometry: { type: "Point" as const, coordinates: [0, 0] },
-  properties: { date },
+  properties: { date: date.toISOString(), timestamp: date.valueOf(), count: 0 },
 });
 
-const mockCollection = (dates: string[]) => ({
+const mockCollection = (dates: Dayjs[]) => ({
   type: "FeatureCollection" as const,
   features: dates.map(mockFeature),
 });
 
 describe("HexbinLayer - createFilteredFeatures", () => {
   const fc = mockCollection([
-    "2023-01-15",
-    "2023-06-20",
-    "2024-01-01",
-    "2024-12-31",
-    "2025-03",
+    dayjs(
+      "2023-01-15",
+      [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+      true
+    ),
+    dayjs(
+      "2023-06-20",
+      [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+      true
+    ),
+    dayjs(
+      "2024-01-01",
+      [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+      true
+    ),
+    dayjs(
+      "2024-12-31",
+      [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+      true
+    ),
+    dayjs(
+      "2025-03",
+      [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+      true
+    ),
   ]);
 
   it("returns undefined when no collection", () => {
