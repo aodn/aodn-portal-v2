@@ -312,7 +312,7 @@ const fetchFeaturesByUuid = createAsyncThunk<
           ...feature.properties,
           timestamp: dayjs(
             feature.properties?.date,
-            [dateDefault.DATE_FORMAT, dateDefault.DATE_YEAR_MONTH_FORMAT],
+            [dateDefault.DATE_YEAR_MONTH_FORMAT, dateDefault.DATE_FORMAT],
             true
           ).valueOf(),
         },
