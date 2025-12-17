@@ -10,11 +10,14 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import { CloudOptimizedFeature } from "../../../components/common/store/CloudOptimizedDefinitions";
 
 export interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
-  featureCollection: FeatureCollection<Point> | undefined;
+  featureCollection:
+    | FeatureCollection<Point, CloudOptimizedFeature>
+    | undefined;
   isCollectionNotFound: boolean;
   downloadConditions: IDownloadCondition[];
   getAndSetDownloadConditions: (
@@ -35,7 +38,9 @@ export interface DetailPageContextType {
 const DetailPageContextDefault = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
-  featureCollection: {} as FeatureCollection<Point> | undefined,
+  featureCollection: {} as
+    | FeatureCollection<Point, CloudOptimizedFeature>
+    | undefined,
   isCollectionNotFound: false,
   downloadConditions: [],
   getAndSetDownloadConditions: () => [],

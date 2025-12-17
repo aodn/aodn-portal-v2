@@ -7,9 +7,9 @@ import * as turf from "@turf/turf";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
-export interface LayerBasicType {
+export interface LayerBasicType<P = GeoJsonProperties> {
   // Tile layer should added to map
-  featureCollection?: FeatureCollection<Point>;
+  featureCollection?: FeatureCollection<Point, P>;
   // Event fired when user click on the point layer
   onClickMapPoint?: (uuids: Array<string>) => void;
   // dataset that user selected from result list or map
