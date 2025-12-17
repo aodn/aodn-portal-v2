@@ -122,7 +122,7 @@ const ReactMap = memo(
           minZoom: minZoom,
           maxZoom: maxZoom,
           testMode: import.meta.env.MODE === "dev",
-          attributionControl: false,
+          attributionControl: true,
           localIdeographFontFamily:
             "'Open Sans', 'Open Sans CJK SC', sans-serif",
         });
@@ -136,13 +136,6 @@ const ReactMap = memo(
               .querySelector(".mapboxgl-ctrl-scale");
             if (scaleElement) {
               (scaleElement as HTMLElement).style.display = "none";
-            }
-            // Remove logo after map loads
-            const logoElement = newMap
-              .getContainer()
-              .querySelector(".mapboxgl-ctrl-logo");
-            if (logoElement) {
-              (logoElement as HTMLElement).style.display = "none";
             }
           }, 0)
         );
