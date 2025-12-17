@@ -43,7 +43,7 @@ const renderStatusButton = (
     return (
       <ResultCardButton
         startIcon={TaskAltSharpIcon}
-        text={"Completed"}
+        text="Completed"
         shouldHideText={shouldHideText}
         resultCardButtonConfig={resultCardButtonConfig}
       />
@@ -53,7 +53,7 @@ const renderStatusButton = (
     return (
       <ResultCardButton
         startIcon={DoubleArrowIcon}
-        text={"On Going"}
+        text="On Going"
         resultCardButtonConfig={{
           ...resultCardButtonConfig,
           color: color.success.main,
@@ -110,7 +110,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
         {links && (
           <ResultCardButton
             startIcon={LinkIcon}
-            text={"Data Access"}
+            text="Data Access"
             shouldHideText={shouldHideText}
             onClick={onLinks}
             resultCardButtonConfig={resultCardButtonConfig}
