@@ -1,4 +1,4 @@
-import { FC, useCallback, useContext, useEffect, useRef } from "react";
+import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { HexagonLayer } from "@deck.gl/aggregation-layers";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
@@ -12,6 +12,7 @@ import { MapDefaultConfig } from "../constants";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 import dayjs from "dayjs";
 import { CloudOptimizedFeature } from "../../../common/store/CloudOptimizedDefinitions";
+import _ from "lodash";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
@@ -51,17 +52,15 @@ interface HexbinLayerProps extends LayerBasicType<CloudOptimizedFeature> {
   filterStartDate?: dayjs.Dayjs;
   filterEndDate?: dayjs.Dayjs;
 }
-
+// Use binary tree lookup the start and end point, data is assume sorted by timestamp asc
 export const createFilteredFeatures = (
   featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>,
   filterStartDate?: dayjs.Dayjs,
   filterEndDate?: dayjs.Dayjs
 ) => {
-  if (!featureCollection?.features) return undefined;
+  if (!featureCollection?.features?.length) return featureCollection;
 
   const features = featureCollection.features;
-  if (features.length === 0) return featureCollection;
-
   const startTs = filterStartDate?.valueOf();
   const endTs = filterEndDate?.valueOf();
   const hasStart = startTs !== undefined;
@@ -69,12 +68,36 @@ export const createFilteredFeatures = (
 
   if (!hasStart && !hasEnd) return featureCollection;
 
-  const filteredFeatures = features.filter((feature) => {
-    const ts = feature.properties.timestamp;
-    return (!hasStart || ts >= startTs) && (!hasEnd || ts <= endTs);
-  });
+  const dummy = { properties: { timestamp: 0 } };
+
+  let startIdx = 0;
+  if (hasStart) {
+    dummy.properties.timestamp = startTs!;
+    startIdx = _.sortedIndexBy(features, dummy, "properties.timestamp");
+  }
+
+  let endIdx = features.length;
+  if (hasEnd) {
+    dummy.properties.timestamp = endTs!;
+    endIdx = _.sortedLastIndexBy(features, dummy, "properties.timestamp");
+  }
+
+  const filteredFeatures = features.slice(startIdx, endIdx);
 
   return { ...featureCollection, features: filteredFeatures };
+};
+
+export const createSortedFeatures = (
+  featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>
+) => {
+  const sortedFeatures = featureCollection?.features.sort(
+    (a, b) => a.properties.timestamp - b.properties.timestamp
+  );
+
+  return {
+    ...featureCollection,
+    features: sortedFeatures,
+  } as FeatureCollection<Point, CloudOptimizedFeature>;
 };
 
 const HexbinLayer: FC<HexbinLayerProps> = ({
@@ -86,6 +109,10 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>();
   const overlayRef = useRef<MapboxOverlay | null>();
+  // Sort it to make later lookup faster
+  const sortedFeatureCollection = useMemo<
+    FeatureCollection<Point, CloudOptimizedFeature>
+  >(() => createSortedFeatures(featureCollection), [featureCollection]);
 
   const createLayer = useCallback(
     (map: Map) =>
@@ -178,7 +205,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
     // Update the data on change
     if (overlayRef.current) {
       const features = createFilteredFeatures(
-        featureCollection,
+        sortedFeatureCollection,
         filterStartDate,
         filterEndDate
       );
@@ -190,7 +217,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       popupRef.current.remove();
       popupRef.current = null;
     }
-  }, [featureCollection, filterEndDate, filterStartDate, visible]);
+  }, [sortedFeatureCollection, filterEndDate, filterStartDate, visible]);
 
   return (
     <TestHelper

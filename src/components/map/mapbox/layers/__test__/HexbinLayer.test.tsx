@@ -16,6 +16,7 @@ const mockCollection = (dates: Dayjs[]) => ({
 });
 
 describe("HexbinLayer - createFilteredFeatures", () => {
+  // The createFilteredFeature function assume data sorted by timestamp asc !!!
   const fc = mockCollection([
     dayjs(
       "2023-01-15",
