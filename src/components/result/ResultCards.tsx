@@ -5,7 +5,7 @@ import {
   DEFAULT_SEARCH_PAGE_SIZE,
   FULL_LIST_PAGE_SIZE,
 } from "../common/store/searchReducer";
-import useTabNavigation from "../../hooks/useTabNavigation";
+import useTabNavigation, { OpenType } from "../../hooks/useTabNavigation";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
@@ -19,9 +19,9 @@ import { detailPageDefault, pageReferer } from "../common/constants";
 export interface ResultCardBasicType {
   content?: OGCCollection;
   onClickCard?: (item: OGCCollection | undefined) => void;
-  onClickDetail?: (uuid: string) => void;
-  onClickDownload?: (uuid: string) => void;
-  onClickLinks?: (uuid: string) => void;
+  onClickDetail?: (uuid: string, type?: OpenType) => void;
+  onClickDownload?: (uuid: string, type?: OpenType) => void;
+  onClickLinks?: (uuid: string, type?: OpenType) => void;
   selectedUuid?: string;
   sx?: SxProps;
   isSimplified?: boolean;
@@ -209,37 +209,42 @@ const ResultCards: FC<ResultCardsProps> = ({
   );
 
   const onClickBtnDetail = useCallback(
-    (uuid: string) => {
+    (uuid: string, type: OpenType | undefined) => {
       onClickDetail?.(uuid);
       goToDetailPage(
         uuid,
         detailPageDefault.SUMMARY,
-        pageReferer.SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
       );
     },
     [goToDetailPage, onClickDetail]
   );
 
   const onClickBtnDownload = useCallback(
-    (uuid: string) => {
+    (uuid: string, type: OpenType | undefined) => {
       onClickDownload?.(uuid);
       goToDetailPage(
         uuid,
         detailPageDefault.SUMMARY,
         pageReferer.SEARCH_PAGE_REFERER,
-        "download-section"
+        "download-section",
+        type
       );
     },
     [goToDetailPage, onClickDownload]
   );
 
   const onClickBtnLinks = useCallback(
-    (uuid: string) => {
+    (uuid: string, type: OpenType | undefined) => {
       onClickLinks?.(uuid);
       goToDetailPage(
         uuid,
         detailPageDefault.DATA_ACCESS,
-        pageReferer.SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
       );
     },
     [goToDetailPage, onClickLinks]

@@ -2,17 +2,18 @@ import {
   ElementType,
   FC,
   isValidElement,
+  MouseEvent,
   ReactNode,
+  useCallback,
   useMemo,
   useState,
-  MouseEvent,
-  useCallback,
 } from "react";
 import { Button, MenuItem, SxProps, Tooltip, Typography } from "@mui/material";
 import { color, padding } from "../../../styles/constants";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import rc8Theme from "../../../styles/themeRC8";
 import Menu from "@mui/material/Menu";
+import { OpenType } from "../../../hooks/useTabNavigation";
 
 export enum ResultCardButtonSize {
   SMALL = "small",
@@ -30,13 +31,13 @@ interface ResultCardButtonProps {
   shouldHideText?: boolean;
   sx?: SxProps;
   text?: string | null;
-  onClick?: () => void;
+  onClick?: (type: OpenType | undefined) => void;
 }
 
-enum OPEN_TYPE {
-  TAB = 1,
-  WINDOW = 2,
-}
+const buttonStyles = {
+  ...rc8Theme.typography.body2Regular,
+  color: rc8Theme.palette.primary1,
+};
 
 // Memoize font sizes for performance
 const fontSizes = {
@@ -79,9 +80,9 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   }, []);
 
   const handleClick = useCallback(
-    (e: MouseEvent<HTMLElement>) => {
+    (e: MouseEvent<HTMLElement>, type: OpenType) => {
       handleClose(e);
-      onClick?.();
+      onClick?.(type);
     },
     [handleClose, onClick]
   );
@@ -90,20 +91,21 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     <>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem
-          sx={{
-            ...rc8Theme.typography.body2Regular,
-            color: rc8Theme.palette.primary1,
-          }}
-          onClick={handleClick}
+          sx={buttonStyles}
+          onClick={(e) => handleClick(e, OpenType.TAB)}
         >
           Open in new tab..
         </MenuItem>
-        {/* Add more items */}
+        <MenuItem
+          sx={buttonStyles}
+          onClick={(e) => handleClick(e, OpenType.WINDOW)}
+        >
+          Open in new window..
+        </MenuItem>
       </Menu>
       <Button
-        component={onClick ? "button" : "span"}
         onContextMenu={onClick ? handleContextMenu : undefined}
-        onClick={onClick}
+        onClick={() => onClick?.(undefined)}
         disabled={disabled}
         sx={{
           p: 0,
@@ -137,10 +139,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
             pl={padding.extraSmall}
             mt={-0.5}
             whiteSpace="nowrap"
-            sx={{
-              ...rc8Theme.typography.body2Regular,
-              color: rc8Theme.palette.primary1,
-            }}
+            sx={buttonStyles}
             data-testid={`result-card-button-${text}`}
           >
             {text}

@@ -2,18 +2,30 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { pageDefault } from "../components/common/constants";
 
+export enum OpenType {
+  TAB = "TAB",
+  WINDOW = "WINDOW",
+}
+
 export type TabNavigation = (
   uuid: string,
   tab: string,
   referer: string,
-  section?: string
+  section?: string,
+  type?: OpenType
 ) => void;
 
 const useTabNavigation = () => {
   const navigate = useNavigate();
 
   return useCallback<TabNavigation>(
-    (uuid: string, tab: string, referer: string, section?: string) => {
+    (
+      uuid: string,
+      tab: string,
+      referer: string,
+      section?: string,
+      type?: OpenType
+    ) => {
       const searchParams = new URLSearchParams();
 
       // Add tab parameter
@@ -24,12 +36,32 @@ const useTabNavigation = () => {
         searchParams.set("section", section);
       }
 
-      // Navigate to the constructed URL
-      navigate(`${pageDefault.details}/${uuid}?${searchParams.toString()}`, {
-        state: {
-          referer: referer,
-        },
-      });
+      switch (type) {
+        case OpenType.TAB:
+          window.open(
+            `${pageDefault.details}/${uuid}?${searchParams.toString()}`,
+            "_blank"
+          );
+          break;
+        case OpenType.WINDOW:
+          window.open(
+            `${pageDefault.details}/${uuid}?${searchParams.toString()}`,
+            "_blank",
+            "width=800,height=600"
+          );
+          break;
+        default:
+          // Navigate to the constructed URL
+          navigate(
+            `${pageDefault.details}/${uuid}?${searchParams.toString()}`,
+            {
+              state: {
+                referer: referer,
+              },
+            }
+          );
+          break;
+      }
     },
     [navigate]
   );

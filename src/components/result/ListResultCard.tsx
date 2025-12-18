@@ -22,15 +22,16 @@ import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { LIST_CARD_TITLE_HEIGHT } from "./constants";
 import rc8Theme from "../../styles/themeRC8";
+import { OpenType } from "../../hooks/useTabNavigation";
 
 interface ListResultCardProps extends ResultCardBasicType {}
 
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
   content,
-  onClickCard = () => {},
-  onClickDetail = () => {},
-  onClickLinks = () => {},
+  onClickCard = undefined,
+  onClickDetail = undefined,
+  onClickLinks = undefined,
   onClickDownload = undefined,
   selectedUuid,
   isSimplified = false,
@@ -91,7 +92,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
               }}
               title={
                 <Typography
-                  onClick={() => onClickDetail(uuid)}
+                  onClick={() => onClickDetail?.(uuid)}
                   variant="title1Medium"
                   color={rc8Theme.palette.text1}
                   title={title}
@@ -143,7 +144,9 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   color={rc8Theme.palette.text2}
                   arial-label="result-list-card-content"
                   onClick={() =>
-                    isSimplified ? onClickDetail(uuid) : onClickCard(content)
+                    isSimplified
+                      ? onClickDetail?.(uuid)
+                      : onClickCard?.(content)
                   }
                   sx={{
                     minHeight: 90,
@@ -206,13 +209,18 @@ const ListResultCard: FC<ListResultCardProps> = ({
                 <ResultCardButtonGroup
                   content={content}
                   shouldHideText={isSimplified}
-                  onLinks={() => onClickLinks(uuid)}
+                  onLinks={(type: OpenType | undefined) =>
+                    onClickLinks?.(uuid, type)
+                  }
                   onDownload={
                     onClickDownload
-                      ? () => onClickDownload(uuid)
-                      : onClickDownload
+                      ? (type: OpenType | undefined) =>
+                          onClickDownload(uuid, type)
+                      : undefined
                   }
-                  onDetail={() => onClickDetail(uuid)}
+                  onDetail={(type: OpenType | undefined) =>
+                    onClickDetail?.(uuid, type)
+                  }
                 />
               </CardActions>
             </Box>
