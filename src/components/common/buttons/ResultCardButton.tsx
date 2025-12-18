@@ -82,7 +82,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   const handleClick = useCallback(
     (e: MouseEvent<HTMLElement>, type: OpenType) => {
       handleClose(e);
-      onClick?.(type);
+      setTimeout(() => onClick?.(type), 0);
     },
     [handleClose, onClick]
   );
