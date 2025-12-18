@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material";
-import { TabNavigation } from "../../../../hooks/useTabNavigation";
+import { OpenType, TabNavigation } from "../../../../hooks/useTabNavigation";
 import {
   fontColor,
   fontSize,
@@ -39,7 +39,7 @@ const mapContainerId = "card-popup-map-container";
 
 const CardPopup: React.FC<CardPopupProps> = ({
   layerId,
-  tabNavigation = () => {},
+  tabNavigation = undefined,
 }) => {
   const { map } = useContext(MapContext);
   const dispatch = useAppDispatch();
@@ -48,29 +48,35 @@ const CardPopup: React.FC<CardPopupProps> = ({
   const [content, setContent] = useState<OGCCollection>(new OGCCollection());
 
   const onLinks = useCallback(
-    (collection: OGCCollection) =>
-      tabNavigation(
+    (collection: OGCCollection, type: OpenType | undefined) =>
+      tabNavigation?.(
         collection.id,
         detailPageDefault.DATA_ACCESS,
-        pageReferer.SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
       ),
     [tabNavigation]
   );
   const onDownload = useCallback(
-    (collection: OGCCollection) =>
-      tabNavigation(
+    (collection: OGCCollection, type: OpenType | undefined) =>
+      tabNavigation?.(
         collection.id,
         detailPageDefault.SUMMARY,
-        pageReferer.SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
       ),
     [tabNavigation]
   );
   const onDetail = useCallback(
-    (collection: OGCCollection) =>
-      tabNavigation(
+    (collection: OGCCollection, type: OpenType | undefined) =>
+      tabNavigation?.(
         collection.id,
         detailPageDefault.SUMMARY,
-        pageReferer.SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
       ),
     [tabNavigation]
   );
@@ -258,13 +264,13 @@ const CardPopup: React.FC<CardPopupProps> = ({
             <ResultCardButtonGroup
               content={content}
               isGridView
-              onLinks={() => onLinks(content)}
+              onLinks={(type: OpenType | undefined) => onLinks(content, type)}
               onDownload={
                 content.hasSummaryFeature()
-                  ? () => onDownload(content)
+                  ? (type: OpenType | undefined) => onDownload(content, type)
                   : undefined
               }
-              onDetail={() => onDetail(content)}
+              onDetail={(type: OpenType | undefined) => onDetail(content, type)}
             />
           )}
         </CardContent>
