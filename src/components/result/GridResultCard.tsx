@@ -20,14 +20,15 @@ import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import rc8Theme from "../../styles/themeRC8";
+import { OpenType } from "../../hooks/useTabNavigation";
 
 interface GridResultCardProps extends ResultCardBasicType {}
 
 const GridResultCard: FC<GridResultCardProps> = ({
   content,
-  onClickCard = () => {},
-  onClickDetail = () => {},
-  onClickLinks = () => {},
+  onClickCard = undefined,
+  onClickDetail = undefined,
+  onClickLinks = undefined,
   onClickDownload = undefined,
   selectedUuid,
   isSimplified = false,
@@ -73,7 +74,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
 
       <CardActionArea
         onClick={() =>
-          isSimplified ? onClickDetail(uuid) : onClickCard(content)
+          isSimplified ? onClickDetail?.(uuid) : onClickCard?.(content)
         }
       >
         <Box
@@ -118,7 +119,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         )}
 
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea onClick={() => onClickDetail(uuid)}>
+          <CardActionArea onClick={() => onClickDetail?.(uuid)}>
             <Box
               display="flex"
               alignItems="center"
@@ -164,11 +165,17 @@ const GridResultCard: FC<GridResultCardProps> = ({
               content={content}
               shouldHideText
               isGridView
-              onLinks={() => onClickLinks(uuid)}
-              onDownload={
-                onClickDownload ? () => onClickDownload(uuid) : onClickDownload
+              onLinks={(type: OpenType | undefined) =>
+                onClickLinks?.(uuid, type)
               }
-              onDetail={() => onClickDetail(uuid)}
+              onDownload={
+                onClickDownload
+                  ? (type: OpenType | undefined) => onClickDownload(uuid, type)
+                  : undefined
+              }
+              onDetail={(type: OpenType | undefined) =>
+                onClickDetail?.(uuid, type)
+              }
             />
           )}
         </Stack>

@@ -11,14 +11,15 @@ import ResultCardButton, {
   ResultCardButtonConfig,
 } from "../common/buttons/ResultCardButton";
 import { color } from "../../styles/constants";
+import { OpenType } from "../../hooks/useTabNavigation";
 
 interface ResultCardButtonGroupProps {
   content: OGCCollection;
   isGridView?: boolean;
   shouldHideText?: boolean;
-  onLinks?: () => void;
-  onDownload?: () => void;
-  onDetail?: () => void;
+  onLinks?: (type: OpenType | undefined) => void;
+  onDownload?: (type: OpenType | undefined) => void;
+  onDetail?: (type: OpenType | undefined) => void;
   resultCardButtonConfig?: ResultCardButtonConfig;
 }
 
@@ -43,7 +44,7 @@ const renderStatusButton = (
     return (
       <ResultCardButton
         startIcon={TaskAltSharpIcon}
-        text={"Completed"}
+        text="Completed"
         shouldHideText={shouldHideText}
         resultCardButtonConfig={resultCardButtonConfig}
       />
@@ -53,7 +54,7 @@ const renderStatusButton = (
     return (
       <ResultCardButton
         startIcon={DoubleArrowIcon}
-        text={"On Going"}
+        text="On Going"
         resultCardButtonConfig={{
           ...resultCardButtonConfig,
           color: color.success.main,
@@ -93,7 +94,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   content,
   isGridView,
   shouldHideText = false,
-  onLinks = () => {},
+  onLinks = undefined,
   onDownload = undefined,
   onDetail = undefined,
   resultCardButtonConfig,
@@ -110,7 +111,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
         {links && (
           <ResultCardButton
             startIcon={LinkIcon}
-            text={"Data Access"}
+            text="Data Access"
             shouldHideText={shouldHideText}
             onClick={onLinks}
             resultCardButtonConfig={resultCardButtonConfig}

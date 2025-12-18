@@ -13,7 +13,7 @@ import Map from "../../map/mapbox/Map";
 import Layers from "../../map/mapbox/layers/Layers";
 import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
 import BookmarkButton from "../../bookmark/BookmarkButton";
-import { TabNavigation } from "../../../hooks/useTabNavigation";
+import { OpenType, TabNavigation } from "../../../hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "../constants";
 import FitToSpatialExtentsLayer from "../../map/mapbox/layers/FitToSpatialExtentsLayer";
 
@@ -36,29 +36,35 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   sx,
 }) => {
   const onLinks = useCallback(
-    () =>
+    (type: OpenType | undefined) =>
       tabNavigation(
         collection.id,
         detailPageDefault.DATA_ACCESS,
-        pageReferer.SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
       ),
     [collection.id, tabNavigation]
   );
   const onDownload = useCallback(
-    () =>
+    (type: OpenType | undefined) =>
       tabNavigation(
         collection.id,
         detailPageDefault.SUMMARY,
-        pageReferer.SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
       ),
     [collection.id, tabNavigation]
   );
   const onDetail = useCallback(
-    () =>
+    (type: OpenType | undefined) =>
       tabNavigation(
         collection.id,
         detailPageDefault.SUMMARY,
-        pageReferer.SEARCH_PAGE_REFERER
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
       ),
     [collection.id, tabNavigation]
   );
