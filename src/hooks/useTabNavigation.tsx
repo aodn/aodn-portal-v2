@@ -15,7 +15,7 @@ export type TabNavigation = (
   type?: OpenType
 ) => void;
 
-const useTabNavigation = () => {
+const useTabNavigation = (): TabNavigation => {
   const navigate = useNavigate();
 
   return useCallback<TabNavigation>(

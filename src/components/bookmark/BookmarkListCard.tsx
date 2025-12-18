@@ -6,7 +6,7 @@ import Layers from "../map/mapbox/layers/Layers";
 import GeojsonLayer from "../map/mapbox/layers/GeojsonLayer";
 import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
 import { padding } from "../../styles/constants";
-import { TabNavigation } from "../../hooks/useTabNavigation";
+import { OpenType, TabNavigation } from "../../hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "../common/constants";
 import rc8Theme from "../../styles/themeRC8";
 import FitToSpatialExtentsLayer from "../map/mapbox/layers/FitToSpatialExtentsLayer";
@@ -22,14 +22,21 @@ interface BookmarkListCardProps extends BookmarkListCardType {
 
 const BookmarkListCard: FC<BookmarkListCardProps> = ({
   dataset,
-  tabNavigation = () => {},
+  tabNavigation = undefined,
   sx,
 }) => {
   const mapContainerId = `bookmark-list-map-${dataset.id}`;
   const handleNavigation = useCallback(
-    (tab: string) => () =>
-      tabNavigation(dataset.id, tab, pageReferer.SEARCH_PAGE_REFERER),
-    [dataset.id, tabNavigation]
+    (uuid: string, tab: string, type: OpenType | undefined) => {
+      tabNavigation?.(
+        uuid,
+        tab,
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
+      );
+    },
+    [tabNavigation]
   );
 
   return (
@@ -65,13 +72,18 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
         <ResultCardButtonGroup
           content={dataset}
           isGridView
-          onLinks={handleNavigation(detailPageDefault.DATA_ACCESS)}
+          onLinks={(type: OpenType | undefined) =>
+            handleNavigation(dataset.id, detailPageDefault.DATA_ACCESS, type)
+          }
           onDownload={
             dataset.hasSummaryFeature()
-              ? handleNavigation(detailPageDefault.SUMMARY)
+              ? (type: OpenType | undefined) =>
+                  handleNavigation(dataset.id, detailPageDefault.SUMMARY, type)
               : undefined
           }
-          onDetail={handleNavigation(detailPageDefault.SUMMARY)}
+          onDetail={(type: OpenType | undefined) =>
+            handleNavigation(dataset.id, detailPageDefault.SUMMARY, type)
+          }
         />
 
         <Tooltip title="More detail..." placement="top">
