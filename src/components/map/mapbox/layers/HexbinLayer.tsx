@@ -52,7 +52,7 @@ interface HexbinLayerProps extends LayerBasicType<CloudOptimizedFeature> {
   filterStartDate?: dayjs.Dayjs;
   filterEndDate?: dayjs.Dayjs;
 }
-// Use binary tree lookup the start and end point, data is assume sorted by timestamp asc
+// Use binary tree lookup the start and end point, data is assumed sorted by timestamp asc
 export const createFilteredFeatures = (
   featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>,
   filterStartDate?: dayjs.Dayjs,
