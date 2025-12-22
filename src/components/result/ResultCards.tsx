@@ -178,7 +178,7 @@ const ResultCards: FC<ResultCardsProps> = ({
   selectedUuids,
 }) => {
   const { isUnderLaptop } = useBreakpoint();
-  const goToDetailPage = useTabNavigation();
+  const tabNavigation = useTabNavigation();
   const { fetchRecord } = useFetchData();
 
   const [count, total] = useMemo(() => {
@@ -211,7 +211,7 @@ const ResultCards: FC<ResultCardsProps> = ({
   const onClickBtnDetail = useCallback(
     (uuid: string, type: OpenType | undefined) => {
       onClickDetail?.(uuid);
-      goToDetailPage(
+      tabNavigation(
         uuid,
         detailPageDefault.SUMMARY,
         pageReferer.SEARCH_PAGE_REFERER,
@@ -219,13 +219,13 @@ const ResultCards: FC<ResultCardsProps> = ({
         type
       );
     },
-    [goToDetailPage, onClickDetail]
+    [tabNavigation, onClickDetail]
   );
 
   const onClickBtnDownload = useCallback(
     (uuid: string, type: OpenType | undefined) => {
       onClickDownload?.(uuid);
-      goToDetailPage(
+      tabNavigation(
         uuid,
         detailPageDefault.SUMMARY,
         pageReferer.SEARCH_PAGE_REFERER,
@@ -233,13 +233,13 @@ const ResultCards: FC<ResultCardsProps> = ({
         type
       );
     },
-    [goToDetailPage, onClickDownload]
+    [tabNavigation, onClickDownload]
   );
 
   const onClickBtnLinks = useCallback(
     (uuid: string, type: OpenType | undefined) => {
       onClickLinks?.(uuid);
-      goToDetailPage(
+      tabNavigation(
         uuid,
         detailPageDefault.DATA_ACCESS,
         pageReferer.SEARCH_PAGE_REFERER,
@@ -247,7 +247,7 @@ const ResultCards: FC<ResultCardsProps> = ({
         type
       );
     },
-    [goToDetailPage, onClickLinks]
+    [tabNavigation, onClickLinks]
   );
 
   const renderLoadMoreButton = useCallback(() => {

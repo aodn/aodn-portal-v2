@@ -29,6 +29,7 @@ import BookmarkButton from "../../../bookmark/BookmarkButton";
 import { detailPageDefault, pageReferer } from "../../../common/constants";
 import { MapEventEnum } from "../constants";
 import FitToSpatialExtentsLayer from "../layers/FitToSpatialExtentsLayer";
+import ContextMenu, { ContextMenuRef } from "../../../menu/ContextMenu";
 
 interface CardPopupProps {
   layerId: string;
@@ -46,6 +47,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
   const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
   const panel = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState<OGCCollection>(new OGCCollection());
+  const menuRef = useRef<ContextMenuRef>(null);
 
   const onLinks = useCallback(
     (collection: OGCCollection, type: OpenType | undefined) =>
@@ -225,6 +227,10 @@ const CardPopup: React.FC<CardPopupProps> = ({
             maxHeight: "50%",
           }}
         >
+          <ContextMenu
+            ref={menuRef}
+            onClick={(type: OpenType | undefined) => onDetail(content, type)}
+          />
           <Box position="absolute" sx={{ top: gap.md, right: gap.md }}>
             <BookmarkButton dataset={content} />
           </Box>
@@ -240,6 +246,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
               WebkitLineClamp: "5",
               WebkitBoxOrient: "vertical",
             }}
+            onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
           >
             {content?.title}
           </Typography>

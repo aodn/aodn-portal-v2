@@ -1,4 +1,4 @@
-import { FC, SyntheticEvent, useState } from "react";
+import React, { FC, SyntheticEvent, useRef, useState } from "react";
 import {
   Box,
   Card,
@@ -21,6 +21,7 @@ import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import rc8Theme from "../../styles/themeRC8";
 import { OpenType } from "../../hooks/useTabNavigation";
+import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
 
 interface GridResultCardProps extends ResultCardBasicType {}
 
@@ -35,6 +36,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
   sx,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
+  const menuRef = useRef<ContextMenuRef>(null);
 
   if (!content) return;
   const { id: uuid, title, findIcon, findThumbnail } = content;
@@ -61,6 +63,10 @@ const GridResultCard: FC<GridResultCardProps> = ({
       onMouseLeave={() => setShowButtons(false)}
       data-testid="result-card-grid"
     >
+      <ContextMenu
+        ref={menuRef}
+        onClick={(type: OpenType | undefined) => onClickDetail?.(uuid, type)}
+      />
       <Box
         position="absolute"
         top={gap.lg}
@@ -125,6 +131,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
               alignItems="center"
               arial-label="grid-list-card-title"
               data-testid="grid-card-title"
+              onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
             >
               <Typography
                 variant="title1Medium"

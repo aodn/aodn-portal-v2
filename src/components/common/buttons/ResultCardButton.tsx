@@ -2,18 +2,16 @@ import {
   ElementType,
   FC,
   isValidElement,
-  MouseEvent,
   ReactNode,
-  useCallback,
   useMemo,
-  useState,
+  useRef,
 } from "react";
-import { Button, MenuItem, SxProps, Tooltip, Typography } from "@mui/material";
+import { Button, SxProps, Tooltip, Typography } from "@mui/material";
 import { color, padding } from "../../../styles/constants";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
-import rc8Theme from "../../../styles/themeRC8";
-import Menu from "@mui/material/Menu";
 import { OpenType } from "../../../hooks/useTabNavigation";
+import rc8Theme from "../../../styles/themeRC8";
+import ContextMenu, { ContextMenuRef } from "../../menu/ContextMenu";
 
 export enum ResultCardButtonSize {
   SMALL = "small",
@@ -59,8 +57,8 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   shouldHideText = false,
   disabled = false,
 }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const IconComponent = startIcon as ElementType;
+  const menuRef = useRef<ContextMenuRef>(null);
 
   const [config, size, hasText] = useMemo(() => {
     const config = mergeWithDefaults(defaultConfig, resultCardButtonConfig);
@@ -69,42 +67,13 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     return [config, size, hasText];
   }, [resultCardButtonConfig, shouldHideText, text]);
 
-  const handleContextMenu = useCallback((e: MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    setAnchorEl(e.currentTarget);
-  }, []);
-
-  const handleClose = useCallback((e: MouseEvent<HTMLElement>) => {
-    e.stopPropagation(); // prevent event bubbling trigger other click event.
-    setAnchorEl(null);
-  }, []);
-
-  const handleClick = useCallback(
-    (e: MouseEvent<HTMLElement>, type: OpenType) => {
-      handleClose(e);
-      setTimeout(() => onClick?.(type), 0);
-    },
-    [handleClose, onClick]
-  );
-
   return (
     <>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        <MenuItem
-          sx={buttonStyles}
-          onClick={(e) => handleClick(e, OpenType.TAB)}
-        >
-          Open in new tab..
-        </MenuItem>
-        <MenuItem
-          sx={buttonStyles}
-          onClick={(e) => handleClick(e, OpenType.WINDOW)}
-        >
-          Open in new window..
-        </MenuItem>
-      </Menu>
+      <ContextMenu ref={menuRef} onClick={onClick} sx={buttonStyles} />
       <Button
-        onContextMenu={onClick ? handleContextMenu : undefined}
+        onContextMenu={(e) =>
+          onClick ? menuRef.current?.openContextMenu(e) : undefined
+        }
         onClick={() => onClick?.(undefined)}
         disabled={disabled}
         sx={{
