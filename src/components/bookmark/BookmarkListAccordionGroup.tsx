@@ -50,7 +50,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   hideHead = false,
 }) => {
   const state = getBookmarkList(store.getState());
-  const menuRef = useRef<ContextMenuRef>(null);
+  const menuRef = useRef<Map<string, ContextMenuRef>>(new Map());
 
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
   const [items, setItems] = useState<OGCCollection[]>(() => {
@@ -204,10 +204,18 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               justifyContent="space-between"
               flexWrap="nowrap"
               width="100%"
-              onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
+              onContextMenu={(e) =>
+                menuRef.current?.get(item.id)?.openContextMenu(e)
+              }
             >
               <ContextMenu
-                ref={menuRef}
+                ref={(node) => {
+                  if (node) {
+                    menuRef.current.set(item.id, node);
+                  } else {
+                    menuRef.current.delete(item.id);
+                  }
+                }}
                 onClick={(type: OpenType | undefined) =>
                   onClickBtnDetail(item.id, type)
                 }
