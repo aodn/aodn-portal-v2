@@ -4,10 +4,12 @@ import {
   MouseEvent,
   useCallback,
   useImperativeHandle,
+  useMemo,
   useState,
 } from "react";
 import { MenuItem, SxProps } from "@mui/material";
 import { OpenType } from "../../hooks/useTabNavigation";
+import rc8Theme from "../../styles/themeRC8";
 
 export interface ContextMenuRef {
   openContextMenu: (e: MouseEvent<HTMLElement>) => void; // User call this to open the menu
@@ -21,6 +23,15 @@ interface ContextMenuProps {
 const ContextMenu = forwardRef<ContextMenuRef, ContextMenuProps>(
   ({ onClick, sx }, ref) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const style = useMemo<SxProps>(
+      () =>
+        ({
+          ...sx,
+          ...rc8Theme.typography.body2Regular,
+          color: rc8Theme.palette.primary1,
+        }) as SxProps,
+      [sx]
+    );
 
     const handleClose = useCallback((e: MouseEvent<HTMLElement>) => {
       e.stopPropagation(); // prevent event bubbling trigger other click event.
@@ -44,10 +55,10 @@ const ContextMenu = forwardRef<ContextMenuRef, ContextMenuProps>(
 
     return (
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        <MenuItem sx={sx} onClick={(e) => handleClick(e, OpenType.TAB)}>
+        <MenuItem sx={style} onClick={(e) => handleClick(e, OpenType.TAB)}>
           Open in new tab..
         </MenuItem>
-        <MenuItem sx={sx} onClick={(e) => handleClick(e, OpenType.WINDOW)}>
+        <MenuItem sx={style} onClick={(e) => handleClick(e, OpenType.WINDOW)}>
           Open in new window..
         </MenuItem>
       </Menu>

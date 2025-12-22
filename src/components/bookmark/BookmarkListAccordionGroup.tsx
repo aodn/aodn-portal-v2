@@ -1,4 +1,11 @@
-import { FC, SyntheticEvent, useCallback, useEffect, useState } from "react";
+import {
+  FC,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import StyledAccordion from "../common/accordion/StyledAccordion";
@@ -22,9 +29,11 @@ import {
   EVENT_BOOKMARK,
 } from "../map/mapbox/controls/menu/Definition";
 import BookmarkListHead from "./BookmarkListHead";
-import { TabNavigation } from "../../hooks/useTabNavigation";
+import { OpenType, TabNavigation } from "../../hooks/useTabNavigation";
 import rc8Theme from "../../styles/themeRC8";
 import { CancelIcon } from "../../assets/icons/download/cancel";
+import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
+import { detailPageDefault, pageReferer } from "../common/constants";
 
 export interface BookmarkListAccordionGroupBasicType {
   onDeselectDataset?: () => void;
@@ -41,6 +50,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   hideHead = false,
 }) => {
   const state = getBookmarkList(store.getState());
+  const menuRef = useRef<ContextMenuRef>(null);
 
   // State to store accordion group list, which is the combination of bookmark items and bookmark temporary item
   const [items, setItems] = useState<OGCCollection[]>(() => {
@@ -94,6 +104,18 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
     [onDeselectDataset]
   );
 
+  const onClickBtnDetail = useCallback(
+    (uuid: string, type: OpenType | undefined) => {
+      tabNavigation?.(
+        uuid,
+        detailPageDefault.SUMMARY,
+        pageReferer.SEARCH_PAGE_REFERER,
+        undefined,
+        type
+      );
+    },
+    [tabNavigation]
+  );
   // Update accordion group list by listening bookmark items and bookmark temporary item
   useEffect(() => {
     store.dispatch(initializeBookmarkList());
@@ -182,7 +204,14 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               justifyContent="space-between"
               flexWrap="nowrap"
               width="100%"
+              onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
             >
+              <ContextMenu
+                ref={menuRef}
+                onClick={(type: OpenType | undefined) =>
+                  onClickBtnDetail(item.id, type)
+                }
+              />
               <Box
                 onMouseEnter={() => setHoverOnButton(true)}
                 onMouseLeave={() => setHoverOnButton(false)}
