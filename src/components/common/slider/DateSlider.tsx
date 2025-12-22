@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import dayjs from "dayjs";
+import { Dayjs } from "dayjs";
 import { Grid, Stack, Typography } from "@mui/material";
 import { dateToValue, valueToDate } from "../../../utils/DateUtils";
 import { dateDefault } from "../constants";
@@ -9,10 +9,11 @@ import PlainSlider from "./PlainSlider";
 
 interface DateSliderProps {
   visible?: boolean;
-  currentMinDate: string | undefined;
-  currentMaxDate: string | undefined;
-  minDate: string;
-  maxDate: string;
+  currentMinDate: Dayjs | undefined;
+  currentMaxDate: Dayjs | undefined;
+  minDate: Dayjs;
+  maxDate: Dayjs;
+  optionMidDate?: Date | undefined;
   onDateRangeChange: (
     event: Event | React.SyntheticEvent<Element, Event>,
     value: number | number[]
@@ -29,12 +30,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
   onDateRangeChange,
 }) => {
   const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
-    dateToValue(
-      dayjs(currentMinDate ? currentMinDate : minDate, dateDefault.DATE_FORMAT)
-    ),
-    dateToValue(
-      dayjs(currentMaxDate ? currentMaxDate : maxDate, dateDefault.DATE_FORMAT)
-    ),
+    dateToValue(currentMinDate ? currentMinDate : minDate),
+    dateToValue(currentMaxDate ? currentMaxDate : maxDate),
   ]);
 
   const handleSliderChange = useCallback(
@@ -47,18 +44,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
 
   useEffect(() => {
     const newDateRangeStamp = [
-      dateToValue(
-        dayjs(
-          currentMinDate ? currentMinDate : minDate,
-          dateDefault.DATE_FORMAT
-        )
-      ),
-      dateToValue(
-        dayjs(
-          currentMaxDate ? currentMaxDate : maxDate,
-          dateDefault.DATE_FORMAT
-        )
-      ),
+      dateToValue(currentMinDate ? currentMinDate : minDate),
+      dateToValue(currentMaxDate ? currentMaxDate : maxDate),
     ];
     setDateRangeStamp(newDateRangeStamp);
   }, [currentMinDate, currentMaxDate, minDate, maxDate]);
@@ -104,8 +91,8 @@ const DateSlider: React.FC<DateSliderProps> = ({
           </Typography>
           <PlainSlider
             value={dateRangeStamp}
-            min={dateToValue(dayjs(minDate, dateDefault.DATE_FORMAT))}
-            max={dateToValue(dayjs(maxDate, dateDefault.DATE_FORMAT))}
+            min={dateToValue(minDate)}
+            max={dateToValue(maxDate)}
             onChangeCommitted={(_, value) => onDateRangeChange(_, value)}
             onChange={handleSliderChange}
             valueLabelDisplay="auto"
@@ -144,7 +131,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
             color: rc8Theme.palette.text1,
           }}
         >
-          {dayjs(minDate).format(dateDefault.DISPLAY_FORMAT)}
+          {minDate.format(dateDefault.DISPLAY_FORMAT)}
         </Typography>
         <Typography
           sx={{
@@ -152,7 +139,7 @@ const DateSlider: React.FC<DateSliderProps> = ({
             color: rc8Theme.palette.text1,
           }}
         >
-          {dayjs(maxDate).format(dateDefault.DISPLAY_FORMAT)}
+          {maxDate.format(dateDefault.DISPLAY_FORMAT)}
         </Typography>
       </Grid>
     </Grid>

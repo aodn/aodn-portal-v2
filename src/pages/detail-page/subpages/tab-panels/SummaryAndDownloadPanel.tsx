@@ -449,8 +449,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       )}
                       menu={
                         <DateRange
-                          minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
-                          maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
+                          minDate={minDateStamp}
+                          maxDate={maxDateStamp}
                           getAndSetDownloadConditions={
                             getAndSetDownloadConditions
                           }

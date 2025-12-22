@@ -9,7 +9,7 @@ import {
 import { ControlProps } from "./Definition";
 import { Box, IconButton } from "@mui/material";
 import { switcherIconButtonSx } from "./MenuControl";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { dateDefault } from "../../../../common/constants";
 import { TimeRangeIcon } from "../../../../../assets/icons/map/time_range";
 import DateSlider from "../../../../common/slider/DateSlider";
@@ -17,8 +17,8 @@ import { TimeRangeTooltipIcon } from "../../../../../assets/icons/map/tooltip_ti
 import MenuTooltip from "./MenuTooltip";
 
 interface DateRangeControlProps extends ControlProps {
-  minDate: string;
-  maxDate: string;
+  minDate: Dayjs;
+  maxDate: Dayjs;
   getAndSetDownloadConditions: (
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
@@ -38,10 +38,10 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   const [open, setOpen] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const anchorRef = useRef(null);
-  const [currentMinDate, setCurrentMinDate] = useState<string | undefined>(
+  const [currentMinDate, setCurrentMinDate] = useState<Dayjs | undefined>(
     undefined
   );
-  const [currentMaxDate, setCurrentMaxDate] = useState<string | undefined>(
+  const [currentMaxDate, setCurrentMaxDate] = useState<Dayjs | undefined>(
     undefined
   );
 
@@ -67,10 +67,10 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       dateRangeStamps: number | number[]
     ) => {
       const d = dateRangeStamps as number[];
-      const start = dayjs(d[0]).format(dateDefault.DATE_FORMAT);
-      const end = dayjs(d[1]).format(dateDefault.DATE_FORMAT);
+      const start = dayjs(d[0]);
+      const end = dayjs(d[1]);
 
-      if (minDate === start && maxDate === end) {
+      if (minDate.isSame(start) && maxDate.isSame(end)) {
         const prev = getAndSetDownloadConditions(
           DownloadConditionType.DATE_RANGE,
           []
@@ -83,8 +83,8 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       } else {
         const dateRangeCondition = new DateRangeCondition(
           DownloadConditionType.DATE_RANGE,
-          start,
-          end,
+          start.format(dateDefault.DATE_FORMAT),
+          end.format(dateDefault.DATE_FORMAT),
           () => {
             setCurrentMinDate(undefined);
             setCurrentMaxDate(undefined);
@@ -106,8 +106,8 @@ const DateRange: React.FC<DateRangeControlProps> = ({
     ) as DateRangeCondition[];
     if (dateTime && dateTime.length !== 0) {
       setOpen(true);
-      const start = dayjs(dateTime[0].start).format(dateDefault.DATE_FORMAT);
-      const end = dayjs(dateTime[0].end).format(dateDefault.DATE_FORMAT);
+      const start = dayjs(dateTime[0].start);
+      const end = dayjs(dateTime[0].end);
       setCurrentMinDate(start ?? undefined);
       setCurrentMaxDate(end ?? undefined);
     }
