@@ -14,7 +14,7 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import { FC, SyntheticEvent, useState } from "react";
+import React, { FC, SyntheticEvent, useRef, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
@@ -23,6 +23,7 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { LIST_CARD_TITLE_HEIGHT } from "./constants";
 import rc8Theme from "../../styles/themeRC8";
 import { OpenType } from "../../hooks/useTabNavigation";
+import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
 
 interface ListResultCardProps extends ResultCardBasicType {}
 
@@ -38,6 +39,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
   sx,
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
+  const menuRef = useRef<ContextMenuRef>(null);
 
   if (content) {
     const { id: uuid, title, description, findIcon, findThumbnail } = content;
@@ -69,6 +71,10 @@ const ListResultCard: FC<ListResultCardProps> = ({
         onMouseLeave={() => setShowButtons(false)}
         data-testid="result-card-list"
       >
+        <ContextMenu
+          ref={menuRef}
+          onClick={(type: OpenType | undefined) => onClickDetail?.(uuid, type)}
+        />
         <Box position="absolute" top={gap.md} right={gap.md}>
           <BookmarkButton dataset={content} />
         </Box>
@@ -107,6 +113,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     alignItems: "flex-start",
                   }}
                   data-testid="result-card-title"
+                  onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
                 >
                   <Tooltip title={title} arrow>
                     <>{title}</>

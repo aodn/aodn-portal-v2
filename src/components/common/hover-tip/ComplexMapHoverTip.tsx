@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useRef } from "react";
 import { OGCCollection } from "../store/OGCCollectionDefinitions";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import {
@@ -16,6 +16,7 @@ import BookmarkButton from "../../bookmark/BookmarkButton";
 import { OpenType, TabNavigation } from "../../../hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "../constants";
 import FitToSpatialExtentsLayer from "../../map/mapbox/layers/FitToSpatialExtentsLayer";
+import ContextMenu, { ContextMenuRef } from "../../menu/ContextMenu";
 
 interface BasicMapHoverTipProps {
   content?: string | undefined | null;
@@ -35,6 +36,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   tabNavigation = () => {},
   sx,
 }) => {
+  const menuRef = useRef<ContextMenuRef>(null);
   const onLinks = useCallback(
     (type: OpenType | undefined) =>
       tabNavigation(
@@ -72,7 +74,11 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   return (
     <Box flex={1} sx={{ zIndex: zIndex.MAP_POPUP, ...sx }}>
       <Stack direction="column" spacing={1}>
-        <Box position="relative">
+        <ContextMenu ref={menuRef} onClick={onDetail} />
+        <Box
+          position="relative"
+          onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
+        >
           <Box position="absolute" top={-4} right={-4}>
             <BookmarkButton dataset={collection} />
           </Box>
