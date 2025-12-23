@@ -7,3 +7,4 @@ class LayerType(Enum):
     SPIDER = auto()
     GEO_SERVER = auto()
     HEX_GRID = auto()
+    SPATIAL_EXTENT = auto()

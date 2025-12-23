@@ -22,6 +22,7 @@ class Map(BasePage):
         )
         self.zoom_in_button = self.get_button('Zoom in')
         self.zoom_out_button = self.get_button('Zoom out')
+        self.announcement_panel = page.get_by_test_id('announcement-panel')
         self.bookmarks_icon = self.get_by_id('bookmark-list-button')
         self.basemap_show_hide_menu = page.get_by_test_id(
             'basemap-show-hide-menu-button'
@@ -183,6 +184,12 @@ class Map(BasePage):
         """Get the Hex Grid layer id"""
         return self.get_layer_id_from_test_props(
             'getHexbinLayer', is_map_loading=False
+        )
+
+    def get_Spatial_Extent_Layer_id(self) -> str:
+        """Get the Spatial Extent layer id"""
+        return self.get_layer_id_from_test_props(
+            'getSpatialExtentLayer', is_map_loading=False
         )
 
     def is_map_layer_visible(

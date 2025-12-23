@@ -16,6 +16,7 @@ import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { fitToBound } from "../../../../utils/MapUtils";
 import bluePin from "@/assets/icons/blue_pin.png";
 import { MapEventEnum } from "../constants";
+import { TestHelper } from "../../../common/test/helper";
 
 interface SpatialExtentPhoto {
   bbox: Position;
@@ -242,7 +243,12 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, handleIdle, layerPolygonId, sourceId]);
 
-  return <React.Fragment />;
+  return (
+    <TestHelper
+      id={map?.getContainer().id || ""}
+      getSpatialExtentLayer={() => layerPolygonId}
+    />
+  );
 };
 
 export default GeojsonLayer;

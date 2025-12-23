@@ -17,3 +17,5 @@ class LayerFactory:
             return self.map.get_Geo_Server_Layer_id()
         elif layer_type == LayerType.HEX_GRID:
             return self.map.get_Hex_Grid_Layer_id()
+        elif layer_type == LayerType.SPATIAL_EXTENT:
+            return self.map.get_Spatial_Extent_Layer_id()
