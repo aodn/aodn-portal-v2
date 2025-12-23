@@ -196,7 +196,7 @@ const extractDiscreteDays = (
         result.set(layer.name, dates);
       }
     });
-    return result;
+    return result.size === 0 ? undefined : result;
   }
   return undefined;
 };
@@ -608,7 +608,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                 );
                 setTimeSliderSupport?.(foundDatetime !== undefined);
                 setDrawRectSupportSupport?.(foundGeo !== undefined);
-                setIsFetchingWmsLayers(false);
                 onWFSAvailabilityChange?.(true);
               })
               .catch((error: ErrorResponse) => {
@@ -626,6 +625,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               })
               .finally(() => {
                 setMapLoading?.(false);
+                setIsFetchingWmsLayers(false);
               });
           })
           .catch((error) => {
@@ -634,11 +634,15 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               // If abort means there is another result coming, so we cannot
               // set value conclusively for now.
               onWMSAvailabilityChange?.(false);
-              setIsFetchingWmsLayers(false);
             }
+          })
+          .finally(() => {
+            setMapLoading?.(false);
+            setIsFetchingWmsLayers(false);
           });
       } else {
         setIsFetchingWmsLayers(false);
+        setMapLoading?.(false);
       }
     };
     // Give a slight delay so that the state updated before we do fetch
