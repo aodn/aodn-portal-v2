@@ -22,7 +22,7 @@ interface DateSliderRangeProps {
 interface DateSliderPointProps {
   valid_points?: Array<number>;
   onDatePointChange?: (
-    event: Event | React.SyntheticEvent<Element, Event>,
+    event: Event | React.SyntheticEvent<Element, Event> | undefined,
     value: number | number[]
   ) => void;
 }
@@ -80,7 +80,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
           }}
         >
           Displaying @{" "}
-          {valueToDate(datePointStamp!).format(dateDefault.DISPLAY_FORMAT)}
+          {valueToDate(datePointStamp!).format(dateDefault.DATE_TIME_FORMAT)}
         </Typography>
       </Grid>
       <Grid
@@ -104,7 +104,9 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             min={sorted_valid_points?.[0]}
             max={sorted_valid_points?.[sorted_valid_points?.length - 1]}
             value={datePointStamp}
-            onChangeCommitted={(_, value) => onDatePointChange?.(_, value)}
+            onChangeCommitted={(event, value) =>
+              onDatePointChange?.(event, value)
+            }
             onChange={handleSliderChange}
             sx={{
               "& .MuiSlider-valueLabel": {

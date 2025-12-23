@@ -54,11 +54,18 @@ enum LAYER_VISIBILITY {
   NONE = "none",
 }
 
+export enum Dimension {
+  SINGLE = "single",
+  RANGE = "range",
+}
+
 interface UrlParams {
   LAYERS?: string[];
   BBOX?: string;
   START_DATE?: Dayjs;
   END_DATE?: Dayjs;
+  TIME?: Dayjs;
+  MODE?: Dimension;
   WIDTH?: number;
   HEIGHT?: number;
   X?: number;
@@ -165,6 +172,7 @@ const extractDiscreteDays = (
     const result: Map<string, Array<number>> = new Map();
     layers.forEach((layer) => {
       if (layer.ncWmsLayerInfo?.datesWithData) {
+        const nearest = dayjs(layer.ncWmsLayerInfo.nearestTimeIso);
         const dates: number[] = [];
         for (const [year, months] of Object.entries(
           layer.ncWmsLayerInfo.datesWithData || {}
@@ -177,6 +185,11 @@ const extractDiscreteDays = (
                     .year(Number(year))
                     .month(Number(month) - 1)
                     .day(day)
+                    .hour(nearest.hour())
+                    .minute(nearest.minute())
+                    .second(nearest.second())
+                    .millisecond(nearest.millisecond())
+                    .utc()
                 )
               )
             );
@@ -258,6 +271,11 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         ? dayjs(dateDefault.max)
         : config.urlParams.END_DATE;
 
+    const time =
+      config.urlParams.TIME === undefined
+        ? dayjs(dateDefault.max)
+        : config.urlParams.TIME;
+
     return config.uuid
       ? [
           formatToUrl<MapTileRequest>({
@@ -265,7 +283,10 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             params: {
               layerName: config.urlParams.LAYERS?.join(",") || "",
               bbox: config?.urlParams?.BBOX,
-              datetime: `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
+              datetime:
+                config?.urlParams?.MODE === Dimension.SINGLE
+                  ? `${time.format(dateDefault.DATE_TIME_FORMAT)}`
+                  : `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
             },
           }),
         ]
@@ -274,7 +295,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.urlParams?.BBOX,
     config.urlParams.END_DATE,
     config.urlParams.LAYERS,
+    config.urlParams?.MODE,
     config.urlParams.START_DATE,
+    config.urlParams.TIME,
     config.uuid,
   ]);
 

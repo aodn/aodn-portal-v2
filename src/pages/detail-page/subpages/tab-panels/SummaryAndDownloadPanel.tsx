@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -30,7 +30,9 @@ import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
-import GeoServerLayer from "../../../../components/map/mapbox/layers/GeoServerLayer";
+import GeoServerLayer, {
+  Dimension,
+} from "../../../../components/map/mapbox/layers/GeoServerLayer";
 import MapLayerSwitcher, {
   LayerName,
   LayerSwitcherLayer,
@@ -47,6 +49,7 @@ import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/F
 import AIGenTag from "../../../../components/info/AIGenTag";
 import { MapEventEnum } from "../../../../components/map/mapbox/constants";
 import { DateSliderPoint } from "../../../../components/common/slider/DateSlider";
+import { valueToDate } from "../../../../utils/DateUtils";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -186,6 +189,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
     Map<string, Array<number>> | undefined
   >(undefined);
+  const [datePointValue, setDatePointValue] = useState<number>();
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
 
@@ -323,6 +327,16 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       );
     },
     [setLastSelectedMapLayer]
+  );
+
+  const handleSliderPointChange = useCallback(
+    (
+      event: Event | React.SyntheticEvent<Element, Event> | undefined,
+      value: number | number[]
+    ) => {
+      setDatePointValue(value as number);
+    },
+    []
   );
 
   const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
@@ -469,6 +483,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                                       valid_points={discreteTimeSliderValues?.get(
                                         selectedWmsLayer
                                       )}
+                                      onDatePointChange={
+                                        handleSliderPointChange
+                                      }
                                     />
                                   ),
                                 }
@@ -508,12 +525,23 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     visible={lastSelectedMapLayer?.id === LayerName.Hexbin}
                   />
                   <GeoServerLayer
-                    geoServerLayerConfig={{
-                      urlParams: {
-                        START_DATE: filterStartDate,
-                        END_DATE: filterEndDate,
-                      },
-                    }}
+                    geoServerLayerConfig={
+                      // This value appears only if this dataset layer support single time
+                      // move, NOT range
+                      discreteTimeSliderValues
+                        ? {
+                            urlParams: {
+                              TIME: valueToDate(datePointValue!),
+                              MODE: Dimension.SINGLE,
+                            },
+                          }
+                        : {
+                            urlParams: {
+                              START_DATE: filterStartDate,
+                              END_DATE: filterEndDate,
+                            },
+                          }
+                    }
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
                     onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
