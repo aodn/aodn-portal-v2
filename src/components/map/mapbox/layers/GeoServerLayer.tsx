@@ -270,9 +270,15 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         : config.urlParams.END_DATE;
 
     const time =
-      config.urlParams.TIME === undefined
-        ? dayjs(dateDefault.max)
+      config.urlParams.TIME === undefined ||
+      config?.urlParams.TIME.isSame(dayjs(dateDefault.min))
+        ? undefined
         : config.urlParams.TIME;
+
+    const datetime =
+      config?.urlParams?.MODE === Dimension.SINGLE
+        ? `${time?.toISOString()}` // Must ISO format, any slight diff in format will cause internal server error
+        : `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`;
 
     return config.uuid
       ? [
@@ -281,10 +287,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             params: {
               layerName: config.urlParams.LAYERS?.join(",") || "",
               bbox: config?.urlParams?.BBOX,
-              datetime:
-                config?.urlParams?.MODE === Dimension.SINGLE
-                  ? `${time.toISOString()}` // Must ISO format, any slight diff in format will cause internal server error
-                  : `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
+              ...(datetime !== undefined && { datetime }),
             },
           }),
         ]

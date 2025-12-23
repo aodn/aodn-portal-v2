@@ -49,6 +49,7 @@ import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/F
 import AIGenTag from "../../../../components/info/AIGenTag";
 import { MapEventEnum } from "../../../../components/map/mapbox/constants";
 import { DateSliderPoint } from "../../../../components/common/slider/DateSlider";
+import { dateToValue } from "../../../../utils/DateUtils";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -188,7 +189,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
     Map<string, Array<number>> | undefined
   >(undefined);
-  const [datePointValue, setDatePointValue] = useState<number>();
+  const [datePointValue, setDatePointValue] = useState<number>(
+    dateToValue(dayjs(dateDefault.min))
+  );
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
 

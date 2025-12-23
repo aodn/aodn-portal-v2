@@ -36,7 +36,10 @@ const formatToUrl = <T extends Record<string, any>>({
 }): string => {
   // Process parameters
   const queryParams = Object.entries(params)
-    .filter(([_, value]) => value !== undefined && value !== null)
+    .filter(
+      ([_, value]) =>
+        value !== undefined && value !== null && value !== "undefined"
+    )
     .map(([key, value]) => {
       // Check if the value matches the pattern {something}
       // This used for the WMS parameters BBOX

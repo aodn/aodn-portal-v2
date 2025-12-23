@@ -103,6 +103,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             min={sorted_valid_points?.[0]}
             max={sorted_valid_points?.[sorted_valid_points?.length - 1]}
             value={datePointStamp}
+            defaultValue={datePointStamp}
             onChangeCommitted={(event, value) =>
               onDatePointChange?.(event, value)
             }
