@@ -1,0 +1,582 @@
+{
+  "properties": {
+    "credits": [
+      "National Environmental Science Program (NESP) Marine and Coastal Hub"
+    ],
+    "ai:description": "This dataset is a mosaicked product of all publicly available bathymetry data within the Australian Exclusive Economic Zone (EEZ). The data package consists of 8x bathymetry mosaics (and associated bathymetry derivatives: hillshade, slope, aspect) for each of the 8x Parks Australia Management Effectiveness Ecosystem Component depth zones (\"Ecosystem Zones\"). The grid resolution of the mosaics has been guided by the depth gridding recommendations of the AusSeabed Australian Multibeam Guidelines (2020) to produce the following mosaics:\n\n- shallow zone (0-30m): 10m resolution\n- mesophotic zone (30-70m): 10m resolution\n- rariphotic zone (70-200m): 10m resolution\n- upper-slope zone (200-700m): 32m resolution\n- mid-slope zone (700-2,000m): 64m resolution\n- lower-slope zone (2,000-4,000m): 128m resolution\n- abyss zone (4,000-6,000m): 210m resolution\n- hadal zone (>6,000m): 210m resolution\n\nA systematic prioritisation approach was used to preferentially use newer, high-resolution, and cleaner bathymetry inputs from remote sensing (multibeam, singlebeam, satellite, seismic etc), with Digital Elevation Models (DEM) used as foundational data in regions where survey data was not available. This approach optimised spatial resolution by preserving higher resolutions in shallower waters as supported by the data, while also ensuring the output datasets remain manageable for downstream applications. \n\nThe result is suite of depth-stratified bathymetry mosaics and associated derivatives that provide full coverage of Australia's marine estate (clipped to the boundaries of the Australian Exclusive Economic Zone (EEZ)). All publicly available bathymetry data as at July 2024 for was included.\n\nData can be visualised and used in GIS packages as maps of hillshaded bathymetry and hillshaded slope at the following WMS endpoints:\n\n- bathymetry: https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_composite_multires/wms?request=GetCapabilities&service=WMS\n- hillshade: https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_hillshade_composite_multires/wms?request=GetCapabilities&service=WMS\n- slope: https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_slope_composite_multires/wms?request=GetCapabilities&service=WMS\n- aspect: https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_aspect_composite_multires/wms?request=GetCapabilities&service=WMS\n- aspect-slope (for mapping applications only): https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_aspectSlope_composite_multires/wms?request=GetCapabilities&service=WMS\n\nData is available for download in the following packages (each structured as 8x mosaics for each Ecosystem Zone at the gridding resolution specified above):\n\n1. bathymetry composites;\n2. hillshade composites;\n3. slope composites;\n4. aspect composites.\n\nAn ancillary Shapefile footprint index file is also available showing the source data used in generating each region of the mosaics.\n\nNote that minimal cleaning of input data was conducted, and no attempt was made to smooth or blend the transitions between swath edges, or between swaths and the underlying DEMs. Consequently, noise and edge effects between adjacent input data may be visible. This should be considered when interpreting the data, and the data should not be used for navigational purposes.\n\nSee the Lineage section of this record for full methodology.",
+    "status": "underDevelopment",
+    "temporal": [
+      {
+        "start": "1988-12-31T13:00:00Z"
+      }
+    ],
+    "citation": {
+      "suggestedCitation": "Cite data as: Flukes, E., (2024). Multi-resolution bathymetry composite surface for Australian waters (EEZ). Institute for Marine and Antarctic Studies (IMAS). Data accessed from https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/69e9ac91-babe-47ed-8c37-0ef08f29338a on [access date].",
+      "otherConstraints": [
+        "This dataset is the intellectual property of the Institute for Marine and Antarctic Studies, but was made possible by the data contributions of AusSeabed (Geoscience Australia), CSIRO Marine National Facility (MNF), the Australian Hydrographic Office, and various Universities and state and federal organisations around Australia.\n\nThis data is not to be used for navigational purposes."
+      ]
+    },
+    "revision": "2025-08-14T21:09:29",
+    "centroid": [[132.625, -33.5]],
+    "pace": "other",
+    "statement": "The steps below outline the broad approach taken to generating the bathymetry mosaics. For the methodology, including sample code, see the attached data documentation linked to this record.\n\n---Collating input bathymetry data---\nRelevant input bathymetry data was identified using Seamap Australia's 'Coverage of Australian bathymetry surveys' database [https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/bfaac2bc-0c11-4991-b0fa-2a1dc7fd6e61]. AusSeabed's 'Bathymetry acquisitions coverage database' [https://dx.doi.org/10.26186/148613] and 'Bathymetry compilations coverage database' [https://dx.doi.org/10.26186/148614] may also be used. The AusSeabed Data Portal and other relevant portals (AODN Portal, WA Bathymetry Portal, NSW SEED, CSIRO DAP) were used to download source data in GeoTIFF format. Only bathymetry datasets intersecting the Australian EEZ were retained.\n\n---Organising and processing input data---\nInput data was resampled to the target resolution for the intersected Ecosystem Zone using gdalwarp. For example, input data at 15m resolution intersecting the upper-slope zone was downsampled to 32m. Resampled files were catalogued according to the relevant intersected depth zone.\n\n---Generating mosaics---\nFor each depth zone, an order of priority was determined for mosaicking input files. In general: higher resolution > lower resolution; newer > older; survey > compilation. Directly sampled bathymetry (multibeam, singlebeam, lidar, seismic, satellite etc) was always prioritised above Digital Elevation Models. Input files were mosaicked in the determined order of priority for each depth zone using gdal_translate.\n\n---Post-processing mosaics---\nEach of the generated 8x depth zone bathymetry mosaic surfaces was clipped to the boundaries of (1) the Aus EEZ; and (2) depth zone masks prepared from the Geoscience Australia 2023 250m bathymetry grid [https://doi.org/10.26186/148758]. A slight positive buffer was applied to depth masks to ensure contiguous coverage of clipped mosaics.\n\nBathymetry derivatives were generated using gdaldem for hillshade, slope, and aspect. For hillshade, a a z-factor of 1 (no vertical exaggeration) was applied, with azimuth 315° and altitude 45m. For slope and aspect, the Horn algorithm was used.\n\nAll output files were exported as Cloud Optimised GeoTIFFs (COGs) for optimal performance in Web Mapping applications.\n\n---Generating Shapefile footprint index of coverage---\nA Shapefile footprint was generated for each input GeoTIFF. All footprints were merged into a single master index with the following attributes: filename, resolution, depth zone, target resolution, resolution flag (meets target Y=1 N=0), sort order (from mosaicking prioritisation). This file can be used to provide a rapid visualisation of the coverage and 'quality' of mosaics (in terms of data resolution relative to target) which will facilitate future updates.",
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [160.93697899978113, -58.20834200028304],
+              [162.24694700000407, -57.79978300028518],
+              [163.33190100003117, -57.20617999970716],
+              [163.9457940000931, -56.64893100016547],
+              [164.39936400014858, -55.87324999998748],
+              [164.69123299960336, -54.69528599964911],
+              [164.24501100025748, -53.84995599996939],
+              [160.62503099978088, -51.17674999991252],
+              [158.99821400017606, -51.02734399972576],
+              [157.40319099996478, -51.170859999889046],
+              [155.90911700014954, -51.596728000396865],
+              [154.6557460000779, -52.27389800019251],
+              [153.58556200038606, -53.319878999815955],
+              [152.96325800005673, -54.63966200030102],
+              [152.88926699997216, -55.578014999992206],
+              [153.28060199978256, -56.48000299993845],
+              [154.01491999995815, -57.19922900021816],
+              [155.08603500031504, -57.791674999601526],
+              [156.40087500038103, -58.20507399976526],
+              [157.88548099974844, -58.42108400022641],
+              [159.440252999976, -58.42298499975789],
+              [160.93697899978113, -58.20834200028304]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [168.65103300027283, -32.42181899974702],
+              [171.22514299994953, -30.88678200038896],
+              [171.7132010004259, -29.803558000101596],
+              [171.77250599955232, -28.67279199995079],
+              [171.3992929999721, -27.57573800040837],
+              [170.64097199995786, -26.649718000185544],
+              [169.56288800018115, -25.983339999841064],
+              [168.73833299986813, -25.845000000049954],
+              [165.8600760002073, -26.201133999834155],
+              [165.20328200026415, -26.68371899973198],
+              [164.68137299996408, -27.282674999851345],
+              [164.3134570000406, -27.981218999657074],
+              [164.13279700018143, -28.70770700027783],
+              [164.13783000025433, -29.500234000298796],
+              [164.34193700039236, -30.260158999638065],
+              [164.70043699956796, -30.921719999977995],
+              [165.2241890003222, -31.499999999900012],
+              [166.29286100043493, -32.15617500007613],
+              [166.98176900013937, -32.37193099961587],
+              [168.39475199980507, -32.45512000028776],
+              [168.65103300027283, -32.42181899974702]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [133.38333300001796, -8.883333000417563],
+              [131.4666669996824, -9.700000000299724],
+              [130.91666699988218, -9.7833330004176],
+              [130.10000000000002, -9.650000000399643],
+              [129.5000000002998, -9.750000000199805],
+              [128.2333330004177, -10.466667000281788],
+              [127.52705299999604, -11.238576000082276],
+              [126.51666699968236, -11.333333000017873],
+              [125.33333299991807, -11.783333000017876],
+              [123.5653060003717, -12.259555999709562],
+              [123.36222199974553, -11.858916999819655],
+              [122.8901940001531, -11.80891699991956],
+              [122.54002800039201, -12.112389000252108],
+              [122.5184999995754, -12.841167000356734],
+              [121.81666700008202, -13.250000000399652],
+              [120.01302800044198, -13.942138999814915],
+              [118.41225000013742, -13.242667000381743],
+              [118.28694699990423, -14.05669499997424],
+              [117.48102399995764, -14.42295199983488],
+              [116.4057130003547, -15.217892999662183],
+              [115.810643999621, -16.035179000210633],
+              [115.47384700033888, -16.920931999711968],
+              [114.15028400000668, -17.13622300029118],
+              [112.99114499994187, -17.818599000043776],
+              [112.4795719996481, -18.37198899969252],
+              [112.10275900042757, -19.019868000407826],
+              [111.14741399955646, -19.82214799963043],
+              [110.67620700005307, -20.536989000042297],
+              [110.15119200041056, -21.7635850001476],
+              [110.02009900026871, -22.875883000300178],
+              [109.37820100017608, -24.66790500021557],
+              [109.2408589996432, -25.42418300044504],
+              [109.3773299995799, -26.612704000189414],
+              [109.86192500043848, -27.720699999805113],
+              [109.81374700002408, -28.655867000061967],
+              [110.0765160002133, -29.76301300004986],
+              [110.52560899975559, -30.617934999600482],
+              [111.28609199964615, -31.426822000434917],
+              [111.50872399971287, -31.96627100020647],
+              [111.0974070002329, -32.907917999815815],
+              [110.96134000004103, -34.16787399958537],
+              [111.1646349996056, -35.322784999827824],
+              [111.74289799964306, -36.28138799985629],
+              [112.68468999964387, -37.07136600014076],
+              [114.5921790003606, -38.085686000208675],
+              [115.6142469997992, -38.31869600042007],
+              [118.2247719997281, -38.517381999679515],
+              [119.42458600044358, -38.2920019996925],
+              [120.84720700030287, -37.680224000037526],
+              [122.2009829999655, -37.80796500028447],
+              [124.0695140000711, -37.688509999936514],
+              [124.94611100002271, -37.51408299973058],
+              [126.22995999995406, -36.8924319998369],
+              [127.59250400015958, -35.60392600008481],
+              [128.66507400016508, -35.419037000357264],
+              [130.04063099972097, -34.99314300044909],
+              [130.45812399982276, -35.17988500019254],
+              [131.24765300008596, -36.59257299974411],
+              [132.12265700032037, -37.40895399992712],
+              [133.22155300027077, -37.92771599989344],
+              [133.87808299973074, -38.553309999956475],
+              [134.91930400017952, -39.18218700032974],
+              [135.81946300031723, -39.540712999805066],
+              [136.78895599981956, -39.71648099979825],
+              [137.32404800011523, -40.25117599977256],
+              [137.96944599973313, -40.68744699977918],
+              [139.89242599986005, -41.52252399968278],
+              [140.4033580002715, -42.178506999998035],
+              [140.9637560002393, -43.72840100010603],
+              [141.50649999997506, -44.66625400012197],
+              [142.53089299961232, -45.78121499987231],
+              [143.73494899989646, -46.503645000416384],
+              [144.6718130001699, -46.851868999654585],
+              [145.98457499973654, -47.120308999660544],
+              [147.89721100038741, -47.12984499964699],
+              [149.62546300031727, -46.629941999723485],
+              [151.5328279998124, -45.41501800008058],
+              [152.29090400021948, -44.472641000082035],
+              [152.77674099989724, -42.99735799987178],
+              [152.82108399972685, -40.01463000017434],
+              [153.49680500015074, -39.36945199990982],
+              [153.923611999894, -38.69410599969211],
+              [154.17558699964036, -37.868572000097686],
+              [154.29803799965407, -36.86762599983996],
+              [154.66973799960908, -36.23447700031329],
+              [155.06858799973645, -35.085476000117296],
+              [155.7225480002901, -34.492849999627765],
+              [156.160565999921, -33.859992000030715],
+              [156.7205319997521, -34.34169499972443],
+              [157.427827000216, -34.742970000165315],
+              [158.98559300001705, -35.118191999760924],
+              [160.60850300021332, -34.936022999561715],
+              [161.35110700028793, -34.63823100036035],
+              [161.99883200019667, -34.21868299992046],
+              [162.76569100003974, -33.3523300002293],
+              [163.15553899962518, -32.302514000021056],
+              [163.1624059997372, -31.436086999615274],
+              [162.90813800036847, -30.589501999617546],
+              [162.87512300042624, -28.79989999978511],
+              [162.57853900027476, -28.03294299991944],
+              [162.0859860002538, -27.346101000160957],
+              [161.42921100028755, -26.781441999748452],
+              [160.64997099966192, -26.371379999687193],
+              [159.78611700009958, -26.135178999810933],
+              [158.89598800024612, -26.08686300022725],
+              [158.01454099966747, -26.226971999757954],
+              [157.18336399974888, -26.547614999632454],
+              [157.12772399966298, -26.278369000229134],
+              [157.8969689998196, -25.828261999791437],
+              [158.61083300014286, -25.146667000081948],
+              [157.80111100037243, -23.24833299976808],
+              [157.3119440000156, -22.5272219997954],
+              [157.0525000002749, -20.541111000372325],
+              [156.25555599980964, -19.286667000281795],
+              [156.9455560004092, -18.540278000129547],
+              [158.76083299984316, -15.735277999979658],
+              [157.71666700028183, -14.683332999618173],
+              [157.25275900012787, -14.284156999745676],
+              [156.61666699978227, -14.083332999917957],
+              [154.25000000029976, -14.750000000099874],
+              [152.1166669997823, -14.633332999718107],
+              [148.0833330003178, -13.174999999650195],
+              [146.4999999996004, -12.333332999818026],
+              [144.73333299981812, -9.849999999999966],
+              [144.2499999996004, -9.499999999800067],
+              [143.79999999960035, -9.366666999782183],
+              [143.50000000019986, -9.399999999999977],
+              [143.33333299991807, -9.549999999700162],
+              [142.84999999970034, -9.675000000349726],
+              [142.8050000001499, -9.323889000177177],
+              [142.4947219998205, -9.367777999754821],
+              [142.21500000024992, -9.18944400014044],
+              [142.05833299976814, -9.2619439998157],
+              [142.05833299976814, -9.756667000081961],
+              [140.0000000000001, -10.98333299981806],
+              [139.38333299971828, -11.150000000099851],
+              [139.19999999980018, -10.833333000117818],
+              [138.2166669996824, -10.150000000299713],
+              [135.48333300031777, -9.133332999917968],
+              [134.83333299981814, -9.416666999682263],
+              [133.38333300001796, -8.883333000417563]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [106.57900000034981, -13.794070000130375],
+              [107.78946600035567, -13.183488999917358],
+              [108.65620900004535, -12.15252000009788],
+              [109.03497200015772, -11.118861000334846],
+              [107.72626499963008, -9.826072000022748],
+              [106.82293199971207, -9.132460000128845],
+              [105.30043200023671, -8.726071000376294],
+              [102.5691759995728, -8.872498999928837],
+              [102.17068799995127, -10.151546999694231],
+              [102.28010999987663, -11.45096099975028],
+              [102.88348599967918, -12.606907000057959],
+              [103.9012060000569, -13.45114799988022],
+              [105.21541899998692, -13.89129599971055],
+              [106.57900000034981, -13.794070000130375]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [98.23415900043753, -15.294776000012348],
+              [99.3527900003583, -14.55585899999285],
+              [100.08934200013329, -13.454593999613339],
+              [100.33645599964473, -12.168342000382964],
+              [100.00505500008826, -10.641503999609824],
+              [99.31199400042283, -9.544306999768196],
+              [98.19724299956482, -8.75887899976594],
+              [96.86789400040784, -8.472083000430073],
+              [96.15731200034861, -8.537335000409882],
+              [95.4765979998978, -8.748415000152079],
+              [94.8528030000585, -9.09734400042521],
+              [94.32351999964834, -9.559831999846907],
+              [93.89886500021964, -10.124042000238092],
+              [93.59963300026283, -10.76637899989089],
+              [93.41212899955377, -12.188483000190274],
+              [93.68148599957925, -13.502204999960725],
+              [94.44597599989254, -14.598600999736277],
+              [95.58736899997945, -15.32353999997099],
+              [96.92704000029585, -15.55899599966564],
+              [98.23415900043753, -15.294776000012348]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "themes": [
+      {
+        "scheme": "",
+        "concepts": [
+          {
+            "id": "acoustic mapping",
+            "description": "",
+            "title": "Keywords (Theme)"
+          },
+          {
+            "id": "digital elevation models (DEM)",
+            "description": "",
+            "title": "Keywords (Theme)"
+          },
+          {
+            "id": "seafloor features",
+            "description": "",
+            "title": "Keywords (Theme)"
+          },
+          {
+            "id": "multibeam bathymetry",
+            "description": "",
+            "title": "Keywords (Theme)"
+          },
+          {
+            "id": "Parks Australia Management Effectiveness",
+            "description": "",
+            "title": "Keywords (Theme)"
+          },
+          {
+            "id": "imagery composites",
+            "description": "",
+            "title": "Keywords (Theme)"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "BATHYMETRY",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/80d79c7e-6c64-4ada-bfcc-4093969758a5",
+            "description": "Science Keywords",
+            "title": "NASA/GCMD Keywords, Version 8.5"
+          },
+          {
+            "id": "WATER DEPTH",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/ca477721-473b-40d7-a72b-4ffa963e48fb",
+            "description": "Science Keywords",
+            "title": "NASA/GCMD Keywords, Version 8.5"
+          },
+          {
+            "id": "CONTINENTAL MARGINS",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/a91a00f7-05ed-4633-9fac-1772a48b6342",
+            "description": "Science Keywords",
+            "title": "NASA/GCMD Keywords, Version 8.5"
+          },
+          {
+            "id": "FRACTURE ZONES",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/58c12630-a889-44c1-a951-56bbbe9758c9",
+            "description": "Science Keywords",
+            "title": "NASA/GCMD Keywords, Version 8.5"
+          },
+          {
+            "id": "SEAMOUNTS",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/83520258-413c-4842-93c0-58a23dc58638",
+            "description": "Science Keywords",
+            "title": "NASA/GCMD Keywords, Version 8.5"
+          },
+          {
+            "id": "SUBMARINE CANYONS",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/18ce5577-26e9-4b76-860b-1ba31cafa9d0",
+            "description": "Science Keywords",
+            "title": "NASA/GCMD Keywords, Version 8.5"
+          },
+          {
+            "id": "SEAFLOOR TOPOGRAPHY",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/b6b51058-1111-4498-a9ac-e1515270fb27",
+            "description": "Science Keywords",
+            "title": "NASA/GCMD Keywords, Version 8.5"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Geospatial Information Systems",
+            "url": "http://purl.org/au-research/vocabulary/anzsrc-for/2008/090903",
+            "description": "",
+            "title": "Australian and New Zealand Standard Research Classification (ANZSRC): Fields of Research"
+          },
+          {
+            "id": "Surveying (incl. Hydrographic Surveying)",
+            "url": "http://purl.org/au-research/vocabulary/anzsrc-for/2008/090906",
+            "description": "",
+            "title": "Australian and New Zealand Standard Research Classification (ANZSRC): Fields of Research"
+          }
+        ]
+      },
+      {
+        "scheme": "Categories",
+        "concepts": [
+          {
+            "id": "geoscientificInformation"
+          },
+          {
+            "id": "boundaries"
+          },
+          {
+            "id": "elevation"
+          }
+        ]
+      }
+    ],
+    "dataset_group": ["imas"],
+    "contacts": [
+      {
+        "name": "Flukes, Emma",
+        "organization": "Institute for Marine and Antarctic Studies (IMAS), University of Tasmania (UTAS)",
+        "emails": ["Emma.Flukes@utas.edu.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["IMAS - Hobart", "Private Bag 129"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0003-2749-834X",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID ID"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "name": "IMAS Data Manager",
+        "organization": "Institute for Marine and Antarctic Studies (IMAS), University of Tasmania (UTAS)",
+        "emails": ["IMAS.DataManager@utas.edu.au"],
+        "roles": ["pointOfContact", "metadata"]
+      },
+      {
+        "name": "Flukes, Emma",
+        "organization": "Institute for Marine and Antarctic Studies (IMAS), University of Tasmania (UTAS)",
+        "emails": ["Emma.Flukes@utas.edu.au"],
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0003-2749-834X",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID ID"
+          }
+        ],
+        "roles": ["principalInvestigator", "citation"]
+      }
+    ],
+    "license": "Creative Commons Attribution 4.0 International License",
+    "creation": "2024-03-21T11:44:25"
+  },
+  "id": "69e9ac91-babe-47ed-8c37-0ef08f29338a",
+  "title": "Multi-resolution bathymetry composite surface for Australian waters (EEZ)",
+  "description": "This dataset is a mosaicked product of all publicly available bathymetry data within the Australian Exclusive Economic Zone (EEZ). The data package consists of 8x bathymetry mosaics (and associated bathymetry derivatives: hillshade, slope, aspect) for each of the 8x Parks Australia Management Effectiveness Ecosystem Component depth zones (\"Ecosystem Zones\"). The grid resolution of the mosaics has been guided by the depth gridding recommendations of the AusSeabed Australian Multibeam Guidelines (2020) to produce the following mosaics:\n\n • shallow zone (0-30m): 10m resolution\n • mesophotic zone (30-70m): 10m resolution\n • rariphotic zone (70-200m): 10m resolution\n • upper-slope zone (200-700m): 32m resolution\n • mid-slope zone (700-2,000m): 64m resolution\n • lower-slope zone (2,000-4,000m): 128m resolution\n • abyss zone (4,000-6,000m): 210m resolution\n • hadal zone (>6,000m): 210m resolution\n\nA systematic prioritisation approach was used to preferentially use newer, high-resolution, and cleaner bathymetry inputs from remote sensing (multibeam, singlebeam, satellite, seismic etc), with Digital Elevation Models (DEM) used as foundational data in regions where survey data was not available. This approach optimised spatial resolution by preserving higher resolutions in shallower waters as supported by the data, while also ensuring the output datasets remain manageable for downstream applications. The result is suite of depth-stratified bathymetry mosaics and associated derivatives that provide full coverage of Australia's marine estate (clipped to the boundaries of the Australian Exclusive Economic Zone (EEZ)). All publicly available bathymetry data as at July 2024 for was included. \n\nData can be visualised and used in GIS packages as maps of hillshaded bathymetry and hillshaded slope at the following WMS endpoints:\n • bathymetry: https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_composite_multires/wms?request=GetCapabilities&service=WMS\n • hillshade: https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_hillshade_composite_multires/wms?request=GetCapabilities&service=WMS\n • slope: https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_slope_composite_multires/wms?request=GetCapabilities&service=WMS\n • aspect: https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_aspect_composite_multires/wms?request=GetCapabilities&service=WMS\n • aspect-slope (for mapping applications only): https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/AusEEZ_bathy_aspectSlope_composite_multires/wms?request=GetCapabilities&service=WMS\n\nData is available for download in the following packages (each structured as 8x mosaics for each Ecosystem Zone at the gridding resolution specified above): (1) bathymetry composites; (2) hillshade composites; (3) slope composites; (4) aspect composites.\n\nAn ancillary Shapefile footprint index file is also available showing the source data used in generating each region of the mosaics.\n\nNote that minimal cleaning of input data was conducted, and no attempt was made to smooth or blend the transitions between swath edges, or between swaths and the underlying DEMs. Consequently, noise and edge effects between adjacent input data may be visible. This should be considered when interpreting the data, and the data should not be used for navigational purposes.\n\nSee the Lineage section of this record for full methodology.",
+  "links": [
+    {
+      "href": "https://data.imas.utas.edu.au/attachments/69e9ac91-babe-47ed-8c37-0ef08f29338a/",
+      "rel": "data",
+      "type": "",
+      "title": "DATA ACCESS OPTION 1 - single tifs",
+      "ai:group": "Data Access",
+      "description": "Explore and download single GeoTIFFs by depth zone or derivative type"
+    },
+    {
+      "href": "https://data.imas.utas.edu.au/attachments/69e9ac91-babe-47ed-8c37-0ef08f29338a/packaged_dls/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "DATA ACCESS OPTION 2 - pre-zipped download packages",
+      "ai:group": "Data Access",
+      "description": "Download zipped packages (all depth zones) of bathymetry and derivatives. NOTE: unzipped packages may exceed 100GB"
+    },
+    {
+      "href": "https://seamapaustralia.org/map/#96db6aac-960d-4b38-a341-dd0617f995f9",
+      "rel": "WWW:LINK-1.0-http--portal",
+      "type": "",
+      "title": "Explore the data through the interactive Seamap Australia portal",
+      "ai:group": "Other",
+      "description": "Select from a bathymetry view or derivative type in the left-hand panel."
+    },
+    {
+      "href": "https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/bfaac2bc-0c11-4991-b0fa-2a1dc7fd6e61",
+      "rel": "related",
+      "type": "text/html",
+      "title": "RELATED DATA - Coverage database of Australian bathymetry surveys, compilations, and depth models",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "AusEEZ_bathy_composite_multires",
+      "ai:group": "Data Access > wms",
+      "description": "WMS: bathymetry composite for Australian waters"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "AusEEZ_bathy_slope_composite_multires",
+      "ai:group": "Data Access > wms",
+      "description": "WMS: bathymetric slope composite for Australian waters"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "AusEEZ_bathy_hillshade_composite_multires",
+      "ai:group": "Data Access > wms",
+      "description": "WMS: a hillshade composite map for Australian waters"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "AusEEZ_bathy_aspect_composite_multires",
+      "ai:group": "Data Access > wms",
+      "description": "WMS: bathymetric aspect composite for Australian waters"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "AusEEZ_bathy_aspectSlope_composite_multires",
+      "ai:group": "Data Access > wms",
+      "description": "WMS: an aspect-slope composite map for Australian waters"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/seamap/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "footprints_multires_bathymetry_composite_EEZ",
+      "ai:group": "Data Access > wms",
+      "description": "WMS: spatial footprint index of source bathymetry data used in mosaics"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/seamap/wfs?version=1.0.0&request=GetFeature&typeName=footprints_multires_bathymetry_composite_EEZ&outputFormat=SHAPE-ZIP",
+      "rel": "data",
+      "type": "",
+      "title": "WFS [data download]: spatial footprint index of source bathymetry data used in mosaics",
+      "ai:group": "Data Access > wfs"
+    },
+    {
+      "href": "https://geonetwork.production.aodn.org.au:443/geonetwork/images/logos/1bb8f09c-99d6-431f-b902-4d3e4cef02df.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://metadata.imas.utas.edu.au/geonetwork/srv/api/records/69e9ac91-babe-47ed-8c37-0ef08f29338a/attachments/SS01.png",
+      "rel": "preview",
+      "type": "image"
+    },
+    {
+      "href": "https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/69e9ac91-babe-47ed-8c37-0ef08f29338a",
+      "rel": "describedby",
+      "type": "text/html",
+      "title": "Full metadata link"
+    },
+    {
+      "href": "http://i.creativecommons.org/l/by/4.0/88x31.png",
+      "rel": "license",
+      "type": "image/png"
+    },
+    {
+      "href": "http://creativecommons.org/licenses/by/4.0/",
+      "rel": "license",
+      "type": "text/html"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [93.4121289996, -58.4229849998, 171.7725059996, -8.4720830004],
+        [152.889267, -58.4229849998, 164.6912329996, -51.0273439997],
+        [164.1327970002, -32.4551200003, 171.7725059996, -25.845],
+        [109.2408589996, -47.1298449996, 163.1624059997, -8.8833330004],
+        [102.170688, -13.8912959997, 109.0349720002, -8.7260710004],
+        [93.4121289996, -15.5589959997, 100.3364559996, -8.4720830004]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["1988-12-31T13:00:00.000+00:00", null],
+        ["1988-12-31T13:00:00.000+00:00", null]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

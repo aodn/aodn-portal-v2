@@ -1,3 +1,5 @@
+from typing import Callable
+
 from playwright.sync_api import Route
 
 
@@ -5,12 +7,21 @@ def handle_wms_map_tile_api(route: Route) -> None:
     route.fulfill(json={})  # Response not needed in the UI tests
 
 
-# Hardcode a response with type dateTime field so that the time slider button shown.
-# We may need to change it later to allow check on hidden time slider button
-def handle_wms_downloadable_fields_api(route: Route) -> None:
-    route.fulfill(
-        json=[
-            {'label': 'timestamp', 'type': 'dateTime', 'name': 'timestamp'},
-            {'label': 'geom', 'type': 'geometrypropertytype', 'name': 'geom'},
-        ]
-    )
+def create_api_handler(
+    is_time_supported: bool, is_geometry_supported: bool
+) -> Callable[[Route], None]:
+    """Factory function that creates a route handler with specific response."""
+    json_data = []
+    if is_time_supported:
+        json_data.append(
+            {'label': 'timestamp', 'type': 'dateTime', 'name': 'timestamp'}
+        )
+    if is_geometry_supported:
+        json_data.append(
+            {'label': 'geom', 'type': 'geometrypropertytype', 'name': 'geom'}
+        )
+
+    def handler(route: Route) -> None:
+        route.fulfill(json=json_data)
+
+    return handler

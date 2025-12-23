@@ -66,6 +66,13 @@ window.__map_functions = {
       throw new Error("Hexbin layer not found");
     }
   },
+  getSpatialExtentLayer: function (mapId) {
+    if (this.getTestProps(mapId).getSpatialExtentLayer) {
+      return this.getTestProps(mapId).getSpatialExtentLayer();
+    } else {
+      throw new Error("Spatial Extent layer not found");
+    }
+  },
   isMapLayerVisible: function (mapId, layerId) {
     const map = this.getMap(mapId);
     if (map.getLayer(layerId) == undefined) {
