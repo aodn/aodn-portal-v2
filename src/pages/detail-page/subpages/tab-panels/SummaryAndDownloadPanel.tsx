@@ -5,7 +5,7 @@ import { useDetailPageContext } from "../../context/detail-page-context";
 import Controls from "../../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
-import Map from "../../../../components/map/mapbox/Map";
+import MapBox from "../../../../components/map/mapbox/Map";
 import Layers, {
   createStaticLayers,
 } from "../../../../components/map/mapbox/layers/Layers";
@@ -46,6 +46,7 @@ import useBreakpoint from "../../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 import AIGenTag from "../../../../components/info/AIGenTag";
 import { MapEventEnum } from "../../../../components/map/mapbox/constants";
+import { DateSliderPoint } from "../../../../components/common/slider/DateSlider";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -170,6 +171,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     featureCollection,
     downloadConditions,
     getAndSetDownloadConditions,
+    selectedWmsLayer,
     setSelectedWmsLayer,
     lastSelectedMapLayer,
     setLastSelectedMapLayer,
@@ -181,6 +183,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
+  const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
+    Map<string, Array<number>> | undefined
+  >(undefined);
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
 
@@ -410,7 +415,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 marginY: padding.large,
               }}
             >
-              <Map
+              <MapBox
                 animate={false}
                 panelId={mapContainerId}
                 projection={"mercator"} // Hexbin support this project or globe only
@@ -449,12 +454,26 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       )}
                       menu={
                         <DateRange
+                          key="date-range"
                           minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
                           maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
                           getAndSetDownloadConditions={
                             getAndSetDownloadConditions
                           }
                           downloadConditions={downloadConditions}
+                          options={
+                            discreteTimeSliderValues
+                              ? {
+                                  additionalSlider: (
+                                    <DateSliderPoint
+                                      valid_points={discreteTimeSliderValues?.get(
+                                        selectedWmsLayer
+                                      )}
+                                    />
+                                  ),
+                                }
+                              : undefined
+                          }
                         />
                       }
                     />
@@ -499,6 +518,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
                     setTimeSliderSupport={setTimeSliderSupport}
+                    setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
                     setDrawRectSupportSupport={setDrawRectSupportSupport}
                     collection={collection}
                     visible={lastSelectedMapLayer?.id === LayerName.GeoServer}
@@ -510,7 +530,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     }
                   />
                 </Layers>
-              </Map>
+              </MapBox>
             </Box>
           </Stack>
         </Grid>
