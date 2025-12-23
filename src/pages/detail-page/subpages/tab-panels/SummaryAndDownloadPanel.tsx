@@ -49,7 +49,6 @@ import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/F
 import AIGenTag from "../../../../components/info/AIGenTag";
 import { MapEventEnum } from "../../../../components/map/mapbox/constants";
 import { DateSliderPoint } from "../../../../components/common/slider/DateSlider";
-import { valueToDate } from "../../../../utils/DateUtils";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -531,7 +530,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       discreteTimeSliderValues
                         ? {
                             urlParams: {
-                              TIME: valueToDate(datePointValue!),
+                              TIME: dayjs.utc(datePointValue!),
                               MODE: Dimension.SINGLE,
                             },
                           }

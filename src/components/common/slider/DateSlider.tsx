@@ -79,8 +79,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             color: rc8Theme.palette.text1,
           }}
         >
-          Displaying @{" "}
-          {valueToDate(datePointStamp!).format(dateDefault.DATE_TIME_FORMAT)}
+          Displaying @ {valueToDate(datePointStamp!).toISOString()}
         </Typography>
       </Grid>
       <Grid

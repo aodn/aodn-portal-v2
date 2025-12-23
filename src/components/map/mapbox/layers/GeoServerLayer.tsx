@@ -178,21 +178,19 @@ const extractDiscreteDays = (
           layer.ncWmsLayerInfo.datesWithData || {}
         )) {
           for (const [month, days] of Object.entries(months)) {
-            days.forEach((day) =>
-              dates.push(
-                dateToValue(
-                  dayjs()
-                    .year(Number(year))
-                    .month(Number(month) - 1)
-                    .day(day)
-                    .hour(nearest.hour())
-                    .minute(nearest.minute())
-                    .second(nearest.second())
-                    .millisecond(nearest.millisecond())
-                    .utc()
-                )
-              )
-            );
+            // Here assume that the time of all dateWithData follows the
+            // one that found in the nearestTimeIso. So we copy the value
+            // from nearest, then MUST make sure it is using utc() to avoid
+            // hr shift, then override the year month day with the value
+            // from datesWithDate
+            days.forEach((day) => {
+              const d = dayjs(nearest)
+                .utc()
+                .year(Number(year))
+                .month(Number(month) - 1)
+                .day(day);
+              dates.push(dateToValue(d));
+            });
           }
         }
         result.set(layer.name, dates);
@@ -285,7 +283,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               bbox: config?.urlParams?.BBOX,
               datetime:
                 config?.urlParams?.MODE === Dimension.SINGLE
-                  ? `${time.format(dateDefault.DATE_TIME_FORMAT)}`
+                  ? `${time.toISOString()}` // Must ISO format, any slight diff in format will cause internal server error
                   : `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
             },
           }),
