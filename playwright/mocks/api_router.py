@@ -114,6 +114,14 @@ class ApiRouter:
     ) -> None:
         self.unroute(Routes.WMS_MAP_TILE, handler_function)
 
+    def route_wms_layers(self, handler_function: Callable) -> None:
+        self.route(Routes.WMS_LAYERS, handler_function)
+
+    def unroute_wms_layers(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.WMS_LAYERS, handler_function)
+
     def route_wms_downloadable_fields(self, handler_function: Callable) -> None:
         self.route(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)
 

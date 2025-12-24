@@ -40,7 +40,7 @@ def apply_mock(page: Page) -> None:
         handle_detail_api, handle_detail_item_api
     )
     api_router.route_wms_map_tile(handle_wms_map_tile_api)
-
+    api_router.route_wms_layers(lambda route: route.fulfill(json={}))
     wms_downloadable_fields_handler = create_api_handler(
         is_time_supported=True, is_geometry_supported=True
     )
