@@ -21,6 +21,9 @@ export interface LayerBasicType<P = GeoJsonProperties> {
   preferCurrentCentroid?: boolean;
   visible?: boolean;
   setTimeSliderSupport?: Dispatch<SetStateAction<boolean>>;
+  setDiscreteTimeSliderValues?: Dispatch<
+    SetStateAction<Map<string, Array<number>> | undefined>
+  >;
   setDrawRectSupportSupport?: Dispatch<SetStateAction<boolean>>;
   collection?: OGCCollection;
 }

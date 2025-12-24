@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import {
   DateRangeCondition,
@@ -24,6 +30,9 @@ interface DateRangeControlProps extends ControlProps {
     conditions: IDownloadCondition[]
   ) => IDownloadCondition[];
   downloadConditions: IDownloadCondition[];
+  options?: {
+    additionalSlider: ReactElement;
+  };
 }
 
 const MENU_ID = "daterange-show-hide-menu-button";
@@ -34,6 +43,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   getAndSetDownloadConditions,
   downloadConditions,
   map, // Map instance passed through ControlProps via cloneElement
+  options = undefined,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -148,6 +158,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
               justifyContent: "center",
             }}
           >
+            {options?.additionalSlider}
             <DateSlider
               currentMinDate={currentMinDate}
               currentMaxDate={currentMaxDate}

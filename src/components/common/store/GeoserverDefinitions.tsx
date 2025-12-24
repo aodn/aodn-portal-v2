@@ -41,4 +41,18 @@ export type MapLayerResponse = {
   name: string;
   title: string;
   queryable: string;
+  ncWmsLayerInfo?: {
+    units: string;
+    bbox: Array<number>;
+    palettes: Array<string>;
+    defaultPalette: string;
+    scaleRange: Array<string>;
+    datesWithData: { [year: string]: { [month: string]: number[] } };
+    numColorBands: number;
+    supportedStyles: Array<string>;
+    moreInfo: string;
+    timeAxisUnits: string;
+    nearestTimeIso: string;
+    logScale: boolean;
+  };
 };
