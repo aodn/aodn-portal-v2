@@ -13,7 +13,7 @@ interface MenuControlGroupProps {
   className?: string;
 }
 
-// MenuControlGroup as a functional component
+// MenuControlGroup as a functional component, use to group menu icon together
 const MenuControlGroup: FC<MenuControlGroupProps> = ({
   children,
   className = "menu-control-group",

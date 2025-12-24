@@ -1,11 +1,11 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import Controls from "../../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
-import Map from "../../../../components/map/mapbox/Map";
+import MapBox from "../../../../components/map/mapbox/Map";
 import Layers, {
   createStaticLayers,
 } from "../../../../components/map/mapbox/layers/Layers";
@@ -30,7 +30,9 @@ import { dateDefault } from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
-import GeoServerLayer from "../../../../components/map/mapbox/layers/GeoServerLayer";
+import GeoServerLayer, {
+  Dimension,
+} from "../../../../components/map/mapbox/layers/GeoServerLayer";
 import MapLayerSwitcher, {
   LayerName,
   LayerSwitcherLayer,
@@ -46,6 +48,8 @@ import useBreakpoint from "../../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 import AIGenTag from "../../../../components/info/AIGenTag";
 import { MapEventEnum } from "../../../../components/map/mapbox/constants";
+import { DateSliderPoint } from "../../../../components/common/slider/DateSlider";
+import { dateToValue } from "../../../../utils/DateUtils";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -170,6 +174,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     featureCollection,
     downloadConditions,
     getAndSetDownloadConditions,
+    selectedWmsLayer,
     setSelectedWmsLayer,
     lastSelectedMapLayer,
     setLastSelectedMapLayer,
@@ -181,6 +186,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
+  const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
+    Map<string, Array<number>> | undefined
+  >(undefined);
+  const [datePointValue, setDatePointValue] = useState<number>(
+    dateToValue(dayjs(dateDefault.min))
+  );
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
 
@@ -320,6 +331,16 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     [setLastSelectedMapLayer]
   );
 
+  const handleSliderPointChange = useCallback(
+    (
+      event: Event | React.SyntheticEvent<Element, Event> | undefined,
+      value: number | number[]
+    ) => {
+      setDatePointValue(value as number);
+    },
+    []
+  );
+
   const onWMSAvailabilityChange = useCallback((isWMSAvailable: boolean) => {
     setIsWMSAvailable(isWMSAvailable);
   }, []);
@@ -410,7 +431,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 marginY: padding.large,
               }}
             >
-              <Map
+              <MapBox
                 animate={false}
                 panelId={mapContainerId}
                 projection={"mercator"} // Hexbin support this project or globe only
@@ -449,12 +470,29 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       )}
                       menu={
                         <DateRange
+                          key="date-range"
                           minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
                           maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
                           getAndSetDownloadConditions={
                             getAndSetDownloadConditions
                           }
                           downloadConditions={downloadConditions}
+                          options={
+                            discreteTimeSliderValues
+                              ? {
+                                  additionalSlider: (
+                                    <DateSliderPoint
+                                      valid_points={discreteTimeSliderValues?.get(
+                                        selectedWmsLayer
+                                      )}
+                                      onDatePointChange={
+                                        handleSliderPointChange
+                                      }
+                                    />
+                                  ),
+                                }
+                              : undefined
+                          }
                         />
                       }
                     />
@@ -489,16 +527,28 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     visible={lastSelectedMapLayer?.id === LayerName.Hexbin}
                   />
                   <GeoServerLayer
-                    geoServerLayerConfig={{
-                      urlParams: {
-                        START_DATE: filterStartDate,
-                        END_DATE: filterEndDate,
-                      },
-                    }}
+                    geoServerLayerConfig={
+                      // This value appears only if this dataset layer support single time
+                      // move, NOT range
+                      discreteTimeSliderValues
+                        ? {
+                            urlParams: {
+                              TIME: dayjs.utc(datePointValue!),
+                              MODE: Dimension.SINGLE,
+                            },
+                          }
+                        : {
+                            urlParams: {
+                              START_DATE: filterStartDate,
+                              END_DATE: filterEndDate,
+                            },
+                          }
+                    }
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
                     onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
                     setTimeSliderSupport={setTimeSliderSupport}
+                    setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
                     setDrawRectSupportSupport={setDrawRectSupportSupport}
                     collection={collection}
                     visible={lastSelectedMapLayer?.id === LayerName.GeoServer}
@@ -510,7 +560,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     }
                   />
                 </Layers>
-              </Map>
+              </MapBox>
             </Box>
           </Stack>
         </Grid>

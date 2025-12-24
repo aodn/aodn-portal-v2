@@ -47,10 +47,16 @@ import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 import { checkEmptyArray } from "../../../../utils/Helpers";
 import AdminScreenContext from "../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
+import { dateToValue } from "../../../../utils/DateUtils";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
   NONE = "none",
+}
+
+export enum Dimension {
+  SINGLE = "single",
+  RANGE = "range",
 }
 
 interface UrlParams {
@@ -58,6 +64,8 @@ interface UrlParams {
   BBOX?: string;
   START_DATE?: Dayjs;
   END_DATE?: Dayjs;
+  TIME?: Dayjs;
+  MODE?: Dimension;
   WIDTH?: number;
   HEIGHT?: number;
   X?: number;
@@ -157,6 +165,42 @@ const extractLayerName = (layer: ILink): string => {
   return layer.title;
 };
 
+const extractDiscreteDays = (
+  layers: MapLayerResponse[]
+): Map<string, Array<number>> | undefined => {
+  if (layers && layers.length > 0) {
+    const result: Map<string, Array<number>> = new Map();
+    layers.forEach((layer) => {
+      if (layer.ncWmsLayerInfo?.datesWithData) {
+        const nearest = dayjs(layer.ncWmsLayerInfo.nearestTimeIso);
+        const dates: number[] = [];
+        for (const [year, months] of Object.entries(
+          layer.ncWmsLayerInfo.datesWithData || {}
+        )) {
+          for (const [month, days] of Object.entries(months)) {
+            // Here assume that the time of all dateWithData follows the
+            // one that found in the nearestTimeIso. So we copy the value
+            // from nearest, then MUST make sure it is using utc() to avoid
+            // hr shift, then override the year month day with the value
+            // from datesWithDate
+            days.forEach((day) => {
+              const d = dayjs(nearest)
+                .utc()
+                .year(Number(year))
+                .month(Number(month) - 1)
+                .day(day);
+              dates.push(dateToValue(d));
+            });
+          }
+        }
+        result.set(layer.name, dates);
+      }
+    });
+    return result.size === 0 ? undefined : result;
+  }
+  return undefined;
+};
+
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
   geoServerLayerConfig,
   visible,
@@ -166,6 +210,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   onWmsLayerChange,
   setTimeSliderSupport,
   setDrawRectSupportSupport,
+  setDiscreteTimeSliderValues,
 }: GeoServerLayerProps) => {
   const { map, setLoading: setMapLoading } = useContext(MapContext);
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
@@ -224,6 +269,17 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         ? dayjs(dateDefault.max)
         : config.urlParams.END_DATE;
 
+    const time =
+      config.urlParams.TIME === undefined ||
+      config?.urlParams.TIME.isSame(dayjs(dateDefault.min))
+        ? undefined
+        : config.urlParams.TIME;
+
+    const datetime =
+      config?.urlParams?.MODE === Dimension.SINGLE
+        ? `${time?.toISOString()}` // Must ISO format, any slight diff in format will cause internal server error
+        : `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`;
+
     return config.uuid
       ? [
           formatToUrl<MapTileRequest>({
@@ -231,7 +287,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             params: {
               layerName: config.urlParams.LAYERS?.join(",") || "",
               bbox: config?.urlParams?.BBOX,
-              datetime: `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`,
+              ...(datetime !== undefined && { datetime }),
             },
           }),
         ]
@@ -240,7 +296,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.urlParams?.BBOX,
     config.urlParams.END_DATE,
     config.urlParams.LAYERS,
+    config.urlParams?.MODE,
     config.urlParams.START_DATE,
+    config.urlParams.TIME,
     config.uuid,
   ]);
 
@@ -515,74 +573,76 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       if (layerName && layerName.trim().length > 0) {
         setMapLoading?.(true);
 
-        dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
+        // We query the wms_layer first to get info related to map drawing, then we query what can be download
+        const wmsLayersRequest: MapFeatureRequest = {
+          uuid: collection.id,
+          layerName: layerName,
+        };
+
+        // Cancel previous search if exist
+        layerSearchRef.current?.abort();
+        const search = dispatch(fetchGeoServerMapLayers(wmsLayersRequest));
+
+        layerSearchRef.current = search;
+
+        search
           .unwrap()
-          .then((value) => {
-            // Successfully fetched fields, loading is complete
-            const foundDatetime = value.find(
-              (v) => v.type === "dateTime" || v.type === "date"
-            );
-            const foundGeo = value.find(
-              (v) => v.type === "geometrypropertytype"
-            );
-            setTimeSliderSupport?.(foundDatetime !== undefined);
-            setDrawRectSupportSupport?.(foundGeo !== undefined);
-            setIsFetchingWmsLayers(false);
-            onWFSAvailabilityChange?.(true);
+          .then((layers: MapLayerResponse[]) => {
+            if (layers && layers.length > 0 && !(search as any).aborted) {
+              handleWmsLayerChange(formWmsLayerOptions(layers)[0].value || "");
+              setWmsLayers(formWmsLayerOptions(layers));
+              setDiscreteTimeSliderValues?.(extractDiscreteDays(layers));
+              onWMSAvailabilityChange?.(true);
+            }
           })
-          .catch((error: ErrorResponse) => {
-            if (error.statusCode === 404) {
-              // Although no associated fields found for the layer, we can still display it,
-              // What is sure is you cannot do subsetting if we come here because there is
-              // no field that we can operate
-              const wmsLayersRequest: MapFeatureRequest = {
-                uuid: collection.id,
-                layerName: layerName,
-              };
-
-              // Cancel previous search if exist
-              layerSearchRef.current?.abort();
-
-              const search = dispatch(
-                fetchGeoServerMapLayers(wmsLayersRequest)
-              );
-
-              layerSearchRef.current = search;
-
-              search
-                .unwrap()
-                .then((layers) => {
-                  if (layers && layers.length > 0 && !(search as any).aborted) {
-                    handleWmsLayerChange(
-                      formWmsLayerOptions(layers)[0].value || ""
-                    );
-                    setWmsLayers(formWmsLayerOptions(layers));
-                    setIsFetchingWmsLayers(false);
-                    onWMSAvailabilityChange?.(true);
-                  }
-                })
-                .catch((error) => {
-                  // Fail or terminated fetch layer, assume WMS not available
-                  if (error.name !== "AbortError") {
-                    // If abort means there is another result coming, so we cannot
-                    // set value conclusively for now.
-                    onWMSAvailabilityChange?.(false);
-                    setIsFetchingWmsLayers(false);
-                  }
-                });
-            } else if (error.statusCode === HttpStatusCode.Unauthorized) {
-              // If is not allow likely due to white list, we should set the wms not support to block display WMS layer
+          .then(() => {
+            dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
+              .unwrap()
+              .then((value) => {
+                // Successfully fetched fields, loading is complete
+                const foundDatetime = value.find(
+                  (v) => v.type === "dateTime" || v.type === "date"
+                );
+                const foundGeo = value.find(
+                  (v) => v.type === "geometrypropertytype"
+                );
+                setTimeSliderSupport?.(foundDatetime !== undefined);
+                setDrawRectSupportSupport?.(foundGeo !== undefined);
+                onWFSAvailabilityChange?.(true);
+              })
+              .catch((error: ErrorResponse) => {
+                if (error.statusCode === 404) {
+                  // Although no associated fields found for the layer, we can still display it,
+                  // What is sure is you cannot do subsetting if we come here because there is
+                  // no field that we can operate
+                } else if (error.statusCode === HttpStatusCode.Unauthorized) {
+                  // If is not allow likely due to white list, we should set the wms not support to block display WMS layer
+                  onWMSAvailabilityChange?.(false);
+                  onWFSAvailabilityChange?.(false);
+                } else {
+                  console.log("Failed to fetch fields, ok to ignore", error);
+                }
+              })
+              .finally(() => {
+                setMapLoading?.(false);
+                setIsFetchingWmsLayers(false);
+              });
+          })
+          .catch((error) => {
+            // Fail or terminated fetch layer, assume WMS not available
+            if (error.name !== "AbortError") {
+              // If abort means there is another result coming, so we cannot
+              // set value conclusively for now.
               onWMSAvailabilityChange?.(false);
-              onWFSAvailabilityChange?.(false);
-            } else {
-              console.log("Failed to fetch fields, ok to ignore", error);
             }
           })
           .finally(() => {
             setMapLoading?.(false);
+            setIsFetchingWmsLayers(false);
           });
       } else {
         setIsFetchingWmsLayers(false);
+        setMapLoading?.(false);
       }
     };
     // Give a slight delay so that the state updated before we do fetch
@@ -594,6 +654,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     handleWmsLayerChange,
     onWFSAvailabilityChange,
     onWMSAvailabilityChange,
+    setDiscreteTimeSliderValues,
     setDrawRectSupportSupport,
     setMapLoading,
     setTimeSliderSupport,
