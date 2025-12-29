@@ -21,4 +21,4 @@ def handle_wms_downloadable_fields_api(route: Route) -> None:
         json_data = load_json_data(f'wms_download_fields/{data_id}.json')
         route.fulfill(json=json_data)
     except FileNotFoundError:
-        route.fulfill(json={})
+        route.fulfill(json=[])
