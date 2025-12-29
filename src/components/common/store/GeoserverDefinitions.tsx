@@ -46,13 +46,13 @@ export type MapLayerResponse = {
     bbox: Array<number>;
     palettes: Array<string>;
     defaultPalette: string;
-    scaleRange: Array<string>;
+    scaleRange: Array<number>;
     datesWithData: { [year: string]: { [month: string]: number[] } };
     numColorBands: number;
     supportedStyles: Array<string>;
     moreInfo: string;
     timeAxisUnits: string;
     nearestTimeIso: string;
-    logScale: boolean;
+    logScaling: boolean;
   };
 };
