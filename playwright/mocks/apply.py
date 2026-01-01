@@ -19,6 +19,7 @@ from mocks.api.vocabs import handle_vocabs_api
 from mocks.api.wms_map import (
     handle_wms_downloadable_fields_api,
     handle_wms_map_tile_api,
+    handle_wms_map_layers_api,
 )
 from mocks.api_router import ApiRouter
 
@@ -40,4 +41,5 @@ def apply_mock(page: Page) -> None:
         handle_detail_api, handle_detail_item_api
     )
     api_router.route_wms_map_tile(handle_wms_map_tile_api)
+    api_router.route_wms_layers(handle_wms_map_layers_api)
     api_router.route_wms_downloadable_fields(handle_wms_downloadable_fields_api)
