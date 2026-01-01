@@ -13,6 +13,10 @@ const pageDefault = {
   search: "/search",
   details: "/details",
   landing: "/",
+  url: {
+    IMOS: "https://imos.org.au",
+    AODN: "https://www.aodn.org.au",
+  },
 };
 
 const pageReferer = {

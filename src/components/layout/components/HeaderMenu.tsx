@@ -24,6 +24,7 @@ import {
 } from "../../../styles/constants";
 import { openInNewTab } from "../../../utils/LinkUtils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { pageDefault } from "../../common/constants";
 
 export enum HeaderMenuStyle {
   DROPDOWN_MENU = "DROPDOWN",
@@ -42,13 +43,13 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
         items: [
           {
             name: "About IMOS",
-            handler: () => openInNewTab("https://imos.org.au/"),
+            handler: () => openInNewTab(pageDefault.url.IMOS),
           },
           {
             name: "About AODN",
             handler: () =>
               openInNewTab(
-                "https://imos.org.au/data/about-the-australian-ocean-data-network"
+                `${pageDefault.url.IMOS}/data/about-the-australian-ocean-data-network`
               ),
           },
           {
@@ -63,7 +64,9 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
           {
             name: "Acknowledging Us",
             handler: () =>
-              openInNewTab("https://imos.org.au/resources/acknowledging-us"),
+              openInNewTab(
+                `${pageDefault.url.IMOS}/resources/acknowledging-us`
+              ),
           },
           {
             name: "Disclaimer",

@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { openInNewTab } from "../../../utils/LinkUtils";
 import HeaderMenu, { HeaderMenuStyle } from "../components/HeaderMenu";
 import { userEvent } from "@testing-library/user-event";
+import { pageDefault } from "../../common/constants";
 
 vi.mock("../../../utils/LinkUtils", () => ({
   openInNewTab: vi.fn(),
@@ -41,7 +42,7 @@ describe("HeaderMenu", () => {
         user.click(aboutImosItem);
         // Check if openInNewTab was called with the correct URL
         return waitFor(() =>
-          expect(openInNewTab).toHaveBeenCalledWith("https://imos.org.au/")
+          expect(openInNewTab).toHaveBeenCalledWith(pageDefault.url.IMOS)
         );
       });
     });
