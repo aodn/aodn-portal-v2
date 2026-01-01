@@ -14,7 +14,6 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import XIcon from "@mui/icons-material/X";
 import dayjs from "dayjs";
 import {
   borderRadius,
@@ -161,7 +160,9 @@ const Footer: FC = () => {
               gap={{ xs: 0, sm: 2 }}
             >
               <Button
-                onClick={() => openInNewTab("https://imos.org.au/terms-of-use")}
+                onClick={() =>
+                  openInNewTab(`${pageDefault.url.IMOS}/terms-of-use`)
+                }
               >
                 <Typography color="#000" paddingTop={gap.md}>
                   Terms of Use
@@ -169,7 +170,9 @@ const Footer: FC = () => {
               </Button>
               <Button
                 onClick={() =>
-                  openInNewTab("https://imos.org.au/resources/acknowledging-us")
+                  openInNewTab(
+                    `${pageDefault.url.IMOS}/resources/acknowledging-us`
+                  )
                 }
               >
                 <Typography color="#000" paddingTop={gap.md}>
@@ -178,7 +181,7 @@ const Footer: FC = () => {
               </Button>
               <Button
                 onClick={() =>
-                  openInNewTab("https://imos.org.au/conditions-of-use")
+                  openInNewTab(`${pageDefault.url.IMOS}/conditions-of-use`)
                 }
               >
                 <Typography color="#000" paddingTop={gap.md}>

@@ -6,10 +6,8 @@ import {
   fontSize,
   fontWeight,
   lineHeight,
-  padding,
 } from "../../../styles/constants";
 import useRedirectHome from "../../../hooks/useRedirectHome";
-import { openInNewTab } from "../../../utils/LinkUtils";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import {
   AODN_SITE_LOGO_HEIGHT,
@@ -38,11 +36,11 @@ const AODNSiteLogo = () => {
           cursor: "pointer",
           height: "100%",
         }}
-        href={"https://imos.org.au/"}
-        onClick={(e) => {
-          e.preventDefault();
-          openInNewTab("https://imos.org.au/");
-        }}
+        href={pageDefault.landing}
+        // onClick={(e) => {
+        //   Temp disable this due to user confuse, new design needed
+        //   openInNewTab(pageDefault.url.IMOS);
+        // }}
       >
         <img
           src={IMOS}
