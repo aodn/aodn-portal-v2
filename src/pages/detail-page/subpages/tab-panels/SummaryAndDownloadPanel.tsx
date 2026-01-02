@@ -158,7 +158,10 @@ export const buildMapLayerConfig = (
     if (lastSelectedLayer) {
       // Check if we have last selected layer, if yes, select it, otherwise select the first one
       layers.forEach((l) => (l.selected = l.id === lastSelectedLayer.id));
-    } else if (layers.find((l) => l.selected) === undefined) {
+    } else if (
+      layers.length > 0 &&
+      layers.find((l) => l.selected) === undefined
+    ) {
       // If non of the layer is set to selected, select the first one
       layers[0].selected = true;
     }
