@@ -109,7 +109,8 @@ export const buildMapLayerConfig = (
   hasSummaryFeature: boolean,
   isZarrDataset: boolean,
   isWMSAvailable: boolean,
-  hasSpatialExtent: boolean
+  hasSpatialExtent: boolean,
+  lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
 
@@ -127,39 +128,39 @@ export const buildMapLayerConfig = (
 
     // Must be ordered by Hexbin > GeoServer > Spatial extents
     if (isSupportHexbin) {
-      const l = {
+      const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.Hexbin,
         name: "Hex Grid",
-        default: true,
+        selected: true,
       };
       layers.push(l);
     }
 
     if (isWMSAvailable) {
-      const l = {
+      const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.GeoServer,
         name: "Geoserver",
         // If hexbin is supported, then geoserver is not default
-        default: !isSupportHexbin,
+        selected: !isSupportHexbin,
       };
       layers.push(l);
     }
 
     if (isSupportSpatialExtent) {
-      const l = {
+      const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.SpatialExtent,
         name: "Spatial Extent",
-        default: false,
+        selected: false,
       };
       layers.push(l);
     }
 
-    // Check if we have assigned any default, if no set the first one is default
-    if (
-      layers.length > 0 &&
-      layers.find((l) => l.default === true) === undefined
-    ) {
-      layers[0].default = true;
+    if (lastSelectedLayer) {
+      // Check if we have last selected layer, if yes, select it, otherwise select the first one
+      layers.forEach((l) => (l.selected = l.id === lastSelectedLayer.id));
+    } else if (layers.find((l) => l.selected) === undefined) {
+      // If non of the layer is set to selected, select the first one
+      layers[0].selected = true;
     }
   }
   return layers;
@@ -174,15 +175,18 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     featureCollection,
     downloadConditions,
     getAndSetDownloadConditions,
-    selectedWmsLayer,
-    setSelectedWmsLayer,
     lastSelectedMapLayer,
     setLastSelectedMapLayer,
+    selectedWmsLayer,
+    setSelectedWmsLayer,
     downloadService,
     setDownloadService,
   } = useDetailPageContext();
 
   // Need to init with null as collection value can be undefined when it entered this component.
+  const [mapLayerConfig, setMapLayerConfig] = useState<
+    LayerSwitcherLayer<LayerName>[]
+  >([]);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
@@ -198,8 +202,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [
     abstract,
     hasSummaryFeature,
-    hasSpatialExtent,
-    isZarrDataset,
     noMapPreview,
     minDateStamp,
     maxDateStamp,
@@ -225,71 +227,18 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
     }
 
-    return [
-      abstract,
-      hasSummaryFeature,
-      hasSpatialExtent,
-      isZarrDataset,
-      noMapPreview,
-      start,
-      end,
-    ];
-  }, [collection, downloadService]);
-
-  const checkSubsettingSupport = useCallback(
-    (subsettingType: SubsettingType) => {
-      switch (subsettingType) {
-        // Time slider support when
-        // 1. CO download is available
-        // 2. or the in geoserver and it supports time slider
-        case SubsettingType.TimeSlider:
-          return (
-            hasSummaryFeature ||
-            (lastSelectedMapLayer?.id === LayerName.GeoServer &&
-              timeSliderSupport)
-          );
-
-        // Draw rect support when
-        // 1. CO download is available
-        // 2. or the in geoserver and it supports draw rect
-        // Also the download service must be available
-        case SubsettingType.DrawRect:
-          return (
-            (hasSummaryFeature ||
-              (lastSelectedMapLayer?.id === LayerName.GeoServer &&
-                drawRectSupport)) &&
-            downloadService !== DownloadServiceType.Unavailable
-          );
-        default:
-          return false;
-      }
-    },
-    [
-      drawRectSupport,
-      downloadService,
-      hasSummaryFeature,
-      lastSelectedMapLayer?.id,
-      timeSliderSupport,
-    ]
-  );
-
-  const mapLayerConfig = useMemo(
-    (): LayerSwitcherLayer<LayerName>[] =>
+    setMapLayerConfig(
       buildMapLayerConfig(
         collection,
         hasSummaryFeature,
         isZarrDataset,
         isWMSAvailable,
-        hasSpatialExtent
-      ),
-    [
-      collection,
-      hasSummaryFeature,
-      isZarrDataset,
-      isWMSAvailable,
-      hasSpatialExtent,
-    ]
-  );
+        hasSpatialExtent,
+        lastSelectedMapLayer
+      )
+    );
+    return [abstract, hasSummaryFeature, noMapPreview, start, end];
+  }, [collection, downloadService, isWMSAvailable, lastSelectedMapLayer]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
@@ -316,17 +265,54 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     [onMapMoveEnd]
   );
 
+  const checkSubsettingSupport = useCallback(
+    (subsettingType: SubsettingType) => {
+      switch (subsettingType) {
+        // Time slider support when
+        // 1. CO download is available
+        // 2. or the in geoserver and it supports time slider
+        case SubsettingType.TimeSlider:
+          return (
+            hasSummaryFeature ||
+            (mapLayerConfig.filter((m) => m.selected)?.[0]?.id ===
+              LayerName.GeoServer &&
+              timeSliderSupport)
+          );
+
+        // Draw rect support when
+        // 1. CO download is available
+        // 2. or the in geoserver and it supports draw rect
+        // Also the download service must be available
+        case SubsettingType.DrawRect:
+          return (
+            (hasSummaryFeature ||
+              (mapLayerConfig.filter((m) => m.selected)?.[0]?.id ===
+                LayerName.GeoServer &&
+                drawRectSupport)) &&
+            downloadService !== DownloadServiceType.Unavailable
+          );
+        default:
+          return false;
+      }
+    },
+    [
+      hasSummaryFeature,
+      mapLayerConfig,
+      timeSliderSupport,
+      drawRectSupport,
+      downloadService,
+    ]
+  );
+
   const handleMapLayerChange = useCallback(
     (layer: LayerSwitcherLayer<LayerName>) => {
-      setLastSelectedMapLayer(
-        (prevLayer: LayerSwitcherLayer<LayerName> | null) => {
-          if (prevLayer) {
-            prevLayer.default = false;
-          }
-          layer.default = true;
-          return layer;
-        }
-      );
+      layer.selected = true;
+      setLastSelectedMapLayer(layer);
+      setMapLayerConfig((prevLayers: LayerSwitcherLayer<LayerName>[]) => {
+        const layers = [...prevLayers];
+        layers.forEach((l) => (l.selected = l.id === layer.id));
+        return layers;
+      });
     },
     [setLastSelectedMapLayer]
   );
@@ -379,15 +365,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     (wmsLayerName: string) => setSelectedWmsLayer(wmsLayerName),
     [setSelectedWmsLayer]
   );
-
-  useEffect(() => {
-    setLastSelectedMapLayer((v) => {
-      if (mapLayerConfig.length > 0) {
-        return mapLayerConfig.filter((m) => m.default)[0] || mapLayerConfig[0];
-      }
-      return v;
-    });
-  }, [mapLayerConfig, setLastSelectedMapLayer]);
 
   useEffect(() => {
     // Set the type of download based on simple  in collection, the value
@@ -524,7 +501,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     featureCollection={featureCollection}
                     filterStartDate={filterStartDate}
                     filterEndDate={filterEndDate}
-                    visible={lastSelectedMapLayer?.id === LayerName.Hexbin}
+                    visible={
+                      mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+                      LayerName.Hexbin
+                    }
                   />
                   <GeoServerLayer
                     geoServerLayerConfig={
@@ -551,12 +531,16 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
                     setDrawRectSupportSupport={setDrawRectSupportSupport}
                     collection={collection}
-                    visible={lastSelectedMapLayer?.id === LayerName.GeoServer}
+                    visible={
+                      mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+                      LayerName.GeoServer
+                    }
                   />
                   <GeojsonLayer
                     collection={collection}
                     visible={
-                      lastSelectedMapLayer?.id === LayerName.SpatialExtent
+                      mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+                      LayerName.SpatialExtent
                     }
                   />
                 </Layers>
