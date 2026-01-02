@@ -41,7 +41,7 @@ export enum LayerName {
 export interface LayerSwitcherLayer<T = string> {
   id: T;
   name: string;
-  default?: boolean;
+  selected?: boolean;
 }
 
 interface LayerSwitcherProps
@@ -56,7 +56,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [currentLayer, setCurrentLayer] = useState<LayerName | undefined>(
-    layers.find((layer) => layer.default)?.id
+    layers.find((layer) => layer.selected)?.id
   );
 
   const handleToggle = useCallback(() => {
@@ -64,8 +64,8 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   }, [setOpen]);
 
   useEffect(() => {
-    const defaultLayer = layers.filter((layer) => layer.default);
-    setCurrentLayer(defaultLayer[0]?.id || layers[0]?.id);
+    const selected = layers.filter((layer) => layer.selected);
+    setCurrentLayer(selected[0]?.id || layers[0]?.id);
   }, [layers]);
 
   useEffect(() => {

@@ -6,7 +6,10 @@ import {
   getMinMaxDateStamps,
 } from "../SummaryAndDownloadPanel";
 import { dateDefault } from "../../../../../components/common/constants";
-import { LayerName } from "../../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import {
+  LayerName,
+  LayerSwitcherLayer,
+} from "../../../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import {
   OGCCollection,
   DatasetType,
@@ -186,7 +189,7 @@ describe("buildMapLayerConfig", () => {
       getBBox: () => any;
     }> = {}
   ) => {
-    const mockCollection = {
+    return {
       hasSummaryFeature: vi
         .fn()
         .mockReturnValue(overrides.hasSummaryFeature ?? false),
@@ -195,8 +198,6 @@ describe("buildMapLayerConfig", () => {
         .mockReturnValue(overrides.getDatasetType?.() ?? undefined),
       getBBox: vi.fn().mockReturnValue(overrides.getBBox?.() ?? undefined),
     } as unknown as OGCCollection;
-
-    return mockCollection;
   };
 
   it("returns empty array when collection is null", () => {
@@ -227,13 +228,13 @@ describe("buildMapLayerConfig", () => {
     expect(result[0]).toEqual({
       id: LayerName.Hexbin,
       name: "Hex Grid",
-      default: true,
-    });
+      selected: true,
+    } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
       id: LayerName.GeoServer,
       name: "Geoserver",
-      default: false,
-    });
+      selected: false,
+    } as LayerSwitcherLayer<LayerName>);
   });
 
   it("builds correct layer config for zarr dataset with spatial extent", () => {
@@ -255,8 +256,8 @@ describe("buildMapLayerConfig", () => {
     expect(result[0]).toEqual({
       id: LayerName.SpatialExtent,
       name: "Spatial Extent",
-      default: true, // Should be set to true as it's the only layer
-    });
+      selected: true, // Should be set to true as it's the only layer
+    } as LayerSwitcherLayer<LayerName>);
   });
 
   it("sets first layer as default when no layer has default set to true", () => {
@@ -276,8 +277,8 @@ describe("buildMapLayerConfig", () => {
     expect(result[0]).toEqual({
       id: LayerName.SpatialExtent,
       name: "Spatial Extent",
-      default: true, // Should be set to true as it's the only layer
-    });
+      selected: true, // Should be set to true as it's the only layer
+    } as LayerSwitcherLayer<LayerName>);
   });
 
   it("builds layer config with multiple layers and correct defaults", () => {
@@ -297,13 +298,13 @@ describe("buildMapLayerConfig", () => {
     expect(result[0]).toEqual({
       id: LayerName.Hexbin,
       name: "Hex Grid",
-      default: true,
-    });
+      selected: true,
+    } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
       id: LayerName.GeoServer,
       name: "Geoserver",
-      default: false, // Not default because hexbin is available
-    });
+      selected: false, // Not default because hexbin is available
+    } as LayerSwitcherLayer<LayerName>);
   });
 
   it("returns empty array when no layers are available (no preview mode)", () => {
