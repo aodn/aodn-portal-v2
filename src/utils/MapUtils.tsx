@@ -122,7 +122,9 @@ export const isDrawModeRectangle = (
   const ctrl = map._controls?.find((c: any) => c instanceof MapboxDraw);
   return ctrl?.getMode() === DRAW_RECTANGLE_MODE;
 };
-
+// Mapbox do not create a bbox box align with EPSG:3857 if you use the bounds value, you need to adjust it
+// with functions, however, if you use the url directly with "{bbox-epsg-3857}", then mapbox will do the cal for you.
+// in case you are not able to use the "{bbox-epsg-3857}" then you need to do the cal yourself
 export const boundingBoxInEpsg3857 = (map: MapboxMap) => {
   const bounds = map.getBounds();
   const sw = bounds?.getSouthWest();
