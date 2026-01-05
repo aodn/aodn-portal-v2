@@ -43,7 +43,10 @@ import {
 } from "../../../common/store/OGCCollectionDefinitions";
 import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
-import { isDrawModeRectangle } from "../../../../utils/MapUtils";
+import {
+  boundingBoxInEpsg3857,
+  isDrawModeRectangle,
+} from "../../../../utils/MapUtils";
 import { checkEmptyArray } from "../../../../utils/Helpers";
 import AdminScreenContext from "../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
@@ -461,7 +464,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         height: map.getCanvas().height,
         x: Math.round(event.point.x),
         y: Math.round(event.point.y),
-        bbox: map.getBounds()?.toArray().flat().join(","),
+        bbox: boundingBoxInEpsg3857(map),
       };
 
       dispatch(fetchGeoServerMapFeature(request))
