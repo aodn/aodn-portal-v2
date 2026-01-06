@@ -91,9 +91,9 @@ const Footer: FC = () => {
               lineHeight={2}
               px={1}
             >
-              The Australian Ocean Data Network (AODN) stands at the forefront
-              of marine data management in Australia, providing an essential
-              infrastructure for the discovery, sharing and reuse of
+              The IMOS Australian Ocean Data Network (AODN) stands at the
+              forefront of marine data management in Australia, providing an
+              essential infrastructure for the discovery, sharing and reuse of
               comprehensive marine and climate data. By managing the IMOS data
               collection program and incorporating contributions from
               universities and government research agencies, AODN supports a
