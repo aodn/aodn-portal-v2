@@ -1,0 +1,4 @@
+[
+  { "label": "timestamp", "type": "dateTime", "name": "timestamp" },
+  { "label": "geom", "type": "geometrypropertytype", "name": "geom" }
+]

@@ -189,17 +189,17 @@ const MapSection: React.FC<MapSectionProps> = memo(
                       {
                         id: LayerName.Cluster,
                         name: capitalizeFirstLetter(LayerName.Cluster),
-                        default: selectedLayer === LayerName.Cluster,
+                        selected: selectedLayer === LayerName.Cluster,
                       },
                       {
                         id: LayerName.Uncluster,
                         name: capitalizeFirstLetter(LayerName.Uncluster),
-                        default: selectedLayer === LayerName.Uncluster,
+                        selected: selectedLayer === LayerName.Uncluster,
                       },
                       {
                         id: LayerName.Heatmap,
                         name: capitalizeFirstLetter(LayerName.Heatmap),
-                        default: selectedLayer === LayerName.Heatmap,
+                        selected: selectedLayer === LayerName.Heatmap,
                       },
                     ]}
                     onEvent={(

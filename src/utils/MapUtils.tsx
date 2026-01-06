@@ -1,5 +1,9 @@
 import { Root } from "react-dom/client";
-import { LngLatBoundsLike, Map as MapboxMap } from "mapbox-gl";
+import {
+  LngLatBoundsLike,
+  Map as MapboxMap,
+  MercatorCoordinate,
+} from "mapbox-gl";
 import { Position } from "geojson";
 import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
 import { MapDefaultConfig } from "../components/map/mapbox/constants";
@@ -18,6 +22,9 @@ const DEFAULT_BASE_ZOOM = 8;
  * [west, south, east, north] format
  */
 const BBOX_COORDINATES_COUNT = 4;
+
+const worldSize = 40075016.68; // Full projected width/height in meters
+const half = worldSize / 2;
 
 /**
  * Fits the map view to the specified bounding box with intelligent zoom calculation
@@ -114,4 +121,26 @@ export const isDrawModeRectangle = (
   // The control is the instance we added with `map.addControl(draw)`
   const ctrl = map._controls?.find((c: any) => c instanceof MapboxDraw);
   return ctrl?.getMode() === DRAW_RECTANGLE_MODE;
+};
+// Mapbox do not create a bbox box align with EPSG:3857 if you use the bounds value, you need to adjust it
+// with functions, however, if you use the url directly with "{bbox-epsg-3857}", then mapbox will do the cal for you.
+// in case you are not able to use the "{bbox-epsg-3857}" then you need to do the cal yourself
+export const boundingBoxInEpsg3857 = (map: MapboxMap) => {
+  const bounds = map.getBounds();
+  const sw = bounds?.getSouthWest();
+  const ne = bounds?.getNorthEast();
+
+  if (sw && ne) {
+    // Project to EPSG:3857 meters
+    const sw3857 = MercatorCoordinate.fromLngLat(sw);
+    const ne3857 = MercatorCoordinate.fromLngLat(ne);
+
+    const minX = sw3857.x * worldSize - half;
+    const maxX = ne3857.x * worldSize - half;
+    const maxY = -(ne3857.y * worldSize - half); // south: higher normalized y
+    const minY = -(sw3857.y * worldSize - half); // north: lower normalized y
+
+    return [minX, minY, maxX, maxY].join(",");
+  }
+  return undefined;
 };
