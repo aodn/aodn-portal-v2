@@ -19,5 +19,4 @@ class Routes:
     COLLECTION_DETAIL_ITEM = f'{PREFIX}/collections/*/items/summary'
 
     WMS_MAP_TILE = '*/**/items/wms_map_tile?*'
-    WMS_LAYERS = '*/**/items/wms_layers?*'
     WMS_DOWNLOADABLE_FIELDS = '*/**/items/wms_downloadable_fields?*'

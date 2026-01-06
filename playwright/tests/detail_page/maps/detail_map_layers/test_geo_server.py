@@ -5,7 +5,6 @@ from playwright.sync_api import Page, expect
 
 from core.enums.layer_type import LayerType
 from core.factories.layer import LayerFactory
-from mocks.api.wms_map import create_api_handler
 from mocks.api_router import ApiRouter
 from pages.detail_page import DetailPage
 
@@ -72,12 +71,6 @@ def test_map_shows_geoserver_layer_with_only_timeSlider_support(
     """
     detail_page = DetailPage(responsive_page)
     layer_factory = LayerFactory(detail_page.detail_map)
-    # Mock WMS downloadable fields API to support only time subsetting
-    wms_downloadable_fields_handler = create_api_handler(
-        is_time_supported=True, is_geometry_supported=False
-    )
-    api_router = ApiRouter(responsive_page)
-    api_router.route_wms_downloadable_fields(wms_downloadable_fields_handler)
 
     detail_page.load(uuid)
     expect(detail_page.wms_link_header).to_be_visible()
@@ -122,12 +115,6 @@ def test_map_shows_geoserver_layer_with_only_drawRect_support(
     """
     detail_page = DetailPage(responsive_page)
     layer_factory = LayerFactory(detail_page.detail_map)
-    # Mock WMS downloadable fields API to support only draw rectangle subsetting
-    wms_downloadable_fields_handler = create_api_handler(
-        is_time_supported=False, is_geometry_supported=True
-    )
-    api_router = ApiRouter(responsive_page)
-    api_router.route_wms_downloadable_fields(wms_downloadable_fields_handler)
 
     detail_page.load(uuid)
     expect(detail_page.wms_link_header).to_be_visible()
@@ -221,6 +208,7 @@ def test_data_not_on_whitelist(desktop_page: Page, uuid: str) -> None:
 
     detail_page.load(uuid)
     detail_page.detail_map.wait_for_map_loading()
+    detail_page.pause()
 
     # Ensure that the Spatial Extent option is displayed in the layers menu
     detail_page.detail_map.layers_menu.click()
