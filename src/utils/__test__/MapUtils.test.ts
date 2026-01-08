@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
-import { overallBoundingBox } from "../MapUtils";
+import { fitToBound, overallBoundingBox } from "../MapUtils";
+import { Map as MapboxMap } from "mapbox-gl";
 
 describe("MapUtils", () => {
   it("returns default bounding box when collection is undefined", () => {
@@ -70,5 +71,43 @@ describe("MapUtils", () => {
       MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON,
       MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT,
     ]);
+  });
+
+  it("adjusts east > 180 by subtracting 360 for Pacific bbox", () => {
+    const map = {
+      cameraForBounds: vi.fn(),
+      flyTo: vi.fn(),
+    } as unknown as MapboxMap;
+
+    const bbox = [176, -72, 276, -48]; // crosses antimeridian
+
+    fitToBound(map, bbox);
+
+    expect(map.cameraForBounds).toHaveBeenCalledWith(
+      [
+        [176, -72],
+        [276 - 360, -48],
+      ],
+      expect.objectContaining({ padding: 20 })
+    );
+  });
+
+  it("does not adjust when east <= 180", () => {
+    const map = {
+      cameraForBounds: vi.fn(),
+      flyTo: vi.fn(),
+    } as unknown as MapboxMap;
+
+    const bbox = [-10, -20, 30, 40];
+
+    fitToBound(map, bbox);
+
+    expect(map.cameraForBounds).toHaveBeenCalledWith(
+      [
+        [-10, -20],
+        [30, 40],
+      ],
+      expect.any(Object)
+    );
   });
 });
