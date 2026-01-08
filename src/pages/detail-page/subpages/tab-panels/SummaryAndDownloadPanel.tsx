@@ -216,7 +216,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
     const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
     const noMapPreview =
-      downloadService === DownloadServiceType.Unavailable && !hasSpatialExtent;
+      downloadService === DownloadServiceType.Unavailable &&
+      !hasSpatialExtent &&
+      !isWMSAvailable;
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
     // time value, for example cloud optimized date range may be different from the
     // geoserver one
