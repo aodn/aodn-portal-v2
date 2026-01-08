@@ -54,7 +54,7 @@ def test_map_shows_geoserver_layer_with_timeSlider_and_drawRect_support(
 @pytest.mark.parametrize(
     'uuid',
     [
-        '1fba3a57-35f4-461b-8a0e-551af229714e',
+        '0dd3832a-cf67-4068-a446-a9c91c77273e',
     ],
 )
 def test_map_shows_geoserver_layer_with_only_timeSlider_support(
@@ -98,7 +98,7 @@ def test_map_shows_geoserver_layer_with_only_timeSlider_support(
 @pytest.mark.parametrize(
     'uuid',
     [
-        '1fba3a57-35f4-461b-8a0e-551af229714e',
+        '0145df96-3847-474b-8b63-a66f0e03ff54',
     ],
 )
 def test_map_shows_geoserver_layer_with_only_drawRect_support(
@@ -142,7 +142,7 @@ def test_map_shows_geoserver_layer_with_only_drawRect_support(
 @pytest.mark.parametrize(
     'uuid',
     [
-        '69e9ac91-babe-47ed-8c37-0ef08f29338a',
+        '08067a15-2615-4b3e-9b04-23f6a08abb75',
     ],
 )
 def test_map_shows_geoserver_layer_without_timeSlider_and_drawRect_support(
@@ -192,15 +192,15 @@ def test_map_shows_geoserver_layer_without_timeSlider_and_drawRect_support(
         '4739e4b0-4dba-4ec5-b658-02c09f27ab9a',  # Not on whitelist
     ],
 )
-def test_data_not_on_whitelist(desktop_page: Page, uuid: str) -> None:
+def test_data_not_on_whitelist(responsive_page: Page, uuid: str) -> None:
     """
     This test uses a dataset with a WMS link and bounding box coordinates, but the dataset is not on the whitelist.
     As a result, the WMS downloadable fields API returns an unauthorized error.
     It verifies that the GeoServer layer does not appear on the map, while the Spatial Extent layer is displayed.
     """
-    detail_page = DetailPage(desktop_page)
+    detail_page = DetailPage(responsive_page)
     # Mock WMS downloadable fields API to return 401 Unauthorized
-    api_router = ApiRouter(desktop_page)
+    api_router = ApiRouter(responsive_page)
     api_router.route_wms_downloadable_fields(
         lambda route: route.fulfill(status=HTTPStatus.UNAUTHORIZED)
     )
@@ -208,7 +208,6 @@ def test_data_not_on_whitelist(desktop_page: Page, uuid: str) -> None:
 
     detail_page.load(uuid)
     detail_page.detail_map.wait_for_map_loading()
-    detail_page.pause()
 
     # Ensure that the Spatial Extent option is displayed in the layers menu
     detail_page.detail_map.layers_menu.click()

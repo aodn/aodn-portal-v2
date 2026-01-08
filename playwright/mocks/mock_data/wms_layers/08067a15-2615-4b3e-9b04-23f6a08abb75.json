@@ -1,0 +1,48 @@
+[
+  {
+    "queryable": "1",
+    "opaque": "0",
+    "name": "MaC_3_6_Furneaux_mapped_extent",
+    "title": "Mapping of temperate subtidal seagrass in Tayaritja (Furneaux Group), Tasmania: surveyed area & validation extent (NESP MaC 3.6)",
+    "abstract_": "",
+    "keywordList": {
+      "keyword": ["NESP_MaC_3_6_Furneaux_mapping_extent", "boundary"]
+    },
+    "crs": ["EPSG:4326", "CRS:84"],
+    "geographicBoundingBox": {
+      "westBoundLongitude": 147.7188754890127,
+      "eastBoundLongitude": 148.51711845045622,
+      "southBoundLatitude": -40.61193567958787,
+      "northBoundLatitude": -39.63519747098644
+    },
+    "boundingBoxes": [
+      {
+        "minx": 147.7188754890127,
+        "miny": -40.61193567958787,
+        "maxx": 148.51711845045622,
+        "maxy": -39.63519747098644,
+        "crs": "CRS:84"
+      },
+      {
+        "minx": -40.61193567958787,
+        "miny": 147.7188754890127,
+        "maxx": -39.63519747098644,
+        "maxy": 148.51711845045622,
+        "crs": "EPSG:4326"
+      }
+    ],
+    "style": {
+      "name": "boundary_Furneaux_mapping",
+      "title": "boundary_Furneaux_mapping",
+      "legendURL": {
+        "width": 241,
+        "height": 40,
+        "format": "image/png",
+        "onlineResource": {
+          "type": "simple",
+          "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=MaC_3_6_Furneaux_mapped_extent"
+        }
+      }
+    }
+  }
+]

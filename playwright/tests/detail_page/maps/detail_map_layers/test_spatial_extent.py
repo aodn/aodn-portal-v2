@@ -13,7 +13,7 @@ from pages.detail_page import DetailPage
     ],
 )
 def test_map_shows_only_spatial_extent_layer(
-    desktop_page: Page, uuid: str
+    responsive_page: Page, uuid: str
 ) -> None:
     """
     This test uses a dataset that has bounding box coordinates but no WMS or summary links.
@@ -23,7 +23,7 @@ def test_map_shows_only_spatial_extent_layer(
     1. The Spatial Extent layer option is displayed in the layers menu
     2. The Spatial Extent layer is added to the map and is visible
     """
-    detail_page = DetailPage(desktop_page)
+    detail_page = DetailPage(responsive_page)
 
     layer_factory = LayerFactory(detail_page.detail_map)
 
@@ -42,21 +42,21 @@ def test_map_shows_only_spatial_extent_layer(
 @pytest.mark.parametrize(
     'uuid',
     [
-        '19da2ce7-138f-4427-89de-a50c724f5f54',  # contains bbox and a ZARR dataset
+        '19da2ce7-138f-4427-89de-a50c724f5f54',
     ],
 )
 def test_map_shows_both_geoserver_and_spatial_extent_layer(
-    desktop_page: Page, uuid: str
+    responsive_page: Page, uuid: str
 ) -> None:
     """
-    This test uses a dataset that has bounding box coordinates and is a ZARR dataset.
+    This test uses a ZARR dataset with a WMS link and has bounding box coordinates.
     It verifies that both the GeoServer and Spatial Extent layers appear on the map.
 
     This test ensures that:
     1. The Spatial Extent layer option is displayed in the layers menu
     2. Both the GeoServer layer and the Spatial Extent layer are added to the map and visible
     """
-    detail_page = DetailPage(desktop_page)
+    detail_page = DetailPage(responsive_page)
 
     layer_factory = LayerFactory(detail_page.detail_map)
 
@@ -90,12 +90,14 @@ def test_map_shows_both_geoserver_and_spatial_extent_layer(
         'd9199700-cdda-4d18-bce7-fc0aeee55ba1',  # No bbox or WMS or summary links
     ],
 )
-def test_map_shows_preview_not_available(desktop_page: Page, uuid: str) -> None:
+def test_map_shows_preview_not_available(
+    responsive_page: Page, uuid: str
+) -> None:
     """
     This test uses a dataset that doesn't have bounding box coordinates, WMS links, or summary links.
     It verifies that map shows 'Map Preview Not Available' announcement.
     """
-    detail_page = DetailPage(desktop_page)
+    detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     detail_page.detail_map.wait_for_map_idle()

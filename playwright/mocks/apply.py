@@ -18,8 +18,8 @@ from mocks.api.search_collections import (
 from mocks.api.vocabs import handle_vocabs_api
 from mocks.api.wms_map import (
     handle_wms_downloadable_fields_api,
-    handle_wms_map_tile_api,
     handle_wms_map_layers_api,
+    handle_wms_map_tile_api,
 )
 from mocks.api_router import ApiRouter
 

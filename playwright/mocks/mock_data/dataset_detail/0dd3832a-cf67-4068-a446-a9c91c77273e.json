@@ -1,0 +1,495 @@
+{
+  "properties": {
+    "contacts": [
+      {
+        "name": "Cosoli, Simone",
+        "organization": "Oceans Graduate School (OGS), The University of Western Australia (UWA)",
+        "position": "Facility leader",
+        "emails": ["simone.cosoli@uwa.edu.au"],
+        "addresses": [
+          {
+            "city": "Crawley",
+            "country": "Australia",
+            "delivery_point": ["M051, 35 Stirling Highway"],
+            "administrative_area": "Western Australia",
+            "postal_code": "6009"
+          }
+        ],
+        "roles": ["pointOfContact", "about"],
+        "phones": [
+          {
+            "value": "+61 8 6488 7314",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "position": "Data Officer",
+        "emails": ["info@aodn.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["University of Tasmania", "Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://imos.org.au/aodn.html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Australian Ocean Data Network (AODN)"
+          }
+        ],
+        "roles": ["pointOfContact", "about"],
+        "phones": [
+          {
+            "value": "61 3 6226 7488",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "position": "Data Officer",
+        "emails": ["info@aodn.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["University of Tasmania", "Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://imos.org.au/aodn.html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Australian Ocean Data Network (AODN)"
+          }
+        ],
+        "roles": ["distributor", "metadata"],
+        "phones": [
+          {
+            "value": "61 3 6226 7488",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "emails": ["imos@imos.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.imos.org.au/html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Integrated Marine Observing System (IMOS)"
+          }
+        ],
+        "roles": ["resourceProvider", "citation"],
+        "phones": [
+          {
+            "value": "61 3 6226 7549",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      },
+      {
+        "organization": "Fisheries Research and Development Corporation (FRDC)",
+        "emails": ["frdc@frdc.com.au"],
+        "addresses": [
+          {
+            "city": "Deakin",
+            "country": "Australia",
+            "delivery_point": ["25 Geils Court"],
+            "administrative_area": "Australian Capital Territory",
+            "postal_code": "2600"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://www.frdc.com.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Fisheries Research and Development Corporation (FRDC)"
+          }
+        ],
+        "roles": ["resourceProvider", "citation"],
+        "phones": [
+          {
+            "value": "61 2 6122 2100",
+            "roles": ["voice"]
+          }
+        ]
+      }
+    ],
+    "status": "onGoing",
+    "pace": "real-time",
+    "credits": [
+      "Australia’s Integrated Marine Observing System (IMOS) is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS). It is operated by a consortium of institutions as an unincorporated joint venture, with the University of Tasmania as Lead Agent.",
+      "Fisheries Research and Development Corporation (FRDC)",
+      "The University of Western Australia (UWA)"
+    ],
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [111.81, -31.970000000000002],
+              [115.87000000000002, -31.970000000000002],
+              [115.87000000000002, -28.4],
+              [111.81, -28.4],
+              [111.81, -31.970000000000002]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "license": "Creative Commons Attribution 4.0 International License",
+    "centroid": [[113.75, -30.25]],
+    "revision": "2025-03-25T03:16:38",
+    "themes": [
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Oceans | Ocean Circulation | Eddies",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          },
+          {
+            "id": "Oceans | Ocean Circulation | Ocean Currents",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          },
+          {
+            "id": "Oceans | Ocean Circulation | Upwelling",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          },
+          {
+            "id": "Oceans | Ocean Circulation | Wind-driven Circulation",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          },
+          {
+            "id": "Oceans | Coastal Processes | Coral Reefs",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          },
+          {
+            "id": "Radiance Or Imagery | Radio Wave | Radio Wave",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "IMOS Site | CORL | Coral Coast HF ocean radar site",
+            "description": "IMOS",
+            "title": "IMOS Keywords Thesaurus"
+          },
+          {
+            "id": "Marine Features (Australia) | Leeuwin Current",
+            "description": "IMOS",
+            "title": "IMOS Keywords Thesaurus"
+          },
+          {
+            "id": "SeaSonde (CODAR) HF Radar | Amplitude Direction Finding",
+            "description": "IMOS",
+            "title": "IMOS Keywords Thesaurus"
+          },
+          {
+            "id": "Doppler Frequency",
+            "description": "IMOS",
+            "title": "IMOS Keywords Thesaurus"
+          },
+          {
+            "id": "Physical Oceanography",
+            "description": "IMOS",
+            "title": "IMOS Keywords Thesaurus"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "concepts": [
+          {
+            "id": "Global / Oceans | Indian Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Perth Canyon, WA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "concepts": [
+          {
+            "id": "Coastal Cities / Towns (Australia) | Perth, WA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Turquoise Coast, WA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Australia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | Western Australia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "SeaSonde direction finding HF radar",
+            "url": "http://vocab.aodn.org.au/def/platform/entity/727",
+            "description": "",
+            "title": "AODN Platform Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Northward current velocity in the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/LCNSZZ01",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Current direction in the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/LCDAZZ01",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Eastward current velocity in the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/LCEWZZ01",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Current speed in the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/383",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "surface current radars",
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/303",
+            "description": "",
+            "title": "AODN Instrument Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "concepts": [
+          {
+            "id": "Ocean Radar Facility, Integrated Marine Observing System (IMOS)",
+            "url": "http://vocab.aodn.org.au/def/organisation/entity/469",
+            "description": "",
+            "title": "AODN Organisation Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "Categories",
+        "concepts": [
+          {
+            "id": "oceans"
+          }
+        ]
+      }
+    ],
+    "ai:description": "The Coral Coast (CORL) HF ocean radar system covers an area of the Western Australia Coast, Western Australia, an area subject to the variability of the Leeuwin Current (LC) and its coupling with coastal winds, tides, and waves. In this area the LC generates several eddies which control the larval species and the higher marine species and ecosystems in which they forage.\n\nThe CORL HF ocean radar system consists of two SeaSonde crossed loop direction finding stations located at Dongara - Port Denison (29.283 S 114.920E) and Green Head (114.967 E 30.073 S).  These radars operate at a frequency of 4.463 MHz, with a bandwidth of 25 KHz, a maximum range of 200 Km and a range resolution of 6 Km.  Within the HF radar coverage area surface currents are measured.\n\nThe CORL area of coverage has a small overlap of commonly observed ocean with the Turqoise Coast (TURQ) SeaSonde HF ocean radar system on its southern side, which in turns early overlaps with the Rottnest HF radar node.  Together, the CORL, TURQ and ROT systems provide continuous monitoring of the shelf from Fremantle to Geraldton.",
+    "temporal": [
+      {
+        "start": "2019-04-17T14:00:00Z"
+      }
+    ],
+    "citation": {
+      "suggestedCitation": "The citation in a list of references is: \"IMOS, FRDC [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access].\"",
+      "useLimitations": [
+        "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose."
+      ],
+      "otherConstraints": [
+        "Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: \"Data was sourced from Australia’s Integrated Marine Observing System (IMOS) – IMOS is enabled by the National Collaborative Research Infrastructure strategy (NCRIS).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in 'credit' in the metadata record)."
+      ]
+    },
+    "statement": "This site was offline from November 2022 - March 2023",
+    "dataset_group": ["imos"],
+    "creation": "2020-07-13T15:03:03"
+  },
+  "id": "0dd3832a-cf67-4068-a446-a9c91c77273e",
+  "title": "IMOS - Ocean Radar - Coral Coast HF ocean radar site (Western Australia, Australia) - Real-time sea water velocity",
+  "description": "The Coral Coast (CORL) HF ocean radar system covers an area of the Western Australia Coast, Western Australia, an area subject to the variability of the Leeuwin Current (LC) and its coupling with coastal winds, tides, and waves. In this area the LC generates several eddies which control the larval species and the higher marine species and ecosystems in which they forage.\n\nThe CORL HF ocean radar system consists of two SeaSonde crossed loop direction finding stations located at Dongara - Port Denison (29.283 S 114.920E) and Green Head (114.967 E 30.073 S).  These radars operate at a frequency of 4.463 MHz, with a bandwidth of 25 KHz, a maximum range of 200 Km and a range resolution of 6 Km.  Within the HF radar coverage area surface currents are measured.\n\nThe CORL area of coverage has a small overlap of commonly observed ocean with the Turqoise Coast (TURQ) SeaSonde HF ocean radar system on its southern side, which in turns early overlaps with the Rottnest HF radar node.  Together, the CORL, TURQ and ROT systems provide continuous monitoring of the shelf from Fremantle to Geraldton.",
+  "links": [
+    {
+      "href": "http://imos.org.au/facilities/oceanradar",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Ocean Radar page on IMOS website",
+      "ai:group": "Other"
+    },
+    {
+      "href": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ACORN/gridded_1h-avg-current-map_non-QC/CORL/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog",
+      "ai:group": "Data Access > thredds"
+    },
+    {
+      "href": "http://content.aodn.org.au/Documents/IMOS/Facilities/ocean_radar/QC_procedures_for_IMOS_Ocean_Radar_manual_LATEST.pdf",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Quality Control procedures for IMOS Ocean Radar Manual",
+      "ai:group": "Document"
+    },
+    {
+      "href": "https://portal.aodn.org.au/search?uuid=0dd3832a-cf67-4068-a446-a9c91c77273e",
+      "rel": "related",
+      "type": "text/html",
+      "title": "View and download data though the AODN Portal"
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ncwms",
+      "rel": "wms",
+      "type": "",
+      "title": "acorn_hourly_avg_corl_nonqc_timeseries_url/sea_water_velocity",
+      "ai:group": "Data Access > wms",
+      "description": "Coral Coast - sea water velocity (non-QC data) - WMS layer"
+    },
+    {
+      "href": "https://processes.aodn.org.au/wps",
+      "rel": "OGC:WPS--gogoduck",
+      "type": "",
+      "title": "acorn_hourly_avg_corl_nonqc_timeseries_url",
+      "description": "The GoGoDuck subsets and aggregates gridded data.  Data is returned as a NetCDF file."
+    },
+    {
+      "href": "https://help.aodn.org.au/web-services/gogoduck-aggregator/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "GoGoDuck help documentation"
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+      "rel": "IMOS:AGGREGATION--bodaac",
+      "type": "",
+      "title": "acorn_hourly_avg_corl_nonqc_timeseries_url#file_url",
+      "description": "The ncUrlList is a WFS service that returns a list of URLs matching a query."
+    },
+    {
+      "href": "https://help.aodn.org.au/web-services/ncurllist-service/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "ncUrlList help documentation"
+    },
+    {
+      "href": "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/10d2b13d-2b4b-4480-8836-327cac8c1081.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/0dd3832a-cf67-4068-a446-a9c91c77273e",
+      "rel": "describedby",
+      "type": "text/html",
+      "title": "Full metadata link"
+    },
+    {
+      "href": "https://licensebuttons.net/l/by/4.0/88x31.png",
+      "rel": "license",
+      "type": "image/png"
+    },
+    {
+      "href": "http://creativecommons.org/licenses/by/4.0/",
+      "rel": "license",
+      "type": "text/html"
+    },
+    {
+      "href": "uuid:133b2add-6e03-49b4-9b4e-f2c450d9590e",
+      "rel": "parent",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Ocean Radar - Coral Coast HF ocean radar site (Western Australia, Australia)\",\"recordAbstract\":\"The Coral Coast (CORL) HF ocean radar system covers an area of the Western Australia Coast, Western Australia, an area subject to the variability of the Leeuwin Current (LC) and its coupling with coastal winds, tides, and waves. In this area the LC generates several eddies which control the larval species and the higher marine species and ecosystems in which they forage.\\n\\nThe CORL HF ocean radar system consists of two SeaSonde crossed loop direction finding stations located at Dongara - Port Denison (29.283 S 114.920E) and Green Head (114.967 E 30.073 S). These radars operate at a frequency of 4.463 MHz, with a bandwidth of 25 KHz, a maximum range of 200 Km and a range resolution of 6 Km. Within the HF radar coverage area surface currents are measured.\\n\\nThe CORL area of coverage has a small overlap of commonly observed ocean with the Turqoise Coast (TURQ) SeaSonde HF ocean radar system on its southern side, which in turns early overlaps with the Rottnest HF radar node. Together, the CORL, TURQ and ROT systems provide continuous monitoring of the shelf from Fremantle to Geraldton.\"}"
+    },
+    {
+      "href": "uuid:21e55994-932c-4de2-8a06-8e0e28574d1f",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Ocean Radar - Dongara - Port Denison HF ocean radar station (Coral Coast, Western Australia, Australia)\",\"recordAbstract\":\"The Dongara - Port Denison (DONG) HF ocean radar site (29.283 S 114.920 E) is one of two HF ocean radars covering the Coral Coast north of Perth. The other HF ocean radar station is at Green Head. The HF ocean radar coverage is from the coast to beyond the edge of the continental shelf.\\n\\nThe DONG HF ocean radar is a SeaSonde crossed-loop direction finding array. This radar operates at a frequency of 4.463 MHz, with a bandwidth of 25 KHz, a maximum range of 200 Km and a range resolution of 6 Km. The antenna bearing is 288 deg true east of north (approximately west by north-west).\\n\\nWithin the HF radar coverage area surface current radials are measured.\"}"
+    },
+    {
+      "href": "uuid:f7b36a1c-0936-4da6-b47f-94ed538b367e",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Ocean Radar - Coral Coast HF ocean radar site (Western Australia, Australia) - Delayed mode sea water velocity\",\"recordAbstract\":\"The Coral Coast (CORL) HF ocean radar system covers an area of the Western Australia Coast, Western Australia, an area subject to the variability of the Leeuwin Current (LC) and its coupling with coastal winds, tides, and waves. In this area the LC generates several eddies which control the larval species and the higher marine species and ecosystems in which they forage.\\n\\nThe CORL HF ocean radar system consists of two SeaSonde crossed loop direction finding stations located at Dongara (29.283 S 114.920E) and Green Head (114.967 E 30.073 S). These radars operate at a frequency of 4.463 MHz, with a bandwidth of 25 KHz, a maximum range of 200 Km and a range resolution of 6 Km. Within the HF radar coverage area surface currents are measured.\\n\\nThe CORL area of coverage has a small overlap of commonly observed ocean with the Turqoise Coast (TURQ) SeaSonde HF ocean radar system on its southern side, which in turns early overlaps with the Rottnest HF radar node. Together, the CORL, TURQ and ROT systems provide continuous monitoring of the shelf from Fremantle to Geraldton.\"}"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [111.81, -31.97, 115.87, -28.4],
+        [111.81, -31.97, 115.87, -28.4]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["2019-04-17T14:00:00.000+00:00", null],
+        ["2019-04-17T14:00:00.000+00:00", null]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}
