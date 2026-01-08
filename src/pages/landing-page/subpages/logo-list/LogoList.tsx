@@ -162,8 +162,8 @@ const LogoList: FC = () => {
             <Typography variant="title1Medium" color={rc8Theme.palette.text2}>
               IMOS thanks the many other organisations who partner with IMOS,
               providing co-investment, funding and operational support,
-              including investment from the Tasmanian, Western Australian and
-              Queensland State Governments.
+              including investment from the Tasmanian and Western Australian
+              Governments.
             </Typography>
           </Grid>
         </Grid>

@@ -1,11 +1,13 @@
 import { FC } from "react";
 import {
+  Avatar,
   Box,
   Button,
   Divider,
   Grid,
   Icon,
   IconButton,
+  Stack,
   SxProps,
   Tooltip,
   Typography,
@@ -14,6 +16,7 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
+import traditional from "@/assets/icons/traditional.png";
 import dayjs from "dayjs";
 import {
   borderRadius,
@@ -91,9 +94,9 @@ const Footer: FC = () => {
               lineHeight={2}
               px={1}
             >
-              The Australian Ocean Data Network (AODN) stands at the forefront
-              of marine data management in Australia, providing an essential
-              infrastructure for the discovery, sharing and reuse of
+              The IMOS Australian Ocean Data Network (AODN) stands at the
+              forefront of marine data management in Australia, providing an
+              essential infrastructure for the discovery, sharing and reuse of
               comprehensive marine and climate data. By managing the IMOS data
               collection program and incorporating contributions from
               universities and government research agencies, AODN supports a
@@ -199,7 +202,23 @@ const Footer: FC = () => {
         />
         <Grid item xs={12} paddingY={padding.large}>
           <Grid container>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={7}>
+              <Stack
+                direction="row"
+                gap={2}
+                alignItems="center"
+                justifyContent="center"
+                marginBottom={2}
+              >
+                <Avatar src={traditional} />
+                <Typography color="#000" fontSize={fontSize.subscription}>
+                  IMOS acknowledges the Traditional Custodians and Elders of the
+                  land and sea on which we work and observe, and recognise them
+                  as Australia’s first marine scientists and carers of sea
+                  Country. We pay our respects to Aboriginal and Torres Strait
+                  Islander peoples past and present.
+                </Typography>
+              </Stack>
               <Typography
                 color="#000"
                 fontSize={fontSize.subscription}
@@ -212,7 +231,7 @@ const Footer: FC = () => {
             <Grid
               item
               xs={12}
-              sm={6}
+              sm={5}
               display="flex"
               justifyContent={{ xs: "center", sm: "end" }}
               alignItems="center"
