@@ -59,7 +59,9 @@ export const fitToBound = (
       const [west, south, east, north] = boundsArray;
       const bounds: LngLatBoundsLike = [
         [west, south],
-        [east, north],
+        // cameraForBounds do not handle cross antimeridian
+        // and takes shortest path (Atlantic-centered).
+        [east > 180 ? east - 360 : east, north],
       ];
 
       const { center, zoom } = map.cameraForBounds(bounds, {
