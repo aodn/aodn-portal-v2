@@ -118,7 +118,7 @@ class ApiRouter:
         self.route(Routes.WMS_MAP_LAYERS, handler_function)
 
     def unroute_wms_layers(
-            self, handler_function: Optional[Callable] = None
+        self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.WMS_MAP_LAYERS, handler_function)
 

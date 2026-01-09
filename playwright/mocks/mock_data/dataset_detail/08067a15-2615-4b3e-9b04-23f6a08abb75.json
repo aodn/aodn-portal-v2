@@ -1,0 +1,595 @@
+{
+  "properties": {
+    "contacts": [
+      {
+        "name": "Lucieer, Vanessa",
+        "organization": "Institute for Marine and Antarctic Studies",
+        "emails": ["vanessa.lucieer@utas.edu.au"],
+        "addresses": [
+          {
+            "country": "Australia",
+            "administrative_area": "Tasmania"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0001-7531-5750",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "name": "Ierodiaconou, Daniel",
+        "organization": "Deakin University",
+        "emails": ["Daniel.Ierodoconou@deakin.edu.au"],
+        "addresses": [
+          {
+            "country": "Australia",
+            "administrative_area": "Victoria"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0002-7832-4801",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "name": "Emma Flukes",
+        "organization": "Institute for Marine and Antarctic Studies",
+        "position": "NESP Marine and Coastal Hub Data Manager (Southern node)",
+        "emails": ["Emma.Flukes@utas.edu.au"],
+        "roles": ["pointOfContact", "metadata"]
+      },
+      {
+        "name": "Lucieer, Vanessa",
+        "organization": "Institute for Marine and Antarctic Studies",
+        "position": "Project Leader",
+        "emails": ["vanessa.lucieer@utas.edu.au"],
+        "addresses": [
+          {
+            "country": "Australia",
+            "administrative_area": "Tasmania"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0001-7531-5750",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["principalInvestigator", "citation"]
+      },
+      {
+        "name": "Ierodiaconou, Daniel",
+        "organization": "Deakin University",
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0002-7832-4801",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["principalInvestigator", "citation"]
+      },
+      {
+        "name": "Lyons, Mitchell",
+        "organization": "University of New South Wales",
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0003-3960-3522",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Monk, Jacquomo",
+        "organization": "Institute for Marine and Antarctic Studies",
+        "addresses": [
+          {
+            "delivery_point": ["University of Tasmania"]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0002-1874-0619",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Strain, Elisabeth",
+        "organization": "Institute for Marine and Antarctic Studies",
+        "addresses": [
+          {
+            "delivery_point": ["University of Tasmania"]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0003-2165-9544",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Flukes, Emma",
+        "organization": "Institute for Marine and Antarctic Studies",
+        "addresses": [
+          {
+            "delivery_point": ["University of Tasmania"]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0003-2749-834X",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Hulls, Justin",
+        "organization": "Institute for Marine and Antarctic Studies",
+        "addresses": [
+          {
+            "delivery_point": ["University of Tasmania"]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://orcid.org/0009-0008-4513-0198",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Carnell, Paul",
+        "organization": "RMIT University",
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0001-6747-1366",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Dalby, Oliver",
+        "organization": "Deakin University",
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0001-6187-7656",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Ellis, Megan",
+        "organization": "Deakin University",
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0002-6076-3187",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Sherman, Craig",
+        "organization": "Deakin University",
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0003-2099-0462",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Fractal, Kelsie",
+        "organization": "Institute for Marine and Antarctic Studies",
+        "addresses": [
+          {
+            "delivery_point": ["University of Tasmania"]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://orcid.org/0009-0006-3180-6084",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Yusuf, Anne",
+        "organization": "RMIT University",
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0002-4104-8487",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Trevanthan-Tackett, Stacey",
+        "organization": "RMIT University",
+        "links": [
+          {
+            "href": "https://orcid.org/0000-0002-4977-0757",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "ORCID"
+          }
+        ],
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Wise, A",
+        "organization": "Tasmanian Aboriginal Centre",
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Maher, Fiona",
+        "organization": "Tasmanian Aboriginal Centre",
+        "roles": ["collaborator", "citation"]
+      },
+      {
+        "name": "Cozens, Zoe",
+        "organization": "Tasmanian Aboriginal Centre",
+        "roles": ["collaborator", "citation"]
+      }
+    ],
+    "status": "complete",
+    "pace": "other",
+    "credits": ["NESP Marine & Coastal Hub"],
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [147.72615315223652, -39.86742759751769],
+              [147.72431041706295, -39.87900574630486],
+              [147.75202376907714, -39.91071004696846],
+              [147.75853633300096, -39.97300364535799],
+              [147.74504218343168, -39.99769412675021],
+              [147.73847795760514, -40.02645778504302],
+              [147.71142325622088, -40.0533986293791],
+              [147.7016421154102, -40.08392544801416],
+              [147.69763189738978, -40.12430220596229],
+              [147.71359302414714, -40.141553522298295],
+              [147.77156661944548, -40.15900840096384],
+              [147.79001119640054, -40.17610527405168],
+              [147.8303021966451, -40.2075918075891],
+              [147.8393661420239, -40.24101304591778],
+              [147.83701644082305, -40.26540306443195],
+              [147.82311225063836, -40.29565879325827],
+              [147.82122771385968, -40.325712423741614],
+              [147.8399134693185, -40.36951972804945],
+              [147.84473453703458, -40.38605279798708],
+              [147.84503721095018, -40.40684849066587],
+              [147.8627533251488, -40.44827173753112],
+              [147.90451562214128, -40.48713787267161],
+              [147.95186755497548, -40.53098079495652],
+              [148.02216423537357, -40.580237952592995],
+              [148.05479517116805, -40.601504703404544],
+              [148.09988144262286, -40.61975266755548],
+              [148.1698662042146, -40.64005247742426],
+              [148.25880096238257, -40.641023698636786],
+              [148.32779805597193, -40.622410027053775],
+              [148.37637752941407, -40.58982545540393],
+              [148.4296816985526, -40.54744627097186],
+              [148.4891755391975, -40.50899239405396],
+              [148.53584587884598, -40.4936618806342],
+              [148.57118615102797, -40.47913314949824],
+              [148.5870616875668, -40.46150060600877],
+              [148.59488916113264, -40.421492066010096],
+              [148.58515208343064, -40.38942186502061],
+              [148.57462670218501, -40.36092474275643],
+              [148.56527768112824, -40.345260617878296],
+              [148.55139589111857, -40.32330131576674],
+              [148.52401462789192, -40.280196657230874],
+              [148.50235622200614, -40.23801529006533],
+              [148.48500251078315, -40.199569058585666],
+              [148.4687610202884, -40.16658579782028],
+              [148.44602011445613, -40.1372575689893],
+              [148.42078553223166, -40.096841933955155],
+              [148.41244363161672, -40.051530276515045],
+              [148.39980026852743, -40.015222052460445],
+              [148.3940426687327, -39.977303323879475],
+              [148.39157289762022, -39.95335013874029],
+              [148.37553159119807, -39.89777017039046],
+              [148.36419819261198, -39.88580700780573],
+              [148.35243821938695, -39.85217354665633],
+              [148.32357763612436, -39.77911643459885],
+              [148.2943111613656, -39.74244088995431],
+              [148.24918382196256, -39.703988578593005],
+              [148.20954811785592, -39.66576169508006],
+              [148.16552048458902, -39.63380461008461],
+              [148.11178536896523, -39.618807591362206],
+              [148.0547833800839, -39.609406494333086],
+              [148.0060913860151, -39.601227836034475],
+              [147.96023819092565, -39.60273010624518],
+              [147.93576112513188, -39.609218520033835],
+              [147.9232022743829, -39.6229066514079],
+              [147.91817034721055, -39.63590961111323],
+              [147.9054148503891, -39.64111839197619],
+              [147.89212129867167, -39.65524406931746],
+              [147.87041519776403, -39.67518520081154],
+              [147.86026606141604, -39.68477446103747],
+              [147.82649829116122, -39.713810744358845],
+              [147.81087122745407, -39.756705272017825],
+              [147.79221510908917, -39.77781906115274],
+              [147.7891968008703, -39.79363227294749],
+              [147.76655445807012, -39.81975860818677],
+              [147.75375327954225, -39.842503228228],
+              [147.73703629056638, -39.85143030979776],
+              [147.72615315223652, -39.86742759751769]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "license": "Creative Commons Attribution 4.0 International License",
+    "centroid": [[148.125, -40.125]],
+    "revision": "2025-11-20T12:31:31",
+    "themes": [
+      {
+        "scheme": "",
+        "concepts": [
+          {
+            "id": "National Environmental Science Program (NESP) Marine and Coastal Hub",
+            "description": "",
+            "title": "Keywords (Theme)"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "MARINE",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/bc320625-d9ba-41f5-9336-57e86fd878f3",
+            "description": "Science Keywords",
+            "title": "GCMD Earth science Keywords"
+          },
+          {
+            "id": "BENTHIC",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/09a78997-581b-4d1b-ae71-b2b3f96ef719",
+            "description": "Science Keywords",
+            "title": "GCMD Earth science Keywords"
+          },
+          {
+            "id": "MARINE ECOSYSTEMS",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/f6350232-b1c7-458c-bc43-bda357ebb6db",
+            "description": "Science Keywords",
+            "title": "GCMD Earth science Keywords"
+          },
+          {
+            "id": "SEAGRASS",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/e36c5faa-c772-4bb0-aeca-b361e160ce9d",
+            "description": "Science Keywords",
+            "title": "GCMD Earth science Keywords"
+          },
+          {
+            "id": "MACROALGAE (SEAWEEDS)",
+            "url": "https://gcmd.earthdata.nasa.gov/kms/concept/e731c2a1-e4b0-42e9-bed9-bd911c9b496c",
+            "description": "Science Keywords",
+            "title": "GCMD Earth science Keywords"
+          }
+        ]
+      },
+      {
+        "scheme": "Categories",
+        "concepts": [
+          {
+            "id": "biota"
+          }
+        ]
+      }
+    ],
+    "ai:description": "Seagrass beds are a dominant marine ecosystem of Tayaritja (the Furneaux Group of Islands) in the north-eastern waters off Tasmania. Historical coarse mapping has indicated extensive beds of Posidonia, Amphibolis, Heterozostera, and Zostera species, potentially comprising some of the largest and deepest seagrass extents found in temperate Australian waters. However, limited data on the distribution and ecological value of these seagrass habitats represents a significant knowledge gap in understanding Australia's wetland natural assets.\n\nThis project mapped the extent, ecological composition, population structure, and blue carbon value of seagrass beds around Tayaritja, in partnership with the Tasmanian Aboriginal Centre. The study area focused on the coastal waters surrounding Flinders Island in the western Furneaux Group, with mapping extending from the high tide line to the depth limit of reliable optical detection (approximately 30 m), based on analysis of field data and satellite imagery capabilities in the region.\n\nThis record specifically describes the benthic mapping component of the study. See https://doi.org/10.25959/WRXK-KV06 for imagery annotation data from the field validation campaigns.\n\nA combination of close-range remote sensing methods was used to map the extent and ecological values of seagrass beds. The approach developed through this study contributed to the creation of the NESP Standard Operating Procedure (SOP) for Seagrass Mapping using Optical Remote Sensing (https://sustainabledevelopmentreform.github.io/nesp-sop-seagrass-mapping).\n\nHigh-resolution satellite imagery from Sentinel-2 (10 m) sensors, combined with bathymetric LiDAR data and oceanographic variables, was used to map baseline seagrass extent and composition. A field campaign deployed a Benthic Observation Survey System (BOSS) and unBaited Remote Underwater stereo-Video system (stereo-uBRUV) at approximately 400 locations to validate remote sensing outputs. From these data, maps were produced showing the extent and coverage of seagrass, sand, and macroalgae, and where possible, seagrass species composition, subject to water depth and clarity constraints.\n\nSee the \"Lineage\" section of this record for full methodology.\n\nThree key types of mapping products were developed:\n\n- Occurrence probability maps\n  - Continuous probability surfaces (0-100%), modelled from presence/absence data, indicating the likelihood of habitat presence at each pixel for:\n    - Seagrass (all morphologies; > 5% cover observed in underwater field imagery)\n    - Macroalgae species/assemblages\n    - Sand\n\n- Habitat percentage cover maps\n  - Quantitative estimates of percent cover for each habitat category:\n    - Seagrass (all morphologies)\n    - Macroalgae species/assemblages\n    - Sand\n\n---Derived products---\n\n- Baseline binary presence/extent maps derived from optimised probability thresholds:\n  - Seagrass:     sgprob > 0.5 & sgprob > macroprob & sandcover < 0.9\n  - Macroalgae: macroprob > 0.5 & macroprob > sgprob & sandcover < 0.9\n  - Sand:           sandprob > 0.5 & sandcover < 0.2\n\n- Predicted seagrass species composition of binary extent map.\n\n- Fractional cover visualisation: combining cover percentages of multiple habitats into a single composite product\n\n- Composite habitat maps: combining binary habitat extents and delineating mixed habitat classes\n\nThese complementary products serve different purposes: \n\n- probability maps provide confidence measures, \n- extent maps delineate habitat boundaries, \n- percent cover maps support quantitative analysis of habitat density patterns, and \n- composite habitat maps represent the diversity of mixed habitat classes. \n\nTogether, they provide a comprehensive understanding of seagrass and associated habitat distribution across the study area.",
+    "temporal": [
+      {
+        "start": "2019-12-31T13:00:00Z",
+        "end": "2023-12-31T12:59:59Z"
+      }
+    ],
+    "citation": {
+      "suggestedCitation": "Cite data as: Lucieer, V., Ierodiaconou, D., Lyons, M., Monk, J., Strain, E., Flukes, E., Hulls, J., Carnell, P., Dalby, O., Ellis, M. R., Sherman, C., Fractal, K., Yusuf, A., Trevathan-Tackett, S., Wise, A., Maher, F., & Cozens, Z. (2025). Mapping of temperate subtidal seagrass beds in Tayaritja Sea Country (Furneaux Group of Islands), Lutruwita (Tasmania) [Data set]. Institute for Marine and Antarctic Studies. https://doi.org/10.25959/E4S6-GE74",
+      "useLimitations": [
+        "Data was sourced from the NESP Marine and Coastal Hub – the Marine and Coastal Hub is supported through funding from the Australian Government’s National Environmental Science Program (NESP), administered by the Department of Climate Change, Energy, the Environment and Water."
+      ],
+      "otherConstraints": [
+        "This dataset is hosted by the Institute for Marine and Antarctic Studies (IMAS), University of Tasmania, on behalf of NESP Marine and Coastal Hub Project 3.6."
+      ]
+    },
+    "statement": "----Field Data Collection----\nField data collection followed the protocols outlined in Section 5 of the Seagrass Mapping SOP (https://sustainabledevelopmentreform.github.io/nesp-sop-seagrass-mapping/#5-training-data-collection-and-curation). Two stereo-video platforms were deployed using a statistically balanced sampling approach. See https://doi.org/10.25959/WRXK-KV06 for a full description and access to field validation data.\n\n\n---Satellite Imagery---\nSentinel-2 multispectral imagery from 01-01-2020 to 31-12-2023 was used to create multi-temporal stacks. Clouds were masked using Google Cloud Score Plus. Composite images were produced using percentile metrics (20th, 40th, 60th, 80th)\n\n\n---Environmental Data Sources---\nSeveral ancillary data sources were integrated to provide information on water depth (influences light availability) and improve classification accuracy:\n• High-resolution LiDAR bathymetry from surveys conducted for the Australian Hydrographic Office\n• Lower-resolution LiDAR and sonar bathymetry to fill gaps in the primary dataset\n• Derived products including slope and rugosity at multiple scales\n• Wavewatch III wave hindcast model (metrics included average wave power, maximum wave power, standard deviation)\n\nData was then interpolated to create a uniform grid with appropriate spatial resolution for the study area.\n\n\n---Classification Approach---\nA Boosted Regression Tree machine learning algorithm was selected for its effectiveness with complex environmental data, with parameters optimised for this study. \n\nThe classification approach consisted of three main steps:\n\n• Probabilistic Classification: Generation of a continuous probability (from classification trees) surface indicating the likelihood of seagrass (+ macroalgae/sand) presence at each pixel\n• Habitat percent cover regression: Generation of continuous percentage cover estimates (from regression trees) indicating cover of seagrass (+ macroalgae/sand) in each pixel\n• Threshold Selection and Extent Mapping: Determination of a probability threshold, combining with information from other modelled products and manual editing boundaries, to define a baseline seagrass extent\n\nSee 3.6 Case Study SOP (https://sustainabledevelopmentreform.github.io/nesp-sop-seagrass-mapping/case_study_NESP3.6/NESP_3.6_case_study.html) for a full description of the modelling approach and associated code.",
+    "dataset_group": ["imas"],
+    "creation": "2015-05-06T11:44:25"
+  },
+  "id": "08067a15-2615-4b3e-9b04-23f6a08abb75",
+  "title": "Mapping of temperate subtidal seagrass beds in Tayaritja Sea Country (Furneaux Group of Islands), Lutruwita (Tasmania) (NESP MaC 3.6)",
+  "description": "Seagrass beds are a dominant marine ecosystem of Tayaritja (the Furneaux Group of Islands) in the north-eastern waters off Tasmania. Historical coarse mapping has indicated extensive beds of Posidonia, Amphibolis, Heterozostera, and Zostera species, potentially comprising some of the largest and deepest seagrass extents found in temperate Australian waters. However, limited data on the distribution and ecological value of these seagrass habitats represents a significant knowledge gap in understanding Australia's wetland natural assets.\n\nThis project mapped the extent, ecological composition, population structure, and blue carbon value of seagrass beds around Tayaritja, in partnership with the Tasmanian Aboriginal Centre. The study area focused on the coastal waters surrounding Flinders Island in the western Furneaux Group, with mapping extending from the high tide line to the depth limit of reliable optical detection (approximately 30 m), based on analysis of field data and satellite imagery capabilities in the region.\n\nThis record specifically describes the benthic mapping component of the study. See https://doi.org/10.25959/WRXK-KV06 for imagery annotation data from the field validation campaigns.\n\nA combination of close-range remote sensing methods was used to map the extent and ecological values of seagrass beds. The approach developed through this study contributed to the creation of the NESP Standard Operating Procedure (SOP) for Seagrass Mapping using Optical Remote Sensing (https://sustainabledevelopmentreform.github.io/nesp-sop-seagrass-mapping)..\n\nHigh-resolution satellite imagery from Sentinel-2 (10 m) sensors, combined with bathymetric LiDAR data and oceanographic variables, was used to map baseline seagrass extent and composition. A field campaign deployed a Benthic Observation Survey System (BOSS) and unBaited Remote Underwater stereo-Video system (stereo-uBRUV) at approximately 400 locations to validate remote sensing outputs. From these data, maps were produced showing the extent and coverage of seagrass, sand, and macroalgae, and where possible, seagrass species composition, subject to water depth and clarity constraints.\n\nSee the \"Lineage\" section of this record for full methodology.\n\nThree key types of mapping products were developed:\n\n---Occurrence probability maps---\nContinuous probability surfaces (0-100%), modelled from presence/absence data, indicating the likelihood of habitat presence at each pixel for:\n• Seagrass (all morphologies; > 5% cover observed in underwater field imagery)\n• Macroalgae species/assemblages\n• Sand\n\n---Habitat percentage cover maps---\nQuantitative estimates of percent cover for each habitat category:\n• Seagrass (all morphologies)\n• Macroalgae species/assemblages\n• Sand\n\n---Derived products---\n• Baseline binary presence/extent maps derived from optimised probability thresholds:\n    ○ Seagrass:     sgprob > 0.5 & sgprob > macroprob & sandcover < 0.9\n    ○ Macroalgae: macroprob > 0.5 & macroprob > sgprob & sandcover < 0.9\n    ○ Sand:           sandprob > 0.5 & sandcover < 0.2\n• Predicted seagrass species composition of binary extent map.\n• Fractional cover visualisation: combining cover percentages of multiple habitats into a single composite product\n• Composite habitat maps: combining binary habitat extents and delineating mixed habitat classes\n\nThese complementary products serve different purposes: probability maps provide confidence measures, extent maps delineate habitat boundaries, percent cover maps support quantitative analysis of habitat density patterns, and composite habitat maps represent the diversity of mixed habitat classes. Together, they provide a comprehensive understanding of seagrass and associated habitat distribution across the study area.",
+  "links": [
+    {
+      "href": "https://data.imas.utas.edu.au/attachments/08067a15-2615-4b3e-9b04-23f6a08abb75/derived",
+      "rel": "data",
+      "type": "",
+      "title": "DATA ACCESS - derived products (binary habitat extents, seagrass species composition, composite habitat map)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://data.imas.utas.edu.au/attachments/08067a15-2615-4b3e-9b04-23f6a08abb75/occurrence_probability",
+      "rel": "data",
+      "type": "",
+      "title": "DATA ACCESS - probability of occurrence for each habitat class",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://data.imas.utas.edu.au/attachments/08067a15-2615-4b3e-9b04-23f6a08abb75/percent_cover",
+      "rel": "data",
+      "type": "",
+      "title": "DATA ACCESS - percent cover for each habitat class",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://data.imas.utas.edu.au/attachments/08067a15-2615-4b3e-9b04-23f6a08abb75/raw",
+      "rel": "data",
+      "type": "",
+      "title": "DATA ACCESS - fractional cover detection products (multiband probability and % cover for all habitat classes)",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=MaC_3_6_Furneaux_mapped_extent&outputFormat=SHAPE-ZIP",
+      "rel": "data",
+      "type": "",
+      "title": "Vector mask of field-validated vs unvalidated regions of the prediction area (.shp)",
+      "ai:group": "Data Access > wfs"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "MaC_3_6_Furneaux_fractionalcover",
+      "ai:group": "Data Access > wms",
+      "description": "MAP - Fractional cover of all habitats"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "MaC_3_6_Furneaux_seagrass_extent_mask",
+      "ai:group": "Data Access > wms",
+      "description": "MAP - Seagrass baseline extent (binary)"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "MaC_3_6_Furneaux_proboccurrence_seagrass_mask",
+      "ai:group": "Data Access > wms",
+      "description": "MAP - seagrass probability of occurrence"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "MaC_3_6_Furneaux_perccover_seagrass_mask",
+      "ai:group": "Data Access > wms",
+      "description": "MAP - seagrass percent cover"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "MaC_3_6_Furneaux_domspecies_seagrass",
+      "ai:group": "Data Access > wms",
+      "description": "MAP - dominant seagrass species"
+    },
+    {
+      "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "MaC_3_6_Furneaux_habitat_combined_mask",
+      "ai:group": "Data Access > wms",
+      "description": "MAP - combined benthic habitat map"
+    },
+    {
+      "href": "https://seamapaustralia.org/map/#9d83b272-083b-4fbc-ba21-d3fb84efc0fa",
+      "rel": "WWW:LINK-1.0-http--portal",
+      "type": "",
+      "title": "View & explore mapping products in Seamap Australia",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://squidle.org/geodata/explore/img?filters={\"campaign_ids\":[967,1106,1138]}",
+      "rel": "related",
+      "type": "text/html",
+      "title": "View underwater imagery (BOSS, uBRUV) on Squidle+",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://sustainabledevelopmentreform.github.io/nesp-sop-seagrass-mapping/case_study_NESP3.6/NESP_3.6_case_study.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Standard Operating Procedure for Seagrass Mapping using Optical Remote Sensing: NESP 3.6 Case Study",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/1bb8f09c-99d6-431f-b902-4d3e4cef02df.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://metadata.imas.utas.edu.au/geonetwork/srv/api/records/08067a15-2615-4b3e-9b04-23f6a08abb75/attachments/overview1.png",
+      "rel": "preview",
+      "type": "image"
+    },
+    {
+      "href": "https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search#/metadata/08067a15-2615-4b3e-9b04-23f6a08abb75",
+      "rel": "describedby",
+      "type": "text/html",
+      "title": "Full metadata link"
+    },
+    {
+      "href": "http://i.creativecommons.org/l/by/4.0/88x31.png",
+      "rel": "license",
+      "type": "image/png"
+    },
+    {
+      "href": "http://creativecommons.org/licenses/by/4.0/",
+      "rel": "license",
+      "type": "text/html"
+    },
+    {
+      "href": "uuid:8f3696d0-ae35-4d48-8a79-59121a5ae168",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"Imagery from BOSS and uBRUV drops for mapping temperate subtidal seagrass of Tayaritja Sea Country (Furneaux Group of Islands), Lutruwita (Tasmania) (NESP MaC 3.6)\",\"recordAbstract\":\"Seagrass beds are a dominant marine ecosystem of Tayaritja (the Furneaux Group of Islands) in the north-eastern waters off Tasmania. Historical coarse mapping has indicated extensive beds of Posidonia, Amphibolis, Heterozostera, and Zostera species, potentially comprising some of the largest and deepest seagrass extents found in temperate Australian waters. However, limited data on the distribution and ecological value of these seagrass habitats represents a significant knowledge gap in understanding Australia's wetland natural assets.\\n\\nThis project mapped the extent, ecological composition, population structure, and blue carbon value of seagrass beds around Tayaritja, in partnership with the Tasmanian Aboriginal Centre. The study area focused on the coastal waters surrounding Flinders Island in the western Furneaux Group, with mapping extending from the high tide line to the depth limit of reliable optical detection (approximately 30 m), based on analysis of field data and satellite imagery capabilities in the region.\\n\\nThe field validation component of this study involved deployment of benthic video platforms to capture imagery of seagrass beds and associated ecosystems. A field campaign deployed a Benthic Observation Survey System (BOSS) and unBaited Remote Underwater stereo-Video system (stereo-uBRUV) at approximately 400 locations to collect photoquadrats and validate remote sensing outputs. Imagery annotation was conducted in the SQUIDLE+ platform.\\n\\nSee dataset https://doi.org/10.25959/e4s6-ge74 for habitat maps derived from field validation and remote sensing inputs.\\n\\nThe approach developed through this study contributed to the creation of the NESP Standard Operating Procedure (SOP) for Seagrass Mapping using Optical Remote Sensing (https://sustainabledevelopmentreform.github.io/nesp-sop-seagrass-mapping)..\\n\\nSee the \\\"Lineage\\\" section of this record for full methodology of field collection techniques.\"}"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [147.6976318974, -40.6410236986, 148.5948891611, -39.601227836],
+        [147.6976318974, -40.6410236986, 148.5948891611, -39.601227836]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["2019-12-31T13:00:00.000+00:00", "2023-12-31T12:59:59.000+00:00"],
+        ["2019-12-31T13:00:00.000+00:00", "2023-12-31T12:59:59.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

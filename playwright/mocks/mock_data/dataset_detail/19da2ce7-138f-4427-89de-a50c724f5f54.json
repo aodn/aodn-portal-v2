@@ -1,14 +1,6 @@
 {
   "properties": {
-    "citation": {
-      "suggestedCitation": "The citation in a list of references is: \"IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access].\"",
-      "useLimitations": [
-        "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose."
-      ],
-      "otherConstraints": [
-        "Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: \"Data was sourced from Australia’s Integrated Marine Observing System (IMOS) – IMOS is enabled by the National Collaborative Research Infrastructure strategy (NCRIS).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in 'credit' in the metadata record)."
-      ]
-    },
+    "license": "Creative Commons Attribution 4.0 International License",
     "contacts": [
       {
         "name": "Cosoli, Simone",
@@ -116,36 +108,10 @@
         ]
       }
     ],
-    "license": "Creative Commons Attribution 4.0 International License",
-    "ai:description": "The South Australia Gulfs (SAG) HF ocean radar system covers the area of about 40,000 square kilometres bounded by Kangaroo Island to the east and the Eyre Peninsula to the north. This is a dynamic region where warm water from the remnants of the Leeuwin current is moving from the west, and water with varying density is exchanging with Spencer Gulf and the Gulf of St Vincent. Upwelling events occur from the deep ocean on the south side of the observation area. This is a key ocean area for aquaculture and fishing, and is a major shipping thoroughfare. The data from this HF ocean radar system link the dynamics of the Great Australian Bight to the Bonney Coast and on to Tasmania.\n\nSpecific research questions identified by the SA Node of IMOS are:\n\n- What is the detailed connection between shelf currents and the Flinders Current to non-regional influences (e.g. Southern Ocean, WA)?  \n- What is the nature of oceanic currents and processes (e.g. wave drift, mixing, eddies) that drive both winter and summer cross and along shelf exchange including the summertime upwelling systems and flushing of the gulfs?  \n- How does the ocean circulation, wave drift, eddies and environmental variability affect the distribution of sediments, nutrients, the production of lower trophic levels (phytoplankton and zooplankton), the dispersal of larvae that underpin productive fisheries in the region and the effects of environment on aquaculture.\n\nThe SAG HF ocean radar is a WERA phased array system with 16-element receive arrays located at Cape Wiles (34.943 S, 135.681 E) and Cape Spencer (35.294 S, 136.879 E). These radars operate at a frequency of 8.512 MHz, with a bandwidth of 33 KHz and a maximum range of 200 Km. Within the HF radar coverage area surface currents are measured. Data are also collected from which wind directions and significant wave height can be calculated.\n\nMost of the capital was contributed by the South Australia Research and Development Institute.",
-    "pace": "completed",
-    "revision": "2025-08-27T06:53:09",
-    "dataset_group": "imos",
-    "geometry": {
-      "geometries": [
-        {
-          "type": "Polygon",
-          "coordinates": [
-            [
-              [133, -37.4],
-              [137.4, -37.4],
-              [137.4, -34.8],
-              [133, -34.8],
-              [133, -37.4]
-            ]
-          ]
-        }
-      ],
-      "type": "GeometryCollection"
-    },
+    "centroid": [[135.25, -36.125]],
     "status": "completed",
+    "revision": "2025-08-27T06:53:09",
     "creation": "2020-07-13T15:13:12",
-    "temporal": [
-      {
-        "start": "2009-09-23T14:00:00Z",
-        "end": "2020-12-03T12:59:59Z"
-      }
-    ],
     "themes": [
       {
         "scheme": "theme",
@@ -395,11 +361,45 @@
         ]
       }
     ],
-    "centroid": [[135.25, -36.125]],
     "credits": [
       "Australia’s Integrated Marine Observing System (IMOS) is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS). It is operated by a consortium of institutions as an unincorporated joint venture, with the University of Tasmania as Lead Agent.",
       "The University of Western Australia (UWA)"
-    ]
+    ],
+    "ai:description": "The South Australia Gulfs (SAG) HF ocean radar system covers the area of about 40,000 square kilometres bounded by Kangaroo Island to the east and the Eyre Peninsula to the north. This is a dynamic region where warm water from the remnants of the Leeuwin current is moving from the west, and water with varying density is exchanging with Spencer Gulf and the Gulf of St Vincent. Upwelling events occur from the deep ocean on the south side of the observation area. This is a key ocean area for aquaculture and fishing, and is a major shipping thoroughfare. The data from this HF ocean radar system link the dynamics of the Great Australian Bight to the Bonney Coast and on to Tasmania.\n\nSpecific research questions identified by the SA Node of IMOS are:\n\n- What is the detailed connection between shelf currents and the Flinders Current to non-regional influences (e.g. Southern Ocean, WA)?  \n- What is the nature of oceanic currents and processes (e.g. wave drift, mixing, eddies) that drive both winter and summer cross and along shelf exchange including the summertime upwelling systems and flushing of the gulfs?  \n- How does the ocean circulation, wave drift, eddies and environmental variability affect the distribution of sediments, nutrients, the production of lower trophic levels (phytoplankton and zooplankton), the dispersal of larvae that underpin productive fisheries in the region and the effects of environment on aquaculture.\n\nThe SAG HF ocean radar is a WERA phased array system with 16-element receive arrays located at Cape Wiles (34.943 S, 135.681 E) and Cape Spencer (35.294 S, 136.879 E). These radars operate at a frequency of 8.512 MHz, with a bandwidth of 33 KHz and a maximum range of 200 Km. Within the HF radar coverage area surface currents are measured. Data are also collected from which wind directions and significant wave height can be calculated.\n\nMost of the capital was contributed by the South Australia Research and Development Institute.",
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [133, -37.4],
+              [137.4, -37.4],
+              [137.4, -34.8],
+              [133, -34.8],
+              [133, -37.4]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "temporal": [
+      {
+        "start": "2009-09-23T14:00:00Z",
+        "end": "2020-12-03T12:59:59Z"
+      }
+    ],
+    "pace": "completed",
+    "dataset_group": ["imos"],
+    "citation": {
+      "suggestedCitation": "The citation in a list of references is: \"IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access].\"",
+      "useLimitations": [
+        "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose."
+      ],
+      "otherConstraints": [
+        "Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: \"Data was sourced from Australia’s Integrated Marine Observing System (IMOS) – IMOS is enabled by the National Collaborative Research Infrastructure strategy (NCRIS).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in 'credit' in the metadata record)."
+      ]
+    }
   },
   "id": "19da2ce7-138f-4427-89de-a50c724f5f54",
   "title": "IMOS - Ocean Radar - South Australia Gulfs HF ocean radar site (South Australia, Australia) - Delayed mode wave",
@@ -437,20 +437,23 @@
       "rel": "wms",
       "type": "",
       "title": "acorn_wave_site_qc_sag_url/VAVH",
-      "ai:group": "Data Access > wms"
+      "ai:group": "Data Access > wms",
+      "description": "South Australia Gulfs - significant wave height (QC data) - WMS layer"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/ncwms",
       "rel": "wms",
       "type": "",
       "title": "acorn_wave_site_qc_sag_url/VDIRT",
-      "ai:group": "Data Access > wms"
+      "ai:group": "Data Access > wms",
+      "description": "South Australia Gulfs - wave to direction (QC data) - WMS layer"
     },
     {
       "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
       "rel": "IMOS:AGGREGATION--bodaac",
       "type": "",
-      "title": "acorn_wave_site_qc_sag_url#file_url"
+      "title": "acorn_wave_site_qc_sag_url#file_url",
+      "description": "The ncUrlList is a WFS service that returns a list of URLs matching a query."
     },
     {
       "href": "https://help.aodn.org.au/web-services/ncurllist-service/",
@@ -462,7 +465,8 @@
       "href": "https://processes.aodn.org.au/wps",
       "rel": "OGC:WPS--gogoduck",
       "type": "",
-      "title": "acorn_wave_site_qc_sag_url"
+      "title": "acorn_wave_site_qc_sag_url",
+      "description": "The GoGoDuck subsets and aggregates gridded data.  Data is returned as a NetCDF file."
     },
     {
       "href": "https://help.aodn.org.au/web-services/gogoduck-aggregator/",
@@ -485,7 +489,7 @@
       "ai:group": "Python Notebook"
     },
     {
-      "href": "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/23675ca8-31e6-4295-bca7-58ca1dadf5cc.png",
+      "href": "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/b421b696-a942-4020-9983-1b342629eee9.png",
       "rel": "icon",
       "type": "image/png",
       "title": "Suggest icon for dataset"
@@ -507,10 +511,34 @@
       "type": "text/html"
     },
     {
+      "href": "uuid:c95de3c2-1edb-41a6-8525-935434405fcc",
+      "rel": "parent",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Ocean Radar - South Australia Gulfs HF ocean radar site (South Australia, Australia)\",\"recordAbstract\":\"The South Australia Gulfs (SAG) HF ocean radar system covers the area of about 40,000 square kilometres bounded by Kangaroo Island to the east and the Eyre Peninsula to the north. This is a dynamic region where warm water from the remnants of the Leeuwin current is moving from the west, and water with varying density is exchanging with Spencer Gulf and the Gulf of St Vincent. Upwelling events occur from the deep ocean on the south side of the observation area. This is a key ocean area for aquaculture and fishing, and is a major shipping thoroughfare. The data from this HF ocean radar system link the dynamics of the Great Australian Bight to the Bonney Coast and on to Tasmania. \\n\\nSpecific research questions identified by the SA Node of IMOS are: What is the detailed connection between shelf currents and the Flinders Current to non-regional influences (e.g. Southern Ocean, WA)? What is the nature of oceanic currents and processes (e.g. wave drift, mixing, eddies) that drive both winter and summer cross and along shelf exchange including the summertime upwelling systems and flushing of the gulfs? How does the ocean circulation, wave drift, eddies and environmental variability affect the distribution of sediments, nutrients, the production of lower trophic levels\\n(phytoplankton and zooplankton), the dispersal of larvae that underpin productive fisheries in the region and the effects of environment on aquaculture\\n\\nThe SAG HF ocean radar is a WERA phased array system with 16-element receive arrays located at Cape Wiles (34.943 S, 135.681 E) and Cape Spencer (35.294 S, 136.879 E). These radars operate at a frequency of 8.512 MHz, with a bandwidth of 33 KHz and a maximum range of 200 Km. Within the HF radar coverage area surface currents are measured. Data are also collected from which wind directions and significant wave height can be calculated. \\n\\nMost of the capital was contributed by the South Australia Research and Development Institute.\"}"
+    },
+    {
       "href": "uuid:5fbe8b2b-9044-4dc5-8c3e-d3de74baa6e6",
       "rel": "sibling",
       "type": "application/json",
       "title": "{\"title\":\"IMOS - Ocean Radar - Cape Spencer HF ocean radar station (South Australia Gulfs, South Australia, Australia)\",\"recordAbstract\":\"The Cape Spencer (CSP) HF ocean radar site (35.294 S, 136.879 E) is one of two HF ocean radars covering the area between Eyre Peninsula and Kangaroo Island. The other HF ocean radar station is at Cape Wiles. The HF ocean radar coverage is from the coast to beyond the edge of the continental shelf. \\n\\nThe CSP HF ocean radar is a WERA phased array system with a 16-element receive array. This radar operates at a frequency of 8.512 MHz, with a bandwidth of 33 KHz, a maximum range of 200 Km and a range resolution of 4.5 Km. Azimuthally the radar covers a sweep 60 deg either side of a bore sight direction of 237 deg true east of north (approximately north by north-west).\\n\\nWithin the HF radar coverage area surface current radials are measured. Data are also collected from which wind directions and significant wave height can be calculated.\"}"
+    },
+    {
+      "href": "uuid:db049981-3d4e-4cb2-9c4b-e697650845b9",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Ocean Radar - South Australia Gulfs HF ocean radar site (South Australia, Australia) - Delayed mode wind\",\"recordAbstract\":\"The South Australia Gulfs (SAG) HF ocean radar system covers the area of about 40,000 square kilometres bounded by Kangaroo Island to the east and the Eyre Peninsula to the north. This is a dynamic region where warm water from the remnants of the Leeuwin current is moving from the west, and water with varying density is exchanging with Spencer Gulf and the Gulf of St Vincent. Upwelling events occur from the deep ocean on the south side of the observation area. This is a key ocean area for aquaculture and fishing, and is a major shipping thoroughfare. The data from this HF ocean radar system link the dynamics of the Great Australian Bight to the Bonney Coast and on to Tasmania. \\n\\nSpecific research questions identified by the SA Node of IMOS are: What is the detailed connection between shelf currents and the Flinders Current to non-regional influences (e.g. Southern Ocean, WA)? What is the nature of oceanic currents and processes (e.g. wave drift, mixing, eddies) that drive both winter and summer cross and along shelf exchange including the summertime upwelling systems and flushing of the gulfs? How does the ocean circulation, wave drift, eddies and environmental variability affect the distribution of sediments, nutrients, the production of lower trophic levels\\n(phytoplankton and zooplankton), the dispersal of larvae that underpin productive fisheries in the region and the effects of environment on aquaculture\\n\\nThe SAG HF ocean radar is a WERA phased array system with 16-element receive arrays located at Cape Wiles (34.943 S, 135.681 E) and Cape Spencer (35.294 S, 136.879 E). These radars operate at a frequency of 8.512 MHz, with a bandwidth of 33 KHz and a maximum range of 200 Km. Within the HF radar coverage area surface currents are measured. Data are also collected from which wind directions and significant wave height can be calculated. \\n\\nMost of the capital was contributed by the South Australia Research and Development Institute.\"}"
+    },
+    {
+      "href": "uuid:d83ef640-827e-4990-8c35-7c1a1aa587a9",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Ocean Radar - South Australia Gulfs HF ocean radar site (South Australia, Australia) - Real-time sea water velocity\",\"recordAbstract\":\"The South Australia Gulfs (SAG) HF ocean radar system covers the area of about 40,000 square kilometres bounded by Kangaroo Island to the east and the Eyre Peninsula to the north. This is a dynamic region where warm water from the remnants of the Leeuwin current is moving from the west, and water with varying density is exchanging with Spencer Gulf and the Gulf of St Vincent. Upwelling events occur from the deep ocean on the south side of the observation area. This is a key ocean area for aquaculture and fishing, and is a major shipping thoroughfare. The data from this HF ocean radar system link the dynamics of the Great Australian Bight to the Bonney Coast and on to Tasmania. \\n\\nSpecific research questions identified by the SA Node of IMOS are: What is the detailed connection between shelf currents and the Flinders Current to non-regional influences (e.g. Southern Ocean, WA)? What is the nature of oceanic currents and processes (e.g. wave drift, mixing, eddies) that drive both winter and summer cross and along shelf exchange including the summertime upwelling systems and flushing of the gulfs? How does the ocean circulation, wave drift, eddies and environmental variability affect the distribution of sediments, nutrients, the production of lower trophic levels\\n(phytoplankton and zooplankton), the dispersal of larvae that underpin productive fisheries in the region and the effects of environment on aquaculture\\n\\nThe SAG HF ocean radar is a WERA phased array system with 16-element receive arrays located at Cape Wiles (34.943 S, 135.681 E) and Cape Spencer (35.294 S, 136.879 E). These radars operate at a frequency of 8.512 MHz, with a bandwidth of 33 KHz and a maximum range of 200 Km. Within the HF radar coverage area surface currents are measured. Data are also collected from which wind directions and significant wave height can be calculated. \\n\\nMost of the capital was contributed by the South Australia Research and Development Institute.\"}"
+    },
+    {
+      "href": "uuid:cb2e22b5-ebb9-460b-8cff-b446fe14ea2f",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Ocean Radar - South Australia Gulfs HF ocean radar site (South Australia, Australia) - Delayed mode sea water velocity\",\"recordAbstract\":\"The South Australia Gulfs (SAG) HF ocean radar system covers the area of about 40,000 square kilometres bounded by Kangaroo Island to the east and the Eyre Peninsula to the north. This is a dynamic region where warm water from the remnants of the Leeuwin current is moving from the west, and water with varying density is exchanging with Spencer Gulf and the Gulf of St Vincent. Upwelling events occur from the deep ocean on the south side of the observation area. This is a key ocean area for aquaculture and fishing, and is a major shipping thoroughfare. The data from this HF ocean radar system link the dynamics of the Great Australian Bight to the Bonney Coast and on to Tasmania. \\n\\nSpecific research questions identified by the SA Node of IMOS are: What is the detailed connection between shelf currents and the Flinders Current to non-regional influences (e.g. Southern Ocean, WA)? What is the nature of oceanic currents and processes (e.g. wave drift, mixing, eddies) that drive both winter and summer cross and along shelf exchange including the summertime upwelling systems and flushing of the gulfs? How does the ocean circulation, wave drift, eddies and environmental variability affect the distribution of sediments, nutrients, the production of lower trophic levels\\n(phytoplankton and zooplankton), the dispersal of larvae that underpin productive fisheries in the region and the effects of environment on aquaculture\\n\\nThe SAG HF ocean radar is a WERA phased array system with 16-element receive arrays located at Cape Wiles (34.943 S, 135.681 E) and Cape Spencer (35.294 S, 136.879 E). These radars operate at a frequency of 8.512 MHz, with a bandwidth of 33 KHz and a maximum range of 200 Km. Within the HF radar coverage area surface currents are measured. Data are also collected from which wind directions and significant wave height can be calculated. \\n\\nMost of the capital was contributed by the South Australia Research and Development Institute.\"}"
     },
     {
       "href": "uuid:0fa0140a-786a-4de8-8a4f-28552205bb57",
@@ -529,7 +557,7 @@
       "href": "http://localhost:8081/api/v1/ogc/collections/19da2ce7-138f-4427-89de-a50c724f5f54/items/summary",
       "rel": "summary",
       "type": "application/x-zarr",
-      "title": "Summary"
+      "title": "radar_SouthAustraliaGulfs_wave_delayed_qc.zarr"
     }
   ],
   "extent": {

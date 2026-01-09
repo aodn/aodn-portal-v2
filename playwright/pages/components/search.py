@@ -42,7 +42,7 @@ class SearchComponent(BasePage):
         Get the date range from the date range picker.
         """
         self.date_button.click()
-        self.wait_for_timeout(500)  # wait for values to load
+        self.wait_for_timeout(900)  # wait for values to load
         start_date = (
             self.start_date_picker.locator('input').get_attribute('value') or ''
         )
