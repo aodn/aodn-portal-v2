@@ -147,8 +147,9 @@ describe("HexbinLayer - with key filtering", () => {
 
   it("returns empty when key has no matches in date range", () => {
     const keyFiltered = filterFeaturesByKey(fcWithKeys, "argo.parquet");
-    const start = dayjs("2024-01-01");
-    const result = createFilteredFeatures(keyFiltered, start);
+    const start = dayjs("2025-01-01");
+    const end = dayjs("2025-12-31");
+    const result = createFilteredFeatures(keyFiltered, start, end);
 
     expect(result?.features.length).toBe(0);
   });

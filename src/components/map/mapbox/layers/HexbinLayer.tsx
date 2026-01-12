@@ -58,12 +58,7 @@ export const extractHexbinOptions = (
 
 // remove dataset type to format key for display in dropdown
 const formatKeyLabel = (key: string): string => {
-  return key
-    .replace(/\.(parquet|zarr)$/i, "")
-    .replace(/_/g, " ")
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  return key.replace(/\.(parquet|zarr)$/i, "");
 };
 
 // filter features by selected key
