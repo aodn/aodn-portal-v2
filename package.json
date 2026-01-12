@@ -16,6 +16,7 @@
     "test": "vitest",
     "test:debug": "vitest --run --reporter=verbose --watch=false",
     "playwright": "docker compose -f playwright/docker-compose.yml up --abort-on-container-exit --exit-code-from tests",
+    "playwright-local": "bash generateEnv.sh dev && vitest run && vite --mode playwright-local --host 0.0.0.0",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {

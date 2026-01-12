@@ -121,7 +121,7 @@ const ReactMap = memo(
           style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
           minZoom: minZoom,
           maxZoom: maxZoom,
-          testMode: import.meta.env.MODE === "dev",
+          testMode: import.meta.env.MODE === "playwright-local",
           attributionControl: true,
           localIdeographFontFamily:
             "'Open Sans', 'Open Sans CJK SC', sans-serif",
@@ -192,7 +192,7 @@ const ReactMap = memo(
         );
         resizeObserver.observe(map.getContainer());
 
-        if (import.meta.env.MODE === "dev") {
+        if (import.meta.env.MODE === "playwright-local") {
           //map.showPadding = true;
           //map.showCollisionBoxes = true;
         }
