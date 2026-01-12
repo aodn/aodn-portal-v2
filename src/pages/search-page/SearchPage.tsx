@@ -153,7 +153,7 @@ const SearchPage = () => {
       );
       // Make sure no other code abort the search
       if (mapSearchAbortRef.current) {
-        dispatch(
+        await dispatch(
           // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
           // and ordered by uuid to avoid affecting cluster calculation
           fetchResultNoStore({
@@ -178,7 +178,11 @@ const SearchPage = () => {
               setLayers(jsonToOGCCollections(collections).collections);
             }
           })
-          .then(() => {
+          .catch(() => {
+            // empty result / error → clear previous layers
+            setLayers([]);
+          })
+          .finally(() => {
             // Must update status after search done, this change the location.state and will
             // cause all search cancel. However, we also need to make sure that the controller is not canceled
             // and replace by a new one due to new search
@@ -188,11 +192,8 @@ const SearchPage = () => {
                 pageDefault.search + "?" + formatToUrlParam(componentParam)
               );
             }
-          })
-          .catch(() => {
-            // console.log("doSearchMap signal abort");
-          })
-          .finally(() => (mapSearchAbortRef.current = null));
+            mapSearchAbortRef.current = null;
+          });
       }
     },
     [dispatch]
@@ -215,7 +216,10 @@ const SearchPage = () => {
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
     (event: MapEvent | undefined) => {
-      if ((event as any)?.originalEvent || import.meta.env.MODE === "dev") {
+      if (
+        (event as any)?.originalEvent ||
+        import.meta.env.MODE === "playwright-local"
+      ) {
         // Make sure it is user generated event, if we zoom map via api we do not
         // want the search cancel OR in dev mode where test case use a lot of api
         // call to move map
