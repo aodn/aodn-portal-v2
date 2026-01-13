@@ -31,7 +31,9 @@ interface TabsPanelContainerProps {
   handleTabChange?: (newValue: number) => void;
   sx?: SxProps;
 }
-
+/**
+ * DO NOT unmount children here, we need to keep child status
+ */
 const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
   return (
     <Box
@@ -42,7 +44,7 @@ const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
       sx={{ p: padding.medium }}
       {...other}
     >
-      {value === index && children}
+      {children}
     </Box>
   );
 };

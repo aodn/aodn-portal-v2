@@ -6,9 +6,8 @@ import SideSection from "./subpages/SideSection";
 import { DetailPageProvider } from "./context/detail-page-provider";
 import ContentSection from "./subpages/ContentSection";
 import SectionContainer from "../../components/layout/components/SectionContainer";
-import { LngLatBounds, MapEvent, MapMouseEvent } from "mapbox-gl";
+import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { useCallback, useState } from "react";
-import { MapEventEnum } from "../../components/map/mapbox/constants";
 
 const DetailsPage = () => {
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
@@ -19,18 +18,6 @@ const DetailsPage = () => {
         // Magic number 10 to move to a bound area given the lnglat
         const bounds = evt.lngLat.toBounds(10);
         setBbox(bounds);
-      }
-    },
-    [setBbox]
-  );
-
-  const onMapMoveEnd = useCallback(
-    (evt: MapEvent) => {
-      if ((evt as any)?.originalEvent) {
-        if (evt.type === MapEventEnum.MOVE_END) {
-          const b = evt?.target.getBounds();
-          setBbox(b!);
-        }
       }
     },
     [setBbox]
@@ -50,7 +37,7 @@ const DetailsPage = () => {
               <HeaderSection />
             </Grid>
             <Grid item xs={12} md={9}>
-              <ContentSection mapFocusArea={bbox} onMapMoveEnd={onMapMoveEnd} />
+              <ContentSection mapFocusArea={bbox} />
             </Grid>
             <Grid item xs={12} md={3}>
               <SideSection
