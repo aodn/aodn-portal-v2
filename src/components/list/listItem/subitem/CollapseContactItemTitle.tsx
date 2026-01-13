@@ -3,6 +3,7 @@ import { Grid, Link, Tooltip, Typography, Box } from "@mui/material";
 import rc8Theme from "../../../../styles/themeRC8";
 import { MailOutlineIcon } from "../../../../assets/icons/details/mail";
 import { openInNewTab } from "../../../../utils/LinkUtils";
+import { addSpacesToCamelCase } from "../../../../utils/FormatUtils";
 
 interface CollapseContactItemTItleProps {
   isExpanded?: boolean;
@@ -88,8 +89,7 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
               textTransform: "capitalize",
             }}
           >
-            {/* Convert camelCase to readable text "pointOfContact" → "Point Of Contact" */}
-            {roles[0].replace(/([A-Z])/g, " $1").trim()}
+            {addSpacesToCamelCase(roles[0])}
           </Typography>
         )}
       </Grid>
