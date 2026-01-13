@@ -313,12 +313,15 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
 
   return (
     <>
-      <HexbinLayerSelect
-        hexbinOptions={hexbinOptions}
-        selectedHexbin={selectedHexbinKey}
-        handleSelectHexbin={handleSelectHexbin}
-        isLoading={isLoadingOptions}
-      />
+      {/* Only render HexbinLayerSelect when visible is true */}
+      {visible && (
+        <HexbinLayerSelect
+          hexbinOptions={hexbinOptions}
+          selectedHexbin={selectedHexbinKey}
+          handleSelectHexbin={handleSelectHexbin}
+          isLoading={isLoadingOptions}
+        />
+      )}
       <TestHelper
         id={map?.getContainer().id || ""}
         getHexbinLayer={() => MAPBOX_OVERLAY_HEXAGON_LAYER}
