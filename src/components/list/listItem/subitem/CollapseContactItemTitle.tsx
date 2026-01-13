@@ -3,17 +3,20 @@ import { Grid, Link, Tooltip, Typography, Box } from "@mui/material";
 import rc8Theme from "../../../../styles/themeRC8";
 import { MailOutlineIcon } from "../../../../assets/icons/details/mail";
 import { openInNewTab } from "../../../../utils/LinkUtils";
+import { addSpacesToCamelCase } from "../../../../utils/FormatUtils";
 
 interface CollapseContactItemTItleProps {
   isExpanded?: boolean;
   email?: string | undefined;
   text: string;
+  roles?: string[];
 }
 
 const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
   isExpanded = false,
   email,
   text,
+  roles,
 }) => {
   const generateTitle = (color: string) => {
     return (
@@ -36,7 +39,14 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
       <Grid
         item
         md={12}
-        sx={{ textAlign: "left", whiteSpace: "normal", py: "10px" }}
+        sx={{
+          textAlign: "left",
+          whiteSpace: "normal",
+          py: "10px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
       >
         {isExpanded ? (
           <Box
@@ -65,6 +75,22 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
           </Box>
         ) : (
           generateTitle(rc8Theme.palette.text1)
+        )}
+
+        {roles && roles.length > 0 && (
+          <Typography
+            sx={{
+              ...rc8Theme.typography.body1Medium,
+              backgroundColor: rc8Theme.palette.primary4,
+              padding: "4px 10px",
+              borderRadius: "6px",
+              ml: 2,
+              textAlign: "center",
+              textTransform: "capitalize",
+            }}
+          >
+            {addSpacesToCamelCase(roles[0])}
+          </Typography>
         )}
       </Grid>
     </Grid>
