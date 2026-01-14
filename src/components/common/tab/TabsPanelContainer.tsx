@@ -38,10 +38,14 @@ const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
   return (
     <Box
       role="tabpanel"
-      hidden={value !== index}
       id={`tabpanel-${index}`}
       aria-labelledby={`tab-${index}`}
-      sx={{ p: padding.medium }}
+      sx={{
+        p: padding.medium,
+        position: "absolute",
+        zIndex: value === index ? 1 : -1,
+        pointerEvents: value === index ? "auto" : "none",
+      }}
       {...other}
     >
       {children}
@@ -78,17 +82,13 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   if (!tabs?.length) return;
 
   return (
-    <Box
-      sx={{
-        ...sx,
-      }}
-    >
+    <>
       <StyledTabs
         value={value}
         onChange={handleChange}
         aria-label="tabsPanelContainer"
         data-testid="tabs-panel-container"
-        sx={{ px: isAboveDesktop ? "10px" : "8px" }}
+        sx={{ ...sx, px: isAboveDesktop ? "10px" : "8px" }}
       >
         {tabs.map((tab, index) => (
           <StyledTab
@@ -100,17 +100,26 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
           />
         ))}
       </StyledTabs>
-      {tabs.map((tab, index) => (
-        <TabPanel
-          key={index}
-          value={value}
-          index={index}
-          data-testid={`tab-panel-${tab.label}`}
-        >
-          {tab.component}
-        </TabPanel>
-      ))}
-    </Box>
+      <Box
+        sx={{
+          ...sx,
+          position: "relative",
+          flex: 1,
+          minHeight: "70vh",
+        }}
+      >
+        {tabs.map((tab, index) => (
+          <TabPanel
+            key={index}
+            value={value}
+            index={index}
+            data-testid={`tab-panel-${tab.label}`}
+          >
+            {tab.component}
+          </TabPanel>
+        ))}
+      </Box>
+    </>
   );
 };
 
