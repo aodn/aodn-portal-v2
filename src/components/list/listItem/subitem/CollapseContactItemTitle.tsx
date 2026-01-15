@@ -79,10 +79,7 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
         )}
 
         {roles && roles.length > 0 && (
-          <LabelChip
-            text={[addSpacesToCamelCase(roles[0])]}
-            color={rc8Theme.palette.primary4}
-          />
+          <LabelChip text={[addSpacesToCamelCase(roles[0])]} />
         )}
       </Grid>
     </Grid>

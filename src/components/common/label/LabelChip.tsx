@@ -8,11 +8,7 @@ interface LabelChipProps {
   sx?: SxProps;
 }
 
-const LabelChip: FC<LabelChipProps> = ({
-  text,
-  color = rc8Theme.palette.primary4,
-  sx,
-}) => {
+const LabelChip: FC<LabelChipProps> = ({ text, color = "#fff", sx }) => {
   if (!text || text.every((i) => i.trim() === "")) return null;
 
   return (
@@ -22,7 +18,7 @@ const LabelChip: FC<LabelChipProps> = ({
           key={item}
           sx={{
             ...rc8Theme.typography.body1Medium,
-            backgroundColor: "#fff",
+            backgroundColor: color,
             padding: "4px 10px",
             borderRadius: "6px",
             ml: 2,
