@@ -13,7 +13,7 @@ const LabelChip: FC<LabelChipProps> = ({
   color = rc8Theme.palette.primary4,
   sx,
 }) => {
-  if (!text || text.some((i) => i.trim() === "")) return null;
+  if (!text || text.every((i) => i.trim() === "")) return null;
 
   return (
     <Stack direction="row" flexWrap="wrap" alignItems="center" spacing={1}>
@@ -22,7 +22,7 @@ const LabelChip: FC<LabelChipProps> = ({
           key={item}
           sx={{
             ...rc8Theme.typography.body1Medium,
-            backgroundColor: color,
+            backgroundColor: "#fff",
             padding: "4px 10px",
             borderRadius: "6px",
             ml: 2,
