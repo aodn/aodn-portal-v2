@@ -37,7 +37,7 @@ def test_drawing_shape_adds_download_filter(
     detail_page.detail_map.hover_map()
     detail_page.detail_map.click_map()
     detail_page.detail_map.delete_button.click()
-    expect(detail_page.bbox_condition_box.first).to_be_hidden()
+    expect(detail_page.bbox_condition_box.first).not_to_have_css("visibility", "visible", timeout=5000)
 
 
 @pytest.mark.parametrize(
