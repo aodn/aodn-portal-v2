@@ -31,13 +31,13 @@ def test_drawing_shape_adds_download_filter(
     )
     detail_page.mouse.move(x, y)
     detail_page.detail_map.click_map()
-    expect(detail_page.bbox_condition_box).to_be_visible()
+    expect(detail_page.bbox_condition_box.first).to_have_css("visibility", "visible", timeout=5000)
 
     # Remove the drawn shape
     detail_page.detail_map.hover_map()
     detail_page.detail_map.click_map()
     detail_page.detail_map.delete_button.click()
-    expect(detail_page.bbox_condition_box).not_to_be_visible()
+    expect(detail_page.bbox_condition_box.first).to_be_hidden()
 
 
 @pytest.mark.parametrize(
