@@ -42,11 +42,9 @@ const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
       role="tabpanel"
       id={`tabpanel-${index}`}
       aria-labelledby={`tab-${index}`}
+      hidden={value !== index}
       sx={{
         p: padding.medium,
-        position: "absolute",
-        zIndex: value === index ? 1 : -1,
-        pointerEvents: value === index ? "auto" : "none",
       }}
       {...other}
     >
@@ -102,14 +100,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
           />
         ))}
       </StyledTabs>
-      <Box
-        sx={{
-          ...sx,
-          position: "relative",
-          flex: 1,
-          minHeight: "70vh",
-        }}
-      >
+      <Box sx={sx}>
         {tabs.map((tab, index) => (
           <TabPanel
             key={index}

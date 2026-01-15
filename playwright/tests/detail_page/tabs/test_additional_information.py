@@ -66,8 +66,11 @@ def test_additional_information_sections_in_desktop(
     ).to_be_visible()
 
     additional_info.metadata_contact.click()
-    expect(additional_info.metadata_contact_title).to_be_visible()
-    expect(additional_info.metadata_contact_title).to_have_text(
+    """
+    Multiple string found, this is because different tab all in DOM just hidden
+    """
+    expect(additional_info.metadata_contact_title.first).to_have_css("visibility", "visible", timeout=5000)
+    expect(additional_info.metadata_contact_title.first).to_have_text(
         metadata_contact
     )
 
@@ -138,8 +141,11 @@ def test_additional_information_sections_in_mobile(
         metadata_identifier_list.get_by_text(metadata_identifier)
     ).to_be_visible()
 
-    expect(additional_info.metadata_contact_title).to_be_visible()
-    expect(additional_info.metadata_contact_title).to_have_text(
+    """
+    Multiple string found, this is because different tab all in DOM just hidden
+    """
+    expect(additional_info.metadata_contact_title.first).to_have_css("visibility", "visible", timeout=5000)
+    expect(additional_info.metadata_contact_title.first).to_have_text(
         metadata_contact
     )
 
