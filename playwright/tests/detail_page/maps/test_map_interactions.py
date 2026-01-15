@@ -173,7 +173,7 @@ def test_map_layer_persists_after_tab_navigation(
     detail_page.tabs.data_access.tab.click()
     expect(detail_page.tabs.data_access.data).to_be_visible()
     detail_page.tabs.summary.tab.click()
-    expect(detail_page.tabs.summary.description).to_be_visible()
+    expect(detail_page.tabs.summary.description.first).to_be_visible()
 
     # Verify that the Geoserver layer is present and visible on the map
     detail_page.detail_map.wait_for_map_idle()
