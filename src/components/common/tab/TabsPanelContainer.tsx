@@ -32,7 +32,9 @@ interface TabsPanelContainerProps {
   sx?: SxProps;
 }
 /**
- * DO NOT unmount children here, we need to keep child status
+ * DO NOT unmount children here, we need to keep child status, the way we do it is use zIndex instead of hidden
+ * the reason if one of the component contains map, when it is visible, map renders again and causes unnecessary
+ * api call. Use zIndex to hide it at back avoid this issue.
  */
 const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
   return (
