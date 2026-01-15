@@ -13,9 +13,13 @@ const KeywordList: React.FC<KeywordListProps> = ({
   keywords,
   selected = false,
 }) => {
-  const generateKeywordCollaseItem = (keyword: IKeyword, index: number) => {
+  const generateKeywordCollapseItem = (keyword: IKeyword, index: number) => {
     return (
-      <CollapseItem title={keyword.title} key={index}>
+      <CollapseItem
+        title={keyword.title}
+        key={index}
+        labels={[keyword.description]}
+      >
         {keyword.content && keyword.content.length > 0
           ? keyword.content.map((line, index) => (
               <TextArea text={line} key={index} sx={{ pb: "10px" }} />
@@ -26,7 +30,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
   };
 
   const keywordItems = keywords.map((keyword, index) =>
-    generateKeywordCollaseItem(keyword, index)
+    generateKeywordCollapseItem(keyword, index)
   );
 
   return (

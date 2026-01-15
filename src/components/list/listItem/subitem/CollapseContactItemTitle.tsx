@@ -4,6 +4,7 @@ import rc8Theme from "../../../../styles/themeRC8";
 import { MailOutlineIcon } from "../../../../assets/icons/details/mail";
 import { openInNewTab } from "../../../../utils/LinkUtils";
 import { addSpacesToCamelCase } from "../../../../utils/FormatUtils";
+import LabelChip from "../../../common/label/LabelChip";
 
 interface CollapseContactItemTItleProps {
   isExpanded?: boolean;
@@ -78,19 +79,10 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
         )}
 
         {roles && roles.length > 0 && (
-          <Typography
-            sx={{
-              ...rc8Theme.typography.body1Medium,
-              backgroundColor: rc8Theme.palette.primary4,
-              padding: "4px 10px",
-              borderRadius: "6px",
-              ml: 2,
-              textAlign: "center",
-              textTransform: "capitalize",
-            }}
-          >
-            {addSpacesToCamelCase(roles[0])}
-          </Typography>
+          <LabelChip
+            text={[addSpacesToCamelCase(roles[0])]}
+            color={rc8Theme.palette.primary4}
+          />
         )}
       </Grid>
     </Grid>
