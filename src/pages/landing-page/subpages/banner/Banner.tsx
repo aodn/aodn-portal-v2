@@ -1,6 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material";
 import {
-  fontColor,
   fontSize,
   fontWeight,
   gap,
@@ -30,7 +29,7 @@ const renderBannerText = () => {
             },
             letterSpacing: gap.xs,
             fontWeight: fontWeight.light,
-            color: fontColor.gray.extraDark,
+            color: rc8Theme.palette.text2,
             textAlign: "left",
             padding: 0,
           }}
@@ -46,7 +45,7 @@ const renderBannerText = () => {
             },
             letterSpacing: gap.xs,
             fontWeight: fontWeight.bold,
-            color: fontColor.gray.extraDark,
+            color: rc8Theme.palette.text2,
             textAlign: "left",
             padding: 0,
             mt: -2,
