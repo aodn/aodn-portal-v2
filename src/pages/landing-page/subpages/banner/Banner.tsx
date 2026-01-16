@@ -57,7 +57,7 @@ const renderBannerText = () => {
         <Typography
           sx={{
             ...rc8Theme.typography.heading4,
-            color: fontColor.gray.extraDark,
+            color: rc8Theme.palette.text2,
             whiteSpace: "wrap",
             p: 0,
             pr: padding.small,
