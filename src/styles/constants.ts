@@ -88,7 +88,6 @@ const fontWeight = {
 
 const fontColor = {
   gray: {
-    extraDark: "#3C3C3C",
     dark: "#575757",
     medium: "#787878",
     light: "#979797",
