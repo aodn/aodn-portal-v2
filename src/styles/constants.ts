@@ -49,7 +49,7 @@ const fontSize = {
   bannerTitleLarge: "48px",
   bannerTitleMedium: "36px",
   bannerTitleSmall: "28px",
-  bannerSubtitle: "14px",
+  bannerSubtitle: "16px",
   bannerSubtitleSmall: "10px",
   mapMenuItem: 14,
   mapMenuSubItem: 13,
@@ -88,7 +88,6 @@ const fontWeight = {
 
 const fontColor = {
   gray: {
-    extraDark: "#3C3C3C",
     dark: "#575757",
     medium: "#787878",
     light: "#979797",
