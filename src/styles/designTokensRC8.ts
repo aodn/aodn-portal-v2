@@ -79,6 +79,7 @@ export const designTokensRC8 = {
         fontFamily: FONT_FAMILIES.poppins,
         fontSize: "16px",
         fontWeight: 500,
+        fontStyle: "normal",
         lineHeight: "22px",
         color: "#090C02",
       },

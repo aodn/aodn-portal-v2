@@ -10,6 +10,7 @@ import useBreakpoint from "../../../../hooks/useBreakpoint";
 import bannerImage1 from "@/assets/images/banner_image_1.png";
 import bannerImage2 from "@/assets/images/banner_image_2.png";
 import bannerImage3 from "@/assets/images/banner_image_3.png";
+import rc8Theme from "../../../../styles/themeRC8";
 
 const renderBannerText = () => {
   return (
@@ -55,15 +56,9 @@ const renderBannerText = () => {
         </Typography>
         <Typography
           sx={{
-            fontSize: {
-              xs: fontSize.bannerSubtitleSmall,
-              sm: fontSize.bannerSubtitle,
-            },
-            fontWeight: fontWeight.light,
-            letterSpacing: gap.xs,
+            ...rc8Theme.typography.heading4,
             color: fontColor.gray.extraDark,
             whiteSpace: "wrap",
-            textAlign: "left",
             p: 0,
             pr: padding.small,
           }}
