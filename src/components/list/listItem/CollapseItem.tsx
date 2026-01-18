@@ -13,6 +13,7 @@ interface CollapseItemProps {
   onIconClick?: () => void; // Click handler for expandedIcon when visible
   titleComponent?: ReactNode; // Allow custom title component
   titleColor?: string; // Custom title color
+  labels?: string[]; // Labels to display next to title
 }
 
 const CollapseItem: React.FC<CollapseItemProps> = ({
@@ -23,6 +24,7 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
   expandedIcon,
   onIconClick,
   titleComponent,
+  labels,
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(isOpen);
 
@@ -78,11 +80,13 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
                 {currentIcon}
               </Box>
             )}
-
             {/* Title text section */}
-            <Box sx={{ flex: 1 }}>
-              {/* {renderTitle()} */}
-              <CollapseItemTitle text={title} titleComponent={titleElement()} />
+            <Box flex={1}>
+              <CollapseItemTitle
+                text={title}
+                titleComponent={titleElement()}
+                labels={labels}
+              />
             </Box>
           </Box>
         </Grid>
