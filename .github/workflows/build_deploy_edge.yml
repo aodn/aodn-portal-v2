@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**/*.md'
-      - '.github/environment/**'
+      - "**/*.md"
+      - ".github/environment/**"
 
 permissions:
   id-token: write
@@ -25,7 +25,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Yarn install
         run: |
@@ -36,9 +36,9 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-            name: build
-            path: ./dist
-            retention-days: 1
+          name: build
+          path: ./dist
+          retention-days: 1
 
   edge_deploy:
     environment: edge
