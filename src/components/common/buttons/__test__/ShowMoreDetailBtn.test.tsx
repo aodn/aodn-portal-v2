@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import ShowMoreDetailBtn from "../ShowMoreDetailBtn";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 
 // Mock the icons
 vi.mock("../../../icon/PlusIcon", () => ({
@@ -104,7 +104,7 @@ describe("ShowMoreDetailBtn", () => {
     expect(grid).toHaveStyle("justify-content: center");
     expect(grid).toHaveStyle("align-items: center");
     expect(button).toHaveStyle(
-      `border: 1px solid ${rc8Theme.palette.primary1}`
+      `border: 1px solid ${portalTheme.palette.primary1}`
     );
     expect(button).toHaveStyle("border-radius: 10px");
     expect(button).toHaveStyle("width: 160px");

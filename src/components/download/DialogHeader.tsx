@@ -1,4 +1,4 @@
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { CancelIcon } from "../../assets/icons/download/cancel";
 import { Box, DialogTitle, IconButton, Typography } from "@mui/material";
 
@@ -22,7 +22,7 @@ export const DialogHeader = ({ onClose }: DialogHeaderProps) => {
         <Typography
           variant="heading3"
           sx={{
-            color: rc8Theme.palette.primary.main,
+            color: portalTheme.palette.primary.main,
           }}
         >
           Dataset Download
@@ -33,7 +33,7 @@ export const DialogHeader = ({ onClose }: DialogHeaderProps) => {
           sx={{
             position: "absolute",
             right: 14,
-            color: rc8Theme.palette.text2,
+            color: portalTheme.palette.text2,
           }}
         >
           <CancelIcon />

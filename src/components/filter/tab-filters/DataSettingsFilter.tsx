@@ -10,7 +10,7 @@ import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButton
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { DatasetFrequency } from "../../common/store/searchReducer";
 import { IndexDataType, ItemButton } from "../FilterDefinition";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 enum DataSettingsCategory {
   dataDeliverMode = "dataDeliveryMode",
@@ -159,8 +159,8 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
       <Box>
         <Typography
           sx={{
-            ...rc8Theme.typography.title1Medium,
-            color: rc8Theme.palette.text1,
+            ...portalTheme.typography.title1Medium,
+            color: portalTheme.palette.text1,
             fontWeight: 500,
             padding: "8px 20px",
           }}
@@ -176,15 +176,15 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
             "& .MuiToggleButton-root": {
               borderRadius: "6px",
               textTransform: "capitalize",
-              ...rc8Theme.typography.title2Regular,
-              color: rc8Theme.palette.text1,
+              ...portalTheme.typography.title2Regular,
+              color: portalTheme.palette.text1,
               bgcolor: "#fff",
-              border: `1px solid ${rc8Theme.palette.grey500}`,
+              border: `1px solid ${portalTheme.palette.grey500}`,
               px: "38px",
               py: "8px",
               "&.Mui-selected": {
                 border: "none",
-                bgcolor: rc8Theme.palette.primary1,
+                bgcolor: portalTheme.palette.primary1,
                 color: "#fff",
               },
             },
@@ -204,8 +204,8 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
       <Box>
         <Typography
           sx={{
-            ...rc8Theme.typography.title1Medium,
-            color: rc8Theme.palette.text1,
+            ...portalTheme.typography.title1Medium,
+            color: portalTheme.palette.text1,
             fontWeight: 500,
             padding: "8px 20px",
           }}
@@ -220,15 +220,15 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
             "& .MuiToggleButton-root": {
               borderRadius: "6px",
               textTransform: "capitalize",
-              ...rc8Theme.typography.title2Regular,
-              color: rc8Theme.palette.text1,
+              ...portalTheme.typography.title2Regular,
+              color: portalTheme.palette.text1,
               bgcolor: "#fff",
-              border: `1px solid ${rc8Theme.palette.grey500}`,
+              border: `1px solid ${portalTheme.palette.grey500}`,
               px: "38px",
               py: "8px",
               "&.Mui-selected": {
                 border: "none",
-                bgcolor: rc8Theme.palette.primary1,
+                bgcolor: portalTheme.palette.primary1,
                 color: "#fff",
               },
             },
@@ -248,7 +248,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
       {/* <Box>
         <Typography
           variant="title1Medium"
-          color={rc8Theme.palette.text1}
+          color={portalTheme.palette.text1}
           sx={{ padding: "8px 20px" }}
         >
           Data Service

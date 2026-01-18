@@ -20,7 +20,7 @@ import { borderRadius, color, margin } from "../../../styles/constants";
 import { IconProps } from "../../icon/types";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface IconSelectColorConfig {
   defaultColor: string;
@@ -30,11 +30,11 @@ interface IconSelectColorConfig {
   selectedBgColor: string;
 }
 const defaultColorConfig = {
-  defaultColor: rc8Theme.palette.text1,
-  displayColor: rc8Theme.palette.primary1,
+  defaultColor: portalTheme.palette.text1,
+  displayColor: portalTheme.palette.primary1,
   selectedColor: "#fff",
   defaultBgColor: "#FFF",
-  selectedBgColor: rc8Theme.palette.primary1,
+  selectedBgColor: portalTheme.palette.primary1,
 };
 
 export interface IconSelectProps<T = string> extends CommonSelectProps<T> {
@@ -209,7 +209,7 @@ const IconSelect = <T extends string | number = string>({
             "& .MuiPaper-root": {
               marginTop: "6px",
               borderRadius: "6px",
-              border: `0.5px solid ${rc8Theme.palette.primary1}`,
+              border: `0.5px solid ${portalTheme.palette.primary1}`,
               boxShadow: "0 2px 2px 0 rgba(0, 0, 0, 0.15)",
             },
           },
@@ -217,10 +217,10 @@ const IconSelect = <T extends string | number = string>({
         sx={{
           padding: 0,
           height: ICON_SELECT_DEFAULT_HEIGHT,
-          border: `0.5px solid ${rc8Theme.palette.grey500}`,
+          border: `0.5px solid ${portalTheme.palette.grey500}`,
           borderRadius: borderRadius.small,
           backgroundColor: selectedItem
-            ? rc8Theme.palette.primary1
+            ? portalTheme.palette.primary1
             : color.white.sixTenTransparent,
           "& fieldset": {
             border: "none",

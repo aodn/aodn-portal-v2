@@ -25,7 +25,7 @@ import {
 } from "../../../../../styles/constants";
 import grey from "../../../../common/colors/grey";
 import { Grid } from "@mui/material";
-import rc8Theme from "../../../../../styles/themeRC8";
+import { portalTheme } from "../../../../../styles";
 
 const eventEmitter: EventEmitter = new EventEmitter();
 
@@ -84,7 +84,7 @@ export const switcherMenuContentIconSx = {
 };
 
 export const switcherMenuContentLabelTypographySx = {
-  ...rc8Theme.typography.body2Regular,
+  ...portalTheme.typography.body2Regular,
 };
 
 interface MenuControlProps extends MenuControlType {

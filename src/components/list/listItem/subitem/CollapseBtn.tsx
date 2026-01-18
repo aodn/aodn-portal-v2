@@ -2,7 +2,7 @@ import React from "react";
 import { IconButton } from "@mui/material";
 import { ExpandLess } from "../../../../assets/icons/details/expandLess";
 import { ExpandMore } from "../../../../assets/icons/details/expendMore";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 
 interface CollapseBtnProps {
   onClick: () => void;
@@ -19,9 +19,9 @@ const CollapseBtn: React.FC<CollapseBtnProps> = ({ onClick, isExpanded }) => {
       }}
     >
       {isExpanded ? (
-        <ExpandLess color={rc8Theme.palette.text2} />
+        <ExpandLess color={portalTheme.palette.text2} />
       ) : (
-        <ExpandMore color={rc8Theme.palette.text2} />
+        <ExpandMore color={portalTheme.palette.text2} />
       )}
     </IconButton>
   );

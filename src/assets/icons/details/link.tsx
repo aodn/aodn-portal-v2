@@ -1,8 +1,8 @@
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import { IconProps } from "../../../types/assets/iconsTypes";
 
 export const TitleChainIcon = ({
-  color = rc8Theme.palette.grey700,
+  color = portalTheme.palette.grey700,
   width = 20,
   height = 20,
 }: IconProps) => (
