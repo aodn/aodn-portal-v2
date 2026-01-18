@@ -10,7 +10,7 @@ import {
 import { FC, memo, ReactElement, useCallback, useState } from "react";
 import { IconProps } from "../../icon/types";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import { ExpandMore } from "@mui/icons-material";
 
 export interface SelectItem<T = string> {
@@ -33,9 +33,9 @@ export interface CommonSelectProps<T = string> {
 }
 
 const DEFAULT_SELECT_STYLE: SxProps = {
-  ...rc8Theme.typography.body1Medium,
-  color: rc8Theme.palette.text1,
-  border: `1px solid ${rc8Theme.palette.primary1}`,
+  ...portalTheme.typography.body1Medium,
+  color: portalTheme.palette.text1,
+  border: `1px solid ${portalTheme.palette.primary1}`,
   padding: "0",
   textAlign: "center",
   height: "44px",
@@ -51,13 +51,13 @@ const DEFAULT_MENU_PROPS = {
   PaperProps: {
     sx: {
       backgroundColor: "#fff",
-      border: `1px solid ${rc8Theme.palette.primary1}`,
+      border: `1px solid ${portalTheme.palette.primary1}`,
       borderRadius: "6px",
       mt: "6px",
       "& .MuiMenuItem-root": {
-        color: rc8Theme.palette.text1,
+        color: portalTheme.palette.text1,
         "&.Mui-selected": {
-          backgroundColor: rc8Theme.palette.primary5,
+          backgroundColor: portalTheme.palette.primary5,
         },
       },
     },

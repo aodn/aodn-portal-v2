@@ -21,7 +21,7 @@ import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { LIST_CARD_TITLE_HEIGHT } from "./constants";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
 
@@ -100,7 +100,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                 <Typography
                   onClick={() => onClickDetail?.(uuid)}
                   variant="title1Medium"
-                  color={rc8Theme.palette.text1}
+                  color={portalTheme.palette.text1}
                   title={title}
                   padding={0}
                   sx={{
@@ -148,7 +148,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
               <Box sx={{ flex: 1 }}>
                 <Typography
                   variant="body3Small"
-                  color={rc8Theme.palette.text2}
+                  color={portalTheme.palette.text2}
                   arial-label="result-list-card-content"
                   onClick={() =>
                     isSimplified

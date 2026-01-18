@@ -1,6 +1,6 @@
 import { FC, useCallback } from "react";
 import { Box, Button, SxProps, Typography } from "@mui/material";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 
 interface BookmarkListHeadProps {
   bookmarkCount: number | undefined;
@@ -27,15 +27,15 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
-        bgcolor: rc8Theme.palette.primary4,
+        bgcolor: portalTheme.palette.primary4,
         ...sx,
       }}
       data-testid="bookmark-list-head"
     >
       <Typography
         sx={{
-          ...rc8Theme.typography.title2Regular,
-          color: rc8Theme.palette.text1,
+          ...portalTheme.typography.title2Regular,
+          color: portalTheme.palette.text1,
           fontWeight: 500,
           lineHeight: "24px",
           py: "10px",
@@ -54,8 +54,8 @@ const BookmarkListHead: FC<BookmarkListHeadProps> = ({
       >
         <Typography
           sx={{
-            ...rc8Theme.typography.body1Medium,
-            color: rc8Theme.palette.text1,
+            ...portalTheme.typography.body1Medium,
+            color: portalTheme.palette.text1,
             fontWeight: 500,
             py: "4px",
           }}

@@ -5,7 +5,7 @@ import {
   isUrl,
   LINE_BREAK_REGEX,
 } from "../../../utils/StringUtils";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import { FC, Fragment } from "react";
 
 interface TextRenderProps {
@@ -31,8 +31,8 @@ const TextRender: FC<TextRenderProps> = ({ text }) => {
               color="primary"
               underline="hover"
               sx={{
-                ...rc8Theme.typography.body2Regular,
-                color: rc8Theme.palette.primary.main,
+                ...portalTheme.typography.body2Regular,
+                color: portalTheme.palette.primary.main,
                 wordBreak: "break-all",
               }}
             >
@@ -52,8 +52,8 @@ const TextRender: FC<TextRenderProps> = ({ text }) => {
               color="primary"
               underline="hover"
               sx={{
-                ...rc8Theme.typography.body2Regular,
-                color: rc8Theme.palette.primary.main,
+                ...portalTheme.typography.body2Regular,
+                color: portalTheme.palette.primary.main,
                 wordBreak: "break-all",
               }}
             >

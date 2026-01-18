@@ -3,7 +3,7 @@ import { IconButton, Popover } from "@mui/material";
 import InfoCard from "./InfoCard";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { InfoIcon } from "../../assets/icons/details/info";
 import { CloseIcon } from "../../assets/icons/download/close";
 
@@ -29,7 +29,7 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
       <IconButton
         ref={buttonRef}
         onClick={handleClick}
-        sx={{ color: rc8Theme.palette.info.main, padding: 0 }}
+        sx={{ color: portalTheme.palette.info.main, padding: 0 }}
         data-testid="Info-tip-icon"
       >
         <InfoIcon />

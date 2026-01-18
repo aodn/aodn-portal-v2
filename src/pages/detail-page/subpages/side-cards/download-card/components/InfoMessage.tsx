@@ -1,6 +1,6 @@
 import { Box, SxProps, Typography } from "@mui/material";
 import { InformationIcon } from "../../../../../../assets/icons/download/information";
-import rc8Theme from "../../../../../../styles/themeRC8";
+import { portalTheme } from "../../../../../../styles";
 import { FC } from "react";
 
 interface InfoMessageProps {
@@ -21,14 +21,14 @@ const InfoMessage: FC<InfoMessageProps> = ({ infoText, iconColor, sx }) => {
     >
       <Box sx={{ minWidth: 22, flexShrink: 0, px: "8px" }}>
         <InformationIcon
-          color={iconColor ? iconColor : rc8Theme.palette.primary1}
+          color={iconColor ? iconColor : portalTheme.palette.primary1}
           height={24}
           width={24}
         />
       </Box>
       <Typography
-        sx={{ ...rc8Theme.typography.body2Regular }}
-        color={rc8Theme.palette.text2}
+        sx={{ ...portalTheme.typography.body2Regular }}
+        color={portalTheme.palette.text2}
         pt="3px"
       >
         {infoText}

@@ -4,9 +4,8 @@ import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import CopyButton from "../common/buttons/CopyButton";
-import { openInNewTab } from "../../utils/LinkUtils";
 
 interface LicenseListProps {
   license?: string;
@@ -45,7 +44,7 @@ const LicenseList: React.FC<LicenseListProps> = ({
             <Grid item xs={12}>
               <Typography
                 variant="body2Regular"
-                sx={{ color: rc8Theme.palette.text1 }}
+                sx={{ color: portalTheme.palette.text1 }}
               >
                 {license}
               </Typography>
@@ -84,7 +83,7 @@ const LicenseList: React.FC<LicenseListProps> = ({
         <>
           <Typography
             variant="title1Medium"
-            sx={{ color: rc8Theme.palette.text1 }}
+            sx={{ color: portalTheme.palette.text1 }}
           >
             {title}
             {!licenseComponent ? (

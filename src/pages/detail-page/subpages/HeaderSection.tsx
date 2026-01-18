@@ -29,7 +29,7 @@ import DataUsageIcon from "@mui/icons-material/DataUsage";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import { pageReferer } from "../../../components/common/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import InfoCard from "../../../components/info/InfoCard";
 import { InfoStatusType } from "../../../components/info/InfoDefinition";
 import { DataTestId } from "../../../components/map/mapbox/constants";
@@ -144,7 +144,7 @@ const renderCompletedStatus = () => (
       padding={0}
       paddingX={padding.extraSmall}
       variant="title1Medium"
-      color={rc8Theme.palette.text1}
+      color={portalTheme.palette.text1}
     >
       Completed
     </Typography>
@@ -169,7 +169,7 @@ const renderSubTitle = (
           <Typography
             padding={0}
             variant="title1Medium"
-            color={rc8Theme.palette.text1}
+            color={portalTheme.palette.text1}
           >
             {capitalizeFirstLetter(pace)}
           </Typography>
@@ -186,7 +186,7 @@ const renderSubTitle = (
           padding={0}
           paddingRight={padding.small}
           variant="title1Medium"
-          color={rc8Theme.palette.text1}
+          color={portalTheme.palette.text1}
         >
           {startDate}
         </Typography>
@@ -201,7 +201,7 @@ const renderSubTitle = (
             padding={0}
             paddingLeft={padding.small}
             variant="title1Medium"
-            color={rc8Theme.palette.text1}
+            color={portalTheme.palette.text1}
           >
             {endDate}
           </Typography>
@@ -298,7 +298,7 @@ const HeaderSection = () => {
               padding: 0,
               px: 2,
               textAlign: "center",
-              ...rc8Theme.typography.title1Medium,
+              ...portalTheme.typography.title1Medium,
             }}
           />
         )}
@@ -319,7 +319,7 @@ const HeaderSection = () => {
               <Typography
                 variant="heading3"
                 aria-label="collection title"
-                color={rc8Theme.palette.text2}
+                color={portalTheme.palette.text2}
                 sx={{
                   p: 0,
                   overflow: "hidden",

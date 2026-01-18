@@ -30,7 +30,7 @@ import {
 } from "../map/mapbox/controls/menu/Definition";
 import BookmarkListHead from "./BookmarkListHead";
 import { OpenType, TabNavigation } from "../../hooks/useTabNavigation";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { CancelIcon } from "../../assets/icons/download/cancel";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
 import { detailPageDefault, pageReferer } from "../common/constants";
@@ -237,8 +237,8 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               >
                 <Typography
                   sx={{
-                    ...rc8Theme.typography.body1Medium,
-                    color: rc8Theme.palette.text2,
+                    ...portalTheme.typography.body1Medium,
+                    color: portalTheme.palette.text2,
                     fontWeight: 500,
                     pt: 0,
                     overflow: "hidden",
@@ -260,7 +260,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                   <CancelIcon
                     height={12}
                     width={12}
-                    color={rc8Theme.palette.grey700}
+                    color={portalTheme.palette.grey700}
                   />
                 </IconButton>
               </Box>

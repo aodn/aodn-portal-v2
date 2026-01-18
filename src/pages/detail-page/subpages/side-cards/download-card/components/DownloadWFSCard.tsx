@@ -13,7 +13,7 @@ import {
 import CancelIcon from "@mui/icons-material/Cancel";
 import { borderRadius } from "../../../../../../styles/constants";
 import { ILink } from "../../../../../../components/common/store/OGCCollectionDefinitions";
-import rc8Theme from "../../../../../../styles/themeRC8";
+import { portalTheme } from "../../../../../../styles";
 import useWFSDownload, {
   DownloadStatus,
 } from "../../../../../../hooks/useWFSDownload";
@@ -138,9 +138,9 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
             sx={{
               height: 8,
               borderRadius: borderRadius.small,
-              backgroundColor: rc8Theme.palette.grey[300],
+              backgroundColor: portalTheme.palette.grey[300],
               "& .MuiLinearProgress-bar": {
-                backgroundColor: rc8Theme.palette.primary.main,
+                backgroundColor: portalTheme.palette.primary.main,
               },
             }}
           />
@@ -150,7 +150,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
                 <Grid item xs={6}>
                   <Typography
                     textAlign="right"
-                    sx={{ ...rc8Theme.typography.body3Small }}
+                    sx={{ ...portalTheme.typography.body3Small }}
                   >
                     Downloaded:
                   </Typography>
@@ -159,7 +159,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
                   <Typography
                     width="60%"
                     textAlign="left"
-                    sx={{ ...rc8Theme.typography.body3Small }}
+                    sx={{ ...portalTheme.typography.body3Small }}
                   >
                     {dataSize}
                   </Typography>
@@ -179,7 +179,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           </Grid>
           <InfoMessage
             infoText="Please don't leave the page while the download is processing"
-            iconColor={rc8Theme.palette.warning.main}
+            iconColor={portalTheme.palette.warning.main}
           />
         </Stack>
       );
@@ -220,7 +220,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
                 <IconButton
                   size="small"
                   onClick={handleCancelDownload}
-                  sx={{ color: rc8Theme.palette.grey[100] }}
+                  sx={{ color: portalTheme.palette.grey[100] }}
                 >
                   <CancelIcon />
                 </IconButton>

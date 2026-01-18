@@ -7,7 +7,7 @@ import {
   IconButton,
 } from "@mui/material";
 import DataUsageForm, { DataUsageInformation } from "./DataUsageForm";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { InformationIcon } from "../../assets/icons/download/information";
 import { ClearIcon } from "../../assets/icons/download/clear";
 
@@ -28,11 +28,11 @@ const textFieldStyles = {
   container: { my: "8px" },
   inputRoot: {
     height: "42px",
-    backgroundColor: rc8Theme.palette.primary5,
+    backgroundColor: portalTheme.palette.primary5,
     opacity: 0.7,
     borderRadius: "4px",
     "&:before, &:hover:not(.Mui-disabled):before, &:after": {
-      borderBottom: `1px solid ${rc8Theme.palette.grey700}`,
+      borderBottom: `1px solid ${portalTheme.palette.grey700}`,
     },
   },
   input: {
@@ -47,7 +47,7 @@ const adornmentStyles = {
   wrapper: { m: 1, mb: "16px" },
   clearButton: {
     padding: "4px",
-    backgroundColor: rc8Theme.palette.primary5,
+    backgroundColor: portalTheme.palette.primary5,
   },
 };
 
@@ -91,7 +91,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
   const createErrorAdornment = () => (
     <InputAdornment position="end" sx={adornmentStyles.wrapper}>
       <InformationIcon
-        color={rc8Theme.palette.error.main}
+        color={portalTheme.palette.error.main}
         height={30}
         width={30}
       />
@@ -139,7 +139,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
         "& .MuiInputBase-root": textFieldStyles.inputRoot,
         "& .MuiInputBase-root.MuiInput-root .MuiInputBase-input": {
           ...textFieldStyles.input,
-          ...rc8Theme.typography.title2Regular,
+          ...portalTheme.typography.title2Regular,
         },
       }}
     />
@@ -152,7 +152,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
       <Typography
         variant="body1Medium"
         sx={{
-          color: rc8Theme.palette.error.main,
+          color: portalTheme.palette.error.main,
           px: "20px",
         }}
       >

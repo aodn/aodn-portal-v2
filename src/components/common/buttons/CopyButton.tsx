@@ -3,7 +3,7 @@ import { Box, IconButton, SxProps, Tooltip } from "@mui/material";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { ContentCopyIcon } from "../../../assets/icons/download/contentCopy";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import { useClipboardContext } from "../../../context/clipboard/ClipboardContext";
 
 interface CopyIconConfig {
@@ -14,10 +14,16 @@ interface CopyIconConfig {
 // TODO: change to SVG as per design if needed
 const COPY_ICON_CONFIG_DEFAULT: CopyIconConfig = {
   iconBeforeCopy: (
-    <ContentCopyIcon height={16} width={16} color={rc8Theme.palette.primary1} />
+    <ContentCopyIcon
+      height={16}
+      width={16}
+      color={portalTheme.palette.primary1}
+    />
   ),
   iconAfterCopy: (
-    <DoneAllIcon sx={{ fontSize: "16px", color: rc8Theme.palette.primary1 }} />
+    <DoneAllIcon
+      sx={{ fontSize: "16px", color: portalTheme.palette.primary1 }}
+    />
   ),
 };
 

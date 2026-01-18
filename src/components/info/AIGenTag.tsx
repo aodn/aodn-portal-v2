@@ -3,7 +3,7 @@ import { Box, IconButton, Popover, Typography } from "@mui/material";
 import AIGenIcon from "../icon/AIGenIcon";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import InfoCard from "./InfoCard";
 import { CloseIcon } from "../../assets/icons/download/close";
 import AIGenStarIcon from "../icon/AIGenStarIcon";
@@ -34,7 +34,7 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
         sx={{ padding: 0, bgcolor: "transparent" }}
         data-testid="AIGenTag-icon"
       >
-        <AIGenIcon color={rc8Theme.palette.primary1} />
+        <AIGenIcon color={portalTheme.palette.primary1} />
       </IconButton>
       <Popover
         elevation={2}
@@ -81,11 +81,11 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
             width="100%"
             gap={1}
           >
-            <AIGenStarIcon color={rc8Theme.palette.primary1} />
+            <AIGenStarIcon color={portalTheme.palette.primary1} />
             <Typography
               sx={{
-                ...rc8Theme.typography.heading4,
-                color: rc8Theme.palette.primary1,
+                ...portalTheme.typography.heading4,
+                color: portalTheme.palette.primary1,
                 padding: 0,
               }}
             >
@@ -93,7 +93,7 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
             </Typography>
           </Box>
 
-          <Typography sx={{ ...rc8Theme.typography.body2Regular, p: "8px" }}>
+          <Typography sx={{ ...portalTheme.typography.body2Regular, p: "8px" }}>
             <TextRender text={infoContent?.body ?? ""} />
           </Typography>
         </InfoCard>

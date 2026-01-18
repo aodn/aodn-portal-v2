@@ -1,6 +1,6 @@
 import { Grid, GridProps, SxProps, Theme } from "@mui/material";
 import React, { createContext, useContext, useState } from "react";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface HoverContextProps {
   isOnHover: boolean;
@@ -32,7 +32,9 @@ const ItemBaseGrid = ({
   // Disable hover when in tab panels
   const getBackgroundColor = () => {
     if (disableHover) return "transparent";
-    return isOnHover ? rc8Theme.palette.primary5 : rc8Theme.palette.primary6;
+    return isOnHover
+      ? portalTheme.palette.primary5
+      : portalTheme.palette.primary6;
   };
 
   return (

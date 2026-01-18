@@ -3,7 +3,7 @@ import { SxProps, Theme, Typography } from "@mui/material";
 import { useClipboardContext } from "../../../../context/clipboard/ClipboardContext";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import TextAreaBaseGrid from "./TextAreaBaseGrid";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 import CopyButton, {
   CopyButtonConfig,
 } from "../../../common/buttons/CopyButton";
@@ -43,7 +43,7 @@ const TextArea: React.FC<TextAreaProps> = ({
       <Typography
         component="span"
         sx={{
-          ...rc8Theme.typography.body2Regular,
+          ...portalTheme.typography.body2Regular,
           wordBreak: "break-word",
           p: 0,
           display: "inline",

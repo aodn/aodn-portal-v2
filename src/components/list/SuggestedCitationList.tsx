@@ -5,7 +5,7 @@ import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
 import { Stack, Typography } from "@mui/material";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { AnalyticsEvent } from "../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../analytics/customEventTracker";
 
@@ -51,7 +51,7 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
         <>
           <Typography
             variant="title1Medium"
-            sx={{ color: rc8Theme.palette.text1 }}
+            sx={{ color: portalTheme.palette.text1 }}
           >
             {title}
             {!suggestedCitation ? (

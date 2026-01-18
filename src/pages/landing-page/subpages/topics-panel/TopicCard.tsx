@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { borderRadius, padding, shadow } from "../../../../styles/constants";
 import { TOPICS_CARD_HEIGHT, TOPICS_CARD_ICON_BOX_SIZE } from "./constants";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 
 export interface TopicCardType {
   title: string;
@@ -64,7 +64,7 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
       >
         <Typography
           variant="body3Small"
-          color={rc8Theme.palette.text2}
+          color={portalTheme.palette.text2}
           sx={{
             mt: "8px",
             overflow: "hidden",

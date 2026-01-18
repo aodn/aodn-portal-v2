@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PlainAccordion from "../../../../../../components/common/accordion/PlainAccordion";
-import rc8Theme from "../../../../../../styles/themeRC8";
+import { portalTheme } from "../../../../../../styles";
 import {
   DownloadCondition,
   DownloadConditionType,
@@ -56,7 +56,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
         <InfoMessage
           infoText="Please consider subsetting your download selection using the tools on
         the map."
-          iconColor={rc8Theme.palette.secondary1}
+          iconColor={portalTheme.palette.secondary1}
           sx={{ pl: "8px", pr: "16px" }}
         />
       )}
@@ -75,7 +75,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
             <Box display="flex" alignItems="center" gap={3}>
               <Typography
                 typography="title1Medium"
-                color={rc8Theme.palette.text1}
+                color={portalTheme.palette.text1}
                 p={0}
               >
                 Download Selection
@@ -83,9 +83,9 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
               <Badge
                 sx={{
                   "& .MuiBadge-badge": {
-                    backgroundColor: rc8Theme.palette.primary1,
-                    ...rc8Theme.typography.title2Regular,
-                    color: rc8Theme.palette.text3,
+                    backgroundColor: portalTheme.palette.primary1,
+                    ...portalTheme.typography.title2Regular,
+                    color: portalTheme.palette.text3,
                     pb: "1px",
                   },
                 }}

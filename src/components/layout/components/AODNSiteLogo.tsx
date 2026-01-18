@@ -13,7 +13,7 @@ import {
   AODN_SITE_LOGO_HEIGHT,
   AODN_SITE_LOGO_HEIGHT_MOBILE,
 } from "../constant";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import { pageDefault } from "../../common/constants";
 
 const AODNSiteLogo = () => {
@@ -57,7 +57,7 @@ const AODNSiteLogo = () => {
         orientation="vertical"
         flexItem
         sx={{
-          bgcolor: `${rc8Theme.palette.primary1}`,
+          bgcolor: `${portalTheme.palette.primary1}`,
           opacity: "50%",
           width: "1px",
           mx: { xs: "12px", md: "18px" },

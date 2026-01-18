@@ -14,7 +14,7 @@ import { pageReferer } from "../common/constants";
 import { DateRangeIcon } from "../../assets/icons/search/date";
 import { PlaceIcon } from "../../assets/icons/search/location";
 import { TuneIcon } from "../../assets/icons/search/filter";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { SearchIcon } from "../../assets/icons/search/search";
 import useBreakpoint from "../../hooks/useBreakpoint";
 
@@ -100,10 +100,10 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   const filterButtonWidth = isUnderLaptop ? "100%" : "120px";
   const buttonStyleOnDropdownOpen = {
     color: "#fff",
-    backgroundColor: rc8Theme.palette.primary1,
+    backgroundColor: portalTheme.palette.primary1,
     width: filterButtonWidth,
     "&:hover": {
-      backgroundColor: rc8Theme.palette.primary1,
+      backgroundColor: portalTheme.palette.primary1,
     },
   };
 
@@ -156,7 +156,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
           color:
             isPopupOpen && activeButton === SearchbarButtonNames.Date
               ? "#FFF"
-              : rc8Theme.palette.primary1,
+              : portalTheme.palette.primary1,
         }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Date)}
         badgeContent={dateCount}
@@ -195,7 +195,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
           color:
             isPopupOpen && activeButton === SearchbarButtonNames.Location
               ? "#FFF"
-              : rc8Theme.palette.primary1,
+              : portalTheme.palette.primary1,
         }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Location)}
         badgeContent={areaCount}
@@ -234,7 +234,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
           color:
             isPopupOpen && activeButton === SearchbarButtonNames.Filter
               ? "#FFF"
-              : rc8Theme.palette.primary1,
+              : portalTheme.palette.primary1,
         }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Filter)}
         badgeContent={filterCount}
@@ -275,11 +275,11 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
           width: "48px",
           height: "48px",
           color: "#FFF",
-          backgroundColor: rc8Theme.palette.primary2,
+          backgroundColor: portalTheme.palette.primary2,
           borderRadius: "8px",
           ml: isUnderLaptop ? "0" : "2px",
           "&:hover": {
-            backgroundColor: rc8Theme.palette.secondary1,
+            backgroundColor: portalTheme.palette.secondary1,
             ml: isUnderLaptop ? "0" : "2px",
           },
         }}

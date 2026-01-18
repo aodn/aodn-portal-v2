@@ -2,7 +2,7 @@ import { Button, Grid, Typography } from "@mui/material";
 import { FC, memo } from "react";
 import PlusIcon from "../../icon/PlusIcon";
 import MinusIcon from "../../icon/MinusIcon";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface ShowMoreDetailButtonProps {
   isShowingMore: boolean;
@@ -33,17 +33,17 @@ const ShowMoreDetailBtn: FC<ShowMoreDetailButtonProps> = memo(
           onClick={handleClick}
           sx={{
             width: "160px",
-            border: `1px solid ${rc8Theme.palette.primary1}`,
+            border: `1px solid ${portalTheme.palette.primary1}`,
             borderRadius: "10px",
             "&:hover": {
-              border: `2px solid ${rc8Theme.palette.primary1}`,
+              border: `2px solid ${portalTheme.palette.primary1}`,
             },
           }}
         >
           <IconComponent />
           <Typography
             variant="title1Medium"
-            color={rc8Theme.palette.primary1}
+            color={portalTheme.palette.primary1}
             marginLeft={"10px"}
           >
             {buttonText}

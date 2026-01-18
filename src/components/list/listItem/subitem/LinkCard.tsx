@@ -8,7 +8,7 @@ import {
   ILink,
 } from "../../../common/store/OGCCollectionDefinitions";
 import { openInNewTab } from "../../../../utils/LinkUtils";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 import { dataAccessParams } from "../../../../analytics/dataAccessEvent";
@@ -121,8 +121,8 @@ const LinkCard: FC<LinkCardProps> = ({
             <Typography
               component="span"
               sx={{
-                ...rc8Theme.typography.title1Medium,
-                color: rc8Theme.palette.primary.main,
+                ...portalTheme.typography.title1Medium,
+                color: portalTheme.palette.primary.main,
                 padding: 0,
                 overflowWrap: "anywhere",
                 display: "inline",

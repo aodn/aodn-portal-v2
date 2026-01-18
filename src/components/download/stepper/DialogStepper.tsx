@@ -8,7 +8,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface StepItem {
   number: number;
@@ -54,12 +54,12 @@ const DialogStepper = ({
   // Get background color for step icon
   const getIconBackgroundColor = (isActive: boolean, isCompleted: boolean) => {
     if (isCompleted) {
-      return rc8Theme.palette.secondary1;
+      return portalTheme.palette.secondary1;
     }
     if (isActive) {
-      return rc8Theme.palette.primary1;
+      return portalTheme.palette.primary1;
     }
-    return rc8Theme.palette.grey300;
+    return portalTheme.palette.grey300;
   };
 
   // Get hover background color for step icon
@@ -69,13 +69,13 @@ const DialogStepper = ({
   ) => {
     if (!onStepClick) {
       return isCompleted || isActive
-        ? rc8Theme.palette.primary1
-        : rc8Theme.palette.grey100;
+        ? portalTheme.palette.primary1
+        : portalTheme.palette.grey100;
     }
 
     return isCompleted || isActive
-      ? rc8Theme.palette.secondary1
-      : rc8Theme.palette.grey300;
+      ? portalTheme.palette.secondary1
+      : portalTheme.palette.grey300;
   };
 
   // Render the circular step icon with number or check mark
@@ -94,7 +94,7 @@ const DialogStepper = ({
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: getIconBackgroundColor(isActive, isCompleted),
-          color: isActive ? "white" : rc8Theme.palette.text2,
+          color: isActive ? "white" : portalTheme.palette.text2,
           cursor: onStepClick ? "pointer" : "default",
           "&:hover": {
             backgroundColor: getIconHoverBackgroundColor(isActive, isCompleted),

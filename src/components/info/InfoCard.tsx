@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Paper, SxProps, Typography } from "@mui/material";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import TextRender from "../common/text/TextRender";
 
 interface InfoCardProps {
@@ -41,10 +41,10 @@ const InfoCard: FC<InfoCardProps> = ({
             alignSelf: "stretch",
             backgroundColor:
               status === InfoStatusType.ERROR
-                ? rc8Theme.palette.error.main
+                ? portalTheme.palette.error.main
                 : status === InfoStatusType.WARNING
-                  ? rc8Theme.palette.warning.main
-                  : rc8Theme.palette.info.main,
+                  ? portalTheme.palette.warning.main
+                  : portalTheme.palette.info.main,
           }}
         />
       )}
@@ -57,7 +57,7 @@ const InfoCard: FC<InfoCardProps> = ({
               sx={{
                 display: "block",
                 padding: 2,
-                color: rc8Theme.palette.primary.main,
+                color: portalTheme.palette.primary.main,
                 textAlign: "center",
                 letterSpacing: "0.05em",
                 ...titleSx,

@@ -3,7 +3,7 @@ import ItemBaseGrid from "./ItemBaseGrid";
 import InfoCard from "../../info/InfoCard";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import { InfoStatusType } from "../../info/InfoDefinition";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface NaItemProps {
   title: string;
@@ -23,12 +23,12 @@ const NaItem: React.FC<NaItemProps> = ({ title }) => {
           padding: "4px",
           borderRadius: "4px",
           boxShadow: "none",
-          bgcolor: rc8Theme.palette.primary6,
+          bgcolor: portalTheme.palette.primary6,
         }}
         contentSx={{
           padding: 0,
           textAlign: "center",
-          bgcolor: rc8Theme.palette.primary6,
+          bgcolor: portalTheme.palette.primary6,
         }}
       />
     </ItemBaseGrid>

@@ -14,7 +14,7 @@ import AircraftIcon from "../../icon/platform/AircraftIcon";
 import BioPlatformIcon from "../../icon/platform/BioPlatformIcon";
 import RadarIcon from "../../icon/platform/RadarIcon";
 import AUVIcon from "../../icon/platform/AUVIcon";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface PlatformFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -97,10 +97,10 @@ const PlatformFilter: FC<PlatformFilterProps> = ({
             "& .MuiToggleButton-root": {
               borderRadius: "12px",
               textTransform: "capitalize",
-              ...rc8Theme.typography.body1Medium,
-              color: rc8Theme.palette.text1,
+              ...portalTheme.typography.body1Medium,
+              color: portalTheme.palette.text1,
               "&.Mui-selected": {
-                border: `3px solid ${rc8Theme.palette.primary1}`,
+                border: `3px solid ${portalTheme.palette.primary1}`,
                 backgroundColor: "#fff",
               },
             },
@@ -135,8 +135,8 @@ const PlatformFilter: FC<PlatformFilterProps> = ({
               </StyledToggleButton>
               <Typography
                 sx={{
-                  ...rc8Theme.typography.title2Regular,
-                  color: rc8Theme.palette.text1,
+                  ...portalTheme.typography.title2Regular,
+                  color: portalTheme.palette.text1,
                   whiteSpace: "normal",
                   wordWrap: "break-word",
                   textAlign: "center",

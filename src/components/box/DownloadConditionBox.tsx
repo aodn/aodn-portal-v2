@@ -6,7 +6,7 @@ import {
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
 import { CloseIcon } from "../../assets/icons/download/close";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { BboxSelectionIcon } from "../../assets/icons/download/bbox_selection";
 import { TimeRangeIcon } from "../../assets/icons/download/time_range";
 
@@ -69,9 +69,9 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
       container
       sx={{
         position: "relative",
-        border: `1px solid ${rc8Theme.palette.grey600}`,
+        border: `1px solid ${portalTheme.palette.grey600}`,
         borderRadius: theme.borderRadius.md,
-        backgroundColor: rc8Theme.palette.primary6,
+        backgroundColor: portalTheme.palette.primary6,
         mb: "8px",
         py: "8px",
         px: "12px",
@@ -87,8 +87,8 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
         <Grid item xs>
           <Typography
             sx={{
-              ...rc8Theme.typography.body1Medium,
-              color: rc8Theme.palette.text1,
+              ...portalTheme.typography.body1Medium,
+              color: portalTheme.palette.text1,
               padding: 0,
               pb: "4px",
             }}

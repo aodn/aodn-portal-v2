@@ -12,7 +12,7 @@ import ResultListSortButton, {
 import { ICON_SELECT_DEFAULT_HEIGHT } from "../common/dropdown/IconSelect";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import ShareButtonMenu from "../menu/ShareButtonMenu";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 
 export interface ResultPanelSimpleFilterType
   extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
@@ -60,9 +60,9 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           alignItems: "center",
           overflow: "hidden",
           height: "40px",
-          border: `0.5px solid ${rc8Theme.palette.grey500}`,
+          border: `0.5px solid ${portalTheme.palette.grey500}`,
           borderRadius: "6px",
-          bgcolor: rc8Theme.palette.primary6,
+          bgcolor: portalTheme.palette.primary6,
           px: isUnderLaptop ? (isMobile ? "0" : "4px") : "20px",
           py: "10px",
           flexShrink: 0,

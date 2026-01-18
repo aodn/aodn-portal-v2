@@ -3,7 +3,7 @@ import {
   IAddress,
   IContact,
 } from "../../../common/store/OGCCollectionDefinitions";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 import { Grid, Link, Typography, Box } from "@mui/material";
 import { LocationOnOutlinedIcon } from "../../../../assets/icons/details/location";
 import { LanguageOutlinedIcon } from "../../../../assets/icons/details/language";
@@ -38,7 +38,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
   const renderTextLine = (text: string, key?: string) => (
     <Typography
       key={key}
-      sx={{ ...rc8Theme.typography.body2Regular, pt: "2px", mt: "4px" }}
+      sx={{ ...portalTheme.typography.body2Regular, pt: "2px", mt: "4px" }}
       display="block"
     >
       {text}
@@ -96,7 +96,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
 
                 <Typography
                   sx={{
-                    ...rc8Theme.typography.body2Regular,
+                    ...portalTheme.typography.body2Regular,
                     pt: 0,
                   }}
                 >
@@ -124,8 +124,8 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
                   href={link.href}
                   display="block"
                   sx={{
-                    ...rc8Theme.typography.body2Regular,
-                    color: rc8Theme.palette.primary1,
+                    ...portalTheme.typography.body2Regular,
+                    color: portalTheme.palette.primary1,
                     wordBreak: "break-word",
                   }}
                 >

@@ -13,7 +13,7 @@ import MarkdownRenderer from "../../../common/text/MarkdownRenderer";
 import CopyButton, {
   CopyButtonConfig,
 } from "../../../common/buttons/CopyButton";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 
 const LINE_CLAMP_DEFAULT = 10; // Default number of lines to show before expanding
 const LINE_CLAMP_DEFAULT_TABLET = 7;
@@ -143,8 +143,8 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
           <Button
             onClick={onShowMoreClick}
             sx={{
-              ...rc8Theme.typography.body1Medium,
-              color: rc8Theme.palette.text2,
+              ...portalTheme.typography.body1Medium,
+              color: portalTheme.palette.text2,
             }}
           >
             {isExpanded ? "Show Less" : showMoreStr}
