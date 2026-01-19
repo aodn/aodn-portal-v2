@@ -45,3 +45,32 @@ export const sortByRelevance = (
 export const checkEmptyArray = (array?: any[]): boolean => {
   return array?.some((item) => item?.toString().trim() !== "") ?? false;
 };
+
+/**
+ * Removes duplicate and empty items from an array of strings.
+ * - Trims whitespace from each item
+ * - Removes whitespace-only strings
+ * - Removes duplicates based on trim + lowercase (case-insensitive comparison)
+ * - Keeps the original text format of the first occurrence
+ *
+ * @param items Array of strings to deduplicate
+ * @returns Array with duplicates and empty items removed
+ *
+ * @example
+ * const result = removeDuplicatesAndEmpty(['PointOfContact', '  pointofcontact  ', '', '  ', 'SCIENCE', 'Science']);
+ * // result: ['PointOfContact', 'SCIENCE']
+ */
+export const removeDuplicatesAndEmpty = (items: string[]): string[] => {
+  const arr = new Set<string>();
+  return items
+    .map((item) => item.trim())
+    .filter((item) => {
+      // Remove whitespace-only strings
+      if (item === "") return false;
+      // Remove duplicates based on trim + lowercase
+      const normalizedItem = item.toLowerCase();
+      if (arr.has(normalizedItem)) return false;
+      arr.add(normalizedItem);
+      return true;
+    });
+};

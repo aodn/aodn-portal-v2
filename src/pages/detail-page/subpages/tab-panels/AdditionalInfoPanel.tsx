@@ -72,14 +72,14 @@ const AdditionalInfoPanel = () => {
       // According to current implementation, concepts belong to one theme
       // share the same title & description. The reason that making every concept
       // has the same title is to obey the STAC collection standard (theme extension).
-      const title = theme.concepts?.[0].title;
-      const description = theme.concepts?.[0].description;
+      const title = theme.concepts[0].title ?? "";
+      const description = theme.concepts[0].description ?? "";
       keywords.push({
         title: title,
         description: description,
-        content: theme.concepts.map(
-          (concept) => ` \u00A0 \u2022 ${concept.id}`
-        ),
+        content: theme.concepts
+          .filter((concept) => concept.id)
+          .map((concept) => ` \u00A0 \u2022 ${concept.id}`),
       });
     });
 
