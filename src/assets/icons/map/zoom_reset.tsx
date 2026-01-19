@@ -1,4 +1,8 @@
-export const ZoomResetIcon = () => (
+export const ZoomResetIcon = ({
+  hoverColor = "white",
+}: {
+  hoverColor?: string;
+}) => (
   <svg
     width="39"
     height="39"
@@ -8,7 +12,7 @@ export const ZoomResetIcon = () => (
     xmlnsXlink="http://www.w3.org/1999/xlink"
   >
     <g filter="url(#filter0_d_3464_37348)">
-      <circle cx="17.1953" cy="17.1953" r="15" fill="white" />
+      <circle cx="17.1953" cy="17.1953" r="15" fill={hoverColor} />
     </g>
     <mask
       id="mask0_3464_37348"

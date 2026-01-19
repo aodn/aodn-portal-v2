@@ -1,4 +1,8 @@
-export const ZoomInIcon = () => (
+export const ZoomInIcon = ({
+  hoverColor = "white",
+}: {
+  hoverColor?: string;
+}) => (
   <svg
     width="39"
     height="39"
@@ -7,7 +11,7 @@ export const ZoomInIcon = () => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <g filter="url(#filter0_d_3464_37308)">
-      <circle cx="17.1953" cy="17.1953" r="15" fill="white" />
+      <circle cx="17.1953" cy="17.1953" r="15" fill={hoverColor} />
     </g>
     <path
       d="M10.1953 18.3192V16.0393H16.0465V10.1953H18.3441V16.0393H24.1953V18.3192H18.3441V24.1953H16.0465V18.3192H10.1953Z"

@@ -9,6 +9,7 @@ import { ZoomInIcon } from "../../../../assets/icons/map/zoom_in";
 import { ZoomOutIcon } from "../../../../assets/icons/map/zoom_out";
 import { ZoomResetIcon } from "../../../../assets/icons/map/zoom_reset";
 import { MapDefaultConfig, MapEventEnum } from "../constants";
+import { portalTheme } from "../../../../styles";
 
 interface NavigationControlProps {
   visible?: boolean;
@@ -17,7 +18,7 @@ interface NavigationControlProps {
   visualizePitch?: boolean;
 }
 
-const CONTAINER_MAP_ZOOM_ID = "map-zoom-reset";
+const MAP_LEFT_CONTROL_CONTAINER = "map-left-control-container";
 
 class StyledNavigationControl extends MapboxNavigationControl {
   private readonly zoomReset: HTMLButtonElement | undefined = undefined;
@@ -26,6 +27,8 @@ class StyledNavigationControl extends MapboxNavigationControl {
   private zoomResetHandler: (event: MouseEvent) => void = () => {};
   private zoomButtonDisable: () => void = () => {};
   private zoomButtonEnable: () => void = () => {};
+  private pointerOverHandler: (event: PointerEvent) => void;
+  private pointerOutHandler: (event: PointerEvent) => void;
 
   private static readonly ICON_PX = "39px";
 
@@ -37,8 +40,10 @@ class StyledNavigationControl extends MapboxNavigationControl {
     super(options); // Pass options to parent class
     // create our own button
     const zoomResetSpan = document.createElement("span");
-    zoomResetSpan.className = "mapbox-ctrl-icon";
-    zoomResetSpan.style.backgroundImage = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon />))}")`;
+    zoomResetSpan.className = "mapboxgl-ctrl-icon";
+    zoomResetSpan.dataset.normalSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon />))}")`;
+    zoomResetSpan.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon hoverColor={portalTheme.palette.secondary1} />))}")`;
+    zoomResetSpan.style.backgroundImage = zoomResetSpan.dataset.normalSvg;
     zoomResetSpan.ariaHidden = "true";
     zoomResetSpan.title = "Zoom Reset";
     zoomResetSpan.style.display = "inline-block";
@@ -54,11 +59,29 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.zoomReset.style.minHeight = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.minWidth = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.borderTop = "0px";
+
+    this.pointerOverHandler = (event: PointerEvent) => {
+      if (event?.target instanceof Element) {
+        const icon = event.target.closest<HTMLButtonElement>(
+          ".mapboxgl-ctrl-icon"
+        );
+        if (icon) icon.style.backgroundImage = icon.dataset.hoverSvg || "";
+      }
+    };
+
+    this.pointerOutHandler = (event: PointerEvent) => {
+      if (event?.target instanceof Element) {
+        const icon = event.target.closest<HTMLButtonElement>(
+          ".mapboxgl-ctrl-icon"
+        );
+        if (icon) icon.style.backgroundImage = icon.dataset.normalSvg || "";
+      }
+    };
   }
 
   onAdd(map: Mapbox): HTMLElement {
     this.container = super.onAdd(map) as HTMLDivElement;
-    this.container.id = CONTAINER_MAP_ZOOM_ID;
+    this.container.id = MAP_LEFT_CONTROL_CONTAINER;
     this.container.style.cssText = `
       align-content: left;
       border: 0 !important;
@@ -68,6 +91,8 @@ class StyledNavigationControl extends MapboxNavigationControl {
       background: transparent !important;
       gap: 20px
     `;
+    this.container?.addEventListener("pointerover", this.pointerOverHandler);
+    this.container?.addEventListener("pointerout", this.pointerOutHandler);
 
     const zoomIn = this.container.querySelector(
       ".mapboxgl-ctrl-zoom-in"
@@ -80,7 +105,9 @@ class StyledNavigationControl extends MapboxNavigationControl {
 
       // Change the image to our design, hence keep function
       if (icon) {
-        icon.style.backgroundImage = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomInIcon />))}")`;
+        icon.dataset.normalSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomInIcon />))}")`;
+        icon.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomInIcon hoverColor={portalTheme.palette.secondary1} />))}")`;
+        icon.style.backgroundImage = icon.dataset.normalSvg;
       }
       zoomIn.style.minHeight = StyledNavigationControl.ICON_PX;
       zoomIn.style.minWidth = StyledNavigationControl.ICON_PX;
@@ -98,7 +125,9 @@ class StyledNavigationControl extends MapboxNavigationControl {
 
       // Change the image to our design, hence keep function
       if (icon) {
-        icon.style.backgroundImage = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon />))}")`;
+        icon.dataset.normalSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon />))}")`;
+        icon.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon hoverColor={portalTheme.palette.secondary1} />))}")`;
+        icon.style.backgroundImage = icon.dataset.normalSvg;
       }
       zoomOut.style.minHeight = StyledNavigationControl.ICON_PX;
       zoomOut.style.minWidth = StyledNavigationControl.ICON_PX;
@@ -136,6 +165,8 @@ class StyledNavigationControl extends MapboxNavigationControl {
 
   onRemove() {
     super.onRemove();
+    this.container?.removeEventListener("pointerover", this.pointerOverHandler);
+    this.container?.removeEventListener("pointerout", this.pointerOutHandler);
     this.zoomReset?.removeEventListener("click", this.zoomResetHandler!);
     this.container?.removeChild(this.zoomReset!);
 
@@ -179,7 +210,7 @@ const NavigationControl = ({
 
   useEffect(() => {
     const container: HTMLButtonElement | null = document.getElementById(
-      CONTAINER_MAP_ZOOM_ID
+      MAP_LEFT_CONTROL_CONTAINER
     ) as HTMLButtonElement;
 
     if (container) {
@@ -189,5 +220,4 @@ const NavigationControl = ({
   return <React.Fragment />;
 };
 
-export { CONTAINER_MAP_ZOOM_ID };
 export default NavigationControl;
