@@ -5,7 +5,7 @@ import MinusIcon from "../../icon/MinusIcon";
 import { portalTheme } from "../../../styles";
 
 interface ShowMoreDetailButtonProps {
-  id: string;
+  id?: string;
   isShowingMore: boolean;
   setIsShowingMore: (isShowingMore: boolean) => void;
   title?: string;
