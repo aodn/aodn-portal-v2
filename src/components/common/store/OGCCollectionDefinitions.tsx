@@ -18,6 +18,7 @@ import { dateDefault } from "../constants";
 // interfaces:
 export interface IKeyword {
   title: string;
+  description: string;
   content: string[];
 }
 
