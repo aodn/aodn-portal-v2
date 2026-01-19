@@ -330,6 +330,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               sx: {
                 "&::placeholder": {
                   ...portalTheme.typography.title1Medium,
+                  color: portalTheme.palette.text2,
                 },
               },
             }}
