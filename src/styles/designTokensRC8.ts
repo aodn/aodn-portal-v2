@@ -84,7 +84,8 @@ export const designTokensRC8 = {
         color: "#090C02",
       },
 
-      // Title styles - Size: 16, Line Height: 24
+      // Title styles - Size: 16, Line Height: 24, use in front page search box,
+      // if you found diff, please check with designer
       title1Medium: {
         fontFamily: FONT_FAMILIES.openSans,
         fontSize: "16px",
@@ -93,12 +94,12 @@ export const designTokensRC8 = {
         color: "#090C02",
       },
 
-      // Title styles - Size: 16, Line Height: 26
+      // Title styles - Size: 16, Line Height: 24
       title2Regular: {
         fontFamily: FONT_FAMILIES.openSans,
         fontSize: "16px",
         fontWeight: 400,
-        lineHeight: "26px",
+        lineHeight: "24px",
         color: "#090C02",
       },
 

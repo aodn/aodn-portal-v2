@@ -319,9 +319,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
                 border: "none",
               },
-              "& .MuiInputBase-input::placeholder": {
-                ...portalTheme.typography.title1Medium,
-              },
             }}
             {...params}
             placeholder="Search for open data"
@@ -330,6 +327,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               ...params.inputProps,
               onKeyDown: handleKeyDown,
               "data-testid": "input-with-suggester",
+              sx: {
+                "&::placeholder": {
+                  ...portalTheme.typography.title1Medium,
+                },
+              },
             }}
           />
         </Box>
