@@ -27,6 +27,7 @@ import { SearchbarButtonNames } from "./SearchbarButtonGroup";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import { portalTheme } from "../../styles";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -317,6 +318,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               minWidth: TEXT_FIELD_MIN_WIDTH,
               "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
                 border: "none",
+              },
+              "& .MuiInputBase-input::placeholder": {
+                ...portalTheme.typography.title1Medium,
               },
             }}
             {...params}
