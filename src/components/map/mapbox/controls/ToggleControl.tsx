@@ -7,6 +7,7 @@ import { borderRadius } from "../../../../styles/constants";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import { MapEventEnum } from "../constants";
+import { portalTheme } from "../../../../styles";
 
 export interface ToggleControlProps {
   showFullMap: boolean;
@@ -21,13 +22,14 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
     <IconButton
       id="map-toggle-control-button"
       title={showFullMap ? "Exit fullscreen" : "Fullscreen"}
-      style={{
-        width: "32px",
-        height: "32px",
+      sx={{
+        width: "36px",
+        height: "36px",
         borderRadius: borderRadius.small,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: "none",
       }}
       onClick={() => {
         if (onToggleClicked) {
@@ -36,9 +38,21 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
       }}
     >
       {showFullMap ? (
-        <CloseFullscreenIcon fontSize="small" />
+        <CloseFullscreenIcon
+          sx={{
+            height: "100%",
+            width: "100%",
+            "&:hover": { backgroundColor: portalTheme.palette.secondary1 },
+          }}
+        />
       ) : (
-        <FullscreenIcon fontSize="medium" />
+        <FullscreenIcon
+          sx={{
+            height: "100%",
+            width: "100%",
+            "&:hover": { backgroundColor: portalTheme.palette.secondary1 },
+          }}
+        />
       )}
     </IconButton>
   );
@@ -67,6 +81,7 @@ class ToggleControlClass implements IControl {
   onAdd(map: Map): HTMLElement {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
+    this.container.style.marginLeft = "13px";
     this.root = createRoot(this.container!);
     this.redraw(this.props.showFullMap);
 
