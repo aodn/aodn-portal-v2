@@ -27,6 +27,7 @@ import { SearchbarButtonNames } from "./SearchbarButtonGroup";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import { portalTheme } from "../../styles";
 
 interface InputWithSuggesterProps {
   handleEnterPressed?: (
@@ -326,6 +327,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               ...params.inputProps,
               onKeyDown: handleKeyDown,
               "data-testid": "input-with-suggester",
+              sx: {
+                "&::placeholder": {
+                  ...portalTheme.typography.title1Medium,
+                },
+              },
             }}
           />
         </Box>
