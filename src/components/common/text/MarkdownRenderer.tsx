@@ -8,7 +8,7 @@ import {
   Stack,
   Box,
 } from "@mui/material";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import TextRender from "./TextRender";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 
@@ -261,7 +261,7 @@ const renderInlineContent = (text: string | undefined) => {
             rel="noopener noreferrer"
             variant="body2Regular"
             sx={{
-              color: rc8Theme.palette.primary.main,
+              color: portalTheme.palette.primary.main,
               textDecoration: "none",
               wordBreak: "break-all",
               "&:hover": {

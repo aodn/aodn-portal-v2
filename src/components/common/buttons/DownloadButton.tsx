@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Button, SxProps, Typography } from "@mui/material";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import { DownloadIcon } from "../../../assets/icons/download/download";
 
 interface DownloadButtonProps {
@@ -18,10 +18,10 @@ const DownloadButton: FC<DownloadButtonProps> = ({
     <Button
       sx={{
         width: "100%",
-        backgroundColor: rc8Theme.palette.primary1,
+        backgroundColor: portalTheme.palette.primary1,
         borderRadius: "6px",
         ":hover": {
-          backgroundColor: rc8Theme.palette.primary1,
+          backgroundColor: portalTheme.palette.primary1,
         },
         cursor: isDownloading ? "not-allowed" : "pointer",
         gap: 1,
@@ -32,7 +32,7 @@ const DownloadButton: FC<DownloadButtonProps> = ({
       <DownloadIcon />
       <Typography
         typography="title1Medium"
-        color={rc8Theme.palette.text3}
+        color={portalTheme.palette.text3}
         padding={0}
       >
         {isDownloading ? "Downloading..." : "Download"}

@@ -1,6 +1,6 @@
 import { styled, Tab, TabProps } from "@mui/material";
 import StyledBadge, { Position } from "../badge/StyledBadge";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface StyledTabProps extends TabProps {
   showBadge?: boolean;
@@ -12,7 +12,7 @@ const StyledTab = styled((props: StyledTabProps) => {
   const {
     showBadge = false,
     badgePosition = Position.TopRight,
-    badgeColor = rc8Theme.palette.secondary1,
+    badgeColor = portalTheme.palette.secondary1,
     ...tabProps
   } = props;
 
@@ -26,7 +26,7 @@ const StyledTab = styled((props: StyledTabProps) => {
       <Tab
         {...tabProps}
         sx={{
-          ...rc8Theme.typography.title1Medium,
+          ...portalTheme.typography.title1Medium,
           py: 0,
           px: "24px",
           my: "20px",
@@ -37,15 +37,15 @@ const StyledTab = styled((props: StyledTabProps) => {
   );
 })(() => ({
   textTransform: "none",
-  color: rc8Theme.palette.text1,
-  border: `1px solid  ${rc8Theme.palette.primary2}`,
+  color: portalTheme.palette.text1,
+  border: `1px solid  ${portalTheme.palette.primary2}`,
   borderRadius: "40px",
   "&.Mui-selected": {
     color: "#fff",
-    backgroundColor: rc8Theme.palette.primary2,
+    backgroundColor: portalTheme.palette.primary2,
   },
   " &:hover": {
-    backgroundColor: rc8Theme.palette.primary2,
+    backgroundColor: portalTheme.palette.primary2,
     color: "#fff",
   },
 }));

@@ -9,7 +9,7 @@ import {
 } from "react";
 import { MenuItem, SxProps } from "@mui/material";
 import { OpenType } from "../../hooks/useTabNavigation";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 
 export interface ContextMenuRef {
   openContextMenu: (e: MouseEvent<HTMLElement>) => void; // User call this to open the menu
@@ -27,8 +27,8 @@ const ContextMenu = forwardRef<ContextMenuRef, ContextMenuProps>(
       () =>
         ({
           ...sx,
-          ...rc8Theme.typography.body2Regular,
-          color: rc8Theme.palette.primary1,
+          ...portalTheme.typography.body2Regular,
+          color: portalTheme.palette.primary1,
         }) as SxProps,
       [sx]
     );

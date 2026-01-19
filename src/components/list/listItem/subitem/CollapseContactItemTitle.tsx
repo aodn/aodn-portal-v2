@@ -1,6 +1,6 @@
 import React from "react";
 import { Grid, Link, Tooltip, Typography, Box } from "@mui/material";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 import { MailOutlineIcon } from "../../../../assets/icons/details/mail";
 import { openInNewTab } from "../../../../utils/LinkUtils";
 import { addSpacesToCamelCase } from "../../../../utils/FormatUtils";
@@ -22,7 +22,7 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
     return (
       <Typography
         sx={{
-          ...rc8Theme.typography.body1Medium,
+          ...portalTheme.typography.body1Medium,
           p: 0,
           mx: "6px",
           color: color,
@@ -69,19 +69,19 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
                   openInNewTab(`mailto:${email}`);
                 }}
               >
-                {generateTitle(rc8Theme.palette.primary1)}
+                {generateTitle(portalTheme.palette.primary1)}
               </Link>
             </Tooltip>
           </Box>
         ) : (
-          generateTitle(rc8Theme.palette.text1)
+          generateTitle(portalTheme.palette.text1)
         )}
 
         {roles && roles.length > 0 && (
           <Typography
             sx={{
-              ...rc8Theme.typography.body1Medium,
-              backgroundColor: rc8Theme.palette.primary4,
+              ...portalTheme.typography.body1Medium,
+              backgroundColor: portalTheme.palette.primary4,
               padding: "4px 10px",
               borderRadius: "6px",
               ml: 2,

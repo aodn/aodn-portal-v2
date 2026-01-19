@@ -6,7 +6,7 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 import { ArrowOutwardIcon } from "../../../../assets/icons/side-cards/arrowOutward";
 
 interface SideCardContainerProps {
@@ -46,7 +46,7 @@ const SideCardContainer: FC<SideCardContainerProps> = ({
           <Typography
             variant="heading4"
             id={titleId}
-            sx={{ color: rc8Theme.palette.text2 }}
+            sx={{ color: portalTheme.palette.text2 }}
           >
             {title}
           </Typography>
@@ -57,7 +57,7 @@ const SideCardContainer: FC<SideCardContainerProps> = ({
               aria-label="open external"
               size="small"
               onClick={onClick}
-              sx={{ color: rc8Theme.palette.text2 }}
+              sx={{ color: portalTheme.palette.text2 }}
             >
               <ArrowOutwardIcon />
             </IconButton>

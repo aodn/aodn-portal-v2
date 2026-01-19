@@ -19,7 +19,7 @@ import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
 
@@ -135,7 +135,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
             >
               <Typography
                 variant="title1Medium"
-                color={rc8Theme.palette.text1}
+                color={portalTheme.palette.text1}
                 sx={{
                   padding: 0,
                   overflow: "hidden",

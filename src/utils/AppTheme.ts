@@ -14,7 +14,7 @@
  * MIGRATION PHASES:
  *
  * Phase 1: Legacy + RC8 Integration
- * - AppTheme.ts: Spreads rc8Theme as base, legacy configs override
+ * - AppTheme.ts: Spreads portalTheme as base, legacy configs override
  * - All existing components continue to work unchanged
  * - RC8 features available for new development
  * - Usage: import AppTheme from "./utils/AppTheme"
@@ -49,7 +49,7 @@
  */
 
 import { createTheme, Shadows, ThemeOptions } from "@mui/material/styles";
-import rc8Theme from "../styles/themeRC8";
+import { portalTheme } from "../styles";
 import { FONT_FAMILIES } from "../styles/fontsRC8";
 
 declare module "@mui/material/styles" {
@@ -147,10 +147,10 @@ declare module "@mui/material/Typography/Typography" {
 
 const theme: ThemeOptions = {
   // RC8 theme as foundation (provides designTokens, RC8 typography, RC8 palette)
-  ...rc8Theme,
+  ...portalTheme,
 
   palette: {
-    ...rc8Theme.palette, // Include all RC8 colors (primary1, text1, etc.)
+    ...portalTheme.palette, // Include all RC8 colors (primary1, text1, etc.)
     detail: {
       text: "#5B5B5B",
       listItemBG: "#F2F6F9",
@@ -223,7 +223,7 @@ const theme: ThemeOptions = {
   },
 
   typography: {
-    ...rc8Theme.typography, // Include all RC8 variants (heading1, slogan1, etc.)
+    ...portalTheme.typography, // Include all RC8 variants (heading1, slogan1, etc.)
 
     // Only override what needs to be changed, keep everything else intact
     fontFamily: FONT_FAMILIES.openSans, // Global font changed to RC8
