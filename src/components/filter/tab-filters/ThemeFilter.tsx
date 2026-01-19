@@ -9,7 +9,7 @@ import { fetchParameterVocabsWithStore } from "../../common/store/searchReducer"
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { TabFilterType } from "../Filters";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface ThemeFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -70,21 +70,21 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
           "& .MuiToggleButton-root": {
             borderRadius: "6px",
             textTransform: "capitalize",
-            ...rc8Theme.typography.title2Regular,
-            color: rc8Theme.palette.text1,
-            bgcolor: rc8Theme.palette.primary6,
+            ...portalTheme.typography.title2Regular,
+            color: portalTheme.palette.text1,
+            bgcolor: portalTheme.palette.primary6,
             px: "24px",
             py: "8px",
             "&:hover": {
-              bgcolor: rc8Theme.palette.primary1,
+              bgcolor: portalTheme.palette.primary1,
               color: "#fff",
             },
             "&.Mui-selected": {
               border: "none",
-              bgcolor: rc8Theme.palette.primary1,
+              bgcolor: portalTheme.palette.primary1,
               color: "#fff",
               "&:hover": {
-                bgcolor: rc8Theme.palette.primary1,
+                bgcolor: portalTheme.palette.primary1,
               },
             },
           },

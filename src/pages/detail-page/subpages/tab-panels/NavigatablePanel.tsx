@@ -14,8 +14,8 @@ import useBreakpoint from "../../../../hooks/useBreakpoint";
 import AIGenTag from "../../../../components/info/AIGenTag";
 import { InfoContentType } from "../../../../components/info/InfoDefinition";
 
-// the visible height of the navigatable panel. May change according to the design
-const PANEL_VISIBLE_HEIGHT = 1480;
+// the visible height of the navigable panel. May change, according to the design
+const PANEL_VISIBLE_HEIGHT = 850;
 
 export interface NavigatablePanelChild {
   title: string;

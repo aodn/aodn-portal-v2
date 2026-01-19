@@ -3,7 +3,7 @@ import CommonSelect, {
   CommonSelectProps,
 } from "../../../../../../components/common/dropdown/CommonSelect";
 import { useTheme } from "@mui/material";
-import rc8Theme from "../../../../../../styles/themeRC8";
+import { portalTheme } from "../../../../../../styles";
 
 interface DownloadSelectProps extends CommonSelectProps<string> {}
 
@@ -36,9 +36,9 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
           boxShadow: theme.shadows[5],
           mt: "6px",
           "& .MuiMenuItem-root": {
-            ...rc8Theme.typography.body1Medium,
+            ...portalTheme.typography.body1Medium,
             "&.Mui-selected": {
-              backgroundColor: rc8Theme.palette.primary5,
+              backgroundColor: portalTheme.palette.primary5,
             },
           },
         },
@@ -55,7 +55,7 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
       value={value}
       onSelectCallback={onSelectCallback}
       selectSx={selectSxProps}
-      labelSx={{ ...rc8Theme.typography.title1Medium, pb: "9px" }}
+      labelSx={{ ...portalTheme.typography.title1Medium, pb: "9px" }}
       menuProps={menuProps}
     />
   );

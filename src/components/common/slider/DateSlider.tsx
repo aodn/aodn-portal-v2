@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { Grid, Stack, Typography } from "@mui/material";
 import { dateToValue, valueToDate } from "../../../utils/DateUtils";
 import { dateDefault } from "../constants";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import { padding } from "../../../styles/constants";
 import PlainSlider from "./PlainSlider";
 
@@ -53,7 +53,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     <Grid
       container
       sx={{
-        backgroundColor: rc8Theme.palette.primary6,
+        backgroundColor: portalTheme.palette.primary6,
         borderRadius: "6px",
         display: "flex",
         width: "100%",
@@ -75,8 +75,8 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
       >
         <Typography
           sx={{
-            ...rc8Theme.typography.body1Medium,
-            color: rc8Theme.palette.text1,
+            ...portalTheme.typography.body1Medium,
+            color: portalTheme.palette.text1,
           }}
         >
           Displaying @ {valueToDate(datePointStamp!).toISOString()}
@@ -167,7 +167,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
     <Grid
       container
       sx={{
-        backgroundColor: rc8Theme.palette.primary6,
+        backgroundColor: portalTheme.palette.primary6,
         borderRadius: "6px",
         display: "flex",
         width: "100%",
@@ -193,8 +193,8 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
         >
           <Typography
             sx={{
-              ...rc8Theme.typography.title1Medium,
-              color: rc8Theme.palette.text1,
+              ...portalTheme.typography.title1Medium,
+              color: portalTheme.palette.text1,
               whiteSpace: "nowrap",
               mr: "8px",
               display: { xs: "none", sm: "block" },
@@ -215,8 +215,8 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
           />
           <Typography
             sx={{
-              ...rc8Theme.typography.title1Medium,
-              color: rc8Theme.palette.text1,
+              ...portalTheme.typography.title1Medium,
+              color: portalTheme.palette.text1,
               whiteSpace: "nowrap",
               ml: "8px",
               display: { xs: "none", sm: "block" },
@@ -240,16 +240,16 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
       >
         <Typography
           sx={{
-            ...rc8Theme.typography.body1Medium,
-            color: rc8Theme.palette.text1,
+            ...portalTheme.typography.body1Medium,
+            color: portalTheme.palette.text1,
           }}
         >
           {dayjs(minDate).format(dateDefault.DISPLAY_FORMAT)}
         </Typography>
         <Typography
           sx={{
-            ...rc8Theme.typography.body1Medium,
-            color: rc8Theme.palette.text1,
+            ...portalTheme.typography.body1Medium,
+            color: portalTheme.palette.text1,
           }}
         >
           {dayjs(maxDate).format(dateDefault.DISPLAY_FORMAT)}

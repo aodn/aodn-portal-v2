@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import rc8Theme from "../../../../styles/themeRC8";
 import LabelChip from "../../../common/label/LabelChip";
+import { portalTheme } from "../../../../styles";
 
 interface CollapseItemTitleProps {
   text: string;
@@ -40,7 +40,7 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
               display: "inline-block",
               textAlign: "left",
               whiteSpace: "normal",
-              ...rc8Theme.typography.title1Medium,
+              ...portalTheme.typography.title1Medium,
               p: 0,
               my: "8px",
               mx: "6px",

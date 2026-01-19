@@ -1,4 +1,4 @@
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import { Slider, SliderProps, styled } from "@mui/material";
 import { useMemo } from "react";
 
@@ -27,7 +27,7 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
 
   return {
     "& .MuiSlider-valueLabel": {
-      ...rc8Theme.typography.body1Medium,
+      ...portalTheme.typography.body1Medium,
       backgroundColor: "transparent",
       ...labelPositioning,
       opacity: 0, // Hide text by default
@@ -42,13 +42,13 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
       },
     "& .MuiSlider-track": {
       boxShadow: "0 0 3px 1px rgba(0, 0, 0, 0.10) inset",
-      backgroundColor: rc8Theme.palette.primary1,
+      backgroundColor: portalTheme.palette.primary1,
       opacity: 0.7,
       border: "none",
       height: "8px",
     },
     "& .MuiSlider-rail": {
-      backgroundColor: rc8Theme.palette.primary4,
+      backgroundColor: portalTheme.palette.primary4,
       height: "6px",
     },
     "& .MuiSlider-thumb": {

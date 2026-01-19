@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography } from "@mui/material";
 import _ from "lodash";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 
 interface BBoxItemProps {
   label: string;
@@ -13,8 +13,8 @@ const BBoxItem: React.FC<BBoxItemProps> = ({ label, value }) => {
   return (
     <Typography
       sx={{
-        ...rc8Theme.typography.body2Regular,
-        color: rc8Theme.palette.text2,
+        ...portalTheme.typography.body2Regular,
+        color: portalTheme.palette.text2,
         padding: 0,
       }}
     >

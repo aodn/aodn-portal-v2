@@ -2,7 +2,7 @@ import React from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import { Grid, Typography, useTheme } from "@mui/material";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 
 interface MetadataDateListProps {
   creation?: string;
@@ -21,7 +21,7 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
       <ItemBaseGrid container key="Metadata date" sx={{ py: "10px" }}>
         {creation && (
           <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
-            <Typography sx={{ ...rc8Theme.typography.body2Regular, p: 0 }}>
+            <Typography sx={{ ...portalTheme.typography.body2Regular, p: 0 }}>
               <b>CREATION: </b>
               {creation}
             </Typography>
@@ -30,7 +30,7 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
 
         {revision && (
           <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
-            <Typography sx={{ ...rc8Theme.typography.body2Regular, p: 0 }}>
+            <Typography sx={{ ...portalTheme.typography.body2Regular, p: 0 }}>
               <b>REVISION: </b>
               {revision}
             </Typography>

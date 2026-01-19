@@ -10,7 +10,7 @@ import { Button, SxProps, Tooltip, Typography } from "@mui/material";
 import { color, padding } from "../../../styles/constants";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { OpenType } from "../../../hooks/useTabNavigation";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 import ContextMenu, { ContextMenuRef } from "../../menu/ContextMenu";
 
 export enum ResultCardButtonSize {
@@ -33,8 +33,8 @@ interface ResultCardButtonProps {
 }
 
 const buttonStyles = {
-  ...rc8Theme.typography.body2Regular,
-  color: rc8Theme.palette.primary1,
+  ...portalTheme.typography.body2Regular,
+  color: portalTheme.palette.primary1,
 };
 
 // Memoize font sizes for performance

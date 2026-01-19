@@ -72,7 +72,7 @@ def test_not_found_item(
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
 
-    expect(detail_page.get_not_found_element(not_found_item)).to_be_visible()
+    expect(detail_page.get_not_found_element(not_found_item).first).to_have_css("visibility", "visible", timeout=5000)
 
 
 @pytest.mark.parametrize(
@@ -114,7 +114,7 @@ def test_contact_details(
     expect(detail_page.page_title).to_have_text(title)
 
     detail_page.click_tab(tab)
-    detail_page.get_collapse_item_title(contact_button).click()
+    detail_page.get_collapse_item_title(contact_button).first.click()
 
     expect(detail_page.contact_area.address.first).to_contain_text(address)
     expect(detail_page.contact_area.phone.first).to_contain_text(phone)

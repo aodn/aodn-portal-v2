@@ -1,6 +1,6 @@
 import { ForwardedRef, forwardRef } from "react";
 import { Box, Button, Typography } from "@mui/material";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface DetailSubtabProps {
   id?: string;
@@ -29,8 +29,8 @@ const DetailSubtabBtn = forwardRef<HTMLDivElement | null, DetailSubtabProps>(
         >
           <Typography
             sx={{
-              ...rc8Theme.typography.body1Medium,
-              color: rc8Theme.palette.text1,
+              ...portalTheme.typography.body1Medium,
+              color: portalTheme.palette.text1,
               textAlign: "left",
               pb: "6px",
               pl: "2px",

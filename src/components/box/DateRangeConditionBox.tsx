@@ -5,7 +5,7 @@ import {
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import React, { useMemo } from "react";
 import { Typography } from "@mui/material";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import dayjs from "dayjs";
 import { dateDefault } from "../common/constants";
 
@@ -34,8 +34,8 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
     >
       <Typography
         sx={{
-          ...rc8Theme.typography.title1Medium,
-          color: rc8Theme.palette.text1,
+          ...portalTheme.typography.title1Medium,
+          color: portalTheme.palette.text1,
           fontSize: "14px",
           padding: 0,
         }}

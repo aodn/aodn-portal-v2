@@ -20,7 +20,7 @@ import {
   clearComponentParam,
   updateSearchText,
 } from "../../../../components/common/store/componentParamReducer";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 
@@ -144,7 +144,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
                 pr: gap.sm,
                 height: SCROLL_BUTTON_SIZE,
                 width: SCROLL_BUTTON_SIZE,
-                color: rc8Theme.palette.grey700,
+                color: portalTheme.palette.grey700,
               }}
             />
           </IconButton>
@@ -216,7 +216,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
                 pl: gap.sm,
                 height: SCROLL_BUTTON_SIZE,
                 width: SCROLL_BUTTON_SIZE,
-                color: rc8Theme.palette.grey700,
+                color: portalTheme.palette.grey700,
               }}
             />
           </IconButton>

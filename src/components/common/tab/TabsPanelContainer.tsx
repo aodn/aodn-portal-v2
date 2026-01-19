@@ -31,18 +31,24 @@ interface TabsPanelContainerProps {
   handleTabChange?: (newValue: number) => void;
   sx?: SxProps;
 }
-
+/**
+ * DO NOT unmount children here, we need to keep child status, the way we do it is use zIndex instead of hidden
+ * the reason if one of the component contains map, when it is visible, map renders again and causes unnecessary
+ * api call. Use zIndex to hide it at back avoid this issue.
+ */
 const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
   return (
     <Box
       role="tabpanel"
-      hidden={value !== index}
       id={`tabpanel-${index}`}
       aria-labelledby={`tab-${index}`}
-      sx={{ p: padding.medium }}
+      hidden={value !== index}
+      sx={{
+        p: padding.medium,
+      }}
       {...other}
     >
-      {value === index && children}
+      {children}
     </Box>
   );
 };
@@ -76,17 +82,13 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   if (!tabs?.length) return;
 
   return (
-    <Box
-      sx={{
-        ...sx,
-      }}
-    >
+    <>
       <StyledTabs
         value={value}
         onChange={handleChange}
         aria-label="tabsPanelContainer"
         data-testid="tabs-panel-container"
-        sx={{ px: isAboveDesktop ? "10px" : "8px" }}
+        sx={{ ...sx, px: isAboveDesktop ? "10px" : "8px" }}
       >
         {tabs.map((tab, index) => (
           <StyledTab
@@ -98,17 +100,19 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
           />
         ))}
       </StyledTabs>
-      {tabs.map((tab, index) => (
-        <TabPanel
-          key={index}
-          value={value}
-          index={index}
-          data-testid={`tab-panel-${tab.label}`}
-        >
-          {tab.component}
-        </TabPanel>
-      ))}
-    </Box>
+      <Box sx={sx}>
+        {tabs.map((tab, index) => (
+          <TabPanel
+            key={index}
+            value={value}
+            index={index}
+            data-testid={`tab-panel-${tab.label}`}
+          >
+            {tab.component}
+          </TabPanel>
+        ))}
+      </Box>
+    </>
   );
 };
 
