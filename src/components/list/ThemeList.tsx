@@ -2,8 +2,9 @@ import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import NaList from "./NaList";
-import { useTheme } from "@mui/material";
 import LabelChip from "../common/label/LabelChip";
+import { addSpacesToCamelCase } from "../../utils/FormatUtils";
+import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
 interface ThemeListProps {
   title: string;
@@ -16,8 +17,9 @@ const ThemeList: React.FC<ThemeListProps> = ({
   themes,
   selected = false,
 }) => {
-  const theme = useTheme();
-
+  const updatedThemes = themes.map((theme) =>
+    addSpacesToCamelCase(capitalizeFirstLetter(theme, false))
+  );
   const statementItem = useMemo(
     () => (
       <ItemBaseGrid
@@ -28,7 +30,7 @@ const ThemeList: React.FC<ThemeListProps> = ({
       >
         {themes.length !== 0 ? (
           <LabelChip
-            text={themes}
+            text={updatedThemes}
             sx={{
               padding: "8px 14px",
             }}
@@ -38,7 +40,7 @@ const ThemeList: React.FC<ThemeListProps> = ({
         )}
       </ItemBaseGrid>
     ),
-    [themes, title]
+    [themes.length, title, updatedThemes]
   );
 
   return (

@@ -8,19 +8,13 @@ describe("LabelChip", () => {
 
     render(<LabelChip text={testText} />);
 
+    const chips = screen.getAllByTestId(/label-chip-/);
+    expect(chips).toHaveLength(3);
+
     // Check that all text items are rendered with capitalized first letter
-    expect(screen.getByTestId("label-chip-Label one")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Label one")).toHaveTextContent(
-      "Label one"
-    );
-    expect(screen.getByTestId("label-chip-Label two")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Label two")).toHaveTextContent(
-      "Label two"
-    );
-    expect(screen.getByTestId("label-chip-Label three")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Label three")).toHaveTextContent(
-      "Label three"
-    );
+    expect(screen.getByText("Label one")).toBeInTheDocument();
+    expect(screen.getByText("Label two")).toBeInTheDocument();
+    expect(screen.getByText("Label three")).toBeInTheDocument();
   });
 
   it("should return null when text array is empty or contains only whitespace", () => {
@@ -42,12 +36,8 @@ describe("LabelChip", () => {
     const chips = screen.getAllByTestId(/label-chip-/);
     expect(chips).toHaveLength(2);
 
-    expect(screen.getByTestId("label-chip-Ocean")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Ocean")).toHaveTextContent("Ocean");
-    expect(screen.getByTestId("label-chip-Climate")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Climate")).toHaveTextContent(
-      "Climate"
-    );
+    expect(screen.getByText("Ocean")).toBeInTheDocument();
+    expect(screen.getByText("Climate")).toBeInTheDocument();
   });
 
   it("should trim whitespace from items and capitalize first letter", () => {
@@ -55,17 +45,13 @@ describe("LabelChip", () => {
 
     render(<LabelChip text={testText} />);
 
+    const chips = screen.getAllByTestId(/label-chip-/);
+    expect(chips).toHaveLength(3);
+
     // Check trimmed and capitalized versions are rendered
-    expect(screen.getByTestId("label-chip-Ocean")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Ocean")).toHaveTextContent("Ocean");
-    expect(screen.getByTestId("label-chip-Climate")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Climate")).toHaveTextContent(
-      "Climate"
-    );
-    expect(screen.getByTestId("label-chip-Temperature")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Temperature")).toHaveTextContent(
-      "Temperature"
-    );
+    expect(screen.getByText("Ocean")).toBeInTheDocument();
+    expect(screen.getByText("Climate")).toBeInTheDocument();
+    expect(screen.getByText("Temperature")).toBeInTheDocument();
   });
 
   it("should filter out empty strings after trimming", () => {
@@ -73,11 +59,11 @@ describe("LabelChip", () => {
 
     render(<LabelChip text={testText} />);
 
-    // Should only render non-empty items
     const chips = screen.getAllByTestId(/label-chip-/);
     expect(chips).toHaveLength(2);
 
-    expect(screen.getByTestId("label-chip-Ocean")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Climate")).toBeInTheDocument();
+    // Should only render non-empty items
+    expect(screen.getByText("Ocean")).toBeInTheDocument();
+    expect(screen.getByText("Climate")).toBeInTheDocument();
   });
 });
