@@ -23,9 +23,11 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
     return (
       <Typography
         sx={{
-          ...portalTheme.typography.body1Medium,
+          display: "flex",
+          alignItems: "center",
+          minHeight: "100%",
           p: 0,
-          mx: "6px",
+          ...portalTheme.typography.title1Medium,
           color: color,
         }}
         data-testid="metadata-contact-title"
@@ -36,28 +38,28 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
   };
 
   return (
-    <Grid item container md={12} data-testid={`collapse-item-${text}`}>
+    <Grid item container xs={12} data-testid={`collapse-item-${text}`}>
       <Grid
         item
-        md={12}
+        xs={12}
         sx={{
-          textAlign: "left",
-          whiteSpace: "normal",
-          py: "10px",
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "start",
+          gap: 1,
         }}
       >
         {isExpanded ? (
           <Box
             sx={{
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "start",
               gap: 1,
             }}
           >
-            <MailOutlineIcon />
+            <Box>
+              <MailOutlineIcon />
+            </Box>
             <Tooltip
               title={email ? `mail to: ${email}` : "[NO EMAIL PROVIDED]"}
               placement="top"
