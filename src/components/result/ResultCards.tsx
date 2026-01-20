@@ -9,12 +9,12 @@ import useTabNavigation, { OpenType } from "../../hooks/useTabNavigation";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
-import DetailSubtabBtn from "../common/buttons/DetailSubtabBtn";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import useFetchData from "../../hooks/useFetchData";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { detailPageDefault, pageReferer } from "../common/constants";
+import ShowMoreDetailBtn from "../common/buttons/ShowMoreDetailBtn";
 
 export interface ResultCardBasicType {
   content?: OGCCollection;
@@ -252,10 +252,10 @@ const ResultCards: FC<ResultCardsProps> = ({
 
   const renderLoadMoreButton = useCallback(() => {
     return (
-      <DetailSubtabBtn
+      <ShowMoreDetailBtn
         id="result-card-load-more-btn"
-        title="Show more results"
-        onClick={loadMoreResults}
+        isShowingMore={false} // Always false since we're loading more, not toggling
+        setIsShowingMore={() => loadMoreResults()}
       />
     );
   }, [loadMoreResults]);
