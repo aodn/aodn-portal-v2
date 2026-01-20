@@ -11,7 +11,7 @@ import { borderRadius, zIndex } from "../../../../styles/constants";
 import CommonSelect, {
   SelectItem,
 } from "../../../common/dropdown/CommonSelect";
-import rc8Theme from "../../../../styles/themeRC8";
+import { portalTheme } from "../../../../styles";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 interface HexbinLayerSelectProps {
@@ -47,9 +47,9 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
           boxShadow: theme.shadows[5],
           mt: "6px",
           "& .MuiMenuItem-root": {
-            ...rc8Theme.typography.body1Medium,
+            ...portalTheme.typography.body1Medium,
             "&.Mui-selected": {
-              backgroundColor: rc8Theme.palette.primary5,
+              backgroundColor: portalTheme.palette.primary5,
             },
           },
         },
@@ -88,7 +88,7 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
         >
           <Typography
             sx={{
-              ...rc8Theme.typography.body1Medium,
+              ...portalTheme.typography.body1Medium,
               p: 0,
               px: "12px",
               whiteSpace: "nowrap",
@@ -102,9 +102,9 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
               height: 8,
               width: "100%",
               borderRadius: borderRadius.small,
-              backgroundColor: rc8Theme.palette.grey[300],
+              backgroundColor: portalTheme.palette.grey[300],
               "& .MuiLinearProgress-bar": {
-                backgroundColor: rc8Theme.palette.primary.main,
+                backgroundColor: portalTheme.palette.primary.main,
               },
             }}
           />
@@ -124,7 +124,7 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
         >
           <Typography
             sx={{
-              ...rc8Theme.typography.body1Medium,
+              ...portalTheme.typography.body1Medium,
               pt: 0,
               px: "12px",
               whiteSpace: "nowrap",
@@ -136,7 +136,7 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
             orientation="vertical"
             flexItem
             sx={{
-              bgcolor: rc8Theme.palette.grey600,
+              bgcolor: portalTheme.palette.grey600,
               my: "6px",
             }}
           />
