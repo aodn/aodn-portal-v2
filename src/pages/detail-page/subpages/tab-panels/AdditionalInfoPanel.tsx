@@ -11,6 +11,7 @@ import MetadataUrlList from "../../../../components/list/MetadataUrlList";
 import MetadataDateList from "../../../../components/list/MetadataDateList";
 import { convertDateFormat } from "../../../../utils/DateUtils";
 import { contactRoles } from "../../../../components/common/constants";
+import { IKeyword } from "../../../../components/common/store/OGCCollectionDefinitions";
 
 const AdditionalInfoPanel = () => {
   const context = useDetailPageContext();
@@ -56,7 +57,7 @@ const AdditionalInfoPanel = () => {
 
     const metadataUrl = context.collection?.getMetadataUrl() ?? "";
 
-    let keywords: { title: string; content: string[] }[] = [];
+    let keywords: IKeyword[] = [];
     themes?.forEach((theme) => {
       // if no concepts, it is not considered as a keyword
       if (!theme.concepts || theme.concepts.length === 0) {
@@ -71,12 +72,14 @@ const AdditionalInfoPanel = () => {
       // According to current implementation, concepts belong to one theme
       // share the same title & description. The reason that making every concept
       // has the same title is to obey the STAC collection standard (theme extension).
-      const title = theme.concepts?.[0].title;
+      const title = theme.concepts[0].title ?? "";
+      const description = theme.concepts[0].description ?? "";
       keywords.push({
         title: title,
-        content: theme.concepts.map(
-          (concept) => ` \u00A0 \u2022 ${concept.id}`
-        ),
+        description: description,
+        content: theme.concepts
+          .filter((concept) => concept.id)
+          .map((concept) => ` \u00A0 \u2022 ${concept.id}`),
       });
     });
 
