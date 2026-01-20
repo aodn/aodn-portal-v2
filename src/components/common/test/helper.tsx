@@ -20,7 +20,7 @@ interface TestProps {
 // Use in test only to expose reference that need by test e2e testing.
 const TestHelper: React.FC<TestProps> = (props) => {
   useEffect(() => {
-    if (import.meta.env.MODE === "dev") {
+    if (import.meta.env.MODE === "playwright-local") {
       const { id, ...restProps } = props;
       const getMap = restProps.getMap;
 

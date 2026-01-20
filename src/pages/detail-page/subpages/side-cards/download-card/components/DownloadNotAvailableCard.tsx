@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import rc8Theme from "../../../../../../styles/themeRC8";
+import { portalTheme } from "../../../../../../styles";
 import { DownloadNotAvailableIcon } from "../../../../../../assets/icons/download/downloadNotAvaliable";
 
 const DownloadNotAvailableCard = () => {
@@ -8,7 +8,7 @@ const DownloadNotAvailableCard = () => {
       <Box
         sx={{
           borderRadius: "6px",
-          border: `1px solid ${rc8Theme.palette.grey600}`,
+          border: `1px solid ${portalTheme.palette.grey600}`,
           background: "#FFF",
           padding: "16px",
           marginBottom: "22px",
@@ -17,7 +17,7 @@ const DownloadNotAvailableCard = () => {
         <Typography
           variant="body2Regular"
           sx={{
-            color: rc8Theme.palette.text2,
+            color: portalTheme.palette.text2,
             textAlign: "center",
             width: "100%",
             display: "block",
@@ -34,12 +34,12 @@ const DownloadNotAvailableCard = () => {
         sx={{
           width: "100%",
           height: "38px",
-          background: rc8Theme.palette.grey600,
+          background: portalTheme.palette.grey600,
           borderRadius: "6px",
           gap: 1,
-          ...rc8Theme.typography.body1Medium,
+          ...portalTheme.typography.body1Medium,
           "&:disabled": {
-            background: rc8Theme.palette.grey600,
+            background: portalTheme.palette.grey600,
             color: "white",
             cursor: "not-allowed",
           },

@@ -11,7 +11,6 @@ interface ContactListProps {
   selected?: boolean;
 }
 
-// ContactList.tsx
 export const mapContactsToCollapseItems = (
   contacts: IContact[]
 ): ReactNode[] => {
@@ -29,7 +28,11 @@ export const mapContactsToCollapseItems = (
         <CollapseItem
           key={index}
           titleComponent={
-            <CollapseContactItemTitle email={email} text={title} />
+            <CollapseContactItemTitle
+              email={email}
+              text={title}
+              roles={contact.roles}
+            />
           }
         >
           <Grid container item md={12}>

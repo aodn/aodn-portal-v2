@@ -10,7 +10,7 @@ import AustraliaAntarcticProgramIcon from "../../icon/organisation/AustraliaAnta
 import AIMSIcon from "../../icon/organisation/AIMSIcon";
 import CSIROIcon from "../../icon/organisation/CSIROIcon";
 import IMASIcon from "../../icon/organisation/IMASIcon";
-import rc8Theme from "../../../styles/themeRC8";
+import { portalTheme } from "../../../styles";
 
 interface OrganisationFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -115,10 +115,10 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
             "& .MuiToggleButton-root": {
               borderRadius: "12px",
               textTransform: "capitalize",
-              ...rc8Theme.typography.body1Medium,
-              color: rc8Theme.palette.text1,
+              ...portalTheme.typography.body1Medium,
+              color: portalTheme.palette.text1,
               "&.Mui-selected": {
-                border: `3px solid ${rc8Theme.palette.primary1}`,
+                border: `3px solid ${portalTheme.palette.primary1}`,
                 backgroundColor: theme.palette.common.white,
               },
             },
@@ -153,8 +153,8 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
               </StyledToggleButton>
               <Typography
                 sx={{
-                  ...rc8Theme.typography.title2Regular,
-                  color: rc8Theme.palette.text1,
+                  ...portalTheme.typography.title2Regular,
+                  color: portalTheme.palette.text1,
                 }}
               >
                 {label}

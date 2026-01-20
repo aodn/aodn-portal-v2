@@ -26,7 +26,7 @@ import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
 import { DatasetFrequency } from "../common/store/searchReducer";
 import { IndexDataType } from "./FilterDefinition";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 
 enum FiltersTabs {
   Parameters = "parameters",
@@ -225,7 +225,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
           tabs={TABS}
           sx={{
             "& .MuiTabs-root": {
-              backgroundColor: rc8Theme.palette.primary6,
+              backgroundColor: portalTheme.palette.primary6,
               px: "28px",
             },
           }}

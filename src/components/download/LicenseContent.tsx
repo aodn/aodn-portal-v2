@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { useMemo } from "react";
 import CopyButton from "../../components/common/buttons/CopyButton";
 import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import { trackCustomEvent } from "../../analytics/customEventTracker";
 import { AnalyticsEvent } from "../../analytics/analyticsEvents";
 
@@ -17,12 +17,12 @@ const LicenseContent = () => {
   );
 
   const commonBodyStyles = {
-    color: rc8Theme.palette.text2,
+    color: portalTheme.palette.text2,
     display: "block",
   };
 
   const headingStyles = {
-    color: rc8Theme.palette.text1,
+    color: portalTheme.palette.text1,
     display: "block",
     mb: "12px",
   };
@@ -62,7 +62,7 @@ const LicenseContent = () => {
             rel="noopener noreferrer"
             sx={{
               ...commonBodyStyles,
-              color: rc8Theme.palette.primary1,
+              color: portalTheme.palette.primary1,
               textDecoration: "none",
               display: "block",
               "&:hover": {
@@ -116,7 +116,7 @@ const LicenseContent = () => {
       <Box>
         <Typography
           variant="body2Regular"
-          sx={{ color: rc8Theme.palette.text1 }}
+          sx={{ color: portalTheme.palette.text1 }}
         >
           {citationText}
         </Typography>

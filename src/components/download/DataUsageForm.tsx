@@ -8,7 +8,7 @@ import {
   FormLabel,
   Typography,
 } from "@mui/material";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 
 interface FormFieldConfig {
   key: string;
@@ -72,16 +72,16 @@ const commonStyles = {
     width: "100%",
   },
   formLabel: {
-    ...rc8Theme.typography.body2Regular,
-    color: rc8Theme.palette.text2,
+    ...portalTheme.typography.body2Regular,
+    color: portalTheme.palette.text2,
     mb: "8px",
   },
   checkbox: {
     padding: "4px 10px",
   },
   labelText: {
-    ...rc8Theme.typography.body2Regular,
-    color: rc8Theme.palette.text2,
+    ...portalTheme.typography.body2Regular,
+    color: portalTheme.palette.text2,
     padding: 0,
   },
   formControlLabel: (isUnderLaptop: boolean) => ({

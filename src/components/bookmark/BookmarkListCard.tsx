@@ -8,7 +8,7 @@ import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
 import { padding } from "../../styles/constants";
 import { OpenType, TabNavigation } from "../../hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "../common/constants";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import FitToSpatialExtentsLayer from "../map/mapbox/layers/FitToSpatialExtentsLayer";
 
 export interface BookmarkListCardType {
@@ -89,8 +89,8 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
         <Tooltip title="More detail..." placement="top">
           <Typography
             sx={{
-              ...rc8Theme.typography.body3Small,
-              color: rc8Theme.palette.grey700,
+              ...portalTheme.typography.body3Small,
+              color: portalTheme.palette.grey700,
               fontWeight: 400,
               padding: 0,
               paddingX: padding.small,

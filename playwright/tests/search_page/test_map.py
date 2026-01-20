@@ -457,4 +457,3 @@ def test_map_card_popup_download_button_in_mobile(
 
     detail_page.return_button.click()
     expect(search_page.main_map).to_be_visible()
-    mobile_page.pause()

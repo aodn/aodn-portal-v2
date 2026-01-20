@@ -13,7 +13,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { BOOKMARK_LIST_WIDTH_RESULTS } from "./constants";
 import useTabNavigation from "../../hooks/useTabNavigation";
 import BookmarkListHead from "../bookmark/BookmarkListHead";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 
 export interface BookmarkListButtonBasicType {
   onDeselectDataset?: () => void;
@@ -56,9 +56,9 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
           alignItems: "center",
           width: "100%",
           height: "40px",
-          border: `0.5px solid ${rc8Theme.palette.grey500}`,
+          border: `0.5px solid ${portalTheme.palette.grey500}`,
           borderRadius: "6px",
-          backgroundColor: rc8Theme.palette.primary6,
+          backgroundColor: portalTheme.palette.primary6,
           position: "relative",
           ":hover": {
             cursor: "pointer",
@@ -75,9 +75,9 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
           }}
         >
           {anchorEl ? (
-            <ExpandLessIcon sx={{ color: rc8Theme.palette.primary.main }} />
+            <ExpandLessIcon sx={{ color: portalTheme.palette.primary.main }} />
           ) : (
-            <ExpandMoreIcon sx={{ color: rc8Theme.palette.primary.main }} />
+            <ExpandMoreIcon sx={{ color: portalTheme.palette.primary.main }} />
           )}
         </Box>
         <BookmarkListHead

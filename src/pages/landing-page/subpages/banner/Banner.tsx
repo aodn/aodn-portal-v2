@@ -1,6 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material";
 import {
-  fontColor,
   fontSize,
   fontWeight,
   gap,
@@ -10,6 +9,7 @@ import useBreakpoint from "../../../../hooks/useBreakpoint";
 import bannerImage1 from "@/assets/images/banner_image_1.png";
 import bannerImage2 from "@/assets/images/banner_image_2.png";
 import bannerImage3 from "@/assets/images/banner_image_3.png";
+import { portalTheme } from "../../../../styles";
 
 const renderBannerText = () => {
   return (
@@ -29,7 +29,7 @@ const renderBannerText = () => {
             },
             letterSpacing: gap.xs,
             fontWeight: fontWeight.light,
-            color: fontColor.gray.extraDark,
+            color: portalTheme.palette.text2,
             textAlign: "left",
             padding: 0,
           }}
@@ -45,7 +45,7 @@ const renderBannerText = () => {
             },
             letterSpacing: gap.xs,
             fontWeight: fontWeight.bold,
-            color: fontColor.gray.extraDark,
+            color: portalTheme.palette.text2,
             textAlign: "left",
             padding: 0,
             mt: -2,
@@ -55,15 +55,9 @@ const renderBannerText = () => {
         </Typography>
         <Typography
           sx={{
-            fontSize: {
-              xs: fontSize.bannerSubtitleSmall,
-              sm: fontSize.bannerSubtitle,
-            },
-            fontWeight: fontWeight.light,
-            letterSpacing: gap.xs,
-            color: fontColor.gray.extraDark,
+            ...portalTheme.typography.heading4,
+            color: portalTheme.palette.text2,
             whiteSpace: "wrap",
-            textAlign: "left",
             p: 0,
             pr: padding.small,
           }}

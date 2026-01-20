@@ -1,7 +1,7 @@
 import { FC, ReactNode, cloneElement, isValidElement } from "react";
 import { IconButton, SxProps } from "@mui/material";
 import StyledBadge, { Position } from "../common/badge/StyledBadge";
-import rc8Theme from "../../styles/themeRC8";
+import { portalTheme } from "../../styles";
 import useBreakpoint from "../../hooks/useBreakpoint";
 
 interface SearchbarExpandableButtonProps {
@@ -37,17 +37,17 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
     : icon;
 
   const defaultButtonSx: SxProps = {
-    ...rc8Theme.typography.body1Medium,
+    ...portalTheme.typography.body1Medium,
     fontSize: isMobile ? "12px" : isUnderLaptop ? "14px" : "16px",
     height: "42px",
-    color: rc8Theme.palette.primary1,
-    backgroundColor: rc8Theme.palette.primary6,
+    color: portalTheme.palette.primary1,
+    backgroundColor: portalTheme.palette.primary6,
     borderRadius: "8px",
     "&:hover": {
-      backgroundColor: rc8Theme.palette.primary1,
+      backgroundColor: portalTheme.palette.primary1,
       color: "#FFF",
       "&:hover": {
-        backgroundColor: rc8Theme.palette.primary1,
+        backgroundColor: portalTheme.palette.primary1,
         color: "#FFF",
         "& svg path": { fill: "#FFF" },
       },

@@ -1,15 +1,18 @@
 import React, { ReactNode } from "react";
-import { Grid, Typography } from "@mui/material";
-import rc8Theme from "../../../../styles/themeRC8";
+import { Box, Grid, Typography } from "@mui/material";
+import LabelChip from "../../../common/label/LabelChip";
+import { portalTheme } from "../../../../styles";
 
 interface CollapseItemTitleProps {
   text: string;
   titleComponent?: ReactNode;
+  labels?: string[];
 }
 
 const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
   text,
   titleComponent,
+  labels,
 }) => {
   return (
     <Grid
@@ -25,15 +28,19 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
       ) : (
         <Grid
           item
-          md={11}
+          xs={12}
           sx={{
-            textAlign: "left",
-            whiteSpace: "normal",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
           <Typography
             sx={{
-              ...rc8Theme.typography.title1Medium,
+              display: "inline-block",
+              textAlign: "left",
+              whiteSpace: "normal",
+              ...portalTheme.typography.title1Medium,
               p: 0,
               my: "8px",
               mx: "6px",
@@ -41,6 +48,11 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
           >
             {text ? text : "[ NO TITLE ]"}
           </Typography>
+          {labels && labels.length > 0 && (
+            <Box display="inline-block">
+              <LabelChip text={labels} />
+            </Box>
+          )}
         </Grid>
       )}
     </Grid>
