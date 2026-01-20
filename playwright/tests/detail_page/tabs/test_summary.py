@@ -31,7 +31,13 @@ def test_show_all_and_less_description(
     initial_height = detail_page.get_element_height(summary.description.first)
 
     summary.show_all_button.click()
-    assert detail_page.get_element_height(summary.description.first) > initial_height
+    assert (
+        detail_page.get_element_height(summary.description.first)
+        > initial_height
+    )
 
     summary.show_less_button.click()
-    assert detail_page.get_element_height(summary.description.first) == initial_height
+    assert (
+        detail_page.get_element_height(summary.description.first)
+        == initial_height
+    )
