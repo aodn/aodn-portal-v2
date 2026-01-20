@@ -31,18 +31,17 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
         alignItems: "center",
         backgroundColor: "none",
       }}
-      onClick={() => {
-        if (onToggleClicked) {
-          onToggleClicked(!showFullMap);
-        }
-      }}
+      onClick={() => onToggleClicked?.(!showFullMap)}
     >
       {showFullMap ? (
         <CloseFullscreenIcon
           sx={{
             height: "100%",
             width: "100%",
-            "&:hover": { backgroundColor: portalTheme.palette.secondary1 },
+            "&:hover": {
+              color: "white",
+              backgroundColor: portalTheme.palette.secondary1,
+            },
           }}
         />
       ) : (
@@ -50,7 +49,10 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
           sx={{
             height: "100%",
             width: "100%",
-            "&:hover": { backgroundColor: portalTheme.palette.secondary1 },
+            "&:hover": {
+              color: "white",
+              backgroundColor: portalTheme.palette.secondary1,
+            },
           }}
         />
       )}
@@ -129,7 +131,7 @@ class ToggleControlClass implements IControl {
 
 const ToggleControl = ({
   showFullMap = false,
-  onToggleClicked = (v: boolean) => {},
+  onToggleClicked = undefined,
 }: ToggleControlProps) => {
   const { map } = useContext(MapContext);
   const [control, setControl] = useState<ToggleControlClass | null>(null);
