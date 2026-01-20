@@ -50,6 +50,7 @@ import AIGenTag from "../../../../components/info/AIGenTag";
 import { MapEventEnum } from "../../../../components/map/mapbox/constants";
 import { DateSliderPoint } from "../../../../components/common/slider/DateSlider";
 import { dateToValue } from "../../../../utils/DateUtils";
+import { portalTheme } from "../../../../styles";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -401,7 +402,14 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
               <ExpandableTextArea
                 text={abstract}
                 showMoreStr={"Show All"}
-                sx={{ width: isUnderLaptop ? "95%" : "98%" }}
+                sx={{
+                  width: isUnderLaptop ? "95%" : "98%",
+                  "& button": {
+                    ...portalTheme.typography.body1Medium,
+                    color: portalTheme.palette.text1,
+                    lineHeight: "24px",
+                  },
+                }}
               />
             </Stack>
             <Box
