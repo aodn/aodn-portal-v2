@@ -9,7 +9,6 @@ import { ZoomInIcon } from "../../../../assets/icons/map/zoom_in";
 import { ZoomOutIcon } from "../../../../assets/icons/map/zoom_out";
 import { ZoomResetIcon } from "../../../../assets/icons/map/zoom_reset";
 import { MapDefaultConfig, MapEventEnum } from "../constants";
-import { portalTheme } from "../../../../styles";
 
 interface NavigationControlProps {
   visible?: boolean;
@@ -42,7 +41,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
     const zoomResetSpan = document.createElement("span");
     zoomResetSpan.className = "mapboxgl-ctrl-icon";
     zoomResetSpan.dataset.normalSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon />))}")`;
-    zoomResetSpan.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon hoverColor={portalTheme.palette.secondary1} />))}")`;
+    zoomResetSpan.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon hover={true} />))}")`;
     zoomResetSpan.style.backgroundImage = zoomResetSpan.dataset.normalSvg;
     zoomResetSpan.ariaHidden = "true";
     zoomResetSpan.title = "Zoom Reset";
@@ -106,7 +105,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
       // Change the image to our design, hence keep function
       if (icon) {
         icon.dataset.normalSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomInIcon />))}")`;
-        icon.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomInIcon hoverColor={portalTheme.palette.secondary1} />))}")`;
+        icon.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomInIcon hover={true} />))}")`;
         icon.style.backgroundImage = icon.dataset.normalSvg;
       }
       zoomIn.style.minHeight = StyledNavigationControl.ICON_PX;
@@ -126,7 +125,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
       // Change the image to our design, hence keep function
       if (icon) {
         icon.dataset.normalSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon />))}")`;
-        icon.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon hoverColor={portalTheme.palette.secondary1} />))}")`;
+        icon.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon hover={true} />))}")`;
         icon.style.backgroundImage = icon.dataset.normalSvg;
       }
       zoomOut.style.minHeight = StyledNavigationControl.ICON_PX;

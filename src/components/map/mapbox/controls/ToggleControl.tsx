@@ -23,8 +23,8 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
       id="map-toggle-control-button"
       title={showFullMap ? "Exit fullscreen" : "Fullscreen"}
       sx={{
-        width: "36px",
-        height: "36px",
+        width: "30px",
+        height: "30px",
         borderRadius: borderRadius.small,
         display: "flex",
         justifyContent: "center",

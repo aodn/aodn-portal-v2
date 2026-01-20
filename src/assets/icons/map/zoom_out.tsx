@@ -1,8 +1,6 @@
-export const ZoomOutIcon = ({
-  hoverColor = "white",
-}: {
-  hoverColor?: string;
-}) => (
+import { portalTheme } from "../../../styles";
+
+export const ZoomOutIcon = ({ hover = false }: { hover?: boolean }) => (
   <svg
     width="39"
     height="39"
@@ -11,11 +9,16 @@ export const ZoomOutIcon = ({
     xmlns="http://www.w3.org/2000/svg"
   >
     <g filter="url(#filter0_d_3464_37311)">
-      <circle cx="17.1953" cy="17.1953" r="15" fill={hoverColor} />
+      <circle
+        cx="17.1953"
+        cy="17.1953"
+        r="15"
+        fill={hover ? portalTheme.palette.secondary1 : "white"}
+      />
     </g>
     <path
       d="M10.1953 18.1953V16.1953H24.1953V18.1953H10.1953Z"
-      fill="#595959"
+      fill={hover ? "white" : portalTheme.palette.grey700}
     />
     <defs>
       <filter
