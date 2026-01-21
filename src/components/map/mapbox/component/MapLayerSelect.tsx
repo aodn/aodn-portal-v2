@@ -14,30 +14,29 @@ import CommonSelect, {
 import { portalTheme } from "../../../../styles";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 
-interface HexbinLayerSelectProps {
-  hexbinOptions: SelectItem<string>[];
-  selectedHexbin: string;
-  handleSelectHexbin: (value: string) => void;
+interface MapLayerSelectProps {
+  mapLayersOptions: SelectItem<string>[];
+  selectedItem: string;
+  handleSelectItem: (value: string) => void;
   isLoading: boolean;
+  loadingText?: string;
 }
 
-const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
-  hexbinOptions,
-  selectedHexbin,
-  handleSelectHexbin,
+const MapLayerSelect: FC<MapLayerSelectProps> = ({
+  mapLayersOptions,
+  selectedItem,
+  handleSelectItem,
   isLoading,
 }) => {
   const theme = useTheme();
   const { isUnderLaptop } = useBreakpoint();
 
-  // Style props for the select component
   const selectProps = {
     backgroundColor: "transparent",
     border: "none",
     boxShadow: "unset",
   };
 
-  // Menu dropdown styling configuration
   const menuProps = useMemo(
     () => ({
       PaperProps: {
@@ -60,7 +59,7 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
 
   return (
     <Box
-      id="hexbin-layer-select-container"
+      id="geoserver-layer-select-container"
       sx={{
         width: "auto",
         maxWidth: "70%",
@@ -71,7 +70,6 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
         padding: "10px",
       }}
     >
-      {/* Loading state: show progress bar */}
       {isLoading ? (
         <Stack
           direction="column"
@@ -94,7 +92,7 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
               whiteSpace: "nowrap",
             }}
           >
-            Loading Hexbin Layers...
+            loadingText
           </Typography>
           <LinearProgress
             variant="indeterminate"
@@ -109,8 +107,7 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
             }}
           />
         </Stack>
-      ) : hexbinOptions.length > 0 ? (
-        // Data available: show label with dropdown selector
+      ) : mapLayersOptions.length > 0 ? (
         <Stack
           direction="row"
           sx={{
@@ -141,9 +138,9 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
             }}
           />
           <CommonSelect
-            items={hexbinOptions}
-            value={selectedHexbin}
-            onSelectCallback={handleSelectHexbin}
+            items={mapLayersOptions}
+            value={selectedItem}
+            onSelectCallback={handleSelectItem}
             menuProps={menuProps}
             selectSx={selectProps}
           />
@@ -153,4 +150,4 @@ const HexbinLayerSelect: FC<HexbinLayerSelectProps> = ({
   );
 };
 
-export default HexbinLayerSelect;
+export default MapLayerSelect;

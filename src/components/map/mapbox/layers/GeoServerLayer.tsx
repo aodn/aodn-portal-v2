@@ -36,7 +36,7 @@ import { CardContent, Typography } from "@mui/material";
 import { createRoot, Root } from "react-dom/client";
 import dayjs, { Dayjs } from "dayjs";
 import { dateDefault } from "../../../common/constants";
-import GeoserverLayerSelect from "../component/GeoserverLayerSelect";
+import MapLayerSelect from "../component/MapLayerSelect";
 import {
   ILink,
   OGCCollection,
@@ -673,11 +673,12 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   return (
     <>
       {visible && (
-        <GeoserverLayerSelect
-          wmsLayersOptions={wmsLayers}
-          selectedWMSLayer={selectedWmsLayer}
-          handleSelectWMSLayer={(value: string) => handleWmsLayerChange(value)}
+        <MapLayerSelect
+          mapLayersOptions={wmsLayers}
+          selectedItem={selectedWmsLayer}
+          handleSelectItem={(value: string) => handleWmsLayerChange(value)}
           isLoading={isFetchingWmsLayers}
+          loadingText="Fetching Geoserver Layers..."
         />
       )}
 

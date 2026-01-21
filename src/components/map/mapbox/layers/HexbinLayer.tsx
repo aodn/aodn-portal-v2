@@ -22,8 +22,8 @@ import dayjs from "dayjs";
 import { CloudOptimizedFeature } from "../../../common/store/CloudOptimizedDefinitions";
 import _ from "lodash";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
+import MapLayerSelect from "../component/MapLayerSelect";
 
-import HexbinLayerSelect from "../component/HexbinLayerSelect";
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
   [255, 255, 178],
@@ -34,7 +34,7 @@ const COLOR_RANGE: Color[] = [
   [189, 0, 38],
 ];
 
-// extract unique keys from feature colelction for dropdown options
+// Extract unique keys from feature collection for dropdown options
 export const extractHexbinOptions = (
   featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>
 ): SelectItem<string>[] => {
@@ -56,12 +56,12 @@ export const extractHexbinOptions = (
     }));
 };
 
-// remove dataset type to format key for display in dropdown
+// Remove dataset type to format key for display in dropdown
 const formatKeyLabel = (key: string): string => {
   return key.replace(/\.(parquet|zarr)$/i, "");
 };
 
-// filter features by selected key
+// Filter features by selected key
 export const filterFeaturesByKey = (
   featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>,
   selectedKey?: string
@@ -109,6 +109,7 @@ interface HexbinLayerProps extends LayerBasicType<CloudOptimizedFeature> {
   filterStartDate?: dayjs.Dayjs;
   filterEndDate?: dayjs.Dayjs;
 }
+
 // Use binary tree lookup the start and end point, data is assumed sorted by timestamp asc
 export const createFilteredFeatures = (
   featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>,
@@ -168,28 +169,15 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
   const overlayRef = useRef<MapboxOverlay | null>();
 
   const [selectedHexbinKey, setSelectedHexbinKey] = useState<string>("");
-  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
+  const [hexbinOptions, setHexbinOptions] = useState<SelectItem<string>[]>([]);
+  const [isFetchingHexbinOptions, setIsFetchingHexbinOptions] = useState(true);
 
   // Sort it to make later lookup faster
   const sortedFeatureCollection = useMemo<
     FeatureCollection<Point, CloudOptimizedFeature>
   >(() => createSortedFeatures(featureCollection), [featureCollection]);
 
-  // Extract Hexbin options from featureCollection
-  const hexbinOptions = useMemo(() => {
-    setIsLoadingOptions(true);
-    const options = extractHexbinOptions(sortedFeatureCollection);
-    setIsLoadingOptions(false);
-
-    // Set first option as default
-    if (options.length > 0 && !selectedHexbinKey) {
-      setSelectedHexbinKey(options[0].value);
-    }
-
-    return options;
-  }, [sortedFeatureCollection, selectedHexbinKey]);
-
-  // handle hexbin option selection
+  // Handle hexbin option selection
   const handleSelectHexbin = useCallback((key: string) => {
     setSelectedHexbinKey(key);
   }, []);
@@ -281,6 +269,32 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
     };
   }, [createLayer, map]);
 
+  // Extract hexbin options from feature collection
+  useEffect(() => {
+    if (!sortedFeatureCollection) {
+      setIsFetchingHexbinOptions(false);
+      return;
+    }
+
+    setIsFetchingHexbinOptions(true);
+
+    // Extract options from sorted feature collection
+    const options = extractHexbinOptions(sortedFeatureCollection);
+
+    if (options.length > 0) {
+      setHexbinOptions(options);
+
+      // Set first option as default if none selected
+      if (!selectedHexbinKey) {
+        handleSelectHexbin(options[0].value);
+      }
+    } else {
+      setHexbinOptions([]);
+    }
+
+    setIsFetchingHexbinOptions(false);
+  }, [sortedFeatureCollection, selectedHexbinKey, handleSelectHexbin]);
+
   useEffect(() => {
     // Update the data on change, first filter by key, then filter by date range
     if (overlayRef.current) {
@@ -313,13 +327,13 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
 
   return (
     <>
-      {/* Only render HexbinLayerSelect when visible is true */}
       {visible && (
-        <HexbinLayerSelect
-          hexbinOptions={hexbinOptions}
-          selectedHexbin={selectedHexbinKey}
-          handleSelectHexbin={handleSelectHexbin}
-          isLoading={isLoadingOptions}
+        <MapLayerSelect
+          mapLayersOptions={hexbinOptions}
+          selectedItem={selectedHexbinKey}
+          handleSelectItem={handleSelectHexbin}
+          isLoading={isFetchingHexbinOptions}
+          loadingText="Loading Hexbin Layers..."
         />
       )}
       <TestHelper
