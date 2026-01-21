@@ -9,7 +9,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import ReplyIcon from "@mui/icons-material/Reply";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { useDetailPageContext } from "../context/detail-page-context";
 import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
@@ -33,6 +32,7 @@ import { portalTheme } from "../../../styles";
 import InfoCard from "../../../components/info/InfoCard";
 import { InfoStatusType } from "../../../components/info/InfoDefinition";
 import { DataTestId } from "../../../components/map/mapbox/constants";
+import { ReplyIcon } from "../../../assets/icons/details/back";
 
 enum Status {
   onGoing = "onGoing",
@@ -52,7 +52,7 @@ const HeaderButton: FC<HeaderButtonProps> = ({ children, onClick, sx }) => (
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      borderRadius: borderRadius.small,
+      borderRadius: "8px",
       cursor: "pointer",
       minWidth: "40px",
       minHeight: "40px",
@@ -83,11 +83,7 @@ const renderGoBackButton = (onClick: () => void, referer: string) => {
     >
       <HeaderButton>
         <Tooltip title={tip} placement="top">
-          <ReplyIcon
-            sx={{
-              color: color.brightBlue.dark,
-            }}
-          />
+          <ReplyIcon />
         </Tooltip>
       </HeaderButton>
     </Box>
