@@ -29,6 +29,7 @@ import {
 import { DataTestId, MapDefaultConfig } from "../../constants";
 import { BaseLayerIcon } from "../../../../../assets/icons/map/base_layer";
 import MenuTitle from "./MenuTitle";
+import { AttributionControl } from "mapbox-gl";
 
 export interface BaseMapSwitcherLayer {
   id: string;
@@ -45,6 +46,9 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
   const [currentStyle, setCurrentStyle] = useState<string>(
     mapStyles[MapDefaultConfig.DEFAULT_STYLE].id
   );
+  const [_, setAttributionControl] = useState<AttributionControl | undefined>(
+    undefined
+  );
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
 
@@ -58,6 +62,22 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
       if (target) {
         map?.setStyle(target.style);
         setCurrentStyle(id);
+        setAttributionControl((a) => {
+          if (a) {
+            // Remove any existing custom attribution control
+            map?.removeControl(a);
+          }
+          if (target.attribution) {
+            // Set custom attribution if exist
+            const control = new AttributionControl({
+              customAttribution: target.attribution,
+            });
+            map?.addControl(control, "bottom-right");
+            return control;
+          } else {
+            return undefined;
+          }
+        });
       }
     },
     [map]
@@ -80,8 +100,8 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
 
     return () => {
       eventEmitter.off(EVENT_MENU.CLICKED, handleEvent);
-      eventEmitter.off(EVENT_MAP.MOVE_START, handleEvent);
       eventEmitter.off(EVENT_MAP.CLICKED, handleMapEvent);
+      eventEmitter.off(EVENT_MAP.MOVE_START, handleMapEvent);
     };
   }, []);
 

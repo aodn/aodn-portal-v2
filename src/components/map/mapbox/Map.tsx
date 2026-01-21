@@ -54,6 +54,8 @@ const styles = [
     id: "4",
     name: "World Imagery",
     style: ERSIWorldImagery as StyleSpecification,
+    attribution:
+      "Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community",
   },
   // Add more styles as needed
 ];
