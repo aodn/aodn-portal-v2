@@ -14,18 +14,20 @@ import CommonSelect, {
 import { portalTheme } from "../../../../styles";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 
-interface GeoserverLayerSelectProps {
-  wmsLayersOptions: SelectItem<string>[];
-  selectedWMSLayer: string;
-  handleSelectWMSLayer: (value: string) => void;
+interface MapLayerSelectProps {
+  mapLayersOptions: SelectItem<string>[];
+  selectedItem: string;
+  handleSelectItem: (value: string) => void;
   isLoading: boolean;
+  loadingText?: string;
 }
 
-const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
-  wmsLayersOptions,
-  selectedWMSLayer,
-  handleSelectWMSLayer,
+const MapLayerSelect: FC<MapLayerSelectProps> = ({
+  mapLayersOptions,
+  selectedItem,
+  handleSelectItem,
   isLoading,
+  loadingText = "Loading Layers...",
 }) => {
   const theme = useTheme();
   const { isUnderLaptop } = useBreakpoint();
@@ -91,7 +93,7 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
               whiteSpace: "nowrap",
             }}
           >
-            Fetching Geoserver Layers...
+            {loadingText}
           </Typography>
           <LinearProgress
             variant="indeterminate"
@@ -106,7 +108,7 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
             }}
           />
         </Stack>
-      ) : wmsLayersOptions.length > 0 ? (
+      ) : mapLayersOptions.length > 0 ? (
         <Stack
           direction="row"
           sx={{
@@ -137,9 +139,9 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
             }}
           />
           <CommonSelect
-            items={wmsLayersOptions}
-            value={selectedWMSLayer}
-            onSelectCallback={handleSelectWMSLayer}
+            items={mapLayersOptions}
+            value={selectedItem}
+            onSelectCallback={handleSelectItem}
             menuProps={menuProps}
             selectSx={selectProps}
           />
@@ -149,4 +151,4 @@ const GeoserverLayerSelect: FC<GeoserverLayerSelectProps> = ({
   );
 };
 
-export default GeoserverLayerSelect;
+export default MapLayerSelect;

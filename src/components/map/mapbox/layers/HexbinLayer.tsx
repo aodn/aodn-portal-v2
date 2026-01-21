@@ -1,4 +1,12 @@
-import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { HexagonLayer } from "@deck.gl/aggregation-layers";
 import MapContext from "../MapContext";
 import { LayerBasicType } from "./Layers";
@@ -13,6 +21,8 @@ import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 import dayjs from "dayjs";
 import { CloudOptimizedFeature } from "../../../common/store/CloudOptimizedDefinitions";
 import _ from "lodash";
+import { SelectItem } from "../../../common/dropdown/CommonSelect";
+import MapLayerSelect from "../component/MapLayerSelect";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
@@ -23,6 +33,53 @@ const COLOR_RANGE: Color[] = [
   [240, 59, 32],
   [189, 0, 38],
 ];
+
+// Extract unique keys from feature collection for dropdown options
+export const extractHexbinOptions = (
+  featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>
+): SelectItem<string>[] => {
+  if (!featureCollection?.features?.length) return [];
+
+  const uniqueKeys = new Set<string>();
+  featureCollection.features.forEach((feature) => {
+    const key = feature.properties?.key;
+    if (key && typeof key === "string") {
+      uniqueKeys.add(key);
+    }
+  });
+
+  return Array.from(uniqueKeys)
+    .sort()
+    .map((key) => ({
+      label: formatKeyLabel(key),
+      value: key,
+    }));
+};
+
+// Remove dataset type to format key for display in dropdown
+const formatKeyLabel = (key: string): string => {
+  return key.replace(/\.(parquet|zarr)$/i, "");
+};
+
+// Filter features by selected key
+export const filterFeaturesByKey = (
+  featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>,
+  selectedKey?: string
+): FeatureCollection<Point, CloudOptimizedFeature> | undefined => {
+  if (!featureCollection?.features?.length) return featureCollection;
+  // Show all if no key selected
+  if (!selectedKey) return featureCollection;
+
+  const filteredFeatures = featureCollection.features.filter(
+    (feature) => feature.properties?.key === selectedKey
+  );
+
+  return {
+    ...featureCollection,
+    features: filteredFeatures,
+  };
+};
+
 // If featureCollection is undefined, create an empty layer
 const createHexagonLayer = (
   featureCollection: FeatureCollection<Point> | undefined,
@@ -52,6 +109,7 @@ interface HexbinLayerProps extends LayerBasicType<CloudOptimizedFeature> {
   filterStartDate?: dayjs.Dayjs;
   filterEndDate?: dayjs.Dayjs;
 }
+
 // Use binary tree lookup the start and end point, data is assumed sorted by timestamp asc
 export const createFilteredFeatures = (
   featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>,
@@ -109,10 +167,20 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>();
   const overlayRef = useRef<MapboxOverlay | null>();
+
+  const [selectedHexbinKey, setSelectedHexbinKey] = useState<string>("");
+  const [hexbinOptions, setHexbinOptions] = useState<SelectItem<string>[]>([]);
+  const [isFetchingHexbinOptions, setIsFetchingHexbinOptions] = useState(true);
+
   // Sort it to make later lookup faster
   const sortedFeatureCollection = useMemo<
     FeatureCollection<Point, CloudOptimizedFeature>
   >(() => createSortedFeatures(featureCollection), [featureCollection]);
+
+  // Handle hexbin option selection
+  const handleSelectHexbin = useCallback((key: string) => {
+    setSelectedHexbinKey(key);
+  }, []);
 
   const createLayer = useCallback(
     (map: Map) =>
@@ -201,14 +269,46 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
     };
   }, [createLayer, map]);
 
+  // Extract hexbin options from feature collection
   useEffect(() => {
-    // Update the data on change
+    if (!sortedFeatureCollection) {
+      setIsFetchingHexbinOptions(false);
+      return;
+    }
+
+    setIsFetchingHexbinOptions(true);
+
+    // Extract options from sorted feature collection
+    const options = extractHexbinOptions(sortedFeatureCollection);
+
+    if (options.length > 0) {
+      setHexbinOptions(options);
+
+      // Set first option as default if none selected
+      if (!selectedHexbinKey) {
+        handleSelectHexbin(options[0].value);
+      }
+    } else {
+      setHexbinOptions([]);
+    }
+
+    setIsFetchingHexbinOptions(false);
+  }, [sortedFeatureCollection, selectedHexbinKey, handleSelectHexbin]);
+
+  useEffect(() => {
+    // Update the data on change, first filter by key, then filter by date range
     if (overlayRef.current) {
-      const features = createFilteredFeatures(
+      const keyFilteredFeatures = filterFeaturesByKey(
         sortedFeatureCollection,
+        selectedHexbinKey
+      );
+
+      const features = createFilteredFeatures(
+        keyFilteredFeatures,
         filterStartDate,
         filterEndDate
       );
+
       overlayRef.current?.setProps({
         layers: [createHexagonLayer(features, visible)],
       });
@@ -217,13 +317,30 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       popupRef.current.remove();
       popupRef.current = null;
     }
-  }, [sortedFeatureCollection, filterEndDate, filterStartDate, visible]);
+  }, [
+    sortedFeatureCollection,
+    filterEndDate,
+    filterStartDate,
+    visible,
+    selectedHexbinKey,
+  ]);
 
   return (
-    <TestHelper
-      id={map?.getContainer().id || ""}
-      getHexbinLayer={() => MAPBOX_OVERLAY_HEXAGON_LAYER}
-    />
+    <>
+      {visible && (
+        <MapLayerSelect
+          mapLayersOptions={hexbinOptions}
+          selectedItem={selectedHexbinKey}
+          handleSelectItem={handleSelectHexbin}
+          isLoading={isFetchingHexbinOptions}
+          loadingText="Loading Hexbin Layers..."
+        />
+      )}
+      <TestHelper
+        id={map?.getContainer().id || ""}
+        getHexbinLayer={() => MAPBOX_OVERLAY_HEXAGON_LAYER}
+      />
+    </>
   );
 };
 
