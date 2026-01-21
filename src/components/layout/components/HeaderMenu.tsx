@@ -39,12 +39,17 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
   const HEADER_MENUS: Menu[] = useMemo(
     () => [
       {
-        menuName: "About Us",
+        menu: {
+          name: "IMOS Home",
+          handler: () => openInNewTab(pageDefault.url.IMOS),
+        },
+        items: [],
+      },
+      {
+        menu: {
+          name: "About Us",
+        },
         items: [
-          {
-            name: "About IMOS",
-            handler: () => openInNewTab(pageDefault.url.IMOS),
-          },
           {
             name: "About AODN",
             handler: () =>
@@ -59,7 +64,9 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
         ],
       },
       {
-        menuName: "Resources",
+        menu: {
+          name: "Resources",
+        },
         items: [
           {
             name: "Acknowledging Us",
@@ -151,16 +158,14 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
       <Accordion key={index} data-testid="accordion-menu">
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography padding={0} color="#000" fontSize={fontSize.info}>
-            {menu.menuName}
+            {menu.menu.name}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
           {menu.items.map((item) => (
             <MenuItem
               key={item.name}
-              onClick={(event) => {
-                item.handler(event);
-              }}
+              onClick={(event) => item.handler && item.handler(event)}
             >
               <Typography padding={0} color="#000" fontSize={fontSize.info}>
                 {item.name}

@@ -32,17 +32,19 @@ describe("HeaderMenu", () => {
       user.click(aboutUsButton);
 
       // Wait for dropdown menu to appear and find "About IMOS" item
-      return waitFor(() => screen.findByText("About IMOS"), {
+      return waitFor(() => screen.findByText("About AODN"), {
         timeout: 5000,
       }).then(() => {
-        const aboutImosItem = screen.getByText("About IMOS");
+        const aboutImosItem = screen.getByText("About AODN");
         expect(aboutImosItem).toBeInTheDocument();
 
         // Click the "About IMOS" menu item
         user.click(aboutImosItem);
         // Check if openInNewTab was called with the correct URL
         return waitFor(() =>
-          expect(openInNewTab).toHaveBeenCalledWith(pageDefault.url.IMOS)
+          expect(openInNewTab).toHaveBeenCalledWith(
+            `${pageDefault.url.IMOS}/data/about-the-australian-ocean-data-network`
+          )
         );
       });
     });
@@ -54,10 +56,11 @@ describe("HeaderMenu", () => {
 
       // Should have two accordion menus
       const accordions = screen.getAllByTestId("accordion-menu");
-      expect(accordions).toHaveLength(2);
+      expect(accordions).toHaveLength(3);
 
       // Should render menu summaries (About Us, Resources)
       // Here we trust MUI Accordion so no need to test the expand of accordion
+      expect(screen.getByText("IMOS Home")).toBeInTheDocument();
       expect(screen.getByText("About Us")).toBeInTheDocument();
       expect(screen.getByText("Resources")).toBeInTheDocument();
     });
