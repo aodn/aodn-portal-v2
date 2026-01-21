@@ -19,7 +19,7 @@ import {
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
 import { borderRadius, color, padding } from "../../styles/constants";
-import _ from "lodash";
+import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "../common/store/hooks";
 import { TEXT_FIELD_MIN_WIDTH } from "./constants";
@@ -60,7 +60,7 @@ enum OptionGroup {
  * Customized input box with suggester. If more customization is needed, please
  * do as the below nullable props.
  * @param handleEnterPressed handle the event when users press the ENTER on keyboard.
- * have default empty implementation. Can be overridden.
+ * have a default empty implementation. Can be overridden.
  * @param handleScrollToTop
  * @param setPendingSearch
  * @param setActiveButton
@@ -70,12 +70,12 @@ enum OptionGroup {
  * @constructor
  */
 const InputWithSuggester: FC<InputWithSuggesterProps> = ({
-  handleEnterPressed = () => {},
-  handleScrollToTop = () => {},
-  setPendingSearch = () => {},
-  setActiveButton = () => {},
-  setShouldExpandSearchbar = () => {},
-  setShouldExpandAllButtons = () => {},
+  handleEnterPressed,
+  handleScrollToTop,
+  setPendingSearch,
+  setActiveButton,
+  setShouldExpandSearchbar,
+  setShouldExpandAllButtons,
   suggesterWidth = 0,
 }) => {
   const location = useLocation();
@@ -91,7 +91,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const refreshOptions = useCallback(
     async (inputValue: string) => {
       // setPendingSearch to true to prevent doing search before refreshing options is finished
-      setPendingSearch(true);
+      setPendingSearch?.(true);
       try {
         const currentState: ParameterState = getComponentState(
           store.getState()
@@ -144,15 +144,13 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         console.error("Error fetching data:", error);
       } finally {
         // when refreshing options is done, allow to search
-        setPendingSearch(false);
+        setPendingSearch?.(false);
       }
     },
     [dispatch, setPendingSearch]
   );
 
-  const debounceRefreshOptions = useRef(
-    _.debounce(refreshOptions, 500)
-  ).current;
+  const debounceRefreshOptions = useRef(debounce(refreshOptions, 500)).current;
 
   // cancel all debounce things when component is unmounted
   useEffect(() => {
@@ -162,24 +160,26 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   }, [debounceRefreshOptions]);
 
   const handleInputChange = useCallback(
-    async (_: any, newInputValue: string) => {
-      setInputValue(newInputValue);
-      dispatch(updateSearchText(newInputValue));
+    (_: any, newInputValue: string) => {
       if (newInputValue?.length > 0) {
-        // wait for the debounced refresh to complete
-        // dispatch updateCommonKey if there is any during the refreshing-options to ensure the commonKey comes from the latest options given any inputValue changed
-        await debounceRefreshOptions(newInputValue);
+        debounceRefreshOptions(newInputValue);
       }
+      setTimeout(() => {
+        // Must use setTimeout so that update can be outside this cycle
+        // otherwise the text will not update correctly
+        setInputValue(newInputValue);
+        dispatch(updateSearchText(newInputValue));
+      }, 0);
     },
     [debounceRefreshOptions, dispatch]
   );
 
   const handleSearchbarOpen = useCallback(() => {
-    handleScrollToTop();
-    setActiveButton(SearchbarButtonNames.Search);
+    handleScrollToTop?.();
+    setActiveButton?.(SearchbarButtonNames.Search);
     setIsSearchbarActive(true);
     if (location.pathname === pageDefault.landing && !isMobile) {
-      setShouldExpandAllButtons(false);
+      setShouldExpandAllButtons?.(false);
     }
   }, [
     handleScrollToTop,
@@ -192,7 +192,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const handleSearchbarClose = useCallback(() => {
     setIsSearchbarActive(false);
     if (location.pathname === pageDefault.landing && !isMobile) {
-      setShouldExpandAllButtons(true);
+      setShouldExpandAllButtons?.(true);
     }
     setOptions([]);
   }, [isMobile, location.pathname, setShouldExpandAllButtons]);
@@ -200,7 +200,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       if (event.key === "Enter") {
-        handleEnterPressed(event, false);
+        handleEnterPressed?.(event, false);
       }
     },
     [handleEnterPressed]
@@ -210,9 +210,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   // Searchbar will keep expanded if searchbar is active or there exists a text input
   useEffect(() => {
     if (isSearchbarActive || (searchInput && searchInput.length > 0)) {
-      setShouldExpandSearchbar(true);
+      setShouldExpandSearchbar?.(true);
     } else {
-      setShouldExpandSearchbar(false);
+      setShouldExpandSearchbar?.(false);
     }
   }, [isSearchbarActive, searchInput, setShouldExpandSearchbar]);
 

@@ -1,13 +1,5 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  describe,
-  expect,
-  test,
-  vi,
-} from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { Provider } from "react-redux";
 import store from "../../common/store/store";
 import InputWithSuggester from "../InputWithSuggester";
@@ -40,25 +32,13 @@ describe("InputWithSuggester", () => {
   beforeAll(() => {
     // Mock scrollIntoView
     window.HTMLElement.prototype.scrollIntoView = vi.fn();
-
     // Mock window.scrollTo
     window.scrollTo = vi.fn();
     server.listen();
   });
 
-  afterEach(() => {
+  beforeEach(() => {
     cleanup();
-    server.resetHandlers();
-    vi.clearAllMocks();
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
-  test("Suggestion options should disappear after choosing one of them", () => {
-    const user = userEvent.setup();
-
     // Render the component with Router context and Theme
     render(
       <ThemeProvider theme={AppTheme}>
@@ -76,13 +56,22 @@ describe("InputWithSuggester", () => {
         </Router>
       </ThemeProvider>
     );
+  });
 
+  afterAll(() => {
+    vi.clearAllMocks();
+    server.close();
+  });
+
+  it("Suggestion options should disappear after choosing one of them", () => {
     // Get input field and type text
+    const user = userEvent.setup();
     const input = screen.getByTestId("input-with-suggester");
     user.click(input);
+    user.clear(input);
     user.type(input, "wave");
 
-    // Wait for input value to be updated
+    // Wait for the input value to be updated
     return waitFor(() => {
       expect(input).toHaveValue("wave");
     }).then(() => {
@@ -97,10 +86,37 @@ describe("InputWithSuggester", () => {
         const option = screen.getByText("wave buoy");
         user.click(option);
 
-        // Wait for suggester listbox to be removed
+        // Wait for the suggester listbox to be removed
         return waitFor(() =>
           expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
         );
+      });
+    });
+  });
+  // Make sure when the user types "wa," then the suggested list show "wave" as the first
+  // option, then press down arrow, then press enter. The value in the search will be
+  // "wave" previous there is a bug where "wa" is used for search
+  it("clears highlight / sets correct inputValue after selecting suggestion with Enter", () => {
+    const user = userEvent.setup();
+    const input = screen.getByTestId("input-with-suggester");
+    user.click(input);
+    user.clear(input);
+    user.type(input, "imo");
+
+    // Wait for the input value to be updated
+    return waitFor(() => {
+      expect(input).toHaveValue("imo");
+    }).then(() => {
+      return waitFor(() =>
+        expect(screen.queryByRole("listbox")).toBeInTheDocument()
+      ).then(() => {
+        // Focus first option and press Enter
+        user.keyboard("{ArrowDown}");
+        user.keyboard("{Enter}");
+
+        return waitFor(() => {
+          expect(input).toHaveValue("imos sst"); // or whatever exact value your mock returns
+        });
       });
     });
   });
