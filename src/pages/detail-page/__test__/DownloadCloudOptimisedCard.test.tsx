@@ -65,6 +65,7 @@ const createMockCollection = (datasetType: DatasetType): OGCCollection => {
 describe("DownloadCloudOptimisedCard", () => {
   const mockGetAndSetDownloadConditions = vi.fn();
   const mockRemoveDownloadCondition = vi.fn();
+  const mockSetSelectedCoKey = vi.fn();
 
   const findDataSelect = (container: HTMLElement): HTMLSelectElement | null => {
     const selectElements = container.querySelectorAll("select");
@@ -79,7 +80,8 @@ describe("DownloadCloudOptimisedCard", () => {
 
   const renderComponent = (
     collection: OGCCollection = createMockCollection(DatasetType.ZARR),
-    downloadConditions: any[] = []
+    downloadConditions: any[] = [],
+    selectedCoKey?: string
   ) => {
     return render(
       <Provider store={store}>
@@ -89,6 +91,8 @@ describe("DownloadCloudOptimisedCard", () => {
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
             removeDownloadCondition={mockRemoveDownloadCondition}
+            selectedCoKey={selectedCoKey}
+            setSelectedCoKey={mockSetSelectedCoKey}
           />
         </ThemeProvider>
       </Provider>
@@ -149,6 +153,72 @@ describe("DownloadCloudOptimisedCard", () => {
       await waitFor(() => {
         expect(dataSelect.value).toBe("test-parquet.parquet");
       });
+
+      expect(mockSetSelectedCoKey).toHaveBeenCalledWith("test-parquet.parquet");
+    }
+  });
+
+  it("should sync selectedCoKey from map to data selection", async () => {
+    const { container, rerender } = renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      "test-zarr.zarr"
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    const dataSelect = findDataSelect(container);
+    expect(dataSelect).not.toBeNull();
+
+    if (dataSelect) {
+      await waitFor(() => {
+        expect(dataSelect.value).toBe("test-zarr.zarr");
+      });
+
+      // mock map selection change
+      rerender(
+        <Provider store={store}>
+          <ThemeProvider theme={theme}>
+            <DownloadCloudOptimisedCard
+              collection={createMockCollection(DatasetType.ZARR)}
+              downloadConditions={[]}
+              getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
+              removeDownloadCondition={mockRemoveDownloadCondition}
+              selectedCoKey="test-parquet.parquet"
+              setSelectedCoKey={mockSetSelectedCoKey}
+            />
+          </ThemeProvider>
+        </Provider>
+      );
+
+      // expected to sync change with map
+      await waitFor(() => {
+        expect(dataSelect.value).toBe("test-parquet.parquet");
+      });
+    }
+  });
+
+  it("should display all data selection options even when selectedCoKey is set", async () => {
+    const { container } = renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      "test-zarr.zarr"
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    const dataSelect = findDataSelect(container);
+    expect(dataSelect).not.toBeNull();
+
+    if (dataSelect) {
+      const options = dataSelect.querySelectorAll("option");
+      expect(options).toHaveLength(2);
+      expect(options[0].value).toBe("test-zarr.zarr");
+      expect(options[1].value).toBe("test-parquet.parquet");
     }
   });
 });
