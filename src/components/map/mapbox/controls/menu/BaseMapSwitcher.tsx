@@ -93,6 +93,8 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
     };
 
     const handleMapEvent = () => setOpen(false);
+    // Make sure custom attribution shown if needed
+    updateCurrentStyle(mapStyles[MapDefaultConfig.DEFAULT_STYLE].id);
 
     eventEmitter.on(EVENT_MENU.CLICKED, handleEvent);
     eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
@@ -103,7 +105,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
       eventEmitter.off(EVENT_MAP.CLICKED, handleMapEvent);
       eventEmitter.off(EVENT_MAP.MOVE_START, handleMapEvent);
     };
-  }, []);
+  }, [updateCurrentStyle]);
 
   return (
     <>
