@@ -32,17 +32,19 @@ describe("HeaderMenu", () => {
       user.click(aboutUsButton);
 
       // Wait for dropdown menu to appear and find "About IMOS" item
-      return waitFor(() => screen.findByText("About IMOS"), {
+      return waitFor(() => screen.findByText("About AODN"), {
         timeout: 5000,
       }).then(() => {
-        const aboutImosItem = screen.getByText("About IMOS");
+        const aboutImosItem = screen.getByText("About AODN");
         expect(aboutImosItem).toBeInTheDocument();
 
         // Click the "About IMOS" menu item
         user.click(aboutImosItem);
         // Check if openInNewTab was called with the correct URL
         return waitFor(() =>
-          expect(openInNewTab).toHaveBeenCalledWith(pageDefault.url.IMOS)
+          expect(openInNewTab).toHaveBeenCalledWith(
+            `${pageDefault.url.IMOS}/data/about-the-australian-ocean-data-network`
+          )
         );
       });
     });
