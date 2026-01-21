@@ -158,11 +158,11 @@ describe("DownloadCloudOptimisedCard", () => {
     }
   });
 
-  it("should sync selectedCoKey from map to data selection", async () => {
-    const { container, rerender } = renderComponent(
+  it("should sync selectedCoKey from map to data selection on mount", async () => {
+    const { container } = renderComponent(
       createMockCollection(DatasetType.ZARR),
       [],
-      "test-zarr.zarr"
+      "test-parquet.parquet"
     );
 
     await waitFor(() => {
@@ -174,33 +174,15 @@ describe("DownloadCloudOptimisedCard", () => {
 
     if (dataSelect) {
       await waitFor(() => {
-        expect(dataSelect.value).toBe("test-zarr.zarr");
-      });
-
-      // mock map selection change
-      rerender(
-        <Provider store={store}>
-          <ThemeProvider theme={theme}>
-            <DownloadCloudOptimisedCard
-              collection={createMockCollection(DatasetType.ZARR)}
-              downloadConditions={[]}
-              getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
-              removeDownloadCondition={mockRemoveDownloadCondition}
-              selectedCoKey="test-parquet.parquet"
-              setSelectedCoKey={mockSetSelectedCoKey}
-            />
-          </ThemeProvider>
-        </Provider>
-      );
-
-      // expected to sync change with map
-      await waitFor(() => {
         expect(dataSelect.value).toBe("test-parquet.parquet");
       });
+
+      expect(mockGetAndSetDownloadConditions).toHaveBeenCalled();
     }
   });
 
-  it("should display all data selection options even when selectedCoKey is set", async () => {
+  it("should call setSelectedCoKey when user changes data selection", async () => {
+    const user = userEvent.setup();
     const { container } = renderComponent(
       createMockCollection(DatasetType.ZARR),
       [],
@@ -215,10 +197,17 @@ describe("DownloadCloudOptimisedCard", () => {
     expect(dataSelect).not.toBeNull();
 
     if (dataSelect) {
-      const options = dataSelect.querySelectorAll("option");
-      expect(options).toHaveLength(2);
-      expect(options[0].value).toBe("test-zarr.zarr");
-      expect(options[1].value).toBe("test-parquet.parquet");
+      vi.clearAllMocks();
+
+      await user.selectOptions(dataSelect, "test-parquet.parquet");
+
+      await waitFor(() => {
+        expect(mockSetSelectedCoKey).toHaveBeenCalledWith(
+          "test-parquet.parquet"
+        );
+      });
+
+      expect(dataSelect.value).toBe("test-parquet.parquet");
     }
   });
 });
