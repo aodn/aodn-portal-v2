@@ -27,6 +27,7 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
   selectedItem,
   handleSelectItem,
   isLoading,
+  loadingText = "Loading Layers...",
 }) => {
   const theme = useTheme();
   const { isUnderLaptop } = useBreakpoint();
@@ -92,7 +93,7 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
               whiteSpace: "nowrap",
             }}
           >
-            loadingText
+            {loadingText}
           </Typography>
           <LinearProgress
             variant="indeterminate"
