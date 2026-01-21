@@ -405,7 +405,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 sx={{
                   width: isUnderLaptop ? "95%" : "98%",
                   "& button": {
-                    ...portalTheme.typography.body1Medium,
+                    fontSize: "16px",
                     color: portalTheme.palette.text1,
                     lineHeight: "24px",
                   },
