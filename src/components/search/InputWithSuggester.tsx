@@ -19,7 +19,7 @@ import {
   fetchSuggesterOptions,
 } from "../common/store/searchReducer";
 import { borderRadius, color, padding } from "../../styles/constants";
-import _ from "lodash";
+import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "../common/store/hooks";
 import { TEXT_FIELD_MIN_WIDTH } from "./constants";
@@ -150,9 +150,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [dispatch, setPendingSearch]
   );
 
-  const debounceRefreshOptions = useRef(
-    _.debounce(refreshOptions, 500)
-  ).current;
+  const debounceRefreshOptions = useRef(debounce(refreshOptions, 500)).current;
 
   // cancel all debounce things when component is unmounted
   useEffect(() => {
