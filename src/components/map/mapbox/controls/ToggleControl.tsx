@@ -7,6 +7,7 @@ import { borderRadius } from "../../../../styles/constants";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import { MapEventEnum } from "../constants";
+import { portalTheme } from "../../../../styles";
 
 export interface ToggleControlProps {
   showFullMap: boolean;
@@ -21,24 +22,39 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
     <IconButton
       id="map-toggle-control-button"
       title={showFullMap ? "Exit fullscreen" : "Fullscreen"}
-      style={{
-        width: "32px",
-        height: "32px",
+      sx={{
+        width: "30px",
+        height: "30px",
         borderRadius: borderRadius.small,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: "none",
       }}
-      onClick={() => {
-        if (onToggleClicked) {
-          onToggleClicked(!showFullMap);
-        }
-      }}
+      onClick={() => onToggleClicked?.(!showFullMap)}
     >
       {showFullMap ? (
-        <CloseFullscreenIcon fontSize="small" />
+        <CloseFullscreenIcon
+          sx={{
+            height: "100%",
+            width: "100%",
+            "&:hover": {
+              color: "white",
+              backgroundColor: portalTheme.palette.secondary1,
+            },
+          }}
+        />
       ) : (
-        <FullscreenIcon fontSize="medium" />
+        <FullscreenIcon
+          sx={{
+            height: "100%",
+            width: "100%",
+            "&:hover": {
+              color: "white",
+              backgroundColor: portalTheme.palette.secondary1,
+            },
+          }}
+        />
       )}
     </IconButton>
   );
@@ -67,6 +83,7 @@ class ToggleControlClass implements IControl {
   onAdd(map: Map): HTMLElement {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
+    this.container.style.marginLeft = "13px";
     this.root = createRoot(this.container!);
     this.redraw(this.props.showFullMap);
 
@@ -114,7 +131,7 @@ class ToggleControlClass implements IControl {
 
 const ToggleControl = ({
   showFullMap = false,
-  onToggleClicked = (v: boolean) => {},
+  onToggleClicked = undefined,
 }: ToggleControlProps) => {
   const { map } = useContext(MapContext);
   const [control, setControl] = useState<ToggleControlClass | null>(null);

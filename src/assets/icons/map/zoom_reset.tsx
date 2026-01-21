@@ -1,4 +1,6 @@
-export const ZoomResetIcon = () => (
+import { portalTheme } from "../../../styles";
+
+export const ZoomResetIcon = ({ hover = false }: { hover?: boolean }) => (
   <svg
     width="39"
     height="39"
@@ -8,7 +10,12 @@ export const ZoomResetIcon = () => (
     xmlnsXlink="http://www.w3.org/1999/xlink"
   >
     <g filter="url(#filter0_d_3464_37348)">
-      <circle cx="17.1953" cy="17.1953" r="15" fill="white" />
+      <circle
+        cx="17.1953"
+        cy="17.1953"
+        r="15"
+        fill={hover ? portalTheme.palette.secondary1 : "white"}
+      />
     </g>
     <mask
       id="mask0_3464_37348"
@@ -30,7 +37,7 @@ export const ZoomResetIcon = () => (
         width="20"
         height="21.6667"
         transform="matrix(-1 0 8.74228e-08 1 27.0859 6.11719)"
-        fill="#595959"
+        fill={hover ? "white" : portalTheme.palette.grey700}
       />
     </g>
     <defs>
