@@ -7,11 +7,11 @@ import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 
 interface MenuItem {
   name: string;
-  handler: (event: React.MouseEvent<HTMLElement>) => void;
+  handler?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
 export interface Menu {
-  menuName: string;
+  menu: MenuItem;
   items: MenuItem[];
 }
 
@@ -20,7 +20,7 @@ interface PlainMenuProps {
 }
 
 // TODO: implement onClick for each menu item to trigger handler once the function is designed
-const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
+const PlainMenu: FC<PlainMenuProps> = ({ menu }: PlainMenuProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -37,7 +37,7 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
 
   const handleMenuItemClick = useCallback(
     (item: MenuItem) => (event: React.MouseEvent<HTMLElement>) => {
-      item.handler(event);
+      item.handler?.(event);
       handleClose();
     },
     [handleClose]
@@ -46,8 +46,8 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
   return (
     <div>
       <Button
-        onClick={handleClick}
-        endIcon={<KeyboardArrowDownIcon />}
+        onClick={menu.items.length > 0 ? handleClick : menu.menu.handler}
+        endIcon={menu.items.length > 0 ? <KeyboardArrowDownIcon /> : undefined}
         sx={{
           backgroundColor: "transparent",
           border: "none",
@@ -56,7 +56,7 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }) => {
           fontWeight: 400,
         }}
       >
-        {menu.menuName}
+        {menu.menu.name}
       </Button>
       {menu.items.length > 0 && (
         <StyledMenu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
