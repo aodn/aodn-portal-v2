@@ -1,8 +1,8 @@
 import { FC } from "react";
 import { Stack, SxProps, Typography } from "@mui/material";
 import rc8Theme from "../../../styles/themeRC8";
-import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import { removeDuplicatesAndEmpty } from "../../../utils/Helpers";
+import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 
 interface LabelChipProps {
   text: string[];
@@ -13,7 +13,7 @@ interface LabelChipProps {
 const LabelChip: FC<LabelChipProps> = ({ text, color = "#fff", sx }) => {
   // Remove duplicates and empty strings, then capitalize the first letter of each item
   const validItems = removeDuplicatesAndEmpty(text).map((item) =>
-    capitalizeFirstLetter(item)
+    capitalizeFirstLetter(item, false)
   );
 
   if (validItems.length === 0) return null;

@@ -45,12 +45,12 @@ const ItemBaseGrid = ({
         sx={{
           backgroundColor: getBackgroundColor(),
           width: "98%",
-          minheight: "44px",
+          minHeight: "40px",
           display: "flex",
           alignItems: "center",
           borderRadius: "4px",
           my: disableHover ? "10px" : "6px",
-          p: disableHover ? 0 : "4px 16px",
+          p: disableHover ? 0 : "10px 22px",
           ...sx,
         }}
         {...props}

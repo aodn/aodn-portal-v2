@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import LabelChip from "../../../common/label/LabelChip";
 import { portalTheme } from "../../../../styles";
 
@@ -32,27 +32,24 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "start",
+            gap: 1,
           }}
         >
           <Typography
             sx={{
-              display: "inline-block",
-              textAlign: "left",
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "center",
+              minHeight: "100%",
               whiteSpace: "normal",
               ...portalTheme.typography.title1Medium,
               p: 0,
-              my: "8px",
-              mx: "6px",
             }}
           >
             {text ? text : "[ NO TITLE ]"}
           </Typography>
-          {labels && labels.length > 0 && (
-            <Box display="inline-block">
-              <LabelChip text={labels} />
-            </Box>
-          )}
+          {labels && labels.length > 0 && <LabelChip text={labels} />}
         </Grid>
       )}
     </Grid>

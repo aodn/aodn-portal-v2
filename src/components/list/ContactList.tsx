@@ -35,7 +35,7 @@ export const mapContactsToCollapseItems = (
             />
           }
         >
-          <Grid container item md={12}>
+          <Grid container item xs={12}>
             <ContactArea contact={contact} />
           </Grid>
         </CollapseItem>

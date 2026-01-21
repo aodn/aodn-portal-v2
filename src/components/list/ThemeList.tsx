@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
-import TextArea from "./listItem/subitem/TextArea";
 import NaList from "./NaList";
-import { borderRadius, gap } from "../../styles/constants";
-import { useTheme } from "@mui/material";
+import LabelChip from "../common/label/LabelChip";
+import { addSpacesToCamelCase } from "../../utils/FormatUtils";
+import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
 interface ThemeListProps {
   title: string;
@@ -17,8 +17,9 @@ const ThemeList: React.FC<ThemeListProps> = ({
   themes,
   selected = false,
 }) => {
-  const theme = useTheme();
-
+  const updatedThemes = themes.map((theme) =>
+    addSpacesToCamelCase(capitalizeFirstLetter(theme, false))
+  );
   const statementItem = useMemo(
     () => (
       <ItemBaseGrid
@@ -28,30 +29,18 @@ const ThemeList: React.FC<ThemeListProps> = ({
         gap={1.25}
       >
         {themes.length !== 0 ? (
-          themes.map((item: string) => {
-            return (
-              <TextArea
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyItems: "center",
-                  backgroundColor: theme.palette.common.white,
-                  padding: "8px 14px",
-                  my: "4px",
-                  gap: gap.xlg,
-                  borderRadius: borderRadius.small,
-                }}
-                key={item}
-                text={item}
-              />
-            );
-          })
+          <LabelChip
+            text={updatedThemes}
+            sx={{
+              padding: "8px 14px",
+            }}
+          />
         ) : (
           <NaList title={title}></NaList>
         )}
       </ItemBaseGrid>
     ),
-    [theme.palette.common.white, themes, title]
+    [themes.length, title, updatedThemes]
   );
 
   return (

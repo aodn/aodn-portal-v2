@@ -58,13 +58,18 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
     <ItemBaseGrid>
       <Grid container data-testid="collapseItem">
         {/* Title content area (icon + title) */}
-        <Grid item xs={children ? 11 : 12} onClick={toggleExpanded}>
+        <Grid
+          item
+          xs={children ? 10 : 12}
+          sm={children ? 11 : 12}
+          onClick={toggleExpanded}
+        >
           <Box
             sx={{
               cursor: "pointer",
               display: "flex",
               alignItems: "flex-start",
-              gap: 1.5,
+              gap: 1,
             }}
           >
             {/* Title icon section */}
@@ -96,7 +101,8 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
             {/* Collapse button */}
             <Grid
               item
-              xs={1}
+              xs={2}
+              sm={1}
               sx={{
                 display: "flex",
                 justifyContent: "flex-end",
