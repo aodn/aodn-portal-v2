@@ -18,6 +18,7 @@ interface LinkCardProps {
   icon?: boolean;
   link: ILink;
   isCopyable?: boolean;
+  isSideCard?: boolean;
   showCopyOnHover?: boolean;
 }
 
@@ -25,6 +26,7 @@ const LinkCard: FC<LinkCardProps> = ({
   icon = true,
   link,
   isCopyable = true,
+  isSideCard = false,
   showCopyOnHover = true,
 }) => {
   const { checkIsCopied } = useClipboardContext();
@@ -121,8 +123,10 @@ const LinkCard: FC<LinkCardProps> = ({
             <Typography
               component="span"
               sx={{
-                ...portalTheme.typography.title1Medium,
-                color: portalTheme.palette.primary.main,
+                ...(isSideCard
+                  ? portalTheme.typography.body2Regular
+                  : portalTheme.typography.title1Medium),
+                color: portalTheme.palette.primary1,
                 padding: 0,
                 overflowWrap: "anywhere",
                 display: "inline",

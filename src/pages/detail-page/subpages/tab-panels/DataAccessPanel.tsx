@@ -21,6 +21,7 @@ import DataList from "../../../../components/list/DataList";
 import DocumentList from "../../../../components/list/DocumentLIst";
 import OtherItemList from "../../../../components/list/OtherItemList";
 import CodeTutorialsList from "../../../../components/list/CodeTutorialsList";
+import { portalTheme } from "../../../../styles";
 
 export enum TYPE {
   DATA_ACCESS = "DATA_ACCESS",
@@ -121,15 +122,21 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                 <Typography
                   padding={1}
                   key={`da-${key}`}
-                  fontWeight={fontWeight.bold}
-                  fontSize={fontSize.slideCardSubTitle}
+                  sx={{
+                    ...portalTheme.typography.body1Medium,
+                  }}
                 >
                   {TITLE.has(key) ? TITLE.get(key) : "Misc Link"}
                   {!item || item.length === 0 ? (
                     <NaList title={title ? title : ""} />
                   ) : (
                     item.map((link: ILink, index: number) => (
-                      <LinkCard key={`ch-${index}`} link={link} icon={false} />
+                      <LinkCard
+                        key={`ch-${index}`}
+                        link={link}
+                        icon={false}
+                        isSideCard={true}
+                      />
                     ))
                   )}
                 </Typography>
