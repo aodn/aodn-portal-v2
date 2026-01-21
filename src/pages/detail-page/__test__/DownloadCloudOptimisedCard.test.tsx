@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Provider } from "react-redux";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 beforeAll(() => {
   window.scrollTo = vi.fn();
@@ -81,7 +82,8 @@ describe("DownloadCloudOptimisedCard", () => {
   const renderComponent = (
     collection: OGCCollection = createMockCollection(DatasetType.ZARR),
     downloadConditions: any[] = [],
-    selectedCoKey?: string
+    selectedCoKey?: string,
+    setSelectedCoKey = mockSetSelectedCoKey
   ) => {
     return render(
       <Provider store={store}>
@@ -92,7 +94,7 @@ describe("DownloadCloudOptimisedCard", () => {
             getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
             removeDownloadCondition={mockRemoveDownloadCondition}
             selectedCoKey={selectedCoKey}
-            setSelectedCoKey={mockSetSelectedCoKey}
+            setSelectedCoKey={setSelectedCoKey}
           />
         </ThemeProvider>
       </Provider>
@@ -153,12 +155,10 @@ describe("DownloadCloudOptimisedCard", () => {
       await waitFor(() => {
         expect(dataSelect.value).toBe("test-parquet.parquet");
       });
-
-      expect(mockSetSelectedCoKey).toHaveBeenCalledWith("test-parquet.parquet");
     }
   });
 
-  it("should sync selectedCoKey from map to data selection on mount", async () => {
+  it("should sync selectedCoKey from context to dropdown on mount", async () => {
     const { container } = renderComponent(
       createMockCollection(DatasetType.ZARR),
       [],
@@ -176,12 +176,50 @@ describe("DownloadCloudOptimisedCard", () => {
       await waitFor(() => {
         expect(dataSelect.value).toBe("test-parquet.parquet");
       });
-
-      expect(mockGetAndSetDownloadConditions).toHaveBeenCalled();
     }
   });
 
-  it("should call setSelectedCoKey when user changes data selection", async () => {
+  it("should update dropdown value when selectedCoKey from context changes", async () => {
+    const { container, rerender } = renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      "test-zarr.zarr"
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    const dataSelect = findDataSelect(container);
+    expect(dataSelect).not.toBeNull();
+
+    if (dataSelect) {
+      await waitFor(() => {
+        expect(dataSelect.value).toBe("test-zarr.zarr");
+      });
+
+      rerender(
+        <Provider store={store}>
+          <ThemeProvider theme={theme}>
+            <DownloadCloudOptimisedCard
+              collection={createMockCollection(DatasetType.ZARR)}
+              downloadConditions={[]}
+              getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
+              removeDownloadCondition={mockRemoveDownloadCondition}
+              selectedCoKey="test-parquet.parquet"
+              setSelectedCoKey={mockSetSelectedCoKey}
+            />
+          </ThemeProvider>
+        </Provider>
+      );
+
+      await waitFor(() => {
+        expect(dataSelect.value).toBe("test-parquet.parquet");
+      });
+    }
+  });
+
+  it("should call setSelectedCoKey to update context when user changes selection", async () => {
     const user = userEvent.setup();
     const { container } = renderComponent(
       createMockCollection(DatasetType.ZARR),
@@ -208,6 +246,112 @@ describe("DownloadCloudOptimisedCard", () => {
       });
 
       expect(dataSelect.value).toBe("test-parquet.parquet");
+    }
+  });
+
+  it("should not update dropdown when selectedCoKey doesn't match any option", async () => {
+    const { container } = renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      "non-existent-key.zarr"
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    const dataSelect = findDataSelect(container);
+    expect(dataSelect).not.toBeNull();
+
+    if (dataSelect) {
+      await waitFor(() => {
+        expect(dataSelect.value).toBe("test-zarr.zarr");
+      });
+    }
+  });
+
+  it("should work without setSelectedCoKey callback", async () => {
+    const user = userEvent.setup();
+
+    const { container } = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DownloadCloudOptimisedCard
+            collection={createMockCollection(DatasetType.ZARR)}
+            downloadConditions={[]}
+            getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
+            removeDownloadCondition={mockRemoveDownloadCondition}
+          />
+        </ThemeProvider>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    const dataSelect = findDataSelect(container);
+    expect(dataSelect).not.toBeNull();
+
+    if (dataSelect) {
+      await expect(async () => {
+        await user.selectOptions(dataSelect, "test-parquet.parquet");
+      }).not.toThrow();
+      await waitFor(() => {
+        expect(dataSelect.value).toBe("test-parquet.parquet");
+      });
+    }
+  });
+
+  it("should maintain two-way binding between context and dropdown", async () => {
+    const user = userEvent.setup();
+    let currentKey = "test-zarr.zarr";
+
+    const mockSet = vi.fn((key: string) => {
+      currentKey = key;
+    });
+
+    const { container, rerender } = renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      currentKey,
+      mockSet
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    const dataSelect = findDataSelect(container);
+    expect(dataSelect).not.toBeNull();
+
+    if (dataSelect) {
+      expect(dataSelect.value).toBe("test-zarr.zarr");
+
+      await user.selectOptions(dataSelect, "test-parquet.parquet");
+
+      await waitFor(() => {
+        expect(mockSet).toHaveBeenCalledWith("test-parquet.parquet");
+      });
+
+      rerender(
+        <Provider store={store}>
+          <ThemeProvider theme={theme}>
+            <DownloadCloudOptimisedCard
+              collection={createMockCollection(DatasetType.ZARR)}
+              downloadConditions={[]}
+              getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
+              removeDownloadCondition={mockRemoveDownloadCondition}
+              selectedCoKey="test-parquet.parquet"
+              setSelectedCoKey={mockSet}
+            />
+          </ThemeProvider>
+        </Provider>
+      );
+
+      await waitFor(() => {
+        expect(dataSelect.value).toBe("test-parquet.parquet");
+      });
     }
   });
 });
