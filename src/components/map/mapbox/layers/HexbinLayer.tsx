@@ -23,6 +23,7 @@ import { CloudOptimizedFeature } from "../../../common/store/CloudOptimizedDefin
 import _ from "lodash";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import MapLayerSelect from "../component/MapLayerSelect";
+import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
@@ -165,10 +166,10 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
   visible,
 }) => {
   const { map } = useContext(MapContext);
+  const { selectedCoKey, setSelectedCoKey } = useDetailPageContext();
   const popupRef = useRef<Popup | null>();
   const overlayRef = useRef<MapboxOverlay | null>();
 
-  const [selectedHexbinKey, setSelectedHexbinKey] = useState<string>("");
   const [hexbinOptions, setHexbinOptions] = useState<SelectItem<string>[]>([]);
   const [isFetchingHexbinOptions, setIsFetchingHexbinOptions] = useState(true);
 
@@ -177,10 +178,12 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
     FeatureCollection<Point, CloudOptimizedFeature>
   >(() => createSortedFeatures(featureCollection), [featureCollection]);
 
-  // Handle hexbin option selection
-  const handleSelectHexbin = useCallback((key: string) => {
-    setSelectedHexbinKey(key);
-  }, []);
+  const handleSelectHexbin = useCallback(
+    (key: string) => {
+      setSelectedCoKey(key);
+    },
+    [setSelectedCoKey]
+  );
 
   const createLayer = useCallback(
     (map: Map) =>
@@ -285,7 +288,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       setHexbinOptions(options);
 
       // Set first option as default if none selected
-      if (!selectedHexbinKey) {
+      if (!selectedCoKey) {
         handleSelectHexbin(options[0].value);
       }
     } else {
@@ -293,14 +296,14 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
     }
 
     setIsFetchingHexbinOptions(false);
-  }, [sortedFeatureCollection, selectedHexbinKey, handleSelectHexbin]);
+  }, [sortedFeatureCollection, selectedCoKey, handleSelectHexbin]);
 
   useEffect(() => {
     // Update the data on change, first filter by key, then filter by date range
     if (overlayRef.current) {
       const keyFilteredFeatures = filterFeaturesByKey(
         sortedFeatureCollection,
-        selectedHexbinKey
+        selectedCoKey
       );
 
       const features = createFilteredFeatures(
@@ -322,7 +325,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
     filterEndDate,
     filterStartDate,
     visible,
-    selectedHexbinKey,
+    selectedCoKey,
   ]);
 
   return (
@@ -330,7 +333,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       {visible && (
         <MapLayerSelect
           mapLayersOptions={hexbinOptions}
-          selectedItem={selectedHexbinKey}
+          selectedItem={selectedCoKey}
           handleSelectItem={handleSelectHexbin}
           isLoading={isFetchingHexbinOptions}
           loadingText="Loading Hexbin Layers..."

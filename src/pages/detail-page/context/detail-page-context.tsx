@@ -27,6 +27,8 @@ export interface DetailPageContextType {
   removeDownloadCondition: (condition: IDownloadCondition) => void;
   selectedWmsLayer: string;
   setSelectedWmsLayer: Dispatch<SetStateAction<string>>;
+  selectedCoKey: string;
+  setSelectedCoKey: Dispatch<SetStateAction<string>>;
   lastSelectedMapLayer: LayerSwitcherLayer<LayerName> | null;
   setLastSelectedMapLayer: Dispatch<
     SetStateAction<LayerSwitcherLayer<LayerName> | null>
@@ -47,6 +49,8 @@ const DetailPageContextDefault = {
   removeDownloadCondition: () => {},
   selectedWmsLayer: "",
   setSelectedWmsLayer: () => {},
+  selectedCoKey: "",
+  setSelectedCoKey: () => {},
   lastSelectedMapLayer: null,
   setLastSelectedMapLayer: () => {},
   downloadService: DownloadServiceType.Unavailable,

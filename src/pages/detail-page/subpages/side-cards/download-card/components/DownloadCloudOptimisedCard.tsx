@@ -22,6 +22,8 @@ const downloadFormats = [
 
 interface DownloadCardProps extends DownloadCondition {
   collection: OGCCollection;
+  selectedCoKey?: string;
+  setSelectedCoKey?: (value: string) => void;
 }
 
 const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
@@ -29,6 +31,8 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   downloadConditions,
   getAndSetDownloadConditions,
   removeDownloadCondition,
+  selectedCoKey,
+  setSelectedCoKey,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
 
@@ -40,7 +44,6 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
   }, []);
-
   const dataSelectOptions = useMemo(() => {
     const summaryLinks = collection?.links?.filter(
       (link) => link.rel === "summary"
@@ -56,14 +59,36 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     }));
   }, [collection]);
 
+  useEffect(() => {
+    if (selectedCoKey && selectedDataItem !== selectedCoKey) {
+      const matchedOption = dataSelectOptions.find(
+        (opt) => opt.value === selectedCoKey
+      );
+      if (matchedOption) {
+        setSelectedDataItem(selectedCoKey);
+        getAndSetDownloadConditions(DownloadConditionType.KEY, [
+          new KeyCondition("key", selectedCoKey),
+        ]);
+      }
+    }
+  }, [
+    selectedCoKey,
+    selectedDataItem,
+    dataSelectOptions,
+    getAndSetDownloadConditions,
+  ]);
+
   const handleSelectDataItem = useCallback(
     (value: string) => {
       setSelectedDataItem(value);
       getAndSetDownloadConditions(DownloadConditionType.KEY, [
         new KeyCondition("key", value),
       ]);
+      if (setSelectedCoKey) {
+        setSelectedCoKey(value);
+      }
     },
-    [getAndSetDownloadConditions]
+    [getAndSetDownloadConditions, setSelectedCoKey]
   );
 
   useEffect(() => {
@@ -80,8 +105,6 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     }
   }, [dataSelectOptions, downloadConditions, getAndSetDownloadConditions]);
 
-  // Currently, csv is the best format for parquet datasets, and netcdf is the best for zarr datasets.
-  // we will support more formats in the future, but for now, we filter the formats based on the dataset type.
   const filteredDownloadFormats = useMemo(() => {
     const datasetType = collection?.getDatasetType();
     if (!datasetType) {
@@ -97,7 +120,6 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   }, [collection]);
 
   useEffect(() => {
-    // set default format
     if (
       downloadConditions.filter(
         (condition) => condition.type === DownloadConditionType.FORMAT
