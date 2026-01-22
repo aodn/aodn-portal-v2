@@ -37,7 +37,65 @@ export const handlers = [
       );
     }
 
-    return HttpResponse.json(getSuggesterOptionsBy(input[0], filters));
+    if (Array.isArray(input) ? input.includes("wave") : input === "wave") {
+      return HttpResponse.json(getSuggesterOptionsBy(input[0], filters));
+    } else if (Array.isArray(input) ? input.includes("imo") : input === "imo") {
+      // If user type imo, then need to give this suggestion list
+      return HttpResponse.json({
+        suggested_organisation_vocabs: [
+          "Expendable Bathythermograph Sub-Facility, Integrated Marine Observing System (IMOS)",
+          "Ocean Radar Facility, Integrated Marine Observing System (IMOS)",
+          "Sea Surface Temperature Products Sub-Facility, Integrated Marine Observing System (IMOS)",
+          "Southern Ocean Time Series Observatory Sub-Facility, Integrated Marine Observing System (IMOS)",
+          "Integrated Marine Observing System (IMOS)",
+        ],
+        suggested_platform_vocabs: [],
+        suggested_phrases: [
+          "imos indonsian throughflow",
+          "rv southern surveyor imos",
+          "former imos ship",
+          "watch imos platform code",
+          "surveyor imos platform",
+          "marine observing system imos",
+          "timor north",
+          "imos platform code vlhj",
+          "imos indonsian",
+          "imos sst",
+          "imos sst products web",
+          "coffs harbour where imos",
+          "southern surveyor imos",
+          "surveyor imos platform code",
+          "timor passage throughflow components",
+          "imos platform",
+          "imos platform code fhzi",
+          "system imos",
+          "timor passage throughflow",
+          "imos funded",
+          "imos platform code",
+          "observing system imos",
+          "timor north deep",
+          "imos indonsian throughflow moorings",
+          "imos ships",
+          "imos ship",
+          "timor",
+          "system imos funded",
+          "harbour where imos",
+          "watch imos platform",
+          "southern surveyor imos platform",
+          "timor passage",
+          "former imos",
+          "watch imos",
+          "surveyor imos",
+          "timor north deep water",
+          "where imos",
+          "observing system imos funded",
+          "imos sst products",
+        ],
+        suggested_parameter_vocabs: [],
+      });
+    } else {
+      return HttpResponse.json({});
+    }
   }),
 
   http.get(PREFIX + "/collections", ({ request }) => {
