@@ -156,10 +156,6 @@ const borderRadius = {
   xxlg: "34px",
 };
 
-const filterList = {
-  filterListMaxDisplay: 4,
-};
-
 const zIndex = {
   MAP_BASE: 0,
   MAP_CONTROL: 2,
@@ -190,7 +186,6 @@ export {
   color,
   border,
   borderRadius,
-  filterList,
   zIndex,
   shadow,
   lineHeight,

@@ -428,10 +428,10 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
           {c.longitude && c.longitude && (
             <CardContent>
               <Typography component="div" variant="body3Small">
-                Latitude: {c.latitude}
+                Latitude: {c.latitude.toFixed(5)}
               </Typography>
               <Typography component="div" variant="body3Small">
-                Longitude: {c.longitude}
+                Longitude: {c.longitude.toFixed(5)}
               </Typography>
             </CardContent>
           )}
