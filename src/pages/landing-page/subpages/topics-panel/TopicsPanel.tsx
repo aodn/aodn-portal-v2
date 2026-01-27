@@ -19,12 +19,8 @@ import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 import iconUnderwaterVehicles from "@/assets/topics-panel-icons/icon_underwater_vehicles.png";
-import iconOceanChemistry from "@/assets/topics-panel-icons/icon_ocean_chemistry.png";
 import iconTide from "@/assets/topics-panel-icons/icon_tide.png";
-import iconIndustry from "@/assets/topics-panel-icons/icon_industry.png";
-import iconGriddedDatasets from "@/assets/topics-panel-icons/icon_gridded_datasets.png";
 import iconOceanPhysics from "@/assets/topics-panel-icons/icon_ocean_physics.png";
-import iconPlankton from "@/assets/topics-panel-icons/icon_plankton.png";
 import iconOceanColor from "@/assets/topics-panel-icons/icon_ocean_color.png";
 import iconBenthic from "@/assets/topics-panel-icons/icon_benthic.png";
 import iconTimeSeriesDatasets from "@/assets/topics-panel-icons/icon_time_series_datasets.png";
@@ -49,6 +45,10 @@ import { IconWeatherClimate } from "../../../../assets/topics-panel-icons/icon_w
 import { IconAllTopics } from "../../../../assets/topics-panel-icons/icon_all_topics";
 import { IconLessTopics } from "../../../../assets/topics-panel-icons/icon_less_topics";
 import { IconAcidification } from "../../../../assets/topics-panel-icons/icon_acidification";
+import { IconOceanChemistry } from "../../../../assets/topics-panel-icons/icon_ocean_chemistry";
+import { IconPlankton } from "../../../../assets/topics-panel-icons/icon_plankton";
+import { IconIndustry } from "../../../../assets/topics-panel-icons/icon_industry";
+import { IconGriddedDatasets } from "../../../../assets/topics-panel-icons/icon_gridded_datasets";
 
 interface TopicsPanelProps {}
 
@@ -168,7 +168,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Ocean Chemistry",
-        icon: iconOceanChemistry,
+        icon: IconOceanChemistry,
         handler: () => handleClickTopicCard("Ocean Chemistry"),
       },
       {
@@ -188,12 +188,12 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Industry",
-        icon: iconIndustry,
+        icon: IconIndustry,
         handler: () => handleClickTopicCard("Industry"),
       },
       {
         title: "Gridded Datasets",
-        icon: iconGriddedDatasets,
+        icon: IconGriddedDatasets,
         handler: () => handleClickTopicCard("Gridded Datasets"),
       },
       {
@@ -208,7 +208,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Plankton",
-        icon: iconPlankton,
+        icon: IconPlankton,
         handler: () => handleClickTopicCard("Plankton"),
       },
       {
