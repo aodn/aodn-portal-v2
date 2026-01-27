@@ -18,15 +18,9 @@ import {
 import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
-import iconTutorials from "@/assets/topics-panel-icons/icon_tutorials.png";
-import iconWeatherClimate from "@/assets/topics-panel-icons/icon_weather_climate.png";
 import iconUnderwaterVehicles from "@/assets/topics-panel-icons/icon_underwater_vehicles.png";
-import iconOceanBiota from "@/assets/topics-panel-icons/icon_ocean_biota.png";
 import iconOceanChemistry from "@/assets/topics-panel-icons/icon_ocean_chemistry.png";
 import iconTide from "@/assets/topics-panel-icons/icon_tide.png";
-import iconCurrents from "@/assets/topics-panel-icons/icon_currents.png";
-import iconWaterQuality from "@/assets/topics-panel-icons/icon_water_quality.png";
-import iconMolecular from "@/assets/topics-panel-icons/icon_molecular.png";
 import iconAcidification from "@/assets/topics-panel-icons/icon_acidification.png";
 import iconIndustry from "@/assets/topics-panel-icons/icon_industry.png";
 import iconGriddedDatasets from "@/assets/topics-panel-icons/icon_gridded_datasets.png";
@@ -49,6 +43,12 @@ import { IconVessels } from "../../../../assets/topics-panel-icons/icon_vessels"
 import { IconWaves } from "../../../../assets/topics-panel-icons/icon_waves";
 import { IconFisheries } from "../../../../assets/topics-panel-icons/icon_fisheries";
 import { IconAnimalTracking } from "../../../../assets/topics-panel-icons/icon_animal_tracking";
+import { IconTutorials } from "../../../../assets/topics-panel-icons/icon_tutorials";
+import { IconCurrents } from "../../../../assets/topics-panel-icons/icon_currents";
+import { IconWaterQuality } from "../../../../assets/topics-panel-icons/icon_water_quality";
+import { IconOceanBiota } from "../../../../assets/topics-panel-icons/icon_ocean_biota";
+import { IconMolecular } from "../../../../assets/topics-panel-icons/icon_molecular";
+import { IconWeatherClimate } from "../../../../assets/topics-panel-icons/icon_weather_climate";
 
 interface TopicsPanelProps {}
 
@@ -133,32 +133,32 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Tutorials",
-        icon: iconTutorials,
+        icon: IconTutorials,
         handler: () => handleClickTopicCard("Tutorials"),
       },
       {
         title: "Currents",
-        icon: iconCurrents,
+        icon: IconCurrents,
         handler: () => handleClickTopicCard("Currents"),
       },
       {
         title: "Water Quality",
-        icon: iconWaterQuality,
+        icon: IconWaterQuality,
         handler: () => handleClickTopicCard("Water Quality"),
       },
       {
         title: "Ocean Biota",
-        icon: iconOceanBiota,
+        icon: IconOceanBiota,
         handler: () => handleClickTopicCard("Ocean Biota"),
       },
       {
         title: "Molecular",
-        icon: iconMolecular,
+        icon: IconMolecular,
         handler: () => handleClickTopicCard("Molecular"),
       },
       {
         title: "Weather & Climate",
-        icon: iconWeatherClimate,
+        icon: IconWeatherClimate,
         handler: () => handleClickTopicCard("Weather & Climate"),
       },
       {
