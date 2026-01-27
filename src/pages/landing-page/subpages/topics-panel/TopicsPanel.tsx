@@ -22,9 +22,7 @@ import iconTutorials from "@/assets/topics-panel-icons/icon_tutorials.png";
 import iconWeatherClimate from "@/assets/topics-panel-icons/icon_weather_climate.png";
 import iconUnderwaterVehicles from "@/assets/topics-panel-icons/icon_underwater_vehicles.png";
 import iconOceanBiota from "@/assets/topics-panel-icons/icon_ocean_biota.png";
-import iconFisheries from "@/assets/topics-panel-icons/icon_fisheries.png";
 import iconOceanChemistry from "@/assets/topics-panel-icons/icon_ocean_chemistry.png";
-import iconAnimalTracking from "@/assets/topics-panel-icons/icon_animal_tracking.png";
 import iconTide from "@/assets/topics-panel-icons/icon_tide.png";
 import iconCurrents from "@/assets/topics-panel-icons/icon_currents.png";
 import iconWaterQuality from "@/assets/topics-panel-icons/icon_water_quality.png";
@@ -49,6 +47,8 @@ import { IconGliders } from "../../../../assets/topics-panel-icons/icon_gliders"
 import { IconSatellite } from "../../../../assets/topics-panel-icons/icon_satellite";
 import { IconVessels } from "../../../../assets/topics-panel-icons/icon_vessels";
 import { IconWaves } from "../../../../assets/topics-panel-icons/icon_waves";
+import { IconFisheries } from "../../../../assets/topics-panel-icons/icon_fisheries";
+import { IconAnimalTracking } from "../../../../assets/topics-panel-icons/icon_animal_tracking";
 
 interface TopicsPanelProps {}
 
@@ -128,7 +128,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Animal Tracking",
-        icon: iconAnimalTracking,
+        icon: IconAnimalTracking,
         handler: () => handleClickTopicCard("Animal Tracking"),
       },
       {
@@ -178,7 +178,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Fisheries",
-        icon: iconFisheries,
+        icon: IconFisheries,
         handler: () => handleClickTopicCard("Fisheries"),
       },
       {
