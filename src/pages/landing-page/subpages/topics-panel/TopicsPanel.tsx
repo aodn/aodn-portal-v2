@@ -21,7 +21,6 @@ import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 import iconUnderwaterVehicles from "@/assets/topics-panel-icons/icon_underwater_vehicles.png";
 import iconOceanChemistry from "@/assets/topics-panel-icons/icon_ocean_chemistry.png";
 import iconTide from "@/assets/topics-panel-icons/icon_tide.png";
-import iconAcidification from "@/assets/topics-panel-icons/icon_acidification.png";
 import iconIndustry from "@/assets/topics-panel-icons/icon_industry.png";
 import iconGriddedDatasets from "@/assets/topics-panel-icons/icon_gridded_datasets.png";
 import iconOceanPhysics from "@/assets/topics-panel-icons/icon_ocean_physics.png";
@@ -30,8 +29,6 @@ import iconOceanColor from "@/assets/topics-panel-icons/icon_ocean_color.png";
 import iconBenthic from "@/assets/topics-panel-icons/icon_benthic.png";
 import iconTimeSeriesDatasets from "@/assets/topics-panel-icons/icon_time_series_datasets.png";
 import iconReef from "@/assets/topics-panel-icons/icon_reef.png";
-import iconAllTopics from "@/assets/topics-panel-icons/icon_all_topics.png";
-import iconLessTopics from "@/assets/topics-panel-icons/icon_less_topics.png";
 import { SearchKeys } from "../../../../components/search/constants";
 import { IconImos } from "../../../../assets/topics-panel-icons/icon_imos";
 import { IconSeaTemperature } from "../../../../assets/topics-panel-icons/icon_sea_temperature";
@@ -49,6 +46,9 @@ import { IconWaterQuality } from "../../../../assets/topics-panel-icons/icon_wat
 import { IconOceanBiota } from "../../../../assets/topics-panel-icons/icon_ocean_biota";
 import { IconMolecular } from "../../../../assets/topics-panel-icons/icon_molecular";
 import { IconWeatherClimate } from "../../../../assets/topics-panel-icons/icon_weather_climate";
+import { IconAllTopics } from "../../../../assets/topics-panel-icons/icon_all_topics";
+import { IconLessTopics } from "../../../../assets/topics-panel-icons/icon_less_topics";
+import { IconAcidification } from "../../../../assets/topics-panel-icons/icon_acidification";
 
 interface TopicsPanelProps {}
 
@@ -163,7 +163,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Acidification",
-        icon: iconAcidification,
+        icon: IconAcidification,
         handler: () => handleClickTopicCard("Acidification"),
       },
       {
@@ -249,7 +249,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   const LESS_TOPICS_CARD: TopicCardType = useMemo(
     () => ({
       title: "Show Less",
-      icon: iconLessTopics,
+      icon: IconLessTopics,
       handler: () => setShowAllTopics((prev) => !prev),
     }),
     [setShowAllTopics]
@@ -258,7 +258,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   const ALL_TOPICS_CARD: TopicCardType = useMemo(
     () => ({
       title: "Show All",
-      icon: iconAllTopics,
+      icon: IconAllTopics,
       handler: () => setShowAllTopics((prev) => !prev),
     }),
     [setShowAllTopics]
