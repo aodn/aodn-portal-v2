@@ -18,13 +18,7 @@ import {
 import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
-import iconUnderwaterVehicles from "@/assets/topics-panel-icons/icon_underwater_vehicles.png";
-import iconTide from "@/assets/topics-panel-icons/icon_tide.png";
-import iconOceanPhysics from "@/assets/topics-panel-icons/icon_ocean_physics.png";
-import iconOceanColor from "@/assets/topics-panel-icons/icon_ocean_color.png";
-import iconBenthic from "@/assets/topics-panel-icons/icon_benthic.png";
-import iconTimeSeriesDatasets from "@/assets/topics-panel-icons/icon_time_series_datasets.png";
-import iconReef from "@/assets/topics-panel-icons/icon_reef.png";
+
 import { SearchKeys } from "../../../../components/search/constants";
 import { IconImos } from "../../../../assets/topics-panel-icons/icon_imos";
 import { IconSeaTemperature } from "../../../../assets/topics-panel-icons/icon_sea_temperature";
@@ -49,6 +43,13 @@ import { IconOceanChemistry } from "../../../../assets/topics-panel-icons/icon_o
 import { IconPlankton } from "../../../../assets/topics-panel-icons/icon_plankton";
 import { IconIndustry } from "../../../../assets/topics-panel-icons/icon_industry";
 import { IconGriddedDatasets } from "../../../../assets/topics-panel-icons/icon_gridded_datasets";
+import { IconOceanPhysics } from "../../../../assets/topics-panel-icons/icon_ocean_physics";
+import { IconUnderwaterVehicles } from "../../../../assets/topics-panel-icons/icon_underwater_vehicles";
+import { IconOceanColor } from "../../../../assets/topics-panel-icons/icon_ocean_color";
+import { IconBenthic } from "../../../../assets/topics-panel-icons/icon_benthic";
+import { IconTimeSeriesDatasets } from "../../../../assets/topics-panel-icons/icon_time_series_datasets";
+import { IconTide } from "../../../../assets/topics-panel-icons/icon_tide";
+import { IconReef } from "../../../../assets/topics-panel-icons/icon_reef";
 
 interface TopicsPanelProps {}
 
@@ -173,7 +174,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Tides",
-        icon: iconTide,
+        icon: IconTide,
         handler: () => handleClickTopicCard("Tides"),
       },
       {
@@ -183,7 +184,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Reef",
-        icon: iconReef,
+        icon: IconReef,
         handler: () => handleClickTopicCard("National Reef Monitoring Network"),
       },
       {
@@ -198,12 +199,12 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Ocean Physics",
-        icon: iconOceanPhysics,
+        icon: IconOceanPhysics,
         handler: () => handleClickTopicCard("Ocean Physics"),
       },
       {
         title: "Underwater Vehicles",
-        icon: iconUnderwaterVehicles,
+        icon: IconUnderwaterVehicles,
         handler: () => handleClickTopicCard("Underwater Vehicles"),
       },
       {
@@ -213,17 +214,17 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Ocean Color",
-        icon: iconOceanColor,
+        icon: IconOceanColor,
         handler: () => handleClickTopicCard("Ocean Color"),
       },
       {
         title: "Benthic",
-        icon: iconBenthic,
+        icon: IconBenthic,
         handler: () => handleClickTopicCard("Benthic"),
       },
       {
         title: "Time Series Datasets",
-        icon: iconTimeSeriesDatasets,
+        icon: IconTimeSeriesDatasets,
         handler: () => handleClickTopicCard("Time Series Datasets"),
       },
     ],
