@@ -21,7 +21,6 @@ import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 import iconTutorials from "@/assets/topics-panel-icons/icon_tutorials.png";
 import iconSatellite from "@/assets/topics-panel-icons/icon_satellite.png";
 import iconWaves from "@/assets/topics-panel-icons/icon_waves.png";
-import iconSeaTemperature from "@/assets/topics-panel-icons/icon_sea_temperature.png";
 import iconWeatherClimate from "@/assets/topics-panel-icons/icon_weather_climate.png";
 import iconMoorings from "@/assets/topics-panel-icons/icon_moorings.png";
 import iconGliders from "@/assets/topics-panel-icons/icon_gliders.png";
@@ -49,6 +48,7 @@ import iconAllTopics from "@/assets/topics-panel-icons/icon_all_topics.png";
 import iconLessTopics from "@/assets/topics-panel-icons/icon_less_topics.png";
 import { IconImos } from "../../../../assets/topics-panel-icons/icon_imos";
 import { SearchKeys } from "../../../../components/search/constants";
+import { IconSeaTemperature } from "../../../../assets/topics-panel-icons/icon_sea_temperature";
 
 interface TopicsPanelProps {}
 
@@ -93,7 +93,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Sea Temperature",
-        icon: iconSeaTemperature,
+        icon: IconSeaTemperature,
         handler: () => handleClickTopicCard("Sea Temperature"),
       },
       {
@@ -276,10 +276,10 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       // Use a small tolerance to handle precision issues
       const tolerance = 10;
 
-      // Disable left arrow when panel's left edge is at/near container's left edge
+      // Disable left arrow when panel's left edge is at/near the container's left edge
       setIsLeftDisabled(panelLeft + tolerance >= containerLeft);
 
-      // Disable right arrow when panel's right edge is at/near container's right edge
+      // Disable right arrow when panel's right edge is at/near the container's right edge
       setIsRightDisabled(panelRight - tolerance <= containerRight);
     }
   }, []);
