@@ -22,7 +22,6 @@ import iconTutorials from "@/assets/topics-panel-icons/icon_tutorials.png";
 import iconSatellite from "@/assets/topics-panel-icons/icon_satellite.png";
 import iconWaves from "@/assets/topics-panel-icons/icon_waves.png";
 import iconWeatherClimate from "@/assets/topics-panel-icons/icon_weather_climate.png";
-import iconMoorings from "@/assets/topics-panel-icons/icon_moorings.png";
 import iconGliders from "@/assets/topics-panel-icons/icon_gliders.png";
 import iconUnderwaterVehicles from "@/assets/topics-panel-icons/icon_underwater_vehicles.png";
 import iconOceanBiota from "@/assets/topics-panel-icons/icon_ocean_biota.png";
@@ -30,7 +29,6 @@ import iconFisheries from "@/assets/topics-panel-icons/icon_fisheries.png";
 import iconOceanChemistry from "@/assets/topics-panel-icons/icon_ocean_chemistry.png";
 import iconAnimalTracking from "@/assets/topics-panel-icons/icon_animal_tracking.png";
 import iconTide from "@/assets/topics-panel-icons/icon_tide.png";
-import iconArgoFloats from "@/assets/topics-panel-icons/icon_argo_floats.png";
 import iconVessels from "@/assets/topics-panel-icons/icon_vessels.png";
 import iconCurrents from "@/assets/topics-panel-icons/icon_currents.png";
 import iconWaterQuality from "@/assets/topics-panel-icons/icon_water_quality.png";
@@ -46,9 +44,11 @@ import iconTimeSeriesDatasets from "@/assets/topics-panel-icons/icon_time_series
 import iconReef from "@/assets/topics-panel-icons/icon_reef.png";
 import iconAllTopics from "@/assets/topics-panel-icons/icon_all_topics.png";
 import iconLessTopics from "@/assets/topics-panel-icons/icon_less_topics.png";
-import { IconImos } from "../../../../assets/topics-panel-icons/icon_imos";
 import { SearchKeys } from "../../../../components/search/constants";
+import { IconImos } from "../../../../assets/topics-panel-icons/icon_imos";
 import { IconSeaTemperature } from "../../../../assets/topics-panel-icons/icon_sea_temperature";
+import { IconMoorings } from "../../../../assets/topics-panel-icons/icon_moorings";
+import { IconArgoFloats } from "../../../../assets/topics-panel-icons/icon_argo_floats";
 
 interface TopicsPanelProps {}
 
@@ -98,12 +98,12 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Moorings",
-        icon: iconMoorings,
+        icon: IconMoorings,
         handler: () => handleClickTopicCard("Moorings"),
       },
       {
         title: "Argo Floats",
-        icon: iconArgoFloats,
+        icon: IconArgoFloats,
         handler: () => handleClickTopicCard("Argo Floats"),
       },
       {
