@@ -29,6 +29,7 @@ import iconTimeSeriesDatasets from "@/assets/topics-panel-icons/icon_time_series
 import iconReef from "@/assets/topics-panel-icons/icon_reef.png";
 
 import { TopicCardType } from "./TopicCard";
+import { IconImos } from "../../../../assets/topics-panel-icons/icon_imos";
 
 export const SCROLL_BUTTON_SIZE = 18;
 
@@ -55,6 +56,10 @@ export const LESS_TOPICS_CARD: TopicCardType = {
 };
 
 export const TOPICS_CARDS: TopicCardType[] = [
+  {
+    title: "IMOS",
+    icon: IconImos,
+  },
   {
     title: "Sea Temperature",
     icon: iconSeaTemperature,

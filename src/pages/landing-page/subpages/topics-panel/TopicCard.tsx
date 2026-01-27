@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { ComponentType, createElement, FC, SVGProps, useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { borderRadius, padding, shadow } from "../../../../styles/constants";
 import { TOPICS_CARD_HEIGHT, TOPICS_CARD_ICON_BOX_SIZE } from "./constants";
@@ -6,7 +6,7 @@ import { portalTheme } from "../../../../styles";
 
 export interface TopicCardType {
   title: string;
-  icon: string;
+  icon: string | ComponentType<SVGProps<SVGSVGElement>>;
   searchKey?: string;
 }
 
@@ -46,16 +46,26 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
           boxShadow: shadow.bottom,
         }}
       >
-        <img
-          src={cardData.icon}
-          alt={cardData.icon}
-          style={{
-            objectFit: "contain",
+        {typeof cardData.icon === "string" ? (
+          <img
+            src={cardData.icon}
+            alt={cardData.icon}
+            style={{
+              objectFit: "contain",
+              width: "100%",
+              height: "100%",
+              scale: isHovered ? "105%" : "none",
+            }}
+          />
+        ) : (
+          createElement(cardData.icon, {
             width: "100%",
             height: "100%",
-            scale: isHovered ? "105%" : "none",
-          }}
-        />
+            style: {
+              transform: isHovered ? "scale(1.05)" : "none",
+            },
+          })
+        )}
       </Paper>
       <Box
         width={TOPICS_CARD_ICON_BOX_SIZE}
