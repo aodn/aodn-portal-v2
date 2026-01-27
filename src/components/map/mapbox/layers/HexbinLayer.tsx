@@ -109,6 +109,8 @@ const createHexagonLayer = (
 interface HexbinLayerProps extends LayerBasicType<CloudOptimizedFeature> {
   filterStartDate?: dayjs.Dayjs;
   filterEndDate?: dayjs.Dayjs;
+  selectedCoKey?: string;
+  onSelectCoKey?: (key: string) => void;
 }
 
 // Use binary tree lookup the start and end point, data is assumed sorted by timestamp asc
@@ -164,9 +166,10 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
   filterStartDate,
   filterEndDate,
   visible,
+  selectedCoKey,
+  onSelectCoKey,
 }) => {
   const { map } = useContext(MapContext);
-  const { selectedCoKey, setSelectedCoKey } = useDetailPageContext();
   const popupRef = useRef<Popup | null>();
   const overlayRef = useRef<MapboxOverlay | null>();
 
@@ -180,9 +183,9 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
 
   const handleSelectHexbin = useCallback(
     (key: string) => {
-      setSelectedCoKey(key);
+      onSelectCoKey?.(key);
     },
-    [setSelectedCoKey]
+    [onSelectCoKey]
   );
 
   const createLayer = useCallback(
@@ -333,7 +336,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       {visible && (
         <MapLayerSelect
           mapLayersOptions={hexbinOptions}
-          selectedItem={selectedCoKey}
+          selectedItem={selectedCoKey || ""}
           handleSelectItem={handleSelectHexbin}
           isLoading={isFetchingHexbinOptions}
           loadingText="Loading Hexbin Layers..."

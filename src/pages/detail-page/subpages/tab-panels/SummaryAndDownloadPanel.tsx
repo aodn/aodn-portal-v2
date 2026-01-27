@@ -185,6 +185,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setSelectedWmsLayer,
     downloadService,
     setDownloadService,
+    selectedCoKey,
+    setSelectedCoKey,
   } = useDetailPageContext();
 
   // Need to init with null as collection value can be undefined when it entered this component.
@@ -518,6 +520,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
                       LayerName.Hexbin
                     }
+                    selectedCoKey={selectedCoKey}
+                    onSelectCoKey={setSelectedCoKey}
                   />
                   <GeoServerLayer
                     geoServerLayerConfig={
