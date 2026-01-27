@@ -44,6 +44,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     IDownloadCondition[]
   >([]);
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>("");
+  const [selectedCoKey, setSelectedCoKey] = useState<string>("");
   const [lastSelectedMapLayer, setLastSelectedMapLayer] =
     useState<LayerSwitcherLayer<LayerName> | null>(null);
   const [downloadService, setDownloadService] = useState<DownloadServiceType>(
@@ -125,6 +126,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         removeDownloadCondition,
         selectedWmsLayer,
         setSelectedWmsLayer,
+        selectedCoKey,
+        setSelectedCoKey,
         lastSelectedMapLayer,
         setLastSelectedMapLayer,
         downloadService,

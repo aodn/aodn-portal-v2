@@ -14,6 +14,8 @@ const DownloadCard: FC = () => {
     removeDownloadCondition,
     selectedWmsLayer,
     downloadService,
+    selectedCoKey,
+    setSelectedCoKey,
   } = useDetailPageContext();
 
   const [wfsLinks, wmsLinks] = useMemo(() => {
@@ -29,6 +31,8 @@ const DownloadCard: FC = () => {
         return (
           <DownloadCloudOptimisedCard
             collection={collection}
+            selectedCoKey={selectedCoKey}
+            setSelectedCoKey={setSelectedCoKey}
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
@@ -57,6 +61,8 @@ const DownloadCard: FC = () => {
     getAndSetDownloadConditions,
     removeDownloadCondition,
     selectedWmsLayer,
+    selectedCoKey,
+    setSelectedCoKey,
     wfsLinks,
     wmsLinks,
   ]);

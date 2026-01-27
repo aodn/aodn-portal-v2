@@ -65,21 +65,17 @@ const createMockCollection = (datasetType: DatasetType): OGCCollection => {
 describe("DownloadCloudOptimisedCard", () => {
   const mockGetAndSetDownloadConditions = vi.fn();
   const mockRemoveDownloadCondition = vi.fn();
+  const mockSetSelectedCoKey = vi.fn();
 
-  const findDataSelect = (container: HTMLElement): HTMLSelectElement | null => {
-    const selectElements = container.querySelectorAll("select");
-    for (const select of Array.from(selectElements)) {
-      const parent = select.closest("div");
-      if (parent?.textContent?.includes("Data Selection")) {
-        return select as HTMLSelectElement;
-      }
-    }
-    return null;
+  const getDataSelect = () => {
+    return screen.getByTestId("select-data-selection") as HTMLSelectElement;
   };
 
   const renderComponent = (
     collection: OGCCollection = createMockCollection(DatasetType.ZARR),
-    downloadConditions: any[] = []
+    downloadConditions: any[] = [],
+    selectedCoKey?: string,
+    setSelectedCoKey = mockSetSelectedCoKey
   ) => {
     return render(
       <Provider store={store}>
@@ -89,6 +85,8 @@ describe("DownloadCloudOptimisedCard", () => {
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
             removeDownloadCondition={mockRemoveDownloadCondition}
+            selectedCoKey={selectedCoKey}
+            setSelectedCoKey={setSelectedCoKey}
           />
         </ThemeProvider>
       </Provider>
@@ -108,47 +106,144 @@ describe("DownloadCloudOptimisedCard", () => {
   });
 
   it("should display correct data selection options with labels without extensions", async () => {
-    const { container } = renderComponent();
+    renderComponent();
 
     await waitFor(() => {
       expect(screen.getByText("Data Selection")).toBeInTheDocument();
     });
 
-    const dataSelect = findDataSelect(container);
-    expect(dataSelect).not.toBeNull();
+    const dataSelect = getDataSelect();
+    const options = dataSelect.querySelectorAll("option");
 
-    if (dataSelect) {
-      const options = dataSelect.querySelectorAll("option");
-      expect(options).toHaveLength(2);
-      expect(options[0].textContent).toBe("test-zarr");
-      expect(options[1].textContent).toBe("test-parquet");
-      expect(options[0].value).toBe("test-zarr.zarr");
-      expect(options[1].value).toBe("test-parquet.parquet");
-    }
+    expect(options).toHaveLength(2);
+    expect(options[0].textContent).toBe("test-zarr");
+    expect(options[1].textContent).toBe("test-parquet");
+    expect(options[0].value).toBe("test-zarr.zarr");
+    expect(options[1].value).toBe("test-parquet.parquet");
   });
 
   it("should change data selection value when user selects different option", async () => {
     const user = userEvent.setup();
-    const { container } = renderComponent();
+    renderComponent();
 
     await waitFor(() => {
       expect(screen.getByText("Data Selection")).toBeInTheDocument();
     });
 
-    const dataSelect = findDataSelect(container);
-    expect(dataSelect).not.toBeNull();
+    const dataSelect = getDataSelect();
+    expect(dataSelect.value).toBe("test-zarr.zarr");
 
-    if (dataSelect) {
-      // the default value should be the first option
-      expect(dataSelect.value).toBe("test-zarr.zarr");
+    await user.selectOptions(dataSelect, "test-parquet.parquet");
 
-      // change selection
+    await waitFor(() => {
+      expect(getDataSelect().value).toBe("test-parquet.parquet");
+    });
+  });
+
+  it("should sync selectedCoKey from context to dropdown on mount", async () => {
+    renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      "test-parquet.parquet"
+    );
+
+    await waitFor(() => {
+      expect(getDataSelect().value).toBe("test-parquet.parquet");
+    });
+  });
+
+  it("should sync different selectedCoKey values on separate mounts", async () => {
+    const { unmount: unmount1 } = renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      "test-zarr.zarr"
+    );
+
+    await waitFor(() => {
+      expect(getDataSelect().value).toBe("test-zarr.zarr");
+    });
+
+    unmount1();
+
+    const { unmount: unmount2 } = renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      "test-parquet.parquet"
+    );
+
+    await waitFor(() => {
+      expect(getDataSelect().value).toBe("test-parquet.parquet");
+    });
+
+    unmount2();
+  });
+
+  it("should call setSelectedCoKey when user changes selection", async () => {
+    const user = userEvent.setup();
+    renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      "test-zarr.zarr"
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    vi.clearAllMocks();
+
+    const dataSelect = getDataSelect();
+    await user.selectOptions(dataSelect, "test-parquet.parquet");
+
+    await waitFor(() => {
+      expect(mockSetSelectedCoKey).toHaveBeenCalledWith("test-parquet.parquet");
+    });
+  });
+
+  it("should not update dropdown when selectedCoKey doesn't match any option", async () => {
+    renderComponent(
+      createMockCollection(DatasetType.ZARR),
+      [],
+      "non-existent-key.zarr"
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(getDataSelect().value).toBe("test-zarr.zarr");
+    });
+  });
+
+  it("should work without setSelectedCoKey callback", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DownloadCloudOptimisedCard
+            collection={createMockCollection(DatasetType.ZARR)}
+            downloadConditions={[]}
+            getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
+            removeDownloadCondition={mockRemoveDownloadCondition}
+          />
+        </ThemeProvider>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    const dataSelect = getDataSelect();
+
+    await expect(async () => {
       await user.selectOptions(dataSelect, "test-parquet.parquet");
+    }).not.toThrow();
 
-      // the expected value should changed to the selected option
-      await waitFor(() => {
-        expect(dataSelect.value).toBe("test-parquet.parquet");
-      });
-    }
+    await waitFor(() => {
+      expect(getDataSelect().value).toBe("test-parquet.parquet");
+    });
   });
 });
