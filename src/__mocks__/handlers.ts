@@ -16,6 +16,7 @@ import {
   emptyLineageInfo,
   emptyMetadataInfo,
 } from "./utils/DataModificationUtils";
+import { SearchKeys } from "../components/search/constants";
 
 const PREFIX = "/api/v1/ogc";
 
@@ -106,11 +107,11 @@ export const handlers = [
     if (q === "wave" || q === null) {
       // For simplify current test usage, return wave result only for now. May need to update in the future
       return HttpResponse.json(COLLECTIONS_WAVE);
-    } else if (q === "imos" && search_after === null) {
+    } else if (q === SearchKeys.IMOS && search_after === null) {
       // Search word imos for first page
       return HttpResponse.json(COLLECTIONS_IMOS_PAGE1);
     } else if (
-      q === "imos" &&
+      q === SearchKeys.IMOS &&
       search_after === "8.631659,c1344e70-480e-0993-e044-00144f7bc0f4"
     ) {
       return HttpResponse.json(COLLECTIONS_IMOS_PAGE2);

@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { ComponentType, createElement, FC, SVGProps, useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { borderRadius, padding, shadow } from "../../../../styles/constants";
 import { TOPICS_CARD_HEIGHT, TOPICS_CARD_ICON_BOX_SIZE } from "./constants";
@@ -6,21 +6,16 @@ import { portalTheme } from "../../../../styles";
 
 export interface TopicCardType {
   title: string;
-  icon: string;
-  searchKey?: string;
+  icon: string | ComponentType<SVGProps<SVGSVGElement>>;
+  handler?: () => void;
 }
 
 interface TopicCardProps {
   cardData: TopicCardType;
-  handleClickTopicCard: (value: string) => void;
 }
 
-const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
+const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
-
-  const handleClick = (value: string) => {
-    handleClickTopicCard(value);
-  };
 
   return (
     <Box
@@ -33,7 +28,7 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
       sx={{
         cursor: "pointer",
       }}
-      onClick={() => handleClick(cardData.searchKey || cardData.title)}
+      onClick={cardData.handler}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -41,21 +36,29 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
         sx={{
           width: TOPICS_CARD_ICON_BOX_SIZE,
           height: TOPICS_CARD_ICON_BOX_SIZE,
-          padding: padding.medium,
           borderRadius: borderRadius.small,
           boxShadow: shadow.bottom,
         }}
       >
-        <img
-          src={cardData.icon}
-          alt={cardData.icon}
-          style={{
-            objectFit: "contain",
-            width: "100%",
-            height: "100%",
-            scale: isHovered ? "105%" : "none",
-          }}
-        />
+        {typeof cardData.icon === "string" ? (
+          <img
+            src={cardData.icon}
+            alt={cardData.icon}
+            style={{
+              padding: padding.medium,
+              objectFit: "contain",
+              width: "100%",
+              height: "100%",
+              scale: isHovered ? "105%" : "none",
+            }}
+          />
+        ) : (
+          createElement(cardData.icon, {
+            style: {
+              transform: isHovered ? "scale(1.05)" : "none",
+            },
+          })
+        )}
       </Paper>
       <Box
         width={TOPICS_CARD_ICON_BOX_SIZE}

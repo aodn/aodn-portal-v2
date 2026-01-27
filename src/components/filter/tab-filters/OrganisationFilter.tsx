@@ -11,6 +11,7 @@ import AIMSIcon from "../../icon/organisation/AIMSIcon";
 import CSIROIcon from "../../icon/organisation/CSIROIcon";
 import IMASIcon from "../../icon/organisation/IMASIcon";
 import { portalTheme } from "../../../styles";
+import { SearchKeys } from "../../search/constants";
 
 interface OrganisationFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -20,27 +21,27 @@ interface OrganisationFilterProps extends TabFilterType {
 // TODO: fetch from ogcapi or align with ogcapi keywords
 const ORGANISATION = [
   {
-    value: "imos",
+    value: SearchKeys.IMOS,
     label: "IMOS",
     icon: <IMOSIcon />,
   },
   {
-    value: "aims",
+    value: SearchKeys.AIMS,
     label: "AIMS",
     icon: <AIMSIcon />,
   },
   {
-    value: "australian_antarctic_division",
+    value: SearchKeys.AAD,
     label: "AAD",
     icon: <AustraliaAntarcticProgramIcon />,
   },
   {
-    value: "csiro",
+    value: SearchKeys.CSIRO,
     label: "CSIRO",
     icon: <CSIROIcon />,
   },
   {
-    value: "imas",
+    value: SearchKeys.IMAS,
     label: "IMAS",
     icon: <IMASIcon />,
   },
