@@ -55,6 +55,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import Searchbar from "../Searchbar";
 import { PARAMETER_VOCABS } from "../../../__mocks__/data/PARAMETER_VOCABS";
 import { encodeParam } from "../../../utils/UrlUtils";
+import { SearchKeys } from "../constants";
 
 describe("Searchbar", () => {
   beforeAll(() => {
@@ -359,7 +360,7 @@ describe("Searchbar", () => {
       // Verify boolean conversion works in complex URL
       expect(paramReducer.hasCOData).toBe(false);
       expect(typeof paramReducer.hasCOData).toBe("boolean");
-      expect(paramReducer?.datasetGroup).toBe("imos");
+      expect(paramReducer?.datasetGroup).toBe(SearchKeys.IMOS);
       expect(typeof paramReducer.datasetGroup).toBe("string");
 
       // Verify bbox is properly reconstructed

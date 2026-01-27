@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from "react";
+import { FC, useCallback, useMemo, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import { IconButton, Stack } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -9,26 +9,230 @@ import useTopicsPanelSize from "../../../../hooks/useTopicsPanelSize";
 import { useDebounce } from "../../../../hooks/useDebounce";
 import { gap } from "../../../../styles/constants";
 import {
-  TOPICS_CARDS,
   TOPICS_PANEL_GAP,
   SCROLL_BUTTON_SIZE,
   ALL_TOPICS_CARD,
   LESS_TOPICS_CARD,
 } from "./constants";
-import TopicCard from "./TopicCard";
+import TopicCard, { TopicCardType } from "./TopicCard";
 import {
   clearComponentParam,
+  updateDatasetGroup,
   updateSearchText,
 } from "../../../../components/common/store/componentParamReducer";
 import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
+import iconTutorials from "@/assets/topics-panel-icons/icon_tutorials.png";
+import iconSatellite from "@/assets/topics-panel-icons/icon_satellite.png";
+import iconWaves from "@/assets/topics-panel-icons/icon_waves.png";
+import iconSeaTemperature from "@/assets/topics-panel-icons/icon_sea_temperature.png";
+import iconWeatherClimate from "@/assets/topics-panel-icons/icon_weather_climate.png";
+import iconMoorings from "@/assets/topics-panel-icons/icon_moorings.png";
+import iconGliders from "@/assets/topics-panel-icons/icon_gliders.png";
+import iconUnderwaterVehicles from "@/assets/topics-panel-icons/icon_underwater_vehicles.png";
+import iconOceanBiota from "@/assets/topics-panel-icons/icon_ocean_biota.png";
+import iconFisheries from "@/assets/topics-panel-icons/icon_fisheries.png";
+import iconOceanChemistry from "@/assets/topics-panel-icons/icon_ocean_chemistry.png";
+import iconAnimalTracking from "@/assets/topics-panel-icons/icon_animal_tracking.png";
+import iconTide from "@/assets/topics-panel-icons/icon_tide.png";
+import iconArgoFloats from "@/assets/topics-panel-icons/icon_argo_floats.png";
+import iconVessels from "@/assets/topics-panel-icons/icon_vessels.png";
+import iconCurrents from "@/assets/topics-panel-icons/icon_currents.png";
+import iconWaterQuality from "@/assets/topics-panel-icons/icon_water_quality.png";
+import iconMolecular from "@/assets/topics-panel-icons/icon_molecular.png";
+import iconAcidification from "@/assets/topics-panel-icons/icon_acidification.png";
+import iconIndustry from "@/assets/topics-panel-icons/icon_industry.png";
+import iconGriddedDatasets from "@/assets/topics-panel-icons/icon_gridded_datasets.png";
+import iconOceanPhysics from "@/assets/topics-panel-icons/icon_ocean_physics.png";
+import iconPlankton from "@/assets/topics-panel-icons/icon_plankton.png";
+import iconOceanColor from "@/assets/topics-panel-icons/icon_ocean_color.png";
+import iconBenthic from "@/assets/topics-panel-icons/icon_benthic.png";
+import iconTimeSeriesDatasets from "@/assets/topics-panel-icons/icon_time_series_datasets.png";
+import iconReef from "@/assets/topics-panel-icons/icon_reef.png";
+import { IconImos } from "../../../../assets/topics-panel-icons/icon_imos";
+import { SearchKeys } from "../../../../components/search/constants";
 
 interface TopicsPanelProps {}
 
 const TopicsPanel: FC<TopicsPanelProps> = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
+  // This is a simple click topic card function that with updates search input text and clear all the filters
+  // Can be change to a function-switcher if any other functions are designed in the future
+  const handleClickTopicCard = useCallback(
+    (value: string) => {
+      // Clear the component states
+      dispatch(clearComponentParam());
+      // Then update the search text with the selected topic value
+      dispatch(updateSearchText(value));
+      // Track topics panel button click
+      trackCustomEvent(AnalyticsEvent.SEARCH_TOPIC_CLICK, {
+        search_topic: value,
+      });
+
+      redirectSearch("TopicsPanel");
+    },
+    [dispatch, redirectSearch]
+  );
+
+  const TOPICS_CARDS: TopicCardType[] = useMemo(
+    () => [
+      {
+        title: "IMOS",
+        icon: IconImos,
+        handler: () => {
+          // Clear the component states
+          dispatch(clearComponentParam());
+          // Then update the search text with the selected topic value
+          dispatch(updateDatasetGroup(SearchKeys.IMOS));
+          // Track topics panel button click
+          trackCustomEvent(AnalyticsEvent.SEARCH_TOPIC_CLICK, {
+            search_topic: SearchKeys.IMOS,
+          });
+
+          redirectSearch("TopicsPanel");
+        },
+      },
+      {
+        title: "Sea Temperature",
+        icon: iconSeaTemperature,
+        handler: () => handleClickTopicCard("Sea Temperature"),
+      },
+      {
+        title: "Moorings",
+        icon: iconMoorings,
+        handler: () => handleClickTopicCard("Moorings"),
+      },
+      {
+        title: "Argo Floats",
+        icon: iconArgoFloats,
+        handler: () => handleClickTopicCard("Argo Floats"),
+      },
+      {
+        title: "Gliders",
+        icon: iconGliders,
+        handler: () => handleClickTopicCard("Gliders"),
+      },
+      {
+        title: "Satellite",
+        icon: iconSatellite,
+        handler: () => handleClickTopicCard("Satellite"),
+      },
+      {
+        title: "Waves",
+        icon: iconWaves,
+        handler: () => handleClickTopicCard("Waves"),
+      },
+      {
+        title: "Vessels",
+        icon: iconVessels,
+        handler: () => handleClickTopicCard("Vessels"),
+      },
+      {
+        title: "Animal Tracking",
+        icon: iconAnimalTracking,
+        handler: () => handleClickTopicCard("Animal Tracking"),
+      },
+      {
+        title: "Tutorials",
+        icon: iconTutorials,
+        handler: () => handleClickTopicCard("Tutorials"),
+      },
+      {
+        title: "Currents",
+        icon: iconCurrents,
+        handler: () => handleClickTopicCard("Currents"),
+      },
+      {
+        title: "Water Quality",
+        icon: iconWaterQuality,
+        handler: () => handleClickTopicCard("Water Quality"),
+      },
+      {
+        title: "Ocean Biota",
+        icon: iconOceanBiota,
+        handler: () => handleClickTopicCard("Ocean Biota"),
+      },
+      {
+        title: "Molecular",
+        icon: iconMolecular,
+        handler: () => handleClickTopicCard("Molecular"),
+      },
+      {
+        title: "Weather & Climate",
+        icon: iconWeatherClimate,
+        handler: () => handleClickTopicCard("Weather & Climate"),
+      },
+      {
+        title: "Acidification",
+        icon: iconAcidification,
+        handler: () => handleClickTopicCard("Acidification"),
+      },
+      {
+        title: "Ocean Chemistry",
+        icon: iconOceanChemistry,
+        handler: () => handleClickTopicCard("Ocean Chemistry"),
+      },
+      {
+        title: "Tides",
+        icon: iconTide,
+        handler: () => handleClickTopicCard("Tides"),
+      },
+      {
+        title: "Fisheries",
+        icon: iconFisheries,
+        handler: () => handleClickTopicCard("Fisheries"),
+      },
+      {
+        title: "Reef",
+        icon: iconReef,
+        handler: () => handleClickTopicCard("National Reef Monitoring Network"),
+      },
+      {
+        title: "Industry",
+        icon: iconIndustry,
+        handler: () => handleClickTopicCard("Industry"),
+      },
+      {
+        title: "Gridded Datasets",
+        icon: iconGriddedDatasets,
+        handler: () => handleClickTopicCard("Gridded Datasets"),
+      },
+      {
+        title: "Ocean Physics",
+        icon: iconOceanPhysics,
+        handler: () => handleClickTopicCard("Ocean Physics"),
+      },
+      {
+        title: "Underwater Vehicles",
+        icon: iconUnderwaterVehicles,
+        handler: () => handleClickTopicCard("Underwater Vehicles"),
+      },
+      {
+        title: "Plankton",
+        icon: iconPlankton,
+        handler: () => handleClickTopicCard("Plankton"),
+      },
+      {
+        title: "Ocean Color",
+        icon: iconOceanColor,
+        handler: () => handleClickTopicCard("Ocean Color"),
+      },
+      {
+        title: "Benthic",
+        icon: iconBenthic,
+        handler: () => handleClickTopicCard("Benthic"),
+      },
+      {
+        title: "Time Series Datasets",
+        icon: iconTimeSeriesDatasets,
+        handler: () => handleClickTopicCard("Time Series Datasets"),
+      },
+    ],
+    [dispatch, handleClickTopicCard, redirectSearch]
+  );
+
   const {
     showAllTopics,
     setShowAllTopics,
@@ -64,24 +268,6 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       setIsRightDisabled(panelRight - tolerance <= containerRight);
     }
   }, []);
-
-  // This is a simple click topic card function that with update search input text and clear all the filters
-  // Can be change to a function-switcher if any other functions are designed in the future
-  const handleClickTopicCard = useCallback(
-    (value: string) => {
-      // Clear the component states
-      dispatch(clearComponentParam());
-      // Then update search text with the selected topic value
-      dispatch(updateSearchText(value));
-      // Track topics panel button click
-      trackCustomEvent(AnalyticsEvent.SEARCH_TOPIC_CLICK, {
-        search_topic: value,
-      });
-
-      redirectSearch("TopicsPanel");
-    },
-    [dispatch, redirectSearch]
-  );
 
   const handleClickAllTopicsCard = useCallback(() => {
     setShowAllTopics((prev) => !prev);
@@ -124,18 +310,18 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
             disabled={isLeftDisabled}
             sx={{
               visibility: isLeftDisabled ? "hidden" : "visible",
-              bgcolor: "#FFF",
+              backgroundColor: "#FFF",
               borderRadius: "50%",
               height: "32px",
               width: "32px",
               "&:hover": {
-                bgcolor: "#FFF",
+                backgroundColor: "#FFF",
               },
               "&:focus": {
-                bgcolor: "#FFF",
+                backgroundColor: "#FFF",
               },
               "&:active": {
-                bgcolor: "#FFF",
+                backgroundColor: "#FFF",
               },
             }}
           >

@@ -7,20 +7,15 @@ import { portalTheme } from "../../../../styles";
 export interface TopicCardType {
   title: string;
   icon: string | ComponentType<SVGProps<SVGSVGElement>>;
-  searchKey?: string;
+  handler?: () => void;
 }
 
 interface TopicCardProps {
   cardData: TopicCardType;
-  handleClickTopicCard: (value: string) => void;
 }
 
-const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
+const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
-
-  const handleClick = (value: string) => {
-    handleClickTopicCard(value);
-  };
 
   return (
     <Box
@@ -33,7 +28,7 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
       sx={{
         cursor: "pointer",
       }}
-      onClick={() => handleClick(cardData.searchKey || cardData.title)}
+      onClick={cardData.handler}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -41,7 +36,6 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
         sx={{
           width: TOPICS_CARD_ICON_BOX_SIZE,
           height: TOPICS_CARD_ICON_BOX_SIZE,
-          padding: padding.medium,
           borderRadius: borderRadius.small,
           boxShadow: shadow.bottom,
         }}
@@ -51,6 +45,7 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
             src={cardData.icon}
             alt={cardData.icon}
             style={{
+              padding: padding.medium,
               objectFit: "contain",
               width: "100%",
               height: "100%",
@@ -59,8 +54,6 @@ const TopicCard: FC<TopicCardProps> = ({ cardData, handleClickTopicCard }) => {
           />
         ) : (
           createElement(cardData.icon, {
-            width: "100%",
-            height: "100%",
             style: {
               transform: isHovered ? "scale(1.05)" : "none",
             },

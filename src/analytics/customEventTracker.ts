@@ -7,5 +7,5 @@ export function trackCustomEvent(
   eventName: AnalyticsEvent,
   eventParameters?: Gtag.CustomParams
 ) {
-  window.gtag?.("event", eventName, eventParameters);
+  setTimeout(() => window.gtag?.("event", eventName, eventParameters), 0);
 }

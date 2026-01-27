@@ -7,11 +7,12 @@ import {
 import { bboxPolygon } from "@turf/turf";
 import { MapDefaultConfig } from "../../../map/mapbox/constants";
 import { decodeParam } from "../../../../utils/UrlUtils";
+import { SearchKeys } from "../../../search/constants";
 
 describe("Component Reducer Function Test", () => {
   it("Verify formatToUrlParam", () => {
     const sample1: ParameterState = {
-      datasetGroup: "imos",
+      datasetGroup: SearchKeys.IMOS,
       dateTimeFilterRange: {},
       searchText: "",
     };
@@ -20,7 +21,7 @@ describe("Component Reducer Function Test", () => {
     expect(answer1).toEqual("datasetGroup=imos");
 
     const sample2: ParameterState = {
-      datasetGroup: "imos",
+      datasetGroup: SearchKeys.IMOS,
       dateTimeFilterRange: {},
       searchText: "This is test",
     };
@@ -29,7 +30,7 @@ describe("Component Reducer Function Test", () => {
     expect(answer2).toEqual("datasetGroup=imos&searchText=This%20is%20test");
 
     const sample3: ParameterState = {
-      datasetGroup: "imos",
+      datasetGroup: SearchKeys.IMOS,
       dateTimeFilterRange: {
         start: 12345,
       },
@@ -42,7 +43,7 @@ describe("Component Reducer Function Test", () => {
     );
 
     const sample4: ParameterState = {
-      datasetGroup: "imos",
+      datasetGroup: SearchKeys.IMOS,
       dateTimeFilterRange: {
         start: 12345,
         end: 45697,
@@ -66,7 +67,7 @@ describe("Component Reducer Function Test", () => {
     );
 
     const sample5: ParameterState = {
-      datasetGroup: "imos",
+      datasetGroup: SearchKeys.IMOS,
       dateTimeFilterRange: {
         start: 12345,
         end: 45697,
@@ -93,7 +94,7 @@ describe("Component Reducer Function Test", () => {
 
   it("Verify unFlattenToParameterState", () => {
     const sample1: ParameterState = {
-      datasetGroup: "imos",
+      datasetGroup: SearchKeys.IMOS,
       hasCOData: false,
       dateTimeFilterRange: {},
       searchText: "",
@@ -104,9 +105,9 @@ describe("Component Reducer Function Test", () => {
     const objAnswer1: ParameterState = unFlattenToParameterState(answer1);
     expect(objAnswer1).toEqual(sample1);
 
-    // Only label get export, other fields in category are volatile.
+    // Only label get export, other fields in the category are volatile.
     const sample4: ParameterState = {
-      datasetGroup: "imos",
+      datasetGroup: SearchKeys.IMOS,
       hasCOData: false,
       dateTimeFilterRange: {
         start: 12345,
@@ -129,7 +130,7 @@ describe("Component Reducer Function Test", () => {
     expect(objAnswer4).toEqual(sample4);
 
     const sample5: ParameterState = {
-      datasetGroup: "imos",
+      datasetGroup: SearchKeys.IMOS,
       hasCOData: false,
       dateTimeFilterRange: {
         start: 12345,
