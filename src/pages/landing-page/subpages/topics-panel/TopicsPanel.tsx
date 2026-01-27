@@ -8,12 +8,7 @@ import useRedirectSearch from "../../../../hooks/useRedirectSearch";
 import useTopicsPanelSize from "../../../../hooks/useTopicsPanelSize";
 import { useDebounce } from "../../../../hooks/useDebounce";
 import { gap } from "../../../../styles/constants";
-import {
-  TOPICS_PANEL_GAP,
-  SCROLL_BUTTON_SIZE,
-  ALL_TOPICS_CARD,
-  LESS_TOPICS_CARD,
-} from "./constants";
+import { TOPICS_PANEL_GAP, SCROLL_BUTTON_SIZE } from "./constants";
 import TopicCard, { TopicCardType } from "./TopicCard";
 import {
   clearComponentParam,
@@ -50,6 +45,8 @@ import iconOceanColor from "@/assets/topics-panel-icons/icon_ocean_color.png";
 import iconBenthic from "@/assets/topics-panel-icons/icon_benthic.png";
 import iconTimeSeriesDatasets from "@/assets/topics-panel-icons/icon_time_series_datasets.png";
 import iconReef from "@/assets/topics-panel-icons/icon_reef.png";
+import iconAllTopics from "@/assets/topics-panel-icons/icon_all_topics.png";
+import iconLessTopics from "@/assets/topics-panel-icons/icon_less_topics.png";
 import { IconImos } from "../../../../assets/topics-panel-icons/icon_imos";
 import { SearchKeys } from "../../../../components/search/constants";
 
@@ -59,7 +56,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
   // This is a simple click topic card function that with updates search input text and clear all the filters
-  // Can be change to a function-switcher if any other functions are designed in the future
+  // Can be changed to a function-switcher if any other functions are designed in the future
   const handleClickTopicCard = useCallback(
     (value: string) => {
       // Clear the component states
@@ -249,6 +246,24 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
   const [isLeftDisabled, setIsLeftDisabled] = useState(true);
   const [isRightDisabled, setIsRightDisabled] = useState(false);
 
+  const LESS_TOPICS_CARD: TopicCardType = useMemo(
+    () => ({
+      title: "Show Less",
+      icon: iconLessTopics,
+      handler: () => setShowAllTopics((prev) => !prev),
+    }),
+    [setShowAllTopics]
+  );
+
+  const ALL_TOPICS_CARD: TopicCardType = useMemo(
+    () => ({
+      title: "Show All",
+      icon: iconAllTopics,
+      handler: () => setShowAllTopics((prev) => !prev),
+    }),
+    [setShowAllTopics]
+  );
+
   // Helper to check the position of the topics panel relative to its container
   const checkPosition = useCallback(() => {
     if (containerRef.current && topicsPanelRef.current) {
@@ -268,10 +283,6 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       setIsRightDisabled(panelRight - tolerance <= containerRight);
     }
   }, []);
-
-  const handleClickAllTopicsCard = useCallback(() => {
-    setShowAllTopics((prev) => !prev);
-  }, [setShowAllTopics]);
 
   // Handler for programmatic scrolling triggered by arrow button clicks
   const handleScroll = useCallback(
@@ -360,14 +371,9 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         >
           <TopicCard
             cardData={showAllTopics ? LESS_TOPICS_CARD : ALL_TOPICS_CARD}
-            handleClickTopicCard={handleClickAllTopicsCard}
           />
           {TOPICS_CARDS.map((item) => (
-            <TopicCard
-              key={item.title}
-              cardData={item}
-              handleClickTopicCard={handleClickTopicCard}
-            />
+            <TopicCard key={item.title} cardData={item} />
           ))}
         </Stack>
       </Box>
