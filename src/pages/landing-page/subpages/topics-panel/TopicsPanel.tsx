@@ -19,17 +19,13 @@ import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 import iconTutorials from "@/assets/topics-panel-icons/icon_tutorials.png";
-import iconSatellite from "@/assets/topics-panel-icons/icon_satellite.png";
-import iconWaves from "@/assets/topics-panel-icons/icon_waves.png";
 import iconWeatherClimate from "@/assets/topics-panel-icons/icon_weather_climate.png";
-import iconGliders from "@/assets/topics-panel-icons/icon_gliders.png";
 import iconUnderwaterVehicles from "@/assets/topics-panel-icons/icon_underwater_vehicles.png";
 import iconOceanBiota from "@/assets/topics-panel-icons/icon_ocean_biota.png";
 import iconFisheries from "@/assets/topics-panel-icons/icon_fisheries.png";
 import iconOceanChemistry from "@/assets/topics-panel-icons/icon_ocean_chemistry.png";
 import iconAnimalTracking from "@/assets/topics-panel-icons/icon_animal_tracking.png";
 import iconTide from "@/assets/topics-panel-icons/icon_tide.png";
-import iconVessels from "@/assets/topics-panel-icons/icon_vessels.png";
 import iconCurrents from "@/assets/topics-panel-icons/icon_currents.png";
 import iconWaterQuality from "@/assets/topics-panel-icons/icon_water_quality.png";
 import iconMolecular from "@/assets/topics-panel-icons/icon_molecular.png";
@@ -49,6 +45,10 @@ import { IconImos } from "../../../../assets/topics-panel-icons/icon_imos";
 import { IconSeaTemperature } from "../../../../assets/topics-panel-icons/icon_sea_temperature";
 import { IconMoorings } from "../../../../assets/topics-panel-icons/icon_moorings";
 import { IconArgoFloats } from "../../../../assets/topics-panel-icons/icon_argo_floats";
+import { IconGliders } from "../../../../assets/topics-panel-icons/icon_gliders";
+import { IconSatellite } from "../../../../assets/topics-panel-icons/icon_satellite";
+import { IconVessels } from "../../../../assets/topics-panel-icons/icon_vessels";
+import { IconWaves } from "../../../../assets/topics-panel-icons/icon_waves";
 
 interface TopicsPanelProps {}
 
@@ -108,22 +108,22 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       },
       {
         title: "Gliders",
-        icon: iconGliders,
+        icon: IconGliders,
         handler: () => handleClickTopicCard("Gliders"),
       },
       {
         title: "Satellite",
-        icon: iconSatellite,
+        icon: IconSatellite,
         handler: () => handleClickTopicCard("Satellite"),
       },
       {
         title: "Waves",
-        icon: iconWaves,
+        icon: IconWaves,
         handler: () => handleClickTopicCard("Waves"),
       },
       {
         title: "Vessels",
-        icon: iconVessels,
+        icon: IconVessels,
         handler: () => handleClickTopicCard("Vessels"),
       },
       {
