@@ -388,18 +388,18 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
             disabled={isRightDisabled}
             sx={{
               visibility: isRightDisabled ? "hidden" : "visible",
-              bgcolor: "#FFF",
+              backgroundColor: "#FFF",
               borderRadius: "50%",
               height: "32px",
               width: "32px",
               "&:hover": {
-                bgcolor: "#FFF",
+                backgroundColor: "#FFF",
               },
               "&:focus": {
-                bgcolor: "#FFF",
+                backgroundColor: "#FFF",
               },
               "&:active": {
-                bgcolor: "#FFF",
+                backgroundColor: "#FFF",
               },
             }}
           >

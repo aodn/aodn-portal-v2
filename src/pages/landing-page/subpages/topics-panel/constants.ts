@@ -10,4 +10,4 @@ export const TOPICS_PANEL_COLS_TABLET = 6;
 export const TOPICS_PANEL_COLS_MOBILE = 3;
 
 export const TOPICS_CARD_ICON_BOX_SIZE = 88;
-export const TOPICS_CARD_HEIGHT = 120;
+export const TOPICS_CARD_HEIGHT = 130;
