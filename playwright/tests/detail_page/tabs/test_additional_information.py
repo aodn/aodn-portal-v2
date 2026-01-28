@@ -69,7 +69,9 @@ def test_additional_information_sections_in_desktop(
     """
     Multiple string found, this is because different tab all in DOM just hidden
     """
-    expect(additional_info.metadata_contact_title.first).to_have_css("visibility", "visible", timeout=5000)
+    expect(additional_info.metadata_contact_title.first).to_have_css(
+        'visibility', 'visible', timeout=5000
+    )
     expect(additional_info.metadata_contact_title.first).to_have_text(
         metadata_contact
     )
@@ -144,7 +146,9 @@ def test_additional_information_sections_in_mobile(
     """
     Multiple string found, this is because different tab all in DOM just hidden
     """
-    expect(additional_info.metadata_contact_title.first).to_have_css("visibility", "visible", timeout=5000)
+    expect(additional_info.metadata_contact_title.first).to_have_css(
+        'visibility', 'visible', timeout=5000
+    )
     expect(additional_info.metadata_contact_title.first).to_have_text(
         metadata_contact
     )
