@@ -43,7 +43,6 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
           display="flex"
           flexDirection="row"
           flexWrap="wrap"
-          justifyContent="space-between"
           alignItems="center"
         >
           <Typography
@@ -52,13 +51,6 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
             fontWeight={fontWeight.extraLight}
           >
             {news.subheading}
-          </Typography>
-          <Typography
-            color="#fff"
-            fontSize={fontSize.newsInfo}
-            fontWeight={fontWeight.extraLight}
-          >
-            {news.date}
           </Typography>
         </Box>
         <Typography
