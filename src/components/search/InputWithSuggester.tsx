@@ -331,6 +331,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
                 "&::placeholder": {
                   ...portalTheme.typography.title1Medium,
                   color: portalTheme.palette.text2,
+                  opacity: 1,
                 },
               },
             }}
