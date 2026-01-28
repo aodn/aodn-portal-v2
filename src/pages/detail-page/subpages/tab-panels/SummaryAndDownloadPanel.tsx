@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -26,7 +27,10 @@ import {
   DownloadServiceType,
   SubsettingType,
 } from "../../context/DownloadDefinitions";
-import { dateDefault } from "../../../../components/common/constants";
+import {
+  dateDefault,
+  detailPageDefault,
+} from "../../../../components/common/constants";
 import { FeatureCollection, Point } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
@@ -57,7 +61,6 @@ const mapContainerId = "map-detail-container-id";
 interface SummaryAndDownloadPanelProps {
   mapFocusArea?: LngLatBounds;
   onMapMoveEnd?: (evt: MapEvent) => void;
-  isTabActive?: boolean;
 }
 
 const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
@@ -174,7 +177,6 @@ export const buildMapLayerConfig = (
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   mapFocusArea,
   onMapMoveEnd,
-  isTabActive = true,
 }) => {
   const {
     collection,
@@ -206,6 +208,12 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
+  const location = useLocation();
+
+  const isTabActive = useMemo(() => {
+    const params: URLSearchParams = new URLSearchParams(location.search);
+    return params.get("tab") === detailPageDefault.SUMMARY;
+  }, [location.search]);
 
   const [
     abstract,

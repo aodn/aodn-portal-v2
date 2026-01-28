@@ -38,15 +38,19 @@ const FitToSpatialExtentsLayer: FC<FitToSpatialExtentsLayerProps> = ({
         map.getBounds()?.getEast() !== bbox?.getEast() ||
         map.getBounds()?.getNorth() !== bbox?.getNorth()
       ) {
-        console.log(
-          `[${map?.getContainer().id}] start to fit to bound, zoom level ===`,
-          map.getZoom()
-        );
-        // This make the event fired earlier than IDLE which makes the map move to place
-        // during rendering
-        map.once(MapEventEnum.RENDER, () => {
-          fitToBound(map, b[0]);
-          hasFittedRef.current = true;
+        hasFittedRef.current = true;
+
+        // Use requestAnimationFrame to ensure the container has been laid out
+        // and has correct dimensions before fitting bounds.
+        // This is important when switching tabs - the container might not have
+        // its final dimensions immediately when shouldActive becomes true.
+        requestAnimationFrame(() => {
+          // Trigger resize to ensure map knows the correct container dimensions
+          map.resize();
+
+          map.once(MapEventEnum.RENDER, () => {
+            fitToBound(map, b[0]);
+          });
         });
       }
     }
