@@ -17,7 +17,10 @@ const FitToSpatialExtentsLayer: FC<FitToSpatialExtentsLayerProps> = ({
   bbox,
 }: FitToSpatialExtentsLayerProps) => {
   const { map } = useContext(MapContext);
-
+  console.log(
+    `[${map?.getContainer().id}] fit to spatial extents layer zoom level ===`,
+    map?.getZoom()
+  );
   useEffect(() => {
     const b = bbox
       ? [[bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]]
@@ -30,10 +33,16 @@ const FitToSpatialExtentsLayer: FC<FitToSpatialExtentsLayerProps> = ({
         map.getBounds()?.getEast() !== bbox?.getEast() ||
         map.getBounds()?.getNorth() !== bbox?.getNorth()
       ) {
+        console.log(
+          `[${map?.getContainer().id}] start to fit to bound, zoom level ===`,
+          map.getZoom()
+        );
         // This make the event fired earlier than IDLE which makes the map move to place
         // during rendering
         map.once(MapEventEnum.RENDER, () => fitToBound(map, b[0]));
       }
+    } else {
+      console.log("no need to fit ===");
     }
   }, [bbox, collection, map]);
   return null;

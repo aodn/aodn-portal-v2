@@ -21,7 +21,7 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
   onSpatialCoverageLayerClick,
 }) => {
   const { collection } = useDetailPageContext();
-  const mapContainerId = "map-spatial-extent-container-id";
+  const mapContainerId = "map-spatial-coverage-container-id";
 
   const onMouseEnterHandler = useCallback((event: MapMouseEvent) => {
     event.target.getCanvas().style.cursor = "pointer";
