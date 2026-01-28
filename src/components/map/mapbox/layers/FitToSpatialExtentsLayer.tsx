@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from "react";
+import { FC, useContext, useEffect, useRef } from "react";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import MapContext from "../MapContext";
 import { fitToBound } from "../../../../utils/MapUtils";
@@ -8,6 +8,9 @@ import { LngLatBounds } from "mapbox-gl";
 interface FitToSpatialExtentsLayerProps {
   collection: OGCCollection;
   bbox?: LngLatBounds | undefined;
+  // This prop is to control whether the fitting should be active or not
+  // It is a dependency to the useEffect to re-evaluate when it's value changes (e.g., when tab becomes active from inactive)
+  shouldActive?: boolean;
 }
 /*
  * This layer is just to use to fit the map to the spatial extents area of the collection
@@ -15,17 +18,19 @@ interface FitToSpatialExtentsLayerProps {
 const FitToSpatialExtentsLayer: FC<FitToSpatialExtentsLayerProps> = ({
   collection,
   bbox,
+  shouldActive = true,
 }: FitToSpatialExtentsLayerProps) => {
   const { map } = useContext(MapContext);
-  console.log(
-    `[${map?.getContainer().id}] fit to spatial extents layer zoom level ===`,
-    map?.getZoom()
-  );
+  // Ref to track if we have already fitted the map
+  // We only want to fit once
+  const hasFittedRef = useRef(false);
+
   useEffect(() => {
     const b = bbox
       ? [[bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]]
       : collection.getExtent()?.bbox;
-    if (map && b && b.length > 0) {
+
+    if (map && b && b.length > 0 && shouldActive && !hasFittedRef.current) {
       // No need to fit if already fit
       if (
         map.getBounds()?.getWest() !== bbox?.getWest() ||
@@ -39,12 +44,14 @@ const FitToSpatialExtentsLayer: FC<FitToSpatialExtentsLayerProps> = ({
         );
         // This make the event fired earlier than IDLE which makes the map move to place
         // during rendering
-        map.once(MapEventEnum.RENDER, () => fitToBound(map, b[0]));
+        map.once(MapEventEnum.RENDER, () => {
+          fitToBound(map, b[0]);
+          hasFittedRef.current = true;
+        });
       }
-    } else {
-      console.log("no need to fit ===");
     }
-  }, [bbox, collection, map]);
+  }, [bbox, collection, map, shouldActive]);
+
   return null;
 };
 

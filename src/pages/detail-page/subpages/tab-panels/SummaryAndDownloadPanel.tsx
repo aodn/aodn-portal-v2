@@ -57,6 +57,7 @@ const mapContainerId = "map-detail-container-id";
 interface SummaryAndDownloadPanelProps {
   mapFocusArea?: LngLatBounds;
   onMapMoveEnd?: (evt: MapEvent) => void;
+  isTabActive?: boolean;
 }
 
 const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
@@ -173,6 +174,7 @@ export const buildMapLayerConfig = (
 const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   mapFocusArea,
   onMapMoveEnd,
+  isTabActive = true,
 }) => {
   const {
     collection,
@@ -505,6 +507,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   <FitToSpatialExtentsLayer
                     collection={collection}
                     bbox={mapFocusArea}
+                    shouldActive={isTabActive}
                   />
                   {createStaticLayers(staticLayer)}
                   {

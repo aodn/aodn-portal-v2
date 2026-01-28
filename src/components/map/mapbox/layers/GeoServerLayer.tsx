@@ -214,10 +214,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   setDiscreteTimeSliderValues,
 }: GeoServerLayerProps) => {
   const { map, setLoading: setMapLoading } = useContext(MapContext);
-  console.log(
-    `[${map?.getContainer().id}] geoserver layer zoom level ===`,
-    map?.getZoom()
-  );
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const dispatch = useAppDispatch();
   const layerSearchRef = useRef<{

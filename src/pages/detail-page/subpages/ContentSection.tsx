@@ -56,7 +56,8 @@ const associatedRecordsPanelTab: Tab = {
 
 const summaryAndDownloadPanelTab = (
   mapFocusArea: LngLatBounds | undefined,
-  onMapMoveEnd?: (evt: MapEvent) => void
+  onMapMoveEnd?: (evt: MapEvent) => void,
+  isActive?: boolean
 ): Tab => {
   return {
     label: "Summary",
@@ -65,6 +66,7 @@ const summaryAndDownloadPanelTab = (
       <SummaryAndDownloadPanel
         mapFocusArea={mapFocusArea}
         onMapMoveEnd={onMapMoveEnd}
+        isTabActive={isActive}
       />
     ),
   };
@@ -76,18 +78,6 @@ const ContentSection: FC<ContentSectionProps> = ({
 }) => {
   const { uuid } = useParams();
   const tabNavigation = useTabNavigation();
-
-  const TABS: Tab[] = useMemo(
-    () => [
-      summaryAndDownloadPanelTab(mapFocusArea, onMapMoveEnd),
-      dataAccessPanelTab,
-      citationPanelTab,
-      additionalInfoPanelTab,
-      associatedRecordsPanelTab,
-    ],
-    [mapFocusArea, onMapMoveEnd]
-  );
-
   const location = useLocation();
   const { isCollectionNotFound } = useDetailPageContext();
 
@@ -96,7 +86,29 @@ const ContentSection: FC<ContentSectionProps> = ({
     [location.search]
   );
 
-  const [tabValue, setTabValue] = useState<number>(findTabIndex(params, TABS));
+  // Initialize tabValue state early so it can be used in TABS memoization
+  const [tabValue, setTabValue] = useState<number>(() => {
+    // We need to create a temporary TABS array to find the initial index
+    const tempTabs = [
+      { value: detailPageDefault.SUMMARY },
+      { value: detailPageDefault.DATA_ACCESS },
+      { value: detailPageDefault.CITATION },
+      { value: detailPageDefault.ADDITIONAL_INFO },
+      { value: detailPageDefault.ASSOCIATED_RECORDS },
+    ];
+    return findTabIndex(params, tempTabs as Tab[]);
+  });
+
+  const TABS: Tab[] = useMemo(
+    () => [
+      summaryAndDownloadPanelTab(mapFocusArea, onMapMoveEnd, tabValue === 0),
+      dataAccessPanelTab,
+      citationPanelTab,
+      additionalInfoPanelTab,
+      associatedRecordsPanelTab,
+    ],
+    [mapFocusArea, onMapMoveEnd, tabValue]
+  );
 
   const handleTabChange = useCallback(
     (newValue: number) => {
