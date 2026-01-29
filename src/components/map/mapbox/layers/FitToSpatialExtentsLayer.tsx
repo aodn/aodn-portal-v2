@@ -2,7 +2,6 @@ import { FC, useContext, useEffect, useRef } from "react";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import MapContext from "../MapContext";
 import { fitToBound } from "../../../../utils/MapUtils";
-import { MapEventEnum } from "../constants";
 import { LngLatBounds } from "mapbox-gl";
 
 interface FitToSpatialExtentsLayerProps {
@@ -21,16 +20,28 @@ const FitToSpatialExtentsLayer: FC<FitToSpatialExtentsLayerProps> = ({
   shouldActive = true,
 }: FitToSpatialExtentsLayerProps) => {
   const { map } = useContext(MapContext);
-  // Ref to track if we have already fitted the map
-  // We only want to fit once
-  const hasFittedRef = useRef(false);
+  // Ref to track if we have already done the initial fit (based on collection extent)
+  // We only want the initial fit to happen once, but user-triggered fits (via bbox prop) should always work
+  const hasInitialFittedRef = useRef(false);
+  // Track the last bbox we fitted to, so we can detect when it changes
+  const lastBboxRef = useRef<LngLatBounds | undefined>(undefined);
 
   useEffect(() => {
+    if (!map || !shouldActive) return;
+
+    // Check if this is a new bbox from user interaction
+    const isNewBbox = bbox !== undefined && bbox !== lastBboxRef.current;
+
     const b = bbox
       ? [[bbox.getWest(), bbox.getSouth(), bbox.getEast(), bbox.getNorth()]]
       : collection.getExtent()?.bbox;
 
-    if (map && b && b.length > 0 && shouldActive && !hasFittedRef.current) {
+    if (!b || b.length === 0) return;
+
+    // Fit to bounds if:
+    // 1. We have a new bbox from user interaction (clicking spatial coverage map)
+    // 2. OR we haven't done the initial fit yet (first time loading without bbox)
+    if (isNewBbox || !hasInitialFittedRef.current) {
       // No need to fit if already fit
       if (
         map.getBounds()?.getWest() !== bbox?.getWest() ||
@@ -38,7 +49,9 @@ const FitToSpatialExtentsLayer: FC<FitToSpatialExtentsLayerProps> = ({
         map.getBounds()?.getEast() !== bbox?.getEast() ||
         map.getBounds()?.getNorth() !== bbox?.getNorth()
       ) {
-        hasFittedRef.current = true;
+        // Update refs
+        lastBboxRef.current = bbox;
+        hasInitialFittedRef.current = true;
 
         // Use requestAnimationFrame to ensure the container has been laid out
         // and has correct dimensions before fitting bounds.
@@ -47,10 +60,7 @@ const FitToSpatialExtentsLayer: FC<FitToSpatialExtentsLayerProps> = ({
         requestAnimationFrame(() => {
           // Trigger resize to ensure map knows the correct container dimensions
           map.resize();
-
-          map.once(MapEventEnum.RENDER, () => {
-            fitToBound(map, b[0]);
-          });
+          fitToBound(map, b[0]);
         });
       }
     }
