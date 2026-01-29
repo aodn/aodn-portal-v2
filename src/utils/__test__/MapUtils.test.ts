@@ -75,7 +75,8 @@ describe("MapUtils", () => {
 
   it("adjusts east > 180 by subtracting 360 for Pacific bbox", () => {
     const map = {
-      cameraForBounds: vi.fn(),
+      resize: vi.fn(),
+      cameraForBounds: vi.fn().mockReturnValue({ center: [0, 0], zoom: 5 }),
       flyTo: vi.fn(),
     } as unknown as MapboxMap;
 
@@ -94,7 +95,8 @@ describe("MapUtils", () => {
 
   it("does not adjust when east <= 180", () => {
     const map = {
-      cameraForBounds: vi.fn(),
+      resize: vi.fn(),
+      cameraForBounds: vi.fn().mockReturnValue({ center: [0, 0], zoom: 5 }),
       flyTo: vi.fn(),
     } as unknown as MapboxMap;
 
