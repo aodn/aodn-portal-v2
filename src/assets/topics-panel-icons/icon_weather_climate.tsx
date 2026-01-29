@@ -1,31 +1,33 @@
 import { ComponentType, SVGProps } from "react";
+import { portalTheme } from "../../styles";
 
-export const IconWeatherClimate: ComponentType<SVGProps<SVGSVGElement>> = (
-  props: SVGProps<SVGSVGElement>
-) => (
+export const IconWeatherClimate: ComponentType<SVGProps<SVGSVGElement>> = ({
+  color = portalTheme.palette.grey700,
+  width = 56,
+  height = 56,
+}: SVGProps<SVGSVGElement>) => (
   <svg
-    width="56"
-    height="56"
+    width={width}
+    height={height}
     viewBox="0 0 56 56"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    {...props}
   >
     <path
       d="M50.2956 16.4867C59.6256 22.4767 56.2056 37.1767 45.1656 38.3467L9.78574 38.2967C-3.60426 35.6267 -3.12436 16.4967 10.4356 14.6067C10.8256 13.4567 11.0257 12.4567 11.6257 11.3767C14.3657 6.48673 20.7757 5.73672 25.0057 9.18672C26.5257 5.03672 29.8457 1.46672 34.2457 0.406724C44.2457 -1.99328 52.6156 6.59672 50.2956 16.4767V16.4867Z"
-      fill="black"
+      fill={color}
     />
     <path
       d="M27.777 45.8136C28.147 45.7536 29.747 48.1536 29.997 48.5936C30.927 50.2536 31.707 52.3836 30.847 54.2236C29.757 56.5436 26.097 56.6036 24.877 54.3236C23.437 51.6236 25.907 47.7436 27.777 45.8136Z"
-      fill="black"
+      fill={color}
     />
     <path
       d="M40.2676 40.4688C42.0976 42.4688 44.8176 46.6588 43.0076 49.3088C41.6676 51.2688 38.4576 51.1688 37.2576 49.1188C35.7476 46.5488 38.3376 42.2587 40.2676 40.4688Z"
-      fill="black"
+      fill={color}
     />
     <path
       d="M15.5443 40.4688C17.5043 42.4388 20.2344 46.6788 18.3444 49.3688C16.9444 51.3488 13.8144 51.0987 12.6244 49.0387C11.1544 46.4887 13.7543 42.3288 15.5443 40.4788V40.4688Z"
-      fill="black"
+      fill={color}
     />
   </svg>
 );
