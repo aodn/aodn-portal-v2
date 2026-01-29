@@ -53,8 +53,9 @@ export const fitToBound = (
   }
 
   try {
-    const boundsArray = bbox as number[];
+    map.resize();
 
+    const boundsArray = bbox as number[];
     if (boundsArray && boundsArray.length === BBOX_COORDINATES_COUNT) {
       const [west, south, east, north] = boundsArray;
       const bounds: LngLatBoundsLike = [
