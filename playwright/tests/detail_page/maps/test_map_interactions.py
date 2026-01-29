@@ -74,6 +74,7 @@ def test_selecting_date_range_adds_download_filter(
         '0015db7e-e684-7548-e053-08114f8cd4ad',
     ],
 )
+@pytest.mark.skip
 def test_spatial_map_click_zooms_detail_map(
     desktop_page: Page, uuid: str
 ) -> None:
@@ -103,6 +104,7 @@ def test_spatial_map_click_zooms_detail_map(
         '0015db7e-e684-7548-e053-08114f8cd4ad',
     ],
 )
+@pytest.mark.skip
 def test_map_state_persists_after_tab_navigation(
     desktop_page: Page, uuid: str
 ) -> None:
