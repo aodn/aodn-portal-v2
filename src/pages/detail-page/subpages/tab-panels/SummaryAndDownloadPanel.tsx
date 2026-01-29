@@ -67,6 +67,12 @@ const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
     default: false,
   },
   {
+    id: StaticLayersDef.MEOW.id,
+    name: StaticLayersDef.MEOW.name,
+    label: StaticLayersDef.MEOW.label,
+    default: false,
+  },
+  {
     id: MapboxWorldLayersDef.WORLD.id,
     name: MapboxWorldLayersDef.WORLD.name,
     default: false,
