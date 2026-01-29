@@ -1,7 +1,14 @@
-export const BboxSelectionIcon = () => (
+import { portalTheme } from "../../../styles";
+import { SVGProps } from "react";
+
+export const BboxSelectionIcon = ({
+  color = portalTheme.palette.grey700,
+  width = 40,
+  height = 40,
+}: SVGProps<SVGSVGElement>) => (
   <svg
-    width="40"
-    height="40"
+    width={width}
+    height={height}
     viewBox="0 0 40 40"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -10,41 +17,41 @@ export const BboxSelectionIcon = () => (
       d="M2 2.07V2H38V38H37.93V35.33H35.97V36.03H35.27V38H33.94V35.33H30.01V38H27.9V35.33H23.97V38H21.93V35.33H18V38H15.96V35.33H12.03V38H9.92V35.33H5.99V38H4.66V36.03H3.96V35.33H2V34H4.67V30.07H2V27.96H4.67V24.03H2V21.99H4.67V18.06H2V16.02H4.67V12.09H2V9.98H4.67V6.05H2V4.72H3.97V4.02H4.67V2.06H2V2.07ZM9.93 2.07H6V4.74H9.93V2.07ZM15.96 2.07H12.03V4.74H15.96V2.07ZM21.93 2.07H18V4.74H21.93V2.07ZM27.89 2.07H23.96V4.74H27.89V2.07ZM33.93 2.07H30V4.74H33.93V2.07ZM37.93 2.07H35.26V4.03H35.96V4.73H37.92V2.06L37.93 2.07ZM37.93 6.07H35.26V10H37.93V6.07ZM37.93 12.11H35.26V16.04H37.93V12.11ZM37.93 18.07H35.26V22H37.93V18.07ZM37.93 24.04H35.26V27.97H37.93V24.04ZM37.93 30.07H35.26V34H37.93V30.07Z"
       fill="#B3B3B3"
     />
-    <path d="M4.67 6.07031H2V10.0003H4.67V6.07031Z" fill="black" />
-    <path d="M4.67 12.1094H2V16.0394H4.67V12.1094Z" fill="black" />
-    <path d="M4.67 18.0703H2V22.0003H4.67V18.0703Z" fill="black" />
-    <path d="M4.67 24.0391H2V27.9691H4.67V24.0391Z" fill="black" />
-    <path d="M4.67 30.0703H2V34.0003H4.67V30.0703Z" fill="black" />
-    <path d="M9.93 35.3281H6V37.9981H9.93V35.3281Z" fill="black" />
-    <path d="M15.9691 35.3281H12.0391V37.9981H15.9691V35.3281Z" fill="black" />
-    <path d="M21.93 35.3281H18V37.9981H21.93V35.3281Z" fill="black" />
-    <path d="M27.8909 35.3281H23.9609V37.9981H27.8909V35.3281Z" fill="black" />
-    <path d="M33.93 35.3281H30V37.9981H33.93V35.3281Z" fill="black" />
+    <path d="M4.67 6.07031H2V10.0003H4.67V6.07031Z" fill={color} />
+    <path d="M4.67 12.1094H2V16.0394H4.67V12.1094Z" fill={color} />
+    <path d="M4.67 18.0703H2V22.0003H4.67V18.0703Z" fill={color} />
+    <path d="M4.67 24.0391H2V27.9691H4.67V24.0391Z" fill={color} />
+    <path d="M4.67 30.0703H2V34.0003H4.67V30.0703Z" fill={color} />
+    <path d="M9.93 35.3281H6V37.9981H9.93V35.3281Z" fill={color} />
+    <path d="M15.9691 35.3281H12.0391V37.9981H15.9691V35.3281Z" fill={color} />
+    <path d="M21.93 35.3281H18V37.9981H21.93V35.3281Z" fill={color} />
+    <path d="M27.8909 35.3281H23.9609V37.9981H27.8909V35.3281Z" fill={color} />
+    <path d="M33.93 35.3281H30V37.9981H33.93V35.3281Z" fill={color} />
     <path
       d="M2 2.07031H4.67V4.04031L3.96 4.03031L3.97 4.74031H2V2.07031Z"
-      fill="black"
+      fill={color}
     />
     <path
       d="M2 35.3281H3.97L3.96 36.0381L4.67 36.0281V37.9981H2V35.3281Z"
-      fill="black"
+      fill={color}
     />
     <path
       d="M35.2617 37.9981V36.0281L35.9717 36.0381L35.9617 35.3281H37.9317V37.9981H35.2617Z"
-      fill="black"
+      fill={color}
     />
-    <path d="M9.93 2.07031H6V4.74031H9.93V2.07031Z" fill="black" />
-    <path d="M15.9691 2.07031H12.0391V4.74031H15.9691V2.07031Z" fill="black" />
-    <path d="M21.93 2.07031H18V4.74031H21.93V2.07031Z" fill="black" />
-    <path d="M27.8909 2.07031H23.9609V4.74031H27.8909V2.07031Z" fill="black" />
-    <path d="M33.93 2.07031H30V4.74031H33.93V2.07031Z" fill="black" />
-    <path d="M37.9317 6.07031H35.2617V10.0003H37.9317V6.07031Z" fill="black" />
-    <path d="M37.9317 12.1094H35.2617V16.0394H37.9317V12.1094Z" fill="black" />
-    <path d="M37.9317 18.0703H35.2617V22.0003H37.9317V18.0703Z" fill="black" />
-    <path d="M37.9317 24.0391H35.2617V27.9691H37.9317V24.0391Z" fill="black" />
-    <path d="M37.9317 30.0703H35.2617V34.0003H37.9317V30.0703Z" fill="black" />
+    <path d="M9.93 2.07031H6V4.74031H9.93V2.07031Z" fill={color} />
+    <path d="M15.9691 2.07031H12.0391V4.74031H15.9691V2.07031Z" fill={color} />
+    <path d="M21.93 2.07031H18V4.74031H21.93V2.07031Z" fill={color} />
+    <path d="M27.8909 2.07031H23.9609V4.74031H27.8909V2.07031Z" fill={color} />
+    <path d="M33.93 2.07031H30V4.74031H33.93V2.07031Z" fill={color} />
+    <path d="M37.9317 6.07031H35.2617V10.0003H37.9317V6.07031Z" fill={color} />
+    <path d="M37.9317 12.1094H35.2617V16.0394H37.9317V12.1094Z" fill={color} />
+    <path d="M37.9317 18.0703H35.2617V22.0003H37.9317V18.0703Z" fill={color} />
+    <path d="M37.9317 24.0391H35.2617V27.9691H37.9317V24.0391Z" fill={color} />
+    <path d="M37.9317 30.0703H35.2617V34.0003H37.9317V30.0703Z" fill={color} />
     <path
       d="M37.9317 2.07031V4.74031H35.9617L35.9717 4.03031L35.2617 4.04031V2.07031H37.9317Z"
-      fill="black"
+      fill={color}
     />
   </svg>
 );
