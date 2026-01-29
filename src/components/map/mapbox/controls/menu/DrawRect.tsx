@@ -268,7 +268,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
         onClick={handleIconClick}
         sx={switcherIconButtonSx(open)}
       >
-        <BboxSelectionIcon />
+        <BboxSelectionIcon color={open ? "white" : undefined} />
       </IconButton>
 
       <MenuTooltip

@@ -1,11 +1,11 @@
 import { portalTheme } from "../../../styles";
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { SVGProps } from "react";
 
 export const TitleChainIcon = ({
   color = portalTheme.palette.grey700,
   width = 20,
   height = 20,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     id="Layer_1"
     data-name="Layer 1"

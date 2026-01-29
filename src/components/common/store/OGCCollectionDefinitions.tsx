@@ -1,3 +1,4 @@
+import { ComponentType, SVGProps } from "react";
 import {
   Feature,
   FeatureCollection,
@@ -9,11 +10,11 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { bboxPolygon } from "@turf/turf";
 
 import * as turf from "@turf/turf";
-import wmsIcon from "../../../assets/icons/wms-icon.png";
-import wfsIcon from "../../../assets/icons/wfs-icon.png";
-import linkIcon from "../../../assets/icons/link.png";
 import dayjs from "dayjs";
 import { dateDefault } from "../constants";
+import { IconWMS } from "../../../assets/icons/wms-icon";
+import { IconWFS } from "../../../assets/icons/wfs-icon";
+import { IconLink } from "../../../assets/icons/link";
 
 // interfaces:
 export interface IKeyword {
@@ -29,7 +30,7 @@ export interface ILink {
   title: string;
   "ai:group"?: string;
   description?: string;
-  getIcon?: () => string;
+  getIcon?: () => string | ComponentType<SVGProps<SVGSVGElement>>;
 }
 
 export interface IAddress {
@@ -152,14 +153,14 @@ const getIcon = (link: ILink) => {
   if (subgroupType) {
     switch (subgroupType.toLowerCase()) {
       case DataAccessSubGroup.WMS:
-        return wmsIcon;
+        return IconWMS;
       case DataAccessSubGroup.WFS:
-        return wfsIcon;
+        return IconWFS;
       default:
-        return linkIcon;
+        return IconLink;
     }
   } else {
-    return linkIcon;
+    return IconLink;
   }
 };
 

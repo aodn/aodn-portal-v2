@@ -90,7 +90,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
         onClick={handleToggle}
         sx={switcherIconButtonSx(open)}
       >
-        <ReferenceLayerIcon />
+        <ReferenceLayerIcon color={open ? "white" : undefined} />
       </IconButton>
       <Popper
         id="reference-popper-id"

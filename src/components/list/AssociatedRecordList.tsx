@@ -7,8 +7,8 @@ import ExpandableList from "./ExpandableList";
 import CollapseItem from "./listItem/CollapseItem";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 import LinkCard from "./listItem/subitem/LinkCard";
-import linkIcon from "../../assets/icons/link.png";
 import { pageDefault } from "../common/constants";
+import { IconLink } from "../../assets/icons/link";
 
 interface AssociatedRecordListProps {
   title: string;
@@ -34,7 +34,7 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
                 title: record.title,
                 type: "",
                 description: record.abstract,
-                getIcon: () => linkIcon,
+                getIcon: () => IconLink,
               } as ILink)}
             >
               <ExpandableTextArea
