@@ -1,7 +1,14 @@
-export const SearchStyleIcon = () => (
+import { portalTheme } from "../../../styles";
+import { SVGProps } from "react";
+
+export const SearchStyleIcon = ({
+  color = portalTheme.palette.grey700,
+  width = 30,
+  height = 30,
+}: SVGProps<SVGSVGElement>) => (
   <svg
-    width="30"
-    height="30"
+    width={width}
+    height={height}
     viewBox="0 0 40 40"
     fill="#595959"
     xmlns="http://www.w3.org/2000/svg"
@@ -9,15 +16,15 @@ export const SearchStyleIcon = () => (
   >
     <path
       d="M14.2174 35.6926C21.5172 35.6926 27.4348 29.775 27.4348 22.4752C27.4348 15.1754 21.5172 9.25781 14.2174 9.25781C6.91763 9.25781 1 15.1754 1 22.4752C1 29.775 6.91763 35.6926 14.2174 35.6926Z"
-      fill="black"
+      fill={color}
     />
     <path
       d="M31.5679 39.003C33.8491 39.003 35.6984 37.1538 35.6984 34.8726C35.6984 32.5914 33.8491 30.7422 31.5679 30.7422C29.2868 30.7422 27.4375 32.5914 27.4375 34.8726C27.4375 37.1538 29.2868 39.003 31.5679 39.003Z"
-      fill="black"
+      fill={color}
     />
     <path
       d="M32.393 12.9813C35.3585 12.9813 37.7626 10.5773 37.7626 7.61176C37.7626 4.64623 35.3585 2.24219 32.393 2.24219C29.4275 2.24219 27.0234 4.64623 27.0234 7.61176C27.0234 10.5773 29.4275 12.9813 32.393 12.9813Z"
-      stroke="black"
+      stroke={color}
       strokeWidth="2.47826"
     />
   </svg>

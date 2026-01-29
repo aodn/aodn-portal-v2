@@ -117,7 +117,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
         onClick={handleToggle}
         sx={switcherIconButtonSx(open)}
       >
-        <BaseLayerIcon />
+        <BaseLayerIcon color={open ? "white" : undefined} />
       </IconButton>
       <Popper
         id="basemap-popper-id"

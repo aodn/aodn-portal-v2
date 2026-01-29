@@ -131,7 +131,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
         onClick={handleIconClick}
         sx={switcherIconButtonSx(open)}
       >
-        <TimeRangeIcon />
+        <TimeRangeIcon color={open ? "white" : undefined} />
       </IconButton>
 
       <MenuTooltip
