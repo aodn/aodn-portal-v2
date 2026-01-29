@@ -1,11 +1,11 @@
-import { FC } from "react";
+import { FC, SVGProps } from "react";
 import { IconProps } from "./types";
 
 const AIGenIcon: FC<IconProps> = ({
   width = 28,
   height = 28,
   color = "#ADADAD",
-}) => {
+}: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
