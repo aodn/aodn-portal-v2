@@ -1,22 +1,22 @@
 import { Dispatch, PropsWithChildren, SetStateAction } from "react";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { LngLatBounds, MapMouseEvent, LngLat, Map as Mapbox } from "mapbox-gl";
-import { AustraliaMarineParkLayer, StaticLayersDef } from "./StaticLayer";
+import { MarineParkLayer, StaticLayersDef } from "./StaticLayer";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 import * as turf from "@turf/turf";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 
 export interface LayerBasicType<P = GeoJsonProperties> {
-  // Tile layer should added to map
+  // Tile layer should add to map
   featureCollection?: FeatureCollection<Point, P>;
-  // Event fired when user click on the point layer
+  // Event fired when user clicks on the point layer
   onClickMapPoint?: (uuids: Array<string>) => void;
-  // dataset that user selected from result list or map
+  // dataset that user selected from the result list or map
   selectedUuids?: string[];
   tabNavigation?: TabNavigation;
   // True to make the centroid more sticky, so that centroid will stay in current
-  // location even map drag. Centroid only move when it is absolute necessary like
+  // location even map drag. Centroid only move when it is an absolute necessary like
   // outside of viewport.
   preferCurrentCentroid?: boolean;
   visible?: boolean;
@@ -27,15 +27,27 @@ export interface LayerBasicType<P = GeoJsonProperties> {
   setDrawRectSupportSupport?: Dispatch<SetStateAction<boolean>>;
   collection?: OGCCollection;
 }
-// Use to create static layer on map, you need to add menu item to select those layers,
-// refer to map section
+// Use to create a static layer on a map, you need to add a menu item to select those layers,
+// refer to a map section
 const createStaticLayers = (ids: Array<string>) => (
   <>
     {ids.map((id) => {
-      if (id === StaticLayersDef.AUSTRALIA_MARINE_PARKS.id) {
-        return <AustraliaMarineParkLayer key={"s" + id} />;
-      } else if (id === MapboxWorldLayersDef.WORLD.id) {
-        return <MapboxWorldLayer key={"mb" + MapboxWorldLayersDef.WORLD.id} />;
+      switch (id) {
+        case StaticLayersDef.AUSTRALIA_MARINE_PARKS.id: {
+          return (
+            <MarineParkLayer
+              key={"s" + id}
+              {...StaticLayersDef.AUSTRALIA_MARINE_PARKS}
+            />
+          );
+        }
+        case StaticLayersDef.MEOW.id: {
+          return <MarineParkLayer key={"s" + id} {...StaticLayersDef.MEOW} />;
+        }
+        case MapboxWorldLayersDef.WORLD.id:
+          return (
+            <MapboxWorldLayer key={"mb" + MapboxWorldLayersDef.WORLD.id} />
+          );
       }
     })}
   </>
