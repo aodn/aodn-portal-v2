@@ -1,10 +1,10 @@
-import { IconProps } from "../../../components/icon/types";
+import { ComponentType, SVGProps } from "react";
 
-export const ClearIcon = ({
+export const ClearIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "currentColor",
   width = 14,
   height = 13,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     width={width}
     height={height}

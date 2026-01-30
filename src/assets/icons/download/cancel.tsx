@@ -1,10 +1,10 @@
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { ComponentType, SVGProps } from "react";
 
-export const CancelIcon = ({
+export const CancelIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "black",
   width = 15,
   height = 15,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     width={width}
     height={height}
