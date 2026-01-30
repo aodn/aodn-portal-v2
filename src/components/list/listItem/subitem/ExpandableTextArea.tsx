@@ -72,14 +72,22 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
 
   // Check if content actually needs expansion by measuring DOM
   useEffect(() => {
-    if (contentRef.current) {
-      const element = contentRef.current;
+    const element = contentRef.current;
+    if (!element) return;
+
+    const checkExpansion = () => {
       const scrollHeight = element.scrollHeight;
       const clientHeight = element.clientHeight;
-
       // If scrollHeight > clientHeight, content is being truncated
       setNeedsExpansion(scrollHeight > clientHeight);
-    }
+    };
+
+    checkExpansion();
+
+    const resizeObserver = new ResizeObserver(checkExpansion);
+    resizeObserver.observe(element);
+
+    return () => resizeObserver.disconnect();
   }, [text, isExpanded]);
 
   return (
