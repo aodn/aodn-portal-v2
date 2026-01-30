@@ -51,7 +51,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
         onClick={() => setOpen((prev) => !prev)}
         sx={switcherIconButtonSx(open)}
       >
-        <BookmarkIcon />
+        <BookmarkIcon color={open ? "white" : undefined} />
       </IconButton>
       <Popper
         id="bookmark-list"

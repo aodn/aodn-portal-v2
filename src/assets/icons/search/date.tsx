@@ -1,10 +1,10 @@
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { ComponentType, SVGProps } from "react";
 
-export const DateRangeIcon = ({
+export const DateRangeIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "#3B6E8F",
   width = 26,
   height = 26,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     id="Layer_1"
     data-name="Layer 1"

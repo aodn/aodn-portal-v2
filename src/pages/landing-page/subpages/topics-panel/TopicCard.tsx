@@ -38,6 +38,9 @@ const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
           height: TOPICS_CARD_ICON_BOX_SIZE,
           borderRadius: borderRadius.small,
           boxShadow: shadow.bottom,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         {typeof cardData.icon === "string" ? (

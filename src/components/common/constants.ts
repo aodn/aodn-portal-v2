@@ -28,6 +28,18 @@ const pageReferer = {
 
 const marineParkDefault = {
   geojson: "/data/Australian_Marine_Parks_boundaries.json",
+  acknowledge:
+    "Anyone can see this content, refer to /data/README.md for source",
+  termsOfUse:
+    "This dataset is released under Creative Commons by Attribution 4.0 International (CC BY 4.0).",
+};
+
+const marineEcoregionOfWorldDefault = {
+  geojson: "/data/Meow.json",
+  acknowledge:
+    "Anyone can see this content, refer to /data/README.md for source",
+  termsOfUse:
+    "This dataset is released under Creative Commons by Attribution 4.0 International (CC BY 4.0).",
 };
 
 const detailPageDefault = {
@@ -52,5 +64,6 @@ export {
   pageReferer,
   detailPageDefault,
   marineParkDefault,
+  marineEcoregionOfWorldDefault,
   contactRoles,
 };
