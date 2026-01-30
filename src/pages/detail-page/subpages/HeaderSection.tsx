@@ -20,7 +20,9 @@ import {
   border,
   borderRadius,
   color,
+  fontColor,
   fontSize,
+  fontWeight,
   padding,
 } from "../../../styles/constants";
 import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
@@ -147,68 +149,93 @@ const renderCompletedStatus = () => (
   </RoundCard>
 );
 
+const renderDocumentScope = () => (
+  <RoundCard sx={{ backgroundColor: `${color.success.light}` }}>
+    <Typography
+      padding={0}
+      paddingX={padding.extraSmall}
+      variant="title1Medium"
+      color={fontColor.black.dark}
+      fontWeight={fontWeight.regular}
+    >
+      Document
+    </Typography>
+  </RoundCard>
+);
+
 const renderSubTitle = (
   pace: string | undefined,
   startDate: string | undefined,
   endDate: string | undefined,
-  status: string | undefined
-) => (
-  <Stack flexDirection="row" flexWrap="wrap" gap={1}>
-    {pace &&
-      pace.toLowerCase() !== "other" &&
-      !(pace.toLowerCase() === "completed" && status === Status.completed) && (
+  status: string | undefined,
+  scope: string | undefined
+) => {
+  // check if is document, if so, only show scope and hide date
+  const isDocumentScope = scope?.toLowerCase() === "document";
+
+  return (
+    <Stack flexDirection="row" flexWrap="wrap" gap={1}>
+      {pace &&
+        pace.toLowerCase() !== "other" &&
+        !(
+          pace.toLowerCase() === "completed" && status === Status.completed
+        ) && (
+          <RoundCard
+            sx={{
+              bgcolor: color.pace,
+            }}
+          >
+            <Typography
+              padding={0}
+              variant="title1Medium"
+              color={portalTheme.palette.text1}
+            >
+              {capitalizeFirstLetter(pace)}
+            </Typography>
+          </RoundCard>
+        )}
+      {!isDocumentScope && startDate && (
         <RoundCard
           sx={{
-            bgcolor: color.pace,
+            border: `${border.xs} ${color.gray.extraLight}`,
+            backgroundColor: color.blue.extraLightSemiTransparent,
           }}
         >
           <Typography
             padding={0}
+            paddingRight={padding.small}
             variant="title1Medium"
             color={portalTheme.palette.text1}
           >
-            {capitalizeFirstLetter(pace)}
+            {startDate}
           </Typography>
+          <KeyboardDoubleArrowRightIcon
+            sx={{
+              fontSize: fontSize.label,
+              color: color.gray.light,
+            }}
+          />
+          {endDate && (
+            <Typography
+              padding={0}
+              paddingLeft={padding.small}
+              variant="title1Medium"
+              color={portalTheme.palette.text1}
+            >
+              {endDate}
+            </Typography>
+          )}
         </RoundCard>
       )}
-    {startDate && (
-      <RoundCard
-        sx={{
-          border: `${border.xs} ${color.gray.extraLight}`,
-          backgroundColor: color.blue.extraLightSemiTransparent,
-        }}
-      >
-        <Typography
-          padding={0}
-          paddingRight={padding.small}
-          variant="title1Medium"
-          color={portalTheme.palette.text1}
-        >
-          {startDate}
-        </Typography>
-        <KeyboardDoubleArrowRightIcon
-          sx={{
-            fontSize: fontSize.label,
-            color: color.gray.light,
-          }}
-        />
-        {endDate && (
-          <Typography
-            padding={0}
-            paddingLeft={padding.small}
-            variant="title1Medium"
-            color={portalTheme.palette.text1}
-          >
-            {endDate}
-          </Typography>
-        )}
-      </RoundCard>
-    )}
-    {status && status === Status.completed
-      ? renderCompletedStatus()
-      : renderOnGoingStatus()}
-  </Stack>
-);
+      {isDocumentScope
+        ? renderDocumentScope()
+        : status &&
+          (status === Status.completed
+            ? renderCompletedStatus()
+            : renderOnGoingStatus())}
+    </Stack>
+  );
+};
 
 const HeaderSection = () => {
   const location = useLocation();
@@ -217,11 +244,12 @@ const HeaderSection = () => {
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
-  const [title, pace, status, startDate, endDate] = useMemo(() => {
+  const [title, pace, status, startDate, endDate, scope] = useMemo(() => {
     const title = collection?.title;
     const pace = collection?.getPace();
     const status = collection?.getStatus();
     const extent = collection?.getExtent();
+    const scope = collection?.getScope();
 
     let startDate = undefined;
     let endDate = undefined;
@@ -231,7 +259,7 @@ const HeaderSection = () => {
       endDate = e;
     }
 
-    return [title, pace, status, startDate, endDate];
+    return [title, pace, status, startDate, endDate, scope];
   }, [collection]);
 
   const onGoBack = useCallback(
@@ -327,7 +355,8 @@ const HeaderSection = () => {
               >
                 {title}
               </Typography>
-              {!isMobile && renderSubTitle(pace, startDate, endDate, status)}
+              {!isMobile &&
+                renderSubTitle(pace, startDate, endDate, status, scope)}
             </Grid>
             <Grid
               item
@@ -352,7 +381,7 @@ const HeaderSection = () => {
             </Grid>
             {isMobile && (
               <Grid item xs={8} sm={12}>
-                {renderSubTitle(pace, startDate, endDate, status)}
+                {renderSubTitle(pace, startDate, endDate, status, scope)}
               </Grid>
             )}
           </Grid>

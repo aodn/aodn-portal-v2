@@ -270,6 +270,8 @@ export class OGCCollection {
   // Get the AI enhanced description
   getEnhancedDescription = (): string | undefined =>
     this.propValue?.["ai:description"];
+  // Get the Metadata scope from 'code' field, i.e., document or other types of resouce
+  getScope = (): string | undefined => this.propValue?.["scope"]?.["code"];
   getDataAccessLinks = (): ILink[] | undefined =>
     this.getLinksByAIGroupPrefix(AIGroup.DATA_ACCESS);
   getWMSLinks = (): ILink[] | undefined =>
@@ -323,6 +325,7 @@ export class SummariesProperties {
   readonly pace?: string;
   readonly "ai:description"?: string;
   readonly dataset_group?: Array<string>;
+  readonly scope?: Record<string, string>;
 }
 
 export class Spatial {

@@ -218,10 +218,15 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const bbox = collection?.getBBox();
     const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
     const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
+
+    const scope = collection?.getScope();
+    const isDocumentScope = scope?.toLowerCase() === "document";
     const noMapPreview =
-      downloadService === DownloadServiceType.Unavailable &&
-      !hasSpatialExtent &&
-      !isWMSAvailable;
+      // hide map view for document records
+      isDocumentScope ||
+      (downloadService === DownloadServiceType.Unavailable &&
+        !hasSpatialExtent &&
+        !isWMSAvailable);
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
     // time value, for example cloud optimized date range may be different from the
     // geoserver one
