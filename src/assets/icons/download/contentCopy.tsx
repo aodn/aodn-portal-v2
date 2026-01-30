@@ -1,10 +1,10 @@
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { ComponentType, SVGProps } from "react";
 
-export const ContentCopyIcon = ({
+export const ContentCopyIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "currentColor",
   width = 30,
   height = 25,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     id="Layer_1"
     data-name="Layer 1"

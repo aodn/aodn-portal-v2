@@ -1,10 +1,10 @@
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { ComponentType, SVGProps } from "react";
 
-export const NorthIcon = ({
+export const NorthIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "#000",
   width = 26,
   height = 24,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={width}
