@@ -1,11 +1,10 @@
-import { FC } from "react";
-import { IconProps } from "./types";
+import { ComponentType, SVGProps } from "react";
 
-const RelevancyIcon: FC<IconProps> = ({
+const RelevancyIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   width = 24,
   height = 24,
   color = "#ADADAD",
-}) => {
+}: SVGProps<SVGSVGElement>) => {
   return (
     <svg width={width} height={height} viewBox="0 0 51 30" fill={color}>
       <g opacity="1">

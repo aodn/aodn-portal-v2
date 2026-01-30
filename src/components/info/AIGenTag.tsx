@@ -1,6 +1,5 @@
 import { FC, useCallback, useRef, useState } from "react";
 import { Box, IconButton, Popover, Typography } from "@mui/material";
-import AIGenIcon from "../icon/AIGenIcon";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 import { portalTheme } from "../../styles";
@@ -8,6 +7,7 @@ import InfoCard from "./InfoCard";
 import { CloseIcon } from "../../assets/icons/download/close";
 import AIGenStarIcon from "../icon/AIGenStarIcon";
 import TextRender from "../common/text/TextRender";
+import { AIGenIcon } from "../icon/AIGenIcon";
 
 interface AIGenTagProps {
   infoContent?: InfoContentType;

@@ -1,9 +1,9 @@
-import { FC } from "react";
+import { ComponentType, createElement, FC, SVGProps } from "react";
 import { Paper, SxProps, Theme, Typography } from "@mui/material";
 import { border, color, fontSize } from "../../styles/constants";
 
 interface IconContainerProps {
-  icon?: () => JSX.Element;
+  icon?: ComponentType<SVGProps<SVGSVGElement>>;
   label?: string;
   imgUrl?: string;
   sx?: SxProps<Theme>;
@@ -29,7 +29,7 @@ const IconContainer: FC<IconContainerProps> = ({ icon, label, imgUrl, sx }) => {
         ...sx,
       }}
     >
-      {icon && icon()}
+      {icon && createElement(icon)}
       {imgUrl && (
         <img
           src={imgUrl}

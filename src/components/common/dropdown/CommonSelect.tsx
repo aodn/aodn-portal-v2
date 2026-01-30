@@ -7,8 +7,15 @@ import {
   SelectChangeEvent,
   SxProps,
 } from "@mui/material";
-import { FC, memo, ReactElement, useCallback, useState } from "react";
-import { IconProps } from "../../icon/types";
+import {
+  ComponentType,
+  FC,
+  memo,
+  ReactElement,
+  SVGProps,
+  useCallback,
+  useState,
+} from "react";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 import { portalTheme } from "../../../styles";
 import { ExpandMore } from "@mui/icons-material";
@@ -17,7 +24,7 @@ export interface SelectItem<T = string> {
   queryable?: boolean;
   value: T;
   label: string;
-  icon?: ReactElement | FC<IconProps>;
+  icon?: ReactElement | ComponentType<SVGProps<SVGSVGElement>>;
 }
 export interface CommonSelectProps<T = string> {
   items: SelectItem<T>[];

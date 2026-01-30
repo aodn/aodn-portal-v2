@@ -1,11 +1,10 @@
-import { FC } from "react";
-import { IconProps } from "./types";
+import { ComponentType, SVGProps } from "react";
 
-const ListAndMapIcon: FC<IconProps> = ({
+const ListAndMapIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   width = 22,
   height = 22,
   color = "#ADADAD",
-}) => {
+}: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width={width}

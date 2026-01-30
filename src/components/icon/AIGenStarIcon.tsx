@@ -1,11 +1,10 @@
-import { FC } from "react";
-import { IconProps } from "./types";
+import { ComponentType, SVGProps } from "react";
 
-const AIGenStarIcon: FC<IconProps> = ({
+const AIGenStarIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   width = 20,
   height = 20,
   color = "#ADADAD",
-}) => {
+}: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

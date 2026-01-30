@@ -1,4 +1,6 @@
-export const FileDownloadIcon = () => (
+import { ComponentType, SVGProps } from "react";
+
+export const FileDownloadIcon: ComponentType<SVGProps<SVGSVGElement>> = () => (
   <svg
     width="44"
     height="44"

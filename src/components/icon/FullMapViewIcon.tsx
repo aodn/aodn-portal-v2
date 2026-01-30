@@ -1,35 +1,35 @@
-import { FC } from "react";
-import { IconProps } from "./types";
+import { ComponentType, SVGProps } from "react";
 
-const FullMapViewIcon: FC<IconProps> = ({
-  width = 22,
-  height = 22,
-  color = "#ADADAD",
-  bgColor = "white",
-}) => {
+const FullMapViewIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
+  width = 23,
+  height = 17,
+  color = "3B6E8F",
+}: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width={width}
       height={height}
-      viewBox="0 0 24 18"
+      viewBox="0 0 23 17"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <rect
-        x="23.7012"
-        y="17.6475"
+        x="22.8398"
+        y="16.8828"
         width="22.8398"
         height="16.8816"
-        transform="rotate(-180 23.7012 17.6475)"
+        rx="1"
+        transform="rotate(-180 22.8398 16.8828)"
         fill={color}
       />
       <rect
-        x="21.7148"
-        y="15.6599"
+        x="20.8555"
+        y="14.8984"
         width="1.98607"
         height="12.9094"
-        transform="rotate(-180 21.7148 15.6599)"
-        fill={bgColor}
+        rx="0.993035"
+        transform="rotate(-180 20.8555 14.8984)"
+        fill="#ECECEC"
       />
     </svg>
   );

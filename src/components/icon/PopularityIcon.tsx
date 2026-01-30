@@ -1,11 +1,10 @@
-import { FC } from "react";
-import { IconProps } from "./types";
+import { ComponentType, SVGProps } from "react";
 
-const PopularityIcon: FC<IconProps> = ({
+const PopularityIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   width = 24,
   height = 24,
   color = "#ADADAD",
-}) => {
+}: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       version="1.0"

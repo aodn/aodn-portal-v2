@@ -7,17 +7,17 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  FunctionComponent,
+  ComponentType,
   isValidElement,
   ReactElement,
   ReactNode,
+  SVGProps,
   useCallback,
   useEffect,
   useState,
 } from "react";
 import { CommonSelectProps, SelectItem } from "./CommonSelect";
 import { borderRadius, color, margin } from "../../../styles/constants";
-import { IconProps } from "../../icon/types";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 import { portalTheme } from "../../../styles";
@@ -54,7 +54,7 @@ const getSelectedItem = <T extends string | number>(
 
 // Function to render the icon wrapped in a Box
 const renderIcon = (
-  icon: ReactElement | FunctionComponent<IconProps> | undefined,
+  icon: ReactElement | ComponentType<SVGProps<SVGSVGElement>> | undefined,
   color: string,
   iconBgColor: string,
   isIconOnly?: boolean
@@ -71,16 +71,16 @@ const renderIcon = (
   }
 
   // Handle FunctionComponent
-  const IconComponent = icon as FunctionComponent<IconProps>;
+  const IconComponent = icon as ComponentType<SVGProps<SVGSVGElement>>;
   return (
     <Box mr={isIconOnly ? 0 : margin.lg} mb={"-5px"}>
-      <IconComponent color={color} bgColor={iconBgColor} />
+      <IconComponent color={color} style={{ backgroundColor: iconBgColor }} />
     </Box>
   );
 };
 
 const renderSelectValue = (
-  icon: ReactElement | FunctionComponent<IconProps> | undefined,
+  icon: ReactElement | ComponentType<SVGProps<SVGSVGElement>> | undefined,
   label: string | undefined,
   color: string,
   iconBgColor: string,
