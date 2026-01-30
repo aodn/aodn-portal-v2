@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import useRedirectHome from "../../../hooks/useRedirectHome";
 import {
   AODN_SITE_LOGO_HEIGHT,
   AODN_SITE_LOGO_HEIGHT_MOBILE,
@@ -9,6 +10,7 @@ import { IconImosLogoWithTitle } from "../../../assets/images/banner_logo_with_t
 
 const AODNSiteLogo = () => {
   const { isMobile } = useBreakpoint();
+  const redirectHome = useRedirectHome();
   return (
     <Box
       component={"a"}
@@ -21,6 +23,11 @@ const AODNSiteLogo = () => {
         cursor: "pointer",
       }}
       href={pageDefault.landing}
+      onClick={(e) => {
+        e.preventDefault();
+        redirectHome("AODNSiteLogo", true);
+      }}
+      data-testid="aodn-home-link"
     >
       <IconImosLogoWithTitle data-testid="imos-logo" />
     </Box>
