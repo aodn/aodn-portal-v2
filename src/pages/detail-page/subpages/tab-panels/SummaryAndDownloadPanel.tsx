@@ -222,11 +222,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const scope = collection?.getScope();
     const isDocumentScope = scope?.toLowerCase() === "document";
     const noMapPreview =
-      // hide map view for document records
-      isDocumentScope ||
-      (downloadService === DownloadServiceType.Unavailable &&
-        !hasSpatialExtent &&
-        !isWMSAvailable);
+      downloadService === DownloadServiceType.Unavailable &&
+      !hasSpatialExtent &&
+      !isWMSAvailable &&
+      isDocumentScope;
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
     // time value, for example cloud optimized date range may be different from the
     // geoserver one
@@ -433,7 +432,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 panelId={mapContainerId}
                 projection={"mercator"} // Hexbin support this project or globe only
                 announcement={
-                  noMapPreview ? "Map Preview Not Available" : undefined
+                  noMapPreview ? "Dataset preview is not available." : undefined
                 }
                 onMoveEvent={handleMapChange}
                 onZoomEvent={handleMapChange}
