@@ -271,6 +271,27 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     return [conditionStart, conditionEnd];
   }, [downloadConditions]);
 
+  const geoServerLayerConfig = useMemo(() => {
+    return discreteTimeSliderValues
+      ? {
+          urlParams: {
+            TIME: dayjs.utc(datePointValue!),
+            MODE: Dimension.SINGLE,
+          },
+        }
+      : {
+          urlParams: {
+            START_DATE: filterStartDate,
+            END_DATE: filterEndDate,
+          },
+        };
+  }, [
+    discreteTimeSliderValues,
+    datePointValue,
+    filterStartDate,
+    filterEndDate,
+  ]);
+
   const handleMapChange = useCallback(
     (event: MapEvent | undefined) => {
       // implement later
@@ -530,23 +551,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     onSelectCoKey={setSelectedCoKey}
                   />
                   <GeoServerLayer
-                    geoServerLayerConfig={
-                      // This value appears only if this dataset layer support single time
-                      // move, NOT range
-                      discreteTimeSliderValues
-                        ? {
-                            urlParams: {
-                              TIME: dayjs.utc(datePointValue!),
-                              MODE: Dimension.SINGLE,
-                            },
-                          }
-                        : {
-                            urlParams: {
-                              START_DATE: filterStartDate,
-                              END_DATE: filterEndDate,
-                            },
-                          }
-                    }
+                    geoServerLayerConfig={geoServerLayerConfig}
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
                     onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
