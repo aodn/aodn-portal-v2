@@ -72,7 +72,9 @@ def test_not_found_item(
     detail_page.load(uuid)
     expect(detail_page.page_title).to_have_text(title)
 
-    expect(detail_page.get_not_found_element(not_found_item).first).to_have_css("visibility", "visible", timeout=5000)
+    expect(detail_page.get_not_found_element(not_found_item).first).to_have_css(
+        'visibility', 'visible', timeout=5000
+    )
 
 
 @pytest.mark.parametrize(
