@@ -31,6 +31,22 @@ describe("Search Reducer Function Test", () => {
     expect(collection.getStatus()).toEqual("completed");
   });
 
+  it("Verify OGCCollection get scope correct", () => {
+    const item = {
+      id: "ba9110f1-072c-4d15-8328-2091be983991",
+      index: "1",
+      itemType: "Collection",
+      links: [],
+      properties: {
+        status: "completed",
+        scope: { code: "document", name: "test document collection" },
+      },
+    };
+
+    const collection: OGCCollection = Object.assign(new OGCCollection(), item);
+    expect(collection.getScope()).toEqual("document");
+  });
+
   it("Verify generate correct parameter on temperature", () => {
     // Simulate user type "tempeature" and select filter by "parameter"
     const parameterState: ParameterState = {

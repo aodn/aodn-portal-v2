@@ -12,7 +12,12 @@ import {
   borderRadius,
   color,
   gap,
+  fontColor,
+  fontSize,
+  fontWeight,
   padding,
+  lineHeight,
+  fontFamily,
 } from "../../styles/constants";
 import React, { FC, SyntheticEvent, useRef, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
@@ -26,6 +31,29 @@ import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
 
 interface ListResultCardProps extends ResultCardBasicType {}
+
+// for document records, render document tag
+const renderDocumentScope = () => (
+  <Box
+    sx={{
+      display: "inline-flex",
+      width: "100px",
+      height: "26px",
+      padding: "2px 0",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "6px",
+      backgroundColor: color.success.light,
+      fontFamily: fontFamily.general,
+      fontSize: fontSize.resultCardTitle,
+      fontWeight: fontWeight.regular,
+      color: fontColor.black.dark,
+      lineHeight: lineHeight.heading,
+    }}
+  >
+    Document
+  </Box>
+);
 
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
@@ -45,6 +73,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
     const { id: uuid, title, description, findIcon, findThumbnail } = content;
     const isSelectedDataset = uuid === selectedUuid;
     const thumbnail: string = findThumbnail();
+    const scope = content.getScope();
+    const hasDocumentTag = scope?.toLowerCase() === "document";
 
     return (
       <Card
@@ -161,17 +191,34 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     overflow: "hidden",
                     display: "-webkit-box",
                     cursor: "pointer",
-                    WebkitLineClamp: isSimplified
-                      ? 5
-                      : isSelectedDataset || showButtons
-                        ? "4"
-                        : "5",
+                    WebkitLineClamp: hasDocumentTag
+                      ? "4" // show less text for document records on responsive page
+                      : isSimplified
+                        ? 5 //defalt with 5 lines
+                        : isSelectedDataset || showButtons
+                          ? "4" // if mouse hovering or clicked, show 4 lines
+                          : "5",
+
                     WebkitBoxOrient: "vertical",
                     wordBreak: "break-word",
                   }}
                 >
                   {description}
                 </Typography>
+                {hasDocumentTag && !isSelectedDataset && !showButtons && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      height: "26px",
+                      paddingLeft: "8px",
+                      alignItems: "center",
+                      gap: "16px",
+                      mt: 0.5,
+                    }}
+                  >
+                    {renderDocumentScope()}
+                  </Box>
+                )}
               </Box>
               {thumbnail !== default_thumbnail && (
                 <Box

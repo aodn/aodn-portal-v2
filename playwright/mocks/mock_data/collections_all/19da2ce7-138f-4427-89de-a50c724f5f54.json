@@ -3,7 +3,11 @@
   "collections": [
     {
       "properties": {
-        "status": "completed"
+        "status": "completed",
+        "scope": {
+          "code": "dataset",
+          "name": "IMOS Dataset level record"
+        }
       },
       "id": "19da2ce7-138f-4427-89de-a50c724f5f54",
       "title": "IMOS - Ocean Radar - South Australia Gulfs HF ocean radar site (South Australia, Australia) - Delayed mode wave",
