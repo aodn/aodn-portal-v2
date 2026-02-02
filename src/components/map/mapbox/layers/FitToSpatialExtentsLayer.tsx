@@ -30,9 +30,17 @@ const FitToSpatialExtentsLayer: FC<FitToSpatialExtentsLayerProps> = ({
         map.getBounds()?.getEast() !== bbox?.getEast() ||
         map.getBounds()?.getNorth() !== bbox?.getNorth()
       ) {
+        // If style is already loaded, fit to bound immediately
+        if (map.isStyleLoaded()) {
+          fitToBound(map, b[0]);
+          return;
+        }
+
         // This make the event fired earlier than IDLE which makes the map move to place
         // during rendering
-        map.once(MapEventEnum.RENDER, () => fitToBound(map, b[0]));
+        map.once(MapEventEnum.RENDER, () => {
+          return fitToBound(map, b[0]);
+        });
       }
     }
   }, [bbox, collection, map]);
