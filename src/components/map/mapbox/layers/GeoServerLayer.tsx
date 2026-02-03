@@ -479,6 +479,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             // Some content from server is super long
             popupContainer.style.overflow = "auto";
             popupContainer.style.maxHeight = "300px";
+            popupContainer.dataset.testid = "map-popup"; // for playwright tests
 
             if (response.html) {
               // The server can return html directly, so we can only use it

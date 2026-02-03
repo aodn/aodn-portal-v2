@@ -1,0 +1,685 @@
+{
+  "properties": {
+    "themes": [
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Oceans | Ocean Optics | Ocean Color",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          },
+          {
+            "id": "Oceans | Ocean Chemistry | Chlorophyll",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "concepts": [
+          {
+            "id": "Global / Oceans | Indian Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Global / Oceans | Southern Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Global / Oceans | Pacific Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Great Australian Bight, SA/WA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Bass Strait, TAS/VIC",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Tasman Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Coral Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Solomon Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Arafura Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Timor Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Banda Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Java Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Philippine Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Celebes Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | South China Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features | Strait of Malacca",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Gulf of Thailand",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Andaman Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "concepts": [
+          {
+            "id": "Countries | Malaysia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | New Caledonia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Philippines",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | New South Wales",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | Victoria",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Indonesia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Papua New Guinea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Singapore",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | New Zealand",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | Tasmania",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | Northern Territory",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Timor-Leste",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Vanuatu",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Thailand",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Vietnam",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | Queensland",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Australia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | South Australia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Fiji",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | Western Australia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Aqua",
+            "url": "http://vocab.aodn.org.au/def/platform/entity/879",
+            "description": "",
+            "title": "AODN Platform Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Concentration of inferred chlorophyll from relative fluorescence per unit volume of the water body",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/894",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "ocean colour radiometers",
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/304",
+            "description": "",
+            "title": "AODN Instrument Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "concepts": [
+          {
+            "id": "Ocean Colour Sub-Facility, Integrated Marine Observing System (IMOS)",
+            "url": "http://vocab.aodn.org.au/def/organisation/entity/508",
+            "description": "",
+            "title": "AODN Organisation Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "Categories",
+        "concepts": [
+          {
+            "id": "oceans"
+          }
+        ]
+      }
+    ],
+    "credits": [
+      "Australia’s Integrated Marine Observing System (IMOS) is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS). It is operated by a consortium of institutions as an unincorporated joint venture, with the University of Tasmania as Lead Agent.",
+      "CSIRO Oceans and Atmosphere",
+      "Curtin University"
+    ],
+    "creation": "2019-01-08T13:47:38",
+    "pace": "completed",
+    "status": "completed",
+    "contacts": [
+      {
+        "name": "King, Edward",
+        "organization": "CSIRO Oceans and Atmosphere - Hobart",
+        "position": "Facility Leader",
+        "emails": ["Edward.King@csiro.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://remote-sensing.nci.org.au/u39/public/html/imos/index.shtml#chla.nrt.61",
+            "type": "",
+            "title": "Chl-a MODIS Aqua L2 5-min granules remapped OC3 SeaDAS 6.1 - dataset download"
+          }
+        ],
+        "roles": ["resourceProvider", "about"],
+        "phones": [
+          {
+            "value": "+61-3 6232 5334",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "position": "Data Officer",
+        "emails": ["info@aodn.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://imos.org.au/aodn.html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Australian Ocean Data Network (AODN)"
+          }
+        ],
+        "roles": ["distributor", "metadata"],
+        "phones": [
+          {
+            "value": "61 3 6226 7488",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "emails": ["imos@imos.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.imos.org.au/html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Integrated Marine Observing System (IMOS)"
+          }
+        ],
+        "roles": ["resourceProvider", "citation"],
+        "phones": [
+          {
+            "value": "61 3 6226 7549",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      }
+    ],
+    "citation": {
+      "suggestedCitation": "The citation in a list of references is: \"IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access].\"",
+      "useLimitations": [
+        "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose."
+      ],
+      "otherConstraints": [
+        "Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: \"Data was sourced from Australia’s Integrated Marine Observing System (IMOS) – IMOS is enabled by the National Collaborative Research Infrastructure strategy (NCRIS).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in 'credit' in the metadata record)."
+      ]
+    },
+    "temporal": [
+      {
+        "start": "2002-06-30T14:00:00Z",
+        "end": "2024-12-26T12:59:59Z"
+      }
+    ],
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [80, -60],
+              [179.9, -60],
+              [179.9, 10],
+              [80, 10],
+              [80, -60]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "license": "Creative Commons Attribution 4.0 International License",
+    "ai:description": "The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. Modelling is then used to compute an estimate of the Net Primary Productivity (NPP).\n\nThe model used is based on the standard vertically generalised production model (VGPM). The VGPM is a \"chlorophyll-based\" model that estimates net primary production from chlorophyll using a temperature-dependent description of chlorophyll-specific photosynthetic efficiency. For the VGPM, net primary production is a function of chlorophyll, available light, and the photosynthetic efficiency. The only difference between the Standard VGPM and the Eppley-VGPM is the temperature-dependent description of photosynthetic efficiencies, with the Eppley approach using an exponential function to account for variation in photosynthetic efficiencies due to photoacclimation. The similarity between these models (VGPM vs E_VGPM) is described more extensively in a paper by Elena-Carr et al (2006.). VGPM is a Depth Integrated Model(DIM) described by Behrenfeld and Falkowski (1997), with modification due to Eppley (1972) as implemented by Antoine and Morel (1996).\n\nThere are multiple retrieval algorithms for estimating Chl-a. These data (eppley_npp_chl_gsm) use the Garver-Siegel-Maritorena (GSM) method implemented in the SeaDAS processing software l2gen and described in \"Chapter 11, and references therein, of IOCCG Report 5, 2006, (http://ioccg.org/wp-content/uploads/2015/10/ioccg-report-05.pdf). This product is recommended for use in the VGPM model. The product Eppley_NPP_chl_gsm is experimental, in the sense that it is challenging to validate due to the scarcity of insitu measurments. It should only be used with caution informed by understanding of the algorithms.\n\nProduction of contemporary MODIS data ceased at 2024/12/26. Users requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.",
+    "revision": "2025-08-27T06:57:33",
+    "statement": "The radiometric sensitivity of the MODIS sensor is evolving continuously during its mission and is monitored regularly by NASA. The SeaDAS software uses tables of calibration coefficients that are updated periodically. From time to time upgrades to the algorithms and/or the format of the calibration tables are required, in which case a new version of SeaDAS is released. These data were updated on 1 September 2020 to use processing in SeaDAS v7.5 and between 2002/07/04 and 2022/06/30 are consistent with the R2018.0 reprocessing (https://oceancolor.gsfc.nasa.gov/reprocessing/r2018/aqua/). Data between 2022/07/01-2023/01/31 and then from 2023/02/01 onwards, have been processed with two more recent releases of SeaDAS and are yet to be fully verified for consistency with NASA’s most recent processing(s). Production of contemporary MODIS data ceased at 2024/12/26.  \n\nUsers requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.\nIt is anticipated that during 2025 IMOS will complete a reprocessing of the entire MODIS archive from 2002/07/04 – 2024/12/26 that will be consistent throughout with the latest recommended NASA processing version.  \n\nThe data are produced by combining the near real time (nrt) data stream from all the available direct broadcast reception stations in Australia with delayed-mode data from NASA in the US. The data have been remapped from satellite projection into a geographic (Latitude/Longitude axes) projection (0.01 degree sampling) and are presented as a sequence of daily mosaics covering the region (80 <= Longitude <= 180, -60 <= Latitude <= +10) formatted as CF-compliant netCDF files. It should be noted that the data are not processed until the definitive spacecraft ephemeris becomes available, usually 12-24 hours after the overpass. This means that the geolocation should be of a uniformly high standard.\n\nThe filenames are of the form A.P1D.<yyyymmdd>T<hhmmss>Z.<region>.<productname>.nc, where 'A\" denotes the Aqua/MODIS sensor, 'P1D' is a period of 1 day, '<yyyymmdd>T<hhmmss>Z' is the UTC date+time of the centre of the compositing interval, '<region>' is the area covered (normally 'aust' for Australasia). '<productname>' is the name of the data product and 'nc' denotes a netCDF format file. Files are written in netCDF4 format with compression.",
+    "dataset_group": ["imos"],
+    "centroid": [[96.83036, -24.875]]
+  },
+  "id": "27cc65c0-d453-4ba3-a0d6-55e4449fee8c",
+  "title": "IMOS - Satellite Remote Sensing - MODIS - 01 day - Net Primary Productivity (GSM model and Eppley-VGPM algorithm)",
+  "description": "The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. Modelling is then used to compute an estimate of the Net Primary Productivity (NPP).\n\nThe model used is based on the standard vertically generalised production model (VGPM).  The VGPM is a \"chlorophyll-based\" model that estimates net primary production from chlorophyll using a temperature-dependent description of chlorophyll-specific        photosynthetic efficiency. For the VGPM, net primary production is a function of chlorophyll, available light, and the photosynthetic efficiency. The only difference between the Standard VGPM and the Eppley-VGPM is the temperature-dependent description of photosynthetic efficiencies, with the Eppley approach using an exponential function to account for variation in photosynthetic efficiencies due to photoacclimation. The similarity between these models (VGPM vs E_VGPM) is described more extensively in a paper by Elena-Carr et al (2006.). VGPM is a Depth Integrated Model(DIM) described by Behrenfeld and Falkowski (1997), with modification due to Eppley (1972) as implemented by Antoine and Morel (1996).\n\nThere are multiple retrieval algorithms for estimating Chl-a. These data (eppley_npp_chl_gsm) use the Garver-Siegel-Maritorena (GSM) method implemented in the SeaDAS processing software l2gen and described in “Chapter 11, and references therein, of IOCCG Report 5, 2006, (http://ioccg.org/wp-content/uploads/2015/10/ioccg-report-05.pdf). This product is recommended for use in the VGPM model. The product Eppley_NPP_chl_gsm is experimental, in the sense that it is challenging to validate due to the scarcity of insitu measurments. It should only be used with caution informed by understanding of the algorithms.\n\nProduction of contemporary MODIS data ceased at 2024/12/26. Users requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.",
+  "links": [
+    {
+      "href": "http://thredds.aodn.org.au/thredds/catalog/IMOS/SRS/OC/gridded/aqua/P1D/catalog.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "NetCDF files via THREDDS catalog",
+      "ai:group": "Data Access > thredds"
+    },
+    {
+      "href": "http://imos.org.au/srs.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Satellite Remote Sensing page on IMOS website",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://portal.aodn.org.au/search?uuid=27cc65c0-d453-4ba3-a0d6-55e4449fee8c",
+      "rel": "related",
+      "type": "text/html",
+      "title": "View and download data though the AODN Portal"
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ncwms",
+      "rel": "wms",
+      "type": "",
+      "title": "srs_oc_aqua_npp_vgpm_eppley_gsm_url/npp_vgpm_eppley_gsm",
+      "ai:group": "Data Access > wms",
+      "description": "SRS - OC GSM - WMS layer"
+    },
+    {
+      "href": "https://processes.aodn.org.au/wps",
+      "rel": "OGC:WPS--gogoduck",
+      "type": "",
+      "title": "srs_oc_aqua_npp_vgpm_eppley_gsm_url",
+      "description": "The GoGoDuck subsets and aggregates gridded data.  Data is returned as a NetCDF file."
+    },
+    {
+      "href": "https://help.aodn.org.au/web-services/gogoduck-aggregator/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "GoGoDuck help documentation"
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+      "rel": "IMOS:AGGREGATION--bodaac",
+      "type": "",
+      "title": "srs_oc_aqua_npp_vgpm_eppley_gsm_url#file_url",
+      "description": "The ncUrlList is a WFS service that returns a list of URLs matching a query."
+    },
+    {
+      "href": "https://help.aodn.org.au/web-services/ncurllist-service/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "ncUrlList help documentation"
+    },
+    {
+      "href": "https://registry.opendata.aws/aodn_satellite_net_primary_productivity_gsm_1day_aqua/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Access To AWS Open Data Program registry for the Cloud Optimised version of this dataset",
+      "ai:group": "Data Access > aws"
+    },
+    {
+      "href": "https://github.com/aodn/aodn_cloud_optimised/blob/main/notebooks/satellite_net_primary_productivity_gsm_1day_aqua.ipynb",
+      "rel": "related",
+      "type": "application/x-ipynb+json",
+      "title": "Access to Jupyter notebook to query Cloud Optimised converted dataset",
+      "ai:group": "Python Notebook"
+    },
+    {
+      "href": "https://geonetwork.production.aodn.org.au:443/geonetwork/images/logos/01328ab2-703e-4f37-a467-d27397af3712.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/27cc65c0-d453-4ba3-a0d6-55e4449fee8c",
+      "rel": "describedby",
+      "type": "text/html",
+      "title": "Full metadata link"
+    },
+    {
+      "href": "https://licensebuttons.net/l/by/4.0/88x31.png",
+      "rel": "license",
+      "type": "image/png"
+    },
+    {
+      "href": "http://creativecommons.org/licenses/by/4.0/",
+      "rel": "license",
+      "type": "text/html"
+    },
+    {
+      "href": "uuid:8209bf83-0c3c-4fbe-9f36-41f7a5ee9913",
+      "rel": "parent",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - Ocean colour Sub-Facility\",\"recordAbstract\":\"The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThe data are produced from the near real time (nrt) data stream formed by combining data from all the available direct broadcast reception stations in Australia (Alice Springs, Melbourne, Townsville, Perth, Hobart). The data are presented as a sequence of granules, each with a maximum size corresponding to 5 minutes of data, and beginning on UTC-5 minute boundary (eg. 04:05, 04:10, 04:15). The granules have been remapped from satellite projection into a geographic (Latitude/Longitude axes) projection and are formatted as CF-compliant netCDF files. It should be noted that the data are not processed until the definitive spacecraft ephemeris becomes available, usually 12-24 hours after the overpass. This means that the geolocation should be of a uniformly high standard.\\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the OC3 method recommended by the NASA Ocean Biology Processing Group and implemented in the SeaDAS processing software l2gen. The radiometric sensitivity of the MODIS sensor is evolving continuously during its mission and is being monitored regularly. The SeaDAS software uses tables of calibration coefficients that are updated periodically. From time to time upgrades to the algorithms and thand/or the format of the calibration tables are required, in which case a new version of SeaDAS is released. These data are initially being produced using SeaDAS 6.1, then SeaDAS 6.4 and eventually with SeaDAS 7.x. The data processed with each different version can be distinguished by the digits at the end of the root URL for the data; for example l2oc.nrt.61 is level-2 ocean colour (l2oc), using the near real time (nrt) data stream, produced using SeaDAS 6.1.\"}"
+    },
+    {
+      "href": "uuid:697aa9e7-bf24-4f9e-9950-d5cfd78f1b35",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - SNPP - 01 day - Diffuse attenuation coefficient (k490)\",\"recordAbstract\":\"The SNPP satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the diffuse attenuation coefficient (Kd) at 490nm wavelength which provides information on how light is attenuated in the water column. It is defined as the scaling length of the exponential decrease of the downwelling irradiance, and has units (m^-1). The VIIRS K490 product estimates Kd at 490nm wavelength, using a semi-empirical model based on the ratio of water leaving radiances at 490nm and 555nm. The algorithm is described at https://oceancolor.gsfc.nasa.gov/atbd/kd/.\"}"
+    },
+    {
+      "href": "uuid:77f46a04-f07d-4968-a5f9-1da8df9706a7",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - NOAA20 - 01 day - Chlorophyll-a concentration (OC3 model)\",\"recordAbstract\":\"The NOAA20 satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the OC3 method recommended by the NASA Ocean Biology Processing Group and implemented in the SeaDAS processing software l2gen. The OC3 algorithm is described at http://oceancolor.gsfc.nasa.gov/cms/atbd/chlor_a (and links therein).\"}"
+    },
+    {
+      "href": "uuid:8e00907f-716d-4080-b212-534fcd78a602",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - SNPP - 01 day - Ocean Colour - SST\",\"recordAbstract\":\"The SNPP/VIIRS Sea Surface Temperature product is derived from VIIRS 11 and 12 micron spectral bands according to the algorithm described at https://oceancolor.gsfc.nasa.gov/atbd/sst/. This is not a GHRSST-quality product, and demanding applications requiring a high standard of accuracy should consider using one of the IMOS GHRSST products in preference. The VIIRS SST is nevertheless useful primarily because it is measured at the same time as the water leaving radiances used to derive the optical properties (eg chl). This means it is both contemporaneous, and has a matching cloud mask, so it is valuable for applications that seek to combine both SST and optical properties (ie Net Primary Productivity variants). The data set provided here matches the Chl_oci product in temporal and spatial extent.\\n\\nThis SRS dataset covers waters around Australia.\"}"
+    },
+    {
+      "href": "uuid:8f44f09a-07a3-4f9b-ba26-2fc4983fef69",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - SNPP - 01 day - Optical Water Type (Moore et al 2009 algorithm)\",\"recordAbstract\":\"The SNPP satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These measurements at discrete wavelengths represent the spectrum of light leaving the water surface, and the shape of the spectrum is characteristic of the water optical properties. \\n\\nMoore et al. (2009, RSE, 113, pp2424-2430, doi:10.1016/j.rse.2009.07.016) applied a clustering technique to spectra to identify 8 sets of discrete optical water types for data from the MODIS sensor. This product \\\"owtd_csiro\\\" is produced using a CSIRO implementation of the Moore et al. algorithm, and testing shows that it closely reproduces the results of the original Moore et al implementation in the NASA SeaDAS package. The CSIRO implementation was created because the implementation in SeaDAS has not been kept up to date, and to extend the product to the VIIRS sensor.\"}"
+    },
+    {
+      "href": "uuid:9fde091c-9d38-4b2f-ba23-c262c21a41a2",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - MODIS - 01 day - Nanoplankton fraction (OC3 model and Brewin et al 2012 algorithm)\",\"recordAbstract\":\"The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. An empirical relationship is then used to compute an estimate of the relative abundance of three phytoplankton size classes (micro, nano and picoplankton). \\n\\nThe methods used to decompose chl_oc3 are described by Brewin et al in two papers in 2010 and 2012. The two methods, denoted Brewin2010at and Brewin2012in, used calibration data from the Atlantic and Indian Oceans respectively. Users should note that these are unvalidated experimental products and they should familiarise themselves with the underlying algorithms and methodologies described in the published literature before making use of them.\\n\\nThe data are produced from the same data stream as the MODIS Chla_oc3 data set (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/d7a14921-8f3f-4522-9a54-e7d1df969c8a). \\n\\nData are provided as two files per day, one with the percentage of nanoplankton, and one for picoplankton. The percentage of microplankton is computed as the balance to 100%, that is %micro = 100 - %nano - %pico.\\n\\nProduction of contemporary MODIS data ceased at 2024/12/26. Users requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.\"}"
+    },
+    {
+      "href": "uuid:ad4d6908-3a36-4991-996a-5b00ac162794",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - NOAA20 - 01 day - Chlorophyll-a concentration (GSM model)\",\"recordAbstract\":\"The NOAA20 satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the Garver-Siegel-Maritorena (GSM) method implemented in the SeaDAS processing software l2gen and described in “Chapter 11, and references therein, of IOCCG Report 5, 2006, (http://ioccg.org/wp-content/uploads/2015/10/ioccg-report-05.pdf).\"}"
+    },
+    {
+      "href": "uuid:b35b829c-9149-46c6-9e25-d0fd03463280",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - MODIS - 01 day - Net Primary Productivity (OC3 model and Eppley-VGPM algorithm)\",\"recordAbstract\":\"The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. Modelling is then used to compute an estimate of the Net Primary Productivity (NPP).\\n\\nThe model used is based on the standard vertically generalised production model (VGPM). The VGPM is a \\\"chlorophyll-based\\\" model that estimates net primary production from chlorophyll using a temperature-dependent description of chlorophyll-specific photosynthetic efficiency. For the VGPM, net primary production is a function of chlorophyll, available light, and the photosynthetic efficiency. The only difference between the Standard VGPM and the Eppley-VGPM is the temperature-dependent description of photosynthetic efficiencies, with the Eppley approach using an exponential function to account for variation in photosynthetic efficiencies due to photoacclimation. The similarity between these models (VGPM vs E_VGPM) is described more extensively in a paper by Elena-Carr et al (2006.). VGPM is a Depth Integrated Model(DIM) described by Behrenfeld and Falkowski (1997), with modification due to Eppley (1972) as implemented by Antoine and Morel (1996).\\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data (eppley_npp_chl_oc3) use the OC3 method implemented by the NASA Ocean Biology Processing Group in the SeaDAS processing software l2gen. The OC3 algorithm is described at https://oceancolor.gsfc.nasa.gov/atbd/chlor_a/ (and links therein). The Eppley_NPP_chl_oc3 product (based on the IMOS chl_oc3 product) is experimental and was created for comparison purposes with Eppley_NPP_chl_gsm, which is the recommended NPP product. It should only be used with full understanding of the algorithms. If you do not know which product to use, then go with Eppley_NPP_chl_gsm.\\n\\nProduction of contemporary MODIS data ceased at 2024/12/26. Users requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.\"}"
+    },
+    {
+      "href": "uuid:a9e03db8-f277-45d1-821d-cfcbfe8ae6be",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - NOAA20 - 01 day - Chlorophyll-a concentration (OCI model)\",\"recordAbstract\":\"The NOAA20 satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the OCI method (Hu et al 2012, doi: 10.1029/2011jc007395) recommended by the NASA Ocean Biology Processing Group and implemented in the SeaDAS processing software l2gen. The OCI algorithm is described at https://oceancolor.gsfc.nasa.gov/atbd/chlor_a/ (and links therein).\"}"
+    },
+    {
+      "href": "uuid:c24d0593-2c53-47d3-a6d1-2e5456dd7e16",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - NOAA20 - 01 day - Ocean Colour - SST\",\"recordAbstract\":\"The NOAA20/VIIRS Sea Surface Temperature product is derived from VIIRS 11 and 12 micron spectral bands according to the algorithm described at https://oceancolor.gsfc.nasa.gov/atbd/sst/. This is not a GHRSST-quality product, and demanding applications requiring a high standard of accuracy should consider using one of the IMOS GHRSST products in preference. The VIIRS SST is nevertheless useful primarily because it is measured at the same time as the water leaving radiances used to derive the optical properties (eg chl). This means it is both contemporaneous, and has a matching cloud mask, so it is valuable for applications that seek to combine both SST and optical properties (ie Net Primary Productivity variants). The data set provided here matches the Chl_oci product in temporal and spatial extent.\\n\\nThis SRS dataset covers waters around Australia.\"}"
+    },
+    {
+      "href": "uuid:c8113974-50d8-4fc9-9a47-1c4572f554e6",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - MODIS - 01 day - Nanoplankton fraction (OC3 model and Brewin et al 2010 algorithm)\",\"recordAbstract\":\"The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. An empirical relationship is then used to compute an estimate of the relative abundance of three phytoplankton size classes (micro, nano and picoplankton). \\n\\nThe methods used to decompose chl_oc3 are described by Brewin et al in two papers in 2010 and 2012. The two methods, denoted Brewin2010at and Brewin2012in, used calibration data from the Atlantic and Indian Oceans respectively. Users should note that these are unvalidated experimental products and they should familiarise themselves with the underlying algorithms and methodologies described in the published literature before making use of them.\\n\\nThe data are produced from the same data stream as the MODIS Chla_oci data set (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/d7a14921-8f3f-4522-9a54-e7d1df969c8a). \\n\\nData are provided as two files per day, one with the percentage of nanoplankton, and one for picoplankton. The percentage of microplankton is computed as the balance to 100%, that is %micro = 100 - %nano - %pico.\\n\\nThis collection was removed from the AODN Portal in March 2023, please refer to the Brewin 2012 collection which supersedes this one - https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/9fde091c-9d38-4b2f-ba23-c262c21a41a2\"}"
+    },
+    {
+      "href": "uuid:bc428d0b-eff7-41b9-8d4c-10e666ee1312",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - MODIS - 01 day - Picoplankton fraction (OC3 model and Brewin et al 2012 algorithm)\",\"recordAbstract\":\"The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. An empirical relationship is then used to compute an estimate of the relative abundance of three phytoplankton size classes (micro, nano and picoplankton). \\n\\nThe methods used to decompose chl_oc3 are described by Brewin et al in two papers in 2010 and 2012. The two methods, denoted Brewin2010at and Brewin2012in, used calibration data from the Atlantic and Indian Oceans respectively. Users should note that these are unvalidated experimental products and they should familiarise themselves with the underlying algorithms and methodologies described in the published literature before making use of them.\\n\\nThe data are produced from the same data stream as the MODIS Chla_oci data set (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/d7a14921-8f3f-4522-9a54-e7d1df969c8a). \\n\\nData are provided as two files per day, one with the percentage of nanoplankton, and one for picoplankton. The percentage of microplankton is computed as the balance to 100%, that is %micro = 100 - %nano - %pico.\\n\\nProduction of contemporary MODIS data ceased at 2024/12/26. Users requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.\"}"
+    },
+    {
+      "href": "uuid:d7a14921-8f3f-4522-9a54-e7d1df969c8a",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - MODIS - 01 day - Chlorophyll-a concentration (OC3 model)\",\"recordAbstract\":\"The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the OC3 method recommended by the NASA Ocean Biology Processing Group and implemented in the SeaDAS processing software l2gen. The OC3 algorithm is described at http://oceancolor.gsfc.nasa.gov/cms/atbd/chlor_a (and links therein).\\n\\nProduction of contemporary MODIS data ceased at 2024/12/26. Users requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.\"}"
+    },
+    {
+      "href": "uuid:d7f9eb3f-b81e-4421-8c75-761ffb33db5d",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - SNPP - 01 day - Chlorophyll-a concentration (OCI model)\",\"recordAbstract\":\"The SNPP satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the OCI method (Hu et al 2012, doi: 10.1029/2011jc007395) recommended by the NASA Ocean Biology Processing Group and implemented in the SeaDAS processing software l2gen. The OCI algorithm is described at https://oceancolor.gsfc.nasa.gov/atbd/chlor_a/ (and links therein).\"}"
+    },
+    {
+      "href": "uuid:d222bd3f-b1a8-46f1-b462-90e44c5d9b44",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - SNPP - 01 day - Chlorophyll-a concentration (OC3 model)\",\"recordAbstract\":\"The SNPP satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the OC3 method recommended by the NASA Ocean Biology Processing Group and implemented in the SeaDAS processing software l2gen. The OC3 algorithm is described at http://oceancolor.gsfc.nasa.gov/cms/atbd/chlor_a (and links therein).\"}"
+    },
+    {
+      "href": "uuid:f73daf07-eb81-4995-a72a-ca903834509f",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - MODIS - 01 day - Chlorophyll-a concentration (GSM model)\",\"recordAbstract\":\"The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the Garver-Siegel-Maritorena (GSM) method implemented in the SeaDAS processing software l2gen and described in “Chapter 11, and references therein, of IOCCG Report 5, 2006, (http://ioccg.org/wp-content/uploads/2015/10/ioccg-report-05.pdf).\\n\\nProduction of contemporary MODIS data ceased at 2024/12/26. Users requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.\"}"
+    },
+    {
+      "href": "uuid:5f359ca7-396a-4c1a-8388-77a50ad39859",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - NOAA20 - 01 day - Optical Water Type (Moore et al 2009 algorithm)\",\"recordAbstract\":\"The NOAA20 satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These measurements at discrete wavelengths represent the spectrum of light leaving the water surface, and the shape of the spectrum is characteristic of the water optical properties. \\n\\nMoore et al. (2009, RSE, 113, pp2424-2430, doi:10.1016/j.rse.2009.07.016) applied a clustering technique to spectra to identify 8 sets of discrete optical water types for data from the MODIS sensor. This product \\\"owtd_csiro\\\" is produced using a CSIRO implementation of the Moore et al. algorithm, and testing shows that it closely reproduces the results of the original Moore et al implementation in the NASA SeaDAS package. The CSIRO implementation was created because the implementation in SeaDAS has not been kept up to date, and to extend the product to the VIIRS sensor.\"}"
+    },
+    {
+      "href": "uuid:3177b188-9d42-4ba2-ab23-3d38b217eb3a",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - MODIS - 01 day - Picoplankton fraction (OC3 model and Brewin et al 2010 algorithm)\",\"recordAbstract\":\"The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. An empirical relationship is then used to compute an estimate of the relative abundance of three phytoplankton size classes (micro, nano and picoplankton). \\n\\nThe methods used to decompose chl_oc3 are described by Brewin et al in two papers in 2010 and 2012. The two methods, denoted Brewin2010at and Brewin2012in, used calibration data from the Atlantic and Indian Oceans respectively. Users should note that these are unvalidated experimental products and they should familiarise themselves with the underlying algorithms and methodologies described in the published literature before making use of them.\\n\\nThe data are produced from the same data stream as the MODIS Chla_oci data set (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/d7a14921-8f3f-4522-9a54-e7d1df969c8a). \\n \\nData are provided as two files per day, one with the percentage of nanoplankton, and one for picoplankton. The percentage of microplankton is computed as the balance to 100%, that is %micro = 100 - %nano - %pico.\\n\\nThis collection was removed from the AODN Portal in March 2023, please refer to the Brewin 2012 collection which supersedes this one - https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/bc428d0b-eff7-41b9-8d4c-10e666ee1312\"}"
+    },
+    {
+      "href": "uuid:37751f5b-3c93-40df-9913-951df310cbc8",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - NOAA20 - 01 day - Diffuse attenuation coefficient (k490)\",\"recordAbstract\":\"The NOAA20 satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the diffuse attenuation coefficient (Kd) at 490nm wavelength which provides information on how light is attenuated in the water column. It is defined as the scaling length of the exponential decrease of the downwelling irradiance, and has units (m^-1). The VIIRS K490 product estimates Kd at 490nm wavelength, using a semi-empirical model based on the ratio of water leaving radiances at 490nm and 555nm. The algorithm is described at https://oceancolor.gsfc.nasa.gov/atbd/kd/.\"}"
+    },
+    {
+      "href": "uuid:468f550b-bbd8-42b1-91b5-313d5898d9e6",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - MODIS - 01 day - Ocean Colour - SST\",\"recordAbstract\":\"The MODIS Sea Surface Temperature product is derived from MODIS bands 31 and 32 according to the algorithm described at https://oceancolor.gsfc.nasa.gov/atbd/sst/. This is not a GHRSST-quality product, and demanding applications requiring a high standard of accuracy should consider using one of the IMOS GHRSST products in preference. The MODIS SST is nevertheless useful primarily because it is measured at the same time as the water leaving radiances used to derive the optical properties (eg chl). This means it is both contemporaneous, and has a matching cloud mask, so it is valuable for applications that seek to combine both SST and optical properties (ie Net Primary Productivity variants). The data set provided here matches the Chl_oci product in temporal and spatial extent.\\n\\nThis SRS dataset covers waters around Australia.\\n\\nProduction of contemporary MODIS data ceased at 2024/12/26. Users requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.\"}"
+    },
+    {
+      "href": "uuid:6447f562-9063-4879-8598-ca0b5c4e0175",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - SNPP - 01 day - Chlorophyll-a concentration (GSM model)\",\"recordAbstract\":\"The SNPP satellite platform carries a VIIRS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the Garver-Siegel-Maritorena (GSM) method implemented in the SeaDAS processing software l2gen and described in “Chapter 11, and references therein, of IOCCG Report 5, 2006, (http://ioccg.org/wp-content/uploads/2015/10/ioccg-report-05.pdf).\"}"
+    },
+    {
+      "href": "uuid:ce859887-bdf0-4eb0-acf2-80d38af4c85c",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"Satellite Remote Sensing - Satellite Contributed Ocean Colour - MODIS - Aqua Chlorophyll Concentration in the Southern Ocean: Monthly, Johnson et al 2013\",\"recordAbstract\":\"The Aqua and Orbview satellites carry a MODIS and SeaWIFS sensors (respectively) that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a and aggregating the data over time. This data set is a reprocessed copy of 9km monthly and 8-day versions produced globally by NASA, adjusted for the Southern Ocean south of latitude 30S. The full methodology is described in Johnson, R., Strutton, P.G., Wright, S.W., McMinn, A., Meiners, K.M., 2013. Three improved satellite chlorophyll algorithms for the Southern Ocean. Journal of Geophysical Research: Oceans. doi: 10.1002/jgrc.20270. It is expected that the data set will be periodically updated with contemporary data as it becomes available.\\n\\nThere are four sub-streams within this data set. A monthly and an 8-day series for MODIS/Aqua and similarly for SeaWIFS. Note that SeaWIFS ceased operation in late 2010 so there will be no further SeaWIFS data. \\n\\nThe data represented by this record is monthly data for MODIS/Aqua.\"}"
+    },
+    {
+      "href": "uuid:54023994-e1aa-479d-a693-c18dfc57a175",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"Satellite Remote Sensing - Satellite Contributed Ocean Colour - MODIS - Aqua Chlorophyll Concentration in the Southern Ocean: Weekly, Johnson et al 2013\",\"recordAbstract\":\"The Aqua and Orbview satellites carry a MODIS and SeaWIFS sensors (respectively) that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a and aggregating the data over time. This data set is a reprocessed copy of 9km monthly and 8-day versions produced globally by NASA, adjusted for the Southern Ocean south of latitude 30S. The full methodology is described in Johnson, R., Strutton, P.G., Wright, S.W., McMinn, A., Meiners, K.M., 2013. Three improved satellite chlorophyll algorithms for the Southern Ocean. Journal of Geophysical Research: Oceans. doi: 10.1002/jgrc.20270. It is expected that the data set will be periodically updated with contemporary data as it becomes available.\\n\\nThere are four sub-streams within this data set. A monthly and an 8-day series for MODIS/Aqua and similarly for SeaWIFS. Note that SeaWIFS ceased operation in late 2010 so there will be no further SeaWIFS data. \\n\\nThe data represented by this record is weekly data for MODIS/Aqua.\"}"
+    },
+    {
+      "href": "uuid:bd2a812b-d76d-42eb-9654-9f2e13d305ff",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"Satellite Remote Sensing - Satellite Contributed Ocean Colour - SeaWIFS Chlorophyll Concentration in the Southern Ocean: Weekly, Johnson et al 2013\",\"recordAbstract\":\"The Aqua and Orbview satellites carry a MODIS and SeaWIFS sensors (respectively) that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a and aggregating the data over time. This data set is a reprocessed copy of 9km monthly and 8-day versions produced globally by NASA, adjusted for the Southern Ocean south of latitude 30S. The full methodology is described in Johnson, R., Strutton, P.G., Wright, S.W., McMinn, A., Meiners, K.M., 2013. Three improved satellite chlorophyll algorithms for the Southern Ocean. Journal of Geophysical Research: Oceans. doi: 10.1002/jgrc.20270. It is expected that the data set will be periodically updated with contemporary data as it becomes available.\\n\\nThere are four sub-streams within this data set. A monthly and an 8-day series for MODIS/Aqua and similarly for SeaWIFS. Note that SeaWIFS ceased operation in late 2010 so there will be no further SeaWIFS data. \\n\\nThe data represented by this record is weekly data for SeaWIFS.\"}"
+    },
+    {
+      "href": "uuid:10fcb776-d331-4a04-ac1f-4a48fa050385",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"Satellite Remote Sensing - Satellite Contributed Ocean Colour - SeaWIFS Chlorophyll Concentration in the Southern Ocean: Monthly, Johnson et al 2013\",\"recordAbstract\":\"The Aqua and Orbview satellites carry a MODIS and SeaWIFS sensors (respectively) that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a and aggregating the data over time. This data set is a reprocessed copy of 9km monthly and 8-day versions produced globally by NASA, adjusted for the Southern Ocean south of latitude 30S. The full methodology is described in Johnson, R., Strutton, P.G., Wright, S.W., McMinn, A., Meiners, K.M., 2013. Three improved satellite chlorophyll algorithms for the Southern Ocean. Journal of Geophysical Research: Oceans. doi: 10.1002/jgrc.20270. It is expected that the data set will be periodically updated with contemporary data as it becomes available.\\n\\nThere are four sub-streams within this data set. A monthly and an 8-day series for MODIS/Aqua and similarly for SeaWIFS. Note that SeaWIFS ceased operation in late 2010 so there will be no further SeaWIFS data. \\n\\nThe data represented by this record is monthly data for SeaWIFS.\"}"
+    },
+    {
+      "href": "uuid:24055e3a-94e5-40bb-b97f-7519f0482d6a",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Satellite Remote Sensing - MODIS - 01 day - Chlorophyll-a concentration (OCI model)\",\"recordAbstract\":\"The Aqua satellite platform carries a MODIS sensor that observes sunlight reflected from within the ocean surface layer at multiple wavelengths. These multi-spectral measurements are used to infer the concentration of chlorophyll-a (Chl-a), most typically due to phytoplankton, present in the water. \\n\\nThere are multiple retrieval algorithms for estimating Chl-a. These data use the OCI method (Hu et al 2012, doi: 10.1029/2011jc007395) recommended by the NASA Ocean Biology Processing Group and implemented in the SeaDAS processing software l2gen. The OCI algorithm is described at https://oceancolor.gsfc.nasa.gov/atbd/chlor_a/ (and links therein).\\n\\nProduction of contemporary MODIS data ceased at 2024/12/26. Users requiring similar Ocean Colour Radiometry data beyond 2024 should consider the VIIRS instruments on the SNPP and NOAA20+ series of satellites, also provided by IMOS.\"}"
+    },
+    {
+      "href": "\"https://nbviewer.org/github/aodn/aodn_cloud_optimised/blob/main/notebooks/satellite_net_primary_productivity_gsm_1day_aqua.ipynb\"",
+      "rel": "related",
+      "type": "application/x-ipynb+json",
+      "title": "Python notebook example",
+      "ai:group": "Python Notebook"
+    },
+    {
+      "href": "http://localhost:8081/api/v1/ogc/collections/27cc65c0-d453-4ba3-a0d6-55e4449fee8c/items/summary",
+      "rel": "summary",
+      "type": "application/x-zarr",
+      "title": "satellite_net_primary_productivity_gsm_1day_aqua.zarr"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [80.0, -60.0, 179.9, 10.0],
+        [80.0, -60.0, 179.9, 10.0]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["2002-06-30T14:00:00.000+00:00", "2024-12-26T12:59:59.000+00:00"],
+        ["2002-06-30T14:00:00.000+00:00", "2024-12-26T12:59:59.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

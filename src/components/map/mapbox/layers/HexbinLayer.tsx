@@ -237,6 +237,12 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
               .setLngLat(info.coordinate as [number, number])
               .setHTML(htmlBuilder.getHtml())
               .addTo(map);
+
+            // add test id for playwright tests
+            const popupElement = popupRef.current.getElement();
+            if (popupElement) {
+              popupElement.dataset.testid = "map-popup";
+            }
           }
         },
       }),

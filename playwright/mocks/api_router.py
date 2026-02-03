@@ -93,18 +93,18 @@ class ApiRouter:
         self.route(Routes.COLLECTION_ALL, handler_function)
 
     def route_collection_detail(
-        self, detail_handler: Callable, detail_item_handler: Callable
+        self, detail_handler: Callable, detail_summary_handler: Callable
     ) -> None:
         self.route(Routes.COLLECTION_DETAIL, detail_handler)
-        self.route(Routes.COLLECTION_DETAIL_ITEM, detail_item_handler)
+        self.route(Routes.COLLECTION_DETAIL_SUMMARY, detail_summary_handler)
 
     def unroute_collection_detail(
         self,
         detail_handler: Optional[Callable] = None,
-        detail_item_handler: Optional[Callable] = None,
+        detail_summary_handler: Optional[Callable] = None,
     ) -> None:
         self.unroute(Routes.COLLECTION_DETAIL, detail_handler)
-        self.unroute(Routes.COLLECTION_DETAIL_ITEM, detail_item_handler)
+        self.unroute(Routes.COLLECTION_DETAIL_SUMMARY, detail_summary_handler)
 
     def route_wms_map_tile(self, handler_function: Callable) -> None:
         self.route(Routes.WMS_MAP_TILE, handler_function)
@@ -129,3 +129,11 @@ class ApiRouter:
         self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)
+
+    def route_wms_map_feature(self, handler_function: Callable) -> None:
+        self.route(Routes.WMS_MAP_FEATURE, handler_function)
+
+    def unroute_wms_map_feature(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.WMS_MAP_FEATURE, handler_function)

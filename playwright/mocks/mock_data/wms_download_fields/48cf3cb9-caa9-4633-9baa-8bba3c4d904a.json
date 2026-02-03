@@ -1,0 +1,12 @@
+[
+  {
+    "label": "survey_date",
+    "type": "date",
+    "name": "survey_date"
+  },
+  {
+    "label": "geom",
+    "type": "geometrypropertytype",
+    "name": "geom"
+  }
+]
