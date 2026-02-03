@@ -10,6 +10,7 @@ const dateDefault = {
 
 const pageDefault = {
   error: "/error",
+  degraded: "/degraded",
   search: "/search",
   details: "/details",
   landing: "/",
