@@ -1,10 +1,9 @@
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { ComponentType, SVGProps } from "react";
 
-export const BlueskyLogoIcon = ({
-  color = "#000",
+export const BlueskyLogoIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   width = 24,
   height = 24,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     width={width}
     height={height}

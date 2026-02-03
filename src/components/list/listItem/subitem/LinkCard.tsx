@@ -1,12 +1,8 @@
-import { FC, useMemo, useState } from "react";
+import { createElement, FC, useMemo, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import { useClipboardContext } from "../../../../context/clipboard/ClipboardContext";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
-import {
-  DataAccessSubGroup,
-  getSubgroup,
-  ILink,
-} from "../../../common/store/OGCCollectionDefinitions";
+import { ILink } from "../../../common/store/OGCCollectionDefinitions";
 import { openInNewTab } from "../../../../utils/LinkUtils";
 import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
@@ -77,25 +73,13 @@ const LinkCard: FC<LinkCardProps> = ({
       >
         {icon && link.getIcon && (
           <Box display="flex" alignItems="center">
-            <Box
-              component="img"
-              width={
-                getSubgroup(link) === DataAccessSubGroup.WFS
-                  ? "27px" // Fixed WFS icon size as per design
-                  : getSubgroup(link) === DataAccessSubGroup.WMS
-                    ? "22px" // Fixed WMS icon size as per design
-                    : "16px" // Fixed Link icon size as per design
-              }
-              height={
-                getSubgroup(link) === DataAccessSubGroup.WFS
-                  ? "30px"
-                  : getSubgroup(link) === DataAccessSubGroup.WMS
-                    ? "28px"
-                    : "16px"
-              }
-              src={link.getIcon()}
-              alt={"link icon"}
-            />
+            <Box width={27}>
+              {typeof link.getIcon() === "string" ? (
+                <img src={link.getIcon() as string} alt={"link icon"} />
+              ) : (
+                createElement(link.getIcon(), { height: "100%", width: "100%" })
+              )}
+            </Box>
           </Box>
         )}
         <Box

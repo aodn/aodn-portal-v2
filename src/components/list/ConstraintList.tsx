@@ -1,7 +1,7 @@
 import React from "react";
 import CollapseItem from "./listItem/CollapseItem";
 import ExpandableList from "./ExpandableList";
-import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
+import TextArea from "./listItem/subitem/TextArea";
 
 interface ConstraintListProps {
   constraints: { title: string; content: string[] }[];
@@ -22,11 +22,11 @@ const ConstraintList: React.FC<ConstraintListProps> = ({
     return (
       <CollapseItem title={constraint.title} isOpen key={index}>
         {constraint.content.map((line, index) => (
-          <ExpandableTextArea
+          <TextArea
             text={line}
             key={index}
-            lineClampConfig={{ default: 4, mobile: 3, tablet: 3 }}
             isCopyable
+            showCopyOnHover={false}
           />
         ))}
       </CollapseItem>

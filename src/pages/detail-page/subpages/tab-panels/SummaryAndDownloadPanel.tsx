@@ -67,6 +67,12 @@ const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
     default: false,
   },
   {
+    id: StaticLayersDef.MEOW.id,
+    name: StaticLayersDef.MEOW.name,
+    label: StaticLayersDef.MEOW.label,
+    default: false,
+  },
+  {
     id: MapboxWorldLayersDef.WORLD.id,
     name: MapboxWorldLayersDef.WORLD.name,
     default: false,
@@ -264,6 +270,27 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const conditionEnd = dayjs(dateRangeCondition.end, dateDefault.DATE_FORMAT);
     return [conditionStart, conditionEnd];
   }, [downloadConditions]);
+
+  const geoServerLayerConfig = useMemo(() => {
+    return discreteTimeSliderValues
+      ? {
+          urlParams: {
+            TIME: dayjs.utc(datePointValue!),
+            MODE: Dimension.SINGLE,
+          },
+        }
+      : {
+          urlParams: {
+            START_DATE: filterStartDate,
+            END_DATE: filterEndDate,
+          },
+        };
+  }, [
+    discreteTimeSliderValues,
+    datePointValue,
+    filterStartDate,
+    filterEndDate,
+  ]);
 
   const handleMapChange = useCallback(
     (event: MapEvent | undefined) => {
@@ -524,23 +551,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     onSelectCoKey={setSelectedCoKey}
                   />
                   <GeoServerLayer
-                    geoServerLayerConfig={
-                      // This value appears only if this dataset layer support single time
-                      // move, NOT range
-                      discreteTimeSliderValues
-                        ? {
-                            urlParams: {
-                              TIME: dayjs.utc(datePointValue!),
-                              MODE: Dimension.SINGLE,
-                            },
-                          }
-                        : {
-                            urlParams: {
-                              START_DATE: filterStartDate,
-                              END_DATE: filterEndDate,
-                            },
-                          }
-                    }
+                    geoServerLayerConfig={geoServerLayerConfig}
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
                     onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}

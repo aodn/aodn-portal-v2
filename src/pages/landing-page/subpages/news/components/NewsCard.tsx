@@ -39,28 +39,14 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
         />
       </CardActionArea>
       <Box bgcolor={color.blue.extraDark}>
-        <Box
-          display="flex"
-          flexDirection="row"
-          flexWrap="wrap"
-          justifyContent="space-between"
-          alignItems="center"
+        <Typography
+          color="#fff"
+          fontSize={fontSize.newsInfo}
+          fontWeight={fontWeight.extraLight}
+          textAlign="left"
         >
-          <Typography
-            color="#fff"
-            fontSize={fontSize.newsInfo}
-            fontWeight={fontWeight.extraLight}
-          >
-            {news.subheading}
-          </Typography>
-          <Typography
-            color="#fff"
-            fontSize={fontSize.newsInfo}
-            fontWeight={fontWeight.extraLight}
-          >
-            {news.date}
-          </Typography>
-        </Box>
+          {news.subheading}
+        </Typography>
         <Typography
           color="#fff"
           fontSize={fontSize.newsTitle}
@@ -71,6 +57,7 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
             WebkitLineClamp: "2",
             WebkitBoxOrient: "vertical",
           }}
+          textAlign="left"
         >
           {news.title}
         </Typography>

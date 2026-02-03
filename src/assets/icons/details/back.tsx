@@ -1,10 +1,10 @@
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { ComponentType, SVGProps } from "react";
 
-export const ReplyIcon = ({
+export const ReplyIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "#52BDEC",
   width = 34,
   height = 34,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     id="Layer_1"
     data-name="Layer 1"

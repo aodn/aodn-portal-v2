@@ -164,6 +164,12 @@ const MapSection: React.FC<MapSectionProps> = memo(
                         default: false,
                       },
                       {
+                        id: StaticLayersDef.MEOW.id,
+                        name: StaticLayersDef.MEOW.name,
+                        label: StaticLayersDef.MEOW.label,
+                        default: false,
+                      },
+                      {
                         id: MapboxWorldLayersDef.WORLD.id,
                         name: MapboxWorldLayersDef.WORLD.name,
                         default: false,

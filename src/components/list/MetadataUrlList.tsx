@@ -3,7 +3,7 @@ import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import LinkCard from "./listItem/subitem/LinkCard";
 import { ILink } from "../common/store/OGCCollectionDefinitions";
-import linkIcon from "../../assets/icons/link.png";
+import { IconLink } from "../../assets/icons/link";
 
 interface MetadataUrlListProps {
   url: string;
@@ -24,7 +24,7 @@ const MetadataUrlList: React.FC<MetadataUrlListProps> = ({
             title: url,
             type: "",
             description: "",
-            getIcon: () => linkIcon,
+            getIcon: () => IconLink,
           } as ILink
         }
       />

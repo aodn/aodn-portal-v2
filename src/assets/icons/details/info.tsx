@@ -1,10 +1,10 @@
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { SVGProps } from "react";
 
 export const InfoIcon = ({
   color = "currentColor",
   width = 40,
   height = 40,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     id="Layer_1"
     data-name="Layer 1"

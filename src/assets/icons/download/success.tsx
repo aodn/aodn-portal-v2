@@ -1,10 +1,10 @@
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { ComponentType, SVGProps } from "react";
 
-export const SuccessIcon = ({
+export const SuccessIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "none",
   width = 20,
   height = 14,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     width={width}
     height={height}

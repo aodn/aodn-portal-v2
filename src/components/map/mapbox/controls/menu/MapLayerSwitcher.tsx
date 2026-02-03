@@ -99,7 +99,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
         onClick={handleToggle}
         sx={switcherIconButtonSx(open)}
       >
-        <SearchStyleIcon />
+        <SearchStyleIcon color={open ? "white" : undefined} />
       </IconButton>
       <Popper
         id={ComponentId.MapLayerSwitcher.PopperId}

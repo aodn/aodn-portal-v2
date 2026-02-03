@@ -10,12 +10,17 @@ import MapContext from "../MapContext";
 import { FeatureCollection, Polygon } from "geojson";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { TestHelper } from "../../../common/test/helper";
-import { marineParkDefault } from "../../../common/constants";
+import {
+  marineEcoregionOfWorldDefault,
+  marineParkDefault,
+} from "../../../common/constants";
 
 export interface StaticLayersProps {
   id: string;
   name: string;
   label: string;
+  geojson: string;
+  termsOfUse: string;
   features?: FeatureCollection;
 }
 
@@ -23,11 +28,24 @@ const StaticLayersDef = {
   AUSTRALIA_MARINE_PARKS: {
     id: "static-australia-marine-parks",
     name: "Australian Marine Parks",
+    geojson: marineParkDefault.geojson,
+    termsOfUse: marineParkDefault.termsOfUse,
     label: "RESNAME",
+  },
+  MEOW: {
+    id: "static-meow",
+    name: "Marine Ecoregion of the World",
+    geojson: marineEcoregionOfWorldDefault.geojson,
+    termsOfUse: marineEcoregionOfWorldDefault.termsOfUse,
+    label: "ECOREGION",
   },
 };
 
-const StaticLayer: FC<StaticLayersProps> = ({ id, label, features }) => {
+const StaticLayer: FC<Partial<StaticLayersProps>> = ({
+  id,
+  label,
+  features,
+}) => {
   const { map } = useContext(MapContext);
   const [_, setCreated] = useState<boolean>(false);
 
@@ -52,7 +70,7 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, label, features }) => {
       type: "fill",
       source: sourceId,
       paint: {
-        "fill-color": stringToColor(id),
+        "fill-color": stringToColor(id!),
         "fill-outline-color": "black",
       },
     });
@@ -119,27 +137,30 @@ const StaticLayer: FC<StaticLayersProps> = ({ id, label, features }) => {
     <React.Fragment />
   );
 };
-// A shortcut for australian marine parks
-const AustraliaMarineParkLayer: FC<Partial<StaticLayersProps>> = ({
-  id = StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
-  name = StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
-  label = StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-}) => {
+// A shortcut for Australian marine parks
+const MarineParkLayer: FC<StaticLayersProps> = (props) => {
   const [data, setData] = useState<FeatureCollection<Polygon>>();
 
   // Data orginated from here, we store a copy in the following path and useEffect to load it so we do not need to bundle it to the package which make is very big
   // https://data.gov.au/dataset/ds-dcceew-https%3A%2F%2Fwww.arcgis.com%2Fhome%2Fitem.html%3Fid%3D2b3eb1d42b8d4319900cf4777f0a83b9%26sublayer%3D0/details?q=marine%20park
   useEffect(() => {
-    fetch(marineParkDefault.geojson)
+    fetch(props.geojson)
       .then((response) => response.json())
       .then((json: FeatureCollection<Polygon>) => setData(json))
       .catch((error) => console.error("Error fetching JSON:", error));
-  }, []);
+  }, [props.geojson]);
 
-  return <StaticLayer id={id} name={name} label={label} features={data} />;
+  return (
+    <StaticLayer
+      id={props.id}
+      name={props.name}
+      label={props.label}
+      features={data}
+    />
+  );
 };
 
 // Export needed layers
-export { AustraliaMarineParkLayer, StaticLayersDef };
+export { MarineParkLayer, StaticLayersDef };
 
 export default StaticLayer;
