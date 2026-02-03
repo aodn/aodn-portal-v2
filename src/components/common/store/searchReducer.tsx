@@ -39,6 +39,7 @@ import {
 import dayjs from "dayjs";
 import { dateDefault } from "../constants";
 import { CloudOptimizedFeature } from "./CloudOptimizedDefinitions";
+import { Health } from "./systemDefinition";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -476,6 +477,16 @@ const fetchGeoServerMapLayers = createAsyncThunk<
   }
 );
 
+const fetchSystemHealthNoStore = createAsyncThunk<
+  Health,
+  void,
+  { rejectValue: ErrorResponse }
+>("system/fetchSystemHealthNoStore", async (thunkApi: any) =>
+  ogcAxiosWithRetry
+    .get<Health>("/ogc/manage/health")
+    .then((response) => response.data)
+    .catch(errorHandling(thunkApi))
+);
 /**
  * Appends a filter condition using AND operation.
  */
@@ -627,6 +638,7 @@ export {
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
+  fetchSystemHealthNoStore,
   processDatasetDownload,
   processWFSDownload,
   jsonToOGCCollections,

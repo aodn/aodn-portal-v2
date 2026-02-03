@@ -1,6 +1,6 @@
 // React import is not required in React 17 or later
 import { RouterProvider } from "react-router-dom";
-import Fallback from "./pages/Fallback";
+import Fallback from "./pages/error-page/Fallback";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "./utils/AppTheme";
 import AppRouter from "./utils/AppRouter";
