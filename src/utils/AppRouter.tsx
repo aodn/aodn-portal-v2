@@ -27,7 +27,7 @@ const router = createBrowserRouter([
     path: pageDefault.landing,
     element: (
       <ErrorBoundary>
-        <HealthChecker />
+        {import.meta.env.MODE !== "playwright-local" && <HealthChecker />}
         <LandingPage />
       </ErrorBoundary>
     ),
@@ -38,7 +38,7 @@ const router = createBrowserRouter([
     loader: searchLoader,
     element: (
       <ErrorBoundary>
-        <HealthChecker />
+        {import.meta.env.MODE !== "playwright-local" && <HealthChecker />}
         <SearchPage />
       </ErrorBoundary>
     ),
@@ -48,7 +48,7 @@ const router = createBrowserRouter([
     path: `${pageDefault.details}/:uuid`,
     element: (
       <ErrorBoundary>
-        <HealthChecker />
+        {import.meta.env.MODE !== "playwright-local" && <HealthChecker />}
         <DetailsPage />
       </ErrorBoundary>
     ),
