@@ -169,73 +169,64 @@ const renderSubTitle = (
   endDate: string | undefined,
   status: string | undefined,
   scope: string | undefined
-) => {
-  // check if is document, if so, only show scope and hide date
-  const isDocumentScope = scope?.toLowerCase() === "document";
-
-  return (
-    <Stack flexDirection="row" flexWrap="wrap" gap={1}>
-      {pace &&
-        pace.toLowerCase() !== "other" &&
-        !(
-          pace.toLowerCase() === "completed" && status === Status.completed
-        ) && (
-          <RoundCard
-            sx={{
-              bgcolor: color.pace,
-            }}
-          >
-            <Typography
-              padding={0}
-              variant="title1Medium"
-              color={portalTheme.palette.text1}
-            >
-              {capitalizeFirstLetter(pace)}
-            </Typography>
-          </RoundCard>
-        )}
-      {!isDocumentScope && startDate && (
+) => (
+  <Stack flexDirection="row" flexWrap="wrap" gap={1}>
+    {scope && scope.toLowerCase() === "document" && renderDocumentScope()}
+    {pace &&
+      pace.toLowerCase() !== "other" &&
+      !(pace.toLowerCase() === "completed" && status === Status.completed) && (
         <RoundCard
           sx={{
-            border: `${border.xs} ${color.gray.extraLight}`,
-            backgroundColor: color.blue.extraLightSemiTransparent,
+            bgcolor: color.pace,
           }}
         >
           <Typography
             padding={0}
-            paddingRight={padding.small}
             variant="title1Medium"
             color={portalTheme.palette.text1}
           >
-            {startDate}
+            {capitalizeFirstLetter(pace)}
           </Typography>
-          <KeyboardDoubleArrowRightIcon
-            sx={{
-              fontSize: fontSize.label,
-              color: color.gray.light,
-            }}
-          />
-          {endDate && (
-            <Typography
-              padding={0}
-              paddingLeft={padding.small}
-              variant="title1Medium"
-              color={portalTheme.palette.text1}
-            >
-              {endDate}
-            </Typography>
-          )}
         </RoundCard>
       )}
-      {isDocumentScope
-        ? renderDocumentScope()
-        : status &&
-          (status === Status.completed
-            ? renderCompletedStatus()
-            : renderOnGoingStatus())}
-    </Stack>
-  );
-};
+    {startDate && (
+      <RoundCard
+        sx={{
+          border: `${border.xs} ${color.gray.extraLight}`,
+          backgroundColor: color.blue.extraLightSemiTransparent,
+        }}
+      >
+        <Typography
+          padding={0}
+          paddingRight={padding.small}
+          variant="title1Medium"
+          color={portalTheme.palette.text1}
+        >
+          {startDate}
+        </Typography>
+        <KeyboardDoubleArrowRightIcon
+          sx={{
+            fontSize: fontSize.label,
+            color: color.gray.light,
+          }}
+        />
+        {endDate && (
+          <Typography
+            padding={0}
+            paddingLeft={padding.small}
+            variant="title1Medium"
+            color={portalTheme.palette.text1}
+          >
+            {endDate}
+          </Typography>
+        )}
+      </RoundCard>
+    )}
+    {status && status === Status.completed
+      ? renderCompletedStatus()
+      : renderOnGoingStatus()}
+  </Stack>
+);
 
 const HeaderSection = () => {
   const location = useLocation();
