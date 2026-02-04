@@ -20,7 +20,9 @@ import {
   border,
   borderRadius,
   color,
+  fontColor,
   fontSize,
+  fontWeight,
   padding,
 } from "../../../styles/constants";
 import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
@@ -33,6 +35,7 @@ import InfoCard from "../../../components/info/InfoCard";
 import { InfoStatusType } from "../../../components/info/InfoDefinition";
 import { DataTestId } from "../../../components/map/mapbox/constants";
 import { ReplyIcon } from "../../../assets/icons/details/back";
+import LabelChip from "../../../components/common/label/LabelChip";
 
 enum Status {
   onGoing = "onGoing",
@@ -151,9 +154,25 @@ const renderSubTitle = (
   pace: string | undefined,
   startDate: string | undefined,
   endDate: string | undefined,
-  status: string | undefined
+  status: string | undefined,
+  scope: string | undefined
 ) => (
   <Stack flexDirection="row" flexWrap="wrap" gap={1}>
+    {scope && scope.toLowerCase() === "document" && (
+      <RoundCard sx={{ backgroundColor: `${color.success.light}` }}>
+        <LabelChip
+          text={["Document"]}
+          color={color.success.light}
+          sx={{
+            padding: 0,
+            paddingX: padding.extraSmall,
+            ...portalTheme.typography.title1Medium,
+            color: fontColor.black.dark,
+            fontWeight: fontWeight.regular,
+          }}
+        />
+      </RoundCard>
+    )}
     {pace &&
       pace.toLowerCase() !== "other" &&
       !(pace.toLowerCase() === "completed" && status === Status.completed) && (
@@ -217,11 +236,12 @@ const HeaderSection = () => {
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
-  const [title, pace, status, startDate, endDate] = useMemo(() => {
+  const [title, pace, status, startDate, endDate, scope] = useMemo(() => {
     const title = collection?.title;
     const pace = collection?.getPace();
     const status = collection?.getStatus();
     const extent = collection?.getExtent();
+    const scope = collection?.getScope();
 
     let startDate = undefined;
     let endDate = undefined;
@@ -231,7 +251,7 @@ const HeaderSection = () => {
       endDate = e;
     }
 
-    return [title, pace, status, startDate, endDate];
+    return [title, pace, status, startDate, endDate, scope];
   }, [collection]);
 
   const onGoBack = useCallback(
@@ -327,7 +347,8 @@ const HeaderSection = () => {
               >
                 {title}
               </Typography>
-              {!isMobile && renderSubTitle(pace, startDate, endDate, status)}
+              {!isMobile &&
+                renderSubTitle(pace, startDate, endDate, status, scope)}
             </Grid>
             <Grid
               item
@@ -352,7 +373,7 @@ const HeaderSection = () => {
             </Grid>
             {isMobile && (
               <Grid item xs={8} sm={12}>
-                {renderSubTitle(pace, startDate, endDate, status)}
+                {renderSubTitle(pace, startDate, endDate, status, scope)}
               </Grid>
             )}
           </Grid>

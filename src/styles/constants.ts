@@ -97,6 +97,9 @@ const fontColor = {
     header: "#3B6E8F",
     medium: "#468CB6",
   },
+  black: {
+    dark: "#090C02",
+  },
 };
 
 const color = {
@@ -132,6 +135,7 @@ const color = {
   },
   success: {
     main: "#4CAF50",
+    light: "#D7EEC6",
   },
   pace: "#D7F4F2",
 };
