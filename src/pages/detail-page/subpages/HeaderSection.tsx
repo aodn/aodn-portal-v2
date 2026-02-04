@@ -150,20 +150,6 @@ const renderCompletedStatus = () => (
   </RoundCard>
 );
 
-const renderDocumentScope = () => (
-  <RoundCard sx={{ backgroundColor: `${color.success.light}` }}>
-    <Typography
-      padding={0}
-      paddingX={padding.extraSmall}
-      variant="title1Medium"
-      color={fontColor.black.dark}
-      fontWeight={fontWeight.regular}
-    >
-      Document
-    </Typography>
-  </RoundCard>
-);
-
 const renderSubTitle = (
   pace: string | undefined,
   startDate: string | undefined,
