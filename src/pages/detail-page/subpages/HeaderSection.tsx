@@ -35,6 +35,7 @@ import InfoCard from "../../../components/info/InfoCard";
 import { InfoStatusType } from "../../../components/info/InfoDefinition";
 import { DataTestId } from "../../../components/map/mapbox/constants";
 import { ReplyIcon } from "../../../assets/icons/details/back";
+import LabelChip from "../../../components/common/label/LabelChip";
 
 enum Status {
   onGoing = "onGoing",
@@ -171,7 +172,21 @@ const renderSubTitle = (
   scope: string | undefined
 ) => (
   <Stack flexDirection="row" flexWrap="wrap" gap={1}>
-    {scope && scope.toLowerCase() === "document" && renderDocumentScope()}
+    {scope && scope.toLowerCase() === "document" && (
+      <RoundCard sx={{ backgroundColor: `${color.success.light}` }}>
+        <LabelChip
+          text={["Document"]}
+          color={color.success.light}
+          sx={{
+            padding: 0,
+            paddingX: padding.extraSmall,
+            ...portalTheme.typography.title1Medium,
+            color: fontColor.black.dark,
+            fontWeight: fontWeight.regular,
+          }}
+        />
+      </RoundCard>
+    )}
     {pace &&
       pace.toLowerCase() !== "other" &&
       !(pace.toLowerCase() === "completed" && status === Status.completed) && (

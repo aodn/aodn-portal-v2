@@ -29,31 +29,9 @@ import { LIST_CARD_TITLE_HEIGHT } from "./constants";
 import { portalTheme } from "../../styles";
 import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
+import LabelChip from "../common/label/LabelChip";
 
 interface ListResultCardProps extends ResultCardBasicType {}
-
-// for document records, render document tag
-const renderDocumentScope = () => (
-  <Box
-    sx={{
-      display: "inline-flex",
-      width: "100px",
-      height: "26px",
-      padding: "2px 0",
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: "6px",
-      backgroundColor: color.success.light,
-      fontFamily: fontFamily.general,
-      fontSize: fontSize.resultCardTitle,
-      fontWeight: fontWeight.regular,
-      color: fontColor.black.dark,
-      lineHeight: lineHeight.heading,
-    }}
-  >
-    Document
-  </Box>
-);
 
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
@@ -210,13 +188,29 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     sx={{
                       display: "flex",
                       height: "26px",
-                      paddingLeft: "8px",
                       alignItems: "center",
                       gap: "16px",
                       mt: 0.5,
                     }}
                   >
-                    {renderDocumentScope()}
+                    <LabelChip
+                      text={["Document"]}
+                      sx={{
+                        display: "inline-flex",
+                        width: "100px",
+                        height: "26px",
+                        padding: "2px 0",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "6px",
+                        backgroundColor: color.success.light,
+                        fontFamily: fontFamily.general,
+                        fontSize: fontSize.resultCardTitle,
+                        fontWeight: fontWeight.regular,
+                        color: fontColor.black.dark,
+                        lineHeight: lineHeight.heading,
+                      }}
+                    />
                   </Box>
                 )}
               </Box>
