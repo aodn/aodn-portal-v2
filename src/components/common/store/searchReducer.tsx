@@ -39,6 +39,7 @@ import {
 import dayjs from "dayjs";
 import { dateDefault } from "../constants";
 import { CloudOptimizedFeature } from "./CloudOptimizedDefinitions";
+import { Health } from "./systemDefinition";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -156,7 +157,7 @@ const searchResult = async (
       param.properties !== undefined
         ? param.properties
         : // Including the keyword "bbox" to ensure spatial extents is returned
-          "id,title,description,status,links,assets_summary,bbox",
+          "id,title,description,status,scope,links,assets_summary,bbox",
   };
 
   if (param.text !== undefined && param.text.length !== 0) {
@@ -476,6 +477,16 @@ const fetchGeoServerMapLayers = createAsyncThunk<
   }
 );
 
+const fetchSystemHealthNoStore = createAsyncThunk<
+  Health,
+  void,
+  { rejectValue: ErrorResponse }
+>("system/fetchSystemHealthNoStore", async (thunkApi: any) =>
+  ogcAxiosWithRetry
+    .get<Health>("/ogc/manage/health")
+    .then((response) => response.data)
+    .catch(errorHandling(thunkApi))
+);
 /**
  * Appends a filter condition using AND operation.
  */
@@ -627,6 +638,7 @@ export {
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
+  fetchSystemHealthNoStore,
   processDatasetDownload,
   processWFSDownload,
   jsonToOGCCollections,

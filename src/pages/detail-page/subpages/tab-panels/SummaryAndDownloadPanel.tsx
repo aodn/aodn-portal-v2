@@ -224,10 +224,16 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const bbox = collection?.getBBox();
     const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
     const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
-    const noMapPreview =
-      downloadService === DownloadServiceType.Unavailable &&
-      !hasSpatialExtent &&
-      !isWMSAvailable;
+
+    const scope = collection?.getScope();
+    const isDocumentScope = scope?.toLowerCase() === "document";
+    // for document records, no map preview if there is no spatial extent,
+    // for dataset records, no map preview if satisfies both: no co download and no wfs download service and no spatial extent
+    const noMapPreview = isDocumentScope
+      ? !hasSpatialExtent
+      : downloadService === DownloadServiceType.Unavailable &&
+        !hasSpatialExtent &&
+        !isWMSAvailable;
     // We trust the metadata value instead of raw data, in fact it is hard to have a common
     // time value, for example cloud optimized date range may be different from the
     // geoserver one
@@ -270,6 +276,27 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     const conditionEnd = dayjs(dateRangeCondition.end, dateDefault.DATE_FORMAT);
     return [conditionStart, conditionEnd];
   }, [downloadConditions]);
+
+  const geoServerLayerConfig = useMemo(() => {
+    return discreteTimeSliderValues
+      ? {
+          urlParams: {
+            TIME: dayjs.utc(datePointValue!),
+            MODE: Dimension.SINGLE,
+          },
+        }
+      : {
+          urlParams: {
+            START_DATE: filterStartDate,
+            END_DATE: filterEndDate,
+          },
+        };
+  }, [
+    discreteTimeSliderValues,
+    datePointValue,
+    filterStartDate,
+    filterEndDate,
+  ]);
 
   const handleMapChange = useCallback(
     (event: MapEvent | undefined) => {
@@ -530,23 +557,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                     onSelectCoKey={setSelectedCoKey}
                   />
                   <GeoServerLayer
-                    geoServerLayerConfig={
-                      // This value appears only if this dataset layer support single time
-                      // move, NOT range
-                      discreteTimeSliderValues
-                        ? {
-                            urlParams: {
-                              TIME: dayjs.utc(datePointValue!),
-                              MODE: Dimension.SINGLE,
-                            },
-                          }
-                        : {
-                            urlParams: {
-                              START_DATE: filterStartDate,
-                              END_DATE: filterEndDate,
-                            },
-                          }
-                    }
+                    geoServerLayerConfig={geoServerLayerConfig}
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
                     onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}

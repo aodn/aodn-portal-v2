@@ -136,6 +136,10 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
+        "/api/v1/ogc/manage/health": {
+          target: apiPath,
+          changeOrigin: true,
+        },
       },
     },
     plugins: [

@@ -1,10 +1,10 @@
-import { IconProps } from "../../../types/assets/iconsTypes";
+import { ComponentType, SVGProps } from "react";
 
-export const SearchIcon = ({
+export const SearchIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "none",
   width = 22,
   height = 22,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     width={width}
     height={height}

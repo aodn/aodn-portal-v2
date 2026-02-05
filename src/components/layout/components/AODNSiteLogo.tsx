@@ -1,100 +1,35 @@
-import { Box, Divider, Link, Typography } from "@mui/material";
-import IMOS from "@/assets/logos/imos_logo_with_title.png";
-import {
-  fontColor,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  lineHeight,
-} from "../../../styles/constants";
-import useRedirectHome from "../../../hooks/useRedirectHome";
+import { Box } from "@mui/material";
 import useBreakpoint from "../../../hooks/useBreakpoint";
+import useRedirectHome from "../../../hooks/useRedirectHome";
 import {
   AODN_SITE_LOGO_HEIGHT,
   AODN_SITE_LOGO_HEIGHT_MOBILE,
 } from "../constant";
-import { portalTheme } from "../../../styles";
 import { pageDefault } from "../../common/constants";
+import { IconImosLogoWithTitle } from "../../../assets/images/banner_logo_with_title";
 
 const AODNSiteLogo = () => {
   const { isMobile } = useBreakpoint();
   const redirectHome = useRedirectHome();
-
   return (
     <Box
+      component={"a"}
       sx={{
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         height: isMobile ? AODN_SITE_LOGO_HEIGHT_MOBILE : AODN_SITE_LOGO_HEIGHT,
         minWidth: "320px",
+        cursor: "pointer",
       }}
+      href={pageDefault.landing}
+      onClick={(e) => {
+        e.preventDefault();
+        redirectHome("AODNSiteLogo", true);
+      }}
+      data-testid="aodn-home-link"
     >
-      <Box
-        component={"a"}
-        sx={{
-          cursor: "pointer",
-          height: "100%",
-        }}
-        href={pageDefault.landing}
-        // onClick={(e) => {
-        //   Temp disable this due to user confuse, new design needed
-        //   openInNewTab(pageDefault.url.IMOS);
-        // }}
-      >
-        <img
-          src={IMOS}
-          alt="IMOS Logo"
-          style={{
-            height: "100%",
-            width: "auto",
-            objectFit: "contain",
-          }}
-          data-testid="imos-logo"
-        />
-      </Box>
-      <Divider
-        orientation="vertical"
-        flexItem
-        sx={{
-          bgcolor: `${portalTheme.palette.primary1}`,
-          opacity: "50%",
-          width: "1px",
-          mx: { xs: "12px", md: "18px" },
-          my: "6px",
-        }}
-      />
-      <Link
-        sx={{
-          cursor: "pointer",
-          textDecoration: "none",
-          "&:hover": {
-            textDecoration: "none",
-          },
-        }}
-        href={pageDefault.landing}
-        onClick={(e) => {
-          e.preventDefault();
-          redirectHome("AODNSiteLogo", true);
-        }}
-      >
-        <Typography
-          textAlign="left"
-          lineHeight={lineHeight.heading}
-          fontFamily={fontFamily.poppins}
-          fontSize={{
-            xs: fontSize.AODNSiteLogoTextMobile,
-            md: fontSize.AODNSiteLogoText,
-          }}
-          fontWeight={fontWeight.light}
-          color={fontColor.blue.header}
-          padding={0}
-          data-testid="aodn-home-link"
-        >
-          Australian Ocean <br />
-          Data Network
-        </Typography>
-      </Link>
+      <IconImosLogoWithTitle data-testid="imos-logo" />
     </Box>
   );
 };

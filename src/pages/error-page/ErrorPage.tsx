@@ -1,13 +1,16 @@
-import { Box, Typography } from "@mui/material";
+// ErrorPage.tsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import notFoundImage from "@/assets/images/no_matching_record.png";
+import { Box, Typography } from "@mui/material";
 
-const NotFoundPage = () => {
+const ErrorPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <Box
-      component="img"
-      src={notFoundImage}
-      alt="not found image"
       sx={{
+        backgroundImage: `url(${notFoundImage})`,
         backgroundSize: "cover", // Covers the entire area
         backgroundPosition: "center", // Centers the image
         backgroundRepeat: "no-repeat", // Prevents tiling
@@ -24,7 +27,7 @@ const NotFoundPage = () => {
             color: "black",
           }}
         >
-          404 Error Page
+          Error Occurred
         </Typography>
         <Typography
           sx={{
@@ -32,11 +35,12 @@ const NotFoundPage = () => {
             color: "black",
           }}
         >
-          The page you were looking for doesn&rsquo;t exist.
+          Something went wrong. Please try again later.
         </Typography>
+        <button onClick={() => navigate("/")}>Go Back Home</button>
       </Box>
     </Box>
   );
 };
 
-export default NotFoundPage;
+export default ErrorPage;

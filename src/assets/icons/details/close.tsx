@@ -1,10 +1,10 @@
-import { IconProps } from "../../../components/icon/types";
+import { ComponentType, SVGProps } from "react";
 
-export const CloseIcon = ({
+export const CloseIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "#8c8c8c",
   width = 18,
   height = 18,
-}: IconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={width}
