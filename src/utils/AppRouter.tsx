@@ -2,10 +2,12 @@ import LandingPage from "../pages/landing-page/LandingPage";
 import SearchPage from "../pages/search-page/SearchPage";
 import DetailsPage from "../pages/detail-page/DetailsPage";
 import { createBrowserRouter, redirect } from "react-router-dom";
-import NotFoundPage from "../pages/NotFoundPage";
-import ErrorPage from "../pages/ErrorPage";
+import NotFoundPage from "../pages/error-page/NotFoundPage";
+import ErrorPage from "../pages/error-page/ErrorPage";
 import ErrorBoundary from "./ErrorBoundary";
 import { pageDefault } from "../components/common/constants";
+import HealthChecker from "./HealthChecker";
+import DegradedPage from "../pages/error-page/DegradedPage";
 
 export const searchLoader = ({ request }: { request: Request }) => {
   const url = new URL(request.url);
@@ -25,6 +27,7 @@ const router = createBrowserRouter([
     path: pageDefault.landing,
     element: (
       <ErrorBoundary>
+        {import.meta.env.MODE !== "playwright-local" && <HealthChecker />}
         <LandingPage />
       </ErrorBoundary>
     ),
@@ -35,6 +38,7 @@ const router = createBrowserRouter([
     loader: searchLoader,
     element: (
       <ErrorBoundary>
+        {import.meta.env.MODE !== "playwright-local" && <HealthChecker />}
         <SearchPage />
       </ErrorBoundary>
     ),
@@ -44,6 +48,7 @@ const router = createBrowserRouter([
     path: `${pageDefault.details}/:uuid`,
     element: (
       <ErrorBoundary>
+        {import.meta.env.MODE !== "playwright-local" && <HealthChecker />}
         <DetailsPage />
       </ErrorBoundary>
     ),
@@ -52,6 +57,11 @@ const router = createBrowserRouter([
   {
     path: pageDefault.error,
     Component: ErrorPage,
+    children: [],
+  },
+  {
+    path: pageDefault.degraded,
+    Component: DegradedPage,
     children: [],
   },
   {
