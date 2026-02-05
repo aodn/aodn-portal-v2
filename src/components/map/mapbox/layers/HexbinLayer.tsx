@@ -24,6 +24,7 @@ import _ from "lodash";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import MapLayerSelect from "../component/MapLayerSelect";
 import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
+import { playwrightTestIds } from "../../../common/constants";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
@@ -241,7 +242,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
             // add test id for playwright tests
             const popupElement = popupRef.current.getElement();
             if (popupElement) {
-              popupElement.dataset.testid = "map-popup";
+              popupElement.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
             }
           }
         },
