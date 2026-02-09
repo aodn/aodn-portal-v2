@@ -59,6 +59,10 @@ const contactRoles = {
   CITATION: "citation",
 };
 
+const playwrightTestIds = {
+  DETAIL_MAP_POPUP: "map-popup",
+};
+
 export {
   dateDefault,
   pageDefault,
@@ -67,4 +71,5 @@ export {
   marineParkDefault,
   marineEcoregionOfWorldDefault,
   contactRoles,
+  playwrightTestIds,
 };

@@ -30,6 +30,7 @@ class DetailPage(BasePage):
         self.share_button = self.page.get_by_test_id('share-button')
         self.copy_link = self.page.get_by_test_id('copy-link')
         self.wms_link_header = self.get_text('WMS Service Link')
+        self.detail_map_popup = self.page.get_by_test_id('map-popup')
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')

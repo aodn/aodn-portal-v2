@@ -16,8 +16,9 @@ class Routes:
         f'{PREFIX}/collections?properties=id,title,description&filter=id*'
     )
     COLLECTION_DETAIL = f'{PREFIX}/collections/*'
-    COLLECTION_DETAIL_ITEM = f'{PREFIX}/collections/*/items/summary'
+    COLLECTION_DETAIL_SUMMARY = f'{PREFIX}/collections/*/items/summary'
 
     WMS_MAP_TILE = '*/**/items/wms_map_tile?*'
     WMS_MAP_LAYERS = '*/**/items/wms_layers?*'
     WMS_DOWNLOADABLE_FIELDS = '*/**/items/wms_downloadable_fields?*'
+    WMS_MAP_FEATURE = '*/**/items/wms_map_feature?*'
