@@ -29,7 +29,7 @@ const InfoCard: FC<InfoCardProps> = ({
         flexDirection: "row",
         justifyContent: "left",
         alignItems: "center",
-        padding: "8px", // Fixed padding as per design
+        padding: "4px",
         ...sx,
       }}
     >
@@ -37,7 +37,7 @@ const InfoCard: FC<InfoCardProps> = ({
         <Paper
           elevation={0}
           sx={{
-            width: "6px", // Fixed width as per design
+            width: "6px",
             alignSelf: "stretch",
             backgroundColor:
               status === InfoStatusType.ERROR
@@ -50,7 +50,7 @@ const InfoCard: FC<InfoCardProps> = ({
       )}
 
       {infoContent && (
-        <Paper elevation={0} sx={{ flex: 1 }}>
+        <Paper elevation={0} sx={{ flex: 1, bgcolor: "inherit" }}>
           {infoContent.title && (
             <Typography
               variant="heading4"

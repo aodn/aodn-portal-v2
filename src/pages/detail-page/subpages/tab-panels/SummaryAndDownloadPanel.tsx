@@ -461,7 +461,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 panelId={mapContainerId}
                 projection={"mercator"} // Hexbin support this project or globe only
                 announcement={
-                  noMapPreview ? "Map Preview Not Available" : undefined
+                  !noMapPreview ? "Dataset preview is not available" : undefined
                 }
                 onMoveEvent={handleMapChange}
                 onZoomEvent={handleMapChange}

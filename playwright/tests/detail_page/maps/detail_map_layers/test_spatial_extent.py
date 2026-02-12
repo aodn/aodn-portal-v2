@@ -95,12 +95,12 @@ def test_map_shows_preview_not_available(
 ) -> None:
     """
     This test uses a dataset that doesn't have bounding box coordinates, WMS links, or summary links.
-    It verifies that map shows 'Map Preview Not Available' announcement.
+    It verifies that map shows 'Dataset preview is not available' announcement.
     """
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     detail_page.detail_map.wait_for_map_idle()
     expect(detail_page.detail_map.announcement_panel).to_have_text(
-        'Map Preview Not Available'
+        'Dataset preview is not available'
     )

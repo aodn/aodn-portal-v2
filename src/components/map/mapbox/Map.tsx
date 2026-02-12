@@ -13,7 +13,9 @@ import lodash from "lodash";
 import { TestHelper } from "../../common/test/helper";
 import { MapDefaultConfig, MapEventEnum } from "./constants";
 import { CircularProgress, Paper } from "@mui/material";
-import { padding } from "../../../styles/constants";
+import { portalTheme } from "../../../styles";
+import { InfoStatusType } from "../../info/InfoDefinition";
+import InfoCard from "../../info/InfoCard";
 
 export interface MapBasicType {
   centerLongitude?: number;
@@ -296,37 +298,25 @@ const ReactMap = memo(
             visibility: announcement ? "visible" : "hidden",
           }}
         >
-          <Paper
-            sx={{
-              padding: padding.medium,
-              backgroundColor: "rgba(255, 255, 255, 0.70)",
-              border: "1px solid #8C8C8C",
-              borderRadius: "6px",
-              backdropFilter: "blur(10px)",
-              flexShrink: 0,
-              width: {
-                xs: "280px",
-                sm: "350px",
-                md: "480px",
-              },
-              height: {
-                xs: "56px",
-                sm: "60px",
-                md: "64px",
-              },
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#090C02",
-              textAlign: "center",
-              fontSize: "16px",
-              fontStyle: "normal",
-              fontWeight: 500,
-              lineHeight: "14px",
+          <InfoCard
+            infoContent={{
+              body: announcement?.replace(/^model:/, "") || "",
             }}
-          >
-            {announcement?.replace(/^model:/, "")}
-          </Paper>
+            status={InfoStatusType.WARNING}
+            sx={{
+              boxShadow: "unset",
+              width: "480px",
+              height: "56px",
+              bgcolor: portalTheme.palette.primary6,
+              borderRadius: "6px",
+            }}
+            contentSx={{
+              padding: 0,
+              px: 2,
+              textAlign: "center",
+              ...portalTheme.typography.title2Regular,
+            }}
+          />
         </Paper>
         <TestHelper id={panelId} getMap={() => map} />
         {children}
