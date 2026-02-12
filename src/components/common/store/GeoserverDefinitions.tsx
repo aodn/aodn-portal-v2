@@ -17,6 +17,48 @@ export type MapFeatureRequest = {
   enableGeoServerWhiteList?: boolean;
 };
 
+type FieldsInfo = {
+  label: string;
+  name: string;
+  type: string;
+};
+
+type NcWmsLayerInfo = {
+  units: string;
+  bbox: Array<number>;
+  palettes: Array<string>;
+  defaultPalette: string;
+  scaleRange: Array<number>;
+  datesWithData: { [year: string]: { [month: string]: number[] } };
+  numColorBands: number;
+  supportedStyles: Array<string>;
+  moreInfo: string;
+  timeAxisUnits: string;
+  nearestTimeIso: string;
+  logScaling: boolean;
+};
+
+// Response type for wfs_fields and wms_fields endpoints
+export type GeoserverFieldsResponse = {
+  typename: string;
+  fields: FieldsInfo[];
+};
+
+// Response type for wms_layers endpoint
+export type MapLayerResponse = {
+  name: string;
+  title: string;
+  queryable: string;
+  ncWmsLayerInfo?: NcWmsLayerInfo;
+};
+
+// Response type for wfs_layers endpoint
+export type DownloadLayersResponse = {
+  name: string;
+  title: string;
+};
+
+// Response type for wms_feature_info endpoint
 export type MapFeatureResponse = {
   latitude: number;
   longitude: number;
@@ -29,30 +71,4 @@ export type MapFeatureResponse = {
     time?: Date;
     value?: number;
   }>;
-};
-
-export type MapFieldResponse = {
-  label: string;
-  type: string;
-  name: string;
-};
-
-export type MapLayerResponse = {
-  name: string;
-  title: string;
-  queryable: string;
-  ncWmsLayerInfo?: {
-    units: string;
-    bbox: Array<number>;
-    palettes: Array<string>;
-    defaultPalette: string;
-    scaleRange: Array<number>;
-    datesWithData: { [year: string]: { [month: string]: number[] } };
-    numColorBands: number;
-    supportedStyles: Array<string>;
-    moreInfo: string;
-    timeAxisUnits: string;
-    nearestTimeIso: string;
-    logScaling: boolean;
-  };
 };

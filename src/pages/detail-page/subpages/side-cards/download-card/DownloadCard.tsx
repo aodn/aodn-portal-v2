@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { useDetailPageContext } from "../../../context/detail-page-context";
 import DownloadWFSCard from "./components/DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./components/DownloadCloudOptimisedCard";
@@ -14,6 +14,7 @@ const DownloadCard: FC = () => {
     removeDownloadCondition,
     selectedWmsLayer,
     downloadService,
+    setDownloadService,
     selectedCoKey,
     setSelectedCoKey,
   } = useDetailPageContext();
@@ -23,6 +24,23 @@ const DownloadCard: FC = () => {
     const wmsLinks = collection?.getWMSLinks() || [];
     return [wfsLinks, wmsLinks];
   }, [collection]);
+
+  const onWFSAvailabilityChange = useCallback(
+    (isWFSAvailable: boolean) => {
+      // Strong preference on cloud optimized data, if collection have it
+      // then always use it regardless of what WFS told us.
+      setDownloadService((type) => {
+        if (type !== DownloadServiceType.CloudOptimised) {
+          return isWFSAvailable
+            ? DownloadServiceType.WFS
+            : DownloadServiceType.Unavailable;
+        } else {
+          return type;
+        }
+      });
+    },
+    [setDownloadService]
+  );
 
   const downloadCard = useMemo(() => {
     if (!collection) return null;

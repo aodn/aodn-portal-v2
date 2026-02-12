@@ -51,6 +51,7 @@ import { MapEventEnum } from "../../../../components/map/mapbox/constants";
 import { DateSliderPoint } from "../../../../components/common/slider/DateSlider";
 import { dateToValue } from "../../../../utils/DateUtils";
 import { portalTheme } from "../../../../styles";
+import { GeoserverFieldsResponse } from "../../../../components/common/store/GeoserverDefinitions";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -201,6 +202,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   >([]);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
+  const [_, setWMSFields] = useState<GeoserverFieldsResponse[]>([]);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
     Map<string, Array<number>> | undefined
@@ -372,22 +374,22 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setIsWMSAvailable(isWMSAvailable);
   }, []);
 
-  const onWFSAvailabilityChange = useCallback(
-    (isWFSAvailable: boolean) => {
-      // Strong preference on cloud optimized data, if collection have it
-      // then always use it regardless of what WFS told us.
-      setDownloadService((type) => {
-        if (type !== DownloadServiceType.CloudOptimised) {
-          return isWFSAvailable
-            ? DownloadServiceType.WFS
-            : DownloadServiceType.Unavailable;
-        } else {
-          return type;
-        }
-      });
-    },
-    [setDownloadService]
-  );
+  // const onWFSAvailabilityChange = useCallback(
+  //   (isWFSAvailable: boolean) => {
+  //     // Strong preference on cloud optimized data, if collection have it
+  //     // then always use it regardless of what WFS told us.
+  //     setDownloadService((type) => {
+  //       if (type !== DownloadServiceType.CloudOptimised) {
+  //         return isWFSAvailable
+  //           ? DownloadServiceType.WFS
+  //           : DownloadServiceType.Unavailable;
+  //       } else {
+  //         return type;
+  //       }
+  //     });
+  //   },
+  //   [setDownloadService]
+  // );
 
   const handleBaseMapSwitch = useCallback(
     (target: EventTarget & HTMLInputElement) =>
@@ -559,8 +561,9 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   <GeoServerLayer
                     geoServerLayerConfig={geoServerLayerConfig}
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
-                    onWFSAvailabilityChange={onWFSAvailabilityChange}
+                    // onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
+                    setWMSFields={setWMSFields}
                     setTimeSliderSupport={setTimeSliderSupport}
                     setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
                     setDrawRectSupportSupport={setDrawRectSupportSupport}

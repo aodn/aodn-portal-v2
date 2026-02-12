@@ -8,7 +8,7 @@ import MapContext from "../../MapContext";
 import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import {
-  MapFieldResponse,
+  GeoserverFieldsResponse,
   MapLayerResponse,
 } from "../../../../common/store/GeoserverDefinitions";
 import { MapEventEnum } from "../../constants";
@@ -252,9 +252,9 @@ describe("GeoServerLayer", () => {
           data: data,
         });
       }
-      if (url.includes("wms_downloadable_fields")) {
+      if (url.includes("wms_fields")) {
         return Promise.resolve({
-          data: [{ type: "dateTime" } as MapFieldResponse],
+          data: [{ type: "dateTime" } as unknown as GeoserverFieldsResponse],
         });
       }
       return Promise.resolve({ data: [] });
