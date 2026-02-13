@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useEffect, useMemo } from "react";
 import { useDetailPageContext } from "../../../context/detail-page-context";
 import DownloadWFSCard from "./components/DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./components/DownloadCloudOptimisedCard";
@@ -12,17 +12,16 @@ const DownloadCard: FC = () => {
     downloadConditions,
     getAndSetDownloadConditions,
     removeDownloadCondition,
-    selectedWmsLayer,
     downloadService,
     setDownloadService,
     selectedCoKey,
     setSelectedCoKey,
   } = useDetailPageContext();
 
-  const [wfsLinks, wmsLinks] = useMemo(() => {
+  const [wfsLinks, hasSummaryFeature] = useMemo(() => {
     const wfsLinks = collection?.getWFSLinks() || [];
-    const wmsLinks = collection?.getWMSLinks() || [];
-    return [wfsLinks, wmsLinks];
+    const hasSummaryFeature = collection?.hasSummaryFeature() || false;
+    return [wfsLinks, hasSummaryFeature];
   }, [collection]);
 
   const onWFSAvailabilityChange = useCallback(
@@ -42,6 +41,18 @@ const DownloadCard: FC = () => {
     [setDownloadService]
   );
 
+  useEffect(() => {
+    // Set the type of download based on simple  in collection, the value
+    // may change by callback if more info available
+    if (hasSummaryFeature) {
+      setDownloadService(DownloadServiceType.CloudOptimised);
+    } else if (wfsLinks.length > 0) {
+      setDownloadService(DownloadServiceType.WFS);
+    } else {
+      setDownloadService(DownloadServiceType.Unavailable);
+    }
+  }, [hasSummaryFeature, setDownloadService, wfsLinks.length]);
+
   const downloadCard = useMemo(() => {
     if (!collection) return null;
     switch (downloadService) {
@@ -59,13 +70,11 @@ const DownloadCard: FC = () => {
       case DownloadServiceType.WFS:
         return (
           <DownloadWFSCard
-            WFSLinks={wfsLinks}
-            WMSLinks={wmsLinks}
-            selectedWmsLayerName={selectedWmsLayer}
             uuid={collection?.id}
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
+            onWFSAvailabilityChange={onWFSAvailabilityChange}
           />
         );
       case DownloadServiceType.Unavailable:
@@ -77,12 +86,10 @@ const DownloadCard: FC = () => {
     downloadConditions,
     downloadService,
     getAndSetDownloadConditions,
+    onWFSAvailabilityChange,
     removeDownloadCondition,
-    selectedWmsLayer,
     selectedCoKey,
     setSelectedCoKey,
-    wfsLinks,
-    wmsLinks,
   ]);
 
   return (

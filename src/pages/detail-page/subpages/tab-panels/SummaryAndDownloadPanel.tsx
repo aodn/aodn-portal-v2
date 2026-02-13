@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
+import React, { FC, useCallback, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -191,7 +191,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     selectedWmsLayer,
     setSelectedWmsLayer,
     downloadService,
-    setDownloadService,
     selectedCoKey,
     setSelectedCoKey,
   } = useDetailPageContext();
@@ -204,13 +203,13 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
   const [_, setWMSFields] = useState<GeoserverFieldsResponse[]>([]);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
+  const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
     Map<string, Array<number>> | undefined
   >(undefined);
   const [datePointValue, setDatePointValue] = useState<number>(
     dateToValue(dayjs(dateDefault.min))
   );
-  const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
 
   const [
@@ -374,23 +373,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setIsWMSAvailable(isWMSAvailable);
   }, []);
 
-  // const onWFSAvailabilityChange = useCallback(
-  //   (isWFSAvailable: boolean) => {
-  //     // Strong preference on cloud optimized data, if collection have it
-  //     // then always use it regardless of what WFS told us.
-  //     setDownloadService((type) => {
-  //       if (type !== DownloadServiceType.CloudOptimised) {
-  //         return isWFSAvailable
-  //           ? DownloadServiceType.WFS
-  //           : DownloadServiceType.Unavailable;
-  //       } else {
-  //         return type;
-  //       }
-  //     });
-  //   },
-  //   [setDownloadService]
-  // );
-
   const handleBaseMapSwitch = useCallback(
     (target: EventTarget & HTMLInputElement) =>
       setStaticLayer((values) => {
@@ -408,19 +390,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     (wmsLayerName: string) => setSelectedWmsLayer(wmsLayerName),
     [setSelectedWmsLayer]
   );
-
-  useEffect(() => {
-    // Set the type of download based on simple  in collection, the value
-    // may change by callback if more info available
-    const wfsLinks = collection?.getWFSLinks() || [];
-    if (hasSummaryFeature) {
-      setDownloadService(DownloadServiceType.CloudOptimised);
-    } else if (wfsLinks.length > 0) {
-      setDownloadService(DownloadServiceType.WFS);
-    } else {
-      setDownloadService(DownloadServiceType.Unavailable);
-    }
-  }, [collection, hasSummaryFeature, setDownloadService]);
 
   return (
     collection && (
@@ -561,9 +530,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   <GeoServerLayer
                     geoServerLayerConfig={geoServerLayerConfig}
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
-                    // onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
-                    setWMSFields={setWMSFields}
+                    setWmsFields={setWMSFields}
                     setTimeSliderSupport={setTimeSliderSupport}
                     setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
                     setDrawRectSupportSupport={setDrawRectSupportSupport}
