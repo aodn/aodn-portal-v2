@@ -33,13 +33,22 @@ export const switcherIconButtonSx = (open: boolean) => ({
   "&.MuiIconButton-root.MuiIconButton-root": {
     backgroundColor: `${open ? fontColor.blue.dark : "transparent"}`,
     color: open ? "white" : color.gray.dark,
-    width: "40px",
-    height: "40px",
+    width: "38px",
+    height: "38px",
+    padding: "2px",
     borderRadius: "6px",
     my: "3px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    "& svg": {
+      width: "26px",
+      height: "26px",
+    },
+    "& img": {
+      width: "26px",
+      height: "26px",
+    },
     "&:hover": {
       backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
     },
