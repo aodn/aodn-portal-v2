@@ -2,6 +2,7 @@ import { FC } from "react";
 import { Stack } from "@mui/material";
 import { useDetailPageContext } from "../context/detail-page-context";
 import { MODE } from "../../../components/list/CommonDef";
+import ParametersCard from "./side-cards/ParametersCard";
 import DownloadCard from "./side-cards/download-card/DownloadCard";
 import DataAccessPanel, { TYPE } from "./tab-panels/DataAccessPanel";
 import SpatialCoverageCard, {
@@ -22,6 +23,7 @@ const SideSection: FC<SideSectionProps> = ({ onSpatialCoverageLayerClick }) => {
       gap={2}
       flexWrap="wrap"
     >
+      <ParametersCard />
       <DownloadCard />
       <DataAccessPanel mode={MODE.COMPACT} type={TYPE.DATA_ACCESS} />
       <SpatialCoverageCard
