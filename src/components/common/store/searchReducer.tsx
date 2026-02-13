@@ -460,23 +460,6 @@ const fetchGeoServerMapFields = createAsyncThunk<
   }
 );
 
-// const fetchGeoServerDownloadFields = createAsyncThunk<
-//   Array<GeoserverFieldsResponse>,
-//   MapFeatureRequest,
-//   { rejectValue: ErrorResponse }
-// >(
-//   "geoserver/fetchGeoServerDownloadFields",
-//   (request: MapFeatureRequest, thunkApi: any) => {
-//     return ogcAxiosWithRetry
-//       .get<MapFeatureResponse>(
-//         `/ogc/collections/${request.uuid}/items/wfs_fields`,
-//         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
-//       )
-//       .then((response) => response.data)
-//       .catch(errorHandling(thunkApi));
-//   }
-// );
-
 const fetchGeoServerMapLayers = createAsyncThunk<
   Array<MapLayerResponse>,
   MapFeatureRequest,
