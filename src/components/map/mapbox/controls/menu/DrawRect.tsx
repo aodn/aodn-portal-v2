@@ -25,6 +25,8 @@ import { switcherIconButtonSx } from "./MenuControl";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { BboxTooltipIcon } from "../../../../../assets/icons/map/tooltip_bbox";
 import MenuTooltip from "./MenuTooltip";
+import { PolygonSelectionTooltipIcon } from "../../../../../assets/icons/map/tooltip_polygon_selection";
+import { PolygonSelectionIcon } from "../../../../../assets/icons/map/polygon_selection";
 
 interface DrawControlProps extends ControlProps {
   getAndSetDownloadConditions: (
@@ -35,23 +37,27 @@ interface DrawControlProps extends ControlProps {
 }
 
 const MENU_ID = "draw-rect-menu-button";
+const POLYGON_MENU_ID = "draw-polygon-menu-button";
 const TRASH_ID = "draw-rect-trash-button";
 const DRAW_RECTANGLE_MODE = "draw_rectangle";
+type SelectionTool = "bbox" | "polygon";
 
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
   getAndSetDownloadConditions,
   downloadConditions,
 }) => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [isDrawingMode, setIsDrawingMode] = useState<boolean>(false);
+  const [activeTool, setActiveTool] = useState<SelectionTool>("bbox");
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showPolygonTooltip, setShowPolygonTooltip] = useState(false);
   const [hasFeatures, setHasFeatures] = useState<boolean>(false);
 
   const handleIconClick = () => {
     if (showTooltip) {
       // If tooltip is showing, close it but keep draw mode active
       setShowTooltip(false);
-    } else if (!open) {
+    } else if (!isDrawingMode) {
       // If not in draw mode, activate draw mode and show tooltip
       mapDraw.changeMode(DRAW_RECTANGLE_MODE);
       setShowTooltip(true);
@@ -59,10 +65,32 @@ const DrawRect: React.FC<DrawControlProps> = ({
       // If already in draw mode, just show tooltip again
       setShowTooltip(true);
     }
+    setActiveTool("bbox");
+    setShowPolygonTooltip(false);
   };
 
   const handleCloseTooltip = () => {
     setShowTooltip(false);
+  };
+
+  const handlePolygonClick = () => {
+    if (showPolygonTooltip) {
+      // If tooltip is showing, close it but keep draw mode active
+      setShowPolygonTooltip(false);
+    } else if (!isDrawingMode) {
+      // Keep same behavior as bounding box: activate draw mode first
+      mapDraw.changeMode(DRAW_RECTANGLE_MODE);
+      setShowPolygonTooltip(true);
+    } else {
+      // If already in draw mode, just show tooltip again
+      setShowPolygonTooltip(true);
+    }
+    setActiveTool("polygon");
+    setShowTooltip(false);
+  };
+
+  const handleClosePolygonTooltip = () => {
+    setShowPolygonTooltip(false);
   };
 
   const mapDraw = useMemo<MapboxDraw>(
@@ -113,6 +141,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
   );
 
   const anchorRef = useRef(null);
+  const polygonAnchorRef = useRef(null);
   const popperRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
@@ -120,7 +149,8 @@ const DrawRect: React.FC<DrawControlProps> = ({
       return;
     }
     if (!popperRef.current.contains(event.target as Node)) {
-      setOpen(false);
+      setShowTooltip(false);
+      setShowPolygonTooltip(false);
     }
   }, []);
 
@@ -145,7 +175,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
   }, [mapDraw, hasFeatures, syncMapFeaturesToContext]);
 
   useEffect(() => {
-    if (open) {
+    if (isDrawingMode) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -154,14 +184,13 @@ const DrawRect: React.FC<DrawControlProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [handleClickOutside, open]);
+  }, [handleClickOutside, isDrawingMode]);
 
   // Sync button state with actual draw mode
   useEffect(() => {
     const modePollingInterval = setInterval(() => {
       const currentMode = mapDraw.getMode();
-      const isDrawingMode = currentMode === DRAW_RECTANGLE_MODE;
-      setOpen(isDrawingMode);
+      setIsDrawingMode(currentMode === DRAW_RECTANGLE_MODE);
 
       // Check if there are any features to enable/disable trash button
       try {
@@ -266,9 +295,11 @@ const DrawRect: React.FC<DrawControlProps> = ({
         data-testid={MENU_ID}
         ref={anchorRef}
         onClick={handleIconClick}
-        sx={switcherIconButtonSx(open)}
+        sx={switcherIconButtonSx(isDrawingMode && activeTool === "bbox")}
       >
-        <BboxSelectionIcon color={open ? "white" : undefined} />
+        <BboxSelectionIcon
+          color={isDrawingMode && activeTool === "bbox" ? "white" : undefined}
+        />
       </IconButton>
 
       <MenuTooltip
@@ -278,6 +309,30 @@ const DrawRect: React.FC<DrawControlProps> = ({
         description="Use bounding box tool to draw a rectangle as selection."
         icon={<BboxTooltipIcon />}
         onClose={handleCloseTooltip}
+      />
+
+      <IconButton
+        aria-label="polygon-selection-menu"
+        id={POLYGON_MENU_ID}
+        data-testid={POLYGON_MENU_ID}
+        ref={polygonAnchorRef}
+        onClick={handlePolygonClick}
+        sx={switcherIconButtonSx(isDrawingMode && activeTool === "polygon")}
+      >
+        <PolygonSelectionIcon
+          color={
+            isDrawingMode && activeTool === "polygon" ? "white" : undefined
+          }
+        />
+      </IconButton>
+
+      <MenuTooltip
+        open={showPolygonTooltip}
+        anchorEl={polygonAnchorRef.current}
+        title="Polygon Selection"
+        description="Use polygon tool to draw several points to complete a selection."
+        icon={<PolygonSelectionTooltipIcon />}
+        onClose={handleClosePolygonTooltip}
       />
 
       <IconButton

@@ -28,6 +28,9 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       borderRadius: 0,
       background: "#FFF",
       boxShadow: "none",
+      "& button + button": {
+        borderTop: "none",
+      },
       marginY: 0,
       mx: "1px",
       display: "flex",

@@ -37,7 +37,7 @@ export const switcherIconButtonSx = (open: boolean) => ({
     height: "38px",
     padding: "2px",
     borderRadius: "6px",
-    my: "3px",
+    my: "2px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
