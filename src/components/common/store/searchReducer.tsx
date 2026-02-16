@@ -451,7 +451,7 @@ const fetchGeoServerMapFields = createAsyncThunk<
   (request: MapFeatureRequest, thunkApi: any) => {
     return ogcAxiosWithRetry
       .get<MapFeatureResponse>(
-        `/ogc/collections/${request.uuid}/items/wms_downloadable_fields`,
+        `/ogc/collections/${request.uuid}/items/wms_fields`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)

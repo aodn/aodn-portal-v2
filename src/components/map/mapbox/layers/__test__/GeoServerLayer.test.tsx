@@ -126,7 +126,7 @@ describe("GeoServerLayer", () => {
           data: [{ name: "test_layer", title: "Test Layer" }],
         });
       }
-      if (url.includes("wms_downloadable_fields")) {
+      if (url.includes("wms_fields")) {
         return Promise.resolve({ data: [{ type: "dateTime" }] });
       }
       return Promise.resolve({ data: [] });
@@ -180,7 +180,7 @@ describe("GeoServerLayer", () => {
           ],
         });
       }
-      if (url.includes("wms_downloadable_fields")) {
+      if (url.includes("wms_fields")) {
         return Promise.reject({
           response: { status: 404, data: { message: "Not found" } },
           isAxiosError: true,
@@ -252,7 +252,7 @@ describe("GeoServerLayer", () => {
           data: data,
         });
       }
-      if (url.includes("wms_downloadable_fields")) {
+      if (url.includes("wms_fields")) {
         return Promise.resolve({
           data: [{ type: "dateTime" } as MapFieldResponse],
         });
