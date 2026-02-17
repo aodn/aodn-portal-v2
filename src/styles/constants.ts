@@ -128,6 +128,7 @@ const color = {
     light: "#979797",
     extraLight: "#dfdfdf",
     xxLight: "#f8f8f8",
+    warm: "#F6F0ED",
   },
   white: {
     twoTenTransparent: " rgba(255, 255, 255, 0.2  )",

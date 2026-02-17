@@ -157,7 +157,7 @@ const searchResult = async (
       param.properties !== undefined
         ? param.properties
         : // Including the keyword "bbox" to ensure spatial extents is returned
-          "id,title,description,status,scope,links,assets_summary,bbox",
+          "id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox",
   };
 
   if (param.text !== undefined && param.text.length !== 0) {

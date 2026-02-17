@@ -52,7 +52,64 @@ const ListResultCard: FC<ListResultCardProps> = ({
     const isSelectedDataset = uuid === selectedUuid;
     const thumbnail: string = findThumbnail();
     const scope = content.getScope();
+    const aiUpdateFrequency = content.getAiUpdateFrequency();
+    const hasAiUpdateFrequency =
+      aiUpdateFrequency?.toLowerCase() === "real-time" ||
+      aiUpdateFrequency?.toLowerCase() === "delayed";
     const hasDocumentTag = scope?.toLowerCase() === "document";
+    const shouldHideTags = isSelectedDataset || showButtons;
+
+    // Helper function to render a tag chip
+    const renderTagChip = (text: string) => (
+      <Box
+        sx={{
+          display: "flex",
+          height: "26px",
+          alignItems: "center",
+          gap: "16px",
+          mt: 0.5,
+        }}
+      >
+        <LabelChip
+          text={[text]}
+          sx={{
+            display: "inline-flex",
+            width: "100px",
+            height: "26px",
+            padding: "2px 0",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "6px",
+            backgroundColor: getTagColor(text),
+            fontFamily: fontFamily.general,
+            fontSize: fontSize.resultCardTitle,
+            fontWeight: fontWeight.regular,
+            color: fontColor.black.dark,
+            lineHeight: lineHeight.heading,
+          }}
+        />
+      </Box>
+    );
+
+    const getTagColor = (tagText: string | undefined): string => {
+      if (!tagText) return color.tabPanel.background;
+      const formattedText = tagText.toLowerCase();
+      let tagColor;
+      switch (formattedText) {
+        case "document":
+          tagColor = color.success.light;
+          break;
+        case "real-time":
+          tagColor = color.pace;
+          break;
+        case "delayed":
+          tagColor = color.gray.warm;
+          break;
+        default:
+          tagColor = color.tabPanel.background;
+      }
+      return tagColor;
+    };
 
     return (
       <Card
@@ -157,7 +214,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                 <Typography
                   variant="body3Small"
                   color={portalTheme.palette.text2}
-                  arial-label="result-list-card-content"
+                  aria-label="result-list-card-content"
                   onClick={() =>
                     isSimplified
                       ? onClickDetail?.(uuid)
@@ -169,13 +226,14 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     overflow: "hidden",
                     display: "-webkit-box",
                     cursor: "pointer",
-                    WebkitLineClamp: hasDocumentTag
-                      ? "4" // show less text for document records on responsive page
-                      : isSimplified
-                        ? 5 //defalt with 5 lines
-                        : isSelectedDataset || showButtons
-                          ? "4" // if mouse hovering or clicked, show 4 lines
-                          : "5",
+                    WebkitLineClamp:
+                      hasDocumentTag || hasAiUpdateFrequency
+                        ? "4" // show less text for document records on responsive page
+                        : isSimplified
+                          ? "5" //defalt with 5 lines
+                          : isSelectedDataset || showButtons
+                            ? "4" // if mouse hovering or clicked, show 4 lines
+                            : "5",
 
                     WebkitBoxOrient: "vertical",
                     wordBreak: "break-word",
@@ -183,36 +241,10 @@ const ListResultCard: FC<ListResultCardProps> = ({
                 >
                   {description}
                 </Typography>
-                {hasDocumentTag && !isSelectedDataset && !showButtons && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      height: "26px",
-                      alignItems: "center",
-                      gap: "16px",
-                      mt: 0.5,
-                    }}
-                  >
-                    <LabelChip
-                      text={["Document"]}
-                      sx={{
-                        display: "inline-flex",
-                        width: "100px",
-                        height: "26px",
-                        padding: "2px 0",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: "6px",
-                        backgroundColor: color.success.light,
-                        fontFamily: fontFamily.general,
-                        fontSize: fontSize.resultCardTitle,
-                        fontWeight: fontWeight.regular,
-                        color: fontColor.black.dark,
-                        lineHeight: lineHeight.heading,
-                      }}
-                    />
-                  </Box>
-                )}
+                {!shouldHideTags && hasDocumentTag && renderTagChip("Document")}
+                {!shouldHideTags &&
+                  hasAiUpdateFrequency &&
+                  renderTagChip(aiUpdateFrequency || "other")}
               </Box>
               {thumbnail !== default_thumbnail && (
                 <Box
