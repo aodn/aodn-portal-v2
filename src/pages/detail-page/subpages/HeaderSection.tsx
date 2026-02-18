@@ -199,8 +199,8 @@ const renderSubTitle = (
             sx={{
               bgcolor:
                 aiUpdateFrequency?.toLowerCase() === "real-time"
-                  ? color.pace
-                  : color.gray.warm,
+                  ? portalTheme.palette.tag1
+                  : portalTheme.palette.tag2,
             }}
           >
             <Typography
