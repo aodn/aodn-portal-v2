@@ -42,7 +42,7 @@ def test_map_shows_only_spatial_extent_layer(
 @pytest.mark.parametrize(
     'uuid',
     [
-        '19da2ce7-138f-4427-89de-a50c724f5f54',
+        '27cc65c0-d453-4ba3-a0d6-55e4449fee8c', # Zarr data, has bbox and Geoserver
     ],
 )
 def test_map_shows_both_geoserver_and_spatial_extent_layer(

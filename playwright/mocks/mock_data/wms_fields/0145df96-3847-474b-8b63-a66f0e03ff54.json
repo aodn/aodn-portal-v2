@@ -1,0 +1,8 @@
+[
+  {
+    "typename": "SeamapAus_VIC_statewide_habitats_2023",
+    "fields": [
+      { "label": "geom", "type": "geometrypropertytype", "name": "geom" }
+    ]
+  }
+]

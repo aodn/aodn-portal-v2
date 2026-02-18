@@ -122,13 +122,13 @@ class ApiRouter:
     ) -> None:
         self.unroute(Routes.WMS_MAP_LAYERS, handler_function)
 
-    def route_wms_downloadable_fields(self, handler_function: Callable) -> None:
-        self.route(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)
+    def route_wms_fields(self, handler_function: Callable) -> None:
+        self.route(Routes.WMS_MAP_FIELDS, handler_function)
 
-    def unroute_wms_downloadable_fields(
+    def unroute_wms_fields(
         self, handler_function: Optional[Callable] = None
     ) -> None:
-        self.unroute(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)
+        self.unroute(Routes.WMS_MAP_FIELDS, handler_function)
 
     def route_wms_map_feature(self, handler_function: Callable) -> None:
         self.route(Routes.WMS_MAP_FEATURE, handler_function)
