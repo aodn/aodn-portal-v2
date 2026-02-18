@@ -20,5 +20,5 @@ class Routes:
 
     WMS_MAP_TILE = '*/**/items/wms_map_tile?*'
     WMS_MAP_LAYERS = '*/**/items/wms_layers?*'
-    WMS_DOWNLOADABLE_FIELDS = '*/**/items/wms_fields?*'
+    WMS_MAP_FIELDS = '*/**/items/wms_fields?*'
     WMS_MAP_FEATURE = '*/**/items/wms_map_feature?*'

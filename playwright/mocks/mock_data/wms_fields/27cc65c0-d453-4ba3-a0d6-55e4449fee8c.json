@@ -1,0 +1,32 @@
+[
+  {
+    "typename": "srs_oc_aqua_npp_vgpm_eppley_gsm_url",
+    "fields": [
+      {
+        "label": "timestep_id",
+        "name": "timestep_id",
+        "type": "long"
+      },
+      {
+        "label": "collection_name",
+        "name": "collection_name",
+        "type": "string"
+      },
+      {
+        "label": "file_url",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "size",
+        "name": "size",
+        "type": "double"
+      },
+      {
+        "label": "time",
+        "name": "time",
+        "type": "dateTime"
+      }
+    ]
+  }
+]

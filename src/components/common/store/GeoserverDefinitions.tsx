@@ -72,3 +72,9 @@ export type MapFeatureResponse = {
     value?: number;
   }>;
 };
+
+export enum FieldType {
+  Geom = "GeometryPropertyType",
+  DateTime = "dateTime",
+  Date = "date",
+}

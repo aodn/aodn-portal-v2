@@ -23,6 +23,7 @@ import {
   RasterTileSource,
 } from "mapbox-gl";
 import {
+  FieldType,
   GeoserverFieldsResponse,
   MapFeatureRequest,
   MapFeatureResponse,
@@ -158,10 +159,12 @@ const checkFieldSupport = (
   );
   if (layerFields) {
     const foundDatetime = layerFields.fields.some(
-      (f) => f.type === "dateTime" || f.type === "date"
+      (f) =>
+        f.type.toLowerCase() === FieldType.DateTime.toLowerCase() ||
+        f.type.toLowerCase() === FieldType.Date.toLowerCase()
     );
     const foundGeo = layerFields.fields.some(
-      (f) => f.type === "GeometryPropertyType"
+      (f) => f.type.toLowerCase() === FieldType.Geom.toLowerCase()
     );
 
     setTimeSliderSupport?.(foundDatetime);
