@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import searchReducer from "../../../../common/store/searchReducer";
-import GeoServerLayer from "../GeoServerLayer";
+import GeoServerLayer, { extractDiscreteDays } from "../GeoServerLayer";
 import MapContext from "../../MapContext";
 import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import {
-  MapFieldResponse,
+  GeoserverFieldsResponse,
   MapLayerResponse,
 } from "../../../../common/store/GeoserverDefinitions";
 import { MapEventEnum } from "../../constants";
@@ -40,6 +40,7 @@ vi.mock("axios", async () => {
     },
     create: vi.fn(() => mocks.axiosInstance),
     isAxiosError: actual.isAxiosError,
+    HttpStatusCode: actual.HttpStatusCode,
   };
 });
 
@@ -106,11 +107,11 @@ describe("GeoServerLayer", () => {
               visible={true}
               collection={collection}
               onWMSAvailabilityChange={vi.fn()}
-              onWFSAvailabilityChange={vi.fn()}
               onWmsLayerChange={vi.fn()}
               setTimeSliderSupport={vi.fn()}
               setDrawRectSupportSupport={vi.fn()}
               setDiscreteTimeSliderValues={vi.fn()}
+              setWmsFields={vi.fn()}
               {...props}
             />
           </MapContext.Provider>
@@ -132,13 +133,11 @@ describe("GeoServerLayer", () => {
       return Promise.resolve({ data: [] });
     });
 
-    const onWFSAvailabilityChange = vi.fn();
     const onWMSAvailabilityChange = vi.fn();
     const onWmsLayerChange = vi.fn();
 
     renderComponent({
       onWMSAvailabilityChange,
-      onWFSAvailabilityChange,
       onWmsLayerChange,
     });
 
@@ -147,7 +146,6 @@ describe("GeoServerLayer", () => {
         expect.stringContaining("wms_layers"),
         expect.anything()
       );
-      expect(onWFSAvailabilityChange).toHaveBeenCalledWith(true);
       expect(onWMSAvailabilityChange).toHaveBeenCalledWith(true);
       expect(onWmsLayerChange).toHaveBeenCalledWith("test_layer");
     });
@@ -189,24 +187,21 @@ describe("GeoServerLayer", () => {
       return Promise.resolve({ data: [] });
     });
 
-    const onWFSAvailabilityChange = vi.fn();
     const onWMSAvailabilityChange = vi.fn();
     const onWmsLayerChange = vi.fn();
 
     renderComponent({
       onWMSAvailabilityChange,
-      onWFSAvailabilityChange,
       onWmsLayerChange,
     });
 
     return waitFor(() => {
-      expect(onWFSAvailabilityChange).toHaveBeenCalledWith(false);
       expect(onWMSAvailabilityChange).toHaveBeenCalledWith(true);
       expect(onWmsLayerChange).toHaveBeenCalledWith("fallback");
     });
   });
 
-  it("should handle metadata with single time point slider", async () => {
+  it("should handle metadata with ncWmsLayerInfo and set discrete time slider values", async () => {
     const ncWmsLayerInfo = {
       units: "kelvin",
       bbox: [-180, -77.48999786376953, 180, -27.510000228881836],
@@ -254,32 +249,28 @@ describe("GeoServerLayer", () => {
       }
       if (url.includes("wms_fields")) {
         return Promise.resolve({
-          data: [{ type: "dateTime" } as MapFieldResponse],
+          data: [{ type: "dateTime" } as unknown as GeoserverFieldsResponse],
         });
       }
       return Promise.resolve({ data: [] });
     });
 
-    const onWFSAvailabilityChange = vi.fn();
     const onWMSAvailabilityChange = vi.fn();
     const onWmsLayerChange = vi.fn();
-    const setTimeSliderSupport = vi.fn();
     const setDiscreteTimeSliderValues = vi.fn();
 
     renderComponent({
       onWMSAvailabilityChange,
-      onWFSAvailabilityChange,
       onWmsLayerChange,
-      setTimeSliderSupport,
       setDiscreteTimeSliderValues,
     });
 
     await waitFor(() => {
-      expect(onWFSAvailabilityChange).toHaveBeenCalledWith(true);
       expect(onWMSAvailabilityChange).toHaveBeenCalledWith(true);
-      expect(onWmsLayerChange).toHaveBeenCalledWith("test_layer");
-      expect(setTimeSliderSupport).toHaveBeenCalledWith(true);
-      expect(setDiscreteTimeSliderValues).toHaveBeenCalled();
+      expect(onWmsLayerChange).toHaveBeenCalledWith("single");
+      expect(setDiscreteTimeSliderValues).toHaveBeenCalledWith(
+        extractDiscreteDays(data)
+      );
     });
   });
 });

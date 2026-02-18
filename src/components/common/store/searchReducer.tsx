@@ -33,8 +33,9 @@ import { trackSearchResultParameters } from "../../../analytics/searchParamsEven
 import {
   MapFeatureRequest,
   MapFeatureResponse,
-  MapFieldResponse,
+  GeoserverFieldsResponse,
   MapLayerResponse,
+  DownloadLayersResponse,
 } from "./GeoserverDefinitions";
 import dayjs from "dayjs";
 import { dateDefault } from "../constants";
@@ -443,7 +444,7 @@ const fetchGeoServerMapFeature = createAsyncThunk<
 );
 
 const fetchGeoServerMapFields = createAsyncThunk<
-  Array<MapFieldResponse>,
+  Array<GeoserverFieldsResponse>,
   MapFeatureRequest,
   { rejectValue: ErrorResponse }
 >(
@@ -487,6 +488,23 @@ const fetchGeoServerMapLayers = createAsyncThunk<
     return ogcAxiosWithRetry
       .get<MapLayerResponse>(
         `/ogc/collections/${request.uuid}/items/wms_layers`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
+
+const fetchGeoServerDownloadLayers = createAsyncThunk<
+  Array<DownloadLayersResponse>,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "geoserver/fetchGeoServerDownloadLayers",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return ogcAxiosWithRetry
+      .get<DownloadLayersResponse>(
+        `/ogc/collections/${request.uuid}/items/wfs_layers`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)
@@ -655,6 +673,7 @@ export {
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
+  fetchGeoServerDownloadLayers,
   fetchGeoServerFieldValues,
   fetchSystemHealthNoStore,
   processDatasetDownload,

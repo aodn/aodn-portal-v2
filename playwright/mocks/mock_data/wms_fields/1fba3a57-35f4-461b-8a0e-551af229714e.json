@@ -1,0 +1,132 @@
+[
+  {
+    "typename": "asset_map",
+    "fields": [
+      {
+        "label": "facility",
+        "name": "facility",
+        "type": "string"
+      },
+      {
+        "label": "subfacility",
+        "name": "subfacility",
+        "type": "string"
+      },
+      {
+        "label": "product",
+        "name": "product",
+        "type": "string"
+      },
+      {
+        "label": "platform_code",
+        "name": "platform_code",
+        "type": "string"
+      },
+      {
+        "label": "platform_type",
+        "name": "platform_type",
+        "type": "string"
+      },
+      {
+        "label": "date_start",
+        "name": "date_start",
+        "type": "dateTime"
+      },
+      {
+        "label": "date_end",
+        "name": "date_end",
+        "type": "dateTime"
+      },
+      {
+        "label": "w_temp_b",
+        "name": "w_temp_b",
+        "type": "boolean"
+      },
+      {
+        "label": "w_psal_b",
+        "name": "w_psal_b",
+        "type": "boolean"
+      },
+      {
+        "label": "w_oxygen_b",
+        "name": "w_oxygen_b",
+        "type": "boolean"
+      },
+      {
+        "label": "w_co2_b",
+        "name": "w_co2_b",
+        "type": "boolean"
+      },
+      {
+        "label": "w_chlorophyll_b",
+        "name": "w_chlorophyll_b",
+        "type": "boolean"
+      },
+      {
+        "label": "turb_b",
+        "name": "turb_b",
+        "type": "boolean"
+      },
+      {
+        "label": "w_current_b",
+        "name": "w_current_b",
+        "type": "boolean"
+      },
+      {
+        "label": "wave_b",
+        "name": "wave_b",
+        "type": "boolean"
+      },
+      {
+        "label": "air_temperature_b",
+        "name": "air_temperature_b",
+        "type": "boolean"
+      },
+      {
+        "label": "air_pressure_b",
+        "name": "air_pressure_b",
+        "type": "boolean"
+      },
+      {
+        "label": "air_co2_b",
+        "name": "air_co2_b",
+        "type": "boolean"
+      },
+      {
+        "label": "wind_b",
+        "name": "wind_b",
+        "type": "boolean"
+      },
+      {
+        "label": "plankton_b",
+        "name": "plankton_b",
+        "type": "boolean"
+      },
+      {
+        "label": "optical_properties_b",
+        "name": "optical_properties_b",
+        "type": "boolean"
+      },
+      {
+        "label": "animal_location_b",
+        "name": "animal_location_b",
+        "type": "boolean"
+      },
+      {
+        "label": "geom",
+        "name": "geom",
+        "type": "GeometryPropertyType"
+      },
+      {
+        "label": "gtype",
+        "name": "gtype",
+        "type": "string"
+      },
+      {
+        "label": "colour",
+        "name": "colour",
+        "type": "string"
+      }
+    ]
+  }
+]

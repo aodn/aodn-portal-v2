@@ -160,7 +160,7 @@ def test_map_shows_geoserver_layer_without_timeSlider_and_drawRect_support(
     layer_factory = LayerFactory(detail_page.detail_map)
     # Mock WMS downloadable fields API to return 404 Not Found
     api_router = ApiRouter(responsive_page)
-    api_router.route_wms_downloadable_fields(
+    api_router.route_wms_fields(
         lambda route: route.fulfill(status=HTTPStatus.NOT_FOUND)
     )
 
@@ -201,7 +201,7 @@ def test_data_not_on_whitelist(responsive_page: Page, uuid: str) -> None:
     detail_page = DetailPage(responsive_page)
     # Mock WMS downloadable fields API to return 401 Unauthorized
     api_router = ApiRouter(responsive_page)
-    api_router.route_wms_downloadable_fields(
+    api_router.route_wms_fields(
         lambda route: route.fulfill(status=HTTPStatus.UNAUTHORIZED)
     )
     layer_factory = LayerFactory(detail_page.detail_map)

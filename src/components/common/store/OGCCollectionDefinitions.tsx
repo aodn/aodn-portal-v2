@@ -273,6 +273,8 @@ export class OGCCollection {
     this.propValue?.["ai:description"];
   // Get the Metadata scope from 'code' field, i.e., document or other types of resouce
   getScope = (): string | undefined => this.propValue?.["scope"]?.["code"];
+  getParameterVocabs = (): Array<string> | undefined =>
+    this.propValue?.parameter_vocabs;
   getDataAccessLinks = (): ILink[] | undefined =>
     this.getLinksByAIGroupPrefix(AIGroup.DATA_ACCESS);
   getWMSLinks = (): ILink[] | undefined =>
@@ -327,6 +329,7 @@ export class SummariesProperties {
   readonly "ai:description"?: string;
   readonly dataset_group?: Array<string>;
   readonly scope?: Record<string, string>;
+  readonly parameter_vocabs?: Array<string>;
 }
 
 export class Spatial {
