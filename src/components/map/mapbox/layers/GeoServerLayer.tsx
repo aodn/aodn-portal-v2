@@ -551,16 +551,15 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
           .unwrap()
           .then(async (layers: MapLayerResponse[]) => {
             if (layers && layers.length > 0 && !(search as any).aborted) {
-              dispatch(fetchGeoServerFieldValues(wmsFieldsRequest))
-                .unwrap()
-                .then((val: Record<string, Array<object>>) => {
-                  const result: Map<string, Array<number>> = new Map();
-                  result.set(
-                    layerName,
-                    val["time"]?.map((v) => dateToValue(dayjs(v.toString())))
-                  );
-                  setDiscreteTimeSliderValues?.(result);
-                });
+              const val = await dispatch(
+                fetchGeoServerFieldValues(wmsFieldsRequest)
+              ).unwrap();
+              const result: Map<string, Array<number>> = new Map();
+              result.set(
+                layerName,
+                val["time"]?.map((v) => dateToValue(dayjs(v.toString())))
+              );
+              setDiscreteTimeSliderValues?.(result);
             }
             // Whether we set layers need to decide later based on map fields call
             return layers;
