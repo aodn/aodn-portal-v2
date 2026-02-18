@@ -100,7 +100,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
         />
       </Box>
     ),
-    [getTagColor, portalTheme]
+    [getTagColor]
   );
 
   if (!content) return;
