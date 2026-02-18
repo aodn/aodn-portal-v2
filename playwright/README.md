@@ -81,6 +81,7 @@ To install `Conda`, please refer to the [official guide](https://conda.io/projec
 
 1. Run all tests:
    ```bash
+   # If you run locally, make sure you run "yarn playwright-local" to start the local server before running the tests.
    pytest
    ```
 2. Run tests with visible browsers
