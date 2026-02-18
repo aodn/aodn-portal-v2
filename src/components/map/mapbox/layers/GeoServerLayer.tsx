@@ -28,6 +28,7 @@ import {
 } from "../../../common/store/GeoserverDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import {
+  fetchGeoServerFieldValues,
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
@@ -166,40 +167,6 @@ const extractLayerName = (layer: ILink): string => {
     }
   }
   return layer.title;
-};
-
-export const extractDiscreteDays = (
-  layers: MapLayerResponse[]
-): Map<string, Array<number>> | undefined => {
-  if (layers && layers.length > 0) {
-    const result: Map<string, Array<number>> = new Map();
-    layers.forEach((layer) => {
-      if (layer.ncWmsLayerInfo?.datesWithData) {
-        const nearest = dayjs(layer.ncWmsLayerInfo.nearestTimeIso);
-        const dates: number[] = [];
-        for (const [year, months] of Object.entries(
-          layer.ncWmsLayerInfo.datesWithData || {}
-        )) {
-          const yr = Number(year);
-          for (const [month, days] of Object.entries(months)) {
-            // Here assume that the time of all dateWithData follows the
-            // one that found in the nearestTimeIso. So we copy the value
-            // from nearest, then MUST make sure it is using utc() to avoid
-            // hr shift, then override the year month day with the value
-            // from datesWithDate
-            const mth = Number(month) - 1;
-            for (const day of days) {
-              const d = dayjs(nearest).utc().year(yr).month(mth).date(day);
-              dates.push(dateToValue(d));
-            }
-          }
-        }
-        result.set(layer.name, dates);
-      }
-    });
-    return result.size === 0 ? undefined : result;
-  }
-  return undefined;
 };
 
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
@@ -563,6 +530,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       const wmsFieldsRequest: MapFeatureRequest = {
         uuid: collection.id,
         layerName: layerName,
+        properties: ["time"],
         enableGeoServerWhiteList: enableGeoServerWhiteList,
       };
 
@@ -581,9 +549,18 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
         search
           .unwrap()
-          .then((layers: MapLayerResponse[]) => {
+          .then(async (layers: MapLayerResponse[]) => {
             if (layers && layers.length > 0 && !(search as any).aborted) {
-              setDiscreteTimeSliderValues?.(extractDiscreteDays(layers));
+              dispatch(fetchGeoServerFieldValues(wmsFieldsRequest))
+                .unwrap()
+                .then((val: Record<string, Array<object>>) => {
+                  const result: Map<string, Array<number>> = new Map();
+                  result.set(
+                    layerName,
+                    val["time"]?.map((v) => dateToValue(dayjs(v.toString())))
+                  );
+                  setDiscreteTimeSliderValues?.(result);
+                });
             }
             // Whether we set layers need to decide later based on map fields call
             return layers;

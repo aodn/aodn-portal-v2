@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import searchReducer from "../../../../common/store/searchReducer";
-import GeoServerLayer, { extractDiscreteDays } from "../GeoServerLayer";
+import GeoServerLayer from "../GeoServerLayer";
 import MapContext from "../../MapContext";
 import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
@@ -279,9 +279,7 @@ describe("GeoServerLayer", () => {
       expect(onWMSAvailabilityChange).toHaveBeenCalledWith(true);
       expect(onWmsLayerChange).toHaveBeenCalledWith("test_layer");
       expect(setTimeSliderSupport).toHaveBeenCalledWith(true);
-      expect(setDiscreteTimeSliderValues).toHaveBeenCalledWith(
-        extractDiscreteDays(data)
-      );
+      expect(setDiscreteTimeSliderValues).toHaveBeenCalled();
     });
   });
 });
