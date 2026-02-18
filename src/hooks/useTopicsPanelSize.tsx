@@ -9,7 +9,7 @@ import {
   TOPICS_PANEL_COLS_TABLET,
   TOPICS_PANEL_GAP,
   TOPICS_PANEL_ROWS_DEFAULT,
-} from "../pages/landing-page/subpages/topics-panel/constants";
+} from "../pages/landing-page/sections/topics-panel/constants";
 interface UseTopicsPanelSizeProps {
   topicCardsCount: number;
 }

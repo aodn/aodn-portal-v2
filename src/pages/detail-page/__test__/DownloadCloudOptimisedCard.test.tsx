@@ -9,7 +9,7 @@ beforeAll(() => {
 });
 
 vi.mock(
-  "../subpages/side-cards/download-card/components/DownloadSelect",
+  "../sections/side-cards/download-card/components/DownloadSelect",
   () => ({
     default: ({ label, items, value, onSelectCallback }: any) => (
       <div>
@@ -30,7 +30,7 @@ vi.mock(
   })
 );
 
-import DownloadCloudOptimisedCard from "../subpages/side-cards/download-card/components/DownloadCloudOptimisedCard";
+import DownloadCloudOptimisedCard from "../sections/side-cards/download-card/components/DownloadCloudOptimisedCard";
 import {
   DatasetType,
   OGCCollection,

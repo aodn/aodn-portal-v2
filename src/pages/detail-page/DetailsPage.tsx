@@ -1,10 +1,10 @@
 import Layout from "../../components/layout/layout";
 import { Grid } from "@mui/material";
 import { color, padding } from "../../styles/constants";
-import HeaderSection from "./subpages/HeaderSection";
-import SideSection from "./subpages/SideSection";
+import HeaderSection from "./sections/HeaderSection";
+import SideSection from "./sections/SideSection";
 import { DetailPageProvider } from "./context/detail-page-provider";
-import ContentSection from "./subpages/ContentSection";
+import ContentSection from "./sections/ContentSection";
 import SectionContainer from "../../components/layout/components/SectionContainer";
 import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { useCallback, useState } from "react";
