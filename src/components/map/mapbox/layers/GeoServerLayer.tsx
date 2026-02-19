@@ -206,7 +206,9 @@ const checkSupportDiscreteTimeSlider = (
         }
       })
       .catch(() => {
-        // Safe to ignore as dataset may not support this query
+        // Some dataset do not support this function call, in this case
+        // assume it didn't support discrete time slider
+        setDiscreteTimeSliderValues?.(undefined);
       });
   }
 };
@@ -316,7 +318,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     (value: string) => {
       setSelectedWmsLayer(value);
       onWmsLayerChange?.(value);
-      setWmsFields((prev) => {
+      setWmsFields?.((prev) => {
         if (prev && prev.length > 0) {
           // Check the field support for the selected wms layer, and then decide if we should enable time slider or draw rect support
           checkSupportTimeSliderOrDrawRect(

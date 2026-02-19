@@ -270,4 +270,52 @@ describe("GeoServerLayer", () => {
       expect(onWmsLayerChange).toHaveBeenCalledWith("single");
     });
   });
+
+  it("should call set discrete time slider with expect value", () => {
+    mocks.axiosInstance.get.mockImplementation((url: string) => {
+      if (url.includes("wms_layers")) {
+        return Promise.resolve({
+          data: [{ name: "test_with_discrete", title: "Test Layer" }],
+        });
+      } else if (url.includes("wms_fields")) {
+        return Promise.resolve({ data: [{ type: "dateTime" }] });
+      } else if (url.includes("wfs_field_value")) {
+        return Promise.resolve({
+          data: {
+            time: ["2022-10-12T00:00:00.000Z", "2022-10-13T00:00:00.000Z"],
+          },
+        });
+      }
+      return Promise.resolve({ data: [] });
+    });
+
+    const onWMSAvailabilityChange = vi.fn();
+    const onWmsLayerChange = vi.fn();
+    const setDiscreteTimeSliderValues = vi.fn();
+    // In real case, it is a useState but we cannot have useState in vitest, so we define
+    // a function that do the same actio as useState function update.
+    const setWmsFields = vi.fn().mockImplementation((updater) => {
+      if (typeof updater === "function") {
+        const prev = [{ name: "time" }]; // fake previous state
+        updater(prev); // run the updater
+      }
+    });
+
+    renderComponent({
+      onWMSAvailabilityChange,
+      onWmsLayerChange,
+      setDiscreteTimeSliderValues,
+      setWmsFields,
+    });
+
+    return waitFor(() => {
+      expect(mocks.axiosInstance.get).toHaveBeenCalledWith(
+        expect.stringContaining("wms_layers"),
+        expect.anything()
+      );
+      expect(setDiscreteTimeSliderValues).toHaveBeenCalledWith(
+        new Map([["test_with_discrete", [1665532800000, 1665619200000]]])
+      );
+    });
+  });
 });
