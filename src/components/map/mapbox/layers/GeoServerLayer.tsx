@@ -32,6 +32,7 @@ import {
 } from "../../../common/store/GeoserverDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import {
+  fetchGeoServerFieldValues,
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
@@ -53,6 +54,7 @@ import AdminScreenContext from "../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
 import { dateToValue } from "../../../../utils/DateUtils";
 import { layernameRoughlyMatch } from "../../../../utils/GeoJsonUtils";
+import { AppDispatch } from "../../../common/store/store";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
@@ -148,7 +150,7 @@ const formWmsLayerOptions = (
   }));
 };
 
-const checkFieldSupport = (
+const checkSupportTimeSliderOrDrawRect = (
   layerName: string,
   fields: GeoserverFieldsResponse[],
   setTimeSliderSupport?: Dispatch<SetStateAction<boolean>>,
@@ -175,38 +177,40 @@ const checkFieldSupport = (
   }
 };
 
-export const extractDiscreteDays = (
-  layers: MapLayerResponse[]
-): Map<string, Array<number>> | undefined => {
-  if (layers && layers.length > 0) {
-    const result: Map<string, Array<number>> = new Map();
-    layers.forEach((layer) => {
-      if (layer.ncWmsLayerInfo?.datesWithData) {
-        const nearest = dayjs(layer.ncWmsLayerInfo.nearestTimeIso);
-        const dates: number[] = [];
-        for (const [year, months] of Object.entries(
-          layer.ncWmsLayerInfo.datesWithData || {}
-        )) {
-          const yr = Number(year);
-          for (const [month, days] of Object.entries(months)) {
-            // Here assume that the time of all dateWithData follows the
-            // one that found in the nearestTimeIso. So we copy the value
-            // from nearest, then MUST make sure it is using utc() to avoid
-            // hr shift, then override the year month day with the value
-            // from datesWithDate
-            const mth = Number(month) - 1;
-            for (const day of days) {
-              const d = dayjs(nearest).utc().year(yr).month(mth).date(day);
-              dates.push(dateToValue(d));
-            }
-          }
+const checkSupportDiscreteTimeSlider = (
+  dispatch: AppDispatch,
+  id: string,
+  layerName: string,
+  setDiscreteTimeSliderValues?: Dispatch<
+    SetStateAction<Map<string, Array<number>> | undefined>
+  >
+) => {
+  if (id && layerName) {
+    const request: MapFeatureRequest = {
+      uuid: id,
+      layerName: layerName,
+      properties: ["time"],
+    };
+    dispatch(fetchGeoServerFieldValues(request))
+      .unwrap()
+      .then((val) => {
+        if (val["time"] !== undefined && val["time"].length > 0) {
+          const result: Map<string, Array<number>> = new Map();
+          result.set(
+            layerName,
+            val["time"]?.map((v) => dateToValue(dayjs(v.toString())))
+          );
+          setDiscreteTimeSliderValues?.(result);
+        } else {
+          setDiscreteTimeSliderValues?.(undefined);
         }
-        result.set(layer.name, dates);
-      }
-    });
-    return result.size === 0 ? undefined : result;
+      })
+      .catch(() => {
+        // Some dataset do not support this function call, in this case
+        // assume it didn't support discrete time slider
+        setDiscreteTimeSliderValues?.(undefined);
+      });
   }
-  return undefined;
 };
 
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
@@ -314,14 +318,20 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     (value: string) => {
       setSelectedWmsLayer(value);
       onWmsLayerChange?.(value);
-      setWmsFields((prev) => {
+      setWmsFields?.((prev) => {
         if (prev && prev.length > 0) {
           // Check the field support for the selected wms layer, and then decide if we should enable time slider or draw rect support
-          checkFieldSupport(
+          checkSupportTimeSliderOrDrawRect(
             value,
             prev,
             setTimeSliderSupport,
             setDrawRectSupportSupport
+          );
+          checkSupportDiscreteTimeSlider(
+            dispatch,
+            config.uuid,
+            value,
+            setDiscreteTimeSliderValues
           );
         }
         return prev;
@@ -329,9 +339,12 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     },
     [
       onWmsLayerChange,
-      setDrawRectSupportSupport,
-      setTimeSliderSupport,
       setWmsFields,
+      setTimeSliderSupport,
+      setDrawRectSupportSupport,
+      dispatch,
+      config.uuid,
+      setDiscreteTimeSliderValues,
     ]
   );
 
@@ -607,7 +620,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               if (wmsLayerOptions && wmsLayerOptions.length > 0) {
                 setWmsLayers(wmsLayerOptions);
               }
-              setDiscreteTimeSliderValues?.(extractDiscreteDays(layers));
               onWMSAvailabilityChange?.(true);
             }
             return layers;

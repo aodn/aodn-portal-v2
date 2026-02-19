@@ -8,6 +8,7 @@ export type MapTileRequest = {
 
 export type MapFeatureRequest = {
   uuid: string;
+  properties?: Array<string>;
   layerName?: string;
   width?: number;
   height?: number;
