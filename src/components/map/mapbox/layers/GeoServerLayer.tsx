@@ -204,6 +204,9 @@ const checkSupportDiscreteTimeSlider = (
         } else {
           setDiscreteTimeSliderValues?.(undefined);
         }
+      })
+      .catch(() => {
+        // Safe to ignore as dataset may not support this query
       });
   }
 };
