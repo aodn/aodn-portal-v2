@@ -329,11 +329,11 @@ const processDatasetDownload = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >(
   "download/downloadDataset",
-  async (reequest: DatasetDownloadRequest, thunkAPI: any) => {
+  async (request: DatasetDownloadRequest, thunkAPI: any) => {
     try {
       const response = await ogcAxiosWithRetry.post(
         "/ogc/processes/download/execution",
-        reequest
+        request
       );
       return response.data;
     } catch (error) {
