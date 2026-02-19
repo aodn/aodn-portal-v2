@@ -99,9 +99,15 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
           gap="16px"
         >
           <PlainSlider
-            step={86400000}
-            min={sorted_valid_points?.[0]}
-            max={sorted_valid_points?.[sorted_valid_points?.length - 1]}
+            step={null} // ← key: disables free sliding
+            marks={sorted_valid_points?.map((v) => ({
+              value: v,
+            }))}
+            min={sorted_valid_points && sorted_valid_points[0]}
+            max={
+              sorted_valid_points &&
+              sorted_valid_points[sorted_valid_points.length - 1]
+            }
             value={datePointStamp}
             defaultValue={datePointStamp}
             onChangeCommitted={(event, value) =>
