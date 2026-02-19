@@ -47,6 +47,21 @@ describe("Search Reducer Function Test", () => {
     expect(collection.getScope()).toEqual("document");
   });
 
+  it("Verify OGCCollection get AI inferred update frequency correct", () => {
+    const item = {
+      id: "ba9110f1-072c-4d15-8328-2091be983991",
+      index: "1",
+      itemType: "Collection",
+      links: [],
+      properties: {
+        "ai:update_frequency": "real-time",
+      },
+    };
+
+    const collection: OGCCollection = Object.assign(new OGCCollection(), item);
+    expect(collection.getAiUpdateFrequency()).toEqual("real-time");
+  });
+
   it("Verify generate correct parameter on temperature", () => {
     // Simulate user type "tempeature" and select filter by "parameter"
     const parameterState: ParameterState = {
