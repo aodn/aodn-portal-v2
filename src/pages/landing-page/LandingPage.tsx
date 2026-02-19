@@ -1,12 +1,12 @@
 import { FC } from "react";
 import Layout from "../../components/layout/layout";
-import Banner from "./sections/banner/Banner";
+import Banner from "./subpages/banner/Banner";
 import Searchbar from "../../components/search/Searchbar";
 import { color, padding } from "../../styles/constants";
-import Logos from "./sections/logo-list/LogoList";
-import News from "./sections/news/News";
+import Logos from "./subpages/logo-list/LogoList";
+import News from "./subpages/news/News";
 import SectionContainer from "../../components/layout/components/SectionContainer";
-import TopicsPanel from "./sections/topics-panel/TopicsPanel";
+import TopicsPanel from "./subpages/topics-panel/TopicsPanel";
 
 const LandingPage: FC = () => {
   return (
