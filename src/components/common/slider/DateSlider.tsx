@@ -6,6 +6,7 @@ import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "../../../styles/constants";
 import PlainSlider from "./PlainSlider";
+import { Mark } from "@mui/material/Slider/useSlider.types";
 
 interface DateSliderRangeProps {
   visible?: boolean;
@@ -33,18 +34,17 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   valid_points,
   onDatePointChange = undefined,
 }) => {
-  const sorted_valid_points = useMemo(() => {
-    return valid_points?.sort((a, b) => a - b);
+  const sorted_marks: Mark[] = useMemo(() => {
+    return valid_points?.sort((a, b) => a - b).map((v) => ({ value: v })) ?? [];
   }, [valid_points]);
 
   const [datePointStamp, setDatePointStamp] = useState<number | undefined>(
-    sorted_valid_points?.[sorted_valid_points?.length - 1]
+    sorted_marks?.[sorted_marks?.length - 1].value
   );
 
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]) => {
-      const v = newValue as number;
-      setDatePointStamp(v);
+      setDatePointStamp(newValue as number);
     },
     []
   );
@@ -100,14 +100,9 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
         >
           <PlainSlider
             step={null} // ← key: disables free sliding
-            marks={sorted_valid_points?.map((v) => ({
-              value: v,
-            }))}
-            min={sorted_valid_points && sorted_valid_points[0]}
-            max={
-              sorted_valid_points &&
-              sorted_valid_points[sorted_valid_points.length - 1]
-            }
+            marks={sorted_marks}
+            min={sorted_marks && sorted_marks[0].value}
+            max={sorted_marks && sorted_marks[sorted_marks.length - 1].value}
             value={datePointStamp}
             defaultValue={datePointStamp}
             onChangeCommitted={(event, value) =>
