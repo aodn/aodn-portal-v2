@@ -8,7 +8,7 @@ class Routes:
     COLLECTION_TEMPORAL = f'{PREFIX}/collections?properties=id,temporal&*'
     COLLECTION_PROVIDER = f'{PREFIX}/collections?properties=id,providers&*'
     COLLECTION_CENTROID = f'{PREFIX}/collections?properties=id,centroid&*'
-    COLLECTION_ALL = f'{PREFIX}/collections?properties=id,title,description,status,scope,links,assets_summary,bbox&*'
+    COLLECTION_ALL = f'{PREFIX}/collections?properties=id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox&*'
     COLLECTION_POPUP = (
         f'{PREFIX}/collections?properties=title,description&filter=id*'
     )
