@@ -27,6 +27,7 @@ import {
 } from "../../../pages/detail-page/context/DownloadDefinitions";
 import {
   getDateConditionFrom,
+  getFormatFrom,
   getMultiPolygonFrom,
 } from "../../../utils/DownloadConditionUtils";
 import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
@@ -353,6 +354,7 @@ const processWFSDownload = createAsyncThunk<
       // Extract download conditions
       const dateRange = getDateConditionFrom(request.downloadConditions);
       const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+      const format = getFormatFrom(request.downloadConditions);
 
       const requestBody = {
         inputs: {
@@ -361,6 +363,7 @@ const processWFSDownload = createAsyncThunk<
           end_date: dateRange.end,
           multi_polygon: multiPolygon,
           layer_name: request.layerName,
+          output_format: format,
         },
         outputs: {},
         subscriber: {
