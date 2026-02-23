@@ -1,4 +1,5 @@
 import React from "react";
+import { SxProps } from "@mui/material";
 import ItemBaseGrid from "./ItemBaseGrid";
 import InfoCard from "../../info/InfoCard";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
@@ -7,14 +8,22 @@ import { portalTheme } from "../../../styles";
 
 interface NaItemProps {
   title: string;
+  message?: string;
+  cardSx?: SxProps;
+  contentSx?: SxProps;
 }
 
-const NaItem: React.FC<NaItemProps> = ({ title }) => {
+const NaItem: React.FC<NaItemProps> = ({
+  title,
+  message,
+  cardSx,
+  contentSx,
+}) => {
   return (
     <ItemBaseGrid disableHover>
       <InfoCard
         infoContent={{
-          body: `${capitalizeFirstLetter(title)} not available`,
+          body: message || `${capitalizeFirstLetter(title)} not available`,
         }}
         status={InfoStatusType.WARNING}
         sx={{
@@ -24,11 +33,13 @@ const NaItem: React.FC<NaItemProps> = ({ title }) => {
           borderRadius: "4px",
           boxShadow: "none",
           bgcolor: portalTheme.palette.primary6,
+          ...(cardSx as object),
         }}
         contentSx={{
           padding: 0,
           textAlign: "center",
           bgcolor: portalTheme.palette.primary6,
+          ...(contentSx as object),
         }}
       />
     </ItemBaseGrid>

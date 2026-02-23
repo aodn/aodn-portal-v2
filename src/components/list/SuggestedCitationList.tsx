@@ -4,7 +4,7 @@ import ItemBaseGrid from "./listItem/ItemBaseGrid";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
-import { Stack, Typography } from "@mui/material";
+import { Stack, SxProps, Typography } from "@mui/material";
 import { portalTheme } from "../../styles";
 import { AnalyticsEvent } from "../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../analytics/customEventTracker";
@@ -14,6 +14,9 @@ interface SuggestedCitationListProps {
   title?: string;
   selected?: boolean;
   mode?: MODE;
+  naMessage?: string;
+  naCardSx?: SxProps;
+  naContentSx?: SxProps;
 }
 
 const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
@@ -21,6 +24,9 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
   title = "Suggested Citation",
   selected = false,
   mode,
+  naMessage,
+  naCardSx,
+  naContentSx,
 }) => {
   const suggestedCitationItem = useMemo(
     () =>
@@ -55,7 +61,12 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
           >
             {title}
             {!suggestedCitation ? (
-              <NaList title={title ? title : ""} />
+              <NaList
+                title={title ? title : ""}
+                message={naMessage}
+                cardSx={naCardSx}
+                contentSx={naContentSx}
+              />
             ) : (
               suggestedCitationItem
             )}
