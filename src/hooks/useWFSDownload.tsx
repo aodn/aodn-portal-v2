@@ -33,6 +33,7 @@ interface SSEEventData {
   final?: boolean;
   filename?: string;
   error?: string;
+  mediaType?: string;
 }
 
 // Download status from frontend use
@@ -122,7 +123,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         case EventName.CONNECTION_ESTABLISHED:
           setDownloadingStatus(DownloadStatus.WAITING_SERVER);
           setProgressMessage(DownloadProgressMessage.CONNECTING);
-          onCallback && onCallback();
+          onCallback?.();
           break;
 
         case EventName.WFS_REQUEST_READY:
@@ -130,14 +131,14 @@ const useWFSDownload = (onCallback?: () => void) => {
           setProgressMessage(
             data.message || DownloadProgressMessage.CONNECTING
           );
-          onCallback && onCallback();
+          onCallback?.();
           break;
 
         case EventName.KEEP_ALIVE:
           if (data.status === EventStatus.WAITING_FOR_WFS_SERVER) {
             setDownloadingStatus(DownloadStatus.WAITING_SERVER);
             setProgressMessage(DownloadProgressMessage.WAITING_SERVER);
-            onCallback && onCallback();
+            onCallback?.();
           } else if (data.status === EventStatus.STREAMING) {
             setDownloadingStatus(DownloadStatus.IN_PROGRESS);
           }
@@ -148,7 +149,7 @@ const useWFSDownload = (onCallback?: () => void) => {
           setProgressMessage(
             data.message || DownloadProgressMessage.IN_PROGRESS
           );
-          onCallback && onCallback();
+          onCallback?.();
           // Reset chunk tracking on download start
           fileChunksRef.current = [];
           receivedChunksRef.current.clear();
@@ -250,7 +251,9 @@ const useWFSDownload = (onCallback?: () => void) => {
             }
 
             // Create and download file
-            const blob = new Blob([finalBytes], { type: "text/csv" });
+            const blob = new Blob([finalBytes], {
+              type: data.mediaType || "text/csv",
+            });
             const filename = data.filename || generateFileName(layerName);
             downloadFile(blob, filename);
 

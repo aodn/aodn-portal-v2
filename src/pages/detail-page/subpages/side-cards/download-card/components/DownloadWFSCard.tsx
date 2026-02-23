@@ -40,7 +40,7 @@ import AdminScreenContext from "../../../../../../components/admin/AdminScreenCo
 // TODO:the format options will be fetched from the backend in the future
 const formatOptions = [
   { label: "CSV", value: "text/csv" },
-  { label: "Shape File", value: "shape-zip" },
+  { label: "Shape-Zip", value: "shape-zip" },
 ];
 
 interface DownloadWFSCardProps extends DownloadCondition {
