@@ -26,25 +26,21 @@ const NaItem: React.FC<NaItemProps> = ({
           body: message || `${capitalizeFirstLetter(title)} not available`,
         }}
         status={InfoStatusType.WARNING}
-        sx={[
-          {
-            height: "40px",
-            width: "100%",
-            padding: "4px",
-            borderRadius: "4px",
-            boxShadow: "none",
-            bgcolor: portalTheme.palette.primary6,
-          },
-          ...(Array.isArray(cardSx) ? cardSx : [cardSx]),
-        ]}
-        contentSx={[
-          {
-            padding: 0,
-            textAlign: "center",
-            bgcolor: portalTheme.palette.primary6,
-          },
-          ...(Array.isArray(contentSx) ? contentSx : [contentSx]),
-        ]}
+        sx={{
+          height: "40px",
+          width: "100%",
+          padding: "4px",
+          borderRadius: "4px",
+          boxShadow: "none",
+          bgcolor: portalTheme.palette.primary6,
+          ...(cardSx as object),
+        }}
+        contentSx={{
+          padding: 0,
+          textAlign: "center",
+          bgcolor: portalTheme.palette.primary6,
+          ...(contentSx as object),
+        }}
       />
     </ItemBaseGrid>
   );
