@@ -216,10 +216,10 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
               naCardSx={{
                 height: "38px",
                 border: `1px solid ${portalTheme.palette.primary1}`,
-                backgroundColor: "#FFF",
+                bgcolor: "#FFF",
               }}
               naContentSx={{
-                backgroundColor: "#FFF",
+                bgcolor: "#FFF",
               }}
             />
             <LicenseList

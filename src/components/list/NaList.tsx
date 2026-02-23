@@ -1,12 +1,12 @@
 import React from "react";
-import { Grid } from "@mui/material";
+import { Grid, SxProps } from "@mui/material";
 import NaItem from "./listItem/NaItem";
 
 interface NaListProps {
   title: string;
   message?: string;
-  cardSx?: React.CSSProperties;
-  contentSx?: React.CSSProperties;
+  cardSx?: SxProps;
+  contentSx?: SxProps;
 }
 
 const NaList: React.FC<NaListProps> = ({

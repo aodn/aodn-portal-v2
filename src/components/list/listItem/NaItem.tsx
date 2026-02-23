@@ -1,4 +1,5 @@
 import React from "react";
+import { SxProps } from "@mui/material";
 import ItemBaseGrid from "./ItemBaseGrid";
 import InfoCard from "../../info/InfoCard";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
@@ -8,8 +9,8 @@ import { portalTheme } from "../../../styles";
 interface NaItemProps {
   title: string;
   message?: string;
-  cardSx?: React.CSSProperties;
-  contentSx?: React.CSSProperties;
+  cardSx?: SxProps;
+  contentSx?: SxProps;
 }
 
 const NaItem: React.FC<NaItemProps> = ({
@@ -25,21 +26,25 @@ const NaItem: React.FC<NaItemProps> = ({
           body: message || `${capitalizeFirstLetter(title)} not available`,
         }}
         status={InfoStatusType.WARNING}
-        sx={{
-          height: "40px",
-          width: "100%",
-          padding: "4px",
-          borderRadius: "4px",
-          boxShadow: "none",
-          bgcolor: portalTheme.palette.primary6,
-          ...cardSx,
-        }}
-        contentSx={{
-          padding: 0,
-          textAlign: "center",
-          bgcolor: portalTheme.palette.primary6,
-          ...contentSx,
-        }}
+        sx={[
+          {
+            height: "40px",
+            width: "100%",
+            padding: "4px",
+            borderRadius: "4px",
+            boxShadow: "none",
+            bgcolor: portalTheme.palette.primary6,
+          },
+          ...(Array.isArray(cardSx) ? cardSx : [cardSx]),
+        ]}
+        contentSx={[
+          {
+            padding: 0,
+            textAlign: "center",
+            bgcolor: portalTheme.palette.primary6,
+          },
+          ...(Array.isArray(contentSx) ? contentSx : [contentSx]),
+        ]}
       />
     </ItemBaseGrid>
   );
