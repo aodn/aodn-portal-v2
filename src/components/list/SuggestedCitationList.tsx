@@ -14,6 +14,9 @@ interface SuggestedCitationListProps {
   title?: string;
   selected?: boolean;
   mode?: MODE;
+  naMessage?: string;
+  naCardSx?: React.CSSProperties;
+  naContentSx?: React.CSSProperties;
 }
 
 const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
@@ -21,6 +24,9 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
   title = "Suggested Citation",
   selected = false,
   mode,
+  naMessage,
+  naCardSx,
+  naContentSx,
 }) => {
   const suggestedCitationItem = useMemo(
     () =>
@@ -55,7 +61,12 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
           >
             {title}
             {!suggestedCitation ? (
-              <NaList title={title ? title : ""} />
+              <NaList
+                title={title ? title : ""}
+                message={naMessage}
+                cardSx={naCardSx}
+                contentSx={naContentSx}
+              />
             ) : (
               suggestedCitationItem
             )}

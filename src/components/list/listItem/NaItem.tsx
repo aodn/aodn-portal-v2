@@ -7,14 +7,22 @@ import { portalTheme } from "../../../styles";
 
 interface NaItemProps {
   title: string;
+  message?: string;
+  cardSx?: React.CSSProperties;
+  contentSx?: React.CSSProperties;
 }
 
-const NaItem: React.FC<NaItemProps> = ({ title }) => {
+const NaItem: React.FC<NaItemProps> = ({
+  title,
+  message,
+  cardSx,
+  contentSx,
+}) => {
   return (
     <ItemBaseGrid disableHover>
       <InfoCard
         infoContent={{
-          body: `${capitalizeFirstLetter(title)} not available`,
+          body: message || `${capitalizeFirstLetter(title)} not available`,
         }}
         status={InfoStatusType.WARNING}
         sx={{
@@ -24,11 +32,13 @@ const NaItem: React.FC<NaItemProps> = ({ title }) => {
           borderRadius: "4px",
           boxShadow: "none",
           bgcolor: portalTheme.palette.primary6,
+          ...cardSx,
         }}
         contentSx={{
           padding: 0,
           textAlign: "center",
           bgcolor: portalTheme.palette.primary6,
+          ...contentSx,
         }}
       />
     </ItemBaseGrid>

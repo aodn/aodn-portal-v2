@@ -21,6 +21,7 @@ import useTabNavigation from "../../../../hooks/useTabNavigation";
 import CreditList from "../../../../components/list/CreditList";
 import ContactList from "../../../../components/list/ContactList";
 import { checkEmptyArray } from "../../../../utils/Helpers";
+import { portalTheme } from "../../../../styles";
 
 interface CitationPanelProps {
   mode?: MODE;
@@ -211,6 +212,15 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
             <SuggestedCitationList
               suggestedCitation={suggestedCitation ?? ""}
               mode={mode}
+              naMessage="Refer to Citation and Usage"
+              naCardSx={{
+                height: "38px",
+                border: `1px solid ${portalTheme.palette.primary1}`,
+                backgroundColor: "#FFF",
+              }}
+              naContentSx={{
+                backgroundColor: "#FFF",
+              }}
             />
             <LicenseList
               license={license ? license : ""}
