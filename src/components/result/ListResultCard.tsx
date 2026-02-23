@@ -14,14 +14,7 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import React, {
-  FC,
-  SyntheticEvent,
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
+import { FC, SyntheticEvent, useRef, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
@@ -40,6 +33,53 @@ enum UpdateFrequency {
   delayed = "delayed",
 }
 
+const getTagColor = (tagText: string | undefined): string => {
+  if (!tagText) return color.tabPanel.background;
+  const formattedText = tagText.toLowerCase();
+  let tagColor;
+  switch (formattedText) {
+    case "document":
+      tagColor = color.success.light;
+      break;
+    case UpdateFrequency.real_time:
+      tagColor = portalTheme.palette.tag1;
+      break;
+    case UpdateFrequency.delayed:
+      tagColor = portalTheme.palette.tag2;
+      break;
+    default:
+      tagColor = color.tabPanel.background;
+  }
+  return tagColor;
+};
+
+const renderTagChip = (text: string) => (
+  <Box
+    sx={{
+      display: "flex",
+      height: "26px",
+      alignItems: "center",
+      gap: "16px",
+      mt: 0.5,
+    }}
+  >
+    <LabelChip
+      text={[text]}
+      sx={{
+        display: "inline-flex",
+        width: "100px",
+        height: "26px",
+        padding: "2px 0",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: "6px",
+        backgroundColor: getTagColor(text),
+        ...portalTheme.typography.body2Regular,
+      }}
+    />
+  </Box>
+);
+
 // links here may need to be changed, because only html links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
   content,
@@ -53,55 +93,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
 }) => {
   const [showButtons, setShowButtons] = useState<boolean>(false);
   const menuRef = useRef<ContextMenuRef>(null);
-  const getTagColor = useCallback((tagText: string | undefined): string => {
-    if (!tagText) return color.tabPanel.background;
-    const formattedText = tagText.toLowerCase();
-    let tagColor;
-    switch (formattedText) {
-      case "document":
-        tagColor = color.success.light;
-        break;
-      case UpdateFrequency.real_time:
-        tagColor = portalTheme.palette.tag1;
-        break;
-      case UpdateFrequency.delayed:
-        tagColor = portalTheme.palette.tag2;
-        break;
-      default:
-        tagColor = color.tabPanel.background;
-    }
-    return tagColor;
-  }, []);
-
-  const renderTagChip = useCallback(
-    (text: string) => (
-      <Box
-        sx={{
-          display: "flex",
-          height: "26px",
-          alignItems: "center",
-          gap: "16px",
-          mt: 0.5,
-        }}
-      >
-        <LabelChip
-          text={[text]}
-          sx={{
-            display: "inline-flex",
-            width: "100px",
-            height: "26px",
-            padding: "2px 0",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "6px",
-            backgroundColor: getTagColor(text),
-            ...portalTheme.typography.body2Regular,
-          }}
-        />
-      </Box>
-    ),
-    [getTagColor]
-  );
 
   if (!content) return;
 
