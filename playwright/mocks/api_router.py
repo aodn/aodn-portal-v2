@@ -137,3 +137,19 @@ class ApiRouter:
         self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.WMS_MAP_FEATURE, handler_function)
+
+    def route_download_dialog(self, handler_function: Callable) -> None:
+        self.route(Routes.DOWNLOAD_DIALOG, handler_function)
+
+    def unroute_download_dialog(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.DOWNLOAD_DIALOG, handler_function)
+
+    def route_download_wfs(self, handler_function: Callable) -> None:
+        self.route(Routes.DOWNLOAD_WFS, handler_function)
+
+    def unroute_download_wfs(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.DOWNLOAD_WFS, handler_function)

@@ -11,6 +11,8 @@ from mocks.api.collections import (
     handle_collections_centroid_api,
     handle_collections_popup_api,
 )
+from mocks.api.download_dialog import handle_download_dialog_success
+from mocks.api.download_wfs import handle_download_wfs
 from mocks.api.search_collections import (
     handle_provider_api,
     handle_temporal_api,
@@ -45,3 +47,5 @@ def apply_mock(page: Page) -> None:
     api_router.route_wms_layers(handle_wms_map_layers_api)
     api_router.route_wms_downloadable_fields(handle_wms_downloadable_fields_api)
     api_router.route_wms_map_feature(handle_wms_map_feature_api)
+    api_router.route_download_dialog(handle_download_dialog_success)
+    api_router.route_download_wfs(handle_download_wfs)

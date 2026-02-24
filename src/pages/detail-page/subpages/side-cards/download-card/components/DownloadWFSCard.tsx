@@ -264,6 +264,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           }
           variant="filled"
           sx={{ width: "100%" }}
+          data-testid="download-status-alert"
         >
           {progressMessage || downloadingStatus}
         </Alert>

@@ -1,0 +1,828 @@
+{
+  "properties": {
+    "contacts": [
+      {
+        "name": "Harcourt, Rob",
+        "organization": "School of Natural Sciences, Macquarie University",
+        "position": "Animal Tracking Facility Leader",
+        "emails": ["robert.harcourt@mq.edu.au"],
+        "addresses": [
+          {
+            "city": "North Ryde",
+            "country": "Australia",
+            "delivery_point": [
+              "Marine Predator Research Group, School of Natural Sciences",
+              "Macquarie University"
+            ],
+            "administrative_area": "New South Wales",
+            "postal_code": "2109"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://researchers.mq.edu.au/en/persons/robert-harcourt",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Maquarie University staff profile for Rob Harcourt"
+          }
+        ],
+        "roles": ["principalInvestigator", "about"]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "position": "Data Officer",
+        "emails": ["info@aodn.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["University of Tasmania", "Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://imos.org.au/aodn.html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Australian Ocean Data Network (AODN)"
+          }
+        ],
+        "roles": ["distributor", "metadata"],
+        "phones": [
+          {
+            "value": "61 3 6226 7488",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "emails": ["imos@imos.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.imos.org.au/html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website for the Integrated Marine Observing System"
+          }
+        ],
+        "roles": ["resourceProvider", "citation"],
+        "phones": [
+          {
+            "value": "61 3 6226 7549",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      }
+    ],
+    "status": "completed",
+    "creation": "2020-07-10T14:31:24",
+    "centroid": [[85.0, -61.0]],
+    "revision": "2024-12-19T05:24:25",
+    "license": "Creative Commons Attribution 4.0 International License",
+    "credits": [
+      "Australia’s Integrated Marine Observing System (IMOS) is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS). It is operated by a consortium of institutions as an unincorporated joint venture, with the University of Tasmania as Lead Agent.",
+      "Sydney Institute of Marine Science (SIMS)"
+    ],
+    "scope": {
+      "code": "dataset",
+      "name": "IMOS dataset level record"
+    },
+    "themes": [
+      {
+        "scheme": "",
+        "concepts": [
+          {
+            "id": "Oceans | Ocean Temperature | Water Temperature",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          },
+          {
+            "id": "Oceans | Salinity/density | Conductivity",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          },
+          {
+            "id": "Oceans | Marine Biology | Marine Mammals",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          },
+          {
+            "id": "Oceans | Marine Biology | Marine Birds",
+            "description": "GCMD",
+            "title": "NASA/Global Change Master Directory Earth Science Keywords Version 5.3.8"
+          }
+        ]
+      },
+      {
+        "scheme": "",
+        "concepts": [
+          {
+            "id": "Satellite Tag",
+            "description": "IMOS",
+            "title": "IMOS Keywords Thesaurus"
+          },
+          {
+            "id": "CTD Satellite Relay Data Logger",
+            "description": "IMOS",
+            "title": "IMOS Keywords Thesaurus"
+          },
+          {
+            "id": "Agency | SMRU | Sea Mammal Research Unit",
+            "description": "IMOS",
+            "title": "IMOS Keywords Thesaurus"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Tags and Tracking Devices",
+            "description": "",
+            "title": "Marine Community Profile of ISO19115 v1.4 Collection Methods Vocabulary (Annex C.1.3)"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "concepts": [
+          {
+            "id": "Global / Oceans | Atlantic Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Global / Oceans | Southern Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Bass Strait, TAS/VIC",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Global / Oceans | Indian Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Coral Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Global / Oceans | Pacific Ocean",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Marine Features (Australia) | Great Australian Bight, SA/WA",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Regional Seas | Tasman Sea",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "place",
+        "concepts": [
+          {
+            "id": "Continents | Antarctica",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | Victoria",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | New Zealand",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Offshore Islands (Australia) | Heard & McDonald Islands",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | South Australia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Countries | Australia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | Tasmania",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | New South Wales",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "Offshore Islands (Australia) | Macquarie Island",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          },
+          {
+            "id": "States, Territories (Australia) | Western Australia",
+            "description": "",
+            "title": "AODN Geographic Extents Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "land-sea mammals",
+            "url": "http://vocab.nerc.ac.uk/collection/L06/current/77",
+            "description": "",
+            "title": "AODN Platform Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Temperature of the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/TEMPPR01",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Practical salinity of the water body",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/PSLTZZ01",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          },
+          {
+            "id": "Pressure (measured variable) in the water body exerted by overlying sea water and any medium above it",
+            "url": "http://vocab.aodn.org.au/def/discovery_parameter/entity/565",
+            "description": "",
+            "title": "AODN Discovery Parameter Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "Latitude north",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/ALATZZ01",
+            "description": "",
+            "title": "AODN Sampling Parameter Vocabulary"
+          },
+          {
+            "id": "Longitude east",
+            "url": "http://vocab.nerc.ac.uk/collection/P01/current/ALONZZ01",
+            "description": "",
+            "title": "AODN Sampling Parameter Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "theme",
+        "concepts": [
+          {
+            "id": "water temperature sensor",
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/134",
+            "description": "",
+            "title": "AODN Instrument Vocabulary"
+          },
+          {
+            "id": "CTD",
+            "url": "http://vocab.nerc.ac.uk/collection/L05/current/130",
+            "description": "",
+            "title": "AODN Instrument Vocabulary"
+          },
+          {
+            "id": "SMRU Ltd Satellite Relay Data Logger 9000x",
+            "url": "http://vocab.nerc.ac.uk/collection/L22/current/TOOL0719",
+            "description": "",
+            "title": "AODN Instrument Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "discipline",
+        "concepts": [
+          {
+            "id": "Animal Tagging Sub-Facility, Integrated Marine Observing System (IMOS)",
+            "url": "http://vocab.aodn.org.au/def/organisation/entity/497",
+            "description": "",
+            "title": "AODN Organisation Vocabulary"
+          }
+        ]
+      },
+      {
+        "scheme": "Categories",
+        "concepts": [
+          {
+            "id": "oceans"
+          }
+        ]
+      }
+    ],
+    "dataset_group": ["imos"],
+    "ai:description": "The Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal tagging project. Satellite Relay Data Loggers (SRDL) (most with CTDs, and some also with fluorometers) are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real time via the Argo satellite system. The Satellite Relay Data Loggers are deployed on marine mammals, including Elephant Seals, Weddell Seals, Australian Fur Seals, Australian Sea Lions, New Zealand Fur Seals. Data is being collected in the Southern Ocean, the Great Australian Bight, and off the South-East Coast of Australia.\n\nThis metadata record, represents several different datasets listed hereafter, which can all be accessed through a multi-WFS service. The data represented by this record are presented in delayed mode.\n\nCTD - parameters measured by the instruments include time, conductivity (salinity), temperature, speed, fluorescence (available in the future) and depth.\n\nDiving - parameters measured by the instruments include start and end time and longitude/latitude of each individual dive, post-dive surface duration, dive duration, maximum dive depth, intermediate dive depths and times.\n\nHaulout - a haulout begins when the SRDL has been continuously dry for a specified length of time (usually 10 minutes). It ends when continuously wet for another interval (usually 40 seconds). Haulout data parameters measured by the instruments include haulout start and end dates and longitude/latitude, and haulout number.\n\nArgos locations - location data parameters measured by the instruments include time, longitude, latitude, location quality, along with other diagnostic information provided by Argos (http://www.argos-system.org/).\n\nSummary Statistics - as well as sending records of individual events such as dives and haulouts, the SRDL also calculates summary statistics of those events over a specified time period (usually 3, 4 or 6 hours). Summary statistics computed by the instruments include the proportion of time spent diving, at the surface and hauled-out, the number of dives, and the average, standard deviation and maximum dive duration and dive depth during each summary period. These statistics are based on all the data recorded by the SRDL and so are not prone to distortion by variations in the efficiency of transmission via Argos.\n\n\n\n- For data after October 2018, please consult IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data with quality-controlled locations (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/70f148b1-7040-4fad-944a-456413c95472), to access data with improved satellite locations.\n\n- In the near future all historical delayed mode data will be reprocessed with the new quality control (QC) process, to improve the accuracy of the satellite location data, and this dataset will be replaced by the new QC’d one.",
+    "temporal": [
+      {
+        "start": "2007-03-26T06:00:00Z",
+        "end": "2019-11-30T12:59:59Z"
+      }
+    ],
+    "citation": {
+      "suggestedCitation": "The citation in a list of references is: \"IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access].\"",
+      "useLimitations": [
+        "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose."
+      ],
+      "otherConstraints": [
+        "Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: \"Data was sourced from Australia’s Integrated Marine Observing System (IMOS) – IMOS is enabled by the National Collaborative Research Infrastructure strategy (NCRIS).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in 'credit' in the metadata record)."
+      ]
+    },
+    "geometry": {
+      "geometries": [
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [118.00000000000001, -35.999999999999986],
+              [123.99999999999999, -35.999999999999986],
+              [123.99999999999999, -34],
+              [126, -34],
+              [126, -32],
+              [122, -32],
+              [122, -34],
+              [118.00000000000001, -34],
+              [118.00000000000001, -35.999999999999986]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [134, -37.99999999999999],
+              [140, -37.99999999999999],
+              [140, -34],
+              [136, -34],
+              [136, -32],
+              [130, -32],
+              [130, -34],
+              [132, -34],
+              [132, -35.999999999999986],
+              [134, -35.999999999999986],
+              [134, -37.99999999999999]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [150, -42.00000000000001],
+              [160, -42.00000000000001],
+              [160, -37.99999999999999],
+              [156, -37.99999999999999],
+              [156, -32],
+              [150, -32],
+              [150, -35.999999999999986],
+              [148, -35.999999999999986],
+              [148, -37.99999999999999],
+              [140, -37.99999999999999],
+              [140, -40],
+              [150, -40],
+              [150, -42.00000000000001]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [-180, -50],
+              [-178, -50],
+              [-178, -48],
+              [-176, -48],
+              [-176, -46.00000000000001],
+              [-174, -46.00000000000001],
+              [-174, -44],
+              [-180, -44],
+              [-180, -50]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [-166.00000000000003, -74],
+              [-160, -74],
+              [-160, -70],
+              [-154, -70],
+              [-154, -68],
+              [-148, -68],
+              [-148, -70],
+              [-150, -70],
+              [-150, -72],
+              [-146, -72],
+              [-146, -70],
+              [-140, -70],
+              [-140, -64],
+              [-136, -64],
+              [-136, -60.00000000000001],
+              [-138, -60.00000000000001],
+              [-138, -58],
+              [-144, -58],
+              [-144, -56],
+              [-146, -56],
+              [-146, -58],
+              [-152, -58],
+              [-152, -54],
+              [-148, -54],
+              [-148, -50],
+              [-152, -50],
+              [-152, -52],
+              [-154, -52],
+              [-154, -56],
+              [-156, -56],
+              [-156, -52],
+              [-160, -52],
+              [-160, -54],
+              [-180, -54],
+              [-180, -70],
+              [-166.00000000000003, -70],
+              [-166.00000000000003, -74]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [-36, -76],
+              [-26.000000000000004, -76],
+              [-26.000000000000004, -74],
+              [-36, -74],
+              [-36, -76]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [164, -80],
+              [168, -80],
+              [168, -78],
+              [180, -78],
+              [180, -68],
+              [174, -68],
+              [174, -66],
+              [180, -66],
+              [180, -54],
+              [178, -54],
+              [178, -52],
+              [180, -52],
+              [180, -46.00000000000001],
+              [176, -46.00000000000001],
+              [176, -48],
+              [174, -48],
+              [174, -50],
+              [170, -50],
+              [170, -48],
+              [172, -48],
+              [172, -44],
+              [170, -44],
+              [170, -46.00000000000001],
+              [168, -46.00000000000001],
+              [168, -48],
+              [166.00000000000003, -48],
+              [166.00000000000003, -50],
+              [157.99999999999997, -50],
+              [157.99999999999997, -48],
+              [154, -48],
+              [154, -46.00000000000001],
+              [144, -46.00000000000001],
+              [144, -44],
+              [134, -44],
+              [134, -48],
+              [132, -48],
+              [132, -46.00000000000001],
+              [130, -46.00000000000001],
+              [130, -42.00000000000001],
+              [128, -42.00000000000001],
+              [128, -40],
+              [123.99999999999999, -40],
+              [123.99999999999999, -42.00000000000001],
+              [122, -42.00000000000001],
+              [122, -44],
+              [106, -44],
+              [106, -40],
+              [94.00000000000001, -40],
+              [94.00000000000001, -42.00000000000001],
+              [92.00000000000001, -42.00000000000001],
+              [92.00000000000001, -40],
+              [90, -40],
+              [90, -37.99999999999999],
+              [86, -37.99999999999999],
+              [86, -44],
+              [78, -44],
+              [78, -46.00000000000001],
+              [74, -46.00000000000001],
+              [74, -44],
+              [72, -44],
+              [72, -42.00000000000001],
+              [66, -42.00000000000001],
+              [66, -44],
+              [58, -44],
+              [58, -42.00000000000001],
+              [52.00000000000001, -42.00000000000001],
+              [52.00000000000001, -37.99999999999999],
+              [50, -37.99999999999999],
+              [50, -40],
+              [46.00000000000001, -40],
+              [46.00000000000001, -42.00000000000001],
+              [44, -42.00000000000001],
+              [44, -40],
+              [40, -40],
+              [40, -42.00000000000001],
+              [30, -42.00000000000001],
+              [30, -46.00000000000001],
+              [40, -46.00000000000001],
+              [40, -48],
+              [24, -48],
+              [24, -46.00000000000001],
+              [20, -46.00000000000001],
+              [20, -52],
+              [14.000000000000002, -52],
+              [14.000000000000002, -54],
+              [2, -54],
+              [2, -58],
+              [-10, -58],
+              [-10, -64],
+              [-2, -64],
+              [-2, -68],
+              [6, -68],
+              [6, -70],
+              [14.000000000000002, -70],
+              [14.000000000000002, -68],
+              [16, -68],
+              [16, -70],
+              [42, -70],
+              [42, -68],
+              [68, -68],
+              [68, -70],
+              [82, -70],
+              [82, -68],
+              [96, -68],
+              [96, -66],
+              [104.00000000000001, -66],
+              [104.00000000000001, -68],
+              [112.00000000000001, -68],
+              [112.00000000000001, -66],
+              [118.00000000000001, -66],
+              [118.00000000000001, -68],
+              [122, -68],
+              [122, -66],
+              [132, -66],
+              [132, -68],
+              [136, -68],
+              [136, -66],
+              [138, -66],
+              [138, -68],
+              [148, -68],
+              [148, -66],
+              [160, -66],
+              [160, -68],
+              [161.99999999999997, -68],
+              [161.99999999999997, -70],
+              [170, -70],
+              [170, -72],
+              [174, -72],
+              [174, -74],
+              [161.99999999999997, -74],
+              [161.99999999999997, -78],
+              [164, -78],
+              [164, -80]
+            ]
+          ]
+        },
+        {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [-172, -78],
+              [-172, -76],
+              [-178, -76],
+              [-178, -74],
+              [-180, -74],
+              [-180, -78],
+              [-178, -78],
+              [-178, -80],
+              [-172, -80],
+              [-172, -78]
+            ]
+          ]
+        }
+      ],
+      "type": "GeometryCollection"
+    },
+    "pace": "completed",
+    "statement": "The Animal Tracking Facility Satellite Relay Tag data has been supplied to IMOS by participants, via the St Andrews University Sea Mammal Research Unit. Tags used on species: Australian Fur Seal, Australian Sea Lion, New Zealand Fur Seal and Southern Elephant Seal - CTD Satellite Relay Data Loggers (SRDL). Collect conductivity, temperature and depth information. On some Australian Sea Lions - CTD/Fluorometer Satellite Relay Data Loggers (SRDL). Collects conductivity, temperature, fluorescence and depth information. Weddell Seals - Satellite Relay Data Loggers (SRDL). Collect temperature, speed and depth information. CTD-SRDLs The CTD–Satellite Relay Data Loggers (CTD-SRDLs) are built by the Sea Mammal Research Unit (SMRU, University of St. Andrews, UK), incorporating CTD sensors developed by Valeport Ltd (Devon, UK). The sensor head consists of a pressure transducer, a platinum resistance thermometer, and an inductive cell for measuring conductivity. The temperature and conductivity sensors have a precision (repeatability) of 0.005°C and 0.005 mS/cm, respectively. Before being taken into the field, devices are calibrated in the laboratory by Valeport. Some of the CTD-SRDLs (about half) were also tested at sea against a ship-based CTD before the deployment. CTD-SRDLs record hydrographic profiles during the ascent of seals, retaining only the deepest dive in each six-hour time interval, and transmitting profiles in a compressed form (between 10 and 25 data points per profile, depending on the tag program) through the Advanced Research and Global Observation Satellite (ARGOS) system. The accuracy of ARGOS geo-positioning is typically better than ±5 km, because seals never stay at the surface more than a few minutes. New methods are currently under development by the ARGOS team, which should substantially improve the quality of positioning. Hydrographic profiles are post-processed using a unified procedure of editing, adjustment, and validation. A standard set of tests, adapted from Argo standard quality-control procedures, is first run to remove bad profiles, spikes, and outliers. For CTD-SRDLs with profiles in frozen areas, a temperature offset was estimated using the local freezing temperature. A salinity adjustment was also estimated, consisting in a pressure dependent linear correction. This bias is mainly induced by an external field effect on the conductivity sensor, which cannot be corrected a priori because it depends on how the tag has been attached on the seal’s head. Adjustments parameters were estimated for each CTD-SRDLs separately by comparisons of salinity measurements with available data in the World Ocean Database. Because the southern ACC region (south of 55ºS) is associated with a large-scale upwelling of circumpolar deep waters near the surface, the salinity at depth is very stable there, with a low natural variability highly suitable for use as a reference. Salinity data cross-comparisons between different CTD-SRDLs were also used to estimate suitable adjustments for CTD-SRDLs having no profiles available in the southern ACC region. Once calibrated, the accuracy of post-processed CTD-SRDL measurements was estimated to be ±0.03oC in temperature and ±0.05 psu (practical salinity unit) or better in salinity for CTD-SRDLs built after 2007. The achieved accuracy is highly dependent upon availability of ship-based CTD comparisons, and the type of water masses sampled during the deployment time. In best cases, an accuracy of ±0.01 ºC and ±0.02 psu can be obtained. Pre-2007 CTD-SRDLs (about 5% of profiles) used an older technology with a poorer accuracy roughly estimated around ±0.1 ºC and ±0.1 psu."
+  },
+  "id": "06b09398-d3d0-47dc-a54a-a745319fbece",
+  "title": "IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data",
+  "description": "The Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal tagging project. Satellite Relay Data Loggers (SRDL) (most with CTDs, and some also with fluorometers) are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real time via the Argo satellite system. The Satellite Relay Data Loggers are deployed on marine mammals, including Elephant Seals, Weddell Seals, Australian Fur Seals, Australian Sea Lions, New Zealand Fur Seals. Data is being collected in the Southern Ocean, the Great Australian Bight, and off the South-East Coast of Australia. \nThis metadata record, represents several different datasets listed hereafter, which can all be accessed through a multi-WFS service. The data represented by this record are presented in delayed mode. \nCTD - parameters measured by the instruments include time, conductivity (salinity), temperature, speed, fluorescence (available in the future) and depth. \nDiving - parameters measured by the instruments include start and end time and longitude/latitude of each individual dive, post-dive surface duration, dive duration, maximum dive depth, intermediate dive depths and times. \nHaulout - a haulout begins when the SRDL has been continuously dry for a specified length of time (usually 10 minutes). It ends when continuously wet for another interval (usually 40 seconds). Haulout data parameters measured by the instruments include haulout start and end dates and longitude/latitude, and haulout number. \nArgos locations - location data parameters measured by the instruments include time, longitude, latitude, location quality, along with other diagnostic information provided by Argos (http://www.argos-system.org/). \nSummary Statistics - as well as sending records of individual events such as dives and haulouts, the SRDL also calculates summary statistics of those events over a specified time period (usually 3, 4 or 6 hours). Summary statistics computed by the instruments include the proportion of time spent diving, at the surface and hauled-out, the number of dives, and the average, standard deviation and maximum dive duration and dive depth during each summary period. These statistics are based on all the data recorded by the SRDL and so are not prone to distortion by variations in the efficiency of transmission via Argos.\n\n** For data after October 2018, please consult IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data with quality-controlled locations (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/70f148b1-7040-4fad-944a-456413c95472), to access data with improved satellite locations. In the near future all historical delayed mode data will be reprocessed with the new quality control (QC) process, to improve the accuracy of the satellite location data, and this dataset will be replaced by the new QC’d one. **",
+  "links": [
+    {
+      "href": "http://imos.org.au/animaltracking.html",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Animal Tracking Facility page on IMOS website",
+      "ai:group": "Other"
+    },
+    {
+      "href": "https://portal.aodn.org.au/search?uuid=06b09398-d3d0-47dc-a54a-a745319fbece",
+      "rel": "related",
+      "type": "text/html",
+      "title": "View and download data though the AODN Portal"
+    },
+    {
+      "href": "http://oceancurrent.imos.org.au/aatams.php",
+      "rel": "data",
+      "type": "",
+      "title": "View profile plots from Oceancurrent SealCTDs page",
+      "ai:group": "Data Access"
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/wms",
+      "rel": "wms",
+      "type": "",
+      "title": "imos:aatams_sattag_dm_profile_map",
+      "ai:group": "Data Access > wms",
+      "description": "Delayed-mode trajectories"
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+      "rel": "wfs",
+      "type": "",
+      "title": "aatams_sattag_dm_profile_data",
+      "ai:group": "Data Access > wfs",
+      "description": "This OGC WFS service returns filtered geographic information. The returned data (CTD profile) is available in multiple formats including CSV."
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+      "rel": "wfs",
+      "type": "",
+      "title": "aatams_sattag_dm_location_data",
+      "ai:group": "Data Access > wfs",
+      "description": "This OGC WFS service returns filtered geographic information. The returned data (Argos locations) is available in multiple formats including CSV."
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+      "rel": "wfs",
+      "type": "",
+      "title": "aatams_sattag_dm_dive_profile_data",
+      "ai:group": "Data Access > wfs",
+      "description": "This OGC WFS service returns filtered geographic information. The returned data (Dive profiles) is available in multiple formats including CSV."
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+      "rel": "wfs",
+      "type": "",
+      "title": "aatams_sattag_dm_haulout_data",
+      "ai:group": "Data Access > wfs",
+      "description": "This OGC WFS service returns filtered geographic information. The returned data (Haulout) is available in multiple formats including CSV."
+    },
+    {
+      "href": "http://geoserver-123.aodn.org.au/geoserver/ows",
+      "rel": "wfs",
+      "type": "",
+      "title": "aatams_sattag_dm_summary_data",
+      "ai:group": "Data Access > wfs",
+      "description": "This OGC WFS service returns filtered geographic information. The returned data (Summary statistics) is available in multiple formats including CSV."
+    },
+    {
+      "href": "https://help.aodn.org.au/web-services/ogc-wfs/",
+      "rel": "related",
+      "type": "text/html",
+      "title": "OGC WFS help documentation",
+      "ai:group": "Document"
+    },
+    {
+      "href": "https://content.aodn.org.au/Documents/IMOS/Facilities/animal_tracking/IMOS_Animal_Tracking_Best_Practice_Manual_for_SMRU_CTD_Satellite_Relay_Data_Loggers_LATEST.pdf",
+      "rel": "related",
+      "type": "text/html",
+      "title": "Best Practice Manual for SMRU CTD Satellite Relay Data Loggers",
+      "ai:group": "Document"
+    },
+    {
+      "href": "https://geonetwork.staging.aodn.org.au:443/geonetwork/images/logos/07bcdf90-35b9-43c1-b6cc-a65c3d26179d.png",
+      "rel": "icon",
+      "type": "image/png",
+      "title": "Suggest icon for dataset"
+    },
+    {
+      "href": "https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/06b09398-d3d0-47dc-a54a-a745319fbece",
+      "rel": "describedby",
+      "type": "text/html",
+      "title": "Full metadata link"
+    },
+    {
+      "href": "https://licensebuttons.net/l/by/4.0/88x31.png",
+      "rel": "license",
+      "type": "image/png"
+    },
+    {
+      "href": "http://creativecommons.org/licenses/by/4.0/",
+      "rel": "license",
+      "type": "text/html"
+    },
+    {
+      "href": "uuid:4637bd9b-8fba-4a10-bf23-26a511e17042",
+      "rel": "parent",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Animal Tracking Facility Satellite Relay Tagging Program\",\"recordAbstract\":\"The Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal tagging project. \\n\\nSatellite Relay Data Loggers (SRDL) (most with CTDs, and some also with fluorometers) are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real time via the Argo satellite system.\\n\\nThe Satellite Relay Data Loggers are deployed on marine mammals, including Elephant Seals, Weddell Seals, Australian Fur Seals, Australian Sea Lions, New Zealand Fur Seals. Data parameters measured by the instruments include time, conductivity (salinity), temperature, speed, fluorescence (available in the future) and depth.\\n\\nData is being collected in the Southern Ocean, the Great Australian Bight, and off the South-East Coast of Australia.\"}"
+    },
+    {
+      "href": "uuid:95d6314c-cfc7-40ae-b439-85f14541db71",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"Satellite Relay Tagging Program - Southern Ocean - MEOP Quality Controlled CTD Profiles\",\"recordAbstract\":\"CTD (Conductivity-Temperature_Depth)-Satellite Relay Data Loggers (CTD-SRDLs) are used to explore how marine animal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real-time via the Argo satellite system. Data represented here was collected in the Southern Ocean, from elephant, fur and Weddell Seals. In 2024 data was added from flatback and olive ridley turtles, from a pilot study co-funded by the Royal Australian Navy in collaboration with the Australian Institute of Marine Science and Indigenous Ranger groups.\\n\\nData parameters measured by the instruments include time, conductivity (salinity), temperature, pressure and depth. The data represented by this record have been Qc'd and are the Australian subset of the MEOP-CTD database (MEOP: Marine Mammals Exploring the Oceans Pole to Pole), complemented with the most recent Southern Ocean deployment data. This Australian subset of the Southern Ocean database represents about one quarter of the entire MEOP-CTD database, which currently is about 52,000 profiles obtained from 275 CTD-SRDL tag deployments. The Australian dataset originated in 2004, and was initially collected by Mark Hindell's team based at the University of Tasmania, and in later years his data has formed part of the Animal Tracking Facility of Integrated Marine Observing System (IMOS).\"}"
+    },
+    {
+      "href": "uuid:b2548767-514f-4a31-b65e-36bb894382d5",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Near real-time data with quality-controlled locations\",\"recordAbstract\":\"The Animal Tagging Sub-Facility of the IMOS Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal satellite-tracking project. Satellite Relay Data Loggers (SRDL) (most with Conductivity-Temperature-Depth (CTD) sensors, and some with CTD/fluorometers) are used to explore how marine animals (e.g. mammals) interact with their oceanic environment. The primary focus of this program is to collect CTD data from marine mammals, such as southern elephant seals (Mirounga leonina) and Weddell seals (Leptonychotes weddellii), in the southern Indian Ocean and along the East Antarctic coast. This is achieved through international collaborations with the French national polar program's long-term National Observatory Services: Mammals as Ocean Bio-Samplers (SNO-MEMO), the National Institute of Water and Atmospheric Research as part of the Ross Sea Research and Monitoring Programme, and the CNES (Centre National d'Etudes Spatiales) TOSCA programme (Phoques de Weddell bio-oceanographes de la banquise antarctique et outils satellites) in Terre Adelie. SRDL loggers developed at the Sea Mammal Research Unit (SMRU, University of St Andrews, UK) transmit data in near real time via the Argos satellite system. This metadata record, represents several different datasets listed hereafter, which can all be accessed through a multi-WFS service. \\nThe data represented by this record are presented in near real-time. \\nCTD - parameters measured by the instruments include time, depth, conductivity (salinity), temperature, speed and fluorescence (available in some deployments). \\nDiving - parameters measured by the instruments include individual dive start and end time, longitude/latitude at dive end time, post-dive surface duration, dive duration, maximum dive depth, intermediate dive depths and times. \\nHaulout - a haulout begins when the SRDL has been continuously dry for a specified length of time (usually 10 minutes). It ends when continuously wet for another interval (usually 40 seconds). Haulout data parameters measured by the instruments include haulout start and end dates and longitude/latitude, and haulout number. \\nArgos Locations - location data parameters measured by the instruments include time, longitude, latitude, location quality, along with other diagnostic information provided by Argos (http://www.argos-system.org/). \\nSummary Statistics - as well as sending records of individual events such as dives and haulouts, the SRDL also calculates summary statistics of those events over a specified time period (usually 3, 4 or 6 hours). Summary statistics computed by the instruments include the proportion of time spent diving, at the surface and hauled-out, the number of dives, and the average, standard deviation and maximum dive duration and dive depth during each summary period. These statistics are based on all the data recorded by the SRDL and thus are not prone to distortion by variations in the efficiency of transmission via Argos. \\nSSM QC Locations - SSM-predicted locations and uncertainty at 6-h intervals from the location quality-control process. SSM-predicted locations are also appended to records in the CTD, Diving, Haulout, Argos Locations, and Summary Statistics datasets. See Jonsen et al. 2020 for further details on the SSM used for location quality control\"}"
+    },
+    {
+      "href": "uuid:70f148b1-7040-4fad-944a-456413c95472",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data with quality-controlled locations\",\"recordAbstract\":\"The Animal Tagging Sub-Facility of the IMOS Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal satellite-tracking project. Satellite Relay Data Loggers (SRDL) (most with Conductivity-Temperature-Depth (CTD) sensors, and some with CTD/fluorometers) are used to explore how marine animals (e.g. mammals) interact with their oceanic environment. The primary focus of this program is to collect CTD data from marine mammals, such as southern elephant seals (Mirounga leonina) and Weddell seals (Leptonychotes weddellii), in the southern Indian Ocean and along the East Antarctic coast. This is achieved through international collaborations with the French national polar program's long-term National Observatory Services: Mammals as Ocean Bio-Samplers (SNO-MEMO), the National Institute of Water and Atmospheric Research as part of the Ross Sea Research and Monitoring Programme, and the CNES (Centre National d'Etudes Spatiales) TOSCA programme (Phoques de Weddell bio-oceanographes de la banquise antarctique et outils satellites) in Terre Adelie. SRDL loggers developed at the Sea Mammal Research Unit (SMRU, University of St Andrews, UK) transmit data in near real time via the Argos satellite system. \\n\\nBetween January 2022 and June 2024, a pilot study co-funded by the Royal Australian Navy in collaboration with the Australian Institute of Marine Science and Indigenous Ranger groups was initiated to determine whether conductivity-temperature-depth instruments mounted on turtles could provide essential observations spatially and vertically in the seas of Northern Australia. \\n\\nThis metadata record, represents several different datasets listed hereafter, which can all be accessed through a multi-WFS service. \\nThe data represented by this record are presented in delayed mode. \\nCTD - parameters measured by the instruments include time, depth, conductivity (salinity), temperature, speed and fluorescence (available in some deployments). \\nDiving - parameters measured by the instruments include individual dive start and end time, longitude/latitude at dive end time, post-dive surface duration, dive duration, maximum dive depth, intermediate dive depths and times. \\nHaulout - a haulout begins when the SRDL has been continuously dry for a specified length of time (usually 10 minutes). It ends when continuously wet for another interval (usually 40 seconds). Haulout data parameters measured by the instruments include haulout start and end dates and longitude/latitude, and haulout number. \\nArgos Locations - location data parameters measured by the instruments include time, longitude, latitude, location quality, along with other diagnostic information provided by Argos (http://www.argos-system.org/). \\nSummary Statistics - as well as sending records of individual events such as dives and haulouts, the SRDL also calculates summary statistics of those events over a specified time period (usually 3, 4 or 6 hours). Summary statistics computed by the instruments include the proportion of time spent diving, at the surface and hauled-out, the number of dives, and the average, standard deviation and maximum dive duration and dive depth during each summary period. These statistics are based on all the data recorded by the SRDL and thus are not prone to distortion by variations in the efficiency of transmission via Argos. \\nSSM QC Locations - SSM-predicted locations and uncertainty at 6-h intervals from the location quality-control process. SSM-predicted locations are also appended to records in the CTD, Diving, Haulout, Argos Locations, and Summary Statistics datasets. See Jonsen et al. 2020 for further details on the SSM used for location quality control.\\n\\n** For data prior to October 2018, please consult IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/06b09398-d3d0-47dc-a54a-a745319fbece), to access data without improved satellite locations. In the near future all historical delayed mode data will be reprocessed with the new quality control (QC) process, to improve the accuracy of the satellite location data, and this dataset will replace the original one. **\"}"
+    },
+    {
+      "href": "uuid:b4e742f9-58e5-46b8-b365-15430ea45599",
+      "rel": "sibling",
+      "type": "application/json",
+      "title": "{\"title\":\"IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Near real-time CTD profile data\",\"recordAbstract\":\"The Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal tagging project. Satellite Relay Data Loggers (SRDL) (most with CTDs, and some also with fluorometers) are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real-time via the Argo satellite system. The Satellite Relay Data Loggers are deployed on marine mammals, including Elephant Seals, Weddell Seals, Australian Fur Seals, Australian Sea Lions, New Zealand Fur Seals. Data is being collected in the Southern Ocean, the Great Australian Bight, and off the South-East Coast of Australia. Data parameters measured by the instruments include time, conductivity (salinity), temperature, and depth. The data represented by this record are presented in near real-time.\\n\\nAs of the 19/11/2019, this data collection has been decommissioned. Historical files are still available on the IMOS THREDDS catalog. \\n\\nAll subsequent CTD data is available via the current “IMOS - AATAMS Facility - Satellite Relay Tagging Program - Delayed mode data” collection (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/06b09398-d3d0-47dc-a54a-a745319fbece) in csv format, as opposed to NetCDF as was previously delivered via this “Near real-time” collection.\"}"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [118.0, -80.0, 350.0, -32.0],
+        [118.0, -36.0, 126.0, -32.0],
+        [130.0, -38.0, 140.0, -32.0],
+        [140.0, -42.0, 160.0, -32.0],
+        [-180.0, -50.0, -174.0, -44.0],
+        [-180.0, -74.0, -136.0, -50.0],
+        [-36.0, -76.0, -26.0, -74.0],
+        [-10.0, -80.0, 180.0, -38.0],
+        [-180.0, -80.0, -172.0, -74.0]
+      ],
+      "crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+    },
+    "temporal": {
+      "interval": [
+        ["2007-03-26T06:00:00.000+00:00", "2019-11-30T12:59:59.000+00:00"],
+        ["2007-03-26T06:00:00.000+00:00", "2019-11-30T12:59:59.000+00:00"]
+      ],
+      "trs": "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"
+    }
+  },
+  "itemType": "Collection"
+}

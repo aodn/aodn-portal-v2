@@ -31,6 +31,16 @@ class DetailPage(BasePage):
         self.copy_link = self.page.get_by_test_id('copy-link')
         self.wms_link_header = self.get_text('WMS Service Link')
         self.detail_map_popup = self.page.get_by_test_id('map-popup')
+        self.download_button = self.page.get_by_test_id('download-button')
+        self.cancel_download_button = self.page.get_by_test_id('CancelIcon')
+        self.download_status_alert = self.page.get_by_test_id(
+            'download-status-alert'
+        )
+        self.download_dialog = self.page.get_by_test_id('download-dialog')
+        self.download_email_input = self.page.get_by_test_id(
+            'download-email-input'
+        ).locator('input')
+        self.dialog_button = self.page.get_by_test_id('dialog-button')
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')

@@ -28,6 +28,7 @@ const DownloadButton: FC<DownloadButtonProps> = ({
         ...sx,
       }}
       onClick={isDownloading ? undefined : () => onDownload()}
+      data-testid="download-button"
     >
       <DownloadIcon />
       <Typography

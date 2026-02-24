@@ -1,0 +1,22 @@
+[
+  {
+    "label": "time_start",
+    "type": "dateTime",
+    "name": "time_start"
+  },
+  {
+    "label": "time_end",
+    "type": "dateTime",
+    "name": "time_end"
+  },
+  {
+    "label": "TIME",
+    "type": "dateTime",
+    "name": "TIME"
+  },
+  {
+    "label": "geom",
+    "type": "geometrypropertytype",
+    "name": "geom"
+  }
+]
