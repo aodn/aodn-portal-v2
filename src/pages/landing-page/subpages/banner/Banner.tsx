@@ -1,4 +1,5 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack, Tooltip, Typography } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 import {
   fontSize,
   fontWeight,
@@ -34,7 +35,7 @@ const renderBannerText = () => {
             padding: 0,
           }}
         >
-          Open Access to
+          IMOS Australian
         </Typography>
         <Typography
           sx={{
@@ -51,7 +52,7 @@ const renderBannerText = () => {
             mt: -2,
           }}
         >
-          Ocean Data
+          Ocean Data Portal
         </Typography>
         <Typography
           sx={{
@@ -62,7 +63,8 @@ const renderBannerText = () => {
             pr: padding.small,
           }}
         >
-          &quot;The gateway to Australian marine and climate science data&rdquo;
+          &quot;Open access to Australian marine and climate science
+          data.&rdquo;
         </Typography>
       </Stack>
     </Box>
@@ -80,17 +82,32 @@ const renderBannerImages = (isMobile: boolean) => {
       }}
     >
       <Box pl="40%" pr="10%">
-        <img
-          src={bannerImage2}
-          alt="banner-image-2"
-          style={{
-            objectFit: "cover",
-            width: "100%",
-            height: "100%",
-          }}
-        />
+        <Box sx={{ position: "relative", display: "inline-block" }}>
+          <img
+            src={bannerImage2}
+            alt="banner-image-2"
+            style={{
+              objectFit: "cover",
+              width: "100%",
+              height: "100%",
+            }}
+          />
+          <Tooltip title="Nick Thake" placement="right">
+            <InfoIcon
+              sx={{
+                position: "absolute",
+                top: 8,
+                left: 8,
+                zIndex: 1,
+                fontSize: 20,
+                color: "rgba(255, 255, 255, 0.7)",
+                cursor: "pointer",
+              }}
+            />
+          </Tooltip>
+        </Box>
       </Box>
-      <Box mt="-10%" pr="20%">
+      <Box mt="-10%" pr="20%" sx={{ zIndex: 2, position: "relative" }}>
         <img
           src={bannerImage1}
           alt="banner-image-1"
