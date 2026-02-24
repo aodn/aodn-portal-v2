@@ -67,25 +67,34 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
   }, [dataset]);
 
   useEffect(() => {
+    if (!dataset) return;
+
     const handler = (event: BookmarkEvent) => {
       if (
-        event.id === dataset?.id ||
+        event.id === dataset.id ||
         event.action === EVENT_BOOKMARK.REMOVE_ALL
       ) {
         setIsBookmarked(event.action === EVENT_BOOKMARK.ADD);
       }
     };
 
+    const initHandler = () => {
+      const bookmarkStatus = checkIsBookmarked(store.getState(), dataset.id);
+      setIsBookmarked(bookmarkStatus);
+    };
+
     on(EVENT_BOOKMARK.ADD, handler);
     on(EVENT_BOOKMARK.REMOVE, handler);
     on(EVENT_BOOKMARK.REMOVE_ALL, handler);
+    on(EVENT_BOOKMARK.INIT, initHandler);
 
     return () => {
       off(EVENT_BOOKMARK.ADD, handler);
       off(EVENT_BOOKMARK.REMOVE, handler);
       off(EVENT_BOOKMARK.REMOVE_ALL, handler);
+      off(EVENT_BOOKMARK.INIT, initHandler);
     };
-  }, [dataset?.id]);
+  }, [dataset]);
 
   return (
     dataset && (

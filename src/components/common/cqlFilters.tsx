@@ -42,7 +42,7 @@ export type FilterTypes =
 const funcIsNotNull: IsNotNull = (field: string) => `(${field} IS NOT NULL)`;
 
 const funcUpdateFrequency: UpdateFrequency = (freq: DatasetFrequency) =>
-  `update_frequency='${freq}'`;
+  `ai_update_frequency='${freq}'`;
 
 const funcUpdateDatasetGroup: DatasetGroup = (name: string) =>
   `dataset_group='${name}'`;
