@@ -38,7 +38,10 @@ import AdminScreenContext from "../../../../../../components/admin/AdminScreenCo
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
-const formatOptions = [{ label: "CSV", value: "csv" }];
+const formatOptions = [
+  { label: "CSV", value: "text/csv" },
+  { label: "Shape-Zip", value: "shape-zip" },
+];
 
 interface DownloadWFSCardProps extends DownloadCondition {
   uuid?: string;
