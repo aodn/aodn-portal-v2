@@ -1,4 +1,5 @@
-import { Box, Stack, Tooltip, Typography } from "@mui/material";
+import { useState } from "react";
+import { Box, Dialog, Stack, Tooltip, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import {
   fontSize,
@@ -71,7 +72,10 @@ const renderBannerText = () => {
   );
 };
 
-const renderBannerImages = (isMobile: boolean) => {
+const renderBannerImages = (
+  isMobile: boolean,
+  onImageClick: (src: string) => void
+) => {
   return (
     <Box
       sx={{
@@ -83,15 +87,29 @@ const renderBannerImages = (isMobile: boolean) => {
     >
       <Box pl="40%" pr="10%">
         <Box sx={{ position: "relative", display: "inline-block" }}>
-          <img
-            src={bannerImage2}
-            alt="banner-image-2"
+          <button
+            type="button"
+            onClick={() => onImageClick(bannerImage2)}
             style={{
-              objectFit: "cover",
+              padding: 0,
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+              display: "block",
               width: "100%",
-              height: "100%",
             }}
-          />
+          >
+            <img
+              src={bannerImage2}
+              alt="banner-image-2"
+              style={{
+                objectFit: "cover",
+                width: "100%",
+                height: "100%",
+                display: "block",
+              }}
+            />
+          </button>
           <Tooltip title="Nick Thake" placement="right">
             <InfoIcon
               sx={{
@@ -107,27 +125,60 @@ const renderBannerImages = (isMobile: boolean) => {
           </Tooltip>
         </Box>
       </Box>
-      <Box mt="-10%" pr="20%" sx={{ zIndex: 2, position: "relative" }}>
-        <img
-          src={bannerImage1}
-          alt="banner-image-1"
+      <Box
+        mt="-10%"
+        pr="20%"
+        sx={{ zIndex: 2, position: "relative", pointerEvents: "none" }}
+      >
+        <button
+          type="button"
+          onClick={() => onImageClick(bannerImage1)}
           style={{
-            objectFit: "cover",
+            padding: 0,
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            display: "block",
             width: "100%",
-            height: "100%",
+            pointerEvents: "auto",
           }}
-        />
+        >
+          <img
+            src={bannerImage1}
+            alt="banner-image-1"
+            style={{
+              objectFit: "cover",
+              width: "100%",
+              height: "100%",
+              display: "block",
+            }}
+          />
+        </button>
       </Box>
       <Box mt="-15%" pl="70%">
-        <img
-          src={bannerImage3}
-          alt="banner-image-3"
+        <button
+          type="button"
+          onClick={() => onImageClick(bannerImage3)}
           style={{
-            objectFit: "cover",
+            padding: 0,
+            border: "none",
+            background: "none",
+            cursor: "pointer",
+            display: "block",
             width: "100%",
-            height: "100%",
           }}
-        />
+        >
+          <img
+            src={bannerImage3}
+            alt="banner-image-3"
+            style={{
+              objectFit: "cover",
+              width: "100%",
+              height: "100%",
+              display: "block",
+            }}
+          />
+        </button>
       </Box>
     </Box>
   );
@@ -135,6 +186,7 @@ const renderBannerImages = (isMobile: boolean) => {
 
 const Banner = () => {
   const { isMobile } = useBreakpoint();
+  const [openImage, setOpenImage] = useState<string | null>(null);
 
   return (
     <Box
@@ -149,7 +201,41 @@ const Banner = () => {
       gap={2}
     >
       {renderBannerText()}
-      {renderBannerImages(isMobile)}
+      {renderBannerImages(isMobile, setOpenImage)}
+      <Dialog
+        open={!!openImage}
+        onClose={() => setOpenImage(null)}
+        maxWidth={false}
+        PaperProps={{
+          sx: {
+            backgroundColor: "transparent",
+            boxShadow: "none",
+          },
+        }}
+      >
+        {openImage && (
+          <button
+            type="button"
+            onClick={() => setOpenImage(null)}
+            style={{
+              padding: 0,
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+            }}
+          >
+            <img
+              src={openImage}
+              alt="Full size"
+              style={{
+                maxWidth: "90vw",
+                maxHeight: "90vh",
+                objectFit: "contain",
+              }}
+            />
+          </button>
+        )}
+      </Dialog>
     </Box>
   );
 };
