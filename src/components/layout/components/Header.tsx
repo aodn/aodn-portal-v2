@@ -31,8 +31,9 @@ import HeaderIconMenu from "./HeaderIconMenu";
 const FEEDBACK_URL =
   "https://forms.office.com/pages/responsepage.aspx?id=VV3rFZEZvEaNp6slI03uCIbxNcrqZltDmWw3jsls7JBUMEJTRENHV1o4QzcyWUtKUzJZU1U2SDk1US4u&route=shorturl";
 
-const FEEDBACK_TEXT =
-  "This portal is currently in a Beta stage. To provide much appreciated feedback please";
+const FEEDBACK_TEXT_BEFORE =
+  "This portal is currently in beta stage, your feedback";
+const FEEDBACK_TEXT_AFTER = "is much appreciated.";
 
 const Header: FC = () => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
@@ -108,15 +109,16 @@ const Header: FC = () => {
                 py: 0.5,
               }}
             >
-              {FEEDBACK_TEXT}{" "}
+              {FEEDBACK_TEXT_BEFORE}{" "}
               <Link
                 href={FEEDBACK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{ fontWeight: 600, color: "inherit" }}
               >
-                click here
-              </Link>
+                [click here]
+              </Link>{" "}
+              {FEEDBACK_TEXT_AFTER}
             </Box>
           )}
           {isMobile && <HeaderIconMenu />}
