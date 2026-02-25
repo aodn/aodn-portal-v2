@@ -7,7 +7,7 @@ def handle_wms_map_tile_api(route: Route) -> None:
     route.fulfill(json={})  # Response not needed in the UI tests
 
 
-def handle_wms_map_layers_api(route: Route) -> None:
+def handle_wms_layers_api(route: Route) -> None:
     try:
         data_id = route.request.url.split('/')[-3]
         json_data = load_json_data(f'wms_layers/{data_id}.json')

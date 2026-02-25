@@ -1,13 +1,23 @@
 {
   "properties": {
-    "dataset_group": ["imos"],
-    "scope": {
-      "code": "dataset",
-      "name": ""
-    },
-    "status": "onGoing",
+    "statement": "Waverider buoy data from the World Meteorological Organization (WMO) Global Telecommunication System (GTS) is provided, as delivered, by the Bureau of Meteorology. In March 2018, Queensland buoys were added. In July 2020, NSW MHL buoys were added. In September 2020, Victorian buoys were added. In April 2021, IMOS buoys were added, with more added In November 2021. In November 2002 UWA, NSW Nearshore Wave Data Program, Victorian Coastal Monitoring Program and Pilbara Port's buoys were added. In August 2023 Flinders University + SARDI buoys were added.\n\nThis data is collated by AODN, and made available as a timeseries. The location of the buoy in the WMO message is recorded in degrees, minutes (not seconds), hence the location is only accurate to 1-2 kilometres.",
+    "centroid": [[147.5, -37.5]],
+    "credits": [
+      "Australian Bureau of Meteorology",
+      "Data from the Buoys in Western Australia is kindly provided by Department of Transport (DOT)",
+      "Data from the Buoys in Queensland is kindly provided by Department of Environment and Science (DES). The following buoys are part of these joint projects: Tweed River entrance sand bypass project (Tweed Heads), Port of Brisbane Corporation (North Moreton Bay and Caloundra), Gold Coast City Council (Gold Coast), Department of Transport and Main Roads (Mooloolaba), Gladstone Ports Corporation (Gladstone), North Queensland Bulk Ports Corporation Limited (Hay Point, Albatross Bay)",
+      "Data collection of Manly Hydraulics Laboratory (MHL) buoys, funded by NSW Department of Climate Change, Energy, the Environment and Water (DCCEEW) (formerly known as Department of Planning, Industry and Environment (DPIE) and then Department of Planning and Environment (DPE))(prior funding by former NSW Office of Environment and Heritage (OEH))",
+      "MHL Waverider buoy system and data management undertaken for NSW DCCEEW (formerly DPIE and DPE) by NSW Public Works Manly Hydraulics Laboratory",
+      "Data from the Lakes Entrance buoy is kindly provided by Gippsland Ports.",
+      "Data from the Maria Island and Goodrich Bank Buoys - the wave buoy infrastructure was funded by the Integrated Marine Observing System (IMOS), with co-investment from the Bureau of Meteorology and the Australian Institute of Marine Science.",
+      "Data from the Brisbane Offshore Buoy - the wave buoy infrastructure was funded by the Integrated Marine Observing System (IMOS), with co-investment from the Department of Environment and Science (DES), Queensland and the Australian Institute of Marine Science.",
+      "NSW nearshore wave buoy data were collected, processed and provided by the NSW DCCEEW Nearshore Wave Data Program",
+      "Data from the Deakin buoys - Wave data was provided by the Victorian Coastal Monitoring Program with funding through Department of Environment, Land, Water and Planning, University of Melbourne and Deakin University.",
+      "Data from the Pilbara buoys - Data was provided by the Pilbara Ports Authority with assistance from OMC International.",
+      "Catching Oz Waves project",
+      "Flinders University and the South Australia Research and Development Institute provided the wave data from Gulf Saint Vincent, via funding from SA Water, the Environment Protection Authority (EPA) and the SA Department for Environment and Water (DEW) through its Coastal Research and Development Grant Program. The buoys in the Robe area were funded by the District Council of Robe."
+    ],
     "pace": "real-time",
-    "revision": "2026-02-10T22:42:06",
     "citation": {
       "suggestedCitation": "The citation in a list of references is: \"Department of Transport [W.A]; State of Queensland, Department of Environment and Science; Australian Bureau of Meteorology; Department of Climate Change, Energy, the Environment and Water (DCCEEW), New South Wales Government; Gippsland Ports; Integrated Marine Observing System; University of Western Australia (UWA); Deakin University, Pilbara Ports Authority, Flinders University and South Australian Research and Development Institute (SARDI) [year-of-data-downloaded], Wave buoys Observations - Australia - near real-time, Downloaded from [url] on [date-of-download]\".",
       "otherConstraints": [
@@ -24,6 +34,8 @@
         "South Australian buoys - If you are using this data please acknowledge that “Flinders University and the South Australia Research and Development Institute provided the wave data from Gulf Saint Vincent, via funding from SA Water, the Environment Protection Authority (EPA) and the SA Department for Environment and Water (DEW) through its Coastal Research and Development Grant Program.” If you are using data from the Robe wave buoys please acknowledge that “Flinders University and the South Australia Research and Development Institute provided the wave data from the Robe region, via funding from the District Council of Robe.”"
       ]
     },
+    "license": "Creative Commons Attribution 4.0 International License",
+    "ai:description": "Buoys provide integral wave parameters. Buoy data from the following organisations contribute to the National Wave Archive:\n\n- Manly Hydraulics Laboratory (part of the NSW Department of Climate Change, Energy, the Environment and Water (DCCEEW), which has assumed function of the former NSW Office of Environment and Heritage (OEH))\n- Bureau of Meteorology\n- Western Australia Department of Transport (DOT)\n- the Queensland Department of Environment and Science (DES)\n- the Integrated Marine Observing System (IMOS)\n- Gippsland Ports\n- the NSW Nearshore Wave Data Program from the NSW Department of Climate Change, Energy, the Environment and Water (DCCEEW)\n- the University of Western Australia (UWA)\n- Deakin University\n- Pilbara Ports Authority\n- Flinders University\n- South Australian Research and Development Institute (SARDI).\n\nThe data from MHL, BOM, DOT, DES, Gippsland Ports and Pilbara Ports Authority, is gathered by the Waverider system developed by the Dutch company, Datawell. Some older wave data were collected using non-directional Waverider buoys. As technology advanced and directional measuring capabilities were developed in wave buoys, wave buoy networks were gradually upgraded to directional Waverider buoys. Therefore, some older datasets do not have directional information whereas newer datasets have directional information.\n\nThe data from IMOS, the NSW Nearshore Wave Data Program, DCCEEW, UWA, Deakin, Flinders University and SARDI comes from Spotter Wave Buoys, developed by Sofar Ocean Technologies, which collect data similarly to the Waverider system.\n\nBOM, DES, DOT, MHL, IMOS (some) and Gippsland Ports - The wave buoy data is issued in GTS bulletins (which are only available for 24 hours) : IOWK01 (in BUFR format) and SWWE01 (CREX format). The data is collated by the Bureau into a CSV file (containing the last 24 hours of observations) which is updated every hour, at 5 minutes past the hour. This data is provided via WFS to the AODN.\n\nNote - The Maria Island buoy is currently undergoing repairs, so data is unavailable, we will update when resolved (May 2024).\n\nIMOS (some), DCCEEW, UWA, Deakin, Flinders University + SARDI - The data is updated every hour, at 40 minutes past the hour.\n\nPilbara Ports Authority - The data is uploaded every hour, at 30 minutes past the hour.",
     "themes": [
       {
         "scheme": "theme",
@@ -296,30 +308,457 @@
         ]
       }
     ],
-    "license": "Creative Commons Attribution 4.0 International License",
+    "ai:update_frequency": "real-time",
+    "status": "onGoing",
+    "contacts": [
+      {
+        "organization": "Department of Transport (DoT), Western Australian Government",
+        "position": "Manager Oceanographic Services",
+        "emails": ["tides@transport.wa.gov.au"],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "organization": "Department of Environment and Science (DES), Queensland Government",
+        "emails": ["coastal.sciences@dsiti.qld.gov.au"],
+        "addresses": [
+          {
+            "city": "Brisbane",
+            "country": "Australia",
+            "delivery_point": ["Coastal Impacts Unit", "GPO Box 2454"],
+            "administrative_area": "Queensland",
+            "postal_code": "4001"
+          }
+        ],
+        "roles": ["pointOfContact", "about"],
+        "phones": [
+          {
+            "value": "137468",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Australian Bureau of Meteorology",
+        "position": "Data Requirements and Quality",
+        "emails": ["marine_obs@bom.gov.au"],
+        "addresses": [
+          {
+            "city": "Docklands",
+            "country": "Australia",
+            "delivery_point": ["700 Collins Street"],
+            "administrative_area": "Victoria",
+            "postal_code": "3008"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "organization": "Manly Hydraulics Laboratory (MHL)",
+        "emails": ["MHL.Reception@mhl.nsw.gov.au"],
+        "addresses": [
+          {
+            "city": "Sydney",
+            "country": "Australia",
+            "delivery_point": ["110B King Street, Manly Vale"],
+            "administrative_area": "NSW",
+            "postal_code": "2093"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.mhl.nsw.gov.au",
+            "type": "WWW:LINK-1.0-http--link"
+          }
+        ],
+        "roles": ["pointOfContact", "about"],
+        "phones": [
+          {
+            "value": "(02) 9949 0200",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Gippsland Ports",
+        "emails": ["feedback@gippslandports.vic.gov.au"],
+        "addresses": [
+          {
+            "city": "Bairnsdale",
+            "country": "Australia",
+            "delivery_point": [
+              "Hydrographic Services Department",
+              "97 Main Street"
+            ],
+            "administrative_area": "Victoria",
+            "postal_code": "3875"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://www.gippslandports.vic.gov.au/",
+            "type": "WWW:LINK-1.0-http--link"
+          }
+        ],
+        "roles": ["pointOfContact", "about"],
+        "phones": [
+          {
+            "value": "+61 3 5150 0500",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "name": "Hansen, Jeff",
+        "organization": "The University of Western Australia (UWA)",
+        "emails": ["jeff.hansen@uwa.edu.au"],
+        "addresses": [
+          {
+            "city": "Perth",
+            "country": "Australia",
+            "delivery_point": ["35 Stirling Highway, Crawley"],
+            "administrative_area": "Western Australia",
+            "postal_code": "6009"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "name": "Ierodiaconou, Daniel",
+        "organization": "Deakin University",
+        "emails": ["daniel.ierodiaconou@deakin.edu.au"],
+        "addresses": [
+          {
+            "city": "Burwood",
+            "country": "Australia",
+            "delivery_point": [
+              "School of Life and Environmental Sciences",
+              "221 Burwood Highway"
+            ],
+            "administrative_area": "Victoria",
+            "postal_code": "3125"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "name": "King, Richard",
+        "organization": "Pilbara Ports Authority",
+        "emails": ["Richard.King@pilbaraports.com.au"],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "name": "Miot da Silva, Graziela",
+        "organization": "Flinders University",
+        "emails": ["graziela.miotdasilva@flinders.edu.au"],
+        "addresses": [
+          {
+            "city": "Adelaide",
+            "country": "Australia",
+            "delivery_point": ["Earth Sciences (315)", "GPO Box 2100"],
+            "administrative_area": "South Australia",
+            "postal_code": "5001"
+          }
+        ],
+        "roles": ["pointOfContact", "about"]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "position": "Data Officer",
+        "emails": ["info@aodn.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["University of Tasmania", "Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://imos.org.au/aodn.html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Australian Ocean Data Network (AODN)"
+          }
+        ],
+        "roles": ["pointOfContact", "metadata"],
+        "phones": [
+          {
+            "value": "61 3 6226 7488",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      },
+      {
+        "organization": "Australian Bureau of Meteorology",
+        "emails": ["mgdu@bom.gov.au"],
+        "addresses": [
+          {
+            "city": "Docklands",
+            "country": "Australia",
+            "delivery_point": ["700 Collins Street"],
+            "administrative_area": "Victoria",
+            "postal_code": "3008"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      },
+      {
+        "organization": "Department of Transport (DoT), Western Australian Government",
+        "emails": ["tides@transport.wa.gov.au"],
+        "addresses": [
+          {
+            "country": "Australia",
+            "administrative_area": "Western Australia"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      },
+      {
+        "organization": "Department of Environment and Science (DES), Queensland Government",
+        "emails": ["info@des.qld.gov.au"],
+        "addresses": [
+          {
+            "city": "Brisbane",
+            "country": "Australia",
+            "delivery_point": ["Coastal Impacts Unit", "GPO Box 2454"],
+            "administrative_area": "Queensland",
+            "postal_code": "4001"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "137468",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Department of Climate Change, Energy, the Environment and Water (DCCEEW), New South Wales Government",
+        "addresses": [
+          {
+            "city": "Paramatta",
+            "country": "Australia",
+            "delivery_point": ["Locked Bag 5022"],
+            "administrative_area": "New South Wales",
+            "postal_code": "2124"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://www.planning.nsw.gov.au/",
+            "type": "WWW:LINK-1.0-http--link"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "1300 420 596",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Gippsland Ports",
+        "emails": ["feedback@gippslandports.vic.gov.au"],
+        "addresses": [
+          {
+            "city": "Bairnsdale",
+            "country": "Australia",
+            "delivery_point": [
+              "Hydrographic Services Department",
+              "97 Main Street"
+            ],
+            "administrative_area": "Victoria",
+            "postal_code": "3875"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://www.gippslandports.vic.gov.au/",
+            "type": "WWW:LINK-1.0-http--link"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "+61 3 5150 0500",
+            "roles": ["voice"]
+          }
+        ]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "emails": ["imos@imos.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.imos.org.au/html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Integrated Marine Observing System (IMOS)"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "61 3 6226 7549",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimilie"]
+          }
+        ]
+      },
+      {
+        "organization": "The University of Western Australia (UWA)",
+        "emails": ["general.enquiries@uwa.edu.au"],
+        "addresses": [
+          {
+            "city": "Perth",
+            "country": "Australia",
+            "delivery_point": ["35 Stirling Highway, Crawley"],
+            "administrative_area": "Western Australia",
+            "postal_code": "6009"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.uwa.edu.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the University of Western Australia (UWA)"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "+61 8 6488 6000",
+            "roles": ["voice"]
+          },
+          {
+            "value": "+61 8 6488 1380",
+            "roles": ["facsimilie"]
+          }
+        ]
+      },
+      {
+        "organization": "Deakin University",
+        "emails": ["enquire@deakin.edu.au"],
+        "addresses": [
+          {
+            "city": "Burwood",
+            "country": "Australia",
+            "delivery_point": ["221 Burwood Highway"],
+            "administrative_area": "Victoria",
+            "postal_code": "3125"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.deakin.edu.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Deakin University website"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      },
+      {
+        "organization": "Pilbara Ports Authority",
+        "emails": ["feedback@pilbaraports.com.au"],
+        "addresses": [
+          {
+            "city": "Perth",
+            "country": "Australia",
+            "delivery_point": ["Level 5/999 Hay Street"],
+            "administrative_area": "Western Australia",
+            "postal_code": "6000"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://www.pilbaraports.com.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Pilbara Ports Authority website"
+          }
+        ],
+        "roles": ["owner", "citation"],
+        "phones": [
+          {
+            "value": "+61 8 6217 7112",
+            "roles": ["voice"]
+          },
+          {
+            "value": "+61 8 9226 2196",
+            "roles": ["facsimilie"]
+          }
+        ]
+      },
+      {
+        "organization": "Flinders University",
+        "addresses": [
+          {
+            "city": "Adelaide",
+            "country": "Australia",
+            "delivery_point": ["GPO Box 2100"],
+            "administrative_area": "South Australia",
+            "postal_code": "5001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.flinders.edu.au/",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Flinders University website"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      },
+      {
+        "organization": "South Australian Research and Development Institute (SARDI)",
+        "emails": ["pirsa.sardi@sa.gov.au"],
+        "addresses": [
+          {
+            "city": "Adelaide",
+            "country": "Australia",
+            "delivery_point": ["GPO Box 397"],
+            "administrative_area": "South Australia",
+            "postal_code": "5001"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://pir.sa.gov.au/research/about_sardi",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "SARDI website"
+          }
+        ],
+        "roles": ["owner", "citation"]
+      }
+    ],
     "temporal": [
       {
         "start": "2018-01-14T12:10:00Z"
       }
     ],
-    "creation": "2020-07-15T12:11:02",
-    "ai:description": "Buoys provide integral wave parameters. Buoy data from the following organisations contribute to the National Wave Archive:\n\n- Manly Hydraulics Laboratory (part of the NSW Department of Climate Change, Energy, the Environment and Water (DCCEEW), which has assumed function of the former NSW Office of Environment and Heritage (OEH))\n- Bureau of Meteorology\n- Western Australia Department of Transport (DOT)\n- the Queensland Department of Environment and Science (DES)\n- the Integrated Marine Observing System (IMOS)\n- Gippsland Ports\n- the NSW Nearshore Wave Data Program from the NSW Department of Climate Change, Energy, the Environment and Water (DCCEEW)\n- the University of Western Australia (UWA)\n- Deakin University\n- Pilbara Ports Authority\n- Flinders University\n- South Australian Research and Development Institute (SARDI).\n\nThe data from MHL, BOM, DOT, DES, Gippsland Ports and Pilbara Ports Authority, is gathered by the Waverider system developed by the Dutch company, Datawell. Some older wave data were collected using non-directional Waverider buoys. As technology advanced and directional measuring capabilities were developed in wave buoys, wave buoy networks were gradually upgraded to directional Waverider buoys. Therefore, some older datasets do not have directional information whereas newer datasets have directional information.\n\nThe data from IMOS, the NSW Nearshore Wave Data Program, DCCEEW, UWA, Deakin, Flinders University and SARDI comes from Spotter Wave Buoys, developed by Sofar Ocean Technologies, which collect data similarly to the Waverider system.\n\nBOM, DES, DOT, MHL, IMOS (some) and Gippsland Ports - The wave buoy data is issued in GTS bulletins (which are only available for 24 hours): IOWK01 (in BUFR format) and SWWE01 (CREX format). The data is collated by the Bureau into a CSV file (containing the last 24 hours of observations) which is updated every hour, at 5 minutes past the hour. This data is provided via WFS to the AODN.\n\nNote - The Maria Island buoy is currently undergoing repairs, so data is unavailable, we will update when resolved (May 2024).\n\nIMOS (some), DCCEEW, UWA, Deakin, Flinders University + SARDI - The data is updated every hour, at 40 minutes past the hour.\n\nPilbara Ports Authority - The data is uploaded every hour, at 30 minutes past the hour.",
-    "credits": [
-      "Australian Bureau of Meteorology",
-      "Data from the Buoys in Western Australia is kindly provided by Department of Transport (DOT)",
-      "Data from the Buoys in Queensland is kindly provided by Department of Environment and Science (DES). The following buoys are part of these joint projects: Tweed River entrance sand bypass project (Tweed Heads), Port of Brisbane Corporation (North Moreton Bay and Caloundra), Gold Coast City Council (Gold Coast), Department of Transport and Main Roads (Mooloolaba), Gladstone Ports Corporation (Gladstone), North Queensland Bulk Ports Corporation Limited (Hay Point, Albatross Bay)",
-      "Data collection of Manly Hydraulics Laboratory (MHL) buoys, funded by NSW Department of Climate Change, Energy, the Environment and Water (DCCEEW) (formerly known as Department of Planning, Industry and Environment (DPIE) and then Department of Planning and Environment (DPE))(prior funding by former NSW Office of Environment and Heritage (OEH))",
-      "MHL Waverider buoy system and data management undertaken for NSW DCCEEW (formerly DPIE and DPE) by NSW Public Works Manly Hydraulics Laboratory",
-      "Data from the Lakes Entrance buoy is kindly provided by Gippsland Ports.",
-      "Data from the Maria Island and Goodrich Bank Buoys - the wave buoy infrastructure was funded by the Integrated Marine Observing System (IMOS), with co-investment from the Bureau of Meteorology and the Australian Institute of Marine Science.",
-      "Data from the Brisbane Offshore Buoy - the wave buoy infrastructure was funded by the Integrated Marine Observing System (IMOS), with co-investment from the Department of Environment and Science (DES), Queensland and the Australian Institute of Marine Science.",
-      "NSW nearshore wave buoy data were collected, processed and provided by the NSW DCCEEW Nearshore Wave Data Program",
-      "Data from the Deakin buoys - Wave data was provided by the Victorian Coastal Monitoring Program with funding through Department of Environment, Land, Water and Planning, University of Melbourne and Deakin University.",
-      "Data from the Pilbara buoys - Data was provided by the Pilbara Ports Authority with assistance from OMC International.",
-      "Catching Oz Waves project",
-      "Flinders University and the South Australia Research and Development Institute provided the wave data from Gulf Saint Vincent, via funding from SA Water, the Environment Protection Authority (EPA) and the SA Department for Environment and Water (DEW) through its Coastal Research and Development Grant Program. The buoys in the Robe area were funded by the District Council of Robe."
-    ],
-    "centroid": [[147.5, -37.5]],
+    "dataset_group": ["imos"],
+    "scope": {
+      "code": "dataset",
+      "name": ""
+    },
+    "revision": "2026-02-10T22:42:06",
     "geometry": {
       "geometries": [
         {
@@ -581,381 +1020,8 @@
       ],
       "type": "GeometryCollection"
     },
-    "statement": "Waverider buoy data from the World Meteorological Organization (WMO) Global Telecommunication System (GTS) is provided, as delivered, by the Bureau of Meteorology. In March 2018, Queensland buoys were added. In July 2020, NSW MHL buoys were added. In September 2020, Victorian buoys were added. In April 2021, IMOS buoys were added, with more added In November 2021. In November 2002 UWA, NSW Nearshore Wave Data Program, Victorian Coastal Monitoring Program and Pilbara Port's buoys were added. In August 2023 Flinders University + SARDI buoys were added.\n\nThis data is collated by AODN, and made available as a timeseries. The location of the buoy in the WMO message is recorded in degrees, minutes (not seconds), hence the location is only accurate to 1-2 kilometres.",
-    "contacts": [
-      {
-        "organization": "Department of Transport (DoT), Western Australian Government",
-        "position": "Manager Oceanographic Services",
-        "emails": ["tides@transport.wa.gov.au"],
-        "roles": ["pointOfContact", "about"]
-      },
-      {
-        "organization": "Department of Environment and Science (DES), Queensland Government",
-        "emails": ["coastal.sciences@dsiti.qld.gov.au"],
-        "addresses": [
-          {
-            "city": "Brisbane",
-            "country": "Australia"
-          }
-        ],
-        "roles": ["pointOfContact", "about"],
-        "phones": [
-          {
-            "value": "137468",
-            "roles": ["voice"]
-          }
-        ]
-      },
-      {
-        "organization": "Australian Bureau of Meteorology",
-        "position": "Data Requirements and Quality",
-        "emails": ["marine_obs@bom.gov.au"],
-        "addresses": [
-          {
-            "city": "Docklands",
-            "country": "Australia"
-          }
-        ],
-        "roles": ["pointOfContact", "about"]
-      },
-      {
-        "organization": "Manly Hydraulics Laboratory (MHL)",
-        "emails": ["MHL.Reception@mhl.nsw.gov.au"],
-        "addresses": [
-          {
-            "city": "Sydney",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "http://www.mhl.nsw.gov.au",
-            "type": "WWW:LINK-1.0-http--link"
-          }
-        ],
-        "roles": ["pointOfContact", "about"],
-        "phones": [
-          {
-            "value": "(02) 9949 0200",
-            "roles": ["voice"]
-          }
-        ]
-      },
-      {
-        "organization": "Gippsland Ports",
-        "emails": ["feedback@gippslandports.vic.gov.au"],
-        "addresses": [
-          {
-            "city": "Bairnsdale",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "https://www.gippslandports.vic.gov.au/",
-            "type": "WWW:LINK-1.0-http--link"
-          }
-        ],
-        "roles": ["pointOfContact", "about"],
-        "phones": [
-          {
-            "value": "+61 3 5150 0500",
-            "roles": ["voice"]
-          }
-        ]
-      },
-      {
-        "name": "Hansen, Jeff",
-        "organization": "The University of Western Australia (UWA)",
-        "emails": ["jeff.hansen@uwa.edu.au"],
-        "addresses": [
-          {
-            "city": "Perth",
-            "country": "Australia"
-          }
-        ],
-        "roles": ["pointOfContact", "about"]
-      },
-      {
-        "name": "Ierodiaconou, Daniel",
-        "organization": "Deakin University",
-        "emails": ["daniel.ierodiaconou@deakin.edu.au"],
-        "addresses": [
-          {
-            "city": "Burwood",
-            "country": "Australia"
-          }
-        ],
-        "roles": ["pointOfContact", "about"]
-      },
-      {
-        "name": "King, Richard",
-        "organization": "Pilbara Ports Authority",
-        "emails": ["Richard.King@pilbaraports.com.au"],
-        "roles": ["pointOfContact", "about"]
-      },
-      {
-        "name": "Miot da Silva, Graziela",
-        "organization": "Flinders University",
-        "emails": ["graziela.miotdasilva@flinders.edu.au"],
-        "addresses": [
-          {
-            "city": "Adelaide",
-            "country": "Australia"
-          }
-        ],
-        "roles": ["pointOfContact", "about"]
-      },
-      {
-        "organization": "Integrated Marine Observing System (IMOS)",
-        "position": "Data Officer",
-        "emails": ["info@aodn.org.au"],
-        "addresses": [
-          {
-            "city": "Hobart",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "http://imos.org.au/aodn.html",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "Website of the Australian Ocean Data Network (AODN)"
-          }
-        ],
-        "roles": ["pointOfContact", "metadata"],
-        "phones": [
-          {
-            "value": "61 3 6226 7488",
-            "roles": ["voice"]
-          },
-          {
-            "value": "61 3 6226 2107",
-            "roles": ["facsimile"]
-          }
-        ]
-      },
-      {
-        "organization": "Australian Bureau of Meteorology",
-        "emails": ["mgdu@bom.gov.au"],
-        "addresses": [
-          {
-            "city": "Docklands",
-            "country": "Australia"
-          }
-        ],
-        "roles": ["owner", "citation"]
-      },
-      {
-        "organization": "Department of Transport (DoT), Western Australian Government",
-        "emails": ["tides@transport.wa.gov.au"],
-        "addresses": [
-          {
-            "country": "Australia"
-          }
-        ],
-        "roles": ["owner", "citation"]
-      },
-      {
-        "organization": "Department of Environment and Science (DES), Queensland Government",
-        "emails": ["info@des.qld.gov.au"],
-        "addresses": [
-          {
-            "city": "Brisbane",
-            "country": "Australia"
-          }
-        ],
-        "roles": ["owner", "citation"],
-        "phones": [
-          {
-            "value": "137468",
-            "roles": ["voice"]
-          }
-        ]
-      },
-      {
-        "organization": "Department of Climate Change, Energy, the Environment and Water (DCCEEW), New South Wales Government",
-        "addresses": [
-          {
-            "city": "Paramatta",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "https://www.planning.nsw.gov.au/",
-            "type": "WWW:LINK-1.0-http--link"
-          }
-        ],
-        "roles": ["owner", "citation"],
-        "phones": [
-          {
-            "value": "1300 420 596",
-            "roles": ["voice"]
-          }
-        ]
-      },
-      {
-        "organization": "Gippsland Ports",
-        "emails": ["feedback@gippslandports.vic.gov.au"],
-        "addresses": [
-          {
-            "city": "Bairnsdale",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "https://www.gippslandports.vic.gov.au/",
-            "type": "WWW:LINK-1.0-http--link"
-          }
-        ],
-        "roles": ["owner", "citation"],
-        "phones": [
-          {
-            "value": "+61 3 5150 0500",
-            "roles": ["voice"]
-          }
-        ]
-      },
-      {
-        "organization": "Integrated Marine Observing System (IMOS)",
-        "emails": ["imos@imos.org.au"],
-        "addresses": [
-          {
-            "city": "Hobart",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "http://www.imos.org.au/html",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "Website of the Integrated Marine Observing System (IMOS)"
-          }
-        ],
-        "roles": ["owner", "citation"],
-        "phones": [
-          {
-            "value": "61 3 6226 7549",
-            "roles": ["voice"]
-          },
-          {
-            "value": "61 3 6226 2107",
-            "roles": ["facsimilie"]
-          }
-        ]
-      },
-      {
-        "organization": "The University of Western Australia (UWA)",
-        "emails": ["general.enquiries@uwa.edu.au"],
-        "addresses": [
-          {
-            "city": "Perth",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "http://www.uwa.edu.au/",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "Website of the University of Western Australia (UWA)"
-          }
-        ],
-        "roles": ["owner", "citation"],
-        "phones": [
-          {
-            "value": "+61 8 6488 6000",
-            "roles": ["voice"]
-          },
-          {
-            "value": "+61 8 6488 1380",
-            "roles": ["facsimilie"]
-          }
-        ]
-      },
-      {
-        "organization": "Deakin University",
-        "emails": ["enquire@deakin.edu.au"],
-        "addresses": [
-          {
-            "city": "Burwood",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "http://www.deakin.edu.au/",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "Deakin University website"
-          }
-        ],
-        "roles": ["owner", "citation"]
-      },
-      {
-        "organization": "Pilbara Ports Authority",
-        "emails": ["feedback@pilbaraports.com.au"],
-        "addresses": [
-          {
-            "city": "Perth",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "https://www.pilbaraports.com.au/",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "Pilbara Ports Authority website"
-          }
-        ],
-        "roles": ["owner", "citation"],
-        "phones": [
-          {
-            "value": "+61 8 6217 7112",
-            "roles": ["voice"]
-          },
-          {
-            "value": "+61 8 9226 2196",
-            "roles": ["facsimilie"]
-          }
-        ]
-      },
-      {
-        "organization": "Flinders University",
-        "addresses": [
-          {
-            "city": "Adelaide",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "http://www.flinders.edu.au/",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "Flinders University website"
-          }
-        ],
-        "roles": ["owner", "citation"]
-      },
-      {
-        "organization": "South Australian Research and Development Institute (SARDI)",
-        "emails": ["pirsa.sardi@sa.gov.au"],
-        "addresses": [
-          {
-            "city": "Adelaide",
-            "country": "Australia"
-          }
-        ],
-        "links": [
-          {
-            "href": "https://pir.sa.gov.au/research/about_sardi",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "SARDI website"
-          }
-        ],
-        "roles": ["owner", "citation"]
-      }
-    ]
+    "creation": "2020-07-15T12:11:02",
+    "parameter_vocabs": ["bathymetry", "wave"]
   },
   "id": "b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc",
   "title": "Wave buoys Observations - Australia - near real-time",
@@ -1158,7 +1224,7 @@
       "ai:group": "Python Notebook"
     },
     {
-      "href": "https://geonetwork.staging.aodn.org.au:443/geonetwork/images/logos/07bcdf90-35b9-43c1-b6cc-a65c3d26179d.png",
+      "href": "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/ffa84292-0213-415d-b20b-d07bccbd416a.png",
       "rel": "icon",
       "type": "image/png",
       "title": "Suggest icon for dataset"

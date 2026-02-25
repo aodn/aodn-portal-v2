@@ -18,10 +18,14 @@ from mocks.api.search_collections import (
     handle_temporal_api,
 )
 from mocks.api.vocabs import handle_vocabs_api
+from mocks.api.wfs_map import (
+    handle_wfs_field_value_api,
+    handle_wfs_layers_api,
+)
 from mocks.api.wms_map import (
     handle_wms_fields_api,
+    handle_wms_layers_api,
     handle_wms_map_feature_api,
-    handle_wms_map_layers_api,
     handle_wms_map_tile_api,
 )
 from mocks.api_router import ApiRouter
@@ -43,9 +47,14 @@ def apply_mock(page: Page) -> None:
     api_router.route_collection_detail(
         handle_detail_api, handle_detail_summary_api
     )
+
     api_router.route_wms_map_tile(handle_wms_map_tile_api)
-    api_router.route_wms_layers(handle_wms_map_layers_api)
+    api_router.route_wms_layers(handle_wms_layers_api)
     api_router.route_wms_fields(handle_wms_fields_api)
     api_router.route_wms_map_feature(handle_wms_map_feature_api)
+
+    api_router.route_wfs_field_value(handle_wfs_field_value_api)
+    api_router.route_wfs_layers(handle_wfs_layers_api)
+
     api_router.route_download_dialog(handle_download_dialog_success)
     api_router.route_download_wfs(handle_download_wfs)

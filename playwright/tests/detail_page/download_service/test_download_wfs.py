@@ -76,6 +76,7 @@ def test_incomplete_download_wfs(
 
     detail_page.download_button.click()
     expect(detail_page.download_status_alert).to_have_text(alert_message)
+    detail_page.prevent_http_proxy_errors()
 
 
 @pytest.mark.parametrize(
@@ -108,3 +109,4 @@ def test_download_wfs_cancellation(
 
     detail_page.cancel_download_button.click()
     expect(detail_page.download_status_alert).to_have_text(alert_message)
+    detail_page.prevent_http_proxy_errors()

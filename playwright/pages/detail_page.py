@@ -53,6 +53,13 @@ class DetailPage(BasePage):
         url = f'{settings.baseURL}/details/{uuid}'
         self.page.goto(url, wait_until='load')
 
+    def prevent_http_proxy_errors(self) -> None:
+        """
+        Waits for a short duration to allow any pending requests to complete,
+        preventing HTTP proxy errors due to unhandled requests.
+        """
+        self.page.wait_for_timeout(1000)
+
     def return_and_get_api_request_url(self) -> str:
         """Return to the previous page and return the API URL used for the request."""
         try:

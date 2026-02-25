@@ -1,0 +1,107 @@
+[
+  {
+    "typename": "aodn_wave_nrt_v2_timeseries_map",
+    "fields": [
+      {
+        "label": "file_id",
+        "name": "file_id",
+        "type": "int"
+      },
+      {
+        "label": "url",
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "label": "size",
+        "name": "size",
+        "type": "double"
+      },
+      {
+        "label": "institution",
+        "name": "institution",
+        "type": "string"
+      },
+      {
+        "label": "institut_for_filter",
+        "name": "institut_for_filter",
+        "type": "string"
+      },
+      {
+        "label": "site_name",
+        "name": "site_name",
+        "type": "string"
+      },
+      {
+        "label": "instrument",
+        "name": "instrument",
+        "type": "string"
+      },
+      {
+        "label": "wave_buoy_type",
+        "name": "wave_buoy_type",
+        "type": "string"
+      },
+      {
+        "label": "platform",
+        "name": "platform",
+        "type": "string"
+      },
+      {
+        "label": "water_depth",
+        "name": "water_depth",
+        "type": "float"
+      },
+      {
+        "label": "time_start",
+        "name": "time_start",
+        "type": "dateTime"
+      },
+      {
+        "label": "time_end",
+        "name": "time_end",
+        "type": "dateTime"
+      },
+      {
+        "label": "latitude_min",
+        "name": "latitude_min",
+        "type": "double"
+      },
+      {
+        "label": "longitude_min",
+        "name": "longitude_min",
+        "type": "double"
+      },
+      {
+        "label": "TIME",
+        "name": "TIME",
+        "type": "dateTime"
+      },
+      {
+        "label": "significant_wave_height",
+        "name": "significant_wave_height",
+        "type": "float"
+      },
+      {
+        "label": "wave_mean_period",
+        "name": "wave_mean_period",
+        "type": "float"
+      },
+      {
+        "label": "peak_wave_direction",
+        "name": "peak_wave_direction",
+        "type": "float"
+      },
+      {
+        "label": "peak_wave_period",
+        "name": "peak_wave_period",
+        "type": "float"
+      },
+      {
+        "label": "geom",
+        "name": "geom",
+        "type": "GeometryPropertyType"
+      }
+    ]
+  }
+]

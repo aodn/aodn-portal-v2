@@ -1,109 +1,23 @@
 {
   "properties": {
-    "contacts": [
-      {
-        "name": "Harcourt, Rob",
-        "organization": "School of Natural Sciences, Macquarie University",
-        "position": "Animal Tracking Facility Leader",
-        "emails": ["robert.harcourt@mq.edu.au"],
-        "addresses": [
-          {
-            "city": "North Ryde",
-            "country": "Australia",
-            "delivery_point": [
-              "Marine Predator Research Group, School of Natural Sciences",
-              "Macquarie University"
-            ],
-            "administrative_area": "New South Wales",
-            "postal_code": "2109"
-          }
-        ],
-        "links": [
-          {
-            "href": "https://researchers.mq.edu.au/en/persons/robert-harcourt",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "Maquarie University staff profile for Rob Harcourt"
-          }
-        ],
-        "roles": ["principalInvestigator", "about"]
-      },
-      {
-        "organization": "Integrated Marine Observing System (IMOS)",
-        "position": "Data Officer",
-        "emails": ["info@aodn.org.au"],
-        "addresses": [
-          {
-            "city": "Hobart",
-            "country": "Australia",
-            "delivery_point": ["University of Tasmania", "Private Bag 110"],
-            "administrative_area": "Tasmania",
-            "postal_code": "7001"
-          }
-        ],
-        "links": [
-          {
-            "href": "http://imos.org.au/aodn.html",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "Website of the Australian Ocean Data Network (AODN)"
-          }
-        ],
-        "roles": ["distributor", "metadata"],
-        "phones": [
-          {
-            "value": "61 3 6226 7488",
-            "roles": ["voice"]
-          },
-          {
-            "value": "61 3 6226 2107",
-            "roles": ["facsimile"]
-          }
-        ]
-      },
-      {
-        "organization": "Integrated Marine Observing System (IMOS)",
-        "emails": ["imos@imos.org.au"],
-        "addresses": [
-          {
-            "city": "Hobart",
-            "country": "Australia",
-            "delivery_point": ["Private Bag 110"],
-            "administrative_area": "Tasmania",
-            "postal_code": "7001"
-          }
-        ],
-        "links": [
-          {
-            "href": "http://www.imos.org.au/html",
-            "type": "WWW:LINK-1.0-http--link",
-            "title": "Website for the Integrated Marine Observing System"
-          }
-        ],
-        "roles": ["resourceProvider", "citation"],
-        "phones": [
-          {
-            "value": "61 3 6226 7549",
-            "roles": ["voice"]
-          },
-          {
-            "value": "61 3 6226 2107",
-            "roles": ["facsimile"]
-          }
-        ]
-      }
-    ],
-    "status": "completed",
-    "creation": "2020-07-10T14:31:24",
+    "statement": "The Animal Tracking Facility Satellite Relay Tag data has been supplied to IMOS by participants, via the St Andrews University Sea Mammal Research Unit. Tags used on species: Australian Fur Seal, Australian Sea Lion, New Zealand Fur Seal and Southern Elephant Seal - CTD Satellite Relay Data Loggers (SRDL). Collect conductivity, temperature and depth information. On some Australian Sea Lions - CTD/Fluorometer Satellite Relay Data Loggers (SRDL). Collects conductivity, temperature, fluorescence and depth information. Weddell Seals - Satellite Relay Data Loggers (SRDL). Collect temperature, speed and depth information. CTD-SRDLs The CTD–Satellite Relay Data Loggers (CTD-SRDLs) are built by the Sea Mammal Research Unit (SMRU, University of St. Andrews, UK), incorporating CTD sensors developed by Valeport Ltd (Devon, UK). The sensor head consists of a pressure transducer, a platinum resistance thermometer, and an inductive cell for measuring conductivity. The temperature and conductivity sensors have a precision (repeatability) of 0.005°C and 0.005 mS/cm, respectively. Before being taken into the field, devices are calibrated in the laboratory by Valeport. Some of the CTD-SRDLs (about half) were also tested at sea against a ship-based CTD before the deployment. CTD-SRDLs record hydrographic profiles during the ascent of seals, retaining only the deepest dive in each six-hour time interval, and transmitting profiles in a compressed form (between 10 and 25 data points per profile, depending on the tag program) through the Advanced Research and Global Observation Satellite (ARGOS) system. The accuracy of ARGOS geo-positioning is typically better than ±5 km, because seals never stay at the surface more than a few minutes. New methods are currently under development by the ARGOS team, which should substantially improve the quality of positioning. Hydrographic profiles are post-processed using a unified procedure of editing, adjustment, and validation. A standard set of tests, adapted from Argo standard quality-control procedures, is first run to remove bad profiles, spikes, and outliers. For CTD-SRDLs with profiles in frozen areas, a temperature offset was estimated using the local freezing temperature. A salinity adjustment was also estimated, consisting in a pressure dependent linear correction. This bias is mainly induced by an external field effect on the conductivity sensor, which cannot be corrected a priori because it depends on how the tag has been attached on the seal’s head. Adjustments parameters were estimated for each CTD-SRDLs separately by comparisons of salinity measurements with available data in the World Ocean Database. Because the southern ACC region (south of 55ºS) is associated with a large-scale upwelling of circumpolar deep waters near the surface, the salinity at depth is very stable there, with a low natural variability highly suitable for use as a reference. Salinity data cross-comparisons between different CTD-SRDLs were also used to estimate suitable adjustments for CTD-SRDLs having no profiles available in the southern ACC region. Once calibrated, the accuracy of post-processed CTD-SRDL measurements was estimated to be ±0.03oC in temperature and ±0.05 psu (practical salinity unit) or better in salinity for CTD-SRDLs built after 2007. The achieved accuracy is highly dependent upon availability of ship-based CTD comparisons, and the type of water masses sampled during the deployment time. In best cases, an accuracy of ±0.01 ºC and ±0.02 psu can be obtained. Pre-2007 CTD-SRDLs (about 5% of profiles) used an older technology with a poorer accuracy roughly estimated around ±0.1 ºC and ±0.1 psu.",
     "centroid": [[85.0, -61.0]],
-    "revision": "2024-12-19T05:24:25",
-    "license": "Creative Commons Attribution 4.0 International License",
     "credits": [
       "Australia’s Integrated Marine Observing System (IMOS) is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS). It is operated by a consortium of institutions as an unincorporated joint venture, with the University of Tasmania as Lead Agent.",
       "Sydney Institute of Marine Science (SIMS)"
     ],
-    "scope": {
-      "code": "dataset",
-      "name": "IMOS dataset level record"
+    "pace": "completed",
+    "citation": {
+      "suggestedCitation": "The citation in a list of references is: \"IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access].\"",
+      "useLimitations": [
+        "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose."
+      ],
+      "otherConstraints": [
+        "Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: \"Data was sourced from Australia’s Integrated Marine Observing System (IMOS) – IMOS is enabled by the National Collaborative Research Infrastructure strategy (NCRIS).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in 'credit' in the metadata record)."
+      ]
     },
+    "license": "Creative Commons Attribution 4.0 International License",
+    "ai:description": "The Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal tagging project. Satellite Relay Data Loggers (SRDL) (most with CTDs, and some also with fluorometers) are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real time via the Argo satellite system. The Satellite Relay Data Loggers are deployed on marine mammals, including Elephant Seals, Weddell Seals, Australian Fur Seals, Australian Sea Lions, New Zealand Fur Seals. Data is being collected in the Southern Ocean, the Great Australian Bight, and off the South-East Coast of Australia.\n\nThis metadata record, represents several different datasets listed hereafter, which can all be accessed through a multi-WFS service. The data represented by this record are presented in delayed mode.\n\nCTD - parameters measured by the instruments include time, conductivity (salinity), temperature, speed, fluorescence (available in the future) and depth.\n\nDiving - parameters measured by the instruments include start and end time and longitude/latitude of each individual dive, post-dive surface duration, dive duration, maximum dive depth, intermediate dive depths and times.\n\nHaulout - a haulout begins when the SRDL has been continuously dry for a specified length of time (usually 10 minutes). It ends when continuously wet for another interval (usually 40 seconds). Haulout data parameters measured by the instruments include haulout start and end dates and longitude/latitude, and haulout number.\n\nArgos locations - location data parameters measured by the instruments include time, longitude, latitude, location quality, along with other diagnostic information provided by Argos (http://www.argos-system.org/).\n\nSummary Statistics - as well as sending records of individual events such as dives and haulouts, the SRDL also calculates summary statistics of those events over a specified time period (usually 3, 4 or 6 hours). Summary statistics computed by the instruments include the proportion of time spent diving, at the surface and hauled-out, the number of dives, and the average, standard deviation and maximum dive duration and dive depth during each summary period. These statistics are based on all the data recorded by the SRDL and so are not prone to distortion by variations in the efficiency of transmission via Argos.\n\n\n\n- For data after October 2018, please consult IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data with quality-controlled locations (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/70f148b1-7040-4fad-944a-456413c95472), to access data with improved satellite locations.\n\n- In the near future all historical delayed mode data will be reprocessed with the new quality control (QC) process, to improve the accuracy of the satellite location data, and this dataset will be replaced by the new QC’d one.",
     "themes": [
       {
         "scheme": "",
@@ -354,23 +268,111 @@
         ]
       }
     ],
-    "dataset_group": ["imos"],
-    "ai:description": "The Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal tagging project. Satellite Relay Data Loggers (SRDL) (most with CTDs, and some also with fluorometers) are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real time via the Argo satellite system. The Satellite Relay Data Loggers are deployed on marine mammals, including Elephant Seals, Weddell Seals, Australian Fur Seals, Australian Sea Lions, New Zealand Fur Seals. Data is being collected in the Southern Ocean, the Great Australian Bight, and off the South-East Coast of Australia.\n\nThis metadata record, represents several different datasets listed hereafter, which can all be accessed through a multi-WFS service. The data represented by this record are presented in delayed mode.\n\nCTD - parameters measured by the instruments include time, conductivity (salinity), temperature, speed, fluorescence (available in the future) and depth.\n\nDiving - parameters measured by the instruments include start and end time and longitude/latitude of each individual dive, post-dive surface duration, dive duration, maximum dive depth, intermediate dive depths and times.\n\nHaulout - a haulout begins when the SRDL has been continuously dry for a specified length of time (usually 10 minutes). It ends when continuously wet for another interval (usually 40 seconds). Haulout data parameters measured by the instruments include haulout start and end dates and longitude/latitude, and haulout number.\n\nArgos locations - location data parameters measured by the instruments include time, longitude, latitude, location quality, along with other diagnostic information provided by Argos (http://www.argos-system.org/).\n\nSummary Statistics - as well as sending records of individual events such as dives and haulouts, the SRDL also calculates summary statistics of those events over a specified time period (usually 3, 4 or 6 hours). Summary statistics computed by the instruments include the proportion of time spent diving, at the surface and hauled-out, the number of dives, and the average, standard deviation and maximum dive duration and dive depth during each summary period. These statistics are based on all the data recorded by the SRDL and so are not prone to distortion by variations in the efficiency of transmission via Argos.\n\n\n\n- For data after October 2018, please consult IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data with quality-controlled locations (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/70f148b1-7040-4fad-944a-456413c95472), to access data with improved satellite locations.\n\n- In the near future all historical delayed mode data will be reprocessed with the new quality control (QC) process, to improve the accuracy of the satellite location data, and this dataset will be replaced by the new QC’d one.",
+    "ai:update_frequency": "completed",
+    "status": "completed",
+    "contacts": [
+      {
+        "name": "Harcourt, Rob",
+        "organization": "School of Natural Sciences, Macquarie University",
+        "position": "Animal Tracking Facility Leader",
+        "emails": ["robert.harcourt@mq.edu.au"],
+        "addresses": [
+          {
+            "city": "North Ryde",
+            "country": "Australia",
+            "delivery_point": [
+              "Marine Predator Research Group, School of Natural Sciences",
+              "Macquarie University"
+            ],
+            "administrative_area": "New South Wales",
+            "postal_code": "2109"
+          }
+        ],
+        "links": [
+          {
+            "href": "https://researchers.mq.edu.au/en/persons/robert-harcourt",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Maquarie University staff profile for Rob Harcourt"
+          }
+        ],
+        "roles": ["principalInvestigator", "about"]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "position": "Data Officer",
+        "emails": ["info@aodn.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["University of Tasmania", "Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://imos.org.au/aodn.html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website of the Australian Ocean Data Network (AODN)"
+          }
+        ],
+        "roles": ["distributor", "metadata"],
+        "phones": [
+          {
+            "value": "61 3 6226 7488",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      },
+      {
+        "organization": "Integrated Marine Observing System (IMOS)",
+        "emails": ["imos@imos.org.au"],
+        "addresses": [
+          {
+            "city": "Hobart",
+            "country": "Australia",
+            "delivery_point": ["Private Bag 110"],
+            "administrative_area": "Tasmania",
+            "postal_code": "7001"
+          }
+        ],
+        "links": [
+          {
+            "href": "http://www.imos.org.au/html",
+            "type": "WWW:LINK-1.0-http--link",
+            "title": "Website for the Integrated Marine Observing System"
+          }
+        ],
+        "roles": ["resourceProvider", "citation"],
+        "phones": [
+          {
+            "value": "61 3 6226 7549",
+            "roles": ["voice"]
+          },
+          {
+            "value": "61 3 6226 2107",
+            "roles": ["facsimile"]
+          }
+        ]
+      }
+    ],
     "temporal": [
       {
         "start": "2007-03-26T06:00:00Z",
         "end": "2019-11-30T12:59:59Z"
       }
     ],
-    "citation": {
-      "suggestedCitation": "The citation in a list of references is: \"IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access].\"",
-      "useLimitations": [
-        "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose."
-      ],
-      "otherConstraints": [
-        "Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: \"Data was sourced from Australia’s Integrated Marine Observing System (IMOS) – IMOS is enabled by the National Collaborative Research Infrastructure strategy (NCRIS).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in 'credit' in the metadata record)."
-      ]
+    "dataset_group": ["imos"],
+    "scope": {
+      "code": "dataset",
+      "name": "IMOS dataset level record"
     },
+    "revision": "2024-12-19T05:24:25",
     "geometry": {
       "geometries": [
         {
@@ -659,8 +661,8 @@
       ],
       "type": "GeometryCollection"
     },
-    "pace": "completed",
-    "statement": "The Animal Tracking Facility Satellite Relay Tag data has been supplied to IMOS by participants, via the St Andrews University Sea Mammal Research Unit. Tags used on species: Australian Fur Seal, Australian Sea Lion, New Zealand Fur Seal and Southern Elephant Seal - CTD Satellite Relay Data Loggers (SRDL). Collect conductivity, temperature and depth information. On some Australian Sea Lions - CTD/Fluorometer Satellite Relay Data Loggers (SRDL). Collects conductivity, temperature, fluorescence and depth information. Weddell Seals - Satellite Relay Data Loggers (SRDL). Collect temperature, speed and depth information. CTD-SRDLs The CTD–Satellite Relay Data Loggers (CTD-SRDLs) are built by the Sea Mammal Research Unit (SMRU, University of St. Andrews, UK), incorporating CTD sensors developed by Valeport Ltd (Devon, UK). The sensor head consists of a pressure transducer, a platinum resistance thermometer, and an inductive cell for measuring conductivity. The temperature and conductivity sensors have a precision (repeatability) of 0.005°C and 0.005 mS/cm, respectively. Before being taken into the field, devices are calibrated in the laboratory by Valeport. Some of the CTD-SRDLs (about half) were also tested at sea against a ship-based CTD before the deployment. CTD-SRDLs record hydrographic profiles during the ascent of seals, retaining only the deepest dive in each six-hour time interval, and transmitting profiles in a compressed form (between 10 and 25 data points per profile, depending on the tag program) through the Advanced Research and Global Observation Satellite (ARGOS) system. The accuracy of ARGOS geo-positioning is typically better than ±5 km, because seals never stay at the surface more than a few minutes. New methods are currently under development by the ARGOS team, which should substantially improve the quality of positioning. Hydrographic profiles are post-processed using a unified procedure of editing, adjustment, and validation. A standard set of tests, adapted from Argo standard quality-control procedures, is first run to remove bad profiles, spikes, and outliers. For CTD-SRDLs with profiles in frozen areas, a temperature offset was estimated using the local freezing temperature. A salinity adjustment was also estimated, consisting in a pressure dependent linear correction. This bias is mainly induced by an external field effect on the conductivity sensor, which cannot be corrected a priori because it depends on how the tag has been attached on the seal’s head. Adjustments parameters were estimated for each CTD-SRDLs separately by comparisons of salinity measurements with available data in the World Ocean Database. Because the southern ACC region (south of 55ºS) is associated with a large-scale upwelling of circumpolar deep waters near the surface, the salinity at depth is very stable there, with a low natural variability highly suitable for use as a reference. Salinity data cross-comparisons between different CTD-SRDLs were also used to estimate suitable adjustments for CTD-SRDLs having no profiles available in the southern ACC region. Once calibrated, the accuracy of post-processed CTD-SRDL measurements was estimated to be ±0.03oC in temperature and ±0.05 psu (practical salinity unit) or better in salinity for CTD-SRDLs built after 2007. The achieved accuracy is highly dependent upon availability of ship-based CTD comparisons, and the type of water masses sampled during the deployment time. In best cases, an accuracy of ±0.01 ºC and ±0.02 psu can be obtained. Pre-2007 CTD-SRDLs (about 5% of profiles) used an older technology with a poorer accuracy roughly estimated around ±0.1 ºC and ±0.1 psu."
+    "creation": "2020-07-10T14:31:24",
+    "parameter_vocabs": ["salinity", "temperature", "water pressure"]
   },
   "id": "06b09398-d3d0-47dc-a54a-a745319fbece",
   "title": "IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data",
@@ -749,7 +751,7 @@
       "ai:group": "Document"
     },
     {
-      "href": "https://geonetwork.staging.aodn.org.au:443/geonetwork/images/logos/07bcdf90-35b9-43c1-b6cc-a65c3d26179d.png",
+      "href": "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/ffa84292-0213-415d-b20b-d07bccbd416a.png",
       "rel": "icon",
       "type": "image/png",
       "title": "Suggest icon for dataset"
@@ -777,10 +779,10 @@
       "title": "{\"title\":\"IMOS - Animal Tracking Facility Satellite Relay Tagging Program\",\"recordAbstract\":\"The Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal tagging project. \\n\\nSatellite Relay Data Loggers (SRDL) (most with CTDs, and some also with fluorometers) are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real time via the Argo satellite system.\\n\\nThe Satellite Relay Data Loggers are deployed on marine mammals, including Elephant Seals, Weddell Seals, Australian Fur Seals, Australian Sea Lions, New Zealand Fur Seals. Data parameters measured by the instruments include time, conductivity (salinity), temperature, speed, fluorescence (available in the future) and depth.\\n\\nData is being collected in the Southern Ocean, the Great Australian Bight, and off the South-East Coast of Australia.\"}"
     },
     {
-      "href": "uuid:95d6314c-cfc7-40ae-b439-85f14541db71",
+      "href": "uuid:b4e742f9-58e5-46b8-b365-15430ea45599",
       "rel": "sibling",
       "type": "application/json",
-      "title": "{\"title\":\"Satellite Relay Tagging Program - Southern Ocean - MEOP Quality Controlled CTD Profiles\",\"recordAbstract\":\"CTD (Conductivity-Temperature_Depth)-Satellite Relay Data Loggers (CTD-SRDLs) are used to explore how marine animal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real-time via the Argo satellite system. Data represented here was collected in the Southern Ocean, from elephant, fur and Weddell Seals. In 2024 data was added from flatback and olive ridley turtles, from a pilot study co-funded by the Royal Australian Navy in collaboration with the Australian Institute of Marine Science and Indigenous Ranger groups.\\n\\nData parameters measured by the instruments include time, conductivity (salinity), temperature, pressure and depth. The data represented by this record have been Qc'd and are the Australian subset of the MEOP-CTD database (MEOP: Marine Mammals Exploring the Oceans Pole to Pole), complemented with the most recent Southern Ocean deployment data. This Australian subset of the Southern Ocean database represents about one quarter of the entire MEOP-CTD database, which currently is about 52,000 profiles obtained from 275 CTD-SRDL tag deployments. The Australian dataset originated in 2004, and was initially collected by Mark Hindell's team based at the University of Tasmania, and in later years his data has formed part of the Animal Tracking Facility of Integrated Marine Observing System (IMOS).\"}"
+      "title": "{\"title\":\"IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Near real-time CTD profile data\",\"recordAbstract\":\"The Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal tagging project. Satellite Relay Data Loggers (SRDL) (most with CTDs, and some also with fluorometers) are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real-time via the Argo satellite system. The Satellite Relay Data Loggers are deployed on marine mammals, including Elephant Seals, Weddell Seals, Australian Fur Seals, Australian Sea Lions, New Zealand Fur Seals. Data is being collected in the Southern Ocean, the Great Australian Bight, and off the South-East Coast of Australia. Data parameters measured by the instruments include time, conductivity (salinity), temperature, and depth. The data represented by this record are presented in near real-time.\\n\\nAs of the 19/11/2019, this data collection has been decommissioned. Historical files are still available on the IMOS THREDDS catalog. \\n\\nAll subsequent CTD data is available via the current “IMOS - AATAMS Facility - Satellite Relay Tagging Program - Delayed mode data” collection (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/06b09398-d3d0-47dc-a54a-a745319fbece) in csv format, as opposed to NetCDF as was previously delivered via this “Near real-time” collection.\"}"
     },
     {
       "href": "uuid:b2548767-514f-4a31-b65e-36bb894382d5",
@@ -795,10 +797,10 @@
       "title": "{\"title\":\"IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data with quality-controlled locations\",\"recordAbstract\":\"The Animal Tagging Sub-Facility of the IMOS Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal satellite-tracking project. Satellite Relay Data Loggers (SRDL) (most with Conductivity-Temperature-Depth (CTD) sensors, and some with CTD/fluorometers) are used to explore how marine animals (e.g. mammals) interact with their oceanic environment. The primary focus of this program is to collect CTD data from marine mammals, such as southern elephant seals (Mirounga leonina) and Weddell seals (Leptonychotes weddellii), in the southern Indian Ocean and along the East Antarctic coast. This is achieved through international collaborations with the French national polar program's long-term National Observatory Services: Mammals as Ocean Bio-Samplers (SNO-MEMO), the National Institute of Water and Atmospheric Research as part of the Ross Sea Research and Monitoring Programme, and the CNES (Centre National d'Etudes Spatiales) TOSCA programme (Phoques de Weddell bio-oceanographes de la banquise antarctique et outils satellites) in Terre Adelie. SRDL loggers developed at the Sea Mammal Research Unit (SMRU, University of St Andrews, UK) transmit data in near real time via the Argos satellite system. \\n\\nBetween January 2022 and June 2024, a pilot study co-funded by the Royal Australian Navy in collaboration with the Australian Institute of Marine Science and Indigenous Ranger groups was initiated to determine whether conductivity-temperature-depth instruments mounted on turtles could provide essential observations spatially and vertically in the seas of Northern Australia. \\n\\nThis metadata record, represents several different datasets listed hereafter, which can all be accessed through a multi-WFS service. \\nThe data represented by this record are presented in delayed mode. \\nCTD - parameters measured by the instruments include time, depth, conductivity (salinity), temperature, speed and fluorescence (available in some deployments). \\nDiving - parameters measured by the instruments include individual dive start and end time, longitude/latitude at dive end time, post-dive surface duration, dive duration, maximum dive depth, intermediate dive depths and times. \\nHaulout - a haulout begins when the SRDL has been continuously dry for a specified length of time (usually 10 minutes). It ends when continuously wet for another interval (usually 40 seconds). Haulout data parameters measured by the instruments include haulout start and end dates and longitude/latitude, and haulout number. \\nArgos Locations - location data parameters measured by the instruments include time, longitude, latitude, location quality, along with other diagnostic information provided by Argos (http://www.argos-system.org/). \\nSummary Statistics - as well as sending records of individual events such as dives and haulouts, the SRDL also calculates summary statistics of those events over a specified time period (usually 3, 4 or 6 hours). Summary statistics computed by the instruments include the proportion of time spent diving, at the surface and hauled-out, the number of dives, and the average, standard deviation and maximum dive duration and dive depth during each summary period. These statistics are based on all the data recorded by the SRDL and thus are not prone to distortion by variations in the efficiency of transmission via Argos. \\nSSM QC Locations - SSM-predicted locations and uncertainty at 6-h intervals from the location quality-control process. SSM-predicted locations are also appended to records in the CTD, Diving, Haulout, Argos Locations, and Summary Statistics datasets. See Jonsen et al. 2020 for further details on the SSM used for location quality control.\\n\\n** For data prior to October 2018, please consult IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Delayed mode data (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/06b09398-d3d0-47dc-a54a-a745319fbece), to access data without improved satellite locations. In the near future all historical delayed mode data will be reprocessed with the new quality control (QC) process, to improve the accuracy of the satellite location data, and this dataset will replace the original one. **\"}"
     },
     {
-      "href": "uuid:b4e742f9-58e5-46b8-b365-15430ea45599",
+      "href": "uuid:95d6314c-cfc7-40ae-b439-85f14541db71",
       "rel": "sibling",
       "type": "application/json",
-      "title": "{\"title\":\"IMOS - Animal Tracking Facility - Satellite Relay Tagging Program - Near real-time CTD profile data\",\"recordAbstract\":\"The Animal Tracking Facility (formerly known as the Australian Animal Tracking And Monitoring System (AATAMS)) is a coordinated marine animal tagging project. Satellite Relay Data Loggers (SRDL) (most with CTDs, and some also with fluorometers) are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real-time via the Argo satellite system. The Satellite Relay Data Loggers are deployed on marine mammals, including Elephant Seals, Weddell Seals, Australian Fur Seals, Australian Sea Lions, New Zealand Fur Seals. Data is being collected in the Southern Ocean, the Great Australian Bight, and off the South-East Coast of Australia. Data parameters measured by the instruments include time, conductivity (salinity), temperature, and depth. The data represented by this record are presented in near real-time.\\n\\nAs of the 19/11/2019, this data collection has been decommissioned. Historical files are still available on the IMOS THREDDS catalog. \\n\\nAll subsequent CTD data is available via the current “IMOS - AATAMS Facility - Satellite Relay Tagging Program - Delayed mode data” collection (https://catalogue-imos.aodn.org.au:443/geonetwork/srv/api/records/06b09398-d3d0-47dc-a54a-a745319fbece) in csv format, as opposed to NetCDF as was previously delivered via this “Near real-time” collection.\"}"
+      "title": "{\"title\":\"Satellite Relay Tagging Program - Southern Ocean - MEOP Quality Controlled CTD Profiles\",\"recordAbstract\":\"CTD (Conductivity-Temperature_Depth)-Satellite Relay Data Loggers (CTD-SRDLs) are used to explore how marine animal behaviour relates to their oceanic environment. Loggers developed at the University of St Andrews Sea Mammal Research Unit transmit data in near real-time via the Argo satellite system. Data represented here was collected in the Southern Ocean, from elephant, fur and Weddell Seals. In 2024 data was added from flatback and olive ridley turtles, from a pilot study co-funded by the Royal Australian Navy in collaboration with the Australian Institute of Marine Science and Indigenous Ranger groups.\\n\\nData parameters measured by the instruments include time, conductivity (salinity), temperature, pressure and depth. The data represented by this record have been Qc'd and are the Australian subset of the MEOP-CTD database (MEOP: Marine Mammals Exploring the Oceans Pole to Pole), complemented with the most recent Southern Ocean deployment data. This Australian subset of the Southern Ocean database represents about one quarter of the entire MEOP-CTD database, which currently is about 52,000 profiles obtained from 275 CTD-SRDL tag deployments. The Australian dataset originated in 2004, and was initially collected by Mark Hindell's team based at the University of Tasmania, and in later years his data has formed part of the Animal Tracking Facility of Integrated Marine Observing System (IMOS).\"}"
     }
   ],
   "extent": {
