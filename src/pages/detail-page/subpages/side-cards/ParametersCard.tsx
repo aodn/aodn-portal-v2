@@ -9,6 +9,7 @@ import {
 } from "../../../../components/common/store/componentParamReducer";
 import useRedirectSearch from "../../../../hooks/useRedirectSearch";
 import { pageReferer } from "../../../../components/common/constants";
+import { capitalizeFirstLetter } from "../../../../utils/StringUtils";
 import { portalTheme } from "../../../../styles";
 
 const ParametersCard: FC = () => {
@@ -17,7 +18,10 @@ const ParametersCard: FC = () => {
   const redirectSearch = useRedirectSearch();
 
   const parameterVocabs = useMemo(
-    () => collection?.getParameterVocabs() ?? [],
+    () =>
+      (collection?.getParameterVocabs() ?? []).map((v) =>
+        capitalizeFirstLetter(v)
+      ),
     [collection]
   );
 
