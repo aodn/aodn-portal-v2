@@ -224,13 +224,14 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
               naContentSx={{
                 bgcolor: "#FFF",
               }}
-              onNaClick={() =>
+              onNaClick={() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
                 goToDetailPage(
                   collection.id,
                   detailPageDefault.CITATION,
                   pageReferer.DETAIL_PAGE_REFERER
-                )
-              }
+                );
+              }}
             />
             <LicenseList
               license={license ? license : ""}
