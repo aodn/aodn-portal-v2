@@ -17,6 +17,7 @@ interface SuggestedCitationListProps {
   naMessage?: string;
   naCardSx?: SxProps;
   naContentSx?: SxProps;
+  onNaClick?: () => void;
 }
 
 const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
@@ -27,6 +28,7 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
   naMessage,
   naCardSx,
   naContentSx,
+  onNaClick,
 }) => {
   const suggestedCitationItem = useMemo(
     () =>
@@ -66,6 +68,7 @@ const SuggestedCitationList: React.FC<SuggestedCitationListProps> = ({
                 message={naMessage}
                 cardSx={naCardSx}
                 contentSx={naContentSx}
+                onClick={onNaClick}
               />
             ) : (
               suggestedCitationItem

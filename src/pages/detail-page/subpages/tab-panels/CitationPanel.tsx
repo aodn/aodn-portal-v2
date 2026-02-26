@@ -217,9 +217,20 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
                 height: "38px",
                 border: `1px solid ${portalTheme.palette.primary1}`,
                 bgcolor: "#FFF",
+                "&:hover": {
+                  borderWidth: "2px",
+                },
               }}
               naContentSx={{
                 bgcolor: "#FFF",
+              }}
+              onNaClick={() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                goToDetailPage(
+                  collection.id,
+                  detailPageDefault.CITATION,
+                  pageReferer.DETAIL_PAGE_REFERER
+                );
               }}
             />
             <LicenseList
