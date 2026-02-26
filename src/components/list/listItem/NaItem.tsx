@@ -11,6 +11,7 @@ interface NaItemProps {
   message?: string;
   cardSx?: SxProps;
   contentSx?: SxProps;
+  onClick?: () => void;
 }
 
 const NaItem: React.FC<NaItemProps> = ({
@@ -18,9 +19,10 @@ const NaItem: React.FC<NaItemProps> = ({
   message,
   cardSx,
   contentSx,
+  onClick,
 }) => {
   return (
-    <ItemBaseGrid disableHover>
+    <ItemBaseGrid disableHover onClick={onClick}>
       <InfoCard
         infoContent={{
           body: message || `${capitalizeFirstLetter(title)} not available`,
@@ -33,6 +35,9 @@ const NaItem: React.FC<NaItemProps> = ({
           borderRadius: "4px",
           boxShadow: "none",
           bgcolor: portalTheme.palette.primary6,
+          ...(onClick && {
+            cursor: "pointer",
+          }),
           ...(cardSx as object),
         }}
         contentSx={{
