@@ -8,6 +8,7 @@ import {
   SxProps,
   Tooltip,
   Typography,
+  Badge,
 } from "@mui/material";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { useDetailPageContext } from "../context/detail-page-context";
@@ -36,6 +37,7 @@ import { InfoStatusType } from "../../../components/info/InfoDefinition";
 import { DataTestId } from "../../../components/map/mapbox/constants";
 import { ReplyIcon } from "../../../assets/icons/details/back";
 import LabelChip from "../../../components/common/label/LabelChip";
+import AIGenStarIcon from "../../../components/icon/AIGenStarIcon";
 
 enum Status {
   onGoing = "onGoing",
@@ -151,11 +153,11 @@ const renderCompletedStatus = () => (
 );
 
 const renderSubTitle = (
-  pace: string | undefined,
   startDate: string | undefined,
   endDate: string | undefined,
   status: string | undefined,
-  scope: string | undefined
+  scope: string | undefined,
+  aiUpdateFrequency: string | undefined
 ) => (
   <Stack flexDirection="row" flexWrap="wrap" gap={1}>
     {scope && scope.toLowerCase() === "document" && (
@@ -173,22 +175,43 @@ const renderSubTitle = (
         />
       </RoundCard>
     )}
-    {pace &&
-      pace.toLowerCase() !== "other" &&
-      !(pace.toLowerCase() === "completed" && status === Status.completed) && (
-        <RoundCard
+    {aiUpdateFrequency &&
+      aiUpdateFrequency.toLowerCase() !== "other" &&
+      !(aiUpdateFrequency.toLowerCase() === "completed") && (
+        <Badge
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          badgeContent={<AIGenStarIcon color={color.brightBlue.medium} />}
           sx={{
-            bgcolor: color.pace,
+            "& .MuiBadge-badge": {
+              backgroundColor: "transparent",
+              padding: 0,
+              minWidth: "unset",
+              height: "unset",
+              top: 0,
+              right: 0,
+            },
           }}
         >
-          <Typography
-            padding={0}
-            variant="title1Medium"
-            color={portalTheme.palette.text1}
+          <RoundCard
+            sx={{
+              bgcolor:
+                aiUpdateFrequency?.toLowerCase() === "real-time"
+                  ? portalTheme.palette.tag1
+                  : portalTheme.palette.tag2,
+            }}
           >
-            {capitalizeFirstLetter(pace)}
-          </Typography>
-        </RoundCard>
+            <Typography
+              padding={0}
+              variant="title1Medium"
+              color={portalTheme.palette.text1}
+            >
+              {capitalizeFirstLetter(aiUpdateFrequency)}
+            </Typography>
+          </RoundCard>
+        </Badge>
       )}
     {startDate && (
       <RoundCard
@@ -236,23 +259,24 @@ const HeaderSection = () => {
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
-  const [title, pace, status, startDate, endDate, scope] = useMemo(() => {
-    const title = collection?.title;
-    const pace = collection?.getPace();
-    const status = collection?.getStatus();
-    const extent = collection?.getExtent();
-    const scope = collection?.getScope();
+  const [title, status, startDate, endDate, scope, aiUpdateFrequency] =
+    useMemo(() => {
+      const title = collection?.title;
+      const status = collection?.getStatus();
+      const extent = collection?.getExtent();
+      const scope = collection?.getScope();
+      const aiUpdateFrequency = collection?.getAiUpdateFrequency();
 
-    let startDate = undefined;
-    let endDate = undefined;
-    if (extent) {
-      const [s, e] = extent.getOverallTemporal();
-      startDate = s;
-      endDate = e;
-    }
+      let startDate = undefined;
+      let endDate = undefined;
+      if (extent) {
+        const [s, e] = extent.getOverallTemporal();
+        startDate = s;
+        endDate = e;
+      }
 
-    return [title, pace, status, startDate, endDate, scope];
-  }, [collection]);
+      return [title, status, startDate, endDate, scope, aiUpdateFrequency];
+    }, [collection]);
 
   const onGoBack = useCallback(
     (referer: string) => {
@@ -348,7 +372,13 @@ const HeaderSection = () => {
                 {title}
               </Typography>
               {!isMobile &&
-                renderSubTitle(pace, startDate, endDate, status, scope)}
+                renderSubTitle(
+                  startDate,
+                  endDate,
+                  status,
+                  scope,
+                  aiUpdateFrequency
+                )}
             </Grid>
             <Grid
               item
@@ -373,7 +403,13 @@ const HeaderSection = () => {
             </Grid>
             {isMobile && (
               <Grid item xs={8} sm={12}>
-                {renderSubTitle(pace, startDate, endDate, status, scope)}
+                {renderSubTitle(
+                  startDate,
+                  endDate,
+                  status,
+                  scope,
+                  aiUpdateFrequency
+                )}
               </Grid>
             )}
           </Grid>

@@ -8,7 +8,7 @@ class Routes:
     COLLECTION_TEMPORAL = f'{PREFIX}/collections?properties=id,temporal&*'
     COLLECTION_PROVIDER = f'{PREFIX}/collections?properties=id,providers&*'
     COLLECTION_CENTROID = f'{PREFIX}/collections?properties=id,centroid&*'
-    COLLECTION_ALL = f'{PREFIX}/collections?properties=id,title,description,status,scope,links,assets_summary,bbox&*'
+    COLLECTION_ALL = f'{PREFIX}/collections?properties=id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox&*'
     COLLECTION_POPUP = (
         f'{PREFIX}/collections?properties=title,description&filter=id*'
     )
@@ -20,5 +20,5 @@ class Routes:
 
     WMS_MAP_TILE = '*/**/items/wms_map_tile?*'
     WMS_MAP_LAYERS = '*/**/items/wms_layers?*'
-    WMS_DOWNLOADABLE_FIELDS = '*/**/items/wms_downloadable_fields?*'
+    WMS_MAP_FIELDS = '*/**/items/wms_fields?*'
     WMS_MAP_FEATURE = '*/**/items/wms_map_feature?*'

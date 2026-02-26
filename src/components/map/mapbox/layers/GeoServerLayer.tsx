@@ -1,5 +1,7 @@
 import {
+  Dispatch,
   FC,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -21,6 +23,8 @@ import {
   RasterTileSource,
 } from "mapbox-gl";
 import {
+  FieldType,
+  GeoserverFieldsResponse,
   MapFeatureRequest,
   MapFeatureResponse,
   MapLayerResponse,
@@ -28,6 +32,7 @@ import {
 } from "../../../common/store/GeoserverDefinitions";
 import { useAppDispatch } from "../../../common/store/hooks";
 import {
+  fetchGeoServerFieldValues,
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
@@ -37,10 +42,7 @@ import { createRoot, Root } from "react-dom/client";
 import dayjs, { Dayjs } from "dayjs";
 import { dateDefault, playwrightTestIds } from "../../../common/constants";
 import MapLayerSelect from "../component/MapLayerSelect";
-import {
-  ILink,
-  OGCCollection,
-} from "../../../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import {
@@ -51,6 +53,8 @@ import { checkEmptyArray } from "../../../../utils/Helpers";
 import AdminScreenContext from "../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
 import { dateToValue } from "../../../../utils/DateUtils";
+import { layernameRoughlyMatch } from "../../../../utils/GeoJsonUtils";
+import { AppDispatch } from "../../../common/store/store";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
@@ -88,8 +92,8 @@ interface GeoServerLayerConfig {
 export interface GeoServerLayerProps extends LayerBasicType {
   geoServerLayerConfig?: Partial<GeoServerLayerConfig>;
   onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
-  onWFSAvailabilityChange?: (wfsDownload: boolean) => void;
   onWmsLayerChange?: (wmsLayerName: string) => void;
+  setWmsFields: Dispatch<SetStateAction<GeoserverFieldsResponse[]>>;
 }
 
 // Example url for mapbox wms resource: "/geowebcache/service/wms?LAYERS=imos%3Aanmn_velocity_timeseries_map&TRANSPARENT=TRUE&VERSION=1.1.1&FORMAT=image%2Fpng&EXCEPTIONS=application%2Fvnd.ogc.se_xml&TILED=true&SERVICE=WMS&REQUEST=GetMap&STYLES=&QUERYABLE=true&SRS=EPSG%3A3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256"
@@ -146,60 +150,67 @@ const formWmsLayerOptions = (
   }));
 };
 
-const formWmsLinkOptions = (layers: ILink[] | undefined): SelectItem[] => {
-  if (!layers || layers.length === 0) return [];
-  return layers?.map((layer) => ({
-    value: extractLayerName(layer),
-    label: layer.title, // Use title for label for now. Could be changed to ai:label in future
-  }));
-};
+const checkSupportTimeSliderOrDrawRect = (
+  layerName: string,
+  fields: GeoserverFieldsResponse[],
+  setTimeSliderSupport?: Dispatch<SetStateAction<boolean>>,
+  setDrawRectSupportSupport?: Dispatch<SetStateAction<boolean>>
+) => {
+  const layerFields = fields.find((f) =>
+    layernameRoughlyMatch(f.typename, layerName)
+  );
+  if (layerFields) {
+    const foundDatetime = layerFields.fields.some(
+      (f) =>
+        f.type.toLowerCase() === FieldType.DateTime.toLowerCase() ||
+        f.type.toLowerCase() === FieldType.Date.toLowerCase()
+    );
+    const foundGeo = layerFields.fields.some(
+      (f) => f.type.toLowerCase() === FieldType.Geom.toLowerCase()
+    );
 
-const extractLayerName = (layer: ILink): string => {
-  // Two ways to use the wms like, either you put the layer name in title or you put a description and then
-  // give a link to wms, now if it is the later case then we try to see if the url have attribute layer name there
-  // if yes we use it otherwise we use the title.
-  if (layer.href) {
-    const url = new URL(layer.href);
-    const ln = url.searchParams.get("layers");
-    if (ln) {
-      return ln;
-    }
+    setTimeSliderSupport?.(foundDatetime);
+    setDrawRectSupportSupport?.(foundGeo);
+  } else {
+    setTimeSliderSupport?.(false);
+    setDrawRectSupportSupport?.(false);
   }
-  return layer.title;
 };
 
-export const extractDiscreteDays = (
-  layers: MapLayerResponse[]
-): Map<string, Array<number>> | undefined => {
-  if (layers && layers.length > 0) {
-    const result: Map<string, Array<number>> = new Map();
-    layers.forEach((layer) => {
-      if (layer.ncWmsLayerInfo?.datesWithData) {
-        const nearest = dayjs(layer.ncWmsLayerInfo.nearestTimeIso);
-        const dates: number[] = [];
-        for (const [year, months] of Object.entries(
-          layer.ncWmsLayerInfo.datesWithData || {}
-        )) {
-          const yr = Number(year);
-          for (const [month, days] of Object.entries(months)) {
-            // Here assume that the time of all dateWithData follows the
-            // one that found in the nearestTimeIso. So we copy the value
-            // from nearest, then MUST make sure it is using utc() to avoid
-            // hr shift, then override the year month day with the value
-            // from datesWithDate
-            const mth = Number(month) - 1;
-            for (const day of days) {
-              const d = dayjs(nearest).utc().year(yr).month(mth).date(day);
-              dates.push(dateToValue(d));
-            }
-          }
+const checkSupportDiscreteTimeSlider = (
+  dispatch: AppDispatch,
+  id: string,
+  layerName: string,
+  setDiscreteTimeSliderValues?: Dispatch<
+    SetStateAction<Map<string, Array<number>> | undefined>
+  >
+) => {
+  if (id && layerName) {
+    const request: MapFeatureRequest = {
+      uuid: id,
+      layerName: layerName,
+      properties: ["time"],
+    };
+    dispatch(fetchGeoServerFieldValues(request))
+      .unwrap()
+      .then((val) => {
+        if (val["time"] !== undefined && val["time"].length > 0) {
+          const result: Map<string, Array<number>> = new Map();
+          result.set(
+            layerName,
+            val["time"]?.map((v) => dateToValue(dayjs(v.toString())))
+          );
+          setDiscreteTimeSliderValues?.(result);
+        } else {
+          setDiscreteTimeSliderValues?.(undefined);
         }
-        result.set(layer.name, dates);
-      }
-    });
-    return result.size === 0 ? undefined : result;
+      })
+      .catch(() => {
+        // Some dataset do not support this function call, in this case
+        // assume it didn't support discrete time slider
+        setDiscreteTimeSliderValues?.(undefined);
+      });
   }
-  return undefined;
 };
 
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
@@ -207,8 +218,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   visible,
   collection,
   onWMSAvailabilityChange,
-  onWFSAvailabilityChange,
   onWmsLayerChange,
+  setWmsFields,
   setTimeSliderSupport,
   setDrawRectSupportSupport,
   setDiscreteTimeSliderValues,
@@ -307,8 +318,34 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     (value: string) => {
       setSelectedWmsLayer(value);
       onWmsLayerChange?.(value);
+      setWmsFields?.((prev) => {
+        if (prev && prev.length > 0) {
+          // Check the field support for the selected wms layer, and then decide if we should enable time slider or draw rect support
+          checkSupportTimeSliderOrDrawRect(
+            value,
+            prev,
+            setTimeSliderSupport,
+            setDrawRectSupportSupport
+          );
+          checkSupportDiscreteTimeSlider(
+            dispatch,
+            config.uuid,
+            value,
+            setDiscreteTimeSliderValues
+          );
+        }
+        return prev;
+      });
     },
-    [onWmsLayerChange]
+    [
+      onWmsLayerChange,
+      setWmsFields,
+      setTimeSliderSupport,
+      setDrawRectSupportSupport,
+      dispatch,
+      config.uuid,
+      setDiscreteTimeSliderValues,
+    ]
   );
 
   // Add the tile layer to the map
@@ -542,14 +579,11 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     map,
     setDrawRectSupportSupport,
     setMapLoading,
-    setTimeSliderSupport,
     titleLayerId,
     visible,
   ]);
-  // call wms_download_fields first to get wms selector fields
-  // if it doesn't work that means the wms link is invalid (invalid server url or layerName)
-  // in this case we will call wms_layers to get all the possible layers
-  // once get the all the layers we will use the correct layerName to for wms_download_fields, wms_map_tile and wms_map_feature
+
+  // Fetch all WMS layers then fetch all WMS fields for the collection
   useEffect(() => {
     if (!collection) return;
 
@@ -561,75 +595,56 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       const layerName = getWmsLayerNames(collection)?.[0] || "";
 
       const wmsFieldsRequest: MapFeatureRequest = {
+        // We don't pass layername here because we want to get all the fields for all wfs links in the collection
         uuid: collection.id,
-        layerName: layerName,
         enableGeoServerWhiteList: enableGeoServerWhiteList,
       };
 
       if (layerName && layerName.trim().length > 0) {
-        // We query the wms_layer first to get info related to map drawing, then we query what can be download
+        // We don't pass layername here because we want to get all the fields for all wms links in the collection
         const wmsLayersRequest: MapFeatureRequest = {
           uuid: collection.id,
-          layerName: layerName,
         };
 
-        // Cancel in progres search if exist
+        // Cancel in progress search if exist
         layerSearchRef.current?.abort();
         const search = dispatch(fetchGeoServerMapLayers(wmsLayersRequest));
-
         layerSearchRef.current = search;
 
         search
           .unwrap()
           .then((layers: MapLayerResponse[]) => {
+            // Set fetched layers to wmsLayers because we successfully get the layers from geoserver capabilities
             if (layers && layers.length > 0 && !(search as any).aborted) {
-              setDiscreteTimeSliderValues?.(extractDiscreteDays(layers));
+              const wmsLayerOptions = formWmsLayerOptions(layers);
+              if (wmsLayerOptions && wmsLayerOptions.length > 0) {
+                setWmsLayers(wmsLayerOptions);
+              }
+              onWMSAvailabilityChange?.(true);
             }
-            // Whether we set layers need to decide later based on map fields call
             return layers;
           })
           .then((layersFromGeoserver: MapLayerResponse[]) => {
             dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
               .unwrap()
-              .then((value) => {
-                // Successfully fetched fields, loading is complete
-                const foundDatetime = value.find(
-                  (v) => v.type === "dateTime" || v.type === "date"
+              .then((mapFields: GeoserverFieldsResponse[]) => {
+                // Successfully fetched fields, loading is completed
+                setWmsFields(mapFields);
+                // Using the return layer name from the ogcapi to make sure the layer name is correct, because the one in metadata could be wrong and cause issue for later wms request
+                handleWmsLayerChange(
+                  formWmsLayerOptions(layersFromGeoserver)[0].value || ""
                 );
-                const foundGeo = value.find(
-                  (v) => v.type === "geometrypropertytype"
-                );
-                setTimeSliderSupport?.(foundDatetime !== undefined);
-                setDrawRectSupportSupport?.(foundGeo !== undefined);
-                onWFSAvailabilityChange?.(true);
-
-                // Assume the value from metadata is correct because we can find the fields
-                // associated with this wms in metadata
-                const wmsLinksOptions = formWmsLinkOptions(
-                  collection?.getWMSLinks()
-                );
-                if (wmsLinksOptions && wmsLinksOptions.length > 0) {
-                  handleWmsLayerChange(wmsLinksOptions[0].value);
-                  setWmsLayers(wmsLinksOptions);
-                }
               })
               .catch((error: ErrorResponse) => {
                 if (error.statusCode === 404) {
-                  // Although no associated fields found for this layer which means the
-                  // layer name in metadata is likely not correct, however, we can still display the layer
-                  // using the return layer name from geoserver from fetchGeoServerMapLayer call.
+                  // Although no associated fields found for this layer, we can still display the layer
+                  // using the return layer name from ogcapi
                   handleWmsLayerChange(
                     formWmsLayerOptions(layersFromGeoserver)[0].value || ""
                   );
-                  setWmsLayers(formWmsLayerOptions(layersFromGeoserver));
-                  onWMSAvailabilityChange?.(true);
-                  // You cannot do subsetting if we come here because there is
-                  // no field that we can operate
-                  onWFSAvailabilityChange?.(false);
                 } else if (error.statusCode === HttpStatusCode.Unauthorized) {
                   // If is not allowed likely due to whitelist, we should set the wms not support to block display WMS layer
                   onWMSAvailabilityChange?.(false);
-                  onWFSAvailabilityChange?.(false);
                 } else {
                   console.log("Failed to fetch fields, ok to ignore", error);
                 }
@@ -663,12 +678,10 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     dispatch,
     enableGeoServerWhiteList,
     handleWmsLayerChange,
-    onWFSAvailabilityChange,
     onWMSAvailabilityChange,
     setDiscreteTimeSliderValues,
-    setDrawRectSupportSupport,
     setMapLoading,
-    setTimeSliderSupport,
+    setWmsFields,
   ]);
 
   return (
@@ -691,5 +704,4 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   );
 };
 
-export { formWmsLinkOptions };
 export default GeoServerLayer;

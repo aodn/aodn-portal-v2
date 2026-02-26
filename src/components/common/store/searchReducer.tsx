@@ -27,14 +27,16 @@ import {
 } from "../../../pages/detail-page/context/DownloadDefinitions";
 import {
   getDateConditionFrom,
+  getFormatFrom,
   getMultiPolygonFrom,
 } from "../../../utils/DownloadConditionUtils";
 import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
 import {
   MapFeatureRequest,
   MapFeatureResponse,
-  MapFieldResponse,
+  GeoserverFieldsResponse,
   MapLayerResponse,
+  DownloadLayersResponse,
 } from "./GeoserverDefinitions";
 import dayjs from "dayjs";
 import { dateDefault } from "../constants";
@@ -157,7 +159,7 @@ const searchResult = async (
       param.properties !== undefined
         ? param.properties
         : // Including the keyword "bbox" to ensure spatial extents is returned
-          "id,title,description,status,scope,links,assets_summary,bbox",
+          "id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox",
   };
 
   if (param.text !== undefined && param.text.length !== 0) {
@@ -328,11 +330,11 @@ const processDatasetDownload = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >(
   "download/downloadDataset",
-  async (reequest: DatasetDownloadRequest, thunkAPI: any) => {
+  async (request: DatasetDownloadRequest, thunkAPI: any) => {
     try {
       const response = await ogcAxiosWithRetry.post(
         "/ogc/processes/download/execution",
-        reequest
+        request
       );
       return response.data;
     } catch (error) {
@@ -352,6 +354,7 @@ const processWFSDownload = createAsyncThunk<
       // Extract download conditions
       const dateRange = getDateConditionFrom(request.downloadConditions);
       const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+      const format = getFormatFrom(request.downloadConditions);
 
       const requestBody = {
         inputs: {
@@ -360,6 +363,7 @@ const processWFSDownload = createAsyncThunk<
           end_date: dateRange.end,
           multi_polygon: multiPolygon,
           layer_name: request.layerName,
+          output_format: format,
         },
         outputs: {},
         subscriber: {
@@ -443,7 +447,7 @@ const fetchGeoServerMapFeature = createAsyncThunk<
 );
 
 const fetchGeoServerMapFields = createAsyncThunk<
-  Array<MapFieldResponse>,
+  Array<GeoserverFieldsResponse>,
   MapFeatureRequest,
   { rejectValue: ErrorResponse }
 >(
@@ -451,7 +455,24 @@ const fetchGeoServerMapFields = createAsyncThunk<
   (request: MapFeatureRequest, thunkApi: any) => {
     return ogcAxiosWithRetry
       .get<MapFeatureResponse>(
-        `/ogc/collections/${request.uuid}/items/wms_downloadable_fields`,
+        `/ogc/collections/${request.uuid}/items/wms_fields`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
+
+const fetchGeoServerFieldValues = createAsyncThunk<
+  Record<string, Array<object>>,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "geoserver/fetchGeoServerFieldValues",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return ogcAxiosWithRetry
+      .get<MapFeatureResponse>(
+        `/ogc/collections/${request.uuid}/items/wfs_field_value`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)
@@ -470,6 +491,23 @@ const fetchGeoServerMapLayers = createAsyncThunk<
     return ogcAxiosWithRetry
       .get<MapLayerResponse>(
         `/ogc/collections/${request.uuid}/items/wms_layers`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
+
+const fetchGeoServerDownloadLayers = createAsyncThunk<
+  Array<DownloadLayersResponse>,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "geoserver/fetchGeoServerDownloadLayers",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return ogcAxiosWithRetry
+      .get<DownloadLayersResponse>(
+        `/ogc/collections/${request.uuid}/items/wfs_layers`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)
@@ -638,6 +676,8 @@ export {
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
+  fetchGeoServerDownloadLayers,
+  fetchGeoServerFieldValues,
   fetchSystemHealthNoStore,
   processDatasetDownload,
   processWFSDownload,

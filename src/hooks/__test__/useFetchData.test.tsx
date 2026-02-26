@@ -49,7 +49,7 @@ describe("useFetchData", () => {
         filter:
           "page_size=11 AND (BBOX(geometry,104,-43,163,-8) OR geometry IS NULL)",
         properties:
-          "id,title,description,status,scope,links,assets_summary,bbox",
+          "id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox",
         q: "testing",
       },
       signal: expect.any(AbortSignal),
@@ -88,7 +88,7 @@ describe("useFetchData", () => {
         filter:
           "page_size=11 AND search_after='1.0||88||str:ffe8f19c-de4a-4362-89be-7605b2dd6b8c' AND (BBOX(geometry,104,-43,163,-8) OR geometry IS NULL)",
         properties:
-          "id,title,description,status,scope,links,assets_summary,bbox",
+          "id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox",
         q: "testing",
       },
       signal: expect.any(AbortSignal),
