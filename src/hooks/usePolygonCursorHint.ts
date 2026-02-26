@@ -83,7 +83,7 @@ const usePolygonCursorHint = ({
       "position:absolute;pointer-events:none;z-index:10;display:none;" +
       "width:" +
       CURSOR_HINT_BUBBLE_WIDTH +
-      "px;height:" +
+      "px;max-width:320px;height:" +
       CURSOR_HINT_BUBBLE_HEIGHT +
       "px;";
 
@@ -111,9 +111,11 @@ const usePolygonCursorHint = ({
       if (!cursorHintRef.current) return;
       if (isPolygonActiveRef.current) {
         if (hasSelectedRef.current) {
-          textSpan.textContent = "Double-click to draw polygon.";
+          textSpan.textContent = "Click to adjust vertices.";
+          cursorHintRef.current.style.width = CURSOR_HINT_BUBBLE_WIDTH + "px";
         } else {
-          textSpan.textContent = "Click to draw bounding box.";
+          textSpan.textContent = "Click to add points, double-click to finish.";
+          cursorHintRef.current.style.width = "200px";
         }
         cursorHintRef.current.style.display = "block";
         // Arrow tip in SVG is at (0, 15), align with cursor

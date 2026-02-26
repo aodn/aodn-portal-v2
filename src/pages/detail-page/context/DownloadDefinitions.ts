@@ -2,6 +2,7 @@ import { BBox, MultiPolygon } from "geojson";
 
 export enum DownloadConditionType {
   BBOX = "bbox",
+  POLYGON = "polygon",
   DATE_RANGE = "date_range",
   FORMAT = "format",
   KEY = "key",
@@ -77,6 +78,25 @@ export class BBoxCondition
     this.type = DownloadConditionType.BBOX;
     this.id = id;
     this.bbox = bbox;
+    this.removeCallback = removeCallback;
+  }
+}
+
+export class PolygonCondition
+  implements IDownloadCondition, IDownloadConditionCallback
+{
+  type: DownloadConditionType = DownloadConditionType.POLYGON;
+  coordinates: [number, number][];
+  id: string;
+  removeCallback?: () => void;
+
+  constructor(
+    id: string,
+    coordinates: [number, number][],
+    removeCallback?: () => void
+  ) {
+    this.id = id;
+    this.coordinates = coordinates;
     this.removeCallback = removeCallback;
   }
 }
