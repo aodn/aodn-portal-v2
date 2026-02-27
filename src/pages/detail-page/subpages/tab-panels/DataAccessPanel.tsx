@@ -10,7 +10,6 @@ import {
   ILink,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import SideCardContainer from "../side-cards/SideCardContainer";
-import { fontWeight, fontSize } from "../../../../styles/constants";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import useTabNavigation from "../../../../hooks/useTabNavigation";
 import {
