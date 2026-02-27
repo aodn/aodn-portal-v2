@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useMemo } from "react";
+import { FC, ReactNode, useCallback, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Box,
@@ -278,20 +278,20 @@ const HeaderSection = () => {
       return [title, status, startDate, endDate, scope, aiUpdateFrequency];
     }, [collection]);
 
+  // Capture the referer when the detail page first mounts.
+  // Tab switching within the detail page won't overwrite this value.
+  const initialReferer = useRef(location.state?.referer);
+  const referer = initialReferer.current;
+
   const onGoBack = useCallback(
     (referer: string) => {
-      if (referer !== pageReferer.SEARCH_PAGE_REFERER) {
-        redirectHome(pageReferer.DETAIL_PAGE_REFERER, true);
-      } else {
+      if (referer === pageReferer.SEARCH_PAGE_REFERER) {
         redirectSearch(pageReferer.DETAIL_PAGE_REFERER, true, false);
+      } else {
+        redirectHome(pageReferer.DETAIL_PAGE_REFERER, true);
       }
     },
     [redirectHome, redirectSearch]
-  );
-
-  const referer = useMemo(
-    () => location.state?.referer,
-    [location.state?.referer]
   );
   return (
     <Box
