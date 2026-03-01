@@ -64,7 +64,7 @@ export function trackSearchResultParameters(searchParams: SearchParameters) {
       .trim();
   };
 
-  const searchKey = `${searchParams.text || ""}_${searchParams.sortby || ""}_${extractUserFilters(searchParams.filter || "")}`;
+  const searchKey = `${(searchParams.text || "").toLowerCase()}_${searchParams.sortby || ""}_${extractUserFilters(searchParams.filter || "")}`;
 
   // Check if already tracked in this session
   const lastTracked = sessionStorage.getItem("lastSearch") || "";
@@ -88,7 +88,7 @@ export function trackSearchResultParameters(searchParams: SearchParameters) {
 
   // Add search text
   if (searchParams.text) {
-    analyticsData.search_text = String(searchParams.text);
+    analyticsData.search_text = String(searchParams.text).toLowerCase();
   }
 
   if (searchParams.filter) {

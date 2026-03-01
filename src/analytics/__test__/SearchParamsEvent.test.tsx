@@ -199,6 +199,20 @@ describe("Search Analytics Tracking", () => {
       });
     });
 
+    // Tests: search_text is case-insensitive (lowercased)
+    it("normalizes search text to lowercase", () => {
+      trackSearchResultParameters({
+        properties: "id,centroid",
+        text: "Ocean Data",
+        filter: "page_size=1500",
+      } as SearchParameters);
+
+      expect(mockTrack).toHaveBeenCalledWith("search_result_params", {
+        search_text: "ocean data",
+        has_co_data: "false",
+      });
+    });
+
     // Tests: All extraction logic together
     it("extracts all parameters together", () => {
       trackSearchResultParameters({
@@ -270,6 +284,23 @@ describe("Search Analytics Tracking", () => {
       } as SearchParameters);
 
       expect(mockTrack).toHaveBeenCalledTimes(2);
+    });
+
+    // Tests: case-insensitive deduplication
+    it("deduplicates searches with different casing", () => {
+      trackSearchResultParameters({
+        properties: "id,centroid",
+        text: "Test",
+        filter: "dataset_group='test'",
+      } as SearchParameters);
+
+      trackSearchResultParameters({
+        properties: "id,centroid",
+        text: "TEST",
+        filter: "dataset_group='test'",
+      } as SearchParameters);
+
+      expect(mockTrack).toHaveBeenCalledTimes(1);
     });
 
     // Tests: extractUserFilters() removes BBOX, INTERSECTS, page_size
