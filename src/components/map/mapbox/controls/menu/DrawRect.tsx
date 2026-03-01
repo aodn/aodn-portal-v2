@@ -13,6 +13,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import {
   BBoxCondition,
+  PolygonCondition,
   DownloadConditionType,
   IDownloadCondition,
 } from "../../../../../pages/detail-page/context/DownloadDefinitions";
@@ -25,6 +26,9 @@ import { switcherIconButtonSx } from "./MenuControl";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { BboxTooltipIcon } from "../../../../../assets/icons/map/tooltip_bbox";
 import MenuTooltip from "./MenuTooltip";
+import { PolygonSelectionTooltipIcon } from "../../../../../assets/icons/map/tooltip_polygon_selection";
+import { PolygonSelectionIcon } from "../../../../../assets/icons/map/polygon_selection";
+import usePolygonCursorHint from "../../../../../hooks/usePolygonCursorHint";
 
 interface DrawControlProps extends ControlProps {
   getAndSetDownloadConditions: (
@@ -35,23 +39,31 @@ interface DrawControlProps extends ControlProps {
 }
 
 const MENU_ID = "draw-rect-menu-button";
+const POLYGON_MENU_ID = "draw-polygon-menu-button";
 const TRASH_ID = "draw-rect-trash-button";
 const DRAW_RECTANGLE_MODE = "draw_rectangle";
+const DRAW_POLYGON_MODE = "draw_polygon";
+type SelectionTool = "bbox" | "polygon";
 
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
   getAndSetDownloadConditions,
   downloadConditions,
 }) => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [isDrawingMode, setIsDrawingMode] = useState<boolean>(false);
+  const [isDirectSelectMode, setIsDirectSelectMode] = useState(false);
+  const [activeTool, setActiveTool] = useState<SelectionTool>("bbox");
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showPolygonTooltip, setShowPolygonTooltip] = useState(false);
   const [hasFeatures, setHasFeatures] = useState<boolean>(false);
+  const [hasSelectedFeatures, setHasSelectedFeatures] = useState(false);
+  const activeToolRef = useRef<SelectionTool>("bbox");
 
   const handleIconClick = () => {
     if (showTooltip) {
       // If tooltip is showing, close it but keep draw mode active
       setShowTooltip(false);
-    } else if (!open) {
+    } else if (!isDrawingMode) {
       // If not in draw mode, activate draw mode and show tooltip
       mapDraw.changeMode(DRAW_RECTANGLE_MODE);
       setShowTooltip(true);
@@ -59,10 +71,34 @@ const DrawRect: React.FC<DrawControlProps> = ({
       // If already in draw mode, just show tooltip again
       setShowTooltip(true);
     }
+    setActiveTool("bbox");
+    activeToolRef.current = "bbox";
+    setShowPolygonTooltip(false);
   };
 
   const handleCloseTooltip = () => {
     setShowTooltip(false);
+  };
+
+  const handlePolygonClick = () => {
+    if (showPolygonTooltip) {
+      // If tooltip is showing, close it but keep draw mode active
+      setShowPolygonTooltip(false);
+    } else if (!isDrawingMode) {
+      // Use built-in draw_polygon mode for freeform polygon drawing
+      mapDraw.changeMode(DRAW_POLYGON_MODE);
+      setShowPolygonTooltip(true);
+    } else {
+      // If already in draw mode, just show tooltip again
+      setShowPolygonTooltip(true);
+    }
+    setActiveTool("polygon");
+    activeToolRef.current = "polygon";
+    setShowTooltip(false);
+  };
+
+  const handleClosePolygonTooltip = () => {
+    setShowPolygonTooltip(false);
   };
 
   const mapDraw = useMemo<MapboxDraw>(
@@ -81,46 +117,83 @@ const DrawRect: React.FC<DrawControlProps> = ({
     []
   );
 
-  // Converts map features to BBoxCondition objects and updates the context
+  // Converts map features to BBoxCondition or PolygonCondition objects and updates the context
   const syncMapFeaturesToContext = useCallback(
     (mapDraw: MapboxDraw) => {
       const features = mapDraw.getAll().features;
-      const newConditions = features
-        .filter((feature) => feature.geometry.type === "Polygon")
-        .map((feature) => {
-          const polygon = feature.geometry as Polygon;
-          const bbox = turf.bbox(polygon);
-          const id = _.toString(feature.id);
+      const bboxConditions: BBoxCondition[] = [];
+      const polygonConditions: PolygonCondition[] = [];
 
-          return new BBoxCondition(id, bbox, () => {
+      features
+        .filter((feature) => feature.geometry.type === "Polygon")
+        .forEach((feature) => {
+          const polygon = feature.geometry as Polygon;
+          const id = _.toString(feature.id);
+          const selectionType = feature.properties?.selectionType || "bbox";
+
+          const removeCallback = () => {
             try {
               mapDraw.delete(id);
             } catch (error) {
-              // Ok to ignore the error as this happens when user try to delete a download bbox condition when map is off
-              // We use an effect to update the onRemove callback when map is on again
+              // Ok to ignore the error as this happens when user try to delete a download condition when map is off
               console.warn(
-                "Failed to delete bbox from map, but ok to ignore:",
+                "Failed to delete feature from map, but ok to ignore:",
                 error
               );
             }
-          });
+          };
+
+          if (selectionType === "polygon") {
+            const coords = polygon.coordinates[0];
+            // Remove closing duplicate point if present
+            const vertices =
+              coords.length > 1 &&
+              coords[0][0] === coords[coords.length - 1][0] &&
+              coords[0][1] === coords[coords.length - 1][1]
+                ? coords.slice(0, -1)
+                : coords;
+            polygonConditions.push(
+              new PolygonCondition(
+                id,
+                vertices as [number, number][],
+                removeCallback
+              )
+            );
+          } else {
+            const bbox = turf.bbox(polygon);
+            bboxConditions.push(new BBoxCondition(id, bbox, removeCallback));
+          }
         });
 
-      getAndSetDownloadConditions(DownloadConditionType.BBOX, newConditions);
-      return newConditions;
+      getAndSetDownloadConditions(DownloadConditionType.BBOX, bboxConditions);
+      getAndSetDownloadConditions(
+        DownloadConditionType.POLYGON,
+        polygonConditions
+      );
+      return [...bboxConditions, ...polygonConditions];
     },
     [getAndSetDownloadConditions]
   );
 
   const anchorRef = useRef(null);
+  const polygonAnchorRef = useRef(null);
   const popperRef = useRef<HTMLDivElement>(null);
+
+  const { syncHasSelected } = usePolygonCursorHint({
+    map,
+    activeTool,
+    isDrawingMode,
+    isDirectSelectMode,
+    hasSelectedFeatures,
+  });
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (!popperRef.current || !anchorRef.current) {
       return;
     }
     if (!popperRef.current.contains(event.target as Node)) {
-      setOpen(false);
+      setShowTooltip(false);
+      setShowPolygonTooltip(false);
     }
   }, []);
 
@@ -145,7 +218,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
   }, [mapDraw, hasFeatures, syncMapFeaturesToContext]);
 
   useEffect(() => {
-    if (open) {
+    if (isDrawingMode) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -154,38 +227,63 @@ const DrawRect: React.FC<DrawControlProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [handleClickOutside, open]);
+  }, [handleClickOutside, isDrawingMode]);
 
   // Sync button state with actual draw mode
   useEffect(() => {
     const modePollingInterval = setInterval(() => {
       const currentMode = mapDraw.getMode();
-      const isDrawingMode = currentMode === DRAW_RECTANGLE_MODE;
-      setOpen(isDrawingMode);
+      const drawing =
+        currentMode === DRAW_RECTANGLE_MODE ||
+        currentMode === DRAW_POLYGON_MODE;
+      const directSelect = currentMode === "direct_select";
+      const selected = mapDraw.getSelectedIds().length > 0;
+
+      // Update ref for mousemove handler (no re-render needed)
+      syncHasSelected(selected);
+
+      // Only setState when values actually changed to avoid unnecessary re-renders
+      setIsDrawingMode((prev) => (prev !== drawing ? drawing : prev));
+      setIsDirectSelectMode((prev) =>
+        prev !== directSelect ? directSelect : prev
+      );
+      setHasSelectedFeatures((prev) => (prev !== selected ? selected : prev));
 
       // Check if there are any features to enable/disable trash button
       try {
-        const features = mapDraw.getAll().features;
-        setHasFeatures(features.length > 0);
+        const featureCount = mapDraw.getAll().features.length;
+        const hasFeat = featureCount > 0;
+        setHasFeatures((prev) => (prev !== hasFeat ? hasFeat : prev));
       } catch (e: unknown) {
         // Ignore error
       }
     }, 100);
     return () => clearInterval(modePollingInterval);
-  }, [mapDraw]);
+  }, [mapDraw, syncHasSelected]);
 
   useEffect(() => {
     if (map) {
-      // This function also handle delete, the reason is draw.delete works on the highlighted draw item on map
-      // so the below logic looks for remain valid box and set all effectively remove the item
-      const onCreateOrUpdate = () => {
+      const onUpdateOrDelete = () => {
         const features = mapDraw.getAll().features;
         setHasFeatures(features.length > 0);
         syncMapFeaturesToContext(mapDraw);
       };
 
+      // Tag newly created features with the active selection type before syncing
+      const onCreate = (e: { features: Feature[] }) => {
+        e.features?.forEach((feature) => {
+          mapDraw.setFeatureProperty(
+            String(feature.id),
+            "selectionType",
+            activeToolRef.current
+          );
+        });
+        onUpdateOrDelete();
+      };
+
       const onModeChanged = (e: { mode: string }) => {
-        const isDrawing = e.mode === DRAW_RECTANGLE_MODE;
+        const isDrawing =
+          e.mode === DRAW_RECTANGLE_MODE || e.mode === DRAW_POLYGON_MODE;
         if (isDrawing) {
           map.dragPan.disable(); // Optional: prevent accidental pan
         } else {
@@ -194,16 +292,16 @@ const DrawRect: React.FC<DrawControlProps> = ({
       };
 
       map.addControl(mapDraw);
-      map.on("draw.create", onCreateOrUpdate);
-      map.on("draw.delete", onCreateOrUpdate);
-      map.on("draw.update", onCreateOrUpdate);
+      map.on("draw.create", onCreate);
+      map.on("draw.delete", onUpdateOrDelete);
+      map.on("draw.update", onUpdateOrDelete);
       map.on("draw.modechange", onModeChanged);
 
       return () => {
         try {
-          map.off("draw.create", onCreateOrUpdate);
-          map.off("draw.delete", onCreateOrUpdate);
-          map.off("draw.update", onCreateOrUpdate);
+          map.off("draw.create", onCreate);
+          map.off("draw.delete", onUpdateOrDelete);
+          map.off("draw.update", onUpdateOrDelete);
           map.off("draw.modechange", onModeChanged);
           map.removeControl(mapDraw);
         } catch (ignored) {
@@ -213,23 +311,28 @@ const DrawRect: React.FC<DrawControlProps> = ({
     }
   }, [mapDraw, map, syncMapFeaturesToContext]);
 
-  // Effect for init map draw rectangle
+  // Effect for init map draw features (bbox rectangles and polygons)
   useEffect(() => {
     if (!map || !mapDraw) return;
     const existingBboxConditions = downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.BBOX
     ) as BBoxCondition[];
 
+    const existingPolygonConditions = downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.POLYGON
+    ) as PolygonCondition[];
+
     const features = mapDraw.getAll().features;
+    const totalConditions =
+      existingBboxConditions.length + existingPolygonConditions.length;
 
-    // We only need to update map rectangles when number of bbox in context and map are different
-    const shouldUpdateDrawRect =
-      features.length !== existingBboxConditions.length;
+    // We only need to update map features when count in context and map are different
+    const shouldUpdate = features.length !== totalConditions;
 
-    if (shouldUpdateDrawRect) {
+    if (shouldUpdate) {
       mapDraw.deleteAll();
 
-      // For each existing bbox conditions from context, we create feature and add to map
+      // Restore bbox conditions as rectangular features
       existingBboxConditions.forEach((condition) => {
         const [west, south, east, north] = condition.bbox;
         const feature: Feature<Polygon> = {
@@ -246,7 +349,24 @@ const DrawRect: React.FC<DrawControlProps> = ({
               ],
             ],
           },
-          properties: {},
+          properties: { selectionType: "bbox" },
+        };
+        mapDraw.add(feature);
+      });
+
+      // Restore polygon conditions as polygon features
+      existingPolygonConditions.forEach((condition) => {
+        const closedCoords = [
+          ...condition.coordinates,
+          condition.coordinates[0],
+        ];
+        const feature: Feature<Polygon> = {
+          type: "Feature",
+          geometry: {
+            type: "Polygon",
+            coordinates: [closedCoords],
+          },
+          properties: { selectionType: "polygon" },
         };
         mapDraw.add(feature);
       });
@@ -266,9 +386,11 @@ const DrawRect: React.FC<DrawControlProps> = ({
         data-testid={MENU_ID}
         ref={anchorRef}
         onClick={handleIconClick}
-        sx={switcherIconButtonSx(open)}
+        sx={switcherIconButtonSx(isDrawingMode && activeTool === "bbox")}
       >
-        <BboxSelectionIcon color={open ? "white" : undefined} />
+        <BboxSelectionIcon
+          color={isDrawingMode && activeTool === "bbox" ? "white" : undefined}
+        />
       </IconButton>
 
       <MenuTooltip
@@ -278,6 +400,30 @@ const DrawRect: React.FC<DrawControlProps> = ({
         description="Use bounding box tool to draw a rectangle as selection."
         icon={<BboxTooltipIcon />}
         onClose={handleCloseTooltip}
+      />
+
+      <IconButton
+        aria-label="polygon-selection-menu"
+        id={POLYGON_MENU_ID}
+        data-testid={POLYGON_MENU_ID}
+        ref={polygonAnchorRef}
+        onClick={handlePolygonClick}
+        sx={switcherIconButtonSx(isDrawingMode && activeTool === "polygon")}
+      >
+        <PolygonSelectionIcon
+          color={
+            isDrawingMode && activeTool === "polygon" ? "white" : undefined
+          }
+        />
+      </IconButton>
+
+      <MenuTooltip
+        open={showPolygonTooltip}
+        anchorEl={polygonAnchorRef.current}
+        title="Polygon Selection"
+        description="Use polygon tool to draw several points to complete a selection."
+        icon={<PolygonSelectionTooltipIcon />}
+        onClose={handleClosePolygonTooltip}
       />
 
       <IconButton
@@ -302,5 +448,5 @@ const DrawRect: React.FC<DrawControlProps> = ({
   );
 };
 
-export { DRAW_RECTANGLE_MODE };
+export { DRAW_RECTANGLE_MODE, DRAW_POLYGON_MODE };
 export default DrawRect;

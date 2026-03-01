@@ -24,10 +24,13 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
   const childStyles: SxProps<Theme> = {
     // Target the mapboxgl-ctrl-group class on the child's rendered div
     [`&.${className}`]: {
-      width: "43px",
+      width: "40px",
       borderRadius: 0,
       background: "#FFF",
       boxShadow: "none",
+      "& button + button": {
+        borderTop: "none",
+      },
       marginY: 0,
       mx: "1px",
       display: "flex",
@@ -42,13 +45,13 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       direction="column"
       ref={ref}
       sx={{
-        width: "45px",
+        width: "42px",
         bgcolor: "#FFF",
         borderRadius: "6px",
         boxShadow: "4px 4px 4px 0px rgba(0, 0, 0, 0.10)",
         mt: "10px",
         mr: "10px",
-        py: "3px",
+        py: "2px",
       }}
     >
       {Children.toArray(children).map((child, index) => {
