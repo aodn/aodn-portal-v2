@@ -50,19 +50,59 @@ describe("HeaderMenu", () => {
     });
   });
 
-  describe("ACCORDION_MENU style", () => {
-    it("renders accordion menu correctly", () => {
-      render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
+  it("menu with no items is not expandable and calls handler on click", () => {
+    const user = userEvent.setup();
+    render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
 
-      // Should have two accordion menus
-      const accordions = screen.getAllByTestId("accordion-menu");
-      expect(accordions).toHaveLength(3);
+    // "IMOS Home" has no sub-items — clicking it should navigate, not expand
+    user.click(screen.getByText("IMOS Home"));
 
-      // Should render menu summaries (About Us, Resources)
-      // Here we trust MUI Accordion so no need to test the expand of accordion
-      expect(screen.getByText("IMOS Home")).toBeInTheDocument();
-      expect(screen.getByText("About Us")).toBeInTheDocument();
-      expect(screen.getByText("Resources")).toBeInTheDocument();
+    return waitFor(() => {
+      expect(openInNewTab).toHaveBeenCalledWith(pageDefault.url.IMOS);
+      // Its accordion should have no expand icon
+      const imosHomeAccordion = screen
+        .getByText("IMOS Home")
+        .closest("[data-testid='accordion-menu']");
+      expect(
+        imosHomeAccordion?.querySelector(
+          ".MuiAccordionSummary-expandIconWrapper"
+        )
+      ).not.toBeInTheDocument();
     });
+  });
+
+  it("menu with items shows expand icon and does not call handler on click", () => {
+    const user = userEvent.setup();
+    render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
+
+    // "About Us" has sub-items — clicking expands it, does not navigate
+    user.click(screen.getByText("About Us"));
+
+    return waitFor(() => {
+      expect(openInNewTab).not.toHaveBeenCalled();
+      // Its accordion should show an expand icon
+      const aboutUsAccordion = screen
+        .getByText("About Us")
+        .closest("[data-testid='accordion-menu']");
+      expect(
+        aboutUsAccordion?.querySelector(
+          ".MuiAccordionSummary-expandIconWrapper"
+        )
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("renders accordion menu correctly", () => {
+    render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
+
+    // Should have two accordion menus
+    const accordions = screen.getAllByTestId("accordion-menu");
+    expect(accordions).toHaveLength(3);
+
+    // Should render menu summaries (About Us, Resources)
+    // Here we trust MUI Accordion so no need to test the expand of accordion
+    expect(screen.getByText("IMOS Home")).toBeInTheDocument();
+    expect(screen.getByText("About Us")).toBeInTheDocument();
+    expect(screen.getByText("Resources")).toBeInTheDocument();
   });
 });
