@@ -95,7 +95,7 @@ describe("HeaderMenu", () => {
   it("renders accordion menu correctly", () => {
     render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
 
-    // Should have two accordion menus
+    // Should have three accordion menus
     const accordions = screen.getAllByTestId("accordion-menu");
     expect(accordions).toHaveLength(3);
 
