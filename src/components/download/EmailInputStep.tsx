@@ -142,6 +142,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
           ...portalTheme.typography.title2Regular,
         },
       }}
+      data-testid="download-email-input"
     />
   );
 

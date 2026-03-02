@@ -1,0 +1,15 @@
+[
+  {
+    "name": "seamap:SeamapAus_VIC_statewide_habitats_2023",
+    "title": "Seamap Australia - VIC - statewide marine habitats 2023 (DELWP)",
+    "keywords": {
+      "keyword": ["benthic habitat", "Seamap Australia"]
+    },
+    "defaultCRS": "urn:ogc:def:crs:EPSG::4326",
+    "wgs84BoundingBox": {
+      "lowerCorner": "614823.1273700156 -4462480.941505034",
+      "upperCorner": "1419563.0902250237 -4292991.669882505"
+    },
+    "abstract": ""
+  }
+]

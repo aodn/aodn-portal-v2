@@ -1,0 +1,67 @@
+[
+  {
+    "name": "imos:aatams_sattag_dm_dive_profile_data",
+    "title": "aatams_sattag_dm_dive_profile_data",
+    "keywords": {
+      "keyword": ["aatams_sattag_dm_dive_profile_data", "features"]
+    },
+    "defaultCRS": "urn:ogc:def:crs:EPSG::4326",
+    "wgs84BoundingBox": {
+      "lowerCorner": "-180.0 -90.0",
+      "upperCorner": "180.0 90.0"
+    },
+    "abstract": ""
+  },
+  {
+    "name": "imos:aatams_sattag_dm_haulout_data",
+    "title": "aatams_sattag_dm_haulout_data",
+    "keywords": {
+      "keyword": ["features", "aatams_sattag_dm_haulout_data"]
+    },
+    "defaultCRS": "urn:ogc:def:crs:EPSG::4326",
+    "wgs84BoundingBox": {
+      "lowerCorner": "-180.0 -90.0",
+      "upperCorner": "180.0 90.0"
+    },
+    "abstract": ""
+  },
+  {
+    "name": "imos:aatams_sattag_dm_location_data",
+    "title": "aatams_sattag_dm_location_data",
+    "keywords": {
+      "keyword": ["features", "aatams_sattag_dm_location_data"]
+    },
+    "defaultCRS": "urn:ogc:def:crs:EPSG::4326",
+    "wgs84BoundingBox": {
+      "lowerCorner": "-180.0 -90.0",
+      "upperCorner": "180.0 90.0"
+    },
+    "abstract": ""
+  },
+  {
+    "name": "imos:aatams_sattag_dm_profile_data",
+    "title": "aatams_sattag_dm_profile_data",
+    "keywords": {
+      "keyword": ["features", "aatams_sattag_dm_profile_data"]
+    },
+    "defaultCRS": "urn:ogc:def:crs:EPSG::4326",
+    "wgs84BoundingBox": {
+      "lowerCorner": "-180.0 -90.0",
+      "upperCorner": "180.0 90.0"
+    },
+    "abstract": ""
+  },
+  {
+    "name": "imos:aatams_sattag_dm_summary_data",
+    "title": "aatams_sattag_dm_summary_data",
+    "keywords": {
+      "keyword": ["aatams_sattag_dm_summary_data", "features"]
+    },
+    "defaultCRS": "urn:ogc:def:crs:EPSG::4326",
+    "wgs84BoundingBox": {
+      "lowerCorner": "-180.0 -90.0",
+      "upperCorner": "180.0 90.0"
+    },
+    "abstract": ""
+  }
+]

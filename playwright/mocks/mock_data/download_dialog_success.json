@@ -1,0 +1,11 @@
+{
+  "type": "Results",
+  "message": {
+    "type": "InlineValue",
+    "message": "Job submitted with ID: f358dc2f-e211-4bf1-95c4-c513ef57c2b6"
+  },
+  "status": {
+    "type": "InlineValue",
+    "message": "200"
+  }
+}

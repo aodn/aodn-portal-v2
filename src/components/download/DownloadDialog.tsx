@@ -198,6 +198,7 @@ const DownloadDialog = ({
           },
         },
       }}
+      data-testid="download-dialog"
     >
       {/* Dialog Header */}
       <DialogHeader onClose={handleIsClose} />
