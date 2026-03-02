@@ -154,27 +154,43 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
   }, [HEADER_MENUS]);
 
   const renderHeaderAccordionMenu = useCallback(() => {
-    return HEADER_MENUS.map((menu, index) => (
-      <Accordion key={index} data-testid="accordion-menu">
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography padding={0} color="#000" fontSize={fontSize.info}>
-            {menu.menu.name}
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {menu.items.map((item) => (
-            <MenuItem
-              key={item.name}
-              onClick={(event) => item.handler && item.handler(event)}
-            >
-              <Typography padding={0} color="#000" fontSize={fontSize.info}>
-                {item.name}
-              </Typography>
-            </MenuItem>
-          ))}
-        </AccordionDetails>
-      </Accordion>
-    ));
+    return HEADER_MENUS.map((menu, index) => {
+      const hasItems = menu.items.length > 0;
+      return (
+        <Accordion
+          key={index}
+          data-testid="accordion-menu"
+          {...(!hasItems && {
+            expanded: false,
+            onChange: () => {},
+            onClick: (event: React.MouseEvent<HTMLElement>) =>
+              menu.menu?.handler && menu.menu.handler(event),
+          })}
+        >
+          <AccordionSummary
+            expandIcon={hasItems ? <ExpandMoreIcon /> : undefined}
+          >
+            <Typography padding={0} color="#000" fontSize={fontSize.info}>
+              {menu.menu.name}
+            </Typography>
+          </AccordionSummary>
+          {hasItems && (
+            <AccordionDetails>
+              {menu.items.map((item) => (
+                <MenuItem
+                  key={item.name}
+                  onClick={(event) => item.handler && item.handler(event)}
+                >
+                  <Typography padding={0} color="#000" fontSize={fontSize.info}>
+                    {item.name}
+                  </Typography>
+                </MenuItem>
+              ))}
+            </AccordionDetails>
+          )}
+        </Accordion>
+      );
+    });
   }, [HEADER_MENUS]);
 
   return (

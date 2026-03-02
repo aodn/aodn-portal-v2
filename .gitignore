@@ -39,3 +39,4 @@ tsconfig.node.tsbuildinfo
 .last-run.json
 
 CLAUDE.md
+.claude
