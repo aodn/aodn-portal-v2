@@ -1,4 +1,4 @@
-import React, {
+import {
   Dispatch,
   FC,
   SetStateAction,
@@ -8,10 +8,11 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import * as turf from "@turf/turf";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
-import { Position } from "geojson";
-import { MapMouseEvent } from "mapbox-gl";
+import { Feature, Polygon, Position } from "geojson";
+import { LngLat, LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
 import { fitToBound } from "../../../../utils/MapUtils";
 import bluePin from "@/assets/icons/blue_pin.png";
@@ -25,7 +26,7 @@ interface SpatialExtentPhoto {
 interface GeojsonLayerProps {
   // Vector tile layer should add to map
   collection: OGCCollection;
-  onLayerClick?: (event: MapMouseEvent) => void;
+  onLayerClick?: (bounds: LngLatBounds) => void;
   onMouseEnter?: (event: MapMouseEvent) => void;
   onMouseLeave?: (event: MapMouseEvent) => void;
   onMouseMove?: (event: MapMouseEvent) => void;
@@ -38,10 +39,10 @@ const BLUE_PIN_NAME = "blue_pin_name";
 
 const GeojsonLayer: FC<GeojsonLayerProps> = ({
   collection,
-  onLayerClick = (_: MapMouseEvent) => {},
-  onMouseEnter = (_: MapMouseEvent) => {},
-  onMouseLeave = (_: MapMouseEvent) => {},
-  onMouseMove = (_: MapMouseEvent) => {},
+  onLayerClick,
+  onMouseEnter,
+  onMouseLeave,
+  onMouseMove,
   setPhotos,
   animate = false,
   visible = false,
@@ -118,6 +119,32 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       }
     },
     [setPhotos, takePhoto]
+  );
+
+  const handleLayerClick = useCallback(
+    (event: MapMouseEvent) => {
+      if (!map || !onLayerClick) return;
+      try {
+        const point = map.project(event.lngLat);
+        const features = map.queryRenderedFeatures(point, {
+          layers: [layerPolygonId],
+        });
+        if (features && features.length > 0) {
+          const feature = features[0] as Feature<Polygon>;
+          const featureBbox = turf.bbox(feature);
+          if (featureBbox && featureBbox.length === 4) {
+            const bounds = new LngLatBounds(
+              new LngLat(featureBbox[0], featureBbox[1]), // SW
+              new LngLat(featureBbox[2], featureBbox[3]) // NE
+            );
+            onLayerClick(bounds);
+          }
+        }
+      } catch (error) {
+        console.error("Error handling layer click:", error);
+      }
+    },
+    [map, onLayerClick, layerPolygonId]
   );
 
   const createLayer = useCallback(() => {
@@ -212,10 +239,10 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           // Call handleIdle when the map is idle
           const onceIdle = () => handleIdle(extent?.bbox);
           map?.once("idle", onceIdle);
-          map?.on("click", layerPolygonId, onLayerClick);
-          map?.on("mouseenter", layerPolygonId, onMouseEnter);
-          map?.on("mouseleave", layerPolygonId, onMouseLeave);
-          map?.on("mousemove", layerPolygonId, onMouseMove);
+          map?.on("click", layerPolygonId, handleLayerClick);
+          if (onMouseEnter) map?.on("mouseenter", layerPolygonId, onMouseEnter);
+          if (onMouseLeave) map?.on("mouseleave", layerPolygonId, onMouseLeave);
+          if (onMouseMove) map?.on("mousemove", layerPolygonId, onMouseMove);
 
           return true;
         } else return prev;
@@ -234,10 +261,10 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       } catch (error) {
         // OK to ignore error here
       } finally {
-        map?.off("click", layerPolygonId, onLayerClick);
-        map?.off("mouseenter", layerPolygonId, onMouseEnter);
-        map?.off("mouseleave", layerPolygonId, onMouseLeave);
-        map?.off("mousemove", layerPolygonId, onMouseMove);
+        map?.off("click", layerPolygonId, handleLayerClick);
+        if (onMouseEnter) map?.off("mouseenter", layerPolygonId, onMouseEnter);
+        if (onMouseLeave) map?.off("mouseleave", layerPolygonId, onMouseLeave);
+        if (onMouseMove) map?.off("mousemove", layerPolygonId, onMouseMove);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

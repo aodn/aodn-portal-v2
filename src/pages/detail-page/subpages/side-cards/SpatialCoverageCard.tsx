@@ -5,11 +5,11 @@ import { useDetailPageContext } from "../../context/detail-page-context";
 import Layers from "../../../../components/map/mapbox/layers/Layers";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import { FC, useCallback } from "react";
-import { Popup, MapMouseEvent } from "mapbox-gl";
+import { Popup, MapMouseEvent, LngLatBounds } from "mapbox-gl";
 import FitToSpatialExtentsLayer from "../../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 
 export interface SpatialCoverageCardProps {
-  onSpatialCoverageLayerClick?: (event: MapMouseEvent) => void;
+  onSpatialCoverageLayerClick?: (bounds: LngLatBounds) => void;
 }
 
 const popup = new Popup({
