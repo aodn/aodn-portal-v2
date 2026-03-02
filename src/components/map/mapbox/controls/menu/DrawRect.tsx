@@ -63,12 +63,8 @@ const DrawRect: React.FC<DrawControlProps> = ({
     if (showTooltip) {
       // If tooltip is showing, close it but keep draw mode active
       setShowTooltip(false);
-    } else if (!isDrawingMode) {
-      // If not in draw mode, activate draw mode and show tooltip
-      mapDraw.changeMode(DRAW_RECTANGLE_MODE);
-      setShowTooltip(true);
     } else {
-      // If already in draw mode, just show tooltip again
+      mapDraw.changeMode(DRAW_RECTANGLE_MODE);
       setShowTooltip(true);
     }
     setActiveTool("bbox");
@@ -84,12 +80,8 @@ const DrawRect: React.FC<DrawControlProps> = ({
     if (showPolygonTooltip) {
       // If tooltip is showing, close it but keep draw mode active
       setShowPolygonTooltip(false);
-    } else if (!isDrawingMode) {
-      // Use built-in draw_polygon mode for freeform polygon drawing
-      mapDraw.changeMode(DRAW_POLYGON_MODE);
-      setShowPolygonTooltip(true);
     } else {
-      // If already in draw mode, just show tooltip again
+      mapDraw.changeMode(DRAW_POLYGON_MODE);
       setShowPolygonTooltip(true);
     }
     setActiveTool("polygon");
