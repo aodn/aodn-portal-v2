@@ -68,7 +68,8 @@ const DrawRect: React.FC<DrawControlProps> = ({
       mapDraw.changeMode(DRAW_RECTANGLE_MODE);
       setShowTooltip(true);
     } else {
-      // If already in draw mode, just show tooltip again
+      // If already in draw mode, switch to rectangle and show tooltip
+      mapDraw.changeMode(DRAW_RECTANGLE_MODE);
       setShowTooltip(true);
     }
     setActiveTool("bbox");
@@ -89,7 +90,8 @@ const DrawRect: React.FC<DrawControlProps> = ({
       mapDraw.changeMode(DRAW_POLYGON_MODE);
       setShowPolygonTooltip(true);
     } else {
-      // If already in draw mode, just show tooltip again
+      // If already in draw mode, switch to polygon and show tooltip
+      mapDraw.changeMode(DRAW_POLYGON_MODE);
       setShowPolygonTooltip(true);
     }
     setActiveTool("polygon");
