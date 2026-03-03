@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { useAppDispatch } from "../components/common/store/hooks";
 import { processWFSEstimateSize } from "../components/common/store/searchReducer";
 import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
+import { consumeSSEStream } from "../utils/SSEUtils";
 
 // Aligned with backend SSE event names for the estimate endpoint
 enum EstimateEventName {
@@ -44,50 +45,6 @@ const useWFSEstimateSize = () => {
     setStatus(EstimateStatus.IDLE);
   }, []);
 
-  const processSSEEvent = useCallback(async (eventText: string) => {
-    try {
-      const lines = eventText.split("\n");
-      let eventType = "";
-      let dataContent = "";
-
-      for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine.startsWith("event:")) {
-          eventType = trimmedLine.slice(6).trim();
-        } else if (trimmedLine.startsWith("data:")) {
-          dataContent = trimmedLine.slice(5).trim();
-        }
-      }
-
-      if (!eventType || !dataContent) return;
-
-      const data: EstimateSSEEventData = JSON.parse(dataContent);
-
-      switch (eventType) {
-        case EstimateEventName.CONNECTION_ESTABLISHED:
-        case EstimateEventName.WFS_REQUEST_READY:
-        case EstimateEventName.KEEP_ALIVE:
-          setStatus(EstimateStatus.ESTIMATING);
-          break;
-
-        case EstimateEventName.ESTIMATE_COMPLETE:
-          if (data.size !== undefined) {
-            setEstimatedSizeMB(
-              parseFloat((data.size / BYTES_PER_MB).toFixed(2))
-            );
-          }
-          setStatus(EstimateStatus.COMPLETED);
-          break;
-
-        case EstimateEventName.ERROR:
-          setStatus(EstimateStatus.ERROR);
-          break;
-      }
-    } catch (error) {
-      console.error("Failed to process estimate SSE event:", error, eventText);
-    }
-  }, []);
-
   const estimateSize = useCallback(
     async (
       uuid: string,
@@ -125,43 +82,34 @@ const useWFSEstimateSize = () => {
           return;
         }
 
-        const reader = responseStream.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        let done = false;
+        await consumeSSEStream(responseStream, async (eventType, data) => {
+          const eventData = data as EstimateSSEEventData;
+          switch (eventType) {
+            case EstimateEventName.CONNECTION_ESTABLISHED:
+            case EstimateEventName.WFS_REQUEST_READY:
+            case EstimateEventName.KEEP_ALIVE:
+              setStatus(EstimateStatus.ESTIMATING);
+              break;
 
-        try {
-          while (!done) {
-            const result = await reader.read();
-            done = result.done;
-            if (done) break;
-
-            buffer += decoder.decode(result.value, { stream: true });
-
-            let eventStart = 0;
-            while (eventStart < buffer.length) {
-              const eventEnd = buffer.indexOf("\n\n", eventStart);
-              if (eventEnd === -1) {
-                buffer = buffer.slice(eventStart);
-                break;
+            case EstimateEventName.ESTIMATE_COMPLETE:
+              if (eventData.size !== undefined) {
+                setEstimatedSizeMB(
+                  parseFloat((eventData.size / BYTES_PER_MB).toFixed(2))
+                );
               }
+              setStatus(EstimateStatus.COMPLETED);
+              break;
 
-              const eventText = buffer.slice(eventStart, eventEnd);
-              if (eventText.trim()) {
-                await processSSEEvent(eventText);
-              }
-
-              eventStart = eventEnd + 2;
-            }
+            case EstimateEventName.ERROR:
+              setStatus(EstimateStatus.ERROR);
+              break;
           }
-        } finally {
-          await reader.cancel("Cleaning up estimate stream");
-        }
+        });
       } catch {
         setStatus(EstimateStatus.ERROR);
       }
     },
-    [dispatch, processSSEEvent]
+    [dispatch]
   );
 
   return {
