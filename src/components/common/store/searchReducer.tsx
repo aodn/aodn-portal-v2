@@ -12,6 +12,7 @@ import {
   TemporalAfterOrBefore,
   TemporalDuring,
   UpdateFrequency,
+  Status,
 } from "../cqlFilters";
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
@@ -47,6 +48,11 @@ export enum DatasetFrequency {
   REALTIME = "real-time",
   DELAYED = "delayed",
   OTHER = "other",
+}
+
+export enum DatasetStatus {
+  ONGOING = "onGoing",
+  COMPLETED = "completed",
 }
 
 export type SuggesterParameters = {
@@ -606,6 +612,11 @@ const createSearchParamFrom = (
   if (i.updateFreq) {
     const f = cqlDefaultFilters.get("UPDATE_FREQUENCY") as UpdateFrequency;
     p.filter = appendFilter(p.filter, f(i.updateFreq));
+  }
+
+  if (i.datasetStatus) {
+    const f = cqlDefaultFilters.get("STATUS") as Status;
+    p.filter = appendFilter(p.filter, f(i.datasetStatus));
   }
 
   if (
