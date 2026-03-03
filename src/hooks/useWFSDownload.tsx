@@ -72,14 +72,6 @@ const useWFSDownload = (onCallback?: () => void) => {
   const expectedTotalChunksRef = useRef<number>(0);
 
   // Helper functions
-  const formatBytes = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
   const generateFileName = (layerName: string) => {
     const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
     const sanitizedLayerName = layerName.replace(/[^a-z0-9]/gi, "_");
@@ -381,7 +373,6 @@ const useWFSDownload = (onCallback?: () => void) => {
     progressMessage,
     startDownload,
     cancelDownload,
-    formatBytes,
     isDownloading:
       downloadingStatus === DownloadStatus.IN_PROGRESS ||
       downloadingStatus === DownloadStatus.WAITING_SERVER,

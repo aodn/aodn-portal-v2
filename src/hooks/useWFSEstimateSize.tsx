@@ -29,11 +29,11 @@ enum EstimateStatus {
   ERROR = "error",
 }
 
-const BYTES_PER_MB = 1024 * 1024;
-
 const useWFSEstimateSize = () => {
   const dispatch = useAppDispatch();
-  const [estimatedSizeMB, setEstimatedSizeMB] = useState<number | null>(null);
+  const [estimatedSizeBytes, setEstimatedSizeBytes] = useState<number | null>(
+    null
+  );
   const [status, setStatus] = useState<EstimateStatus>(EstimateStatus.IDLE);
   const estimatePromiseRef = useRef<any>(null);
 
@@ -59,7 +59,7 @@ const useWFSEstimateSize = () => {
 
       if (!uuid || !layerName) return;
 
-      setEstimatedSizeMB(null);
+      setEstimatedSizeBytes(null);
       setStatus(EstimateStatus.ESTIMATING);
 
       try {
@@ -93,9 +93,7 @@ const useWFSEstimateSize = () => {
 
             case EstimateEventName.ESTIMATE_COMPLETE:
               if (eventData.size !== undefined) {
-                setEstimatedSizeMB(
-                  parseFloat((eventData.size / BYTES_PER_MB).toFixed(2))
-                );
+                setEstimatedSizeBytes(eventData.size);
               }
               setStatus(EstimateStatus.COMPLETED);
               break;
@@ -113,7 +111,7 @@ const useWFSEstimateSize = () => {
   );
 
   return {
-    estimatedSizeMB,
+    estimatedSizeBytes,
     isEstimating: status === EstimateStatus.ESTIMATING,
     estimateSize,
     cancelEstimate,
