@@ -36,18 +36,19 @@ import BookmarkListMenu, {
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import MenuControlGroup from "../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import ReferenceLayerSwitcher from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
+import { ProgressType } from "../../../components/map/mapbox/MapContext";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,
     Partial<LayerBasicType>,
     BookmarkListMenuBasicType,
     ToggleControlProps {
+  collections: OGCCollection[];
+  onMapZoomOrMove: (event: MapEvent | undefined) => void;
+  progress?: ProgressType;
   showFullMap: boolean;
   showFullList: boolean;
-  collections: OGCCollection[];
   sx?: SxProps<Theme>;
-  onMapZoomOrMove: (event: MapEvent | undefined) => void;
-  isLoading: boolean;
 }
 
 const mapContainerId = "result-page-main-map";
@@ -104,7 +105,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
     collections,
     sx,
     selectedUuids,
-    isLoading,
+    progress,
     onDeselectDataset,
   }: MapSectionProps) => {
     const { isUnderLaptop } = useBreakpoint();
@@ -130,7 +131,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
           panelId={mapContainerId}
           bbox={bbox}
           zoom={zoom}
-          announcement={isLoading ? "Searching..." : undefined}
+          progress={progress}
           onZoomEvent={onMapZoomOrMove}
           onMoveEvent={onMapZoomOrMove}
         >
