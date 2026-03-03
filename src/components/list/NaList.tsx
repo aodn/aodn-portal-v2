@@ -7,6 +7,7 @@ interface NaListProps {
   message?: string;
   cardSx?: SxProps;
   contentSx?: SxProps;
+  onClick?: () => void;
 }
 
 const NaList: React.FC<NaListProps> = ({
@@ -14,6 +15,7 @@ const NaList: React.FC<NaListProps> = ({
   message,
   cardSx,
   contentSx,
+  onClick,
 }) => {
   return (
     <Grid item container md={12}>
@@ -22,6 +24,7 @@ const NaList: React.FC<NaListProps> = ({
         message={message}
         cardSx={cardSx}
         contentSx={contentSx}
+        onClick={onClick}
       />
     </Grid>
   );

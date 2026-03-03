@@ -91,6 +91,8 @@ const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
 const TIMEOUT = 60000;
 const WFS_DOWNLOAD_TIMEOUT =
   Number(import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT) || 1200000; // Default 20 minutes timeout for WFS downloads
+const WFS_ESTIMATE_TIMEOUT =
+  Number(import.meta.env.VITE_WFS_ESTIMATE_TIMEOUT) || 300000; // Default 5 minutes timeout for WFS size estimation
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
   return new OGCCollections(
@@ -394,6 +396,50 @@ const processWFSDownload = createAsyncThunk<
   }
 );
 
+const processWFSEstimateSize = createAsyncThunk<
+  any,
+  WFSDownloadRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "download/estimateWFSSize",
+  async (request: WFSDownloadRequest, thunkAPI: any) => {
+    try {
+      const dateRange = getDateConditionFrom(request.downloadConditions);
+      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+      const format = getFormatFrom(request.downloadConditions);
+
+      const requestBody = {
+        inputs: {
+          uuid: request.uuid,
+          layer_name: request.layerName,
+          start_date: dateRange.start,
+          end_date: dateRange.end,
+          output_format: format,
+          multi_polygon: multiPolygon,
+        },
+      };
+
+      return ogcAxiosWithRetry.post(
+        "/ogc/processes/estimateWfsDownload/execution",
+        requestBody,
+        {
+          adapter: "fetch",
+          responseType: "stream",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+            "Cache-Control": "no-cache",
+          },
+          timeout: WFS_ESTIMATE_TIMEOUT,
+          signal: thunkAPI.signal,
+        }
+      );
+    } catch (error) {
+      errorHandling(thunkAPI);
+    }
+  }
+);
+
 const fetchParameterVocabsWithStore = createAsyncThunk<
   Array<Vocab>,
   Map<string, string> | null,
@@ -681,6 +727,7 @@ export {
   fetchSystemHealthNoStore,
   processDatasetDownload,
   processWFSDownload,
+  processWFSEstimateSize,
   jsonToOGCCollections,
   ogcAxiosWithRetry,
 };
