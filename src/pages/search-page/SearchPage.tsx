@@ -197,8 +197,13 @@ const SearchPage = () => {
                 pageDefault.search + "?" + formatToUrlParam(componentParam)
               );
             }
+
+            if (mapSearchAbortRef.current === mapSearchAbortRef.current) {
+              // We can have multiple search, hence the best way to tell if we need to cancel
+              // the progress bar is to check if this is the last search that currently happens
+              setProgress(undefined);
+            }
             mapSearchAbortRef.current = null;
-            setProgress(undefined);
           });
       }
     },
