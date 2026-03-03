@@ -2,6 +2,7 @@ import { useCallback, useState, useRef } from "react";
 import { useAppDispatch } from "../components/common/store/hooks";
 import { processWFSDownload } from "../components/common/store/searchReducer";
 import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
+import { consumeSSEStream } from "../utils/SSEUtils";
 
 // Aligned with backend WFS SSE event names
 enum EventName {
@@ -289,35 +290,6 @@ const useWFSDownload = (onCallback?: () => void) => {
     [onCallback]
   );
 
-  // Process SSE event text and extract type + data
-  const processSSEEvent = useCallback(
-    async (eventText: string, layerName: string) => {
-      try {
-        const lines = eventText.split("\n");
-        let eventType = "";
-        let dataContent = "";
-
-        // Parse event type and data
-        for (const line of lines) {
-          const trimmedLine = line.trim();
-          if (trimmedLine.startsWith("event:")) {
-            eventType = trimmedLine.slice(6).trim();
-          } else if (trimmedLine.startsWith("data:")) {
-            dataContent = trimmedLine.slice(5).trim();
-          }
-        }
-
-        if (eventType && dataContent) {
-          const data: SSEEventData = JSON.parse(dataContent);
-          await processSSEData(eventType, data, layerName);
-        }
-      } catch (error) {
-        console.error("Failed to process SSE event:", error, eventText);
-      }
-    },
-    [processSSEData]
-  );
-
   // Main download function using manual fetch + streaming
   const startDownload = useCallback(
     async (
@@ -375,48 +347,14 @@ const useWFSDownload = (onCallback?: () => void) => {
           return;
         }
 
-        // Parse SSE stream manually
-        const reader = responseStream.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        let done = false;
         let downloadCompleted = false;
 
-        try {
-          while (!done) {
-            const result = await reader.read();
-            done = result.done;
-            if (done) break;
-
-            const value = result.value;
-            buffer += decoder.decode(value, { stream: true });
-
-            // Process complete SSE events
-            let eventStart = 0;
-            while (eventStart < buffer.length) {
-              // Look for complete event (ends with double newline)
-              const eventEnd = buffer.indexOf("\n\n", eventStart);
-              if (eventEnd === -1) {
-                // No complete event found, keep remaining buffer for next iteration
-                buffer = buffer.slice(eventStart);
-                break;
-              }
-
-              // Extract and process complete event
-              const eventText = buffer.slice(eventStart, eventEnd);
-              if (eventText.trim()) {
-                await processSSEEvent(eventText, layerName);
-                if (eventText.includes("download-complete")) {
-                  downloadCompleted = true;
-                }
-              }
-
-              eventStart = eventEnd + 2; // Skip the double newline
-            }
+        await consumeSSEStream(responseStream, async (eventType, data) => {
+          await processSSEData(eventType, data as SSEEventData, layerName);
+          if (eventType === EventName.DOWNLOAD_COMPLETE) {
+            downloadCompleted = true;
           }
-        } finally {
-          await reader.cancel("Cleaning up stream");
-        }
+        });
 
         // Only show error if we haven't successfully completed the download
         if (!downloadCompleted) {
@@ -434,7 +372,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         cleanupDownload();
       }
     },
-    [cleanupDownload, onCallback, processSSEEvent, dispatch]
+    [cleanupDownload, onCallback, processSSEData, dispatch]
   );
 
   return {
