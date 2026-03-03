@@ -36,6 +36,7 @@ import { useAppDispatch } from "../../../../../../components/common/store/hooks"
 import { SelectItem } from "../../../../../../components/common/dropdown/CommonSelect";
 import { fetchGeoServerDownloadLayers } from "../../../../../../components/common/store/searchReducer";
 import AdminScreenContext from "../../../../../../components/admin/AdminScreenContext";
+import { formatBytes } from "../../../../../../utils/Helpers";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -72,10 +73,9 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     progressMessage,
     startDownload,
     cancelDownload,
-    formatBytes,
     isDownloading,
   } = useWFSDownload(() => setSnackbarOpen(true));
-  const { estimatedSizeMB, isEstimating, estimateSize, cancelEstimate } =
+  const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
     useWFSEstimateSize();
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
@@ -255,7 +255,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
             onDownload={handleDownload}
             isDownloading={isDownloading}
             isEstimating={isEstimating}
-            estimatedSizeMB={estimatedSizeMB}
+            estimatedSizeBytes={estimatedSizeBytes}
           />
           {isDownloading && (
             <Box sx={{ position: "absolute", right: 1, top: 1 }}>

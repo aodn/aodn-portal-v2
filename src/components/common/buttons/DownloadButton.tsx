@@ -2,49 +2,73 @@ import { FC } from "react";
 import {
   Button,
   CircularProgress,
+  Stack,
   SxProps,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { portalTheme } from "../../../styles";
 import { DownloadIcon } from "../../../assets/icons/download/download";
+import { formatBytes } from "../../../utils/Helpers";
 
 interface DownloadButtonProps {
   onDownload: () => void;
   isDownloading?: boolean;
   isEstimating?: boolean;
-  estimatedSizeMB?: number | null;
+  estimatedSizeBytes?: number | null;
   sx?: SxProps;
 }
-const getSizeLabel = (estimatedSizeMB: number | null) =>
-  estimatedSizeMB != null ? ` [~${estimatedSizeMB} MB]` : "";
-
-const getButtonLabel = (isDownloading: boolean, sizeLabel: string) =>
-  isDownloading ? `Downloading...${sizeLabel}` : `Download${sizeLabel}`;
 
 const getTooltip = (
   isDownloading: boolean,
   isEstimating: boolean,
-  estimatedSizeMB: number | null
+  estimatedSizeBytes: number | null
 ) =>
   isDownloading
     ? "Downloading data"
     : isEstimating
       ? "Estimating download size..."
-      : estimatedSizeMB != null
-        ? `Download data is approximately ${estimatedSizeMB} MB`
+      : estimatedSizeBytes != null
+        ? `Download data is approximately ${formatBytes(estimatedSizeBytes)}`
         : "Download data";
+
+const renderButtonLabel = (
+  isDownloading: boolean,
+  estimatedSizeBytes: number | null
+) => (
+  <Stack
+    direction="row"
+    sx={{ flexWrap: "wrap", justifyContent: "center", gap: 0.5 }}
+  >
+    <Typography
+      typography="title1Medium"
+      color={portalTheme.palette.text3}
+      padding={0}
+    >
+      {isDownloading ? "Downloading..." : "Download"}
+    </Typography>
+    {estimatedSizeBytes != null && (
+      <Typography
+        typography="title1Medium"
+        color={portalTheme.palette.text3}
+        padding={0}
+      >
+        {`[~${formatBytes(estimatedSizeBytes)}]`}
+      </Typography>
+    )}
+  </Stack>
+);
 
 const DownloadButton: FC<DownloadButtonProps> = ({
   onDownload,
   isDownloading = false,
   isEstimating = false,
-  estimatedSizeMB = null,
+  estimatedSizeBytes = null,
   sx,
 }) => {
   return (
     <Tooltip
-      title={getTooltip(isDownloading, isEstimating, estimatedSizeMB)}
+      title={getTooltip(isDownloading, isEstimating, estimatedSizeBytes)}
       placement="top"
     >
       <Button
@@ -62,13 +86,7 @@ const DownloadButton: FC<DownloadButtonProps> = ({
         onClick={isDownloading ? undefined : () => onDownload()}
       >
         <DownloadIcon />
-        <Typography
-          typography="title1Medium"
-          color={portalTheme.palette.text3}
-          padding={0}
-        >
-          {getButtonLabel(isDownloading, getSizeLabel(estimatedSizeMB ?? null))}
-        </Typography>
+        {renderButtonLabel(isDownloading, estimatedSizeBytes ?? null)}
         {isEstimating && !isDownloading && (
           <CircularProgress
             size={14}
