@@ -16,6 +16,7 @@ import { portalTheme } from "../../../../../../styles";
 import useWFSDownload, {
   DownloadStatus,
 } from "../../../../../../hooks/useWFSDownload";
+import useWFSEstimateSize from "../../../../../../hooks/useWFSEstimateSize";
 import {
   DownloadCondition,
   DownloadConditionType,
@@ -74,6 +75,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     formatBytes,
     isDownloading,
   } = useWFSDownload(() => setSnackbarOpen(true));
+  const { estimatedSizeMB, isEstimating, estimateSize, cancelEstimate } =
+    useWFSEstimateSize();
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
@@ -128,6 +131,19 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       new FormatCondition("format", formatOptions[0].value),
     ]);
   }, [getAndSetDownloadConditions]);
+
+  // Re-estimate whenever the selected data item or download conditions (subsetting) change
+  useEffect(() => {
+    if (!selectedDataItem || !uuid) return;
+    estimateSize(uuid, selectedDataItem, downloadConditions);
+    return () => cancelEstimate();
+  }, [
+    selectedDataItem,
+    downloadConditions,
+    uuid,
+    estimateSize,
+    cancelEstimate,
+  ]);
 
   useEffect(() => {
     if (!uuid) return;
@@ -238,6 +254,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           <DownloadButton
             onDownload={handleDownload}
             isDownloading={isDownloading}
+            isEstimating={isEstimating}
+            estimatedSizeMB={estimatedSizeMB}
           />
           {isDownloading && (
             <Box sx={{ position: "absolute", right: 1, top: 1 }}>
