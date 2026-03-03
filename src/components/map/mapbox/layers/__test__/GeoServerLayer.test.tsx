@@ -275,7 +275,13 @@ describe("GeoServerLayer", () => {
     mocks.axiosInstance.get.mockImplementation((url: string) => {
       if (url.includes("wms_layers")) {
         return Promise.resolve({
-          data: [{ name: "test_with_discrete", title: "Test Layer" }],
+          data: [
+            {
+              name: "test_with_discrete",
+              title: "Test Layer",
+              ncWmsLayerInfo: {},
+            },
+          ],
         });
       } else if (url.includes("wms_fields")) {
         return Promise.resolve({ data: [{ type: "dateTime" }] });
@@ -306,6 +312,7 @@ describe("GeoServerLayer", () => {
       onWmsLayerChange,
       setDiscreteTimeSliderValues,
       setWmsFields,
+      geoServerLayerConfig: { uuid: "test-uuid" },
     });
 
     return waitFor(() => {

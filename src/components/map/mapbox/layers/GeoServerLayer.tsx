@@ -315,7 +315,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   ]);
 
   const handleWmsLayerChange = useCallback(
-    (value: string) => {
+    (value: string, shouldCheckDiscreteTimeSlider: boolean = true) => {
       setSelectedWmsLayer(value);
       onWmsLayerChange?.(value);
       setWmsFields?.((prev) => {
@@ -327,12 +327,13 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             setTimeSliderSupport,
             setDrawRectSupportSupport
           );
-          checkSupportDiscreteTimeSlider(
-            dispatch,
-            config.uuid,
-            value,
-            setDiscreteTimeSliderValues
-          );
+          shouldCheckDiscreteTimeSlider &&
+            checkSupportDiscreteTimeSlider(
+              dispatch,
+              config.uuid,
+              value,
+              setDiscreteTimeSliderValues
+            );
         }
         return prev;
       });
@@ -630,9 +631,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
               .then((mapFields: GeoserverFieldsResponse[]) => {
                 // Successfully fetched fields, loading is completed
                 setWmsFields(mapFields);
+
+                // Only check discrete time slider when it is  ncWms layer,
+                const shouldCheckDiscreteTimeSlider =
+                  layersFromGeoserver[0].ncWmsLayerInfo !== undefined;
                 // Using the return layer name from the ogcapi to make sure the layer name is correct, because the one in metadata could be wrong and cause issue for later wms request
                 handleWmsLayerChange(
-                  formWmsLayerOptions(layersFromGeoserver)[0].value || ""
+                  formWmsLayerOptions(layersFromGeoserver)[0].value || "",
+                  shouldCheckDiscreteTimeSlider
                 );
               })
               .catch((error: ErrorResponse) => {
