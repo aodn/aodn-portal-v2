@@ -1,12 +1,15 @@
 import { FC } from "react";
 import {
+  Box,
   Button,
   CircularProgress,
+  IconButton,
   Stack,
   SxProps,
   Tooltip,
   Typography,
 } from "@mui/material";
+import CancelIcon from "@mui/icons-material/Cancel";
 import { portalTheme } from "../../../styles";
 import { DownloadIcon } from "../../../assets/icons/download/download";
 import { formatBytes } from "../../../utils/Helpers";
@@ -16,6 +19,7 @@ interface DownloadButtonProps {
   isDownloading?: boolean;
   isEstimating?: boolean;
   estimatedSizeBytes?: number | null;
+  handleCancelDownload?: () => void;
   sx?: SxProps;
 }
 
@@ -64,38 +68,54 @@ const DownloadButton: FC<DownloadButtonProps> = ({
   isDownloading = false,
   isEstimating = false,
   estimatedSizeBytes = null,
+  handleCancelDownload = () => {},
   sx,
 }) => {
   return (
-    <Tooltip
-      title={getTooltip(isDownloading, isEstimating, estimatedSizeBytes)}
-      placement="top"
-    >
-      <Button
-        sx={{
-          width: "100%",
+    <Button
+      sx={{
+        width: "100%",
+        backgroundColor: portalTheme.palette.primary1,
+        borderRadius: "6px",
+        ":hover": {
           backgroundColor: portalTheme.palette.primary1,
-          borderRadius: "6px",
-          ":hover": {
-            backgroundColor: portalTheme.palette.primary1,
-          },
-          cursor: isDownloading ? "not-allowed" : "pointer",
-          gap: 1,
-          ...sx,
-        }}
-        onClick={isDownloading ? undefined : () => onDownload()}
+        },
+        cursor: isDownloading ? "not-allowed" : "pointer",
+        gap: 1,
+        ...sx,
+      }}
+      onClick={isDownloading ? undefined : () => onDownload()}
+    >
+      <Tooltip
+        title={getTooltip(isDownloading, isEstimating, estimatedSizeBytes)}
+        placement="top"
       >
-        <DownloadIcon />
-        {renderButtonLabel(isDownloading, estimatedSizeBytes ?? null)}
-        {isEstimating && !isDownloading && (
-          <CircularProgress
-            size={14}
-            thickness={5}
-            sx={{ color: portalTheme.palette.text3 }}
-          />
-        )}
-      </Button>
-    </Tooltip>
+        <Stack direction="row" alignItems="center" gap={1}>
+          <Box sx={{ flexShrink: 0, display: "flex" }}>
+            <DownloadIcon />
+          </Box>
+          {renderButtonLabel(isDownloading, estimatedSizeBytes ?? null)}
+          {isEstimating && !isDownloading && (
+            <CircularProgress
+              size={14}
+              thickness={5}
+              sx={{ color: portalTheme.palette.text3 }}
+            />
+          )}
+        </Stack>
+      </Tooltip>
+      {isDownloading && (
+        <Tooltip placement="top" title="Cancel Download">
+          <IconButton
+            size="small"
+            onClick={handleCancelDownload}
+            sx={{ color: portalTheme.palette.grey[100] }}
+          >
+            <CancelIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Button>
   );
 };
 
