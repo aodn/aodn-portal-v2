@@ -98,7 +98,7 @@ const progressBar = (loading: ProgressType | undefined) => {
     case ProgressType.LINEAR:
       return <LinearProgress sx={{ color: "#4ecdc4", height: 8 }} />;
     default:
-      return null;
+      return <></>;
   }
 };
 
