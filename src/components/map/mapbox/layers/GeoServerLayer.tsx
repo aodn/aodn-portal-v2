@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import MapContext from "../MapContext";
+import MapContext, { ProgressType } from "../MapContext";
 import { LayerBasicType } from "./Layers";
 import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
 import { formatToUrl } from "../../../../utils/UrlUtils";
@@ -588,7 +588,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   useEffect(() => {
     if (!collection) return;
 
-    setMapLoading?.(true);
+    setMapLoading?.(ProgressType.CIRCLE);
     setIsFetchingWmsLayers(true);
     onWMSAvailabilityChange?.(true); // Show the loading status again
 
@@ -656,7 +656,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                 }
               })
               .finally(() => {
-                setMapLoading?.(false);
+                setMapLoading?.(undefined);
                 setIsFetchingWmsLayers(false);
               });
           })
@@ -669,12 +669,12 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             }
           })
           .finally(() => {
-            setMapLoading?.(false);
+            setMapLoading?.(undefined);
             setIsFetchingWmsLayers(false);
           });
       } else {
         setIsFetchingWmsLayers(false);
-        setMapLoading?.(false);
+        setMapLoading?.(undefined);
       }
     };
 

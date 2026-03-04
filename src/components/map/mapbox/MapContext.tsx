@@ -9,10 +9,15 @@ import { createContext, Dispatch, SetStateAction } from "react";
 // as the type definition combined them together
 import { Map } from "mapbox-gl";
 
+export enum ProgressType {
+  CIRCLE = "circle",
+  LINEAR = "linear",
+}
+
 // ---------------------------------------------------------------
 type MapContextType = {
   map: Map | null;
-  setLoading: Dispatch<SetStateAction<boolean>>;
+  setLoading: Dispatch<SetStateAction<ProgressType | undefined>>;
 };
 
 const MapContext = createContext<Partial<MapContextType>>({});
