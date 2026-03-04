@@ -3,14 +3,11 @@ import {
   Alert,
   Box,
   Grid,
-  IconButton,
   LinearProgress,
   Snackbar,
   Stack,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import CancelIcon from "@mui/icons-material/Cancel";
 import { borderRadius } from "../../../../../../styles/constants";
 import { portalTheme } from "../../../../../../styles";
 import useWFSDownload, {
@@ -250,27 +247,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}
         />
-        <Box position="relative">
-          <DownloadButton
-            onDownload={handleDownload}
-            isDownloading={isDownloading}
-            isEstimating={isEstimating}
-            estimatedSizeBytes={estimatedSizeBytes}
-          />
-          {isDownloading && (
-            <Box sx={{ position: "absolute", right: 1, top: 1 }}>
-              <Tooltip placement="top" title="Cancel Download">
-                <IconButton
-                  size="small"
-                  onClick={handleCancelDownload}
-                  sx={{ color: portalTheme.palette.grey[100] }}
-                >
-                  <CancelIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          )}
-        </Box>
+        <DownloadButton
+          onDownload={handleDownload}
+          isDownloading={isDownloading}
+          isEstimating={isEstimating}
+          estimatedSizeBytes={estimatedSizeBytes}
+          handleCancelDownload={handleCancelDownload}
+        />
         {isDownloading &&
           renderProgressMessage(formatBytes(downloadedBytes), progressMessage)}
       </Stack>
