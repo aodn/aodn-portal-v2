@@ -14,7 +14,7 @@ export enum MapEventEnum {
 
 export const MapDefaultConfig = {
   // Magic number, try and error by experience
-  DEBOUNCE_BEFORE_EVENT_FIRE: 1000,
+  DEBOUNCE_BEFORE_EVENT_FIRE: 300,
   ZOOM: 3.5,
   ZOOM_TABLET: 3,
   ZOOM_MOBILE: 2,

@@ -3,14 +3,11 @@ import {
   Alert,
   Box,
   Grid,
-  IconButton,
   LinearProgress,
   Snackbar,
   Stack,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import CancelIcon from "@mui/icons-material/Cancel";
 import { borderRadius } from "../../../../../../styles/constants";
 import { portalTheme } from "../../../../../../styles";
 import useWFSDownload, {
@@ -36,6 +33,7 @@ import { useAppDispatch } from "../../../../../../components/common/store/hooks"
 import { SelectItem } from "../../../../../../components/common/dropdown/CommonSelect";
 import { fetchGeoServerDownloadLayers } from "../../../../../../components/common/store/searchReducer";
 import AdminScreenContext from "../../../../../../components/admin/AdminScreenContext";
+import { formatBytes } from "../../../../../../utils/Helpers";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -72,10 +70,9 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     progressMessage,
     startDownload,
     cancelDownload,
-    formatBytes,
     isDownloading,
   } = useWFSDownload(() => setSnackbarOpen(true));
-  const { estimatedSizeMB, isEstimating, estimateSize, cancelEstimate } =
+  const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
     useWFSEstimateSize();
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
@@ -250,27 +247,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}
         />
-        <Box position="relative">
-          <DownloadButton
-            onDownload={handleDownload}
-            isDownloading={isDownloading}
-            isEstimating={isEstimating}
-            estimatedSizeMB={estimatedSizeMB}
-          />
-          {isDownloading && (
-            <Box sx={{ position: "absolute", right: 1, top: 1 }}>
-              <Tooltip placement="top" title="Cancel Download">
-                <IconButton
-                  size="small"
-                  onClick={handleCancelDownload}
-                  sx={{ color: portalTheme.palette.grey[100] }}
-                >
-                  <CancelIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          )}
-        </Box>
+        <DownloadButton
+          onDownload={handleDownload}
+          isDownloading={isDownloading}
+          isEstimating={isEstimating}
+          estimatedSizeBytes={estimatedSizeBytes}
+          handleCancelDownload={handleCancelDownload}
+        />
         {isDownloading &&
           renderProgressMessage(formatBytes(downloadedBytes), progressMessage)}
       </Stack>

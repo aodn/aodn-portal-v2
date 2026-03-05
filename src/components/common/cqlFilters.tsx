@@ -7,7 +7,7 @@ import { dateDefault } from "./constants";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
 import { Vocab } from "./store/componentParamReducer";
-import { DatasetFrequency } from "./store/searchReducer";
+import { DatasetFrequency, DatasetStatus } from "./store/searchReducer";
 import { bbox } from "@turf/turf";
 
 // TODO: refactor this, naming like this is not ideal for readability,
@@ -28,6 +28,7 @@ export type ParameterVocabsIn = SingleArgumentFunction<
 export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
 export type DatasetGroup = SingleArgumentFunction<string, string>;
 export type PlatformFilter = SingleArgumentFunction<Array<string>, string>;
+export type Status = SingleArgumentFunction<DatasetStatus, string>;
 export type IsNotNull = SingleArgumentFunction<string, string>;
 export type FilterTypes =
   | string
@@ -37,12 +38,15 @@ export type FilterTypes =
   | PolygonOperation
   | UpdateFrequency
   | PlatformFilter
+  | Status
   | IsNotNull;
 
 const funcIsNotNull: IsNotNull = (field: string) => `(${field} IS NOT NULL)`;
 
 const funcUpdateFrequency: UpdateFrequency = (freq: DatasetFrequency) =>
   `ai_update_frequency='${freq}'`;
+
+const funcStatus: Status = (stat: DatasetStatus) => `status='${stat}'`;
 
 const funcUpdateDatasetGroup: DatasetGroup = (name: string) =>
   `dataset_group='${name}'`;
@@ -116,6 +120,7 @@ cqlDefaultFilters
   .set("BBOX_POLYGON", funcBBoxPolygon)
   .set("BBOX_POLYGON_OR_EMPTY_EXTENTS", funcBBoxPolygonOrEmptyExtents)
   .set("UPDATE_FREQUENCY", funcUpdateFrequency)
+  .set("STATUS", funcStatus)
   .set("UPDATE_PLATFORM_FILTER_VARIABLES", funcPlatformFilter)
   .set("IS_NOT_NULL", funcIsNotNull);
 

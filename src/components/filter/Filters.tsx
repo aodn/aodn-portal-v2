@@ -14,6 +14,7 @@ import {
   updatePlatform,
   updateUpdateFreq,
   Vocab,
+  updateStatus,
 } from "../common/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import CloseIcon from "@mui/icons-material/Close";
@@ -24,7 +25,7 @@ import ThemeFilter from "./tab-filters/ThemeFilter";
 import PlatformFilter from "./tab-filters/PlatformFilter";
 import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
-import { DatasetFrequency } from "../common/store/searchReducer";
+import { DatasetFrequency, DatasetStatus } from "../common/store/searchReducer";
 import { IndexDataType } from "./FilterDefinition";
 import { portalTheme } from "../../styles";
 
@@ -43,6 +44,7 @@ interface Filters {
   organisation?: Array<string>;
   dataDeliveryFrequency?: Array<DatasetFrequency> | undefined;
   dataDeliveryMode?: Array<string>;
+  dataStatus?: Array<DatasetStatus> | undefined;
   dataIndexedType?: Array<IndexDataType>;
   dataService?: Array<string>;
 }
@@ -74,7 +76,8 @@ const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
         filters.dataDeliveryFrequency?.length ||
         filters.dataDeliveryMode?.length ||
         filters.dataService?.length ||
-        filters.dataIndexedType?.length
+        filters.dataIndexedType?.length ||
+        filters.dataStatus?.length
       );
 
     default:
@@ -85,8 +88,14 @@ const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
 const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   const dispatch = useAppDispatch();
 
-  const { parameterVocabs, platform, updateFreq, datasetGroup, hasCOData } =
-    useAppSelector((state) => state.paramReducer);
+  const {
+    parameterVocabs,
+    platform,
+    updateFreq,
+    datasetGroup,
+    hasCOData,
+    datasetStatus,
+  } = useAppSelector((state) => state.paramReducer);
 
   const [filters, setFilters] = useState<Filters>({});
   // Do not use useMemo here due to change in filters items not filters
@@ -148,6 +157,7 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     dispatch(updateHasData(undefined));
     dispatch(updatePlatform([]));
     dispatch(updateUpdateFreq(undefined));
+    dispatch(updateStatus(undefined));
   }, [dispatch]);
 
   const handleClose = useCallback(() => {
@@ -185,7 +195,20 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
         dataIndexedType: [IndexDataType.CLOUD],
       }));
     }
-  }, [hasCOData, datasetGroup, parameterVocabs, platform, updateFreq]);
+    if (datasetStatus) {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        dataStatus: [datasetStatus],
+      }));
+    }
+  }, [
+    hasCOData,
+    datasetGroup,
+    parameterVocabs,
+    platform,
+    updateFreq,
+    datasetStatus,
+  ]);
 
   return (
     <>
