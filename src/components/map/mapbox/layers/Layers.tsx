@@ -33,6 +33,14 @@ const createStaticLayers = (ids: Array<string>) => (
   <>
     {ids.map((id) => {
       switch (id) {
+        case StaticLayersDef.ALLEN_CORAL_ATLAS.id: {
+          return (
+            <MarineParkLayer
+              key={"s" + id}
+              {...StaticLayersDef.ALLEN_CORAL_ATLAS}
+            />
+          );
+        }
         case StaticLayersDef.AUSTRALIA_MARINE_PARKS.id: {
           return (
             <MarineParkLayer

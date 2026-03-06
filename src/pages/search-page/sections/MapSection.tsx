@@ -18,8 +18,6 @@ import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 import UnclusterLayer from "../../../components/map/mapbox/layers/UnclusterLayer";
 import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
-import { StaticLayersDef } from "../../../components/map/mapbox/layers/StaticLayer";
-import { MapboxWorldLayersDef } from "../../../components/map/mapbox/layers/MapboxWorldLayer";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
@@ -35,7 +33,9 @@ import BookmarkListMenu, {
 } from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import MenuControlGroup from "../../../components/map/mapbox/controls/menu/MenuControlGroup";
-import ReferenceLayerSwitcher from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
+import ReferenceLayerSwitcher, {
+  staticBaseLayerConfig,
+} from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import { ProgressType } from "../../../components/map/mapbox/MapContext";
 
 interface MapSectionProps
@@ -157,25 +157,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
               <MenuControl
                 menu={
                   <ReferenceLayerSwitcher
-                    layers={[
-                      {
-                        id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
-                        name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
-                        label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-                        default: false,
-                      },
-                      {
-                        id: StaticLayersDef.MEOW.id,
-                        name: StaticLayersDef.MEOW.name,
-                        label: StaticLayersDef.MEOW.label,
-                        default: false,
-                      },
-                      {
-                        id: MapboxWorldLayersDef.WORLD.id,
-                        name: MapboxWorldLayersDef.WORLD.name,
-                        default: false,
-                      },
-                    ]}
+                    layers={staticBaseLayerConfig}
                     onEvent={(target: EventTarget & HTMLInputElement) =>
                       setStaticLayer((values) => {
                         // Remove the item and add it back if selected

@@ -43,6 +43,14 @@ const marineEcoregionOfWorldDefault = {
     "This dataset is released under Creative Commons by Attribution 4.0 International (CC BY 4.0).",
 };
 
+const allenCoralAtlasDefault = {
+  geojson: "/data/Allen_Coral_Atlas.json",
+  acknowledge:
+    "Allen Coral Atlas (2020). Imagery, maps and monitoring of the world's tropical coral reefs. doi.org/10.5281/zenodo.3833242 For more information on citation and attribution: https://github.com/CoralMapping/AllenCoralAtlas We would love to hear about any use of our data. Please tell us about it at: support@allencoralatlas.org",
+  termsOfUse:
+    "Allen Coral Atlas maps, bathymetry and map statistics are © 2018-2023 Allen Coral Atlas Partnership and Arizona State University and licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)",
+};
+
 const detailPageDefault = {
   ADDITIONAL_INFO: "additional-info",
   ASSOCIATED_RECORDS: "associated-records",
@@ -64,6 +72,7 @@ const playwrightTestIds = {
 };
 
 export {
+  allenCoralAtlasDefault,
   dateDefault,
   pageDefault,
   pageReferer,
