@@ -2,7 +2,91 @@
   {
     "typename": "SeamapAus_VIC_statewide_habitats_2023",
     "fields": [
-      { "label": "geom", "type": "geometrypropertytype", "name": "geom" }
+      {
+        "label": "OID",
+        "name": "OID",
+        "type": "int"
+      },
+      {
+        "label": "METHOD",
+        "name": "METHOD",
+        "type": "string"
+      },
+      {
+        "label": "PERSON_OBS",
+        "name": "PERSON_OBS",
+        "type": "string"
+      },
+      {
+        "label": "PERSON_SUP",
+        "name": "PERSON_SUP",
+        "type": "string"
+      },
+      {
+        "label": "ORG",
+        "name": "ORG",
+        "type": "string"
+      },
+      {
+        "label": "BIOT_TTL",
+        "name": "BIOT_TTL",
+        "type": "string"
+      },
+      {
+        "label": "BIOTC_CDE",
+        "name": "BIOTC_CDE",
+        "type": "string"
+      },
+      {
+        "label": "BIOT_LBL",
+        "name": "BIOT_LBL",
+        "type": "string"
+      },
+      {
+        "label": "BIOT_LVL",
+        "name": "BIOT_LVL",
+        "type": "decimal"
+      },
+      {
+        "label": "HAB3BIOCDE",
+        "name": "HAB3BIOCDE",
+        "type": "string"
+      },
+      {
+        "label": "HAB3BIOLBL",
+        "name": "HAB3BIOLBL",
+        "type": "string"
+      },
+      {
+        "label": "HAB3BIOTTL",
+        "name": "HAB3BIOTTL",
+        "type": "string"
+      },
+      {
+        "label": "ID",
+        "name": "ID",
+        "type": "string"
+      },
+      {
+        "label": "HAB3BIOID",
+        "name": "HAB3BIOID",
+        "type": "string"
+      },
+      {
+        "label": "BIOTIC_ID",
+        "name": "BIOTIC_ID",
+        "type": "string"
+      },
+      {
+        "label": "SM_HAB_CLS",
+        "name": "SM_HAB_CLS",
+        "type": "string"
+      },
+      {
+        "label": "geom",
+        "name": "geom",
+        "type": "GeometryPropertyType"
+      }
     ]
   }
 ]

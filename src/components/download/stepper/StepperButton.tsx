@@ -137,7 +137,7 @@ const StepperButton = ({
   return (
     <Button
       id={id}
-      data-testid={id}
+      data-testid={id ?? "dialog-button"}
       disabled={shouldDisableButton}
       startIcon={startIcon}
       endIcon={endIcon}

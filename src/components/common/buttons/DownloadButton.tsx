@@ -85,6 +85,7 @@ const DownloadButton: FC<DownloadButtonProps> = ({
         ...sx,
       }}
       onClick={isDownloading ? undefined : () => onDownload()}
+      data-testid="download-button"
     >
       <Tooltip
         title={getTooltip(isDownloading, isEstimating, estimatedSizeBytes)}
