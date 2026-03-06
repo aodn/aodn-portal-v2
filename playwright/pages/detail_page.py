@@ -31,6 +31,16 @@ class DetailPage(BasePage):
         self.copy_link = self.page.get_by_test_id('copy-link')
         self.wms_link_header = self.get_text('WMS Service Link')
         self.detail_map_popup = self.page.get_by_test_id('map-popup')
+        self.download_button = self.page.get_by_test_id('download-button')
+        self.cancel_download_button = self.page.get_by_test_id('CancelIcon')
+        self.download_status_alert = self.page.get_by_test_id(
+            'download-status-alert'
+        )
+        self.download_dialog = self.page.get_by_test_id('download-dialog')
+        self.download_email_input = self.page.get_by_test_id(
+            'download-email-input'
+        ).locator('input')
+        self.dialog_button = self.page.get_by_test_id('dialog-button')
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')
@@ -42,6 +52,13 @@ class DetailPage(BasePage):
         """Load the detail page for the given uuid"""
         url = f'{settings.baseURL}/details/{uuid}'
         self.page.goto(url, wait_until='load')
+
+    def prevent_http_proxy_errors(self) -> None:
+        """
+        Waits for a short duration to allow any pending requests to complete,
+        preventing HTTP proxy errors due to unhandled requests.
+        """
+        self.page.wait_for_timeout(1000)
 
     def return_and_get_api_request_url(self) -> str:
         """Return to the previous page and return the API URL used for the request."""
