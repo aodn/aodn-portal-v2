@@ -52,6 +52,7 @@ def test_map_spider_disappears_on_zoom_out(
 
     # Try to find and click a cluster
     cluster_found = search_page.map.find_and_click_cluster()
+    search_page.wait_for_timeout(1000)
     assert cluster_found is True
 
     # Verify spider is visible
