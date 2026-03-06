@@ -159,6 +159,12 @@ const MapSection: React.FC<MapSectionProps> = memo(
                   <ReferenceLayerSwitcher
                     layers={[
                       {
+                        id: StaticLayersDef.ALLEN_CORAL_ATLAS.id,
+                        name: StaticLayersDef.ALLEN_CORAL_ATLAS.name,
+                        label: StaticLayersDef.ALLEN_CORAL_ATLAS.label,
+                        default: false,
+                      },
+                      {
                         id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
                         name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
                         label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,

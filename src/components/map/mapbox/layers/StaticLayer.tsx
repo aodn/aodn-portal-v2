@@ -7,10 +7,11 @@ import React, {
   useState,
 } from "react";
 import MapContext from "../MapContext";
-import { FeatureCollection, Polygon } from "geojson";
+import { FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { TestHelper } from "../../../common/test/helper";
 import {
+  allenCoralAtlasDefault,
   marineEcoregionOfWorldDefault,
   marineParkDefault,
 } from "../../../common/constants";
@@ -31,6 +32,13 @@ const StaticLayersDef = {
     geojson: marineParkDefault.geojson,
     termsOfUse: marineParkDefault.termsOfUse,
     label: "RESNAME",
+  },
+  ALLEN_CORAL_ATLAS: {
+    id: "static-allen-coral-atlas",
+    name: "Allen Coral Atlas",
+    geojson: allenCoralAtlasDefault.geojson,
+    termsOfUse: allenCoralAtlasDefault.termsOfUse,
+    label: "ECOREGION",
   },
   MEOW: {
     id: "static-meow",
@@ -139,14 +147,19 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
 };
 // A shortcut for Australian marine parks
 const MarineParkLayer: FC<StaticLayersProps> = (props) => {
-  const [data, setData] = useState<FeatureCollection<Polygon>>();
+  const [data, setData] = useState<
+    FeatureCollection<Polygon> | FeatureCollection<MultiPolygon>
+  >();
 
   // Data orginated from here, we store a copy in the following path and useEffect to load it so we do not need to bundle it to the package which make is very big
   // https://data.gov.au/dataset/ds-dcceew-https%3A%2F%2Fwww.arcgis.com%2Fhome%2Fitem.html%3Fid%3D2b3eb1d42b8d4319900cf4777f0a83b9%26sublayer%3D0/details?q=marine%20park
   useEffect(() => {
     fetch(props.geojson)
       .then((response) => response.json())
-      .then((json: FeatureCollection<Polygon>) => setData(json))
+      .then(
+        (json: FeatureCollection<Polygon> | FeatureCollection<MultiPolygon>) =>
+          setData(json)
+      )
       .catch((error) => console.error("Error fetching JSON:", error));
   }, [props.geojson]);
 
@@ -160,7 +173,5 @@ const MarineParkLayer: FC<StaticLayersProps> = (props) => {
   );
 };
 
-// Export needed layers
+// Export need layers
 export { MarineParkLayer, StaticLayersDef };
-
-export default StaticLayer;

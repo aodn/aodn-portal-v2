@@ -173,116 +173,120 @@ const CardPopup: React.FC<CardPopupProps> = ({
   }, [getCollectionData, isUnderLaptop, layerId, map]);
 
   return (
-    <div
-      id={"card-popup"}
-      ref={panel}
-      style={{
-        display: "flex",
-        visibility: "hidden",
-        flexDirection: "column",
-        position: "absolute",
-        top: 0,
-        height: "100%",
-        width: "100%",
-        pointerEvents: "none", // Forward all event to behind
-        zIndex: zIndex.MAP_POPUP,
-      }}
-    >
-      <Card
-        elevation={0}
-        sx={{
+    content && (
+      <div
+        id={"card-popup"}
+        ref={panel}
+        style={{
           display: "flex",
-          borderRadius: 0,
-          marginTop: "auto",
-          height: "auto",
-          maxHeight: "50%",
+          visibility: "hidden",
+          flexDirection: "column",
+          position: "absolute",
+          top: 0,
+          height: "100%",
           width: "100%",
-          backgroundColor: "rgba(255, 255, 255, 0.9)",
-          pointerEvents: "auto",
+          pointerEvents: "none", // Forward all event to behind
+          zIndex: zIndex.MAP_POPUP,
         }}
       >
-        {isTablet && (
-          <CardMedia
-            component="div"
-            id={mapContainerId}
-            sx={{ position: "relative", height: "100%", width: "250px" }}
-          >
-            <Map
-              panelId={mapContainerId}
-              zoom={isUnderLaptop ? 1 : 2}
-              animate={false}
-            >
-              <Layers>
-                <FitToSpatialExtentsLayer collection={content} />
-                <GeojsonLayer collection={content} visible={true} />
-              </Layers>
-            </Map>
-          </CardMedia>
-        )}
-        <CardContent
+        <Card
+          elevation={0}
           sx={{
-            position: "relative",
-            width: isTablet ? "calc(100% - 250px)" : "100%",
+            display: "flex",
+            borderRadius: 0,
+            marginTop: "auto",
             height: "auto",
             maxHeight: "50%",
+            width: "100%",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            pointerEvents: "auto",
           }}
         >
-          <ContextMenu
-            ref={menuRef}
-            onClick={(type: OpenType | undefined) => onDetail(content, type)}
-          />
-          <Box position="absolute" sx={{ top: gap.md, right: gap.md }}>
-            <BookmarkButton dataset={content} />
-          </Box>
-          <Typography
-            fontWeight={fontWeight.bold}
-            fontSize={isMobile ? fontSize.label : fontSize.info}
-            sx={{
-              width: "95%",
-              padding: 0,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: "5",
-              WebkitBoxOrient: "vertical",
-            }}
-            onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
-          >
-            {content?.title}
-          </Typography>
           {isTablet && (
+            <CardMedia
+              component="div"
+              id={mapContainerId}
+              sx={{ position: "relative", height: "100%", width: "250px" }}
+            >
+              <Map
+                panelId={mapContainerId}
+                zoom={isUnderLaptop ? 1 : 2}
+                animate={false}
+              >
+                <Layers>
+                  <FitToSpatialExtentsLayer collection={content} />
+                  <GeojsonLayer collection={content} visible={true} />
+                </Layers>
+              </Map>
+            </CardMedia>
+          )}
+          <CardContent
+            sx={{
+              position: "relative",
+              width: isTablet ? "calc(100% - 250px)" : "100%",
+              height: "auto",
+              maxHeight: "50%",
+            }}
+          >
+            <ContextMenu
+              ref={menuRef}
+              onClick={(type: OpenType | undefined) => onDetail(content, type)}
+            />
+            <Box position="absolute" sx={{ top: gap.md, right: gap.md }}>
+              <BookmarkButton dataset={content} />
+            </Box>
             <Typography
-              color={fontColor.gray.medium}
-              fontSize={fontSize.resultCardContent}
+              fontWeight={fontWeight.bold}
+              fontSize={isMobile ? fontSize.label : fontSize.info}
               sx={{
+                width: "95%",
                 padding: 0,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
-                WebkitLineClamp: "4",
+                WebkitLineClamp: "5",
                 WebkitBoxOrient: "vertical",
-                wordBreak: "break-word",
               }}
+              onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
             >
-              {content?.description}
+              {content?.title}
             </Typography>
-          )}
-          {content && (
-            <ResultCardButtonGroup
-              content={content}
-              isGridView
-              onLinks={(type: OpenType | undefined) => onLinks(content, type)}
-              onDownload={
-                content.hasSummaryFeature()
-                  ? (type: OpenType | undefined) => onDownload(content, type)
-                  : undefined
-              }
-              onDetail={(type: OpenType | undefined) => onDetail(content, type)}
-            />
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            {isTablet && (
+              <Typography
+                color={fontColor.gray.medium}
+                fontSize={fontSize.resultCardContent}
+                sx={{
+                  padding: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: "4",
+                  WebkitBoxOrient: "vertical",
+                  wordBreak: "break-word",
+                }}
+              >
+                {content?.description}
+              </Typography>
+            )}
+            {
+              <ResultCardButtonGroup
+                content={content}
+                isGridView
+                onLinks={(type: OpenType | undefined) => onLinks(content, type)}
+                onDownload={
+                  content.hasSummaryFeature()
+                    ? (type: OpenType | undefined) => onDownload(content, type)
+                    : undefined
+                }
+                onDetail={(type: OpenType | undefined) =>
+                  onDetail(content, type)
+                }
+              />
+            }
+          </CardContent>
+        </Card>
+      </div>
+    )
   );
 };
 

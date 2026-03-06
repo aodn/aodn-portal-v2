@@ -53,7 +53,6 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   // Do not use memo on this, some case result in wrong id.
   const containerId = map?.getContainer().id;
   const sourceId = `geojson-${containerId}-source-${collectionId}`;
-
   const layerPolygonId = `geojson-${containerId}-layer-${collectionId}-poly`;
   const layerPointId = `geojson-${containerId}-layer-${collectionId}-point`;
 
@@ -124,7 +123,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     // If style changed, we may need to add the layer again, hence listen to this event.
     // https://github.com/mapbox/mapbox-gl-js/issues/8660
     //
-    if (map?.getSource(sourceId)) return true;
+    if (map?.getSource(sourceId) || !collectionId) return true;
 
     map?.addSource(sourceId, {
       type: "geojson",
@@ -159,9 +158,9 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   }, [
     map,
     sourceId,
+    collectionId,
     extent,
     layerPolygonId,
-    collectionId,
     visible,
     layerPointId,
   ]);
