@@ -49,12 +49,15 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   const { map } = useContext(MapContext);
   const [_, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
-  const collectionId = useMemo(() => collection.id, [collection.id]);
-  // Do not use memo on this, some case result in wrong id.
-  const containerId = map?.getContainer().id;
-  const sourceId = `geojson-${containerId}-source-${collectionId}`;
-  const layerPolygonId = `geojson-${containerId}-layer-${collectionId}-poly`;
-  const layerPointId = `geojson-${containerId}-layer-${collectionId}-point`;
+
+  const [collectionId, sourceId, layerPolygonId, layerPointId] = useMemo(() => {
+    const collectionId = collection.id;
+    const containerId = map?.getContainer().id;
+    const sourceId = `geojson-${containerId}-source-${collectionId}`;
+    const layerPolygonId = `geojson-${containerId}-layer-${collectionId}-poly`;
+    const layerPointId = `geojson-${containerId}-layer-${collectionId}-point`;
+    return [collectionId, sourceId, layerPolygonId, layerPointId];
+  }, [collection.id, map]);
 
   // Function to take photo of the map for given bounding boxes
   const takePhoto = useCallback(
