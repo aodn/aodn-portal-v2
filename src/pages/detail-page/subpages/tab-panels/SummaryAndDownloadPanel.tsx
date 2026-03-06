@@ -9,14 +9,10 @@ import MapBox from "../../../../components/map/mapbox/Map";
 import Layers, {
   createStaticLayers,
 } from "../../../../components/map/mapbox/layers/Layers";
-import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
-import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
-import BaseMapSwitcher, {
-  BaseMapSwitcherLayer,
-} from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
+import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../../components/map/mapbox/controls/menu/DateRange";
 import dayjs, { Dayjs } from "dayjs";
@@ -41,7 +37,9 @@ import {
   DatasetType,
   OGCCollection,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
-import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
+import ReferenceLayerSwitcher, {
+  staticBaseLayerConfig,
+} from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
@@ -59,26 +57,6 @@ interface SummaryAndDownloadPanelProps {
   mapFocusArea?: LngLatBounds;
   onMapMoveEnd?: (evt: MapEvent) => void;
 }
-
-const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
-  {
-    id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
-    name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
-    label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-    default: false,
-  },
-  {
-    id: StaticLayersDef.MEOW.id,
-    name: StaticLayersDef.MEOW.name,
-    label: StaticLayersDef.MEOW.label,
-    default: false,
-  },
-  {
-    id: MapboxWorldLayersDef.WORLD.id,
-    name: MapboxWorldLayersDef.WORLD.name,
-    default: false,
-  },
-];
 
 const getMinMaxDateStamps = (
   featureCollection?: FeatureCollection<Point>
