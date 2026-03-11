@@ -5,6 +5,10 @@ import time
 from playwright.sync_api import Route
 
 
+def handle_estimate_wfs_download(route: Route) -> None:
+    route.fulfill(json={})  # Response not needed in the UI tests
+
+
 def handle_download_wfs(route: Route) -> None:
     # Parse the POST body to get the uuid
     request = route.request

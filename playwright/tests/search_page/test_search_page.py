@@ -79,7 +79,7 @@ def test_full_list_view(desktop_page: Page) -> None:
     search_page.full_list_view_button.click()
     expect(search_page.main_map).not_to_be_visible()
     expect(search_page.result_list).to_be_visible()
-    expect(search_page.bookmark_list).to_be_visible()
+    expect(search_page.bookmark_list_head).to_be_visible()
 
 
 @pytest.mark.parametrize(
@@ -196,7 +196,7 @@ def test_buttons_disappear_on_mobile(mobile_page: Page) -> None:
     search_page.full_map_view_button.click()
     expect(search_page.result_sort_button).not_to_be_visible()
     expect(search_page.result_view_button).not_to_be_visible()
-    expect(search_page.bookmark_list).not_to_be_visible()
+    expect(search_page.bookmark_list_head).not_to_be_visible()
     expect(search_page.map.zoom_in_button).not_to_be_visible()
     expect(search_page.map.zoom_out_button).not_to_be_visible()
 
@@ -234,3 +234,36 @@ def test_search_result_layout_remains_intact_after_reload(
     # verify that the full list view is still active
     expect(search_page.result_list).to_be_visible()
     expect(search_page.main_map).not_to_be_visible()
+
+
+@pytest.mark.parametrize(
+    'data_id',
+    [
+        '19da2ce7-138f-4427-89de-a50c724f5f54',
+    ],
+)
+def test_data_bookmark_persistence(desktop_page: Page, data_id: str) -> None:
+    """
+    Verifies that bookmarking a dataset (from result card) correctly updates:
+      - result card bookmark icon
+      - bookmark list
+    and that this state persists after search refresh (search again).
+    """
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+
+    landing_page.load()
+    landing_page.search.search_for(data_id)
+
+    # Click result card bookmark icon
+    search_page.get_bookmark_icon(data_id, search_page.result_card_list).click()
+    search_page.assert_bookmark_state(data_id, True)
+
+    # Clear search to show all results
+    search_page.search.search_for('')
+    search_page.map.wait_for_map_idle()
+    # Search again to see if bookmark persists
+    search_page.search.search_for(data_id)
+    search_page.map.wait_for_map_idle()
+
+    search_page.assert_bookmark_state(data_id, True)
