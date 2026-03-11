@@ -123,8 +123,7 @@ def test_search_input_persistence_after_navigation(
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
 
-    search_page.search.fill_search_text(search_text)
-    search_page.search.click_search_button()
+    search_page.search.search_for(search_text)
     search_page.wait_for_search_to_complete()
 
     search_page.first_result_title.click()

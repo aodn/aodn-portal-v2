@@ -37,6 +37,11 @@ class SearchComponent(BasePage):
         """Click on the search button"""
         self.search_button.click()
 
+    def search_for(self, query: str) -> None:
+        """Fills search input and submits search"""
+        self.fill_search_text(query)
+        self.click_search_button()
+
     def get_date_range(self) -> Tuple[str, str]:
         """
         Get the date range from the date range picker.
