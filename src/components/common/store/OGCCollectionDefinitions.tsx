@@ -271,8 +271,13 @@ export class OGCCollection {
   // Get the AI enhanced description
   getEnhancedDescription = (): string | undefined =>
     this.propValue?.["ai:description"];
+  // Get the AI inferered update frequency
+  getAiUpdateFrequency = (): string | undefined =>
+    this.propValue?.["ai:update_frequency"];
   // Get the Metadata scope from 'code' field, i.e., document or other types of resouce
   getScope = (): string | undefined => this.propValue?.["scope"]?.["code"];
+  getParameterVocabs = (): Array<string> | undefined =>
+    this.propValue?.parameter_vocabs;
   getDataAccessLinks = (): ILink[] | undefined =>
     this.getLinksByAIGroupPrefix(AIGroup.DATA_ACCESS);
   getWMSLinks = (): ILink[] | undefined =>
@@ -325,8 +330,10 @@ export class SummariesProperties {
   readonly centroid?: Array<Array<number>>;
   readonly pace?: string;
   readonly "ai:description"?: string;
+  readonly "ai:update_frequency"?: string;
   readonly dataset_group?: Array<string>;
   readonly scope?: Record<string, string>;
+  readonly parameter_vocabs?: Array<string>;
 }
 
 export class Spatial {

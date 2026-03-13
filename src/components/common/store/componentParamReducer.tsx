@@ -4,7 +4,7 @@
  */
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, GeoJsonProperties } from "geojson";
-import { DatasetFrequency } from "./searchReducer";
+import { DatasetFrequency, DatasetStatus } from "./searchReducer";
 import { MapDefaultConfig } from "../../map/mapbox/constants";
 import { SearchResultLayoutEnum } from "../buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../buttons/ResultListSortButton";
@@ -21,6 +21,7 @@ const UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE =
   "UPDATE_PARAMETER_VOCAB_FILTER_VARIABLE";
 const UPDATE_PLATFORM_FILTER_VARIABLE = "UPDATE_PLATFORM_FILTER_VARIABLE";
 const UPDATE_UPDATE_FREQ_VARIABLE = "UPDATE_UPDATE_FREQ_VARIABLE";
+const UPDATE_STATUS_VARIABLE = "UPDATE_STATUS_VARIABLE";
 const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
 const UPDATE_ZOOM_VARIABLE = "UPDATE_ZOOM_VARIABLE";
 // Contains cloud optimized data where download possible
@@ -70,6 +71,7 @@ export interface ParameterState {
   parameterVocabs?: Array<Vocab>;
   platform?: Array<string>;
   updateFreq?: DatasetFrequency | undefined;
+  datasetStatus?: DatasetStatus | undefined;
   sortby?: string;
   zoom?: number;
   sort?: SortResultEnum;
@@ -180,6 +182,15 @@ const updateUpdateFreq = (input: DatasetFrequency | undefined): ActionType => {
     type: UPDATE_UPDATE_FREQ_VARIABLE,
     payload: {
       updateFreq: input,
+    } as ParameterState,
+  };
+};
+
+const updateStatus = (input: DatasetStatus | undefined): ActionType => {
+  return {
+    type: UPDATE_STATUS_VARIABLE,
+    payload: {
+      datasetStatus: input,
     } as ParameterState,
   };
 };
@@ -306,6 +317,11 @@ const paramReducer = (
       return {
         ...state,
         updateFreq: action.payload.updateFreq,
+      };
+    case UPDATE_STATUS_VARIABLE:
+      return {
+        ...state,
+        datasetStatus: action.payload.datasetStatus,
       };
     case UPDATE_SORT_BY_VARIABLE:
       return {
@@ -477,6 +493,7 @@ export {
   updateParameterStates,
   updateSortBy,
   updateUpdateFreq,
+  updateStatus,
   updateZoom,
   updateHasData,
   updateSort,

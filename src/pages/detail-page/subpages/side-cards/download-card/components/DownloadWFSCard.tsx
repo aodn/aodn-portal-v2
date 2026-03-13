@@ -1,22 +1,19 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
 import {
   Alert,
   Box,
   Grid,
-  IconButton,
   LinearProgress,
   Snackbar,
   Stack,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import CancelIcon from "@mui/icons-material/Cancel";
 import { borderRadius } from "../../../../../../styles/constants";
-import { ILink } from "../../../../../../components/common/store/OGCCollectionDefinitions";
 import { portalTheme } from "../../../../../../styles";
 import useWFSDownload, {
   DownloadStatus,
 } from "../../../../../../hooks/useWFSDownload";
+import useWFSEstimateSize from "../../../../../../hooks/useWFSEstimateSize";
 import {
   DownloadCondition,
   DownloadConditionType,
@@ -28,27 +25,44 @@ import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import { trackCustomEvent } from "../../../../../../analytics/customEventTracker";
 import { AnalyticsEvent } from "../../../../../../analytics/analyticsEvents";
-import { formWmsLinkOptions } from "../../../../../../components/map/mapbox/layers/GeoServerLayer";
+import {
+  DownloadLayersResponse,
+  MapFeatureRequest,
+} from "../../../../../../components/common/store/GeoserverDefinitions";
+import { useAppDispatch } from "../../../../../../components/common/store/hooks";
+import { SelectItem } from "../../../../../../components/common/dropdown/CommonSelect";
+import { fetchGeoServerDownloadLayers } from "../../../../../../components/common/store/searchReducer";
+import AdminScreenContext from "../../../../../../components/admin/AdminScreenContext";
+import { formatBytes } from "../../../../../../utils/Helpers";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
-const formatOptions = [{ label: "CSV", value: "csv" }];
+const formatOptions = [
+  { label: "CSV", value: "text/csv" },
+  { label: "Shape-Zip", value: "shape-zip" },
+];
 
 interface DownloadWFSCardProps extends DownloadCondition {
-  WFSLinks: ILink[] | undefined;
-  WMSLinks: ILink[] | undefined;
-  selectedWmsLayerName: string | undefined;
   uuid?: string;
+  onWFSAvailabilityChange?: (isWFSAvailable: boolean) => void;
 }
 
+const formWfsDataOptions = (
+  layers: DownloadLayersResponse[] | undefined
+): SelectItem[] => {
+  if (!layers || layers.length === 0) return [];
+  return layers.map((layer) => ({
+    value: layer.name,
+    label: layer.title,
+  }));
+};
+
 const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
-  WFSLinks,
-  WMSLinks,
-  selectedWmsLayerName,
   uuid,
   downloadConditions,
   getAndSetDownloadConditions,
   removeDownloadCondition,
+  onWFSAvailabilityChange,
 }) => {
   const {
     downloadingStatus,
@@ -56,34 +70,20 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     progressMessage,
     startDownload,
     cancelDownload,
-    formatBytes,
     isDownloading,
   } = useWFSDownload(() => setSnackbarOpen(true));
+  const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
+    useWFSEstimateSize();
+  const dispatch = useAppDispatch();
+  const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [dataSelectOptions, setDataSelectOptions] = useState<SelectItem[]>([]);
   const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
     undefined
   );
   const [selectedFormat, setSelectedFormat] = useState<string>(
     formatOptions[0].value
   );
-
-  // For now we just display the wms layer to make sure the download data is associated with the geoserver layer
-  // And hide all the wfs layers if there is a wms layer
-  // Will display all the wfs layers if there is no wms layer
-  const dataSelectOptions = useMemo(() => {
-    if (selectedWmsLayerName) {
-      setSelectedDataItem(selectedWmsLayerName);
-      return [{ value: selectedWmsLayerName, label: selectedWmsLayerName }];
-    }
-
-    if (WMSLinks && WMSLinks.length > 0) {
-      return formWmsLinkOptions(WFSLinks);
-    }
-    return (WFSLinks ?? []).map((link) => ({
-      value: link.title,
-      label: link.title,
-    }));
-  }, [WFSLinks, WMSLinks, selectedWmsLayerName]);
 
   const handleSelectFormat = useCallback(
     (value: string) => {
@@ -128,6 +128,49 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       new FormatCondition("format", formatOptions[0].value),
     ]);
   }, [getAndSetDownloadConditions]);
+
+  // Re-estimate whenever the selected data item or download conditions (subsetting) change
+  useEffect(() => {
+    if (!selectedDataItem || !uuid) return;
+    estimateSize(uuid, selectedDataItem, downloadConditions);
+    return () => cancelEstimate();
+  }, [
+    selectedDataItem,
+    downloadConditions,
+    uuid,
+    estimateSize,
+    cancelEstimate,
+  ]);
+
+  useEffect(() => {
+    if (!uuid) return;
+
+    const wfsLayersRequest: MapFeatureRequest = {
+      uuid,
+      enableGeoServerWhiteList: enableGeoServerWhiteList,
+    };
+
+    dispatch(fetchGeoServerDownloadLayers(wfsLayersRequest))
+      .unwrap()
+      .then((layers: DownloadLayersResponse[]) => {
+        // If there are layers available for download, we consider WFS download is available
+        // We display all fetched wfs layers in the dropdown for user to select
+        if (layers && layers.length > 0) {
+          const wfsDataOptions = formWfsDataOptions(layers);
+          if (wfsDataOptions && wfsDataOptions.length > 0) {
+            setDataSelectOptions(wfsDataOptions);
+            setSelectedDataItem(wfsDataOptions[0].value);
+          }
+          onWFSAvailabilityChange?.(true);
+        } else {
+          onWFSAvailabilityChange?.(false);
+        }
+      })
+      .catch(() => {
+        // If any error happens (e.g. 401 due to whitelist. 404 due to not found fields), we consider WFS download is not available
+        onWFSAvailabilityChange?.(false);
+      });
+  }, [dispatch, enableGeoServerWhiteList, onWFSAvailabilityChange, uuid]);
 
   const renderProgressMessage = useCallback(
     (dataSize: string, progressMessage: string) => {
@@ -189,11 +232,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
 
   return (
     <Stack direction="column">
-      {/* TODO: Add download dialog in the future  */}
-      {/* <DownloadDialog
-        isOpen={downloadDialogOpen}
-        setIsOpen={setDownloadDialogOpen}
-      /> */}
       <Stack sx={{ p: "16px" }} spacing={2}>
         <DownloadSelect
           disabled={isDownloading}
@@ -209,25 +247,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}
         />
-        <Box position="relative">
-          <DownloadButton
-            onDownload={handleDownload}
-            isDownloading={isDownloading}
-          />
-          {isDownloading && (
-            <Box sx={{ position: "absolute", right: 1, top: 1 }}>
-              <Tooltip placement="top" title="Cancel Download">
-                <IconButton
-                  size="small"
-                  onClick={handleCancelDownload}
-                  sx={{ color: portalTheme.palette.grey[100] }}
-                >
-                  <CancelIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          )}
-        </Box>
+        <DownloadButton
+          onDownload={handleDownload}
+          isDownloading={isDownloading}
+          isEstimating={isEstimating}
+          estimatedSizeBytes={estimatedSizeBytes}
+          handleCancelDownload={handleCancelDownload}
+        />
         {isDownloading &&
           renderProgressMessage(formatBytes(downloadedBytes), progressMessage)}
       </Stack>
@@ -264,6 +290,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           }
           variant="filled"
           sx={{ width: "100%" }}
+          data-testid="download-status-alert"
         >
           {progressMessage || downloadingStatus}
         </Alert>

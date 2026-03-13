@@ -1,9 +1,11 @@
 import { FC, useCallback, useMemo } from "react";
 import { Box, SxProps } from "@mui/material";
 import BBoxConditionBox from "../box/BBoxConditionBox";
+import PolygonConditionBox from "../box/PolygonConditionBox";
 import DateRangeConditionBox from "../box/DateRangeConditionBox";
 import {
   BBoxCondition,
+  PolygonCondition,
   DownloadConditionType,
   DateRangeCondition,
   IDownloadCondition,
@@ -33,6 +35,12 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
     return bboxConditions as BBoxCondition[];
   }, [downloadConditions]);
 
+  const polygonConditions: PolygonCondition[] = useMemo(() => {
+    return downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.POLYGON
+    ) as PolygonCondition[];
+  }, [downloadConditions]);
+
   const dateRangeCondition: DateRangeCondition[] = useMemo(() => {
     const timeRangeConditions = downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
@@ -56,6 +64,16 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
             key={index}
             bboxCondition={bboxCondition}
             onRemove={() => handleRemove(bboxCondition)}
+            disable={disable}
+          />
+        );
+      })}
+      {polygonConditions.map((polygonCondition, index) => {
+        return (
+          <PolygonConditionBox
+            key={index}
+            polygonCondition={polygonCondition}
+            onRemove={() => handleRemove(polygonCondition)}
             disable={disable}
           />
         );

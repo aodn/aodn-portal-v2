@@ -1,8 +1,12 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { vi, beforeEach, describe, expect, afterAll } from "vitest";
+import { vi, beforeEach, describe, expect, afterAll, it } from "vitest";
 import store from "../../common/store/store";
-import { removeAllItems } from "../../common/store/bookmarkListReducer";
+import {
+  removeAllItems,
+  addItem,
+  setItems,
+} from "../../common/store/bookmarkListReducer";
 import { OGCCollection } from "../../common/store/OGCCollectionDefinitions";
 import BookmarkButton from "../BookmarkButton";
 
@@ -194,5 +198,91 @@ describe("BookmarkButton", () => {
           }
         );
       });
+  });
+
+  it("Renders with correct initial bookmark state when store is pre-populated ", async () => {
+    const item1 = {
+      id: "bookmark-init-test-1",
+      index: "1",
+      itemType: "Collection",
+      links: [],
+      properties: {},
+    };
+
+    const item2 = {
+      id: "bookmark-init-test-2",
+      index: "2",
+      itemType: "Collection",
+      links: [],
+      properties: {},
+    };
+
+    const collection1: OGCCollection = Object.assign(
+      new OGCCollection(),
+      item1
+    );
+    const collection2: OGCCollection = Object.assign(
+      new OGCCollection(),
+      item2
+    );
+
+    // Pre-populate Redux store with bookmarks (simulating successful initialization)
+    // This is what happens after initializeBookmarkList completes
+    store.dispatch(setItems([collection1]));
+
+    // Wait for store to be updated
+    await waitFor(() => {
+      expect(store.getState().bookmarkList.items).toHaveLength(1);
+    });
+
+    // Render BookmarkButtons - one bookmarked, one not
+    render(
+      <>
+        <BookmarkButton dataset={collection1} dataTestId="init-test-1" />
+        <BookmarkButton dataset={collection2} dataTestId="init-test-2" />
+      </>
+    );
+
+    // The fix ensures buttons check store on mount via useState initializer
+    // collection1 should show as bookmarked
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("init-test-1-bookmarkicon")
+      ).toBeInTheDocument();
+    });
+
+    // collection2 should show as not bookmarked
+    expect(
+      screen.getByTestId("init-test-2-bookmarkbordericon")
+    ).toBeInTheDocument();
+  });
+
+  it("Bookmark button responds to INIT event after Redux state is populated", async () => {
+    const item = {
+      id: "init-event-test-item",
+      index: "1",
+      itemType: "Collection",
+      links: [],
+      properties: {},
+    };
+
+    const collection: OGCCollection = Object.assign(new OGCCollection(), item);
+
+    // Pre-populate store to simulate bookmarks loaded from localStorage
+    store.dispatch(addItem(collection));
+
+    // Render button after store is already populated
+    render(<BookmarkButton dataset={collection} dataTestId="init-event" />);
+
+    // Button should immediately show bookmarked state
+    // because useState initializer checks the store
+    await waitFor(() => {
+      expect(screen.getByTestId("init-event-bookmarkicon")).toBeInTheDocument();
+    });
+
+    // Verify it's NOT showing the border icon
+    expect(
+      screen.queryByTestId("init-event-bookmarkbordericon")
+    ).not.toBeInTheDocument();
   });
 });

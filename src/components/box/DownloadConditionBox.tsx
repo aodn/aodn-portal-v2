@@ -8,6 +8,7 @@ import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
 import { CloseIcon } from "../../assets/icons/download/close";
 import { portalTheme } from "../../styles";
 import { BboxSelectionIcon } from "../../assets/icons/download/bbox_selection";
+import { PolygonSelectionIcon } from "../../assets/icons/map/polygon_selection";
 import { TimeRangeIcon } from "../../assets/icons/download/time_range";
 
 interface DownloadConditionBoxProps
@@ -19,6 +20,9 @@ interface DownloadConditionBoxProps
 
 const iconMap: Partial<Record<DownloadConditionType, React.ComponentType>> = {
   [DownloadConditionType.BBOX]: BboxSelectionIcon,
+  [DownloadConditionType.POLYGON]: () => (
+    <PolygonSelectionIcon color={portalTheme.palette.primary1} />
+  ),
   [DownloadConditionType.DATE_RANGE]: TimeRangeIcon,
 };
 
@@ -50,6 +54,8 @@ const getTitle = (type: DownloadConditionType) => {
   switch (type) {
     case DownloadConditionType.BBOX:
       return "Bounding Box Selection";
+    case DownloadConditionType.POLYGON:
+      return "Polygon Selection";
     case DownloadConditionType.DATE_RANGE:
       return "Time Range";
     default:

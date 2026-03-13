@@ -42,7 +42,6 @@ interface IconContainerProps {
 
 const recipient = "info@aodn.org.au";
 const subject = "AODN Data Discovery enquiry";
-const body = "**This is a test - please ignore**";
 
 const IconContainer: FC<IconContainerProps> = ({ children, sx }) => (
   <Icon sx={{ color: "#000", display: "flex", alignItems: "center", ...sx }}>
@@ -51,7 +50,7 @@ const IconContainer: FC<IconContainerProps> = ({ children, sx }) => (
 );
 
 const handleClickContactUs = () => {
-  window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}`;
 };
 
 const currentYear = dayjs(new Date()).year();

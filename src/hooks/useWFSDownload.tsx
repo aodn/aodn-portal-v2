@@ -2,6 +2,7 @@ import { useCallback, useState, useRef } from "react";
 import { useAppDispatch } from "../components/common/store/hooks";
 import { processWFSDownload } from "../components/common/store/searchReducer";
 import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
+import { consumeSSEStream } from "../utils/SSEUtils";
 
 // Aligned with backend WFS SSE event names
 enum EventName {
@@ -33,6 +34,7 @@ interface SSEEventData {
   final?: boolean;
   filename?: string;
   error?: string;
+  mediaType?: string;
 }
 
 // Download status from frontend use
@@ -70,14 +72,6 @@ const useWFSDownload = (onCallback?: () => void) => {
   const expectedTotalChunksRef = useRef<number>(0);
 
   // Helper functions
-  const formatBytes = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
   const generateFileName = (layerName: string) => {
     const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
     const sanitizedLayerName = layerName.replace(/[^a-z0-9]/gi, "_");
@@ -122,7 +116,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         case EventName.CONNECTION_ESTABLISHED:
           setDownloadingStatus(DownloadStatus.WAITING_SERVER);
           setProgressMessage(DownloadProgressMessage.CONNECTING);
-          onCallback && onCallback();
+          onCallback?.();
           break;
 
         case EventName.WFS_REQUEST_READY:
@@ -130,14 +124,14 @@ const useWFSDownload = (onCallback?: () => void) => {
           setProgressMessage(
             data.message || DownloadProgressMessage.CONNECTING
           );
-          onCallback && onCallback();
+          onCallback?.();
           break;
 
         case EventName.KEEP_ALIVE:
           if (data.status === EventStatus.WAITING_FOR_WFS_SERVER) {
             setDownloadingStatus(DownloadStatus.WAITING_SERVER);
             setProgressMessage(DownloadProgressMessage.WAITING_SERVER);
-            onCallback && onCallback();
+            onCallback?.();
           } else if (data.status === EventStatus.STREAMING) {
             setDownloadingStatus(DownloadStatus.IN_PROGRESS);
           }
@@ -148,7 +142,7 @@ const useWFSDownload = (onCallback?: () => void) => {
           setProgressMessage(
             data.message || DownloadProgressMessage.IN_PROGRESS
           );
-          onCallback && onCallback();
+          onCallback?.();
           // Reset chunk tracking on download start
           fileChunksRef.current = [];
           receivedChunksRef.current.clear();
@@ -250,7 +244,9 @@ const useWFSDownload = (onCallback?: () => void) => {
             }
 
             // Create and download file
-            const blob = new Blob([finalBytes], { type: "text/csv" });
+            const blob = new Blob([finalBytes], {
+              type: data.mediaType || "text/csv",
+            });
             const filename = data.filename || generateFileName(layerName);
             downloadFile(blob, filename);
 
@@ -284,35 +280,6 @@ const useWFSDownload = (onCallback?: () => void) => {
       }
     },
     [onCallback]
-  );
-
-  // Process SSE event text and extract type + data
-  const processSSEEvent = useCallback(
-    async (eventText: string, layerName: string) => {
-      try {
-        const lines = eventText.split("\n");
-        let eventType = "";
-        let dataContent = "";
-
-        // Parse event type and data
-        for (const line of lines) {
-          const trimmedLine = line.trim();
-          if (trimmedLine.startsWith("event:")) {
-            eventType = trimmedLine.slice(6).trim();
-          } else if (trimmedLine.startsWith("data:")) {
-            dataContent = trimmedLine.slice(5).trim();
-          }
-        }
-
-        if (eventType && dataContent) {
-          const data: SSEEventData = JSON.parse(dataContent);
-          await processSSEData(eventType, data, layerName);
-        }
-      } catch (error) {
-        console.error("Failed to process SSE event:", error, eventText);
-      }
-    },
-    [processSSEData]
   );
 
   // Main download function using manual fetch + streaming
@@ -372,48 +339,14 @@ const useWFSDownload = (onCallback?: () => void) => {
           return;
         }
 
-        // Parse SSE stream manually
-        const reader = responseStream.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        let done = false;
         let downloadCompleted = false;
 
-        try {
-          while (!done) {
-            const result = await reader.read();
-            done = result.done;
-            if (done) break;
-
-            const value = result.value;
-            buffer += decoder.decode(value, { stream: true });
-
-            // Process complete SSE events
-            let eventStart = 0;
-            while (eventStart < buffer.length) {
-              // Look for complete event (ends with double newline)
-              const eventEnd = buffer.indexOf("\n\n", eventStart);
-              if (eventEnd === -1) {
-                // No complete event found, keep remaining buffer for next iteration
-                buffer = buffer.slice(eventStart);
-                break;
-              }
-
-              // Extract and process complete event
-              const eventText = buffer.slice(eventStart, eventEnd);
-              if (eventText.trim()) {
-                await processSSEEvent(eventText, layerName);
-                if (eventText.includes("download-complete")) {
-                  downloadCompleted = true;
-                }
-              }
-
-              eventStart = eventEnd + 2; // Skip the double newline
-            }
+        await consumeSSEStream(responseStream, async (eventType, data) => {
+          await processSSEData(eventType, data as SSEEventData, layerName);
+          if (eventType === EventName.DOWNLOAD_COMPLETE) {
+            downloadCompleted = true;
           }
-        } finally {
-          await reader.cancel("Cleaning up stream");
-        }
+        });
 
         // Only show error if we haven't successfully completed the download
         if (!downloadCompleted) {
@@ -431,7 +364,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         cleanupDownload();
       }
     },
-    [cleanupDownload, onCallback, processSSEEvent, dispatch]
+    [cleanupDownload, onCallback, processSSEData, dispatch]
   );
 
   return {
@@ -440,7 +373,6 @@ const useWFSDownload = (onCallback?: () => void) => {
     progressMessage,
     startDownload,
     cancelDownload,
-    formatBytes,
     isDownloading:
       downloadingStatus === DownloadStatus.IN_PROGRESS ||
       downloadingStatus === DownloadStatus.WAITING_SERVER,

@@ -1,5 +1,6 @@
 import {
   BBoxCondition,
+  PolygonCondition,
   DateRangeCondition,
   DownloadConditionType,
   FormatCondition,
@@ -7,7 +8,7 @@ import {
   IDownloadCondition,
 } from "../pages/detail-page/context/DownloadDefinitions";
 import { MultiPolygon } from "geojson";
-import { combineBBoxesToMultiPolygon } from "./GeoJsonUtils";
+import { combineToMultiPolygon } from "./GeoJsonUtils";
 
 export const getDateConditionFrom = (
   conditions: IDownloadCondition[]
@@ -29,15 +30,19 @@ export const getDateConditionFrom = (
 export const getMultiPolygonFrom = (
   conditions: IDownloadCondition[]
 ): MultiPolygon | string => {
-  const filteredCondition = conditions.filter(
+  const bboxConditions = conditions.filter(
     (condition) => condition.type === DownloadConditionType.BBOX
   );
-  // if no bbox condition found, return the whole world
-  if (filteredCondition.length === 0) {
+  const polygonConditions = conditions.filter(
+    (condition) => condition.type === DownloadConditionType.POLYGON
+  );
+
+  // if no spatial condition found, return the whole world
+  if (bboxConditions.length === 0 && polygonConditions.length === 0) {
     return "non-specified";
   }
 
-  const bboxes: [number, number, number, number][] = filteredCondition.map(
+  const bboxes: [number, number, number, number][] = bboxConditions.map(
     (condition) => {
       const bbox = (condition as BBoxCondition).bbox;
       if (bbox.length !== 4) {
@@ -47,7 +52,11 @@ export const getMultiPolygonFrom = (
     }
   );
 
-  return combineBBoxesToMultiPolygon(bboxes);
+  const polygonCoords: [number, number][][] = polygonConditions.map(
+    (condition) => (condition as PolygonCondition).coordinates
+  );
+
+  return combineToMultiPolygon(bboxes, polygonCoords);
 };
 
 export const getFormatFrom = (conditions: IDownloadCondition[]): string => {

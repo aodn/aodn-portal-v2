@@ -71,6 +71,10 @@ const checkCount = ({
         count++;
       }
 
+      if (filterObj.datasetStatus) {
+        count++;
+      }
+
       return count;
 
     case SearchbarButtonNames.Location:

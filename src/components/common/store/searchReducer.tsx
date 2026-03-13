@@ -12,6 +12,7 @@ import {
   TemporalAfterOrBefore,
   TemporalDuring,
   UpdateFrequency,
+  Status,
 } from "../cqlFilters";
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
@@ -27,14 +28,16 @@ import {
 } from "../../../pages/detail-page/context/DownloadDefinitions";
 import {
   getDateConditionFrom,
+  getFormatFrom,
   getMultiPolygonFrom,
 } from "../../../utils/DownloadConditionUtils";
 import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
 import {
   MapFeatureRequest,
   MapFeatureResponse,
-  MapFieldResponse,
+  GeoserverFieldsResponse,
   MapLayerResponse,
+  DownloadLayersResponse,
 } from "./GeoserverDefinitions";
 import dayjs from "dayjs";
 import { dateDefault } from "../constants";
@@ -45,6 +48,11 @@ export enum DatasetFrequency {
   REALTIME = "real-time",
   DELAYED = "delayed",
   OTHER = "other",
+}
+
+export enum DatasetStatus {
+  ONGOING = "onGoing",
+  COMPLETED = "completed",
 }
 
 export type SuggesterParameters = {
@@ -89,6 +97,8 @@ const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
 const TIMEOUT = 60000;
 const WFS_DOWNLOAD_TIMEOUT =
   Number(import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT) || 1200000; // Default 20 minutes timeout for WFS downloads
+const WFS_ESTIMATE_TIMEOUT =
+  Number(import.meta.env.VITE_WFS_ESTIMATE_TIMEOUT) || 300000; // Default 5 minutes timeout for WFS size estimation
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
   return new OGCCollections(
@@ -157,7 +167,7 @@ const searchResult = async (
       param.properties !== undefined
         ? param.properties
         : // Including the keyword "bbox" to ensure spatial extents is returned
-          "id,title,description,status,scope,links,assets_summary,bbox",
+          "id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox",
   };
 
   if (param.text !== undefined && param.text.length !== 0) {
@@ -328,11 +338,11 @@ const processDatasetDownload = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >(
   "download/downloadDataset",
-  async (reequest: DatasetDownloadRequest, thunkAPI: any) => {
+  async (request: DatasetDownloadRequest, thunkAPI: any) => {
     try {
       const response = await ogcAxiosWithRetry.post(
         "/ogc/processes/download/execution",
-        reequest
+        request
       );
       return response.data;
     } catch (error) {
@@ -352,6 +362,7 @@ const processWFSDownload = createAsyncThunk<
       // Extract download conditions
       const dateRange = getDateConditionFrom(request.downloadConditions);
       const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+      const format = getFormatFrom(request.downloadConditions);
 
       const requestBody = {
         inputs: {
@@ -360,6 +371,7 @@ const processWFSDownload = createAsyncThunk<
           end_date: dateRange.end,
           multi_polygon: multiPolygon,
           layer_name: request.layerName,
+          output_format: format,
         },
         outputs: {},
         subscriber: {
@@ -381,6 +393,50 @@ const processWFSDownload = createAsyncThunk<
             "Cache-Control": "no-cache",
           },
           timeout: WFS_DOWNLOAD_TIMEOUT,
+          signal: thunkAPI.signal,
+        }
+      );
+    } catch (error) {
+      errorHandling(thunkAPI);
+    }
+  }
+);
+
+const processWFSEstimateSize = createAsyncThunk<
+  any,
+  WFSDownloadRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "download/estimateWFSSize",
+  async (request: WFSDownloadRequest, thunkAPI: any) => {
+    try {
+      const dateRange = getDateConditionFrom(request.downloadConditions);
+      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+      const format = getFormatFrom(request.downloadConditions);
+
+      const requestBody = {
+        inputs: {
+          uuid: request.uuid,
+          layer_name: request.layerName,
+          start_date: dateRange.start,
+          end_date: dateRange.end,
+          output_format: format,
+          multi_polygon: multiPolygon,
+        },
+      };
+
+      return ogcAxiosWithRetry.post(
+        "/ogc/processes/estimateWfsDownload/execution",
+        requestBody,
+        {
+          adapter: "fetch",
+          responseType: "stream",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+            "Cache-Control": "no-cache",
+          },
+          timeout: WFS_ESTIMATE_TIMEOUT,
           signal: thunkAPI.signal,
         }
       );
@@ -443,7 +499,7 @@ const fetchGeoServerMapFeature = createAsyncThunk<
 );
 
 const fetchGeoServerMapFields = createAsyncThunk<
-  Array<MapFieldResponse>,
+  Array<GeoserverFieldsResponse>,
   MapFeatureRequest,
   { rejectValue: ErrorResponse }
 >(
@@ -451,7 +507,24 @@ const fetchGeoServerMapFields = createAsyncThunk<
   (request: MapFeatureRequest, thunkApi: any) => {
     return ogcAxiosWithRetry
       .get<MapFeatureResponse>(
-        `/ogc/collections/${request.uuid}/items/wms_downloadable_fields`,
+        `/ogc/collections/${request.uuid}/items/wms_fields`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
+
+const fetchGeoServerFieldValues = createAsyncThunk<
+  Record<string, Array<object>>,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "geoserver/fetchGeoServerFieldValues",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return ogcAxiosWithRetry
+      .get<MapFeatureResponse>(
+        `/ogc/collections/${request.uuid}/items/wfs_field_value`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)
@@ -470,6 +543,23 @@ const fetchGeoServerMapLayers = createAsyncThunk<
     return ogcAxiosWithRetry
       .get<MapLayerResponse>(
         `/ogc/collections/${request.uuid}/items/wms_layers`,
+        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi));
+  }
+);
+
+const fetchGeoServerDownloadLayers = createAsyncThunk<
+  Array<DownloadLayersResponse>,
+  MapFeatureRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "geoserver/fetchGeoServerDownloadLayers",
+  (request: MapFeatureRequest, thunkApi: any) => {
+    return ogcAxiosWithRetry
+      .get<DownloadLayersResponse>(
+        `/ogc/collections/${request.uuid}/items/wfs_layers`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
       .then((response) => response.data)
@@ -570,6 +660,11 @@ const createSearchParamFrom = (
     p.filter = appendFilter(p.filter, f(i.updateFreq));
   }
 
+  if (i.datasetStatus) {
+    const f = cqlDefaultFilters.get("STATUS") as Status;
+    p.filter = appendFilter(p.filter, f(i.datasetStatus));
+  }
+
   if (
     i.dateTimeFilterRange &&
     (i.dateTimeFilterRange.start || i.dateTimeFilterRange.end)
@@ -638,9 +733,12 @@ export {
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
+  fetchGeoServerDownloadLayers,
+  fetchGeoServerFieldValues,
   fetchSystemHealthNoStore,
   processDatasetDownload,
   processWFSDownload,
+  processWFSEstimateSize,
   jsonToOGCCollections,
   ogcAxiosWithRetry,
 };

@@ -74,3 +74,22 @@ export const removeDuplicatesAndEmpty = (items: string[]): string[] => {
       return true;
     });
 };
+
+/**
+ * Formats a number of bytes into a human-readable string with appropriate units.
+ *
+ * @param bytes The number of bytes to format
+ * @returns A formatted string representing the size in Bytes, KB, MB, or GB
+ *
+ * @example
+ * formatBytes(1024); // "1 KB"
+ * formatBytes(1048576); // "1 MB"
+ * formatBytes(1073741824); // "1 GB"
+ */
+export const formatBytes = (bytes: number): string => {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+};

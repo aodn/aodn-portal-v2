@@ -4,7 +4,8 @@
     {
       "properties": {
         "status": "",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "1fba3a57-35f4-461b-8a0e-551af229714e",
       "title": "Integrated Marine Observing System (IMOS) - Location of assets",
@@ -242,7 +243,8 @@
     {
       "properties": {
         "status": "completed",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "0015db7e-e684-7548-e053-08114f8cd4ad",
       "title": "IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility",
@@ -307,7 +309,8 @@
     {
       "properties": {
         "status": "",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "c78801d0-bffe-11dc-a463-00188b4c0af8",
       "title": "Integrated Marine Observing System (IMOS)",
@@ -364,7 +367,8 @@
     {
       "properties": {
         "status": "onGoing",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "2807f3aa-4db0-4924-b64b-354ae8c10b58",
       "title": "Wave buoys Observations - Australia - delayed (National Wave Archive)",
@@ -506,7 +510,8 @@
     {
       "properties": {
         "status": "completed",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "72dbe843-2fb1-4b2e-8b7e-4661d857affb",
       "title": "IMOS - ANMN National Reference Stations - Maria and North Stradbroke Islands - Near real-time wave height",
@@ -678,7 +683,8 @@
     {
       "properties": {
         "status": "onGoing",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "bc14672f-c007-408e-972b-684d8415dae8",
       "title": "IMOS - Zooplankton Abundance and Biomass (reference stations)",
@@ -898,7 +904,8 @@
     {
       "properties": {
         "status": "onGoing",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "4d3d4aca-472e-4616-88a5-df0f5ab401ba",
       "title": "IMOS - ANMN Acidification Moorings (AM) Sub-Facility - Automatically quality-controlled near real-time data",
@@ -1010,7 +1017,8 @@
     {
       "properties": {
         "status": "onGoing",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "b442c3e8-3d30-48ad-b144-680afd848167",
       "title": "IMOS - Combined Biogeochemical parameters (reference stations)",
@@ -1206,7 +1214,8 @@
     {
       "properties": {
         "status": "onGoing",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "d3feff71-ebe1-4b66-91c6-149beceef205",
       "title": "IMOS - ANMN National Reference Stations - Combined long-term hydrological data product (1944-2014)",
@@ -1372,7 +1381,8 @@
     {
       "properties": {
         "status": "onGoing",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "279a50e3-21a5-4590-85a0-71f963efab82",
       "title": "IMOS - Moorings - Gridded time-series product",
@@ -1526,7 +1536,8 @@
     {
       "properties": {
         "status": "onGoing",
-        "scope": {}
+        "scope": {},
+        "ai:update_frequency": ""
       },
       "id": "7b901002-b1dc-46c3-89f2-b4951cedca48",
       "title": "IMOS - Australian National Mooring Network (ANMN) - CTD Profiles",

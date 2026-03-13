@@ -6,28 +6,31 @@ import {
   ProjectionSpecification,
   StyleSpecification,
 } from "mapbox-gl";
-import MapContext from "./MapContext";
+import MapContext, { ProgressType } from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import lodash from "lodash";
 import { TestHelper } from "../../common/test/helper";
 import { MapDefaultConfig, MapEventEnum } from "./constants";
-import { CircularProgress, Paper } from "@mui/material";
-import { padding } from "../../../styles/constants";
+import { CircularProgress, LinearProgress, Paper } from "@mui/material";
+import { portalTheme } from "../../../styles";
+import { InfoStatusType } from "../../info/InfoDefinition";
+import InfoCard from "../../info/InfoCard";
 
 export interface MapBasicType {
+  animate?: boolean;
+  announcement?: string;
+  bbox?: LngLatBounds;
   centerLongitude?: number;
   centerLatitude?: number;
-  bbox?: LngLatBounds;
-  zoom?: number;
+  progress?: ProgressType | undefined;
   minZoom?: number;
   maxZoom?: number;
-  panelId: string;
-  animate?: boolean;
-  projection?: ProjectionSpecification | string;
-  announcement?: string;
   onZoomEvent?: (event: MapEvent | undefined) => void;
   onMoveEvent?: (event: MapEvent | undefined) => void;
+  panelId: string;
+  projection?: ProjectionSpecification | string;
+  zoom?: number;
 }
 
 interface MapProps extends MapBasicType {}
@@ -69,22 +72,53 @@ const defaultBbox = new LngLatBounds([
   NORTH_LAT,
 ]);
 
+const progressBar = (loading: ProgressType | undefined) => {
+  switch (loading) {
+    case ProgressType.CIRCLE:
+      return (
+        <Paper
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "absolute",
+            backgroundColor: "black",
+            opacity: 0.15,
+            height: "100%",
+            width: "100%",
+            zIndex: 500,
+          }}
+        >
+          <CircularProgress
+            sx={{ color: "#4ecdc4", opacity: 1 }}
+            thickness={6}
+          />
+        </Paper>
+      );
+    case ProgressType.LINEAR:
+      return <LinearProgress sx={{ color: "#4ecdc4", height: 8 }} />;
+    default:
+      return <></>;
+  }
+};
+
 const ReactMap = memo(
   ({
-    panelId,
-    bbox = defaultBbox,
-    zoom = MapDefaultConfig.ZOOM,
-    minZoom = MapDefaultConfig.MIN_ZOOM,
-    maxZoom = MapDefaultConfig.MAX_ZOOM,
-    projection = MapDefaultConfig.PROJECTION,
     animate = false,
     announcement = undefined,
+    bbox = defaultBbox,
+    children,
+    progress = undefined,
+    minZoom = MapDefaultConfig.MIN_ZOOM,
+    maxZoom = MapDefaultConfig.MAX_ZOOM,
+    panelId,
+    projection = MapDefaultConfig.PROJECTION,
     onZoomEvent,
     onMoveEvent,
-    children,
+    zoom = MapDefaultConfig.ZOOM,
   }: React.PropsWithChildren<MapProps>) => {
     const [map, setMap] = useState<Map | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<ProgressType | undefined>(progress);
     const containerRef = useRef<HTMLElement | null>(null);
 
     // Debouce to make the map transit smoother
@@ -253,6 +287,8 @@ const ReactMap = memo(
       });
     }, [bbox, zoom, map, debounceOnZoomEvent, debounceOnMoveEvent, animate]);
 
+    useEffect(() => setLoading(progress), [progress]);
+
     // Only render if map is initialized and container is still connected
     if (!map || !containerRef.current?.isConnected) {
       return null;
@@ -260,26 +296,7 @@ const ReactMap = memo(
 
     return (
       <MapContext.Provider value={{ map: map, setLoading: setLoading }}>
-        {loading && (
-          <Paper
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "absolute",
-              backgroundColor: "black",
-              opacity: 0.15,
-              height: "100%",
-              width: "100%",
-              zIndex: 500,
-            }}
-          >
-            <CircularProgress
-              sx={{ color: "#4ecdc4", opacity: 1 }}
-              thickness={6}
-            />
-          </Paper>
-        )}
+        {progressBar(loading)}
         <Paper
           data-testid="announcement-panel"
           sx={{
@@ -296,37 +313,25 @@ const ReactMap = memo(
             visibility: announcement ? "visible" : "hidden",
           }}
         >
-          <Paper
-            sx={{
-              padding: padding.medium,
-              backgroundColor: "rgba(255, 255, 255, 0.70)",
-              border: "1px solid #8C8C8C",
-              borderRadius: "6px",
-              backdropFilter: "blur(10px)",
-              flexShrink: 0,
-              width: {
-                xs: "280px",
-                sm: "350px",
-                md: "480px",
-              },
-              height: {
-                xs: "56px",
-                sm: "60px",
-                md: "64px",
-              },
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#090C02",
-              textAlign: "center",
-              fontSize: "16px",
-              fontStyle: "normal",
-              fontWeight: 500,
-              lineHeight: "14px",
+          <InfoCard
+            infoContent={{
+              body: announcement?.replace(/^model:/, "") || "",
             }}
-          >
-            {announcement?.replace(/^model:/, "")}
-          </Paper>
+            status={InfoStatusType.WARNING}
+            sx={{
+              boxShadow: "unset",
+              width: "480px",
+              height: "56px",
+              bgcolor: portalTheme.palette.primary6,
+              borderRadius: "6px",
+            }}
+            contentSx={{
+              padding: 0,
+              px: 2,
+              textAlign: "center",
+              ...portalTheme.typography.title2Regular,
+            }}
+          />
         </Paper>
         <TestHelper id={panelId} getMap={() => map} />
         {children}

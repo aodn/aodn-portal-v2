@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Callable, Tuple
 from urllib.parse import unquote_plus
 
@@ -175,3 +176,26 @@ class BasePage:
             pytest.fail(
                 'API URL not found within the timeout, search did not trigger successfully.'
             )
+
+    def download_file(
+        self,
+        action: Callable[[], None],
+        tmp_directory_path: Path,
+    ) -> Path:
+        """
+        Perform an action that triggers a file download and save the downloaded file to a temporary location.
+
+        Args:
+            action: A callable function that performs the download action
+            tmp_directory_path (Path): The temporary local file path where the file will be downloaded.
+
+        Returns:
+            Path: The path to the downloaded file.
+        """
+        with self.page.expect_download() as download_info:
+            action()
+        download = download_info.value
+
+        download_path = tmp_directory_path / download.suggested_filename
+        download.save_as(download_path)
+        return download_path

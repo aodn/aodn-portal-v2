@@ -93,18 +93,18 @@ class ApiRouter:
         self.route(Routes.COLLECTION_ALL, handler_function)
 
     def route_collection_detail(
-        self, detail_handler: Callable, detail_item_handler: Callable
+        self, detail_handler: Callable, detail_summary_handler: Callable
     ) -> None:
         self.route(Routes.COLLECTION_DETAIL, detail_handler)
-        self.route(Routes.COLLECTION_DETAIL_ITEM, detail_item_handler)
+        self.route(Routes.COLLECTION_DETAIL_SUMMARY, detail_summary_handler)
 
     def unroute_collection_detail(
         self,
         detail_handler: Optional[Callable] = None,
-        detail_item_handler: Optional[Callable] = None,
+        detail_summary_handler: Optional[Callable] = None,
     ) -> None:
         self.unroute(Routes.COLLECTION_DETAIL, detail_handler)
-        self.unroute(Routes.COLLECTION_DETAIL_ITEM, detail_item_handler)
+        self.unroute(Routes.COLLECTION_DETAIL_SUMMARY, detail_summary_handler)
 
     def route_wms_map_tile(self, handler_function: Callable) -> None:
         self.route(Routes.WMS_MAP_TILE, handler_function)
@@ -115,17 +115,57 @@ class ApiRouter:
         self.unroute(Routes.WMS_MAP_TILE, handler_function)
 
     def route_wms_layers(self, handler_function: Callable) -> None:
-        self.route(Routes.WMS_MAP_LAYERS, handler_function)
+        self.route(Routes.WMS_LAYERS, handler_function)
 
     def unroute_wms_layers(
         self, handler_function: Optional[Callable] = None
     ) -> None:
-        self.unroute(Routes.WMS_MAP_LAYERS, handler_function)
+        self.unroute(Routes.WMS_LAYERS, handler_function)
 
-    def route_wms_downloadable_fields(self, handler_function: Callable) -> None:
-        self.route(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)
+    def route_wms_fields(self, handler_function: Callable) -> None:
+        self.route(Routes.WMS_FIELDS, handler_function)
 
-    def unroute_wms_downloadable_fields(
+    def unroute_wms_fields(
         self, handler_function: Optional[Callable] = None
     ) -> None:
-        self.unroute(Routes.WMS_DOWNLOADABLE_FIELDS, handler_function)
+        self.unroute(Routes.WMS_FIELDS, handler_function)
+
+    def route_wms_map_feature(self, handler_function: Callable) -> None:
+        self.route(Routes.WMS_MAP_FEATURE, handler_function)
+
+    def unroute_wms_map_feature(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.WMS_MAP_FEATURE, handler_function)
+
+    def route_wfs_layers(self, handler_function: Callable) -> None:
+        self.route(Routes.WFS_LAYERS, handler_function)
+
+    def unroute_wfs_layers(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.WFS_LAYERS, handler_function)
+
+    def route_wfs_field_value(self, handler_function: Callable) -> None:
+        self.route(Routes.WFS_FIELD_VALUE, handler_function)
+
+    def unroute_wfs_field_value(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.WFS_FIELD_VALUE, handler_function)
+
+    def route_download_dialog(self, handler_function: Callable) -> None:
+        self.route(Routes.DOWNLOAD_DIALOG, handler_function)
+
+    def unroute_download_dialog(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.DOWNLOAD_DIALOG, handler_function)
+
+    def route_download_wfs(self, handler_function: Callable) -> None:
+        self.route(Routes.DOWNLOAD_WFS, handler_function)
+
+    def unroute_download_wfs(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.DOWNLOAD_WFS, handler_function)

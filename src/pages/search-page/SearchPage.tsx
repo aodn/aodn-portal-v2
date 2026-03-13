@@ -26,14 +26,14 @@ import {
   updateZoom,
 } from "../../components/common/store/componentParamReducer";
 import {
-  on,
   off,
+  on,
   setExpandedItem,
   setTemporaryItem,
 } from "../../components/common/store/bookmarkListReducer";
 import Layout from "../../components/layout/layout";
-import ResultSection from "./subpages/ResultSection";
-import MapSection from "./subpages/MapSection";
+import ResultSection from "./sections/ResultSection";
+import MapSection from "./sections/MapSection";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
@@ -50,11 +50,11 @@ import {
 import {
   SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
   SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
-  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
-  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP,
-  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET,
+  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE,
+  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET,
+  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP,
 } from "./constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
@@ -64,6 +64,7 @@ import {
 } from "../../components/map/mapbox/constants";
 import _ from "lodash";
 import useFetchData from "../../hooks/useFetchData";
+import { ProgressType } from "../../components/map/mapbox/MapContext";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -74,7 +75,7 @@ const SearchPage = () => {
   const { fetchRecord } = useFetchData();
   const layout = useAppSelector((state) => state.paramReducer.layout);
   const currentSort = useAppSelector((state) => state.paramReducer.sort);
-  // Layers contains record with uuid and bbox only
+  // Layers contain record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   // CurrentLayout is used to remember last layout after change to full map view , which is SearchResultLayoutEnum exclude the value FULL_MAP
   const [currentLayout, setCurrentLayout] = useState<
@@ -83,6 +84,9 @@ const SearchPage = () => {
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
+  const [progress, setProgress] = useState<ProgressType | undefined>(
+    ProgressType.LINEAR
+  );
   const [zoom, setZoom] = useState<number | undefined>(
     isUnderLaptop
       ? isMobile
@@ -153,6 +157,7 @@ const SearchPage = () => {
       );
       // Make sure no other code abort the search
       if (mapSearchAbortRef.current) {
+        setProgress(ProgressType.LINEAR);
         await dispatch(
           // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
           // and ordered by uuid to avoid affecting cluster calculation
@@ -192,6 +197,8 @@ const SearchPage = () => {
                 pageDefault.search + "?" + formatToUrlParam(componentParam)
               );
             }
+
+            setProgress(undefined);
             mapSearchAbortRef.current = null;
           });
       }
@@ -597,7 +604,7 @@ const SearchPage = () => {
             onMapZoomOrMove={onMapZoomOrMove}
             onToggleClicked={onToggleDisplay}
             onClickMapPoint={onClickMapPoint}
-            isLoading={false}
+            progress={progress}
             onDeselectDataset={onDeselectDataset}
           />
         </Box>

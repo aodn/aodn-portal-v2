@@ -68,3 +68,48 @@ export const combineBBoxesToMultiPolygon = (
     coordinates: polygons.map((polygon) => polygon.coordinates),
   };
 };
+
+export const combineToMultiPolygon = (
+  bboxes: [number, number, number, number][],
+  polygonCoords: [number, number][][]
+): MultiPolygon => {
+  const bboxPolygons = bboxes.map(bboxToPolygon);
+
+  const freeformPolygons: Polygon[] = polygonCoords.map((coords) => {
+    // Ensure ring is closed (first and last coordinate must match)
+    const closed =
+      coords.length > 0 &&
+      (coords[0][0] !== coords[coords.length - 1][0] ||
+        coords[0][1] !== coords[coords.length - 1][1])
+        ? [...coords, coords[0]]
+        : coords;
+    return {
+      type: "Polygon",
+      coordinates: [closed],
+    };
+  });
+
+  const allPolygons = [...bboxPolygons, ...freeformPolygons];
+  return {
+    type: "MultiPolygon",
+    coordinates: allPolygons.map((polygon) => polygon.coordinates),
+  };
+};
+
+export const layernameRoughlyMatch = (text1: string, text2: string) => {
+  if (text1 == null || text2 == null) {
+    return false;
+  }
+
+  let normalized1 = text1.includes(":")
+    ? text1.substring(text1.indexOf(":") + 1)
+    : text1;
+  let normalized2 = text2.includes(":")
+    ? text2.substring(text2.indexOf(":") + 1)
+    : text2;
+
+  normalized1 = normalized1.split("/")[0];
+  normalized2 = normalized2.split("/")[0];
+
+  return normalized1 === normalized2;
+};

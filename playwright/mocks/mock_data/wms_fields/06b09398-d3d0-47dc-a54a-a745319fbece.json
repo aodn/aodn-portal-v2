@@ -1,0 +1,97 @@
+[
+  {
+    "typename": "aatams_sattag_dm_profile_map",
+    "fields": [
+      {
+        "label": "profile_id",
+        "name": "profile_id",
+        "type": "long"
+      },
+      {
+        "label": "file_id",
+        "name": "file_id",
+        "type": "long"
+      },
+      {
+        "label": "sattag_program",
+        "name": "sattag_program",
+        "type": "string"
+      },
+      {
+        "label": "device_id",
+        "name": "device_id",
+        "type": "string"
+      },
+      {
+        "label": "device_wmo_ref",
+        "name": "device_wmo_ref",
+        "type": "string"
+      },
+      {
+        "label": "tag_type",
+        "name": "tag_type",
+        "type": "string"
+      },
+      {
+        "label": "common_name",
+        "name": "common_name",
+        "type": "string"
+      },
+      {
+        "label": "release_site",
+        "name": "release_site",
+        "type": "string"
+      },
+      {
+        "label": "state_country",
+        "name": "state_country",
+        "type": "string"
+      },
+      {
+        "label": "age_class",
+        "name": "age_class",
+        "type": "string"
+      },
+      {
+        "label": "sex",
+        "name": "sex",
+        "type": "string"
+      },
+      {
+        "label": "timestamp",
+        "name": "timestamp",
+        "type": "dateTime"
+      },
+      {
+        "label": "min_pressure",
+        "name": "min_pressure",
+        "type": "float"
+      },
+      {
+        "label": "max_pressure",
+        "name": "max_pressure",
+        "type": "float"
+      },
+      {
+        "label": "nb_measurements",
+        "name": "nb_measurements",
+        "type": "long"
+      },
+      {
+        "label": "geom",
+        "name": "geom",
+        "type": "GeometryPropertyType"
+      },
+      {
+        "label": "colour",
+        "name": "colour",
+        "type": "string"
+      },
+      {
+        "label": "size",
+        "name": "size",
+        "type": "double"
+      }
+    ]
+  }
+]

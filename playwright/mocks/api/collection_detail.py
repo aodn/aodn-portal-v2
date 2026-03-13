@@ -9,5 +9,10 @@ def handle_detail_api(route: Route) -> None:
     route.fulfill(json=json_data)
 
 
-def handle_detail_item_api(route: Route) -> None:
-    route.fulfill(json={})  # Response not needed in the UI tests
+def handle_detail_summary_api(route: Route) -> None:
+    try:
+        data_id = route.request.url.split('/')[-3]
+        json_data = load_json_data(f'summary/{data_id}.json')
+        route.fulfill(json=json_data)
+    except FileNotFoundError:
+        route.fulfill(json={})  # Response not needed in the UI tests

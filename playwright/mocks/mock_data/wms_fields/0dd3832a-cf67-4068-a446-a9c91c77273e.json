@@ -1,0 +1,32 @@
+[
+  {
+    "typename": "acorn_hourly_avg_corl_nonqc_timeseries_url",
+    "fields": [
+      {
+        "label": "timeseries_id",
+        "name": "timeseries_id",
+        "type": "long"
+      },
+      {
+        "label": "file_url",
+        "name": "file_url",
+        "type": "string"
+      },
+      {
+        "label": "size",
+        "name": "size",
+        "type": "double"
+      },
+      {
+        "label": "site_code",
+        "name": "site_code",
+        "type": "string"
+      },
+      {
+        "label": "time",
+        "name": "time",
+        "type": "dateTime"
+      }
+    ]
+  }
+]

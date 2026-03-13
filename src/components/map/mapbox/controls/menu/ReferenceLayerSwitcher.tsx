@@ -28,6 +28,8 @@ import {
 import { BaseMapSwitcherLayer } from "./BaseMapSwitcher";
 import { ReferenceLayerIcon } from "../../../../../assets/icons/map/ref_layer";
 import MenuTitle from "./MenuTitle";
+import { StaticLayersDef } from "../../layers/StaticLayer";
+import { MapboxWorldLayersDef } from "../../layers/MapboxWorldLayer";
 
 interface ReferenceLayerSwitcherProps extends ControlProps {
   // Static layer to be added to the switch
@@ -35,6 +37,32 @@ interface ReferenceLayerSwitcherProps extends ControlProps {
 }
 
 const MENU_ID = "reference-show-hide-menu-button";
+
+const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
+  {
+    id: StaticLayersDef.ALLEN_CORAL_ATLAS.id,
+    name: StaticLayersDef.ALLEN_CORAL_ATLAS.name,
+    label: StaticLayersDef.ALLEN_CORAL_ATLAS.label,
+    default: false,
+  },
+  {
+    id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
+    name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
+    label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
+    default: false,
+  },
+  {
+    id: StaticLayersDef.MEOW.id,
+    name: StaticLayersDef.MEOW.name,
+    label: StaticLayersDef.MEOW.label,
+    default: false,
+  },
+  {
+    id: MapboxWorldLayersDef.WORLD.id,
+    name: MapboxWorldLayersDef.WORLD.name,
+    default: false,
+  },
+];
 
 const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
   layers,
@@ -148,5 +176,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
     </>
   );
 };
+
+export { staticBaseLayerConfig };
 
 export default ReferenceLayerSwitcher;

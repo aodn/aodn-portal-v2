@@ -2,13 +2,17 @@ import React, { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
 import {
   updateHasData,
+  updateStatus,
   updateUpdateFreq,
 } from "../../common/store/componentParamReducer";
 import { useAppDispatch } from "../../common/store/hooks";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
-import { DatasetFrequency } from "../../common/store/searchReducer";
+import {
+  DatasetFrequency,
+  DatasetStatus,
+} from "../../common/store/searchReducer";
 import { IndexDataType, ItemButton } from "../FilterDefinition";
 import { portalTheme } from "../../../styles";
 
@@ -17,6 +21,7 @@ enum DataSettingsCategory {
   dataDeliveryFrequency = "dataDeliveryFrequency",
   dataIndexedType = "dataIndexedType",
   dataService = "dataService",
+  dataStatus = "dataStatus",
 }
 
 type DataSettingsFilterType = Record<DataSettingsCategory, ItemButton[]>;
@@ -74,6 +79,16 @@ const DATA_SETTINGS: DataSettingsFilterType = {
       label: "THREDDS",
     },
   ],
+  dataStatus: [
+    {
+      value: "onGoing",
+      label: "on Going",
+    },
+    {
+      value: "completed",
+      label: "Completed",
+    },
+  ],
 };
 
 interface DataSettingsFilterProps extends TabFilterType {
@@ -92,7 +107,11 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
     (category: DataSettingsCategory) =>
       (
         _: React.MouseEvent<HTMLElement>,
-        newAlignment: DatasetFrequency | Array<IndexDataType> | Array<string>
+        newAlignment:
+          | DatasetFrequency
+          | Array<IndexDataType>
+          | Array<string>
+          | DatasetStatus
       ) => {
         if (category === DataSettingsCategory.dataDeliveryFrequency) {
           const value = newAlignment as DatasetFrequency;
@@ -124,6 +143,15 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
             dataIndexedType: newAlignment as Array<IndexDataType>,
           }));
           dispatch(updateHasData(values?.includes(IndexDataType.CLOUD)));
+        }
+        if (category === DataSettingsCategory.dataStatus) {
+          const value = newAlignment as DatasetStatus | null;
+          setFilters((prevFilters) => ({
+            ...prevFilters,
+            dataStatus: value === null ? undefined : [value],
+          }));
+          dispatch(updateStatus(value === null ? undefined : value));
+          return;
         }
       },
     [dispatch, setFilters]
@@ -235,6 +263,51 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
           }}
         >
           {DATA_SETTINGS.dataIndexedType.map((item) => (
+            <StyledToggleButton
+              value={item.value}
+              key={item.value}
+              aria-label={item.label}
+            >
+              {item.label}
+            </StyledToggleButton>
+          ))}
+        </StyledToggleButtonGroup>
+      </Box>
+      <Box>
+        <Typography
+          sx={{
+            ...portalTheme.typography.title1Medium,
+            color: portalTheme.palette.text1,
+            fontWeight: 500,
+            padding: "8px 20px",
+          }}
+        >
+          Dataset Status
+        </Typography>
+        <StyledToggleButtonGroup
+          exclusive={true}
+          value={filters.dataStatus?.[0]}
+          onChange={handleChange(DataSettingsCategory.dataStatus)}
+          sx={{
+            gap: "14px 12px",
+            "& .MuiToggleButton-root": {
+              borderRadius: "6px",
+              textTransform: "capitalize",
+              ...portalTheme.typography.title2Regular,
+              color: portalTheme.palette.text1,
+              bgcolor: "#fff",
+              border: `1px solid ${portalTheme.palette.grey500}`,
+              px: "38px",
+              py: "8px",
+              "&.Mui-selected": {
+                border: "none",
+                bgcolor: portalTheme.palette.primary1,
+                color: "#fff",
+              },
+            },
+          }}
+        >
+          {DATA_SETTINGS.dataStatus.map((item) => (
             <StyledToggleButton
               value={item.value}
               key={item.value}

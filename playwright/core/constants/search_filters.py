@@ -9,7 +9,7 @@ class SearchFilterParams:
     PARAMETER_VOCABS = 'parameter_vocabs'
     PLATFORM_VOCABS = 'platform_vocabs'
     DATASET_GROUP = 'dataset_group'
-    UPDATE_FREQUENCY = 'update_frequency'
+    UPDATE_FREQUENCY = 'ai_update_frequency'
     ASSETS_SUMMARY = 'assets_summary'
 
 

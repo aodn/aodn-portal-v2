@@ -120,6 +120,7 @@ const color = {
   },
   brightBlue: {
     dark: "#51BCEB",
+    medium: "#54BCEB",
     semiTransparentDark: "rgba(82, 189, 236, 0.4)",
   },
   gray: {

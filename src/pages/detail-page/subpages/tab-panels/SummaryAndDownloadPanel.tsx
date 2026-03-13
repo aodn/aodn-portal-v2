@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
+import React, { FC, useCallback, useMemo, useState } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -9,14 +9,10 @@ import MapBox from "../../../../components/map/mapbox/Map";
 import Layers, {
   createStaticLayers,
 } from "../../../../components/map/mapbox/layers/Layers";
-import { StaticLayersDef } from "../../../../components/map/mapbox/layers/StaticLayer";
-import { MapboxWorldLayersDef } from "../../../../components/map/mapbox/layers/MapboxWorldLayer";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
-import BaseMapSwitcher, {
-  BaseMapSwitcherLayer,
-} from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
+import BaseMapSwitcher from "../../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../../components/map/mapbox/controls/menu/DateRange";
 import dayjs, { Dayjs } from "dayjs";
@@ -41,7 +37,9 @@ import {
   DatasetType,
   OGCCollection,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
-import ReferenceLayerSwitcher from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
+import ReferenceLayerSwitcher, {
+  staticBaseLayerConfig,
+} from "../../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import MenuControlGroup from "../../../../components/map/mapbox/controls/menu/MenuControlGroup";
 import GeojsonLayer from "../../../../components/map/mapbox/layers/GeojsonLayer";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
@@ -51,6 +49,7 @@ import { MapEventEnum } from "../../../../components/map/mapbox/constants";
 import { DateSliderPoint } from "../../../../components/common/slider/DateSlider";
 import { dateToValue } from "../../../../utils/DateUtils";
 import { portalTheme } from "../../../../styles";
+import { GeoserverFieldsResponse } from "../../../../components/common/store/GeoserverDefinitions";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -58,26 +57,6 @@ interface SummaryAndDownloadPanelProps {
   mapFocusArea?: LngLatBounds;
   onMapMoveEnd?: (evt: MapEvent) => void;
 }
-
-const staticBaseLayerConfig: Array<BaseMapSwitcherLayer> = [
-  {
-    id: StaticLayersDef.AUSTRALIA_MARINE_PARKS.id,
-    name: StaticLayersDef.AUSTRALIA_MARINE_PARKS.name,
-    label: StaticLayersDef.AUSTRALIA_MARINE_PARKS.label,
-    default: false,
-  },
-  {
-    id: StaticLayersDef.MEOW.id,
-    name: StaticLayersDef.MEOW.name,
-    label: StaticLayersDef.MEOW.label,
-    default: false,
-  },
-  {
-    id: MapboxWorldLayersDef.WORLD.id,
-    name: MapboxWorldLayersDef.WORLD.name,
-    default: false,
-  },
-];
 
 const getMinMaxDateStamps = (
   featureCollection?: FeatureCollection<Point>
@@ -190,7 +169,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     selectedWmsLayer,
     setSelectedWmsLayer,
     downloadService,
-    setDownloadService,
     selectedCoKey,
     setSelectedCoKey,
   } = useDetailPageContext();
@@ -201,14 +179,15 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   >([]);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
+  const [_, setWMSFields] = useState<GeoserverFieldsResponse[]>([]);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
+  const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
     Map<string, Array<number>> | undefined
   >(undefined);
   const [datePointValue, setDatePointValue] = useState<number>(
     dateToValue(dayjs(dateDefault.min))
   );
-  const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const { isUnderLaptop } = useBreakpoint();
 
   const [
@@ -372,23 +351,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     setIsWMSAvailable(isWMSAvailable);
   }, []);
 
-  const onWFSAvailabilityChange = useCallback(
-    (isWFSAvailable: boolean) => {
-      // Strong preference on cloud optimized data, if collection have it
-      // then always use it regardless of what WFS told us.
-      setDownloadService((type) => {
-        if (type !== DownloadServiceType.CloudOptimised) {
-          return isWFSAvailable
-            ? DownloadServiceType.WFS
-            : DownloadServiceType.Unavailable;
-        } else {
-          return type;
-        }
-      });
-    },
-    [setDownloadService]
-  );
-
   const handleBaseMapSwitch = useCallback(
     (target: EventTarget & HTMLInputElement) =>
       setStaticLayer((values) => {
@@ -406,19 +368,6 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     (wmsLayerName: string) => setSelectedWmsLayer(wmsLayerName),
     [setSelectedWmsLayer]
   );
-
-  useEffect(() => {
-    // Set the type of download based on simple  in collection, the value
-    // may change by callback if more info available
-    const wfsLinks = collection?.getWFSLinks() || [];
-    if (hasSummaryFeature) {
-      setDownloadService(DownloadServiceType.CloudOptimised);
-    } else if (wfsLinks.length > 0) {
-      setDownloadService(DownloadServiceType.WFS);
-    } else {
-      setDownloadService(DownloadServiceType.Unavailable);
-    }
-  }, [collection, hasSummaryFeature, setDownloadService]);
 
   return (
     collection && (
@@ -461,7 +410,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                 panelId={mapContainerId}
                 projection={"mercator"} // Hexbin support this project or globe only
                 announcement={
-                  noMapPreview ? "Map Preview Not Available" : undefined
+                  noMapPreview ? "Dataset preview is not available" : undefined
                 }
                 onMoveEvent={handleMapChange}
                 onZoomEvent={handleMapChange}
@@ -559,8 +508,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                   <GeoServerLayer
                     geoServerLayerConfig={geoServerLayerConfig}
                     onWMSAvailabilityChange={onWMSAvailabilityChange}
-                    onWFSAvailabilityChange={onWFSAvailabilityChange}
                     onWmsLayerChange={onWmsLayerChange}
+                    setWmsFields={setWMSFields}
                     setTimeSliderSupport={setTimeSliderSupport}
                     setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
                     setDrawRectSupportSupport={setDrawRectSupportSupport}
