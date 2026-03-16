@@ -14,6 +14,7 @@ import {
   switcherMenuContentIconSx,
   switcherMenuContentLabelTypographySx,
 } from "./MenuControl";
+import MenuHintTooltip from "./MenuHintTooltip";
 import {
   Box,
   Typography,
@@ -92,15 +93,17 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
 
   return (
     <>
-      <IconButton
-        aria-label={ComponentId.MapLayerSwitcher.Menu}
-        id={ComponentId.MapLayerSwitcher.MenuButton}
-        ref={anchorRef}
-        onClick={handleToggle}
-        sx={switcherIconButtonSx(open)}
-      >
-        <SearchStyleIcon color={open ? "white" : undefined} />
-      </IconButton>
+      <MenuHintTooltip hint="Layer Styles" disable={open}>
+        <IconButton
+          aria-label={ComponentId.MapLayerSwitcher.Menu}
+          id={ComponentId.MapLayerSwitcher.MenuButton}
+          ref={anchorRef}
+          onClick={handleToggle}
+          sx={switcherIconButtonSx(open)}
+        >
+          <SearchStyleIcon color={open ? "white" : undefined} />
+        </IconButton>
+      </MenuHintTooltip>
       <Popper
         id={ComponentId.MapLayerSwitcher.PopperId}
         open={open}

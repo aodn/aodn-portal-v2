@@ -50,7 +50,11 @@ export const switcherIconButtonSx = (open: boolean) => ({
       height: "26px",
     },
     "&:hover": {
-      backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
+      backgroundColor: open ? fontColor.blue.dark : color.blue.medium,
+      "& svg": {
+        // The filter property only accepts functions like brightness(), grayscale(), etc, it does not accept direct color values.
+        filter: open ? "none" : "brightness(0)",
+      },
     },
     "&.Mui-focusVisible": {
       backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",

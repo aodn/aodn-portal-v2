@@ -15,6 +15,7 @@ import {
 import { ControlProps } from "./Definition";
 import { Box, IconButton } from "@mui/material";
 import { switcherIconButtonSx } from "./MenuControl";
+import MenuHintTooltip from "./MenuHintTooltip";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../common/constants";
 import { TimeRangeIcon } from "../../../../../assets/icons/map/time_range";
@@ -125,14 +126,16 @@ const DateRange: React.FC<DateRangeControlProps> = ({
 
   return (
     <>
-      <IconButton
-        data-testid={MENU_ID}
-        ref={anchorRef}
-        onClick={handleIconClick}
-        sx={switcherIconButtonSx(open)}
-      >
-        <TimeRangeIcon color={open ? "white" : undefined} />
-      </IconButton>
+      <MenuHintTooltip hint="Subset Time Range" disable={open}>
+        <IconButton
+          data-testid={MENU_ID}
+          ref={anchorRef}
+          onClick={handleIconClick}
+          sx={switcherIconButtonSx(open)}
+        >
+          <TimeRangeIcon color={open ? "white" : undefined} />
+        </IconButton>
+      </MenuHintTooltip>
 
       <MenuTooltip
         open={showTooltip}
