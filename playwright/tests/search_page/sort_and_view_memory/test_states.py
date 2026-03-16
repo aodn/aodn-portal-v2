@@ -74,6 +74,7 @@ def test_sort_and_view_states_persist_across_page(
     # Select full map view and toggle to check if the states persist
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
+    search_page.map.wait_for_map_idle()
     search_page.map_toggle_button.click()
     expect(
         search_page.get_result_sort_button(sort_type.test_id)
