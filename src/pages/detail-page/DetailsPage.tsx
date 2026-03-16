@@ -11,12 +11,9 @@ import { useCallback, useState } from "react";
 
 const DetailsPage = () => {
   const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
-
   const onSpatialCoverageLayerClick = useCallback(
-    (evt: MapMouseEvent) => {
-      if (evt.type === "click" && evt.lngLat) {
-        // Magic number 10 to move to a bound area given the lnglat
-        const bounds = evt.lngLat.toBounds(10);
+    (bounds: LngLatBounds) => {
+      if (bounds) {
         setBbox(bounds);
       }
     },

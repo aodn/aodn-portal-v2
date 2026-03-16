@@ -127,6 +127,26 @@ window.__map_functions = {
   getMapClickLngLat: function (mapId) {
     return this.getTestProps(mapId).getMapClickLngLat();
   },
+  fireClickAtLngLat: function (mapId, lng, lat) {
+    const map = this.getMap(mapId);
+    const lngLat = { lng, lat };
+    const point = map.project(lngLat);
+    map.fire("click", {
+      lngLat: lngLat,
+      point: point,
+      originalEvent: { preventDefault: () => {} },
+    });
+  },
+  getMapBounds: function (mapId) {
+    const map = this.getMap(mapId);
+    const bounds = map.getBounds();
+    return {
+      west: bounds.getWest(),
+      east: bounds.getEast(),
+      south: bounds.getSouth(),
+      north: bounds.getNorth(),
+    };
+  },
   findAndClickDataPoint: function (mapId, uuid) {
     const map = this.getMap(mapId);
     const featuresArray = map.queryRenderedFeatures();

@@ -234,6 +234,15 @@ class Map(BasePage):
         )
         return dict(click_coordinate)
 
+    def fire_click_at_lng_lat(self, lng: float, lat: float) -> None:
+        """Fire a programmatic map click at the given coordinates"""
+        execute_map_js(self.page, 'fireClickAtLngLat', self.map_id, lng, lat)
+
+    def get_map_bounds(self) -> dict:
+        """Get the current visible bounds of the map {west, east, south, north}"""
+        bounds = execute_map_js(self.page, 'getMapBounds', self.map_id)
+        return dict(bounds)
+
     def find_and_click_data_point(self, uuid: str) -> bool:
         """Find and click on a data point on the map"""
         return execute_map_js(
