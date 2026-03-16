@@ -4,7 +4,7 @@ from playwright.sync_api import Page, expect
 from core.enums.layer_type import LayerType
 from core.factories.layer import LayerFactory
 from pages.detail_page import DetailPage
-from utils.map_utils import are_coordinates_equal, are_value_equal
+from utils.map_utils import are_coordinates_equal, are_value_equal, is_bbox_contained_by_map_bounds
 
 
 @pytest.mark.parametrize(
@@ -73,30 +73,36 @@ def test_selecting_date_range_adds_download_filter(
 @pytest.mark.parametrize(
     'uuid',
     [
-        '0015db7e-e684-7548-e053-08114f8cd4ad',
+        '40e9283b-d4ed-4176-8fe6-112b8697003f',
     ],
 )
 def test_spatial_map_click_zooms_detail_map(
     desktop_page: Page, uuid: str
 ) -> None:
     """
-    Verifies that clicking within the Spatial Coverage map
-    correctly zooms the detail page map to the selected area.
+    Verifies that clicking a spatial extent polygon on the Spatial Coverage map fits the detail page map to the bounding box of the clicked polygon.
+
+    The second bbox [110.6, -24.0, 111.4, -23.317] from the mock data is targeted by clicking at its centroid. The detail map should then fit to that polygon's full bounding box, so the bbox must be fully contained within the detail map's
+    visible bounds.
     """
+    # Second bbox in the mock data's extent.spatial.bbox array: [west, south, east, north]
+    target_bbox = [110.6000000003, -23.9999999996, 111.4000000005, -23.316666667]
+    bbox_center_lng = (target_bbox[0] + target_bbox[2]) / 2
+    bbox_center_lat = (target_bbox[1] + target_bbox[3]) / 2
+
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
     detail_page.wait_for_timeout(2000)
 
-    # Click on the spatial map
-    detail_page.spatial_map.hover_map()
-    detail_page.spatial_map.click_map()
+    # Fire a programmatic click at the centroid of the target polygon
+    detail_page.spatial_map.fire_click_at_lng_lat(bbox_center_lng, bbox_center_lat)
     detail_page.wait_for_timeout(2000)
 
-    click_lng_lat = detail_page.spatial_map.get_map_click_lng_lat()
-    new_detail_map_center = detail_page.detail_map.get_map_center()
-
-    assert round(click_lng_lat['lng']) == round(new_detail_map_center['lng'])
-    assert round(click_lng_lat['lat']) == round(new_detail_map_center['lat'])
+    # The detail map should now be fitted to the clicked polygon's full bbox
+    detail_map_bounds = detail_page.detail_map.get_map_bounds()
+    assert is_bbox_contained_by_map_bounds(target_bbox, detail_map_bounds), (
+        f'Detail map bounds {detail_map_bounds} do not contain clicked bbox {target_bbox}'
+    )
 
 
 @pytest.mark.parametrize(
