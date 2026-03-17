@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
+import MenuHintTooltip from "./MenuHintTooltip";
 import {
   ControlProps,
   EVENT_MAP,
@@ -109,16 +110,18 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
 
   return (
     <>
-      <IconButton
-        aria-label="basemap-show-hide-menu"
-        id={MENU_ID}
-        data-testid={DataTestId.BaseMapSwitcher.MenuId}
-        ref={anchorRef}
-        onClick={handleToggle}
-        sx={switcherIconButtonSx(open)}
-      >
-        <BaseLayerIcon color={open ? "white" : undefined} />
-      </IconButton>
+      <MenuHintTooltip hint="Base Layers" disable={open}>
+        <IconButton
+          aria-label="basemap-show-hide-menu"
+          id={MENU_ID}
+          data-testid={DataTestId.BaseMapSwitcher.MenuId}
+          ref={anchorRef}
+          onClick={handleToggle}
+          sx={switcherIconButtonSx(open)}
+        >
+          <BaseLayerIcon color={open ? "white" : undefined} />
+        </IconButton>
+      </MenuHintTooltip>
       <Popper
         id="basemap-popper-id"
         open={open}

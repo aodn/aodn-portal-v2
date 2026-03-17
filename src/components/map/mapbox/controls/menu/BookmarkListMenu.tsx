@@ -3,6 +3,7 @@ import { Box, IconButton, Popper } from "@mui/material";
 import { ControlProps, EVENT_MENU, MenuClickedEvent } from "./Definition";
 import { borderRadius } from "../../../../../styles/constants";
 import { eventEmitter, switcherIconButtonSx } from "./MenuControl";
+import MenuHintTooltip from "./MenuHintTooltip";
 import BookmarkListAccordionGroup, {
   BookmarkListAccordionGroupBasicType,
 } from "../../../../bookmark/BookmarkListAccordionGroup";
@@ -44,15 +45,17 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
 
   return (
     <>
-      <IconButton
-        aria-label="bookmark-list-button"
-        id="bookmark-list-button"
-        ref={anchorRef}
-        onClick={() => setOpen((prev) => !prev)}
-        sx={switcherIconButtonSx(open)}
-      >
-        <BookmarkIcon color={open ? "white" : undefined} />
-      </IconButton>
+      <MenuHintTooltip hint="Bookmarks" disable={open}>
+        <IconButton
+          aria-label="bookmark-list-button"
+          id="bookmark-list-button"
+          ref={anchorRef}
+          onClick={() => setOpen((prev) => !prev)}
+          sx={switcherIconButtonSx(open)}
+        >
+          <BookmarkIcon color={open ? "white" : undefined} />
+        </IconButton>
+      </MenuHintTooltip>
       <Popper
         id="bookmark-list"
         open={open}

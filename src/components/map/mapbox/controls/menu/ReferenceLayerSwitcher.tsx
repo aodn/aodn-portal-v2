@@ -25,6 +25,7 @@ import {
   switcherMenuContentIconSx,
   switcherMenuContentLabelTypographySx,
 } from "./MenuControl";
+import MenuHintTooltip from "./MenuHintTooltip";
 import { BaseMapSwitcherLayer } from "./BaseMapSwitcher";
 import { ReferenceLayerIcon } from "../../../../../assets/icons/map/ref_layer";
 import MenuTitle from "./MenuTitle";
@@ -110,16 +111,18 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
 
   return (
     <>
-      <IconButton
-        aria-label="reference-show-hide-menu"
-        id={MENU_ID}
-        data-testid={MENU_ID}
-        ref={anchorRef}
-        onClick={handleToggle}
-        sx={switcherIconButtonSx(open)}
-      >
-        <ReferenceLayerIcon color={open ? "white" : undefined} />
-      </IconButton>
+      <MenuHintTooltip hint="Reference Layers" disable={open}>
+        <IconButton
+          aria-label="reference-show-hide-menu"
+          id={MENU_ID}
+          data-testid={MENU_ID}
+          ref={anchorRef}
+          onClick={handleToggle}
+          sx={switcherIconButtonSx(open)}
+        >
+          <ReferenceLayerIcon color={open ? "white" : undefined} />
+        </IconButton>
+      </MenuHintTooltip>
       <Popper
         id="reference-popper-id"
         open={open}
