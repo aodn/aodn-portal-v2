@@ -56,7 +56,7 @@ def test_map_reference_layers(
 @pytest.mark.parametrize(
     'hint_text',
     [
-        'Base Layer',
+        'Base Layers',
     ],
 )
 def test_map_button_hint_tooltip(desktop_page: Page, hint_text: str) -> None:
