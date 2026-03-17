@@ -124,7 +124,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
         <Box sx={switcherMenuBoxSx}>
-          <MenuTitle title="Layer Style" onClose={handleToggle} />
+          <MenuTitle title="Layer Styles" onClose={handleToggle} />
           <Divider />
           <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">
