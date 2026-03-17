@@ -110,7 +110,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
 
   return (
     <>
-      <MenuHintTooltip hint="Base Layer" disable={open}>
+      <MenuHintTooltip hint="Base Layers" disable={open}>
         <IconButton
           aria-label="basemap-show-hide-menu"
           id={MENU_ID}
