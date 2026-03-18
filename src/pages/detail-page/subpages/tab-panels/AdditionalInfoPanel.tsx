@@ -69,15 +69,23 @@ const AdditionalInfoPanel = () => {
         return;
       }
 
+      // if keyword is AI predicted, it is not considered as a keyword should shown in detail page
+      const nonAiConcepts = theme.concepts.filter(
+        (concept) => !("ai:description" in concept)
+      );
+      if (nonAiConcepts.length === 0) {
+        return;
+      }
+
       // According to current implementation, concepts belong to one theme
       // share the same title & description. The reason that making every concept
       // has the same title is to obey the STAC collection standard (theme extension).
-      const title = theme.concepts[0].title ?? "";
-      const description = theme.concepts[0].description ?? "";
+      const title = nonAiConcepts[0].title ?? "";
+      const description = nonAiConcepts[0].description ?? "";
       keywords.push({
         title: title,
         description: description,
-        content: theme.concepts
+        content: nonAiConcepts
           .filter((concept) => concept.id)
           .map((concept) => ` \u00A0 \u2022 ${concept.id}`),
       });
