@@ -43,8 +43,10 @@ export type FilterTypes =
 
 const funcIsNotNull: IsNotNull = (field: string) => `(${field} IS NOT NULL)`;
 
-const funcUpdateFrequency: UpdateFrequency = (freq: DatasetFrequency) =>
-  `ai_update_frequency='${freq}'`;
+const funcUpdateFrequency: UpdateFrequency = (freq: DatasetFrequency) => {
+  // For real-time or delayed, also include records marked as 'both'
+  return `(ai_update_frequency='${freq}' OR ai_update_frequency='${DatasetFrequency.BOTH}')`;
+};
 
 const funcStatus: Status = (stat: DatasetStatus) => `status='${stat}'`;
 

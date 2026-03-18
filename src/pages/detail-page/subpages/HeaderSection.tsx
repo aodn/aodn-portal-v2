@@ -177,12 +177,15 @@ const renderSubTitle = (
     )}
     {aiUpdateFrequency &&
       aiUpdateFrequency.toLowerCase() !== "other" &&
-      !(aiUpdateFrequency.toLowerCase() === "completed") && (
+      aiUpdateFrequency.toLowerCase() !== "completed" &&
+      // parse 'both' into ['real-time', 'delayed'], render one badge per frequency
+      (aiUpdateFrequency.toLowerCase() === "both"
+        ? ["real-time", "delayed"]
+        : [aiUpdateFrequency]
+      ).map((freq, index) => (
         <Badge
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
+          key={index}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
           badgeContent={<AIGenStarIcon color={color.brightBlue.medium} />}
           sx={{
             "& .MuiBadge-badge": {
@@ -198,7 +201,7 @@ const renderSubTitle = (
           <RoundCard
             sx={{
               bgcolor:
-                aiUpdateFrequency?.toLowerCase() === "real-time"
+                freq.toLowerCase() === "real-time"
                   ? portalTheme.palette.tag1
                   : portalTheme.palette.tag2,
             }}
@@ -208,11 +211,11 @@ const renderSubTitle = (
               variant="title1Medium"
               color={portalTheme.palette.text1}
             >
-              {capitalizeFirstLetter(aiUpdateFrequency)}
+              {capitalizeFirstLetter(freq)}
             </Typography>
           </RoundCard>
         </Badge>
-      )}
+      ))}
     {startDate && (
       <RoundCard
         sx={{
