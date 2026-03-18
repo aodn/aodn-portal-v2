@@ -17,6 +17,7 @@ class Map(BasePage):
         load_map_js_functions(page)
 
         # Page locators
+        self.progress_indicator = page.get_by_test_id('map-loading')
         self.full_screen_toggle_button = self.get_by_id(
             'map-toggle-control-button'
         )
@@ -47,6 +48,18 @@ class Map(BasePage):
         self.date_slider = page.get_by_test_id(
             'dateslider-daterange-menu-button'
         )
+
+    def wait_for_search_loading(self) -> None:
+        """
+        Waits for the search progress_indicator to appear and then disappear.
+        """
+        try:
+            self.progress_indicator.wait_for(state='visible', timeout=2000)
+        except TimeoutError:
+            # If the progress_indicator doesn't appear within the timeout,
+            # assume the search is complete and ignore the exception.
+            pass
+        self.progress_indicator.wait_for(state='hidden', timeout=30 * 1000)
 
     def hover_map(self) -> None:
         """Move the mouse cursor to the center of the map"""

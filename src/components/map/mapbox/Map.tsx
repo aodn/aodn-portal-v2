@@ -96,7 +96,12 @@ const progressBar = (loading: ProgressType | undefined) => {
         </Paper>
       );
     case ProgressType.LINEAR:
-      return <LinearProgress sx={{ color: "#4ecdc4", height: 8 }} />;
+      return (
+        <LinearProgress
+          sx={{ color: "#4ecdc4", height: 8 }}
+          data-testid="map-loading"
+        />
+      );
     default:
       return <></>;
   }
