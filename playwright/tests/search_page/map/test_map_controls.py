@@ -54,6 +54,35 @@ def test_map_reference_layers(
 
 
 @pytest.mark.parametrize(
+    'hint_text',
+    [
+        'Base Layers',
+    ],
+)
+def test_map_button_hint_tooltip(desktop_page: Page, hint_text: str) -> None:
+    """
+    Validates that hovering over a map control button shows a hint tooltip,
+    and that the tooltip is hidden when the button's menu is open.
+    """
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
+
+    hint_locator = desktop_page.get_by_text(hint_text, exact=True)
+
+    # Hover over the basemap button — hint should appear
+    search_page.map.basemap_show_hide_menu.hover()
+    expect(hint_locator).to_be_visible()
+
+    # Click to open the menu — hint should be hidden while menu is open
+    search_page.map.basemap_show_hide_menu.click()
+    expect(hint_locator).not_to_be_visible()
+
+
+@pytest.mark.parametrize(
     'data_title',
     [
         'IMOS Bio-Acoustic Ships of Opportunity (BA SOOP) Sub-Facility',

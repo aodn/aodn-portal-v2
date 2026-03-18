@@ -19,7 +19,6 @@ import {
 } from "./Definition";
 import {
   borderRadius,
-  color,
   fontColor,
   zIndex,
 } from "../../../../../styles/constants";
@@ -31,8 +30,8 @@ const eventEmitter: EventEmitter = new EventEmitter();
 
 export const switcherIconButtonSx = (open: boolean) => ({
   "&.MuiIconButton-root.MuiIconButton-root": {
-    backgroundColor: `${open ? fontColor.blue.dark : "transparent"}`,
-    color: open ? "white" : color.gray.dark,
+    backgroundColor: `${open ? portalTheme.palette.primary.main : "transparent"}`,
+    color: open ? "white" : portalTheme.palette.grey700,
     width: "38px",
     height: "38px",
     padding: "2px",
@@ -50,10 +49,18 @@ export const switcherIconButtonSx = (open: boolean) => ({
       height: "26px",
     },
     "&:hover": {
-      backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
+      backgroundColor: open
+        ? portalTheme.palette.primary.main
+        : portalTheme.palette.primary4,
+      "& svg": {
+        // The filter property only accepts functions like brightness(), grayscale(), etc, it does not accept direct color values.
+        filter: open ? "none" : "brightness(0)",
+      },
     },
     "&.Mui-focusVisible": {
-      backgroundColor: open ? fontColor.blue.dark : "rgba(0, 0, 0, 0.12)",
+      backgroundColor: open
+        ? portalTheme.palette.primary.main
+        : portalTheme.palette.grey300,
     },
   },
 });

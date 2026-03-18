@@ -23,6 +23,7 @@ import DrawRectangle from "./DrawRectangle";
 import { ControlProps } from "./Definition";
 import { BboxSelectionIcon } from "../../../../../assets/icons/map/bbox_selection";
 import { switcherIconButtonSx } from "./MenuControl";
+import MenuHintTooltip from "./MenuHintTooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { BboxTooltipIcon } from "../../../../../assets/icons/map/tooltip_bbox";
 import MenuTooltip from "./MenuTooltip";
@@ -372,18 +373,23 @@ const DrawRect: React.FC<DrawControlProps> = ({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
-      <IconButton
-        aria-label="draw-rect-menu"
-        id={MENU_ID}
-        data-testid={MENU_ID}
-        ref={anchorRef}
-        onClick={handleIconClick}
-        sx={switcherIconButtonSx(isDrawingMode && activeTool === "bbox")}
+      <MenuHintTooltip
+        hint="Subset Bounding Box Selection"
+        disable={isDrawingMode && activeTool === "bbox"}
       >
-        <BboxSelectionIcon
-          color={isDrawingMode && activeTool === "bbox" ? "white" : undefined}
-        />
-      </IconButton>
+        <IconButton
+          aria-label="draw-rect-menu"
+          id={MENU_ID}
+          data-testid={MENU_ID}
+          ref={anchorRef}
+          onClick={handleIconClick}
+          sx={switcherIconButtonSx(isDrawingMode && activeTool === "bbox")}
+        >
+          <BboxSelectionIcon
+            color={isDrawingMode && activeTool === "bbox" ? "white" : undefined}
+          />
+        </IconButton>
+      </MenuHintTooltip>
 
       <MenuTooltip
         open={showTooltip}
@@ -394,20 +400,25 @@ const DrawRect: React.FC<DrawControlProps> = ({
         onClose={handleCloseTooltip}
       />
 
-      <IconButton
-        aria-label="polygon-selection-menu"
-        id={POLYGON_MENU_ID}
-        data-testid={POLYGON_MENU_ID}
-        ref={polygonAnchorRef}
-        onClick={handlePolygonClick}
-        sx={switcherIconButtonSx(isDrawingMode && activeTool === "polygon")}
+      <MenuHintTooltip
+        hint="Subset Polygon Selection"
+        disable={isDrawingMode && activeTool === "polygon"}
       >
-        <PolygonSelectionIcon
-          color={
-            isDrawingMode && activeTool === "polygon" ? "white" : undefined
-          }
-        />
-      </IconButton>
+        <IconButton
+          aria-label="polygon-selection-menu"
+          id={POLYGON_MENU_ID}
+          data-testid={POLYGON_MENU_ID}
+          ref={polygonAnchorRef}
+          onClick={handlePolygonClick}
+          sx={switcherIconButtonSx(isDrawingMode && activeTool === "polygon")}
+        >
+          <PolygonSelectionIcon
+            color={
+              isDrawingMode && activeTool === "polygon" ? "white" : undefined
+            }
+          />
+        </IconButton>
+      </MenuHintTooltip>
 
       <MenuTooltip
         open={showPolygonTooltip}
@@ -418,24 +429,26 @@ const DrawRect: React.FC<DrawControlProps> = ({
         onClose={handleClosePolygonTooltip}
       />
 
-      <IconButton
-        aria-label="Delete"
-        id={TRASH_ID}
-        data-testid={TRASH_ID}
-        onClick={handleTrashClick}
-        disabled={!hasFeatures}
-        sx={{
-          ...switcherIconButtonSx(false),
-          opacity: hasFeatures ? 1 : 0.5,
-          cursor: hasFeatures ? "pointer" : "not-allowed",
-          "&.MuiIconButton-root": { border: "0px solid transparent" },
-          "&.Mui-disabled": {
-            border: "0px solid transparent",
-          },
-        }}
-      >
-        <DeleteIcon />
-      </IconButton>
+      <MenuHintTooltip hint="Clear Area Selection" disable={!hasFeatures}>
+        <IconButton
+          aria-label="Delete"
+          id={TRASH_ID}
+          data-testid={TRASH_ID}
+          onClick={handleTrashClick}
+          disabled={!hasFeatures}
+          sx={{
+            ...switcherIconButtonSx(false),
+            opacity: hasFeatures ? 1 : 0.5,
+            cursor: hasFeatures ? "pointer" : "not-allowed",
+            "&.MuiIconButton-root": { border: "0px solid transparent" },
+            "&.Mui-disabled": {
+              border: "0px solid transparent",
+            },
+          }}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </MenuHintTooltip>
     </Box>
   );
 };
