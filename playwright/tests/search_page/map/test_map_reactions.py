@@ -37,8 +37,7 @@ def test_map_updates_on_search_change(
     search_page = SearchPage(desktop_page)
 
     landing_page.load()
-    landing_page.search.fill_search_text(search_text)
-    landing_page.search.click_search_button()
+    landing_page.search.search_for(search_text)
     search_page.wait_for_search_to_complete()
     expect(search_page.first_result_title).to_be_visible()
     map_layers = search_page.map.get_map_layers()
@@ -48,8 +47,7 @@ def test_map_updates_on_search_change(
         handle_collections_update_centroid_api,
         handle_collections_update_all_api,
     )
-    search_page.search.fill_search_text(updated_search_text)
-    search_page.search.click_search_button()
+    search_page.search.search_for(updated_search_text)
     search_page.wait_for_timeout(2000)
     updated_map_layers = search_page.map.get_map_layers()
 

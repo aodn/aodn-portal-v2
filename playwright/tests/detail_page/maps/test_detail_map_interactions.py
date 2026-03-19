@@ -4,7 +4,11 @@ from playwright.sync_api import Page, expect
 from core.enums.layer_type import LayerType
 from core.factories.layer import LayerFactory
 from pages.detail_page import DetailPage
-from utils.map_utils import are_coordinates_equal, are_value_equal, is_bbox_contained_by_map_bounds
+from utils.map_utils import (
+    are_coordinates_equal,
+    are_value_equal,
+    is_bbox_contained_by_map_bounds,
+)
 
 
 @pytest.mark.parametrize(
@@ -86,7 +90,12 @@ def test_spatial_map_click_zooms_detail_map(
     visible bounds.
     """
     # Second bbox in the mock data's extent.spatial.bbox array: [west, south, east, north]
-    target_bbox = [110.6000000003, -23.9999999996, 111.4000000005, -23.316666667]
+    target_bbox = [
+        110.6000000003,
+        -23.9999999996,
+        111.4000000005,
+        -23.316666667,
+    ]
     bbox_center_lng = (target_bbox[0] + target_bbox[2]) / 2
     bbox_center_lat = (target_bbox[1] + target_bbox[3]) / 2
 
@@ -95,14 +104,16 @@ def test_spatial_map_click_zooms_detail_map(
     detail_page.wait_for_timeout(2000)
 
     # Fire a programmatic click at the centroid of the target polygon
-    detail_page.spatial_map.fire_click_at_lng_lat(bbox_center_lng, bbox_center_lat)
+    detail_page.spatial_map.fire_click_at_lng_lat(
+        bbox_center_lng, bbox_center_lat
+    )
     detail_page.wait_for_timeout(2000)
 
     # The detail map should now be fitted to the clicked polygon's full bbox
     detail_map_bounds = detail_page.detail_map.get_map_bounds()
-    assert is_bbox_contained_by_map_bounds(target_bbox, detail_map_bounds), (
-        f'Detail map bounds {detail_map_bounds} do not contain clicked bbox {target_bbox}'
-    )
+    assert is_bbox_contained_by_map_bounds(
+        target_bbox, detail_map_bounds
+    ), f'Detail map bounds {detail_map_bounds} do not contain clicked bbox {target_bbox}'
 
 
 @pytest.mark.parametrize(

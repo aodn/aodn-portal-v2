@@ -28,8 +28,7 @@ def test_map_card_popup_download_button_in_desktop(
     detail_page = DetailPage(desktop_page)
 
     landing_page.load()
-    landing_page.search.fill_search_text(data_id)
-    landing_page.search.click_search_button()
+    landing_page.search.search_for(data_id)
 
     search_page.map.center_map(data_lng, data_lat)
     search_page.wait_for_page_stabilization()
@@ -60,8 +59,7 @@ def test_map_card_popup_download_button_in_mobile(
     detail_page = DetailPage(mobile_page)
 
     landing_page.load()
-    landing_page.search.fill_search_text(data_id)
-    landing_page.search.click_search_button()
+    landing_page.search.search_for(data_id)
 
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()

@@ -15,6 +15,7 @@ from pages.components.search import SearchComponent
 
 class SearchPage(BasePage):
     MAP_ID = 'result-page-main-map'
+    BOOKMARKED_ARIA_LABEL = 'Remove bookmark'
 
     def __init__(self, page: Page):
         super().__init__(page)
@@ -25,7 +26,8 @@ class SearchPage(BasePage):
         # -- Page locators --
 
         self.main_map = self.get_by_id('result-page-main-map')
-        self.bookmark_list = page.get_by_test_id('bookmark-list-head')
+        self.bookmark_list = self.get_by_id('bookmark-list')
+        self.bookmark_list_head = page.get_by_test_id('bookmark-list-head')
 
         # results view
         self.show_result_count = page.get_by_test_id('show-result-count')
@@ -115,3 +117,24 @@ class SearchPage(BasePage):
         """
         self.wait_for_url_update()
         self.wait_for_timeout(1000)
+
+    def get_bookmark_icon(self, dataset_id: str, parent: Locator) -> Locator:
+        """Returns the bookmark icon element for a given dataset within the specified parent element."""
+        return parent.get_by_test_id(f'{dataset_id}-iconbutton')
+
+    def is_bookmarked(self, dataset_id: str, parent: Locator) -> bool:
+        """
+        Returns the bookmark state of a dataset by checking the presence of the bookmark icon in the given parent element.
+
+        Args:
+            dataset_id: The ID of the dataset to check
+            parent: The parent element to search within
+        """
+        bookmark_icon = self.get_bookmark_icon(dataset_id, parent)
+        bookmark_icon.wait_for(state='visible')  # ensure element is stable
+        aria_label = bookmark_icon.get_attribute('aria-label')
+        return aria_label == self.BOOKMARKED_ARIA_LABEL
+
+    def assert_bookmark_state(self, data_id: str, expected: bool) -> None:
+        assert self.is_bookmarked(data_id, self.result_card_list) is expected
+        assert self.is_bookmarked(data_id, self.bookmark_list) is expected

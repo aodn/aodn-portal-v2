@@ -25,7 +25,6 @@ def test_map_drag_updates_search_results(desktop_page: Page) -> None:
     search_page = SearchPage(desktop_page)
 
     landing_page.load()
-    landing_page.search.fill_search_text('imos')
     landing_page.search.click_search_button()
     search_page.wait_for_page_stabilization()
     initial_data = search_page.first_result_title.inner_text()

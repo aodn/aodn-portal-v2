@@ -169,3 +169,11 @@ class ApiRouter:
         self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.DOWNLOAD_WFS, handler_function)
+
+    def route_estimate_wfs_download(self, handler_function: Callable) -> None:
+        self.route(Routes.ESTIMATE_WFS_DOWNLOAD, handler_function)
+
+    def unroute_estimate_wfs_download(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.ESTIMATE_WFS_DOWNLOAD, handler_function)
