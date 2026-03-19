@@ -258,6 +258,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   sx={{
                     display: "flex",
                     flexDirection: "row",
+                    flexWrap: "wrap",
                     gap: "8px",
                     mt: 0.5,
                   }}
