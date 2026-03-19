@@ -14,7 +14,7 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import { FC, SyntheticEvent, useRef, useState } from "react";
+import { FC, Fragment, SyntheticEvent, useRef, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
@@ -31,6 +31,7 @@ interface ListResultCardProps extends ResultCardBasicType {}
 enum UpdateFrequency {
   real_time = "real-time",
   delayed = "delayed",
+  both = "both",
 }
 
 const getTagColor = (tagText: string | undefined): string => {
@@ -60,7 +61,6 @@ const renderTagChip = (text: string) => (
       height: "26px",
       alignItems: "center",
       gap: "16px",
-      mt: 0.5,
     }}
   >
     <LabelChip
@@ -100,10 +100,28 @@ const ListResultCard: FC<ListResultCardProps> = ({
   const isSelectedDataset = uuid === selectedUuid;
   const thumbnail: string = findThumbnail();
   const scope = content.getScope();
+
+  // parse update frequency which is 'both' mode, and convert to ['real-time', 'delayed'] list
+  const parseUpdateFrequencies = (
+    frequency: string | undefined
+  ): UpdateFrequency[] => {
+    if (!frequency) return [];
+    const lower = frequency.toLowerCase();
+    if (lower === UpdateFrequency.both) {
+      return [UpdateFrequency.real_time, UpdateFrequency.delayed];
+    }
+    if (
+      lower === UpdateFrequency.real_time ||
+      lower === UpdateFrequency.delayed
+    ) {
+      return [lower as UpdateFrequency];
+    }
+    return [];
+  };
+
   const aiUpdateFrequency = content.getAiUpdateFrequency();
-  const hasAiUpdateFrequency =
-    aiUpdateFrequency?.toLowerCase() === UpdateFrequency.real_time ||
-    aiUpdateFrequency?.toLowerCase() === UpdateFrequency.delayed;
+  const parsedFrequencies = parseUpdateFrequencies(aiUpdateFrequency);
+  const hasAiUpdateFrequency = parsedFrequencies.length > 0;
   const hasDocumentTag = scope?.toLowerCase() === "document";
   const shouldHideTags = isSelectedDataset || showButtons;
 
@@ -235,11 +253,23 @@ const ListResultCard: FC<ListResultCardProps> = ({
               >
                 {description}
               </Typography>
-              {!shouldHideTags && hasDocumentTag && renderTagChip("Document")}
-              {!shouldHideTags &&
-                hasAiUpdateFrequency &&
-                aiUpdateFrequency &&
-                renderTagChip(aiUpdateFrequency)}
+              {!shouldHideTags && (hasDocumentTag || hasAiUpdateFrequency) && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: "8px",
+                    mt: 0.5,
+                  }}
+                >
+                  {hasDocumentTag && renderTagChip("Document")}
+                  {hasAiUpdateFrequency &&
+                    parsedFrequencies.map((freq, index) => (
+                      <Fragment key={index}>{renderTagChip(freq)}</Fragment>
+                    ))}
+                </Box>
+              )}
             </Box>
             {thumbnail !== default_thumbnail && (
               <Box
