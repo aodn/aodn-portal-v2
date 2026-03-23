@@ -18,6 +18,7 @@ import DownloadSelect from "./DownloadSelect";
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
   { label: "CSV", value: "csv" },
+  { label: "GeoTIFF", value: "geotiff" },
 ];
 
 interface DownloadCardProps extends DownloadCondition {
@@ -114,7 +115,9 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
       return downloadFormats.filter((format) => format.value === "csv");
     }
     if (datasetType === DatasetType.ZARR) {
-      return downloadFormats.filter((format) => format.value === "netcdf");
+      return downloadFormats.filter(
+        (format) => format.value === "netcdf" || format.value === "geotiff"
+      );
     }
     return downloadFormats;
   }, [collection]);

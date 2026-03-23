@@ -26,7 +26,7 @@ export interface DatasetDownloadRequest {
     start_date: string;
     end_date: string;
     multi_polygon: MultiPolygon | string;
-    format: string;
+    output_format: string;
     data_usage?: {
       purposes: string[];
       sectors: string[];
