@@ -336,7 +336,7 @@ export const useDownloadDialog = (
           start_date: dateRange.start,
           end_date: dateRange.end,
           multi_polygon: multiPolygon,
-          format: format,
+          output_format: format,
           data_usage: dataUsage,
           collection_title: collection?.title || "",
           full_metadata_link: collection?.getMetadataUrl() || "",
