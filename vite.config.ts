@@ -63,15 +63,20 @@ export default ({ mode }) => {
       name: "inline-seo",
       transformIndexHtml(html) {
         const canonicalUrl = "https://portal-beta.aodn.org.au/";
+        const isProduction = mode === "prod";
 
         const seoTags = `
-          <!-- SEO: Canonical URL points all environments to production -->
-
-          <!-- Bing Webmaster Tools Verification -->
-          <meta name="msvalidate.01" content="02593ED7942BD40F39C6E03B5EF2265E" />
+          <!-- SEO -->
 
           <!-- Canonical URL: All environments point to production for SEO consolidation -->
           <link rel="canonical" href="${canonicalUrl}" />
+
+          ${
+            isProduction
+              ? `<!-- Bing Webmaster Tools Verification -->
+          <meta name="msvalidate.01" content="02593ED7942BD40F39C6E03B5EF2265E" />`
+              : ""
+          }
 
           <!-- End SEO -->
         `;
