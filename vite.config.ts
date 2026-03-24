@@ -66,20 +66,27 @@ export default ({ mode }) => {
         const isProduction = mode === "prod";
 
         const seoTags = `
-          <!-- SEO -->
+        <!-- SEO -->
 
-          <!-- Canonical URL: All environments point to production for SEO consolidation -->
-          <link rel="canonical" href="${canonicalUrl}" />
+        <!-- Canonical URL: All environments point to production for SEO consolidation -->
+        <link rel="canonical" href="${canonicalUrl}" />
 
-          ${
-            isProduction
-              ? `<!-- Bing Webmaster Tools Verification -->
-          <meta name="msvalidate.01" content="02593ED7942BD40F39C6E03B5EF2265E" />`
-              : ""
-          }
+        ${
+          !isProduction
+            ? `<!-- Non-prod: block indexing -->
+        <meta name="robots" content="noindex, nofollow" />`
+            : ""
+        }
 
-          <!-- End SEO -->
-        `;
+        ${
+          isProduction
+            ? `<!-- Bing Webmaster Tools Verification -->
+        <meta name="msvalidate.01" content="02593ED7942BD40F39C6E03B5EF2265E" />`
+            : ""
+        }
+
+        <!-- End SEO -->
+      `;
 
         return html.replace("<!-- seo-tags -->", seoTags);
       },
@@ -108,8 +115,8 @@ export default ({ mode }) => {
       closeBundle() {
         const file = mode === "prod" ? "robots.prod.txt" : "robots.nonprod.txt";
         fs.copyFileSync(
-          path.resolve(__dirname, "dist", file),
-          path.resolve(__dirname, "dist/robots.txt")
+          path.resolve(__dirname, "public", file), // source from public
+          path.resolve(__dirname, "dist/robots.txt") // output to dist
         );
       },
     };
