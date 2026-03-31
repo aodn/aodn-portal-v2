@@ -141,6 +141,16 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
       id={map?.getContainer().id || ""}
       getAUMarineParksLayer={() => layerId}
     />
+  ) : id === StaticLayersDef.ALLEN_CORAL_ATLAS.id ? (
+    <TestHelper
+      id={map?.getContainer().id || ""}
+      getAllenCoralAtlasLayer={() => layerId}
+    />
+  ) : id === StaticLayersDef.MEOW.id ? (
+    <TestHelper
+      id={map?.getContainer().id || ""}
+      getMarineEcoregionLayer={() => layerId}
+    />
   ) : (
     <React.Fragment />
   );

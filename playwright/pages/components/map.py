@@ -175,9 +175,17 @@ class Map(BasePage):
         layer_id = execute_map_js(self.page, layer_function_name, self.map_id)
         return str(layer_id)
 
+    def get_Allen_Coral_Atlas_Layer_id(self) -> str:
+        """Get the Allen Coral Atlas layer id"""
+        return self.get_layer_id_from_test_props('getAllenCoralAtlasLayer')
+
     def get_AU_Marine_Parks_Layer_id(self) -> str:
         """Get the Australian Marine Parks layer id"""
         return self.get_layer_id_from_test_props('getAUMarineParksLayer')
+
+    def get_Marine_Ecoregion_Layer_id(self) -> str:
+        """Get the Marine Ecoregion layer id"""
+        return self.get_layer_id_from_test_props('getMarineEcoregionLayer')
 
     def get_World_Boundaries_Layer_id(self) -> str:
         """Get the World Boundaries layer id"""

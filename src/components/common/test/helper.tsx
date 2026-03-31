@@ -7,7 +7,9 @@ interface TestProps {
   getMap?: () => Map;
   getClusterLayer?: () => string;
   getHeatmapLayer?: () => string;
+  getAllenCoralAtlasLayer?: () => string;
   getAUMarineParksLayer?: () => string;
+  getMarineEcoregionLayer?: () => string;
   getWorldBoundariesLayer?: () => string;
   getSpiderLayer?: () => string;
   getGeoServerTileLayer?: () => string;
