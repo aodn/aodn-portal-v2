@@ -1,4 +1,11 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  FC,
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Stack } from "@mui/material";
 import DownloadDialog from "../../../../../../components/download/DownloadDialog";
 import {
@@ -66,10 +73,12 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         (opt) => opt.value === selectedCoKey
       );
       if (matchedOption) {
-        setSelectedDataItem(selectedCoKey);
-        getAndSetDownloadConditions(DownloadConditionType.KEY, [
-          new KeyCondition("key", selectedCoKey),
-        ]);
+        startTransition(() => {
+          setSelectedDataItem(selectedCoKey);
+          getAndSetDownloadConditions(DownloadConditionType.KEY, [
+            new KeyCondition("key", selectedCoKey),
+          ]);
+        });
       }
     }
   }, [
@@ -98,11 +107,13 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     );
 
     if (dataSelectOptions.length > 0 && !hasKeyCondition) {
-      const defaultValue = dataSelectOptions[0].value;
-      setSelectedDataItem(defaultValue);
-      getAndSetDownloadConditions(DownloadConditionType.KEY, [
-        new KeyCondition("key", defaultValue),
-      ]);
+      startTransition(() => {
+        const defaultValue = dataSelectOptions[0].value;
+        setSelectedDataItem(defaultValue);
+        getAndSetDownloadConditions(DownloadConditionType.KEY, [
+          new KeyCondition("key", defaultValue),
+        ]);
+      });
     }
   }, [dataSelectOptions, downloadConditions, getAndSetDownloadConditions]);
 
