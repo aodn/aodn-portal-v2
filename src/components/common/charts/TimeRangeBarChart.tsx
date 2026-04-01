@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { axisClasses, BarSeriesType, BarChart } from "@mui/x-charts";
 import { OGCCollections } from "../store/OGCCollectionDefinitions";
 import { color } from "../../../styles/constants";
@@ -188,13 +188,20 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
   selectedEndDate,
 }) => {
   // below consts are private variables
-  const unit = determineChartUnit(selectedStartDate, selectedEndDate);
-  const { xValues, buckets } = determineXWithBucketsBy(
-    selectedStartDate,
-    selectedEndDate,
-    imosDataIds,
-    totalDataset,
-    unit
+  const unit = useMemo(
+    () => determineChartUnit(selectedStartDate, selectedEndDate),
+    [selectedStartDate, selectedEndDate]
+  );
+  const { xValues, buckets } = useMemo(
+    () =>
+      determineXWithBucketsBy(
+        selectedStartDate,
+        selectedEndDate,
+        imosDataIds,
+        totalDataset,
+        unit
+      ),
+    [selectedStartDate, selectedEndDate, imosDataIds, totalDataset, unit]
   );
   const xAxisLabelFormatter = useCallback(
     (date: Date): string => {
