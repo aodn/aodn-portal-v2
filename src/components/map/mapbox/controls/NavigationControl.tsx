@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, startTransition } from "react";
 import MapContext from "../MapContext";
 import {
   NavigationControl as MapboxNavigationControl,
@@ -191,18 +191,20 @@ const NavigationControl = ({
   useEffect(() => {
     if (map !== null) {
       // We do not need to destruct the control, it will be call automatically by map
-      setControl((prev: StyledNavigationControl | undefined) => {
-        if (!prev) {
-          const n = new StyledNavigationControl({
-            showCompass: showCompass,
-            showZoom: showZoom,
-            visualizePitch: visualizePitch,
-          });
+      startTransition(() => {
+        setControl((prev: StyledNavigationControl | undefined) => {
+          if (!prev) {
+            const n = new StyledNavigationControl({
+              showCompass: showCompass,
+              showZoom: showZoom,
+              visualizePitch: visualizePitch,
+            });
 
-          map?.addControl(n, "top-left");
-          return n;
-        }
-        return prev;
+            map?.addControl(n, "top-left");
+            return n;
+          }
+          return prev;
+        });
       });
     }
   }, [map, showCompass, showZoom, visualizePitch]);
