@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useMemo } from "react";
 import DataAccessPanel from "./tab-panels/DataAccessPanel";
 import AdditionalInfoPanel from "./tab-panels/AdditionalInfoPanel";
 import CitationPanel from "./tab-panels/CitationPanel";
@@ -96,8 +96,6 @@ const ContentSection: FC<ContentSectionProps> = ({
     [location.search]
   );
 
-  const [tabValue, setTabValue] = useState<number>(findTabIndex(params, TABS));
-
   const handleTabChange = useCallback(
     (newValue: number) => {
       if (uuid) {
@@ -111,11 +109,6 @@ const ContentSection: FC<ContentSectionProps> = ({
     },
     [TABS, tabNavigation, uuid]
   );
-
-  useEffect(() => {
-    const index = findTabIndex(params, TABS);
-    setTabValue(index);
-  }, [TABS, params]);
 
   if (isCollectionNotFound) {
     return (
@@ -143,7 +136,7 @@ const ContentSection: FC<ContentSectionProps> = ({
     >
       <TabsPanelContainer
         tabs={TABS}
-        tabValue={tabValue}
+        tabValue={findTabIndex(params, TABS)}
         handleTabChange={handleTabChange}
       />
     </Card>
