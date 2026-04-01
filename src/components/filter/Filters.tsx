@@ -2,6 +2,7 @@ import {
   Dispatch,
   FC,
   SetStateAction,
+  startTransition,
   useCallback,
   useEffect,
   useState,
@@ -85,7 +86,7 @@ const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
   }
 };
 
-const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
+const FiltersFC: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   const dispatch = useAppDispatch();
 
   const {
@@ -165,42 +166,44 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   }, [handleClosePopup]);
 
   useEffect(() => {
-    if (parameterVocabs) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        parameterVocabs,
-      }));
-    }
-    if (platform) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        platform,
-      }));
-    }
-    if (updateFreq) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        dataDeliveryFrequency: [updateFreq],
-      }));
-    }
-    if (datasetGroup) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        organisation: [datasetGroup],
-      }));
-    }
-    if (hasCOData) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        dataIndexedType: [IndexDataType.CLOUD],
-      }));
-    }
-    if (datasetStatus) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        dataStatus: [datasetStatus],
-      }));
-    }
+    startTransition(() => {
+      if (parameterVocabs) {
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          parameterVocabs,
+        }));
+      }
+      if (platform) {
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          platform,
+        }));
+      }
+      if (updateFreq) {
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          dataDeliveryFrequency: [updateFreq],
+        }));
+      }
+      if (datasetGroup) {
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          organisation: [datasetGroup],
+        }));
+      }
+      if (hasCOData) {
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          dataIndexedType: [IndexDataType.CLOUD],
+        }));
+      }
+      if (datasetStatus) {
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          dataStatus: [datasetStatus],
+        }));
+      }
+    });
   }, [
     hasCOData,
     datasetGroup,
@@ -258,4 +261,4 @@ const Filters: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   );
 };
 
-export default Filters;
+export default FiltersFC;
