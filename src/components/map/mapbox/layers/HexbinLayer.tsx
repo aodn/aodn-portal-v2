@@ -24,7 +24,6 @@ import { CloudOptimizedFeature } from "../../../common/store/CloudOptimizedDefin
 import _ from "lodash";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import MapLayerSelect from "../component/MapLayerSelect";
-import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
 import { playwrightTestIds } from "../../../common/constants";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
@@ -40,7 +39,7 @@ const COLOR_RANGE: Color[] = [
 // Extract unique keys from feature collection for dropdown options
 export const extractHexbinOptions = (
   featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>
-): SelectItem<string>[] => {
+): SelectItem[] => {
   if (!featureCollection?.features?.length) return [];
 
   const uniqueKeys = new Set<string>();
