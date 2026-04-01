@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
+  startTransition,
 } from "react";
 import { HexagonLayer } from "@deck.gl/aggregation-layers";
 import MapContext from "../MapContext";
@@ -284,28 +285,29 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
 
   // Extract hexbin options from feature collection
   useEffect(() => {
-    if (!sortedFeatureCollection) {
-      setIsFetchingHexbinOptions(false);
-      return;
-    }
-
-    setIsFetchingHexbinOptions(true);
-
-    // Extract options from sorted feature collection
-    const options = extractHexbinOptions(sortedFeatureCollection);
-
-    if (options.length > 0) {
-      setHexbinOptions(options);
-
-      // Set first option as default if none selected
-      if (!selectedCoKey) {
-        handleSelectHexbin(options[0].value);
+    startTransition(() => {
+      if (!sortedFeatureCollection) {
+        setIsFetchingHexbinOptions(false);
+        return;
       }
-    } else {
-      setHexbinOptions([]);
-    }
+      setIsFetchingHexbinOptions(true);
 
-    setIsFetchingHexbinOptions(false);
+      // Extract options from sorted feature collection
+      const options = extractHexbinOptions(sortedFeatureCollection);
+
+      if (options.length > 0) {
+        setHexbinOptions(options);
+
+        // Set first option as default if none selected
+        if (!selectedCoKey) {
+          handleSelectHexbin(options[0].value);
+        }
+      } else {
+        setHexbinOptions([]);
+      }
+
+      setIsFetchingHexbinOptions(false);
+    });
   }, [sortedFeatureCollection, selectedCoKey, handleSelectHexbin]);
 
   useEffect(() => {
