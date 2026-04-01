@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  startTransition,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
@@ -9,7 +17,6 @@ import store, {
 } from "../../components/common/store/store";
 import {
   createSearchParamFrom,
-  DEFAULT_SEARCH_MAP_SIZE,
   fetchResultByUuidNoStore,
   fetchResultNoStore,
   jsonToOGCCollections,
@@ -65,10 +72,12 @@ import {
 import _ from "lodash";
 import useFetchData from "../../hooks/useFetchData";
 import { ProgressType } from "../../components/map/mapbox/MapContext";
+import AdminScreenContext from "../../components/admin/AdminScreenContext";
 
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { getMaxMapCentroids } = useContext(AdminScreenContext);
   const dispatch = useAppDispatch();
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
@@ -130,7 +139,7 @@ const SearchPage = () => {
       return unFlattenToParameterState(param);
     }
     return undefined;
-  }, [location?.search]);
+  }, [location.search]);
 
   const doMapSearch = useCallback(
     async (needNavigate: boolean = false) => {
@@ -152,7 +161,7 @@ const SearchPage = () => {
       const paramNonPaged: SearchParameters = createSearchParamFrom(
         componentParam,
         {
-          pagesize: DEFAULT_SEARCH_MAP_SIZE,
+          pagesize: getMaxMapCentroids?.(),
         }
       );
       // Make sure no other code abort the search
@@ -203,7 +212,7 @@ const SearchPage = () => {
           });
       }
     },
-    [dispatch]
+    [dispatch, getMaxMapCentroids]
   );
 
   const doListSearch = useCallback(
@@ -494,46 +503,50 @@ const SearchPage = () => {
 
   // Set local states currentLayout according to the url param state and screen size when the page is loaded
   useEffect(() => {
-    // Check URL paramState instead of redux state because redux state is not updated before this useEffect
-    if (isUnderLaptop) {
-      // For small screen, if the layout is not full map or full list, then we need to change it to full list
-      // State currentLayout remember the last layout before change to full map, so in this case we set it to full list by default
-      if (
-        urlParamState &&
-        (urlParamState.layout === SearchResultLayoutEnum.FULL_LIST ||
-          urlParamState.layout === SearchResultLayoutEnum.FULL_MAP)
-      ) {
+    startTransition(() => {
+      // Check URL paramState instead of redux state because redux state is not updated before this useEffect
+      if (isUnderLaptop) {
+        // For small screen, if the layout is not full map or full list, then we need to change it to full list
+        // State currentLayout remember the last layout before change to full map, so in this case we set it to full list by default
+        if (
+          urlParamState &&
+          (urlParamState.layout === SearchResultLayoutEnum.FULL_LIST ||
+            urlParamState.layout === SearchResultLayoutEnum.FULL_MAP)
+        ) {
+          setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
+          return;
+        }
+        // Update redux state to full list
+        dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
+        // Form param to url without navigate
+        redirectSearch(pageReferer.SEARCH_PAGE_REFERER, true, false);
         setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
-        return;
+      } else {
+        // For big screens, if the layout is not full map just update the local state according to the url param state
+        if (
+          urlParamState &&
+          urlParamState.layout !== SearchResultLayoutEnum.FULL_MAP
+        ) {
+          setCurrentLayout(urlParamState.layout);
+          return;
+        }
       }
-      // Update redux state to full list
-      dispatch(updateLayout(SearchResultLayoutEnum.FULL_LIST));
-      // Form param to url without navigate
-      redirectSearch(pageReferer.SEARCH_PAGE_REFERER, true, false);
-      setCurrentLayout(SearchResultLayoutEnum.FULL_LIST);
-    } else {
-      // For big screens, if the layout is not full map just update the local state according to the url param state
-      if (
-        urlParamState &&
-        urlParamState.layout !== SearchResultLayoutEnum.FULL_MAP
-      ) {
-        setCurrentLayout(urlParamState.layout);
-        return;
-      }
-    }
+    });
   }, [dispatch, isUnderLaptop, redirectSearch, urlParamState]);
 
   // Set the local states bbox and zoom according to the url param state when the page is loaded
   useEffect(() => {
-    if (urlParamState) {
-      setBbox(
-        new LngLatBounds(
-          urlParamState.bbox?.bbox as [number, number, number, number]
-        )
-      );
-      setZoom(urlParamState.zoom);
-    }
-  }, [dispatch, urlParamState]);
+    startTransition(() => {
+      if (urlParamState) {
+        setBbox(
+          new LngLatBounds(
+            urlParamState.bbox?.bbox as [number, number, number, number]
+          )
+        );
+        setZoom(urlParamState.zoom);
+      }
+    });
+  }, [urlParamState]);
 
   return (
     <Layout>
