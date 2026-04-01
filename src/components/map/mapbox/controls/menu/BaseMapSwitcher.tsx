@@ -60,7 +60,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
 
   const handleToggle = useCallback(() => {
     setOpen((prevOpen) => !prevOpen);
-  }, [setOpen]);
+  }, []);
 
   const updateCurrentStyle = useCallback(
     (id: string) => {
@@ -95,6 +95,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
     const handleEvent = (evt: MenuClickedEvent) => {
       if (evt.component.type !== BaseMapSwitcher) {
         setOpen(false);
+        setAnchorEl(null);
       }
     };
 
