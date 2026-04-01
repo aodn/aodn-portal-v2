@@ -1,4 +1,4 @@
-import { FC, useRef, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Box, IconButton, Popper } from "@mui/material";
 import { ControlProps, EVENT_MENU, MenuClickedEvent } from "./Definition";
 import { borderRadius } from "../../../../../styles/constants";
