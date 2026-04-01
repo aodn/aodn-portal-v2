@@ -108,15 +108,7 @@ const AdditionalInfoPanel = () => {
     ];
   }, [context.collection]);
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!metadataContact || !themes) {
-      setIsLoading(true);
-    } else {
-      setIsLoading(false);
-    }
-  }, [metadataContact, themes]);
+  const isLoading = !metadataContact || !themes;
 
   const blocks: NavigatablePanelChild[] = useMemo(
     () => [
