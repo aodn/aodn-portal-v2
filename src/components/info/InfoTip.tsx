@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from "react";
+import { FC, useCallback, useState, MouseEvent } from "react";
 import { IconButton, Popover } from "@mui/material";
 import InfoCard from "./InfoCard";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
@@ -11,23 +11,23 @@ interface InfoTipProps {
   infoContent?: InfoContentType;
 }
 const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const handleClick = useCallback((_: React.MouseEvent<HTMLButtonElement>) => {
-    setOpen(true);
+  const handleClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
     disableScroll();
   }, []);
 
   const handleClose = useCallback(() => {
-    setOpen(false);
+    setAnchorEl(null);
     enableScroll();
   }, []);
+
+  const open = Boolean(anchorEl);
 
   return (
     <>
       <IconButton
-        ref={buttonRef}
         onClick={handleClick}
         sx={{ color: portalTheme.palette.info.main, padding: 0 }}
         data-testid="Info-tip-icon"
@@ -37,7 +37,7 @@ const InfoTip: FC<InfoTipProps> = ({ infoContent }) => {
       <Popover
         elevation={2}
         open={open}
-        anchorEl={buttonRef.current}
+        anchorEl={anchorEl}
         onClose={handleClose}
         anchorOrigin={{
           vertical: "top",
