@@ -11,6 +11,7 @@ import {
   isValidElement,
   ReactElement,
   ReactNode,
+  startTransition,
   useCallback,
   useEffect,
   useState,
@@ -184,7 +185,7 @@ const IconSelect = <T extends string | number = string>({
   const config = mergeWithDefaults(defaultColorConfig, colorConfig);
 
   useEffect(() => {
-    if (value) setSelectedItem(value);
+    if (value) startTransition(() => setSelectedItem(value));
   }, [value]);
 
   return (
