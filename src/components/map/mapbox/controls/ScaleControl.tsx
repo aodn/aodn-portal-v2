@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import MapContext from "../MapContext";
 import {
   ScaleControl as MapboxScaleControl,
@@ -14,22 +14,22 @@ const ScaleControl = ({
   unit = "metric",
 }: ScaleControlProps) => {
   const { map } = useContext(MapContext);
-  const [_, setInit] = useState<boolean>(false);
+  const isInitialized = useRef(false);
 
   useEffect(() => {
     if (!map) return;
 
-    setInit((prev) => {
-      if (!prev) {
-        const scale = new MapboxScaleControl({
-          maxWidth: maxWidth,
-          unit: unit,
-        });
+    if (!isInitialized.current) {
+      const scale = new MapboxScaleControl({
+        maxWidth: maxWidth,
+        unit: unit,
+      });
 
-        map.addControl(scale);
-      }
-      return true;
-    });
+      map.addControl(scale);
+
+      // 4. Update the ref synchronously (does not trigger re-render)
+      isInitialized.current = true;
+    }
   }, [map, maxWidth, unit]);
 
   return <React.Fragment />;

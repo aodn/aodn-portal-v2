@@ -1,7 +1,8 @@
 import { createContext } from "react";
 
 type AdminScreenContextType = {
-  enableGeoServerWhiteList?: boolean;
+  enableGeoServerWhiteList: boolean;
+  getMaxMapCentroids: () => number;
 };
 
 const AdminScreenContext = createContext<Partial<AdminScreenContextType>>({});
