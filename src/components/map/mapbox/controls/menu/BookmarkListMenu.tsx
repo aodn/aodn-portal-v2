@@ -20,8 +20,8 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   onDeselectDataset,
   tabNavigation,
 }) => {
-  const anchorRef = useRef<HTMLButtonElement>(null);
-  const [open, setOpen] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [open, setOpen] = useState<boolean>(true);
 
   useEffect(() => {
     // Other menu button clicked, close this menu item
@@ -37,19 +37,13 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
     };
   }, [setOpen]);
 
-  useEffect(() => {
-    // Make bookmark list visible after all the init, the init false make
-    // the list invisible during init which is correct.
-    setOpen(true);
-  }, []);
-
   return (
     <>
       <MenuHintTooltip hint="Bookmarks" disable={open}>
         <IconButton
           aria-label="bookmark-list-button"
           id="bookmark-list-button"
-          ref={anchorRef}
+          ref={setAnchorEl}
           onClick={() => setOpen((prev) => !prev)}
           sx={switcherIconButtonSx(open)}
         >
@@ -59,7 +53,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
       <Popper
         id="bookmark-list"
         open={open}
-        anchorEl={anchorRef.current}
+        anchorEl={anchorEl}
         role={undefined}
         placement="left-start"
         disablePortal
