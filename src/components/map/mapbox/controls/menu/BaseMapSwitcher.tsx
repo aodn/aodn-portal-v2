@@ -3,6 +3,7 @@ import React, {
   useState,
   useCallback,
   startTransition,
+  MouseEvent,
 } from "react";
 import MenuHintTooltip from "./MenuHintTooltip";
 import {
@@ -56,10 +57,13 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
     undefined
   );
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [open, setOpen] = useState(false);
 
-  const handleToggle = useCallback(() => {
-    setOpen((prevOpen) => !prevOpen);
+  const handleClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl((prev) => (prev === null ? event.currentTarget : null));
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setAnchorEl(null);
   }, []);
 
   const updateCurrentStyle = useCallback(
@@ -94,12 +98,11 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
     // the menu
     const handleEvent = (evt: MenuClickedEvent) => {
       if (evt.component.type !== BaseMapSwitcher) {
-        setOpen(false);
         setAnchorEl(null);
       }
     };
 
-    const handleMapEvent = () => setOpen(false);
+    const handleMapEvent = () => setAnchorEl(null);
     // Make state update inside useEffect()
     startTransition(() =>
       updateCurrentStyle(mapStyles[MapDefaultConfig.DEFAULT_STYLE].id)
@@ -116,6 +119,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
     };
   }, [updateCurrentStyle]);
 
+  const open = Boolean(anchorEl);
   return (
     <>
       <MenuHintTooltip hint="Base Layers" disable={open}>
@@ -123,8 +127,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
           aria-label="basemap-show-hide-menu"
           id={MENU_ID}
           data-testid={DataTestId.BaseMapSwitcher.MenuId}
-          ref={setAnchorEl}
-          onClick={handleToggle}
+          onClick={handleClick}
           sx={switcherIconButtonSx(open)}
         >
           <BaseLayerIcon color={open ? "white" : undefined} />
@@ -150,7 +153,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
         <Box sx={switcherMenuBoxSx}>
-          <MenuTitle title="Map Base Layers" onClose={handleToggle} />
+          <MenuTitle title="Map Base Layers" onClose={handleClose} />
           <Divider />
           <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">
