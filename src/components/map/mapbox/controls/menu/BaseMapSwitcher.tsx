@@ -1,4 +1,9 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  startTransition,
+} from "react";
 import MenuHintTooltip from "./MenuHintTooltip";
 import {
   ControlProps,
@@ -50,7 +55,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
   const [_, setAttributionControl] = useState<AttributionControl | undefined>(
     undefined
   );
-  const anchorRef = useRef(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
 
   const handleToggle = useCallback(() => {
@@ -94,8 +99,10 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
     };
 
     const handleMapEvent = () => setOpen(false);
-    // Make sure custom attribution shown if needed
-    updateCurrentStyle(mapStyles[MapDefaultConfig.DEFAULT_STYLE].id);
+    // Make state update inside useEffect()
+    startTransition(() =>
+      updateCurrentStyle(mapStyles[MapDefaultConfig.DEFAULT_STYLE].id)
+    );
 
     eventEmitter.on(EVENT_MENU.CLICKED, handleEvent);
     eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
@@ -115,7 +122,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
           aria-label="basemap-show-hide-menu"
           id={MENU_ID}
           data-testid={DataTestId.BaseMapSwitcher.MenuId}
-          ref={anchorRef}
+          ref={setAnchorEl}
           onClick={handleToggle}
           sx={switcherIconButtonSx(open)}
         >
@@ -125,7 +132,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
       <Popper
         id="basemap-popper-id"
         open={open}
-        anchorEl={anchorRef.current}
+        anchorEl={anchorEl}
         role={undefined}
         placement="left-start"
         disablePortal
