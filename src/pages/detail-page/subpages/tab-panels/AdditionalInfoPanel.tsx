@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import NavigatablePanel, { NavigatablePanelChild } from "./NavigatablePanel";
 import _ from "lodash";
