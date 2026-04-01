@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Box, Popper, Typography } from "@mui/material";
 import { portalTheme } from "../../../../../styles";
 
@@ -15,12 +15,12 @@ const MenuHintTooltip: React.FC<MenuHintTooltipProps> = ({
   children,
 }) => {
   const [hovered, setHovered] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   return (
     <>
       <Box
-        ref={wrapperRef}
+        ref={setAnchorEl}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
@@ -28,7 +28,7 @@ const MenuHintTooltip: React.FC<MenuHintTooltipProps> = ({
       </Box>
       <Popper
         open={hovered && !disable}
-        anchorEl={wrapperRef.current}
+        anchorEl={anchorEl}
         placement="left"
         disablePortal
         modifiers={[{ name: "offset", options: { offset: [0, 10] } }]}
