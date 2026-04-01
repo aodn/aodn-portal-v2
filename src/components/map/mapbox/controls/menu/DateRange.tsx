@@ -2,7 +2,7 @@ import React, {
   ReactElement,
   useCallback,
   useEffect,
-  useRef,
+  startTransition,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
@@ -48,7 +48,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState(false);
-  const anchorRef = useRef(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [currentMinDate, setCurrentMinDate] = useState<string | undefined>(
     undefined
   );
@@ -59,13 +59,8 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   const mapContainer = map?.getContainer();
 
   const handleIconClick = () => {
-    if (open) {
-      setOpen(false);
-      setShowTooltip(false);
-    } else {
-      setOpen(true);
-      setShowTooltip(true);
-    }
+    setOpen((prev) => !prev);
+    setShowTooltip((prev) => !prev);
   };
 
   const handleCloseTooltip = () => {
@@ -116,11 +111,13 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
     ) as DateRangeCondition[];
     if (dateTime && dateTime.length !== 0) {
-      setOpen(true);
-      const start = dayjs(dateTime[0].start).format(dateDefault.DATE_FORMAT);
-      const end = dayjs(dateTime[0].end).format(dateDefault.DATE_FORMAT);
-      setCurrentMinDate(start ?? undefined);
-      setCurrentMaxDate(end ?? undefined);
+      startTransition(() => {
+        setOpen(true);
+        const start = dayjs(dateTime[0].start).format(dateDefault.DATE_FORMAT);
+        const end = dayjs(dateTime[0].end).format(dateDefault.DATE_FORMAT);
+        setCurrentMinDate(start ?? undefined);
+        setCurrentMaxDate(end ?? undefined);
+      });
     }
   }, [downloadConditions]);
 
@@ -129,7 +126,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       <MenuHintTooltip hint="Subset Time Range" disable={open}>
         <IconButton
           data-testid={MENU_ID}
-          ref={anchorRef}
+          ref={setAnchorEl}
           onClick={handleIconClick}
           sx={switcherIconButtonSx(open)}
         >
@@ -139,7 +136,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
 
       <MenuTooltip
         open={showTooltip}
-        anchorEl={anchorRef.current}
+        anchorEl={anchorEl}
         title="Time Range"
         description="Select specific date or time range to filter the dataset details."
         icon={<TimeRangeTooltipIcon />}
