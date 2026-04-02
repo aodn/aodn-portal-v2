@@ -31,11 +31,25 @@ window.__map_functions = {
     const layer = this.getMapLayer(mapId);
     return map.queryRenderedFeatures({ layers: [layer] }).length;
   },
+  getAllenCoralAtlasLayer: function (mapId) {
+    if (this.getTestProps(mapId).getAllenCoralAtlasLayer) {
+      return this.getTestProps(mapId).getAllenCoralAtlasLayer();
+    } else {
+      throw new Error("Allen Coral Atlas layer not found");
+    }
+  },
   getAUMarineParksLayer: function (mapId) {
     if (this.getTestProps(mapId).getAUMarineParksLayer) {
       return this.getTestProps(mapId).getAUMarineParksLayer();
     } else {
       throw new Error("AU Marine Parks layer not found");
+    }
+  },
+  getMarineEcoregionLayer: function (mapId) {
+    if (this.getTestProps(mapId).getMarineEcoregionLayer) {
+      return this.getTestProps(mapId).getMarineEcoregionLayer();
+    } else {
+      throw new Error("Marine Ecoregion layer not found");
     }
   },
   getWorldBoundariesLayer: function (mapId) {

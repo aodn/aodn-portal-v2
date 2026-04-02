@@ -1,7 +1,7 @@
 import pytest
 from playwright.sync_api import Page
 
-from core.enums.layer_type import LayerType
+from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
 from mocks.api.collections import (
     handle_collections_update_all_api,
@@ -58,7 +58,7 @@ def test_map_spider_disappears_on_zoom_out(
 
     # Verify spider is visible
     layer_factory = LayerFactory(search_page.map)
-    layer_id = layer_factory.get_layer_id(LayerType.SPIDER)
+    layer_id = layer_factory.get_layer_id(LayerStyle.SPIDER)
     assert search_page.map.is_map_layer_visible(layer_id) is True
 
     # Verify spider disappears on zoom out
@@ -113,7 +113,7 @@ def test_map_spider_disappears_after_search_update(
 
     # Verify spider is visible
     layer_factory = LayerFactory(search_page.map)
-    layer_id = layer_factory.get_layer_id(LayerType.SPIDER)
+    layer_id = layer_factory.get_layer_id(LayerStyle.SPIDER)
     assert search_page.map.is_map_layer_visible(layer_id) is True
 
     # Change api mocking to get updated response after search action

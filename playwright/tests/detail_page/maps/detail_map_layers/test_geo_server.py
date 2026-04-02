@@ -3,7 +3,7 @@ from http import HTTPStatus
 import pytest
 from playwright.sync_api import Page, expect
 
-from core.enums.layer_type import LayerType
+from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
 from mocks.api_router import ApiRouter
 from pages.detail_page import DetailPage
@@ -37,7 +37,7 @@ def test_map_shows_geoserver_layer_with_timeSlider_and_drawRect_support(
     expect(detail_page.detail_map.geoserver_layer).to_be_visible()
 
     # Verify that the Geoserver layer is present and visible on the map
-    layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)
+    layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
     assert (
         detail_page.detail_map.is_map_layer_visible(
             layer_id, is_map_loading=False
@@ -80,7 +80,7 @@ def test_map_shows_geoserver_layer_with_only_timeSlider_support(
     expect(detail_page.detail_map.geoserver_layer).to_be_visible()
 
     # Verify that the Geoserver layer is present and visible on the map
-    layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)
+    layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
     assert (
         detail_page.detail_map.is_map_layer_visible(
             layer_id, is_map_loading=False
@@ -124,7 +124,7 @@ def test_map_shows_geoserver_layer_with_only_drawRect_support(
     expect(detail_page.detail_map.geoserver_layer).to_be_visible()
 
     # Verify that the Geoserver layer is present and visible on the map
-    layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)
+    layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
     assert (
         detail_page.detail_map.is_map_layer_visible(
             layer_id, is_map_loading=False
@@ -172,7 +172,7 @@ def test_map_shows_geoserver_layer_without_timeSlider_and_drawRect_support(
     expect(detail_page.detail_map.geoserver_layer).to_be_visible()
 
     # Verify that the Geoserver layer is present and visible on the map
-    layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)
+    layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
     assert (
         detail_page.detail_map.is_map_layer_visible(
             layer_id, is_map_loading=False
@@ -214,5 +214,5 @@ def test_data_not_on_whitelist(responsive_page: Page, uuid: str) -> None:
     expect(detail_page.detail_map.spatial_extent_layer).to_be_visible()
 
     # Verify that the Spatial Extent layer is present and visible on the map
-    layer_id = layer_factory.get_layer_id(LayerType.SPATIAL_EXTENT)
+    layer_id = layer_factory.get_layer_id(LayerStyle.SPATIAL_EXTENT)
     assert detail_page.detail_map.is_map_layer_visible(layer_id) is True

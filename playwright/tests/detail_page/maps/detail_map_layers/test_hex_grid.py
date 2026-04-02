@@ -1,7 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
-from core.enums.layer_type import LayerType
+from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
 from pages.detail_page import DetailPage
 
@@ -35,12 +35,12 @@ def test_map_shows_hexgrid_layer(responsive_page: Page, uuid: str) -> None:
     expect(detail_page.detail_map.geoserver_layer).to_be_visible()
 
     # Verify that the Hex Grid layer is present and visible on the map
-    layer_id = layer_factory.get_layer_id(LayerType.HEX_GRID)
+    layer_id = layer_factory.get_layer_id(LayerStyle.HEX_GRID)
     assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
     # Verify that the Geoserver layer is present and visible on the map
     detail_page.detail_map.geoserver_layer.check()
     detail_page.detail_map.wait_for_map_idle()
-    layer_id = layer_factory.get_layer_id(LayerType.GEO_SERVER)
+    layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
     assert (
         detail_page.detail_map.is_map_layer_visible(
             layer_id, is_map_loading=False
