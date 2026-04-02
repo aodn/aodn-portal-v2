@@ -2,7 +2,6 @@ import React, {
   memo,
   useCallback,
   useEffect,
-  useRef,
   useState,
   useMemo,
   startTransition,
@@ -237,7 +236,8 @@ const ReactMap = memo(
             }
           }, 0.1)
         );
-        resizeObserver.observe(map.getContainer());
+        const container = map.getContainer();
+        resizeObserver.observe(container);
 
         if (import.meta.env.MODE === "playwright-local") {
           //map.showPadding = true;
@@ -247,16 +247,14 @@ const ReactMap = memo(
         setMap(map);
 
         return () => {
-          if (containerRef) {
-            resizeObserver.unobserve(containerRef);
-          }
+          resizeObserver.unobserve(container);
+
           // We need this when the map destroy
           map.off(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
           map.off(MapEventEnum.MOVE_END, debounceOnMoveEvent);
           map.off(MapEventEnum.MOVE_START, cancelDebounceAndStartMove);
           map.off(MapEventEnum.ZOOM_START, cancelDebounceAndStartZoom);
           map.remove();
-          setContainerRef(null);
           setMap(null);
         };
       };
