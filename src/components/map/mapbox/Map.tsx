@@ -1,4 +1,12 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  startTransition,
+} from "react";
 import {
   LngLatBounds,
   Map,
@@ -124,35 +132,33 @@ const ReactMap = memo(
   }: React.PropsWithChildren<MapProps>) => {
     const [map, setMap] = useState<Map | null>(null);
     const [loading, setLoading] = useState<ProgressType | undefined>(progress);
-    const containerRef = useRef<HTMLElement | null>(null);
+    const [containerRef, setContainerRef] = useState<HTMLElement | null>(null);
 
-    // Debouce to make the map transit smoother
-    const debounceOnZoomEvent = useRef(
-      lodash.debounce(
-        useCallback(
-          async (event: MapEvent | undefined) => onZoomEvent?.(event),
-          [onZoomEvent]
-        ),
-        MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
-      )
-    ).current;
+    // 1. Create the debounced functions using useMemo
+    const debounceOnZoomEvent = useMemo(
+      () =>
+        lodash.debounce((event: MapEvent | undefined) => {
+          onZoomEvent?.(event);
+        }, MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE),
+      [onZoomEvent] // Re-creates when the prop changes
+    );
 
-    const debounceOnMoveEvent = useRef(
-      lodash.debounce(
-        useCallback(
-          async (event: MapEvent | undefined) => onMoveEvent?.(event),
-          [onMoveEvent]
-        ),
-        MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE
-      )
-    ).current;
+    const debounceOnMoveEvent = useMemo(
+      () =>
+        lodash.debounce((event: MapEvent | undefined) => {
+          onMoveEvent?.(event);
+        }, MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE),
+      [onMoveEvent]
+    );
 
     const initializeMap = useCallback(() => {
       try {
         // Check if container exists
-        containerRef.current = document.getElementById(panelId);
-        if (!containerRef.current) {
+        const container = document.getElementById(panelId);
+        if (!container) {
           return null;
+        } else {
+          setContainerRef(document.getElementById(panelId));
         }
 
         // Create new map instance
@@ -241,8 +247,8 @@ const ReactMap = memo(
         setMap(map);
 
         return () => {
-          if (containerRef.current) {
-            resizeObserver.unobserve(containerRef.current);
+          if (containerRef) {
+            resizeObserver.unobserve(containerRef);
           }
           // We need this when the map destroy
           map.off(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
@@ -250,6 +256,7 @@ const ReactMap = memo(
           map.off(MapEventEnum.MOVE_START, cancelDebounceAndStartMove);
           map.off(MapEventEnum.ZOOM_START, cancelDebounceAndStartZoom);
           map.remove();
+          setContainerRef(null);
           setMap(null);
         };
       };
@@ -269,7 +276,7 @@ const ReactMap = memo(
     ]);
 
     useEffect(() => {
-      if (!map || !bbox || !containerRef.current?.isConnected) return;
+      if (!map || !bbox || !containerRef?.isConnected) return;
       // Turn off event to avoid looping
       map.off(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
       map.off(MapEventEnum.MOVE_END, debounceOnMoveEvent);
@@ -290,12 +297,20 @@ const ReactMap = memo(
         map.on(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
         map.on(MapEventEnum.MOVE_END, debounceOnMoveEvent);
       });
-    }, [bbox, zoom, map, debounceOnZoomEvent, debounceOnMoveEvent, animate]);
+    }, [
+      bbox,
+      zoom,
+      map,
+      debounceOnZoomEvent,
+      debounceOnMoveEvent,
+      animate,
+      containerRef?.isConnected,
+    ]);
 
-    useEffect(() => setLoading(progress), [progress]);
+    useEffect(() => startTransition(() => setLoading(progress)), [progress]);
 
     // Only render if map is initialized and container is still connected
-    if (!map || !containerRef.current?.isConnected) {
+    if (!map || !containerRef?.isConnected) {
       return null;
     }
 
