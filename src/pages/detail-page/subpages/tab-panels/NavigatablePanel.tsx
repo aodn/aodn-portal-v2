@@ -127,14 +127,14 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const { isUnderLaptop } = useBreakpoint();
 
   // Create an array of refs with the same size as the menu list which is the size of childrenList
-  const [menuRefs, setMenuRefs] = useState<
-    React.RefObject<HTMLDivElement | null>[]
-  >(childrenList.map(() => React.createRef()));
+  const [menuRefs] = useState<React.RefObject<HTMLDivElement | null>[]>(
+    childrenList.map(() => React.createRef())
+  );
 
   // Create an array of refs with the same size as the item list which is size of childrenList
-  const [contentRefs, setContentRefs] = useState<
-    React.RefObject<HTMLDivElement | null>[]
-  >(childrenList.map(() => React.createRef()));
+  const [contentRefs] = useState<React.RefObject<HTMLDivElement | null>[]>(
+    childrenList.map(() => React.createRef())
+  );
 
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
