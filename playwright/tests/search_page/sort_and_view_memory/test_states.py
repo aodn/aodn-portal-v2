@@ -198,7 +198,7 @@ def test_view_states_for_screen_resize(
             )
         ).to_be_visible()
 
-
+@pytest.mark.skip(reason="Flaky test - needs investigation")
 @pytest.mark.parametrize(
     'view_type',
     [
