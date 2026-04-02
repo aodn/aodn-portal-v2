@@ -1,6 +1,5 @@
 import { Box, CircularProgress, Grid, useTheme } from "@mui/material";
 import React, {
-  UIEvent,
   FC,
   ReactNode,
   useCallback,
@@ -138,7 +137,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   >(childrenList.map(() => React.createRef()));
 
   const handleScroll = useCallback(
-    (event: UIEvent<HTMLDivElement, UIEvent>) => {
+    (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
       // This is use to update the selectedIndex if user scroll up the childlist
       // panel
       const scrollPosition = event.currentTarget.scrollTop;
