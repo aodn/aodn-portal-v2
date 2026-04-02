@@ -78,12 +78,8 @@ export default ({ mode }) => {
             : ""
         }
 
-        ${
-          isProduction
-            ? `<!-- Bing Webmaster Tools Verification -->
-        <meta name="msvalidate.01" content="02593ED7942BD40F39C6E03B5EF2265E" />`
-            : ""
-        }
+        <!-- Bing Webmaster Tools Verification -->
+        <meta name="msvalidate.01" content="02593ED7942BD40F39C6E03B5EF2265E" />
 
         <!-- End SEO -->
       `;

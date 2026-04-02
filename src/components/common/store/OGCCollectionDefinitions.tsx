@@ -138,6 +138,19 @@ export enum DatasetType {
   UNKNOWN = "unknown",
 }
 
+// Fallback function to tag ai:group according to rel=wms/wfs if missing such field
+const inferAIGroup = (link: ILink): string | undefined => {
+  if (link["ai:group"]) return link["ai:group"];
+  switch (link.rel?.toLowerCase()) {
+    case RelationType.WMS:
+      return `${AIGroup.DATA_ACCESS} > ${DataAccessSubGroup.WMS}`;
+    case RelationType.WFS:
+      return `${AIGroup.DATA_ACCESS} > ${DataAccessSubGroup.WFS}`;
+    default:
+      return undefined;
+  }
+};
+
 // Helper function to extract subgroup type from ai:group
 export const getSubgroup = (link: ILink): DataAccessSubGroup | undefined => {
   const aiGroup = link["ai:group"];
@@ -149,7 +162,6 @@ export const getSubgroup = (link: ILink): DataAccessSubGroup | undefined => {
 
 const getIcon = (link: ILink) => {
   const subgroupType = getSubgroup(link);
-
   if (subgroupType) {
     switch (subgroupType.toLowerCase()) {
       case DataAccessSubGroup.WMS:
@@ -209,7 +221,17 @@ export class OGCCollection {
 
   set links(links: ILink[] | undefined) {
     this.propLinks = links?.map<ILink>((link) => {
-      return { ...link, getIcon: () => getIcon(link) };
+      const enrichedLink: ILink = {
+        ...link,
+        // Only set ai:group if inferAIGroup returns a value, otherwise keep original
+        ...(inferAIGroup(link) !== undefined && {
+          "ai:group": inferAIGroup(link),
+        }),
+      };
+      return {
+        ...enrichedLink,
+        getIcon: () => getIcon(enrichedLink),
+      };
     });
   }
 

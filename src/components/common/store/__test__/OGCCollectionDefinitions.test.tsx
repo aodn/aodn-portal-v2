@@ -237,4 +237,107 @@ describe("OGCCollection", () => {
       expect(wfsLinks?.[0].title).toBe("WFS Service");
     });
   });
+  describe("fallback mechanism for links without ai:group", () => {
+    it("should infer ai:group for wms link based on rel field", () => {
+      const collection = new OGCCollection();
+      // Fallback link: no ai:group, only rel=wms
+      collection.links = [
+        {
+          rel: RelationType.WMS,
+          href: "https://geoserver.example.com/wms",
+          type: "",
+          title: "seamap:SeamapAus_VIC_statewide_habitats_2023",
+        },
+      ];
+
+      const wmsLinks = collection.getWMSLinks();
+      expect(wmsLinks).toHaveLength(1);
+      expect(wmsLinks?.[0].title).toBe(
+        "seamap:SeamapAus_VIC_statewide_habitats_2023"
+      );
+      // Verify ai:group was inferred correctly
+      expect(wmsLinks?.[0]["ai:group"]).toBe("Data Access > wms");
+    });
+
+    it("should infer ai:group for wfs link based on rel field", () => {
+      const collection = new OGCCollection();
+      // Fallback link: no ai:group, only rel=wfs
+      collection.links = [
+        {
+          rel: RelationType.WFS,
+          href: "https://geoserver.example.com/wfs",
+          type: "",
+          title: "SeamapAus_VIC_statewide_habitats_2023",
+        },
+      ];
+
+      const wfsLinks = collection.getWFSLinks();
+      expect(wfsLinks).toHaveLength(1);
+      expect(wfsLinks?.[0].title).toBe("SeamapAus_VIC_statewide_habitats_2023");
+      // Verify ai:group was inferred correctly
+      expect(wfsLinks?.[0]["ai:group"]).toBe("Data Access > wfs");
+    });
+
+    it("should include fallback wms/wfs links in getDataAccessLinks", () => {
+      const collection = new OGCCollection();
+      // Mix of ai:group links and fallback links
+      collection.links = [
+        {
+          rel: RelationType.WMS,
+          href: "https://geoserver.example.com/wms",
+          type: "",
+          title: "WMS Fallback",
+        },
+        {
+          rel: RelationType.WFS,
+          href: "https://geoserver.example.com/wfs",
+          type: "",
+          title: "WFS Fallback",
+        },
+      ];
+
+      const dataAccessLinks = collection.getDataAccessLinks();
+      expect(dataAccessLinks).toHaveLength(2);
+    });
+
+    it("should not override existing ai:group with inferred value", () => {
+      const collection = new OGCCollection();
+      // Link already has ai:group, should not be overridden
+      collection.links = [
+        {
+          rel: RelationType.WMS,
+          href: "https://geoserver.example.com/wms",
+          type: "",
+          title: "WMS With AI Group",
+          "ai:group": "Data Access > wms",
+        },
+      ];
+
+      const wmsLinks = collection.getWMSLinks();
+      expect(wmsLinks?.[0]["ai:group"]).toBe("Data Access > wms");
+    });
+
+    it("should include fallback wms links in getAllAIGroupedLinks", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        {
+          rel: RelationType.WMS,
+          href: "https://geoserver.example.com/wms",
+          type: "",
+          title: "WMS Fallback",
+        },
+        {
+          rel: RelationType.RELATED,
+          href: "https://example.com/related",
+          type: "text/html",
+          title: "Related Link",
+        },
+      ];
+
+      const allGroupedLinks = collection.getAllAIGroupedLinks();
+      // Only WMS fallback link should be included, not the related link
+      expect(allGroupedLinks).toHaveLength(1);
+      expect(allGroupedLinks?.[0].title).toBe("WMS Fallback");
+    });
+  });
 });
