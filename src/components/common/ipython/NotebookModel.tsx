@@ -2,7 +2,7 @@ import * as React from "react";
 import { IpynbRenderer, IpynbType } from "react-ipynb-renderer";
 import Dialog from "@mui/material/Dialog";
 import { getNotebook } from "./api";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 
 export interface NotebookModelCallbackProps {
   showDialog: boolean;
@@ -19,7 +19,7 @@ const NotebookModel = (props: NotebookModelProps) => {
   const [nb, setNb] = useState<IpynbType | null>(null);
 
   useEffect(() => {
-    setOpen(props.showDialog);
+    startTransition(() => setOpen(props.showDialog));
   }, [props.showDialog]);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const NotebookModel = (props: NotebookModelProps) => {
       //   //TODO: Should print the error reason
       // });
     } else {
-      setNb(null);
+      startTransition(() => setNb(null));
     }
   }, [props.url]);
 

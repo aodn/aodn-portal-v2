@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { startTransition, useContext, useEffect, useState } from "react";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
@@ -102,7 +102,7 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
     // that is nothing need to add or delete.
     if (toAdd.length > 0 || toDelete.length > 0) {
       // This avoid infinity loop due to layers update.
-      setLayers(stacIds);
+      startTransition(() => setLayers(stacIds));
     }
   }, [map, collections, layers, mapLoaded]);
 
