@@ -1,7 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
-from core.enums.layer_type import LayerType
+from core.enums.map_layers.reference_layer import ReferenceLayer
 from core.factories.layer import LayerFactory
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
@@ -12,17 +12,25 @@ from pages.search_page import SearchPage
     'layer_text, layer_type',
     [
         (
+            'Allen Coral Atlas',
+            ReferenceLayer.ALLEN_CORAL_ATLAS,
+        ),
+        (
             'Australian Marine Parks',
-            LayerType.MARINE_PARKS,
+            ReferenceLayer.MARINE_PARKS,
+        ),
+        (
+            'Marine Ecoregion of the World',
+            ReferenceLayer.MARINE_ECOREGION,
         ),
         (
             'World Boundaries and Places',
-            LayerType.WORLD_BOUNDARIES,
+            ReferenceLayer.WORLD_BOUNDARIES,
         ),
     ],
 )
 def test_map_reference_layers(
-    desktop_page: Page, layer_text: str, layer_type: LayerType
+    desktop_page: Page, layer_text: str, layer_type: ReferenceLayer
 ) -> None:
     """
     Validates that selecting a reference layer from the map menu correctly
