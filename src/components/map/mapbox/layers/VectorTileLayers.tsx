@@ -29,7 +29,7 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
       // and therefore you will have problem setting source and layer. Set-up a listener
       // to update the state and then this effect can be call again when map loaded.
       map?.on("load", () =>
-        setMapLoaded((prev) => {
+        setMapLoaded(() => {
           // If style changed, we may need to add the layer again, hence listen to this event.
           // https://github.com/mapbox/mapbox-gl-js/issues/8660
           //
@@ -66,7 +66,7 @@ const VectorTileLayers = ({ collections }: VectorTileLayersProps) => {
     // If map style changed, then the layer will be gone, we need
     // to try add it again, but before add we need to check if the
     // layer exist
-    stacIds.forEach((uuid, index) => {
+    stacIds.forEach((uuid) => {
       if (!map?.getSource(uuid)) {
         const source: mapboxgl.AnySourceData = {
           type: "vector",
