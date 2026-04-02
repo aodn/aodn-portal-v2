@@ -1,4 +1,10 @@
-import React, { FC, useCallback, useMemo, useState } from "react";
+import React, {
+  FC,
+  startTransition,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { padding } from "../../../../styles/constants";
 import { useDetailPageContext } from "../../context/detail-page-context";
@@ -226,16 +232,19 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
     }
 
-    setMapLayerConfig(
-      buildMapLayerConfig(
-        collection,
-        hasSummaryFeature,
-        isZarrDataset,
-        isWMSAvailable,
-        hasSpatialExtent,
-        lastSelectedMapLayer
-      )
-    );
+    startTransition(() => {
+      setMapLayerConfig(
+        buildMapLayerConfig(
+          collection,
+          hasSummaryFeature,
+          isZarrDataset,
+          isWMSAvailable,
+          hasSpatialExtent,
+          lastSelectedMapLayer
+        )
+      );
+    });
+
     return [abstract, hasSummaryFeature, noMapPreview, start, end];
   }, [collection, downloadService, isWMSAvailable, lastSelectedMapLayer]);
 
