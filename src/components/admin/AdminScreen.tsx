@@ -15,7 +15,7 @@ interface AdminScreenProps {
 }
 
 // This needs to be const function and global to avoid re-render
-const DEFAULT_MAX_MAP_CENTROIDS = 1000;
+const DEFAULT_MAX_MAP_CENTROIDS = 800;
 let maxMapCentroids = DEFAULT_MAX_MAP_CENTROIDS;
 const getMaxMapCentroids = () => maxMapCentroids;
 const setMaxMapCentroids = (max: number) => (maxMapCentroids = max);
