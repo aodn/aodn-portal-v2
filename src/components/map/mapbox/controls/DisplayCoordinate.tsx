@@ -24,7 +24,8 @@ const DisplayCoordinate = () => {
     }
   }, [map]);
 
-  return import.meta.env.MODE === "dev" ? (
+  const mode = import.meta.env.MODE;
+  return mode === "dev" || mode === "playwright-local" ? (
     <div
       id={"display-coor"}
       ref={ref}

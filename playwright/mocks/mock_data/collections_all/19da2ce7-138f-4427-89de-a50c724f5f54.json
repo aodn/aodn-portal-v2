@@ -19,6 +19,12 @@
           "type": "text/html",
           "title": "Ocean Radar page on IMOS website",
           "ai:group": "Other"
+        },
+        {
+          "href": "http://localhost:8081/api/v1/ogc/collections/48cf3cb9-caa9-4633-9baa-8bba3c4d904a/items/summary",
+          "rel": "summary",
+          "type": "application/x-parquet",
+          "title": "diver_mobile_macroinvertebrate_abundance_qc.parquet"
         }
       ],
       "extent": {

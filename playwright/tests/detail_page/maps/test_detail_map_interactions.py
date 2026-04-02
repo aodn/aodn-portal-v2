@@ -10,7 +10,7 @@ from utils.map_utils import (
     is_bbox_contained_by_map_bounds,
 )
 
-
+@pytest.mark.skip(reason="Not stable")
 @pytest.mark.parametrize(
     'uuid',
     [

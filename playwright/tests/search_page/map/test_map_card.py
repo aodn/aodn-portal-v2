@@ -5,7 +5,7 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-
+@pytest.mark.skip(reason="Canned data wrong, download button not enabled")
 @pytest.mark.parametrize(
     'data_id, data_lng, data_lat',
     [
