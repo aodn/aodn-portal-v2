@@ -1,12 +1,4 @@
-import {
-  FC,
-  ReactNode,
-  useCallback,
-  useMemo,
-  useState,
-  MouseEvent,
-} from "react";
-import { useLocation } from "react-router-dom";
+import { FC, ReactNode, useCallback, useState, MouseEvent } from "react";
 import {
   Box,
   IconButton,
@@ -69,6 +61,16 @@ interface ShareButtonProps {
   sx?: SxProps;
 }
 
+// Generate share URL with UTM parameters for Google Analytics tracking
+// Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
+const copyUrlDefault = () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("utm_source", "portal"); // Track source as 'portal'
+  url.searchParams.set("utm_medium", "share_link"); // Track medium as 'share_link'
+  return url.toString();
+  // We need to update the url when the location changes
+};
+
 const ShareButtonMenu: FC<ShareButtonProps> = ({
   hideText = false,
   onClose,
@@ -78,17 +80,6 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
     useClipboardContext();
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const location = useLocation();
-
-  // Generate share URL with UTM parameters for Google Analytics tracking
-  // Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
-  const copyUrlDefault = useMemo(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("utm_source", "portal"); // Track source as 'portal'
-    url.searchParams.set("utm_medium", "share_link"); // Track medium as 'share_link'
-    return url.toString();
-    // We need to update the url when the location changes
-  }, [location]);
 
   const handleClick = useCallback((event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -172,8 +163,8 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
         }}
       >
         {getItems({
-          isCopied: checkIsCopied(copyUrlDefault),
-          copyUrl: copyUrlDefault,
+          isCopied: checkIsCopied(copyUrlDefault()),
+          copyUrl: copyUrlDefault(),
           copyToClipboard,
         }).map((item, index) => (
           <MenuItem key={index} onClick={item.handler} data-testid="copy-link">
