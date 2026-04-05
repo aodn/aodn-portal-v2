@@ -142,7 +142,7 @@ class BasePage:
 
     def perform_action_and_get_api_url(
         self, action: Callable[[], None]
-    ) -> Tuple[str, str]:
+    ) -> Tuple[str, str] | None:
         """
         Perform an action (e.g., click search, zoom/drag map) and return the API URLs
         used for the request.
