@@ -99,6 +99,7 @@ def test_sort_and_view_states_persist_after_map_toggle(
     landing_page.load()
     landing_page.search.click_search_button()
     search_page.wait_for_page_stabilization()
+    search_page.map.wait_for_map_idle()
 
     search_page.result_sort_button.click()
     search_page.click_text(sort_type.display_name, exact=True)
