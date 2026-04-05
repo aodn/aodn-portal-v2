@@ -55,6 +55,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
     new_search_page.map.wait_for_map_idle()
 
     new_map_center = new_search_page.map.get_map_center()
+    new_search_page.map.wait_for_map_idle()
     new_map_zoom = new_search_page.map.get_map_zoom()
 
     assert are_coordinates_equal(map_center, new_map_center)
@@ -96,6 +97,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
 
     new_map_center = search_page.map.get_map_center()
     new_map_zoom = search_page.map.get_map_zoom()
+    search_page.map.wait_for_map_idle()
 
     assert are_value_equal(map_zoom, new_map_zoom)
     assert are_coordinates_equal(map_center, new_map_center)
