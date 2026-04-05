@@ -321,8 +321,11 @@ def test_search_api_request_urls_reflect_parameter_updates(
     )
 
     # Perform search and capture the API URL
+    def search_and_wait():
+        landing_page.search.click_search_button()
+        landing_page.map.wait_for_map_idle()
     api_url_result = landing_page.perform_action_and_get_api_url(
-        action=landing_page.search.click_search_button
+        action=search_and_wait
     )
     api_url_collection, api_url_centroid = api_url_result
 
