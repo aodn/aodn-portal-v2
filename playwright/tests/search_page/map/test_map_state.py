@@ -26,6 +26,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
+    search_page.map.wait_for_map_idle()
     search_page.wait_for_page_stabilization()
 
     search_page.map.drag_map()
@@ -75,6 +76,7 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
 
     landing_page.load()
     landing_page.search.click_search_button()
+    search_page.map.wait_for_map_idle()
     search_page.wait_for_page_stabilization()
 
     search_page.map.drag_map()
