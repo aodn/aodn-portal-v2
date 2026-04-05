@@ -198,7 +198,7 @@ def test_view_states_for_screen_resize(
             )
         ).to_be_visible()
 
-@pytest.mark.skip(reason="Flaky test - needs investigation")
+
 @pytest.mark.parametrize(
     'view_type',
     [
@@ -218,6 +218,7 @@ def test_view_states_for_paste_url_screen_resize(
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
 
+    search_page.map.wait_for_map_idle()
     search_page.result_view_button.click()
     search_page.click_text(view_type.display_name, exact=True)
 
