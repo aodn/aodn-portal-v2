@@ -35,6 +35,7 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
     search_page.wait_for_page_stabilization()
 
     map_center = search_page.map.get_map_center()
+    search_page.map.wait_for_map_idle()
     map_zoom = search_page.map.get_map_zoom()
     search_page.wait_for_url_update()
 
@@ -85,11 +86,13 @@ def test_map_state_persists_across_page(desktop_page: Page) -> None:
     search_page.wait_for_page_stabilization()
 
     map_center = search_page.map.get_map_center()
+    search_page.map.wait_for_map_idle()
     map_zoom = search_page.map.get_map_zoom()
 
     search_page.first_result_title.click()
     detail_page.return_button.click()
     search_page.map.wait_for_map_loading()
+    search_page.map.wait_for_map_idle()
 
     new_map_center = search_page.map.get_map_center()
     new_map_zoom = search_page.map.get_map_zoom()

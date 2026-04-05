@@ -123,7 +123,7 @@ class BasePage:
         else:
             raise ValueError('Element is not visible')
 
-    def wait_for_url_update(self, timeout: int = 5000) -> None:
+    def wait_for_url_update(self, timeout: int = 10000) -> None:
         """
         Wait for the current page URL to update.
 

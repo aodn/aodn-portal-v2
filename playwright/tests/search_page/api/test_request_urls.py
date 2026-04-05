@@ -322,7 +322,6 @@ def test_search_api_request_urls_reflect_parameter_updates(
     )
     api_url_collection, api_url_centroid = api_url_result
 
-    search_page.map.wait_for_map_idle()
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters
     )
