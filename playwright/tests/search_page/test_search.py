@@ -121,13 +121,20 @@ def test_search_input_persistence_after_navigation(
 
     landing_page.load()
     landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
     search_page.wait_for_search_to_complete()
+    if search_page.main_map.is_visible():
+        search_page.map.wait_for_map_idle()
 
     search_page.search.search_for(search_text)
     search_page.wait_for_search_to_complete()
+    if search_page.main_map.is_visible():
+        search_page.map.wait_for_map_idle()
 
     search_page.first_result_title.click()
     detail_page.return_button.click()
+    if search_page.main_map.is_visible():
+        search_page.map.wait_for_map_idle()
 
     expect(search_page.search.search_field).to_have_value(search_text)
 

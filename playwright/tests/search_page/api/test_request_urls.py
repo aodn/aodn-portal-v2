@@ -189,8 +189,13 @@ def test_search_api_request_urls_after_map_state_change(
     )
 
     # Perform search and capture the API URL
+    def search_and_wait():
+        landing_page.search.click_search_button()
+        if search_page.main_map.is_visible():
+            search_page.map.wait_for_map_idle()
+
     api_url_result = landing_page.perform_action_and_get_api_url(
-        action=landing_page.search.click_search_button
+        action=search_and_wait
     )
     api_url_collection, api_url_centroid = api_url_result
 
@@ -217,7 +222,7 @@ def test_search_api_request_urls_after_map_state_change(
 
     # Perform search again to capture the API URL after reset
     api_url_result = search_page.perform_action_and_get_api_url(
-        action=search_page.search.click_search_button
+        action=search_and_wait
     )
     api_url_collection, api_url_centroid = api_url_result
 
@@ -232,8 +237,13 @@ def test_search_api_request_urls_after_map_state_change(
     if not search_page.main_map.is_visible():
         search_page.result_view_button.click()
         search_page.full_map_view_button.click()
+
+    def zoom_in_and_wait():
+        search_page.map.zoom_in()
+        search_page.map.wait_for_map_idle()
+
     api_url_result = search_page.perform_action_and_get_api_url(
-        action=search_page.map.zoom_in
+        action=zoom_in_and_wait
     )
     api_url_collection, api_url_centroid = api_url_result
 
@@ -323,7 +333,9 @@ def test_search_api_request_urls_reflect_parameter_updates(
     # Perform search and capture the API URL
     def search_and_wait():
         landing_page.search.click_search_button()
-        landing_page.map.wait_for_map_idle()
+        if search_page.main_map.is_visible():
+            search_page.map.wait_for_map_idle()
+
     api_url_result = landing_page.perform_action_and_get_api_url(
         action=search_and_wait
     )
