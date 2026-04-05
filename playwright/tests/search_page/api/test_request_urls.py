@@ -102,8 +102,12 @@ def test_search_api_request_urls_across_page(
     )
 
     # Perform search again to capture the API URL after reset
+    def search_and_wait():
+        search_page.search.click_search_button()
+        search_page.map.wait_for_map_idle()
+
     api_url_result = search_page.perform_action_and_get_api_url(
-        action=search_page.search.click_search_button
+        action=search_and_wait
     )
     api_url_collection, api_url_centroid = api_url_result
 
