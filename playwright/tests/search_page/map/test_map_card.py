@@ -69,7 +69,9 @@ def test_map_card_popup_download_button_in_mobile(
         search_page.map.wait_for_map_idle()
 
     search_page.map.find_and_click_data_point(data_id)
+    search_page.wait_for_page_stabilization()
     search_page.result_card_download_button.last.click()
 
     detail_page.return_button.click()
+    search_page.map.wait_for_map_idle()
     expect(search_page.main_map).to_be_visible()
