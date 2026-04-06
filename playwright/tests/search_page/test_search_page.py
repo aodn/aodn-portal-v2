@@ -191,6 +191,8 @@ def test_buttons_disappear_on_mobile(mobile_page: Page) -> None:
     landing_page.load()
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
+    if search_page.main_map.is_visible():
+        search_page.map.wait_for_map_idle()
 
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()

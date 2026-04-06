@@ -28,6 +28,8 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
     landing_page.search.click_search_button()
     search_page.map.wait_for_map_idle()
     search_page.wait_for_page_stabilization()
+    if search_page.main_map.is_visible():
+        search_page.map.wait_for_map_idle()
 
     search_page.map.drag_map()
     search_page.wait_for_page_stabilization()
@@ -35,7 +37,8 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
     search_page.wait_for_page_stabilization()
 
     map_center = search_page.map.get_map_center()
-    search_page.map.wait_for_map_idle()
+    if search_page.main_map.is_visible():
+        search_page.map.wait_for_map_idle()
     map_zoom = search_page.map.get_map_zoom()
     search_page.wait_for_url_update()
 
@@ -52,10 +55,12 @@ def test_map_state_persists_with_url(desktop_page: Page) -> None:
 
     new_search_page = SearchPage(new_page)
     new_search_page.goto(current_url, wait_until='load')
-    new_search_page.map.wait_for_map_idle()
+    if new_search_page.main_map.is_visible():
+        new_search_page.map.wait_for_map_idle()
 
     new_map_center = new_search_page.map.get_map_center()
-    new_search_page.map.wait_for_map_idle()
+    if new_search_page.main_map.is_visible():
+        new_search_page.map.wait_for_map_idle()
     new_map_zoom = new_search_page.map.get_map_zoom()
 
     assert are_coordinates_equal(map_center, new_map_center)
