@@ -11,6 +11,7 @@ from pages.js_scripts.js_utils import (
 
 class SearchComponent(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         load_common_js_functions(self.page)
 
@@ -48,12 +49,8 @@ class SearchComponent(BasePage):
         """
         self.date_button.click()
         self.wait_for_timeout(900)  # wait for values to load
-        start_date = (
-            self.start_date_picker.locator('input').get_attribute('value') or ''
-        )
-        end_date = (
-            self.end_date_picker.locator('input').get_attribute('value') or ''
-        )
+        start_date = self.start_date_picker.locator('input').input_value() or ''
+        end_date = self.end_date_picker.locator('input').input_value() or ''
         self.date_button.click()  # close the date picker
         return start_date, end_date
 
