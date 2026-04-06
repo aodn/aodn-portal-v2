@@ -92,17 +92,33 @@ const SearchPage = () => {
   >(undefined);
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
-  const [bbox, setBbox] = useState<LngLatBounds | undefined>(undefined);
+  const [bbox, setBbox] = useState<LngLatBounds | undefined>(() => {
+    const param = location?.search?.substring(1);
+    if (param && param.length > 0) {
+      const urlState = unFlattenToParameterState(param);
+      if (urlState.bbox?.bbox) {
+        return new LngLatBounds(
+          urlState.bbox.bbox as [number, number, number, number]
+        );
+      }
+    }
+    return undefined;
+  });
   const [progress, setProgress] = useState<ProgressType | undefined>(
     ProgressType.LINEAR
   );
-  const [zoom, setZoom] = useState<number | undefined>(
-    isUnderLaptop
-      ? isMobile
+  const [zoom, setZoom] = useState<number | undefined>(() => {
+    if (isUnderLaptop) {
+      return isMobile
         ? MapDefaultConfig.ZOOM_MOBILE
-        : MapDefaultConfig.ZOOM_TABLET
-      : undefined
-  );
+        : MapDefaultConfig.ZOOM_TABLET;
+    }
+    const param = location?.search?.substring(1);
+    if (param && param.length > 0) {
+      return unFlattenToParameterState(param).zoom;
+    }
+    return undefined;
+  });
   // Add these refs outside the functions, e.g., in the component body
   const listSearchAbortRef = useRef<{
     abort: (reason?: string) => void;
