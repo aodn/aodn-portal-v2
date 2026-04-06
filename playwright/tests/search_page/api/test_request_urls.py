@@ -74,9 +74,14 @@ def test_search_api_request_urls_across_page(
         download_service_available=filter_data_download is not None,
     )
 
+    def search_and_wait():
+        landing_page.search.click_search_button()
+        if search_page.main_map.is_visible():
+            search_page.map.wait_for_map_idle()
+
     # Perform search, capture the API URL
     api_url_result = landing_page.perform_action_and_get_api_url(
-        action=landing_page.search.click_search_button
+        action=search_and_wait
     )
     api_url_collection, api_url_centroid = api_url_result
 
@@ -102,10 +107,6 @@ def test_search_api_request_urls_across_page(
     )
 
     # Perform search again to capture the API URL after reset
-    def search_and_wait():
-        search_page.search.click_search_button()
-        search_page.map.wait_for_map_idle()
-
     api_url_result = search_page.perform_action_and_get_api_url(
         action=search_and_wait
     )
