@@ -339,15 +339,23 @@ def test_repeated_search_action(
     landing_page.load()
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
+    if search_page.main_map.is_visible():
+        search_page.map.wait_for_map_idle()
+
     # Set view type
     search_page.result_view_button.click()
     search_page.click_text(view_type.display_name, exact=True)
+
+    def search_and_wait():
+        search_page.search.click_search_button()
+        if search_page.main_map.is_visible():
+            search_page.map.wait_for_map_idle()
 
     # Perform first search
     search_page.search.location_button.click()
     search_page.get_radio_input(location_a).check()
     api_url = search_page.perform_action_and_get_api_url(
-        action=search_page.search.click_search_button
+        action=search_and_wait
     )
     assert api_url is not None
 
@@ -356,20 +364,20 @@ def test_repeated_search_action(
     search_page.search.location_button.click()
     search_page.get_radio_input(location_b).check()
     api_url = search_page.perform_action_and_get_api_url(
-        action=search_page.search.click_search_button
+        action=search_and_wait
     )
     assert api_url is not None
     # Third search
     search_page.search.location_button.click()
     search_page.get_radio_input(location_c).check()
     api_url = search_page.perform_action_and_get_api_url(
-        action=search_page.search.click_search_button
+        action=search_and_wait
     )
     assert api_url is not None
     # Fourth search
     search_page.search.location_button.click()
     search_page.get_radio_input(location_d).check()
     api_url = search_page.perform_action_and_get_api_url(
-        action=search_page.search.click_search_button
+        action=search_and_wait
     )
     assert api_url is not None
