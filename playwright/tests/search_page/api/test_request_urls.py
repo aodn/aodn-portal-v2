@@ -76,6 +76,7 @@ def test_search_api_request_urls_across_page(
 
     def search_and_wait():
         landing_page.search.click_search_button()
+        search_page.wait_for_page_stabilization()
         if search_page.main_map.is_visible():
             search_page.map.wait_for_map_idle()
 
