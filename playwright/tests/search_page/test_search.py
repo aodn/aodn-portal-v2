@@ -345,6 +345,7 @@ def test_repeated_search_action(
     # Set view type
     search_page.result_view_button.click()
     search_page.click_text(view_type.display_name, exact=True)
+    search_page.wait_for_page_stabilization()
 
     def search_and_wait():
         search_page.search.click_search_button()
