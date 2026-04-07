@@ -348,6 +348,7 @@ def test_repeated_search_action(
 
     def search_and_wait():
         search_page.search.click_search_button()
+        search_page.wait_for_search_to_complete()
         if search_page.main_map.is_visible():
             search_page.map.wait_for_map_idle()
 

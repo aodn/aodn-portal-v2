@@ -33,9 +33,9 @@ class BasePage:
         """Get the current page URL"""
         return self.page.url
 
-    def get_by_id(self, id: str) -> Locator:
+    def get_by_id(self, identity: str) -> Locator:
         """Return a locator by id attribute"""
-        return self.page.locator(f'#{id}')
+        return self.page.locator(f'#{identity}')
 
     def get_button(self, text: str, exact: bool = True) -> Locator:
         """Return button element by text"""
