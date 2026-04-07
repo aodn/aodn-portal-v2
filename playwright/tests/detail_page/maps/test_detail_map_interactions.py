@@ -10,7 +10,7 @@ from utils.map_utils import (
     is_bbox_contained_by_map_bounds,
 )
 
-@pytest.mark.skip(reason="Not stable")
+
 @pytest.mark.parametrize(
     'uuid',
     [
@@ -26,12 +26,13 @@ def test_drawing_shape_adds_download_filter(
     """
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
-    detail_page.wait_for_timeout(1000)
+    detail_page.detail_map.wait_for_map_idle()
 
     # Draw a rectangle on the map
     detail_page.detail_map.draw_rect_menu_button.click()
     detail_page.detail_map.hover_map()
     detail_page.detail_map.click_map()
+    detail_page.detail_map.wait_for_map_idle()
     x, y = detail_page.detail_map.calculate_mouse_coordinates(
         right=100, down=100
     )
