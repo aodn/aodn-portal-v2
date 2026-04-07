@@ -113,9 +113,11 @@ def test_sort_and_view_states_persist_after_map_toggle(
         expect(search_page.result_grid).to_be_visible()
 
     search_page.map_toggle_button.click()
+    search_page.wait_for_page_stabilization()
     search_page.map.wait_for_map_idle()
 
     search_page.map_toggle_button.click()
+    search_page.wait_for_page_stabilization()
     search_page.map.wait_for_map_idle()
 
     expect(
