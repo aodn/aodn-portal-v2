@@ -335,6 +335,7 @@ def test_search_api_request_urls_reflect_parameter_updates(
     # Perform search and capture the API URL
     def search_and_wait():
         landing_page.search.click_search_button()
+        landing_page.wait_for_page_stabilization()
         if search_page.main_map.is_visible():
             search_page.map.wait_for_map_idle()
 
